@@ -23,6 +23,7 @@ import ti4.spring.service.statistics.matchmaking.QueueForGameService;
 class QueueForGameButtonHandler {
 
     static final String BUTTON_ID = "queueForGame~MDL";
+    private static final String LEAVE_QUEUE_BUTTON_ID = "leaveQueueForGame";
     private static final String MODAL_ID = "queueForGameModal";
 
     private static final String EXPANSIONS_ID = "queue_expansions";
@@ -52,6 +53,13 @@ class QueueForGameButtonHandler {
 
     @ButtonHandler(value = BUTTON_ID, save = false)
     public static void offerQueueForGameModal(ButtonInteractionEvent event) {
+        QueueForGameService queueForGameService = SpringContext.getBean(QueueForGameService.class);
+        if (queueForGameService.isUserQueued(event.getUser().getId())) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event,
+                    "You are already queued for a game. To change your preferences, you must first leave the queue.");
+            return;
+        }
         UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
 
         StringSelectMenu expansions = buildMultiSelect(
@@ -82,6 +90,12 @@ class QueueForGameButtonHandler {
                 .addComponents(Label.of("Max Queue Time", maxQueueTime))
                 .build();
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler(value = LEAVE_QUEUE_BUTTON_ID, save = false)
+    public static void leaveQueue(ButtonInteractionEvent event) {
+        SpringContext.getBean(QueueForGameService.class).leaveQueue(event.getUser().getId());
+        MessageHelper.sendEphemeralMessageToEventChannel(event, "You have left the matchmaking queue.");
     }
 
     @ModalHandler(MODAL_ID)

@@ -51,6 +51,21 @@ public class QueueForGameService {
         repository.save(entry);
     }
 
+    public boolean isUserQueued(String userId) {
+        if (DatabasePersistenceGate.isDisabled()) {
+            return false;
+        }
+        return repository.existsByUserId(userId);
+    }
+
+    @Transactional
+    public void leaveQueue(String userId) {
+        if (DatabasePersistenceGate.isDisabled()) {
+            return;
+        }
+        repository.deleteByUserId(userId);
+    }
+
     private static int parseHours(String maxQueueTime) {
         if (maxQueueTime == null) return DEFAULT_MAX_QUEUE_TIME_HOURS;
         StringBuilder hours = new StringBuilder();

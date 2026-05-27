@@ -8,6 +8,8 @@ public interface MatchmakingQueueEntryRepository extends JpaRepository<Matchmaki
 
     List<MatchmakingQueueEntryEntity> findAllByOrderByQueuedAtUtcAsc();
 
+    boolean existsByUserId(String userId);
+
     @Transactional
     void deleteByUserId(String userId);
 }
