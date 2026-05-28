@@ -50,7 +50,7 @@ class QueueForGameButtonHandler {
     private static final String AVOID_PLAYERS_ID = "queue_avoid_players";
 
     private static final String DEFAULT_MAX_QUEUE_TIME = "8 hours";
-    private static final List<String> DEFAULT_EXPANSIONS = List.of("PoK + TE");
+    private static final List<String> DEFAULT_EXPANSIONS = List.of("Prophecy of Kings and Thunder's Edge");
     private static final List<String> DEFAULT_PLAYER_COUNTS = List.of("6");
     private static final List<String> DEFAULT_VICTORY_POINTS = List.of("10");
     private static final List<String> DEFAULT_RESTRICTIONS = List.of("Similar Active Hours");
