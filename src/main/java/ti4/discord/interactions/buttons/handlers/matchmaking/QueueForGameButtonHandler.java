@@ -151,9 +151,9 @@ class QueueForGameButtonHandler {
                         maxQueueTime);
 
         event.getHook()
-            .setEphemeral(true)
-            .sendMessage("You have been added to the matchmaking queue.")
-            .queue(Consumers.nop(), BotLogger::catchRestError);
+                .setEphemeral(true)
+                .sendMessage("You have been added to the matchmaking queue.")
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static CheckboxGroup buildCheckboxGroup(
