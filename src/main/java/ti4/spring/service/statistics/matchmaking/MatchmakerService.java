@@ -74,15 +74,8 @@ public class MatchmakerService {
         return matchmakingQueueEntryRepository.deleteByUserId(userId) > 0;
     }
 
-    private static int parseHours(String maxQueueTime) {
-        if (maxQueueTime == null) return DEFAULT_MAX_QUEUE_TIME_HOURS;
-        StringBuilder hours = new StringBuilder();
-        for (char c : maxQueueTime.trim().toCharArray()) {
-            if (Character.isDigit(c)) hours.append(c);
-            else break;
-        }
-        if (hours.isEmpty()) return DEFAULT_MAX_QUEUE_TIME_HOURS;
-        return Integer.parseInt(hours.toString());
+    private static int getHours(String maxQueueTime) {
+        return MatchmakingOptions.MAX_QUEUE_TIME_OPTIONS_TO_HOURS.get(maxQueueTime.trim());
     }
 
     public void processQueue() {
@@ -174,7 +167,7 @@ public class MatchmakerService {
                 .filter(c ->
                         tiglPredicate.test(toCsv(userSettingsByCandidate.get(c).getQueueForGameRestrictions())))
                 .sorted(Comparator.comparing(
-                                c -> parseHours(userSettingsByCandidate.get(c).getQueueForGameMaxQueueTime()))
+                                c -> getHours(userSettingsByCandidate.get(c).getQueueForGameMaxQueueTime()))
                         .reversed())
                 .toList();
 
@@ -266,7 +259,7 @@ public class MatchmakerService {
     private boolean isHalfQueueTimePassed(
             MatchmakingQueueEntryEntity player,
             Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate) {
-        double maxHours = parseHours(userSettingsByCandidate.get(player).getQueueForGameMaxQueueTime());
+        double maxHours = getHours(userSettingsByCandidate.get(player).getQueueForGameMaxQueueTime());
         double hoursWaited =
                 Duration.between(player.getQueuedAt(), Instant.now()).toMinutes() / 60.0;
         return hoursWaited >= maxHours / SIMILAR_SKILL_DIFFERENCE_THRESHOLD;
@@ -315,8 +308,8 @@ public class MatchmakerService {
             Instant now) {
         List<MatchmakingQueueEntryEntity> expired = entries.stream()
                 .filter(entry -> entry.getQueuedAt()
-                        .plus(Duration.ofHours(parseHours(
-                                userSettingsByEntry.get(entry).getQueueForGameMaxQueueTime())))
+                        .plus(Duration.ofHours(
+                                getHours(userSettingsByEntry.get(entry).getQueueForGameMaxQueueTime())))
                         .isBefore(now))
                 .toList();
         if (!expired.isEmpty()) {

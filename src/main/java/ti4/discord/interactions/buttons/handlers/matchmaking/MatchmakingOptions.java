@@ -16,14 +16,14 @@ public class MatchmakingOptions {
             List.of("Prophecy of Kings", "Thunder's Edge", "Prophecy of Kings and Thunder's Edge", "Twilight's Fall");
     public static final List<String> PLAYER_COUNT_OPTIONS = List.of("3", "4", "5", "6", "7", "8");
     public static final List<String> VICTORY_POINT_OPTIONS = List.of("10", "12", "14");
-    private static final String SIMILAR_ACTIVE_HOURS = "Similar Active Hours";
-    private static final String SIMILAR_PLAYER_SKILL = "Similar Player Skill";
+    private static final String SIMILAR_ACTIVE_HOURS_OPTION = "Similar Active Hours";
+    private static final String SIMILAR_PLAYER_SKILL_OPTION = "Similar Player Skill";
     public static final String FASTER_PACE_OPTION = "Faster Pace (15 days)";
     public static final String FASTEST_PACE_OPTION = "Fastest Pace (7 days)";
     private static final String TIGL_OPTION = "Twilight Imperium Global League";
     public static final List<String> RESTRICTION_OPTIONS = List.of(
-            SIMILAR_ACTIVE_HOURS,
-            SIMILAR_PLAYER_SKILL,
+        SIMILAR_ACTIVE_HOURS_OPTION,
+        SIMILAR_PLAYER_SKILL_OPTION,
             TIGL_OPTION,
             "Fast Pace (30 days)",
             FASTER_PACE_OPTION,
@@ -51,7 +51,6 @@ public class MatchmakingOptions {
 
     public static List<String> getShuffledExpansionsWithBaseIncluded() {
         var expansionsPlusBase = new ArrayList<>(EXPANSION_OPTIONS);
-        expansionsPlusBase.add("Base Only");
 
         Collections.shuffle(expansionsPlusBase);
 
@@ -63,9 +62,9 @@ public class MatchmakingOptions {
     }
 
     public static List<String> getPaceRestrictions() {
-        return RESTRICTION_OPTIONS.stream()
-                .filter(restriction -> restriction.contains("Pace"))
-                .toList();
+        List<String> pacesRestrictions = new ArrayList<>(RESTRICTION_OPTIONS);
+        pacesRestrictions.removeIf(restriction -> !restriction.contains("Pace"));
+        return pacesRestrictions;
     }
 
     public static List<Predicate<String>> getTiglRestrictionPredicates() {
@@ -77,10 +76,10 @@ public class MatchmakingOptions {
     }
 
     public static boolean wantsSimilarActiveHours(String restrictionsCsv) {
-        return restrictionsCsv.contains(SIMILAR_ACTIVE_HOURS);
+        return restrictionsCsv.contains(SIMILAR_ACTIVE_HOURS_OPTION);
     }
 
     public static boolean wantsSimilarPlayerSkill(String restrictionsCsv) {
-        return restrictionsCsv.contains(SIMILAR_PLAYER_SKILL);
+        return restrictionsCsv.contains(SIMILAR_PLAYER_SKILL_OPTION);
     }
 }
