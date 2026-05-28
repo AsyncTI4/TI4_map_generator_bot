@@ -5,7 +5,9 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -50,6 +52,26 @@ public class UserSettings {
 
     UserSettings(String userId) {
         this.userId = userId;
+    }
+
+    public List<String> getPreferredColors() {
+        return Objects.requireNonNullElse(preferredColors, Collections.emptyList());
+    }
+
+    public List<String> getQueueForGameExpansions() {
+        return Objects.requireNonNullElse(queueForGameExpansions, Collections.emptyList());
+    }
+
+    public List<String> getQueueForGamePlayerCounts() {
+        return Objects.requireNonNullElse(queueForGamePlayerCounts, Collections.emptyList());
+    }
+
+    public List<String> getQueueForGameVictoryPointGoals() {
+        return Objects.requireNonNullElse(queueForGameVictoryPointGoals, Collections.emptyList());
+    }
+
+    public List<String> getQueueForGameRestrictions() {
+        return Objects.requireNonNullElse(queueForGameRestrictions, Collections.emptyList());
     }
 
     public void addAfkHour(String hour) {
