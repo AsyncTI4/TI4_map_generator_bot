@@ -129,8 +129,8 @@ class MatchmakingButtonHandler {
                 List.of(DEFAULT_MAX_QUEUE_TIME),
                 REQUIRE_SELECTION);
         EntitySelectMenu avoidPlayers = EntitySelectMenu.create(AVOID_PLAYERS_ID, SelectTarget.USER)
-                .setPlaceholder("Choose players to avoid (optional)")
-                .setRequiredRange(0, 25)
+                .setRequired(false)
+                .setMaxValues(25)
                 .setDefaultValues(userSettings.getQueueForGameAvoidList().stream()
                         .map(EntitySelectMenu.DefaultValue::user)
                         .toList())
@@ -249,9 +249,7 @@ class MatchmakingButtonHandler {
         for (String option : options) {
             builder.addOption(option, option);
         }
-        if (requireSelection) {
-            builder.setRequiredRange(1, options.size());
-        }
+        builder.setRequired(requireSelection);
         builder.setSelectedValues(normalizeSelectedValues(selectedValues, options, defaultValues));
         return builder.build();
     }
