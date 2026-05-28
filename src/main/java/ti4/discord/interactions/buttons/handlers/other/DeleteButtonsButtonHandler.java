@@ -35,6 +35,7 @@ import ti4.service.abilities.MahactTokenService;
 import ti4.service.breakthrough.AutoFactoriesService;
 import ti4.service.breakthrough.EidolonMaximumService;
 import ti4.service.breakthrough.TheIconService;
+import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.LoreService;
@@ -418,6 +419,12 @@ class DeleteButtonsButtonHandler {
                 List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, systemButtons);
                 player.resetOlradinPolicyFlags();
+            }
+            if (buttonID.contains("contingency")) {
+                Tile tile = game.getTileByPosition(game.getActiveSystem());
+                if (tile != null) {
+                    StartCombatService.combatCheck(game, event, tile);
+                }
             }
         }
         if ("diplomacy".equalsIgnoreCase(buttonID)) {

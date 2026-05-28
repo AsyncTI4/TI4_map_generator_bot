@@ -209,6 +209,19 @@ class ActionCardDeck2ButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
 
+    @ButtonHandler("resolveContingency")
+    public static void resolveContingency(Player player, Game game, ButtonInteractionEvent event) {
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        String type = "sling";
+        String pos = game.getActiveSystem();
+        List<Button> buttons = Helper.getPlaceUnitButtons(
+                event, player, game, game.getTileByPosition(pos), type, "placeOneNDone_dontskipcontingency");
+        String message = player.getRepresentation()
+                + ", use the buttons to place up to 2 ships that have a combined cost of 3 or less.";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+    }
+
     @ButtonHandler("resolveReinforcements")
     public static void resolveReinforcements(Player player, Game game, ButtonInteractionEvent event) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
