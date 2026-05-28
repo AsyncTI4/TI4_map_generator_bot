@@ -44,7 +44,7 @@ public class UserGameInfoService {
         return toResultString(users, statsByUserId);
     }
 
-    public static Map<String, UserGameStatsAccumulator> buildUserStats(List<PlayerEntity> players) {
+    private static Map<String, UserGameStatsAccumulator> buildUserStats(List<PlayerEntity> players) {
         Map<String, UserGameStatsAccumulator> statsByUserId = new HashMap<>();
         for (PlayerEntity player : players) {
             UserGameStatsAccumulator stats = statsByUserId.computeIfAbsent(
