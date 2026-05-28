@@ -11,6 +11,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -48,4 +50,24 @@ public class MatchmakingQueueEntryEntity {
 
     @Column(name = "max_queue_time_minutes", nullable = false)
     private int maxQueueTimeHours;
+
+    public List<String> getVictoryPoints() {
+        return splitToList(victoryPointsCsv);
+    }
+
+    public List<String> getPlayerCounts() {
+        return splitToList(playerCountsCsv);
+    }
+
+    public List<String> getExpansions() {
+        return expansionsCsv == null ? List.of() : splitToList(expansionsCsv);
+    }
+
+    public List<String> getRestrictions() {
+        return restrictionsCsv == null ? List.of() : splitToList(restrictionsCsv);
+    }
+
+    private List<String> splitToList(String csv) {
+        return Arrays.asList(csv.split(","));
+    }
 }

@@ -3,14 +3,19 @@ package ti4.spring.service.statistics.matchmaking;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
+import org.apache.commons.collections4.ListUtils;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ti4.logging.BotLogger;
+import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.spring.service.persistence.UserEntity;
 
@@ -21,7 +26,7 @@ public class QueueForGameService {
     private static final String CSV_SEPARATOR = ";";
     private static final int DEFAULT_MAX_QUEUE_TIME_HOURS = 8;
 
-    private final MatchmakingQueueEntryRepository repository;
+    private final MatchmakingQueueEntryRepository matchmakingQueueEntryRepository;
 
     @Transactional
     public void queueUser(
@@ -32,10 +37,8 @@ public class QueueForGameService {
             List<String> victoryPoints,
             List<String> restrictions,
             String maxQueueTime) {
-        if (DatabasePersistenceGate.isDisabled()) {
-            return;
-        }
-        repository.deleteByUserId(userId);
+        if (DatabasePersistenceGate.isDisabled()) return;
+        matchmakingQueueEntryRepository.deleteByUserId(userId);
 
         MatchmakingQueueEntryEntity entry = new MatchmakingQueueEntryEntity();
         entry.setUser(new UserEntity(userId, username));
@@ -46,22 +49,23 @@ public class QueueForGameService {
         entry.setRestrictionsCsv(toCsv(restrictions));
         entry.setMaxQueueTimeHours(parseHours(maxQueueTime));
 
-        repository.save(entry);
+        matchmakingQueueEntryRepository.save(entry);
+    }
+
+    public boolean isQueueingDisabled() {
+        return DatabasePersistenceGate.isDisabled();
     }
 
     public boolean isUserQueued(String userId) {
-        if (DatabasePersistenceGate.isDisabled()) {
-            return false;
-        }
-        return repository.existsByUserId(userId);
+        if (DatabasePersistenceGate.isDisabled()) return false;
+        return matchmakingQueueEntryRepository.existsByUserId(userId);
     }
 
     @Transactional
     public void leaveQueue(String userId) {
-        if (DatabasePersistenceGate.isDisabled()) {
-            return;
-        }
-        repository.deleteByUserId(userId);
+        // TODO: Call this when a user joins a game using the normal Join Game button.
+        if (DatabasePersistenceGate.isDisabled()) return;
+        matchmakingQueueEntryRepository.deleteByUserId(userId);
     }
 
     private static int parseHours(String maxQueueTime) {
@@ -75,52 +79,93 @@ public class QueueForGameService {
         return Integer.parseInt(hours.toString());
     }
 
-    @Transactional
     public void processQueue() {
-        if (DatabasePersistenceGate.isDisabled()) {
-            return;
-        }
-        List<MatchmakingQueueEntryEntity> entries = repository.findAllByOrderByQueuedAtUtcAsc();
-        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+        if (DatabasePersistenceGate.isDisabled()) return;
 
+        List<MatchmakingQueueEntryEntity> entries = matchmakingQueueEntryRepository.findAllByOrderByQueuedAtUtcAsc();
+        List<MatchmakingQueueEntryEntity> candidates =
+                cleanAndRemoveExpiredEntries(entries, LocalDateTime.now(ZoneOffset.UTC));
+
+        List<List<MatchmakingQueueEntryEntity>> gamesToCreate = new ArrayList<>();
+        Set<MatchmakingQueueEntryEntity> playersAddedToGames = new HashSet<>();
+
+        for (String playerCountOption : MatchmakingOptions.getPlayerCountOptionsDescending()) {
+            for (String victoryPointGoalOption : MatchmakingOptions.getVictoryPointOptionsDescending()) {
+                for (String expansionOption : MatchmakingOptions.getShuffledExpansionsWithBaseIncluded()) {
+                    for (String pace : MatchmakingOptions.getPaceRestrictions()) {
+                        for (Predicate<String> tiglPredicate : MatchmakingOptions.getTiglRestrictionPredicates()) {
+                            // TODO: Add similar player skill predicate and active hours predicate
+                            matchAndCollect(
+                                    candidates,
+                                    playersAddedToGames,
+                                    gamesToCreate,
+                                    playerCountOption,
+                                    victoryPointGoalOption,
+                                    expansionOption,
+                                    pace,
+                                    tiglPredicate);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!playersAddedToGames.isEmpty()) {
+            matchmakingQueueEntryRepository.deleteAllInBatch(playersAddedToGames);
+        }
+
+        // TODO: create a post in the forum #making-new-games, using the normal CreateGameButton flow
+        // Perhaps pull that logic into a new service to be used in both places, along with
+        // what we can pull from `handleMakingNewGamesThreadCreation`
+    }
+
+    private void matchAndCollect(
+            List<MatchmakingQueueEntryEntity> candidates,
+            Set<MatchmakingQueueEntryEntity> playersAddedToGames,
+            List<List<MatchmakingQueueEntryEntity>> gamesToCreate,
+            String playerCountOption,
+            String victoryPointGoalOption,
+            String expansionOption,
+            String pace,
+            Predicate<String> tiglPredicate) {
+        int playerCount = Integer.parseInt(playerCountOption);
+
+        List<MatchmakingQueueEntryEntity> eligible = candidates.stream()
+                .filter(c -> !playersAddedToGames.contains(c))
+                .filter(c -> c.getPlayerCounts().contains(playerCountOption))
+                .filter(c -> c.getVictoryPoints().contains(victoryPointGoalOption))
+                .filter(c -> c.getExpansions().contains(expansionOption))
+                .filter(c -> c.getRestrictions().contains(pace))
+                .filter(c -> tiglPredicate.test(c.getRestrictionsCsv()))
+                .sorted(Comparator.comparing(MatchmakingQueueEntryEntity::getMaxQueueTimeHours)
+                        .reversed())
+                .toList();
+
+        // TODO: further handle similar player skill and active hours
+
+        ListUtils.partition(eligible, playerCount).stream()
+                .filter(game -> game.size() == playerCount)
+                .forEach(game -> {
+                    gamesToCreate.add(game);
+                    playersAddedToGames.addAll(game);
+                });
+    }
+
+    @NonNull
+    private List<MatchmakingQueueEntryEntity> cleanAndRemoveExpiredEntries(
+            List<MatchmakingQueueEntryEntity> entries, LocalDateTime now) {
         List<MatchmakingQueueEntryEntity> expired = entries.stream()
                 .filter(entry -> entry.getQueuedAtUtc()
                         .plusMinutes(entry.getMaxQueueTimeHours())
                         .isBefore(now))
                 .toList();
         if (!expired.isEmpty()) {
-            repository.deleteAllInBatch(expired);
+            matchmakingQueueEntryRepository.deleteAllInBatch(expired);
         }
-
-        List<MatchmakingQueueEntryEntity> candidates =
-                entries.stream().filter(entry -> !expired.contains(entry)).toList();
-        Set<Long> matchedIds = new LinkedHashSet<>();
-
-        for (MatchmakingQueueEntryEntity seed : candidates) {
-            if (matchedIds.contains(seed.getId())) continue;
-
-            for (int targetCount : parsePlayerCounts(seed)) {
-                List<MatchmakingQueueEntryEntity> compatible = candidates.stream()
-                        .filter(candidate -> !matchedIds.contains(candidate.getId()))
-                        .filter(candidate -> supportsPlayerCount(candidate, targetCount))
-                        .filter(candidate -> areCompatible(seed, candidate))
-                        .toList();
-
-                List<MatchmakingQueueEntryEntity> match = buildCompatibleGroup(compatible, targetCount);
-                if (match.size() == targetCount) {
-                    matchedIds.addAll(match.stream()
-                            .map(MatchmakingQueueEntryEntity::getId)
-                            .toList());
-                    // TODO handle this later.
-                    BotLogger.logCron("QueueForGameService matched " + targetCount + " players for a game.");
-                    break;
-                }
-            }
-        }
-
-        if (!matchedIds.isEmpty()) {
-            repository.deleteAllByIdInBatch(matchedIds);
-        }
+        // TODO ping expired users with an ephemeral message that they have the matchmaking service wasn't able to find
+        // them a game in the time frame they wanted. Please queue again and consider being open to additional game
+        // types
+        return entries.stream().filter(entry -> !expired.contains(entry)).toList();
     }
 
     private static List<MatchmakingQueueEntryEntity> buildCompatibleGroup(
@@ -137,14 +182,14 @@ public class QueueForGameService {
         return List.of();
     }
 
-    private static boolean supportsPlayerCount(MatchmakingQueueEntryEntity entry, int targetCount) {
-        return parsePlayerCounts(entry).contains(targetCount);
+    private static boolean prefersPlayerCount(MatchmakingQueueEntryEntity entry, int targetCount) {
+        return getPreferredPlayerCountsDescending(entry).contains(targetCount);
     }
 
-    private static List<Integer> parsePlayerCounts(MatchmakingQueueEntryEntity entry) {
+    private static List<Integer> getPreferredPlayerCountsDescending(MatchmakingQueueEntryEntity entry) {
         return parseCsv(entry.getPlayerCountsCsv()).stream()
                 .map(QueueForGameService::tryParseInt)
-                .filter(value -> value > 0)
+                .sorted(Comparator.reverseOrder())
                 .toList();
     }
 
@@ -157,12 +202,11 @@ public class QueueForGameService {
     }
 
     private static boolean areCompatible(MatchmakingQueueEntryEntity a, MatchmakingQueueEntryEntity b) {
-        return overlaps(parseCsv(a.getExpansionsCsv()), parseCsv(b.getExpansionsCsv()))
-                && overlaps(parseCsv(a.getVictoryPointsCsv()), parseCsv(b.getVictoryPointsCsv()))
-                && overlaps(parseCsv(a.getRestrictionsCsv()), parseCsv(b.getRestrictionsCsv()));
+        return anyOverlap(parseCsv(a.getExpansionsCsv()), parseCsv(b.getExpansionsCsv()))
+                && anyOverlap(parseCsv(a.getVictoryPointsCsv()), parseCsv(b.getVictoryPointsCsv()));
     }
 
-    private static boolean overlaps(List<String> a, List<String> b) {
+    private static boolean anyOverlap(List<String> a, List<String> b) {
         Set<String> aSet = new LinkedHashSet<>(a);
         for (String value : b) {
             if (aSet.contains(value)) {
@@ -176,13 +220,13 @@ public class QueueForGameService {
         if (csv == null || csv.isBlank()) {
             return List.of();
         }
-        return List.of(csv.split(CSV_SEPARATOR)).stream()
+        return Stream.of(csv.split(CSV_SEPARATOR))
                 .map(String::trim)
                 .filter(value -> !value.isEmpty())
                 .toList();
     }
 
     private static String toCsv(List<String> values) {
-        return values.stream().collect(Collectors.joining(CSV_SEPARATOR));
+        return String.join(CSV_SEPARATOR, values);
     }
 }

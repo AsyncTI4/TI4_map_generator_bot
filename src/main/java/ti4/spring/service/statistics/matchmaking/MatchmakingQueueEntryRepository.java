@@ -4,7 +4,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface MatchmakingQueueEntryRepository extends JpaRepository<MatchmakingQueueEntryEntity, Long> {
+interface MatchmakingQueueEntryRepository extends JpaRepository<MatchmakingQueueEntryEntity, Long> {
 
     List<MatchmakingQueueEntryEntity> findAllByOrderByQueuedAtUtcAsc();
 
