@@ -15,13 +15,19 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.game.CreateGameLaunchPostService;
+import ti4.service.game.CreateGameService;
 import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
@@ -135,9 +141,7 @@ public class MatchmakerService {
             matchmakingQueueEntryRepository.deleteAllInBatch(playersAddedToGames);
         }
 
-        // TODO: create a post in the forum #making-new-games, using the normal CreateGameButton flow
-        // Perhaps pull that logic into a new service to be used in both places, along with
-        // what we can pull from `handleMakingNewGamesThreadCreation`
+        postMatchedGroupsToMakingNewGamesForum(gamesToCreate);
     }
 
     private static Map<String, Double> getPlayerRatings(List<MatchmakingQueueEntryEntity> candidates) {
@@ -307,6 +311,41 @@ public class MatchmakerService {
 
     private static String toCsv(List<String> values) {
         return String.join(CSV_SEPARATOR, values);
+    }
+
+    private void postMatchedGroupsToMakingNewGamesForum(List<List<MatchmakingQueueEntryEntity>> gamesToCreate) {
+        if (gamesToCreate.isEmpty() || JdaService.guildPrimary == null) {
+            return;
+        }
+
+        List<GuildChannel> channels = JdaService.guildPrimary.getChannelsByName(
+                CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL, true);
+        IThreadContainer threadContainer = channels.stream()
+                .filter(IThreadContainer.class::isInstance)
+                .map(IThreadContainer.class::cast)
+                .findFirst()
+                .orElse(null);
+        if (threadContainer == null) {
+            BotLogger.log("MatchmakerService could not find a thread container named #"
+                    + CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL + ".");
+            return;
+        }
+
+        for (List<MatchmakingQueueEntryEntity> gameEntries : gamesToCreate) {
+            List<Member> members = gameEntries.stream()
+                    .map(entry -> JdaService.guildPrimary.getMemberById(entry.getUser().getId()))
+                    .filter(member -> member != null && !member.getUser().isBot())
+                    .toList();
+            if (members.size() < 2) {
+                continue;
+            }
+
+            String gameFunName = CreateGameService.autoGenerateGameName();
+            String threadTitle = gameFunName.replace(":", "");
+            threadContainer
+                    .createThreadChannel(threadTitle)
+                    .queue(thread -> CreateGameLaunchPostService.postLaunchButtons(thread, members, gameFunName));
+        }
     }
 
     public static MatchmakerService get() {
