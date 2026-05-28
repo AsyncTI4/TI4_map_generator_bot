@@ -7,12 +7,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.logging.BotLogger;
 import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.spring.service.persistence.UserEntity;
 
+@AllArgsConstructor
 @Service
 public class QueueForGameService {
 
@@ -20,10 +22,6 @@ public class QueueForGameService {
     private static final int DEFAULT_MAX_QUEUE_TIME_HOURS = 8;
 
     private final MatchmakingQueueEntryRepository repository;
-
-    public QueueForGameService(MatchmakingQueueEntryRepository repository) {
-        this.repository = repository;
-    }
 
     @Transactional
     public void queueUser(
