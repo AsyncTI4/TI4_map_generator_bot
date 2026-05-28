@@ -354,13 +354,13 @@ public class MatchmakerService {
         Guild guild = JdaService.guildPrimary;
         if (gamesToCreate.isEmpty() || guild == null) return;
 
-        IThreadContainer threadContainer = guild.getForumChannelsByName(
-                        CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL, true)
-                .getFirst();
-        if (threadContainer == null) {
+        var forums = guild.getForumChannelsByName(CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL, true);
+        if (forums.isEmpty()) {
             BotLogger.error("MatchmakerService could not find a thread container named #"
                     + CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL + ".");
             return;
+        }
+        IThreadContainer threadContainer = forums.getFirst();
         }
 
         for (List<MatchmakingQueueEntryEntity> queueEntries : gamesToCreate) {
