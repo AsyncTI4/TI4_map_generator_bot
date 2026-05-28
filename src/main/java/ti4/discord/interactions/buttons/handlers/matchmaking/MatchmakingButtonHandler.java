@@ -57,8 +57,8 @@ class MatchmakingButtonHandler {
     private static final List<String> DEFAULT_VICTORY_POINTS = List.of("10");
     private static final List<String> DEFAULT_RESTRICTIONS = List.of("Similar Active Hours");
     private static final Map<String, Integer> PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT = Map.of(
-            "Faster Pace (15 days)", 19,
-            "Fastest Pace (7 days)", 10);
+            MatchmakingOptions.FASTER_PACE_OPTION, 19,
+            MatchmakingOptions.FASTEST_PACE_OPTION, 10);
 
     @ButtonHandler(value = QUEUE_FOR_GAME_BUTTON_ID, save = false)
     public static void offerQueueForGameModal(ButtonInteractionEvent event) {
