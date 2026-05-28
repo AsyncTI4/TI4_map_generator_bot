@@ -21,12 +21,12 @@ class PostMatchmakingButtons extends Subcommand {
     public void execute(SlashCommandInteractionEvent event) {
         List<Button> buttons = List.of(
                 Buttons.green(QUEUE_BUTTON_ID, "Queue for Game"),
-                Buttons.gray(ADDITIONAL_SETTINGS_BUTTON_ID, "Additional Settings"),
-                Buttons.red(LEAVE_QUEUE_BUTTON_ID, "Leave Queue"));
+                Buttons.red(LEAVE_QUEUE_BUTTON_ID, "Leave Queue"),
+                Buttons.gray(ADDITIONAL_SETTINGS_BUTTON_ID, "Additional Settings"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                "You can use these buttons to search for a game. Specify what game qualities you're"
-                        + " looking for as well as how long you're willing to stay in queue.",
+                "You can use these buttons to search for a game. The more specific your preferences are, "
+                        + "the longer it will take to find a game.",
                 buttons);
     }
 }

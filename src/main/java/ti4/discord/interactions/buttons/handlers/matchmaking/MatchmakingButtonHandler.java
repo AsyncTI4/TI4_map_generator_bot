@@ -36,12 +36,12 @@ import ti4.spring.service.statistics.UserGameInfoService;
 import ti4.spring.service.statistics.matchmaking.MatchmakerService;
 
 @UtilityClass
-class QueueForGameButtonHandler {
+class MatchmakingButtonHandler {
 
-    private static final String BUTTON_ID = "queueForGame~MDL";
+    private static final String QUEUE_FOR_GAME_BUTTON_ID = "queueForGame~MDL";
     private static final String LEAVE_QUEUE_BUTTON_ID = "leaveQueueForGame";
     private static final String ADDITIONAL_SETTINGS_BUTTON_ID = "queueForGameAdditionalSettings~MDL";
-    private static final String MODAL_ID = "queueForGameModal";
+    private static final String QUEUE_FOR_GAME_MODAL_ID = "queueForGameModal";
     private static final String ADDITIONAL_SETTINGS_MODAL_ID = "queueForGameAdditionalSettingsModal";
 
     private static final String EXPANSIONS_ID = "queue_expansions";
@@ -60,7 +60,7 @@ class QueueForGameButtonHandler {
             "Faster Pace (15 days)", 19,
             "Fastest Pace (7 days)", 10);
 
-    @ButtonHandler(value = BUTTON_ID, save = false)
+    @ButtonHandler(value = QUEUE_FOR_GAME_BUTTON_ID, save = false)
     public static void offerQueueForGameModal(ButtonInteractionEvent event) {
         MatchmakerService matchmakerService = SpringContext.getBean(MatchmakerService.class);
         if (matchmakerService.isQueueingDisabled()) {
@@ -106,7 +106,7 @@ class QueueForGameButtonHandler {
                 DEFAULT_RESTRICTIONS,
                 !REQUIRE_SELECTION);
 
-        Modal modal = Modal.create(MODAL_ID, "Queue for Game")
+        Modal modal = Modal.create(QUEUE_FOR_GAME_MODAL_ID, "Queue for Game")
                 .addComponents(Label.of("Expansions", expansions))
                 .addComponents(Label.of("Player Count", playerCounts))
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
@@ -155,7 +155,7 @@ class QueueForGameButtonHandler {
         MessageHelper.sendEphemeralMessageToEventChannel(event, "You have left the matchmaking queue.");
     }
 
-    @ModalHandler(MODAL_ID)
+    @ModalHandler(QUEUE_FOR_GAME_MODAL_ID)
     public static void submitQueueForGameModal(ModalInteractionEvent event) {
         List<String> expansions = getSelectedValues(event, EXPANSIONS_ID);
         List<String> playerCounts = getSelectedValues(event, PLAYER_COUNTS_ID);
@@ -196,7 +196,7 @@ class QueueForGameButtonHandler {
 
         event.getHook()
                 .setEphemeral(true)
-                .sendMessage("Queue additional settings saved.")
+                .sendMessage("Additional settings saved.")
                 .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
