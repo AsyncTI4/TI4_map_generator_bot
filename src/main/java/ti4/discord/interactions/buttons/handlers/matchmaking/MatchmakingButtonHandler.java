@@ -106,7 +106,7 @@ class MatchmakingButtonHandler {
         CheckboxGroup paces = buildCheckboxGroup(
                 PACE_RESTRICTIONS_ID,
                 filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(userId),
-            userSettings.getMatchmakingPaces(),
+                userSettings.getMatchmakingPaces(),
                 DEFAULT_PACE_OPTIONS,
                 REQUIRE_SELECTION);
         CheckboxGroup restrictions = buildCheckboxGroup(
