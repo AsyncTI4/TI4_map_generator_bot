@@ -12,8 +12,11 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.checkboxgroup.CheckboxGroup;
 import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
+import net.dv8tion.jda.api.components.selections.EntitySelectMenu.SelectTarget;
 import net.dv8tion.jda.api.components.selections.SelectOption;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.modals.ModalInteraction;
@@ -44,6 +47,7 @@ class QueueForGameButtonHandler {
     private static final String VICTORY_POINTS_ID = "queue_victory_points";
     private static final String RESTRICTIONS_ID = "queue_restrictions";
     private static final String MAX_QUEUE_TIME_ID = "queue_max_time";
+    private static final String AVOID_PLAYERS_ID = "queue_avoid_players";
 
     private static final String DEFAULT_MAX_QUEUE_TIME = "8 hours";
     private static final List<String> DEFAULT_EXPANSIONS = List.of("PoK + TE");
@@ -108,7 +112,13 @@ class QueueForGameButtonHandler {
                 selectedMaxQueueTime,
                 List.of(DEFAULT_MAX_QUEUE_TIME),
                 REQUIRE_SELECTION);
-        // TODO: Add a multi-user selection "avoid list"
+        EntitySelectMenu avoidPlayers = EntitySelectMenu.create(AVOID_PLAYERS_ID, SelectTarget.USER)
+                .setPlaceholder("Choose players to avoid (optional)")
+                .setRequiredRange(0, 25)
+                .setDefaultValues(userSettings.getQueueForGameAvoidList().stream()
+                        .map(EntitySelectMenu.DefaultValue::user)
+                        .toList())
+                .build();
 
         Modal modal = Modal.create(MODAL_ID, "Queue for Game")
                 .addComponents(Label.of("Expansions", expansions))
@@ -116,6 +126,7 @@ class QueueForGameButtonHandler {
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
                 .addComponents(Label.of("Restrictions", restrictions))
                 .addComponents(Label.of("Max Queue Time", maxQueueTime))
+                .addComponents(Label.of("Players To Avoid", avoidPlayers))
                 .build();
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -139,6 +150,7 @@ class QueueForGameButtonHandler {
         List<String> victoryPoints = getSelectedValues(event, VICTORY_POINTS_ID);
         List<String> restrictions = getSelectedValues(event, RESTRICTIONS_ID);
         String maxQueueTime = getSelectedValues(event, MAX_QUEUE_TIME_ID).getFirst();
+        List<String> avoidedUserIds = getSelectedUserIds(event, AVOID_PLAYERS_ID);
 
         String userId = event.getUser().getId();
         UserSettings userSettings = UserSettingsManager.get(userId);
@@ -151,6 +163,7 @@ class QueueForGameButtonHandler {
 
         userSettings.setQueueForGameRestrictions(restrictions);
         userSettings.setQueueForGameMaxQueueTime(maxQueueTime);
+        userSettings.setQueueForGameAvoidList(avoidedUserIds);
         UserSettingsManager.save(userSettings);
 
         SpringContext.getBean(MatchmakerService.class)
@@ -161,7 +174,8 @@ class QueueForGameButtonHandler {
                         playerCounts,
                         victoryPoints,
                         restrictions,
-                        maxQueueTime);
+                        maxQueueTime,
+                        avoidedUserIds);
 
         event.getHook()
                 .setEphemeral(true)
@@ -245,6 +259,12 @@ class QueueForGameButtonHandler {
     private static List<String> getSelectedValues(ModalInteraction event, String modalValueId) {
         ModalMapping modalMapping = event.getValue(modalValueId);
         return modalMapping == null ? List.of() : modalMapping.getAsStringList();
+    }
+
+    private static List<String> getSelectedUserIds(ModalInteraction event, String modalValueId) {
+        ModalMapping modalMapping = event.getValue(modalValueId);
+        if (modalMapping == null) return List.of();
+        return modalMapping.getAsMentions().getUsers().stream().map(User::getId).toList();
     }
 
     private static List<String> normalizeSelectedValues(

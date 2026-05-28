@@ -52,6 +52,7 @@ public class UserSettings {
     private List<String> queueForGameVictoryPointGoals;
     private List<String> queueForGameRestrictions;
     private String queueForGameMaxQueueTime;
+    private List<String> queueForGameAvoidList;
 
     UserSettings(String userId) {
         this.userId = userId;
@@ -75,6 +76,10 @@ public class UserSettings {
 
     public List<String> getQueueForGameRestrictions() {
         return Objects.requireNonNullElse(queueForGameRestrictions, Collections.emptyList());
+    }
+
+    public List<String> getQueueForGameAvoidList() {
+        return Objects.requireNonNullElse(queueForGameAvoidList, Collections.emptyList());
     }
 
     public void addAfkHour(String hour) {
