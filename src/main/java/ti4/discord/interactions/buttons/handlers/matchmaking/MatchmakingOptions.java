@@ -22,8 +22,8 @@ public class MatchmakingOptions {
     public static final String FASTEST_PACE_OPTION = "Fastest Pace (7 days)";
     private static final String TIGL_OPTION = "Twilight Imperium Global League";
     public static final List<String> RESTRICTION_OPTIONS = List.of(
-        SIMILAR_ACTIVE_HOURS_OPTION,
-        SIMILAR_PLAYER_SKILL_OPTION,
+            SIMILAR_ACTIVE_HOURS_OPTION,
+            SIMILAR_PLAYER_SKILL_OPTION,
             TIGL_OPTION,
             "Fast Pace (30 days)",
             FASTER_PACE_OPTION,
