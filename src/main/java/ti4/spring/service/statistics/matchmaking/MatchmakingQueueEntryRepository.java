@@ -11,5 +11,5 @@ interface MatchmakingQueueEntryRepository extends JpaRepository<MatchmakingQueue
     boolean existsByUserId(String userId);
 
     @Transactional
-    boolean deleteByUserId(String userId);
+    long deleteByUserId(String userId);
 }

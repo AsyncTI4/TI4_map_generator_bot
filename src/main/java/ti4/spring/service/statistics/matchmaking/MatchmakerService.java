@@ -87,7 +87,7 @@ public class MatchmakerService {
     @Transactional
     public boolean leaveQueue(String userId) {
         if (DatabasePersistenceGate.isDisabled()) return false;
-        return matchmakingQueueEntryRepository.deleteByUserId(userId);
+        return matchmakingQueueEntryRepository.deleteByUserId(userId) > 0;
     }
 
     private static int parseHours(String maxQueueTime) {
