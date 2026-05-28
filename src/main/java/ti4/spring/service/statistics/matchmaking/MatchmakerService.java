@@ -97,7 +97,7 @@ public class MatchmakerService {
         for (String playerCountOption : MatchmakingOptions.getPlayerCountOptionsDescending()) {
             for (String victoryPointGoalOption : MatchmakingOptions.getShuffledVictoryPointOptions()) {
                 for (String expansionOption : MatchmakingOptions.getShuffledExpansionsOptions()) {
-                    for (String pace : MatchmakingOptions.getShuffledPaceRestrictions()) {
+                    for (String paceOption : MatchmakingOptions.getShuffledPaceRestrictions()) {
                         matchAndCollect(
                                 candidates,
                                 playersAddedToGames,
@@ -105,7 +105,7 @@ public class MatchmakerService {
                                 playerCountOption,
                                 victoryPointGoalOption,
                                 expansionOption,
-                                pace,
+                                paceOption,
                                 candidateToUserSettings,
                                 playersToActiveHourBuckets,
                                 playerRatings,
@@ -135,26 +135,29 @@ public class MatchmakerService {
             String playerCountOption,
             String victoryPointGoalOption,
             String expansionOption,
-            String pace,
+            String paceOption,
             Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate,
             Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets,
             Map<String, Double> playerRatings,
             Double defaultRating) {
         List<MatchmakingQueueEntryEntity> eligible = candidates.stream()
-                .filter(c -> !playersAddedToGames.contains(c))
-                .filter(c -> userSettingsByCandidate
-                        .get(c)
+                .filter(candidate -> !playersAddedToGames.contains(candidate))
+                .filter(candidate -> userSettingsByCandidate
+                        .get(candidate)
                         .getMatchmakingPlayerCounts()
                         .contains(playerCountOption))
-                .filter(c -> userSettingsByCandidate
-                        .get(c)
+                .filter(candidate -> userSettingsByCandidate
+                        .get(candidate)
                         .getMatchmakingVictoryPointGoals()
                         .contains(victoryPointGoalOption))
-                .filter(c -> userSettingsByCandidate
-                        .get(c)
+                .filter(candidate -> userSettingsByCandidate
+                        .get(candidate)
                         .getMatchmakingExpansions()
                         .contains(expansionOption))
-                .filter(c -> selectedPaceMatches(userSettingsByCandidate.get(c), pace))
+                .filter(candidate -> userSettingsByCandidate
+                    .get(candidate)
+                    .getMatchmakingPaces()
+                    .contains(paceOption))
                 .sorted(Comparator.comparing(
                                 c -> getHours(userSettingsByCandidate.get(c).getMatchmakingMaxQueueTime()))
                         .reversed())
@@ -248,22 +251,6 @@ public class MatchmakerService {
         }
 
         return true;
-    }
-
-    private static boolean selectedPaceMatches(UserSettings userSettings, String pace) {
-        String selectedPace = getSelectedMatchmakingPace(userSettings);
-        return MatchmakingOptions.NO_PACE_OPTION.equals(selectedPace) || selectedPace.equals(pace);
-    }
-
-    private static String getSelectedMatchmakingPace(UserSettings userSettings) {
-        String selectedPace = userSettings.getMatchmakingPace();
-        if (!MatchmakingOptions.NO_PACE_OPTION.equals(selectedPace)) {
-            return selectedPace;
-        }
-        return userSettings.getMatchmakingRestrictions().stream()
-                .filter(MatchmakingOptions.PACE_RESTRICTION_OPTIONS::contains)
-                .findFirst()
-                .orElse(MatchmakingOptions.NO_PACE_OPTION);
     }
 
     private boolean isHalfQueueTimePassed(

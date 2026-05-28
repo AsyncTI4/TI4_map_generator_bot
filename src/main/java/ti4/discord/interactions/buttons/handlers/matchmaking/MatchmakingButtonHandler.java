@@ -106,7 +106,7 @@ class MatchmakingButtonHandler {
         CheckboxGroup paces = buildCheckboxGroup(
                 PACE_RESTRICTIONS_ID,
                 filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(userId),
-                List.of(getSelectedMatchmakingPace(userSettings)),
+            userSettings.getMatchmakingPaces(),
                 DEFAULT_PACE_OPTIONS,
                 REQUIRE_SELECTION);
         CheckboxGroup restrictions = buildCheckboxGroup(
@@ -171,7 +171,7 @@ class MatchmakingButtonHandler {
         List<String> expansions = getSelectedValues(event, EXPANSIONS_ID);
         List<String> playerCounts = getSelectedValues(event, PLAYER_COUNTS_ID);
         List<String> victoryPoints = getSelectedValues(event, VICTORY_POINTS_ID);
-        List<String> paceSelections = getSelectedValues(event, PACE_RESTRICTIONS_ID);
+        List<String> paces = getSelectedValues(event, PACE_RESTRICTIONS_ID);
         List<String> restrictions = getSelectedValues(event, RESTRICTIONS_ID);
 
         String userId = event.getUser().getId();
@@ -182,7 +182,7 @@ class MatchmakingButtonHandler {
         userSettings.setMatchmakingExpansions(expansions);
         userSettings.setMatchmakingPlayerCounts(playerCounts);
         userSettings.setMatchmakingVictoryPointGoals(victoryPoints);
-        userSettings.setMatchmakingPace(paceSelections.isEmpty() ? NO_PACE_OPTION : paceSelections.getFirst());
+        userSettings.setMatchmakingPaces(paces);
         userSettings.setMatchmakingRestrictions(restrictions.stream()
                 .filter(restriction -> !PACE_RESTRICTION_OPTIONS.contains(restriction))
                 .toList());
@@ -250,17 +250,6 @@ class MatchmakingButtonHandler {
                     }
                 });
         return restrictions;
-    }
-
-    private static String getSelectedMatchmakingPace(UserSettings userSettings) {
-        String selectedPace = userSettings.getMatchmakingPace();
-        if (!NO_PACE_OPTION.equals(selectedPace)) {
-            return selectedPace;
-        }
-        return userSettings.getMatchmakingRestrictions().stream()
-                .filter(PACE_RESTRICTION_OPTIONS::contains)
-                .findFirst()
-                .orElse(NO_PACE_OPTION);
     }
 
     private static CheckboxGroup buildCheckboxGroup(
