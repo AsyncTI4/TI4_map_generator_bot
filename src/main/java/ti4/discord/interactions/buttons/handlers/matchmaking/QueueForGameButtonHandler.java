@@ -7,6 +7,7 @@ import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingO
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.checkboxgroup.CheckboxGroup;
 import net.dv8tion.jda.api.components.label.Label;
@@ -20,6 +21,11 @@ import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
+import ti4.game.persistence.ManagedPlayer;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.settings.users.UserSettings;
@@ -124,14 +130,40 @@ class QueueForGameButtonHandler {
 
     @ModalHandler(MODAL_ID)
     public static void submitQueueForGameModal(ModalInteractionEvent event) {
-        // TODO: Check player is below their game limit
         List<String> expansions = getSelectedValues(event, EXPANSIONS_ID);
         List<String> playerCounts = getSelectedValues(event, PLAYER_COUNTS_ID);
         List<String> victoryPoints = getSelectedValues(event, VICTORY_POINTS_ID);
         List<String> restrictions = getSelectedValues(event, RESTRICTIONS_ID);
         String maxQueueTime = getSelectedValues(event, MAX_QUEUE_TIME_ID).getFirst();
 
-        UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
+        String userId = event.getUser().getId();
+        UserSettings userSettings = UserSettingsManager.get(userId);
+
+        ManagedPlayer managedPlayer = GameManager.getManagedPlayer(userId);
+        if (managedPlayer != null) {
+            int ongoingAmount = countOngoingGamesThatAffectJoinLimit(managedPlayer);
+            int completedGames = countCompletedGamesThatAffectJoinLimit(managedPlayer);
+            if (ongoingAmount > completedGames + 2) {
+                event.getHook()
+                        .setEphemeral(true)
+                        .sendMessage(
+                                "You are at your game limit (# of ongoing games must be equal or less than # of completed games + 3) and so cannot queue for more games at the moment."
+                                        + " Your number of ongoing games is " + ongoingAmount
+                                        + " and your number of completed games is " + completedGames + ".\n\n"
+                                        + "If you're playing a private game with friends, you can ping a bothelper for a 1-game exemption from the limit.")
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                return;
+            }
+            if (userSettings.getGameLimit() > 0 && ongoingAmount >= userSettings.getGameLimit()) {
+                event.getHook()
+                        .setEphemeral(true)
+                        .sendMessage("You are currently under a " + userSettings.getGameLimit()
+                                + "-game limit and cannot join more games at this time.")
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                return;
+            }
+        }
+
         userSettings.setQueueForGameExpansions(expansions);
         userSettings.setQueueForGamePlayerCounts(playerCounts);
         userSettings.setQueueForGameVictoryPointGoals(victoryPoints);
@@ -142,7 +174,7 @@ class QueueForGameButtonHandler {
 
         SpringContext.getBean(QueueForGameService.class)
                 .queueUser(
-                        event.getUser().getId(),
+                        userId,
                         event.getUser().getName(),
                         expansions,
                         playerCounts,
@@ -154,6 +186,32 @@ class QueueForGameButtonHandler {
                 .setEphemeral(true)
                 .sendMessage("You have been added to the matchmaking queue.")
                 .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static int countOngoingGamesThatAffectJoinLimit(ManagedPlayer managedPlayer) {
+        return (int) managedPlayer.getGames().stream()
+                .filter(managedGame -> !managedGame.isHasEnded())
+                .map(ManagedGame::getGame)
+                .filter(isRealPlayerIn3PlusPlayerGame(managedPlayer))
+                .count();
+    }
+
+    private static int countCompletedGamesThatAffectJoinLimit(ManagedPlayer managedPlayer) {
+        return (int) managedPlayer.getGames().stream()
+                .filter(managedGame -> managedGame.isHasEnded() && managedGame.isHasWinner())
+                .map(ManagedGame::getGame)
+                .filter(isRealPlayerIn3PlusPlayerGame(managedPlayer))
+                .count();
+    }
+
+    private static Predicate<Game> isRealPlayerIn3PlusPlayerGame(ManagedPlayer managedPlayer) {
+        return game -> {
+            List<Player> realAndEliminatedPlayers = game.getRealAndEliminatedPlayers();
+            return realAndEliminatedPlayers.size() >= 3
+                    && realAndEliminatedPlayers.stream()
+                            .map(Player::getUserID)
+                            .anyMatch(id -> managedPlayer.getId().equals(id));
+        };
     }
 
     private static CheckboxGroup buildCheckboxGroup(
