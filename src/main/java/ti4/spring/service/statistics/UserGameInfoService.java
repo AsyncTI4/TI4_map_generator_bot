@@ -17,6 +17,7 @@ import ti4.game.persistence.ManagedGame;
 import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.Helper;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.persistence.GameEntity;
 import ti4.spring.service.persistence.PlayerEntity;
 import ti4.spring.service.persistence.PlayerEntityRepository;
 
@@ -31,22 +32,23 @@ public class UserGameInfoService {
         return playerEntityRepository.findAllWithGamesByUserIdEquals(userId).stream()
                 .map(PlayerEntity::getGame)
                 .filter(game -> game.getPlayerCount() == 6)
-                .map(game ->
-                        (int) Duration.ofMillis(game.getEndedEpochMilliseconds() - game.getCreationEpochMilliseconds())
-                                .toDays())
+                .map(UserGameInfoService::getDaysToComplete)
                 .filter(days -> days > 0)
                 .sorted()
                 .limit(3)
                 .toList();
     }
 
+    private static int getDaysToComplete(GameEntity game) {
+        return (int) Duration.ofMillis(game.getEndedEpochMilliseconds() - game.getCreationEpochMilliseconds())
+                .toDays();
+    }
+
     @Transactional(readOnly = true)
-    public boolean hasCompletedGameNearPace(String userId, int paceDays) {
-        int maxDurationDays = paceDays + 3;
+    public boolean hasCompletedGameInDays(String userId, int maxDurationDays) {
         return playerEntityRepository.findAllWithCompletedGamesByUserIdEquals(userId).stream()
                 .map(PlayerEntity::getGame)
-                .map(game -> Duration.ofMillis(game.getEndedEpochMilliseconds() - game.getCreationEpochMilliseconds())
-                        .toDays())
+                .map(UserGameInfoService::getDaysToComplete)
                 .anyMatch(days -> days <= maxDurationDays);
     }
 

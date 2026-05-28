@@ -5,8 +5,10 @@ import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingO
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.RESTRICTION_OPTIONS;
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.VICTORY_POINT_OPTIONS;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.checkboxgroup.CheckboxGroup;
 import net.dv8tion.jda.api.components.label.Label;
@@ -48,8 +50,9 @@ class QueueForGameButtonHandler {
     private static final List<String> DEFAULT_PLAYER_COUNTS = List.of("6");
     private static final List<String> DEFAULT_VICTORY_POINTS = List.of("10");
     private static final List<String> DEFAULT_RESTRICTIONS = List.of("Similar Active Hours");
-    private static final String FASTER_PACE_RESTRICTION = "Faster Pace (14 days)";
-    private static final String FASTEST_PACE_RESTRICTION = "Fastest Pace (7 days)";
+    private static final Map<String, Integer> PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT = Map.of(
+            "Faster Pace (15 days)", 19,
+            "Fastest Pace (7 days)", 10);
 
     @ButtonHandler(value = BUTTON_ID, save = false)
     public static void offerQueueForGameModal(ButtonInteractionEvent event) {
@@ -60,7 +63,8 @@ class QueueForGameButtonHandler {
                     .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
-        if (queueForGameService.isUserQueued(event.getUser().getId())) {
+        String userId = event.getUser().getId();
+        if (queueForGameService.isUserQueued(userId)) {
             event.reply(
                             "You are already queued for a game. To change your preferences, you must first leave the queue.")
                     .setEphemeral(true)
@@ -68,7 +72,7 @@ class QueueForGameButtonHandler {
             return;
         }
 
-        UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
+        UserSettings userSettings = UserSettingsManager.get(userId);
 
         final boolean REQUIRE_SELECTION = true;
         CheckboxGroup expansions = buildCheckboxGroup(
@@ -91,7 +95,7 @@ class QueueForGameButtonHandler {
                 REQUIRE_SELECTION);
         CheckboxGroup restrictions = buildCheckboxGroup(
                 RESTRICTIONS_ID,
-                RESTRICTION_OPTIONS,
+                filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(userId),
                 userSettings.getQueueForGameRestrictions(),
                 DEFAULT_RESTRICTIONS,
                 !REQUIRE_SELECTION);
@@ -104,6 +108,7 @@ class QueueForGameButtonHandler {
                 selectedMaxQueueTime,
                 List.of(DEFAULT_MAX_QUEUE_TIME),
                 REQUIRE_SELECTION);
+        // TODO: Add a multi-user selection "avoid list"
 
         Modal modal = Modal.create(MODAL_ID, "Queue for Game")
                 .addComponents(Label.of("Expansions", expansions))
@@ -139,8 +144,6 @@ class QueueForGameButtonHandler {
         UserSettings userSettings = UserSettingsManager.get(userId);
 
         if (isPlayerAtGameLimit(event, userId, userSettings)) return;
-
-        if (playerHasNotCompleted1GameNearRestrictedPace(event, userId, restrictions)) return;
 
         userSettings.setQueueForGameExpansions(expansions);
         userSettings.setQueueForGamePlayerCounts(playerCounts);
@@ -193,28 +196,16 @@ class QueueForGameButtonHandler {
         return false;
     }
 
-    private static boolean playerHasNotCompleted1GameNearRestrictedPace(
-            ModalInteractionEvent event, String userId, List<String> restrictions) {
+    private static List<String> filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(String userId) {
         UserGameInfoService userGameInfoService = UserGameInfoService.get();
-        if (restrictions.contains(FASTEST_PACE_RESTRICTION)
-                && !userGameInfoService.hasCompletedGameNearPace(userId, 7)) {
-            event.getHook()
-                    .setEphemeral(true)
-                    .sendMessage(
-                            "You cannot choose **Fastest Pace (7 days)** until you've completed at least one game in **10 days or less**.")
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
-            return true;
-        }
-        if (restrictions.contains(FASTER_PACE_RESTRICTION)
-                && !userGameInfoService.hasCompletedGameNearPace(userId, 14)) {
-            event.getHook()
-                    .setEphemeral(true)
-                    .sendMessage(
-                            "You cannot choose **Faster Pace (14 days)** until you've completed at least one game in **17 days or less**.")
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
-            return true;
-        }
-        return false;
+        List<String> restrictions = new ArrayList<>(RESTRICTION_OPTIONS);
+        PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT.forEach(
+                (paceRestriction, gameCompletedInDaysRequirement) -> {
+                    if (!userGameInfoService.hasCompletedGameInDays(userId, gameCompletedInDaysRequirement)) {
+                        restrictions.remove(paceRestriction);
+                    }
+                });
+        return restrictions;
     }
 
     private static CheckboxGroup buildCheckboxGroup(
