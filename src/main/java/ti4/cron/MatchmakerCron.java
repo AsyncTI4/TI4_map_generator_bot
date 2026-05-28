@@ -11,7 +11,7 @@ import ti4.spring.service.statistics.matchmaking.MatchmakerService;
 public class MatchmakerCron {
 
     public static void register() {
-        CronManager.schedulePeriodically(MatchmakerCron.class, MatchmakerCron::run, 5, 5, TimeUnit.MINUTES);
+        CronManager.schedulePeriodically(MatchmakerCron.class, MatchmakerCron::run, 15, 15, TimeUnit.MINUTES);
     }
 
     private static void run() {

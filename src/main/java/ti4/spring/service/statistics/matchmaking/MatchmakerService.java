@@ -99,8 +99,6 @@ public class MatchmakerService {
         List<MatchmakingQueueEntryEntity> candidates =
                 cleanAndRemoveExpiredEntries(entries, LocalDateTime.now(ZoneOffset.UTC));
 
-        // TODO: Possibly wait for X number of players to be in queue to allow for more varied matches
-
         Map<String, Double> playerRatings = getPlayerRatings(candidates);
         double averageRating = playerRatings.values().stream()
                 .mapToDouble(Double::doubleValue)
@@ -231,7 +229,7 @@ public class MatchmakerService {
                     Optional.of(playerRatings.get(player1.getUser().getId())).orElse(defaultRating);
             Double player2Rating =
                     Optional.of(playerRatings.get(player2.getUser().getId())).orElse(defaultRating);
-            // If either player has waited half their personal max queue time, relax the rating requirement
+
             boolean relaxed = isHalfQueueTimePassed(player1) || isHalfQueueTimePassed(player2);
             double tolerance =
                     relaxed ? RELAXED_SIMILAR_SKILL_DIFFERENCE_THRESHOLD : SIMILAR_SKILL_DIFFERENCE_THRESHOLD;

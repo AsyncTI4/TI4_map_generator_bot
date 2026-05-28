@@ -67,14 +67,6 @@ public class MatchmakingOptions {
                 restrictionsCsv -> csvContains(restrictionsCsv, "Twilight Imperium Global League"));
     }
 
-    public static List<Predicate<String>> getSimilarPlayerSkillRestrictionPredicates() {
-        return buildRestrictionPredicates(restrictionsCsv -> csvContains(restrictionsCsv, "Similar Player Skill"));
-    }
-
-    public static List<Predicate<String>> getSimilarActiveHoursRestrictionPredicates() {
-        return buildRestrictionPredicates(restrictionsCsv -> csvContains(restrictionsCsv, "Similar Active Hours"));
-    }
-
     private static List<Predicate<String>> buildRestrictionPredicates(Predicate<String> predicate) {
         return List.of(predicate, predicate.negate());
     }
