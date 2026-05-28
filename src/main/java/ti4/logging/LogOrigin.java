@@ -75,9 +75,12 @@ public class LogOrigin {
     }
 
     @NotNull
-    private static String buildEventString(@Nonnull GenericInteractionCreateEvent event) {
-        StringBuilder builder =
-                new StringBuilder().append(event.getUser().getEffectiveName()).append(' ');
+    private static String buildEventString(@Nullable GenericInteractionCreateEvent event) {
+        if (event == null) {
+            return "Unknown user initiated an unexpected event of type `null`\n";
+        }
+        String userName = event.getUser() == null ? "Unknown user" : event.getUser().getEffectiveName();
+        StringBuilder builder = new StringBuilder().append(userName).append(' ');
 
         switch (event) {
             case SlashCommandInteractionEvent sEvent ->
