@@ -79,7 +79,8 @@ public class LogOrigin {
         if (event == null) {
             return "Unknown user initiated an unexpected event of type `null`\n";
         }
-        String userName = event.getUser() == null ? "Unknown user" : event.getUser().getEffectiveName();
+        String userName =
+                event.getUser() == null ? "Unknown user" : event.getUser().getEffectiveName();
         StringBuilder builder = new StringBuilder().append(userName).append(' ');
 
         switch (event) {
