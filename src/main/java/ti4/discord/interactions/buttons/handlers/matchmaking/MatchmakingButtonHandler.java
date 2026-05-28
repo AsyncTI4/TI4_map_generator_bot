@@ -55,11 +55,11 @@ class MatchmakingButtonHandler {
     private static final String AVOID_PLAYERS_ID = "queue_avoid_players";
 
     private static final String DEFAULT_MAX_QUEUE_TIME = "8 hours";
-    private static final List<String> DEFAULT_EXPANSIONS = List.of("Prophecy of Kings and Thunder's Edge");
-    private static final List<String> DEFAULT_PLAYER_COUNTS = List.of("6");
-    private static final List<String> DEFAULT_VICTORY_POINTS = List.of("10");
-    private static final List<String> DEFAULT_PACE_RESTRICTIONS = List.of(NO_PACE_OPTION);
-    private static final List<String> DEFAULT_RESTRICTIONS = List.of("Similar Active Hours");
+    private static final List<String> DEFAULT_EXPANSION_OPTIONS = List.of("Prophecy of Kings and Thunder's Edge");
+    private static final List<String> DEFAULT_PLAYER_COUNT_OPTIONS = List.of("6");
+    private static final List<String> DEFAULT_VICTORY_POINT_OPTIONS = List.of("10");
+    private static final List<String> DEFAULT_PACE_OPTIONS = List.of(NO_PACE_OPTION);
+    private static final List<String> DEFAULT_RESTRICTION_OPTIONS = List.of("Similar Active Hours");
     private static final Map<String, Integer> PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT = Map.of(
             MatchmakingOptions.FASTER_PACE_OPTION, 19,
             MatchmakingOptions.FASTEST_PACE_OPTION, 10);
@@ -89,31 +89,31 @@ class MatchmakingButtonHandler {
                 EXPANSIONS_ID,
                 MatchmakingOptions.EXPANSION_OPTIONS,
                 userSettings.getMatchmakingExpansions(),
-                DEFAULT_EXPANSIONS,
+                DEFAULT_EXPANSION_OPTIONS,
                 REQUIRE_SELECTION);
         CheckboxGroup playerCounts = buildCheckboxGroup(
                 PLAYER_COUNTS_ID,
                 PLAYER_COUNT_OPTIONS,
                 userSettings.getMatchmakingPlayerCounts(),
-                DEFAULT_PLAYER_COUNTS,
+                DEFAULT_PLAYER_COUNT_OPTIONS,
                 REQUIRE_SELECTION);
         CheckboxGroup victoryPoints = buildCheckboxGroup(
                 VICTORY_POINTS_ID,
                 VICTORY_POINT_OPTIONS,
                 userSettings.getMatchmakingVictoryPointGoals(),
-                DEFAULT_VICTORY_POINTS,
+                DEFAULT_VICTORY_POINT_OPTIONS,
                 REQUIRE_SELECTION);
         CheckboxGroup paces = buildCheckboxGroup(
                 PACE_RESTRICTIONS_ID,
                 filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(userId),
                 userSettings.getMatchmakingRestrictions(),
-                DEFAULT_PACE_RESTRICTIONS,
+                DEFAULT_PACE_OPTIONS,
                 REQUIRE_SELECTION);
         CheckboxGroup restrictions = buildCheckboxGroup(
                 RESTRICTIONS_ID,
                 RESTRICTION_OPTIONS,
                 userSettings.getMatchmakingRestrictions(),
-                DEFAULT_RESTRICTIONS,
+                DEFAULT_RESTRICTION_OPTIONS,
                 !REQUIRE_SELECTION);
 
         Modal modal = Modal.create(QUEUE_FOR_GAME_MODAL_ID, "Queue for Game")
