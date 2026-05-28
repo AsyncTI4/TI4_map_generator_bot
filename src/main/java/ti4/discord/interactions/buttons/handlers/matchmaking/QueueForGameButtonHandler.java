@@ -30,7 +30,7 @@ import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.statistics.UserGameInfoService;
-import ti4.spring.service.statistics.matchmaking.QueueForGameService;
+import ti4.spring.service.statistics.matchmaking.MatchmakerService;
 
 @UtilityClass
 class QueueForGameButtonHandler {
@@ -56,15 +56,15 @@ class QueueForGameButtonHandler {
 
     @ButtonHandler(value = BUTTON_ID, save = false)
     public static void offerQueueForGameModal(ButtonInteractionEvent event) {
-        QueueForGameService queueForGameService = SpringContext.getBean(QueueForGameService.class);
-        if (queueForGameService.isQueueingDisabled()) {
+        MatchmakerService matchmakerService = SpringContext.getBean(MatchmakerService.class);
+        if (matchmakerService.isQueueingDisabled()) {
             event.reply("Queueing is currently disabled.")
                     .setEphemeral(true)
                     .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
         String userId = event.getUser().getId();
-        if (queueForGameService.isUserQueued(userId)) {
+        if (matchmakerService.isUserQueued(userId)) {
             event.reply(
                             "You are already queued for a game. To change your preferences, you must first leave the queue.")
                     .setEphemeral(true)
@@ -122,13 +122,13 @@ class QueueForGameButtonHandler {
 
     @ButtonHandler(value = LEAVE_QUEUE_BUTTON_ID, save = false)
     public static void leaveQueue(ButtonInteractionEvent event) {
-        QueueForGameService queueForGameService = SpringContext.getBean(QueueForGameService.class);
-        if (queueForGameService.isQueueingDisabled()) {
+        MatchmakerService matchmakerService = SpringContext.getBean(MatchmakerService.class);
+        if (matchmakerService.isQueueingDisabled()) {
             MessageHelper.sendEphemeralMessageToEventChannel(
                     event, "Leaving queue is currently disabled. Try again later.");
             return;
         }
-        queueForGameService.leaveQueue(event.getUser().getId());
+        matchmakerService.leaveQueue(event.getUser().getId());
         MessageHelper.sendEphemeralMessageToEventChannel(event, "You have left the matchmaking queue.");
     }
 
@@ -153,7 +153,7 @@ class QueueForGameButtonHandler {
         userSettings.setQueueForGameMaxQueueTime(maxQueueTime);
         UserSettingsManager.save(userSettings);
 
-        SpringContext.getBean(QueueForGameService.class)
+        SpringContext.getBean(MatchmakerService.class)
                 .queueUser(
                         userId,
                         event.getUser().getName(),

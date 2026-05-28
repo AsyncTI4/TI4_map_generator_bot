@@ -31,7 +31,7 @@ import ti4.service.game.CreateGameService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.statistics.AverageTurnTimeService;
 import ti4.spring.service.statistics.UserGameInfoService;
-import ti4.spring.service.statistics.matchmaking.QueueForGameService;
+import ti4.spring.service.statistics.matchmaking.MatchmakerService;
 
 @UtilityClass
 public class CreateGameButtonHandler {
@@ -271,7 +271,7 @@ public class CreateGameButtonHandler {
                 .editMessage(generateMemberListMessage(members, fetchSillyNameFromMessage(event)))
                 .queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " joined the game.");
-        if (QueueForGameService.get().leaveQueue(event.getUser().getId())) {
+        if (MatchmakerService.get().leaveQueue(event.getUser().getId())) {
             event.getHook()
                     .setEphemeral(true)
                     .sendMessage("Because you joined a game, you are no longer queued to find a game.")

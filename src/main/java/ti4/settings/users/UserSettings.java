@@ -5,9 +5,12 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -80,6 +83,12 @@ public class UserSettings {
         } else {
             afkHours += ";" + hour;
         }
+    }
+
+    public Set<Integer> getActiveHoursAsIntegers() {
+        return activeHours == null
+                ? Collections.emptySet()
+                : Arrays.stream(activeHours.split(";")).map(Integer::parseInt).collect(Collectors.toSet());
     }
 
     public void addActiveHour(int utcHour) {

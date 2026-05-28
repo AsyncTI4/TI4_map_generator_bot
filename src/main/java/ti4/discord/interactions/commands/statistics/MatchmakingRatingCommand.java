@@ -20,6 +20,6 @@ class MatchmakingRatingCommand extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MatchmakingRatingEventService.getBean().calculateRatings(event);
+        MatchmakingRatingEventService.get().calculateRatings(event);
     }
 }

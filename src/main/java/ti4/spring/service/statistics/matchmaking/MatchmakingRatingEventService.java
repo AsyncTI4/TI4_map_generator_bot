@@ -1,6 +1,9 @@
 package ti4.spring.service.statistics.matchmaking;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -25,12 +28,21 @@ public class MatchmakingRatingEventService {
         boolean onlyTiglGames = event.getOption("tigl_only", Boolean.FALSE, OptionMapping::getAsBoolean);
         boolean showRating = event.getOption("show_my_rating", Boolean.FALSE, OptionMapping::getAsBoolean);
 
+        List<MatchmakingRating> playerRatings = getPlayerRatings(onlyTiglGames);
+        sendMessage(event, playerRatings, showRating);
+    }
+
+    Map<String, Double> getPlayerRatings(Set<String> userIds) {
+        return getPlayerRatings(false).stream()
+                .filter(matchmakingRating -> userIds.contains(matchmakingRating.userId()))
+                .collect(Collectors.toMap(MatchmakingRating::userId, MatchmakingRating::rating));
+    }
+
+    private List<MatchmakingRating> getPlayerRatings(boolean onlyTiglGames) {
         List<PlayerEntity> players =
                 playerEntityRepository.findAllWithUsersAndGamesByCompletedSixPlayerNonAllianceGame(onlyTiglGames);
         List<MatchmakingGame> games = MatchmakingGame.getMatchmakingGames(players);
-
-        List<MatchmakingRating> playerRatings = TrueSkillMatchmakingRatingService.calculateRatings(games);
-        sendMessage(event, playerRatings, showRating);
+        return TrueSkillMatchmakingRatingService.calculateRatings(games);
     }
 
     private static void sendMessage(
@@ -82,7 +94,7 @@ public class MatchmakingRatingEventService {
                 (MessageChannelUnion) event.getMessageChannel(), "Player Matchmaking Ratings", sb.toString());
     }
 
-    public static MatchmakingRatingEventService getBean() {
+    public static MatchmakingRatingEventService get() {
         return SpringContext.getBean(MatchmakingRatingEventService.class);
     }
 }
