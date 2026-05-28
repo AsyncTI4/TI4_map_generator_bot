@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,6 +92,22 @@ class LogOriginTest {
             assertThat(log)
                     .contains(
                             "Tester pressed button __**Roll Space Combat**__  `[combatRoll_307_space]` in: [pbd123-actions](https://discord.com/channels/1/2/3)");
+        }
+    }
+
+    @Test
+    void nullInteractionStillProducesEventString() {
+        try (MockedStatic<DateTimeHelper> mockedTime = mockStatic(DateTimeHelper.class);
+                MockedStatic<ActiveLeaseService> mockedActiveLeaseService = mockStatic(ActiveLeaseService.class)) {
+            mockedTime.when(DateTimeHelper::getCurrentTimestamp).thenReturn("`timestamp`");
+            mockedActiveLeaseService
+                    .when(ActiveLeaseService::getCurrentProcessLogPrefix)
+                    .thenReturn("");
+
+            LogOrigin origin = new LogOrigin((GenericInteractionCreateEvent) null);
+            String log = new TestEventLog(origin).getLogString();
+
+            assertThat(log).contains("Unknown user initiated an unexpected event of type `null`");
         }
     }
 
