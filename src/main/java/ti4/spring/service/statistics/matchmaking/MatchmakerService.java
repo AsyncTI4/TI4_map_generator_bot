@@ -34,7 +34,6 @@ import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
-import ti4.spring.service.persistence.UserEntity;
 
 @AllArgsConstructor
 @Service
@@ -51,12 +50,12 @@ public class MatchmakerService {
     private final MatchmakingQueueEntryRepository matchmakingQueueEntryRepository;
 
     @Transactional
-    public void queueUser(String userId, String username) {
+    public void queueUser(String userId) {
         if (DatabasePersistenceGate.isDisabled()) return;
         matchmakingQueueEntryRepository.deleteByUserId(userId);
 
         MatchmakingQueueEntryEntity entry = new MatchmakingQueueEntryEntity();
-        entry.setUser(new UserEntity(userId, username));
+        entry.setUserId(userId);
         entry.setQueuedAtUtc(LocalDateTime.now(ZoneOffset.UTC));
 
         matchmakingQueueEntryRepository.save(entry);
@@ -139,7 +138,7 @@ public class MatchmakerService {
 
     private static Map<String, Double> getPlayerRatings(List<MatchmakingQueueEntryEntity> candidates) {
         Set<String> userIds =
-                candidates.stream().map(entity -> entity.getUser().getId()).collect(Collectors.toSet());
+                candidates.stream().map(MatchmakingQueueEntryEntity::getUserId).collect(Collectors.toSet());
         return MatchmakingRatingEventService.get().getPlayerRatings(userIds);
     }
 
@@ -228,8 +227,8 @@ public class MatchmakerService {
             Double defaultRating) {
         UserSettings player1Settings = userSettingsByCandidate.get(player1);
         UserSettings player2Settings = userSettingsByCandidate.get(player2);
-        String player1Id = player1.getUser().getId();
-        String player2Id = player2.getUser().getId();
+        String player1Id = player1.getUserId();
+        String player2Id = player2.getUserId();
         if (player1Settings.getQueueForGameAvoidList().contains(player2Id)
                 || player2Settings.getQueueForGameAvoidList().contains(player1Id)) {
             return false;
@@ -252,9 +251,9 @@ public class MatchmakerService {
         boolean doesPlayer2WantSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(player2RestrictionsCsv);
         if (doesPlayer1WantSimilarSkill || doesPlayer2WantSimilarSkill) {
             Double player1Rating =
-                    Optional.of(playerRatings.get(player1.getUser().getId())).orElse(defaultRating);
+                    Optional.of(playerRatings.get(player1.getUserId())).orElse(defaultRating);
             Double player2Rating =
-                    Optional.of(playerRatings.get(player2.getUser().getId())).orElse(defaultRating);
+                    Optional.of(playerRatings.get(player2.getUserId())).orElse(defaultRating);
 
             boolean relaxed = isHalfQueueTimePassed(player1, userSettingsByCandidate)
                     || isHalfQueueTimePassed(player2, userSettingsByCandidate);
@@ -331,7 +330,7 @@ public class MatchmakerService {
             for (MatchmakingQueueEntryEntity entry : expired) {
                 userSettingsByEntry.remove(entry);
 
-                User user = JdaService.jda.getUserById(entry.getUser().getId());
+                User user = JdaService.jda.getUserById(entry.getUserId());
                 if (user == null) continue;
 
                 MessageHelper.sendMessageToUser(expiryMessage, user);
@@ -342,9 +341,7 @@ public class MatchmakerService {
 
     private Map<MatchmakingQueueEntryEntity, UserSettings> getUserSettings(List<MatchmakingQueueEntryEntity> entries) {
         return entries.stream()
-                .collect(Collectors.toMap(
-                        entry -> entry,
-                        entry -> UserSettingsManager.get(entry.getUser().getId())));
+                .collect(Collectors.toMap(entry -> entry, entry -> UserSettingsManager.get(entry.getUserId())));
     }
 
     private static String toCsv(List<String> values) {
@@ -366,7 +363,7 @@ public class MatchmakerService {
 
         for (List<MatchmakingQueueEntryEntity> queueEntries : gamesToCreate) {
             List<Member> members = queueEntries.stream()
-                    .map(entry -> guild.getMemberById(entry.getUser().getId()))
+                    .map(entry -> guild.getMemberById(entry.getUserId()))
                     .filter(Objects::nonNull)
                     .toList();
             if (members.size() != queueEntries.size()) continue;

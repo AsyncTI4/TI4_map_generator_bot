@@ -174,8 +174,7 @@ class MatchmakingButtonHandler {
         userSettings.setQueueForGameRestrictions(restrictions);
         UserSettingsManager.save(userSettings);
 
-        SpringContext.getBean(MatchmakerService.class)
-                .queueUser(userId, event.getUser().getName());
+        SpringContext.getBean(MatchmakerService.class).queueUser(userId);
 
         event.getHook()
                 .setEphemeral(true)
