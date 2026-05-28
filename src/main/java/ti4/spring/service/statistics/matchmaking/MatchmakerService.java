@@ -50,8 +50,7 @@ public class MatchmakerService {
     private final MatchmakingQueueEntryRepository matchmakingQueueEntryRepository;
 
     @Transactional
-    public void queueUser(
-            String userId, String username) {
+    public void queueUser(String userId, String username) {
         if (DatabasePersistenceGate.isDisabled()) return;
         matchmakingQueueEntryRepository.deleteByUserId(userId);
 
@@ -93,10 +92,10 @@ public class MatchmakerService {
 
         List<MatchmakingQueueEntryEntity> entries = matchmakingQueueEntryRepository.findAllByOrderByQueuedAtUtcAsc();
         Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByEntry = getUserSettings(entries);
-        List<MatchmakingQueueEntryEntity> candidates = cleanAndRemoveExpiredEntries(
-                entries, userSettingsByEntry, LocalDateTime.now(ZoneOffset.UTC));
-        Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate = candidates.stream()
-                .collect(Collectors.toMap(candidate -> candidate, userSettingsByEntry::get));
+        List<MatchmakingQueueEntryEntity> candidates =
+                cleanAndRemoveExpiredEntries(entries, userSettingsByEntry, LocalDateTime.now(ZoneOffset.UTC));
+        Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate =
+                candidates.stream().collect(Collectors.toMap(candidate -> candidate, userSettingsByEntry::get));
 
         Map<String, Double> playerRatings = getPlayerRatings(candidates);
         double averageRating = playerRatings.values().stream()
@@ -172,8 +171,12 @@ public class MatchmakerService {
                         .get(c)
                         .getQueueForGameExpansions()
                         .contains(expansionOption))
-                .filter(c -> userSettingsByCandidate.get(c).getQueueForGameRestrictions().contains(pace))
-                .filter(c -> tiglPredicate.test(toCsv(userSettingsByCandidate.get(c).getQueueForGameRestrictions())))
+                .filter(c -> userSettingsByCandidate
+                        .get(c)
+                        .getQueueForGameRestrictions()
+                        .contains(pace))
+                .filter(c ->
+                        tiglPredicate.test(toCsv(userSettingsByCandidate.get(c).getQueueForGameRestrictions())))
                 .sorted(Comparator.comparing(
                                 c -> parseHours(userSettingsByCandidate.get(c).getQueueForGameMaxQueueTime()))
                         .reversed())
@@ -265,22 +268,21 @@ public class MatchmakerService {
     }
 
     private boolean isHalfQueueTimePassed(
-            MatchmakingQueueEntryEntity player, Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate) {
-        double maxHours =
-                parseHours(userSettingsByCandidate.get(player).getQueueForGameMaxQueueTime());
+            MatchmakingQueueEntryEntity player,
+            Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate) {
+        double maxHours = parseHours(userSettingsByCandidate.get(player).getQueueForGameMaxQueueTime());
         double hoursWaited =
                 Duration.between(player.getQueuedAtUtc(), Instant.now()).toMinutes() / 60.0;
         return hoursWaited >= maxHours / SIMILAR_SKILL_DIFFERENCE_THRESHOLD;
     }
 
     private Map<MatchmakingQueueEntryEntity, Set<Integer>> getActiveHourBuckets(
-            List<MatchmakingQueueEntryEntity> eligible, Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate) {
+            List<MatchmakingQueueEntryEntity> eligible,
+            Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate) {
         Map<MatchmakingQueueEntryEntity, Set<Integer>> playerToBucketsMap = new HashMap<>();
 
         for (MatchmakingQueueEntryEntity player : eligible) {
-            Set<Integer> activeHours = userSettingsByCandidate
-                    .get(player)
-                    .getActiveHoursAsIntegers();
+            Set<Integer> activeHours = userSettingsByCandidate.get(player).getActiveHoursAsIntegers();
 
             Set<Integer> matchedBuckets = new HashSet<>();
             for (int i = 0; i < NUMBER_OF_ACTIVE_HOUR_BUCKETS; i++) {
@@ -337,7 +339,9 @@ public class MatchmakerService {
 
     private Map<MatchmakingQueueEntryEntity, UserSettings> getUserSettings(List<MatchmakingQueueEntryEntity> entries) {
         return entries.stream()
-                .collect(Collectors.toMap(entry -> entry, entry -> UserSettingsManager.get(entry.getUser().getId())));
+                .collect(Collectors.toMap(
+                        entry -> entry,
+                        entry -> UserSettingsManager.get(entry.getUser().getId())));
     }
 
     private static String toCsv(List<String> values) {
