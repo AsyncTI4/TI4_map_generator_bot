@@ -171,9 +171,7 @@ class MatchmakingButtonHandler {
         List<String> expansions = getSelectedValues(event, EXPANSIONS_ID);
         List<String> playerCounts = getSelectedValues(event, PLAYER_COUNTS_ID);
         List<String> victoryPoints = getSelectedValues(event, VICTORY_POINTS_ID);
-        List<String> paceRestrictions = getSelectedValues(event, PACE_RESTRICTIONS_ID).stream()
-                .filter(pace -> !NO_PACE_OPTION.equals(pace))
-                .toList();
+        List<String> paceRestrictions = getSelectedValues(event, PACE_RESTRICTIONS_ID);
         List<String> restrictions = getSelectedValues(event, RESTRICTIONS_ID);
 
         String userId = event.getUser().getId();
