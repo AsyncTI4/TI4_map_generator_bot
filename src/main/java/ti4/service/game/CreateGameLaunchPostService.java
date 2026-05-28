@@ -39,7 +39,8 @@ public class CreateGameLaunchPostService {
         buttons.add(Buttons.gray("addSillyName~MDL", "Add Fun Game Name"));
         buttons.add(Buttons.blue("launchGame", "Launch Game"));
 
-        String message = CREATE_GAME_FLOW_MESSAGE + CreateGameButtonHandler.generateMemberListMessage(members, gameFunName);
+        String message =
+                CREATE_GAME_FLOW_MESSAGE + CreateGameButtonHandler.generateMemberListMessage(members, gameFunName);
         channel.sendMessage(message)
                 .addComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
                 .queueAfter(2, TimeUnit.SECONDS);

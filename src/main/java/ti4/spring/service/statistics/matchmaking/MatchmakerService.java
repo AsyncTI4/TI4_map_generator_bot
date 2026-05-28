@@ -16,9 +16,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -318,22 +317,23 @@ public class MatchmakerService {
             return;
         }
 
-        List<GuildChannel> channels = JdaService.guildPrimary.getChannelsByName(
-                CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL, true);
-        IThreadContainer threadContainer = channels.stream()
+        IThreadContainer threadContainer = JdaService.guildPrimary.getChannels().stream()
+                .filter(channel ->
+                        CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL.equalsIgnoreCase(channel.getName()))
                 .filter(IThreadContainer.class::isInstance)
                 .map(IThreadContainer.class::cast)
                 .findFirst()
                 .orElse(null);
         if (threadContainer == null) {
-            BotLogger.log("MatchmakerService could not find a thread container named #"
+            BotLogger.info("MatchmakerService could not find a thread container named #"
                     + CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL + ".");
             return;
         }
 
         for (List<MatchmakingQueueEntryEntity> gameEntries : gamesToCreate) {
             List<Member> members = gameEntries.stream()
-                    .map(entry -> JdaService.guildPrimary.getMemberById(entry.getUser().getId()))
+                    .map(entry -> JdaService.guildPrimary.getMemberById(
+                            entry.getUser().getId()))
                     .filter(member -> member != null && !member.getUser().isBot())
                     .toList();
             if (members.size() < 2) {
