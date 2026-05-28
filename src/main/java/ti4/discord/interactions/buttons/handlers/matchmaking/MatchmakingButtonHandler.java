@@ -103,7 +103,7 @@ class MatchmakingButtonHandler {
                 userSettings.getMatchmakingVictoryPointGoals(),
                 DEFAULT_VICTORY_POINTS,
                 REQUIRE_SELECTION);
-        CheckboxGroup paceRestrictions = buildCheckboxGroup(
+        CheckboxGroup paces = buildCheckboxGroup(
                 PACE_RESTRICTIONS_ID,
                 filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(userId),
                 userSettings.getMatchmakingRestrictions(),
@@ -120,7 +120,7 @@ class MatchmakingButtonHandler {
                 .addComponents(Label.of("Expansions", expansions))
                 .addComponents(Label.of("Player Count", playerCounts))
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
-                .addComponents(Label.of("Pace", paceRestrictions))
+                .addComponents(Label.of("Pace", paces))
                 .addComponents(Label.of("Restrictions", restrictions))
                 .build();
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
