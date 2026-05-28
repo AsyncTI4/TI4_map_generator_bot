@@ -155,9 +155,9 @@ public class MatchmakerService {
                         .getMatchmakingExpansions()
                         .contains(expansionOption))
                 .filter(candidate -> userSettingsByCandidate
-                    .get(candidate)
-                    .getMatchmakingPaces()
-                    .contains(paceOption))
+                        .get(candidate)
+                        .getMatchmakingPaces()
+                        .contains(paceOption))
                 .sorted(Comparator.comparing(
                                 c -> getHours(userSettingsByCandidate.get(c).getMatchmakingMaxQueueTime()))
                         .reversed())
