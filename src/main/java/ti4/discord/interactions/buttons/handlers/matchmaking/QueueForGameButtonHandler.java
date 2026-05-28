@@ -40,7 +40,9 @@ class QueueForGameButtonHandler {
 
     private static final String BUTTON_ID = "queueForGame~MDL";
     private static final String LEAVE_QUEUE_BUTTON_ID = "leaveQueueForGame";
+    private static final String ADDITIONAL_SETTINGS_BUTTON_ID = "queueForGameAdditionalSettings~MDL";
     private static final String MODAL_ID = "queueForGameModal";
+    private static final String ADDITIONAL_SETTINGS_MODAL_ID = "queueForGameAdditionalSettingsModal";
 
     private static final String EXPANSIONS_ID = "queue_expansions";
     private static final String PLAYER_COUNTS_ID = "queue_player_counts";
@@ -103,6 +105,20 @@ class QueueForGameButtonHandler {
                 userSettings.getQueueForGameRestrictions(),
                 DEFAULT_RESTRICTIONS,
                 !REQUIRE_SELECTION);
+
+        Modal modal = Modal.create(MODAL_ID, "Queue for Game")
+                .addComponents(Label.of("Expansions", expansions))
+                .addComponents(Label.of("Player Count", playerCounts))
+                .addComponents(Label.of("Victory Point Goal", victoryPoints))
+                .addComponents(Label.of("Restrictions", restrictions))
+                .build();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler(value = ADDITIONAL_SETTINGS_BUTTON_ID, save = false)
+    public static void offerQueueAdditionalSettingsModal(ButtonInteractionEvent event) {
+        UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
+        final boolean REQUIRE_SELECTION = true;
         List<String> selectedMaxQueueTime = userSettings.getQueueForGameMaxQueueTime() == null
                 ? List.of()
                 : List.of(userSettings.getQueueForGameMaxQueueTime());
@@ -120,13 +136,9 @@ class QueueForGameButtonHandler {
                         .toList())
                 .build();
 
-        Modal modal = Modal.create(MODAL_ID, "Queue for Game")
-                .addComponents(Label.of("Expansions", expansions))
-                .addComponents(Label.of("Player Count", playerCounts))
-                .addComponents(Label.of("Victory Point Goal", victoryPoints))
-                .addComponents(Label.of("Restrictions", restrictions))
+        Modal modal = Modal.create(ADDITIONAL_SETTINGS_MODAL_ID, "Queue Additional Settings")
                 .addComponents(Label.of("Max Queue Time", maxQueueTime))
-                .addComponents(Label.of("Players To Avoid", avoidPlayers))
+                .addComponents(Label.of("Avoid List", avoidPlayers))
                 .build();
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -149,8 +161,6 @@ class QueueForGameButtonHandler {
         List<String> playerCounts = getSelectedValues(event, PLAYER_COUNTS_ID);
         List<String> victoryPoints = getSelectedValues(event, VICTORY_POINTS_ID);
         List<String> restrictions = getSelectedValues(event, RESTRICTIONS_ID);
-        String maxQueueTime = getSelectedValues(event, MAX_QUEUE_TIME_ID).getFirst();
-        List<String> avoidedUserIds = getSelectedUserIds(event, AVOID_PLAYERS_ID);
 
         String userId = event.getUser().getId();
         UserSettings userSettings = UserSettingsManager.get(userId);
@@ -162,8 +172,6 @@ class QueueForGameButtonHandler {
         userSettings.setQueueForGameVictoryPointGoals(victoryPoints);
 
         userSettings.setQueueForGameRestrictions(restrictions);
-        userSettings.setQueueForGameMaxQueueTime(maxQueueTime);
-        userSettings.setQueueForGameAvoidList(avoidedUserIds);
         UserSettingsManager.save(userSettings);
 
         SpringContext.getBean(MatchmakerService.class)
@@ -172,6 +180,22 @@ class QueueForGameButtonHandler {
         event.getHook()
                 .setEphemeral(true)
                 .sendMessage("You have been added to the matchmaking queue.")
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ModalHandler(ADDITIONAL_SETTINGS_MODAL_ID)
+    public static void submitQueueForGameAdditionalSettingsModal(ModalInteractionEvent event) {
+        List<String> selectedMaxQueueTime = getSelectedValues(event, MAX_QUEUE_TIME_ID);
+        List<String> avoidedUserIds = getSelectedUserIds(event, AVOID_PLAYERS_ID);
+
+        UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
+        userSettings.setQueueForGameMaxQueueTime(selectedMaxQueueTime.isEmpty() ? DEFAULT_MAX_QUEUE_TIME : selectedMaxQueueTime.getFirst());
+        userSettings.setQueueForGameAvoidList(avoidedUserIds);
+        UserSettingsManager.save(userSettings);
+
+        event.getHook()
+                .setEphemeral(true)
+                .sendMessage("Queue additional settings saved.")
                 .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 

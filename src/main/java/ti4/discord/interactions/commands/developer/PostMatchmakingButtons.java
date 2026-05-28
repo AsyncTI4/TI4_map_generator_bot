@@ -11,6 +11,7 @@ class PostMatchmakingButtons extends Subcommand {
 
     private static final String QUEUE_BUTTON_ID = "queueForGame~MDL";
     private static final String LEAVE_QUEUE_BUTTON_ID = "leaveQueueForGame";
+    private static final String ADDITIONAL_SETTINGS_BUTTON_ID = "queueForGameAdditionalSettings~MDL";
 
     PostMatchmakingButtons() {
         super("post_matchmaking_buttons", "Post the matchmaking buttons.");
@@ -19,7 +20,9 @@ class PostMatchmakingButtons extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         List<Button> buttons = List.of(
-                Buttons.green(QUEUE_BUTTON_ID, "Queue for Game"), Buttons.red(LEAVE_QUEUE_BUTTON_ID, "Leave Queue"));
+                Buttons.green(QUEUE_BUTTON_ID, "Queue for Game"),
+                Buttons.gray(ADDITIONAL_SETTINGS_BUTTON_ID, "Additional Settings"),
+                Buttons.red(LEAVE_QUEUE_BUTTON_ID, "Leave Queue"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 "You can use these buttons to search for a game. Specify what game qualities you're"
