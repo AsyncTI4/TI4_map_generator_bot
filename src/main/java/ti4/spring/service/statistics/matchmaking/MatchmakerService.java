@@ -91,11 +91,9 @@ public class MatchmakerService {
         if (DatabasePersistenceGate.isDisabled()) return;
 
         List<MatchmakingQueueEntryEntity> entries = matchmakingQueueEntryRepository.findAllByOrderByQueuedAtUtcAsc();
-        Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByEntry = getUserSettings(entries);
+        Map<MatchmakingQueueEntryEntity, UserSettings> candidateToUserSettings = getUserSettings(entries);
         List<MatchmakingQueueEntryEntity> candidates =
-                cleanAndRemoveExpiredEntries(entries, userSettingsByEntry, LocalDateTime.now(ZoneOffset.UTC));
-        Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate =
-                candidates.stream().collect(Collectors.toMap(candidate -> candidate, userSettingsByEntry::get));
+                cleanAndRemoveExpiredEntries(entries, candidateToUserSettings, LocalDateTime.now(ZoneOffset.UTC));
 
         Map<String, Double> playerRatings = getPlayerRatings(candidates);
         double averageRating = playerRatings.values().stream()
@@ -103,7 +101,7 @@ public class MatchmakerService {
                 .average()
                 .orElse(Double.NaN);
         Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets =
-                getActiveHourBuckets(candidates, userSettingsByCandidate);
+                getActiveHourBuckets(candidates, candidateToUserSettings);
         List<List<MatchmakingQueueEntryEntity>> gamesToCreate = new ArrayList<>();
         Set<MatchmakingQueueEntryEntity> playersAddedToGames = new HashSet<>();
 
@@ -121,7 +119,7 @@ public class MatchmakerService {
                                     expansionOption,
                                     pace,
                                     tiglPredicate,
-                                    userSettingsByCandidate,
+                                    candidateToUserSettings,
                                     playersToActiveHourBuckets,
                                     playerRatings,
                                     averageRating);
@@ -323,14 +321,18 @@ public class MatchmakerService {
                         .isBefore(now))
                 .toList();
         if (!expired.isEmpty()) {
+            BotLogger.info("Expiring " + expired.size() + " matchmaking queue entries.");
             matchmakingQueueEntryRepository.deleteAllInBatch(expired);
             String expiryMessage =
                     "The matchmaking service wasn't able to find you a game in the time frame you selected. "
                             + "Queue again when ready and consider being open to additional game types or longer wait "
                             + "times.";
             for (MatchmakingQueueEntryEntity entry : expired) {
+                userSettingsByEntry.remove(entry);
+
                 User user = JdaService.jda.getUserById(entry.getUser().getId());
                 if (user == null) continue;
+
                 MessageHelper.sendMessageToUser(expiryMessage, user);
             }
         }
