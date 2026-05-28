@@ -10,11 +10,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
@@ -219,9 +221,7 @@ public class MatchmakerService {
             long sharedBuckets = player1ActiveHourBuckets.stream()
                     .filter(player2ActiveHourBuckets::contains)
                     .count();
-            if (sharedBuckets < ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT) {
-                return false;
-            }
+            if (sharedBuckets < ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT) return false;
         }
 
         boolean doesPlayer1WantSimilarSkill = MatchmakingOptions.wantsSimilarActiveHours(player1.getRestrictionsCsv());
@@ -312,35 +312,27 @@ public class MatchmakerService {
     }
 
     private void postMatchedGroupsToMakingNewGamesForum(List<List<MatchmakingQueueEntryEntity>> gamesToCreate) {
-        if (gamesToCreate.isEmpty() || JdaService.guildPrimary == null) {
-            return;
-        }
+        Guild guild = JdaService.guildPrimary;
+        if (gamesToCreate.isEmpty() || guild == null) return;
 
-        IThreadContainer threadContainer = JdaService.guildPrimary.getChannels().stream()
-                .filter(channel ->
-                        CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL.equalsIgnoreCase(channel.getName()))
-                .filter(IThreadContainer.class::isInstance)
-                .map(IThreadContainer.class::cast)
-                .findFirst()
-                .orElse(null);
+        IThreadContainer threadContainer = guild.getForumChannelsByName(
+                        CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL, true)
+                .getFirst();
         if (threadContainer == null) {
-            BotLogger.info("MatchmakerService could not find a thread container named #"
+            BotLogger.error("MatchmakerService could not find a thread container named #"
                     + CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL + ".");
             return;
         }
 
-        for (List<MatchmakingQueueEntryEntity> gameEntries : gamesToCreate) {
-            List<Member> members = gameEntries.stream()
-                    .map(entry -> JdaService.guildPrimary.getMemberById(
-                            entry.getUser().getId()))
-                    .filter(member -> member != null && !member.getUser().isBot())
+        for (List<MatchmakingQueueEntryEntity> queueEntries : gamesToCreate) {
+            List<Member> members = queueEntries.stream()
+                    .map(entry -> guild.getMemberById(entry.getUser().getId()))
+                    .filter(Objects::nonNull)
                     .toList();
-            if (members.size() < 2) {
-                continue;
-            }
+            if (members.size() != queueEntries.size()) continue;
 
             String gameFunName = CreateGameService.autoGenerateGameName();
-            String threadTitle = gameFunName.replace(":", "");
+            String threadTitle = "Matchmaker Game: " + gameFunName.replace(":", "");
             threadContainer
                     .createThreadChannel(threadTitle)
                     .queue(thread -> CreateGameLaunchPostService.postLaunchButtons(thread, members, gameFunName));
