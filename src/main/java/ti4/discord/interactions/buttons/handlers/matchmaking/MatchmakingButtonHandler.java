@@ -120,7 +120,7 @@ class MatchmakingButtonHandler {
                 .addComponents(Label.of("Expansions", expansions))
                 .addComponents(Label.of("Player Count", playerCounts))
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
-                .addComponents(Label.of("Pace Restrictions", paceRestrictions))
+                .addComponents(Label.of("Pace", paceRestrictions))
                 .addComponents(Label.of("Restrictions", restrictions))
                 .build();
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
