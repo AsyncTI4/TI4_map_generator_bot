@@ -6,10 +6,15 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.ManagedGame;
+import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.Helper;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.PlayerEntity;
@@ -126,6 +131,41 @@ public class UserGameInfoService {
             index++;
         }
         return sb.toString();
+    }
+
+    public static int countOngoingGamesThatAffectJoinLimit(ManagedPlayer managedPlayer) {
+        if (managedPlayer == null) return 0;
+        return (int) managedPlayer.getGames().stream()
+                .filter(managedGame -> !managedGame.isHasEnded())
+                .map(ManagedGame::getGame)
+                .filter(isRealPlayerIn3PlusPlayerGame(managedPlayer))
+                .count();
+    }
+
+    public static int countCompletedGamesThatAffectJoinLimit(ManagedPlayer managedPlayer) {
+        if (managedPlayer == null) return 0;
+        return (int) managedPlayer.getGames().stream()
+                .filter(managedGame -> managedGame.isHasEnded() && managedGame.isHasWinner())
+                .map(ManagedGame::getGame)
+                .filter(isRealPlayerIn3PlusPlayerGame(managedPlayer))
+                .count();
+    }
+
+    public static boolean isOverStandardGameLimit(ManagedPlayer managedPlayer) {
+        if (managedPlayer == null) return false;
+        int ongoingAmount = countOngoingGamesThatAffectJoinLimit(managedPlayer);
+        int completedGames = countCompletedGamesThatAffectJoinLimit(managedPlayer);
+        return ongoingAmount > completedGames + 2;
+    }
+
+    private static Predicate<Game> isRealPlayerIn3PlusPlayerGame(ManagedPlayer managedPlayer) {
+        return game -> {
+            List<Player> realAndEliminatedPlayers = game.getRealAndEliminatedPlayers();
+            return realAndEliminatedPlayers.size() >= 3
+                    && realAndEliminatedPlayers.stream()
+                            .map(Player::getUserID)
+                            .anyMatch(id -> managedPlayer.getId().equals(id));
+        };
     }
 
     public static UserGameInfoService get() {
