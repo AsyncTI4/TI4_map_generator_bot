@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
+import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -354,14 +355,14 @@ public class MatchmakerService {
         Guild guild = JdaService.guildPrimary;
         if (gamesToCreate.isEmpty() || guild == null) return;
 
-        var forums = guild.getForumChannelsByName(CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL, true);
+        List<ForumChannel> forums =
+                guild.getForumChannelsByName(CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL, true);
         if (forums.isEmpty()) {
             BotLogger.error("MatchmakerService could not find a thread container named #"
                     + CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL + ".");
             return;
         }
         IThreadContainer threadContainer = forums.getFirst();
-        }
 
         for (List<MatchmakingQueueEntryEntity> queueEntries : gamesToCreate) {
             List<Member> members = queueEntries.stream()
