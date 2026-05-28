@@ -12,6 +12,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.apache.commons.collections4.ListUtils;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ public class QueueForGameService {
     public void queueUser(
             String userId,
             String username,
+            String channelId,
             List<String> expansions,
             List<String> playerCounts,
             List<String> victoryPoints,
@@ -51,6 +53,7 @@ public class QueueForGameService {
         entry.setVictoryPointsCsv(toCsv(victoryPoints));
         entry.setRestrictionsCsv(toCsv(restrictions));
         entry.setMaxQueueTimeHours(parseHours(maxQueueTime));
+        entry.setChannelId(channelId);
 
         matchmakingQueueEntryRepository.save(entry);
     }
@@ -169,7 +172,13 @@ public class QueueForGameService {
                             + "Please queue again and consider being open to additional game types.";
             for (MatchmakingQueueEntryEntity entry : expired) {
                 User user = JdaService.jda.getUserById(entry.getUser().getId());
-                MessageHelper.sendMessageToUser(expiryMessage, user);
+                String channelId = entry.getChannelId();
+                MessageChannel channel = channelId == null ? null : JdaService.jda.getChannelById(MessageChannel.class, channelId);
+                if (channel == null || user == null) {
+                    MessageHelper.sendMessageToUser(expiryMessage, user);
+                    continue;
+                }
+                MessageHelper.sendMessageToChannel(channel, user.getAsMention() + " " + expiryMessage);
             }
         }
         return entries.stream().filter(entry -> !expired.contains(entry)).toList();
