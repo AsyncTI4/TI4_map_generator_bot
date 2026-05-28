@@ -22,16 +22,18 @@ public class MatchmakingOptions {
     public static final List<String> VICTORY_POINT_OPTIONS = List.of("10", "12", "14");
     private static final String SIMILAR_ACTIVE_HOURS_OPTION = "Similar Active Hours";
     private static final String SIMILAR_PLAYER_SKILL_OPTION = "Similar Player Skill";
-    public static final String FASTER_PACE_OPTION = "Faster Pace (15 days)";
-    public static final String FASTEST_PACE_OPTION = "Fastest Pace (7 days)";
+    public static final String NO_PACE_OPTION = "No Pace";
+    public static final String SLOW_PACE_OPTION = "Slow (90 days)";
+    public static final String FAST_PACE_OPTION = "Fast (30 days)";
+    public static final String FASTER_PACE_OPTION = "Faster (15 days)";
+    public static final String FASTEST_PACE_OPTION = "Fastest (7 days)";
     private static final String TIGL_OPTION = "Twilight Imperium Global League";
+    public static final List<String> PACE_RESTRICTION_OPTIONS = List.of(
+            NO_PACE_OPTION, SLOW_PACE_OPTION, FAST_PACE_OPTION, FASTER_PACE_OPTION, FASTEST_PACE_OPTION);
     public static final List<String> RESTRICTION_OPTIONS = List.of(
             SIMILAR_ACTIVE_HOURS_OPTION,
             SIMILAR_PLAYER_SKILL_OPTION,
-            TIGL_OPTION,
-            "Fast Pace (30 days)",
-            FASTER_PACE_OPTION,
-            FASTEST_PACE_OPTION);
+            TIGL_OPTION);
 
     public static final Map<String, Integer> MAX_QUEUE_TIME_OPTIONS_TO_HOURS;
 
@@ -66,8 +68,8 @@ public class MatchmakingOptions {
     }
 
     public static List<String> getShuffledPaceRestrictions() {
-        List<String> pacesRestrictions = new ArrayList<>(RESTRICTION_OPTIONS);
-        pacesRestrictions.removeIf(restriction -> !restriction.contains("Pace"));
+        List<String> pacesRestrictions = new ArrayList<>(PACE_RESTRICTION_OPTIONS);
+        pacesRestrictions.remove(NO_PACE_OPTION);
         Collections.shuffle(pacesRestrictions);
         return pacesRestrictions;
     }

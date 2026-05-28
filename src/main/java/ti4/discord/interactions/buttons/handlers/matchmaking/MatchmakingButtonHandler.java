@@ -1,6 +1,8 @@
 package ti4.discord.interactions.buttons.handlers.matchmaking;
 
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.MAX_QUEUE_TIME_OPTIONS_TO_HOURS;
+import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.NO_PACE_OPTION;
+import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.PACE_RESTRICTION_OPTIONS;
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.PLAYER_COUNT_OPTIONS;
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.RESTRICTION_OPTIONS;
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.VICTORY_POINT_OPTIONS;
@@ -47,6 +49,7 @@ class MatchmakingButtonHandler {
     private static final String EXPANSIONS_ID = "queue_expansions";
     private static final String PLAYER_COUNTS_ID = "queue_player_counts";
     private static final String VICTORY_POINTS_ID = "queue_victory_points";
+    private static final String PACE_RESTRICTIONS_ID = "queue_pace_restrictions";
     private static final String RESTRICTIONS_ID = "queue_restrictions";
     private static final String MAX_QUEUE_TIME_ID = "queue_max_time";
     private static final String AVOID_PLAYERS_ID = "queue_avoid_players";
@@ -55,6 +58,7 @@ class MatchmakingButtonHandler {
     private static final List<String> DEFAULT_EXPANSIONS = List.of("Prophecy of Kings and Thunder's Edge");
     private static final List<String> DEFAULT_PLAYER_COUNTS = List.of("6");
     private static final List<String> DEFAULT_VICTORY_POINTS = List.of("10");
+    private static final List<String> DEFAULT_PACE_RESTRICTIONS = List.of(NO_PACE_OPTION);
     private static final List<String> DEFAULT_RESTRICTIONS = List.of("Similar Active Hours");
     private static final Map<String, Integer> PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT = Map.of(
             MatchmakingOptions.FASTER_PACE_OPTION, 19,
@@ -99,9 +103,15 @@ class MatchmakingButtonHandler {
                 userSettings.getMatchmakingVictoryPointGoals(),
                 DEFAULT_VICTORY_POINTS,
                 REQUIRE_SELECTION);
+        CheckboxGroup paceRestrictions = buildCheckboxGroup(
+                PACE_RESTRICTIONS_ID,
+                filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(userId),
+                userSettings.getMatchmakingRestrictions(),
+                DEFAULT_PACE_RESTRICTIONS,
+                REQUIRE_SELECTION);
         CheckboxGroup restrictions = buildCheckboxGroup(
                 RESTRICTIONS_ID,
-                filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(userId),
+                RESTRICTION_OPTIONS,
                 userSettings.getMatchmakingRestrictions(),
                 DEFAULT_RESTRICTIONS,
                 !REQUIRE_SELECTION);
@@ -110,6 +120,7 @@ class MatchmakingButtonHandler {
                 .addComponents(Label.of("Expansions", expansions))
                 .addComponents(Label.of("Player Count", playerCounts))
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
+                .addComponents(Label.of("Pace Restrictions", paceRestrictions))
                 .addComponents(Label.of("Restrictions", restrictions))
                 .build();
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
@@ -160,6 +171,8 @@ class MatchmakingButtonHandler {
         List<String> expansions = getSelectedValues(event, EXPANSIONS_ID);
         List<String> playerCounts = getSelectedValues(event, PLAYER_COUNTS_ID);
         List<String> victoryPoints = getSelectedValues(event, VICTORY_POINTS_ID);
+        List<String> paceRestrictions =
+                getSelectedValues(event, PACE_RESTRICTIONS_ID).stream().filter(pace -> !NO_PACE_OPTION.equals(pace)).toList();
         List<String> restrictions = getSelectedValues(event, RESTRICTIONS_ID);
 
         String userId = event.getUser().getId();
@@ -170,8 +183,9 @@ class MatchmakingButtonHandler {
         userSettings.setMatchmakingExpansions(expansions);
         userSettings.setMatchmakingPlayerCounts(playerCounts);
         userSettings.setMatchmakingVictoryPointGoals(victoryPoints);
-
-        userSettings.setMatchmakingRestrictions(restrictions);
+        List<String> allRestrictions = new ArrayList<>(restrictions);
+        allRestrictions.addAll(paceRestrictions);
+        userSettings.setMatchmakingRestrictions(allRestrictions);
         UserSettingsManager.save(userSettings);
 
         SpringContext.getBean(MatchmakerService.class).queueUser(userId);
@@ -228,7 +242,7 @@ class MatchmakingButtonHandler {
 
     private static List<String> filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(String userId) {
         UserGameInfoService userGameInfoService = UserGameInfoService.get();
-        List<String> restrictions = new ArrayList<>(RESTRICTION_OPTIONS);
+        List<String> restrictions = new ArrayList<>(PACE_RESTRICTION_OPTIONS);
         PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT.forEach(
                 (paceRestriction, gameCompletedInDaysRequirement) -> {
                     if (!userGameInfoService.hasCompletedGameInDays(userId, gameCompletedInDaysRequirement)) {
