@@ -11,11 +11,14 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
+import net.dv8tion.jda.api.entities.User;
 import org.apache.commons.collections4.ListUtils;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
+import ti4.message.MessageHelper;
 import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.spring.service.persistence.UserEntity;
 
@@ -161,10 +164,14 @@ public class QueueForGameService {
                 .toList();
         if (!expired.isEmpty()) {
             matchmakingQueueEntryRepository.deleteAllInBatch(expired);
+            String expiryMessage =
+                    "The matchmaking service wasn't able to find you a game in the time frame you selected. "
+                            + "Please queue again and consider being open to additional game types.";
+            for (MatchmakingQueueEntryEntity entry : expired) {
+                User user = JdaService.jda.getUserById(entry.getUser().getId());
+                MessageHelper.sendMessageToUser(expiryMessage, user);
+            }
         }
-        // TODO ping expired users with an ephemeral message that they have the matchmaking service wasn't able to find
-        // them a game in the time frame they wanted. Please queue again and consider being open to additional game
-        // types
         return entries.stream().filter(entry -> !expired.contains(entry)).toList();
     }
 
