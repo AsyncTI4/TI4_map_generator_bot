@@ -124,6 +124,7 @@ class QueueForGameButtonHandler {
 
     @ModalHandler(MODAL_ID)
     public static void submitQueueForGameModal(ModalInteractionEvent event) {
+        // TODO: Check player is below their game limit
         List<String> expansions = getSelectedValues(event, EXPANSIONS_ID);
         List<String> playerCounts = getSelectedValues(event, PLAYER_COUNTS_ID);
         List<String> victoryPoints = getSelectedValues(event, VICTORY_POINTS_ID);
@@ -149,7 +150,10 @@ class QueueForGameButtonHandler {
                         restrictions,
                         maxQueueTime);
 
-        MessageHelper.sendEphemeralMessageToEventChannel(event, "You have been added to the matchmaking queue.");
+        event.getHook()
+            .setEphemeral(true)
+            .sendMessage("You have been added to the matchmaking queue.")
+            .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static CheckboxGroup buildCheckboxGroup(
