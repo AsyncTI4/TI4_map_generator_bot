@@ -18,13 +18,16 @@ public class MatchmakingOptions {
     public static final List<String> VICTORY_POINT_OPTIONS = List.of("10", "12", "14");
     private static final String SIMILAR_ACTIVE_HOURS = "Similar Active Hours";
     private static final String SIMILAR_PLAYER_SKILL = "Similar Player Skill";
+    public static final String FASTER_PACE_OPTION = "Faster Pace (15 days)";
+    public static final String FASTEST_PACE_OPTION = "Fastest Pace (7 days)";
+    private static final String TIGL_OPTION = "Twilight Imperium Global League";
     public static final List<String> RESTRICTION_OPTIONS = List.of(
             SIMILAR_ACTIVE_HOURS,
             SIMILAR_PLAYER_SKILL,
-            "Twilight Imperium Global League",
+            TIGL_OPTION,
             "Fast Pace (30 days)",
-            "Faster Pace (14 days)",
-            "Fastest Pace (7 days)");
+            FASTER_PACE_OPTION,
+            FASTEST_PACE_OPTION);
 
     public static final Map<String, Integer> MAX_QUEUE_TIME_OPTIONS_TO_HOURS;
 
@@ -66,8 +69,7 @@ public class MatchmakingOptions {
     }
 
     public static List<Predicate<String>> getTiglRestrictionPredicates() {
-        return buildRestrictionPredicates(
-                restrictionsCsv -> csvContains(restrictionsCsv, "Twilight Imperium Global League"));
+        return buildRestrictionPredicates(restrictionsCsv -> csvContains(restrictionsCsv, TIGL_OPTION));
     }
 
     private static List<Predicate<String>> buildRestrictionPredicates(Predicate<String> predicate) {
