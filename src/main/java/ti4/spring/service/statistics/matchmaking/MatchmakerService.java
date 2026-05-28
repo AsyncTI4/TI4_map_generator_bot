@@ -233,8 +233,8 @@ public class MatchmakerService {
             if (sharedBuckets < ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT) return false;
         }
 
-        boolean doesPlayer1WantSimilarSkill = MatchmakingOptions.wantsSimilarActiveHours(player1.getRestrictionsCsv());
-        boolean doesPlayer2WantSimilarSkill = MatchmakingOptions.wantsSimilarActiveHours(player2.getRestrictionsCsv());
+        boolean doesPlayer1WantSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(player1.getRestrictionsCsv());
+        boolean doesPlayer2WantSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(player2.getRestrictionsCsv());
         if (doesPlayer1WantSimilarSkill || doesPlayer2WantSimilarSkill) {
             Double player1Rating =
                     Optional.of(playerRatings.get(player1.getUser().getId())).orElse(defaultRating);
