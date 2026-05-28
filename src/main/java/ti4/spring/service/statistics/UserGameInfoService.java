@@ -41,6 +41,16 @@ public class UserGameInfoService {
     }
 
     @Transactional(readOnly = true)
+    public boolean hasCompletedGameNearPace(String userId, int paceDays) {
+        int maxDurationDays = paceDays + 3;
+        return playerEntityRepository.findAllWithCompletedGamesByUserIdEquals(userId).stream()
+                .map(PlayerEntity::getGame)
+                .map(game -> Duration.ofMillis(game.getEndedEpochMilliseconds() - game.getCreationEpochMilliseconds())
+                        .toDays())
+                .anyMatch(days -> days <= maxDurationDays);
+    }
+
+    @Transactional(readOnly = true)
     public String getUserGameInfo(List<User> users) {
         List<String> userIds = users.stream().map(User::getId).toList();
         List<PlayerEntity> players = playerEntityRepository.findAllWithUsersAndGamesByUserIdIn(userIds);

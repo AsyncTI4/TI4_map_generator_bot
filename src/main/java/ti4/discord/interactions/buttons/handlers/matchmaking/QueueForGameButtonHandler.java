@@ -48,6 +48,8 @@ class QueueForGameButtonHandler {
     private static final List<String> DEFAULT_PLAYER_COUNTS = List.of("6");
     private static final List<String> DEFAULT_VICTORY_POINTS = List.of("10");
     private static final List<String> DEFAULT_RESTRICTIONS = List.of("Similar Active Hours");
+    private static final String FASTER_PACE_RESTRICTION = "Faster Pace (14 days)";
+    private static final String FASTEST_PACE_RESTRICTION = "Fastest Pace (7 days)";
 
     @ButtonHandler(value = BUTTON_ID, save = false)
     public static void offerQueueForGameModal(ButtonInteractionEvent event) {
@@ -138,8 +140,7 @@ class QueueForGameButtonHandler {
 
         if (isPlayerAtGameLimit(event, userId, userSettings)) return;
 
-        // TODO: Make sure the player has completed at least 1 game near the restricted pace
-        // if (playerHasNotCompleted1GameNearRestrictedPace(event, userId, restrictions)) return;
+        if (playerHasNotCompleted1GameNearRestrictedPace(event, userId, restrictions)) return;
 
         userSettings.setQueueForGameExpansions(expansions);
         userSettings.setQueueForGamePlayerCounts(playerCounts);
@@ -188,6 +189,30 @@ class QueueForGameButtonHandler {
                         .queue(Consumers.nop(), BotLogger::catchRestError);
                 return true;
             }
+        }
+        return false;
+    }
+
+    private static boolean playerHasNotCompleted1GameNearRestrictedPace(
+            ModalInteractionEvent event, String userId, List<String> restrictions) {
+        UserGameInfoService userGameInfoService = UserGameInfoService.get();
+        if (restrictions.contains(FASTEST_PACE_RESTRICTION)
+                && !userGameInfoService.hasCompletedGameNearPace(userId, 7)) {
+            event.getHook()
+                    .setEphemeral(true)
+                    .sendMessage(
+                            "You cannot choose **Fastest Pace (7 days)** until you've completed at least one game in **10 days or less**.")
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            return true;
+        }
+        if (restrictions.contains(FASTER_PACE_RESTRICTION)
+                && !userGameInfoService.hasCompletedGameNearPace(userId, 14)) {
+            event.getHook()
+                    .setEphemeral(true)
+                    .sendMessage(
+                            "You cannot choose **Faster Pace (14 days)** until you've completed at least one game in **17 days or less**.")
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            return true;
         }
         return false;
     }
