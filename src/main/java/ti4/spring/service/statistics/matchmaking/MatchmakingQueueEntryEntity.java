@@ -51,6 +51,9 @@ public class MatchmakingQueueEntryEntity {
     @Column(name = "max_queue_time_minutes", nullable = false)
     private int maxQueueTimeHours;
 
+    @Column(name = "channel_id")
+    private String channelId;
+
     public List<String> getVictoryPoints() {
         return splitToList(victoryPointsCsv);
     }
