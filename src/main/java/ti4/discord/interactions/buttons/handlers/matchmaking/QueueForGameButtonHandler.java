@@ -138,10 +138,13 @@ class QueueForGameButtonHandler {
 
         if (isPlayerAtGameLimit(event, userId, userSettings)) return;
 
+        // TODO: Make sure the player has completed at least 1 game near the restricted pace
+        // if (playerHasNotCompleted1GameNearRestrictedPace(event, userId, restrictions)) return;
+
         userSettings.setQueueForGameExpansions(expansions);
         userSettings.setQueueForGamePlayerCounts(playerCounts);
         userSettings.setQueueForGameVictoryPointGoals(victoryPoints);
-        // TODO: Make sure the player has completed at least 1 game near the restricted pace
+
         userSettings.setQueueForGameRestrictions(restrictions);
         userSettings.setQueueForGameMaxQueueTime(maxQueueTime);
         UserSettingsManager.save(userSettings);
