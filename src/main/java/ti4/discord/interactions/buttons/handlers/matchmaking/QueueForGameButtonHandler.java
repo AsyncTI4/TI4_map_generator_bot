@@ -189,7 +189,8 @@ class QueueForGameButtonHandler {
         List<String> avoidedUserIds = getSelectedUserIds(event, AVOID_PLAYERS_ID);
 
         UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
-        userSettings.setQueueForGameMaxQueueTime(selectedMaxQueueTime.isEmpty() ? DEFAULT_MAX_QUEUE_TIME : selectedMaxQueueTime.getFirst());
+        userSettings.setQueueForGameMaxQueueTime(
+                selectedMaxQueueTime.isEmpty() ? DEFAULT_MAX_QUEUE_TIME : selectedMaxQueueTime.getFirst());
         userSettings.setQueueForGameAvoidList(avoidedUserIds);
         UserSettingsManager.save(userSettings);
 
