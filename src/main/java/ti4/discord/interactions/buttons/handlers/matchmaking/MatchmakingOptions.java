@@ -15,9 +15,11 @@ public class MatchmakingOptions {
     public static final List<String> EXPANSION_OPTIONS = List.of("PoK", "TE", "PoK + TE");
     public static final List<String> PLAYER_COUNT_OPTIONS = List.of("3", "4", "5", "6", "7", "8");
     public static final List<String> VICTORY_POINT_OPTIONS = List.of("10", "12", "14");
+    private static final String SIMILAR_ACTIVE_HOURS = "Similar Active Hours";
+    private static final String SIMILAR_PLAYER_SKILL = "Similar Player Skill";
     public static final List<String> RESTRICTION_OPTIONS = List.of(
-            "Similar Active Hours",
-            "Similar Player Skill",
+            SIMILAR_ACTIVE_HOURS,
+            SIMILAR_PLAYER_SKILL,
             "Twilight Imperium Global League",
             "Fast Pace (30 days)",
             "Faster Pace (14 days)",
@@ -69,5 +71,13 @@ public class MatchmakingOptions {
 
     private static List<Predicate<String>> buildRestrictionPredicates(Predicate<String> predicate) {
         return List.of(predicate, predicate.negate());
+    }
+
+    public static boolean wantsSimilarActiveHours(String restrictionsCsv) {
+        return restrictionsCsv.contains(SIMILAR_ACTIVE_HOURS);
+    }
+
+    public static boolean wantsSimilarPlayerSkill(String restrictionsCsv) {
+        return restrictionsCsv.contains(SIMILAR_PLAYER_SKILL);
     }
 }

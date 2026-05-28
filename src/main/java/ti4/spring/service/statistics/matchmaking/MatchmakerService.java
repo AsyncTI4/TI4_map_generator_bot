@@ -208,9 +208,8 @@ public class MatchmakerService {
             Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets,
             Map<String, Double> playerRatings,
             Double defaultRating) {
-
-        boolean doesPlayer1WantSimilarHours = player1.getRestrictions().contains("Similar Active Hours");
-        boolean doesPlayer2WantSimilarHours = player2.getRestrictions().contains("Similar Active Hours");
+        boolean doesPlayer1WantSimilarHours = MatchmakingOptions.wantsSimilarActiveHours(player1.getRestrictionsCsv());
+        boolean doesPlayer2WantSimilarHours = MatchmakingOptions.wantsSimilarActiveHours(player2.getRestrictionsCsv());
         if (doesPlayer1WantSimilarHours || doesPlayer2WantSimilarHours) {
             Set<Integer> player1ActiveHourBuckets = playersToActiveHourBuckets.getOrDefault(player1, Set.of());
             Set<Integer> player2ActiveHourBuckets = playersToActiveHourBuckets.getOrDefault(player2, Set.of());
@@ -222,8 +221,8 @@ public class MatchmakerService {
             }
         }
 
-        boolean doesPlayer1WantSimilarSkill = player1.getRestrictions().contains("Similar Player Skill");
-        boolean doesPlayer2WantSimilarSkill = player2.getRestrictions().contains("Similar Player Skill");
+        boolean doesPlayer1WantSimilarSkill = MatchmakingOptions.wantsSimilarActiveHours(player1.getRestrictionsCsv());
+        boolean doesPlayer2WantSimilarSkill = MatchmakingOptions.wantsSimilarActiveHours(player2.getRestrictionsCsv());
         if (doesPlayer1WantSimilarSkill || doesPlayer2WantSimilarSkill) {
             Double player1Rating =
                     Optional.of(playerRatings.get(player1.getUser().getId())).orElse(defaultRating);
