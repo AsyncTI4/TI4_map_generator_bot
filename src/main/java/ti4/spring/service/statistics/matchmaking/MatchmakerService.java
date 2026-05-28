@@ -315,8 +315,8 @@ public class MatchmakerService {
             Instant now) {
         List<MatchmakingQueueEntryEntity> expired = entries.stream()
                 .filter(entry -> entry.getQueuedAt()
-                        .plus(Duration.ofHours(parseHours(
-                                userSettingsByEntry.get(entry).getQueueForGameMaxQueueTime())))
+                        .plus(Duration.ofHours(
+                                parseHours(userSettingsByEntry.get(entry).getQueueForGameMaxQueueTime())))
                         .isBefore(now))
                 .toList();
         if (!expired.isEmpty()) {
