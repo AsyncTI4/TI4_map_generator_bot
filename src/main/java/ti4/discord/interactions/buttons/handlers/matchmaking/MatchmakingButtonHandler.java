@@ -84,25 +84,25 @@ class MatchmakingButtonHandler {
         CheckboxGroup expansions = buildCheckboxGroup(
                 EXPANSIONS_ID,
                 MatchmakingOptions.EXPANSION_OPTIONS,
-                userSettings.getQueueForGameExpansions(),
+                userSettings.getMatchmakingExpansions(),
                 DEFAULT_EXPANSIONS,
                 REQUIRE_SELECTION);
         CheckboxGroup playerCounts = buildCheckboxGroup(
                 PLAYER_COUNTS_ID,
                 PLAYER_COUNT_OPTIONS,
-                userSettings.getQueueForGamePlayerCounts(),
+                userSettings.getMatchmakingPlayerCounts(),
                 DEFAULT_PLAYER_COUNTS,
                 REQUIRE_SELECTION);
         CheckboxGroup victoryPoints = buildCheckboxGroup(
                 VICTORY_POINTS_ID,
                 VICTORY_POINT_OPTIONS,
-                userSettings.getQueueForGameVictoryPointGoals(),
+                userSettings.getMatchmakingVictoryPointGoals(),
                 DEFAULT_VICTORY_POINTS,
                 REQUIRE_SELECTION);
         CheckboxGroup restrictions = buildCheckboxGroup(
                 RESTRICTIONS_ID,
                 filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(userId),
-                userSettings.getQueueForGameRestrictions(),
+                userSettings.getMatchmakingRestrictions(),
                 DEFAULT_RESTRICTIONS,
                 !REQUIRE_SELECTION);
 
@@ -119,9 +119,9 @@ class MatchmakingButtonHandler {
     public static void offerQueueAdditionalSettingsModal(ButtonInteractionEvent event) {
         UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
         final boolean REQUIRE_SELECTION = true;
-        List<String> selectedMaxQueueTime = userSettings.getQueueForGameMaxQueueTime() == null
+        List<String> selectedMaxQueueTime = userSettings.getMatchmakingMaxQueueTime() == null
                 ? List.of()
-                : List.of(userSettings.getQueueForGameMaxQueueTime());
+                : List.of(userSettings.getMatchmakingMaxQueueTime());
         StringSelectMenu maxQueueTime = buildSingleSelect(
                 MAX_QUEUE_TIME_ID,
                 MAX_QUEUE_TIME_OPTIONS_TO_HOURS.keySet(),
@@ -131,7 +131,7 @@ class MatchmakingButtonHandler {
         EntitySelectMenu avoidPlayers = EntitySelectMenu.create(AVOID_PLAYERS_ID, SelectTarget.USER)
                 .setRequired(false)
                 .setMaxValues(25)
-                .setDefaultValues(userSettings.getQueueForGameAvoidList().stream()
+                .setDefaultValues(userSettings.getMatchmakingAvoidList().stream()
                         .map(EntitySelectMenu.DefaultValue::user)
                         .toList())
                 .build();
@@ -167,11 +167,11 @@ class MatchmakingButtonHandler {
 
         if (isPlayerAtGameLimit(event, userId, userSettings)) return;
 
-        userSettings.setQueueForGameExpansions(expansions);
-        userSettings.setQueueForGamePlayerCounts(playerCounts);
-        userSettings.setQueueForGameVictoryPointGoals(victoryPoints);
+        userSettings.setMatchmakingExpansions(expansions);
+        userSettings.setMatchmakingPlayerCounts(playerCounts);
+        userSettings.setMatchmakingVictoryPointGoals(victoryPoints);
 
-        userSettings.setQueueForGameRestrictions(restrictions);
+        userSettings.setMatchmakingRestrictions(restrictions);
         UserSettingsManager.save(userSettings);
 
         SpringContext.getBean(MatchmakerService.class).queueUser(userId);
@@ -188,9 +188,9 @@ class MatchmakingButtonHandler {
         List<String> avoidedUserIds = getSelectedUserIds(event, AVOID_PLAYERS_ID);
 
         UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
-        userSettings.setQueueForGameMaxQueueTime(
+        userSettings.setMatchmakingMaxQueueTime(
                 selectedMaxQueueTime.isEmpty() ? DEFAULT_MAX_QUEUE_TIME : selectedMaxQueueTime.getFirst());
-        userSettings.setQueueForGameAvoidList(avoidedUserIds);
+        userSettings.setMatchmakingAvoidList(avoidedUserIds);
         UserSettingsManager.save(userSettings);
 
         event.getHook()

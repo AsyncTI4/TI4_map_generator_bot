@@ -47,12 +47,12 @@ public class UserSettings {
     private String takebackPref = "No Preference";
     private String metaPref = "No Preference";
     private String trackRecord = "";
-    private List<String> queueForGameExpansions;
-    private List<String> queueForGamePlayerCounts;
-    private List<String> queueForGameVictoryPointGoals;
-    private List<String> queueForGameRestrictions;
-    private String queueForGameMaxQueueTime;
-    private List<String> queueForGameAvoidList;
+    private List<String> matchmakingExpansions;
+    private List<String> matchmakingPlayerCounts;
+    private List<String> matchmakingVictoryPointGoals;
+    private List<String> matchmakingRestrictions;
+    private String matchmakingMaxQueueTime;
+    private List<String> matchmakingAvoidList;
 
     UserSettings(String userId) {
         this.userId = userId;
@@ -62,24 +62,24 @@ public class UserSettings {
         return Objects.requireNonNullElse(preferredColors, Collections.emptyList());
     }
 
-    public List<String> getQueueForGameExpansions() {
-        return Objects.requireNonNullElse(queueForGameExpansions, Collections.emptyList());
+    public List<String> getMatchmakingExpansions() {
+        return Objects.requireNonNullElse(matchmakingExpansions, Collections.emptyList());
     }
 
-    public List<String> getQueueForGamePlayerCounts() {
-        return Objects.requireNonNullElse(queueForGamePlayerCounts, Collections.emptyList());
+    public List<String> getMatchmakingPlayerCounts() {
+        return Objects.requireNonNullElse(matchmakingPlayerCounts, Collections.emptyList());
     }
 
-    public List<String> getQueueForGameVictoryPointGoals() {
-        return Objects.requireNonNullElse(queueForGameVictoryPointGoals, Collections.emptyList());
+    public List<String> getMatchmakingVictoryPointGoals() {
+        return Objects.requireNonNullElse(matchmakingVictoryPointGoals, Collections.emptyList());
     }
 
-    public List<String> getQueueForGameRestrictions() {
-        return Objects.requireNonNullElse(queueForGameRestrictions, Collections.emptyList());
+    public List<String> getMatchmakingRestrictions() {
+        return Objects.requireNonNullElse(matchmakingRestrictions, Collections.emptyList());
     }
 
-    public List<String> getQueueForGameAvoidList() {
-        return Objects.requireNonNullElse(queueForGameAvoidList, Collections.emptyList());
+    public List<String> getMatchmakingAvoidList() {
+        return Objects.requireNonNullElse(matchmakingAvoidList, Collections.emptyList());
     }
 
     public void addAfkHour(String hour) {

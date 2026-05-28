@@ -49,15 +49,15 @@ public class MatchmakingOptions {
         return PLAYER_COUNT_OPTIONS.stream().sorted(Collections.reverseOrder()).toList();
     }
 
-    public static List<String> getVictoryPointOptionsDescending() {
-        return VICTORY_POINT_OPTIONS.stream().sorted(Collections.reverseOrder()).toList();
+    public static List<String> getShuffledVictoryPointOptions() {
+        var victoryPointOptions = new ArrayList<>(VICTORY_POINT_OPTIONS);
+        Collections.shuffle(victoryPointOptions);
+        return victoryPointOptions;
     }
 
-    public static List<String> getShuffledExpansionsWithBaseIncluded() {
+    public static List<String> getShuffledExpansionsOptions() {
         var expansionsPlusBase = new ArrayList<>(EXPANSION_OPTIONS);
-
         Collections.shuffle(expansionsPlusBase);
-
         return expansionsPlusBase;
     }
 
@@ -65,9 +65,10 @@ public class MatchmakingOptions {
         return Arrays.asList(csv.split(",")).contains(value);
     }
 
-    public static List<String> getPaceRestrictions() {
+    public static List<String> getShuffledPaceRestrictions() {
         List<String> pacesRestrictions = new ArrayList<>(RESTRICTION_OPTIONS);
         pacesRestrictions.removeIf(restriction -> !restriction.contains("Pace"));
+        Collections.shuffle(pacesRestrictions);
         return pacesRestrictions;
     }
 
@@ -85,5 +86,9 @@ public class MatchmakingOptions {
 
     public static boolean wantsSimilarPlayerSkill(String restrictionsCsv) {
         return restrictionsCsv.contains(SIMILAR_PLAYER_SKILL_OPTION);
+    }
+
+    public static boolean wantsTigl(String restrictionsCsv) {
+        return restrictionsCsv.contains(TIGL_OPTION);
     }
 }

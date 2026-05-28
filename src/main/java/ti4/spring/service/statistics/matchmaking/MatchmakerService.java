@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
@@ -97,24 +96,21 @@ public class MatchmakerService {
         Set<MatchmakingQueueEntryEntity> playersAddedToGames = new HashSet<>();
 
         for (String playerCountOption : MatchmakingOptions.getPlayerCountOptionsDescending()) {
-            for (String victoryPointGoalOption : MatchmakingOptions.getVictoryPointOptionsDescending()) {
-                for (String expansionOption : MatchmakingOptions.getShuffledExpansionsWithBaseIncluded()) {
-                    for (String pace : MatchmakingOptions.getPaceRestrictions()) {
-                        for (Predicate<String> tiglPredicate : MatchmakingOptions.getTiglRestrictionPredicates()) {
-                            matchAndCollect(
-                                    candidates,
-                                    playersAddedToGames,
-                                    gamesToCreate,
-                                    playerCountOption,
-                                    victoryPointGoalOption,
-                                    expansionOption,
-                                    pace,
-                                    tiglPredicate,
-                                    candidateToUserSettings,
-                                    playersToActiveHourBuckets,
-                                    playerRatings,
-                                    averageRating);
-                        }
+            for (String victoryPointGoalOption : MatchmakingOptions.getShuffledVictoryPointOptions()) {
+                for (String expansionOption : MatchmakingOptions.getShuffledExpansionsOptions()) {
+                    for (String pace : MatchmakingOptions.getShuffledPaceRestrictions()) {
+                        matchAndCollect(
+                                candidates,
+                                playersAddedToGames,
+                                gamesToCreate,
+                                playerCountOption,
+                                victoryPointGoalOption,
+                                expansionOption,
+                                pace,
+                                candidateToUserSettings,
+                                playersToActiveHourBuckets,
+                                playerRatings,
+                                averageRating);
                     }
                 }
             }
@@ -141,7 +137,6 @@ public class MatchmakerService {
             String victoryPointGoalOption,
             String expansionOption,
             String pace,
-            Predicate<String> tiglPredicate,
             Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate,
             Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets,
             Map<String, Double> playerRatings,
@@ -150,24 +145,22 @@ public class MatchmakerService {
                 .filter(c -> !playersAddedToGames.contains(c))
                 .filter(c -> userSettingsByCandidate
                         .get(c)
-                        .getQueueForGamePlayerCounts()
+                        .getMatchmakingPlayerCounts()
                         .contains(playerCountOption))
                 .filter(c -> userSettingsByCandidate
                         .get(c)
-                        .getQueueForGameVictoryPointGoals()
+                        .getMatchmakingVictoryPointGoals()
                         .contains(victoryPointGoalOption))
                 .filter(c -> userSettingsByCandidate
                         .get(c)
-                        .getQueueForGameExpansions()
+                        .getMatchmakingExpansions()
                         .contains(expansionOption))
                 .filter(c -> userSettingsByCandidate
                         .get(c)
-                        .getQueueForGameRestrictions()
+                        .getMatchmakingRestrictions()
                         .contains(pace))
-                .filter(c ->
-                        tiglPredicate.test(toCsv(userSettingsByCandidate.get(c).getQueueForGameRestrictions())))
                 .sorted(Comparator.comparing(
-                                c -> getHours(userSettingsByCandidate.get(c).getQueueForGameMaxQueueTime()))
+                                c -> getHours(userSettingsByCandidate.get(c).getMatchmakingMaxQueueTime()))
                         .reversed())
                 .toList();
 
@@ -220,16 +213,23 @@ public class MatchmakerService {
         UserSettings player2Settings = userSettingsByCandidate.get(player2);
         String player1Id = player1.getUserId();
         String player2Id = player2.getUserId();
-        if (player1Settings.getQueueForGameAvoidList().contains(player2Id)
-                || player2Settings.getQueueForGameAvoidList().contains(player1Id)) {
+        if (player1Settings.getMatchmakingAvoidList().contains(player2Id)
+                || player2Settings.getMatchmakingAvoidList().contains(player1Id)) {
             return false;
         }
 
-        String player1RestrictionsCsv = toCsv(player1Settings.getQueueForGameRestrictions());
-        String player2RestrictionsCsv = toCsv(player2Settings.getQueueForGameRestrictions());
-        boolean doesPlayer1WantSimilarHours = MatchmakingOptions.wantsSimilarActiveHours(player1RestrictionsCsv);
-        boolean doesPlayer2WantSimilarHours = MatchmakingOptions.wantsSimilarActiveHours(player2RestrictionsCsv);
-        if (doesPlayer1WantSimilarHours || doesPlayer2WantSimilarHours) {
+        String player1RestrictionsCsv = toCsv(player1Settings.getMatchmakingRestrictions());
+        String player2RestrictionsCsv = toCsv(player2Settings.getMatchmakingRestrictions());
+
+        boolean player1WantsTigl = MatchmakingOptions.wantsTigl(player1RestrictionsCsv);
+        boolean player2WantsTigl = MatchmakingOptions.wantsTigl(player2RestrictionsCsv);
+        if (player1WantsTigl != player2WantsTigl) {
+            return false;
+        }
+
+        boolean player1WantsSimilarHours = MatchmakingOptions.wantsSimilarActiveHours(player1RestrictionsCsv);
+        boolean player2WantsSimilarHours = MatchmakingOptions.wantsSimilarActiveHours(player2RestrictionsCsv);
+        if (player1WantsSimilarHours || player2WantsSimilarHours) {
             Set<Integer> player1ActiveHourBuckets = playersToActiveHourBuckets.getOrDefault(player1, Set.of());
             Set<Integer> player2ActiveHourBuckets = playersToActiveHourBuckets.getOrDefault(player2, Set.of());
             long sharedBuckets = player1ActiveHourBuckets.stream()
@@ -238,9 +238,9 @@ public class MatchmakerService {
             if (sharedBuckets < ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT) return false;
         }
 
-        boolean doesPlayer1WantSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(player1RestrictionsCsv);
-        boolean doesPlayer2WantSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(player2RestrictionsCsv);
-        if (doesPlayer1WantSimilarSkill || doesPlayer2WantSimilarSkill) {
+        boolean player1WantsSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(player1RestrictionsCsv);
+        boolean player2WantsSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(player2RestrictionsCsv);
+        if (player1WantsSimilarSkill || player2WantsSimilarSkill) {
             Double player1Rating =
                     Optional.of(playerRatings.get(player1.getUserId())).orElse(defaultRating);
             Double player2Rating =
@@ -259,7 +259,7 @@ public class MatchmakerService {
     private boolean isHalfQueueTimePassed(
             MatchmakingQueueEntryEntity player,
             Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate) {
-        double maxHours = getHours(userSettingsByCandidate.get(player).getQueueForGameMaxQueueTime());
+        double maxHours = getHours(userSettingsByCandidate.get(player).getMatchmakingMaxQueueTime());
         double hoursWaited =
                 Duration.between(player.getQueuedAt(), Instant.now()).toMinutes() / 60.0;
         return hoursWaited >= maxHours / SIMILAR_SKILL_DIFFERENCE_THRESHOLD;
@@ -309,7 +309,7 @@ public class MatchmakerService {
         List<MatchmakingQueueEntryEntity> expired = entries.stream()
                 .filter(entry -> entry.getQueuedAt()
                         .plus(Duration.ofHours(
-                                getHours(userSettingsByEntry.get(entry).getQueueForGameMaxQueueTime())))
+                                getHours(userSettingsByEntry.get(entry).getMatchmakingMaxQueueTime())))
                         .isBefore(now))
                 .toList();
         if (!expired.isEmpty()) {
