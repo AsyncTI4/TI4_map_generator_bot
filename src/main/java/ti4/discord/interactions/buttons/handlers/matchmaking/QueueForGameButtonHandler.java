@@ -171,27 +171,27 @@ class QueueForGameButtonHandler {
 
     private static boolean isPlayerAtGameLimit(ModalInteractionEvent event, String userId, UserSettings userSettings) {
         ManagedPlayer managedPlayer = GameManager.getManagedPlayer(userId);
-        if (managedPlayer != null) {
-            int ongoingAmount = UserGameInfoService.countOngoingGamesThatAffectJoinLimit(managedPlayer);
-            int completedGames = UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer);
-            if (UserGameInfoService.isOverStandardGameLimit(managedPlayer)) {
-                event.getHook()
-                        .setEphemeral(true)
-                        .sendMessage(
-                                "You are at your game limit (# of ongoing games must be equal or less than # of completed games + 3) and so cannot queue for more games at the moment."
-                                        + " Your number of ongoing games is " + ongoingAmount
-                                        + " and your number of completed games is " + completedGames + ".")
-                        .queue(Consumers.nop(), BotLogger::catchRestError);
-                return true;
-            }
-            if (userSettings.getGameLimit() > 0 && ongoingAmount >= userSettings.getGameLimit()) {
-                event.getHook()
-                        .setEphemeral(true)
-                        .sendMessage("You are currently under a " + userSettings.getGameLimit()
-                                + "-game limit and cannot join more games at this time.")
-                        .queue(Consumers.nop(), BotLogger::catchRestError);
-                return true;
-            }
+        if (managedPlayer == null) return false;
+
+        int ongoingAmount = UserGameInfoService.countOngoingGamesThatAffectJoinLimit(managedPlayer);
+        int completedGames = UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer);
+        if (UserGameInfoService.isOverStandardGameLimit(managedPlayer)) {
+            event.getHook()
+                    .setEphemeral(true)
+                    .sendMessage(
+                            "You are at your game limit (# of ongoing games must be equal or less than # of completed games + 3) and so cannot queue for more games at the moment."
+                                    + " Your number of ongoing games is " + ongoingAmount
+                                    + " and your number of completed games is " + completedGames + ".")
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            return true;
+        }
+        if (userSettings.getGameLimit() > 0 && ongoingAmount >= userSettings.getGameLimit()) {
+            event.getHook()
+                    .setEphemeral(true)
+                    .sendMessage("You are currently under a " + userSettings.getGameLimit()
+                            + "-game limit and cannot join more games at this time.")
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            return true;
         }
         return false;
     }
