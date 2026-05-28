@@ -51,6 +51,9 @@ public class MatchmakingQueueEntryEntity {
     @Column(name = "max_queue_time_minutes", nullable = false)
     private int maxQueueTimeHours;
 
+    @Column(name = "avoided_user_ids_csv")
+    private String avoidedUserIdsCsv;
+
     public List<String> getVictoryPoints() {
         return splitToList(victoryPointsCsv);
     }
@@ -65,6 +68,12 @@ public class MatchmakingQueueEntryEntity {
 
     public List<String> getRestrictions() {
         return restrictionsCsv == null ? List.of() : splitToList(restrictionsCsv);
+    }
+
+    public List<String> getAvoidedUserIds() {
+        return avoidedUserIdsCsv == null || avoidedUserIdsCsv.isBlank()
+                ? List.of()
+                : Arrays.asList(avoidedUserIdsCsv.split(";"));
     }
 
     private List<String> splitToList(String csv) {

@@ -57,7 +57,8 @@ public class MatchmakerService {
             List<String> playerCounts,
             List<String> victoryPoints,
             List<String> restrictions,
-            String maxQueueTime) {
+            String maxQueueTime,
+            List<String> avoidedUserIds) {
         if (DatabasePersistenceGate.isDisabled()) return;
         matchmakingQueueEntryRepository.deleteByUserId(userId);
 
@@ -69,6 +70,7 @@ public class MatchmakerService {
         entry.setVictoryPointsCsv(toCsv(victoryPoints));
         entry.setRestrictionsCsv(toCsv(restrictions));
         entry.setMaxQueueTimeHours(parseHours(maxQueueTime));
+        entry.setAvoidedUserIdsCsv(toCsv(avoidedUserIds));
 
         matchmakingQueueEntryRepository.save(entry);
     }
@@ -213,6 +215,13 @@ public class MatchmakerService {
             Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets,
             Map<String, Double> playerRatings,
             Double defaultRating) {
+        String player1Id = player1.getUser().getId();
+        String player2Id = player2.getUser().getId();
+        if (player1.getAvoidedUserIds().contains(player2Id)
+                || player2.getAvoidedUserIds().contains(player1Id)) {
+            return false;
+        }
+
         boolean doesPlayer1WantSimilarHours = MatchmakingOptions.wantsSimilarActiveHours(player1.getRestrictionsCsv());
         boolean doesPlayer2WantSimilarHours = MatchmakingOptions.wantsSimilarActiveHours(player2.getRestrictionsCsv());
         if (doesPlayer1WantSimilarHours || doesPlayer2WantSimilarHours) {
