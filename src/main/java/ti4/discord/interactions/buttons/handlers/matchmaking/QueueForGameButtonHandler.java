@@ -167,15 +167,7 @@ class QueueForGameButtonHandler {
         UserSettingsManager.save(userSettings);
 
         SpringContext.getBean(MatchmakerService.class)
-                .queueUser(
-                        userId,
-                        event.getUser().getName(),
-                        expansions,
-                        playerCounts,
-                        victoryPoints,
-                        restrictions,
-                        maxQueueTime,
-                        avoidedUserIds);
+                .queueUser(userId, event.getUser().getName());
 
         event.getHook()
                 .setEphemeral(true)

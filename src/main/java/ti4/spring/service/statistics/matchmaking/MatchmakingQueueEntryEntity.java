@@ -11,8 +11,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,48 +33,4 @@ public class MatchmakingQueueEntryEntity {
 
     @Column(name = "queued_at_utc", nullable = false)
     private LocalDateTime queuedAtUtc;
-
-    @Column(name = "expansions_csv", nullable = false)
-    private String expansionsCsv;
-
-    @Column(name = "player_counts_csv", nullable = false)
-    private String playerCountsCsv;
-
-    @Column(name = "victory_points_csv", nullable = false)
-    private String victoryPointsCsv;
-
-    @Column(name = "restrictions_csv", nullable = false)
-    private String restrictionsCsv;
-
-    @Column(name = "max_queue_time_minutes", nullable = false)
-    private int maxQueueTimeHours;
-
-    @Column(name = "avoided_user_ids_csv")
-    private String avoidedUserIdsCsv;
-
-    public List<String> getVictoryPoints() {
-        return splitToList(victoryPointsCsv);
-    }
-
-    public List<String> getPlayerCounts() {
-        return splitToList(playerCountsCsv);
-    }
-
-    public List<String> getExpansions() {
-        return expansionsCsv == null ? List.of() : splitToList(expansionsCsv);
-    }
-
-    public List<String> getRestrictions() {
-        return restrictionsCsv == null ? List.of() : splitToList(restrictionsCsv);
-    }
-
-    public List<String> getAvoidedUserIds() {
-        return avoidedUserIdsCsv == null || avoidedUserIdsCsv.isBlank()
-                ? List.of()
-                : Arrays.asList(avoidedUserIdsCsv.split(";"));
-    }
-
-    private List<String> splitToList(String csv) {
-        return Arrays.asList(csv.split(","));
-    }
 }

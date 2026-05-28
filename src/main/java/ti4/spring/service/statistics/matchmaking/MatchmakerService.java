@@ -30,6 +30,7 @@ import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameLaunchPostService;
 import ti4.service.game.CreateGameService;
 import ti4.service.persistence.DatabasePersistenceGate;
+import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.UserEntity;
@@ -38,7 +39,6 @@ import ti4.spring.service.persistence.UserEntity;
 @Service
 public class MatchmakerService {
 
-    private static final String CSV_SEPARATOR = ";";
     private static final int DEFAULT_MAX_QUEUE_TIME_HOURS = 8;
     private static final int NUMBER_OF_ACTIVE_HOUR_BUCKETS = 6;
     private static final int ACTIVE_HOUR_BUCKET_SIZE = 4;
@@ -51,26 +51,13 @@ public class MatchmakerService {
 
     @Transactional
     public void queueUser(
-            String userId,
-            String username,
-            List<String> expansions,
-            List<String> playerCounts,
-            List<String> victoryPoints,
-            List<String> restrictions,
-            String maxQueueTime,
-            List<String> avoidedUserIds) {
+            String userId, String username) {
         if (DatabasePersistenceGate.isDisabled()) return;
         matchmakingQueueEntryRepository.deleteByUserId(userId);
 
         MatchmakingQueueEntryEntity entry = new MatchmakingQueueEntryEntity();
         entry.setUser(new UserEntity(userId, username));
         entry.setQueuedAtUtc(LocalDateTime.now(ZoneOffset.UTC));
-        entry.setExpansionsCsv(toCsv(expansions));
-        entry.setPlayerCountsCsv(toCsv(playerCounts));
-        entry.setVictoryPointsCsv(toCsv(victoryPoints));
-        entry.setRestrictionsCsv(toCsv(restrictions));
-        entry.setMaxQueueTimeHours(parseHours(maxQueueTime));
-        entry.setAvoidedUserIdsCsv(toCsv(avoidedUserIds));
 
         matchmakingQueueEntryRepository.save(entry);
     }
@@ -105,15 +92,19 @@ public class MatchmakerService {
         if (DatabasePersistenceGate.isDisabled()) return;
 
         List<MatchmakingQueueEntryEntity> entries = matchmakingQueueEntryRepository.findAllByOrderByQueuedAtUtcAsc();
-        List<MatchmakingQueueEntryEntity> candidates =
-                cleanAndRemoveExpiredEntries(entries, LocalDateTime.now(ZoneOffset.UTC));
+        Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByEntry = getUserSettings(entries);
+        List<MatchmakingQueueEntryEntity> candidates = cleanAndRemoveExpiredEntries(
+                entries, userSettingsByEntry, LocalDateTime.now(ZoneOffset.UTC));
+        Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate = candidates.stream()
+                .collect(Collectors.toMap(candidate -> candidate, userSettingsByEntry::get));
 
         Map<String, Double> playerRatings = getPlayerRatings(candidates);
         double averageRating = playerRatings.values().stream()
                 .mapToDouble(Double::doubleValue)
                 .average()
                 .orElse(Double.NaN);
-        Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets = getActiveHourBuckets(candidates);
+        Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets =
+                getActiveHourBuckets(candidates, userSettingsByCandidate);
         List<List<MatchmakingQueueEntryEntity>> gamesToCreate = new ArrayList<>();
         Set<MatchmakingQueueEntryEntity> playersAddedToGames = new HashSet<>();
 
@@ -131,6 +122,7 @@ public class MatchmakerService {
                                     expansionOption,
                                     pace,
                                     tiglPredicate,
+                                    userSettingsByCandidate,
                                     playersToActiveHourBuckets,
                                     playerRatings,
                                     averageRating);
@@ -162,17 +154,28 @@ public class MatchmakerService {
             String expansionOption,
             String pace,
             Predicate<String> tiglPredicate,
+            Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate,
             Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets,
             Map<String, Double> playerRatings,
             Double defaultRating) {
         List<MatchmakingQueueEntryEntity> eligible = candidates.stream()
                 .filter(c -> !playersAddedToGames.contains(c))
-                .filter(c -> c.getPlayerCounts().contains(playerCountOption))
-                .filter(c -> c.getVictoryPoints().contains(victoryPointGoalOption))
-                .filter(c -> c.getExpansions().contains(expansionOption))
-                .filter(c -> c.getRestrictions().contains(pace))
-                .filter(c -> tiglPredicate.test(c.getRestrictionsCsv()))
-                .sorted(Comparator.comparing(MatchmakingQueueEntryEntity::getMaxQueueTimeHours)
+                .filter(c -> userSettingsByCandidate
+                        .get(c)
+                        .getQueueForGamePlayerCounts()
+                        .contains(playerCountOption))
+                .filter(c -> userSettingsByCandidate
+                        .get(c)
+                        .getQueueForGameVictoryPointGoals()
+                        .contains(victoryPointGoalOption))
+                .filter(c -> userSettingsByCandidate
+                        .get(c)
+                        .getQueueForGameExpansions()
+                        .contains(expansionOption))
+                .filter(c -> userSettingsByCandidate.get(c).getQueueForGameRestrictions().contains(pace))
+                .filter(c -> tiglPredicate.test(toCsv(userSettingsByCandidate.get(c).getQueueForGameRestrictions())))
+                .sorted(Comparator.comparing(
+                                c -> parseHours(userSettingsByCandidate.get(c).getQueueForGameMaxQueueTime()))
                         .reversed())
                 .toList();
 
@@ -191,7 +194,12 @@ public class MatchmakerService {
 
                 boolean compatibleWithWholeGroup = group.stream()
                         .allMatch(member -> areCompatible(
-                                member, candidate, playersToActiveHourBuckets, playerRatings, defaultRating));
+                                member,
+                                candidate,
+                                userSettingsByCandidate,
+                                playersToActiveHourBuckets,
+                                playerRatings,
+                                defaultRating));
 
                 if (compatibleWithWholeGroup) {
                     group.add(candidate);
@@ -212,18 +220,23 @@ public class MatchmakerService {
     private boolean areCompatible(
             MatchmakingQueueEntryEntity player1,
             MatchmakingQueueEntryEntity player2,
+            Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate,
             Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets,
             Map<String, Double> playerRatings,
             Double defaultRating) {
+        UserSettings player1Settings = userSettingsByCandidate.get(player1);
+        UserSettings player2Settings = userSettingsByCandidate.get(player2);
         String player1Id = player1.getUser().getId();
         String player2Id = player2.getUser().getId();
-        if (player1.getAvoidedUserIds().contains(player2Id)
-                || player2.getAvoidedUserIds().contains(player1Id)) {
+        if (player1Settings.getQueueForGameAvoidList().contains(player2Id)
+                || player2Settings.getQueueForGameAvoidList().contains(player1Id)) {
             return false;
         }
 
-        boolean doesPlayer1WantSimilarHours = MatchmakingOptions.wantsSimilarActiveHours(player1.getRestrictionsCsv());
-        boolean doesPlayer2WantSimilarHours = MatchmakingOptions.wantsSimilarActiveHours(player2.getRestrictionsCsv());
+        String player1RestrictionsCsv = toCsv(player1Settings.getQueueForGameRestrictions());
+        String player2RestrictionsCsv = toCsv(player2Settings.getQueueForGameRestrictions());
+        boolean doesPlayer1WantSimilarHours = MatchmakingOptions.wantsSimilarActiveHours(player1RestrictionsCsv);
+        boolean doesPlayer2WantSimilarHours = MatchmakingOptions.wantsSimilarActiveHours(player2RestrictionsCsv);
         if (doesPlayer1WantSimilarHours || doesPlayer2WantSimilarHours) {
             Set<Integer> player1ActiveHourBuckets = playersToActiveHourBuckets.getOrDefault(player1, Set.of());
             Set<Integer> player2ActiveHourBuckets = playersToActiveHourBuckets.getOrDefault(player2, Set.of());
@@ -233,15 +246,16 @@ public class MatchmakerService {
             if (sharedBuckets < ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT) return false;
         }
 
-        boolean doesPlayer1WantSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(player1.getRestrictionsCsv());
-        boolean doesPlayer2WantSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(player2.getRestrictionsCsv());
+        boolean doesPlayer1WantSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(player1RestrictionsCsv);
+        boolean doesPlayer2WantSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(player2RestrictionsCsv);
         if (doesPlayer1WantSimilarSkill || doesPlayer2WantSimilarSkill) {
             Double player1Rating =
                     Optional.of(playerRatings.get(player1.getUser().getId())).orElse(defaultRating);
             Double player2Rating =
                     Optional.of(playerRatings.get(player2.getUser().getId())).orElse(defaultRating);
 
-            boolean relaxed = isHalfQueueTimePassed(player1) || isHalfQueueTimePassed(player2);
+            boolean relaxed = isHalfQueueTimePassed(player1, userSettingsByCandidate)
+                    || isHalfQueueTimePassed(player2, userSettingsByCandidate);
             double tolerance =
                     relaxed ? RELAXED_SIMILAR_SKILL_DIFFERENCE_THRESHOLD : SIMILAR_SKILL_DIFFERENCE_THRESHOLD;
             return Math.abs(player1Rating - player2Rating) <= tolerance;
@@ -250,20 +264,23 @@ public class MatchmakerService {
         return true;
     }
 
-    private boolean isHalfQueueTimePassed(MatchmakingQueueEntryEntity player) {
-        double maxHours = player.getMaxQueueTimeHours();
+    private boolean isHalfQueueTimePassed(
+            MatchmakingQueueEntryEntity player, Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate) {
+        double maxHours =
+                parseHours(userSettingsByCandidate.get(player).getQueueForGameMaxQueueTime());
         double hoursWaited =
                 Duration.between(player.getQueuedAtUtc(), Instant.now()).toMinutes() / 60.0;
         return hoursWaited >= maxHours / SIMILAR_SKILL_DIFFERENCE_THRESHOLD;
     }
 
     private Map<MatchmakingQueueEntryEntity, Set<Integer>> getActiveHourBuckets(
-            List<MatchmakingQueueEntryEntity> eligible) {
+            List<MatchmakingQueueEntryEntity> eligible, Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate) {
         Map<MatchmakingQueueEntryEntity, Set<Integer>> playerToBucketsMap = new HashMap<>();
 
         for (MatchmakingQueueEntryEntity player : eligible) {
-            Set<Integer> activeHours =
-                    UserSettingsManager.get(player.getUser().getId()).getActiveHoursAsIntegers();
+            Set<Integer> activeHours = userSettingsByCandidate
+                    .get(player)
+                    .getActiveHoursAsIntegers();
 
             Set<Integer> matchedBuckets = new HashSet<>();
             for (int i = 0; i < NUMBER_OF_ACTIVE_HOUR_BUCKETS; i++) {
@@ -295,10 +312,12 @@ public class MatchmakerService {
 
     @NonNull
     private List<MatchmakingQueueEntryEntity> cleanAndRemoveExpiredEntries(
-            List<MatchmakingQueueEntryEntity> entries, LocalDateTime now) {
+            List<MatchmakingQueueEntryEntity> entries,
+            Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByEntry,
+            LocalDateTime now) {
         List<MatchmakingQueueEntryEntity> expired = entries.stream()
                 .filter(entry -> entry.getQueuedAtUtc()
-                        .plusMinutes(entry.getMaxQueueTimeHours())
+                        .plusHours(parseHours(userSettingsByEntry.get(entry).getQueueForGameMaxQueueTime()))
                         .isBefore(now))
                 .toList();
         if (!expired.isEmpty()) {
@@ -316,8 +335,13 @@ public class MatchmakerService {
         return entries.stream().filter(entry -> !expired.contains(entry)).toList();
     }
 
+    private Map<MatchmakingQueueEntryEntity, UserSettings> getUserSettings(List<MatchmakingQueueEntryEntity> entries) {
+        return entries.stream()
+                .collect(Collectors.toMap(entry -> entry, entry -> UserSettingsManager.get(entry.getUser().getId())));
+    }
+
     private static String toCsv(List<String> values) {
-        return String.join(CSV_SEPARATOR, values);
+        return String.join(",", values);
     }
 
     private void postMatchedGroupsToMakingNewGamesForum(List<List<MatchmakingQueueEntryEntity>> gamesToCreate) {
