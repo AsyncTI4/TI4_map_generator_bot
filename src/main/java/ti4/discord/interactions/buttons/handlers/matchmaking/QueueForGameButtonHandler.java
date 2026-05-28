@@ -50,13 +50,16 @@ class QueueForGameButtonHandler {
     public static void offerQueueForGameModal(ButtonInteractionEvent event) {
         QueueForGameService queueForGameService = SpringContext.getBean(QueueForGameService.class);
         if (queueForGameService.isQueueingDisabled()) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Queueing is currently disabled.");
+            event.reply("Queueing is currently disabled.")
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
         if (queueForGameService.isUserQueued(event.getUser().getId())) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event,
-                    "You are already queued for a game. To change your preferences, you must first leave the queue.");
+            event.reply(
+                            "You are already queued for a game. To change your preferences, you must first leave the queue.")
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
