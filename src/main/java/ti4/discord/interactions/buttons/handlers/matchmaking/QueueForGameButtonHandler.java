@@ -144,7 +144,6 @@ class QueueForGameButtonHandler {
                 .queueUser(
                         event.getUser().getId(),
                         event.getUser().getName(),
-                        event.getChannel().getId(),
                         expansions,
                         playerCounts,
                         victoryPoints,
