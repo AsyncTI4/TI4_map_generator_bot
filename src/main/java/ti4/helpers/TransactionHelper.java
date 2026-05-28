@@ -1313,6 +1313,7 @@ public final class TransactionHelper {
 
         int p1TgAfter = p1.getTg();
         int p2TgAfter = p2.getTg();
+        boolean changesTradeGoods = false;
         // compute TGs after transaction is complete
         for (String item : p1.getTransactionItemsWithPlayer(p2)) {
             String[] parts = item.split("_");
@@ -1329,6 +1330,7 @@ public final class TransactionHelper {
                         p2TgAfter -= amount;
                         p1TgAfter += amount;
                     }
+                    changesTradeGoods = true;
                 } else if ("Comms".equals(type)) {
                     int amount = Integer.parseInt(detail);
                     if (item.contains("sending" + p1.getFaction())) {
@@ -1336,10 +1338,12 @@ public final class TransactionHelper {
                     } else {
                         if (!p2.isPlayerMemberOfAlliance(p1)) p1TgAfter += amount;
                     }
+                    changesTradeGoods = true;
                 }
             } catch (NumberFormatException ignored) {
             }
         }
+        if (!changesTradeGoods) return "";
 
         Map<String, List<String>> pillagersToPillaged = new LinkedHashMap<>();
         getPillagers(game, p1, p1TgAfter, pillagersToPillaged);
