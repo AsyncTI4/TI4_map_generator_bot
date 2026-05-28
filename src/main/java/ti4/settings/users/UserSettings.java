@@ -50,6 +50,7 @@ public class UserSettings {
     private List<String> matchmakingExpansions;
     private List<String> matchmakingPlayerCounts;
     private List<String> matchmakingVictoryPointGoals;
+    private String matchmakingPace;
     private List<String> matchmakingRestrictions;
     private String matchmakingMaxQueueTime;
     private List<String> matchmakingAvoidList;
@@ -72,6 +73,10 @@ public class UserSettings {
 
     public List<String> getMatchmakingVictoryPointGoals() {
         return Objects.requireNonNullElse(matchmakingVictoryPointGoals, Collections.emptyList());
+    }
+
+    public String getMatchmakingPace() {
+        return Objects.requireNonNullElse(matchmakingPace, "No Pace");
     }
 
     public List<String> getMatchmakingRestrictions() {

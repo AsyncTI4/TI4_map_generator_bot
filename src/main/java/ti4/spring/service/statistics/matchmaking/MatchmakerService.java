@@ -154,10 +154,7 @@ public class MatchmakerService {
                         .get(c)
                         .getMatchmakingExpansions()
                         .contains(expansionOption))
-                .filter(c -> userSettingsByCandidate
-                        .get(c)
-                        .getMatchmakingRestrictions()
-                        .contains(pace))
+                .filter(c -> selectedPaceMatches(userSettingsByCandidate.get(c), pace))
                 .sorted(Comparator.comparing(
                                 c -> getHours(userSettingsByCandidate.get(c).getMatchmakingMaxQueueTime()))
                         .reversed())
@@ -251,6 +248,22 @@ public class MatchmakerService {
         }
 
         return true;
+    }
+
+    private static boolean selectedPaceMatches(UserSettings userSettings, String pace) {
+        String selectedPace = getSelectedMatchmakingPace(userSettings);
+        return MatchmakingOptions.NO_PACE_OPTION.equals(selectedPace) || selectedPace.equals(pace);
+    }
+
+    private static String getSelectedMatchmakingPace(UserSettings userSettings) {
+        String selectedPace = userSettings.getMatchmakingPace();
+        if (!MatchmakingOptions.NO_PACE_OPTION.equals(selectedPace)) {
+            return selectedPace;
+        }
+        return userSettings.getMatchmakingRestrictions().stream()
+                .filter(MatchmakingOptions.PACE_RESTRICTION_OPTIONS::contains)
+                .findFirst()
+                .orElse(MatchmakingOptions.NO_PACE_OPTION);
     }
 
     private boolean isHalfQueueTimePassed(

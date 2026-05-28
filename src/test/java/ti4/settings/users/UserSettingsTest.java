@@ -37,6 +37,21 @@ class UserSettingsTest {
                 .isEqualTo("Not enough data.");
     }
 
+    @Test
+    void matchmakingPaceDefaultsToNoPace() {
+        UserSettings settings = new UserSettings();
+
+        assertThat(settings.getMatchmakingPace()).isEqualTo("No Pace");
+    }
+
+    @Test
+    void matchmakingPaceReturnsSetValue() {
+        UserSettings settings = new UserSettings();
+        settings.setMatchmakingPace("Fast (30 days)");
+
+        assertThat(settings.getMatchmakingPace()).isEqualTo("Fast (30 days)");
+    }
+
     private static String buildActivity(int base, int... updates) {
         int[] hours = new int[24];
         Arrays.fill(hours, base);
