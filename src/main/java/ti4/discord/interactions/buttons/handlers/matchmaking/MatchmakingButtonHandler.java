@@ -86,7 +86,7 @@ class MatchmakingButtonHandler {
                 MatchmakingOptions.EXPANSION_OPTIONS,
                 userSettings.getQueueForGameExpansions(),
                 DEFAULT_EXPANSIONS,
-                !REQUIRE_SELECTION);
+                REQUIRE_SELECTION);
         CheckboxGroup playerCounts = buildCheckboxGroup(
                 PLAYER_COUNTS_ID,
                 PLAYER_COUNT_OPTIONS,

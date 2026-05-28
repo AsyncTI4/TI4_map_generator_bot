@@ -12,8 +12,12 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class MatchmakingOptions {
 
-    public static final List<String> EXPANSION_OPTIONS =
-            List.of("Prophecy of Kings", "Thunder's Edge", "Prophecy of Kings and Thunder's Edge", "Twilight's Fall");
+    public static final List<String> EXPANSION_OPTIONS = List.of(
+            "Base Only",
+            "Prophecy of Kings",
+            "Thunder's Edge",
+            "Prophecy of Kings and Thunder's Edge",
+            "Twilight's Fall");
     public static final List<String> PLAYER_COUNT_OPTIONS = List.of("3", "4", "5", "6", "7", "8");
     public static final List<String> VICTORY_POINT_OPTIONS = List.of("10", "12", "14");
     private static final String SIMILAR_ACTIVE_HOURS_OPTION = "Similar Active Hours";
