@@ -37,7 +37,8 @@ public class NetrunnersPromissoryHandler {
         }
 
         return game.getRealPlayers().stream()
-                .anyMatch(holder -> holder != activePlayer && holder.getPromissoryNotes().containsKey(SHARED_NETWORK_ACCESS_ID));
+                .anyMatch(holder ->
+                        holder != activePlayer && holder.getPromissoryNotes().containsKey(SHARED_NETWORK_ACCESS_ID));
     }
 
     public static void offerSharedNetworkAccessButtons(Player activePlayer, Game game) {
