@@ -5,11 +5,9 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
 import org.apache.commons.collections4.ListUtils;
@@ -166,71 +164,14 @@ public class QueueForGameService {
             matchmakingQueueEntryRepository.deleteAllInBatch(expired);
             String expiryMessage =
                     "The matchmaking service wasn't able to find you a game in the time frame you selected. "
-                            + "Please queue again and consider being open to additional game types.";
+                            + "Queue again when ready and consider being open to additional game types or longer wait "
+                            + "times.";
             for (MatchmakingQueueEntryEntity entry : expired) {
                 User user = JdaService.jda.getUserById(entry.getUser().getId());
                 MessageHelper.sendMessageToUser(expiryMessage, user);
             }
         }
         return entries.stream().filter(entry -> !expired.contains(entry)).toList();
-    }
-
-    private static List<MatchmakingQueueEntryEntity> buildCompatibleGroup(
-            List<MatchmakingQueueEntryEntity> candidates, int targetCount) {
-        List<MatchmakingQueueEntryEntity> selected = new ArrayList<>();
-        for (MatchmakingQueueEntryEntity candidate : candidates) {
-            boolean fitsAll = selected.stream().allMatch(existing -> areCompatible(existing, candidate));
-            if (!fitsAll) continue;
-            selected.add(candidate);
-            if (selected.size() == targetCount) {
-                return selected;
-            }
-        }
-        return List.of();
-    }
-
-    private static boolean prefersPlayerCount(MatchmakingQueueEntryEntity entry, int targetCount) {
-        return getPreferredPlayerCountsDescending(entry).contains(targetCount);
-    }
-
-    private static List<Integer> getPreferredPlayerCountsDescending(MatchmakingQueueEntryEntity entry) {
-        return parseCsv(entry.getPlayerCountsCsv()).stream()
-                .map(QueueForGameService::tryParseInt)
-                .sorted(Comparator.reverseOrder())
-                .toList();
-    }
-
-    private static int tryParseInt(String value) {
-        try {
-            return Integer.parseInt(value);
-        } catch (Exception e) {
-            return -1;
-        }
-    }
-
-    private static boolean areCompatible(MatchmakingQueueEntryEntity a, MatchmakingQueueEntryEntity b) {
-        return anyOverlap(parseCsv(a.getExpansionsCsv()), parseCsv(b.getExpansionsCsv()))
-                && anyOverlap(parseCsv(a.getVictoryPointsCsv()), parseCsv(b.getVictoryPointsCsv()));
-    }
-
-    private static boolean anyOverlap(List<String> a, List<String> b) {
-        Set<String> aSet = new LinkedHashSet<>(a);
-        for (String value : b) {
-            if (aSet.contains(value)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static List<String> parseCsv(String csv) {
-        if (csv == null || csv.isBlank()) {
-            return List.of();
-        }
-        return Stream.of(csv.split(CSV_SEPARATOR))
-                .map(String::trim)
-                .filter(value -> !value.isEmpty())
-                .toList();
     }
 
     private static String toCsv(List<String> values) {
