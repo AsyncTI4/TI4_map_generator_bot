@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 interface MatchmakingQueueEntryRepository extends JpaRepository<MatchmakingQueueEntryEntity, Long> {
 
-    List<MatchmakingQueueEntryEntity> findAllByOrderByQueuedAtUtcAsc();
+    List<MatchmakingQueueEntryEntity> findAllByOrderByQueuedAtAsc();
 
     boolean existsByUserId(String userId);
 

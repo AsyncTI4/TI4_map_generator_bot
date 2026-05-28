@@ -2,8 +2,6 @@ package ti4.spring.service.statistics.matchmaking;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -56,7 +54,7 @@ public class MatchmakerService {
 
         MatchmakingQueueEntryEntity entry = new MatchmakingQueueEntryEntity();
         entry.setUserId(userId);
-        entry.setQueuedAtUtc(LocalDateTime.now(ZoneOffset.UTC));
+        entry.setQueuedAt(Instant.now());
 
         matchmakingQueueEntryRepository.save(entry);
     }
@@ -90,10 +88,10 @@ public class MatchmakerService {
     public void processQueue() {
         if (DatabasePersistenceGate.isDisabled()) return;
 
-        List<MatchmakingQueueEntryEntity> entries = matchmakingQueueEntryRepository.findAllByOrderByQueuedAtUtcAsc();
+        List<MatchmakingQueueEntryEntity> entries = matchmakingQueueEntryRepository.findAllByOrderByQueuedAtAsc();
         Map<MatchmakingQueueEntryEntity, UserSettings> candidateToUserSettings = getUserSettings(entries);
         List<MatchmakingQueueEntryEntity> candidates =
-                cleanAndRemoveExpiredEntries(entries, candidateToUserSettings, LocalDateTime.now(ZoneOffset.UTC));
+                cleanAndRemoveExpiredEntries(entries, candidateToUserSettings, Instant.now());
 
         Map<String, Double> playerRatings = getPlayerRatings(candidates);
         double averageRating = playerRatings.values().stream()
@@ -270,7 +268,7 @@ public class MatchmakerService {
             Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate) {
         double maxHours = parseHours(userSettingsByCandidate.get(player).getQueueForGameMaxQueueTime());
         double hoursWaited =
-                Duration.between(player.getQueuedAtUtc(), Instant.now()).toMinutes() / 60.0;
+                Duration.between(player.getQueuedAt(), Instant.now()).toMinutes() / 60.0;
         return hoursWaited >= maxHours / SIMILAR_SKILL_DIFFERENCE_THRESHOLD;
     }
 
@@ -314,10 +312,11 @@ public class MatchmakerService {
     private List<MatchmakingQueueEntryEntity> cleanAndRemoveExpiredEntries(
             List<MatchmakingQueueEntryEntity> entries,
             Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByEntry,
-            LocalDateTime now) {
+            Instant now) {
         List<MatchmakingQueueEntryEntity> expired = entries.stream()
-                .filter(entry -> entry.getQueuedAtUtc()
-                        .plusHours(parseHours(userSettingsByEntry.get(entry).getQueueForGameMaxQueueTime()))
+                .filter(entry -> entry.getQueuedAt()
+                        .plus(Duration.ofHours(parseHours(
+                                userSettingsByEntry.get(entry).getQueueForGameMaxQueueTime())))
                         .isBefore(now))
                 .toList();
         if (!expired.isEmpty()) {

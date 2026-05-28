@@ -7,7 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,6 +26,6 @@ public class MatchmakingQueueEntryEntity {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(name = "queued_at_utc", nullable = false)
-    private LocalDateTime queuedAtUtc;
+    @Column(name = "queued_at", nullable = false)
+    private Instant queuedAt;
 }
