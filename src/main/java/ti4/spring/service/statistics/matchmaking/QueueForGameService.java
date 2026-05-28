@@ -18,6 +18,7 @@ import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 import ti4.message.MessageHelper;
 import ti4.service.persistence.DatabasePersistenceGate;
+import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.UserEntity;
 
 @AllArgsConstructor
@@ -63,10 +64,9 @@ public class QueueForGameService {
     }
 
     @Transactional
-    public void leaveQueue(String userId) {
-        // TODO: Call this when a user joins a game using the normal Join Game button.
-        if (DatabasePersistenceGate.isDisabled()) return;
-        matchmakingQueueEntryRepository.deleteByUserId(userId);
+    public boolean leaveQueue(String userId) {
+        if (DatabasePersistenceGate.isDisabled()) return false;
+        return matchmakingQueueEntryRepository.deleteByUserId(userId);
     }
 
     private static int parseHours(String maxQueueTime) {
@@ -177,5 +177,9 @@ public class QueueForGameService {
 
     private static String toCsv(List<String> values) {
         return String.join(CSV_SEPARATOR, values);
+    }
+
+    public static QueueForGameService get() {
+        return SpringContext.getBean(QueueForGameService.class);
     }
 }
