@@ -173,7 +173,8 @@ public class QueueForGameService {
             for (MatchmakingQueueEntryEntity entry : expired) {
                 User user = JdaService.jda.getUserById(entry.getUser().getId());
                 String channelId = entry.getChannelId();
-                MessageChannel channel = channelId == null ? null : JdaService.jda.getChannelById(MessageChannel.class, channelId);
+                MessageChannel channel =
+                        channelId == null ? null : JdaService.jda.getChannelById(MessageChannel.class, channelId);
                 if (channel == null || user == null) {
                     MessageHelper.sendMessageToUser(expiryMessage, user);
                     continue;
