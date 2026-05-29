@@ -1541,17 +1541,15 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public Map.Entry<String, Integer> revealStage1() {
         if (publicObjectives1Peekable.isEmpty() || getPhaseOfGame().contains("agenda")) {
             return revealNextPublicObjective(publicObjectives1);
-        } else {
-            return revealNextPublicObjective(publicObjectives1Peekable);
         }
+      return revealNextPublicObjective(publicObjectives1Peekable);
     }
 
     public Map.Entry<String, Integer> revealStage2() {
         if (publicObjectives2Peekable.isEmpty() || getPhaseOfGame().contains("agenda")) {
             return revealNextPublicObjective(publicObjectives2);
-        } else {
-            return revealNextPublicObjective(publicObjectives2Peekable);
         }
+      return revealNextPublicObjective(publicObjectives2Peekable);
     }
 
     public Map.Entry<String, Integer> revealStage2Random() {
