@@ -44,10 +44,10 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersFactionTechsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -1611,7 +1611,10 @@ public final class Helper {
                     if (entry.getValue() < 10) {
                         localPlace
                                 .append("> ")
-                                .append(removedUnit.getUnitEmoji().toString().repeat(entry.getValue()))
+                                .repeat(
+                                        Objects.requireNonNull(
+                                                removedUnit.getUnitEmoji().toString()),
+                                        entry.getValue())
                                 .append('\n');
                     } else {
                         localPlace
@@ -2238,7 +2241,7 @@ public final class Helper {
                 ButtonHelper.isLawInPlay(game, "conscription") || ButtonHelper.isLawInPlay(game, "absol_conscription");
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String tp = tile.getPosition();
-        String remaining = "";
+        String remaining;
         if (!"solbtbuild".equalsIgnoreCase(warfareNOtherstuff)) {
             if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {
                 if (player.hasWarsunTech() && resourcelimit > 9) {
@@ -2972,7 +2975,7 @@ public final class Helper {
     private static void addPlayerPermissionsToPrivateChannels(Game game) {
         long permission = Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
         for (Player player : game.getPlayers().values()) {
-            TextChannel channel = (TextChannel) player.getPrivateChannel();
+            TextChannel channel = player.getPrivateChannel();
             if (channel != null) {
                 channel.getManager()
                         .putMemberPermissionOverride(player.getMember().getIdLong(), permission, 0)

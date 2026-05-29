@@ -2117,11 +2117,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 ThreadChannel chan = ButtonHelper.getRightStratThread(
                         game, ButtonHelper.getStratName(ButtonHelper.getStratName(sc), game));
                 if (chan != null) {
-                    chan.retrieveMessageById(gameMessage.messageId()).queue(mainMessage -> {
-                        mainMessage
-                                .editMessage(PlayStrategyCardService.getSCFollowSummary(game, sc))
-                                .queue();
-                    });
+                    chan.retrieveMessageById(gameMessage.messageId()).queue(mainMessage -> mainMessage
+                            .editMessage(PlayStrategyCardService.getSCFollowSummary(game, sc))
+                            .queue());
                 }
             }
         }
@@ -3229,7 +3227,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 .toList();
     }
 
-    private TextDisplay getComponentsTextDisplay(String title, List<String> descrs) {
+    private static TextDisplay getComponentsTextDisplay(String title, List<String> descrs) {
         if (descrs.isEmpty()) {
             return TextDisplay.of(title + "\n> -none-");
         } else {

@@ -296,7 +296,7 @@ public class PuppetSoftHeBladeService {
                 String singular = "planet has been taken control of by your Viper";
                 msg = msg.replace(singular, plural);
             }
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), output.toString());
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         }
     }
 

@@ -53,9 +53,7 @@ class CompareActivityTimes extends Subcommand {
                 .filter(Objects::nonNull)
                 .map(User::getId)
                 .map(GameManager::getManagedPlayer)
-                .forEach(player -> {
-                    members.add(event.getGuild().getMemberById(player.getId()));
-                });
+                .forEach(player -> members.add(event.getGuild().getMemberById(player.getId())));
         if (members.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(event, "No valid players or roles provided to compare.");
             return;

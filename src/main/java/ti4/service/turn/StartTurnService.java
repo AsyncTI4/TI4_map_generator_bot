@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.TyrisHeroButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -589,11 +589,9 @@ public class StartTurnService {
                             .append(" If you already reacted, check if your reaction got undone.");
 
                     StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), sc)
-                            .ifPresent(scMessage -> {
-                                sb.append(" Message link is: ")
-                                        .append(scMessage.asJumpLink(game.getMainGameChannel()))
-                                        .append(".\n");
-                            });
+                            .ifPresent(scMessage -> sb.append(" Message link is: ")
+                                    .append(scMessage.asJumpLink(game.getMainGameChannel()))
+                                    .append(".\n"));
                     appendStrategyPoolReminderIfHelpful(sb, game, p2);
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
                 }

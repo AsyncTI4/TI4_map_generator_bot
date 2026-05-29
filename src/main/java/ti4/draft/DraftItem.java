@@ -181,7 +181,7 @@ public abstract class DraftItem {
         String details = getTitle(game);
         if (showDescr || ItemCategory.showDescrByDefault()) {
             String descr = getLongDescriptionImpl(game);
-            descr = descr.trim().replaceAll("\n> ", "\n").replaceAll("\n", "\n> ");
+            descr = descr.trim().replace("\n> ", "\n").replace("\n", "\n> ");
             details += System.lineSeparator() + "> " + descr;
         }
         textFields.add(TextDisplay.of(details));

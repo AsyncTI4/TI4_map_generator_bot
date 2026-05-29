@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners;
 
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -566,7 +566,7 @@ public class NetrunnersLeadersHandler {
             return null;
         }
         UnitHolder unitHolder = tile.getUnitHolders().get(unitHolderName);
-        if (unitHolder == null || !(unitHolder instanceof Planet)) {
+        if (!(unitHolder instanceof Planet)) {
             return null;
         }
         return getRevolutionStructures(target, tile, unitHolder).stream()

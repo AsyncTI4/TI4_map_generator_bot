@@ -1,6 +1,6 @@
 package ti4.settings.users;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -81,7 +81,7 @@ public class UserSettings {
         activeHours = newActiveHours.substring(0, newActiveHours.length() - 1);
     }
 
-    public String summarizeActiveHours(String activity) {
+    public static String summarizeActiveHours(String activity) {
         // Parse the input string
         if (isBlank(activity)) {
             activity = "0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0";
@@ -137,7 +137,7 @@ public class UserSettings {
         return result.isEmpty() ? null : result.toString();
     }
 
-    public String summarizeActiveHoursEmoji(String activity) {
+    public static String summarizeActiveHoursEmoji(String activity) {
         if (isBlank(activity)) {
             activity = "0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0";
         }

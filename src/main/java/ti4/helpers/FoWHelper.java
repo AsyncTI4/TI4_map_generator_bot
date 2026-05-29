@@ -60,9 +60,9 @@ public final class FoWHelper {
     }
 
     public static boolean isPrivateGame(
-            Game game, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel_) {
+            Game game, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel2) {
         Channel eventChannel = event == null ? null : event.getChannel();
-        Channel channel = channel_ != null ? channel_ : eventChannel;
+        Channel channel = channel2 != null ? channel2 : eventChannel;
         if (channel == null) {
             return game.isFowMode();
         }
@@ -77,7 +77,7 @@ public final class FoWHelper {
             }
             game = GameManager.getManagedGame(gameName).getGame();
         }
-        if (game.isFowMode() && channel_ != null || event != null) {
+        if (game.isFowMode() && channel2 != null || event != null) {
             return channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
         }
         return false;

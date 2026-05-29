@@ -241,8 +241,8 @@ public class FrankenDrazDraft extends FrankenDraft {
         MessageV2Builder builder = new MessageV2Builder(player.getCardsInfoThread());
         builder.append("## " + item.getTitle(player.getGame()) + " Components");
         for (DraftItem component : components) {
-            List<ContainerChildComponent> cardComponents = new ArrayList<>();
-            cardComponents.addAll(component.getTextDisplays(player.getGame(), player, true));
+            List<ContainerChildComponent> cardComponents =
+                    new ArrayList<>(component.getTextDisplays(player.getGame(), player, true));
             builder.append(Container.of(cardComponents).withAccentColor(accents.getFirst()));
             Collections.rotate(accents, -1);
         }
@@ -305,7 +305,7 @@ public class FrankenDrazDraft extends FrankenDraft {
         if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
             DraftCategory category = DraftCategory.valueOf(buttonID.split(";")[1]);
             frankenDrazDraft.closePostDraftCategory(event, player, category);
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Closed " + category.toString() + ".");
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Closed " + category + ".");
         }
     }
 
@@ -494,10 +494,10 @@ public class FrankenDrazDraft extends FrankenDraft {
 
     private static List<FactionModel> getDraftableFactionsForGame(Game game) {
         Map<String, FactionModel> factions = new LinkedHashMap<>();
-        for (FactionModel faction : FrankenDraft.getAllFrankenLegalFactions(game)) {
+        for (FactionModel faction : getAllFrankenLegalFactions(game)) {
             factions.put(faction.getAlias(), faction);
         }
-        for (FactionModel faction : FrankenDraft.getAllFrankenLegalFactions(null)) {
+        for (FactionModel faction : getAllFrankenLegalFactions(null)) {
             if (faction.getSource().isDs()) {
                 factions.put(faction.getAlias(), faction);
             }

@@ -24,8 +24,8 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -663,7 +663,7 @@ public class StartCombatService {
                 new TileGenerator(game, event, null, 0, tile.getPosition(), player).createFileUpload();
 
         // Use existing thread, if it exists
-        TextChannel textChannel = (TextChannel) player.getPrivateChannel();
+        TextChannel textChannel = player.getPrivateChannel();
         for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
             if (threadChannel_.getName().equals(threadName)) {
                 initializeSpectatorThread(threadChannel_, game, player, tile, event, systemWithContext, spaceOrGround);

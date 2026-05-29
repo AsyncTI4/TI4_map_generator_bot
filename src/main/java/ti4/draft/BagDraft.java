@@ -91,7 +91,7 @@ public abstract class BagDraft {
         giveBagToPlayer(firstPlayerBag, players.getLast());
     }
 
-    public void giveBagToPlayer(DraftBag bag, Player player) {
+    public static void giveBagToPlayer(DraftBag bag, Player player) {
         player.setCurrentDraftBag(bag);
         boolean newBagCanBeDraftedFrom = false;
         for (DraftItem item : bag.Contents) {
@@ -140,11 +140,11 @@ public abstract class BagDraft {
         return owner.getRealPlayers().stream().allMatch(Player::isReadyToPassBag);
     }
 
-    public boolean playerHasDraftableItemInBag(Player player) {
+    public static boolean playerHasDraftableItemInBag(Player player) {
         return player.getCurrentDraftBag().Contents.stream().anyMatch(draftItem -> draftItem.isDraftable(player));
     }
 
-    private List<DraftItem> draftableItemsInBag(Player player) {
+    private static List<DraftItem> draftableItemsInBag(Player player) {
         return new ArrayList<>(player.getCurrentDraftBag().Contents.stream()
                 .filter(draftItem -> draftItem.isDraftable(player))
                 .toList());
@@ -242,7 +242,7 @@ public abstract class BagDraft {
         return findExistingBagChannel(player, threadName);
     }
 
-    private ThreadChannel findExistingBagChannel(Player player, String threadName) {
+    private static ThreadChannel findExistingBagChannel(Player player, String threadName) {
         TextChannel actionsChannel = player.getCorrectChannel();
         // ATTEMPT TO FIND BY ID
         String bagInfoThread = player.getBagInfoThreadID();
@@ -316,7 +316,7 @@ public abstract class BagDraft {
         return null;
     }
 
-    public boolean playerHasItemInQueue(Player p) {
+    public static boolean playerHasItemInQueue(Player p) {
         return !p.getDraftQueue().Contents.isEmpty();
     }
 

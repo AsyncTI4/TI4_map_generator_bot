@@ -191,7 +191,7 @@ public class FrankenDraftBagService {
         StringBuilder sb = new StringBuilder();
         for (DraftCategory cat : DraftCategory.values()) {
             if (bag.getCategoryCount(cat) == 0) continue;
-            sb.append(cat.title(player.getGame()) + "\n");
+            sb.append(cat.title(player.getGame())).append("\n");
             for (DraftItem item : bag.Contents) {
                 if (item.getItemCategory() != cat) continue;
                 sb.append("> ").append(item.getShortDescription()).append('\n');
@@ -440,7 +440,7 @@ public class FrankenDraftBagService {
         List<Player> realPlayers = game.getRealPlayers();
         for (int i = 0; i < realPlayers.size(); i++) {
             Player player = realPlayers.get(i);
-            game.getActiveBagDraft().giveBagToPlayer(bags.get(i), player);
+            BagDraft.giveBagToPlayer(bags.get(i), player);
             player.resetDraftQueue();
 
             showPlayerBag(game, player);
