@@ -533,7 +533,8 @@ public class StartTurnService {
                                 startButtons.add(lButton);
                             }
                         }
-                    } else if ("mahactcommander".equalsIgnoreCase(leaderID)
+                    } else if (("mahactcommander".equalsIgnoreCase(leaderID)
+                                    || "mahactcommander_y".equalsIgnoreCase(leaderID))
                             && player.getTacticalCC() > 0
                             && !ButtonHelper.getTilesWithYourCC(player, game, event)
                                     .isEmpty()) {

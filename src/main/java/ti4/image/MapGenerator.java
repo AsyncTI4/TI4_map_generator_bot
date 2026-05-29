@@ -1788,8 +1788,10 @@ public class MapGenerator implements AutoCloseable {
         // Additional FS
         int additionalFleetSupply = 0;
         String addFS = "";
-        if (player.hasAbility("edict"))
+
+        if (player.hasAbility("edict") || player.hasAbility("edict_y")) {
             additionalFleetSupply += player.getMahactCC().size();
+        }
         if (player.hasAbility("armada")) additionalFleetSupply += 2;
         if (additionalFleetSupply > 0) addFS = "*";
 
@@ -2103,7 +2105,8 @@ public class MapGenerator implements AutoCloseable {
         int ccCount = player.getFleetCC();
         boolean hasArmada = player.hasAbility("armada");
         List<String> mahactCC = player.getMahactCC();
-        boolean hasMahactCCs = !player.getMahactCC().isEmpty() && player.hasAbility("edict");
+        boolean hasMahactCCs =
+                !player.getMahactCC().isEmpty() && (player.hasAbility("edict") || player.hasAbility("edict_y"));
 
         try {
             BufferedImage ccImage = ImageHelper.read(ccPath);

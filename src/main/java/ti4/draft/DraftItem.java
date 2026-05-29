@@ -2,6 +2,7 @@ package ti4.draft;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import lombok.Getter;
@@ -152,6 +153,10 @@ public abstract class DraftItem {
         items.addAll(MahactKingDraftItem.buildAllItems());
         items.addAll(BreakthroughDraftItem.buildAllItems(factions));
         items.addAll(PlotDraftItem.buildAllItems());
+        Mapper.getFrankenErrata().keySet().stream()
+                .map(DraftItem::generateFromAlias)
+                .forEach(items::add);
+        items = new ArrayList<>(new LinkedHashSet<>(items));
         return items;
     }
 

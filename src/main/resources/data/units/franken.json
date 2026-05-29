@@ -1,0 +1,32 @@
+[
+    {
+        "id": "mahact_mech_y",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Starlancer Y",
+        "source": "franken",
+        "faction": "mahact",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "afbHitsOn": 0,
+        "afbDieCount": 0,
+        "bombardHitsOn": 0,
+        "bombardDieCount": 0,
+        "spaceCannonHitsOn": 0,
+        "spaceCannonDieCount": 0,
+        "deepSpaceCannon": false,
+        "planetaryShield": false,
+        "sustainDamage": true,
+        "disablesPlanetaryShield": false,
+        "canBeDirectHit": false,
+        "isStructure": false,
+        "isMonument": false,
+        "isGroundForce": true,
+        "isShip": false,
+        "isSpaceOnly": false,
+        "isPlanetOnly": false,
+        "ability": "After a player activates this system, you may spend their owner token from your Primacy ability to have them end their turn and they gain 1 command token."
+    }
+]

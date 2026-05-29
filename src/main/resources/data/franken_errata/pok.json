@@ -144,12 +144,14 @@
     {
         "itemCategory": "ABILITY",
         "itemId": "edict",
+        "undraftable": true,
         "alternateText": "When you win a combat, place 1 command token from your opponent's reinforcements in your fleet pool if it does not already contain 1 of that player's tokens; other players' tokens in your fleet pool increase your fleet limit but cannot be redistributed.",
         "source": "pok"
     },
     {
         "itemCategory": "ABILITY",
         "itemId": "imperia",
+        "undraftable": true,
         "alternateText": "[Franken only] When you win a combat, place 1 command token from your opponent's reinforcements in your fleet pool if it does not already contain 1 of that player's tokens; other players' tokens in your fleet pool do not increase your fleet limit and cannot be redistributed. While another player's command token is on your command sheet, you can use the ability of that player's commander, if it is unlocked.",
         "source": "pok"
     },
@@ -158,6 +160,60 @@
         "itemId": "hubris",
         "undraftable": true,
         "source": "pok"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "mahactcommander",
+        "undraftable": true,
+        "source": "pok"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "mahact_mech",
+        "undraftable": true,
+        "source": "pok"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "primacy",
+        "undraftable": true,
+        "source": "franken"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "edict_y",
+        "additionalComponents": [
+            "ABILITY:primacy"
+        ],
+        "alwaysAddToPool": true,
+        "source": "franken"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "imperia_y",
+        "additionalComponents": [
+            "ABILITY:primacy"
+        ],
+        "alwaysAddToPool": true,
+        "source": "franken"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "mahactcommander_y",
+        "additionalComponents": [
+            "ABILITY:primacy"
+        ],
+        "alwaysAddToPool": true,
+        "source": "franken"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "mahact_mech_y",
+        "additionalComponents": [
+            "ABILITY:primacy"
+        ],
+        "alwaysAddToPool": true,
+        "source": "franken"
     },
     {
         "itemCategory": "ABILITY",

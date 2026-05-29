@@ -280,7 +280,7 @@ public class CommandCounterButtonHandler {
     @ButtonHandler("confirm_cc")
     public static void confirmCC(ButtonInteractionEvent event, Game game, Player player) {
         String message = "Confirmed command tokens: " + player.getTacticalCC() + "/" + player.getFleetCC();
-        if (!player.getMahactCC().isEmpty()) {
+        if (player.hasAbility("edict") || player.hasAbility("edict_y")) {
             message += "(+" + player.getMahactCC().size() + ")";
         }
         message += "/" + player.getStrategicCC();
