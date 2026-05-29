@@ -113,7 +113,7 @@ public class LogOrigin {
             return channelName == null ? "" : " in: `" + channelName + "`";
         }
         String messageJumpUrl = message.getJumpUrl();
-        if (channelName == null || messageJumpUrl == null) {
+        if (channelName == null) {
             return "";
         }
         return " in: [" + channelName + "](" + messageJumpUrl + ")";

@@ -2238,7 +2238,7 @@ public final class Helper {
                 ButtonHelper.isLawInPlay(game, "conscription") || ButtonHelper.isLawInPlay(game, "absol_conscription");
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String tp = tile.getPosition();
-        String remaining = "";
+        String remaining;
         if (!"solbtbuild".equalsIgnoreCase(warfareNOtherstuff)) {
             if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {
                 if (player.hasWarsunTech() && resourcelimit > 9) {
