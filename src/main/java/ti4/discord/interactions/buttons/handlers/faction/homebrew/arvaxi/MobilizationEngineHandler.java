@@ -32,8 +32,7 @@ public class MobilizationEngineHandler {
     }
 
     public static int getCombatMod(Game game, Player player, UnitModel unit) {
-        if (!isAttachedToUnit(game, player, unit)) return 0;
-        return isBoon(game) ? 1 : -1;
+      return getMoveMod(game, player, unit);
     }
 
     public static int getMoveMod(Game game, Player player, UnitModel unit) {
@@ -47,7 +46,6 @@ public class MobilizationEngineHandler {
     }
 
     public static int getCapacityMod(Game game, Player player, UnitModel unit) {
-        if (!isAttachedToUnit(game, player, unit)) return 0;
-        return isBoon(game) ? 1 : -1;
+      return getMoveMod(game, player, unit);
     }
 }

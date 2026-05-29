@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -331,9 +331,7 @@ public class NetrunnersAbilitiesHandler {
     }
 
     private static boolean isGroundForceProductionButton(Button button) {
-        String buttonId = button.getCustomId();
-        return buttonId != null
-                && (buttonId.contains("_infantry_") || buttonId.contains("_2gf_") || buttonId.contains("_mech_"));
+      return NetrunnersUnitsHandler.isGroundForceProductionButton(button);
     }
 
     private static boolean canUseControlNetworkProduction(Game game, Player netrunner, Player target, Tile tile) {
