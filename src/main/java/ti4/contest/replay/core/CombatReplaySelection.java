@@ -111,7 +111,7 @@ public class CombatReplaySelection {
         return jointScores.get(index);
     }
 
-    private double percentileRank(List<Double> values, double value) {
+    private static double percentileRank(List<Double> values, double value) {
         if (values.isEmpty()) return 0.0;
         int count = 0;
         for (double candidate : values) {
@@ -120,7 +120,7 @@ public class CombatReplaySelection {
         return count / (double) values.size();
     }
 
-    private double average(List<Double> values) {
+    private static double average(List<Double> values) {
         if (values.isEmpty()) return 0.0;
         double total = 0.0;
         for (double value : values) {
@@ -129,11 +129,11 @@ public class CombatReplaySelection {
         return total / values.size();
     }
 
-    private double weakerStrength(CombatObservationEntity observation) {
+    private static double weakerStrength(CombatObservationEntity observation) {
         return Math.min(observation.getAttackerStrength(), observation.getDefenderStrength());
     }
 
-    private SelectionSnapshot emptySnapshot() {
+    private static SelectionSnapshot emptySnapshot() {
         return new SelectionSnapshot(0, List.of(), List.of(), 1.0, List.of());
     }
 

@@ -32,7 +32,7 @@ public class MobilizationEngineHandler {
     }
 
     public static int getCombatMod(Game game, Player player, UnitModel unit) {
-      return getMoveMod(game, player, unit);
+        return getMoveMod(game, player, unit);
     }
 
     public static int getMoveMod(Game game, Player player, UnitModel unit) {
@@ -46,6 +46,6 @@ public class MobilizationEngineHandler {
     }
 
     public static int getCapacityMod(Game game, Player player, UnitModel unit) {
-      return getMoveMod(game, player, unit);
+        return getMoveMod(game, player, unit);
     }
 }

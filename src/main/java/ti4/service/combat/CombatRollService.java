@@ -882,8 +882,8 @@ public class CombatRollService {
                         CombatRollType.combatround,
                         activeSystem,
                         unitHolder);
-              unitModel.getCombatDieCountForAbility(CombatRollType.combatround, player);
-              int numRollsPerUnit;
+                unitModel.getCombatDieCountForAbility(CombatRollType.combatround, player);
+                int numRollsPerUnit;
                 CombatStatsService.CombatRoundProfile combatRoundProfile = CombatStatsService.getCombatRoundProfile(
                         true, unitModel, player, activeSystem, opponent, false);
                 numRollsPerUnit = combatRoundProfile.diceCount();

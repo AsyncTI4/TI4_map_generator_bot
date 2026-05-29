@@ -331,7 +331,7 @@ public class NetrunnersAbilitiesHandler {
     }
 
     private static boolean isGroundForceProductionButton(Button button) {
-      return NetrunnersUnitsHandler.isGroundForceProductionButton(button);
+        return NetrunnersUnitsHandler.isGroundForceProductionButton(button);
     }
 
     private static boolean canUseControlNetworkProduction(Game game, Player netrunner, Player target, Tile tile) {

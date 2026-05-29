@@ -91,7 +91,7 @@ public class CombatContestSettings {
                 "sideBets.dynamicPayoutTiers is required.");
     }
 
-    private void require(boolean condition, String message) {
+    private static void require(boolean condition, String message) {
         if (!condition) {
             throw new IllegalArgumentException(message);
         }

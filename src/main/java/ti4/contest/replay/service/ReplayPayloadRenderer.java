@@ -189,7 +189,7 @@ public class ReplayPayloadRenderer {
                 context.event().getSummaryText());
     }
 
-    private String leaderHeader(LeaderModel leader) {
+    private static String leaderHeader(LeaderModel leader) {
         return switch (StringUtils.lowerCase(leader.getType())) {
             case "agent" -> "Agent";
             case "hero" -> "Hero";
@@ -207,7 +207,7 @@ public class ReplayPayloadRenderer {
         return ping ? player.getRepresentation() : player.getRepresentationNoPing();
     }
 
-    private ReplayDispatchPayload.DiscordMessage replayMessage(String content, MessageEmbed embed) {
+    private static ReplayDispatchPayload.DiscordMessage replayMessage(String content, MessageEmbed embed) {
         return new ReplayDispatchPayload.DiscordMessage(
                 content, ReplayDispatchSerializer.fromMessageEmbeds(embed == null ? List.of() : List.of(embed)));
     }
@@ -218,11 +218,11 @@ public class ReplayPayloadRenderer {
                 ReplayDispatchSerializer.toMessageEmbeds(message.embeds()));
     }
 
-    private MessageResult message(String content, List<MessageEmbed> embeds) {
+    private static MessageResult message(String content, List<MessageEmbed> embeds) {
         return new MessageResult(content, embeds);
     }
 
-    private TileRenderResult tileRender(
+    private static TileRenderResult tileRender(
             String content, List<MessageEmbed> embeds, String tilePosition, String snapshotJson) {
         return new TileRenderResult(content, embeds, tilePosition, snapshotJson);
     }
@@ -299,7 +299,7 @@ public class ReplayPayloadRenderer {
         return changes;
     }
 
-    private Map<UnitKey, Counts> unitCounts(Game game, String tilePosition) {
+    private static Map<UnitKey, Counts> unitCounts(Game game, String tilePosition) {
         Tile tile = game.getTileByPosition(tilePosition);
         if (tile == null) return Map.of();
 
@@ -312,13 +312,13 @@ public class ReplayPayloadRenderer {
         return counts;
     }
 
-    private String unitOwner(Game game, String colorId) {
+    private static String unitOwner(Game game, String colorId) {
         Player player = game.getPlayerFromColorOrFaction(colorId);
         if (player == null) return colorId;
         return player.getFactionEmoji();
     }
 
-    private String unitPhrase(UnitType unitType, int count) {
+    private static String unitPhrase(UnitType unitType, int count) {
         String name = unitType.humanReadableName().toLowerCase();
         if (count == 1 || unitType == UnitType.Infantry || unitType == UnitType.Pds) {
             return count + " " + name;

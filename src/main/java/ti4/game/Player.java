@@ -3229,7 +3229,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 .toList();
     }
 
-    private TextDisplay getComponentsTextDisplay(String title, List<String> descrs) {
+    private static TextDisplay getComponentsTextDisplay(String title, List<String> descrs) {
         if (descrs.isEmpty()) {
             return TextDisplay.of(title + "\n> -none-");
         } else {

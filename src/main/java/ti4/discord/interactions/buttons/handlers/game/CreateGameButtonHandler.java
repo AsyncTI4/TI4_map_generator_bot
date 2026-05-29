@@ -32,6 +32,7 @@ import ti4.helpers.SearchGameHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
+import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.statistics.AverageTurnTimeService;
 import ti4.spring.service.statistics.UserGameInfoService;
@@ -247,7 +248,7 @@ public class CreateGameButtonHandler {
                 memberList.append(" fastest 6 player game length(s) in days) ");
             }
             var userSettings = UserSettingsManager.get(member.getId());
-            String activeHoursSummary = userSettings.summarizeActiveHoursEmoji(userSettings.getActiveHours());
+            String activeHoursSummary = UserSettings.summarizeActiveHoursEmoji(userSettings.getActiveHours());
             if (activeHoursSummary != null) {
                 if (activityList.isEmpty()) {
                     activityList

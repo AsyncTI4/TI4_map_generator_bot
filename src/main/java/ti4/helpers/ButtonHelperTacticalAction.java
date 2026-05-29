@@ -423,7 +423,8 @@ public final class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, ringButtons);
         }
         // Offer the Dreaming Throne promissory 'Visions' buttons
-        if (!"dream".equalsIgnoreCase(player.getFaction()) && player.getPromissoryNotes().containsKey("bepndream")) {
+        if (!"dream".equalsIgnoreCase(player.getFaction())
+                && player.getPromissoryNotes().containsKey("bepndream")) {
             DreamButtonHandler.offerVisionsPromissoryAtTacticalStart(game, player);
         }
     }

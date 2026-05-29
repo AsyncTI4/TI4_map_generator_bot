@@ -34,7 +34,7 @@ class StartTurnServiceTest extends BaseTi4Test {
         assertTrue(message.contains("You currently have 0 command tokens in your strategy pool."));
     }
 
-    private Game createGameWithPlayedStrategyCard(int playedSc) {
+    private static Game createGameWithPlayedStrategyCard(int playedSc) {
         Game game = new Game();
         game.setName("testGame");
 

@@ -260,7 +260,7 @@ public class CommandCounterButtonHandler {
 
     @ButtonHandler("gain_CC")
     public static void gainCC(ButtonInteractionEvent event, Player player, Game game) {
-      gainCCNoDelete(event, player, game);
+        gainCCNoDelete(event, player, game);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
