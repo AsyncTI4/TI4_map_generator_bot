@@ -64,7 +64,7 @@ public class BlindSelectionService {
     }
 
     private static void filterForBlindSelection(
-            Game game, Player player, List<Button> buttons, String buttonPrefix, String TYPE) {
+            Game game, Player player, List<Button> buttons, String buttonPrefix, String type) {
 
         Set<String> visibleTilePositions = FoWHelper.getTilePositionsToShow(game, player);
         StringBuilder validTargets = new StringBuilder(VALID_SEPARATOR);
@@ -74,7 +74,7 @@ public class BlindSelectionService {
             validTargets.append(target).append(VALID_SEPARATOR);
 
             boolean keep;
-            if (POSITION.equals(TYPE)) {
+            if (POSITION.equals(type)) {
                 // position selection: visible tile only
                 keep = visibleTilePositions.contains(target);
             } else {
@@ -101,7 +101,7 @@ public class BlindSelectionService {
         String encodedButtonPrefix =
                 Base64.getUrlEncoder().withoutPadding().encodeToString(buttonPrefix.getBytes(StandardCharsets.UTF_8));
         game.setStoredValue(VALIDATION_KEY, validTargets.toString());
-        buttons.add(Buttons.red("blindSelection~MDL_" + encodedButtonPrefix + "_" + TYPE, "Blind Target"));
+        buttons.add(Buttons.red("blindSelection~MDL_" + encodedButtonPrefix + "_" + type, "Blind Target"));
     }
 
     @ButtonHandler(value = "blindSelection~MDL", save = false)

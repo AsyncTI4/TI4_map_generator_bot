@@ -2073,7 +2073,7 @@ public class ActionCardHelper {
         sendActionCardInfo(game, p2);
     }
 
-    public void sendRandomACPart2(GenericInteractionCreateEvent event, Game game, Player player, Player player_) {
+    public void sendRandomACPart2(GenericInteractionCreateEvent event, Game game, Player player, Player player2) {
         Map<String, Integer> actionCardsMap = player.getActionCards();
         List<String> actionCards = new ArrayList<>(actionCardsMap.keySet());
         if (actionCards.isEmpty()) {
@@ -2084,28 +2084,28 @@ public class ActionCardHelper {
         // FoW specific pinging
         if (game.isFowMode()) {
             FoWHelper.pingPlayersTransaction(
-                    game, event, player, player_, CardEmojis.getACEmoji(game) + " Action Card", null);
+                    game, event, player, player2, CardEmojis.getACEmoji(game) + " Action Card", null);
         }
         player.removeActionCard(actionCardsMap.get(acID));
-        player_.setActionCard(acID);
-        sendActionCardInfo(game, player_);
-        ButtonHelper.checkACLimit(game, player_);
+        player2.setActionCard(acID);
+        sendActionCardInfo(game, player2);
+        ButtonHelper.checkACLimit(game, player2);
         sendActionCardInfo(game, player);
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
                 "# " + player.getRepresentation() + " you lost the action card _"
                         + Mapper.getActionCard(acID).getName() + "_.");
         MessageHelper.sendMessageToChannel(
-                player_.getCardsInfoThread(),
-                "# " + player_.getRepresentation() + " you gained the action card _"
+                player2.getCardsInfoThread(),
+                "# " + player2.getRepresentation() + " you gained the action card _"
                         + Mapper.getActionCard(acID).getName() + "_.");
     }
 
-    public static void showAll(Player player, Player player_, Game game) {
+    public static void showAll(Player player, Player player2, Game game) {
         StringBuilder sb = new StringBuilder();
         StringBuilder sa = new StringBuilder();
         sa.append("Your action cards were shown to: ")
-                .append(game.isFowMode() ? "Someone" : player_.getUserName())
+                .append(game.isFowMode() ? "Someone" : player2.getUserName())
                 .append('\n');
         sa.append(
                 "Action cards were presented in the order below. You may reference the number listed when discussing the cards:\n");
@@ -2131,7 +2131,7 @@ public class ActionCardHelper {
             index++;
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, sa.toString());
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player2, sb.toString());
     }
 
     public static String actionCardListCondensedNoIds(List<String> discards, String title) {
