@@ -48,6 +48,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -2382,6 +2383,7 @@ public final class Helper {
             unitButtons.add(ff2Button);
         }
         boolean greenMechd = false;
+        boolean ironMechSpaceAdded = false;
 
         if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff)
                 && !"arboHeroBuild".equalsIgnoreCase(warfareNOtherstuff)
@@ -2525,6 +2527,20 @@ public final class Helper {
                 }
                 if (resourcelimit > 1 && !greenMechd) {
                     unitButtons.add(mfButton);
+                }
+                if (resourcelimit > 1 && !ironMechSpaceAdded && IronAbilitiesHandler.hasExoAtmospheric(player)) {
+                    Button spaceMechButton = Buttons.green(
+                            player.factionButtonChecker() + placePrefix + "_mech_space" + tile.getPosition(),
+                            "Produce Mech in space",
+                            UnitEmojis.mech);
+                    if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
+                        spaceMechButton = Buttons.gray(
+                                player.factionButtonChecker() + placePrefix + "_mech_space" + tile.getPosition(),
+                                "Produce Mech in space",
+                                UnitEmojis.mech);
+                    }
+                    unitButtons.add(spaceMechButton);
+                    ironMechSpaceAdded = true;
                 }
 
             } else if (ButtonHelper.canIBuildGFInSpace(player, tile, warfareNOtherstuff)

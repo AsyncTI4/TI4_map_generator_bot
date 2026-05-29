@@ -60,6 +60,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.PhantomEnergyHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.TyrisBreakthroughButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
@@ -6599,12 +6600,14 @@ public class ButtonHelper {
                 }
                 if ("assaultcannoncombat".equalsIgnoreCase(type)
                         && List.of(UnitType.Fighter, UnitType.Spacedock, UnitType.Mech, UnitType.Infantry)
-                                .contains(unitKey.unitType())) {
+                                .contains(unitKey.unitType())
+                        && !IronAbilitiesHandler.isExoAtmosphericMechInSpace(player, unitKey.unitType(), unitHolder)) {
                     continue;
                 }
                 if ("courageouscombat".equalsIgnoreCase(type)
                         && List.of(UnitType.Spacedock, UnitType.Mech, UnitType.Infantry)
-                                .contains(unitKey.unitType())) {
+                                .contains(unitKey.unitType())
+                        && !IronAbilitiesHandler.isExoAtmosphericMechInSpace(player, unitKey.unitType(), unitHolder)) {
                     continue;
                 }
 
