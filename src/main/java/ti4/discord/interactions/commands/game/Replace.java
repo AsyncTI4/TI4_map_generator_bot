@@ -163,7 +163,7 @@ class Replace extends GameStateSubcommand {
         // UPDATE FOW PERMISSIONS
         if (game.isFowMode()) {
             long permission = Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-            TextChannel privateChannel = (TextChannel) replacedPlayer.getPrivateChannel();
+            TextChannel privateChannel = replacedPlayer.getPrivateChannel();
             if (privateChannel != null) {
                 privateChannel.getMemberPermissionOverrides().stream()
                         .filter(override -> Objects.equals(override.getMember(), oldMember))

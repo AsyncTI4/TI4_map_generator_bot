@@ -175,7 +175,7 @@ public class FactionDraftItem extends DraftItem {
         if (isBanned(game, category, banValue)) {
             return;
         }
-        DraftItem item = DraftItem.generate(category, itemId);
+        DraftItem item = generate(category, itemId);
         if (Boolean.TRUE.equals(item.getErrata().getUndraftable())) {
             return;
         }
@@ -218,7 +218,7 @@ public class FactionDraftItem extends DraftItem {
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            allItems.add(DraftItem.generate(DraftCategory.FACTION, faction.getAlias()));
+            allItems.add(generate(DraftCategory.FACTION, faction.getAlias()));
         }
         return allItems;
     }

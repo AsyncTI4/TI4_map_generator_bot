@@ -62,7 +62,7 @@ public class CombatReplaySideBetPayoutService {
         if (betType == CombatSideBetType.AFB_WHIFF) {
             Double probability = afbWhiffProbabilityFromInitialSnapshot(candidate, targetFaction);
             if (probability == null) return fixedPayout(CombatSideBetType.AFB_WHIFF);
-            return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(betType, probability);
+            return probability <= 0.0 ? maxDynamicPayout() : dynamicPayout(CombatSideBetType.AFB_WHIFF, probability);
         }
 
         Double probability = betType == CombatSideBetType.ROUND_ONE_SLAM

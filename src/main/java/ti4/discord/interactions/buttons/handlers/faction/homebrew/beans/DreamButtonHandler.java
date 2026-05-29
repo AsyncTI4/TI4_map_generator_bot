@@ -448,7 +448,7 @@ public class DreamButtonHandler {
         }
         ButtonHelper.deleteMessage(event);
         Tile tile = game.getTileByPosition(buttonID.replace("dream_hero_add_nexus_", ""));
-        if (tile == null || !isDreamHeroNexusDestination(game, tile) || tileContainsNexusToken(game, tile, false)) {
+        if (!isDreamHeroNexusDestination(game, tile) || tileContainsNexusToken(game, tile, false)) {
             MessageHelper.sendMessageToEventChannel(event, "That is not a valid system for a nexus token.");
             return;
         }
@@ -523,7 +523,6 @@ public class DreamButtonHandler {
         Tile fromTile = game.getTileByPosition(parts[0]);
         Tile toTile = game.getTileByPosition(parts[1]);
         if (fromTile == null
-                || toTile == null
                 || !tileContainsNexusToken(game, fromTile, false)
                 || !isDreamHeroNexusDestination(game, toTile)
                 || tileContainsNexusToken(game, toTile, false)) {

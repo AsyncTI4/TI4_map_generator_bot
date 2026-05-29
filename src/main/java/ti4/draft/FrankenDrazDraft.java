@@ -305,7 +305,7 @@ public class FrankenDrazDraft extends FrankenDraft {
         if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
             DraftCategory category = DraftCategory.valueOf(buttonID.split(";")[1]);
             frankenDrazDraft.closePostDraftCategory(event, player, category);
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Closed " + category.toString() + ".");
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Closed " + category + ".");
         }
     }
 
@@ -494,10 +494,10 @@ public class FrankenDrazDraft extends FrankenDraft {
 
     private static List<FactionModel> getDraftableFactionsForGame(Game game) {
         Map<String, FactionModel> factions = new LinkedHashMap<>();
-        for (FactionModel faction : FrankenDraft.getAllFrankenLegalFactions(game)) {
+        for (FactionModel faction : getAllFrankenLegalFactions(game)) {
             factions.put(faction.getAlias(), faction);
         }
-        for (FactionModel faction : FrankenDraft.getAllFrankenLegalFactions(null)) {
+        for (FactionModel faction : getAllFrankenLegalFactions(null)) {
             if (faction.getSource().isDs()) {
                 factions.put(faction.getAlias(), faction);
             }

@@ -2972,7 +2972,7 @@ public final class Helper {
     private static void addPlayerPermissionsToPrivateChannels(Game game) {
         long permission = Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
         for (Player player : game.getPlayers().values()) {
-            TextChannel channel = (TextChannel) player.getPrivateChannel();
+            TextChannel channel = player.getPrivateChannel();
             if (channel != null) {
                 channel.getManager()
                         .putMemberPermissionOverride(player.getMember().getIdLong(), permission, 0)
