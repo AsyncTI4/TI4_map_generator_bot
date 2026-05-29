@@ -107,7 +107,7 @@ public class CombatReplaySelection {
         }
         jointScores.sort(Comparator.reverseOrder());
 
-        int index = Math.max(0, Math.min(jointScores.size() - 1, targetCandidatesPerHour - 1));
+        int index = Math.clamp(jointScores.size() - 1, 0, targetCandidatesPerHour - 1);
         return jointScores.get(index);
     }
 

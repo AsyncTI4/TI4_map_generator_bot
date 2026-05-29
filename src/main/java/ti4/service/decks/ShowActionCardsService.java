@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
@@ -134,7 +135,7 @@ public class ShowActionCardsService {
                     .toList();
             sb.append('\n').append(index).append("\\. ");
             index++;
-            sb.append(CardEmojis.getACEmoji(game).toString().repeat(ids.size()));
+            sb.repeat(Objects.requireNonNull(CardEmojis.getACEmoji(game).toString()), ids.size());
             sb.append(" _").append(acEntryList.getKey()).append("_ ");
             sb.append(String.join(", ", ids)).append("\n> ");
             ActionCardModel model =
@@ -169,7 +170,7 @@ public class ShowActionCardsService {
                     .toList();
             sb.append('\n').append(index).append("\\. ");
             index++;
-            sb.append(CardEmojis.getACEmoji(game).toString().repeat(ids.size()));
+            sb.repeat(Objects.requireNonNull(CardEmojis.getACEmoji(game).toString()), ids.size());
             sb.append(" _").append(acEntryList.getKey()).append("_");
             sb.append(String.join(", ", ids));
         }
@@ -201,9 +202,9 @@ public class ShowActionCardsService {
         for (Map.Entry<String, List<String>> entry : displayOrder) {
             sb.append('\n').append(index).append("\\. ");
             index++;
-            sb.append(CardEmojis.getACEmoji(game)
-                    .toString()
-                    .repeat(entry.getValue().size()));
+            sb.repeat(
+                    Objects.requireNonNull(CardEmojis.getACEmoji(game).toString()),
+                    entry.getValue().size());
             sb.append(" _").append(entry.getKey()).append("_\n> ");
             ActionCardModel model = Mapper.getActionCard(entry.getValue().getFirst());
             sb.append(model.getRepresentationJustText(game));

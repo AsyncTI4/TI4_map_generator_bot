@@ -103,7 +103,7 @@ public class CombatReplaySideBetPayoutService {
                     case ROUND_ONE_WHIFF -> 20;
                     default -> 1;
                 };
-        return Math.min(maxDynamicPayout(), Math.max(minimumPayout, payout));
+        return Math.clamp(minimumPayout, payout, maxDynamicPayout());
     }
 
     private double selectionBiasMultiplier(CombatSideBetType betType) {
@@ -141,7 +141,7 @@ public class CombatReplaySideBetPayoutService {
         profitPoints = Math.max(3, profitPoints);
         int tunedPayout =
                 (int) Math.round(profitPoints * 2 * settings.getSideBets().getWinnerOneHpPayoutMultiplier());
-        return Math.min(maxDynamicPayout(), Math.max(1, tunedPayout));
+        return Math.clamp(tunedPayout, 1, maxDynamicPayout());
     }
 
     private Double openingRoundSlamProbabilityFromInitialSnapshot(
@@ -481,8 +481,8 @@ public class CombatReplaySideBetPayoutService {
     }
 
     private double hitChance(int effectiveThreshold) {
-        int boundedThreshold = Math.max(1, Math.min(11, effectiveThreshold));
-        return Math.max(0.0, Math.min(1.0, (11 - boundedThreshold) / 10.0));
+        int boundedThreshold = Math.clamp(effectiveThreshold, 1, 11);
+        return Math.clamp((11 - boundedThreshold) / 10.0, 0.0, 1.0);
     }
 
     private double hitChanceForRoll(Player player, Game game, CombatRollType rollType, int effectiveThreshold) {

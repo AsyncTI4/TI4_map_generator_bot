@@ -589,11 +589,9 @@ public class StartTurnService {
                             .append(" If you already reacted, check if your reaction got undone.");
 
                     StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), sc)
-                            .ifPresent(scMessage -> {
-                                sb.append(" Message link is: ")
-                                        .append(scMessage.asJumpLink(game.getMainGameChannel()))
-                                        .append(".\n");
-                            });
+                            .ifPresent(scMessage -> sb.append(" Message link is: ")
+                                    .append(scMessage.asJumpLink(game.getMainGameChannel()))
+                                    .append(".\n"));
                     appendStrategyPoolReminderIfHelpful(sb, game, p2);
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
                 }

@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -59,7 +60,7 @@ public class FrankenSettings extends SettingsMenu {
 
         Set<String> empty = new HashSet<>();
         bannedFactions =
-                new ListSetting<FactionModel>(
+                new ListSetting<>(
                         "BannedFactions",
                         "Banned Factions",
                         "Ban faction",
@@ -166,10 +167,13 @@ public class FrankenSettings extends SettingsMenu {
     }
 
     private static String frankenNotes() {
-        return "\n\n"
-                + "**Notes:**\n"
-                + "> Use the game options and homebrew settings above to enable homebrew. DS auto includes BR, if you want to play without them, add the BR ban list.\n\n"
-                + "> Due to discord message limits, component bans must be handled manually via slash command. The ban list options have popular component bans.";
+        return """
+
+
+            **Notes:**
+            > Use the game options and homebrew settings above to enable homebrew. DS auto includes BR, if you want to play without them, add the BR ban list.
+
+            > Due to discord message limits, component bans must be handled manually via slash command. The ban list options have popular component bans.""";
     }
 
     Map<String, Set<String>> selectedBanListSources(String banType) {
@@ -185,7 +189,7 @@ public class FrankenSettings extends SettingsMenu {
     List<FrankenBanList> selectedBanLists() {
         return banLists.getKeys().stream()
                 .map(FrankenBanList::fromString)
-                .filter(banList -> banList != null)
+                .filter(Objects::nonNull)
                 .toList();
     }
 

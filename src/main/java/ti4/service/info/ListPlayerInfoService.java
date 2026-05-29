@@ -150,9 +150,8 @@ public class ListPlayerInfoService {
         if (currentResources >= goal && currentInfluence >= goal) {
             return new ObjectiveResult(true, goal * 2);
         }
-        int additionalResources2 = Math.min(remainingTradeGoods, Math.max(0, goal - currentResources));
-        int additionalInfluence2 =
-                Math.min(remainingTradeGoods - additionalResources2, Math.max(0, goal - currentInfluence));
+        int additionalResources2 = Math.clamp(goal - currentResources, 0, remainingTradeGoods);
+        int additionalInfluence2 = Math.clamp(goal - currentInfluence, 0, remainingTradeGoods - additionalResources2);
 
         int newResources2 = currentResources + additionalResources2;
         int newInfluence2 = currentInfluence + additionalInfluence2;
@@ -177,8 +176,7 @@ public class ListPlayerInfoService {
         if (index >= planets.size()) {
             // Try using remaining trade goods for resources
             int additionalResources = additionalResources2;
-            int additionalInfluence =
-                    Math.min(remainingTradeGoods - additionalResources, Math.max(0, goal - currentInfluence));
+            int additionalInfluence = Math.clamp(goal - currentInfluence, 0, remainingTradeGoods - additionalResources);
 
             int newResources = currentResources + additionalResources;
             int newInfluence = currentInfluence + additionalInfluence;

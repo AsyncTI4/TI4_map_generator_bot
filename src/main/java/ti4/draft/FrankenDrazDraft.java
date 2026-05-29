@@ -241,8 +241,8 @@ public class FrankenDrazDraft extends FrankenDraft {
         MessageV2Builder builder = new MessageV2Builder(player.getCardsInfoThread());
         builder.append("## " + item.getTitle(player.getGame()) + " Components");
         for (DraftItem component : components) {
-          List<ContainerChildComponent> cardComponents =
-              new ArrayList<>(component.getTextDisplays(player.getGame(), player, true));
+            List<ContainerChildComponent> cardComponents =
+                    new ArrayList<>(component.getTextDisplays(player.getGame(), player, true));
             builder.append(Container.of(cardComponents).withAccentColor(accents.getFirst()));
             Collections.rotate(accents, -1);
         }

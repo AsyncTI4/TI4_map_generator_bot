@@ -530,7 +530,7 @@ public final class ButtonHelperModifyUnits {
                 }
             }
             if (opponent != null) {
-                opponentCanDirectHit = opponent.getActionCards().size() > 0;
+                opponentCanDirectHit = !opponent.getActionCards().isEmpty();
             }
         }
 

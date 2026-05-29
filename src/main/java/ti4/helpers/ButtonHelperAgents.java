@@ -1225,8 +1225,8 @@ public final class ButtonHelperAgents {
                 if (!posNPlanet.isEmpty()) {
                     p2 = game.getPlayerFromColorOrFaction(posNPlanet);
                 }
-              List<Button> buttons =
-                  new ArrayList<>(Helper.getPlanetPlaceUnitButtons(p2, game, "2gf", "placeOneNDone_skipbuild"));
+                List<Button> buttons =
+                        new ArrayList<>(Helper.getPlanetPlaceUnitButtons(p2, game, "2gf", "placeOneNDone_skipbuild"));
                 String message2 = p2.getRepresentationUnfogged() + ", use buttons to resolve " + ssruuClever
                         + "T'ro An, the N'orr" + ssruuSlash + " agent.";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message2, buttons);
@@ -1277,8 +1277,8 @@ public final class ButtonHelperAgents {
                 if (!posNPlanet.isEmpty()) {
                     p2 = game.getPlayerFromColorOrFaction(posNPlanet);
                 }
-              List<Button> buttons =
-                  new ArrayList<>(ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game, "l1z1x"));
+                List<Button> buttons = new ArrayList<>(
+                        ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game, "l1z1x"));
                 String message2 = p2.getRepresentationUnfogged() + ", use buttons to resolve " + ssruuClever
                         + "I48S, the L1Z1X" + ssruuSlash + " agent.";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message2, buttons);

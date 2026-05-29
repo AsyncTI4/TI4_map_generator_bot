@@ -3,6 +3,7 @@ package ti4.service.breakthrough;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -102,7 +103,7 @@ public class TheIconService {
             if (model.getIsShip()) {
                 producedSummary
                         .append("\n> ")
-                        .append(model.getUnitEmoji().toString().repeat(entry.getValue()));
+                        .repeat(Objects.requireNonNull(model.getUnitEmoji().toString()), entry.getValue());
             }
         }
 
@@ -143,7 +144,7 @@ public class TheIconService {
                     dest.getSpaceUnitHolder().addUnitsWithStates(key, states);
                     movedSummary
                             .append("\n> ")
-                            .append(model.getUnitEmoji().toString().repeat(entry.getValue()));
+                            .repeat(Objects.requireNonNull(model.getUnitEmoji().toString()), entry.getValue());
                 }
             }
 

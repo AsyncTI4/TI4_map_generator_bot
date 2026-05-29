@@ -1611,7 +1611,10 @@ public final class Helper {
                     if (entry.getValue() < 10) {
                         localPlace
                                 .append("> ")
-                                .append(removedUnit.getUnitEmoji().toString().repeat(entry.getValue()))
+                                .repeat(
+                                        Objects.requireNonNull(
+                                                removedUnit.getUnitEmoji().toString()),
+                                        entry.getValue())
                                 .append('\n');
                     } else {
                         localPlace

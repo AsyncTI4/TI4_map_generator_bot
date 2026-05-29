@@ -353,10 +353,9 @@ public class ReplayPayloadRenderer {
         }
 
         private int sustainedBy(Counts current) {
-            int standardSustains = Math.min(Math.max(0, none - current.none), Math.max(0, current.damaged - damaged));
-            int galvanizedSustains = Math.min(
-                    Math.max(0, galvanized - current.galvanized),
-                    Math.max(0, current.damagedGalvanized - damagedGalvanized));
+            int standardSustains = Math.clamp(none - current.none, 0, Math.max(0, current.damaged - damaged));
+            int galvanizedSustains = Math.clamp(
+                    galvanized - current.galvanized, 0, Math.max(0, current.damagedGalvanized - damagedGalvanized));
             return standardSustains + galvanizedSustains;
         }
     }

@@ -239,7 +239,7 @@ public class CreateGameButtonHandler {
             List<Integer> threeFastestDays = UserGameInfoService.get()
                     .getUsersThreeFastestDaysToComplete6PlayerGames(
                             member.getUser().getId());
-            if (threeFastestDays.size() > 0) {
+            if (!threeFastestDays.isEmpty()) {
                 memberList.append(" (");
                 for (int i = 0; i < threeFastestDays.size(); i++) {
                     memberList.append("`").append(threeFastestDays.get(i)).append("`");

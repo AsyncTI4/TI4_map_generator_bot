@@ -324,7 +324,7 @@ public class ListTechService {
         }
         if (player.hasUnlockedBreakthrough("netrunnersbt")) {
             int dataBreachDiscount = NetrunnersBreakthroughHandler.getDataBreachDiscount(player, tech);
-            wilds += Math.max(0, Math.min(dataBreachDiscount, requirements.length()));
+            wilds += Math.clamp(dataBreachDiscount, 0, requirements.length());
         }
 
         // All sources of pre-requisites below can also apply via synergy.

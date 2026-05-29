@@ -2146,8 +2146,9 @@ public class ActionCardHelper {
         for (Map.Entry<String, List<String>> acEntryList : displayOrder) {
             sb.append('\n').append(index).append("\\. ");
             index++;
-            sb.append(CardEmojis.ActionCard.toString()
-                    .repeat(acEntryList.getValue().size()));
+            sb.repeat(
+                    Objects.requireNonNull(CardEmojis.ActionCard.toString()),
+                    acEntryList.getValue().size());
             sb.append(" _").append(acEntryList.getKey()).append("_");
         }
         return sb.toString();

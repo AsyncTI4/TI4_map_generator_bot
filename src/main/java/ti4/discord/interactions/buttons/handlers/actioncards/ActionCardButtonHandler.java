@@ -94,21 +94,21 @@ class ActionCardButtonHandler {
             message += "a _Sabotage_!";
             boolean hasSabo = false;
             String saboID = "3";
-            for (String AC : player.getActionCards().keySet()) {
-                if (AC.contains("sabo") || AC.contains("shatter")) {
+            for (String ac : player.getActionCards().keySet()) {
+                if (ac.contains("sabo") || ac.contains("shatter")) {
                     hasSabo = true;
-                    saboID = "" + player.getActionCards().get(AC);
+                    saboID = "" + player.getActionCards().get(ac);
                     break;
                 }
             }
             if (player.hasPlanet("garbozia")) {
-                for (String AC : ActionCardHelper.getGarboziaActionCards(player.getGame())
+                for (String ac : ActionCardHelper.getGarboziaActionCards(player.getGame())
                         .keySet()) {
-                    if (AC.contains("sabo") || AC.contains("shatter")) {
+                    if (ac.contains("sabo") || ac.contains("shatter")) {
                         hasSabo = true;
                         saboID = ""
                                 + ActionCardHelper.getGarboziaActionCards(player.getGame())
-                                        .get(AC);
+                                        .get(ac);
                         break;
                     }
                 }

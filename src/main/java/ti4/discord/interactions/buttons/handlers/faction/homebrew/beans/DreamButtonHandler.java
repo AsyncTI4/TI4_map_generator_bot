@@ -662,7 +662,7 @@ public class DreamButtonHandler {
 
         int pageSize = Math.max(1, HERO_BUTTON_LIMIT - persistentCount - 2);
         int maxPage = (mainButtons.size() - 1) / pageSize;
-        int currentPage = Math.max(0, Math.min(page, maxPage));
+        int currentPage = Math.clamp(page, 0, maxPage);
         int fromIndex = currentPage * pageSize;
         int toIndex = Math.min(fromIndex + pageSize, mainButtons.size());
 
