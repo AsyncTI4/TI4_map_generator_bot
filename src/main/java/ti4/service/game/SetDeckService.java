@@ -1,6 +1,7 @@
 package ti4.service.game;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
@@ -34,11 +35,17 @@ public class SetDeckService {
             case Constants.STAGE_1_PUBLIC_DECK -> {
                 game.setPublicObjectives1(new ArrayList<>(deckModel.getNewShuffledDeck()));
                 game.setStage1PublicDeckID(deckModel.getAlias());
+                if (resetDeck) {
+                    resetPeekableAndPeekedPublicObjectives(game);
+                }
                 return true;
             }
             case Constants.STAGE_2_PUBLIC_DECK -> {
                 game.setPublicObjectives2(new ArrayList<>(deckModel.getNewShuffledDeck()));
                 game.setStage2PublicDeckID(deckModel.getAlias());
+                if (resetDeck) {
+                    resetPeekableAndPeekedPublicObjectives(game);
+                }
                 return true;
             }
             case Constants.RELIC_DECK -> {
@@ -74,5 +81,12 @@ public class SetDeckService {
             }
         }
         return false;
+    }
+
+    private static void resetPeekableAndPeekedPublicObjectives(Game game) {
+        game.setPublicObjectives1Peekable(new ArrayList<>());
+        game.setPublicObjectives2Peekable(new ArrayList<>());
+        game.setPublicObjectives1Peeked(new LinkedHashMap<>());
+        game.setPublicObjectives2Peeked(new LinkedHashMap<>());
     }
 }
