@@ -1580,38 +1580,21 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public void setUpPeekableObjectives(int num, int type) {
         if (type == 1) {
-            var maxSize = publicObjectives1.size() + publicObjectives1Peekable.size();
-            if (num > maxSize) {
-                num = maxSize;
-            }
-            while (publicObjectives1Peekable.size() != num) {
-                if (publicObjectives1Peekable.size() > num) {
-                    String id = publicObjectives1Peekable.removeLast();
-                    publicObjectives1.add(id);
-                    Collections.shuffle(publicObjectives1);
-                } else {
-                    Collections.shuffle(publicObjectives1);
-                    String id = publicObjectives1.getFirst();
-                    publicObjectives1.remove(id);
-                    publicObjectives1Peekable.add(id);
-                }
-            }
+            adjustPeekable(num, publicObjectives1, publicObjectives1Peekable);
         } else {
-            var maxSize = publicObjectives2.size() + publicObjectives2Peekable.size();
-            if (num > maxSize) {
-                num = maxSize;
-            }
-            while (publicObjectives2Peekable.size() != num) {
-                if (publicObjectives2Peekable.size() > num) {
-                    String id = publicObjectives2Peekable.removeLast();
-                    publicObjectives2.add(id);
-                    Collections.shuffle(publicObjectives2);
-                } else {
-                    Collections.shuffle(publicObjectives2);
-                    String id = publicObjectives2.getFirst();
-                    publicObjectives2.remove(id);
-                    publicObjectives2Peekable.add(id);
-                }
+            adjustPeekable(num, publicObjectives2, publicObjectives2Peekable);
+        }
+    }
+
+    private void adjustPeekable(int num, List<String> objectiveDeck, List<String> peekable) {
+        num = Math.min(num, objectiveDeck.size() + peekable.size());
+        while (peekable.size() != num) {
+            if (peekable.size() > num) {
+                objectiveDeck.add(peekable.removeLast());
+                Collections.shuffle(objectiveDeck);
+            } else {
+                Collections.shuffle(objectiveDeck);
+                peekable.add(objectiveDeck.removeFirst());
             }
         }
     }
