@@ -24,7 +24,7 @@ public class MatchmakingOptions {
     private static final String SIMILAR_PLAYER_SKILL_OPTION = "Similar Player Skill";
     public static final String NO_PACE_OPTION = "No Pace";
     public static final String SLOW_PACE_OPTION = "Slow (90 days)";
-    public static final String FAST_PACE_OPTION = "Fast (30 days)";
+    public static final String FAST_PACE_OPTION = "Normal (30 days)";
     public static final String FASTER_PACE_OPTION = "Faster (15 days)";
     public static final String FASTEST_PACE_OPTION = "Fastest (7 days)";
     private static final String TIGL_OPTION = "Twilight Imperium Global League";
