@@ -34,11 +34,17 @@ public class SetDeckService {
             case Constants.STAGE_1_PUBLIC_DECK -> {
                 game.setPublicObjectives1(new ArrayList<>(deckModel.getNewShuffledDeck()));
                 game.setStage1PublicDeckID(deckModel.getAlias());
+                if (resetDeck) {
+                    resetPeekableAndPeekedPublicObjectives(game, 1);
+                }
                 return true;
             }
             case Constants.STAGE_2_PUBLIC_DECK -> {
                 game.setPublicObjectives2(new ArrayList<>(deckModel.getNewShuffledDeck()));
                 game.setStage2PublicDeckID(deckModel.getAlias());
+                if (resetDeck) {
+                    resetPeekableAndPeekedPublicObjectives(game, 2);
+                }
                 return true;
             }
             case Constants.RELIC_DECK -> {
@@ -74,5 +80,23 @@ public class SetDeckService {
             }
         }
         return false;
+    }
+
+    private static void resetPeekableAndPeekedPublicObjectives(Game game, int stage) {
+        if (stage == 1) {
+            game.getPublicObjectives1Peeked().clear();
+            game.getPublicObjectives1Peekable().clear();
+            game.setUpPeekableObjectives(5, 1);
+            game.getRevealedPublicObjectives()
+                    .keySet()
+                    .removeIf(Mapper.getPublicObjectivesStage1().keySet()::contains);
+        } else {
+            game.getPublicObjectives2Peeked().clear();
+            game.getPublicObjectives2Peekable().clear();
+            game.setUpPeekableObjectives(5, 2);
+            game.getRevealedPublicObjectives()
+                    .keySet()
+                    .removeIf(Mapper.getPublicObjectivesStage2().keySet()::contains);
+        }
     }
 }
