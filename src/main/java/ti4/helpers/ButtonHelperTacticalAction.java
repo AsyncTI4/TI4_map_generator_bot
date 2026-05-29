@@ -351,7 +351,7 @@ public final class ButtonHelperTacticalAction {
                 spaceCannonButtons.add(
                         Buttons.red("declinePDS_" + tile.getTileID() + "_" + player.getFaction(), "Decline PDS"));
                 if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasAbility("control_network"))
-                        && (!game.getRealPlayers().stream().anyMatch(player_ -> player_.hasUnit("netrunners_flagship"))
+                        && (game.getRealPlayers().stream().noneMatch(player_ -> player_.hasUnit("netrunners_flagship"))
                                 || !NetrunnersUnitsHandler.empBlocksSpaceCannonAgainstOpponent(
                                         game, playerWithPds, tile, CombatRollType.SpaceCannonOffence))) {
                     spaceCannonButtons.addAll(NetrunnersAbilitiesHandler.getControlNetworkSpaceCannonButtons(

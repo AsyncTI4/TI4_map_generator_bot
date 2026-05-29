@@ -1075,8 +1075,8 @@ public class DreamButtonHandler {
             return;
         }
 
-        if (!tile.getPlanetUnitHolders().stream()
-                .anyMatch(p -> player.getPlanets().contains(p.getName()))) {
+        if (tile.getPlanetUnitHolders().stream()
+                .noneMatch(p -> player.getPlanets().contains(p.getName()))) {
             MessageHelper.sendMessageToEventChannel(event, "You do not control a planet in that system.");
             return;
         }

@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.apache.commons.lang3.function.Consumers;
@@ -147,8 +146,8 @@ public class FOWCombatThreadMirroring {
             if (player != null && playerOther == player) {
                 continue;
             }
-            MessageChannel pChannel = playerOther.getPrivateChannel();
-            TextChannel pChan = (TextChannel) pChannel;
+            TextChannel pChannel = playerOther.getPrivateChannel();
+            TextChannel pChan = pChannel;
             if (pChan != null) {
                 boolean combatParticipant = combatParticipants.contains(playerOther);
                 String newMessage =

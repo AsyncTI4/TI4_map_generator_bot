@@ -951,8 +951,7 @@ public class CombatRollService {
             }
             if (rollType == CombatRollType.combatround
                     && player.hasTech("baconcg")
-                    && opponent.getSCs().stream()
-                            .allMatch(sc -> game.getPlayedSCs().contains(sc))) {
+                    && game.getPlayedSCs().containsAll(opponent.getSCs())) {
                 modifierToHit += 1;
             }
             int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player);

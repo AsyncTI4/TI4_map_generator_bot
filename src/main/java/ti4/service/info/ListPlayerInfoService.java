@@ -176,7 +176,7 @@ public class ListPlayerInfoService {
         // If we've run out of planets, try using trade goods
         if (index >= planets.size()) {
             // Try using remaining trade goods for resources
-            int additionalResources = Math.min(remainingTradeGoods, Math.max(0, goal - currentResources));
+            int additionalResources = additionalResources2;
             int additionalInfluence =
                     Math.min(remainingTradeGoods - additionalResources, Math.max(0, goal - currentInfluence));
 
