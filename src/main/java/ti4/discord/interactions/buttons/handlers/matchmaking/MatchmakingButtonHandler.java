@@ -147,7 +147,7 @@ class MatchmakingButtonHandler {
                         .toList())
                 .build();
 
-        Modal modal = Modal.create(ADDITIONAL_SETTINGS_MODAL_ID, "Queue Additional Settings")
+        Modal modal = Modal.create(ADDITIONAL_SETTINGS_MODAL_ID, "Additional Queue Settings")
                 .addComponents(Label.of("Max Queue Time", maxQueueTime))
                 .addComponents(Label.of("Avoid List", avoidPlayers))
                 .build();
