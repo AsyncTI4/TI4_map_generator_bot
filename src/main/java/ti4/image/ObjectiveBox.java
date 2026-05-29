@@ -1,6 +1,7 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import ti4.game.Game;
@@ -71,9 +72,9 @@ class ObjectiveBox {
 
     public static Integer getBoxWidth(Game game, Integer maxTextWidth, Integer scoreTokenSpacing) {
         return Math.clamp(
-                MapGenerator.getMaxObjectiveWidth(game),
+                getMaxLengthOfTokens(game, maxTextWidth, scoreTokenSpacing),
                 getMinimumBoxWidth(game),
-                getMaxLengthOfTokens(game, maxTextWidth, scoreTokenSpacing));
+                MapGenerator.getMaxObjectiveWidth(game));
     }
 
     public static Integer getVerticalSpacing() {
