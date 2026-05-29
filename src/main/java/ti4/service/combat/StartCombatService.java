@@ -859,19 +859,25 @@ public class StartCombatService {
                         buttons2);
             }
 
-            if ((player.hasAbility("edict") || player.hasAbility("imperia"))
+            if ((player.hasAbility("primacy")
+                            || player.hasAbility("edict")
+                            || player.hasAbility("edict_y")
+                            || player.hasAbility("imperia")
+                            || player.hasAbility("imperia_y"))
                     && !player.getMahactCC().contains(otherPlayer.getColor())
                     && !"neutral".equalsIgnoreCase(otherPlayer.getFaction())) {
                 buttons = new ArrayList<>();
                 String factionChecker = player.factionButtonChecker();
+                String location = player.hasAbility("primacy") ? "Primacy" : "Fleet";
                 buttons.add(Buttons.gray(
                         factionChecker + "mahactStealCC_" + otherPlayer.getColor(),
-                        "Add " + otherPlayer.getColor() + " Token to Fleet",
+                        "Add " + otherPlayer.getColor() + " Token to " + location,
                         FactionEmojis.Mahact));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         msg + ", a reminder that if you win this combat, you may add the opponents ("
-                                + otherPlayer.getColor() + ") command token to your fleet pool.",
+                                + otherPlayer.getColor() + ") command token to your "
+                                + (player.hasAbility("primacy") ? "Primacy ability." : "fleet pool."),
                         buttons);
             }
             if (player.hasUnlockedBreakthrough("sardakkbt")) {

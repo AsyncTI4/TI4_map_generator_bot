@@ -297,7 +297,7 @@ public class PlayerAreaGenerator {
 
         // Additional Fleet Supply
         int additionalFleetSupply = 0;
-        if (player.hasAbility("edict")) {
+        if (player.hasAbility("edict") || player.hasAbility("edict_y")) {
             additionalFleetSupply += player.getMahactCC().size();
         }
         if (player.hasAbility("armada")) {
@@ -1360,7 +1360,7 @@ public class PlayerAreaGenerator {
                     graphics, x, y, VeiledHeartService.VeiledCardType.PARADIGM, deltaX, player);
         }
 
-        if (player.hasAbility("imperia")) {
+        if (player.hasAbility("imperia") || player.hasAbility("imperia_y")) {
             deltaX += 5;
             List<String> mahactCCs = player.getMahactCC();
             Collection<Player> players = game.getRealPlayersNDummies();
@@ -1573,7 +1573,6 @@ public class PlayerAreaGenerator {
                     }
                     drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
                 }
-
                 deltaX += 48;
                 addedAbilities = true;
             }

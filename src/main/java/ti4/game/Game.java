@@ -4121,7 +4121,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
         // check if player has Imperia and if any of the stolen CCs are owned by players
         // that have the leader unlocked
-        if (player.hasAbility("imperia")) {
+        if (player.hasAbility("imperia") || player.hasAbility("imperia_y")) {
             for (Player player_ : getRealPlayersNDummies()) {
                 if (player_.getFaction().equalsIgnoreCase(player.getFaction())) continue;
                 if (player.getMahactCC().contains(player_.getColor()) && player_.hasLeaderUnlocked(leaderID)) {
@@ -4156,7 +4156,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
         // check if player has Imperia and if any of the stolen CCs are owned by players
         // that have the leader unlocked
-        if (player.hasAbility("imperia")) {
+        if (player.hasAbility("imperia") || player.hasAbility("imperia_y")) {
             for (Player otherPlayer : getRealPlayers()) {
                 if (otherPlayer.equals(player)) continue;
                 if (player.getMahactCC().contains(otherPlayer.getColor())) {

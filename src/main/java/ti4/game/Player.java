@@ -2010,7 +2010,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public int getEffectiveFleetCC() {
-        return getFleetCC() + getMahactCC().size();
+        return getFleetCC()
+                + ((hasAbility("edict") || hasAbility("edict_y"))
+                        ? getMahactCC().size()
+                        : 0);
     }
 
     @Override

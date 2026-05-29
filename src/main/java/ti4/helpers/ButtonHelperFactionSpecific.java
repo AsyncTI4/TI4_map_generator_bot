@@ -1105,15 +1105,18 @@ public final class ButtonHelperFactionSpecific {
     public static void mahactStealCC(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String color = buttonID.replace("mahactStealCC_", "");
         String ident = player.getRepresentation(true, false);
+
+        String location = player.hasAbility("primacy") ? "Primacy ability" : "fleet pool";
         if (!player.getMahactCC().contains(color)) {
             player.addMahactCC(color);
             Helper.isCCCountCorrect(game, color);
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), ident + " added a " + color + " command token to their fleet pool.");
+                    player.getCorrectChannel(),
+                    ident + " added a " + color + " command token to their " + location + ".");
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    ident + " already had a " + color + " command token in their fleet pool.");
+                    ident + " already had a " + color + " command token in their " + location + ".");
         }
         CommanderUnlockCheckService.checkPlayer(player, "mahact");
 

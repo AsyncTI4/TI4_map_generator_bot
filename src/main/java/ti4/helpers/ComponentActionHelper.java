@@ -276,7 +276,9 @@ public class ComponentActionHelper {
                 }
             }
         }
-        if (game.playerHasLeaderUnlockedOrAlliance(p1, "mahactcommander")
+        boolean hasMahactCommander = game.playerHasLeaderUnlockedOrAlliance(p1, "mahactcommander")
+                || game.playerHasLeaderUnlockedOrAlliance(p1, "mahactcommander_y");
+        if (hasMahactCommander
                 && p1.getTacticalCC() > 0
                 && !ButtonHelper.getTilesWithYourCC(p1, game, event).isEmpty()) {
 

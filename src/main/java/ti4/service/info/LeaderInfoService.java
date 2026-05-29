@@ -86,7 +86,7 @@ public class LeaderInfoService {
 
         // ADD MAHACT IMPERIA REFERENCE
         List<MessageEmbed> imperiaEmbeds = new ArrayList<>();
-        if (player.hasAbility("imperia")) {
+        if (player.hasAbility("imperia") || player.hasAbility("imperia_y")) {
             for (Player otherPlayer : game.getPlayers().values()) {
                 if (otherPlayer != player) {
                     if (player.getMahactCC().contains(otherPlayer.getColor())) {

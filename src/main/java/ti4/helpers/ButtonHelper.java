@@ -1924,15 +1924,16 @@ public class ButtonHelper {
                             buttons);
                 }
             }
-            if (nonActivePlayer.hasUnit("mahact_mech")
+            if (nonActivePlayer.hasAnyUnit("mahact_mech", "mahact_mech_y")
                     && nonActivePlayer.hasMechInSystem(activeSystem)
                     && nonActivePlayer.getMahactCC().contains(player.getColor())
                     && !isLawInPlay(game, "articles_war")) {
+                String mechName = nonActivePlayer.hasUnit("mahact_mech_y") ? "Starlancer Y" : "Starlancer";
+                String tokenLocation = nonActivePlayer.hasAbility("primacy") ? "Primacy ability" : "fleet pool";
                 if (justChecking) {
                     if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(
-                                channel,
-                                "Warning: this would provide an opportunity for a Starlancer (Mahact mech) to trigger.");
+                                channel, "Warning: this would provide an opportunity for " + mechName + " to trigger.");
                     }
                     numberOfAbilities++;
                 } else {
@@ -1946,7 +1947,8 @@ public class ButtonHelper {
                             nonActivePlayer.getCorrectChannel(),
                             ident
                                     + ", you may use the buttons to remove the " + player.getColor()
-                                    + " command token from your fleet pool to end their turn by using the Starlancer (Mahact mech) in the active system.",
+                                    + " command token from your " + tokenLocation
+                                    + " to end their turn by using " + mechName + " in the active system.",
                             buttons);
                 }
             }
@@ -3210,6 +3212,7 @@ public class ButtonHelper {
 
     public static void resolveMahactMechAbilityUse(
             Player mahact, Player target, Game game, Tile tile, ButtonInteractionEvent event) {
+        String mechName = mahact.hasUnit("mahact_mech_y") ? "Starlancer Y" : "Starlancer";
         mahact.removeMahactCC(target.getColor());
         if (!game.isNaaluAgent() && !game.isWarfareAction()) {
             if (!game.getStoredValue("absolLux").isEmpty()) {
@@ -3222,7 +3225,8 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(
                 mahact.getCorrectChannel(),
                 mahact.getRepresentationUnfogged() + " the " + target.getColor()
-                        + " command token has been removed from your fleet pool");
+                        + " command token has been removed from your "
+                        + (mahact.hasAbility("primacy") ? "Primacy ability" : "fleet pool"));
         checkFleetInEveryTile(mahact, game);
         List<Button> conclusionButtons = new ArrayList<>();
         conclusionButtons.add(getEndTurnButton(game, target));
@@ -3237,7 +3241,7 @@ public class ButtonHelper {
                 target.getRepresentation(true, true)
                         + " You've been hit by"
                         + (RandomHelper.isOneInX(1000) ? ", you've been struck by," : "")
-                        + " the Starlancer (Mahact mech) ability. You gain 1 command token to any command pool. "
+                        + " " + mechName + ". You gain 1 command token to any command pool. "
                         + "Then, use the buttons to resolve \"end of turn\" abilities and then end turn.",
                 conclusionButtons);
         deleteMessage(event);
@@ -4018,7 +4022,9 @@ public class ButtonHelper {
         String tooManyPDS = "";
         int fleetCap = (player.getFleetCC()
                         + armadaValue
-                        + player.getMahactCC().size()
+                        + ((player.hasAbility("edict") || player.hasAbility("edict_y"))
+                                ? player.getMahactCC().size()
+                                : 0)
                         + tile.getFleetSupplyBonusForPlayer(player))
                 * 2;
         // fleetCap is double to more easily deal with half-capacity, e.g., Naalu Fighter II
@@ -4254,13 +4260,11 @@ public class ButtonHelper {
             message += player.getRepresentationUnfogged() + ", you are violating fleet pool limits in the system "
                     + tile.getRepresentation()
                     + ". Specifically, you have "
-                    + (player.getFleetCC() + player.getMahactCC().size())
+                    + player.getEffectiveFleetCC()
                     + " command tokens in your fleet pool,"
-                    + (fleetCap / 2 - player.getFleetCC() - player.getMahactCC().size() > 0
+                    + (fleetCap / 2 - player.getEffectiveFleetCC() > 0
                             ? "plus the ability to hold"
-                                    + (fleetCap / 2
-                                            - player.getFleetCC()
-                                            - player.getMahactCC().size())
+                                    + (fleetCap / 2 - player.getEffectiveFleetCC())
                                     + "additional ships, for a total of " + (fleetCap / 2)
                             : "")
                     + " and you currently are filling "

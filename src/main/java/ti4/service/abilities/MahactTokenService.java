@@ -18,7 +18,9 @@ public class MahactTokenService {
 
     public void removeFleetCC(Game game, Player player, String reason) {
         String message = player.getRepresentation();
-        if (!player.getMahactCC().isEmpty()) {
+        if (!(player.hasAbility("primacy"))
+                && (player.hasAbility("edict") || player.hasAbility("imperia"))
+                && !player.getMahactCC().isEmpty()) {
             if (player.getFleetCC() == 0 && player.getMahactCC().size() == 1) {
                 // exactly 1 token in fleet
                 String color = player.getMahactCC().getFirst();
@@ -44,6 +46,9 @@ public class MahactTokenService {
 
     public List<Button> removeFleetTokenOptions(Game game, Player player, boolean includeSelf, boolean keepButtons) {
         List<Button> buttons = new ArrayList<>();
+        if (player.hasAbility("primacy") || (!player.hasAbility("edict") && !player.hasAbility("imperia"))) {
+            return buttons;
+        }
         String prefix = player.factionButtonChecker() + "loseMahactCC_";
         String suffix = keepButtons ? "_keep" : "";
         String label = "Lose your own token";

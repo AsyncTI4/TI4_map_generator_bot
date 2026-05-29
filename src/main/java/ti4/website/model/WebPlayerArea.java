@@ -524,8 +524,7 @@ public class WebPlayerArea {
         }
         webPlayerArea.nombox = nomboxData;
 
-        // Mahact edict: only applies if the player is mahact and loads the mahact's "stolen" fleet supply
-        if (player.hasAbility("edict")) {
+        if (player.hasAbility("edict") || player.hasAbility("edict_y")) {
             webPlayerArea.mahactEdict = player.getMahactCC();
         } else {
             webPlayerArea.mahactEdict = new ArrayList<>();

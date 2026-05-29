@@ -2755,7 +2755,11 @@ public final class Helper {
                 ccCount += player_.getStrategicCC();
                 ccCount += player_.getTacticalCC();
                 ccCount += player_.getFleetCC();
-            } else if (player_.hasAbility("imperia") || player_.hasAbility("edict")) {
+            } else if (player_.hasAbility("primacy")
+                    || player_.hasAbility("edict")
+                    || player_.hasAbility("edict_y")
+                    || player_.hasAbility("imperia")
+                    || player_.hasAbility("imperia_y")) {
                 for (String color_ : player_.getMahactCC()) {
                     ColorModel ccColor = Mapper.getColor(color_);
                     if (player.getColor().equalsIgnoreCase(ccColor.getName())) {
