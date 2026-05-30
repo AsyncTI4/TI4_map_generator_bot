@@ -37,8 +37,11 @@ public class FrankenPromissoryService {
             }
 
             PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pnID);
+            String defaultRepresentation = pnModel.getNameRepresentation()
+                    + "\n> "
+                    + FrankenAlternateTextService.formatInlineText(pnModel.getTextFormatted(game));
             sb.append(FrankenAlternateTextService.getRepresentationWithAlternateText(
-                    game, DraftCategory.PN, pnID, pnModel.getNameRepresentation(), pnModel.getNameRepresentation()));
+                    game, DraftCategory.PN, pnID, pnModel.getNameRepresentation(), defaultRepresentation));
             sb.append('\n');
             player.addOwnedPromissoryNoteByID(pnID);
             player.setPromissoryNote(pnID);
