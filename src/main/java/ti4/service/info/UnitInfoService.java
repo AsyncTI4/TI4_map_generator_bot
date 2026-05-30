@@ -13,6 +13,7 @@ import ti4.game.Player;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.franken.FrankenAlternateTextService;
 
 @UtilityClass
 public class UnitInfoService {
@@ -50,7 +51,8 @@ public class UnitInfoService {
         }
         for (UnitModel unitModel :
                 unitList.stream().sorted().map(Mapper::getUnit).toList()) {
-            MessageEmbed unitRepresentationEmbed = unitModel.getRepresentationEmbed(false);
+            MessageEmbed unitRepresentationEmbed =
+                    FrankenAlternateTextService.getUnitEmbed(player.getGame(), unitModel, false);
             messageEmbeds.add(unitRepresentationEmbed);
         }
         return messageEmbeds;

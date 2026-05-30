@@ -1,10 +1,9 @@
 package ti4.service.franken;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.draft.DraftCategory;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.image.Mapper;
@@ -22,7 +21,6 @@ public class FrankenPromissoryService {
                 .append("promissory note")
                 .append(pnIDs.size() == 1 ? "" : "s")
                 .append(":\n");
-        List<MessageEmbed> embeds = new ArrayList<>();
         for (String pnID : pnIDs) {
             Player pnOwner = game.getPNOwner(pnID);
             sb.append("> ");
@@ -37,10 +35,14 @@ public class FrankenPromissoryService {
                 sb.append('\n');
                 continue;
             }
-            sb.append(pnID);
 
             PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pnID);
-            embeds.add(pnModel.getRepresentationEmbed());
+            sb.append(FrankenAlternateTextService.getRepresentationWithAlternateText(
+                    game,
+                    DraftCategory.PN,
+                    pnID,
+                    pnModel.getNameRepresentation(),
+                    pnModel.getNameRepresentation()));
             sb.append('\n');
             player.addOwnedPromissoryNoteByID(pnID);
             player.setPromissoryNote(pnID);

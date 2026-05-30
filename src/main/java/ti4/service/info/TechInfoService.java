@@ -12,6 +12,7 @@ import ti4.game.Player;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
+import ti4.service.franken.FrankenAlternateTextService;
 
 @UtilityClass
 public class TechInfoService {
@@ -42,7 +43,8 @@ public class TechInfoService {
                 .map(Mapper::getTech)
                 .sorted(TechnologyModel.sortByTechRequirements)
                 .toList()) {
-            MessageEmbed representationEmbed = techModel.getRepresentationEmbed();
+            MessageEmbed representationEmbed =
+                    FrankenAlternateTextService.getTechnologyEmbed(player.getGame(), techModel, false, false);
             messageEmbeds.add(representationEmbed);
         }
         return messageEmbeds;
@@ -55,7 +57,8 @@ public class TechInfoService {
                 .map(Mapper::getTech)
                 .sorted(TechnologyModel.sortByTechRequirements)
                 .toList()) {
-            MessageEmbed representationEmbed = techModel.getRepresentationEmbed(false, true);
+            MessageEmbed representationEmbed =
+                    FrankenAlternateTextService.getTechnologyEmbed(player.getGame(), techModel, false, true);
             messageEmbeds.add(representationEmbed);
         }
         return messageEmbeds;

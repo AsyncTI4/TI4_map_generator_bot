@@ -11,9 +11,11 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.image.Mapper;
+import ti4.draft.DraftCategory;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.franken.FrankenAlternateTextService;
 
 @Data
 public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNoteModel>, EmbeddableModel {
@@ -214,7 +216,10 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     }
 
     public String getTextFormatted(Game game) {
-        String formattedText = text;
+        boolean useAlternateText = FrankenAlternateTextService.hasAlternateText(game, DraftCategory.PN, alias);
+        String formattedText = useAlternateText
+                ? FrankenAlternateTextService.getAlternateText(DraftCategory.PN, alias)
+                : text;
         formattedText = formattedText.replace("\n", "\n> ");
         StringBuilder replaceText = new StringBuilder();
         Player pnOwner = game.getPNOwner(alias);
@@ -223,7 +228,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
             replaceText.append(pnOwner.getColor());
             formattedText = formattedText.replaceAll("<" + pnOwner.getColor() + ">", replaceText.toString());
         }
-        if (notes != null) {
+        if (notes != null && !useAlternateText) {
             formattedText += "\n> -# [" + notes + "]";
         }
         return formattedText;
