@@ -37,11 +37,11 @@ public class FrankenPromissoryService {
             }
 
             PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pnID);
-            String defaultRepresentation = pnModel.getNameRepresentation()
-                    + "\n> "
-                    + FrankenAlternateTextService.formatInlineText(pnModel.getTextFormatted(game));
+            String nameRepresentation = pnModel.getNameRepresentation();
+            String defaultRepresentation =
+                    nameRepresentation + "\n> " + FrankenAlternateTextService.formatInlineText(pnModel.getTextFormatted(game));
             sb.append(FrankenAlternateTextService.getRepresentationWithAlternateText(
-                    game, DraftCategory.PN, pnID, pnModel.getNameRepresentation(), defaultRepresentation));
+                    game, DraftCategory.PN, pnID, nameRepresentation, defaultRepresentation));
             sb.append('\n');
             player.addOwnedPromissoryNoteByID(pnID);
             player.setPromissoryNote(pnID);
