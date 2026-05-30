@@ -1,6 +1,5 @@
 package ti4.service.franken;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.EmbedBuilder;

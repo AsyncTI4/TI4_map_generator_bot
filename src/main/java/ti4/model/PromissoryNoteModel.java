@@ -8,10 +8,10 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
+import ti4.draft.DraftCategory;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.image.Mapper;
-import ti4.draft.DraftCategory;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -217,9 +217,8 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
 
     public String getTextFormatted(Game game) {
         boolean useAlternateText = FrankenAlternateTextService.hasAlternateText(game, DraftCategory.PN, alias);
-        String formattedText = useAlternateText
-                ? FrankenAlternateTextService.getAlternateText(DraftCategory.PN, alias)
-                : text;
+        String formattedText =
+                useAlternateText ? FrankenAlternateTextService.getAlternateText(DraftCategory.PN, alias) : text;
         formattedText = formattedText.replace("\n", "\n> ");
         StringBuilder replaceText = new StringBuilder();
         Player pnOwner = game.getPNOwner(alias);
