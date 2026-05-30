@@ -56,6 +56,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.explore.AddFrontierTokensService;
+import ti4.service.franken.FrankenAlternateTextService;
 import ti4.service.info.ListTurnOrderService;
 import ti4.service.planet.PlanetService;
 import ti4.service.strategycard.PlayStrategyCardService;
@@ -89,8 +90,8 @@ public class PlayHeroService {
                             event.getChannel().getName());
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " played:");
             player.getCorrectChannel()
-                    .sendMessageEmbeds(leaderModel.getRepresentationEmbed(
-                            false, true, false, showFlavourText, game.isTwilightsFallMode()))
+                    .sendMessageEmbeds(FrankenAlternateTextService.getLeaderEmbed(
+                            game, leaderModel, false, true, false, showFlavourText, game.isTwilightsFallMode()))
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             MessageHelper.sendMessageToChannel(

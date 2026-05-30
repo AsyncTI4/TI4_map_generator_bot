@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.draft.DraftCategory;
 import ti4.game.Player;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelperAbilities;
@@ -28,7 +29,13 @@ public class FrankenAbilityService {
                 sb.append("> ").append(abilityID).append(" (player had this ability)");
             } else {
                 AbilityModel abilityModel = Mapper.getAbility(abilityID);
-                sb.append("> ").append(abilityModel.getRepresentation());
+                sb.append("> ")
+                        .append(FrankenAlternateTextService.getRepresentationWithAlternateText(
+                                player.getGame(),
+                                DraftCategory.ABILITY,
+                                abilityID,
+                                abilityModel.getNameRepresentation(),
+                                abilityModel.getRepresentation()));
             }
             sb.append('\n');
             player.addAbility(abilityID);

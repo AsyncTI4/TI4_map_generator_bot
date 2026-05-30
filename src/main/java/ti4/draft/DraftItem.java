@@ -185,7 +185,7 @@ public abstract class DraftItem {
 
         String details = getTitle(game);
         if (showDescr || ItemCategory.showDescrByDefault()) {
-            String descr = getLongDescriptionImpl(game);
+            String descr = getDisplayDescription(game, getLongDescriptionImpl(game));
             descr = descr.trim().replace("\n> ", "\n").replace("\n", "\n> ");
             details += System.lineSeparator() + "> " + descr;
         }
@@ -239,7 +239,7 @@ public abstract class DraftItem {
 
     @JsonIgnore
     public String getLongDescription(Game game) {
-        StringBuilder sb = new StringBuilder(getLongDescriptionImpl(game));
+        StringBuilder sb = new StringBuilder(getDisplayDescription(game, getLongDescriptionImpl(game)));
         if (hasAdditionalComponents()) {
             sb.append("\n>  - *Also adds: ");
             for (DraftErrataModel i : Errata.getAdditionalComponents()) {
@@ -259,6 +259,14 @@ public abstract class DraftItem {
             sb.append("*");
         }
         return sb.toString();
+    }
+
+    private String getDisplayDescription(Game game, String defaultDescription) {
+        if (game == null || !game.isFrankenGame()) {
+            return defaultDescription;
+        }
+        String alternateText = Errata.getAlternateText();
+        return alternateText.isBlank() ? defaultDescription : alternateText;
     }
 
     public boolean isDraftable(Player player) {
