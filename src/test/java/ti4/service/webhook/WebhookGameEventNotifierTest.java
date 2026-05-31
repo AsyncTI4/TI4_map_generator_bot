@@ -62,38 +62,10 @@ class WebhookGameEventNotifierTest extends BaseTi4Test {
         CapturingDispatchService dispatchService = new CapturingDispatchService();
         WebhookGameEventNotifier notifier = newNotifier(dispatchService);
         Game game = createConfiguredGame();
-        GameWebhookConfig.clearWebhookConfig(game);
 
         notifier.notifyPhaseChanged(game, "strategy", "action");
 
         assertTrue(dispatchService.calls.isEmpty());
-    }
-
-    @Test
-    void notifyPhaseChanged_DoesNotDispatch_WhenDisabled() {
-        CapturingDispatchService dispatchService = new CapturingDispatchService();
-        WebhookGameEventNotifier notifier = newNotifier(dispatchService);
-        Game game = createConfiguredGame();
-        GameWebhookConfig.setWebhookEnabled(game, false);
-
-        notifier.notifyPhaseChanged(game, "strategy", "action");
-
-        assertTrue(dispatchService.calls.isEmpty());
-    }
-
-    @Test
-    void notifyPhaseChanged_DoesNotDispatch_ForFowUnlessExplicitlyAllowed() {
-        CapturingDispatchService dispatchService = new CapturingDispatchService();
-        WebhookGameEventNotifier notifier = newNotifier(dispatchService);
-        Game game = createConfiguredGame();
-        game.setFowMode(true);
-
-        notifier.notifyPhaseChanged(game, "strategy", "action");
-        assertTrue(dispatchService.calls.isEmpty());
-
-        GameWebhookConfig.setFowAllowed(game, true);
-        notifier.notifyPhaseChanged(game, "strategy", "action");
-        assertEquals(1, dispatchService.calls.size());
     }
 
     @Test
@@ -118,7 +90,7 @@ class WebhookGameEventNotifierTest extends BaseTi4Test {
     }
 
     @Test
-    void notifyPhaseChanged_DispatchesToSubscriptions_WhenLegacyConfigMissing() {
+    void notifyPhaseChanged_DispatchesToSubscriptions() {
         CapturingDispatchService dispatchService = new CapturingDispatchService();
         GameWebhookSubscriptionService subscriptionService = mock(GameWebhookSubscriptionService.class);
         when(subscriptionService.getCallbackUrls(eq("pbd-test"), eq(GameWebhookEventType.PHASE_CHANGED)))
@@ -126,7 +98,6 @@ class WebhookGameEventNotifierTest extends BaseTi4Test {
         WebhookGameEventNotifier notifier = new WebhookGameEventNotifier(dispatchService, subscriptionService);
 
         Game game = createConfiguredGame();
-        GameWebhookConfig.clearWebhookConfig(game);
 
         notifier.notifyPhaseChanged(game, "strategy", "action");
 
@@ -147,7 +118,6 @@ class WebhookGameEventNotifierTest extends BaseTi4Test {
         Player player = game.addPlayer("p1", "Player 1");
         player.setFaction("hacan");
         player.setColor("yellow");
-        GameWebhookConfig.setWebhookUrl(game, "https://example.com/hook");
         return game;
     }
 

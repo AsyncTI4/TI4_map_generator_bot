@@ -27,7 +27,7 @@ public class WebhookDispatchService {
     }
 
     private void sendWithRetry(Game game, String webhookUrl, GameWebhookEventPayload payload) {
-        if (!GameWebhookConfig.isWebhookUrlValid(webhookUrl)) {
+        if (!isWebhookUrlValid(webhookUrl)) {
             BotLogger.warning(new LogOrigin(game), "Skipping webhook dispatch due to invalid URL.");
             return;
         }
@@ -67,6 +67,16 @@ public class WebhookDispatchService {
                     Thread.currentThread().interrupt();
                     return;
                 }
+            }
+        }
+
+        private boolean isWebhookUrlValid(String webhookUrl) {
+            try {
+                URI uri = URI.create(webhookUrl);
+                String scheme = uri.getScheme();
+                return uri.getHost() != null && ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme));
+            } catch (RuntimeException e) {
+                return false;
             }
         }
     }

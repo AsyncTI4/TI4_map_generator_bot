@@ -54,17 +54,14 @@ AWS infrastructure is managed via Terraform in the `aws-resources` repository. T
 
 ## Game Event Webhooks
 
-The bot supports per-game outbound webhooks for lightweight event integration.
+The bot supports outbound webhook subscriptions for lightweight website event integration.
 
 ### Configuration
 
-Use `/game webhook` in a game to configure delivery:
+Manage subscriptions through the public API:
 
-- `/game webhook url:<https://example.com/hook>` sets the webhook URL.
-- `/game webhook enabled:true|false` toggles delivery on/off.
-- `/game webhook allow_fow:true|false` controls FoW behavior (default is `false`).
-- `/game webhook` with no options shows current config.
-- `/game webhook clear:true` removes all webhook settings for the game.
+- `GET /api/webhooks/games/event-types` lists supported event types.
+- `POST /api/webhooks/games/subscriptions` replaces a user subscription for a game.
 
 ### Event Types
 

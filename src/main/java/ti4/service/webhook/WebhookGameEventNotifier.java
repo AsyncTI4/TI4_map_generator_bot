@@ -112,25 +112,10 @@ public class WebhookGameEventNotifier implements GameEventNotifier {
                     activePlayer == null ? null : activePlayer.getFaction(),
                     Instant.now().toString(),
                     metadata.isEmpty() ? null : metadata);
-            dispatchLegacyWebhook(game, payload);
             dispatchWebhookSubscriptions(game, eventType, payload);
         } catch (RuntimeException e) {
             BotLogger.error(new LogOrigin(game), "Failed to notify webhook for event " + eventType.value(), e);
         }
-    }
-
-    private void dispatchLegacyWebhook(Game game, GameWebhookEventPayload payload) {
-        if (!GameWebhookConfig.isWebhookEnabled(game)) {
-            return;
-        }
-        if (game.isFowMode() && !GameWebhookConfig.isFowAllowed(game)) {
-            return;
-        }
-        String webhookUrl = GameWebhookConfig.getWebhookUrl(game).orElse(null);
-        if (StringUtils.isBlank(webhookUrl)) {
-            return;
-        }
-        webhookDispatchService.dispatch(game, webhookUrl, payload);
     }
 
     private void dispatchWebhookSubscriptions(
