@@ -13,14 +13,13 @@ import ti4.service.info.SecretObjectiveInfoService;
 
 class UnscoreSO extends GameStateSubcommand {
 
-    public UnscoreSO() {
+    UnscoreSO() {
         super(Constants.UNSCORE_SO, "Unscore Secret Objective", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER,
                         Constants.SECRET_OBJECTIVE_ID,
                         "Scored secret objective ID, which is found between ()")
-                .setRequired(true)
-                .setAutoComplete(true));
+                .setRequired(true));
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
                         .setAutoComplete(true));
