@@ -38,6 +38,8 @@ public enum PublicGameWebhookEventType {
     }
 
     public static Optional<PublicGameWebhookEventType> fromInternal(GameWebhookEventType eventType) {
-        return Arrays.stream(values()).filter(type -> type.internalType == eventType).findFirst();
+        return Arrays.stream(values())
+                .filter(type -> type.internalType == eventType)
+                .findFirst();
     }
 }

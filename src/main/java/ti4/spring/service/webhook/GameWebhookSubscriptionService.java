@@ -53,7 +53,8 @@ public class GameWebhookSubscriptionService {
     }
 
     public List<String> getCallbackUrls(String gameName, GameWebhookEventType eventType) {
-        PublicGameWebhookEventType publicEventType = PublicGameWebhookEventType.fromInternal(eventType).orElse(null);
+        PublicGameWebhookEventType publicEventType =
+                PublicGameWebhookEventType.fromInternal(eventType).orElse(null);
         if (publicEventType == null) {
             return List.of();
         }
@@ -63,7 +64,8 @@ public class GameWebhookSubscriptionService {
             return List.of();
         }
 
-        Set<Long> webhookUserIds = subscriptions.stream().map(GameWebhookEntity::getWebhookUserId).collect(Collectors.toSet());
+        Set<Long> webhookUserIds =
+                subscriptions.stream().map(GameWebhookEntity::getWebhookUserId).collect(Collectors.toSet());
         Map<Long, WebhookUserEntity> usersById = webhookUserRepository.findAllById(webhookUserIds).stream()
                 .filter(WebhookUserEntity::isActive)
                 .collect(Collectors.toMap(WebhookUserEntity::getId, user -> user));
@@ -97,6 +99,9 @@ public class GameWebhookSubscriptionService {
         if (eventTypes == null || eventTypes.isEmpty()) {
             return "";
         }
-        return eventTypes.stream().map(Enum::name).sorted(Comparator.naturalOrder()).collect(Collectors.joining(","));
+        return eventTypes.stream()
+                .map(Enum::name)
+                .sorted(Comparator.naturalOrder())
+                .collect(Collectors.joining(","));
     }
 }

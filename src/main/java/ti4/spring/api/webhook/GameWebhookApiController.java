@@ -56,8 +56,7 @@ public class GameWebhookApiController {
     @DeleteMapping("/{gameName}/webhook")
     @SetupRequestContext(save = false)
     public ResponseEntity<Void> delete(
-            @PathVariable String gameName,
-            @RequestHeader(value = "X-API-Key", required = false) String apiKey) {
+            @PathVariable String gameName, @RequestHeader(value = "X-API-Key", required = false) String apiKey) {
         WebhookUserEntity webhookUser = gameWebhookSubscriptionService.authenticateWebhookUser(apiKey);
         if (webhookUser == null) {
             return ResponseEntity.status(401).build();

@@ -19,7 +19,8 @@ public class WebhookGameEventNotifier implements GameEventNotifier {
     private final GameWebhookSubscriptionService gameWebhookSubscriptionService;
 
     public WebhookGameEventNotifier(
-            WebhookDispatchService webhookDispatchService, GameWebhookSubscriptionService gameWebhookSubscriptionService) {
+            WebhookDispatchService webhookDispatchService,
+            GameWebhookSubscriptionService gameWebhookSubscriptionService) {
         this.webhookDispatchService = webhookDispatchService;
         this.gameWebhookSubscriptionService = gameWebhookSubscriptionService;
     }
@@ -132,7 +133,8 @@ public class WebhookGameEventNotifier implements GameEventNotifier {
         webhookDispatchService.dispatch(game, webhookUrl, payload);
     }
 
-    private void dispatchWebhookSubscriptions(Game game, GameWebhookEventType eventType, GameWebhookEventPayload payload) {
+    private void dispatchWebhookSubscriptions(
+            Game game, GameWebhookEventType eventType, GameWebhookEventPayload payload) {
         for (String callbackUrl : gameWebhookSubscriptionService.getCallbackUrls(game.getName(), eventType)) {
             webhookDispatchService.dispatch(game, callbackUrl, payload);
         }
