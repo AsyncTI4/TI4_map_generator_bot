@@ -32,7 +32,7 @@ public class MahactTokenService {
                 ButtonHelper.checkFleetInEveryTile(player, game);
             } else {
                 message += ", you are being forced to lose 1 command token from your fleet pool, " + reason
-                        + ", and have the option to remove another player's command token from your pool instead of your own.";
+                        + " You have the option to remove another player's command token from your pool instead of your own.";
                 List<Button> options = removeFleetTokenOptions(game, player, true, false);
                 MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCorrectChannel(), message, options);
             }
