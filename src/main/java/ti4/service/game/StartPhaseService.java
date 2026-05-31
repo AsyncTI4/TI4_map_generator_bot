@@ -1084,7 +1084,7 @@ public class StartPhaseService {
                         buttons);
             }
             boolean majorityPrefersNoWhispers = noWhispersCount > randomPlayers.size() / 2;
-            if (anyoneWantsLimitedWhispers && !majorityPrefersNoWhispers) {
+            if (anyoneWantsLimitedWhispers) {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.blue("setLimitedWhispers", "Allow Limited Whispers"));
                 buttons.add(Buttons.gray("deleteButtons", "Dismiss these buttons"));
