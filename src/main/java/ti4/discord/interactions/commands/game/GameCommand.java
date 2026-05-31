@@ -33,6 +33,7 @@ public class GameCommand implements ParentCommand {
                     new Tags(),
                     new GalacticEventsSetup(),
                     new GameOptions(),
+                    new GameWebhook(),
                     new StartScenario())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

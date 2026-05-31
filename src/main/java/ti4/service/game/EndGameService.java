@@ -36,6 +36,7 @@ import ti4.service.statistics.game.WinningPathComparisonService;
 import ti4.service.statistics.game.WinningPathHelper;
 import ti4.service.statistics.game.WinningPathPersistenceService;
 import ti4.service.tigl.TiglReportService;
+import ti4.service.webhook.GameEventNotifierFacade;
 import ti4.spring.api.image.GameImageService;
 import ti4.spring.context.SpringContext;
 
@@ -190,6 +191,7 @@ public class EndGameService {
         game.setEndedDate(System.currentTimeMillis());
         game.setAutoPing(false);
         game.setAutoPingSpacer(0);
+        GameEventNotifierFacade.notifyGameEnded(game);
 
         GameMessageManager.remove(List.of(game.getName()));
 

@@ -51,3 +51,66 @@ python scripts/convert_and_upload_to_s3.py
 ### Infrastructure
 
 AWS infrastructure is managed via Terraform in the `aws-resources` repository. The setup uses OIDC for keyless authentication via the `GithubActionsRole` IAM role.
+
+## Game Event Webhooks
+
+The bot supports per-game outbound webhooks for lightweight event integration.
+
+### Configuration
+
+Use `/game webhook` in a game to configure delivery:
+
+- `/game webhook url:<https://example.com/hook>` sets the webhook URL.
+- `/game webhook enabled:true|false` toggles delivery on/off.
+- `/game webhook allow_fow:true|false` controls FoW behavior (default is `false`).
+- `/game webhook` with no options shows current config.
+- `/game webhook clear:true` removes all webhook settings for the game.
+
+### Event Types
+
+The bot emits these event types:
+
+- `active_player_changed`
+- `phase_changed` (only strategy/action/status/agenda transitions)
+- `agenda_voting_started`
+- `agenda_resolved`
+- `player_passed`
+- `game_ended`
+
+### Payload Schema
+
+Each webhook POST sends JSON with this shape:
+
+- `gameName` (string)
+- `eventType` (string)
+- `phaseOfGame` (string)
+- `round` (number)
+- `activePlayerId` (string or null)
+- `activeFaction` (string or null)
+- `timestamp` (ISO-8601 string)
+- `metadata` (object, optional)
+
+Example:
+
+```json
+{
+  "gameName": "pbd1234",
+  "eventType": "player_passed",
+  "phaseOfGame": "action",
+  "round": 4,
+  "activePlayerId": "123456789012345678",
+  "activeFaction": "hacan",
+  "timestamp": "2026-05-31T00:00:00Z",
+  "metadata": {
+    "passedPlayerId": "123456789012345678",
+    "passedFaction": "hacan",
+    "autoPass": false
+  }
+}
+```
+
+### Delivery Semantics
+
+- Best-effort delivery.
+- At-most-once from game-flow perspective (events are triggered only on meaningful transitions).
+- Dispatch is non-blocking; game flow continues if webhook delivery fails.

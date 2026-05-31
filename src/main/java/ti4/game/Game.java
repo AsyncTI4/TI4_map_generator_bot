@@ -99,6 +99,7 @@ import ti4.service.draft.DraftTileManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.milty.MiltyDraftManager;
+import ti4.service.webhook.GameEventNotifierFacade;
 import ti4.service.option.FOWOptionService.FOWOption;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -1398,6 +1399,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         setActivePlayerID(player == null ? null : player.getUserID());
         lastActivePlayerChange = newTime;
         AutoPingMetadataManager.setupAutoPing(getName());
+        GameEventNotifierFacade.notifyActivePlayerChanged(this, prevPlayer, player);
     }
 
     public void setAutoPing(boolean status) {
