@@ -93,6 +93,8 @@ class AutoCompleteProvider {
     static void handleAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
         try {
             resolveAutoCompleteEvent(event);
+        } catch (IllegalArgumentException ignored) {
+            // We don't care about these.
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(event), "Error in handleAutoCompleteEvent", e);
         }
