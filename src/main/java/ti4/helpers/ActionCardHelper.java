@@ -757,8 +757,26 @@ public class ActionCardHelper {
         recordTrackedActionCardPlay(game, player, actionCardTitle);
 
         boolean actionCardIsCancelable = isActionCardCancelable(actionCard) && !twinned;
+        boolean saboAllowed = actionCardIsCancelable && SabotageService.isSaboAllowed(game, player);
 
-        String pingGame = actionCardIsCancelable ? game.getPing() + ", " : "";
+        String pingGame;
+        if (saboAllowed) {
+            pingGame = game.getPing() + ", ";
+        } else if (actionCardIsCancelable && !game.isFowMode()) {
+            StringBuilder pings = new StringBuilder();
+            for (Player p : game.getRealPlayers()) {
+                if (p == player) continue;
+                if ((p.hasTechReady("it") && p.getStrategicCC() > 0)
+                        || p.hasUnit("empyrean_mech")
+                        || p.hasUnit("tf-triune")) {
+                    if (pings.length() > 0) pings.append(", ");
+                    pings.append(p.getRepresentationUnfogged());
+                }
+            }
+            pingGame = pings.length() > 0 ? pings + ", " : "";
+        } else {
+            pingGame = "";
+        }
         String message = pingGame + (game.isFowMode() ? "someone" : player.getRepresentationNoPing());
         message += fromGarbozia ? " purged " : " played ";
         message += "the action card _" + actionCardTitle + "_";
@@ -864,7 +882,7 @@ public class ActionCardHelper {
             if (!actionCardIsCancelable) {
                 MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
             } else {
-                if (SabotageService.isSaboAllowed(game, player)) {
+                if (saboAllowed) {
                     String cancelName = "Sabotage";
                     if (game.isTwilightsFallMode()) {
                         cancelName = "Shatter";
