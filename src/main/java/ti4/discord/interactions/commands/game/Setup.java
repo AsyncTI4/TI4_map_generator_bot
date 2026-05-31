@@ -27,6 +27,8 @@ class Setup extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TIGL_GAME, "True to mark the game as TIGL"));
         addOptions(new OptionData(
                 OptionType.INTEGER, Constants.AUTO_PING, "Hours between auto pings. Min 1. Enter 0 to turn off."));
+        addOptions(
+                new OptionData(OptionType.BOOLEAN, Constants.WHISPERS_ENABLED, "True to allow whispers in this game."));
     }
 
     @Override
@@ -112,6 +114,16 @@ class Setup extends GameStateSubcommand {
             game.setCustomName(customGameName);
         }
 
+        Boolean whispersEnabled = event.getOption(Constants.WHISPERS_ENABLED, null, OptionMapping::getAsBoolean);
+        if (whispersEnabled != null) {
+            game.setWhispersDisabled(!whispersEnabled);
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    whispersEnabled
+                            ? "Whispers have been reenabled for this game."
+                            : "Whispers have been disabled for this game.");
+        }
+
         if (!setGameMode(event, game)) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
@@ -122,6 +134,7 @@ class Setup extends GameStateSubcommand {
                 && scCountPerPlayer == null
                 && maxSOCount == null
                 && vpOption == null
+                && whispersEnabled == null
                 && playerCount == null) {
             CreateGameService.presentSetupToPlayers(game);
         }

@@ -580,6 +580,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.LIMITED_WHISPERS_MODE + " " + game.isLimitedWhispersMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.WHISPERS_DISABLED + " " + game.isWhispersDisabled());
+        writer.write(System.lineSeparator());
         writer.write(Constants.AGE_OF_COMMERCE_MODE + " " + game.isAgeOfCommerceMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.ORDINIAN_C1_MODE + " " + game.isOrdinianC1Mode());

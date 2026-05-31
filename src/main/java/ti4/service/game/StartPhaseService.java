@@ -1010,11 +1010,15 @@ public class StartPhaseService {
             boolean anyoneWantsToBan = false;
             boolean anyoneWantsNoSwaps = false;
             boolean anyoneWantsLimitedWhispers = false;
+            int noWhispersCount = 0;
             Collections.shuffle(randomPlayers);
             for (Player player : randomPlayers) {
                 var userSettings = UserSettingsManager.get(player.getUserID());
                 if (!userSettings.isHasAnsweredSurvey()) {
                     continue;
+                }
+                if ("No Whispers".equalsIgnoreCase(userSettings.getWhisperPref())) {
+                    noWhispersCount++;
                 }
                 question1
                         .append("* ")
@@ -1079,7 +1083,8 @@ public class StartPhaseService {
                         "If you wish to do anything unusual with _Supports For The Thrones_, you can use these buttons.",
                         buttons);
             }
-            if (anyoneWantsLimitedWhispers) {
+            boolean majorityPrefersNoWhispers = noWhispersCount > randomPlayers.size() / 2;
+            if (anyoneWantsLimitedWhispers && !majorityPrefersNoWhispers) {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.blue("setLimitedWhispers", "Allow Limited Whispers"));
                 buttons.add(Buttons.gray("deleteButtons", "Dismiss these buttons"));
@@ -1090,6 +1095,12 @@ public class StartPhaseService {
                                 + " of your deals/transactions are hidden (redacted), so you can have limited secret communication."
                                 + " Players are not allowed to send more than one hidden deal in a turn.",
                         buttons);
+            }
+            if (majorityPrefersNoWhispers) {
+                game.setWhispersDisabled(true);
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        "A majority of players indicated that they prefer no whispers, so whispers have been disabled for this game. To reenable them, use `/game setup whispers_enabled:true`.");
             }
             MessageHelper.sendMessageToChannel(
                     game.getTableTalkChannel(),

@@ -251,6 +251,14 @@ class MessageListener extends ListenerAdapter {
             return true;
         }
 
+        if (game.isWhispersDisabled()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Whispers are disabled in this game. To reenable them, use `/game setup whispers_enabled:true`.");
+            message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return true;
+        }
+
         String messageContent = StringUtils.substringAfter(messageText, " ");
         if (messageContent.isEmpty()) {
             message.reply("No message content?").queue(Consumers.nop(), BotLogger::catchRestError);
