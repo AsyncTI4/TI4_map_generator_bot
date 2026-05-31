@@ -11,13 +11,17 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.spring.service.webhook.GameWebhookSubscriptionService;
 
 @Service
 public class WebhookGameEventNotifier implements GameEventNotifier {
     private final WebhookDispatchService webhookDispatchService;
+    private final GameWebhookSubscriptionService gameWebhookSubscriptionService;
 
-    public WebhookGameEventNotifier(WebhookDispatchService webhookDispatchService) {
+    public WebhookGameEventNotifier(
+            WebhookDispatchService webhookDispatchService, GameWebhookSubscriptionService gameWebhookSubscriptionService) {
         this.webhookDispatchService = webhookDispatchService;
+        this.gameWebhookSubscriptionService = gameWebhookSubscriptionService;
     }
 
     @Override
@@ -92,17 +96,6 @@ public class WebhookGameEventNotifier implements GameEventNotifier {
     private void dispatchIfConfigured(
             Game game, GameWebhookEventType eventType, String phaseOverride, Map<String, Object> metadata) {
         try {
-            if (!GameWebhookConfig.isWebhookEnabled(game)) {
-                return;
-            }
-            if (game.isFowMode() && !GameWebhookConfig.isFowAllowed(game)) {
-                return;
-            }
-            String webhookUrl = GameWebhookConfig.getWebhookUrl(game).orElse(null);
-            if (StringUtils.isBlank(webhookUrl)) {
-                return;
-            }
-
             Player activePlayer = game.getActivePlayer();
             String phaseOfGame = phaseOverride == null ? normalizePhase(game.getPhaseOfGame()) : phaseOverride;
             if (phaseOfGame == null) {
@@ -118,9 +111,30 @@ public class WebhookGameEventNotifier implements GameEventNotifier {
                     activePlayer == null ? null : activePlayer.getFaction(),
                     Instant.now().toString(),
                     metadata.isEmpty() ? null : metadata);
-            webhookDispatchService.dispatch(game, webhookUrl, payload);
+            dispatchLegacyWebhook(game, payload);
+            dispatchWebhookSubscriptions(game, eventType, payload);
         } catch (RuntimeException e) {
             BotLogger.error(new LogOrigin(game), "Failed to notify webhook for event " + eventType.value(), e);
+        }
+    }
+
+    private void dispatchLegacyWebhook(Game game, GameWebhookEventPayload payload) {
+        if (!GameWebhookConfig.isWebhookEnabled(game)) {
+            return;
+        }
+        if (game.isFowMode() && !GameWebhookConfig.isFowAllowed(game)) {
+            return;
+        }
+        String webhookUrl = GameWebhookConfig.getWebhookUrl(game).orElse(null);
+        if (StringUtils.isBlank(webhookUrl)) {
+            return;
+        }
+        webhookDispatchService.dispatch(game, webhookUrl, payload);
+    }
+
+    private void dispatchWebhookSubscriptions(Game game, GameWebhookEventType eventType, GameWebhookEventPayload payload) {
+        for (String callbackUrl : gameWebhookSubscriptionService.getCallbackUrls(game.getName(), eventType)) {
+            webhookDispatchService.dispatch(game, callbackUrl, payload);
         }
     }
 

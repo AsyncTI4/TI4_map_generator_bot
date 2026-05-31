@@ -3,12 +3,17 @@ package ti4.service.webhook;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.spring.service.webhook.GameWebhookSubscriptionService;
 import ti4.testUtils.BaseTi4Test;
 
 class WebhookGameEventNotifierTest extends BaseTi4Test {
@@ -16,7 +21,7 @@ class WebhookGameEventNotifierTest extends BaseTi4Test {
     @Test
     void notifyPhaseChanged_MapsStatusPhase() {
         CapturingDispatchService dispatchService = new CapturingDispatchService();
-        WebhookGameEventNotifier notifier = new WebhookGameEventNotifier(dispatchService);
+        WebhookGameEventNotifier notifier = newNotifier(dispatchService);
         Game game = createConfiguredGame();
         game.setPhaseOfGame("statusHomework");
 
@@ -33,7 +38,7 @@ class WebhookGameEventNotifierTest extends BaseTi4Test {
     @Test
     void notifyPlayerPassed_BuildsExpectedPayload() {
         CapturingDispatchService dispatchService = new CapturingDispatchService();
-        WebhookGameEventNotifier notifier = new WebhookGameEventNotifier(dispatchService);
+        WebhookGameEventNotifier notifier = newNotifier(dispatchService);
         Game game = createConfiguredGame();
         Player activePlayer = game.getPlayer("p1");
         game.updateActivePlayer(activePlayer);
@@ -55,7 +60,7 @@ class WebhookGameEventNotifierTest extends BaseTi4Test {
     @Test
     void notifyPhaseChanged_DoesNotDispatch_WhenNoWebhookUrl() {
         CapturingDispatchService dispatchService = new CapturingDispatchService();
-        WebhookGameEventNotifier notifier = new WebhookGameEventNotifier(dispatchService);
+        WebhookGameEventNotifier notifier = newNotifier(dispatchService);
         Game game = createConfiguredGame();
         GameWebhookConfig.clearWebhookConfig(game);
 
@@ -67,7 +72,7 @@ class WebhookGameEventNotifierTest extends BaseTi4Test {
     @Test
     void notifyPhaseChanged_DoesNotDispatch_WhenDisabled() {
         CapturingDispatchService dispatchService = new CapturingDispatchService();
-        WebhookGameEventNotifier notifier = new WebhookGameEventNotifier(dispatchService);
+        WebhookGameEventNotifier notifier = newNotifier(dispatchService);
         Game game = createConfiguredGame();
         GameWebhookConfig.setWebhookEnabled(game, false);
 
@@ -79,7 +84,7 @@ class WebhookGameEventNotifierTest extends BaseTi4Test {
     @Test
     void notifyPhaseChanged_DoesNotDispatch_ForFowUnlessExplicitlyAllowed() {
         CapturingDispatchService dispatchService = new CapturingDispatchService();
-        WebhookGameEventNotifier notifier = new WebhookGameEventNotifier(dispatchService);
+        WebhookGameEventNotifier notifier = newNotifier(dispatchService);
         Game game = createConfiguredGame();
         game.setFowMode(true);
 
@@ -95,7 +100,7 @@ class WebhookGameEventNotifierTest extends BaseTi4Test {
     void notifyPhaseChanged_DoesNotPropagateDispatchFailures() {
         CapturingDispatchService dispatchService = new CapturingDispatchService();
         dispatchService.throwOnDispatch = true;
-        WebhookGameEventNotifier notifier = new WebhookGameEventNotifier(dispatchService);
+        WebhookGameEventNotifier notifier = newNotifier(dispatchService);
         Game game = createConfiguredGame();
 
         assertDoesNotThrow(() -> notifier.notifyPhaseChanged(game, "strategy", "action"));
@@ -104,12 +109,35 @@ class WebhookGameEventNotifierTest extends BaseTi4Test {
     @Test
     void notifyPhaseChanged_SkipsUnknownPhaseTransitions() {
         CapturingDispatchService dispatchService = new CapturingDispatchService();
-        WebhookGameEventNotifier notifier = new WebhookGameEventNotifier(dispatchService);
+        WebhookGameEventNotifier notifier = newNotifier(dispatchService);
         Game game = createConfiguredGame();
 
         notifier.notifyPhaseChanged(game, "miltydraft", "playerSetup");
 
         assertTrue(dispatchService.calls.isEmpty());
+    }
+
+    @Test
+    void notifyPhaseChanged_DispatchesToSubscriptions_WhenLegacyConfigMissing() {
+        CapturingDispatchService dispatchService = new CapturingDispatchService();
+        GameWebhookSubscriptionService subscriptionService = mock(GameWebhookSubscriptionService.class);
+        when(subscriptionService.getCallbackUrls(eq("pbd-test"), eq(GameWebhookEventType.PHASE_CHANGED)))
+                .thenReturn(List.of("https://example.com/callback"));
+        WebhookGameEventNotifier notifier = new WebhookGameEventNotifier(dispatchService, subscriptionService);
+
+        Game game = createConfiguredGame();
+        GameWebhookConfig.clearWebhookConfig(game);
+
+        notifier.notifyPhaseChanged(game, "strategy", "action");
+
+        assertEquals(1, dispatchService.calls.size());
+        assertEquals("https://example.com/callback", dispatchService.calls.getFirst().webhookUrl);
+    }
+
+    private static WebhookGameEventNotifier newNotifier(CapturingDispatchService dispatchService) {
+        GameWebhookSubscriptionService subscriptionService = mock(GameWebhookSubscriptionService.class);
+        when(subscriptionService.getCallbackUrls(any(), any())).thenReturn(List.of());
+        return new WebhookGameEventNotifier(dispatchService, subscriptionService);
     }
 
     private static Game createConfiguredGame() {
