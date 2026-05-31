@@ -1,7 +1,7 @@
 {
   "gameNameToAutoPing" : {
     "pbd-test" : {
-      "lastPingTimeEpochMilliseconds" : 1780235466770,
+      "lastPingTimeEpochMilliseconds" : 1780233202861,
       "pingCount" : 0,
       "quickPing" : false
     }
