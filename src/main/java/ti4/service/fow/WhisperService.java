@@ -21,6 +21,12 @@ public class WhisperService {
             String anonY,
             MessageChannel feedbackChannel,
             Guild guild) {
+        if (game.isNoWhispersMode() && !game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(
+                    feedbackChannel,
+                    player.getRepresentation() + " Whispers are disabled in this game. Use `/game options` to toggle.");
+            return;
+        }
         String message;
         String realIdentity = player_.getRepresentationUnfogged();
         String player1 = ColorEmojis.getColorEmojiWithName(player.getColor());

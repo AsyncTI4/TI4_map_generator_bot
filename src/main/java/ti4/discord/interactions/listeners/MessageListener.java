@@ -223,6 +223,18 @@ class MessageListener extends ListenerAdapter {
             return false;
         }
 
+        // Block whispers when No Whispers mode is enabled
+        if (game.isNoWhispersMode() && !game.isFowMode()) {
+            Player sender2 = getPlayer(event, game);
+            if (sender2 != null && sender2.isRealPlayer()) {
+                message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+                MessageHelper.sendMessageToPlayerCardsInfoThread(
+                        sender2, "Whispers are disabled in this game. Use `/game options` to toggle.");
+                return true;
+            }
+            return false;
+        }
+
         Player sender = getPlayer(event, game);
         if (sender == null || !sender.isRealPlayer()) {
             return true;

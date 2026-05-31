@@ -99,6 +99,24 @@ final class GameOptionButtonHandler {
         game.setStoredValue(player.getUserID() + "anonDeclare", declaration);
     }
 
+    @ButtonHandler("toggleNoWhispers_")
+    public static void toggleNoWhispers(ButtonInteractionEvent event, Game game, String buttonID) {
+        String action = buttonID.replace("toggleNoWhispers_", "");
+        if ("enable".equals(action)) {
+            game.setNoWhispersMode(false);
+            event.editButton(GameOptionService.noWhispers_OFF).queue(Consumers.nop(), BotLogger::catchRestError);
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    "Whispers have been **enabled** for this game. Use `/game options` to change this.");
+        } else {
+            game.setNoWhispersMode(true);
+            event.editButton(GameOptionService.noWhispers_ON).queue(Consumers.nop(), BotLogger::catchRestError);
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    "Whispers have been **disabled** for this game. Use `/game options` to change this.");
+        }
+    }
+
     @ButtonHandler("setupBaseGameMode")
     public static void setupBaseGameMode(ButtonInteractionEvent event, Game game) {
         game.setBaseGameMode(true);

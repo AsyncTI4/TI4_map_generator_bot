@@ -1274,6 +1274,7 @@ public final class Constants {
     public static final String NO_SWAP_MODE = "no_swap_mode";
     public static final String VEILED_HEART_MODE = "veiled_heart_mode";
     public static final String LIMITED_WHISPERS_MODE = "limited_whispers_mode";
+    public static final String NO_WHISPERS_MODE = "no_whispers_mode";
     public static final String ORDINIAN_C1_MODE = "ordinian_c1_mode";
     public static final String LIBERATION_C4_MODE = "liberation_c4_mode";
     public static final String FAKE_COMMANDERS = "fake_commanders";

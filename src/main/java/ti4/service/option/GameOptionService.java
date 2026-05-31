@@ -16,6 +16,7 @@ public class GameOptionService {
         sendFactionReactOptionButtons(channel);
         sendHexBorderOptionButtons(channel);
         sendShowOwnedPNsInPlayerAreaButton(game, channel);
+        sendNoWhispersButton(game, channel);
     }
 
     private static void sendFactionReactOptionButtons(MessageChannel channel) {
@@ -55,5 +56,22 @@ public class GameOptionService {
         buttons.add(Buttons.gray("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
                 channel, "Show Owned Promissory Notes in Player Area?\n-# Click to toggle.", buttons);
+    }
+
+    public static final Button noWhispers_ON =
+            Buttons.red("toggleNoWhispers_enable", "Whispers Disabled (Click to Enable)");
+    public static final Button noWhispers_OFF =
+            Buttons.green("toggleNoWhispers_disable", "Whispers Enabled (Click to Disable)");
+
+    private static void sendNoWhispersButton(Game game, MessageChannel channel) {
+        List<Button> buttons = new ArrayList<>();
+        if (game.isNoWhispersMode()) {
+            buttons.add(noWhispers_ON);
+        } else {
+            buttons.add(noWhispers_OFF);
+        }
+        buttons.add(Buttons.gray("deleteButtons", "Done"));
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
+                channel, "Allow Whispers (secret player-to-player messages)?\n-# Click to toggle.", buttons);
     }
 }

@@ -1010,12 +1010,15 @@ public class StartPhaseService {
             boolean anyoneWantsToBan = false;
             boolean anyoneWantsNoSwaps = false;
             boolean anyoneWantsLimitedWhispers = false;
+            int noWhisperVotes = 0;
+            int totalSurveyedPlayers = 0;
             Collections.shuffle(randomPlayers);
             for (Player player : randomPlayers) {
                 var userSettings = UserSettingsManager.get(player.getUserID());
                 if (!userSettings.isHasAnsweredSurvey()) {
                     continue;
                 }
+                totalSurveyedPlayers++;
                 question1
                         .append("* ")
                         .append(userSettings
@@ -1038,6 +1041,9 @@ public class StartPhaseService {
                 }
                 if (userSettings.getWhisperPref().contains("Limited")) {
                     anyoneWantsLimitedWhispers = true;
+                }
+                if (userSettings.getWhisperPref().contains("No Whispers")) {
+                    noWhisperVotes++;
                 }
                 question4
                         .append("* ")
@@ -1089,6 +1095,16 @@ public class StartPhaseService {
                                 + " Limited whispers is a mode where the text content (which you can fill in with the \"Specify Deal\" button in a transaction)"
                                 + " of your deals/transactions are hidden (redacted), so you can have limited secret communication."
                                 + " Players are not allowed to send more than one hidden deal in a turn.",
+                        buttons);
+            }
+            if (totalSurveyedPlayers > 0 && noWhisperVotes * 2 > totalSurveyedPlayers) {
+                game.setNoWhispersMode(true);
+                buttons = new ArrayList<>();
+                buttons.add(Buttons.red("toggleNoWhispers_enable", "Whispers Disabled (Click to Enable)"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        game.getMainGameChannel(),
+                        "A majority of surveyed players prefer **No Whispers**. Whispers have been automatically disabled for this game."
+                                + " Use the button below or `/game options` to toggle them on or off.",
                         buttons);
             }
             MessageHelper.sendMessageToChannel(
