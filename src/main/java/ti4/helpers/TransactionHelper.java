@@ -1353,9 +1353,9 @@ public final class TransactionHelper {
         if (pillagersToPillaged.isEmpty()) return "";
 
         StringBuilder notice = new StringBuilder();
-        notice.append("> This is a surcharge notice from ")
+        notice.append("> This is a surcharge notice from **")
                 .append(getRandomPillageSource())
-                .append(":");
+                .append("**:");
         for (Map.Entry<String, List<String>> pillagerToPillaged : pillagersToPillaged.entrySet()) {
             notice.append("\n> • ")
                     .append(MiscEmojis.tg)
