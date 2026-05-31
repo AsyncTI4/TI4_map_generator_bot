@@ -69,15 +69,15 @@ public class WebhookDispatchService {
                 }
             }
         }
+    }
 
-        private boolean isWebhookUrlValid(String webhookUrl) {
-            try {
-                URI uri = URI.create(webhookUrl);
-                String scheme = uri.getScheme();
-                return uri.getHost() != null && ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme));
-            } catch (RuntimeException e) {
-                return false;
-            }
+    private boolean isWebhookUrlValid(String webhookUrl) {
+        try {
+            URI uri = URI.create(webhookUrl);
+            String scheme = uri.getScheme();
+            return uri.getHost() != null && ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme));
+        } catch (RuntimeException e) {
+            return false;
         }
     }
 }

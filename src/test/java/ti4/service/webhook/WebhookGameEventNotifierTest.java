@@ -21,7 +21,10 @@ class WebhookGameEventNotifierTest extends BaseTi4Test {
     @Test
     void notifyPhaseChanged_MapsStatusPhase() {
         CapturingDispatchService dispatchService = new CapturingDispatchService();
-        WebhookGameEventNotifier notifier = newNotifier(dispatchService);
+        GameWebhookSubscriptionService subscriptionService = mock(GameWebhookSubscriptionService.class);
+        when(subscriptionService.getCallbackUrls(eq("pbd-test"), eq(GameWebhookEventType.PHASE_CHANGED)))
+                .thenReturn(List.of("https://example.com/callback"));
+        WebhookGameEventNotifier notifier = new WebhookGameEventNotifier(dispatchService, subscriptionService);
         Game game = createConfiguredGame();
         game.setPhaseOfGame("statusHomework");
 
@@ -38,7 +41,10 @@ class WebhookGameEventNotifierTest extends BaseTi4Test {
     @Test
     void notifyPlayerPassed_BuildsExpectedPayload() {
         CapturingDispatchService dispatchService = new CapturingDispatchService();
-        WebhookGameEventNotifier notifier = newNotifier(dispatchService);
+        GameWebhookSubscriptionService subscriptionService = mock(GameWebhookSubscriptionService.class);
+        when(subscriptionService.getCallbackUrls(eq("pbd-test"), eq(GameWebhookEventType.PLAYER_PASSED)))
+                .thenReturn(List.of("https://example.com/callback"));
+        WebhookGameEventNotifier notifier = new WebhookGameEventNotifier(dispatchService, subscriptionService);
         Game game = createConfiguredGame();
         Player activePlayer = game.getPlayer("p1");
         game.updateActivePlayer(activePlayer);
