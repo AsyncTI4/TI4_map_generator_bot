@@ -22,7 +22,8 @@ public class WebhookDispatchService {
     private final JsonMapper jsonMapper = JsonMapperManager.basic();
 
     public void dispatch(Game game, String webhookUrl, GameWebhookEventPayload payload) {
-        ExecutorServiceManager.runAsync("webhook_dispatch_" + game.getName(), () -> sendWithRetry(game, webhookUrl, payload));
+        ExecutorServiceManager.runAsync(
+                "webhook_dispatch_" + game.getName(), () -> sendWithRetry(game, webhookUrl, payload));
     }
 
     private void sendWithRetry(Game game, String webhookUrl, GameWebhookEventPayload payload) {

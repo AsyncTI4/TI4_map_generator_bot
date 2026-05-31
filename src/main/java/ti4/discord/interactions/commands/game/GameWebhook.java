@@ -20,9 +20,7 @@ class GameWebhook extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, OPTION_URL, "Webhook URL to send game event notifications to"));
         addOptions(new OptionData(OptionType.BOOLEAN, OPTION_ENABLED, "Enable or disable webhook notifications"));
         addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                OPTION_ALLOW_FOW,
-                "Allow notifications for FoW games (default false for privacy)"));
+                OptionType.BOOLEAN, OPTION_ALLOW_FOW, "Allow notifications for FoW games (default false for privacy)"));
         addOptions(new OptionData(OptionType.BOOLEAN, OPTION_CLEAR, "Clear all webhook configuration"));
     }
 
