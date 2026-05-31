@@ -90,7 +90,7 @@ public class DrawSecretService {
                 game.getMainGameChannel(),
                 count + " " + CardEmojis.SecretObjective + " dealt to all players. Check your `#cards-info` threads.");
         if (game.getRound() == 1) {
-            RoundOneService.RoundOne(event, game);
+            RoundOneService.roundOne(event, game);
         }
     }
 }
