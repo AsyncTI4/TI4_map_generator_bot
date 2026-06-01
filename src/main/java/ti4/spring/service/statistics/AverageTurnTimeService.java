@@ -67,15 +67,16 @@ public class AverageTurnTimeService {
                     String userId = stats.userId;
                     List<Integer> threeFastestDays =
                             UserGameInfoService.get().getUsersThreeFastestDaysToComplete6PlayerGames(userId);
+                    List<Integer> threeFastestDaysCopy = new ArrayList<>(threeFastestDays);
                     if (i == 1) {
-                        if (threeFastestDays.size() > 3) {
-                            threeFastestDays.removeLast();
+                        if (threeFastestDaysCopy.size() > 3) {
+                            threeFastestDaysCopy.removeLast();
                         }
-                        if (threeFastestDays.size() > 3) {
-                            threeFastestDays.removeLast();
+                        if (threeFastestDaysCopy.size() > 3) {
+                            threeFastestDaysCopy.removeLast();
                         }
                     }
-                    boolean hasFastGames = threeFastestDays.stream().allMatch(days -> days < 11);
+                    boolean hasFastGames = threeFastestDaysCopy.stream().allMatch(days -> days < 11);
                     long averageTurnTime = DateTimeHelper.getTimeinMinutes(stats.getAverage());
                     if (averageTurnTime < 60) {
                         usersUnder60Minutes++;
