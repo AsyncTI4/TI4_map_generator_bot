@@ -350,12 +350,14 @@ public final class TeHelperTechs {
             Player victim = game.getPlayerFromColorOrFaction(faction);
             Tile tile = game.getTileByPosition(position);
             if (victim == null || tile == null) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Button error, yell at Jazz.");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(), "This Neural Parasite button is no longer valid.");
                 return;
             }
             UnitHolder uh = tile.getUnitHolders().get(uhName);
             if (uh == null) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Button error, yell at Jazz.");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(), "This Neural Parasite button is no longer valid.");
                 return;
             }
             String location = "in the space area of " + tile.getRepresentationForButtons(game, player);
@@ -383,7 +385,8 @@ public final class TeHelperTechs {
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] parts = buttonID.split(";");
         if (parts.length != 6) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Button error, yell at Jazz.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "This Neural Parasite button is no longer valid.");
             return;
         }
 
@@ -396,13 +399,15 @@ public final class TeHelperTechs {
         Player victim = game.getPlayerFromColorOrFaction(faction);
         Tile tile = game.getTileByPosition(position);
         if (victim == null || tile == null) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Button error, yell at Jazz.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "This Neural Parasite button is no longer valid.");
             return;
         }
 
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
         if (!(unitHolder instanceof Planet)) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Button error, yell at Jazz.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "This Neural Parasite button is no longer valid.");
             return;
         }
 
@@ -410,7 +415,8 @@ public final class TeHelperTechs {
         UnitKey unitKey = Mapper.getUnitKey(unitType, victim.getColorID());
         UnitModel unitModel = victim.getUnitFromUnitKey(unitKey);
         if (unitModel == null) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Button error, yell at Jazz.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "This Neural Parasite button is no longer valid.");
             return;
         }
 

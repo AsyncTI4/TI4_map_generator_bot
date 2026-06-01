@@ -187,7 +187,6 @@ public class PuppetSoftHeBladeService {
         techs.put("planesplitter-firm", "planesplitter-obs");
         if (player.getGame().isFrankenGame()) {
             techs.put("parasite-firm_y", "parasite-obs_y");
-            techs.put("parasite-firm", "parasite-obs_y");
         } else {
             techs.put("parasite-firm", "parasite-obs");
         }

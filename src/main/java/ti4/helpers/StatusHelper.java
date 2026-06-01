@@ -620,9 +620,7 @@ public final class StatusHelper {
 
     private static void sendNeuralParasiteButtons(Game game) {
         for (Player player : game.getRealPlayers()) {
-            boolean hasFrankenFirmParasite = game.isFrankenGame()
-                    && (hasTechOrFactionTech(player, "parasite-firm_y")
-                            || hasTechOrFactionTech(player, "parasite-firm"));
+            boolean hasFrankenFirmParasite = game.isFrankenGame() && hasTechOrFactionTech(player, "parasite-firm_y");
             boolean hasBaseFirmParasite = !game.isFrankenGame() && hasTechOrFactionTech(player, "parasite-firm");
 
             if (hasFrankenFirmParasite || hasBaseFirmParasite) {
@@ -636,9 +634,7 @@ public final class StatusHelper {
                         String label = Helper.getUnitHolderRepresentation(home, planet.getName(), game, player);
                         buttons.add(Buttons.green(id, label, PlanetEmojis.getPlanetEmoji(planet.getName())));
                     }
-                    String parasiteAlias = hasFrankenFirmParasite && hasTechOrFactionTech(player, "parasite-firm_y")
-                            ? "parasite-firm_y"
-                            : "parasite-firm";
+                    String parasiteAlias = hasFrankenFirmParasite ? "parasite-firm_y" : "parasite-firm";
                     TechnologyModel parasiteModel = Mapper.getTech(parasiteAlias);
                     String parasiteMsg = player.getRepresentationUnfogged() + ", a reminder to do "
                             + parasiteModel.getNameRepresentation() + ".";
