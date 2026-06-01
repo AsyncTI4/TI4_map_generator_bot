@@ -763,15 +763,34 @@ public class ActionCardHelper {
         if (saboAllowed) {
             pingGame = game.getPing() + ", ";
         } else if (actionCardIsCancelable && !game.isFowMode()) {
-            StringBuilder pings = new StringBuilder();
+            Set<Player> pingPlayers = new java.util.LinkedHashSet<>();
+            boolean isCombatCard = actionCardWindow.contains("combat")
+                    || actionCardWindow.contains("roll")
+                    || actionCardWindow.contains("hit")
+                    || actionCardWindow.contains("invasion")
+                    || actionCardWindow.contains("barrage")
+                    || actionCardWindow.contains("sustain")
+                    || actionCardWindow.contains("retreat");
+            if (isCombatCard && !game.getActiveSystem().isEmpty()) {
+                ti4.game.Tile activeTile = game.getTileByPosition(game.getActiveSystem());
+                if (activeTile != null) {
+                    for (Player p : ButtonHelper.getPlayersWithUnitsInTheSystem(game, activeTile)) {
+                        if (p != player) pingPlayers.add(p);
+                    }
+                }
+            }
             for (Player p : game.getRealPlayers()) {
                 if (p == player) continue;
                 if ((p.hasTechReady("it") && p.getStrategicCC() > 0)
                         || p.hasUnit("empyrean_mech")
                         || p.hasUnit("tf-triune")) {
-                    if (pings.length() > 0) pings.append(", ");
-                    pings.append(p.getRepresentationUnfogged());
+                    pingPlayers.add(p);
                 }
+            }
+            StringBuilder pings = new StringBuilder();
+            for (Player p : pingPlayers) {
+                if (pings.length() > 0) pings.append(", ");
+                pings.append(p.getRepresentationUnfogged());
             }
             pingGame = pings.length() > 0 ? pings + ", " : "";
         } else {
