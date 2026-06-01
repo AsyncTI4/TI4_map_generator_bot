@@ -43,7 +43,6 @@ public class FrankenDrazDraft extends FrankenDraft {
     public static final String FACTION_LIMIT_KEY = "frankenDrazFactionLimit";
 
     private static final int DEFAULT_FACTION_LIMIT = 6;
-    private static final List<String> AUTO_BANNED_FACTIONS = List.of("obsidian", "firmament");
     private static final List<DraftCategory> POST_DRAFT_COMPONENT_CATEGORIES = List.of(
             DraftCategory.ABILITY,
             DraftCategory.TECH,
@@ -506,9 +505,6 @@ public class FrankenDrazDraft extends FrankenDraft {
         String[] bannedFactions = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedFactions"));
         for (String bannedFaction : bannedFactions) {
             factions.remove(bannedFaction);
-        }
-        for (String faction : AUTO_BANNED_FACTIONS) {
-            factions.remove(faction);
         }
         return new ArrayList<>(factions.values());
     }
