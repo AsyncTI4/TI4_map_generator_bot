@@ -631,6 +631,7 @@ class GameLoadService {
                 case Constants.NO_SWAP_MODE -> game.setNoSwapMode(parseBooleanOrDefault(info, false));
                 case Constants.VEILED_HEART_MODE -> game.setVeiledHeartMode(parseBooleanOrDefault(info, false));
                 case Constants.LIMITED_WHISPERS_MODE -> game.setLimitedWhispersMode(parseBooleanOrDefault(info, false));
+                case Constants.WHISPERS_DISABLED -> game.setWhispersDisabled(parseBooleanOrDefault(info, false));
                 case Constants.ORDINIAN_C1_MODE -> game.setOrdinianC1Mode(parseBooleanOrDefault(info, false));
                 case Constants.LIBERATION_C4_MODE -> game.setLiberationC4Mode(parseBooleanOrDefault(info, false));
                 case Constants.VOTC_MODE -> game.setVotcMode(parseBooleanOrDefault(info, false));
@@ -684,6 +685,7 @@ class GameLoadService {
                 case Constants.DRAFT_MANAGER -> game.setDraftString(info); // We will parse this later
                 case Constants.DRAFT_SYSTEM_SETTINGS ->
                     game.setDraftSystemSettingsJson(info); // We will parse this later
+                case Constants.FRANKEN_DRAFT_SETTINGS -> game.setFrankenSettingsJson(info); // We will parse this later
                 case Constants.GAME_TAGS -> game.setTags(getCardList(info));
                 case Constants.TIGL_RANK -> {
                     TIGLHelper.TIGLRank rank = TIGLHelper.TIGLRank.fromString(info);

@@ -475,11 +475,8 @@ public class FactionDraftable extends SinglePickDraftable {
         List<LeaderModel> leaders = leaderNames.stream().map(Mapper::getLeader).toList();
         Optional<LeaderModel> heroOpt =
                 leaders.stream().filter(l -> Constants.HERO.equals(l.getType())).findFirst();
-        if (heroOpt.isPresent()) {
-            LeaderModel hero = heroOpt.get();
-            summaryParts.add(hero.getLeaderEmoji() + " " + hero.getName() + " - *" + hero.getAbilityWindow() + "* "
-                    + hero.getAbilityText());
-        }
+        heroOpt.ifPresent(hero -> summaryParts.add(hero.getLeaderEmoji() + " " + hero.getName() + " - *"
+                + hero.getAbilityWindow() + "* " + hero.getAbilityText()));
 
         return String.join("\n", summaryParts);
     }

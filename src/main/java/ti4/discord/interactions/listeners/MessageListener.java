@@ -86,15 +86,8 @@ class MessageListener extends ListenerAdapter {
                 if (respondToBotHelperPing(message)) return;
                 if (checkForFogOfWarInvitePrompt(message)) return;
                 if (copyLFGPingsToLFGPingsChannel(event, message)) return;
-                String messageRaw = message.getContentRaw().toLowerCase();
-                for (String phrase : INTERESTING_MESSAGES) {
-                    if (messageRaw.contains(phrase)) {
-                        String msg =
-                                "Someone used \"" + phrase + "\" at " + message.getJumpUrl() + ". Full message:\n> "
-                                        + message.getContentRaw().replace("\n", "\n> ");
-                        sendMessageToModLog(msg);
-                    }
-                }
+
+                reportInterestingMessages(message);
 
                 if (isValidGameMessage) {
                     if (handleWhispers(event, message, gameName)) return;
@@ -108,6 +101,17 @@ class MessageListener extends ListenerAdapter {
                     "`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> "
                             + event.getMessage().getJumpUrl(),
                     e);
+        }
+    }
+
+    private static void reportInterestingMessages(Message message) {
+        String messageRaw = message.getContentRaw().toLowerCase();
+        for (String phrase : INTERESTING_MESSAGES) {
+            if (messageRaw.contains(phrase)) {
+                String msg = "Someone used \"" + phrase + "\" at " + message.getJumpUrl() + ". Full message:\n> "
+                        + message.getContentRaw().replace("\n", "\n> ");
+                sendMessageToModLog(msg);
+            }
         }
     }
 
@@ -244,6 +248,14 @@ class MessageListener extends ListenerAdapter {
 
         receivingColorOrFaction = AliasHandler.resolveFaction(receivingColorOrFaction);
         if (!Mapper.isValidColor(receivingColorOrFaction) && !Mapper.isValidFaction(receivingColorOrFaction)) {
+            return true;
+        }
+
+        if (game.isWhispersDisabled()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Whispers are disabled in this game. To reenable them, use `/game setup whispers_enabled:true`.");
+            message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
             return true;
         }
 

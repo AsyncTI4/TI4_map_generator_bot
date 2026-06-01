@@ -41,7 +41,7 @@ class CardsInfoPinCleanupService {
                         pinnedMessages -> {
                             for (var pinnedMessage : pinnedMessages) {
                                 Message message = pinnedMessage.getMessage();
-                                if (message == null || isProtected(message, protectedMessageIds)) continue;
+                                if (isProtected(message, protectedMessageIds)) continue;
                                 if (!message.getAuthor().isBot()) continue;
                                 queueUnpin(message);
                             }

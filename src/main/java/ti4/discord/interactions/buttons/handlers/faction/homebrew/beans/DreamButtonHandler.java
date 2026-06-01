@@ -257,6 +257,42 @@ public class DreamButtonHandler {
 
     // Xal'thuun, the Dreaming Throne agent
 
+    public static Button getDreamAgentCardsInfoButton(Player dreamPlayer) {
+        return Buttons.gray(
+                dreamPlayer.factionButtonChecker() + "dream_agent_select_player",
+                "Use agent on someone else",
+                FactionEmojis.dream);
+    }
+
+    @ButtonHandler("dream_agent_select_player")
+    public static void offerDreamAgentTargetButtons(ButtonInteractionEvent event, Game game, Player dreamPlayer) {
+        if (!dreamPlayer.hasUnexhaustedLeader("dreamagent")) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "**Xal'thuun** is no longer available.");
+            return;
+        }
+        if (getDreamAgentAnomalyTiles(game).isEmpty()) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "There are no valid non-home anomalies to choose.");
+            return;
+        }
+
+        List<Button> buttons = game.getRealPlayers().stream()
+                .filter(target -> !target.getFaction().equalsIgnoreCase(dreamPlayer.getFaction()))
+                .map(target -> Buttons.gray(
+                        dreamPlayer.factionButtonChecker() + "dream_agent_offer_" + target.getFaction() + "_"
+                                + dreamPlayer.getFaction(),
+                        target.getColorDisplayName(),
+                        target.fogSafeEmoji()))
+                .toList();
+        if (buttons.isEmpty()) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "No eligible players were found for **Xal'thuun**.");
+            return;
+        }
+
+        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                event, dreamPlayer.getRepresentationUnfogged() + ", choose a player for **Xal'thuun**.", buttons);
+    }
+
     public static void offerDreamAgentButtons(Game game, Player activePlayer, Player dreamPlayer) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray(
@@ -265,11 +301,9 @@ public class DreamButtonHandler {
                 FactionEmojis.dream));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
-                dreamPlayer.getCardsInfoThread(),
+                game.getActionsChannel(),
                 dreamPlayer.getRepresentation()
-                        + " may exhaust **Xal'thuun**, the Dreaming Throne agent, to let "
-                        + activePlayer.getRepresentationNoPing()
-                        + " choose a non-home anomaly to ignore during this tactical action.",
+                        + " you may exhaust **Xal'thuun**, the Dreaming Throne agent, to choose a non-home anomaly to ignore during this tactical action.",
                 buttons);
     }
 
@@ -279,6 +313,10 @@ public class DreamButtonHandler {
         Player activePlayer = game.getPlayerFromColorOrFaction(parts[0]);
         Player dreamPlayer = parts.length > 1 ? game.getPlayerFromColorOrFaction(parts[1]) : player;
         Player dreamAgentOwner = dreamPlayer == null ? player : dreamPlayer;
+        if (!dreamAgentOwner.hasUnexhaustedLeader("dreamagent")) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "**Xal'thuun** is no longer available.");
+            return;
+        }
         if (activePlayer == null) {
             activePlayer = game.getActivePlayer();
         }
@@ -410,7 +448,7 @@ public class DreamButtonHandler {
         }
         ButtonHelper.deleteMessage(event);
         Tile tile = game.getTileByPosition(buttonID.replace("dream_hero_add_nexus_", ""));
-        if (tile == null || !isDreamHeroNexusDestination(game, tile) || tileContainsNexusToken(game, tile, false)) {
+        if (!isDreamHeroNexusDestination(game, tile) || tileContainsNexusToken(game, tile, false)) {
             MessageHelper.sendMessageToEventChannel(event, "That is not a valid system for a nexus token.");
             return;
         }
@@ -485,7 +523,6 @@ public class DreamButtonHandler {
         Tile fromTile = game.getTileByPosition(parts[0]);
         Tile toTile = game.getTileByPosition(parts[1]);
         if (fromTile == null
-                || toTile == null
                 || !tileContainsNexusToken(game, fromTile, false)
                 || !isDreamHeroNexusDestination(game, toTile)
                 || tileContainsNexusToken(game, toTile, false)) {
@@ -625,7 +662,7 @@ public class DreamButtonHandler {
 
         int pageSize = Math.max(1, HERO_BUTTON_LIMIT - persistentCount - 2);
         int maxPage = (mainButtons.size() - 1) / pageSize;
-        int currentPage = Math.max(0, Math.min(page, maxPage));
+        int currentPage = Math.clamp(page, 0, maxPage);
         int fromIndex = currentPage * pageSize;
         int toIndex = Math.min(fromIndex + pageSize, mainButtons.size());
 
@@ -1038,8 +1075,8 @@ public class DreamButtonHandler {
             return;
         }
 
-        if (!tile.getPlanetUnitHolders().stream()
-                .anyMatch(p -> player.getPlanets().contains(p.getName()))) {
+        if (tile.getPlanetUnitHolders().stream()
+                .noneMatch(p -> player.getPlanets().contains(p.getName()))) {
             MessageHelper.sendMessageToEventChannel(event, "You do not control a planet in that system.");
             return;
         }

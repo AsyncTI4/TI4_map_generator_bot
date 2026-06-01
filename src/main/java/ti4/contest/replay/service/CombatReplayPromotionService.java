@@ -117,7 +117,7 @@ public class CombatReplayPromotionService {
                 CombatCandidateStatus.RESOLVED, CombatCandidatePromotionStatus.PENDING);
         return candidates.stream()
                 .filter(candidate -> !expireIfDiscordantStars(candidate))
-                .filter(this::usesCurrentReplaySnapshotFormat)
+                .filter(CombatReplayPromotionService::usesCurrentReplaySnapshotFormat)
                 .toList();
     }
 
@@ -160,7 +160,7 @@ public class CombatReplayPromotionService {
         this.clock = clock == null ? Clock.systemDefaultZone() : clock;
     }
 
-    String snapshotStartSummaryText(CombatCandidateEntity candidate) {
+    static String snapshotStartSummaryText(CombatCandidateEntity candidate) {
         if (StringUtils.isBlank(candidate.getInitialRenderSnapshotJson())) return null;
 
         Game snapshotGame = CombatReplayTileRenderer.render(
@@ -176,17 +176,17 @@ public class CombatReplayPromotionService {
     }
 
     private Comparator<CombatCandidateEntity> candidateComparator(Map<Long, Double> jointScoresByObservationId) {
-        return Comparator.comparing(this::getPromotionScore)
+        return Comparator.comparing(CombatReplayPromotionService::getPromotionScore)
                 .thenComparing(candidate -> jointScoresByObservationId.getOrDefault(candidate.getObservationId(), 0.0))
                 .thenComparing(CombatCandidateEntity::getResolvedAt, Comparator.reverseOrder())
                 .thenComparing(CombatCandidateEntity::getId, Comparator.reverseOrder());
     }
 
-    private double getPromotionScore(CombatCandidateEntity candidate) {
+    private static double getPromotionScore(CombatCandidateEntity candidate) {
         return candidate.getPromotionScore() == null ? 0.0 : candidate.getPromotionScore();
     }
 
-    private boolean usesCurrentReplaySnapshotFormat(CombatCandidateEntity candidate) {
+    private static boolean usesCurrentReplaySnapshotFormat(CombatCandidateEntity candidate) {
         return candidate != null && CombatReplayTileRenderer.canRender(candidate.getInitialRenderSnapshotJson());
     }
 
@@ -330,7 +330,7 @@ public class CombatReplayPromotionService {
         return replayStartCentral.withZoneSameInstant(clock.getZone()).toLocalDateTime();
     }
 
-    private Game loadGame(String gameName) {
+    private static Game loadGame(String gameName) {
         var managedGame = GameManager.getManagedGame(gameName);
         return managedGame == null ? null : managedGame.getGame();
     }

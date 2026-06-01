@@ -10,6 +10,7 @@ import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.service.emoji.LeaderEmojis;
+import ti4.service.franken.FrankenAlternateTextService;
 import ti4.service.info.CardsInfoService;
 
 @UtilityClass
@@ -48,7 +49,8 @@ public class UnlockLeaderService {
             MessageHelper.sendMessageToChannelWithEmbed(
                     channel,
                     message,
-                    leaderModel.getRepresentationEmbed(false, true, true, showFlavourText, game.isTwilightsFallMode()));
+                    FrankenAlternateTextService.getLeaderEmbed(
+                            game, leaderModel, false, true, true, showFlavourText, game.isTwilightsFallMode()));
         } else {
             MessageHelper.sendMessageToChannel(
                     channel, LeaderEmojis.getLeaderEmoji(playerLeader).toString());

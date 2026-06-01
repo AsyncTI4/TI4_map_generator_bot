@@ -39,7 +39,10 @@ import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 
 public class FrankenDrazDraft extends FrankenDraft {
-    private static final List<String> AUTO_BANNED_FACTIONS = List.of("obsidian", "firmament");
+    public static final String UNLIMITED_KEPT_COMPONENTS_KEY = "frankenDrazUnlimitedKeptComponents";
+    public static final String FACTION_LIMIT_KEY = "frankenDrazFactionLimit";
+
+    private static final int DEFAULT_FACTION_LIMIT = 6;
     private static final List<DraftCategory> POST_DRAFT_COMPONENT_CATEGORIES = List.of(
             DraftCategory.ABILITY,
             DraftCategory.TECH,
@@ -62,7 +65,7 @@ public class FrankenDrazDraft extends FrankenDraft {
     @Override
     public int getItemLimitForCategory(DraftCategory category) {
         return switch (category) {
-            case FACTION -> 6;
+            case FACTION -> getFactionLimit(getOwner());
             case BLUETILE -> 3;
             case REDTILE -> 2;
             case DRAFTORDER -> 1;
@@ -72,15 +75,32 @@ public class FrankenDrazDraft extends FrankenDraft {
 
     @Override
     public int getKeptItemLimitForCategory(DraftCategory category) {
-        return switch (category) {
-            case ABILITY -> 4;
-            case TECH, BLUETILE -> 3;
-            case REDTILE -> 2;
-            case COMMODITIES, FLAGSHIP, MECH, PN -> 1;
-            case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 1;
-            case DRAFTORDER, STARTINGFLEET, STARTINGTECH, HOMESYSTEM -> 1;
-            case FACTION, UNIT, PLOT, MAHACTKING -> 0;
-        };
+        int limit =
+                switch (category) {
+                    case ABILITY -> 4;
+                    case TECH, BLUETILE -> 3;
+                    case REDTILE -> 2;
+                    case COMMODITIES, FLAGSHIP, MECH, PN -> 1;
+                    case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 1;
+                    case DRAFTORDER, STARTINGFLEET, STARTINGTECH, HOMESYSTEM -> 1;
+                    case FACTION, UNIT, PLOT, MAHACTKING -> 0;
+                };
+        if (limit > 0 && hasUnlimitedKeptComponents(getOwner())) {
+            return Integer.MAX_VALUE;
+        }
+        return limit;
+    }
+
+    public static boolean hasUnlimitedKeptComponents(Game game) {
+        return "true".equals(game.getStoredValue(UNLIMITED_KEPT_COMPONENTS_KEY));
+    }
+
+    public static int getFactionLimit(Game game) {
+        String storedLimit = game.getStoredValue(FACTION_LIMIT_KEY);
+        if (!storedLimit.isEmpty()) {
+            return Integer.parseInt(storedLimit);
+        }
+        return DEFAULT_FACTION_LIMIT;
     }
 
     @Override
@@ -220,8 +240,8 @@ public class FrankenDrazDraft extends FrankenDraft {
         MessageV2Builder builder = new MessageV2Builder(player.getCardsInfoThread());
         builder.append("## " + item.getTitle(player.getGame()) + " Components");
         for (DraftItem component : components) {
-            List<ContainerChildComponent> cardComponents = new ArrayList<>();
-            cardComponents.addAll(component.getTextDisplays(player.getGame(), player, true));
+            List<ContainerChildComponent> cardComponents =
+                    new ArrayList<>(component.getTextDisplays(player.getGame(), player, true));
             builder.append(Container.of(cardComponents).withAccentColor(accents.getFirst()));
             Collections.rotate(accents, -1);
         }
@@ -284,7 +304,7 @@ public class FrankenDrazDraft extends FrankenDraft {
         if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
             DraftCategory category = DraftCategory.valueOf(buttonID.split(";")[1]);
             frankenDrazDraft.closePostDraftCategory(event, player, category);
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Closed " + category.toString() + ".");
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Closed " + category + ".");
         }
     }
 
@@ -317,7 +337,7 @@ public class FrankenDrazDraft extends FrankenDraft {
 
     @Override
     public int getBagSize() {
-        return 12;
+        return getFactionLimit(getOwner()) + 6;
     }
 
     private List<Player> getOwnerPlayers() {
@@ -473,10 +493,10 @@ public class FrankenDrazDraft extends FrankenDraft {
 
     private static List<FactionModel> getDraftableFactionsForGame(Game game) {
         Map<String, FactionModel> factions = new LinkedHashMap<>();
-        for (FactionModel faction : FrankenDraft.getAllFrankenLegalFactions(game)) {
+        for (FactionModel faction : getAllFrankenLegalFactions(game)) {
             factions.put(faction.getAlias(), faction);
         }
-        for (FactionModel faction : FrankenDraft.getAllFrankenLegalFactions(null)) {
+        for (FactionModel faction : getAllFrankenLegalFactions(null)) {
             if (faction.getSource().isDs()) {
                 factions.put(faction.getAlias(), faction);
             }
@@ -485,9 +505,6 @@ public class FrankenDrazDraft extends FrankenDraft {
         String[] bannedFactions = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedFactions"));
         for (String bannedFaction : bannedFactions) {
             factions.remove(bannedFaction);
-        }
-        for (String faction : AUTO_BANNED_FACTIONS) {
-            factions.remove(faction);
         }
         return new ArrayList<>(factions.values());
     }

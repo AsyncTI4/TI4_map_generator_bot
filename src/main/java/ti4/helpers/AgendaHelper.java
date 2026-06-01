@@ -2251,6 +2251,24 @@ public final class AgendaHelper {
                             }
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
+                        if (specificVote.contains("Defense Rider")) {
+                            String message = identity
+                                    + ", you have a _Defense Rider_ to resolve. Please choose up to 2 planets on which you wish to place PDS.";
+                            List<Button> buttons = List.of(Buttons.green(
+                                    winningR.factionButtonChecker() + "resolveDefenseRider", "Resolve Defense Rider"));
+                            MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+                        }
+
+                        if (specificVote.contains("Project Rider")) {
+                            List<Button> buttons = List.of(Buttons.green(
+                                    winningR.factionButtonChecker() + "resolveProjectRiderReward",
+                                    "Resolve Project Rider"));
+                            MessageHelper.sendMessageToChannelWithButtons(
+                                    channel,
+                                    identity
+                                            + ", you have a _Project Rider_ to resolve. Use the button to retrieve the action cards you selected when you played it.",
+                                    buttons);
+                        }
 
                         if (specificVote.contains("Trade Rider")) {
                             MessageHelper.sendMessageToChannel(
@@ -2280,6 +2298,12 @@ public final class AgendaHelper {
                                     channel,
                                     identity + " due to having a winning _Relic Rider_, you have gained a Relic.");
                             RelicHelper.drawRelicAndNotify(winningR, event, game);
+                        }
+                        if (specificVote.contains("Exploration Rider")) {
+                            String message = identity
+                                    + ", you have a winning _Exploration Rider_. Choose a non-cultural planet to explore.";
+                            MessageHelper.sendMessageToChannel(channel, message);
+                            ButtonHelperActionCards.sendExplorationRiderButtons(winningR, game, 3, Set.of());
                         }
                         if (specificVote.contains("Radiance")) {
                             List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(

@@ -118,7 +118,7 @@ public class AverageTurnTimeService {
         }
     }
 
-    private List<UserAverageTurnTimeAccumulator> getAverageTurnTimes(
+    private static List<UserAverageTurnTimeAccumulator> getAverageTurnTimes(
             List<PlayerEntity> players, int minTurns, int topLimit) {
         Map<UserEntity, UserAverageTurnTimeAccumulator> statsMap = new HashMap<>();
         for (PlayerEntity player : players) {
@@ -135,7 +135,7 @@ public class AverageTurnTimeService {
                 .toList();
     }
 
-    private String toResultString(List<UserAverageTurnTimeAccumulator> sortedResults) {
+    private static String toResultString(List<UserAverageTurnTimeAccumulator> sortedResults) {
         StringBuilder sb = new StringBuilder("## __**Average Turn Time:**__\n");
         int index = 1;
         for (var stats : sortedResults) {

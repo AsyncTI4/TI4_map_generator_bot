@@ -46,25 +46,25 @@ class CompareActivityTimes extends Subcommand {
         List<Member> members = new ArrayList<>();
         if (event.getOption(Constants.ROLE1) != null) {
             Role role = event.getOption(Constants.ROLE1).getAsRole();
-            if (role != null) {
-                members.addAll(event.getGuild().getMembersWithRoles(role));
-            }
+            members.addAll(event.getGuild().getMembersWithRoles(role));
         }
         PLAYER_OPTIONS_TO_CHECK.stream()
                 .map(playerOptionName -> event.getOption(playerOptionName, null, OptionMapping::getAsUser))
                 .filter(Objects::nonNull)
                 .map(User::getId)
                 .map(GameManager::getManagedPlayer)
-                .forEach(player -> {
-                    members.add(event.getGuild().getMemberById(player.getId()));
-                });
+                .forEach(player -> members.add(event.getGuild().getMemberById(player.getId())));
         if (members.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(event, "No valid players or roles provided to compare.");
             return;
         }
 
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                CreateGameButtonHandler.generateMemberListMessage(members, "Activity Times", false));
+        String message = CreateGameButtonHandler.generateMemberListMessage(members, "Activity Times", false);
+
+        if (members.size() <= 10) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            return;
+        }
+        MessageHelper.sendMessageToThread(event.getChannel(), "Compare Activity Times", message);
     }
 }

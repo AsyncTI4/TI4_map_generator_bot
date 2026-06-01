@@ -116,7 +116,7 @@ class DraftSaveServiceTest extends BaseTi4Test {
                 "Mismatch in save data when you save, then load, then save again a draft manager");
     }
 
-    private Draftable getDraftableWithTestData(String className) {
+    private static Draftable getDraftableWithTestData(String className) {
         return switch (className) {
             case "FactionDraftable" -> TestData.createFactionDraftable();
             case "SeatDraftable" -> TestData.createSeatDraftable();
@@ -129,14 +129,14 @@ class DraftSaveServiceTest extends BaseTi4Test {
         };
     }
 
-    private DraftOrchestrator getOrchestratorWithTestData(String className) {
+    private static DraftOrchestrator getOrchestratorWithTestData(String className) {
         return switch (className) {
             case "PublicSnakeDraftOrchestrator" -> TestData.createPublicSnakeDraftOrchestrator();
             default -> null;
         };
     }
 
-    private Game createTestGame(int playerCount) {
+    private static Game createTestGame(int playerCount) {
         Game game = new Game();
         game.setName("testGame");
         for (int i = 0; i < playerCount; i++) {

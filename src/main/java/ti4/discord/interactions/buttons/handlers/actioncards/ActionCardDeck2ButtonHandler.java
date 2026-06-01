@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -22,9 +23,11 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperStats;
@@ -65,10 +68,14 @@ class ActionCardDeck2ButtonHandler {
 
     private static final String ALLIANCE_RIDER_CURRENT_ALLY = "allianceRiderCurrentAlly";
     private static final String ALLIANCE_RIDER_PURGED_ALLIES = "allianceRiderPurgedAllies";
+    private static final String PROJECT_RIDER_SELECTED_CARDS_PREFIX = "projectRiderSelectedCards_";
+    private static final String PROJECT_RIDER_PICK_PREFIX = "projectRiderPickFromDiscard_";
+    private static final int PROJECT_RIDER_MAX_SELECTIONS = 2;
 
     @ButtonHandler("resolveOracle")
     public static void resolveOracle(Player player, Game game, ButtonInteractionEvent event) {
         List<MessageEmbed> embeds = new ArrayList<>();
+        game.peekAtAllUnrevealedPublicObjectives(player);
 
         for (String objectiveId : game.getPublicObjectives1Peekable()) {
             embeds.add(Mapper.getPublicObjective(objectiveId).getRepresentationEmbed());
@@ -138,6 +145,44 @@ class ActionCardDeck2ButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " put 1 PDS on " + Helper.getPlanetRepresentation(planet, game)
                         + ".");
+    }
+
+    @ButtonHandler("resolveDefenseRider")
+    public static void resolveDefenseRider(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        sendDefenseRiderButtons(player, game, 2);
+    }
+
+    @ButtonHandler("resolveDefenseRiderStep2_")
+    public static void resolveDefenseRiderStep2(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String payload = buttonID.replace("resolveDefenseRiderStep2_", "");
+        String[] parts = payload.split("_", 2);
+        if (parts.length < 2) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Defense Rider_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        int remaining;
+        try {
+            remaining = Integer.parseInt(parts[0]);
+        } catch (NumberFormatException e) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Defense Rider_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String planet = parts[1];
+        AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "pds " + planet);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " put 1 PDS on " + Helper.getPlanetRepresentation(planet, game)
+                        + " with _Defense Rider_.");
+        ButtonHelper.deleteMessage(event);
+        if (remaining > 1) {
+            sendDefenseRiderButtons(player, game, remaining - 1);
+        }
     }
 
     @ButtonHandler("resolveBoardingParty")
@@ -279,6 +324,27 @@ class ActionCardDeck2ButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
+    private static void sendDefenseRiderButtons(Player player, Game game, int remainingPds) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanets()) {
+            buttons.add(Buttons.green(
+                    "resolveDefenseRiderStep2_" + remainingPds + "_" + planet,
+                    Helper.getPlanetRepresentation(planet, game)));
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has no planets available for _Defense Rider_.");
+            return;
+        }
+        buttons.add(Buttons.red("deleteButtons", "Done"));
+
+        String message = remainingPds > 1
+                ? player.getRepresentationUnfogged() + ", choose a planet to place a PDS on with _Defense Rider_."
+                : player.getRepresentationUnfogged() + ", you may place 1 more PDS with _Defense Rider_.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+    }
+
     private static List<Button> getOvertimeButtons(Game game, Player player, int remainingComponents) {
         List<Button> buttons = new ArrayList<>();
         String prefix = "resolveOvertimeStep2_";
@@ -406,6 +472,87 @@ class ActionCardDeck2ButtonHandler {
         //            buttons.add(Buttons.red("getDamageButtons_" + game.getActiveSystem() + "_" + "combat", "Assign
         // Hit" + (hits == 1 ? "" : "s")));
         //        }
+    }
+
+    @ButtonHandler("resolveExplorationRider")
+    public static void resolveExplorationRider(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        ButtonHelperActionCards.sendExplorationRiderButtons(player, game, 3, Set.of());
+    }
+
+    @ButtonHandler("resolveExplorationRiderStep2_")
+    public static void resolveExplorationRiderStep2(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String payload = buttonID.replace("resolveExplorationRiderStep2_", "");
+        int firstSeparator = payload.indexOf('_');
+        int secondSeparator = payload.indexOf('_', firstSeparator + 1);
+        int lastSeparator = payload.lastIndexOf('_');
+        if (firstSeparator < 0 || secondSeparator < 0 || lastSeparator <= secondSeparator) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Exploration Rider_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        int remainingExplores;
+        try {
+            remainingExplores = Integer.parseInt(payload.substring(0, firstSeparator));
+        } catch (NumberFormatException e) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Exploration Rider_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        Set<String> selectedPlanets = ButtonHelperActionCards.decodeExplorationRiderPlanets(
+                payload.substring(firstSeparator + 1, secondSeparator));
+        String planet = payload.substring(secondSeparator + 1, lastSeparator);
+        String trait = payload.substring(lastSeparator + 1);
+        Tile tile = game.getTileFromPlanet(planet);
+        if (tile == null
+                || !ButtonHelperActionCards.isExplorationRiderEligiblePlanet(player, game, planet, selectedPlanets)) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Exploration Rider_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        selectedPlanets.add(planet);
+        ButtonHelper.deleteMessage(event);
+        ExploreService.explorePlanet(event, tile, planet, trait, player, false, game, 1, false);
+        if (remainingExplores > 1) {
+            ButtonHelperActionCards.sendExplorationRiderButtons(player, game, remainingExplores - 1, selectedPlanets);
+        }
+    }
+
+    @ButtonHandler("resolveExplorationRiderDrawAc_")
+    public static void resolveExplorationRiderDrawAc(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String payload = buttonID.replace("resolveExplorationRiderDrawAc_", "");
+        int separator = payload.indexOf('_');
+        if (separator < 0) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Exploration Rider_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        int remainingExplores;
+        try {
+            remainingExplores = Integer.parseInt(payload.substring(0, separator));
+        } catch (NumberFormatException e) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Exploration Rider_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        Set<String> selectedPlanets =
+                ButtonHelperActionCards.decodeExplorationRiderPlanets(payload.substring(separator + 1));
+        ActionCardHelper.drawActionCards(player, 1);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + " drew 1 action card instead of exploring with _Exploration Rider_ via breakthrough.");
+        if (remainingExplores > 1) {
+            ButtonHelperActionCards.sendExplorationRiderButtons(player, game, remainingExplores - 1, selectedPlanets);
+        }
     }
 
     @ButtonHandler("resolveHostileWorld")
@@ -643,6 +790,63 @@ class ActionCardDeck2ButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " placed 1 infantry on "
                         + Helper.getPlanetRepresentation(planet, game) + " via _Freedom Fighters_.");
+    }
+
+    @ButtonHandler("resolveLiberation")
+    public static void resolveLiberation(Player player, Game game, ButtonInteractionEvent event) {
+        Tile activeSystem = game.getTileByPosition(game.getCurrentActiveSystem());
+        Stream<String> liberationPlanets = activeSystem == null
+                ? player.getPlanets().stream()
+                : activeSystem.getPlanetUnitHolders().stream().map(Planet::getName);
+        List<Button> buttons = liberationPlanets
+                .map(planet ->
+                        Buttons.green("resolveLiberationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)))
+                .toList();
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has no planets to target with _Liberation_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose the planet you just gained for _Liberation_.",
+                buttons);
+    }
+
+    @ButtonHandler("resolveLiberationStep2_")
+    public static void resolveLiberationStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.replace("resolveLiberationStep2_", "");
+        Tile tile = game.getTileFromPlanet(planet);
+        if (tile == null || !player.hasPlanet(planet)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not resolve _Liberation_ for that planet.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "2 inf " + planet);
+        PlanetService.refreshPlanet(player, planet);
+
+        List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(
+                game, ButtonHelper.getUnitHolderFromPlanetName(planet, game), player);
+        if (buttons != null && !buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getFactionEmoji() + ", please press the button to explore "
+                            + Helper.getPlanetRepresentation(planet, game) + ".",
+                    buttons);
+        }
+
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " placed 2 infantry on and readied "
+                        + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game)
+                        + " via _Liberation_.");
     }
 
     @ButtonHandler("resolveRefugees")
@@ -1101,6 +1305,104 @@ class ActionCardDeck2ButtonHandler {
                         + tile.getRepresentationForButtons(game, player) + ".");
     }
 
+    @ButtonHandler("resolveArbitration")
+    public static void resolveArbitration(Player player, Game game, ButtonInteractionEvent event) {
+        List<Button> buttons = getArbitrationOwnerButtons(game, player);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has no eligible planets for _Arbitration_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose which player's planets to inspect for _Arbitration_.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("arbitrationOwner_")
+    public static void resolveArbitrationOwner(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String owner = buttonID.replace("arbitrationOwner_", "");
+        List<Button> buttons = getArbitrationPlanetButtons(game, player, owner);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has no eligible planets for _Arbitration_ in that category.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose a non-home planet with ground forces for _Arbitration_.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("arbitrationPlanet_")
+    public static void resolveArbitrationPlanet(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String[] buttonParts = buttonID.split("_", 3);
+        if (buttonParts.length < 3) {
+            return;
+        }
+        String planet = buttonParts[2];
+        List<Button> buttons = getArbitrationTargetButtons(game, player, planet);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has no eligible target players for _Arbitration_ on "
+                            + Helper.getPlanetRepresentation(planet, game) + ".");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", choose who will place 1 infantry into coexistence on "
+                        + Helper.getPlanetRepresentation(planet, game) + ".",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("arbitrationTarget_")
+    public static void resolveArbitrationTarget(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String arbitrationTarget = buttonID.replace("arbitrationTarget_", "");
+        int lastSeparator = arbitrationTarget.lastIndexOf('_');
+        if (lastSeparator < 0) {
+            return;
+        }
+
+        String planet = arbitrationTarget.substring(0, lastSeparator);
+        String faction = arbitrationTarget.substring(lastSeparator + 1);
+        Player target = game.getPlayerFromColorOrFaction(faction);
+        Tile tile = game.getTileFromPlanet(planet);
+        if (target == null || tile == null || target == player || target.hasPlanet(planet)) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Arbitration_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        game.setStoredValue("coexistFlag", "yes");
+        AddUnitService.addUnits(event, tile, game, target.getColor(), "inf " + planet);
+        game.removeStoredValue("coexistFlag");
+        ButtonHelperAbilities.oceanBoundCheck(game);
+
+        String planetRepresentation = Helper.getPlanetRepresentation(planet, game);
+        String message = player.getRepresentation() + " chose " + target.getRepresentationNoPing()
+                + " to place 1 infantry into coexistence on " + planetRepresentation + " using _Arbitration_.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        if (!Objects.equals(player.getCorrectChannel(), target.getCorrectChannel())) {
+            MessageHelper.sendMessageToChannel(target.getCorrectChannel(), message);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
     private static List<TechnologyModel> getUbiquityTechs(Game game, Player player) {
         List<TechnologyModel> techs = new ArrayList<>();
         Set<String> seenTechs = new HashSet<>();
@@ -1112,6 +1414,84 @@ class ActionCardDeck2ButtonHandler {
             }
         }
         return techs;
+    }
+
+    private static List<Button> getArbitrationOwnerButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player owner : game.getRealPlayers()) {
+            if (owner == player
+                    || getArbitrationPlanetButtons(game, player, owner.getFaction())
+                            .isEmpty()) {
+                continue;
+            }
+            if (game.isFowMode()) {
+                buttons.add(Buttons.gray(
+                        player.factionButtonChecker() + "arbitrationOwner_" + owner.getFaction(), owner.getColor()));
+            } else {
+                Button button = Buttons.gray(
+                        player.factionButtonChecker() + "arbitrationOwner_" + owner.getFaction(),
+                        owner.getFactionModel().getShortName());
+                buttons.add(button.withEmoji(Emoji.fromFormatted(owner.getFactionEmoji())));
+            }
+        }
+
+        if (!getArbitrationPlanetButtons(game, player, "neutralUnits").isEmpty()) {
+            buttons.add(Buttons.gray(player.factionButtonChecker() + "arbitrationOwner_neutralUnits", "Neutral Units"));
+        }
+        return buttons;
+    }
+
+    private static List<Button> getArbitrationPlanetButtons(Game game, Player player, String owner) {
+        List<String> planets = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.isHomeSystem(game)) {
+                continue;
+            }
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                if (!isArbitrationPlanetInCategory(game, planet, owner)
+                        || getArbitrationTargetButtons(game, player, planet.getName())
+                                .isEmpty()) {
+                    continue;
+                }
+                planets.add(planet.getName());
+            }
+        }
+
+        Collections.sort(planets);
+        return planets.stream()
+                .map(planet -> Buttons.green(
+                        player.factionButtonChecker() + "arbitrationPlanet_" + owner + "_" + planet,
+                        Helper.getPlanetRepresentation(planet, game)))
+                .toList();
+    }
+
+    private static boolean isArbitrationPlanetInCategory(Game game, Planet planet, String owner) {
+        if ("neutralUnits".equals(owner)) {
+            return planet.hasGroundForces(game.getNeutral());
+        }
+        Player planetOwner = game.getPlanetOwner(planet.getName());
+        return planetOwner != null && owner.equals(planetOwner.getFaction()) && planet.hasGroundForces(game);
+    }
+
+    private static List<Button> getArbitrationTargetButtons(Game game, Player player, String planet) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player target : game.getRealPlayers()) {
+            if (target == player || target.hasPlanet(planet)) {
+                continue;
+            }
+            if (game.isFowMode()) {
+                buttons.add(Buttons.gray(
+                        player.factionButtonChecker() + "arbitrationTarget_" + planet + "_" + target.getFaction(),
+                        target.getColor()));
+            } else {
+                Button button = Buttons.gray(
+                        player.factionButtonChecker() + "arbitrationTarget_" + planet + "_" + target.getFaction(),
+                        target.getFactionModel().getShortName());
+                String factionEmojiString = target.getFactionEmoji();
+                buttons.add(button.withEmoji(Emoji.fromFormatted(factionEmojiString)));
+            }
+        }
+        return buttons;
     }
 
     private static boolean isTechOwnedByEnoughPlayers(Game game, TechnologyModel tech) {
@@ -1369,12 +1749,182 @@ class ActionCardDeck2ButtonHandler {
                         + Mapper.getLeader(allyCommander).getName() + ".");
     }
 
+    @ButtonHandler("resolveProjectRider")
+    public static void resolveProjectRider(Player player, Game game, ButtonInteractionEvent event) {
+        game.setStoredValue(getProjectRiderSelectionKey(player), "");
+        ButtonHelper.deleteMessage(event);
+
+        if (getProjectRiderSelectableCards(game).isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " has no action cards in the discard pile to choose for _Project Rider_.");
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green(player.factionButtonChecker() + "projectRiderCardPick_1", "Card #1"));
+        buttons.add(Buttons.green(player.factionButtonChecker() + "projectRiderCardPick_2", "Card #2"));
+        buttons.add(Buttons.blue(player.factionButtonChecker() + "projectRiderDone", "Done"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", choose up to 2 action cards in the discard pile for _Project Rider_.",
+                buttons);
+    }
+
+    @ButtonHandler("projectRiderCardPick_")
+    public static void resolveProjectRiderCardPick(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        ActionCardHelper.pickACardFromDiscardStep1(
+                game,
+                player,
+                PROJECT_RIDER_PICK_PREFIX,
+                player.getRepresentationUnfogged()
+                        + ", choose an action card from the discard pile for _Project Rider_.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("projectRiderPickFromDiscard_")
+    public static void resolveProjectRiderPickFromDiscard(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String acId = buttonID.replace(PROJECT_RIDER_PICK_PREFIX, "");
+        List<String> selectedCards = new ArrayList<>(getProjectRiderSelections(game, player));
+        if (selectedCards.contains(acId)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " already selected _"
+                            + Mapper.getActionCard(acId).getName() + "_ for _Project Rider_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (!isProjectRiderCardSelectable(game, acId)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " cannot select that action card because it is no longer in the discard pile.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (selectedCards.size() >= PROJECT_RIDER_MAX_SELECTIONS) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " already selected the maximum number of cards for _Project Rider_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        selectedCards.add(acId);
+        setProjectRiderSelections(game, player, selectedCards);
+        ButtonHelper.deleteMessage(event);
+        sendProjectRiderSelectionSummary(player, selectedCards);
+    }
+
+    @ButtonHandler("projectRiderDone")
+    public static void resolveProjectRiderDone(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        sendProjectRiderSelectionSummary(player, getProjectRiderSelections(game, player));
+    }
+
+    @ButtonHandler("resolveProjectRiderReward")
+    public static void resolveProjectRiderReward(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        List<String> selectedCards = new ArrayList<>(getProjectRiderSelections(game, player));
+        game.setStoredValue(getProjectRiderSelectionKey(player), "");
+        if (selectedCards.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " had no action cards selected for _Project Rider_.");
+            return;
+        }
+
+        List<String> retrievedCards = new ArrayList<>();
+        List<String> unavailableCards = new ArrayList<>();
+        for (String acId : selectedCards) {
+            Integer acIndex = game.getDiscardActionCards().get(acId);
+            if (acIndex == null
+                    || !isProjectRiderCardSelectable(game, acId)
+                    || !game.pickActionCard(player.getUserID(), acIndex)) {
+                unavailableCards.add(Mapper.getActionCard(acId).getName());
+                continue;
+            }
+            retrievedCards.add(Mapper.getActionCard(acId).getName());
+        }
+
+        if (!retrievedCards.isEmpty()) {
+            ActionCardHelper.sendActionCardInfo(game, player);
+            ButtonHelper.checkACLimit(game, player);
+        }
+
+        StringBuilder message =
+                new StringBuilder(player.getRepresentationUnfogged()).append(" resolved _Project Rider_.");
+        if (retrievedCards.isEmpty()) {
+            message.append(" None of the selected action cards were still available in the discard pile.");
+        } else {
+            message.append(" Retrieved ")
+                    .append(formatProjectRiderCardNames(retrievedCards))
+                    .append(" from the discard pile.");
+        }
+        if (!unavailableCards.isEmpty()) {
+            message.append(" These selected cards were unavailable: ")
+                    .append(formatProjectRiderCardNames(unavailableCards))
+                    .append(".");
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
+    }
+
     private static List<String> getStoredCommanderList(Game game, String storageKey) {
         String storedValue = game.getStoredValue(storageKey);
         if (storedValue.isBlank()) {
             return new ArrayList<>();
         }
         return new ArrayList<>(List.of(storedValue.split(",")));
+    }
+
+    private static void sendProjectRiderSelectionSummary(Player player, List<String> selectedCards) {
+        String summary = selectedCards.isEmpty()
+                ? "selected no action cards"
+                : "selected " + formatProjectRiderCardIds(selectedCards);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " " + summary + " for _Project Rider_.");
+    }
+
+    private static List<String> getProjectRiderSelections(Game game, Player player) {
+        String storedValue = game.getStoredValue(getProjectRiderSelectionKey(player));
+        if (storedValue.isBlank()) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(List.of(storedValue.split(",")));
+    }
+
+    private static void setProjectRiderSelections(Game game, Player player, List<String> selectedCards) {
+        game.setStoredValue(getProjectRiderSelectionKey(player), String.join(",", selectedCards));
+    }
+
+    private static String getProjectRiderSelectionKey(Player player) {
+        return PROJECT_RIDER_SELECTED_CARDS_PREFIX + player.getUserID();
+    }
+
+    private static List<String> getProjectRiderSelectableCards(Game game) {
+        return game.getDiscardActionCards().keySet().stream()
+                .filter(acId -> isProjectRiderCardSelectable(game, acId))
+                .toList();
+    }
+
+    private static boolean isProjectRiderCardSelectable(Game game, String acId) {
+        return game.getDiscardActionCards().containsKey(acId)
+                && game.getDiscardACStatus().get(acId) == null;
+    }
+
+    private static String formatProjectRiderCardIds(List<String> actionCards) {
+        return formatProjectRiderCardNames(actionCards.stream()
+                .map(acId -> Mapper.getActionCard(acId).getName())
+                .toList());
+    }
+
+    private static String formatProjectRiderCardNames(List<String> actionCards) {
+        return actionCards.stream().map(name -> "_" + name + "_").collect(java.util.stream.Collectors.joining(", "));
     }
 
     @ButtonHandler("brutalOccupationStep2_")

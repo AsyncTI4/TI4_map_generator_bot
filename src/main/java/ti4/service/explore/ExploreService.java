@@ -72,7 +72,7 @@ public class ExploreService {
             String planetName,
             String drawColor,
             Player player,
-            boolean NRACheck,
+            boolean nraCheck,
             Game game,
             int numExplores,
             boolean ownerShipOverride) {
@@ -191,7 +191,7 @@ public class ExploreService {
 
         if (player.hasAbility("distant_suns")) {
             if (Helper.mechCheck(planetName, game, player)) {
-                if (!NRACheck) {
+                if (!nraCheck) {
                     if (player.hasTech("pfa")) { // Pre-Fab Arcologies
                         PlanetService.refreshPlanet(player, planetName);
                         MessageHelper.sendMessageToChannel(
@@ -309,7 +309,7 @@ public class ExploreService {
             if (unitHolder.getUnitCount(Units.UnitType.Mech, player.getColor()) > 0
                     || unitHolder.getUnitCount(Units.UnitType.Spacedock, player.getColor()) > 0
                     || unitHolder.getUnitCount(Units.UnitType.Pds, player.getColor()) > 0) {
-                if (!NRACheck) {
+                if (!nraCheck) {
                     String message = "Please decide whether or not to use your " + FactionEmojis.gledge
                             + "**Deep Mining** (gain 1 trade good instead of exploring) ability.";
                     Button resolveExplore1 = Buttons.green("deep_mining_accept", "Gain 1 Trade Good");

@@ -260,15 +260,7 @@ public class CommandCounterButtonHandler {
 
     @ButtonHandler("gain_CC")
     public static void gainCC(ButtonInteractionEvent event, Player player, Game game) {
-        String message = "";
-
-        String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
-                + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
-        game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
-        List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
-
-        ReactionService.addReaction(event, game, player, message);
+        gainCCNoDelete(event, player, game);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
@@ -288,7 +280,7 @@ public class CommandCounterButtonHandler {
     @ButtonHandler("confirm_cc")
     public static void confirmCC(ButtonInteractionEvent event, Game game, Player player) {
         String message = "Confirmed command tokens: " + player.getTacticalCC() + "/" + player.getFleetCC();
-        if (!player.getMahactCC().isEmpty()) {
+        if (player.hasAbility("edict") || player.hasAbility("edict_y")) {
             message += "(+" + player.getMahactCC().size() + ")";
         }
         message += "/" + player.getStrategicCC();

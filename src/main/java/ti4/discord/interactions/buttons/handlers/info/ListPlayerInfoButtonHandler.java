@@ -18,6 +18,7 @@ import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
+import ti4.service.franken.FrankenAlternateTextService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.UnitInfoService;
 import ti4.service.player.PlayerStatsService;
@@ -86,19 +87,21 @@ class ListPlayerInfoButtonHandler {
                 case "allFaction" -> {
                     sb.append(PlayerStatsService.getPlayersCurrentStatsText(p2, game));
                     for (String ability : p2.getAbilities()) {
-                        messageEmbeds.add(Mapper.getAbility(ability).getRepresentationEmbed());
+                        messageEmbeds.add(
+                                FrankenAlternateTextService.getAbilityEmbed(game, Mapper.getAbility(ability)));
                     }
                     for (Leader lead : p2.getLeadersIncludingPurged()) {
-                        messageEmbeds.add(lead.getLeaderModel()
-                                .get()
-                                .getRepresentationEmbed(true, true, true, true, game.isTwilightsFallMode()));
+                        messageEmbeds.add(FrankenAlternateTextService.getLeaderEmbed(
+                                game, lead.getLeaderModel().get(), true, true, true, true, game.isTwilightsFallMode()));
                     }
                     for (String tech : p2.getFactionTechs()) {
-                        messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
+                        messageEmbeds.add(FrankenAlternateTextService.getTechnologyEmbed(
+                                game, Mapper.getTech(tech), false, false));
                     }
                     for (String unit : p2.getUnitsOwned()) {
                         if (unit.contains("_") || unit.contains("tf-") || unit.contains("tk-")) {
-                            messageEmbeds.add(Mapper.getUnit(unit).getRepresentationEmbed());
+                            messageEmbeds.add(
+                                    FrankenAlternateTextService.getUnitEmbed(game, Mapper.getUnit(unit), false));
                         }
                     }
                     for (String relic : p2.getRelics()) {
@@ -109,20 +112,23 @@ class ListPlayerInfoButtonHandler {
                                 .append('\n');
                     }
                     for (String tech : p2.getTechs()) {
-                        messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
+                        messageEmbeds.add(FrankenAlternateTextService.getTechnologyEmbed(
+                                game, Mapper.getTech(tech), false, false));
                     }
                     for (String pn : p2.getPromissoryNotesOwned()) {
                         if (!pn.contains(p2.getColor() + "_")) {
-                            messageEmbeds.add(Mapper.getPromissoryNote(pn).getRepresentationEmbed());
+                            messageEmbeds.add(FrankenAlternateTextService.getPromissoryNoteEmbed(
+                                    game, Mapper.getPromissoryNote(pn), false, false, false));
                         }
                     }
                     for (BreakthroughModel bt : p2.getBreakthroughModels()) {
-                        messageEmbeds.add(bt.getRepresentationEmbed());
+                        messageEmbeds.add(FrankenAlternateTextService.getBreakthroughEmbed(game, bt, false));
                     }
                 }
                 case "abilities" -> {
                     for (String ability : p2.getAbilities()) {
-                        messageEmbeds.add(Mapper.getAbility(ability).getRepresentationEmbed());
+                        messageEmbeds.add(
+                                FrankenAlternateTextService.getAbilityEmbed(game, Mapper.getAbility(ability)));
                     }
                 }
                 case "stats" -> sb.append(PlayerStatsService.getPlayersCurrentStatsText(p2, game));
@@ -133,17 +139,19 @@ class ListPlayerInfoButtonHandler {
                 }
                 case "ftech" -> {
                     for (String tech : p2.getFactionTechs()) {
-                        messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
+                        messageEmbeds.add(FrankenAlternateTextService.getTechnologyEmbed(
+                                game, Mapper.getTech(tech), false, false));
                     }
                 }
                 case "breakthrough" -> {
                     for (BreakthroughModel bt : p2.getBreakthroughModels()) {
-                        messageEmbeds.add(bt.getRepresentationEmbed());
+                        messageEmbeds.add(FrankenAlternateTextService.getBreakthroughEmbed(game, bt, false));
                     }
                 }
                 case "tech" -> {
                     for (String tech : p2.getTechs()) {
-                        messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
+                        messageEmbeds.add(FrankenAlternateTextService.getTechnologyEmbed(
+                                game, Mapper.getTech(tech), false, false));
                     }
                 }
                 case "planet" -> {
@@ -155,16 +163,22 @@ class ListPlayerInfoButtonHandler {
                 case "pn" -> {
                     for (String pn : p2.getPromissoryNotesOwned()) {
                         if (!pn.contains(p2.getColor() + "_")) {
-                            messageEmbeds.add(Mapper.getPromissoryNote(pn).getRepresentationEmbed());
+                            messageEmbeds.add(FrankenAlternateTextService.getPromissoryNoteEmbed(
+                                    game, Mapper.getPromissoryNote(pn), false, false, false));
                         }
                     }
                 }
                 case "agent", "commander", "hero" -> {
                     for (Leader lead : p2.getLeadersIncludingPurged()) {
                         if (lead.getId().contains(category)) {
-                            messageEmbeds.add(lead.getLeaderModel()
-                                    .get()
-                                    .getRepresentationEmbed(true, true, true, true, game.isTwilightsFallMode()));
+                            messageEmbeds.add(FrankenAlternateTextService.getLeaderEmbed(
+                                    game,
+                                    lead.getLeaderModel().get(),
+                                    true,
+                                    true,
+                                    true,
+                                    true,
+                                    game.isTwilightsFallMode()));
                         }
                     }
                 }

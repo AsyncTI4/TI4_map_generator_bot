@@ -290,6 +290,12 @@ public class CreateGameService {
                 "If you want to start a Twilight's Fall Game (alternate game mode included in Thunder's Edge) use this button",
                 tfOptions);
 
+        Button frankenButton = Buttons.green("frankenSetup", "Start Franken Setup");
+        MessageHelper.sendMessageToChannelWithButton(
+                actionsChannel,
+                "If you want to start a Franken game (alternate homebrew game mode) use this button",
+                frankenButton);
+
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("chooseExp_newPoK", "New PoK"));
         buttons.add(Buttons.gray("chooseExp_oldPoK", "Old PoK"));
@@ -303,6 +309,11 @@ public class CreateGameService {
 
                 -# Please realize that these are broad overviews and that some small components may not fit perfectly into these categories.""";
         MessageHelper.sendMessageToChannelWithButtons(actionsChannel, expMsg, buttons);
+        Button baseGameModeButton = Buttons.green("setupBaseGameMode", "Setup Base Game Only");
+        MessageHelper.sendMessageToChannelWithButton(
+                actionsChannel,
+                "Use the below button to set the game to the base game with PoK strategy cards.\n\n**NOTE: Do not press the button below unless you intend to play the base game only, no expansions.**",
+                baseGameModeButton);
     }
 
     private static void introductionToBotMapUpdatesThread(Game game) {
@@ -581,7 +592,7 @@ public class CreateGameService {
 
     private static int getMaxGamesPerCategory() {
         int maxGamesPerCategory = GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.getAsInt(10);
-        return Math.max(1, Math.min(25, maxGamesPerCategory));
+        return Math.clamp(maxGamesPerCategory, 1, 25);
     }
 
     private static int getChannelCountForNewCategory() {

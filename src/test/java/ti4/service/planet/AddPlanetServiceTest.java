@@ -30,7 +30,7 @@ class AddPlanetServiceTest extends BaseTi4Test {
         assertThat(game.getPlayer("user").getTg()).isZero();
     }
 
-    private Game electedMinisterGame() {
+    private static Game electedMinisterGame() {
         Game game = new Game();
         game.setLaws(Map.of("minister_exploration", 1));
         game.setLawsInfo(Map.of("minister_exploration", "arborec"));

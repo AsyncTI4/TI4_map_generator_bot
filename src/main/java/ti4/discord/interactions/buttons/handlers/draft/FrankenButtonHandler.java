@@ -437,7 +437,7 @@ public class FrankenButtonHandler {
         currentBag.Contents.removeIf((DraftItem bagItem) -> bagItem.getAlias().equals(action));
         player.queueDraftItem(DraftItem.generateFromAlias(action));
 
-        if (!draft.playerHasDraftableItemInBag(player) && !draft.playerHasItemInQueue(player)) {
+        if (!BagDraft.playerHasDraftableItemInBag(player) && !BagDraft.playerHasItemInQueue(player)) {
             draft.setPlayerReadyToPass(player, true);
         }
 

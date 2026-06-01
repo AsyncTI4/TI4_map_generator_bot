@@ -233,7 +233,7 @@ public class SecretObjectiveHelper {
         return Helper.checkEndGame(game, player);
     }
 
-    public static void showAll(Player player, Player player_, Game game) {
+    public static void showAll(Player player, Player player2, Game game) {
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(game.getName()).append('\n');
         sb.append("Player: ").append(player.getUserName()).append('\n');
@@ -244,11 +244,11 @@ public class SecretObjectiveHelper {
             sb.append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id))
                     .append('\n');
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player2, sb.toString());
         MessageHelper.sendMessageToPlayerCardsInfoThread(
                 player,
                 "All secret objectives in your hand have been shown to "
-                        + (game.isFowMode() ? "someone" : player_.getRepresentationNoPing()) + ".");
+                        + (game.isFowMode() ? "someone" : player2.getRepresentationNoPing()) + ".");
     }
 
     public static List<Button> getUnscoredSecretObjectiveButtons(Player player) {

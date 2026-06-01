@@ -29,16 +29,22 @@ public class CommanderUnlockCheckService {
 
     public static void checkPlayer(Player player, String... factionsToCheck) {
         for (String factionToCheck : factionsToCheck) {
-            if (player != null
-                    && player.isRealPlayer()
-                    && player.hasLeader(factionToCheck + "commander")
+            if (player == null || !player.isRealPlayer()) {
+                continue;
+            }
+            if (player.hasLeader(factionToCheck + "commander")
                     && !player.hasLeaderUnlocked(factionToCheck + "commander")) {
-                checkConditionsAndUnlock(player, factionToCheck);
+                checkConditionsAndUnlock(player, factionToCheck, factionToCheck + "commander");
+            }
+            if ("mahact".equals(factionToCheck)
+                    && player.hasLeader("mahactcommander_y")
+                    && !player.hasLeaderUnlocked("mahactcommander_y")) {
+                checkConditionsAndUnlock(player, "mahact_y", "mahactcommander_y");
             }
         }
     }
 
-    private static void checkConditionsAndUnlock(Player player, String faction) {
+    private static void checkConditionsAndUnlock(Player player, String faction, String leaderId) {
         Game game = player.getGame();
         boolean shouldBeUnlocked = false;
         switch (faction) {
@@ -142,6 +148,7 @@ public class CommanderUnlockCheckService {
                 shouldBeUnlocked =
                         (player.getNeighbourCount() >= (game.getRealPlayers().size() - 1));
             case "mahact" -> shouldBeUnlocked = (player.getMahactCC().size() >= 2);
+            case "mahact_y" -> shouldBeUnlocked = (player.getMahactCC().size() >= 3);
             case "naaz" ->
                 shouldBeUnlocked =
                         (CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Mech)
@@ -277,9 +284,11 @@ public class CommanderUnlockCheckService {
             // BEANS
             case "dream" ->
                 shouldBeUnlocked = (DreamButtonHandler.getNexusTokenTiles(game).size() >= 3);
+            case "netrunners" ->
+                shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false) >= 4);
         }
         if (shouldBeUnlocked) {
-            UnlockLeaderService.unlockLeader(faction + "commander", game, player);
+            UnlockLeaderService.unlockLeader(leaderId, game, player);
         }
     }
 }

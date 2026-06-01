@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1105,15 +1108,18 @@ public final class ButtonHelperFactionSpecific {
     public static void mahactStealCC(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String color = buttonID.replace("mahactStealCC_", "");
         String ident = player.getRepresentation(true, false);
+
+        String location = player.hasAbility("primacy") ? "Primacy ability" : "fleet pool";
         if (!player.getMahactCC().contains(color)) {
             player.addMahactCC(color);
             Helper.isCCCountCorrect(game, color);
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), ident + " added a " + color + " command token to their fleet pool.");
+                    player.getCorrectChannel(),
+                    ident + " added a " + color + " command token to their " + location + ".");
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    ident + " already had a " + color + " command token in their fleet pool.");
+                    ident + " already had a " + color + " command token in their " + location + ".");
         }
         CommanderUnlockCheckService.checkPlayer(player, "mahact");
 
@@ -4286,19 +4292,19 @@ public final class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    public static boolean isNextToEmpyMechs(Game game, Player ACPlayer, Player EmpyPlayer) {
-        if (ACPlayer == null || EmpyPlayer == null) {
+    public static boolean isNextToEmpyMechs(Game game, Player acPlayer, Player empyPlayer) {
+        if (acPlayer == null || empyPlayer == null) {
             return false;
         }
-        if (ACPlayer.getFaction().equalsIgnoreCase(EmpyPlayer.getFaction())) {
+        if (acPlayer.getFaction().equalsIgnoreCase(empyPlayer.getFaction())) {
             return false;
         }
-        List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, EmpyPlayer, UnitType.Mech);
+        List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, empyPlayer, UnitType.Mech);
         for (Tile tile : tiles) {
-            Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tile.getPosition(), EmpyPlayer, true);
+            Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tile.getPosition(), empyPlayer, true);
             for (String adjTile : adjTiles) {
                 Tile adjT = game.getTileMap().get(adjTile);
-                if (FoWHelper.playerHasUnitsInSystem(ACPlayer, adjT)) {
+                if (FoWHelper.playerHasUnitsInSystem(acPlayer, adjT)) {
                     return true;
                 }
             }
@@ -4306,22 +4312,22 @@ public final class ButtonHelperFactionSpecific {
         return false;
     }
 
-    public static boolean isNextToTriunes(Game game, Player ACPlayer, Player EmpyPlayer) {
-        if (ACPlayer == null || EmpyPlayer == null) {
+    public static boolean isNextToTriunes(Game game, Player acPlayer, Player empyPlayer) {
+        if (acPlayer == null || empyPlayer == null) {
             return false;
         }
-        if (ACPlayer.getFaction().equalsIgnoreCase(EmpyPlayer.getFaction())) {
+        if (acPlayer.getFaction().equalsIgnoreCase(empyPlayer.getFaction())) {
             return false;
         }
         List<Tile> tiles =
-                CheckUnitContainmentService.getTilesContainingPlayersUnits(game, EmpyPlayer, UnitType.Fighter);
+                CheckUnitContainmentService.getTilesContainingPlayersUnits(game, empyPlayer, UnitType.Fighter);
         int count = 0;
         for (Tile tile : tiles) {
-            int systemFF = tile.getSpaceUnitHolder().getUnitCount(UnitType.Fighter, EmpyPlayer.getColor());
-            Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tile.getPosition(), EmpyPlayer, true);
+            int systemFF = tile.getSpaceUnitHolder().getUnitCount(UnitType.Fighter, empyPlayer.getColor());
+            Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tile.getPosition(), empyPlayer, true);
             for (String adjTile : adjTiles) {
                 Tile adjT = game.getTileMap().get(adjTile);
-                if (FoWHelper.playerHasUnitsInSystem(ACPlayer, adjT)) {
+                if (FoWHelper.playerHasUnitsInSystem(acPlayer, adjT)) {
                     count += systemFF;
                     break;
                 }

@@ -51,18 +51,15 @@ public class OptionalAuthFilter extends OncePerRequestFilter {
                 String token = authHeader.substring(BEARER_PREFIX.length());
                 OAuth2AuthenticatedPrincipal principal = introspector.introspect(token);
 
-                // Create an OAuth2AccessToken for BearerTokenAuthentication
                 OAuth2AccessToken accessToken =
                         new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER, token, Instant.now(), null);
 
-                // Create and set the authentication
-                BearerTokenAuthentication authentication =
-                        new BearerTokenAuthentication(principal, accessToken, principal.getAuthorities());
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext()
+                        .setAuthentication(
+                                new BearerTokenAuthentication(principal, accessToken, principal.getAuthorities()));
             } catch (Exception e) {
                 // Token invalid or expired - continue without auth.
-                // The controller will handle 401 for FoW games if auth is required.
+                // The controller will handle 401 if auth is required.
             }
         }
 

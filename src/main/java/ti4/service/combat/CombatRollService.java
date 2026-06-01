@@ -1,6 +1,8 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,7 +29,9 @@ import ti4.contest.replay.core.CombatRollPayload.RollSegmentType;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -244,6 +248,10 @@ public class CombatRollService {
             if (opponent == null) {
                 opponent = player;
             }
+        }
+        if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasUnit("netrunners_flagship"))
+                && NetrunnersUnitsHandler.resolveEmpSpaceCannonBlock(event, game, player, tile, rollType)) {
+            return 0;
         }
         Map<UnitModel, Integer> opponentUnitsByQuantity =
                 getUnitsInCombat(tile, combatOnHolder, opponent, event, rollType, game);
@@ -874,7 +882,8 @@ public class CombatRollService {
                         CombatRollType.combatround,
                         activeSystem,
                         unitHolder);
-                int numRollsPerUnit = unitModel.getCombatDieCountForAbility(CombatRollType.combatround, player);
+                unitModel.getCombatDieCountForAbility(CombatRollType.combatround, player);
+                int numRollsPerUnit;
                 CombatStatsService.CombatRoundProfile combatRoundProfile = CombatStatsService.getCombatRoundProfile(
                         true, unitModel, player, activeSystem, opponent, false);
                 numRollsPerUnit = combatRoundProfile.diceCount();
@@ -943,8 +952,7 @@ public class CombatRollService {
             }
             if (rollType == CombatRollType.combatround
                     && player.hasTech("baconcg")
-                    && opponent.getSCs().stream()
-                            .allMatch(sc -> game.getPlayedSCs().contains(sc))) {
+                    && game.getPlayedSCs().containsAll(opponent.getSCs())) {
                 modifierToHit += 1;
             }
             int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player);
@@ -2139,6 +2147,9 @@ public class CombatRollService {
                     }
                 }
             }
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "netrunnerscommander")) {
+            output.putAll(NetrunnersLeadersHandler.getCommanderSpaceCannonUnits(game, player, tile));
         }
 
         checkBadUnits(player, event, unitsByAsyncId, output);

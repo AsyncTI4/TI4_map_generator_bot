@@ -35,6 +35,7 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
+import ti4.helpers.settingsFramework.menus.FrankenSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
@@ -564,6 +565,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.LIMITED_WHISPERS_MODE + " " + game.isLimitedWhispersMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.WHISPERS_DISABLED + " " + game.isWhispersDisabled());
+        writer.write(System.lineSeparator());
         writer.write(Constants.AGE_OF_COMMERCE_MODE + " " + game.isAgeOfCommerceMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.ORDINIAN_C1_MODE + " " + game.isOrdinianC1Mode());
@@ -668,6 +671,15 @@ class GameSaveService {
         } else if (game.getDraftSystemSettingsJson() != null) {
             // default to the already stored value, if we failed to read it previously
             writer.write(Constants.DRAFT_SYSTEM_SETTINGS + " " + game.getDraftSystemSettingsJson());
+            writer.write(System.lineSeparator());
+        }
+
+        FrankenSettings frankenSettings = game.getFrankenSettingsUnsafe();
+        if (frankenSettings != null) {
+            writer.write(Constants.FRANKEN_DRAFT_SETTINGS + " " + frankenSettings.json());
+            writer.write(System.lineSeparator());
+        } else if (game.getFrankenSettingsJson() != null) {
+            writer.write(Constants.FRANKEN_DRAFT_SETTINGS + " " + game.getFrankenSettingsJson());
             writer.write(System.lineSeparator());
         }
 

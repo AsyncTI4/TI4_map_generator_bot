@@ -144,6 +144,7 @@ public class GameProperties {
     private @ExportableField boolean noSwapMode;
     private @ExportableField boolean veiledHeartMode;
     private @ExportableField boolean limitedWhispersMode;
+    private @ExportableField boolean whispersDisabled;
     private @ExportableField boolean ageOfCommerceMode;
     private @ExportableField boolean hiddenAgendaMode;
     private @ExportableField boolean ordinianC1Mode;

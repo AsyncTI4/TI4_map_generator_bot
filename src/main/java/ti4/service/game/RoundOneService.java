@@ -29,7 +29,7 @@ import ti4.service.leader.UnlockLeaderService;
 @UtilityClass
 public class RoundOneService {
 
-    public static void RoundOne(GenericInteractionCreateEvent event, Game game) {
+    public static void roundOne(GenericInteractionCreateEvent event, Game game) {
         if (!game.isFowMode()) {
             StringBuilder message =
                     new StringBuilder("Here are the quick reference cards for the factions in this game.");

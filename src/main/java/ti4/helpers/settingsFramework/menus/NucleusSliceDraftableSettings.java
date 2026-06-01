@@ -86,7 +86,7 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         slicePlanetCount = new IntegerRangeSetting("SlicePlanets", "Slice Planet Count", 2, 0, 7, 5, 0, 7, 1);
         nucleusValue = new IntegerRangeSetting("NucleusVal", "Nucleus Optimal Value", 4, 0, 8, 8, 3, 12, 1);
         maxNucleusQualityDifference = new IntegerSetting("MaxNucDiff", "Max Nucleus Quality Diff", 3, 0, 10, 1);
-        int minRedTiles = Math.min(20, Math.max(Math.round((11.0f / 6.0f) * players), 0));
+        int minRedTiles = Math.clamp(Math.round((11.0f / 6.0f) * players), 0, 20);
         minimumRedTiles = new IntegerSetting("MinRed", "Minimum Red Tiles", minRedTiles, 0, 20, 1);
 
         // Add extra info
@@ -302,7 +302,7 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         nucleusLegendaries.setValHigh(suggestLegendariesMax);
         totalLegendaries.setValLow(1);
         totalLegendaries.setValHigh(suggestLegendariesMax);
-        int minRedTiles = Math.min(20, Math.max(Math.round((11.0f / 6.0f) * players), 0));
+        int minRedTiles = Math.clamp(Math.round((11.0f / 6.0f) * players), 0, 20);
         minimumRedTiles.setVal(minRedTiles);
         minimumSliceRes.setVal(0);
         minimumSliceInf.setVal(0);

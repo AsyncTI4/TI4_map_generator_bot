@@ -1,9 +1,13 @@
 package ti4.service.statistics;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -28,7 +32,6 @@ public class ActionCardStatsService {
     }
 
     private static void showActionCardStats(SlashCommandInteractionEvent event) {
-        Map<String, Integer> trackedPlayCounts = new HashMap<>();
         Map<String, Integer> sabotageCounts = new HashMap<>();
         Map<String, Integer> actionCardsPlayedCounts = new HashMap<>();
         Map<String, Integer> overruleCounts = new HashMap<>();
@@ -37,36 +40,21 @@ public class ActionCardStatsService {
         ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
                 game -> accumulateActionCardStats(
-                        game,
-                        trackedPlayCounts,
-                        sabotageCounts,
-                        actionCardsPlayedCounts,
-                        overruleCounts,
-                        playToWinCorrelationCounts),
+                        game, sabotageCounts, actionCardsPlayedCounts, overruleCounts, playToWinCorrelationCounts),
                 ExecutionLockType.READ);
 
         MessageHelper.sendMessageToThread(
                 event.getChannel(),
                 "Action Card Play Statistics",
-                buildMessage(
-                        trackedPlayCounts,
-                        sabotageCounts,
-                        actionCardsPlayedCounts,
-                        overruleCounts,
-                        playToWinCorrelationCounts));
+                buildMessage(sabotageCounts, actionCardsPlayedCounts, overruleCounts, playToWinCorrelationCounts));
     }
 
     private static void accumulateActionCardStats(
             Game game,
-            Map<String, Integer> trackedPlayCounts,
             Map<String, Integer> sabotageCounts,
             Map<String, Integer> actionCardsPlayedCounts,
             Map<String, Integer> overruleCounts,
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
-        for (ActionCardPlay actionCardPlay : game.getGameStats().getActionCardPlays()) {
-            trackedPlayCounts.merge(actionCardPlay.getActionCard(), 1, Integer::sum);
-        }
-
         game.getGameStats()
                 .getCountPerTarget(GameStats.SABOTAGE)
                 .forEach((acName, count) -> sabotageCounts.merge(acName, count, Integer::sum));
@@ -76,8 +64,6 @@ public class ActionCardStatsService {
                 .forEach((scName, count) -> overruleCounts.merge(scName, count, Integer::sum));
 
         game.getDiscardActionCards()
-                .forEach((acID, ignored) -> incrementActionCardPlayCount(actionCardsPlayedCounts, acID));
-        game.getPurgedActionCards()
                 .forEach((acID, ignored) -> incrementActionCardPlayCount(actionCardsPlayedCounts, acID));
         accumulateActionCardPlayToWinCorrelation(game, playToWinCorrelationCounts);
     }
@@ -90,61 +76,68 @@ public class ActionCardStatsService {
     }
 
     private static String buildMessage(
-            Map<String, Integer> trackedPlayCounts,
             Map<String, Integer> sabotageCounts,
             Map<String, Integer> actionCardsPlayedCounts,
             Map<String, Integer> overruleCounts,
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
         StringBuilder message = new StringBuilder();
-        message.append("_We started tracking these on ")
-                .append(PLAYER_TRACKING_START_DATE)
-                .append("_\n");
-        message.append("\n**Action card plays**\n");
-        appendTrackedPlayStats(message, trackedPlayCounts);
+        message.append("\n**Action card plays and Sabotage rate**\n");
+        appendActionCardPlayAndSabotageStats(message, actionCardsPlayedCounts, sabotageCounts);
         message.append("\n**Action card play-to-win correlation**\n");
+        appendTrackingStartNote(message);
         appendPlayToWinCorrelationStats(message, playToWinCorrelationCounts);
-        message.append("**Sabotage targets**\n");
-        appendSabotageStats(message, sabotageCounts, actionCardsPlayedCounts);
         message.append("\n**Overrule targets**\n");
+        appendTrackingStartNote(message);
         appendOverruleStats(message, overruleCounts);
         return message.toString();
     }
 
-    private static void appendTrackedPlayStats(StringBuilder message, Map<String, Integer> trackedPlayCounts) {
-        if (trackedPlayCounts.isEmpty()) {
-            message.append("No tracked action card play data matched the selected filters.\n");
-            return;
-        }
-
-        trackedPlayCounts.entrySet().stream()
-                .sorted(Comparator.comparingInt((Map.Entry<String, Integer> entry) -> entry.getValue())
-                        .reversed()
-                        .thenComparing(Map.Entry::getKey))
-                .forEach(entry -> message.append("- ")
-                        .append(entry.getKey())
-                        .append(": ")
-                        .append(entry.getValue())
-                        .append('\n'));
+    private static void appendTrackingStartNote(StringBuilder message) {
+        message.append("_We started tracking these on ")
+                .append(PLAYER_TRACKING_START_DATE)
+                .append("._\n");
     }
 
-    private static void appendSabotageStats(
-            StringBuilder message, Map<String, Integer> sabotageCounts, Map<String, Integer> actionCardsPlayedCounts) {
-        if (sabotageCounts.isEmpty()) {
-            message.append("No Sabotage data matched the selected filters.\n");
+    private static void appendActionCardPlayAndSabotageStats(
+            StringBuilder message, Map<String, Integer> actionCardsPlayedCounts, Map<String, Integer> sabotageCounts) {
+        if (actionCardsPlayedCounts.isEmpty() && sabotageCounts.isEmpty()) {
+            message.append("No action card play or Sabotage data matched the selected filters.\n");
             return;
         }
 
-        sabotageCounts.entrySet().stream()
-                .sorted(Comparator.comparingInt((Map.Entry<String, Integer> entry) -> entry.getValue())
+        Set<String> actionCardNames = new HashSet<>(actionCardsPlayedCounts.keySet());
+        actionCardNames.addAll(sabotageCounts.keySet());
+
+        actionCardNames.stream()
+                .sorted(Comparator.comparingInt(
+                                (String actionCardName) -> actionCardsPlayedCounts.getOrDefault(actionCardName, 0))
                         .reversed()
-                        .thenComparing(Map.Entry::getKey))
-                .forEach(entry -> message.append("- ")
-                        .append(entry.getKey())
-                        .append(": ")
-                        .append(entry.getValue())
-                        .append(" out of ")
-                        .append(actionCardsPlayedCounts.getOrDefault(entry.getKey(), 0))
-                        .append(" times played\n"));
+                        .thenComparing(
+                                actionCardName -> sabotageCounts.getOrDefault(actionCardName, 0),
+                                Comparator.reverseOrder())
+                        .thenComparing(actionCardName -> actionCardName))
+                .forEach(actionCardName -> {
+                    int playCount = actionCardsPlayedCounts.getOrDefault(actionCardName, 0);
+                    int sabotageCount = sabotageCounts.getOrDefault(actionCardName, 0);
+                    double sabotageRate = playCount == 0 ? 0 : (double) sabotageCount / playCount;
+                    message.append("- ")
+                            .append(actionCardName)
+                            .append(": ")
+                            .append(playCount)
+                            .append(" played, ")
+                            .append(sabotageCount)
+                            .append(" Sabotaged (")
+                            .append(formatSabotageRate(sabotageRate))
+                            .append(")\n");
+                });
+    }
+
+    private static String formatSabotageRate(double sabotageRate) {
+        return BigDecimal.valueOf(sabotageRate * 100)
+                        .setScale(2, RoundingMode.HALF_UP)
+                        .stripTrailingZeros()
+                        .toPlainString()
+                + "%";
     }
 
     private static void appendOverruleStats(StringBuilder message, Map<String, Integer> overruleCounts) {

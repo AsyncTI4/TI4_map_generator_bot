@@ -2,13 +2,17 @@ package ti4.game;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Constants;
 import ti4.json.JsonMapperManager;
+import ti4.testUtils.BaseTi4Test;
 
-class GameTest {
+class GameTest extends BaseTi4Test {
 
     @Test
     void getActionPhaseTurnOrder() {
@@ -54,15 +58,75 @@ class GameTest {
         assertThat(json.get(1).has("target")).isFalse();
     }
 
+    @Test
+    void shouldTrackAllPeekablePublicObjectivesForOracle() {
+        var game = new Game();
+        var player = createPlayer("player1", Set.of(), game);
+        game.setPublicObjectives1Peekable(new ArrayList<>(List.of("po1a", "po1b")));
+        game.setPublicObjectives2Peekable(new ArrayList<>(List.of("po2a")));
+
+        game.peekAtAllUnrevealedPublicObjectives(player);
+        game.peekAtAllUnrevealedPublicObjectives(player);
+
+        assertThat(game.getPublicObjectives1Peeked())
+                .containsEntry("po1a", List.of("player1"))
+                .containsEntry("po1b", List.of("player1"));
+        assertThat(game.getPublicObjectives2Peeked()).containsEntry("po2a", List.of("player1"));
+    }
+
+    @Test
+    void shouldUnrevealStageOnePublicObjectiveAsPeekedByAllPlayers() {
+        var game = createThreePlayerGame();
+        game.setPublicObjectives1(new ArrayList<>());
+        game.setPublicObjectives2(new ArrayList<>());
+        game.setPublicObjectives1Peekable(new ArrayList<>(List.of("develop")));
+        game.setRevealedPublicObjectives(new LinkedHashMap<>(Map.of("corner", 0)));
+
+        assertThat(game.unrevealPublicObjective(0)).isTrue();
+
+        assertThat(game.getRevealedPublicObjectives()).doesNotContainKey("corner");
+        assertThat(game.getPublicObjectives1()).doesNotContain("corner");
+        assertThat(game.getPublicObjectives1Peekable()).containsExactly("corner", "develop");
+        assertThat(game.getPublicObjectives1Peeked())
+                .containsEntry("corner", List.of("hasThe2", "hasThe1", "naaluPnPlayer"));
+    }
+
+    @Test
+    void shouldUnrevealStageTwoPublicObjectiveAsPeekedByAllPlayers() {
+        var game = createThreePlayerGame();
+        game.setPublicObjectives1(new ArrayList<>());
+        game.setPublicObjectives2(new ArrayList<>());
+        game.setPublicObjectives2Peekable(new ArrayList<>(List.of("galvanize")));
+        game.setRevealedPublicObjectives(new LinkedHashMap<>(Map.of("centralize_trade", 1)));
+
+        assertThat(game.unrevealPublicObjective(1)).isTrue();
+
+        assertThat(game.getRevealedPublicObjectives()).doesNotContainKey("centralize_trade");
+        assertThat(game.getPublicObjectives2()).doesNotContain("centralize_trade");
+        assertThat(game.getPublicObjectives2Peekable()).containsExactly("centralize_trade", "galvanize");
+        assertThat(game.getPublicObjectives2Peeked())
+                .containsEntry("centralize_trade", List.of("hasThe2", "hasThe1", "naaluPnPlayer"));
+    }
+
     private Game createThreePlayerGame() {
         var game = new Game();
         game.setName("threePlayerGame");
         var naaluPnPlayer = createPlayer("naaluPnPlayer", Set.of(7, 3), game);
+        naaluPnPlayer.setFaction("naalu");
+        naaluPnPlayer.setColor("blue");
         naaluPnPlayer.addPromissoryNoteToPlayArea(Constants.NAALU_PN);
-        game.setPlayers(Map.of(
-                "hasThe2", createPlayer("hasThe2", Set.of(2, 5), game),
-                "hasThe1", createPlayer("hasThe1", Set.of(8, 1), game),
-                "naaluPnPlayer", naaluPnPlayer));
+        var hasThe2 = createPlayer("hasThe2", Set.of(2, 5), game);
+        hasThe2.setFaction("arborec");
+        hasThe2.setColor("green");
+        var hasThe1 = createPlayer("hasThe1", Set.of(8, 1), game);
+        hasThe1.setFaction("jolnar");
+        hasThe1.setColor("red");
+
+        var players = new LinkedHashMap<String, Player>();
+        players.put("hasThe2", hasThe2);
+        players.put("hasThe1", hasThe1);
+        players.put("naaluPnPlayer", naaluPnPlayer);
+        game.setPlayers(players);
         return game;
     }
 

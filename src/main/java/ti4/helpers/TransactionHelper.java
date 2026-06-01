@@ -1313,11 +1313,15 @@ public final class TransactionHelper {
 
         int p1TgAfter = p1.getTg();
         int p2TgAfter = p2.getTg();
+        boolean debtOnlyTransaction = true;
         // compute TGs after transaction is complete
         for (String item : p1.getTransactionItemsWithPlayer(p2)) {
             String[] parts = item.split("_");
             if (parts.length < 4) continue;
             String type = parts[2];
+            if (!"SendDebt".equals(type) && !"ClearDebt".equals(type)) {
+                debtOnlyTransaction = false;
+            }
             String detail = item.replace(parts[0] + "_" + parts[1] + "_" + type + "_", "");
             try {
                 if ("TGs".equals(type)) {
@@ -1340,6 +1344,7 @@ public final class TransactionHelper {
             } catch (NumberFormatException ignored) {
             }
         }
+        if (debtOnlyTransaction) return "";
 
         Map<String, List<String>> pillagersToPillaged = new LinkedHashMap<>();
         getPillagers(game, p1, p1TgAfter, pillagersToPillaged);
@@ -1348,9 +1353,9 @@ public final class TransactionHelper {
         if (pillagersToPillaged.isEmpty()) return "";
 
         StringBuilder notice = new StringBuilder();
-        notice.append("> This is a surcharge notice from ")
+        notice.append("> This is a surcharge notice from **")
                 .append(getRandomPillageSource())
-                .append(":");
+                .append("**:");
         for (Map.Entry<String, List<String>> pillagerToPillaged : pillagersToPillaged.entrySet()) {
             notice.append("\n> • ")
                     .append(MiscEmojis.tg)

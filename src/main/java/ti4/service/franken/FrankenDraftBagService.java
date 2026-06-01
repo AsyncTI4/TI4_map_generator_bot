@@ -32,9 +32,7 @@ import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
 import ti4.draft.FrankenDrazDraft;
 import ti4.draft.InauguralSpliceFrankenDraft;
-import ti4.draft.items.AgentDraftItem;
 import ti4.draft.items.FactionDraftItem;
-import ti4.draft.items.HeroDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.discord.ContainerHelper;
@@ -191,7 +189,7 @@ public class FrankenDraftBagService {
         StringBuilder sb = new StringBuilder();
         for (DraftCategory cat : DraftCategory.values()) {
             if (bag.getCategoryCount(cat) == 0) continue;
-            sb.append(cat.title(player.getGame()) + "\n");
+            sb.append(cat.title(player.getGame())).append("\n");
             for (DraftItem item : bag.Contents) {
                 if (item.getItemCategory() != cat) continue;
                 sb.append("> ").append(item.getShortDescription()).append('\n');
@@ -389,11 +387,7 @@ public class FrankenDraftBagService {
         sb.append("):\n");
         for (DraftItem item : bag.getCategory(cat)) {
             sb.append("> ").append(item.getShortDescription()).append('\n');
-            if (item instanceof AgentDraftItem || item instanceof HeroDraftItem) {
-                sb.append("> - ").append(item.getLongDescription(game)).append('\n');
-            } else {
-                sb.append("> - ").append(item.getLongDescription()).append('\n');
-            }
+            sb.append("> - ").append(item.getLongDescription(game)).append('\n');
         }
         return sb.toString();
     }
@@ -440,7 +434,7 @@ public class FrankenDraftBagService {
         List<Player> realPlayers = game.getRealPlayers();
         for (int i = 0; i < realPlayers.size(); i++) {
             Player player = realPlayers.get(i);
-            game.getActiveBagDraft().giveBagToPlayer(bags.get(i), player);
+            BagDraft.giveBagToPlayer(bags.get(i), player);
             player.resetDraftQueue();
 
             showPlayerBag(game, player);

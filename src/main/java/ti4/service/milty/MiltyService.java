@@ -260,7 +260,8 @@ public class MiltyService {
             int i = 0;
             while (output.size() < factionCount) {
                 if (i >= randomOrder.size()) return output;
-                String f = randomOrder.get(i++);
+                String f = randomOrder.get(i);
+                i++;
                 if (!output.contains(f) && factions.contains(f)) output.add(f);
             }
             return output;

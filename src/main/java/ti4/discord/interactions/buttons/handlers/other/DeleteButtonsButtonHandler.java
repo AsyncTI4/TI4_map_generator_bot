@@ -9,7 +9,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -240,6 +241,10 @@ class DeleteButtonsButtonHandler {
                 }
                 if (player.hasTechReady("absol_st")) {
                     buttons.add(Buttons.red("useTech_absol_st", "Use Sarween Tools"));
+                }
+                if (game.getRealPlayers().stream()
+                        .anyMatch(player_ -> player_.hasUnexhaustedLeader("netrunnersagent"))) {
+                    buttons.addAll(NetrunnersLeadersHandler.getOverclockButtons(game, player, tile));
                 }
                 if (player.hasUnexhaustedLeader("winnuagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)

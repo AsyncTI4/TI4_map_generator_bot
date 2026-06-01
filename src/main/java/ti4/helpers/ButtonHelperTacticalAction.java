@@ -11,7 +11,8 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -349,7 +350,10 @@ public final class ButtonHelperTacticalAction {
                 List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
                 spaceCannonButtons.add(
                         Buttons.red("declinePDS_" + tile.getTileID() + "_" + player.getFaction(), "Decline PDS"));
-                if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasAbility("control_network"))) {
+                if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasAbility("control_network"))
+                        && (game.getRealPlayers().stream().noneMatch(player_ -> player_.hasUnit("netrunners_flagship"))
+                                || !NetrunnersUnitsHandler.empBlocksSpaceCannonAgainstOpponent(
+                                        game, playerWithPds, tile, CombatRollType.SpaceCannonOffence))) {
                     spaceCannonButtons.addAll(NetrunnersAbilitiesHandler.getControlNetworkSpaceCannonButtons(
                             game, playerWithPds, tile, CombatRollType.SpaceCannonOffence, "space"));
                 }
@@ -419,8 +423,7 @@ public final class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, ringButtons);
         }
         // Offer the Dreaming Throne promissory 'Visions' buttons
-        if (player != null
-                && !"dream".equalsIgnoreCase(player.getFaction())
+        if (!"dream".equalsIgnoreCase(player.getFaction())
                 && player.getPromissoryNotes().containsKey("bepndream")) {
             DreamButtonHandler.offerVisionsPromissoryAtTacticalStart(game, player);
         }
@@ -825,10 +828,8 @@ public final class ButtonHelperTacticalAction {
         }
         if (!game.isL1Hero()
                 && !DreamButtonHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
-            for (Player dreamPlayer : game.getRealPlayers()) {
-                if (dreamPlayer.hasUnexhaustedLeader("dreamagent")) {
-                    DreamButtonHandler.offerDreamAgentButtons(game, player, dreamPlayer);
-                }
+            if (player.hasUnexhaustedLeader("dreamagent")) {
+                DreamButtonHandler.offerDreamAgentButtons(game, player, player);
             }
         }
 

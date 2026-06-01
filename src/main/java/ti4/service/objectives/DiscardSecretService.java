@@ -16,14 +16,14 @@ import ti4.service.info.SecretObjectiveInfoService;
 @UtilityClass
 public class DiscardSecretService {
 
-    public static boolean discardSO(Player player, int SOID, Game game) {
+    public static boolean discardSO(Player player, int soId, Game game) {
         String soIDString = "";
         for (Map.Entry<String, Integer> so : player.getSecrets().entrySet()) {
-            if (so.getValue().equals(SOID)) {
+            if (so.getValue().equals(soId)) {
                 soIDString = so.getKey();
             }
         }
-        boolean removed = game.discardSecretObjective(player.getUserID(), SOID);
+        boolean removed = game.discardSecretObjective(player.getUserID(), soId);
         if (!removed) {
             MessageHelper.sendMessageToPlayerCardsInfoThread(
                     player, "No such secret objective ID found, please retry.");

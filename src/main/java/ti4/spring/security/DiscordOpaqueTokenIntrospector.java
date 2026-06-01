@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.DefaultOAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
@@ -19,6 +20,7 @@ import ti4.spring.api.auth.RestDiscordClient;
 @Component
 public class DiscordOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
 
+    private static final String HTTP_ERROR_THREAD_NAME = "http-errors";
     private static final Cache<String, OAuth2AuthenticatedPrincipal> AUTH_CACHE = Caffeine.newBuilder()
             .maximumSize(1000)
             .expireAfterWrite(30, TimeUnit.MINUTES)
@@ -31,14 +33,14 @@ public class DiscordOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
     }
 
     @Override
-    public OAuth2AuthenticatedPrincipal introspect(String token) {
-
+    public @NonNull OAuth2AuthenticatedPrincipal introspect(@NonNull String token) {
         try {
             return authenticate(token);
         } catch (OAuth2AuthenticationException e) {
             throw e;
         } catch (Exception e) {
-            BotLogger.error("Error during token introspection and authentication", e);
+            String errorMessage = "Error during token introspection and authentication: " + e.getMessage();
+            BotLogger.errorToThread(errorMessage, HTTP_ERROR_THREAD_NAME);
         }
 
         throw newAuthenticationFailureException();

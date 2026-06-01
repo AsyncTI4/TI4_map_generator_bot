@@ -762,8 +762,8 @@
         "alias": "shortcut1",
         "name": "Shortcut",
         "phase": "Action",
-        "window": "After you activate a non-home system",
-        "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
+        "window": "After you activate a system",
+        "text": "Choose 1 system that does not contain another player's ships. All systems adjacent to that system are adjacent to each other during this tactical action.",
         "flavorText": "\"Oy, Captain, best ye lock in,\" the wily pilot chuckled. \"I learned this little maneuver in me scavenging days.\" Before Mendosa could protest, the ship began to groan under the strain.",
         "notes": "Think of this as letting you skip any 1 system.",
         "source": "action_deck_2"
@@ -772,8 +772,8 @@
         "alias": "shortcut2",
         "name": "Shortcut",
         "phase": "Action",
-        "window": "After you activate a non-home system",
-        "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
+        "window": "After you activate a system",
+        "text": "Choose 1 system that does not contain another player's ships. All systems adjacent to that system are adjacent to each other during this tactical action.",
         "flavorText": "Alerts flashed as they screamed ahead. \"Wait for the computer to chart, Douglas!\" Mendosa barked. The pilot laughed and pointed to his head. \"Oy, they call me Doug, sir—Deft Doug if ye like. I've got a keen eye for charting, and a good nose too.\" Then, it was dark.",
         "notes": "Think of this as letting you skip any 1 system.",
         "source": "action_deck_2"
@@ -782,8 +782,8 @@
         "alias": "shortcut3",
         "name": "Shortcut",
         "phase": "Action",
-        "window": "After you activate a non-home system",
-        "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
+        "window": "After you activate a system",
+        "text": "Choose 1 system that does not contain another player's ships. All systems adjacent to that system are adjacent to each other during this tactical action.",
         "flavorText": "The ship's power flickered off, but the strain remained. The pilot had flung them into the void, trusting his intuition, and Mendosa was not eager to discover what awaited them on the other end.",
         "notes": "Think of this as letting you skip any 1 system.",
         "source": "action_deck_2"
@@ -792,8 +792,8 @@
         "alias": "shortcut4",
         "name": "Shortcut",
         "phase": "Action",
-        "window": "After you activate a non-home system",
-        "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
+        "window": "After you activate a system",
+        "text": "Choose 1 system that does not contain another player's ships. All systems adjacent to that system are adjacent to each other during this tactical action.",
         "flavorText": "Somehow they were alive and ahead of schedule. Deft Doug's hoots turned to yowls as Mendosa rapped him on the head. \"Better to call ye Deaf Doug. Ye won't be 'eyeballing' our routes ever again!\"",
         "notes": "Think of this as letting you skip any 1 system.",
         "source": "action_deck_2"

@@ -132,7 +132,7 @@
         "requirements": "Y",
         "faction": "netrunners",
         "source": "beans",
-        "text": "At the start of the status phase, gain 1 trade good for every 2 control tokens on your faction sheet."
+        "text": "At the start of the status phase, gain 1 trade good for every 2 other player's control tokens on your faction sheet."
     },
     {
         "alias": "benetrunnerssd",

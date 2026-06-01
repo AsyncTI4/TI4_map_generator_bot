@@ -835,15 +835,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     @Override
     public Map<String, Integer> getPlotCards() {
-        Map<String, Integer> plots = new LinkedHashMap<>();
-        for (String plot : getPlotCardsRaw().keySet()) {
-            if (plot.startsWith("mutated")) {
-                String other = plot.replace("mutated_", "");
-                if (getPlotCardsRaw().containsKey(other)) continue;
-            }
-            plots.put(plot, getPlotCardsRaw().get(plot));
-        }
-        return MapUtils.unmodifiableMap(plots);
+        return MapUtils.unmodifiableMap(new LinkedHashMap<>(getPlotCardsRaw()));
     }
 
     public Map<String, List<String>> getPlotCardsFactionsRaw() {
@@ -853,7 +845,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     @Override
     public Map<String, List<String>> getPlotCardsFactions() {
         Map<String, List<String>> plots = new LinkedHashMap<>();
-        for (String plot : getPlotCards().keySet()) {
+        for (String plot : getPlotCardsRaw().keySet()) {
             List<String> puppets = getPlotCardsFactionsRaw().get(plot);
             if (puppets == null) puppets = List.of();
             plots.put(plot, puppets);
@@ -1532,12 +1524,17 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         User userById = getUser();
         if (userById == null) return super.getUserName();
 
-        Member member = JdaService.guildPrimary.getMemberById(getUserID());
+        Member member = getMember();
         if (member == null) {
-            setUserName(userById.getName());
-        } else {
-            setUserName(member.getEffectiveName());
+            member = JdaService.guildPrimary.getMemberById(getUserID());
         }
+
+        if (member != null) {
+            setUserName(member.getEffectiveName());
+        } else {
+            setUserName(userById.getName());
+        }
+
         return super.getUserName();
     }
 
@@ -2005,7 +2002,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public int getEffectiveFleetCC() {
-        return getFleetCC() + getMahactCC().size();
+        return getFleetCC()
+                + ((hasAbility("edict") || hasAbility("edict_y"))
+                        ? getMahactCC().size()
+                        : 0);
     }
 
     @Override
@@ -2112,11 +2112,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 ThreadChannel chan = ButtonHelper.getRightStratThread(
                         game, ButtonHelper.getStratName(ButtonHelper.getStratName(sc), game));
                 if (chan != null) {
-                    chan.retrieveMessageById(gameMessage.messageId()).queue(mainMessage -> {
-                        mainMessage
-                                .editMessage(PlayStrategyCardService.getSCFollowSummary(game, sc))
-                                .queue();
-                    });
+                    chan.retrieveMessageById(gameMessage.messageId()).queue(mainMessage -> mainMessage
+                            .editMessage(PlayStrategyCardService.getSCFollowSummary(game, sc))
+                            .queue());
                 }
             }
         }
@@ -3224,7 +3222,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 .toList();
     }
 
-    private TextDisplay getComponentsTextDisplay(String title, List<String> descrs) {
+    private static TextDisplay getComponentsTextDisplay(String title, List<String> descrs) {
         if (descrs.isEmpty()) {
             return TextDisplay.of(title + "\n> -none-");
         } else {

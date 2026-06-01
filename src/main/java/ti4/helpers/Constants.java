@@ -839,6 +839,7 @@ public final class Constants {
     public static final String REVEAL_STAGE2 = "po_reveal_stage2";
     public static final String SCORE_OBJECTIVE = "po_score";
     public static final String UNSCORE_OBJECTIVE = "po_unscore";
+    public static final String UNREVEAL_OBJECTIVE = "po_unreveal";
     public static final String SHUFFLE_OBJECTIVE_BACK = "po_shuffle_back";
     public static final String PO_ID = "public_id";
     public static final String PO_NAME = "public_name";
@@ -1070,6 +1071,7 @@ public final class Constants {
     public static final String MILTY_DRAFT_SETTINGS = "milty_draft_settings";
     public static final String DRAFT_MANAGER = "draft_manager";
     public static final String DRAFT_SYSTEM_SETTINGS = "draft_system_settings";
+    public static final String FRANKEN_DRAFT_SETTINGS = "franken_draft_settings";
     public static final String DRAFT = "draft";
 
     // groups
@@ -1273,6 +1275,8 @@ public final class Constants {
     public static final String NO_SWAP_MODE = "no_swap_mode";
     public static final String VEILED_HEART_MODE = "veiled_heart_mode";
     public static final String LIMITED_WHISPERS_MODE = "limited_whispers_mode";
+    public static final String WHISPERS_ENABLED = "whispers_enabled";
+    public static final String WHISPERS_DISABLED = "whispers_disabled";
     public static final String ORDINIAN_C1_MODE = "ordinian_c1_mode";
     public static final String LIBERATION_C4_MODE = "liberation_c4_mode";
     public static final String FAKE_COMMANDERS = "fake_commanders";

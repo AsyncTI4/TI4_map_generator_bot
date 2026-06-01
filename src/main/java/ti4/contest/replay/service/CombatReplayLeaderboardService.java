@@ -478,7 +478,8 @@ public class CombatReplayLeaderboardService {
         return "**" + (candidate.getWinnerFaction() == null ? "Unknown" : candidate.getWinnerFaction()) + "**";
     }
 
-    private void postParticipantFollowup(Game game, CombatCandidateEntity candidate, MessageChannel threadOrChannel) {
+    private static void postParticipantFollowup(
+            Game game, CombatCandidateEntity candidate, MessageChannel threadOrChannel) {
         if (game == null) return;
         Player attacker = game.getPlayerFromColorOrFaction(candidate.getAttackerFaction());
         Player defender = game.getPlayerFromColorOrFaction(candidate.getDefenderFaction());
@@ -491,7 +492,7 @@ public class CombatReplayLeaderboardService {
         MessageHelper.sendMessageToChannel(threadOrChannel, message);
     }
 
-    private void postSubscriptionPrompt(MessageChannel threadOrChannel) {
+    private static void postSubscriptionPrompt(MessageChannel threadOrChannel) {
         String message = "Did you like this? React " + SUBSCRIBE_EMOJI
                 + " to subscribe to more, " + UNSUBSCRIBE_EMOJI
                 + " to opt out if already subscribed.\n"
@@ -550,7 +551,7 @@ public class CombatReplayLeaderboardService {
         return userName.replace("@", "@\u200B");
     }
 
-    private String writeLockedPredictions(List<LockedPrediction> predictions) {
+    private static String writeLockedPredictions(List<LockedPrediction> predictions) {
         try {
             return JsonMapperManager.basic().writeValueAsString(predictions);
         } catch (Exception e) {
@@ -558,7 +559,7 @@ public class CombatReplayLeaderboardService {
         }
     }
 
-    private Set<String> retainPredictedUserIds(List<LockedPrediction> predictions, Set<String> userIds) {
+    private static Set<String> retainPredictedUserIds(List<LockedPrediction> predictions, Set<String> userIds) {
         if (predictions == null || predictions.isEmpty() || userIds == null || userIds.isEmpty()) return Set.of();
         Set<String> retained = new HashSet<>();
         for (LockedPrediction prediction : predictions) {
@@ -569,7 +570,7 @@ public class CombatReplayLeaderboardService {
         return retained;
     }
 
-    private String writeStringSet(Set<String> values) {
+    private static String writeStringSet(Set<String> values) {
         try {
             return JsonMapperManager.basic().writeValueAsString(values == null ? Set.of() : values);
         } catch (Exception e) {
@@ -577,7 +578,7 @@ public class CombatReplayLeaderboardService {
         }
     }
 
-    private List<LockedPrediction> readLockedPredictions(String predictionsJson) {
+    private static List<LockedPrediction> readLockedPredictions(String predictionsJson) {
         if (predictionsJson == null || predictionsJson.isBlank()) return List.of();
         try {
             return JsonMapperManager.basic()
@@ -588,7 +589,7 @@ public class CombatReplayLeaderboardService {
         }
     }
 
-    private Set<String> readStringSet(String valuesJson) {
+    private static Set<String> readStringSet(String valuesJson) {
         if (valuesJson == null || valuesJson.isBlank()) return Set.of();
         try {
             return new HashSet<>(
@@ -598,7 +599,7 @@ public class CombatReplayLeaderboardService {
         }
     }
 
-    private List<AggregatedSideBetSummary> aggregateSideBetSummaries(List<ResolvedSideBet> resolvedSideBets) {
+    private static List<AggregatedSideBetSummary> aggregateSideBetSummaries(List<ResolvedSideBet> resolvedSideBets) {
         record SideBetKey(String discordUserId, String discordUserName, String label) {}
 
         Map<SideBetKey, AggregatedSideBetSummary> summariesByKey = new LinkedHashMap<>();
@@ -624,7 +625,7 @@ public class CombatReplayLeaderboardService {
         return new ArrayList<>(summariesByKey.values());
     }
 
-    private int safeInt(Integer value) {
+    private static int safeInt(Integer value) {
         return value == null ? 0 : value;
     }
 

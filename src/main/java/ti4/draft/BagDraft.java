@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
@@ -92,7 +91,7 @@ public abstract class BagDraft {
         giveBagToPlayer(firstPlayerBag, players.getLast());
     }
 
-    public void giveBagToPlayer(DraftBag bag, Player player) {
+    public static void giveBagToPlayer(DraftBag bag, Player player) {
         player.setCurrentDraftBag(bag);
         boolean newBagCanBeDraftedFrom = false;
         for (DraftItem item : bag.Contents) {
@@ -141,11 +140,11 @@ public abstract class BagDraft {
         return owner.getRealPlayers().stream().allMatch(Player::isReadyToPassBag);
     }
 
-    public boolean playerHasDraftableItemInBag(Player player) {
+    public static boolean playerHasDraftableItemInBag(Player player) {
         return player.getCurrentDraftBag().Contents.stream().anyMatch(draftItem -> draftItem.isDraftable(player));
     }
 
-    private List<DraftItem> draftableItemsInBag(Player player) {
+    private static List<DraftItem> draftableItemsInBag(Player player) {
         return new ArrayList<>(player.getCurrentDraftBag().Contents.stream()
                 .filter(draftItem -> draftItem.isDraftable(player))
                 .toList());
@@ -216,7 +215,7 @@ public abstract class BagDraft {
         if (owner.getName().contains("pbd100") || owner.getName().contains("pbd500")) {
             isPrivateChannel = true;
         }
-        ThreadChannelAction threadAction = ((IThreadContainer) player.getCorrectChannel())
+        ThreadChannelAction threadAction = player.getCorrectChannel()
                 .createThreadChannel(getBagChannelThreadName(player), isPrivateChannel)
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
         if (isPrivateChannel) {
@@ -230,11 +229,10 @@ public abstract class BagDraft {
     }
 
     private String getBagChannelThreadName(Player player) {
-        String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-"
-                + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("");
+        String fowardSlash = FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("");
+        String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-" + fowardSlash;
         if (owner.isFowMode()) {
-            threadName = owner.getName() + "-" + "bag-info-"
-                    + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("") + "-private";
+            threadName = owner.getName() + "-" + "bag-info-" + fowardSlash + "-private";
         }
         return threadName;
     }
@@ -244,8 +242,8 @@ public abstract class BagDraft {
         return findExistingBagChannel(player, threadName);
     }
 
-    private ThreadChannel findExistingBagChannel(Player player, String threadName) {
-        TextChannel actionsChannel = (TextChannel) player.getCorrectChannel();
+    private static ThreadChannel findExistingBagChannel(Player player, String threadName) {
+        TextChannel actionsChannel = player.getCorrectChannel();
         // ATTEMPT TO FIND BY ID
         String bagInfoThread = player.getBagInfoThreadID();
         try {
@@ -318,7 +316,7 @@ public abstract class BagDraft {
         return null;
     }
 
-    public boolean playerHasItemInQueue(Player p) {
+    public static boolean playerHasItemInQueue(Player p) {
         return !p.getDraftQueue().Contents.isEmpty();
     }
 
