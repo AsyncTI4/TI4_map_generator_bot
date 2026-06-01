@@ -1342,6 +1342,12 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("hidden_initiatives".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.factionButtonChecker() + "resolveHiddenInitiatives", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("refugees".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveRefugees", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
