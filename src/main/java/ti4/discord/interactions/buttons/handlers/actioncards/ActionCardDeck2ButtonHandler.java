@@ -35,7 +35,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.RelicHelper;
 import ti4.helpers.UnusedCommanderHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -2080,7 +2079,7 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveBlackMarketRaid(Player player, Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
         int totalFragments = player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf();
-        int commandSheetTokens = player.getTacticalCC() + player.getStrategicCC();
+        int commandSheetTokens = player.getTacticalCC() + player.getStrategicCC() + player.getFleetCC();
         List<Button> buttons = new ArrayList<>();
         for (int fragsToPurge = 0; fragsToPurge <= Math.min(totalFragments, 3); fragsToPurge++) {
             int tokenCost = 3 - fragsToPurge;
@@ -2147,24 +2146,24 @@ class ActionCardDeck2ButtonHandler {
                     .append(" relic fragment")
                     .append(purged == 1 ? "" : "s");
         }
-
-        // Spend command tokens (tactic first, then strategy)
-        int tokenCost = 3 - fragsToPurge;
-        if (tokenCost > 0) {
-            int tacticSpend = Math.min(tokenCost, player.getTacticalCC());
-            int stratSpend = tokenCost - tacticSpend;
-            player.setTacticalCC(player.getTacticalCC() - tacticSpend);
-            player.setStrategicCC(player.getStrategicCC() - stratSpend);
-            resolveMsg
-                    .append(" and spending ")
-                    .append(tokenCost)
-                    .append(" command token")
-                    .append(tokenCost == 1 ? "" : "s");
-        }
-        resolveMsg.append(" to gain a relic.");
+        resolveMsg.append(".");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), resolveMsg.toString());
 
-        // Draw relic
-        RelicHelper.drawRelicAndNotify(player, event, game);
+        // Prompt player to manually remove command tokens if needed
+        int tokenCost = 3 - fragsToPurge;
+        if (tokenCost > 0) {
+            String tokenMsg = player.getRepresentationUnfogged() + ", you need to remove "
+                    + tokenCost + " command token" + (tokenCost == 1 ? "" : "s")
+                    + " from your tactic, strategy, or fleet pool. Your current tokens are "
+                    + player.getCCRepresentation() + ".";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), tokenMsg, ButtonHelper.getLoseCCButtons(player));
+        }
+
+        // Give a button to draw the relic rather than drawing it automatically
+        MessageHelper.sendMessageToChannelWithButton(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", use the button to draw a relic.",
+                Buttons.green(player.factionButtonChecker() + "drawRelic", "Draw Relic"));
     }
 }
