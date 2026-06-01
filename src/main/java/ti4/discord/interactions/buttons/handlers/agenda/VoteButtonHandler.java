@@ -100,6 +100,11 @@ public class VoteButtonHandler {
             } else {
                 outcomeActionRow = getLawOutcomeButtons(game, null, "outcome");
             }
+            if (!game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
+                MessageHelper.sendEphemeralMessageToEventChannel(
+                        event,
+                        "**Reminder: _Checks and Balances_ has resolved \"Against\" — you will only be able to ready 3 planets at the end of this agenda phase.**");
+            }
             ButtonHelper.deleteMessage(event);
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getChannel(),

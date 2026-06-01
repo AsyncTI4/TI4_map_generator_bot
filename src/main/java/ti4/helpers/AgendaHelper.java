@@ -992,6 +992,10 @@ public final class AgendaHelper {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
         }
 
+        if (!game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
+            msg +=
+                    " **Reminder: _Checks and Balances_ has resolved \"Against\" — you will only be able to ready 3 planets at the end of this agenda phase.**";
+        }
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
