@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -145,9 +145,8 @@ public class WhisperService {
         }
 
         String messageLowerCase = messageText.toLowerCase();
-        String receivingColorOrFaction =
-                PATTERN.matcher(StringUtils.substringBetween(messageLowerCase, "to", " "))
-                        .replaceAll("");
+        String receivingColorOrFaction = PATTERN.matcher(StringUtils.substringBetween(messageLowerCase, "to", " "))
+                .replaceAll("");
 
         if ("futureme".equals(receivingColorOrFaction)) {
             String messageContent = StringUtils.substringAfter(messageText, " ");
@@ -211,19 +210,24 @@ public class WhisperService {
             Game game, String messageContent, Player sender, Player receiver, MessageChannel messageChannel) {
         String futureMsgKey = "futureMessageFor_" + receiver.getFaction() + "_" + sender.getFaction();
         game.setStoredValue(futureMsgKey, game.getStoredValue(futureMsgKey) + "\n\n" + messageContent);
-        MessageHelper.sendMessageToChannel(messageChannel, sender.getFactionEmoji() + " sent someone else a future message");
+        MessageHelper.sendMessageToChannel(
+                messageChannel, sender.getFactionEmoji() + " sent someone else a future message");
         MessageHelper.sendMessageToPlayerCardsInfoThread(
-                sender, "You sent a future message to " + receiver.getRepresentationNoPing() + ":\n>>> " + messageContent);
+                sender,
+                "You sent a future message to " + receiver.getRepresentationNoPing() + ":\n>>> " + messageContent);
     }
 
-    public static void whisperToFutureMe(Game game, Player player, String messageContent, MessageChannel messageChannel) {
+    public static void whisperToFutureMe(
+            Game game, Player player, String messageContent, MessageChannel messageChannel) {
         String previousThoughts = "";
         if (!game.getStoredValue("futureMessageFor" + player.getFaction()).isEmpty()) {
             previousThoughts = game.getStoredValue("futureMessageFor" + player.getFaction()) + "\n\n";
         }
         game.setStoredValue("futureMessageFor" + player.getFaction(), previousThoughts + messageContent);
-        MessageHelper.sendMessageToChannel(messageChannel, player.getFactionEmoji() + " sent themselves a future message");
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, "You sent yourself a future message:\n>>> " + messageContent);
+        MessageHelper.sendMessageToChannel(
+                messageChannel, player.getFactionEmoji() + " sent themselves a future message");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(
+                player, "You sent yourself a future message:\n>>> " + messageContent);
     }
 
     private static Player getPlayer(MessageReceivedEvent event, Game game) {

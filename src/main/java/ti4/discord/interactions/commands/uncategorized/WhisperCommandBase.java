@@ -52,7 +52,8 @@ abstract class WhisperCommandBase extends GameStateCommand {
         }
 
         Game game = getGame();
-        String to = event.getOption(Constants.TO, "", OptionMapping::getAsString).toLowerCase();
+        String to =
+                event.getOption(Constants.TO, "", OptionMapping::getAsString).toLowerCase();
         Player receiver = WhisperService.getPlayerByColorOrFaction(game, to);
         if (receiver == null) {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "Player not found: " + to);
