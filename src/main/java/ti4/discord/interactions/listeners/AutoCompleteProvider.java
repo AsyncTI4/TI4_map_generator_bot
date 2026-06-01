@@ -925,7 +925,7 @@ class AutoCompleteProvider {
                         .toList();
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
-            case Constants.FACTION_COLOR, Constants.TARGET_FACTION_OR_COLOR -> {
+            case Constants.FACTION_COLOR, Constants.TARGET_FACTION_OR_COLOR, Constants.TO -> {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();

@@ -1,8 +1,6 @@
 package ti4.discord.interactions.listeners;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
@@ -19,10 +17,8 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.async.RoundSummaryHelper;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
@@ -37,8 +33,6 @@ import ti4.spring.service.messagecache.SavedBotMessagesService;
 class MessageListener extends ListenerAdapter {
 
     private static final int EXECUTION_TIME_WARNING_THRESHOLD_SECONDS = 1;
-    private static final Pattern FUTURE = Pattern.compile("future");
-    private static final Pattern PATTERN = Pattern.compile("[^a-zA-Z0-9]+$");
     // The mention itself is 23 characters long
     private static final int BOTHELPER_MENTION_REMINDER_MESSAGE_LENGTH_THRESHOLD = 53;
     private static final String BOTHELPER_MENTION_REMINDER_TEXT = """
@@ -90,7 +84,7 @@ class MessageListener extends ListenerAdapter {
                 reportInterestingMessages(message);
 
                 if (isValidGameMessage) {
-                    if (handleWhispers(event, message, gameName)) return;
+                    if (WhisperService.handleWhispers(event, message, gameName)) return;
                     if (endOfRoundSummary(event, message, gameName)) return;
                     if (addFactionEmojiReactionsToMessages(event, gameName)) return;
                 }
@@ -198,123 +192,6 @@ class MessageListener extends ListenerAdapter {
                 game,
                 "End of round summary."); // TODO: We should be locking since we're saving. Convert to ListenerContext?
         return true;
-    }
-
-    private static boolean handleWhispers(MessageReceivedEvent event, Message message, String gameName) {
-        if (message.getContentRaw().contains("used /fow whisper")) {
-            message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        }
-
-        String messageText = message.getContentRaw();
-        if (!messageText.toLowerCase().startsWith("to") || !messageText.contains(" ")) {
-            return false;
-        }
-
-        Game game = GameManager.getManagedGame(gameName).getGame();
-        if (game == null) {
-            return true;
-        }
-
-        // Prevent whispers from fow combat threads
-        if (game.isFowMode()
-                && event.getChannel() instanceof ThreadChannel
-                && event.getChannel().getName().contains("vs")
-                && event.getChannel().getName().contains("private")) {
-            return false;
-        }
-
-        Player sender = getPlayer(event, game);
-        if (sender == null || !sender.isRealPlayer()) {
-            return true;
-        }
-
-        String messageLowerCase = messageText.toLowerCase();
-        String receivingColorOrFaction = PATTERN.matcher(StringUtils.substringBetween(messageLowerCase, "to", " "))
-                .replaceAll("");
-
-        if ("futureme".equals(receivingColorOrFaction)) {
-            whisperToFutureMe(event, game, sender);
-            GameManager.save(
-                    game,
-                    "Whisper to future by " + sender.getUserName()); // TODO: We should be locking since we're saving
-            return true;
-        }
-
-        boolean future = receivingColorOrFaction.startsWith("future");
-        receivingColorOrFaction = FUTURE.matcher(receivingColorOrFaction).replaceFirst("");
-        if (receivingColorOrFaction.isEmpty()) {
-            return true;
-        }
-
-        receivingColorOrFaction = AliasHandler.resolveFaction(receivingColorOrFaction);
-        if (!Mapper.isValidColor(receivingColorOrFaction) && !Mapper.isValidFaction(receivingColorOrFaction)) {
-            return true;
-        }
-
-        if (game.isWhispersDisabled()) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "Whispers are disabled in this game. To reenable them, use `/game setup whispers_enabled:true`.");
-            message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
-            return true;
-        }
-
-        String messageContent = StringUtils.substringAfter(messageText, " ");
-        if (messageContent.isEmpty()) {
-            message.reply("No message content?").queue(Consumers.nop(), BotLogger::catchRestError);
-            return true;
-        }
-
-        Player receiver = null;
-        for (Player player : game.getRealPlayers()) {
-            if (Objects.equals(receivingColorOrFaction, player.getFaction())
-                    || Objects.equals(receivingColorOrFaction, player.getColor())) {
-                receiver = player;
-                break;
-            }
-        }
-
-        if (receiver == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found: " + receivingColorOrFaction);
-            return true;
-        }
-
-        if (future) {
-            whisperToFutureColorOrFaction(event, game, messageContent, sender, receiver);
-        } else {
-            WhisperService.sendWhisper(
-                    game, sender, receiver, messageContent, "n", event.getChannel(), event.getGuild());
-            message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        }
-        GameManager.save(game, "Whisper"); // TODO: We should be locking since we're saving
-        return true;
-    }
-
-    private static void whisperToFutureColorOrFaction(
-            MessageReceivedEvent event, Game game, String messageContent, Player sender, Player receiver) {
-        String futureMsgKey = "futureMessageFor_" + receiver.getFaction() + "_" + sender.getFaction();
-        game.setStoredValue(futureMsgKey, game.getStoredValue(futureMsgKey) + "\n\n" + messageContent);
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(), sender.getFactionEmoji() + " sent someone else a future message");
-        MessageHelper.sendMessageToPlayerCardsInfoThread(
-                sender,
-                "You sent a future message to " + receiver.getRepresentationNoPing() + ":\n>>> " + messageContent);
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
-    private static void whisperToFutureMe(MessageReceivedEvent event, Game game, Player player) {
-        String messageContent = StringUtils.substringAfter(event.getMessage().getContentRaw(), " ");
-
-        String previousThoughts = "";
-        if (!game.getStoredValue("futureMessageFor" + player.getFaction()).isEmpty()) {
-            previousThoughts = game.getStoredValue("futureMessageFor" + player.getFaction()) + "\n\n";
-        }
-        game.setStoredValue("futureMessageFor" + player.getFaction(), previousThoughts + messageContent);
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(), player.getFactionEmoji() + " sent themselves a future message");
-        MessageHelper.sendMessageToPlayerCardsInfoThread(
-                player, "You sent yourself a future message:\n>>> " + messageContent);
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static boolean addFactionEmojiReactionsToMessages(MessageReceivedEvent event, String gameName) {
