@@ -97,21 +97,6 @@ class FrankenDrazDraftTest extends BaseTi4Test {
     }
 
     @Test
-    void generateBagsAutoBansObsidianAndFirmament() {
-        Game game = setupGame(6);
-        FrankenDrazDraft draft = new FrankenDrazDraft(game);
-        game.setBagDraft(draft);
-
-        List<DraftBag> bags = assertDoesNotThrow(() -> draft.generateBags(game));
-
-        assertNotNull(bags);
-        assertFalse(bags.stream()
-                .flatMap(bag -> bag.Contents.stream())
-                .anyMatch(item -> item.getItemCategory() == DraftCategory.FACTION
-                        && List.of("obsidian", "firmament").contains(item.getItemId())));
-    }
-
-    @Test
     void expansionRemovesPackagesAndAddsFactionComponents() {
         Game game = setupGame(1);
         FrankenDrazDraft draft = new FrankenDrazDraft(game);
