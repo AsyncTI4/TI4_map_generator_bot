@@ -642,7 +642,7 @@ public class StartTurnService {
                 String label = (player == nomad ? "Use" : "Use/Request") + " Thunder's Paradox";
                 startButtons.add(Buttons.gray("startThundersParadox", label, FactionEmojis.Nomad));
             }
-            if (player.hasTech("parasite-obs") || player.hasTech("tf-neuralparasite")) {
+            if ((player.hasTech("parasite-obs") && !game.isFrankenGame()) || player.hasTech("tf-neuralparasite")) {
                 if (!TeHelperTechs.neuralParasiteButtons(game, player).isEmpty()) {
                     startButtons.add(Buttons.gray(
                             "startNeuralParasite", "Use Neural Parasite (Mandatory)", FactionEmojis.Obsidian));

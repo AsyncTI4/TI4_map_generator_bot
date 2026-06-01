@@ -835,15 +835,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     @Override
     public Map<String, Integer> getPlotCards() {
-        Map<String, Integer> plots = new LinkedHashMap<>();
-        for (String plot : getPlotCardsRaw().keySet()) {
-            if (plot.startsWith("mutated")) {
-                String other = plot.replace("mutated_", "");
-                if (getPlotCardsRaw().containsKey(other)) continue;
-            }
-            plots.put(plot, getPlotCardsRaw().get(plot));
-        }
-        return MapUtils.unmodifiableMap(plots);
+        return MapUtils.unmodifiableMap(new LinkedHashMap<>(getPlotCardsRaw()));
     }
 
     public Map<String, List<String>> getPlotCardsFactionsRaw() {
@@ -853,7 +845,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     @Override
     public Map<String, List<String>> getPlotCardsFactions() {
         Map<String, List<String>> plots = new LinkedHashMap<>();
-        for (String plot : getPlotCards().keySet()) {
+        for (String plot : getPlotCardsRaw().keySet()) {
             List<String> puppets = getPlotCardsFactionsRaw().get(plot);
             if (puppets == null) puppets = List.of();
             plots.put(plot, puppets);
