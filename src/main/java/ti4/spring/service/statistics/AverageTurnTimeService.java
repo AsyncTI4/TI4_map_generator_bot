@@ -45,7 +45,9 @@ public class AverageTurnTimeService {
 
         String result = toResultString(sortedResults);
 
-        MessageHelper.sendMessageToThread(event.getChannel(), "Average Turn Time", result);
+        if (topLimit < 2000) {
+            MessageHelper.sendMessageToThread(event.getChannel(), "Average Turn Time", result);
+        }
 
         int times = 3;
 
