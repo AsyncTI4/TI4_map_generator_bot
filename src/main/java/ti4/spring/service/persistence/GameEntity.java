@@ -76,6 +76,9 @@ public class GameEntity {
     @Column(name = "player_count")
     private int playerCount;
 
+    @Column(name = "has_winner")
+    private boolean hasWinner;
+
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<PlayerEntity> players = new ArrayList<>();
 

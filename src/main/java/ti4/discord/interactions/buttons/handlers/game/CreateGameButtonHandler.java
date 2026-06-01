@@ -241,7 +241,7 @@ public class CreateGameButtonHandler {
                             member.getUser().getId());
             if (!threeFastestDays.isEmpty()) {
                 memberList.append(" (");
-                for (int i = 0; i < threeFastestDays.size(); i++) {
+                for (int i = 0; i < threeFastestDays.size() && i < 3; i++) {
                     memberList.append("`").append(threeFastestDays.get(i)).append("`");
                     if (i != threeFastestDays.size() - 1) memberList.append(", ");
                 }

@@ -26,12 +26,13 @@ public class UserGameInfoService {
         return playerEntityRepository.findAllWithGamesByUserIdEquals(userId).stream()
                 .map(PlayerEntity::getGame)
                 .filter(game -> game.getPlayerCount() == 6)
+                .filter(game -> game.isHasWinner())
                 .map(game ->
                         (int) Duration.ofMillis(game.getEndedEpochMilliseconds() - game.getCreationEpochMilliseconds())
                                 .toDays())
                 .filter(days -> days > 0)
                 .sorted()
-                .limit(3)
+                .limit(5)
                 .toList();
     }
 
