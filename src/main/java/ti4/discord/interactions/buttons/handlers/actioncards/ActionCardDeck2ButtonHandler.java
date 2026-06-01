@@ -35,6 +35,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RelicHelper;
 import ti4.helpers.UnusedCommanderHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -2073,5 +2074,97 @@ class ActionCardDeck2ButtonHandler {
     public static void amendmentRevealStage2(Player player, Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
         RevealPublicObjectiveService.revealS2(game, event);
+    }
+
+    @ButtonHandler("resolveBlackMarketRaid")
+    public static void resolveBlackMarketRaid(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        int totalFragments = player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf();
+        int commandSheetTokens = player.getTacticalCC() + player.getStrategicCC();
+        List<Button> buttons = new ArrayList<>();
+        for (int fragsToPurge = 0; fragsToPurge <= Math.min(totalFragments, 3); fragsToPurge++) {
+            int tokenCost = 3 - fragsToPurge;
+            if (commandSheetTokens < tokenCost) {
+                continue;
+            }
+            String label = fragsToPurge == 0
+                    ? "Spend 3 command tokens (purge 0 fragments)"
+                    : "Purge " + fragsToPurge + " fragment" + (fragsToPurge == 1 ? "" : "s") + " (spend " + tokenCost
+                            + " command token" + (tokenCost == 1 ? "" : "s") + ")";
+            buttons.add(Buttons.green("resolveBlackMarketRaidStep2_" + fragsToPurge, label));
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " cannot resolve _Black Market Raid_: not enough command tokens or relic fragments.");
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", choose how many relic fragments to purge for _Black Market Raid_.",
+                buttons);
+    }
+
+    @ButtonHandler("resolveBlackMarketRaidStep2_")
+    public static void resolveBlackMarketRaidStep2(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        int fragsToPurge;
+        try {
+            fragsToPurge = Integer.parseInt(buttonID.replace("resolveBlackMarketRaidStep2_", ""));
+        } catch (NumberFormatException e) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Black Market Raid_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        ButtonHelper.deleteMessage(event);
+
+        // Purge relic fragments
+        StringBuilder resolveMsg = new StringBuilder(player.getRepresentationUnfogged());
+        resolveMsg.append(" resolved _Black Market Raid_");
+        if (fragsToPurge > 0) {
+            List<String> fragments = new ArrayList<>(player.getFragments());
+            int purged = 0;
+            StringBuilder fragMsg = new StringBuilder();
+            for (String fragId : fragments) {
+                if (purged >= fragsToPurge) break;
+                player.removeFragment(fragId);
+                game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+                String emoji =
+                        switch (Mapper.getExplore(fragId).getType().toLowerCase()) {
+                            case "cultural" -> ExploreEmojis.CFrag.toString();
+                            case "industrial" -> ExploreEmojis.IFrag.toString();
+                            case "hazardous" -> ExploreEmojis.HFrag.toString();
+                            default -> ExploreEmojis.UFrag.toString();
+                        };
+                fragMsg.append(emoji);
+                purged++;
+            }
+            resolveMsg
+                    .append(", purging ")
+                    .append(fragMsg)
+                    .append(" relic fragment")
+                    .append(purged == 1 ? "" : "s");
+        }
+
+        // Spend command tokens (tactic first, then strategy)
+        int tokenCost = 3 - fragsToPurge;
+        if (tokenCost > 0) {
+            int tacticSpend = Math.min(tokenCost, player.getTacticalCC());
+            int stratSpend = tokenCost - tacticSpend;
+            player.setTacticalCC(player.getTacticalCC() - tacticSpend);
+            player.setStrategicCC(player.getStrategicCC() - stratSpend);
+            resolveMsg
+                    .append(" and spending ")
+                    .append(tokenCost)
+                    .append(" command token")
+                    .append(tokenCost == 1 ? "" : "s");
+        }
+        resolveMsg.append(" to gain a relic.");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), resolveMsg.toString());
+
+        // Draw relic
+        RelicHelper.drawRelicAndNotify(player, event, game);
     }
 }
