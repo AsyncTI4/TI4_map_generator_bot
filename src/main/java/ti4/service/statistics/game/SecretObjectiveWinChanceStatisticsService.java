@@ -15,6 +15,7 @@ import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.ConsumeGameUtility;
+import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
@@ -323,7 +324,7 @@ class SecretObjectiveWinChanceStatisticsService {
         }
         List<String> segments = new java.util.ArrayList<>();
         if (actionCount > 0) {
-            segments.add(actionCount + " action" + (actionCount == 1 ? "" : "s"));
+            segments.add(StringHelper.pluralize(actionCount, "action"));
         }
         if (statusCount > 0) {
             segments.add(statusCount + " " + formatStatusSecretLabel(statusCount));

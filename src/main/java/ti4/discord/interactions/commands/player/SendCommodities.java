@@ -12,6 +12,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.TransactionHelper;
 import ti4.message.MessageHelper;
 
@@ -81,9 +82,9 @@ class SendCommodities extends GameStateSubcommand {
             targetPlayer.clearDebt(player, sendCommodities);
             MessageHelper.sendMessageToEventChannel(
                     event,
-                    targetPlayer.getRepresentation() + " cleared " + sendCommodities + " debt token"
-                            + (sendCommodities == 1 ? "" : "s") + " owned by " + player.getRepresentation()
-                            + ", from their \"Debt Account\" pool.");
+                    targetPlayer.getRepresentation() + " cleared "
+                            + StringHelper.pluralize(sendCommodities, "debt token") + " owned by "
+                            + player.getRepresentation() + ", from their \"Debt Account\" pool.");
         }
 
         if (game.isFowMode()) {

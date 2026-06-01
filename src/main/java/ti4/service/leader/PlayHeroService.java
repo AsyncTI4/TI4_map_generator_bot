@@ -38,6 +38,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
@@ -367,8 +368,8 @@ public class PlayHeroService {
                         .size();
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getFactionEmoji() + " may resolve " + size
-                                + " agenda" + (size == 1 ? "" : "s") + " because that's how many Sigils they got."
+                        player.getFactionEmoji() + " may resolve " + StringHelper.pluralize(size, "agenda")
+                                + " because that's how many Sigils they got."
                                 + " After putting the agendas on top in the order you wish (don't bottom any), please press the button to reveal an agenda.");
                 AgendaHelper.drawAgenda(size, game, player);
                 Button flipAgenda = Buttons.blue("flip_agenda", "Press This to Flip Agenda");
@@ -390,8 +391,7 @@ public class PlayHeroService {
                 }
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getFactionEmoji() + " may gain " + size + " command token" + (size == 1 ? "" : "s")
-                                + ".");
+                        player.getFactionEmoji() + " may gain " + StringHelper.pluralize(size, "command token") + ".");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 String trueIdentity = player.getRepresentationUnfogged();
                 String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()

@@ -6,6 +6,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.message.MessageHelper;
@@ -27,8 +28,8 @@ public class XanHeroButtonHandler {
                 .forEach(uh -> uh.removeAllUnitDamage(player.getColorID()));
         String gainedTg = player.gainTG(amount, true);
         String message = player.getRepresentation() + " repaired all " + amount
-                + " of their damaged units, and consequently gained " + amount + " trade good"
-                + (amount == 1 ? "" : "s") + " " + gainedTg + ".";
+                + " of their damaged units, and consequently gained " + StringHelper.pluralize(amount, "trade good")
+                + " " + gainedTg + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelperAgents.resolveArtunoCheck(player, amount);
         MessageHelper.sendMessageToChannel(

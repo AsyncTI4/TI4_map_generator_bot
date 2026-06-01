@@ -158,7 +158,7 @@ public class ButtonHelperCommanders {
         ButtonHelperAgents.resolveArtunoCheck(player, count);
         String msg = player.getRepresentationUnfogged() + " used Knak Halfear, the Olradin Commander, to exhaust "
                 + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + " and gain "
-                + count + " trade good" + (count == 1 ? "" : "s") + " " + player.gainTG(count);
+                + StringHelper.pluralize(count, "trade good") + " " + player.gainTG(count);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }

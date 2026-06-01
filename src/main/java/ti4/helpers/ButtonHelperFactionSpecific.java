@@ -2502,10 +2502,10 @@ public final class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         String message;
         if (game.isTwilightsFallMode()) {
-            message = player.getRepresentationUnfogged() + ", you have " + amount + " mech" + (amount == 1 ? "" : "s")
+            message = player.getRepresentationUnfogged() + ", you have " + StringHelper.pluralize(amount, "mech")
                     + " that may be placed on home system planets.";
         } else {
-            message = player.getRepresentationUnfogged() + ", you have " + amount + " mech" + (amount == 1 ? "" : "s")
+            message = player.getRepresentationUnfogged() + ", you have " + StringHelper.pluralize(amount, "mech")
                     + " that may replace infantry.";
         }
         buttons.add(Buttons.green("resolveMykoMech", "Replace Infantry With Mech"));
@@ -2638,8 +2638,8 @@ public final class ButtonHelperFactionSpecific {
                             damaged);
                     MessageHelper.sendMessageToChannel(
                             event.getChannel(),
-                            player.getFactionEmoji() + " has repaired " + damaged + " damaged mech"
-                                    + (damaged == 1 ? "" : "s") + " on "
+                            player.getFactionEmoji() + " has repaired "
+                                    + StringHelper.pluralize(damaged, "damaged mech") + " on "
                                     + tile.getRepresentationForButtons(game, player) + ".");
                 }
             }
@@ -2707,8 +2707,8 @@ public final class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), message + "\nRolled against " + p2.getRepresentationNoPing() + ".");
         if (h > 0) {
-            String msg = p2.getRepresentationUnfogged() + ", you may use this to assign " + h + " hit"
-                    + (h == 1 ? "" : "s") + ".";
+            String msg = p2.getRepresentationUnfogged() + ", you may use this to assign "
+                    + StringHelper.pluralize(h, "hit") + ".";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.blue(
                     "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
@@ -2960,8 +2960,8 @@ public final class ButtonHelperFactionSpecific {
                     + (game.isFrankenGame() ? "_Military Support_ owner" : "Sol player")
                     + " has started their turn, use this button to play _Military Support_ if you so wish.";
             if (!game.isFowMode()) {
-                msg += " They have " + player.getStrategicCC() + " command token"
-                        + (player.getStrategicCC() == 1 ? "" : "s") + " in their strategy pool.";
+                msg += " They have " + StringHelper.pluralize(player.getStrategicCC(), "command token")
+                        + " in their strategy pool.";
             }
             Button transact = Buttons.green("resolvePNPlay_ms", "Play Military Support");
             List<Button> buttons = new ArrayList<>();
@@ -4368,7 +4368,7 @@ public final class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         String msg = player.getRepresentation() + " used _Salvage Operations_ to gain 1 trade good (you now have "
-                + player.getTg() + " trade good" + (player.getTg() == 1 ? "" : "s") + ").";
+                + StringHelper.pluralize(player.getTg(), "trade good") + ").";
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -4461,7 +4461,7 @@ public final class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationUnfoggedNoPing() + " recycled " + unit.getUnitEmoji() + " " + unit.getName()
-                        + " for " + toGain + " trade good" + (toGain == 1 ? "" : "s") + " " + player.gainTG(toGain)
+                        + " for " + StringHelper.pluralize(toGain, "trade good") + " " + player.gainTG(toGain)
                         + ".");
 
         ButtonHelperAbilities.pillageCheck(player, game);

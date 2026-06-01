@@ -6,6 +6,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.StringHelper;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -17,10 +18,10 @@ class TrapButtonHandler {
         int count = Math.min(p2.getTg(), 2);
         p2.setTg(p2.getTg() - count);
         player.setTg(player.getTg() + count);
-        String msg1 = p2.getRepresentationUnfogged() + " you had " + count + " trade good" + (count == 1 ? "" : "s")
+        String msg1 = p2.getRepresentationUnfogged() + " you had " + StringHelper.pluralize(count, "trade good")
                 + " stolen by a trap.";
-        String msg2 = player.getRepresentationUnfogged() + " you stole " + count + " trade good"
-                + (count == 1 ? "" : "s") + " via a trap.";
+        String msg2 = player.getRepresentationUnfogged() + " you stole " + StringHelper.pluralize(count, "trade good")
+                + " via a trap.";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         ButtonHelper.deleteMessage(event);

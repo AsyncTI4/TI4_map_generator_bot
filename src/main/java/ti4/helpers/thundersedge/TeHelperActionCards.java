@@ -25,6 +25,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.SecretObjectiveHelper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -123,10 +124,11 @@ public class TeHelperActionCards {
         if (soCount != 0) {
             SecretObjectiveHelper.showAll(player, p2, game);
         }
-        String message = player.getRepresentation() + " discarded their " + acCount + " action card"
-                + (acCount == 1 ? "" : "s") + ", gave their " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
-                + " to " + p2.getRepresentationNoPing() + ", and showed their " + soCount + " unscored secret objective"
-                + (soCount == 1 ? "" : "s") + " to them as well.";
+        String message =
+                player.getRepresentation() + " discarded their " + StringHelper.pluralize(acCount, "action card")
+                        + ", gave their " + StringHelper.pluralize(tgCount, "trade good") + " to "
+                        + p2.getRepresentationNoPing() + ", and showed their "
+                        + StringHelper.pluralize(soCount, "unscored secret objective") + " to them as well.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
     }

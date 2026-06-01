@@ -18,6 +18,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -66,8 +67,7 @@ class SpendingButtonHandler {
             whatIsItFor = buttonID.split("_")[2];
         }
         if (tgLoss > player.getTg()) {
-            String message =
-                    "You don't have " + tgLoss + " trade good" + (tgLoss == 1 ? "" : "s") + ". No change made.";
+            String message = "You don't have " + StringHelper.pluralize(tgLoss, "trade good") + ". No change made.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         } else {
             player.setTg(player.getTg() - tgLoss);
@@ -112,8 +112,7 @@ class SpendingButtonHandler {
                 String msg =
                         player.getRepresentation() + " gained 1 trade good on the _Research Lab_ due to exhausting "
                                 + Helper.getPlanetRepresentation(planetName, game)
-                                + ". It now has " + amountThereNow
-                                + " trade good" + (amountThereNow == 1 ? "" : "s") + " on it.";
+                                + ". It now has " + StringHelper.pluralize(amountThereNow, "trade good") + " on it.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }

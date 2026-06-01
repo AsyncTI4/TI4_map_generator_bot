@@ -16,6 +16,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperUnits;
@@ -288,9 +289,9 @@ public class NetrunnersAbilitiesHandler {
         }
 
         int productionLimit = Integer.parseInt(storedProductionLimit);
-        String message = "Producing a total of " + unitCount + " unit" + (unitCount == 1 ? "" : "s")
+        String message = "Producing a total of " + StringHelper.pluralize(unitCount, "unit")
                 + " (**Control Network** PRODUCTION limit is " + productionLimit + ")"
-                + " for a total cost of " + cost + " resource" + (cost == 1 ? "" : "s") + ".";
+                + " for a total cost of " + StringHelper.pluralize(cost, "resource") + ".";
         if (productionLimit < unitCount) {
             message += "\n### Warning! Exceeding **Control Network** PRODUCTION limit of " + productionLimit + "!";
         }
