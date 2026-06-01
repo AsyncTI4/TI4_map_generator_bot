@@ -95,6 +95,7 @@ public class PersistAllEntitiesService {
         gameEntity.setProphecyOfKings(game.isProphecyOfKings());
         gameEntity.setThundersEdge(game.isThundersEdge());
         gameEntity.setPlayerCount(game.getRealAndEliminatedPlayers().size());
+        gameEntity.setHasWinner(game.getWinner().isPresent());
 
         var players = gameEntity.getPlayers();
         for (Player player : game.getRealAndEliminatedPlayers()) {
