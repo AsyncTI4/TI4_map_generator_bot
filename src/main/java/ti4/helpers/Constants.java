@@ -1270,6 +1270,7 @@ public final class Constants {
     public static final String NO_FRACTURE = "no_fracture";
     public static final String CALL_OF_THE_VOID_MODE = "call_of_the_void_mode";
     public static final String WILD_WILD_GALAXY_MODE = "wild_wild_galaxy_mode";
+    public static final String FEAST_OR_FAMINE_MODE = "feast_or_famine_mode";
     public static final String STELLAR_ATOMICS_MODE = "stellar_atomics_mode";
     public static final String NO_SWAP_MODE = "no_swap_mode";
     public static final String VEILED_HEART_MODE = "veiled_heart_mode";

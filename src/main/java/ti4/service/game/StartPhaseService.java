@@ -218,6 +218,7 @@ public class StartPhaseService {
                 return;
             }
         }
+
         for (Player player2 : game.getRealPlayers()) {
             String id = "sigma_machinations";
             if (player2.getPromissoryNotesInPlayArea().contains(id)) {
@@ -270,6 +271,19 @@ public class StartPhaseService {
         }
         if (game.getRealPlayers().size() == 6) {
             game.setStrategyCardsPerPlayer(1);
+        }
+        if (game.isFeastOrFamineMode() && game.getRealPlayers().size() < 5) {
+            if (game.getRound() % 2 == 0) {
+                game.setStrategyCardsPerPlayer(1);
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        "# Feast or Famine Mode: It's a famine round! Players will have 1 strategy card this round.");
+            } else {
+                game.setStrategyCardsPerPlayer(2);
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        "# Feast or Famine Mode: It's a feast round! Players will have 2 strategy cards this round.");
+            }
         }
         ButtonHelperFactionSpecific.checkForNaaluPN(game);
         for (Player player2 : game.getRealPlayers()) {
