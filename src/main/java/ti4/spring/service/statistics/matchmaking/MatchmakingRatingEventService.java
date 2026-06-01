@@ -1,5 +1,6 @@
 package ti4.spring.service.statistics.matchmaking;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +21,9 @@ import ti4.spring.service.persistence.PlayerEntityRepository;
 public class MatchmakingRatingEventService {
 
     private static final int MAX_LIST_SIZE = 50;
+    private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
+    private static final BigDecimal FIFTY = BigDecimal.valueOf(50);
+    private static final BigDecimal SEVENTY_FIVE = BigDecimal.valueOf(75);
 
     private final PlayerEntityRepository playerEntityRepository;
 
@@ -52,7 +56,7 @@ public class MatchmakingRatingEventService {
         sb.append("__**Player Matchmaking Ratings:**__\n");
         for (int i = 0, listSize = 0; i < playerRatings.size() && listSize < maxListSize; i++) {
             var playerRating = playerRatings.get(i);
-            if (playerRating.calibrationPercent() < 100) {
+            if (playerRating.calibrationPercent().compareTo(ONE_HUNDRED) < 0) {
                 continue;
             }
             listSize++;
@@ -78,7 +82,7 @@ public class MatchmakingRatingEventService {
                         playerRating.userId().equals(event.getUser().getId()))
                 .findFirst()
                 .ifPresent(playerRating -> {
-                    if (showRating && playerRating.calibrationPercent() == 100) {
+                    if (showRating && playerRating.calibrationPercent().compareTo(ONE_HUNDRED) == 0) {
                         sb.append(String.format("\nYour rating is `%.3f`.", playerRating.rating()));
                     } else {
                         sb.append(String.format(

@@ -7,6 +7,8 @@ import de.gesundkrank.jskills.Player;
 import de.gesundkrank.jskills.Rating;
 import de.gesundkrank.jskills.Team;
 import de.gesundkrank.jskills.trueskill.FactorGraphTrueSkillCalculator;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -18,6 +20,7 @@ import lombok.experimental.UtilityClass;
 class TrueSkillMatchmakingRatingService {
 
     private static final double SIGMA_CALIBRATION_THRESHOLD = 1.5;
+    private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
 
     static List<MatchmakingRating> calculateRatings(List<MatchmakingGame> games) {
         games.sort(Comparator.comparingLong(MatchmakingGame::endedDate).thenComparing(MatchmakingGame::name));
@@ -60,8 +63,12 @@ class TrueSkillMatchmakingRatingService {
                     String userId = entry.getKey();
                     String username = userIdToUsername.get(userId);
                     Rating rating = ratings.get(entry.getValue());
-                    double calibrationPercent =
-                            Math.min(100, SIGMA_CALIBRATION_THRESHOLD / rating.getStandardDeviation() * 100);
+
+                    BigDecimal standardDeviation = BigDecimal.valueOf(rating.getStandardDeviation());
+                    BigDecimal calculatedPercent = BigDecimal.valueOf(SIGMA_CALIBRATION_THRESHOLD)
+                            .divide(standardDeviation, MathContext.DECIMAL64)
+                            .multiply(ONE_HUNDRED);
+                    BigDecimal calibrationPercent = calculatedPercent.min(ONE_HUNDRED);
                     return new MatchmakingRating(userId, username, rating.getMean(), calibrationPercent);
                 })
                 .sorted(Comparator.comparing(MatchmakingRating::rating).reversed())
