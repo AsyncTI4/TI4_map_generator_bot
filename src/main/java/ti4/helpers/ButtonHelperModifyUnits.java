@@ -1699,8 +1699,16 @@ public final class ButtonHelperModifyUnits {
                                 player.getFactionEmoji()
                                         + " did not place a command token in system they retreated to due to _Skilled Retreat_ being buffed by _Wild, Wild Galaxy_ galactic event.");
                     } else {
-                        CommandCounterHelper.addCC(event, player, tile2, true);
-                        Helper.isCCCountCorrect(player);
+                        if (!"".equals(game.getStoredValue("diversionActive"))) {
+                            game.setStoredValue("diversionActive", "");
+                            MessageHelper.sendMessageToChannel(
+                                    event.getMessageChannel(),
+                                    player.getFactionEmoji()
+                                            + " did not place a command token in the system they retreated to due to _Diversion_.");
+                        } else {
+                            CommandCounterHelper.addCC(event, player, tile2, true);
+                            Helper.isCCCountCorrect(player);
+                        }
                     }
                 }
             }

@@ -1042,6 +1042,15 @@ public class ActionCardHelper {
                         codedButtons);
             }
 
+            if ("diversion".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveDiversion", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2,
+                        introMsg
+                                + "A reminder that you should declare which system you are retreating to now, before other players choose whether they will Sabo.",
+                        codedButtons);
+            }
+
             if ("reparations".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveReparationsStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(

@@ -30,6 +30,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
@@ -2730,5 +2731,30 @@ class ActionCardDeck2ButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", use the button to draw a relic.",
                 Buttons.green(player.factionButtonChecker() + "drawRelic", "Draw Relic"));
+    }
+
+    @ButtonHandler("resolveDiversion")
+    public static void resolveDiversion(Player player, Game game, ButtonInteractionEvent event) {
+        String pos = game.getActiveSystem();
+        if (pos.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "The active system is currently non-existent, so _Diversion_ cannot be automated.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        game.setStoredValue("diversionActive", pos);
+        List<Button> retreatButtons = ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, pos, false, false);
+        ButtonHelper.deleteMessage(event);
+        if (retreatButtons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + ", there are no valid systems to retreat to.");
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", please choose a system to retreat to for _Diversion_.",
+                retreatButtons);
     }
 }
