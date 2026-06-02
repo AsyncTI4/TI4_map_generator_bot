@@ -133,8 +133,12 @@ class MessageListener extends ListenerAdapter {
             if (bothelperLogChannel != null) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("markResolved", "Resolved?"));
-                String msg = message.getJumpUrl() + ". Full message:\n> "
-                        + message.getContentRaw().replace("@", "");
+
+                String msgWithoutMentions = message.getContentRaw();
+                for (Role role : message.getMentions().getRoles()) {
+                    msgWithoutMentions = msgWithoutMentions.replace(role.getAsMention(), role.getName());
+                }
+                String msg = message.getJumpUrl() + ". Full message:\n> " + msgWithoutMentions.replace("\n", "\n> ");
                 MessageHelper.sendMessageToChannelWithButtons(bothelperLogChannel, msg, buttons);
             }
         }

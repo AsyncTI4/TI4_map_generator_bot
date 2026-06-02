@@ -1462,7 +1462,7 @@ public class ButtonHelper {
 
     @ButtonHandler("markResolved")
     public static void markResolved(ButtonInteractionEvent event) {
-        deleteTheOneButton(event);
+        deleteAllButtons(event);
         event.getMessage().addReaction(Emoji.fromUnicode("✅")).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
