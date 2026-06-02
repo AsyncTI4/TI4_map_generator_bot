@@ -1400,7 +1400,8 @@ public class ActionCardHelper {
             }
 
             if ("classified_weapons".equals(automationID)) {
-                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveClassifiedWeapons", buttonLabel));
+                codedButtons.add(
+                        Buttons.green(player.factionButtonChecker() + "resolveClassifiedWeapons", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "unit"), codedButtons);
             }
