@@ -56,6 +56,7 @@ import ti4.model.RelicModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -1386,8 +1387,8 @@ class ActionCardDeck2ButtonHandler {
         List<Button> buttons = new ArrayList<>(ButtonHelper.getTilesWithPredicateForAction(
                 player,
                 game,
-                "resolveDefectorsStep5_" + target.getFaction() + "_" + sourceTile.getPosition() + "_"
-                        + shipsRemaining + "_" + unitType.getValue(),
+                "resolveDefectorsStep5_" + target.getFaction() + "_" + sourceTile.getPosition() + "_" + shipsRemaining
+                        + "_" + unitType.getValue(),
                 validDestination,
                 false));
         if (buttons.isEmpty()) {
@@ -1438,7 +1439,10 @@ class ActionCardDeck2ButtonHandler {
         }
         return unitHolder.getUnitKeysForPlayer(target).stream().anyMatch(key -> {
             UnitModel model = target.getUnitFromUnitKey(key);
-            return model != null && model.getIsShip() && model.getCapacityValue() <= 0 && unitHolder.getUnitCount(key) > 0;
+            return model != null
+                    && model.getIsShip()
+                    && model.getCapacityValue() <= 0
+                    && unitHolder.getUnitCount(key) > 0;
         });
     }
 
