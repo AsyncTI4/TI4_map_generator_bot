@@ -573,7 +573,7 @@ public final class ButtonHelperTacticalAction {
                 if (playerWithPds == player) {
                     continue;
                 }
-                mentions.add(playerWithPds.getRepresentation());
+                mentions.add(playerWithPds.getRepresentationNoPing());
             }
             if (!mentions.isEmpty()) {
                 message.append('\n')

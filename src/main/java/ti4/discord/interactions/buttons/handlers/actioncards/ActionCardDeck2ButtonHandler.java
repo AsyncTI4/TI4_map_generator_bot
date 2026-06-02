@@ -47,6 +47,7 @@ import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.RelicModel;
+import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.emoji.CardEmojis;
@@ -55,6 +56,7 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
+import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
@@ -2219,5 +2221,193 @@ class ActionCardDeck2ButtonHandler {
     public static void amendmentRevealStage2(Player player, Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
         RevealPublicObjectiveService.revealS2(game, event);
+    }
+
+    @ButtonHandler("resolveBlackMarketIntel")
+    public static void resolveBlackMarketIntel(Player player, Game game, ButtonInteractionEvent event) {
+        String so1 = game.drawSecretObjective(player.getUserID());
+        String so2 = game.drawSecretObjective(player.getUserID());
+
+        String publicMsg = player.getRepresentationNoPing() + " drew 2 secret objectives using _Black Market Intel_.";
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), publicMsg);
+
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
+
+        List<Player> eligiblePlayers = game.getRealPlayers().stream()
+                .filter(p -> p != player && p.getSoScored() < 3)
+                .toList();
+
+        if (eligiblePlayers.isEmpty() || (so1 == null && so2 == null)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + ", no eligible player found to receive a secret objective (all players have 3 or more scored secret objectives). You keep both.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        for (String soID : List.of(so1 != null ? so1 : "", so2 != null ? so2 : "")) {
+            if (soID.isEmpty()) continue;
+            SecretObjectiveModel soModel = Mapper.getSecretObjective(soID);
+            String soName = soModel != null ? soModel.getName() : soID;
+            for (Player target : eligiblePlayers) {
+                String label = "Give '" + soName + "' to " + target.getColorIfCanSeeStats(player);
+                String buttonId =
+                        player.factionButtonChecker() + "blackMarketIntelGive_" + soID + "_" + target.getFaction();
+                buttons.add(Buttons.blue(buttonId, label));
+            }
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged()
+                        + ", choose which secret objective to give to another player with fewer than 3 scored secret objectives.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("blackMarketIntelGive_")
+    public static void blackMarketIntelGive(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String remainder = buttonID.replace("blackMarketIntelGive_", "");
+        int lastUnderscore = remainder.lastIndexOf('_');
+        if (lastUnderscore < 0) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String soID = remainder.substring(0, lastUnderscore);
+        String targetFaction = remainder.substring(lastUnderscore + 1);
+        Player target = game.getPlayerFromColorOrFaction(targetFaction);
+
+        if (target == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(), "Could not find target player; secret objective was not transferred.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        Integer soIdentifier = player.getSecretsUnscored().get(soID);
+        if (soIdentifier == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(), "Could not find that secret objective in your hand.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        player.removeSecret(soIdentifier);
+        target.setSecret(soID);
+
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, target);
+
+        String publicGiveMsg = player.getRepresentationNoPing()
+                + " gave a secret objective to "
+                + (game.isFowMode() ? "another player" : target.getRepresentationNoPing())
+                + " using _Black Market Intel_.";
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), publicGiveMsg);
+
+        if (!Objects.equals(player.getCardsInfoThread(), target.getCardsInfoThread())) {
+            MessageHelper.sendMessageToChannel(
+                    target.getCardsInfoThread(),
+                    target.getRepresentationUnfogged()
+                            + ", you received a secret objective from "
+                            + player.getColorIfCanSeeStats(target)
+                            + " via _Black Market Intel_.");
+        }
+
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveBlackMarketRaid")
+    public static void resolveBlackMarketRaid(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        int totalFragments = player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf();
+        int commandSheetTokens = player.getTacticalCC() + player.getStrategicCC() + player.getFleetCC();
+        List<Button> buttons = new ArrayList<>();
+        for (int fragsToPurge = 0; fragsToPurge <= Math.min(totalFragments, 3); fragsToPurge++) {
+            int tokenCost = 3 - fragsToPurge;
+            if (commandSheetTokens < tokenCost) {
+                continue;
+            }
+            String label = fragsToPurge == 0
+                    ? "Spend 3 command tokens (purge 0 fragments)"
+                    : "Purge " + fragsToPurge + " fragment" + (fragsToPurge == 1 ? "" : "s") + " (spend " + tokenCost
+                            + " command token" + (tokenCost == 1 ? "" : "s") + ")";
+            buttons.add(Buttons.green("resolveBlackMarketRaidStep2_" + fragsToPurge, label));
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " cannot resolve _Black Market Raid_: not enough command tokens or relic fragments.");
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", choose how many relic fragments to purge for _Black Market Raid_.",
+                buttons);
+    }
+
+    @ButtonHandler("resolveBlackMarketRaidStep2_")
+    public static void resolveBlackMarketRaidStep2(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        int fragsToPurge;
+        try {
+            fragsToPurge = Integer.parseInt(buttonID.replace("resolveBlackMarketRaidStep2_", ""));
+        } catch (NumberFormatException e) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Black Market Raid_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        ButtonHelper.deleteMessage(event);
+
+        // Purge relic fragments
+        StringBuilder resolveMsg = new StringBuilder(player.getRepresentationUnfogged());
+        resolveMsg.append(" resolved _Black Market Raid_");
+        if (fragsToPurge > 0) {
+            List<String> fragments = new ArrayList<>(player.getFragments());
+            int purged = 0;
+            StringBuilder fragMsg = new StringBuilder();
+            for (String fragId : fragments) {
+                if (purged >= fragsToPurge) break;
+                player.removeFragment(fragId);
+                game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+                String emoji =
+                        switch (Mapper.getExplore(fragId).getType().toLowerCase()) {
+                            case "cultural" -> ExploreEmojis.CFrag.toString();
+                            case "industrial" -> ExploreEmojis.IFrag.toString();
+                            case "hazardous" -> ExploreEmojis.HFrag.toString();
+                            default -> ExploreEmojis.UFrag.toString();
+                        };
+                fragMsg.append(emoji);
+                purged++;
+            }
+            resolveMsg
+                    .append(", purging ")
+                    .append(fragMsg)
+                    .append(" relic fragment")
+                    .append(purged == 1 ? "" : "s");
+        }
+        resolveMsg.append(".");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), resolveMsg.toString());
+
+        // Prompt player to manually remove command tokens if needed
+        int tokenCost = 3 - fragsToPurge;
+        if (tokenCost > 0) {
+            String tokenMsg = player.getRepresentationUnfogged() + ", you need to remove "
+                    + tokenCost + " command token" + (tokenCost == 1 ? "" : "s")
+                    + " from your tactic, strategy, or fleet pool. Your current tokens are "
+                    + player.getCCRepresentation() + ".";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), tokenMsg, ButtonHelper.getLoseCCButtons(player));
+        }
+
+        // Give a button to draw the relic rather than drawing it automatically
+        MessageHelper.sendMessageToChannelWithButton(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", use the button to draw a relic.",
+                Buttons.green(player.factionButtonChecker() + "drawRelic", "Draw Relic"));
     }
 }
