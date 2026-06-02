@@ -446,14 +446,12 @@ class ActionCardDeck2ButtonHandler {
             return;
         }
 
-        List<String> objectiveDeck = revealedObjective.getPoints() == 1
-                ? game.getPublicObjectives1()
-                : game.getPublicObjectives2();
+        List<String> objectiveDeck =
+                revealedObjective.getPoints() == 1 ? game.getPublicObjectives1() : game.getPublicObjectives2();
         if (objectiveDeck.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + ", there are no objectives in that deck to look at for _Corruption_.");
+                    player.getRepresentation() + ", there are no objectives in that deck to look at for _Corruption_.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -479,8 +477,8 @@ class ActionCardDeck2ButtonHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageEmbedsToCardsInfoThread(
                 player,
-                player.getRepresentationUnfogged()
-                        + ", here are the top " + count + " objective(s) from the matching deck for _Corruption_.",
+                player.getRepresentationUnfogged() + ", here are the top " + count
+                        + " objective(s) from the matching deck for _Corruption_.",
                 embeds);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
@@ -491,7 +489,8 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("resolveCorruptionReplace;")
-    public static void resolveCorruptionReplace(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolveCorruptionReplace(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String payload = buttonID.replace("resolveCorruptionReplace;", "");
         String[] parts = payload.split(";", 2);
         if (parts.length < 2) {
@@ -519,9 +518,8 @@ class ActionCardDeck2ButtonHandler {
             return;
         }
 
-        List<String> objectiveDeck = revealedObjective.getPoints() == 1
-                ? game.getPublicObjectives1()
-                : game.getPublicObjectives2();
+        List<String> objectiveDeck =
+                revealedObjective.getPoints() == 1 ? game.getPublicObjectives1() : game.getPublicObjectives2();
         if (!objectiveDeck.remove(replacementId)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -536,7 +534,8 @@ class ActionCardDeck2ButtonHandler {
         Collections.shuffle(objectiveDeck);
 
         Map<String, Integer> updatedRevealed = new LinkedHashMap<>();
-        for (Map.Entry<String, Integer> revealedEntry : game.getRevealedPublicObjectives().entrySet()) {
+        for (Map.Entry<String, Integer> revealedEntry :
+                game.getRevealedPublicObjectives().entrySet()) {
             if (revealedEntry.getKey().equals(revealedId)) {
                 updatedRevealed.put(replacementId, revealedEntry.getValue());
             } else {
@@ -574,7 +573,8 @@ class ActionCardDeck2ButtonHandler {
 
     private static Map.Entry<String, Integer> getMostRecentPublicObjective(Game game) {
         Map.Entry<String, Integer> latestObjective = null;
-        for (Map.Entry<String, Integer> objective : game.getRevealedPublicObjectives().entrySet()) {
+        for (Map.Entry<String, Integer> objective :
+                game.getRevealedPublicObjectives().entrySet()) {
             if (Mapper.getPublicObjective(objective.getKey()) == null) {
                 continue;
             }
