@@ -15,6 +15,6 @@ public class CombatPredictionPayout {
         double evenness = 4.0 * winnerShare * (1.0 - winnerShare);
         double underdog = Math.max(0.0, 0.5 - winnerShare) / 0.5;
         double points = 4.0 + 12.0 * evenness + 70.0 * Math.pow(underdog, 1.4);
-        return (int) Math.round(Math.max(4.0, Math.min(100.0, points)));
+        return (int) Math.round(Math.clamp(points, 4.0, 100.0));
     }
 }

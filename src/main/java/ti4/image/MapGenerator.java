@@ -282,7 +282,7 @@ public class MapGenerator implements AutoCloseable {
         // Show Grey Setup Tiles
         if (game.isShowMapSetup() || tilesToDisplay.isEmpty()) {
             int ringCount = game.getRingCount();
-            ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
+            ringCount = Math.clamp(ringCount, RING_MIN_COUNT, RING_MAX_COUNT);
             minX = 10_000;
             minY = 10_000;
             maxX = -1;
@@ -1184,7 +1184,7 @@ public class MapGenerator implements AutoCloseable {
                     .forEach(statOrder::add);
         }
 
-        int ringCount = Math.max(Math.min(game.getRingCount(), RING_MAX_COUNT), RING_MIN_COUNT);
+        int ringCount = Math.clamp(game.getRingCount(), RING_MIN_COUNT, RING_MAX_COUNT);
 
         // highlightValidStatTiles(game);
         boolean useNewSystem = true;
@@ -1788,8 +1788,10 @@ public class MapGenerator implements AutoCloseable {
         // Additional FS
         int additionalFleetSupply = 0;
         String addFS = "";
-        if (player.hasAbility("edict"))
+
+        if (player.hasAbility("edict") || player.hasAbility("edict_y")) {
             additionalFleetSupply += player.getMahactCC().size();
+        }
         if (player.hasAbility("armada")) additionalFleetSupply += 2;
         if (additionalFleetSupply > 0) addFS = "*";
 
@@ -2103,7 +2105,8 @@ public class MapGenerator implements AutoCloseable {
         int ccCount = player.getFleetCC();
         boolean hasArmada = player.hasAbility("armada");
         List<String> mahactCC = player.getMahactCC();
-        boolean hasMahactCCs = !player.getMahactCC().isEmpty() && player.hasAbility("edict");
+        boolean hasMahactCCs =
+                !player.getMahactCC().isEmpty() && (player.hasAbility("edict") || player.hasAbility("edict_y"));
 
         try {
             BufferedImage ccImage = ImageHelper.read(ccPath);
@@ -2466,7 +2469,7 @@ public class MapGenerator implements AutoCloseable {
      * @return between 3 and 8 (bounds based on constants)
      */
     private static int getRingCount(Game game) {
-        return Math.max(Math.min(game.getRingCount(), RING_MAX_COUNT), RING_MIN_COUNT);
+        return Math.clamp(game.getRingCount(), RING_MIN_COUNT, RING_MAX_COUNT);
     }
 
     /**

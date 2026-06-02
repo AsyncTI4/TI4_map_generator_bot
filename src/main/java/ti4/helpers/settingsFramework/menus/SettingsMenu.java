@@ -429,7 +429,7 @@ public abstract class SettingsMenu {
             }
             List<List<Button>> paginated = ListUtils.partition(allButtons, allottedSpace - 2);
             int maxPage = paginated.size() - 1;
-            pageNum = Math.max(0, Math.min(pageNum, maxPage));
+            pageNum = Math.clamp(pageNum, 0, maxPage);
 
             String navString = menuNav + "_" + navId() + "_";
             List<Button> buttonsToUse = new ArrayList<>();

@@ -83,7 +83,7 @@ public class CombatReplayExecutionService {
                     replayContestRepository.markReplayStartWarningPostedIfUnset(contest.getId(), LocalDateTime.now());
             if (claimed == 0) return;
 
-            MessageChannel channel = discordPostService.getContestThreadOrChannel(contest);
+            MessageChannel channel = CombatReplayDiscordPostService.getContestThreadOrChannel(contest);
             if (channel == null) return;
             MessageHelper.sendMessageToChannel(channel, buildReplayStartWarningMessage(channel));
         } catch (Exception e) {
@@ -91,7 +91,7 @@ public class CombatReplayExecutionService {
         }
     }
 
-    private String buildReplayStartWarningMessage(MessageChannel channel) {
+    private static String buildReplayStartWarningMessage(MessageChannel channel) {
         return LazaxMinigameRoleHelper.mention(channel) + " replay starts in 5 minutes!\n"
                 + RandomHelper.pickRandomFromList(REPLAY_START_WARNING_LORE);
     }
@@ -127,7 +127,7 @@ public class CombatReplayExecutionService {
 
         Game game = candidate == null ? null : loadGame(candidate.getGameName());
         try {
-            MessageChannel channel = discordPostService.getContestThreadOrChannel(contest);
+            MessageChannel channel = CombatReplayDiscordPostService.getContestThreadOrChannel(contest);
             if (channel == null) {
                 rescheduleReplay(contest, "Replay channel unavailable.");
                 return;
@@ -192,7 +192,7 @@ public class CombatReplayExecutionService {
                 + " Central**.";
     }
 
-    private String formatCentralLockTime(int hour, int minute) {
+    private static String formatCentralLockTime(int hour, int minute) {
         int displayHour = hour % 12;
         if (displayHour == 0) displayHour = 12;
         return String.format("%d:%02d %s", displayHour, minute, hour < 12 ? "AM" : "PM");
@@ -205,7 +205,7 @@ public class CombatReplayExecutionService {
         return Duration.between(LocalDateTime.now(), contest.getReplayStartAt());
     }
 
-    private String formatVotingWindow(Duration votingWindow) {
+    private static String formatVotingWindow(Duration votingWindow) {
         long totalSeconds = Math.max(0, votingWindow.toSeconds());
         if (totalSeconds < 60) {
             return totalSeconds + " " + (totalSeconds == 1 ? "second" : "seconds");
@@ -284,7 +284,7 @@ public class CombatReplayExecutionService {
         return candidateRepository.findById(candidateId).orElse(null);
     }
 
-    private Game loadGame(String gameName) {
+    private static Game loadGame(String gameName) {
         var managedGame = GameManager.getManagedGame(gameName);
         return managedGame == null ? null : managedGame.getGame();
     }

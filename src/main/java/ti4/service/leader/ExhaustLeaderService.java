@@ -10,6 +10,7 @@ import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.franken.FrankenAlternateTextService;
 
 @UtilityClass
 public class ExhaustLeaderService {
@@ -26,7 +27,8 @@ public class ExhaustLeaderService {
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
                     message,
-                    leaderModel.getRepresentationEmbed(false, true, false, false, game.isTwilightsFallMode()));
+                    FrankenAlternateTextService.getLeaderEmbed(
+                            game, leaderModel, false, true, false, false, game.isTwilightsFallMode()));
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message + leader.getId());
         }

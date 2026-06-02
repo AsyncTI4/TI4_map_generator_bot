@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.DefaultOAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
@@ -32,7 +33,7 @@ public class DiscordOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
     }
 
     @Override
-    public OAuth2AuthenticatedPrincipal introspect(String token) {
+    public @NonNull OAuth2AuthenticatedPrincipal introspect(@NonNull String token) {
         try {
             return authenticate(token);
         } catch (OAuth2AuthenticationException e) {

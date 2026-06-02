@@ -592,7 +592,7 @@ public class CreateGameService {
 
     private static int getMaxGamesPerCategory() {
         int maxGamesPerCategory = GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.getAsInt(10);
-        return Math.max(1, Math.min(25, maxGamesPerCategory));
+        return Math.clamp(maxGamesPerCategory, 1, 25);
     }
 
     private static int getChannelCountForNewCategory() {

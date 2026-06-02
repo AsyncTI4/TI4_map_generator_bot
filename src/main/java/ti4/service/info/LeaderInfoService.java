@@ -18,6 +18,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
+import ti4.service.franken.FrankenAlternateTextService;
 
 @UtilityClass
 public class LeaderInfoService {
@@ -70,8 +71,14 @@ public class LeaderInfoService {
                 if (otherPlayer != player) {
                     for (String leaderID : otherPlayer.getLeaderIDs()) {
                         if (leaderID.contains("agent") && (Mapper.getLeader(leaderID) != null)) {
-                            yssarilEmbeds.add(
-                                    Mapper.getLeader(leaderID).getRepresentationEmbed(game.isTwilightsFallMode()));
+                            yssarilEmbeds.add(FrankenAlternateTextService.getLeaderEmbed(
+                                    game,
+                                    Mapper.getLeader(leaderID),
+                                    false,
+                                    true,
+                                    false,
+                                    false,
+                                    game.isTwilightsFallMode()));
                         }
                     }
                 }
@@ -86,7 +93,7 @@ public class LeaderInfoService {
 
         // ADD MAHACT IMPERIA REFERENCE
         List<MessageEmbed> imperiaEmbeds = new ArrayList<>();
-        if (player.hasAbility("imperia")) {
+        if (player.hasAbility("imperia") || player.hasAbility("imperia_y")) {
             for (Player otherPlayer : game.getPlayers().values()) {
                 if (otherPlayer != player) {
                     if (player.getMahactCC().contains(otherPlayer.getColor())) {
@@ -94,7 +101,7 @@ public class LeaderInfoService {
                         if (leader == null) {
                             continue;
                         }
-                        imperiaEmbeds.add(leader.getLeaderEmbed());
+                        imperiaEmbeds.add(leader.getLeaderEmbed(game));
                     }
                 }
             }

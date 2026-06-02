@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners;
 
 import lombok.experimental.UtilityClass;
 import ti4.game.Player;

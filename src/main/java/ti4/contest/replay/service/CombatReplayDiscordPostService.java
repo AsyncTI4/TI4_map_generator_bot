@@ -76,14 +76,14 @@ public class CombatReplayDiscordPostService {
             }
             MessageCreateBuilder builder = new MessageCreateBuilder().addFiles(fileUpload);
             if (!messageParts.isEmpty()) {
-                builder.addContent(messageParts.get(messageParts.size() - 1));
+                builder.addContent(messageParts.getLast());
             }
             if (!embeds.isEmpty()) builder.addEmbeds(embeds);
             return channel.sendMessage(builder.build()).complete();
         }
     }
 
-    public Message sendDiscordMessage(MessageChannel channel, String content, List<MessageEmbed> embeds) {
+    public static Message sendDiscordMessage(MessageChannel channel, String content, List<MessageEmbed> embeds) {
         if (embeds.isEmpty()) {
             return channel.sendMessage(content).complete();
         }
@@ -99,7 +99,7 @@ public class CombatReplayDiscordPostService {
                 .complete();
     }
 
-    public MessageChannel getContestThreadOrChannel(CombatReplayContestEntity contest) {
+    public static MessageChannel getContestThreadOrChannel(CombatReplayContestEntity contest) {
         if (JdaService.guildPrimary == null) return null;
         TextChannel contestChannel = JdaService.guildPrimary.getTextChannelById(contest.getPublicChannelId());
         if (contestChannel == null) return null;
@@ -126,7 +126,7 @@ public class CombatReplayDiscordPostService {
         return "combat-archive-c" + candidateId + "-t" + tilePosition + "-" + attacker + "-v-" + defender;
     }
 
-    private String normalizeThreadNamePart(String value) {
+    private static String normalizeThreadNamePart(String value) {
         String normalized = StringUtils.defaultIfBlank(value, "unknown")
                 .trim()
                 .toLowerCase()

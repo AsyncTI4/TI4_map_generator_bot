@@ -89,7 +89,6 @@ public class FrankenDraft extends BagDraft {
         "kaltrim",
         "xin",
         "sarcosa",
-        "firmament",
         "obsidian"
     };
 

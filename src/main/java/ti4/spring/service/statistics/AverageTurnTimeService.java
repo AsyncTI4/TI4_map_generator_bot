@@ -45,10 +45,80 @@ public class AverageTurnTimeService {
 
         String result = toResultString(sortedResults);
 
-        MessageHelper.sendMessageToThread(event.getChannel(), "Average Turn Time", result);
+        if (topLimit < 2000) {
+            MessageHelper.sendMessageToThread(event.getChannel(), "Average Turn Time", result);
+        } else {
+
+            int times = 3;
+
+            for (int i = 1; i < times; i++) {
+
+                result = "";
+                int slowUsers = 0;
+                int usersUnder120Minutes = 0;
+                int usersUnder90Minutes = 0;
+                int usersUnder60Minutes = 0;
+                int slowUsersWithFastGames = 0;
+                int usersUnder120MinutesWithFastGames = 0;
+                int usersUnder90MinutesWithFastGames = 0;
+                int usersUnder60MinutesWithFastGames = 0;
+
+                for (var stats : sortedResults) {
+                    String userId = stats.userId;
+                    List<Integer> threeFastestDays =
+                            UserGameInfoService.get().getUsersThreeFastestDaysToComplete6PlayerGames(userId);
+                    List<Integer> threeFastestDaysCopy = new ArrayList<>(threeFastestDays);
+                    if (i == 1) {
+                        if (threeFastestDaysCopy.size() > 3) {
+                            threeFastestDaysCopy.removeLast();
+                        }
+                        if (threeFastestDaysCopy.size() > 3) {
+                            threeFastestDaysCopy.removeLast();
+                        }
+                    }
+                    boolean hasFastGames = threeFastestDaysCopy.stream().allMatch(days -> days < 11);
+                    long averageTurnTime = DateTimeHelper.getTimeinMinutes(stats.getAverage());
+                    if (averageTurnTime < 60) {
+                        usersUnder60Minutes++;
+                        if (hasFastGames) {
+                            usersUnder60MinutesWithFastGames++;
+                        }
+                    } else if (averageTurnTime < 90) {
+                        usersUnder90Minutes++;
+                        if (hasFastGames) {
+                            usersUnder90MinutesWithFastGames++;
+                        }
+                    } else if (averageTurnTime < 120) {
+                        usersUnder120Minutes++;
+                        if (hasFastGames) {
+                            usersUnder120MinutesWithFastGames++;
+                        }
+                    } else {
+                        slowUsers++;
+                        if (hasFastGames) {
+                            slowUsersWithFastGames++;
+                        }
+                    }
+                }
+                result += String.format(
+                        "Users with average turn time under 60 minutes: %d (with fast games: %d)\n",
+                        usersUnder60Minutes, usersUnder60MinutesWithFastGames);
+                result += String.format(
+                        "Users with average turn time under 90 minutes: %d (with fast games: %d)\n",
+                        usersUnder90Minutes, usersUnder90MinutesWithFastGames);
+                result += String.format(
+                        "Users with average turn time under 120 minutes: %d (with fast games: %d)\n",
+                        usersUnder120Minutes, usersUnder120MinutesWithFastGames);
+                result += String.format(
+                        "Users with average turn time over 120 minutes: %d (with fast games: %d)\n",
+                        slowUsers, slowUsersWithFastGames);
+
+                MessageHelper.sendMessageToThread(event.getChannel(), "Game Statistics " + i, result);
+            }
+        }
     }
 
-    private List<UserAverageTurnTimeAccumulator> getAverageTurnTimes(
+    private static List<UserAverageTurnTimeAccumulator> getAverageTurnTimes(
             List<PlayerEntity> players, int minTurns, int topLimit) {
         Map<UserEntity, UserAverageTurnTimeAccumulator> statsMap = new HashMap<>();
         for (PlayerEntity player : players) {
@@ -65,7 +135,7 @@ public class AverageTurnTimeService {
                 .toList();
     }
 
-    private String toResultString(List<UserAverageTurnTimeAccumulator> sortedResults) {
+    private static String toResultString(List<UserAverageTurnTimeAccumulator> sortedResults) {
         StringBuilder sb = new StringBuilder("## __**Average Turn Time:**__\n");
         int index = 1;
         for (var stats : sortedResults) {

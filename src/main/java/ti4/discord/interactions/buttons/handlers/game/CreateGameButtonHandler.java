@@ -32,6 +32,7 @@ import ti4.helpers.SearchGameHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
+import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.statistics.AverageTurnTimeService;
 import ti4.spring.service.statistics.UserGameInfoService;
@@ -238,16 +239,16 @@ public class CreateGameButtonHandler {
             List<Integer> threeFastestDays = UserGameInfoService.get()
                     .getUsersThreeFastestDaysToComplete6PlayerGames(
                             member.getUser().getId());
-            if (threeFastestDays.size() > 0) {
+            if (!threeFastestDays.isEmpty()) {
                 memberList.append(" (");
-                for (int i = 0; i < threeFastestDays.size(); i++) {
+                for (int i = 0; i < threeFastestDays.size() && i < 3; i++) {
                     memberList.append("`").append(threeFastestDays.get(i)).append("`");
                     if (i != threeFastestDays.size() - 1) memberList.append(", ");
                 }
                 memberList.append(" fastest 6 player game length(s) in days) ");
             }
             var userSettings = UserSettingsManager.get(member.getId());
-            String activeHoursSummary = userSettings.summarizeActiveHoursEmoji(userSettings.getActiveHours());
+            String activeHoursSummary = UserSettings.summarizeActiveHoursEmoji(userSettings.getActiveHours());
             if (activeHoursSummary != null) {
                 if (activityList.isEmpty()) {
                     activityList
@@ -428,7 +429,14 @@ public class CreateGameButtonHandler {
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
             int ongoingAmount = countOngoingGamesThatAffectJoinLimit(managedPlayer);
             int completedGames = countCompletedGamesThatAffectJoinLimit(managedPlayer);
-            if (ongoingAmount > completedGames + 2) {
+            int limitIncrease = 0;
+            if (event.getChannel() instanceof ThreadChannel channel) {
+                String parentName = channel.getParentChannel().getName();
+                if ("making-private-games".equalsIgnoreCase(parentName)) {
+                    limitIncrease = 1;
+                }
+            }
+            if (ongoingAmount > completedGames + 2 + limitIncrease) {
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(),
                         member.getUser().getAsMention()

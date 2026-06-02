@@ -42,11 +42,11 @@ class SurveyResults extends Subcommand {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
     }
 
-    private void incrementCount(Map<String, Integer> map, String key) {
+    private static void incrementCount(Map<String, Integer> map, String key) {
         map.merge(key, 1, Integer::sum);
     }
 
-    private String generateQuestionResult(String questionHeader, Map<String, Integer> data) {
+    private static String generateQuestionResult(String questionHeader, Map<String, Integer> data) {
         return questionHeader
                 + data.entrySet().stream()
                         .map(entry -> "* " + entry.getKey() + ": " + entry.getValue() + "\n")

@@ -1,5 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.agenda.resolver;
 
+import java.util.Objects;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -33,7 +34,8 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
                                 int amt = uH.getUnitCount(uk);
                                 count += amt;
                                 DestroyUnitService.destroyUnit(event, tile, game, uk, amt, uH, false);
-                                units.append(uk.unitEmoji().emojiString().repeat(amt));
+                                units.repeat(
+                                        Objects.requireNonNull(uk.unitEmoji().emojiString()), amt);
                             }
                         }
                     }
@@ -42,7 +44,7 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
                             int amt = uH.getUnitCount(uk);
                             count += amt;
                             DestroyUnitService.destroyUnit(event, tile, game, uk, amt, uH, false);
-                            units.append(uk.unitEmoji().emojiString().repeat(amt));
+                            units.repeat(Objects.requireNonNull(uk.unitEmoji().emojiString()), amt);
                         }
                     }
                     if (count > 0) {

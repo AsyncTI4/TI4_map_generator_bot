@@ -1,0 +1,24 @@
+[
+    {
+        "id": "primacy",
+        "name": "Primacy",
+        "faction": "mahact",
+        "window": "When you win a combat",
+        "windowEffect": "Place 1 owner token from your opponent on this ability if it does not already contain 1 of that player's tokens.",
+        "source": "franken"
+    },
+    {
+        "id": "edict_y",
+        "name": "Edict Y",
+        "faction": "mahact",
+        "permanentEffect": "Each owner token on your Primacy ability increases your fleet limit by 1.",
+        "source": "franken"
+    },
+    {
+        "id": "imperia_y",
+        "name": "Imperia Y",
+        "faction": "mahact",
+        "permanentEffect": "While another player's owner token is on your Primacy ability, you can use the abilities of that player's commanders, if they are unlocked.",
+        "source": "franken"
+    }
+]

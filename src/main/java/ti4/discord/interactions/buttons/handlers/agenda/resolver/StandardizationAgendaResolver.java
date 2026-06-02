@@ -21,7 +21,7 @@ public class StandardizationAgendaResolver implements AgendaResolver {
         int amountToGain = Math.clamp(3 - p2.getEffectiveFleetCC(), 0, 3);
         p2.gainFleetCC(amountToGain);
 
-        if (p2.getEffectiveFleetCC() > 3 && p2.getMahactCC().size() > 0) {
+        if (p2.getEffectiveFleetCC() > 3 && !p2.getMahactCC().isEmpty()) {
             String msg = p2.getRepresentation()
                     + ", please lose command tokens from your fleet pool until you are at 3 total.";
             var buttons = ButtonHelper.getLoseFleetCCButtons(p2);

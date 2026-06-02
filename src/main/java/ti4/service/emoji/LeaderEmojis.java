@@ -315,6 +315,9 @@ public enum LeaderEmojis implements TI4Emoji {
             case "voicehero" -> XxchaHero;
             case "witchinghero" -> KeleresHeroOdlynn;
 
+            // Franken
+            case "mahactcommander_y" -> MahactCommander;
+
             default -> TI4Emoji.getRandomGoodDog(leader.toLowerCase());
         };
     }

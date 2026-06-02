@@ -3,6 +3,7 @@ package ti4.service.franken;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.draft.DraftCategory;
 import ti4.game.Player;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -42,7 +43,17 @@ public class FrankenUnitService {
                         player.removeOwnedUnitByID(oldBaseType.getAlias());
                     }
                 }
-                sb.append("> ").append(unitID);
+                String unitText = unitID;
+                DraftCategory category = FrankenAlternateTextService.getUnitCategory(unitID);
+                if (category != null) {
+                    unitText = FrankenAlternateTextService.getRepresentationWithAlternateText(
+                            player.getGame(),
+                            category,
+                            unitID,
+                            unitModel.getNameRepresentation(),
+                            unitModel.getUnitRepresentation());
+                }
+                sb.append("> ").append(unitText);
                 player.addOwnedUnitByID(unitID);
             }
             if ("naaz_mech".equalsIgnoreCase(unitID)) {

@@ -21,6 +21,13 @@ public class WhisperService {
             String anonY,
             MessageChannel feedbackChannel,
             Guild guild) {
+        if (game.isWhispersDisabled()) {
+            MessageHelper.sendMessageToChannel(
+                    feedbackChannel,
+                    "Whispers are disabled in this game. To reenable them, use `/game setup whispers_enabled:true`.");
+            return;
+        }
+
         String message;
         String realIdentity = player_.getRepresentationUnfogged();
         String player1 = ColorEmojis.getColorEmojiWithName(player.getColor());

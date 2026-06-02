@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -324,7 +324,7 @@ public class ListTechService {
         }
         if (player.hasUnlockedBreakthrough("netrunnersbt")) {
             int dataBreachDiscount = NetrunnersBreakthroughHandler.getDataBreachDiscount(player, tech);
-            wilds += Math.max(0, Math.min(dataBreachDiscount, requirements.length()));
+            wilds += Math.clamp(dataBreachDiscount, 0, requirements.length());
         }
 
         // All sources of pre-requisites below can also apply via synergy.

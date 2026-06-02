@@ -59,6 +59,7 @@ public class GameModeService {
                         Map.entry("Cosmic Phenomenae", (Supplier<Boolean>) game::isCosmicPhenomenaeMode),
                         Map.entry("Monument to the Ages", (Supplier<Boolean>) game::isMonumentToTheAgesMode),
                         Map.entry("Wild, Wild Galaxy", (Supplier<Boolean>) game::isWildWildGalaxyMode),
+                        Map.entry("Feast or Famine", (Supplier<Boolean>) game::isFeastOrFamineMode),
                         Map.entry("Zealous Orthodoxy", (Supplier<Boolean>) game::isZealousOrthodoxyMode),
                         Map.entry("Stellar Atomics", (Supplier<Boolean>) game::isStellarAtomicsMode),
                         Map.entry("No Support Swap", (Supplier<Boolean>) game::isNoSwapMode),

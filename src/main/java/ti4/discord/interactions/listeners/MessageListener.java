@@ -122,6 +122,17 @@ class MessageListener extends ListenerAdapter {
                 .anyMatch(mentionedRole -> JdaService.bothelperRoles.stream()
                         .anyMatch(bothelperRole -> bothelperRole.getIdLong() == mentionedRole.getIdLong()));
         boolean shouldRespondToBotHelperPing = messageLikelyMissingExplanation && messageMentionsBotHelper;
+        if (messageMentionsBotHelper) {
+            TextChannel bothelperLogChannel =
+                    JdaService.guildPrimary.getTextChannelsByName("bothelper-ping-log", true).stream()
+                            .findFirst()
+                            .orElse(null);
+            if (bothelperLogChannel != null) {
+                String msg = message.getJumpUrl() + ". Full message:\n> "
+                        + message.getContentRaw().replace("@", "");
+                MessageHelper.sendMessageToChannel(bothelperLogChannel, msg);
+            }
+        }
         if (messageMentionsBotHelper
                 && message.getChannel().getName().toLowerCase().contains("cards info")
                 && !message.getAuthor().isBot()) {
@@ -248,6 +259,14 @@ class MessageListener extends ListenerAdapter {
 
         receivingColorOrFaction = AliasHandler.resolveFaction(receivingColorOrFaction);
         if (!Mapper.isValidColor(receivingColorOrFaction) && !Mapper.isValidFaction(receivingColorOrFaction)) {
+            return true;
+        }
+
+        if (game.isWhispersDisabled()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Whispers are disabled in this game. To reenable them, use `/game setup whispers_enabled:true`.");
+            message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
             return true;
         }
 

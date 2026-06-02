@@ -31,7 +31,7 @@ public class UserGameInfoService {
                                 .toDays())
                 .filter(days -> days > 0)
                 .sorted()
-                .limit(3)
+                .limit(5)
                 .toList();
     }
 

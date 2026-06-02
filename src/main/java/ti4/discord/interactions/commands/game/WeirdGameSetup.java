@@ -56,6 +56,8 @@ class WeirdGameSetup extends GameStateSubcommand {
                 new OptionData(OptionType.BOOLEAN, Constants.THUNDERS_EDGE_MODE, "True to enable Thunder's Edge Mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.VEILED_HEART_MODE, "True to enable Veiled Heart Mode"));
         addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.FEAST_OR_FAMINE_MODE, "True to enable Feast or Famine Mode"));
+        addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 FOWOption.RIFTSET_MODE.toString(),
                 "True to enable RiftSet mode (only for Eronous)"));
@@ -122,6 +124,9 @@ class WeirdGameSetup extends GameStateSubcommand {
 
         Boolean veiledHeartMode = event.getOption(Constants.VEILED_HEART_MODE, null, OptionMapping::getAsBoolean);
         if (veiledHeartMode != null) game.setVeiledHeartMode(veiledHeartMode);
+
+        Boolean feastOrFamineMode = event.getOption(Constants.FEAST_OR_FAMINE_MODE, null, OptionMapping::getAsBoolean);
+        if (feastOrFamineMode != null) game.setFeastOrFamineMode(feastOrFamineMode);
 
         Boolean limitedMode = event.getOption(Constants.LIMITED_WHISPERS_MODE, null, OptionMapping::getAsBoolean);
         if (limitedMode != null) game.setLimitedWhispersMode(limitedMode);

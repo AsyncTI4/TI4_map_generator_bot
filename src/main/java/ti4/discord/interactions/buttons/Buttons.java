@@ -232,7 +232,7 @@ public final class Buttons {
     public static List<ActionRow> paginateButtons(
             List<Button> mainButtons, List<Button> persistentButtons, int page, String pageButtonId) {
         int totalPages = (int) Math.ceil((double) mainButtons.size() / PAGE_SIZE);
-        int currentPage = Math.max(1, Math.min(page, totalPages));
+        int currentPage = Math.clamp(page, 1, totalPages);
         int fromIndex = (currentPage - 1) * PAGE_SIZE;
         int toIndex = Math.min(fromIndex + PAGE_SIZE, mainButtons.size());
 

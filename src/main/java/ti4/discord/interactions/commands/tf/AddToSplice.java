@@ -72,6 +72,6 @@ class AddToSplice extends GameStateSubcommand {
                     "The splice has the following order of participants:\n"
                             + ButtonHelperTwilightsFall.getSpliceOrderString(participants));
         }
-        ButtonHelperTwilightsFall.sendPlayerSpliceOptions(game, participants.get(0));
+        ButtonHelperTwilightsFall.sendPlayerSpliceOptions(game, participants.getFirst());
     }
 }

@@ -271,15 +271,13 @@ public class MessageHelper {
     }
 
     public static void sendSCFollowMessageToChannel(MessageChannel channel, String messageText, Game game, int scNum) {
-        Consumer<Message> addFactionReact = (message) -> {
-            GameMessageManager.add(
-                    game.getName(),
-                    new GameMessage(
-                            message.getId(),
-                            GameMessageType.STRATEGY_FOLLOW,
-                            game.getLastModifiedDate(),
-                            game.getRound() + "_" + scNum));
-        };
+        Consumer<Message> addFactionReact = (message) -> GameMessageManager.add(
+                game.getName(),
+                new GameMessage(
+                        message.getId(),
+                        GameMessageType.STRATEGY_FOLLOW,
+                        game.getLastModifiedDate(),
+                        game.getRound() + "_" + scNum));
         splitAndSentWithAction(messageText, channel, addFactionReact);
     }
 

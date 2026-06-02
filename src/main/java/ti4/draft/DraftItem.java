@@ -2,6 +2,7 @@ package ti4.draft;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import lombok.Getter;
@@ -152,6 +153,10 @@ public abstract class DraftItem {
         items.addAll(MahactKingDraftItem.buildAllItems());
         items.addAll(BreakthroughDraftItem.buildAllItems(factions));
         items.addAll(PlotDraftItem.buildAllItems());
+        Mapper.getFrankenErrata().keySet().stream()
+                .map(DraftItem::generateFromAlias)
+                .forEach(items::add);
+        items = new ArrayList<>(new LinkedHashSet<>(items));
         return items;
     }
 
@@ -180,8 +185,8 @@ public abstract class DraftItem {
 
         String details = getTitle(game);
         if (showDescr || ItemCategory.showDescrByDefault()) {
-            String descr = getLongDescriptionImpl(game);
-            descr = descr.trim().replaceAll("\n> ", "\n").replaceAll("\n", "\n> ");
+            String descr = getDisplayDescription(game, getLongDescriptionImpl(game));
+            descr = descr.trim().replace("\n> ", "\n").replace("\n", "\n> ");
             details += System.lineSeparator() + "> " + descr;
         }
         textFields.add(TextDisplay.of(details));
@@ -234,7 +239,7 @@ public abstract class DraftItem {
 
     @JsonIgnore
     public String getLongDescription(Game game) {
-        StringBuilder sb = new StringBuilder(getLongDescriptionImpl(game));
+        StringBuilder sb = new StringBuilder(getDisplayDescription(game, getLongDescriptionImpl(game)));
         if (hasAdditionalComponents()) {
             sb.append("\n>  - *Also adds: ");
             for (DraftErrataModel i : Errata.getAdditionalComponents()) {
@@ -254,6 +259,14 @@ public abstract class DraftItem {
             sb.append("*");
         }
         return sb.toString();
+    }
+
+    private String getDisplayDescription(Game game, String defaultDescription) {
+        if (game == null || !game.isFrankenGame()) {
+            return defaultDescription;
+        }
+        String alternateText = Errata.getAlternateText();
+        return alternateText.isBlank() ? defaultDescription : alternateText;
     }
 
     public boolean isDraftable(Player player) {

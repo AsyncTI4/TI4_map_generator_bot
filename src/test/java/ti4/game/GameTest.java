@@ -62,16 +62,16 @@ class GameTest extends BaseTi4Test {
     void shouldTrackAllPeekablePublicObjectivesForOracle() {
         var game = new Game();
         var player = createPlayer("player1", Set.of(), game);
-        game.setPublicObjectives1Peekable(new java.util.ArrayList<>(java.util.List.of("po1a", "po1b")));
-        game.setPublicObjectives2Peekable(new java.util.ArrayList<>(java.util.List.of("po2a")));
+        game.setPublicObjectives1Peekable(new ArrayList<>(List.of("po1a", "po1b")));
+        game.setPublicObjectives2Peekable(new ArrayList<>(List.of("po2a")));
 
         game.peekAtAllUnrevealedPublicObjectives(player);
         game.peekAtAllUnrevealedPublicObjectives(player);
 
         assertThat(game.getPublicObjectives1Peeked())
-                .containsEntry("po1a", java.util.List.of("player1"))
-                .containsEntry("po1b", java.util.List.of("player1"));
-        assertThat(game.getPublicObjectives2Peeked()).containsEntry("po2a", java.util.List.of("player1"));
+                .containsEntry("po1a", List.of("player1"))
+                .containsEntry("po1b", List.of("player1"));
+        assertThat(game.getPublicObjectives2Peeked()).containsEntry("po2a", List.of("player1"));
     }
 
     @Test

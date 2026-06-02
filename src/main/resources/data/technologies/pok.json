@@ -1011,6 +1011,7 @@
         "source": "base",
         "text": "Exhaust this card when 1 or more of your units use PRODUCTION; swap the resource and influence values of 1 planet you control during that use of Production.",
         "shrinkName": true,
+        "notes": "As an example, if this was used on Mecatol Rex, the PRODUCTION 3 in that system would change to PRODUCTION 8 for that use of Production.",
         "shortName": "Hegemonic Trade Plcy",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/hegemonic_trade_policy.jpg?raw=true"
     },

@@ -1,10 +1,9 @@
 package ti4.game;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
-import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.Getter;
@@ -34,6 +34,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -57,7 +58,6 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.helpers.DistanceTool;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
@@ -246,7 +246,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     private MiltyDraftManager miltyDraftManager;
     private DraftTileManager draftTileManager;
     private DraftManager draftManager;
-    private DistanceTool distanceTool;
 
     @Getter
     private final Expeditions expeditions = new Expeditions();
@@ -446,25 +445,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return soNum;
     }
 
-    public Map<String, Object> getExportableFieldMap() {
-        Class<GameProperties> aClass = GameProperties.class;
-        Field[] fields = aClass.getDeclaredFields();
-        Map<String, Object> returnValue = new HashMap<>();
-
-        for (Field field : fields) {
-            field.setAccessible(true);
-            if (field.getDeclaredAnnotation(ExportableField.class) != null) {
-                try {
-                    returnValue.put(field.getName(), field.get(this));
-                } catch (IllegalAccessException e) {
-                    // This shouldn't really happen since we can even see private fields.
-                    BotLogger.error(new LogOrigin(this), "Unknown error exporting fields from Game.", e);
-                }
-            }
-        }
-        return returnValue;
-    }
-
     public MiltyDraftManager getMiltyDraftManagerUnsafe() {
         return miltyDraftManager;
     }
@@ -529,42 +509,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return draftManager;
     }
 
-    public DistanceTool getDistanceTool() {
-        if (distanceTool != null) {
-            return distanceTool;
-        }
-        if (getMapTemplateID() == null) {
-            BotLogger.warning(new LogOrigin(this), "Map template ID is null, distance tool cannot be created.");
-            return null;
-        }
-        distanceTool = new DistanceTool(this);
-        return distanceTool;
-    }
-
     @Nullable
     public MiltySettings getMiltySettingsUnsafe() {
-        return miltySettings;
-    }
-
-    public MiltySettings initializeMiltySettings() {
-        if (miltySettings == null) {
-            if (miltyJson != null) {
-                try {
-                    JsonNode json = mapper.readTree(miltyJson);
-                    miltySettings = new MiltySettings(this, json);
-                } catch (Exception e) {
-                    BotLogger.error(
-                            new LogOrigin(this),
-                            "Failed loading milty draft settings for `" + getName() + "` " + Constants.jazzPing(),
-                            e);
-                    MessageHelper.sendMessageToChannel(
-                            getActionsChannel(), "Milty draft settings failed to load. Resetting to default.");
-                    miltySettings = new MiltySettings(this, null);
-                }
-            } else {
-                miltySettings = new MiltySettings(this, null);
-            }
-        }
         return miltySettings;
     }
 
@@ -572,54 +518,54 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return draftSystemSettings;
     }
 
-    public DraftSystemSettings initializeDraftSystemSettings() {
-        if (draftSystemSettings == null) {
-            if (draftSystemSettingsJson != null) {
-                try {
-                    JsonNode json = mapper.readTree(draftSystemSettingsJson);
-                    draftSystemSettings = new DraftSystemSettings(this, json);
-                } catch (Exception e) {
-                    BotLogger.error(
-                            new LogOrigin(this),
-                            "Failed loading draft system settings for `" + getName() + "` "
-                                    + Constants.jabberwockyPing(),
-                            e);
-                    MessageHelper.sendMessageToChannel(
-                            getActionsChannel(), "Draft system settings failed to load. Resetting to default.");
-                    draftSystemSettings = new DraftSystemSettings(this, null);
-                }
-            } else {
-                draftSystemSettings = new DraftSystemSettings(this, null);
-            }
-        }
-        return draftSystemSettings;
-    }
-
     public FrankenSettings getFrankenSettingsUnsafe() {
         return frankenSettings;
     }
 
+    public MiltySettings initializeMiltySettings() {
+        if (miltySettings == null) {
+            miltySettings = initializeSetting(
+                    miltyJson, MiltySettings::new, "milty draft settings", Constants.jazzPing(), getActionsChannel());
+        }
+        return miltySettings;
+    }
+
+    public DraftSystemSettings initializeDraftSystemSettings() {
+        if (draftSystemSettings == null) {
+            draftSystemSettings = initializeSetting(
+                    draftSystemSettingsJson,
+                    DraftSystemSettings::new,
+                    "draft system settings",
+                    Constants.jabberwockyPing(),
+                    getActionsChannel());
+        }
+        return draftSystemSettings;
+    }
+
     public FrankenSettings initializeFrankenSettings() {
         if (frankenSettings == null) {
-            if (frankenSettingsJson != null) {
-                try {
-                    JsonNode json = mapper.readTree(frankenSettingsJson);
-                    frankenSettings = new FrankenSettings(this, json);
-                } catch (Exception e) {
-                    BotLogger.error(
-                            new LogOrigin(this),
-                            "Failed loading franken draft settings for `" + getName() + "` "
-                                    + Constants.jabberwockyPing(),
-                            e);
-                    MessageHelper.sendMessageToChannel(
-                            getActionsChannel(), "Franken draft settings failed to load. Resetting to default.");
-                    frankenSettings = new FrankenSettings(this, null);
-                }
-            } else {
-                frankenSettings = new FrankenSettings(this, null);
-            }
+            frankenSettings = initializeSetting(
+                    frankenSettingsJson,
+                    FrankenSettings::new,
+                    "franken draft settings",
+                    Constants.jabberwockyPing(),
+                    getActionsChannel());
         }
         return frankenSettings;
+    }
+
+    private <T> T initializeSetting(
+            String json, BiFunction<Game, JsonNode, T> factory, String label, String ping, MessageChannel channel) {
+        if (json != null) {
+            try {
+                JsonNode node = mapper.readTree(json);
+                return factory.apply(this, node);
+            } catch (Exception e) {
+                BotLogger.error(new LogOrigin(this), "Failed loading " + label + " for `" + getName() + "` " + ping, e);
+                MessageHelper.sendMessageToChannel(channel, label + " failed to load. Resetting to default.");
+            }
+        }
+        return factory.apply(this, null);
     }
 
     public void setPurgedPN(String purgedPN) {
@@ -960,6 +906,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("Weird Wormholes", isWeirdWormholesMode());
         gameModes.put("Cosmic Phenomenae", isCosmicPhenomenaeMode());
         gameModes.put("Wild wild Galaxy", isWildWildGalaxyMode());
+        gameModes.put("Feast or Famine", isFeastOrFamineMode());
         gameModes.put("Zealous Orthodoxy", isZealousOrthodoxyMode());
         gameModes.put("Mercenaries For Hire", isMercenariesForHireMode());
         gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
@@ -1580,38 +1527,21 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public void setUpPeekableObjectives(int num, int type) {
         if (type == 1) {
-            var maxSize = publicObjectives1.size() + publicObjectives1Peekable.size();
-            if (num > maxSize) {
-                num = maxSize;
-            }
-            while (publicObjectives1Peekable.size() != num) {
-                if (publicObjectives1Peekable.size() > num) {
-                    String id = publicObjectives1Peekable.removeLast();
-                    publicObjectives1.add(id);
-                    Collections.shuffle(publicObjectives1);
-                } else {
-                    Collections.shuffle(publicObjectives1);
-                    String id = publicObjectives1.getFirst();
-                    publicObjectives1.remove(id);
-                    publicObjectives1Peekable.add(id);
-                }
-            }
+            adjustPeekable(num, publicObjectives1, publicObjectives1Peekable);
         } else {
-            var maxSize = publicObjectives2.size() + publicObjectives2Peekable.size();
-            if (num > maxSize) {
-                num = maxSize;
-            }
-            while (publicObjectives2Peekable.size() != num) {
-                if (publicObjectives2Peekable.size() > num) {
-                    String id = publicObjectives2Peekable.removeLast();
-                    publicObjectives2.add(id);
-                    Collections.shuffle(publicObjectives2);
-                } else {
-                    Collections.shuffle(publicObjectives2);
-                    String id = publicObjectives2.getFirst();
-                    publicObjectives2.remove(id);
-                    publicObjectives2Peekable.add(id);
-                }
+            adjustPeekable(num, publicObjectives2, publicObjectives2Peekable);
+        }
+    }
+
+    private void adjustPeekable(int num, List<String> objectiveDeck, List<String> peekable) {
+        num = Math.min(num, objectiveDeck.size() + peekable.size());
+        while (peekable.size() != num) {
+            if (peekable.size() > num) {
+                objectiveDeck.add(peekable.removeLast());
+                Collections.shuffle(objectiveDeck);
+            } else {
+                Collections.shuffle(objectiveDeck);
+                peekable.add(objectiveDeck.removeFirst());
             }
         }
     }
@@ -2989,17 +2919,17 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public String drawSecretObjective(String userID) {
-        if (!getSecretObjectives().isEmpty()) {
-            String id = getSecretObjectives().getFirst();
-            Player player = getPlayer(userID);
-            if (player != null) {
-                removeSOFromGame(id);
-                player.setSecret(id);
-                checkSOLimit(player);
-            }
-            return id;
+        if (getSecretObjectives().isEmpty()) {
+            return null;
         }
-        return null;
+        String id = getSecretObjectives().getFirst();
+        Player player = getPlayer(userID);
+        if (player != null) {
+            removeSOFromGame(id);
+            player.setSecret(id);
+            checkSOLimit(player);
+        }
+        return id;
     }
 
     @Nullable
@@ -3060,56 +2990,57 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (status != null) getDiscardACStatus().put(id, status);
     }
 
-    public void setPurgedActionCard(String id) {
+    private void setPurgedActionCard(String id) {
         setDiscardActionCard(id, ACStatus.purged);
     }
 
     public boolean discardActionCard(String userID, Integer acIDNumber) {
         Player player = getPlayer(userID);
-        if (player != null) {
-            Map<String, Integer> actionCards = player.getActionCards();
-            String acID = "";
-            for (Entry<String, Integer> ac : actionCards.entrySet()) {
-                if (ac.getValue().equals(acIDNumber)) {
-                    acID = ac.getKey();
-                    break;
-                }
+        if (player == null) {
+            return false;
+        }
+        Map<String, Integer> actionCards = player.getActionCards();
+        String acID = "";
+        for (Entry<String, Integer> ac : actionCards.entrySet()) {
+            if (ac.getValue().equals(acIDNumber)) {
+                acID = ac.getKey();
+                break;
             }
-            if (!acID.isEmpty()) {
-                player.removeActionCard(acIDNumber);
-                ACStatus status = shouldPutCardOnRalnel(player) ? ACStatus.ralnelbt : null;
-                setDiscardActionCard(acID, status);
-                return true;
-            }
+        }
+        if (!acID.isEmpty()) {
+            player.removeActionCard(acIDNumber);
+            ACStatus status = shouldPutCardOnRalnel(player) ? ACStatus.ralnelbt : null;
+            setDiscardActionCard(acID, status);
+            return true;
         }
         return false;
     }
 
     public boolean purgedActionCard(String userID, Integer acIDNumber) {
         Player player = getPlayer(userID);
-        if (player != null) {
-            Map<String, Integer> actionCards = player.getActionCards();
-            String acID = "";
-            for (Entry<String, Integer> ac : actionCards.entrySet()) {
-                if (ac.getValue().equals(acIDNumber)) {
+        if (player == null) {
+            return false;
+        }
+        Map<String, Integer> actionCards = player.getActionCards();
+        String acID = "";
+        for (Entry<String, Integer> ac : actionCards.entrySet()) {
+            if (ac.getValue().equals(acIDNumber)) {
+                acID = ac.getKey();
+                break;
+            }
+        }
+        if (player.getPlanets().contains("garbozia")) { // allow checking for garbozia
+            for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
+                if (ac.getValue().equals(acIDNumber) && getDiscardACStatus().get(ac.getKey()) == ACStatus.garbozia) {
                     acID = ac.getKey();
                     break;
                 }
             }
-            if (player.getPlanets().contains("garbozia")) { // allow checking for garbozia
-                for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
-                    if (ac.getValue().equals(acIDNumber)
-                            && getDiscardACStatus().get(ac.getKey()) == ACStatus.garbozia) {
-                        acID = ac.getKey();
-                        break;
-                    }
-                }
-            }
-            if (!acID.isEmpty()) {
-                player.removeActionCard(acIDNumber);
-                setPurgedActionCard(acID);
-                return true;
-            }
+        }
+        if (!acID.isEmpty()) {
+            player.removeActionCard(acIDNumber);
+            setPurgedActionCard(acID);
+            return true;
         }
         return false;
     }
@@ -3126,42 +3057,44 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public boolean pickActionCard(String userID, Integer acIDNumber) {
         Player player = getPlayer(userID);
-        if (player != null) {
-            String acID = "";
-            for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
-                ACStatus status = getDiscardACStatus().get(ac.getKey());
-                if (ac.getValue().equals(acIDNumber) && status != ACStatus.purged) {
-                    acID = ac.getKey();
-                    break;
-                }
+        if (player == null) {
+            return false;
+        }
+        String acID = "";
+        for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
+            ACStatus status = getDiscardACStatus().get(ac.getKey());
+            if (ac.getValue().equals(acIDNumber) && status != ACStatus.purged) {
+                acID = ac.getKey();
+                break;
             }
-            if (!acID.isEmpty()) {
-                getDiscardActionCards().remove(acID);
-                getDiscardACStatus().remove(acID);
-                player.setActionCard(acID);
-                return true;
-            }
+        }
+        if (!acID.isEmpty()) {
+            getDiscardActionCards().remove(acID);
+            getDiscardACStatus().remove(acID);
+            player.setActionCard(acID);
+            return true;
         }
         return false;
     }
 
     public boolean pickActionCardFromPurged(String userID, Integer acIDNumber) {
         Player player = getPlayer(userID);
-        if (player != null) {
-            String acID = "";
-            for (Map.Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
-                ACStatus status = getDiscardACStatus().get(ac.getKey());
-                if (ac.getValue().equals(acIDNumber) && status == ACStatus.purged) {
-                    acID = ac.getKey();
-                    break;
-                }
+        if (player == null) {
+            return false;
+        }
+        String acID = "";
+        for (Map.Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
+            ACStatus status = getDiscardACStatus().get(ac.getKey());
+            if (ac.getValue().equals(acIDNumber) && status == ACStatus.purged) {
+                acID = ac.getKey();
+                break;
             }
-            if (!acID.isEmpty()) {
-                getDiscardActionCards().remove(acID);
-                getDiscardACStatus().remove(acID);
-                player.setActionCard(acID);
-                return true;
-            }
+        }
+        if (!acID.isEmpty()) {
+            getDiscardActionCards().remove(acID);
+            getDiscardACStatus().remove(acID);
+            player.setActionCard(acID);
+            return true;
         }
         return false;
     }
@@ -3206,82 +3139,86 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public boolean scoreSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
-        if (player != null) {
-            Map<String, Integer> secrets = player.getSecrets();
-            String soID = "";
-            for (Entry<String, Integer> so : secrets.entrySet()) {
-                if (so.getValue().equals(soIDNumber)) {
-                    soID = so.getKey();
-                    break;
-                }
+        if (player == null) {
+            return false;
+        }
+        Map<String, Integer> secrets = player.getSecrets();
+        String soID = "";
+        for (Entry<String, Integer> so : secrets.entrySet()) {
+            if (so.getValue().equals(soIDNumber)) {
+                soID = so.getKey();
+                break;
             }
-            if (!soID.isEmpty()) {
-                player.removeSecret(soIDNumber);
-                player.setSecretScored(soID);
-                return true;
-            }
+        }
+        if (!soID.isEmpty()) {
+            player.removeSecret(soIDNumber);
+            player.setSecretScored(soID);
+            return true;
         }
         return false;
     }
 
     public boolean unscoreSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
-        if (player != null) {
-            Map<String, Integer> secrets = player.getSecretsScored();
-            String soID = "";
-            for (Entry<String, Integer> so : secrets.entrySet()) {
-                if (so.getValue().equals(soIDNumber)) {
-                    soID = so.getKey();
-                    break;
-                }
+        if (player == null) {
+            return false;
+        }
+        Map<String, Integer> secrets = player.getSecretsScored();
+        String soID = "";
+        for (Entry<String, Integer> so : secrets.entrySet()) {
+            if (so.getValue().equals(soIDNumber)) {
+                soID = so.getKey();
+                break;
             }
-            if (!soID.isEmpty()) {
-                player.removeSecretScored(soIDNumber);
-                player.setSecret(soID);
-                return true;
-            }
+        }
+        if (!soID.isEmpty()) {
+            player.removeSecretScored(soIDNumber);
+            player.setSecret(soID);
+            return true;
         }
         return false;
     }
 
     public boolean unscoreAndShuffleSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
-        if (player != null) {
-            Map<String, Integer> secrets = player.getSecretsScored();
-            String soID = "";
-            for (Entry<String, Integer> so : secrets.entrySet()) {
-                if (so.getValue().equals(soIDNumber)) {
-                    soID = so.getKey();
-                    break;
-                }
+        if (player == null) {
+            return false;
+        }
+        Map<String, Integer> secrets = player.getSecretsScored();
+        String soID = "";
+        for (Entry<String, Integer> so : secrets.entrySet()) {
+            if (so.getValue().equals(soIDNumber)) {
+                soID = so.getKey();
+                break;
             }
-            if (!soID.isEmpty()) {
-                player.removeSecretScored(soIDNumber);
-                getSecretObjectives().add(soID);
-                Collections.shuffle(getSecretObjectives());
-                return true;
-            }
+        }
+        if (!soID.isEmpty()) {
+            player.removeSecretScored(soIDNumber);
+            getSecretObjectives().add(soID);
+            Collections.shuffle(getSecretObjectives());
+            return true;
         }
         return false;
     }
 
     public boolean discardSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
-        if (player != null) {
-            Map<String, Integer> secrets = player.getSecrets();
-            String soID = "";
-            for (Entry<String, Integer> so : secrets.entrySet()) {
-                if (so.getValue().equals(soIDNumber)) {
-                    soID = so.getKey();
-                    break;
-                }
+        if (player == null) {
+            return false;
+        }
+        Map<String, Integer> secrets = player.getSecrets();
+        String soID = "";
+        for (Entry<String, Integer> so : secrets.entrySet()) {
+            if (so.getValue().equals(soIDNumber)) {
+                soID = so.getKey();
+                break;
             }
-            if (!soID.isEmpty()) {
-                player.removeSecret(soIDNumber);
-                getSecretObjectives().add(soID);
-                Collections.shuffle(getSecretObjectives());
-                return true;
-            }
+        }
+        if (!soID.isEmpty()) {
+            player.removeSecret(soIDNumber);
+            getSecretObjectives().add(soID);
+            Collections.shuffle(getSecretObjectives());
+            return true;
         }
         return false;
     }
@@ -3726,11 +3663,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     private Role getGameRole() {
-        if (getGuild() != null) {
-            for (Role role : getGuild().getRoles()) {
-                if (getName().equals(role.getName().toLowerCase())) {
-                    return role;
-                }
+        if (getGuild() == null) {
+            return null;
+        }
+        for (Role role : getGuild().getRoles()) {
+            if (getName().equals(role.getName().toLowerCase())) {
+                return role;
             }
         }
         return null;
@@ -3960,39 +3898,40 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public Set<String> getPlanets() {
-        if (planets.isEmpty()) {
-            for (Tile tile : tileMap.values()) {
-                for (Entry<String, UnitHolder> unitHolderEntry :
-                        tile.getUnitHolders().entrySet()) {
-                    if (unitHolderEntry.getValue() instanceof Planet p) {
-                        planets.put(unitHolderEntry.getKey(), p);
-                    }
+        if (!planets.isEmpty()) {
+            return planets.keySet();
+        }
+        for (Tile tile : tileMap.values()) {
+            for (Entry<String, UnitHolder> unitHolderEntry :
+                    tile.getUnitHolders().entrySet()) {
+                if (unitHolderEntry.getValue() instanceof Planet p) {
+                    planets.put(unitHolderEntry.getKey(), p);
                 }
             }
-            planets.put("custodiavigilia", new Planet("custodiavigilia", new Point(0, 0)));
-            if ("custodiavigilia".equalsIgnoreCase(getStoredValue("terraformedPlanet"))) {
-                planets.get("custodiavigilia").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
-            }
-            if (isThundersEdge()) {
-                planets.get("custodiavigilia").addToken("attachment_negativeinf.png");
-            }
-            planets.put("custodiavigiliaplus", new Planet("custodiavigiliaplus", new Point(0, 0)));
-            planets.put("nevermore", new Planet("nevermore", new Point(0, 0)));
-            planets.put("ghoti", new Planet("ghoti", new Point(0, 0)));
-            if ("ghoti".equalsIgnoreCase(getStoredValue("terraformedPlanet"))) {
-                planets.get("ghoti").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
-            }
-            planets.put("ocean1", new Planet("ocean1", new Point(0, 0)));
-            planets.put("ocean2", new Planet("ocean2", new Point(0, 0)));
-            planets.put("ocean3", new Planet("ocean3", new Point(0, 0)));
-            planets.put("bannerhall1", new Planet("bannerhall1", new Point(0, 0)));
-            planets.put("bannerhall2", new Planet("bannerhall2", new Point(0, 0)));
-            planets.put("bannerhall3", new Planet("bannerhall3", new Point(0, 0)));
-            planets.put("ocean4", new Planet("ocean4", new Point(0, 0)));
-            planets.put("ocean5", new Planet("ocean5", new Point(0, 0)));
-            planets.put("triad", new Planet("triad", new Point(0, 0)));
-            planets.put("grove", new Planet("grove", new Point(0, 0)));
         }
+        planets.put("custodiavigilia", new Planet("custodiavigilia", new Point(0, 0)));
+        if ("custodiavigilia".equalsIgnoreCase(getStoredValue("terraformedPlanet"))) {
+            planets.get("custodiavigilia").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
+        }
+        if (isThundersEdge()) {
+            planets.get("custodiavigilia").addToken("attachment_negativeinf.png");
+        }
+        planets.put("custodiavigiliaplus", new Planet("custodiavigiliaplus", new Point(0, 0)));
+        planets.put("nevermore", new Planet("nevermore", new Point(0, 0)));
+        planets.put("ghoti", new Planet("ghoti", new Point(0, 0)));
+        if ("ghoti".equalsIgnoreCase(getStoredValue("terraformedPlanet"))) {
+            planets.get("ghoti").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
+        }
+        planets.put("ocean1", new Planet("ocean1", new Point(0, 0)));
+        planets.put("ocean2", new Planet("ocean2", new Point(0, 0)));
+        planets.put("ocean3", new Planet("ocean3", new Point(0, 0)));
+        planets.put("bannerhall1", new Planet("bannerhall1", new Point(0, 0)));
+        planets.put("bannerhall2", new Planet("bannerhall2", new Point(0, 0)));
+        planets.put("bannerhall3", new Planet("bannerhall3", new Point(0, 0)));
+        planets.put("ocean4", new Planet("ocean4", new Point(0, 0)));
+        planets.put("ocean5", new Planet("ocean5", new Point(0, 0)));
+        planets.put("triad", new Planet("triad", new Point(0, 0)));
+        planets.put("grove", new Planet("grove", new Point(0, 0)));
         return planets.keySet();
     }
 
@@ -4085,28 +4024,30 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void addFakeCommander(String leaderID) {
-        if (leaderID.contains("commander")) {
-            String fakeString = getStoredValue("fakeCommanders");
-            if (StringUtils.isBlank(fakeString)) {
-                setStoredValue("fakeCommanders", leaderID);
-            } else {
-                Set<String> leaders = new HashSet<>(Arrays.asList(fakeString.split("\\|")));
-                leaders.add(leaderID);
-                setStoredValue("fakeCommanders", String.join("|", leaders));
-            }
+        if (!leaderID.contains("commander")) {
+            return;
+        }
+        String fakeString = getStoredValue("fakeCommanders");
+        if (StringUtils.isBlank(fakeString)) {
+            setStoredValue("fakeCommanders", leaderID);
+        } else {
+            Set<String> leaders = new HashSet<>(Arrays.asList(fakeString.split("\\|")));
+            leaders.add(leaderID);
+            setStoredValue("fakeCommanders", String.join("|", leaders));
         }
     }
 
     public void addFakeAgent(String leaderID) {
-        if (leaderID.contains("agent")) {
-            String fakeString = getStoredValue("fakeAgents");
-            if (StringUtils.isBlank(fakeString)) {
-                setStoredValue("fakeAgents", leaderID);
-            } else {
-                Set<String> leaders = new HashSet<>(Arrays.asList(fakeString.split("\\|")));
-                leaders.add(leaderID);
-                setStoredValue("fakeAgents", String.join("|", leaders));
-            }
+        if (!leaderID.contains("agent")) {
+            return;
+        }
+        String fakeString = getStoredValue("fakeAgents");
+        if (StringUtils.isBlank(fakeString)) {
+            setStoredValue("fakeAgents", leaderID);
+        } else {
+            Set<String> leaders = new HashSet<>(Arrays.asList(fakeString.split("\\|")));
+            leaders.add(leaderID);
+            setStoredValue("fakeAgents", String.join("|", leaders));
         }
     }
 
@@ -4138,7 +4079,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
         // check if player has Imperia and if any of the stolen CCs are owned by players
         // that have the leader unlocked
-        if (player.hasAbility("imperia")) {
+        if (player.hasAbility("imperia") || player.hasAbility("imperia_y")) {
             for (Player player_ : getRealPlayersNDummies()) {
                 if (player_.getFaction().equalsIgnoreCase(player.getFaction())) continue;
                 if (player.getMahactCC().contains(player_.getColor()) && player_.hasLeaderUnlocked(leaderID)) {
@@ -4173,7 +4114,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
         // check if player has Imperia and if any of the stolen CCs are owned by players
         // that have the leader unlocked
-        if (player.hasAbility("imperia")) {
+        if (player.hasAbility("imperia") || player.hasAbility("imperia_y")) {
             for (Player otherPlayer : getRealPlayers()) {
                 if (otherPlayer.equals(player)) continue;
                 if (player.getMahactCC().contains(otherPlayer.getColor())) {

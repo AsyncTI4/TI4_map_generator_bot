@@ -297,7 +297,7 @@ public class PlayerAreaGenerator {
 
         // Additional Fleet Supply
         int additionalFleetSupply = 0;
-        if (player.hasAbility("edict")) {
+        if (player.hasAbility("edict") || player.hasAbility("edict_y")) {
             additionalFleetSupply += player.getMahactCC().size();
         }
         if (player.hasAbility("armada")) {
@@ -629,9 +629,14 @@ public class PlayerAreaGenerator {
             return xDelta;
         }
         boolean faceup = player.hasAbility("bladesorchestra");
+        List<Entry<String, Integer>> plots =
+                new ArrayList<>(player.getPlotCardsRaw().entrySet());
+        plots.sort(Entry.comparingByValue());
+        if (faceup) plots.sort(Entry.comparingByKey());
 
         int height = 150;
-        int width = 180;
+        int columnCount = getPlotCardColumnCount(plots);
+        int width = 180 * columnCount;
         xDelta += width + 15;
 
         Graphics2D g2 = (Graphics2D) graphics;
@@ -642,37 +647,40 @@ public class PlayerAreaGenerator {
         graphics.setColor(Color.white);
         graphics.setFont(Storage.getFont20());
         yDelta += 28;
-
-        List<Entry<String, Integer>> plots =
-                new ArrayList<>(player.getPlotCards().entrySet());
-        plots.sort(Entry.comparingByValue());
-        if (faceup) plots.sort(Entry.comparingByKey());
-        for (Entry<String, Integer> entry : plots) {
+        int rowsPerColumn = 5;
+        for (int i = 0; i < plots.size(); i++) {
+            Entry<String, Integer> entry = plots.get(i);
             String alias = entry.getKey();
             Integer id = entry.getValue();
-            int x = mapWidth - xDelta + 8;
+            int column = i / rowsPerColumn;
+            int row = i % rowsPerColumn;
+            int x = mapWidth - xDelta + 8 + (columnCount - 1 - column) * 180;
+            int plotY = yDelta + row * 27;
 
             String name = faceup ? Mapper.getPlot(alias).getName() : "Plot " + id;
             boolean mutated = name.contains("Mutated ");
             if (mutated) name = name.replace("Mutated ", "");
 
-            DrawingUtil.superDrawString(graphics, name, x, yDelta, Color.white, HorizontalAlign.Left, null, null, null);
+            DrawingUtil.superDrawString(graphics, name, x, plotY, Color.white, HorizontalAlign.Left, null, null, null);
             int strWidth = graphics.getFontMetrics().stringWidth(name);
             if (mutated && faceup) {
                 graphics.setColor(Color.red);
-                graphics.drawLine(x - 2, yDelta - 7, x + strWidth + 2, yDelta - 7);
+                graphics.drawLine(x - 2, plotY - 7, x + strWidth + 2, plotY - 7);
                 graphics.setColor(Color.white);
             }
 
             x += 95;
-            for (String faction : player.getPuppetedFactionsForPlot(alias)) {
+            for (String faction : player.getPlotCardsFactionsRaw().getOrDefault(alias, List.of())) {
                 Player p = game.getPlayerFromColorOrFaction(faction);
-                DrawingUtil.getAndDrawControlToken(graphics, p, x, yDelta - 20, isFoWPrivate, 0.6f);
+                DrawingUtil.getAndDrawControlToken(graphics, p, x, plotY - 20, isFoWPrivate, 0.6f);
                 x += 30;
             }
-            yDelta += 27;
         }
         return xDelta;
+    }
+
+    private int getPlotCardColumnCount(List<Entry<String, Integer>> plots) {
+        return Math.max(1, (plots.size() + 4) / 5);
     }
 
     private int displayRemainingFactionTokens(
@@ -1360,7 +1368,7 @@ public class PlayerAreaGenerator {
                     graphics, x, y, VeiledHeartService.VeiledCardType.PARADIGM, deltaX, player);
         }
 
-        if (player.hasAbility("imperia")) {
+        if (player.hasAbility("imperia") || player.hasAbility("imperia_y")) {
             deltaX += 5;
             List<String> mahactCCs = player.getMahactCC();
             Collection<Player> players = game.getRealPlayersNDummies();
@@ -1573,7 +1581,6 @@ public class PlayerAreaGenerator {
                     }
                     drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
                 }
-
                 deltaX += 48;
                 addedAbilities = true;
             }

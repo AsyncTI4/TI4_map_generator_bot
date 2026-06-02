@@ -103,7 +103,7 @@ public final class PositionMapper {
 
     public static Point getScaledTilePosition(Game game, String position, int x, int y, int fractureYbump) {
         int ringCount = game.getRingCount();
-        ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
+        ringCount = Math.clamp(ringCount, RING_MIN_COUNT, RING_MAX_COUNT);
         if (ringCount == RING_MIN_COUNT) {
             x += HORIZONTAL_TILE_SPACING;
         }
