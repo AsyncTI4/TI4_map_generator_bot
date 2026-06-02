@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.kalora;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora;
 
 import java.util.ArrayList;
 import java.util.List;

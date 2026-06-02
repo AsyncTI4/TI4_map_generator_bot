@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris;
 
 import java.util.ArrayList;
 import java.util.List;
