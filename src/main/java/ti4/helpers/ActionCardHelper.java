@@ -1411,6 +1411,13 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("classified_weapons".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.factionButtonChecker() + "resolveClassifiedWeapons", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "unit"), codedButtons);
+            }
+
             if ("scuttle".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "startToScuttleAUnit_0", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(

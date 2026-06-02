@@ -470,6 +470,11 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "classifiedWeapons" -> {
+                if (game.getStoredValue("classifiedWeapons").startsWith(player.getFaction() + ";")) {
+                    meetsCondition = true;
+                }
+            }
             case "thalnosPlusOne" -> {
                 if ("true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"))) {
                     meetsCondition = true;

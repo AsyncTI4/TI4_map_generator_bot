@@ -108,6 +108,7 @@
     },
     {
         "alias": "classified_weapons1",
+        "automationID": "classified_weapons",
         "name": "Classified Weapons",
         "phase": "Action",
         "window": "When 1 or more of your units make a combat or unit ability roll",
@@ -117,6 +118,7 @@
     },
     {
         "alias": "classified_weapons2",
+        "automationID": "classified_weapons",
         "name": "Classified Weapons",
         "phase": "Action",
         "window": "When 1 or more of your units make a combat or unit ability roll",
@@ -126,6 +128,7 @@
     },
     {
         "alias": "classified_weapons3",
+        "automationID": "classified_weapons",
         "name": "Classified Weapons",
         "phase": "Action",
         "window": "When 1 or more of your units make a combat or unit ability roll",
@@ -135,6 +138,7 @@
     },
     {
         "alias": "classified_weapons4",
+        "automationID": "classified_weapons",
         "name": "Classified Weapons",
         "phase": "Action",
         "window": "When 1 or more of your units make a combat or unit ability roll",
