@@ -10,7 +10,6 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
@@ -44,27 +43,27 @@ public class KaloraButtonHandler {
     }
 
     public static void offerMechButtons(Player player, Game game, Tile tile) {
-        for (UnitHolder uH : tile.getPlanetUnitHolders()) {
-            int mechCount = uH.getUnitCount(UnitType.Mech, player.getColor());
-            if (mechCount == 0) continue;
-            if (!game.getStoredValue("planetsTakenThisRound").contains(uH.getName())) continue;
-            List<Button> buttons = new ArrayList<>();
-            for (Tile t : ButtonHelper.getTilesWithShipsInTheSystem(player, game)) {
-                if (t.getPlanetUnitHolders().isEmpty()) {
-                    buttons.add(Buttons.green(
-                            player.factionButtonChecker() + "kaloraExploreFront_" + t.getPosition(),
-                            t.getRepresentationForButtons(game, player),
-                            ExploreEmojis.Frontier));
-                }
+        boolean hasMechOnTakenPlanet = tile.getPlanetUnitHolders().stream()
+                .anyMatch(uH -> uH.getUnitCount(UnitType.Mech, player.getColor()) > 0
+                        && game.getStoredValue("planetsTakenThisRound").contains(uH.getName()));
+        if (!hasMechOnTakenPlanet) return;
+
+        List<Button> buttons = new ArrayList<>();
+        for (Tile t : ButtonHelper.getTilesWithShipsInTheSystem(player, game)) {
+            if (t.getPlanetUnitHolders().isEmpty()) {
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + "kaloraExploreFront_" + t.getPosition(),
+                        t.getRepresentationForButtons(game, player),
+                        ExploreEmojis.Frontier));
             }
-            if (!buttons.isEmpty()) {
-                buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Delete these buttons"));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(),
-                        player.getRepresentationUnfogged()
-                                + ", please explore systems equal to the number of mechs you have here.",
-                        buttons);
-            }
+        }
+        if (!buttons.isEmpty()) {
+            buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Delete these buttons"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", please explore systems equal to the number of mechs you have here.",
+                    buttons);
         }
     }
 }
