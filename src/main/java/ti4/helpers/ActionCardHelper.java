@@ -1299,6 +1299,11 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("corruption".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveCorruption", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("reinforcements".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveReinforcements", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);

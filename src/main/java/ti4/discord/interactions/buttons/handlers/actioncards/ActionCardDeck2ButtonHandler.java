@@ -3,6 +3,7 @@ package ti4.discord.interactions.buttons.handlers.actioncards;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -422,6 +423,166 @@ class ActionCardDeck2ButtonHandler {
                 + ", use the buttons to place up to 2 ships that have a combined cost of 3 or less.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+    }
+
+    @ButtonHandler("resolveCorruption")
+    public static void resolveCorruption(Player player, Game game, ButtonInteractionEvent event) {
+        Map.Entry<String, Integer> mostRecentObjective = getMostRecentPublicObjective(game);
+        if (mostRecentObjective == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", there is no recently revealed public objective to replace.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        String revealedId = mostRecentObjective.getKey();
+        PublicObjectiveModel revealedObjective = Mapper.getPublicObjective(revealedId);
+        if (revealedObjective == null || (revealedObjective.getPoints() != 1 && revealedObjective.getPoints() != 2)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", that recently revealed objective cannot be replaced with _Corruption_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<String> objectiveDeck = revealedObjective.getPoints() == 1
+                ? game.getPublicObjectives1()
+                : game.getPublicObjectives2();
+        if (objectiveDeck.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", there are no objectives in that deck to look at for _Corruption_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        int count = Math.min(2, objectiveDeck.size());
+        List<String> previewObjectiveIds = new ArrayList<>(objectiveDeck.subList(0, count));
+        List<MessageEmbed> embeds = previewObjectiveIds.stream()
+                .map(Mapper::getPublicObjective)
+                .filter(Objects::nonNull)
+                .map(PublicObjectiveModel::getRepresentationEmbed)
+                .toList();
+        List<Button> buttons = new ArrayList<>();
+        for (String objectiveId : previewObjectiveIds) {
+            PublicObjectiveModel po = Mapper.getPublicObjective(objectiveId);
+            if (po != null) {
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + "resolveCorruptionReplace;" + revealedId + ";" + objectiveId,
+                        "Replace with \"" + po.getName() + "\""));
+            }
+        }
+        buttons.add(Buttons.gray(player.factionButtonChecker() + "resolveCorruptionNoSwap", "No Swap"));
+
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(
+                player,
+                player.getRepresentationUnfogged()
+                        + ", here are the top " + count + " objective(s) from the matching deck for _Corruption_.",
+                embeds);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged()
+                        + ", choose whether to replace the recently revealed objective \""
+                        + revealedObjective.getName() + "\".",
+                buttons);
+    }
+
+    @ButtonHandler("resolveCorruptionReplace;")
+    public static void resolveCorruptionReplace(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String payload = buttonID.replace("resolveCorruptionReplace;", "");
+        String[] parts = payload.split(";", 2);
+        if (parts.length < 2) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Corruption_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String revealedId = parts[0];
+        String replacementId = parts[1];
+        PublicObjectiveModel revealedObjective = Mapper.getPublicObjective(revealedId);
+        PublicObjectiveModel replacementObjective = Mapper.getPublicObjective(replacementId);
+        if (revealedObjective == null || replacementObjective == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Corruption_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (!game.getRevealedPublicObjectives().containsKey(revealedId)
+                || revealedObjective.getPoints() != replacementObjective.getPoints()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", that objective is no longer eligible for replacement with _Corruption_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<String> objectiveDeck = revealedObjective.getPoints() == 1
+                ? game.getPublicObjectives1()
+                : game.getPublicObjectives2();
+        if (!objectiveDeck.remove(replacementId)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", that replacement objective is no longer available for _Corruption_.");
+            Collections.shuffle(objectiveDeck);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        objectiveDeck.add(revealedId);
+        Collections.shuffle(objectiveDeck);
+
+        Map<String, Integer> updatedRevealed = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> revealedEntry : game.getRevealedPublicObjectives().entrySet()) {
+            if (revealedEntry.getKey().equals(revealedId)) {
+                updatedRevealed.put(replacementId, revealedEntry.getValue());
+            } else {
+                updatedRevealed.put(revealedEntry.getKey(), revealedEntry.getValue());
+            }
+        }
+        game.setRevealedPublicObjectives(updatedRevealed);
+
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                game.getActionsChannel(),
+                player.getFactionEmojiOrColor()
+                        + " resolved _Corruption_ and replaced \""
+                        + revealedObjective.getName()
+                        + "\" with \""
+                        + replacementObjective.getName()
+                        + "\". The matching objective deck has been shuffled.");
+    }
+
+    @ButtonHandler("resolveCorruptionNoSwap")
+    public static void resolveCorruptionNoSwap(Player player, Game game, ButtonInteractionEvent event) {
+        Map.Entry<String, Integer> mostRecentObjective = getMostRecentPublicObjective(game);
+        if (mostRecentObjective != null) {
+            PublicObjectiveModel objective = Mapper.getPublicObjective(mostRecentObjective.getKey());
+            if (objective != null) {
+                game.shuffleObjectiveDeck(objective.getPoints());
+            }
+        }
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                game.getActionsChannel(),
+                player.getFactionEmojiOrColor()
+                        + " resolved _Corruption_ without replacing the revealed objective. The matching objective deck has been shuffled.");
+    }
+
+    private static Map.Entry<String, Integer> getMostRecentPublicObjective(Game game) {
+        Map.Entry<String, Integer> latestObjective = null;
+        for (Map.Entry<String, Integer> objective : game.getRevealedPublicObjectives().entrySet()) {
+            if (Mapper.getPublicObjective(objective.getKey()) == null) {
+                continue;
+            }
+            if (latestObjective == null || objective.getValue() > latestObjective.getValue()) {
+                latestObjective = objective;
+            }
+        }
+        return latestObjective;
     }
 
     @ButtonHandler("resolveReinforcements")
