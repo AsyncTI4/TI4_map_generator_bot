@@ -53,6 +53,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Give 1 promissory note to another player. Then, that player and each other player with 1 of your promissory notes in their play area gives you 1 random action card from their hand.",
+        "automationID": "betrayal",
         "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
         "source": "action_deck_2"
     },
