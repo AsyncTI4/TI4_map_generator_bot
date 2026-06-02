@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
@@ -283,7 +282,9 @@ public class PlayerSetupService {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, factionModel.getFactionSheetMessage());
         AbilityInfoService.sendAbilityInfo(player, event);
         TechInfoService.sendTechInfo(player, event);
-        if (!game.isTwilightsFallMode() && game.isThundersEdge() && !player.getBreakthroughIDs().isEmpty()) {
+        if (!game.isTwilightsFallMode()
+                && game.isThundersEdge()
+                && !player.getBreakthroughIDs().isEmpty()) {
             BreakthroughCommandHelper.sendBreakthroughInfo(game, player);
         }
         if (!game.getStoredValue("useOldPok").isEmpty() && player.hasLeader("naaluagent-te")) {

@@ -44,7 +44,9 @@ public class AllInfoCommand extends GameStateCommand {
         UnitInfoService.sendUnitInfo(player, false);
         LeaderInfoService.sendLeadersInfo(game, player);
         TechInfoService.sendTechInfo(player);
-        if (!game.isTwilightsFallMode() && game.isThundersEdge() && !player.getBreakthroughIDs().isEmpty()) {
+        if (!game.isTwilightsFallMode()
+                && game.isThundersEdge()
+                && !player.getBreakthroughIDs().isEmpty()) {
             BreakthroughCommandHelper.sendBreakthroughInfo(game, player);
         }
         RelicInfoService.sendRelicInfo(player);
