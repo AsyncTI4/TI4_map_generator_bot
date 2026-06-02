@@ -52,6 +52,7 @@ public class CombatMod {
         thalnosPlusOne,
         solagent,
         letnevagent,
+        classifiedWeapons,
 
         // te
         opponent_has_sftt,

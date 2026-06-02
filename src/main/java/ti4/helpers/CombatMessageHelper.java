@@ -229,6 +229,9 @@ public final class CombatMessageHelper {
                 if (game.getStoredValue("letnevagent").equalsIgnoreCase(player.getFaction())) {
                     game.setStoredValue("letnevagent", "");
                 }
+                if (game.getStoredValue("classifiedWeapons").startsWith(player.getFaction() + ";")) {
+                    game.setStoredValue("classifiedWeapons", "");
+                }
             }
         }
         if (rollType == CombatRollType.bombardment

@@ -379,6 +379,7 @@ public class StartCombatService {
         }
         game.setStoredValue("solagent", "");
         game.setStoredValue("letnevagent", "");
+        game.setStoredValue("classifiedWeapons", "");
 
         // sigma homebrew
         if (isSpaceCombat) {
