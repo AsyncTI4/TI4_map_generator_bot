@@ -26,6 +26,7 @@
         "phase": "Action",
         "window": "At the start of a round of combat that you are participating in",
         "text": "Choose 1 unit type. Units of that type cannot make combat rolls during this combat round.",
+        "automationID": "anomalous_conditions",
         "flavorText": "Unlenn sat on the edge of a knife, his ship groaning against the rift's horizon. His crew clung to their stations, eyes wide, as the enemy's munitions vanished into the void like pebbles dropped into a well.",
         "source": "action_deck_2"
     },

@@ -779,6 +779,15 @@ class ActionCardDeck2ButtonHandler {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
+    @ButtonHandler("resolveAnomalousConditions")
+    public static void resolveAnomalousConditions(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                game.getActionsChannel(),
+                player.getFactionEmojiOrColor()
+                        + " resolved _Anomalous Conditions_. Choose 1 unit type for this combat round; units of that type cannot make combat rolls.");
+    }
+
     @ButtonHandler("resolveAncientTradeRoutes")
     public static void resolveAncientTradeRoutes(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
