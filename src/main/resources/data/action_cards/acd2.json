@@ -198,6 +198,7 @@
         "phase": "Action",
         "window": "When you win a space combat after the end of its first round",
         "text": "Remove your command token from the active system.",
+        "automationID": "decisive_victory",
         "flavorText": "\"Now, now, Unlenn,\" Evelyn smirked as she hailed the Viscount's heavy cruiser. \"Looking to bring history to life, are we?\" She gave the signal and the Benthic's railguns whirred to life.",
         "source": "action_deck_2"
     },
