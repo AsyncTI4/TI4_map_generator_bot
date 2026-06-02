@@ -1278,6 +1278,11 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
 
+            if ("decisive_victory".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveDecisiveVictory", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("flank_speed".equals(automationID)) {
                 game.setStoredValue("flankspeedBoost", "1");
             }
@@ -1409,6 +1414,13 @@ public class ActionCardHelper {
                 codedButtons.add(
                         Buttons.green(player.factionButtonChecker() + "resolveCompoundingInterests", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("classified_weapons".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.factionButtonChecker() + "resolveClassifiedWeapons", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "unit"), codedButtons);
             }
 
             if ("scuttle".equals(automationID)) {
