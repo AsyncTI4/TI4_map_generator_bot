@@ -4142,6 +4142,11 @@ public class ButtonHelper {
                 if ("fighter".equalsIgnoreCase(unit.getBaseType())
                         || "infantry".equalsIgnoreCase(unit.getBaseType())
                         || "mech".equalsIgnoreCase(unit.getBaseType())) {
+                    if (Constants.SPACE.equals(spaceHolder.getName()) && "iron_mech2".equals(unit.getId())) {
+                        numOfCapitalShips += entry.getValue() * 2;
+                        unitTypesCounted.add(unit.getBaseType());
+                        continue;
+                    }
                     if ("fighter".equalsIgnoreCase(unit.getBaseType()) && player.hasFF2Tech()) {
                         numFighter2s += entry.getValue() - fightersIgnored;
                         if (numFighter2s < 0) {
