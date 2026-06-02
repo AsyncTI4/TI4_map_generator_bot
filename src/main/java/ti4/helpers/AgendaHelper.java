@@ -2274,6 +2274,17 @@ public final class AgendaHelper {
                                     buttons);
                         }
 
+                        if (specificVote.contains("Classified Rider")) {
+                            List<Button> buttons = List.of(Buttons.green(
+                                    winningR.factionButtonChecker() + "resolveClassifiedRider",
+                                    "Resolve Classified Rider"));
+                            MessageHelper.sendMessageToChannelWithButtons(
+                                    channel,
+                                    identity
+                                            + ", you have a _Classified Rider_ to resolve. Use the button to choose 1 of the top 3 secret objectives.",
+                                    buttons);
+                        }
+
                         if (specificVote.contains("Trade Rider")) {
                             MessageHelper.sendMessageToChannel(
                                     channel,
