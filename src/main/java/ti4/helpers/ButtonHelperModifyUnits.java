@@ -20,6 +20,7 @@ import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -702,6 +703,14 @@ public final class ButtonHelperModifyUnits {
                 }
             }
         }
+        if (IronAbilitiesHandler.hasExoAtmospheric(player) && Constants.SPACE.equals(unitHolder.getName())) {
+            int dreadnoughtIndex = assignHitOrder.indexOf("dreadnought");
+            if (dreadnoughtIndex >= 0) {
+                assignHitOrder.add(dreadnoughtIndex, "mech");
+            } else {
+                assignHitOrder.add("mech");
+            }
+        }
         for (String thingToHit : assignHitOrder) {
             if (hits <= 0) continue;
 
@@ -825,7 +834,9 @@ public final class ButtonHelperModifyUnits {
                         && !((ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)
                                         || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)
                                         || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_2", player, tile))
-                                || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
+                                || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0
+                                || IronAbilitiesHandler.isExoAtmosphericMechInSpace(
+                                        player, unitKey.unitType(), unitHolder))) {
 
                     int min = unitEntry.getValue();
                     if (!justSummarizing) {

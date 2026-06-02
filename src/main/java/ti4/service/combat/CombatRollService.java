@@ -29,6 +29,7 @@ import ti4.contest.replay.core.CombatRollPayload.RollSegmentType;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
@@ -307,6 +308,10 @@ public class CombatRollService {
         if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasAbility("control_network"))) {
             tempMods.addAll(NetrunnersAbilitiesHandler.getPendingControlNetworkSpaceCannonModifier(
                     game, player, tile, combatOnHolder, rollType));
+        }
+        if (player.hasTech("beironats")) {
+            extraRolls.addAll(IronFactionTechsHandler.getAdvancedTargetingSystemsExtraRollModifier(
+                    game, player, opponent, tile, combatOnHolder, rollType));
         }
 
         CombatRollResult rollResult = rollForUnitsWithResult(

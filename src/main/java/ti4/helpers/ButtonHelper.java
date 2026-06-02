@@ -59,6 +59,7 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.PhantomEnergyHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.TyrisBreakthroughButtonHandler;
@@ -4141,6 +4142,11 @@ public class ButtonHelper {
                 if ("fighter".equalsIgnoreCase(unit.getBaseType())
                         || "infantry".equalsIgnoreCase(unit.getBaseType())
                         || "mech".equalsIgnoreCase(unit.getBaseType())) {
+                    if (Constants.SPACE.equals(spaceHolder.getName()) && "iron_mech2".equals(unit.getId())) {
+                        numOfCapitalShips += entry.getValue() * 2;
+                        unitTypesCounted.add(unit.getBaseType());
+                        continue;
+                    }
                     if ("fighter".equalsIgnoreCase(unit.getBaseType()) && player.hasFF2Tech()) {
                         numFighter2s += entry.getValue() - fightersIgnored;
                         if (numFighter2s < 0) {
@@ -6599,12 +6605,14 @@ public class ButtonHelper {
                 }
                 if ("assaultcannoncombat".equalsIgnoreCase(type)
                         && List.of(UnitType.Fighter, UnitType.Spacedock, UnitType.Mech, UnitType.Infantry)
-                                .contains(unitKey.unitType())) {
+                                .contains(unitKey.unitType())
+                        && !IronAbilitiesHandler.isExoAtmosphericMechInSpace(player, unitKey.unitType(), unitHolder)) {
                     continue;
                 }
                 if ("courageouscombat".equalsIgnoreCase(type)
                         && List.of(UnitType.Spacedock, UnitType.Mech, UnitType.Infantry)
-                                .contains(unitKey.unitType())) {
+                                .contains(unitKey.unitType())
+                        && !IronAbilitiesHandler.isExoAtmosphericMechInSpace(player, unitKey.unitType(), unitHolder)) {
                     continue;
                 }
 

@@ -13,6 +13,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -199,6 +200,9 @@ public class DestroyUnitService {
             case Infantry -> capturing.addAll(CaptureUnitService.listCapturingMechPlayers(game, allUnits, unit));
             case Mech -> {
                 handleSelfAssemblyRoutines(player, totalAmount, game);
+                if (player.hasUnit("iron_mech") || player.hasUnit("iron_mech2")) {
+                    IronUnitsHandler.resolveRiptideDestroy(event, game, player, unit);
+                }
                 if (player.hasUnit("dream_mech")) {
                     DreamButtonHandler.offerRecurringMechButtons(
                             event, game, player, totalAmount, unit.uh().getName(), unit.unitKey());

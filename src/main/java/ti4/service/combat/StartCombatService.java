@@ -24,6 +24,7 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.game.Game;
@@ -1387,6 +1388,14 @@ public class StartCombatService {
                         p2.factionButtonChecker() + "applytempcombatmod__" + "tech" + "__" + "sc",
                         "Use Supercharge",
                         FactionEmojis.Naaz));
+            }
+        }
+        if (p1.hasTechReady("beironats") || (!game.isFowMode() && p2.hasTechReady("beironats"))) {
+            if (p1.hasTechReady("beironats")) {
+                IronFactionTechsHandler.addAdvancedTargetingSystemsButton(buttons, game, p1, p2, pos, groundOrSpace);
+            }
+            if (!game.isFowMode() && p2.hasTechReady("beironats")) {
+                IronFactionTechsHandler.addAdvancedTargetingSystemsButton(buttons, game, p2, p1, pos, groundOrSpace);
             }
         }
 

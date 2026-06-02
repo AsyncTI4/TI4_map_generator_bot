@@ -486,6 +486,14 @@ public class PlayerSetupService {
                             + " you may peek at the next objective in your `#cards-info` thread (by your promissory note). "
                             + "This holds true for anyone with _Read the Fates_. Don't do this until after secret objectives are dealt and discarded.");
         }
+        if (player.hasAbility("mechanized_military")) {
+            String unitID = AliasHandler.resolveUnit("mech");
+            player.setUnitCap(unitID, 6);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Set mech unit maximum to 6 for " + player.getRepresentation()
+                            + ", due to their **Mechanized Military** ability.");
+        }
         CardsInfoService.sendVariousAdditionalButtons(game, player);
 
         if (!game.isFowMode()) {
