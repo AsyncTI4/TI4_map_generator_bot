@@ -1278,6 +1278,11 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
 
+            if ("decisive_victory".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveDecisiveVictory", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("flank_speed".equals(automationID)) {
                 game.setStoredValue("flankspeedBoost", "1");
             }

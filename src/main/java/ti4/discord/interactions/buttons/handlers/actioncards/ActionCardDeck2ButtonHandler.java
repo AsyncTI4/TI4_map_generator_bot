@@ -444,6 +444,26 @@ class ActionCardDeck2ButtonHandler {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
+    @ButtonHandler("resolveDecisiveVictory")
+    public static void resolveDecisiveVictory(Player player, Game game, ButtonInteractionEvent event) {
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+        if (tile == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " could not resolve _Decisive Victory_ because there is no active system.");
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+
+        RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
+        MessageHelper.sendMessageToChannel(
+                game.getActionsChannel(),
+                player.getFactionEmojiOrColor() + " resolved _Decisive Victory_ and removed their command token from "
+                        + tile.getRepresentationForButtons() + ".");
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
     @ButtonHandler("resolveOvertime")
     public static void resolveOvertime(Player player, Game game, ButtonInteractionEvent event) {
         if (player.getTg() < 3) {
