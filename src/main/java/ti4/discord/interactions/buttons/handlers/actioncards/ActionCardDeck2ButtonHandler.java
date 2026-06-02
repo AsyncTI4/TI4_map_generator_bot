@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -37,6 +38,10 @@ import ti4.helpers.DiceHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitState;
+import ti4.helpers.Units.UnitType;
 import ti4.helpers.UnusedCommanderHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -67,6 +72,7 @@ import ti4.service.planet.FlipTileService;
 import ti4.service.planet.PlanetService;
 import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
 class ActionCardDeck2ButtonHandler {
@@ -1164,6 +1170,281 @@ class ActionCardDeck2ButtonHandler {
                 player.getRepresentation() + " exhausted "
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game)
                         + " and gained " + StringHelper.pluralize(tgGain, "trade good") + " from _Cache_.");
+    }
+
+    @ButtonHandler("resolveDefectors")
+    public static void resolveDefectors(Player player, Game game, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player target : game.getRealPlayers()) {
+            if (target == player || getDefectorsEligibleTiles(game, target).isEmpty()) {
+                continue;
+            }
+            if (game.isFowMode()) {
+                buttons.add(Buttons.gray("resolveDefectorsStep2_" + target.getFaction(), target.getColor()));
+            } else {
+                Button button = Buttons.gray(
+                        "resolveDefectorsStep2_" + target.getFaction(),
+                        target.getFactionModel().getShortName());
+                buttons.add(button.withEmoji(Emoji.fromFormatted(target.getFactionEmoji())));
+            }
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), player.getRepresentation() + " has no valid _Defectors_ targets.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", choose which player's ships to target with _Defectors_.",
+                buttons);
+    }
+
+    @ButtonHandler("resolveDefectorsStep2_")
+    public static void resolveDefectorsStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player target = game.getPlayerFromColorOrFaction(buttonID.replace("resolveDefectorsStep2_", ""));
+        if (target == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not find the selected player for _Defectors_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        sendDefectorsSystemButtons(player, game, target, 2);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveDefectorsStep3_")
+    public static void resolveDefectorsStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String[] payload = buttonID.replace("resolveDefectorsStep3_", "").split("_", 3);
+        if (payload.length < 3) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Defectors_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        Player target = game.getPlayerFromColorOrFaction(payload[0]);
+        int shipsRemaining;
+        try {
+            shipsRemaining = Integer.parseInt(payload[2]);
+        } catch (NumberFormatException e) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Defectors_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        Tile sourceTile = game.getTileByPosition(payload[1]);
+        if (target == null || sourceTile == null || shipsRemaining < 1) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Defectors_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        sendDefectorsShipButtons(player, game, target, sourceTile, shipsRemaining);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveDefectorsStep4_")
+    public static void resolveDefectorsStep4(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String[] payload = buttonID.replace("resolveDefectorsStep4_", "").split("_", 5);
+        if (payload.length < 5) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Defectors_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        Player target = game.getPlayerFromColorOrFaction(payload[0]);
+        Tile sourceTile = game.getTileByPosition(payload[1]);
+        int shipsRemaining;
+        UnitType unitType = Units.findUnitType(payload[3]);
+        UnitState state = Units.findUnitState(payload[4]);
+        try {
+            shipsRemaining = Integer.parseInt(payload[2]);
+        } catch (NumberFormatException e) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Defectors_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        if (target == null
+                || sourceTile == null
+                || shipsRemaining < 1
+                || unitType == null
+                || state == null
+                || !isDefectorsEligibleUnit(target, unitType)) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Defectors_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<RemoveUnitService.RemovedUnit> removedUnits = RemoveUnitService.removeUnit(
+                event, sourceTile, game, target, sourceTile.getSpaceUnitHolder(), unitType, 1, state);
+        if (removedUnits.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not remove that ship while resolving _Defectors_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " removed 1 " + unitType.humanReadableName()
+                        + " from " + target.getRepresentationUnfogged() + " in "
+                        + sourceTile.getRepresentationForButtons(game, player) + " via _Defectors_.");
+        sendDefectorsPlacementButtons(player, game, target, sourceTile, unitType, shipsRemaining - 1);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveDefectorsStep5_")
+    public static void resolveDefectorsStep5(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String[] payload = buttonID.replace("resolveDefectorsStep5_", "").split("_", 5);
+        if (payload.length < 5) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Defectors_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        Player target = game.getPlayerFromColorOrFaction(payload[0]);
+        Tile sourceTile = game.getTileByPosition(payload[1]);
+        int shipsRemaining;
+        UnitType unitType = Units.findUnitType(payload[3]);
+        Tile destinationTile = game.getTileByPosition(payload[4]);
+        try {
+            shipsRemaining = Integer.parseInt(payload[2]);
+        } catch (NumberFormatException e) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Defectors_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        if (target == null
+                || sourceTile == null
+                || destinationTile == null
+                || unitType == null
+                || !isDefectorsEligibleUnit(player, unitType)
+                || FoWHelper.otherPlayersHaveUnitsInSystem(player, destinationTile, game)) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Defectors_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        AddUnitService.addUnits(event, destinationTile, game, player.getColor(), "1 " + unitType.getValue());
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " placed 1 " + unitType.humanReadableName() + " in "
+                        + destinationTile.getRepresentationForButtons(game, player) + " via _Defectors_.");
+        ButtonHelper.deleteMessage(event);
+
+        if (shipsRemaining > 0 && hasDefectorsEligibleShip(target, sourceTile.getSpaceUnitHolder())) {
+            sendDefectorsShipButtons(player, game, target, sourceTile, shipsRemaining);
+        }
+    }
+
+    private static void sendDefectorsSystemButtons(Player player, Game game, Player target, int shipsRemaining) {
+        List<Button> buttons = new ArrayList<>(getDefectorsEligibleTiles(game, target).stream()
+                .map(tile -> Buttons.green(
+                        "resolveDefectorsStep3_" + target.getFaction() + "_" + tile.getPosition() + "_"
+                                + shipsRemaining,
+                        tile.getRepresentationForButtons(game, player)))
+                .toList());
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Could not find any systems with eligible ships for " + target.getRepresentationUnfogged()
+                            + " while resolving _Defectors_.");
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", choose the system containing ships to remove for _Defectors_.",
+                buttons);
+    }
+
+    private static void sendDefectorsShipButtons(
+            Player player, Game game, Player target, Tile sourceTile, int shipsRemaining) {
+        List<Button> buttons = getDefectorsShipButtons(target, sourceTile, shipsRemaining);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Could not find any eligible ships to remove in "
+                            + sourceTile.getRepresentationForButtons(game, player) + " for _Defectors_.");
+            return;
+        }
+        buttons.add(Buttons.red("deleteButtons", "Done removing ships"));
+
+        String message = shipsRemaining > 1
+                ? player.getRepresentationUnfogged() + ", choose a ship to remove from "
+                        + sourceTile.getRepresentationForButtons(game, player) + " for _Defectors_."
+                : player.getRepresentationUnfogged() + ", you may remove 1 more ship from "
+                        + sourceTile.getRepresentationForButtons(game, player) + " for _Defectors_.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+    }
+
+    private static void sendDefectorsPlacementButtons(
+            Player player, Game game, Player target, Tile sourceTile, UnitType unitType, int shipsRemaining) {
+        Predicate<Tile> validDestination = tile -> !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game);
+        List<Button> buttons = new ArrayList<>(ButtonHelper.getTilesWithPredicateForAction(
+                player,
+                game,
+                "resolveDefectorsStep5_" + target.getFaction() + "_" + sourceTile.getPosition() + "_"
+                        + shipsRemaining + "_" + unitType.getValue(),
+                validDestination,
+                false));
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Could not find any valid systems to place that " + unitType.humanReadableName()
+                            + " while resolving _Defectors_.");
+            return;
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", choose where to place 1 " + unitType.humanReadableName()
+                        + " from your reinforcements for _Defectors_.",
+                buttons);
+    }
+
+    private static List<Button> getDefectorsShipButtons(Player target, Tile sourceTile, int shipsRemaining) {
+        List<Button> buttons = new ArrayList<>();
+        for (UnitKey key : sourceTile.getSpaceUnitHolder().getUnitKeysForPlayer(target)) {
+            UnitModel model = target.getUnitFromUnitKey(key);
+            if (model == null || !model.getIsShip() || model.getCapacityValue() > 0) {
+                continue;
+            }
+            UnitType unitType = key.unitType();
+            for (UnitState state : UnitState.values()) {
+                if (sourceTile.getSpaceUnitHolder().getUnitCountForState(key, state) < 1) {
+                    continue;
+                }
+                String buttonID = "resolveDefectorsStep4_" + target.getFaction() + "_" + sourceTile.getPosition() + "_"
+                        + shipsRemaining + "_" + unitType.getValue() + "_" + state.name();
+                String label = "Remove " + model.getNameRepresentation(state);
+                buttons.add(Buttons.red(buttonID, label, key.unitEmoji()));
+            }
+        }
+        return buttons;
+    }
+
+    private static List<Tile> getDefectorsEligibleTiles(Game game, Player target) {
+        return game.getTileMap().values().stream()
+                .filter(tile -> hasDefectorsEligibleShip(target, tile.getSpaceUnitHolder()))
+                .toList();
+    }
+
+    private static boolean hasDefectorsEligibleShip(Player target, UnitHolder unitHolder) {
+        if (unitHolder == null) {
+            return false;
+        }
+        return unitHolder.getUnitKeysForPlayer(target).stream().anyMatch(key -> {
+            UnitModel model = target.getUnitFromUnitKey(key);
+            return model != null && model.getIsShip() && model.getCapacityValue() <= 0 && unitHolder.getUnitCount(key) > 0;
+        });
+    }
+
+    private static boolean isDefectorsEligibleUnit(Player player, UnitType unitType) {
+        UnitModel model = player.getUnitByType(unitType);
+        return model != null && model.getIsShip() && model.getCapacityValue() <= 0;
     }
 
     @ButtonHandler("resolveFreedomFighters")
