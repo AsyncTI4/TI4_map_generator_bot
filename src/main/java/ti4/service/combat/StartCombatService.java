@@ -897,6 +897,18 @@ public class StartCombatService {
                                 + ", a reminder that if you win this combat, you may resolve _N'orr Supremacy_ for a unit upgrade technology or a command token.",
                         buttons);
             }
+            if ("space".equalsIgnoreCase(type) && player.hasUnexhaustedLeader("kaloraagent")) {
+                buttons = new ArrayList<>();
+                buttons.add(Buttons.gray(
+                        player.factionButtonChecker() + "exhaustAgent_kaloraagent",
+                        "Use Valzor, the Kalora Agent",
+                        FactionEmojis.kalora));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        msg
+                                + ", a reminder that at the end of this space combat, you may exhaust the Kalora agent to allow a participating player to gain 1 command token.",
+                        buttons);
+            }
             if ("space".equalsIgnoreCase(type)
                     && (player.getLeaderIDs().contains("arvaxicommander")
                             || game.playerHasLeaderUnlockedOrAlliance(player, "arvaxicommander"))) {
