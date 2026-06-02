@@ -53,7 +53,8 @@ class MessageListener extends ListenerAdapter {
             "please stop",
             "stop pinging",
             "stop messaging",
-            "leave me alone",
+            "crybaby",
+            "stop crying",
             "don’t talk to me",
             "do not message me",
             "this isn’t okay",
@@ -67,7 +68,7 @@ class MessageListener extends ListenerAdapter {
             "cheater",
             "bad faith",
             "drop it",
-            "back off",
+            "calm down",
             "don’t make it personal",
             "keep it game-related");
 
