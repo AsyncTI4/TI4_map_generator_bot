@@ -13,6 +13,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.SecretObjectiveHelper;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -56,8 +57,7 @@ class SecretObjectiveButtonHandler {
                     }
                 }
                 if (amountLeftToDiscard > -1) {
-                    msg += " (" + amountLeftToDiscard + " player" + (amountLeftToDiscard == 1 ? "" : "s")
-                            + " still to discard)";
+                    msg += " (" + StringHelper.pluralize(amountLeftToDiscard, "player") + " still to discard)";
                 }
             }
             if (!DiscardSecretService.discardSO(player, soIndex, game)) {

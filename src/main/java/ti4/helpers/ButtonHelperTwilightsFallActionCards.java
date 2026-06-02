@@ -620,7 +620,7 @@ public final class ButtonHelperTwilightsFallActionCards {
         String gainMsg = player.gainTG(max * 2, true);
         ButtonHelperAgents.resolveArtunoCheck(player, max * 2);
         String msg = player.getRepresentation() + " gained " + (max * 2) + " trade goods " + gainMsg + " from having "
-                + max + " faction symbol" + (max == 1 ? "" : "s") + " from " + bestFaction + ".";
+                + StringHelper.pluralize(max, "faction symbol") + " from " + bestFaction + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }

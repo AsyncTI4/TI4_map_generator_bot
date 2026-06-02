@@ -17,6 +17,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -48,9 +49,8 @@ class TechUseButtonHandler {
                 String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
                 ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
                 player.setSarweenCounter(player.getSarweenCounter() + 1);
-                String msg =
-                        player.getFactionEmoji() + " has used _Sarween Tools_ to save " + player.getSarweenCounter()
-                                + " resource" + (player.getSarweenCounter() == 1 ? "" : "s") + " in this game so far. ";
+                String msg = player.getFactionEmoji() + " has used _Sarween Tools_ to save "
+                        + StringHelper.pluralize(player.getSarweenCounter(), "resource") + " in this game so far. ";
                 int result = ThreadLocalRandom.current().nextInt(0, 5);
                 var userSettings = UserSettingsManager.get(player.getUserID());
 

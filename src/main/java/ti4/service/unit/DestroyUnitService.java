@@ -27,6 +27,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
@@ -358,7 +359,7 @@ public class DestroyUnitService {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + " you gained " + min + " trade good" + (min == 1 ? "" : "s") + " (" + player.getTg()
+                            + " you gained " + StringHelper.pluralize(min, "trade good") + " (" + player.getTg()
                             + "->" + (player.getTg() + min)
                             + ") from _Self-Assembly Routines_ because of " + min + " of your mechs dying."
                             + " This is a mandatory gain" + (min > 1 ? ", and happens 1 trade good at a time" : "")

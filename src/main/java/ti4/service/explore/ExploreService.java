@@ -39,6 +39,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -823,13 +824,12 @@ public class ExploreService {
                 resolveExplore(event, exploreID, tile, mirageID, exploredMessage, player, game);
             }
             case "fb1", "fb2", "fb3", "fb4" -> {
-                message = new StringBuilder(
-                        "Resolve _Functioning Base_:\n-# You currently have " + player.getTg() + " trade good"
-                                + (player.getTg() == 1 ? "" : "s") + ", "
-                                + player.getCommoditiesRepresentation() + " commodit"
-                                + (player.getCommodities() == 1 ? "y" : "ies") + ", and "
-                                + player.getActionCards().size() + " action card"
-                                + (player.getActionCards().size() == 1 ? "" : "s") + ".");
+                message = new StringBuilder("Resolve _Functioning Base_:\n-# You currently have "
+                        + StringHelper.pluralize(player.getTg(), "trade good") + ", "
+                        + player.getCommoditiesRepresentation() + " commodit"
+                        + (player.getCommodities() == 1 ? "y" : "ies") + ", and "
+                        + player.getActionCards().size() + " action card"
+                        + (player.getActionCards().size() == 1 ? "" : "s") + ".");
                 Button getACButton = Buttons.green(
                         "comm_for_AC",
                         "Spend 1 Trade Good or 1 Commodity For 1 Action Card",
@@ -937,8 +937,7 @@ public class ExploreService {
             case "lf1", "lf2", "lf3", "lf4" -> {
                 message = new StringBuilder(
                         player.getRepresentation() + " please resolve _Local Fabricators_:\n-# You currently have "
-                                + player.getTg()
-                                + " trade good" + (player.getTg() == 1 ? "" : "s") + " and "
+                                + StringHelper.pluralize(player.getTg(), "trade good") + " and "
                                 + player.getCommoditiesRepresentation() + " commodit"
                                 + (player.getCommodities() == 1 ? "y" : "ies") + ".");
                 Button getMechButton = Buttons.green(
@@ -1159,9 +1158,8 @@ public class ExploreService {
                 player.setTg(oldTg + tgGain);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getFactionEmojiOrColor() + " gained " + tgGain + " trade good"
-                                + (tgGain == 1 ? "" : "s") + " due to the _Forgotten Trade Station_ (" + oldTg + "->"
-                                + player.getTg() + ").");
+                        player.getFactionEmojiOrColor() + " gained " + StringHelper.pluralize(tgGain, "trade good")
+                                + " due to the _Forgotten Trade Station_ (" + oldTg + "->" + player.getTg() + ").");
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, tgGain);
             }

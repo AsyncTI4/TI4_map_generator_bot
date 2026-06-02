@@ -827,8 +827,8 @@ public final class Helper {
             Button button;
             String label = getSCName(sc, game);
             if (game.getScTradeGoods().get(sc) > 0 && !game.isFowMode()) {
-                label += " [Has " + game.getScTradeGoods().get(sc) + " Trade Good"
-                        + (game.getScTradeGoods().get(sc) == 1 ? "" : "s") + "]";
+                label +=
+                        " [Has " + StringHelper.pluralize(game.getScTradeGoods().get(sc), "Trade Good") + "]";
             }
             if (game.isTwilightsFallMode() && game.getStoredValue("deflectedSC").equalsIgnoreCase(sc + "")) {
                 label += " [Has Tartarus On It]";

@@ -53,6 +53,7 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -404,13 +405,13 @@ public class CombatRollService {
             List<Button> buttons = new ArrayList<>();
             if (rollType == CombatRollType.combatround && opponent != player) {
                 if (combatOnHolder instanceof Planet) {
-                    String msg2 = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered " + h
-                            + " hit" + (h == 1 ? "" : "s") + " in round #" + round2 + ".";
+                    String msg2 = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered "
+                            + StringHelper.pluralize(h, "hit") + " in round #" + round2 + ".";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
                     if (!automated) {
                         if (h > 0) {
-                            String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit"
-                                    + (h == 1 ? "" : "s") + ".";
+                            String msg = opponent.getRepresentationUnfogged() + " you may autoassign "
+                                    + StringHelper.pluralize(h, "hit") + ".";
                             if (opponent.isDummy() || opponent.isNpc()) {
                                 if (round2 > round) {
                                     buttons.add(Buttons.blue(
@@ -499,8 +500,8 @@ public class CombatRollService {
                                     "Roll Dice For Combat Round #" + (round + 1)));
                         }
                     }
-                    String msg = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered " + h
-                            + " hit" + (h == 1 ? "" : "s") + " in round #" + round2 + ".";
+                    String msg = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered "
+                            + StringHelper.pluralize(h, "hit") + " in round #" + round2 + ".";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                     if (h > 0) {
                         String factionChecker = "FFCC_" + opponent.getFaction() + "_";
@@ -590,8 +591,8 @@ public class CombatRollService {
                     buttons.add(Buttons.green(
                             opponent.dummyPlayerSpoof() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_" + h,
                             "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
-                    String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit"
-                            + (h == 1 ? "" : "s") + ".";
+                    String msg = opponent.getRepresentationUnfogged() + " you may autoassign "
+                            + StringHelper.pluralize(h, "hit") + ".";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                 } else {
                     String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign "
@@ -617,8 +618,8 @@ public class CombatRollService {
                 && opponent != player) {
             MessageChannel channel =
                     isFoWPrivateChannelRoll(player, event) ? opponent.getCorrectChannel() : event.getMessageChannel();
-            String msg = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered " + h + " hit"
-                    + (h == 1 ? "" : "s") + " from SPACE CANNON against your ships.";
+            String msg = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered "
+                    + StringHelper.pluralize(h, "hit") + " from SPACE CANNON against your ships.";
             MessageHelper.sendMessageToChannel(channel, msg);
             List<Button> buttons = new ArrayList<>();
             String factionChecker = "FFCC_" + opponent.getFaction() + "_";
@@ -1160,7 +1161,7 @@ public class CombatRollService {
                         MessageHelper.sendMessageToChannel(
                                 event.getMessageChannel(),
                                 player.getRepresentation() + " please gain or convert 1 commodity a total of "
-                                        + hitRolls + " time" + (hitRolls == 1 ? "" : "s")
+                                        + StringHelper.pluralize(hitRolls, "time")
                                         + " due to your Uzean Wardog mech ability.");
                     }
                 }
@@ -1584,8 +1585,8 @@ public class CombatRollService {
         result += CombatMessageHelper.displayHitResults(totalHits, useDoubleBoomEmoji);
 
         if (totalHits > 0 && usesX89c4) {
-            result += "\n" + player.getFactionEmoji() + " produced " + (totalHits / 2) + " additional hit"
-                    + ((totalHits / 2) == 1 ? "" : "s") + " using "
+            result += "\n" + player.getFactionEmoji() + " produced "
+                    + StringHelper.pluralize((totalHits / 2), "additional hit") + " using "
                     + Mapper.getTech("x89c4").getNameRepresentation() + ".";
         }
 

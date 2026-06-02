@@ -35,6 +35,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.UnusedCommanderHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -1000,7 +1001,7 @@ class ActionCardDeck2ButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentation() + " exhausted "
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game)
-                        + " and gained " + tgGain + " trade good" + (tgGain == 1 ? "" : "s") + " from _Cache_.");
+                        + " and gained " + StringHelper.pluralize(tgGain, "trade good") + " from _Cache_.");
     }
 
     @ButtonHandler("resolveFreedomFighters")

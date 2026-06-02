@@ -854,11 +854,11 @@ public class ComponentActionHelper {
                                 + " is exhausting the _Minister of War_ agenda and spending a command token from their strategy pool to remove 1 command token from the game board.");
                 if (p1.getStrategicCC() > 0) {
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
+                    int previousCC = p1.getStrategicCC() + 1;
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
                             factionEmoji
-                                    + ", you previously had " + (p1.getStrategicCC() + 1) + " command token"
-                                    + (p1.getStrategicCC() + 1 == 1 ? "" : "s")
+                                    + ", you previously had " + StringHelper.pluralize(previousCC, "command token")
                                     + " in your strategy pool and now you have " + p1.getStrategicCC() + ".");
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event);
                 }

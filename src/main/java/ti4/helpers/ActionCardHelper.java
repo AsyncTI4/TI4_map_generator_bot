@@ -608,8 +608,8 @@ public class ActionCardHelper {
         if (count < 1) {
             return;
         }
-        StringBuilder message = new StringBuilder(player.getRepresentationNoPing() + " discarded " + count
-                + " random action card" + (count == 1 ? "" : "s") + ".\n");
+        StringBuilder message = new StringBuilder(player.getRepresentationNoPing() + " discarded "
+                + StringHelper.pluralize(count, "random action card") + ".\n");
         while (count > 0 && !player.getActionCards().isEmpty()) {
             Map<String, Integer> actionCards_ = player.getActionCards();
             List<String> cards_ = new ArrayList<>(actionCards_.keySet());
@@ -657,10 +657,10 @@ public class ActionCardHelper {
             return;
         }
 
-        String message = player.getRepresentation() + " drew " + count + " action card" + (count == 1 ? "" : "s") + ".";
+        String message = player.getRepresentation() + " drew " + StringHelper.pluralize(count, "action card") + ".";
         if (scheming && player.hasAbility("scheming")) {
             count++;
-            message = player.getRepresentation() + " drew " + count + " action card" + (count == 1 ? "" : "s")
+            message = player.getRepresentation() + " drew " + StringHelper.pluralize(count, "action card")
                     + " (including one extra because of **Scheming**).";
         }
         game.drawActionCard(player.getUserID(), count);
@@ -2384,7 +2384,7 @@ public class ActionCardHelper {
             }
         }
 
-        String msg = "Added " + tilesAffected.size() + " fighter" + (tilesAffected.size() == 1 ? "" : "s") + ".";
+        String msg = "Added " + StringHelper.pluralize(tilesAffected.size(), "fighter") + ".";
         if (!tilesAffected.isEmpty()) {
             msg += " Please check fleet size and capacity in each of the systems: ";
             ButtonHelper.checkFleetInEveryTile(player, game);

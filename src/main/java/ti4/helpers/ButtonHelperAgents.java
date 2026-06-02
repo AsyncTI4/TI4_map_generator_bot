@@ -635,9 +635,8 @@ public final class ButtonHelperAgents {
             }
             int tgCount = Integer.parseInt(rest.split("_")[1]);
             playerLeader.setTgCount(tgCount);
-            String messageText =
-                    player.getRepresentation() + " placed " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
-                            + " on top of " + ssruuClever + "Artuno the Betrayer, a Nomad" + ssruuSlash + " agent.";
+            String messageText = player.getRepresentation() + " placed " + StringHelper.pluralize(tgCount, "trade good")
+                    + " on top of " + ssruuClever + "Artuno the Betrayer, a Nomad" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, messageText);
             int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 11);
             if (randomJokeChance == 10) {
@@ -2421,7 +2420,7 @@ public final class ButtonHelperAgents {
         ButtonHelperStats.gainComms(event, game, player, commGain, false, true);
         ButtonHelperStats.gainTGs(event, game, player, tgGain, true);
 
-        String msg = player.getFactionEmojiOrColor() + " gained " + tgGain + " trade good" + (tgGain == 1 ? "" : "s")
+        String msg = player.getFactionEmojiOrColor() + " gained " + StringHelper.pluralize(tgGain, "trade good")
                 + " (" + oldTg + "->"
                 + player.getTg() + ") and " + commGain + " commodit" + (commGain == 1 ? "y" : "ies") + " due to "
                 + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
@@ -2742,7 +2741,7 @@ public final class ButtonHelperAgents {
         if (player.hasUnexhaustedLeader("nomadagentartuno")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green(
-                    "exhaustAgent_nomadagentartuno_" + tg, "Exhaust Artuno With " + tg + " TG" + (tg == 1 ? "" : "s")));
+                    "exhaustAgent_nomadagentartuno_" + tg, "Exhaust Artuno With " + StringHelper.pluralize(tg, "TG")));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
@@ -2751,7 +2750,7 @@ public final class ButtonHelperAgents {
                             + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                             + "Artuno the Betrayer, a Nomad"
                             + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                            + " agent, and place " + tg + " trade good" + (tg == 1 ? "" : "s") + " on her.",
+                            + " agent, and place " + StringHelper.pluralize(tg, "trade good") + " on her.",
                     buttons);
         }
     }

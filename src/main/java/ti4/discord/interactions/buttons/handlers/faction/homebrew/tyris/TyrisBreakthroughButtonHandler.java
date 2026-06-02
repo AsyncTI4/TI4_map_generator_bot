@@ -11,6 +11,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
@@ -102,7 +103,7 @@ public class TyrisBreakthroughButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentation() + " placed _" + m.getName()
                         + "_ on _Non-Linear Time Progression_ (cost reduced by "
-                        + count + " resource" + (count == 1 ? "" : "s") + " total).");
+                        + StringHelper.pluralize(count, "resource") + " total).");
         ButtonHelper.deleteMessage(event);
     }
 
