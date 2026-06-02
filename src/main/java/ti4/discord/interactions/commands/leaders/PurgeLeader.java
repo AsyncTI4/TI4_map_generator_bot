@@ -11,6 +11,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.LeaderEmojis;
+import ti4.service.leader.PlayHeroService;
 
 class PurgeLeader extends GameStateSubcommand {
 
@@ -29,6 +30,7 @@ class PurgeLeader extends GameStateSubcommand {
         String leaderID = event.getOption(Constants.LEADER, null, OptionMapping::getAsString);
         Player player = getPlayer();
         Leader playerLeader = player.unsafeGetLeader(leaderID);
+        PlayHeroService.rememberFrankenFirmamentHero(player, playerLeader);
         boolean purged = player.removeLeader(playerLeader);
         if (purged) {
             MessageHelper.sendMessageToEventChannel(

@@ -70,12 +70,28 @@ import ti4.spring.context.SpringContext;
 public class PlayHeroService {
 
     public static boolean removeLeader(Game game, Player player, Leader leader) {
+        rememberFrankenFirmamentHero(player, leader);
         LeaderRemovalReason reason = LeaderRemovalReason.fromHeroId(leader.getId());
         boolean removed = player.removeLeader(leader);
         if (removed && (reason == LeaderRemovalReason.PURGED || reason == LeaderRemovalReason.STATUS_CLEANUP)) {
             DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         }
         return removed;
+    }
+
+    public static void rememberFrankenFirmamentHero(Player player, Leader leader) {
+        if (player == null
+                || leader == null
+                || player.getGame() == null
+                || !player.getGame().isFrankenGame()) {
+            return;
+        }
+        if (!"firmamenthero".equals(leader.getId())) {
+            return;
+        }
+        if (!player.getStoredList("appliedFrankenItems").contains("HERO:firmamenthero")) {
+            player.addToStoredList("appliedFrankenItems", "HERO:firmamenthero");
+        }
     }
 
     public static void playHero(GenericInteractionCreateEvent event, Game game, Player player, Leader playerLeader) {
