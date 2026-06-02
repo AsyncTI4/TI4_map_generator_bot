@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1464,6 +1461,12 @@ public class ButtonHelper {
         return 0;
     }
 
+    @ButtonHandler("markResolved")
+    public static void markResolved(ButtonInteractionEvent event) {
+        deleteAllButtons(event);
+        event.getMessage().addReaction(Emoji.fromUnicode("✅")).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
     public static void resolveMinisterOfCommerceCheck(Game game, Player player, GenericInteractionCreateEvent event) {
         resolveTACheck(game, player);
         for (String law : game.getLaws().keySet()) {
@@ -1672,7 +1675,7 @@ public class ButtonHelper {
         }
         if (doesPlayerHaveFSHere("arborec_flagship", player, activeSystem)) {
             Button arboCommander = Buttons.green(
-                    player.factionButtonChecker() + "umbatTile_" + activeSystem.getPosition(),
+                    player.factionButtonChecker() + "arboHeroBuild_" + activeSystem.getPosition() + "deleteThisMessage",
                     "Build 5 Units With Arborec Flagship");
             Button decline = Buttons.red("deleteButtons", "Decline Build");
             List<Button> buttons = List.of(arboCommander, decline);
