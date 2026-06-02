@@ -1,9 +1,11 @@
 package ti4.discord.interactions.listeners;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -14,6 +16,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -46,7 +49,27 @@ class MessageListener extends ListenerAdapter {
 
         Please do not ping bothelper again, the first ping is enough, just explain without a 2nd ping.
         """;
-    private static final List<String> INTERESTING_MESSAGES = List.of("please stop");
+    private static final List<String> INTERESTING_MESSAGES = List.of(
+            "please stop",
+            "stop pinging",
+            "stop messaging",
+            "leave me alone",
+            "don’t talk to me",
+            "do not message me",
+            "this isn’t okay",
+            "crossed a line",
+            "personal attack",
+            "harassment",
+            "harassing",
+            "bullying",
+            "you’re being rude",
+            "that was rude",
+            "cheater",
+            "bad faith",
+            "drop it",
+            "back off",
+            "don’t make it personal",
+            "keep it game-related");
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
@@ -128,9 +151,15 @@ class MessageListener extends ListenerAdapter {
                             .findFirst()
                             .orElse(null);
             if (bothelperLogChannel != null) {
-                String msg = message.getJumpUrl() + ". Full message:\n> "
-                        + message.getContentRaw().replace("@", "");
-                MessageHelper.sendMessageToChannel(bothelperLogChannel, msg);
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green("markResolved", "Resolved?"));
+
+                String msgWithoutMentions = message.getContentRaw();
+                for (Role role : message.getMentions().getRoles()) {
+                    msgWithoutMentions = msgWithoutMentions.replace(role.getAsMention(), role.getName());
+                }
+                String msg = message.getJumpUrl() + ". Full message:\n> " + msgWithoutMentions.replace("\n", "\n> ");
+                MessageHelper.sendMessageToChannelWithButtons(bothelperLogChannel, msg, buttons);
             }
         }
         if (messageMentionsBotHelper
