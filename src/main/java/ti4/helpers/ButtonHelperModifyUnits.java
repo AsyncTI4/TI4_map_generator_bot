@@ -1090,8 +1090,8 @@ public final class ButtonHelperModifyUnits {
         }
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                player.getRepresentationNoPing() + " replaced " + pdsAmount + " PDS and " + sdAmount
-                        + " space dock" + (sdAmount == 1 ? "" : "s") + " on "
+                player.getRepresentationNoPing() + " replaced " + pdsAmount + " PDS and "
+                        + StringHelper.pluralize(sdAmount, "space dock") + " on "
                         + Helper.getPlanetRepresentation(uH.getName(), game) + " with their own unit"
                         + (pdsAmount + sdAmount == 1 ? "" : "s") + ".");
         Tile tile = game.getTileFromPlanet(uH.getName());
@@ -1215,7 +1215,7 @@ public final class ButtonHelperModifyUnits {
                     }
                     String id = factionChecker + "retreatGroundUnits_" + pos1 + "_" + pos2 + "_" + x + "_mech_"
                             + unitHolder.getName();
-                    String label = "Retreat " + x + " Mech" + (x == 1 ? "" : "s") + " on "
+                    String label = "Retreat " + StringHelper.pluralize(x, "Mech") + " on "
                             + Helper.getPlanetRepresentation(unitHolder.getName(), game);
                     buttons.add(Buttons.green(id, label, UnitEmojis.mech));
                 }
@@ -2632,8 +2632,8 @@ public final class ButtonHelperModifyUnits {
                     event, game, player, tile, tile.getSpaceUnitHolder(), UnitType.Infantry, UnitType.Fighter, numff);
         }
         List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
-        String msg = player.getFactionEmojiOrColor() + " turned " + numff + " infantry into " + numff + " fighter"
-                + (numff == 1 ? "" : "s") + " using Assault Machina, the Mirveda commander.";
+        String msg = player.getFactionEmojiOrColor() + " turned " + numff + " infantry into "
+                + StringHelper.pluralize(numff, "fighter") + " using Assault Machina, the Mirveda commander.";
         event.getMessage()
                 .editMessage(msg)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
@@ -2649,8 +2649,8 @@ public final class ButtonHelperModifyUnits {
                     event, game, player, tile, tile.getSpaceUnitHolder(), UnitType.Fighter, UnitType.Infantry, numff);
         }
         List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
-        String msg = player.getFactionEmojiOrColor() + " turned " + numff + " fighter" + (numff == 1 ? "" : "s")
-                + " into " + numff + " infantry using their **Combat Drones** ability.";
+        String msg = player.getFactionEmojiOrColor() + " turned " + StringHelper.pluralize(numff, "fighter") + " into "
+                + numff + " infantry using their **Combat Drones** ability.";
         event.getMessage()
                 .editMessage(msg)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))

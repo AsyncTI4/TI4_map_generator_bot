@@ -25,6 +25,7 @@ import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -63,7 +64,7 @@ class DeleteButtonsButtonHandler {
                 boolean cyber = false;
                 boolean malevolency = false;
                 int netGain = ButtonHelper.checkNetGain(player, shortCCs);
-                finalCCs += ". You gained a net total of " + netGain + " command token" + (netGain == 1 ? "" : "s");
+                finalCCs += ". You gained a net total of " + StringHelper.pluralize(netGain, "command token");
                 for (String pn : player.getPromissoryNotes().keySet()) {
                     if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
                         cyber = true;
@@ -109,8 +110,8 @@ class DeleteButtonsButtonHandler {
                                     player.getCorrectChannel(),
                                     player.getRepresentationUnfogged()
                                             + ", heads up, bot thinks you should have gained "
-                                            + (properGain == 1 ? "only " : "") + properGain
-                                            + " command token" + (properGain == 1 ? "" : "s") + " due to " + reasons
+                                            + (properGain == 1 ? "only " : "")
+                                            + StringHelper.pluralize(properGain, "command token") + " due to " + reasons
                                             + ".");
                         } else {
                             if (netGain > 2 && cyber) {

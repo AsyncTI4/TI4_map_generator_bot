@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
+import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -94,8 +95,8 @@ class StartMilty extends GameStateSubcommand {
         MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
 
         if (validTemplates.isEmpty()) {
-            String msg = "Milty draft in this bot does not know about any map layouts that support " + players
-                    + " player" + (players == 1 ? "" : "s") + " yet.";
+            String msg = "Milty draft in this bot does not know about any map layouts that support "
+                    + StringHelper.pluralize(players, "player") + " yet.";
             MessageHelper.sendMessageToChannel(event.getChannel(), msg);
             return null;
         }

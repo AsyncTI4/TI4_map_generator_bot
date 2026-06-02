@@ -398,7 +398,7 @@ public final class ButtonHelperActionCards {
         int tgGain = ButtonHelper.getTilesWithYourCC(player, game, event).size();
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                player.getRepresentationNoPing() + " gained " + tgGain + " trade good" + (tgGain == 1 ? "" : "s")
+                player.getRepresentationNoPing() + " gained " + StringHelper.pluralize(tgGain, "trade good")
                         + " due to _Compounding Interests_ " + player.gainTG(tgGain) + ".");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, tgGain);
@@ -2490,8 +2490,8 @@ public final class ButtonHelperActionCards {
         player.setTg(oldTg + resValue);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                player.getFactionEmoji() + " gained " + resValue + " trade good" + (resValue == 1 ? "" : "s") + " ("
-                        + oldTg + "->" + player.getTg() + ").");
+                player.getFactionEmoji() + " gained " + StringHelper.pluralize(resValue, "trade good") + " (" + oldTg
+                        + "->" + player.getTg() + ").");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, resValue);
         if (game.isFowMode()) {
@@ -2561,8 +2561,8 @@ public final class ButtonHelperActionCards {
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", you _Plague_'d " + planetRep + " and got " + hits + " hit"
-                            + (hits == 1 ? "" : "s"));
+                    player.getRepresentationUnfogged() + ", you _Plague_'d " + planetRep + " and got "
+                            + StringHelper.pluralize(hits, "hit"));
             MessageHelper.sendMessageToChannel(
                     p2.getCorrectChannel(),
                     p2.getRepresentationUnfogged() + ", your planet " + planetRep + " suffered a" + adjective
@@ -2612,12 +2612,12 @@ public final class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", you stormed " + tile.getRepresentationForButtons(game, player)
-                        + " and got " + hits + " hit" + (hits == 1 ? "" : "s"));
+                        + " and got " + StringHelper.pluralize(hits, "hit"));
         MessageHelper.sendMessageToChannel(
                 p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged() + ", your fighter" + (amount == 1 ? "" : "s") + " in "
                         + tile.getRepresentationForButtons(game, player) + " were hit by a storm and you lost "
-                        + hits + " fighter" + (hits == 1 ? "" : "s") + ".");
+                        + StringHelper.pluralize(hits, "fighter") + ".");
     }
 
     @ButtonHandler("crippleStep3_")
@@ -3029,7 +3029,7 @@ public final class ButtonHelperActionCards {
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                player.getFactionEmoji() + " gained " + count + " trade good" + (count == 1 ? "" : "s") + " (" + oldTg
+                player.getFactionEmoji() + " gained " + StringHelper.pluralize(count, "trade good") + " (" + oldTg
                         + "->" + player.getTg() + ").");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, count);
@@ -3055,7 +3055,7 @@ public final class ButtonHelperActionCards {
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                player.getFactionEmoji() + " gained " + count + " trade good" + (count == 1 ? "" : "s") + " (" + oldTg
+                player.getFactionEmoji() + " gained " + StringHelper.pluralize(count, "trade good") + " (" + oldTg
                         + "->" + player.getTg() + ") from mining " + bestPlanet + ".");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, count);

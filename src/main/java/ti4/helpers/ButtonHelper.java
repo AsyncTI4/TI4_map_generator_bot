@@ -5487,8 +5487,8 @@ public class ButtonHelper {
                     buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCorrectChannel(),
-                            player.getRepresentationUnfogged() + ", please place " + mechCount + " structure"
-                                    + (mechCount == 1 ? "" : "s") + " (equal to the number of mech"
+                            player.getRepresentationUnfogged() + ", please place "
+                                    + StringHelper.pluralize(mechCount, "structure") + " (equal to the number of mech"
                                     + (mechCount == 1 ? "" : "s") + " you have here).",
                             buttons);
                 }
@@ -6836,8 +6836,8 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         if (!game.isFowMode() && combatOnHolder instanceof Planet && h > 0 && opponent != player) {
-            String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit"
-                    + (h == 1 ? "" : "s") + ".";
+            String msg = opponent.getRepresentationUnfogged() + " you may autoassign "
+                    + StringHelper.pluralize(h, "hit") + ".";
             List<Button> buttons = new ArrayList<>();
             String factionChecker = "FFCC_" + opponent.getFaction() + "_";
             buttons.add(Buttons.green(
@@ -6847,8 +6847,8 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         } else {
             if (!game.isFowMode() && opponent != player) {
-                String msg = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered " + h + " hit"
-                        + (h == 1 ? "" : "s") + ".";
+                String msg = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered "
+                        + StringHelper.pluralize(h, "hit") + ".";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 List<Button> buttons = new ArrayList<>();
                 if (h > 0) {

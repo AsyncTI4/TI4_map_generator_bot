@@ -14,6 +14,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.StringHelper;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.service.emoji.ColorEmojis;
@@ -193,12 +194,12 @@ public class PlayerStatsService {
             tg += tgCount;
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
+                    player.getRepresentation() + " gained " + StringHelper.pluralize(tgCount, "trade good")
                             + " from picking **" + game.getSCName(scNumber) + "**.");
             if (game.isFowMode()) {
-                String messageToSend =
-                        ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " trade good"
-                                + (tgCount == 1 ? "" : "s") + " from picking **" + game.getSCName(scNumber) + "**.";
+                String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained "
+                        + StringHelper.pluralize(tgCount, "trade good") + " from picking **" + game.getSCName(scNumber)
+                        + "**.";
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);

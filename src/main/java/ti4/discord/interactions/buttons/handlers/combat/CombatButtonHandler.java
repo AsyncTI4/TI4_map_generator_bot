@@ -17,6 +17,7 @@ import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.TemporaryCombatModifierModel;
@@ -254,7 +255,7 @@ class CombatButtonHandler {
                 "getDamageButtons_" + tile.getPosition() + "_groundcombat",
                 "Manually Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.gray("cancelGroundHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
-        String msg2 = player.getRepresentation() + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s") + ".";
+        String msg2 = player.getRepresentation() + " you may autoassign " + StringHelper.pluralize(h, "hit") + ".";
         event.getMessage()
                 .editMessage(msg2)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))

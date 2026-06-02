@@ -49,8 +49,8 @@ public final class ButtonHelperStats {
         if (player.getCommodities() >= amt) {
             player.setCommodities(player.getCommodities() - amt);
             player.setTg(player.getTg() + amt);
-            message = "onverted " + amt + " commodit" + (amt == 1 ? "y" : "ies") + " to " + amt + " trade good"
-                    + (amt == 1 ? "" : "s") + ".";
+            message = "onverted " + amt + " commodit" + (amt == 1 ? "y" : "ies") + " to "
+                    + StringHelper.pluralize(amt, "trade good") + ".";
         } else if (player.getCommodities() == 1) {
             message = "onverted their last remaining commodity (less than " + amt + ") into 1 trade good.";
             player.setTg(player.getTg() + player.getCommodities());
