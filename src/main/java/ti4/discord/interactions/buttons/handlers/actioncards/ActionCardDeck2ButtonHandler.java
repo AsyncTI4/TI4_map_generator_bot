@@ -2223,6 +2223,15 @@ class ActionCardDeck2ButtonHandler {
         RevealPublicObjectiveService.revealS2(game, event);
     }
 
+    @ButtonHandler("resolveClassifiedWeapons")
+    public static void resolveClassifiedWeapons(Player player, Game game, ButtonInteractionEvent event) {
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + " resolved _Classified Weapons_. Declare the unit now; it rolls 2 additional dice.");
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("resolveBlackMarketIntel")
     public static void resolveBlackMarketIntel(Player player, Game game, ButtonInteractionEvent event) {
         String so1 = game.drawSecretObjective(player.getUserID());
