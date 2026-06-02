@@ -51,7 +51,9 @@ import ti4.model.RelicModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
+import ti4.service.combat.CombatUnitSelectionHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -2512,6 +2514,54 @@ class ActionCardDeck2ButtonHandler {
     public static void amendmentRevealStage2(Player player, Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
         RevealPublicObjectiveService.revealS2(game, event);
+    }
+
+    @ButtonHandler("resolveClassifiedWeapons")
+    public static void resolveClassifiedWeapons(Player player, Game game, ButtonInteractionEvent event) {
+        String factionChecker = player.factionButtonChecker();
+        List<Button> buttons = new ArrayList<>();
+        Tile activeTile = game.getTileByPosition(game.getActiveSystem());
+        if (activeTile != null) {
+            UnitHolder spaceHolder = activeTile.getUnitHolders().get(Constants.SPACE);
+            if (spaceHolder != null) {
+                Map<UnitModel, Integer> combatUnits =
+                        CombatUnitSelectionHelper.collectCombatRoundUnits(activeTile, spaceHolder, player);
+                for (UnitModel unit : combatUnits.keySet()) {
+                    buttons.add(Buttons.gray(
+                            factionChecker + "resolveClassifiedWeaponsUnit_" + unit.getAsyncId(),
+                            unit.getName(),
+                            unit.getUnitEmoji()));
+                }
+            }
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + " resolved _Classified Weapons_. Declare the unit now; it rolls 2 additional dice.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", please choose the unit that will roll 2 additional dice (_Classified Weapons_).",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveClassifiedWeaponsUnit_")
+    public static void resolveClassifiedWeaponsUnit(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String unitAsyncId = buttonID.replace("resolveClassifiedWeaponsUnit_", "");
+        UnitModel unit = player.getUnitFromAsyncID(unitAsyncId);
+        String unitName = unit != null ? unit.getName() : unitAsyncId;
+        game.setCurrentReacts("classifiedWeapons", player.getFaction() + ";" + unitAsyncId);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " chose " + unitName
+                        + " via _Classified Weapons_; it rolls 2 additional dice this combat round.");
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("resolveBlackMarketIntel")
