@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.zephyrion;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion;
 
 import java.util.List;
 import lombok.experimental.UtilityClass;

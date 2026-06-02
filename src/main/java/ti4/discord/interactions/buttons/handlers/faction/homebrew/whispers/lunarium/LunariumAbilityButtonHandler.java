@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.lunarium;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium;
 
 import java.util.List;
 import lombok.experimental.UtilityClass;

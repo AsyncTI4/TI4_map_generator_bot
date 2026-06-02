@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi;
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi;
 
 import java.util.ArrayList;
 import java.util.List;
