@@ -255,7 +255,8 @@ class ActionCardDeck2ButtonHandler {
         if (peekedSecrets.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", the secret objective deck is empty; _Classified Rider_ cannot be resolved.");
+                    player.getRepresentation()
+                            + ", the secret objective deck is empty; _Classified Rider_ cannot be resolved.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -286,7 +287,8 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("resolveClassifiedRiderStep2_")
-    public static void resolveClassifiedRiderStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolveClassifiedRiderStep2(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String soId = buttonID.replace("resolveClassifiedRiderStep2_", "");
         if (!game.getSecretObjectives().contains(soId)) {
             Collections.shuffle(game.getSecretObjectives());
@@ -308,8 +310,8 @@ class ActionCardDeck2ButtonHandler {
                         + " resolved _Classified Rider_ and drew a secret objective. The secret objective deck has been shuffled.");
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + " drew \"" + Mapper.getSecretObjective(soId).getName()
-                        + "\" with _Classified Rider_.");
+                player.getRepresentationUnfogged() + " drew \""
+                        + Mapper.getSecretObjective(soId).getName() + "\" with _Classified Rider_.");
     }
 
     @ButtonHandler("resolveDataArchive")
