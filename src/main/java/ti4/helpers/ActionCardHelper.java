@@ -1272,6 +1272,12 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "players"), codedButtons);
             }
 
+            if ("armistice".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveArmistice", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
+            }
+
             if ("flank_speed".equals(automationID)) {
                 game.setStoredValue("flankspeedBoost", "1");
             }
@@ -1320,6 +1326,12 @@ public class ActionCardHelper {
 
             if ("arms_deal".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveArmsDeal", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
+            }
+
+            if ("betrayal".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveBetrayal", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
