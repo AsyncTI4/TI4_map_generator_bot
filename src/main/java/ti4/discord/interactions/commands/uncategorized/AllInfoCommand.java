@@ -8,6 +8,7 @@ import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.message.MessageHelper;
 import ti4.service.info.AbilityInfoService;
 import ti4.service.info.CardsInfoService;
@@ -43,6 +44,9 @@ public class AllInfoCommand extends GameStateCommand {
         UnitInfoService.sendUnitInfo(player, false);
         LeaderInfoService.sendLeadersInfo(game, player);
         TechInfoService.sendTechInfo(player);
+        if (!game.isTwilightsFallMode() && game.isThundersEdge() && !player.getBreakthroughIDs().isEmpty()) {
+            BreakthroughCommandHelper.sendBreakthroughInfo(game, player);
+        }
         RelicInfoService.sendRelicInfo(player);
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         ActionCardHelper.sendActionCardInfo(game, player);

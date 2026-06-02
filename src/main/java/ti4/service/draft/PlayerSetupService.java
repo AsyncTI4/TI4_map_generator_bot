@@ -117,11 +117,6 @@ public class PlayerSetupService {
         // BREAKTHROUGH
         if (Mapper.getBreakthrough(breakthrough) != null) {
             player.addBreakthrough(breakthrough);
-            if (!game.isTwilightsFallMode() && game.isThundersEdge()) {
-                List<MessageEmbed> embeds = new ArrayList<>();
-                for (var bt : player.getBreakthroughModels()) embeds.add(bt.getRepresentationEmbed());
-                MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), "Breakthrough info", embeds);
-            }
         }
 
         // HOME SYSTEM
@@ -288,6 +283,9 @@ public class PlayerSetupService {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, factionModel.getFactionSheetMessage());
         AbilityInfoService.sendAbilityInfo(player, event);
         TechInfoService.sendTechInfo(player, event);
+        if (!game.isTwilightsFallMode() && game.isThundersEdge() && !player.getBreakthroughIDs().isEmpty()) {
+            BreakthroughCommandHelper.sendBreakthroughInfo(game, player);
+        }
         if (!game.getStoredValue("useOldPok").isEmpty() && player.hasLeader("naaluagent-te")) {
             player.removeLeader("naaluagent-te");
             player.addLeader("naaluagent");
