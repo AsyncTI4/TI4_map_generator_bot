@@ -78,6 +78,7 @@ import ti4.spring.context.SpringContext;
 
 @UtilityClass
 public class CombatRollService {
+    private static final String ANOMALOUS_CONDITIONS_UNIT_TYPE_PREFIX = "anomalousConditionsUnitType_";
 
     public boolean checkIfUnitsOfType(
             Player player,
@@ -1885,9 +1886,57 @@ public class CombatRollService {
             Tile tile, UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
         Map<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
+        Game game = player.getGame();
         Map<UnitModel, Integer> output = CombatUnitSelectionHelper.collectCombatRoundUnits(tile, unitHolder, player);
+        output = applyAnomalousConditionsUnitTypeSkip(tile, unitHolder, player, game, output, event);
         checkBadUnits(player, event, unitsByAsyncId, output);
         return output;
+    }
+
+    private static Map<UnitModel, Integer> applyAnomalousConditionsUnitTypeSkip(
+            Tile tile,
+            UnitHolder unitHolder,
+            Player player,
+            Game game,
+            Map<UnitModel, Integer> unitsInCombat,
+            GenericInteractionCreateEvent event) {
+        int combatRound = getUpcomingCombatRound(game, player, tile.getPosition(), unitHolder.getName());
+        String selectedUnitTypeValue = game.getStoredValue(
+                getAnomalousConditionsUnitTypeKey(tile.getPosition(), unitHolder.getName(), combatRound));
+        if (isBlank(selectedUnitTypeValue)) {
+            return unitsInCombat;
+        }
+        UnitType selectedUnitType = Units.findUnitType(selectedUnitTypeValue);
+        if (selectedUnitType == null) {
+            return unitsInCombat;
+        }
+        Map<UnitModel, Integer> filteredUnits = new HashMap<>(unitsInCombat.entrySet().stream()
+                .filter(entry -> entry.getKey() != null && entry.getKey().getUnitType() != selectedUnitType)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+        if (filteredUnits.size() != unitsInCombat.size()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Skipping " + selectedUnitType.humanReadableName()
+                            + " combat rolls due to _Anomalous Conditions_.");
+        }
+        return filteredUnits;
+    }
+
+    public static String getAnomalousConditionsUnitTypeKey(
+            String tilePosition, String unitHolderName, int combatRound) {
+        return ANOMALOUS_CONDITIONS_UNIT_TYPE_PREFIX + tilePosition + "_" + unitHolderName + "_" + combatRound;
+    }
+
+    public static int getUpcomingCombatRound(Game game, Player player, String tilePosition, String unitHolderName) {
+        String combatRoundTrackerKey = "combatRoundTracker" + player.getFaction() + tilePosition + unitHolderName;
+        if (isBlank(game.getStoredValue(combatRoundTrackerKey))) {
+            return 1;
+        }
+        int currentCombatRound = Integer.parseInt(game.getStoredValue(combatRoundTrackerKey));
+        if ("true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"))) {
+            return currentCombatRound;
+        }
+        return currentCombatRound + 1;
     }
 
     private static Map<UnitModel, Integer> getUnitsInAFB(

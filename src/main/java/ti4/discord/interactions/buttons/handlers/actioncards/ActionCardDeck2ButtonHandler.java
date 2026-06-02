@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -36,6 +37,8 @@ import ti4.helpers.DiceHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitType;
 import ti4.helpers.UnusedCommanderHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -50,6 +53,8 @@ import ti4.model.RelicModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.service.combat.CombatRollService;
+import ti4.service.combat.CombatUnitSelectionHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -782,10 +787,157 @@ class ActionCardDeck2ButtonHandler {
     @ButtonHandler("resolveAnomalousConditions")
     public static void resolveAnomalousConditions(Player player, Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(
-                game.getActionsChannel(),
+        Tile activeTile = game.getTileByPosition(game.getActiveSystem());
+        if (activeTile == null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentation() + ", no active system was found to resolve _Anomalous Conditions_.");
+            return;
+        }
+        Player opponent = getCombatOpponentForAnomalousConditions(player, game);
+        if (opponent == null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentation() + ", no combat opponent was found to resolve _Anomalous Conditions_.");
+            return;
+        }
+
+        List<UnitHolder> contestedHolders = activeTile.getUnitHolders().values().stream()
+                .filter(unitHolder -> !CombatUnitSelectionHelper.collectCombatRoundUnits(activeTile, unitHolder, player)
+                        .isEmpty())
+                .filter(unitHolder -> !CombatUnitSelectionHelper.collectCombatRoundUnits(
+                                activeTile, unitHolder, opponent)
+                        .isEmpty())
+                .toList();
+        if (contestedHolders.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentation()
+                            + ", no eligible combat participants were found for _Anomalous Conditions_.");
+            return;
+        }
+
+        List<Button> unitTypeButtons = new ArrayList<>();
+        boolean multipleCombatHolders = contestedHolders.size() > 1;
+        for (UnitHolder unitHolder : contestedHolders) {
+            int combatRound = CombatRollService.getUpcomingCombatRound(
+                    game, player, activeTile.getPosition(), unitHolder.getName());
+            Set<UnitType> participatingUnitTypes = Stream.of(player, opponent)
+                    .flatMap(combatPlayer ->
+                            CombatUnitSelectionHelper.collectCombatRoundUnits(activeTile, unitHolder, combatPlayer)
+                                    .keySet()
+                                    .stream())
+                    .filter(Objects::nonNull)
+                    .map(model -> model.getUnitType())
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toCollection(HashSet::new));
+
+            participatingUnitTypes.stream()
+                    .sorted((left, right) -> left.humanReadableName().compareTo(right.humanReadableName()))
+                    .forEach(unitType -> {
+                        String label = unitType.humanReadableName();
+                        if (multipleCombatHolders) {
+                            label += " (" + getAnomalousConditionsHolderLabel(unitHolder.getName(), game) + ")";
+                        }
+                        unitTypeButtons.add(Buttons.gray(
+                                player.factionButtonChecker() + "resolveAnomalousConditionsStep2_"
+                                        + activeTile.getPosition() + "_" + unitHolder.getName() + "_" + combatRound
+                                        + "_"
+                                        + unitType.getValue(),
+                                label,
+                                unitType.getUnitTypeEmoji()));
+                    });
+        }
+        if (unitTypeButtons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentation() + ", no eligible unit types were found for _Anomalous Conditions_.");
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
                 player.getFactionEmojiOrColor()
-                        + " resolved _Anomalous Conditions_. Choose 1 unit type for this combat round; units of that type cannot make combat rolls.");
+                        + " resolved _Anomalous Conditions_. Choose 1 participating unit type for this combat round; units of that type cannot make combat rolls.",
+                unitTypeButtons);
+    }
+
+    @ButtonHandler("resolveAnomalousConditionsStep2_")
+    public static void resolveAnomalousConditionsStep2(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String payload = buttonID.replaceFirst("^resolveAnomalousConditionsStep2_", "");
+        int firstUnderscore = payload.indexOf('_');
+        int lastUnderscore = payload.lastIndexOf('_');
+        int secondLastUnderscore = payload.lastIndexOf('_', lastUnderscore - 1);
+        if (firstUnderscore < 0
+                || lastUnderscore < 0
+                || secondLastUnderscore < 0
+                || secondLastUnderscore <= firstUnderscore) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentation() + ", the _Anomalous Conditions_ selection was invalid.");
+            return;
+        }
+
+        String tilePosition = payload.substring(0, firstUnderscore);
+        String unitHolderName = payload.substring(firstUnderscore + 1, secondLastUnderscore);
+        String combatRoundText = payload.substring(secondLastUnderscore + 1, lastUnderscore);
+        String unitTypeValue = payload.substring(lastUnderscore + 1);
+        UnitType selectedUnitType = Units.findUnitType(unitTypeValue);
+        if (selectedUnitType == null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentation() + ", the selected unit type for _Anomalous Conditions_ was invalid.");
+            return;
+        }
+
+        int combatRound;
+        try {
+            combatRound = Integer.parseInt(combatRoundText);
+        } catch (NumberFormatException e) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentation() + ", the selected combat round for _Anomalous Conditions_ was invalid.");
+            return;
+        }
+
+        game.setStoredValue(
+                CombatRollService.getAnomalousConditionsUnitTypeKey(tilePosition, unitHolderName, combatRound),
+                selectedUnitType.getValue());
+        String holderLabel = getAnomalousConditionsHolderLabel(unitHolderName, game);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getFactionEmojiOrColor() + " chose **" + selectedUnitType.humanReadableName()
+                        + "** for _Anomalous Conditions_ in **" + holderLabel + "** (combat round #" + combatRound
+                        + ").");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static Player getCombatOpponentForAnomalousConditions(Player player, Game game) {
+        String factionsInCombat = game.getStoredValue("factionsInCombat");
+        if (factionsInCombat.isBlank()) {
+            return null;
+        }
+        for (String faction : factionsInCombat.split("_")) {
+            if (faction.equals(player.getFaction())) {
+                continue;
+            }
+            Player opponent = game.getPlayerFromColorOrFaction(faction);
+            if (opponent != null) {
+                return opponent;
+            }
+        }
+        return null;
+    }
+
+    private static String getAnomalousConditionsHolderLabel(String unitHolderName, Game game) {
+        if (Constants.SPACE.equals(unitHolderName)) {
+            return "Space";
+        }
+        PlanetModel planetModel = Mapper.getPlanet(unitHolderName);
+        if (planetModel != null) {
+            return planetModel.getName();
+        }
+        return Helper.getPlanetRepresentation(unitHolderName, game);
     }
 
     @ButtonHandler("resolveAncientTradeRoutes")
