@@ -1,9 +1,11 @@
 package ti4.discord.interactions.listeners;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -14,6 +16,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -128,9 +131,11 @@ class MessageListener extends ListenerAdapter {
                             .findFirst()
                             .orElse(null);
             if (bothelperLogChannel != null) {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green("markResolved", "Resolved?"));
                 String msg = message.getJumpUrl() + ". Full message:\n> "
                         + message.getContentRaw().replace("@", "");
-                MessageHelper.sendMessageToChannel(bothelperLogChannel, msg);
+                MessageHelper.sendMessageToChannelWithButtons(bothelperLogChannel, msg, buttons);
             }
         }
         if (messageMentionsBotHelper
