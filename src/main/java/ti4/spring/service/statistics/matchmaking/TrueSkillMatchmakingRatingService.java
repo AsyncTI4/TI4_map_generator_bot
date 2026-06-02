@@ -23,6 +23,10 @@ class TrueSkillMatchmakingRatingService {
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
 
     static List<MatchmakingRating> calculateRatings(List<MatchmakingGame> games) {
+        return calculateRatings(games, false);
+    }
+
+    static List<MatchmakingRating> calculateRatings(List<MatchmakingGame> games, boolean useConservativeRating) {
         games.sort(Comparator.comparingLong(MatchmakingGame::endedDate).thenComparing(MatchmakingGame::name));
 
         GameInfo gameInfo = GameInfo.getDefaultGameInfo();
@@ -53,11 +57,15 @@ class TrueSkillMatchmakingRatingService {
             trueSkillPlayerToRating.putAll(newRatings);
         }
 
-        return buildMatchmakingRatings(userIdToTrueSkillPlayer, trueSkillPlayerToRating, userIdToUsername);
+        return buildMatchmakingRatings(
+                userIdToTrueSkillPlayer, trueSkillPlayerToRating, userIdToUsername, useConservativeRating);
     }
 
     private static List<MatchmakingRating> buildMatchmakingRatings(
-            Map<String, Player<String>> players, Map<IPlayer, Rating> ratings, Map<String, String> userIdToUsername) {
+            Map<String, Player<String>> players,
+            Map<IPlayer, Rating> ratings,
+            Map<String, String> userIdToUsername,
+            boolean useConservativeRating) {
         return players.entrySet().stream()
                 .map(entry -> {
                     String userId = entry.getKey();
@@ -69,7 +77,8 @@ class TrueSkillMatchmakingRatingService {
                             .divide(standardDeviation, MathContext.DECIMAL64)
                             .multiply(ONE_HUNDRED);
                     BigDecimal calibrationPercent = calculatedPercent.min(ONE_HUNDRED);
-                    return new MatchmakingRating(userId, username, rating.getMean(), calibrationPercent);
+                    double rawRating = useConservativeRating ? rating.getConservativeRating() : rating.getMean();
+                    return new MatchmakingRating(userId, username, BigDecimal.valueOf(rawRating), calibrationPercent);
                 })
                 .sorted(Comparator.comparing(MatchmakingRating::rating).reversed())
                 .toList();

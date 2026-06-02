@@ -1,5 +1,7 @@
 package ti4.spring.service.statistics.matchmaking;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -84,11 +86,12 @@ public class MatchmakerService {
         List<MatchmakingQueueEntryEntity> candidates =
                 cleanAndRemoveExpiredEntries(entries, candidateToUserSettings, Instant.now());
 
-        Map<String, Double> playerRatings = getPlayerRatings(candidates);
-        double averageRating = playerRatings.values().stream()
-                .mapToDouble(Double::doubleValue)
-                .average()
-                .orElse(Double.NaN);
+        Map<String, BigDecimal> playerRatings = getPlayerRatings(candidates);
+        BigDecimal averageRating = playerRatings.isEmpty()
+                ? BigDecimal.ZERO
+                : playerRatings.values().stream()
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                        .divide(BigDecimal.valueOf(playerRatings.size()), MathContext.DECIMAL64);
         Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets =
                 getActiveHourBuckets(candidates, candidateToUserSettings);
         List<List<MatchmakingQueueEntryEntity>> gamesToCreate = new ArrayList<>();
@@ -122,7 +125,7 @@ public class MatchmakerService {
         postMatchedGroupsToMakingNewGamesForum(gamesToCreate);
     }
 
-    private static Map<String, Double> getPlayerRatings(List<MatchmakingQueueEntryEntity> candidates) {
+    private static Map<String, BigDecimal> getPlayerRatings(List<MatchmakingQueueEntryEntity> candidates) {
         Set<String> userIds =
                 candidates.stream().map(MatchmakingQueueEntryEntity::getUserId).collect(Collectors.toSet());
         return MatchmakingRatingEventService.get().getPlayerRatings(userIds);
@@ -138,8 +141,8 @@ public class MatchmakerService {
             String paceOption,
             Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate,
             Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets,
-            Map<String, Double> playerRatings,
-            Double defaultRating) {
+            Map<String, BigDecimal> playerRatings,
+            BigDecimal defaultRating) {
         List<MatchmakingQueueEntryEntity> eligible = candidates.stream()
                 .filter(candidate -> !playersAddedToGames.contains(candidate))
                 .filter(candidate -> userSettingsByCandidate
@@ -206,8 +209,8 @@ public class MatchmakerService {
             MatchmakingQueueEntryEntity player2,
             Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate,
             Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets,
-            Map<String, Double> playerRatings,
-            Double defaultRating) {
+            Map<String, BigDecimal> playerRatings,
+            BigDecimal defaultRating) {
         UserSettings player1Settings = userSettingsByCandidate.get(player1);
         UserSettings player2Settings = userSettingsByCandidate.get(player2);
         String player1Id = player1.getUserId();
@@ -240,14 +243,14 @@ public class MatchmakerService {
         boolean player1WantsSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(player1RestrictionsCsv);
         boolean player2WantsSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(player2RestrictionsCsv);
         if (player1WantsSimilarSkill || player2WantsSimilarSkill) {
-            Double player1Rating = playerRatings.getOrDefault(player1.getUserId(), defaultRating);
-            Double player2Rating = playerRatings.getOrDefault(player2.getUserId(), defaultRating);
+            BigDecimal player1Rating = playerRatings.getOrDefault(player1.getUserId(), defaultRating);
+            BigDecimal player2Rating = playerRatings.getOrDefault(player2.getUserId(), defaultRating);
 
             boolean relaxed = isHalfQueueTimePassed(player1, userSettingsByCandidate)
                     || isHalfQueueTimePassed(player2, userSettingsByCandidate);
             double tolerance =
                     relaxed ? RELAXED_SIMILAR_SKILL_DIFFERENCE_THRESHOLD : SIMILAR_SKILL_DIFFERENCE_THRESHOLD;
-            return Math.abs(player1Rating - player2Rating) <= tolerance;
+            return player1Rating.subtract(player2Rating).abs().compareTo(BigDecimal.valueOf(tolerance)) <= 0;
         }
 
         return true;

@@ -1,8 +1,8 @@
 package ti4.spring.service.statistics.matchmaking;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -47,15 +47,31 @@ class MatchmakingRatingServiceTest {
 
         assertThat(ratings).hasSize(6);
 
-        double winnerRating = sortedRatings.get(0).rating();
-        double rank2Rating = sortedRatings.get(1).rating();
+        BigDecimal winnerRating = sortedRatings.get(0).rating();
+        BigDecimal rank2Rating = sortedRatings.get(1).rating();
         assertThat(winnerRating).isGreaterThan(rank2Rating);
 
-        double otherRank2Rating = sortedRatings.get(2).rating();
-        assertThat(otherRank2Rating).isCloseTo(rank2Rating, within(0.02));
+        BigDecimal otherRank2Rating = sortedRatings.get(2).rating();
+        assertThat(otherRank2Rating.subtract(rank2Rating).abs()).isLessThan(BigDecimal.valueOf(0.02));
 
-        double rank3Rating = sortedRatings.get(3).rating();
+        BigDecimal rank3Rating = sortedRatings.get(3).rating();
         assertThat(rank3Rating).isLessThan(rank2Rating);
+    }
+
+    @Test
+    void conservativeRatingsUseConservativeTrueSkillValue() {
+        MatchmakingGame game = buildMatchmakingGame("game1", new int[] {1, 2, 2, 3, 3, 3});
+
+        List<MatchmakingRating> meanRatings =
+                TrueSkillMatchmakingRatingService.calculateRatings(Lists.newArrayList(game));
+        List<MatchmakingRating> conservativeRatings =
+                TrueSkillMatchmakingRatingService.calculateRatings(Lists.newArrayList(game), true);
+
+        MatchmakingRating meanWinnerRating = findRatingForUser(meanRatings, "p0");
+        MatchmakingRating conservativeWinnerRating = findRatingForUser(conservativeRatings, "p0");
+
+        assertThat(conservativeWinnerRating.rating()).isLessThan(meanWinnerRating.rating());
+        assertThat(conservativeWinnerRating.calibrationPercent()).isEqualTo(meanWinnerRating.calibrationPercent());
     }
 
     @NotNull
@@ -65,5 +81,12 @@ class MatchmakingRatingServiceTest {
             players.add(new MatchmakingPlayer("p" + i, "player" + i, ranks[i]));
         }
         return new MatchmakingGame(name, System.currentTimeMillis(), players);
+    }
+
+    private static MatchmakingRating findRatingForUser(List<MatchmakingRating> ratings, String userId) {
+        return ratings.stream()
+                .filter(rating -> rating.userId().equals(userId))
+                .findFirst()
+                .orElseThrow();
     }
 }

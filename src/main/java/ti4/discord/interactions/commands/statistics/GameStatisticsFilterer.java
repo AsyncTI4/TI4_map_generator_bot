@@ -1,12 +1,17 @@
 package ti4.discord.interactions.commands.statistics;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -14,12 +19,16 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.game.helper.GameHelper;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.map.FractureService;
+import ti4.spring.service.statistics.matchmaking.MatchmakingMedal;
+import ti4.spring.service.statistics.matchmaking.MatchmakingRating;
+import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
 
 @UtilityClass
 public class GameStatisticsFilterer {
@@ -37,8 +46,10 @@ public class GameStatisticsFilterer {
     private static final String HAS_SCENARIO_FILTER = "has_scenario";
     private static final String FRACTURE_IN_PLAY_FILTER = "fracture_in_play";
     private static final String STARTED_AFTER_FILTER = "started_after";
+    public static final String MMR_BRACKET_FILTER = "mmr_bracket";
 
     private static final int MINIMUM_ROUND = 3;
+    private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
     private static final DateTimeFormatter STARTED_AFTER_FILTER_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ROOT);
 
@@ -67,6 +78,8 @@ public class GameStatisticsFilterer {
         filters.add(new OptionData(OptionType.BOOLEAN, FRACTURE_IN_PLAY_FILTER, "Is The Fracture in play?"));
         filters.add(new OptionData(
                 OptionType.STRING, STARTED_AFTER_FILTER, "Filter games by if they started after a date (YYYY-MM-DD)"));
+        filters.add(new OptionData(OptionType.STRING, MMR_BRACKET_FILTER, "Filter games by MMR bracket")
+                .setAutoComplete(true));
         return filters;
     }
 
@@ -93,7 +106,13 @@ public class GameStatisticsFilterer {
         Boolean scenarioFilter = event.getOption(HAS_SCENARIO_FILTER, null, OptionMapping::getAsBoolean);
         Boolean fractureInPlayFilter = event.getOption(FRACTURE_IN_PLAY_FILTER, null, OptionMapping::getAsBoolean);
         String startedAfterFilter = event.getOption(STARTED_AFTER_FILTER, null, OptionMapping::getAsString);
+        String mmrBracketFilter = event.getOption(MMR_BRACKET_FILTER, null, OptionMapping::getAsString);
         LocalDate startedAfterDate = parseStartedAfterDate(startedAfterFilter, event);
+        boolean hasMmrBracketFilter = mmrBracketFilter != null && !mmrBracketFilter.isBlank();
+        Optional<MmrBracketFilter> parsedMmrBracketFilter = parseMmrBracketFilter(mmrBracketFilter);
+        List<MatchmakingRating> matchmakingRatings = parsedMmrBracketFilter.isEmpty()
+                ? List.of()
+                : MatchmakingRatingEventService.get().getPlayerRatings(false);
 
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(playerCountFilter, game);
         return playerCountPredicate
@@ -110,6 +129,8 @@ public class GameStatisticsFilterer {
                 .and(game -> filterOnScenario(scenarioFilter, game))
                 .and(game -> filterOnFractureInPlay(fractureInPlayFilter, game))
                 .and(game -> filterOnStartedAfter(startedAfterDate, game))
+                .and(game -> filterOnMmrBracket(
+                        hasMmrBracketFilter, parsedMmrBracketFilter.orElse(null), matchmakingRatings, game))
                 .and(GameStatisticsFilterer::filterAbortedGames)
                 .and(GameStatisticsFilterer::filterEarlyRounds);
     }
@@ -126,6 +147,22 @@ public class GameStatisticsFilterer {
                     "Unable to parse date '" + startedAfterDate + "'. Use format 'YYYY-MM-DD' instead.");
             return null;
         }
+    }
+
+    private static Optional<MmrBracketFilter> parseMmrBracketFilter(String mmrBracketFilter) {
+        if (mmrBracketFilter == null || mmrBracketFilter.isBlank()) {
+            return Optional.empty();
+        }
+        String strippedFilter = mmrBracketFilter.strip();
+        for (MmrBracketComparison comparison : MmrBracketComparison.values()) {
+            if (strippedFilter.startsWith(comparison.symbol)) {
+                String medalName =
+                        strippedFilter.substring(comparison.symbol.length()).strip();
+                return MatchmakingMedal.fromString(medalName).map(medal -> new MmrBracketFilter(comparison, medal));
+            }
+        }
+        return MatchmakingMedal.fromString(strippedFilter)
+                .map(medal -> new MmrBracketFilter(MmrBracketComparison.EQUAL, medal));
     }
 
     private static boolean filterOnWinningFaction(String winningFactionFilter, Game game) {
@@ -275,6 +312,51 @@ public class GameStatisticsFilterer {
                 || GameHelper.getCreationDateAsLocalDate(game).isAfter(startedAfterDate);
     }
 
+    private static boolean filterOnMmrBracket(
+            boolean hasMmrBracketFilter,
+            MmrBracketFilter mmrBracketFilter,
+            List<MatchmakingRating> matchmakingRatings,
+            Game game) {
+        if (!hasMmrBracketFilter) {
+            return true;
+        }
+        if (mmrBracketFilter == null) {
+            return false;
+        }
+        Set<String> gameUserIds = game.getRealAndEliminatedPlayers().stream()
+                .map(Player::getUserID)
+                .collect(Collectors.toSet());
+        return calculateAverageRatingPercentile(matchmakingRatings, gameUserIds)
+                .map(MatchmakingMedal::fromPercentile)
+                .map(mmrBracketFilter::matches)
+                .orElse(false);
+    }
+
+    public static Optional<BigDecimal> calculateAverageRatingPercentile(
+            List<MatchmakingRating> ratings, Set<String> userIds) {
+        if (ratings.isEmpty() || userIds.isEmpty()) {
+            return Optional.empty();
+        }
+        List<BigDecimal> matchedRatings = ratings.stream()
+                .filter(rating -> userIds.contains(rating.userId()))
+                .map(MatchmakingRating::rating)
+                .toList();
+        if (matchedRatings.isEmpty()) {
+            return Optional.empty();
+        }
+
+        BigDecimal averageRating = matchedRatings.stream()
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .divide(BigDecimal.valueOf(matchedRatings.size()), MathContext.DECIMAL64);
+        long ratingsAtOrBelowUserAverage = ratings.stream()
+                .filter(rating -> rating.rating().compareTo(averageRating) <= 0)
+                .count();
+        BigDecimal percentile = BigDecimal.valueOf(ratingsAtOrBelowUserAverage)
+                .multiply(ONE_HUNDRED)
+                .divide(BigDecimal.valueOf(ratings.size()), MathContext.DECIMAL64);
+        return Optional.of(percentile);
+    }
+
     private static boolean isDiscordantStarsGame(Game game) {
         return game.isDiscordantStarsMode()
                 || Mapper.getFactionsValues().stream()
@@ -302,5 +384,29 @@ public class GameStatisticsFilterer {
         int realAndEliminatedPlayersCount = game.getRealAndEliminatedPlayers().size();
         return realAndEliminatedPlayersCount > 2
                 && (minPlayerCount == null || minPlayerCount <= realAndEliminatedPlayersCount);
+    }
+
+    private enum MmrBracketComparison {
+        AT_LEAST(">="),
+        EQUAL("=="),
+        AT_MOST("<=");
+
+        private final String symbol;
+
+        MmrBracketComparison(String symbol) {
+            this.symbol = symbol;
+        }
+    }
+
+    private record MmrBracketFilter(MmrBracketComparison comparison, MatchmakingMedal medal) {
+
+        private boolean matches(MatchmakingMedal actualMedal) {
+            int comparisonResult = actualMedal.compareTo(medal);
+            return switch (comparison) {
+                case AT_LEAST -> comparisonResult >= 0;
+                case EQUAL -> comparisonResult == 0;
+                case AT_MOST -> comparisonResult <= 0;
+            };
+        }
     }
 }
