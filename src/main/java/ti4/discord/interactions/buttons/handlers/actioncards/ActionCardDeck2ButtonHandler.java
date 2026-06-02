@@ -849,7 +849,8 @@ class ActionCardDeck2ButtonHandler {
                 buttons.add(Buttons.gray("resolveBetrayalStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Buttons.gray(
-                        "resolveBetrayalStep2_" + p2.getFaction(), p2.getFactionModel().getShortName());
+                        "resolveBetrayalStep2_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -876,8 +877,7 @@ class ActionCardDeck2ButtonHandler {
         if (promissoryButtons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged()
-                            + ", you have no sendable promissory notes for _Betrayal_.");
+                    player.getRepresentationUnfogged() + ", you have no sendable promissory notes for _Betrayal_.");
         } else {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
@@ -906,15 +906,12 @@ class ActionCardDeck2ButtonHandler {
             if (p2.getActionCards().isEmpty()) {
                 MessageHelper.sendMessageToChannel(
                         p2.getCardsInfoThread(),
-                        p2.getRepresentationUnfogged()
-                                + ", you have no action cards to send for _Betrayal_.");
+                        p2.getRepresentationUnfogged() + ", you have no action cards to send for _Betrayal_.");
                 continue;
             }
 
             List<Button> buttons = List.of(Buttons.green(
-                    "resolveBetrayalCollect_" + player.getFaction(),
-                    "Send Random Action Card",
-                    CardEmojis.ActionCard));
+                    "resolveBetrayalCollect_" + player.getFaction(), "Send Random Action Card", CardEmojis.ActionCard));
             String msg = p2.getRepresentationUnfogged() + ", _Betrayal_ requires you to send 1 random action card to "
                     + (game.isFowMode() ? "another player." : player.getFactionEmojiOrColor() + ".");
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
