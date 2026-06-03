@@ -283,6 +283,7 @@ class GameLoadService {
                 case Constants.REVEALED_PO -> game.setRevealedPublicObjectives(getParsedCards(info));
                 case Constants.CUSTOM_PO_VP -> game.setCustomPublicVP(getParsedCards(info));
                 case Constants.SCORED_PO -> game.setScoredPublicObjectives(getParsedCardsForScoredPO(info));
+                case Constants.PURGED_PO -> game.setPurgedPublicObjectives(getParsedCardsForScoredPO(info));
                 case Constants.AC_DECK_ID -> game.setAcDeckID(info);
                 case Constants.SO_DECK_ID -> game.setSoDeckID(info);
                 case Constants.STAGE_1_PUBLIC_DECK_ID -> game.setStage1PublicDeckID(info);

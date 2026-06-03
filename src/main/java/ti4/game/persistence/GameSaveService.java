@@ -344,14 +344,8 @@ class GameSaveService {
         writer.write(Constants.MAX_SO_COUNT + " " + game.getMaxSOCountPerPlayer());
         writer.write(System.lineSeparator());
 
-        StringBuilder sb1 = new StringBuilder();
-        for (Map.Entry<String, List<String>> entry :
-                game.getScoredPublicObjectives().entrySet()) {
-            String userIds = String.join("-", entry.getValue());
-            sb1.append(entry.getKey()).append(",").append(userIds).append(";");
-        }
-        writer.write(Constants.SCORED_PO + " " + sb1);
-        writer.write(System.lineSeparator());
+        writeScoredPublicObjectives(game.getScoredPublicObjectives(), writer, Constants.SCORED_PO);
+        writeScoredPublicObjectives(game.getPurgedPublicObjectives(), writer, Constants.PURGED_PO);
 
         StringBuilder adjacentTiles = new StringBuilder();
         for (Map.Entry<String, List<String>> entry :
@@ -1095,6 +1089,17 @@ class GameSaveService {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, Integer> entry : cardList.entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
+        }
+        writer.write(saveID + " " + sb);
+        writer.write(System.lineSeparator());
+    }
+
+    private static void writeScoredPublicObjectives(
+            Map<String, List<String>> scoredPublicObjectives, Writer writer, String saveID) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, List<String>> entry : scoredPublicObjectives.entrySet()) {
+            String userIds = String.join("-", entry.getValue());
+            sb.append(entry.getKey()).append(",").append(userIds).append(";");
         }
         writer.write(saveID + " " + sb);
         writer.write(System.lineSeparator());

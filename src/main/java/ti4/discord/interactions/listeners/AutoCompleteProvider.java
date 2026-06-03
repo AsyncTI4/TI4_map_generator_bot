@@ -1607,7 +1607,8 @@ class AutoCompleteProvider {
             @NotNull String gameName) {
         if (!Constants.SHUFFLE_OBJECTIVE_BACK.equals(subCommandName)
                 && !Constants.SCORE_OBJECTIVE.equals(subCommandName)
-                && !Constants.UNSCORE_OBJECTIVE.equals(subCommandName)) {
+                && !Constants.UNSCORE_OBJECTIVE.equals(subCommandName)
+                && !Constants.PURGE_OBJECTIVE.equals(subCommandName)) {
             return;
         }
         if (!Constants.PO_ID.equals(optionName)) {

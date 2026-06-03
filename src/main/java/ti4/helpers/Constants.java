@@ -839,6 +839,7 @@ public final class Constants {
     public static final String REVEAL_STAGE2 = "po_reveal_stage2";
     public static final String SCORE_OBJECTIVE = "po_score";
     public static final String UNSCORE_OBJECTIVE = "po_unscore";
+    public static final String PURGE_OBJECTIVE = "po_purge";
     public static final String UNREVEAL_OBJECTIVE = "po_unreveal";
     public static final String SHUFFLE_OBJECTIVE_BACK = "po_shuffle_back";
     public static final String PO_ID = "public_id";
@@ -849,6 +850,7 @@ public final class Constants {
     public static final String REVEALED_PO = "revealedPublicObjectives";
     public static final String CUSTOM_PO_VP = "customPublicVP";
     public static final String SCORED_PO = "scoredPublicObjectives";
+    public static final String PURGED_PO = "purgedPublicObjectives";
     public static final String CUSTOM_ADJACENT_TILES = "customAdjacentTiles";
     public static final String ADJACENCY_OVERRIDES = "adjacencyOverrides";
     public static final String CUSTOM_HYPERLANE_DATA = "customHyperlaneData";

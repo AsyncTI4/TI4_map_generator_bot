@@ -17,6 +17,7 @@ public class StatusCommand implements ParentCommand {
                     new ShufflePublicBack(),
                     new UnrevealPublic(),
                     new ScorePublic(),
+                    new PurgePublic(),
                     new PeekPublicObjectiveDeck(),
                     new UnscorePublic(),
                     new AddCustomPO(),

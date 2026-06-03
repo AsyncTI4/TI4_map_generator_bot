@@ -187,6 +187,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     @Getter
     @Setter
+    private Map<String, List<String>> purgedPublicObjectives = new LinkedHashMap<>();
+
+    @Getter
+    @Setter
     private Map<String, List<String>> customAdjacentTiles = new LinkedHashMap<>();
 
     @Getter
@@ -1746,6 +1750,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         soToPoList.remove(id);
         customPublicVP.remove(id);
         scoredPublicObjectives.remove(id);
+        purgedPublicObjectives.remove(id);
     }
 
     public String getCustodiansTaker() {
@@ -1878,16 +1883,38 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 break;
             }
         }
-
         return unscorePublicObjective(userID, id);
     }
 
     public boolean unscorePublicObjective(String userID, String id) {
         if (!id.isEmpty()) {
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
-            return scoredPlayerList.remove(userID);
+            boolean removed = scoredPlayerList.remove(userID);
+            List<String> purgedPlayerList = purgedPublicObjectives.get(id);
+            if (purgedPlayerList != null) {
+                purgedPlayerList.remove(userID);
+            }
+            return removed;
         }
         return false;
+    }
+
+    public boolean purgePublicObjective(Integer idNumber) {
+        String id = "";
+        for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(idNumber)) {
+                id = po.getKey();
+                break;
+            }
+        }
+        if (id.isEmpty()) return false;
+
+        List<String> scorers = scoredPublicObjectives.getOrDefault(id, Collections.emptyList());
+        purgedPublicObjectives.put(id, new ArrayList<>(scorers));
+        revealedPublicObjectives.remove(id);
+        publicObjectives1Peeked.remove(id);
+        publicObjectives2Peeked.remove(id);
+        return true;
     }
 
     public Integer addCustomPO(String poName, int vp) {
@@ -1923,6 +1950,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             soToPoList.remove(id);
             customPublicVP.remove(id);
             scoredPublicObjectives.remove(id);
+            purgedPublicObjectives.remove(id);
             return true;
         }
         return false;

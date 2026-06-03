@@ -1,7 +1,9 @@
 package ti4.image;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import ti4.game.Game;
@@ -43,6 +45,9 @@ class ObjectiveBox {
 
         graphics.drawString(objective.getDisplayText(game), x, y + textVerticalOffset);
         graphics.drawRect(x - horizontalBoxOffset, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
+        if (objective.purged()) {
+            displayPurgedOverlay(graphics, objective);
+        }
         if ((objective.revealed() || game.isRedTapeMode() || game.isCivilizedSocietyMode())
                 && Mapper.getPublicObjective(objective.key()) != null) {
             generator.addWebsiteOverlay(
@@ -138,6 +143,10 @@ class ObjectiveBox {
     }
 
     private static void setColor(Graphics graphics, Objective objective) {
+        if (objective.purged()) {
+            graphics.setColor(Color.GRAY);
+            return;
+        }
         switch (objective.type()) {
             case Stage1 -> {
                 if (objective.revealed()) {
@@ -155,5 +164,22 @@ class ObjectiveBox {
             }
             case Custom -> graphics.setColor(Color.WHITE);
         }
+    }
+
+    private void displayPurgedOverlay(Graphics graphics, Objective objective) {
+        Graphics2D g2 = (Graphics2D) graphics;
+        Color oldColor = g2.getColor();
+        Font oldFont = g2.getFont();
+
+        Font purgeFont = oldFont.deriveFont(Font.BOLD, 32f);
+        g2.setFont(purgeFont);
+        g2.setColor(new Color(190, 20, 20));
+        int textWidth = g2.getFontMetrics().stringWidth("PURGED");
+        int textX = x - horizontalBoxOffset + (boxWidth - textWidth) / 2;
+        int textY = y + 25;
+        g2.drawString("PURGED", textX, textY);
+
+        g2.setFont(oldFont);
+        g2.setColor(oldColor);
     }
 }

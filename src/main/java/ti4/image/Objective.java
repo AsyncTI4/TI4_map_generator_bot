@@ -16,6 +16,7 @@ public record Objective(
         ti4.image.Objective.Type type,
         Integer index,
         Boolean revealed,
+        Boolean purged,
         List<String> scoredPlayerIDs,
         List<String> peekPlayerIDs) {
 
@@ -29,8 +30,10 @@ public record Objective(
         List<Objective> objectives = retrievePublic1(game);
 
         appendRevealedObjectives(game, objectives, Type.Stage2);
+        appendPurgedObjectives(game, objectives, Type.Stage2);
         appendUnrevealedObjectives(game, objectives, Type.Stage2);
         appendRevealedObjectives(game, objectives, Type.Custom);
+        appendPurgedObjectives(game, objectives, Type.Custom);
 
         return objectives;
     }
@@ -38,6 +41,7 @@ public record Objective(
     public static List<Objective> retrievePublic1(Game game) {
         List<Objective> objectives = new ArrayList<>();
         appendRevealedObjectives(game, objectives, Type.Stage1);
+        appendPurgedObjectives(game, objectives, Type.Stage1);
         appendUnrevealedObjectives(game, objectives, Type.Stage1);
         return objectives;
     }
@@ -45,6 +49,7 @@ public record Objective(
     public static List<Objective> retrievePublic2(Game game) {
         List<Objective> objectives = new ArrayList<>();
         appendRevealedObjectives(game, objectives, Type.Stage2);
+        appendPurgedObjectives(game, objectives, Type.Stage2);
         appendUnrevealedObjectives(game, objectives, Type.Stage2);
         return objectives;
     }
@@ -52,6 +57,7 @@ public record Objective(
     public static List<Objective> retrieveCustom(Game game) {
         List<Objective> objectives = new ArrayList<>();
         appendRevealedObjectives(game, objectives, Type.Custom);
+        appendPurgedObjectives(game, objectives, Type.Custom);
         return objectives;
     }
 
@@ -81,7 +87,9 @@ public record Objective(
     public String getDisplayText(Game game) {
         String name = getName();
         Integer worth = getWorth(game);
-        if (revealed) {
+        if (purged) {
+            return String.format("(PURGED) %s - %d VP", name, worth);
+        } else if (revealed) {
             return String.format(
                     "(%d) %s - %d VP", game.getRevealedPublicObjectives().get(key), name, worth);
         } else if (game.isRedTapeMode()) {
@@ -119,7 +127,28 @@ public record Objective(
                 game.getRevealedPublicObjectives().keySet().stream()
                         .filter(Mapper.getPublicObjectivesStage2().keySet()::contains)
                         .collect(Collectors.toList());
-            case Custom -> getCustomObjectives(game).keySet().stream().toList();
+            case Custom ->
+                getCustomObjectives(game).keySet().stream()
+                        .filter(game.getRevealedPublicObjectives()::containsKey)
+                        .collect(Collectors.toList());
+        };
+    }
+
+    private static List<String> getPurgedObjectiveList(Game game, Type type) {
+        return switch (type) {
+            case Stage1 ->
+                game.getPurgedPublicObjectives().keySet().stream()
+                        .filter(Mapper.getPublicObjectivesStage1().keySet()::contains)
+                        .collect(Collectors.toList());
+            case Stage2 ->
+                game.getPurgedPublicObjectives().keySet().stream()
+                        .filter(Mapper.getPublicObjectivesStage2().keySet()::contains)
+                        .collect(Collectors.toList());
+            case Custom ->
+                game.getPurgedPublicObjectives().keySet().stream()
+                        .filter(key -> !Mapper.getPublicObjectivesStage1().containsKey(key))
+                        .filter(key -> !Mapper.getPublicObjectivesStage2().containsKey(key))
+                        .collect(Collectors.toList());
         };
     }
 
@@ -127,7 +156,28 @@ public record Objective(
         Integer index = 1;
         for (String key : getObjectiveList(game, type)) {
             objectives.add(new Objective(
-                    key, type, index, Boolean.TRUE, getScoredPlayerIDs(game, key), getPeekPlayerIDs(game, key)));
+                    key,
+                    type,
+                    index,
+                    Boolean.TRUE,
+                    Boolean.FALSE,
+                    getScoredPlayerIDs(game, key),
+                    getPeekPlayerIDs(game, key)));
+            index++;
+        }
+    }
+
+    private static void appendPurgedObjectives(Game game, List<Objective> objectives, Type type) {
+        Integer index = 1;
+        for (String key : getPurgedObjectiveList(game, type)) {
+            objectives.add(new Objective(
+                    key,
+                    type,
+                    index,
+                    Boolean.TRUE,
+                    Boolean.TRUE,
+                    getPurgedScoredPlayerIDs(game, key),
+                    Collections.emptyList()));
             index++;
         }
     }
@@ -144,13 +194,23 @@ public record Objective(
 
         for (String key : inputList) {
             objectives.add(new Objective(
-                    key, type, index, Boolean.FALSE, getScoredPlayerIDs(game, key), getPeekPlayerIDs(game, key)));
+                    key,
+                    type,
+                    index,
+                    Boolean.FALSE,
+                    Boolean.FALSE,
+                    getScoredPlayerIDs(game, key),
+                    getPeekPlayerIDs(game, key)));
             index++;
         }
     }
 
     private static List<String> getScoredPlayerIDs(Game game, String objectiveKey) {
         return game.getScoredPublicObjectives().getOrDefault(objectiveKey, Collections.emptyList());
+    }
+
+    private static List<String> getPurgedScoredPlayerIDs(Game game, String objectiveKey) {
+        return game.getPurgedPublicObjectives().getOrDefault(objectiveKey, Collections.emptyList());
     }
 
     private static List<String> getPeekPlayerIDs(Game game, String objectiveKey) {
