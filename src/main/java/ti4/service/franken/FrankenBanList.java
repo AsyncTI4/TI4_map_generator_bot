@@ -24,12 +24,10 @@ public enum FrankenBanList {
                                     "vaylerianbt",
                                     "argentbt",
                                     "firmamentbt",
-                                    "bastionbt"
-                                    )),
+                                    "bastionbt")),
                     Map.entry(
                             Constants.ABILITY,
                             List.of(
-                                    
                                     "deep_mining",
                                     "orbital_foundries",
                                     "rule_of_two",
@@ -156,14 +154,11 @@ public enum FrankenBanList {
             Map.ofEntries(
                     Map.entry(
                             Constants.LEADER,
-                            List.of(
-                                    "winnuhero",
-                                    "mahactcommander",
-                                    "naaluagent",
-                                    "edynhero",
-                                    "lanefirhero")),
+                            List.of("winnuhero", "mahactcommander", "naaluagent", "edynhero", "lanefirhero")),
                     Map.entry(Constants.TECH, List.of("lw2", "dt2", "ffac2", "qdn", "asn", "dsuydab")),
-                    Map.entry(Constants.BREAKTHROUGH, List.of("solbt", "letnevbt", "lanefirbt", "sardakkbt", "rhodunbt", "nomadbt", "kyrobt")),
+                    Map.entry(
+                            Constants.BREAKTHROUGH,
+                            List.of("solbt", "letnevbt", "lanefirbt", "sardakkbt", "rhodunbt", "nomadbt", "kyrobt")),
                     Map.entry(Constants.UNIT_ID, List.of("mahact_mech")),
                     Map.entry(
                             Constants.ABILITY,
