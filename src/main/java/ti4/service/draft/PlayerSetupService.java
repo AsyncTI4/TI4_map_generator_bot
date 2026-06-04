@@ -32,6 +32,7 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source;
 import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.info.AbilityInfoService;
 import ti4.service.info.CardsInfoService;
@@ -278,6 +279,12 @@ public class PlayerSetupService {
         // STARTING OWNED UNITS
         Set<String> playerOwnedUnits = new HashSet<>(factionModel.getUnits());
         player.setUnitsOwned(playerOwnedUnits);
+        if (game.isBaseGameMode()) {
+            UnitModel mech = player.getUnitByBaseType("mech");
+            if (mech != null) {
+                player.removeOwnedUnitByID(mech.getId());
+            }
+        }
 
         // Don't do special stuff if Franken Faction
         if (faction.startsWith("franken")) {
