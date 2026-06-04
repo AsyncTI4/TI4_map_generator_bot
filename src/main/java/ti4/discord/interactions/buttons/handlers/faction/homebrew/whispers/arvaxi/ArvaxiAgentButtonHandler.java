@@ -94,6 +94,7 @@ public class ArvaxiAgentButtonHandler {
         ActionCardHelper.sendActionCardInfo(game, target);
 
         List<Button> spendButtons = ButtonHelper.getExhaustButtonsWithTG(game, target, "inf");
+        spendButtons.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCardsInfoThread(),
                 target.getRepresentationUnfogged()
