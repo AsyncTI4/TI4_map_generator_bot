@@ -686,6 +686,8 @@ class GameLoadService {
                 case Constants.DRAFT_SYSTEM_SETTINGS ->
                     game.setDraftSystemSettingsJson(info); // We will parse this later
                 case Constants.FRANKEN_DRAFT_SETTINGS -> game.setFrankenSettingsJson(info); // We will parse this later
+                case Constants.BASE_GAME_MINI_MILTY_SETTINGS ->
+                    game.setBaseGameMiniMiltySettingsJson(info); // We will parse this later
                 case Constants.GAME_TAGS -> game.setTags(getCardList(info));
                 case Constants.TIGL_RANK -> {
                     TIGLHelper.TIGLRank rank = TIGLHelper.TIGLRank.fromString(info);

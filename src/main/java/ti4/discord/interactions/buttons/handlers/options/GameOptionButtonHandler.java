@@ -101,12 +101,6 @@ final class GameOptionButtonHandler {
 
     @ButtonHandler("setupBaseGameMode")
     public static void setupBaseGameMode(ButtonInteractionEvent event, Game game) {
-        game.setBaseGameMode(true);
-        game.setAcDeckID("action_cards_basegame");
-        game.setAgendaDeckID("agendas_base_game");
-        game.setScSetID("pok");
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                "Set game to Base Game mode with Base Game Action Cards, Base Game Agendas, and PoK strategy cards.");
+        game.initializeBaseGameMiniMiltySettings().postMessageAndButtons(event);
     }
 }
