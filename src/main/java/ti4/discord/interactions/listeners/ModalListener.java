@@ -14,6 +14,7 @@ import ti4.discord.interactions.routing.ModalHandler;
 import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
+import ti4.helpers.settingsFramework.menus.BaseGameMiniMiltySettings;
 import ti4.helpers.settingsFramework.menus.FrankenSettings;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -113,6 +114,10 @@ public final class ModalListener extends ListenerAdapter {
             String draftSystemNavPart = ".*_draft[._].*";
             if (modalID.matches(draftSystemNavPart)) {
                 game.initializeDraftSystemSettings().parseInput(context);
+                return;
+            }
+            if (BaseGameMiniMiltySettings.isBaseGameMiniMiltyMenuComponent(modalID)) {
+                game.initializeBaseGameMiniMiltySettings().parseInput(context);
                 return;
             }
             if (FrankenSettings.isFrankenMenuComponent(modalID)) {

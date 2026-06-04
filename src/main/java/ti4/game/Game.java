@@ -67,6 +67,7 @@ import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
+import ti4.helpers.settingsFramework.menus.BaseGameMiniMiltySettings;
 import ti4.helpers.settingsFramework.menus.DeckSettings;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.FrankenSettings;
@@ -264,6 +265,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     @Setter
     @Getter
+    private String baseGameMiniMiltySettingsJson;
+
+    @Setter
+    @Getter
     private String draftString;
 
     @Setter
@@ -274,6 +279,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     @Setter
     private FrankenSettings frankenSettings;
+
+    @Setter
+    private BaseGameMiniMiltySettings baseGameMiniMiltySettings;
 
     @Getter
     @Setter
@@ -483,6 +491,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         draftSystemSettingsJson = null;
         frankenSettings = null;
         frankenSettingsJson = null;
+        baseGameMiniMiltySettings = null;
+        baseGameMiniMiltySettingsJson = null;
     }
 
     @NotNull
@@ -522,6 +532,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return frankenSettings;
     }
 
+    public BaseGameMiniMiltySettings getBaseGameMiniMiltySettingsUnsafe() {
+        return baseGameMiniMiltySettings;
+    }
+
     public MiltySettings initializeMiltySettings() {
         if (miltySettings == null) {
             miltySettings = initializeSetting(
@@ -552,6 +566,18 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                     getActionsChannel());
         }
         return frankenSettings;
+    }
+
+    public BaseGameMiniMiltySettings initializeBaseGameMiniMiltySettings() {
+        if (baseGameMiniMiltySettings == null) {
+            baseGameMiniMiltySettings = initializeSetting(
+                    baseGameMiniMiltySettingsJson,
+                    BaseGameMiniMiltySettings::new,
+                    "base game Mini-Milty settings",
+                    Constants.jabberwockyPing(),
+                    getActionsChannel());
+        }
+        return baseGameMiniMiltySettings;
     }
 
     private <T> T initializeSetting(

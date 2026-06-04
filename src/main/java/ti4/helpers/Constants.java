@@ -1072,6 +1072,7 @@ public final class Constants {
     public static final String DRAFT_MANAGER = "draft_manager";
     public static final String DRAFT_SYSTEM_SETTINGS = "draft_system_settings";
     public static final String FRANKEN_DRAFT_SETTINGS = "franken_draft_settings";
+    public static final String BASE_GAME_MINI_MILTY_SETTINGS = "base_game_mini_milty_settings";
     public static final String DRAFT = "draft";
 
     // groups
