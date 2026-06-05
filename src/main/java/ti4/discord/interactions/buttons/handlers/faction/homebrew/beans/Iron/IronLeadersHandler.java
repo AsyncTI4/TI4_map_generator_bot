@@ -75,7 +75,7 @@ public class IronLeadersHandler {
                 }
                 return;
             }
-            if (holder.getName().equalsIgnoreCase("space")) {
+            if ("space".equalsIgnoreCase(holder.getName())) {
                 return;
             }
             tryUnlockCommanderOnPlanet(game, holder);
