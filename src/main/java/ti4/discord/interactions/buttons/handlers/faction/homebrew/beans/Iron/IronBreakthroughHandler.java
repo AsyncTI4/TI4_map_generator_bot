@@ -13,6 +13,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.CheckUnitContainmentService;
 
@@ -20,6 +21,13 @@ import ti4.service.unit.CheckUnitContainmentService;
 public class IronBreakthroughHandler {
 
     private static final String IRON_BT = "ironbt";
+
+    public static void sendIronBtMessage(Player player, Game game) {
+        MessageHelper.sendMessageToChannel(
+                game.getActionsChannel(),
+                player.getRepresentation()
+                        + " **REMINDER**: You do not need a mech on the planet due to _Foundry Network_.");
+    }
 
     public static List<Button> getPlaceUnitButtonsForIronBt(
             Player player, Tile origTile, Game game, String placePrefix) {
