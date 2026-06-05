@@ -15,6 +15,9 @@ public final class ExploreHelper {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
         UnitKey mechKey = Units.getUnitKey(UnitType.Mech, player.getColorID());
+        if (player.hasUnlockedBreakthrough("ironbt")) {
+            return true;
+        }
         return unitHolder.getUnitCount(mechKey) > 0;
     }
 
