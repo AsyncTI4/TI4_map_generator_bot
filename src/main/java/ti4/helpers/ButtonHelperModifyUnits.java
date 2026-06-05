@@ -454,7 +454,7 @@ public final class ButtonHelperModifyUnits {
                     player.factionButtonChecker() + "removeAllStructures_" + unitHolder.getName(),
                     "Remove Structures"));
             buttons.add(Buttons.gray("deleteButtons", "Don't Remove Structures"));
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
         }
         IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "groundcombat");
         event.getMessage();
