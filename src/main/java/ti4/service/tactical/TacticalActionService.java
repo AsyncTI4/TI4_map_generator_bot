@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -200,6 +201,9 @@ public class TacticalActionService {
             ButtonInteractionEvent event, Game game, Player player, Tile tile) {
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
 
+        if (player.hasLeader("ironhero")) {
+            IronLeadersHandler.updateIronHeroEligibility(game, player, tile);
+        }
         boolean unitsWereMoved = moveUnitsIntoActiveSystem(event, game, tile);
         Tile updatedTile = game.getTileByPosition(tile.getPosition());
         spendAndPlaceTokenIfNecessary(event, game, player, updatedTile);

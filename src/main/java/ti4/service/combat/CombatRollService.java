@@ -29,6 +29,7 @@ import ti4.contest.replay.core.CombatRollPayload.RollSegmentType;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
@@ -1335,6 +1336,42 @@ public class CombatRollService {
                                     .append(unitRoll2);
                         }
                     }
+                }
+                if (IronLeadersHandler.shouldAutoRerollCommanderMechMisses(game, player, unitModel, rollType)
+                        && numMisses > 0) {
+                    resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numMisses);
+                    // Very important to remove the rerolled dice from the original dice pool
+                    resultRolls.removeIf(Predicate.not(Die::isSuccess));
+                    player.setExpectedHitsTimes10(
+                            player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
+                    chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numMisses);
+                    chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numMisses);
+                    maximumHits += numRolls * mult;
+                    int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
+                    totalHits += hitRolls2;
+                    String unitRoll2 = CombatMessageHelper.displayUnitRoll(
+                            unitModel, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
+                    payloadBuilder.addUnitRoll(
+                            unitModel,
+                            toHit,
+                            modifierToHit,
+                            numOfUnit,
+                            numRollsPerUnit,
+                            0,
+                            RollSegmentType.IRON_COMMANDER_REROLL_MISSES,
+                            resultRolls2,
+                            hitRolls2,
+                            DieRollSource.REROLL_MISS);
+                    resultBuilder
+                            .append("Rerolling ")
+                            .append(numMisses)
+                            .append(" miss")
+                            .append(numMisses == 1 ? "" : "es")
+                            .append(" due to Captain Vakros, the Iron Tide Commander:\n")
+                            .append(unitRoll2);
+                    resultRolls.addAll(resultRolls2);
+                    numMisses -= hitRolls2;
+                    resultRolls2 = new ArrayList<>();
                 }
                 if (rollType == CombatRollType.SpaceCannonOffence || rollType == CombatRollType.SpaceCannonDefence) {
                     if (player.ownsUnit("gledge_pds2") && totalHits > 0) {
