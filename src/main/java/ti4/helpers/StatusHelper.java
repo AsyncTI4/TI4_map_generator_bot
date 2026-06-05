@@ -621,8 +621,8 @@ public final class StatusHelper {
 
     private static void sendNeuralParasiteButtons(Game game) {
         for (Player player : game.getRealPlayers()) {
-            boolean hasFrankenFirmParasite = game.isFrankenGame() && hasTechOrFactionTech(player, "parasite-firm_y");
-            boolean hasBaseFirmParasite = !game.isFrankenGame() && hasTechOrFactionTech(player, "parasite-firm");
+            boolean hasFrankenFirmParasite = game.isFrankenGame() && player.hasTech("parasite-firm_y");
+            boolean hasBaseFirmParasite = !game.isFrankenGame() && player.hasTech("parasite-firm");
 
             if (hasFrankenFirmParasite || hasBaseFirmParasite) {
                 Tile home = player.getHomeSystemTile();
@@ -644,7 +644,7 @@ public final class StatusHelper {
             }
 
             if (game.isFrankenGame()
-                    && hasTechOrFactionTech(player, "parasite-obs_y")
+                    && player.hasTech("parasite-obs_y")
                     && TeHelperTechs.playerHasInfantryOnMap(game, player)) {
                 List<Button> buttons = TeHelperTechs.neuralParasiteButtons(game, player);
                 if (!buttons.isEmpty()) {
@@ -655,10 +655,6 @@ public final class StatusHelper {
                 }
             }
         }
-    }
-
-    private static boolean hasTechOrFactionTech(Player player, String techAlias) {
-        return player.hasTech(techAlias) || player.getFactionTechs().contains(techAlias);
     }
 
     private static void sendMitosisButtons(Game game) {
