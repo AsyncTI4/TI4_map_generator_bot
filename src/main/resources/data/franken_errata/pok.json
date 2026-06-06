@@ -362,9 +362,9 @@
     },
     (
         "ItemCategory": "BREAKTHROUGH",
-        "ItemId": ""sardakkbt",
+        "ItemId": "sardakkbt",
         "additionalComponents": [
-            "STARTINGTECH"sardakk"
+            "STARTINGTECH":sardakk"
         ],
         "Source": "thunders_edge"
     },
