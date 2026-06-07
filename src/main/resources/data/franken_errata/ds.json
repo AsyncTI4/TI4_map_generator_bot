@@ -594,10 +594,10 @@
         "itemCategory": "MECH",
         "itemId": "nivyn_mech",
         "additionalComponents": [
-            "ABILITY:singularity_point"
+            "ABILITY:singularity_point",
+            "TECH:dsnivymf"
         ],
         "optionalSwaps": [
-            "TECH:dsnivymf",
             "HERO:nivynhero",
             "BREAKTHROUGH:nivynbt"
         ],
@@ -998,6 +998,20 @@
         "itemCategory": "COMMANDER",
         "itemId": "belkoseacommander",
         "undraftable": true,
+        "source": "ds"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "belkoseahero",
+        "undraftable": true,
+        "source": "ds"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "dsbelkff",
+        "optionalSwaps": [
+            "HERO:belkoseahero"
+        ],
         "source": "ds"
     },
     {
