@@ -361,12 +361,12 @@
         "source": "pok"
     },
     {
-        "ItemCategory": "BREAKTHROUGH",
-        "ItemId": "sardakkbt",
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "sardakkbt",
         "additionalComponents": [
             "STARTINGTECH:sardakk"
         ],
-        "Source": "thunders_edge"
+        "source": "thunders_edge"
     },
     {
         "itemCategory": "BREAKTHROUGH",
