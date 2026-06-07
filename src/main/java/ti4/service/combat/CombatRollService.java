@@ -278,6 +278,7 @@ public class CombatRollService {
                 tileModel,
                 game,
                 rollType,
+                combatOnHolder,
                 Constants.COMBAT_EXTRA_ROLLS);
 
         List<NamedCombatModifierModel> extraRollsDup = new ArrayList<>(extraRolls);
