@@ -291,7 +291,8 @@ public class CombatModHelper {
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
             if (modifier.isInScopeForUnit(unit, playerUnits, rollType, game, player)) {
-                Integer modValue = getVariableModValue(modifier, player, opponent, game, unit, tile, unitHolder);
+                Integer modValue =
+                        getVariableModValue(modifier, player, opponent, game, unit, tile, rollType, unitHolder);
                 Integer perUnitCount = 1;
                 if (modifier.getApplyEachForQuantity()) {
                     perUnitCount = numOfUnit;
@@ -664,6 +665,7 @@ public class CombatModHelper {
             Game game,
             UnitModel origUnit,
             Tile activeSystem,
+            CombatRollType rollType,
             UnitHolder unitHolder) {
         double value = mod.getValue().doubleValue();
         double multiplier = 1.0;
@@ -813,8 +815,18 @@ public class CombatModHelper {
                 }
                 case "opponent_sftt" -> scalingCount = getOpponentSfttCount(opponent);
                 case "nonhome_system_with_planet" -> scalingCount = getSystemsWithControlledPlanets(game, player);
-                case "galvanized_unit_count" ->
+                case "galvanized_unit_count" -> {
                     scalingCount = getGalvanizedUnitCount(game, unitHolder, origUnit, player);
+                    if (rollType == CombatRollType.SpaceCannonOffence && origUnit.getDeepSpaceCannon()) {
+                        for (String adjPos :
+                                FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+                            Tile tile = game.getTileByPosition(adjPos);
+                            for (UnitHolder uH : tile.getUnitHolders().values()) {
+                                scalingCount += getGalvanizedUnitCount(game, uH, origUnit, player);
+                            }
+                        }
+                    }
+                }
                 case "unique_ships" -> scalingCount = getUniqueNonFighterShipCount(activeSystem, player);
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {
