@@ -33,6 +33,8 @@ public class WeirdGameSetup extends GameStateSubcommand {
                 Constants.DISCORDANT_STARS_MODE,
                 "True to add the Discordant Stars factions to the pool."));
         addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.BLUE_REVERIE_MODE, "True to add the Blue Reverie factions to the pool."));
+        addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.UNCHARTED_SPACE_STUFF,
                 "True to add the Uncharted Space Stuff to the draft pool."));
@@ -96,8 +98,13 @@ public class WeirdGameSetup extends GameStateSubcommand {
         if (uncharted != null) {
             game.setUnchartedSpaceStuff(uncharted);
             if (uncharted) {
-                game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"));
-                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"));
+                if (game.isBlueReverieContentMode()) {
+                    game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_BR"));
+                    game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_br"));
+                } else {
+                    game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"));
+                    game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"));
+                }
                 if (game.isAbsolMode()) {
                     if (game.getTechnologyDeckID().contains("absol")) {
                         game.setTechnologyDeckID("techs_ds_absol");
@@ -107,10 +114,12 @@ public class WeirdGameSetup extends GameStateSubcommand {
                     }
 
                 } else {
-                    game.validateAndSetRelicDeck(Mapper.getDeck("relics_ds"));
+                    game.validateAndSetRelicDeck(
+                            Mapper.getDeck(game.isBlueReverieContentMode() ? "relics_br" : "relics_ds"));
                     game.setTechnologyDeckID("techs_ds");
                 }
             }
+            syncBlueReverieContentDecks(event, game);
         }
 
         Boolean extraSecretMode = event.getOption("extra_secret_mode", null, OptionMapping::getAsBoolean);
@@ -186,6 +195,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
         if (event.getOption(Constants.TIGL_GAME) == null
                 && event.getOption(Constants.ABSOL_MODE) == null
                 && event.getOption(Constants.DISCORDANT_STARS_MODE) == null
+                && event.getOption(Constants.BLUE_REVERIE_MODE) == null
                 && event.getOption(Constants.BASE_GAME_MODE) == null
                 && event.getOption(Constants.MILTYMOD_MODE) == null
                 && event.getOption(Constants.VOTC_MODE) == null) {
@@ -198,11 +208,21 @@ public class WeirdGameSetup extends GameStateSubcommand {
                 event.getOption(Constants.MILTYMOD_MODE, game.isMiltyModMode(), OptionMapping::getAsBoolean);
         boolean discordantStarsMode = event.getOption(
                 Constants.DISCORDANT_STARS_MODE, game.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
+        boolean blueReverieMode =
+                event.getOption(Constants.BLUE_REVERIE_MODE, game.isBlueReverieMode(), OptionMapping::getAsBoolean);
         boolean baseGameMode =
                 event.getOption(Constants.BASE_GAME_MODE, game.isBaseGameMode(), OptionMapping::getAsBoolean);
         boolean votcMode = event.getOption(Constants.VOTC_MODE, game.isVotcMode(), OptionMapping::getAsBoolean);
         return setGameMode(
-                event, game, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame, votcMode);
+                event,
+                game,
+                baseGameMode,
+                absolMode,
+                miltyModMode,
+                discordantStarsMode,
+                blueReverieMode,
+                isTIGLGame,
+                votcMode);
     }
 
     // TODO: find a better way to handle this - this is annoying
@@ -214,6 +234,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
             boolean absolMode,
             boolean miltyModMode,
             boolean discordantStarsMode,
+            boolean blueReverieMode,
             boolean isTIGLGame,
             boolean votcMode) {
         if (isTIGLGame && (game.isAllianceMode() || game.isCommunityMode())) {
@@ -226,6 +247,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
                 && (baseGameMode
                         || absolMode
                         || discordantStarsMode
+                        || blueReverieMode
                         || game.isHomebrewSCMode()
                         || game.isFowMode()
                         || votcMode)) {
@@ -250,10 +272,10 @@ public class WeirdGameSetup extends GameStateSubcommand {
             return false;
         }
 
-        if (baseGameMode && (absolMode || discordantStarsMode)) {
+        if (baseGameMode && (absolMode || discordantStarsMode || blueReverieMode)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "No Expansion Mode is not supported with Discordant Stars or Absol Mode");
+                    "No Expansion Mode is not supported with Discordant Stars, Blue Reverie, or Absol Mode");
             return false;
         } else if (baseGameMode && miltyModMode) {
             if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_miltymod"))) return false;
@@ -282,6 +304,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
             game.setMiltyModMode(true);
             game.setAbsolMode(false);
             game.setDiscordantStarsMode(false);
+            game.setBlueReverieMode(false);
             return true;
         } else if (baseGameMode) {
             if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_base_game"))) return false;
@@ -304,6 +327,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
             game.setBaseGameMode(true);
             game.setAbsolMode(false);
             game.setDiscordantStarsMode(false);
+            game.setBlueReverieMode(false);
             return true;
         }
         game.setBaseGameMode(false);
@@ -347,6 +371,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
             game.swapOutVariantTechs();
         }
         game.setDiscordantStarsMode(discordantStarsMode);
+        game.setBlueReverieMode(blueReverieMode);
 
         // JUST ABSOL
         if (absolMode) {
@@ -399,6 +424,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
             game.setBaseGameMode(false);
             game.setAbsolMode(false);
             game.setDiscordantStarsMode(false);
+            game.setBlueReverieMode(false);
             game.swapInVariantTechs();
             game.swapInVariantUnits("pok");
             game.setScSetID("votc");
@@ -428,6 +454,8 @@ public class WeirdGameSetup extends GameStateSubcommand {
             }
         }
 
+        syncBlueReverieContentDecks(event, game);
+
         return true;
     }
 
@@ -435,10 +463,48 @@ public class WeirdGameSetup extends GameStateSubcommand {
         game.setThundersEdge(false);
         game.setTwilightsFallMode(false);
         game.removeStoredValue("useOldPok");
-        boolean success = setGameMode(event, game, true, false, false, false, false, false);
+        boolean success = setGameMode(event, game, true, false, false, false, false, false, false);
         if (success) {
             game.setStrategyCardSet("pok");
         }
         return success;
+    }
+
+    private static void syncBlueReverieContentDecks(GenericInteractionCreateEvent event, Game game) {
+        boolean brContent = game.isBlueReverieContentMode();
+        boolean usContent = game.isUnchartedSpaceStuff();
+
+        if (!game.isAbsolMode()
+                && ("agendas_pok".equalsIgnoreCase(game.getAgendaDeckID())
+                        || "agendas_br".equalsIgnoreCase(game.getAgendaDeckID()))) {
+            game.validateAndSetAgendaDeck(event, Mapper.getDeck(brContent ? "agendas_br" : "agendas_pok"));
+        }
+
+        if (!game.isAcd2()
+                && ("action_cards_pok".equalsIgnoreCase(game.getAcDeckID())
+                        || "action_cards_ds".equalsIgnoreCase(game.getAcDeckID())
+                        || "action_cards_br".equalsIgnoreCase(game.getAcDeckID()))) {
+            String deckId = brContent ? "action_cards_br" : (usContent ? "action_cards_ds" : "action_cards_pok");
+            game.validateAndSetActionCardDeck(event, Mapper.getDeck(deckId));
+        }
+
+        if ("explores_pok".equalsIgnoreCase(game.getExplorationDeckID())
+                || "explores_ds".equalsIgnoreCase(game.getExplorationDeckID())
+                || "explores_br".equalsIgnoreCase(game.getExplorationDeckID())) {
+            String deckId = brContent ? "explores_BR" : (usContent ? "explores_DS" : "explores_pok");
+            game.validateAndSetExploreDeck(event, Mapper.getDeck(deckId));
+        }
+
+        if (game.isAbsolMode()) {
+            if ("relics_absol".equalsIgnoreCase(game.getRelicDeckID())
+                    || "relics_absol_ds".equalsIgnoreCase(game.getRelicDeckID())) {
+                game.validateAndSetRelicDeck(Mapper.getDeck(usContent ? "relics_absol_ds" : "relics_absol"));
+            }
+        } else if ("relics_pok".equalsIgnoreCase(game.getRelicDeckID())
+                || "relics_ds".equalsIgnoreCase(game.getRelicDeckID())
+                || "relics_br".equalsIgnoreCase(game.getRelicDeckID())) {
+            String deckId = brContent ? "relics_br" : (usContent ? "relics_ds" : "relics_pok");
+            game.validateAndSetRelicDeck(Mapper.getDeck(deckId));
+        }
     }
 }

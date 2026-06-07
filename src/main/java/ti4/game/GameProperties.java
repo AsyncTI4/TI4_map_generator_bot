@@ -157,6 +157,7 @@ public class GameProperties {
     private @ExportableField boolean cptiExploreMode;
     private @ExportableField boolean absolMode;
     private @ExportableField boolean discordantStarsMode;
+    private @ExportableField boolean blueReverieMode;
     private @ExportableField boolean unchartedSpaceStuff;
     private @ExportableField boolean miltyModMode;
     private @ExportableField boolean promisesPromisesMode;

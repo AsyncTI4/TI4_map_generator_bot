@@ -116,6 +116,7 @@ public final class Constants {
     public static final String FLAGSHIPPING = "flagshipping";
     public static final String JUST_UNITS = "just_units";
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
+    public static final String BLUE_REVERIE_MODE = "blue_reverie_mode";
     public static final String UNCHARTED_SPACE_STUFF = "uncharted_space_stuff";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
     public static final String THUNDERSEDGE = "thundersedge";
@@ -498,6 +499,7 @@ public final class Constants {
     public static final String ANOMALIES_CAN_TOUCH = "anomalies_can_touch";
     public static final String INCLUDE_DS_TILES = "include_ds_tiles";
     public static final String INCLUDE_DS_FACTIONS = "include_ds_factions";
+    public static final String INCLUDE_BR_FACTIONS = "include_br_factions";
     public static final String USE_MAP_TEMPLATE = "use_map_template";
 
     // /custom command

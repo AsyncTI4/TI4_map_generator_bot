@@ -1,0 +1,104 @@
+[
+    {
+        "alias": "culturalartifact",
+        "name": "Cultural Artifact",
+        "text": "This card may be exchanged as part of a transaction.\nWhen an agenda is revealed: Discard this card and that agenda to reveal 1 agenda from the top of the deck. Players vote on this agenda instead.",
+        "isFakeRelic": true,
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "hazardousartifact",
+        "name": "Hazardous Artifact",
+        "text": "This card may be exchanged as part of a transaction.\nAfter a round of ground combat on a planet you do not control: Discard this card to force your opponent's units into coexistence.",
+        "isFakeRelic": true,
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "industrialartifact",
+        "name": "Industrial Artifact",
+        "text": "This card may be exchanged as part of a transaction.\nAfter you produce a unit: Discard this card to gain 3 commodities, or spend 2 commodities or 2 trade goods to research that unit's unit upgrade technology.",
+        "isFakeRelic": true,
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "unknownartifact",
+        "name": "Unknown Artifact",
+        "text": "This card may be exchanged as part of a transaction.\nAfter a player activates a system: Discard this card; until the end of this tactical action, the active player treats the move value of each of their ships as 1.",
+        "isFakeRelic": true,
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "superweaponavailyn",
+        "name": "Superweapon Availyn",
+        "text": "This system is a nebula. At any time, you may exhaust this card to produce up to 3 fighters in a system that contains your ships. PRODUCTION 3",
+        "notes": "You must be participating in the combat to place the fighters.",
+        "isFakeRelic": true,
+        "source": "ds"
+    },
+    {
+        "alias": "superweaponcaled",
+        "name": "Superweapon Caled",
+        "text": "During combat, if a straight line between the center of this system and the center of the active system would cross only parallel non-anomaly borders, you may exhaust this card to destroy 1 ship in that system.",
+        "notes": "You must be participating in the combat. Cannot hit its own system. Treats hyperlanes as empties for purposes of line drawing.",
+        "isFakeRelic": true,
+        "source": "ds"
+    },
+    {
+        "alias": "superweaponglatison",
+        "name": "Superweapon Glatison",
+        "text": "At any time, you may exhaust this card to repair all of your damaged units. Up to 5 fighters in this system do not count against your ships’ capacity.ANTI-FIGHTER BARRAGE 4(x2).",
+        "notes": "The ANTI-FIGHTER BARRAGE is not automated.",
+        "isFakeRelic": true,
+        "source": "ds"
+    },
+    {
+        "alias": "superweapongrom",
+        "name": "Superweapon Grom",
+        "text": "At any time, you may exhaust this card to resolve ANTI-FIGHTER BARRAGE 4 against each fighter in 1 adjacent system (including your own).",
+        "isFakeRelic": true,
+        "source": "ds"
+    },
+    {
+        "alias": "superweaponmors",
+        "name": "Superweapon Mors",
+        "text": "At any time, you may exhaust this card to force each unit in 1 non-adjacent system to become damaged, if able. PLANETARY SHIELD",
+        "isFakeRelic": true,
+        "source": "ds"
+    },
+    {
+        "alias": "aendstorch",
+        "name": "Aend's Torch",
+        "text": "After you activate a system, you may exhaust this card to place 1 neutral ship in that system’s space area that has a cost value less than the number of victory points you have. Then, resolve space combat in that system.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "matjeksdragoncage",
+        "name": "Matjek's Dragon Cage",
+        "text": "ACTION: Choose a planet in a system that contains your ships; destroy and capture all units on that planet, and gain up to 1 non-faction technology owned by any player whose units you captured. Then, purge this card.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "gedustation",
+        "name": "Gedu Station",
+        "text": "When you gain this card, place or move the Gedu station token into a non-home system that contains your ships. This card is also the Gedu station card. 3 / 3",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "kadlinsstaff",
+        "name": "Kadlin's Staff",
+        "text": "You may exhaust this card at the end of your turn to choose 1 player; that player may spend 1 token from their strategy pool to gain the alliance ability of a random, unused faction.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "theantipode",
+        "name": "The Antipode",
+        "text": "ACTION: Purge this card to ready or unlock up to 3 components that aren't strategy cards and place the Entropic Scar token in a system that contains or is adjacent to your units.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "taraniscrest",
+        "name": "Taranis Crest",
+        "text": "After you gain control of a planet from another player, you may place 1 infantry from that player's reinforcements into coexistence on that planet.\nApply +1 to the resource and influence values of planets you control that contain coexisting units.",
+        "source": "blue_reverie"
+    }
+]

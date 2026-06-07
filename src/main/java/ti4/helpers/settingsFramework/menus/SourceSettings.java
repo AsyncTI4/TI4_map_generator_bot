@@ -33,6 +33,7 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting discoStars;
     private final BooleanSetting betaTestMode;
     private final BooleanSetting unchartedSpace;
+    private final BooleanSetting blueReverie;
     private final BooleanSetting absol;
     private final BooleanSetting ignis;
     private final BooleanSetting eronous;
@@ -59,6 +60,7 @@ public class SourceSettings extends SettingsMenu {
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
         teDemo = new BooleanSetting("ThundersEdge", "Thunders Edge", game.isThundersEdge());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
+        blueReverie = new BooleanSetting("BlueReverie", "Blue Reverie", game.isBlueReverieMode());
         absol = new BooleanSetting("Absol", "Absol Mod", game.isAbsolMode());
         ignis = new BooleanSetting(
                 "Ignis",
@@ -80,6 +82,11 @@ public class SourceSettings extends SettingsMenu {
         deepreaches.setEmoji(SourceEmojis.DeepReaches);
 
         // Other Initialization
+        discoStars.setExtraInfo("Adds Discordant Stars factions only.");
+        blueReverie.setExtraInfo(
+                "Adds Blue Reverie factions. Blue Reverie non-faction content only appears when Uncharted Space is also enabled.");
+        unchartedSpace.setExtraInfo(
+                "Adds Uncharted Space content, plus Blue Reverie non-faction content when Blue Reverie is enabled.");
         // miltymod.setExtraInfo("NOTE: this is NOT \"milty draft\", this is a homebrew mod that replaces components in
         // the game");
 
@@ -98,6 +105,7 @@ public class SourceSettings extends SettingsMenu {
             discoStars.initialize(json.get("discoStars"));
             teDemo.initialize(json.get("teDemo"));
             unchartedSpace.initialize(json.get("unchartedSpace"));
+            blueReverie.initialize(json.get("blueReverie"));
             absol.initialize(json.get("absol"));
             ignis.initialize(json.get("ignis"));
             eronous.initialize(json.get("eronous"));
@@ -120,6 +128,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(codexes);
         ls.add(teDemo);
         ls.add(discoStars);
+        ls.add(blueReverie);
         ls.add(unchartedSpace);
         ls.add(absol);
         ls.add(ignis);
@@ -166,6 +175,7 @@ public class SourceSettings extends SettingsMenu {
             sources.addAll(List.of(
                     ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
         if (discoStars.isVal()) sources.add(ComponentSource.ds);
+        if (blueReverie.isVal()) sources.add(ComponentSource.blue_reverie);
         if (absol.isVal()) sources.add(ComponentSource.absol);
         if (teDemo.isVal()) sources.add(ComponentSource.thunders_edge);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
@@ -237,22 +247,27 @@ public class SourceSettings extends SettingsMenu {
                         .setEphemeral(true)
                         .queue(Consumers.nop(), BotLogger::catchRestError);
             }
-            case "UnchartSpace", "Absol", "ActionCardDeck2" -> {
+            case "UnchartSpace", "BlueReverie", "Absol", "ActionCardDeck2" -> {
                 boolean abs = absol.isVal();
-                boolean ds = unchartedSpace.isVal();
-                boolean both = abs && ds;
+                boolean us = unchartedSpace.isVal();
+                boolean brContent = blueReverie.isVal() && us;
+                boolean both = abs && us;
                 boolean acd2 = actionCardDeck2.isVal();
 
                 // Decks with both
-                String relic = both ? "relics_absol_ds" : (abs ? "relics_absol" : (ds ? "relics_ds" : "relics_pok"));
-                String techs = both ? "techs_ds_absol" : (abs ? "techs_absol" : (ds ? "techs_ds" : "techs_pok_c4"));
+                String relic = both
+                        ? "relics_absol_ds"
+                        : (abs ? "relics_absol" : (brContent ? "relics_br" : (us ? "relics_ds" : "relics_pok")));
+                String techs = both ? "techs_ds_absol" : (abs ? "techs_absol" : (us ? "techs_ds" : "techs_pok_c4"));
 
                 // Decks for ABSOL
-                String agenda = abs ? "agendas_absol" : "agendas_pok";
+                String agenda = abs ? "agendas_absol" : (brContent ? "agendas_br" : "agendas_pok");
 
                 // Decks for Uncharted Space
-                String explore = ds ? "explores_DS" : "explores_pok";
-                String acs = acd2 ? getAcd2Version(pok, teDemo) : (ds ? "action_cards_ds" : "action_cards_pok");
+                String explore = brContent ? "explores_BR" : (us ? "explores_DS" : "explores_pok");
+                String acs = acd2
+                        ? getAcd2Version(pok, teDemo)
+                        : (brContent ? "action_cards_br" : (us ? "action_cards_ds" : "action_cards_pok"));
 
                 // set 'em up
                 decks.getRelics().setChosenKey(relic);
@@ -263,7 +278,8 @@ public class SourceSettings extends SettingsMenu {
 
                 var inclusions = new ArrayList<String>();
                 if (abs) inclusions.add("Absol Mod");
-                if (ds) inclusions.add("Uncharted Space");
+                if (us) inclusions.add("Uncharted Space");
+                if (brContent) inclusions.add("Blue Reverie");
                 if (acd2) inclusions.add("Action Deck 2");
                 String message = inclusions.isEmpty()
                         ? "Reset your decks to include only PoK cards."

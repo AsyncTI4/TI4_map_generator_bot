@@ -27,6 +27,7 @@ class StartMilty extends GameStateSubcommand {
                 .setRequiredRange(1, 25));
         addOptions(
                 new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_FACTIONS, "Include Discordant Stars Factions"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_BR_FACTIONS, "Include Blue Reverie Factions"));
         addOptions(
                 new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_TILES, "Include Uncharted Space Tiles (ds)"));
     }
@@ -51,6 +52,9 @@ class StartMilty extends GameStateSubcommand {
         OptionMapping includeDsFactionsOption = event.getOption(Constants.INCLUDE_DS_FACTIONS);
         if (includeDsFactionsOption != null && includeDsFactionsOption.getAsBoolean())
             specs.getFactionSources().add(ComponentSource.ds);
+        OptionMapping includeBrFactionsOption = event.getOption(Constants.INCLUDE_BR_FACTIONS);
+        if (includeBrFactionsOption != null && includeBrFactionsOption.getAsBoolean())
+            specs.getFactionSources().add(ComponentSource.blue_reverie);
 
         // Faction count & setup ------------------------------------------------------------------
         int factionCount = game.getPlayerCountForMap() + 1;

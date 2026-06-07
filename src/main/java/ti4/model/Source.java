@@ -138,8 +138,14 @@ public class Source {
 
         public boolean isDs() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3, codex4, ds, thunders_edge, uncharted_space, blue_reverie ->
-                    true;
+                case base, pok, codex1, codex2, codex3, codex4, ds, thunders_edge, uncharted_space -> true;
+                default -> false;
+            };
+        }
+
+        public boolean isBr() {
+            return switch (this) {
+                case base, pok, codex1, codex2, codex3, codex4, blue_reverie, thunders_edge -> true;
                 default -> false;
             };
         }
@@ -172,6 +178,7 @@ public class Source {
                         case absol -> SourceEmojis.Absol;
                         case ds -> SourceEmojis.DiscordantStars;
                         case uncharted_space -> SourceEmojis.UnchartedSpace;
+                        case blue_reverie -> SourceEmojis.DiscordantStars;
                         case eronous, riftset -> SourceEmojis.Eronous;
                         case admins -> FactionEmojis.AdminsFaction;
                         case ignis_aurora, pbd2000 -> SourceEmojis.IgnisAurora;
@@ -202,6 +209,7 @@ public class Source {
                 case codex3 -> "Codex 3 - Naalu, Yin, Keleres";
                 case codex4 -> "Codex 4 - Relics";
                 case ds -> "Discordant Stars [Homebrew]";
+                case blue_reverie -> "Blue Reverie [Homebrew]";
                 case absol -> "Absol's Mod [Homebrew]";
                 case flagshipping -> "Flagshipping [Homebrew]";
                 case promises_promises -> "Promises Promises [Homebrew]";

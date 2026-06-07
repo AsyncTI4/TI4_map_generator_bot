@@ -23,6 +23,9 @@ public class UnusedAgentHelper {
                 .filter(f -> game.isDiscordantStarsMode()
                         ? f.getSource().isDs() || f.getSource().isOfficial() || extraSources.contains(f.getSource())
                         : f.getSource().isOfficial() || extraSources.contains(f.getSource()))
+                .filter(f -> game.isBlueReverieMode()
+                        ? f.getSource().isBr() || f.getSource().isOfficial() || extraSources.contains(f.getSource())
+                        : f.getSource().isOfficial() || extraSources.contains(f.getSource()))
                 .toList();
 
         for (FactionModel faction : allFactions) {

@@ -22,6 +22,9 @@ public class UnusedCommanderHelper {
                 .filter(f -> game.isDiscordantStarsMode()
                         ? f.getSource().isDs() || f.getSource().isOfficial()
                         : f.getSource().isOfficial())
+                .filter(f -> game.isBlueReverieMode()
+                        ? f.getSource().isBr() || f.getSource().isOfficial()
+                        : f.getSource().isOfficial())
                 .toList();
 
         for (FactionModel faction : allFactions) {
