@@ -1830,9 +1830,8 @@ public final class Helper {
         int planetUnitVal = 0;
         if ("space".equals(uH.getName())) {
             if (tile.isSupernova()
-                    && player.hasTech("mr")
-                    && (FoWHelper.playerHasUnitsInSystem(player, tile)
-                            || (game.isTwilightsFallMode()
+                    && ((player.hasTech("mr") && (FoWHelper.playerHasUnitsInSystem(player, tile)))
+                            || (player.hasTech("tf-mr")
                                     && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)))) {
                 productionValueTotal += 5;
             } else {
