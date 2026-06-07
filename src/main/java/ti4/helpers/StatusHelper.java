@@ -182,9 +182,10 @@ public final class StatusHelper {
                 player.setCommodities(player.getCommodities() + numScoredPos);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentationUnfogged() + " you gained " + numScoredSOs + " trade good"
-                                + (numScoredSOs == 1 ? "" : "s") + " and " + numScoredPos + " commodit"
-                                + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
+                        player.getRepresentationUnfogged() + " you gained "
+                                + StringHelper.pluralize(numScoredSOs, "trade good") + " and " + numScoredPos
+                                + " commodit" + (numScoredSOs == 1 ? "y" : "ies")
+                                + " due to Komdar Borodin, the Vaden Commander.");
             }
             if (player.hasTech("hydrothermal")) {
                 int oceans = 0;
@@ -197,8 +198,8 @@ public final class StatusHelper {
                     ButtonHelperAgents.resolveArtunoCheck(player, oceans);
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getRepresentationUnfogged() + ", you gained " + oceans + " trade good"
-                                    + (oceans == 1 ? "" : "s") + " due to _ Hydrothermal Mining_.");
+                            player.getRepresentationUnfogged() + ", you gained "
+                                    + StringHelper.pluralize(oceans, "trade good") + " due to _ Hydrothermal Mining_.");
                 }
             }
             if (player.hasTech("tf-geneticresearch")) {
@@ -211,8 +212,8 @@ public final class StatusHelper {
                 ButtonHelperAgents.resolveArtunoCheck(player, maxNum);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentationUnfogged() + ", you gained " + maxNum + " trade good"
-                                + (maxNum == 1 ? "" : "s") + " due to _Genetic Research_.");
+                        player.getRepresentationUnfogged() + ", you gained "
+                                + StringHelper.pluralize(maxNum, "trade good") + " due to _Genetic Research_.");
             }
             if (player.hasTech("tf-radicaladvancement")) {
                 List<Button> buttons = new ArrayList<>();
@@ -620,8 +621,8 @@ public final class StatusHelper {
 
     private static void sendNeuralParasiteButtons(Game game) {
         for (Player player : game.getRealPlayers()) {
-            boolean hasFrankenFirmParasite = game.isFrankenGame() && hasTechOrFactionTech(player, "parasite-firm_y");
-            boolean hasBaseFirmParasite = !game.isFrankenGame() && hasTechOrFactionTech(player, "parasite-firm");
+            boolean hasFrankenFirmParasite = game.isFrankenGame() && player.hasTech("parasite-firm_y");
+            boolean hasBaseFirmParasite = !game.isFrankenGame() && player.hasTech("parasite-firm");
 
             if (hasFrankenFirmParasite || hasBaseFirmParasite) {
                 Tile home = player.getHomeSystemTile();
@@ -643,7 +644,7 @@ public final class StatusHelper {
             }
 
             if (game.isFrankenGame()
-                    && hasTechOrFactionTech(player, "parasite-obs_y")
+                    && player.hasTech("parasite-obs_y")
                     && TeHelperTechs.playerHasInfantryOnMap(game, player)) {
                 List<Button> buttons = TeHelperTechs.neuralParasiteButtons(game, player);
                 if (!buttons.isEmpty()) {
@@ -654,10 +655,6 @@ public final class StatusHelper {
                 }
             }
         }
-    }
-
-    private static boolean hasTechOrFactionTech(Player player, String techAlias) {
-        return player.hasTech(techAlias) || player.getFactionTechs().contains(techAlias);
     }
 
     private static void sendMitosisButtons(Game game) {
@@ -786,7 +783,7 @@ public final class StatusHelper {
             String scarMessage = player.getRepresentationUnfogged()
                     + " You have ships in an Entropic Scar anomaly. You may use these buttons to spend a token from your strategy pool to gain one of your faction technologies.";
             scarMessage +=
-                    "You currently have " + ccs + " command token" + (ccs == 1 ? "" : "s") + " in your strategy pool.";
+                    "You currently have " + StringHelper.pluralize(ccs, "command token") + " in your strategy pool.";
             if (player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar"))
                 scarMessage += "You also have the _" + RelicHelper.sillySpelling()
                         + "_ available to exhaust (this will be spent first).";

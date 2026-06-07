@@ -260,14 +260,19 @@ public class PuppetSoftHeBladeService {
                     player, DraftCategory.COMMANDER, "firmamentcommander", "obsidiancommander");
             output.add(String.format(fmt, oldLeader.getName(), newLeader.getName()));
         });
-        player.getLeaderByID("firmamenthero").ifPresent(oldLeader -> {
-            player.removeLeader(oldLeader);
-            Leader newLeader = new Leader("obsidianhero");
-            player.addLeader(newLeader);
+        boolean frankenHero = player.getStoredList("appliedFrankenItems").contains("HERO:firmamenthero");
+        boolean shouldFlipHero = !player.getGame().isFrankenGame() || frankenHero || player.hasLeader("firmamenthero");
+        if (shouldFlipHero) {
+            String oldHeroName = Mapper.getLeader("firmamenthero").getName();
+            String newHeroName = Mapper.getLeader("obsidianhero").getName();
+            player.getLeaderByID("firmamenthero").ifPresent(player::removeLeader);
+            player.addLeader("obsidianhero");
             HeroUnlockCheckService.checkIfHeroUnlocked(player.getGame(), player);
-            replaceAppliedFrankenItemAliases(player, DraftCategory.HERO, "firmamenthero", "obsidianhero");
-            output.add(String.format(fmt, oldLeader.getName(), newLeader.getName()));
-        });
+            if (frankenHero) {
+                replaceAppliedFrankenItemAliases(player, DraftCategory.HERO, "firmamenthero", "obsidianhero");
+            }
+            output.add(String.format(fmt, oldHeroName, newHeroName));
+        }
         return output;
     }
 

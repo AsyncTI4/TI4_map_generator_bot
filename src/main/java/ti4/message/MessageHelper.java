@@ -9,11 +9,9 @@ import java.io.File;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -879,15 +877,7 @@ public class MessageHelper {
             return;
         }
 
-        ThreadChannel threadChannel = player.getCardsInfoThread();
-        if (threadChannel == null) {
-            return;
-        }
-
-        splitAndSentWithAction(
-                messageText,
-                threadChannel,
-                msg -> rotatePinnedCardsInfoMessage(game, threadChannel, storedValueKeyPrefix, msg));
+        sendMessageToPlayerCardsInfoThread(player, messageText);
     }
 
     public static void sendMessageToPlayerCardsInfoThreadWithButtonsAndPin(
@@ -905,44 +895,7 @@ public class MessageHelper {
             return;
         }
 
-        splitAndSentWithAction(
-                messageText,
-                threadChannel,
-                msg -> rotatePinnedCardsInfoMessage(game, threadChannel, storedValueKeyPrefix, msg),
-                null,
-                buttons);
-    }
-
-    private static void rotatePinnedCardsInfoMessage(
-            @NotNull Game game,
-            @NotNull ThreadChannel threadChannel,
-            @NotNull String storedValueKeyPrefix,
-            @NotNull Message msg) {
-        String storedValueKey = storedValueKeyPrefix + "_" + threadChannel.getId();
-        pinCardsInfoMessage(game, storedValueKey, msg);
-        CardsInfoPinCleanupService.queueStalePinnedMessageCleanup(
-                threadChannel, cardsInfoPinnedMessageIds(game, threadChannel));
-    }
-
-    private static void pinCardsInfoMessage(@NotNull Game game, @NotNull String storedValueKey, @NotNull Message msg) {
-        game.setStoredValue(storedValueKey, msg.getId());
-        msg.pin().queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
-    private static Set<String> cardsInfoPinnedMessageIds(@NotNull Game game, @NotNull ThreadChannel threadChannel) {
-        String threadId = threadChannel.getId();
-        Set<String> messageIds = new HashSet<>();
-        addStoredMessageId(game, messageIds, "pinned_ac_info_message_id_" + threadId);
-        addStoredMessageId(game, messageIds, "pinned_so_info_message_id_" + threadId);
-        addStoredMessageId(game, messageIds, "pinned_pn_info_message_id_" + threadId);
-        return messageIds;
-    }
-
-    private static void addStoredMessageId(Game game, Set<String> messageIds, String storedValueKey) {
-        String messageId = game.getStoredValue(storedValueKey);
-        if (StringUtils.isNotBlank(messageId)) {
-            messageIds.add(messageId);
-        }
+        sendMessageToChannelWithButtons(threadChannel, messageText, buttons);
     }
 
     /**

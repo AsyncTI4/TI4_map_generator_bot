@@ -1620,12 +1620,11 @@ public final class TransactionHelper {
                 tgAmount = Math.min(p1.getTg(), tgAmount);
                 p1.setTg(p1.getTg() - tgAmount);
                 p2.setTg(p2.getTg() + tgAmount);
-                message2 = ident + " sent " + tgAmount + " trade good" + (tgAmount == 1 ? "" : "s") + " to " + ident2
-                        + ".";
+                message2 = ident + " sent " + StringHelper.pluralize(tgAmount, "trade good") + " to " + ident2 + ".";
                 if (p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("data_recovery") && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
                     p2.clearDebt(p1, amount);
-                    message2 += "\n" + ident2 + " cleared " + amount + " debt token" + (amount == 1 ? "" : "s")
+                    message2 += "\n" + ident2 + " cleared " + StringHelper.pluralize(amount, "debt token")
                             + " owned by " + ident + ", from their \"Debt Account\" pool.";
                 }
             }
@@ -1648,7 +1647,7 @@ public final class TransactionHelper {
                 if (p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("data_recovery") && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
                     p2.clearDebt(p1, amount);
-                    message2 += "\n" + ident2 + " cleared " + amount + " debt token" + (amount == 1 ? "" : "s")
+                    message2 += "\n" + ident2 + " cleared " + StringHelper.pluralize(amount, "debt token")
                             + " owned by " + ident + ", from their \"Debt Account\" pool.";
                 }
             }
@@ -1677,10 +1676,10 @@ public final class TransactionHelper {
                 String id2 = p2.getFactionEmojiOrColor();
                 int deltaP1 = oldP1Comms - newP1Comms;
                 int deltaP2 = oldP2Comms - newP2Comms;
-                message2 = ident + " washed their " + deltaP1 + " commodit" + (deltaP1 == 1 ? "" : "s") + " with " + id2
+                message2 = ident + " washed their " + StringHelper.pluralize(deltaP1, "commodit") + " with " + id2
                         + "; "
                         + id1 + " trade goods went from " + oldP1Tg + " to " + p1.getTg() + ".\n"
-                        + ident2 + " washed their " + deltaP2 + " commodit" + (deltaP2 == 1 ? "" : "s") + " with " + id1
+                        + ident2 + " washed their " + StringHelper.pluralize(deltaP2, "commodit") + " with " + id1
                         + "; "
                         + id2 + " trade goods went from " + oldP2tg + " to " + p2.getTg() + ".";
             }

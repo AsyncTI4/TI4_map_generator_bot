@@ -35,6 +35,7 @@ import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.items.FactionDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.StringHelper;
 import ti4.helpers.discord.ContainerHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -461,19 +462,19 @@ public class FrankenDraftBagService {
         String message;
         if (first == next) {
             message = "# " + game.getPing() + " " + draftName + " has started!\n"
-                    + "As a reminder, you will pick " + first + " item" + (first == 1 ? "" : "s") + " from each bag.\n"
+                    + "As a reminder, you will pick " + StringHelper.pluralize(first, "item") + " from each bag.\n"
                     + "After each pick, the draft thread will be recreated. Sometimes Discord will lag while sending long messages, so the buttons may take a few seconds to show up.\n"
                     + "Once you have made your "
-                    + first + " pick" + (first == 1 ? "" : "s")
+                    + StringHelper.pluralize(first, "pick")
                     + ", the bags will automatically be passed once everyone is ready.";
         } else {
             message = "# " + game.getPing() + " " + draftName + " has started!\n"
                     + "As a reminder, for the first bag you pick "
-                    + first + " item" + (first == 1 ? "" : "s") + ", and for all the bags after that you pick "
-                    + next + " item" + (next == 1 ? "" : "s") + ".\n"
+                    + StringHelper.pluralize(first, "item") + ", and for all the bags after that you pick "
+                    + StringHelper.pluralize(next, "item") + ".\n"
                     + "After each pick, the draft thread will be recreated. Sometimes Discord will lag while sending long messages, so the buttons may take a few seconds to show up.\n"
                     + "Once you have made your "
-                    + next + " pick" + (next == 1 ? "" : "s") + " (" + first
+                    + StringHelper.pluralize(next, "pick") + " (" + first
                     + " in the first bag), the bags will automatically be passed once everyone is ready.";
         }
 

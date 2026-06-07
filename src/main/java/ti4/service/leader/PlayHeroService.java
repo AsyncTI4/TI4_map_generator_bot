@@ -16,8 +16,8 @@ import ti4.discord.interactions.buttons.handlers.edict.EdictPhaseHandler;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.onyxxa.OnyxxaHeroButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.xan.XanHeroButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaHeroButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanHeroButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -38,6 +38,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
@@ -69,12 +70,28 @@ import ti4.spring.context.SpringContext;
 public class PlayHeroService {
 
     public static boolean removeLeader(Game game, Player player, Leader leader) {
+        rememberFrankenFirmamentHero(player, leader);
         LeaderRemovalReason reason = LeaderRemovalReason.fromHeroId(leader.getId());
         boolean removed = player.removeLeader(leader);
         if (removed && (reason == LeaderRemovalReason.PURGED || reason == LeaderRemovalReason.STATUS_CLEANUP)) {
             DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         }
         return removed;
+    }
+
+    public static void rememberFrankenFirmamentHero(Player player, Leader leader) {
+        if (player == null
+                || leader == null
+                || player.getGame() == null
+                || !player.getGame().isFrankenGame()) {
+            return;
+        }
+        if (!"firmamenthero".equals(leader.getId())) {
+            return;
+        }
+        if (!player.getStoredList("appliedFrankenItems").contains("HERO:firmamenthero")) {
+            player.addToStoredList("appliedFrankenItems", "HERO:firmamenthero");
+        }
     }
 
     public static void playHero(GenericInteractionCreateEvent event, Game game, Player player, Leader playerLeader) {
@@ -367,8 +384,8 @@ public class PlayHeroService {
                         .size();
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getFactionEmoji() + " may resolve " + size
-                                + " agenda" + (size == 1 ? "" : "s") + " because that's how many Sigils they got."
+                        player.getFactionEmoji() + " may resolve " + StringHelper.pluralize(size, "agenda")
+                                + " because that's how many Sigils they got."
                                 + " After putting the agendas on top in the order you wish (don't bottom any), please press the button to reveal an agenda.");
                 AgendaHelper.drawAgenda(size, game, player);
                 Button flipAgenda = Buttons.blue("flip_agenda", "Press This to Flip Agenda");
@@ -390,8 +407,7 @@ public class PlayHeroService {
                 }
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getFactionEmoji() + " may gain " + size + " command token" + (size == 1 ? "" : "s")
-                                + ".");
+                        player.getFactionEmoji() + " may gain " + StringHelper.pluralize(size, "command token") + ".");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 String trueIdentity = player.getRepresentationUnfogged();
                 String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()

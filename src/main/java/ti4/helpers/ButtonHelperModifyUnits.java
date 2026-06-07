@@ -22,6 +22,8 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -456,6 +458,7 @@ public final class ButtonHelperModifyUnits {
             buttons.add(Buttons.gray("deleteButtons", "Don't Remove Structures"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
         }
+        IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "groundcombat");
         event.getMessage();
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         return sardakkMechHits;
@@ -704,6 +707,14 @@ public final class ButtonHelperModifyUnits {
                 }
             }
         }
+        if (IronAbilitiesHandler.hasExoAtmospheric(player) && Constants.SPACE.equals(unitHolder.getName())) {
+            int dreadnoughtIndex = assignHitOrder.indexOf("dreadnought");
+            if (dreadnoughtIndex >= 0) {
+                assignHitOrder.add(dreadnoughtIndex, "mech");
+            } else {
+                assignHitOrder.add("mech");
+            }
+        }
         for (String thingToHit : assignHitOrder) {
             if (hits <= 0) continue;
 
@@ -827,7 +838,9 @@ public final class ButtonHelperModifyUnits {
                         && !((ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)
                                         || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)
                                         || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_2", player, tile))
-                                || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
+                                || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0
+                                || IronAbilitiesHandler.isExoAtmosphericMechInSpace(
+                                        player, unitKey.unitType(), unitHolder))) {
 
                     int min = unitEntry.getValue();
                     if (!justSummarizing) {
@@ -890,6 +903,7 @@ public final class ButtonHelperModifyUnits {
             }
         }
         if (!justSummarizing && event instanceof ButtonInteractionEvent bevent) {
+            IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "spacecombat");
             bevent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
         return msg.toString();
@@ -1092,8 +1106,8 @@ public final class ButtonHelperModifyUnits {
         }
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                player.getRepresentationNoPing() + " replaced " + pdsAmount + " PDS and " + sdAmount
-                        + " space dock" + (sdAmount == 1 ? "" : "s") + " on "
+                player.getRepresentationNoPing() + " replaced " + pdsAmount + " PDS and "
+                        + StringHelper.pluralize(sdAmount, "space dock") + " on "
                         + Helper.getPlanetRepresentation(uH.getName(), game) + " with their own unit"
                         + (pdsAmount + sdAmount == 1 ? "" : "s") + ".");
         Tile tile = game.getTileFromPlanet(uH.getName());
@@ -1217,7 +1231,7 @@ public final class ButtonHelperModifyUnits {
                     }
                     String id = factionChecker + "retreatGroundUnits_" + pos1 + "_" + pos2 + "_" + x + "_mech_"
                             + unitHolder.getName();
-                    String label = "Retreat " + x + " Mech" + (x == 1 ? "" : "s") + " on "
+                    String label = "Retreat " + StringHelper.pluralize(x, "Mech") + " on "
                             + Helper.getPlanetRepresentation(unitHolder.getName(), game);
                     buttons.add(Buttons.green(id, label, UnitEmojis.mech));
                 }
@@ -2634,8 +2648,8 @@ public final class ButtonHelperModifyUnits {
                     event, game, player, tile, tile.getSpaceUnitHolder(), UnitType.Infantry, UnitType.Fighter, numff);
         }
         List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
-        String msg = player.getFactionEmojiOrColor() + " turned " + numff + " infantry into " + numff + " fighter"
-                + (numff == 1 ? "" : "s") + " using Assault Machina, the Mirveda commander.";
+        String msg = player.getFactionEmojiOrColor() + " turned " + numff + " infantry into "
+                + StringHelper.pluralize(numff, "fighter") + " using Assault Machina, the Mirveda commander.";
         event.getMessage()
                 .editMessage(msg)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
@@ -2651,8 +2665,8 @@ public final class ButtonHelperModifyUnits {
                     event, game, player, tile, tile.getSpaceUnitHolder(), UnitType.Fighter, UnitType.Infantry, numff);
         }
         List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
-        String msg = player.getFactionEmojiOrColor() + " turned " + numff + " fighter" + (numff == 1 ? "" : "s")
-                + " into " + numff + " infantry using their **Combat Drones** ability.";
+        String msg = player.getFactionEmojiOrColor() + " turned " + StringHelper.pluralize(numff, "fighter") + " into "
+                + numff + " infantry using their **Combat Drones** ability.";
         event.getMessage()
                 .editMessage(msg)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))

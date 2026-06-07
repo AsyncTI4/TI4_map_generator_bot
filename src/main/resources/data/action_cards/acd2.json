@@ -35,6 +35,7 @@
         "phase": "Action",
         "window": "When another player activates a system that contains your units",
         "text": "Remove that player's command token from that system and end their turn.",
+        "automationID": "armistice",
         "flavorText": "The Mahact envoy wore a mask of pity as she turned from Menda. \"Why do you lay these troubles on an already troubled mind? Can you not see that she is wearied by your malcontent, your warmongering?\"",
         "source": "action_deck_2"
     },
@@ -53,6 +54,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Give 1 promissory note to another player. Then, that player and each other player with 1 of your promissory notes in their play area gives you 1 random action card from their hand.",
+        "automationID": "betrayal",
         "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
         "source": "action_deck_2"
     },
@@ -106,6 +108,7 @@
     },
     {
         "alias": "classified_weapons1",
+        "automationID": "classified_weapons",
         "name": "Classified Weapons",
         "phase": "Action",
         "window": "When 1 or more of your units make a combat or unit ability roll",
@@ -115,6 +118,7 @@
     },
     {
         "alias": "classified_weapons2",
+        "automationID": "classified_weapons",
         "name": "Classified Weapons",
         "phase": "Action",
         "window": "When 1 or more of your units make a combat or unit ability roll",
@@ -124,6 +128,7 @@
     },
     {
         "alias": "classified_weapons3",
+        "automationID": "classified_weapons",
         "name": "Classified Weapons",
         "phase": "Action",
         "window": "When 1 or more of your units make a combat or unit ability roll",
@@ -133,6 +138,7 @@
     },
     {
         "alias": "classified_weapons4",
+        "automationID": "classified_weapons",
         "name": "Classified Weapons",
         "phase": "Action",
         "window": "When 1 or more of your units make a combat or unit ability roll",
@@ -192,6 +198,7 @@
         "phase": "Action",
         "window": "When you win a space combat after the end of its first round",
         "text": "Remove your command token from the active system.",
+        "automationID": "decisive_victory",
         "flavorText": "\"Now, now, Unlenn,\" Evelyn smirked as she hailed the Viscount's heavy cruiser. \"Looking to bring history to life, are we?\" She gave the signal and the Benthic's railguns whirred to life.",
         "source": "action_deck_2"
     },

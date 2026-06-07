@@ -42,6 +42,10 @@ public final class StringHelper {
         "twenty"
     };
 
+    public static String pluralize(int count, String word) {
+        return count + " " + word + (count == 1 ? "" : "s");
+    }
+
     public static String ordinal(int i) {
         return switch (i % 100) {
             case 11, 12, 13 -> i + "th";

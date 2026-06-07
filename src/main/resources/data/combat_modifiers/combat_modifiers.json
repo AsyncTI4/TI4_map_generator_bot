@@ -467,6 +467,22 @@
         ]
     },
     {
+        "alias": "classified_weapons_mod",
+        "type": "extrarolls",
+        "value": "+2",
+        "persistenceType": "CONDITIONAL",
+        "condition": "classifiedWeapons",
+        "scope": "classifiedWeapons",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "action_cards",
+                "alias": "classified_weapons1",
+                "message": "_Classified Weapons_ gives +2 dice to the chosen unit"
+            }
+        ]
+    },
+    {
         "alias": "sol_agent",
         "type": "extrarolls",
         "value": "+1",

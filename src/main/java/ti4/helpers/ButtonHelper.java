@@ -55,10 +55,12 @@ import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.PhantomEnergyHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.TyrisBreakthroughButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.PhantomEnergyHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.selections.selectmenus.SelectFaction;
@@ -4022,6 +4024,8 @@ public class ButtonHelper {
         int fightersIgnored = 0;
         int numFighter2s = 0;
         int numFighter2sFleet = 0;
+        int numRiptide2s = 0;
+        int numRiptide2sFleet = 0;
         boolean capacityViolated = false;
         boolean fleetSupplyViolated = false;
         String tooManyDocks = "";
@@ -4150,6 +4154,9 @@ public class ButtonHelper {
                             numFighter2s = 0;
                         }
                     }
+                    if ("iron_mech2".equals(unit.getId())) {
+                        numRiptide2s += entry.getValue();
+                    }
                     if ("naaz_voltron".equalsIgnoreCase(unit.getId())) {
                         numFighter2s++;
                     }
@@ -4202,16 +4209,27 @@ public class ButtonHelper {
         }
 
         if (numInfNFightersNMechs > capacity) {
-            if (numInfNFightersNMechs - numFighter2s > capacity) {
+            int overflow = numInfNFightersNMechs - capacity;
+            int fighter2Overflow = Math.min(overflow, numFighter2s);
+            if (fighter2Overflow > 0) {
+                if (player.hasTech("hcf2") || player.hasTech("absol_hcf2") || player.hasUnit("tf-hcf")) {
+                    numFighter2sFleet += fighter2Overflow;
+                } else {
+                    numFighter2sFleet += fighter2Overflow * 2;
+                }
+                overflow -= fighter2Overflow;
+            }
+
+            int riptide2Overflow = Math.min(overflow, numRiptide2s);
+            if (riptide2Overflow > 0) {
+                numRiptide2sFleet += riptide2Overflow * 2;
+                overflow -= riptide2Overflow;
+            }
+
+            if (overflow > 0) {
                 capacityViolated = true;
             } else {
-                numFighter2s = numInfNFightersNMechs - capacity;
-                if (player.hasTech("hcf2") || player.hasTech("absol_hcf2") || player.hasUnit("tf-hcf")) {
-                    numFighter2sFleet += numFighter2s;
-                } else {
-                    numFighter2sFleet += numFighter2s * 2;
-                }
-                if (numFighter2sFleet + numOfCapitalShips > fleetCap) {
+                if (numFighter2sFleet + numRiptide2sFleet + numOfCapitalShips > fleetCap) {
                     fleetSupplyViolated = true;
                 }
             }
@@ -5490,12 +5508,15 @@ public class ButtonHelper {
                     buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCorrectChannel(),
-                            player.getRepresentationUnfogged() + ", please place " + mechCount + " structure"
-                                    + (mechCount == 1 ? "" : "s") + " (equal to the number of mech"
+                            player.getRepresentationUnfogged() + ", please place "
+                                    + StringHelper.pluralize(mechCount, "structure") + " (equal to the number of mech"
                                     + (mechCount == 1 ? "" : "s") + " you have here).",
                             buttons);
                 }
             }
+        }
+        if (player.hasUnit("kalora_mech")) {
+            KaloraButtonHandler.offerMechButtons(player, game, tile);
         }
         if (player.hasUnit("qhet_mech") && !isLawInPlay(game, "articles_war")) {
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
@@ -6602,12 +6623,14 @@ public class ButtonHelper {
                 }
                 if ("assaultcannoncombat".equalsIgnoreCase(type)
                         && List.of(UnitType.Fighter, UnitType.Spacedock, UnitType.Mech, UnitType.Infantry)
-                                .contains(unitKey.unitType())) {
+                                .contains(unitKey.unitType())
+                        && !IronAbilitiesHandler.isExoAtmosphericMechInSpace(player, unitKey.unitType(), unitHolder)) {
                     continue;
                 }
                 if ("courageouscombat".equalsIgnoreCase(type)
                         && List.of(UnitType.Spacedock, UnitType.Mech, UnitType.Infantry)
-                                .contains(unitKey.unitType())) {
+                                .contains(unitKey.unitType())
+                        && !IronAbilitiesHandler.isExoAtmosphericMechInSpace(player, unitKey.unitType(), unitHolder)) {
                     continue;
                 }
 
@@ -6839,8 +6862,8 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         if (!game.isFowMode() && combatOnHolder instanceof Planet && h > 0 && opponent != player) {
-            String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit"
-                    + (h == 1 ? "" : "s") + ".";
+            String msg = opponent.getRepresentationUnfogged() + " you may autoassign "
+                    + StringHelper.pluralize(h, "hit") + ".";
             List<Button> buttons = new ArrayList<>();
             String factionChecker = "FFCC_" + opponent.getFaction() + "_";
             buttons.add(Buttons.green(
@@ -6850,8 +6873,8 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         } else {
             if (!game.isFowMode() && opponent != player) {
-                String msg = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered " + h + " hit"
-                        + (h == 1 ? "" : "s") + ".";
+                String msg = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered "
+                        + StringHelper.pluralize(h, "hit") + ".";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 List<Button> buttons = new ArrayList<>();
                 if (h > 0) {

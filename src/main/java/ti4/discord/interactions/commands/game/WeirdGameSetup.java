@@ -19,7 +19,7 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
-class WeirdGameSetup extends GameStateSubcommand {
+public class WeirdGameSetup extends GameStateSubcommand {
 
     WeirdGameSetup() {
         super(Constants.WEIRD_GAME_SETUP, "Game Setup for Weird Games", true, false);
@@ -290,8 +290,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_base")))
                 return false;
             if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_base"))) return false;
-            if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_basegame_and_codex1")))
-                return false;
+            if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_basegame"))) return false;
             if (!game.validateAndSetRelicDeck(Mapper.getDeck("relics_base"))) return false;
             if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_base"))) return false;
 
@@ -430,5 +429,16 @@ class WeirdGameSetup extends GameStateSubcommand {
         }
 
         return true;
+    }
+
+    public static boolean applyBaseGameMode(GenericInteractionCreateEvent event, Game game) {
+        game.setThundersEdge(false);
+        game.setTwilightsFallMode(false);
+        game.removeStoredValue("useOldPok");
+        boolean success = setGameMode(event, game, true, false, false, false, false, false);
+        if (success) {
+            game.setStrategyCardSet("pok");
+        }
+        return success;
     }
 }

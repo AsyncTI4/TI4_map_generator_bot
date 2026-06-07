@@ -33,13 +33,9 @@ import ti4.service.unit.AddUnitService;
 @UtilityClass
 public class PromissoryNoteHelper {
 
-    private static final String PINNED_PN_INFO_MESSAGE_ID = "pinned_pn_info_message_id";
-
     public static void sendPromissoryNoteInfo(Game game, Player player, boolean longFormat) {
-        MessageHelper.sendMessageToPlayerCardsInfoThreadWithButtonsAndPin(
-                game,
-                player,
-                PINNED_PN_INFO_MESSAGE_ID,
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
                 getPromissoryNoteCardInfo(game, player, longFormat, false),
                 getPNButtons(game, player));
     }
@@ -478,7 +474,7 @@ public class PromissoryNoteHelper {
                 String reducedMsg = owner.getRepresentationUnfogged() + " your _Trade Agreement_ was played.";
                 String reducedMsg2 = player.getRepresentationUnfogged()
                         + " you gained trade goods equal to the number of commodities the player had (your trade goods went from "
-                        + oldTGs + " trade good" + (oldTGs == 1 ? "" : "s") + " to -> " + (oldTGs + comms)
+                        + StringHelper.pluralize(oldTGs, "trade good") + " to -> " + (oldTGs + comms)
                         + " trade good" + (oldTGs + comms == 1 ? "" : "s")
                         + "). Please follow up with the player if this number seems off.";
                 player.setTg(oldTGs + comms);
@@ -492,7 +488,7 @@ public class PromissoryNoteHelper {
                         + owner.getRepresentationUnfogged() + ", taking their " + comms + " commodit"
                         + (comms == 1 ? "y" : "ies")
                         + " ("
-                        + oldTGs + " tg" + (oldTGs == 1 ? "" : "s") + " -> " + (oldTGs + comms) + "tg"
+                        + StringHelper.pluralize(oldTGs, "tg") + " -> " + (oldTGs + comms) + "tg"
                         + (oldTGs + comms == 1 ? "" : "s") + ").";
                 player.setTg(oldTGs + comms);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, owner, player, owner.getCommoditiesTotal());

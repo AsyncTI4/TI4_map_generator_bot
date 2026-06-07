@@ -23,7 +23,7 @@ import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiAgentButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAgentButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -59,8 +59,6 @@ import ti4.spring.context.SpringContext;
 @UtilityClass
 public class ActionCardHelper {
 
-    private static final String PINNED_AC_INFO_MESSAGE_ID = "pinned_ac_info_message_id";
-
     private static final Set<String> WAR_MACHINE_IDS = Set.of(
             "war_machine1",
             "war_machine2",
@@ -82,8 +80,7 @@ public class ActionCardHelper {
 
     public static void sendActionCardInfo(Game game, Player player) {
         // AC INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThreadAndPin(
-                game, player, PINNED_AC_INFO_MESSAGE_ID, getActionCardInfo(game, player));
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, getActionCardInfo(game, player));
         Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(
@@ -608,8 +605,8 @@ public class ActionCardHelper {
         if (count < 1) {
             return;
         }
-        StringBuilder message = new StringBuilder(player.getRepresentationNoPing() + " discarded " + count
-                + " random action card" + (count == 1 ? "" : "s") + ".\n");
+        StringBuilder message = new StringBuilder(player.getRepresentationNoPing() + " discarded "
+                + StringHelper.pluralize(count, "random action card") + ".\n");
         while (count > 0 && !player.getActionCards().isEmpty()) {
             Map<String, Integer> actionCards_ = player.getActionCards();
             List<String> cards_ = new ArrayList<>(actionCards_.keySet());
@@ -657,10 +654,10 @@ public class ActionCardHelper {
             return;
         }
 
-        String message = player.getRepresentation() + " drew " + count + " action card" + (count == 1 ? "" : "s") + ".";
+        String message = player.getRepresentation() + " drew " + StringHelper.pluralize(count, "action card") + ".";
         if (scheming && player.hasAbility("scheming")) {
             count++;
-            message = player.getRepresentation() + " drew " + count + " action card" + (count == 1 ? "" : "s")
+            message = player.getRepresentation() + " drew " + StringHelper.pluralize(count, "action card")
                     + " (including one extra because of **Scheming**).";
         }
         game.drawActionCard(player.getUserID(), count);
@@ -756,13 +753,17 @@ public class ActionCardHelper {
         }
         recordTrackedActionCardPlay(game, player, actionCardTitle);
 
-        boolean actionCardIsCancelable = isActionCardCancelable(actionCard) && !twinned;
+        boolean hasUnyieldingWill = player.hasTech("baarvag");
+        boolean actionCardIsCancelable = isActionCardCancelable(actionCard) && !twinned && !hasUnyieldingWill;
 
         String pingGame = actionCardIsCancelable ? game.getPing() + ", " : "";
         String message = pingGame + (game.isFowMode() ? "someone" : player.getRepresentationNoPing());
         message += fromGarbozia ? " purged " : " played ";
         message += "the action card _" + actionCardTitle + "_";
         message += fromGarbozia ? " using _Dok 'N Pic's Salvage Yard_." : ".";
+        if (hasUnyieldingWill && isActionCardCancelable(actionCard) && !twinned) {
+            message += " This card cannot be canceled due to _Unyielding Will_.";
+        }
 
         List<Button> buttons = new ArrayList<>();
 
@@ -1272,6 +1273,17 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "players"), codedButtons);
             }
 
+            if ("armistice".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveArmistice", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
+            }
+
+            if ("decisive_victory".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveDecisiveVictory", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("flank_speed".equals(automationID)) {
                 game.setStoredValue("flankspeedBoost", "1");
             }
@@ -1288,8 +1300,8 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "destroyed ship"), codedButtons);
             }
 
-            if ("rapid_fulfillment".equals(automationID) || "contingency".equals(automationID)) {
-                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveRapidFulfillment", buttonLabel));
+            if ("contingency".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveContingency", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -1324,6 +1336,12 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
 
+            if ("betrayal".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveBetrayal", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
+            }
+
             if ("defense_installation".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.factionButtonChecker() + "resolveDefenseInstallation", buttonLabel));
@@ -1342,8 +1360,23 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("black_market_intel".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveBlackMarketIntel", buttonLabel));
+            }
+
+            if ("hidden_initiatives".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.factionButtonChecker() + "resolveHiddenInitiatives", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("refugees".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveRefugees", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("black_market_raid".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveBlackMarketRaid", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -1382,6 +1415,13 @@ public class ActionCardHelper {
                 codedButtons.add(
                         Buttons.green(player.factionButtonChecker() + "resolveCompoundingInterests", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("classified_weapons".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.factionButtonChecker() + "resolveClassifiedWeapons", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "unit"), codedButtons);
             }
 
             if ("scuttle".equals(automationID)) {
@@ -1455,6 +1495,11 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveGhostShipStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "system"), codedButtons);
+            }
+
+            if ("covert_operation".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveCovertOperation", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
             if ("stranded_ship".equals(automationID)) {
@@ -2363,7 +2408,7 @@ public class ActionCardHelper {
             }
         }
 
-        String msg = "Added " + tilesAffected.size() + " fighter" + (tilesAffected.size() == 1 ? "" : "s") + ".";
+        String msg = "Added " + StringHelper.pluralize(tilesAffected.size(), "fighter") + ".";
         if (!tilesAffected.isEmpty()) {
             msg += " Please check fleet size and capacity in each of the systems: ";
             ButtonHelper.checkFleetInEveryTile(player, game);

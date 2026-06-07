@@ -150,8 +150,8 @@ public final class AgendaHelper {
         StringBuilder msg = new StringBuilder(
                 player.getRepresentation()
                         + " if you wish, to speed up the Agenda Phase, you can choose now to secretly pass on all \"when\"s and \"after\"s for both agendas in the upcoming Agenda Phase. "
-                        + "You may currently play " + whens.size() + " \"when\"" + (whens.size() == 1 ? "" : "s")
-                        + " and " + afters.size() + " \"after\"" + (afters.size() == 1 ? "" : "s")
+                        + "You may currently play " + StringHelper.pluralize(whens.size(), "\"when\"")
+                        + " and " + StringHelper.pluralize(afters.size(), "\"after\"")
                         + ". You will be able to change your mind during the agendas themselves if something unexpected occurs.");
         if (!whens.isEmpty()) {
             msg.append("\nThe possible \"when\"")
@@ -460,7 +460,7 @@ public final class AgendaHelper {
             StringBuilder msg = new StringBuilder(player.getRepresentation(true, true)
                     + " now is the time to decide whether or not you will play a \"when\". If you do,"
                     + " the bot will queue your \"when\" to play in the proper order (after those before you in speaker order decline). You may currently"
-                    + " play " + whens.size() + " \"when\"" + (whens.size() == 1 ? "" : "s") + ".");
+                    + " play " + StringHelper.pluralize(whens.size(), "\"when\"") + ".");
             if (!whens.isEmpty()) {
                 msg.append("\nThe possible \"when\"")
                         .append(whens.size() == 1 ? "" : "s")
@@ -693,8 +693,8 @@ public final class AgendaHelper {
                                 List<String> afters = getPossibleAfterNames(p2);
                                 StringBuilder msg = new StringBuilder(p2.getRepresentation()
                                         + "due to the recent playing of an \"after\", you are now being asked to decide whether or not you will play an \"after\"."
-                                        + " You can currently play " + afters.size() + " \"after\""
-                                        + (afters.size() == 1 ? "" : "s") + ".");
+                                        + " You can currently play "
+                                        + StringHelper.pluralize(afters.size(), "\"after\"") + ".");
                                 if (!afters.isEmpty()) {
                                     msg.append("\nThe possible \"after\"")
                                             .append(afters.size() == 1 ? "" : "s")
@@ -780,7 +780,7 @@ public final class AgendaHelper {
     }
 
     private static String pluralPerson(int num) {
-        return num + " player" + (num == 1 ? "" : "s");
+        return StringHelper.pluralize(num, "player");
     }
 
     @ButtonHandler("queueAWhen")
@@ -818,7 +818,7 @@ public final class AgendaHelper {
         StringBuilder msg = new StringBuilder(player.getRepresentation(true, true)
                 + " now is the time to decide whether or not you will play an \"after\". If you do,"
                 + " the bot will queue your after to play in the proper order (after those before you in speaker order decline). You may currently"
-                + " play " + afters.size() + " \"after\"" + (afters.size() == 1 ? "" : "s") + ".");
+                + " play " + StringHelper.pluralize(afters.size(), "\"after\"") + ".");
         if (!afters.isEmpty()) {
             msg.append("\nThe possible \"after\"")
                     .append(afters.size() == 1 ? "" : "s")
@@ -992,6 +992,10 @@ public final class AgendaHelper {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
         }
 
+        if (!game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
+            msg +=
+                    " **Reminder: _Checks and Balances_ has resolved \"Against\" — you will only be able to ready 3 planets at the end of this agenda phase.**";
+        }
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
@@ -1045,7 +1049,7 @@ public final class AgendaHelper {
         if ("tg".equalsIgnoreCase(tgOrDebt)) {
             player.setTg(player.getTg() - amount);
             p2.setTg(p2.getTg() + amount);
-            msg = player.getRepresentation(false, false) + " sent " + amount + " trade good" + (amount == 1 ? "" : "s")
+            msg = player.getRepresentation(false, false) + " sent " + StringHelper.pluralize(amount, "trade good")
                     + " to " + p2.getRepresentation(false, false) + ".\n" + msg;
             ButtonHelperAbilities.pillageCheck(p2, game);
             ButtonHelperAbilities.pillageCheck(player, game);
@@ -2048,7 +2052,7 @@ public final class AgendaHelper {
                     MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(), message);
                     if (size > 0) {
                         keleres.setTg(keleres.getTg() + size);
-                        String msg2 = "Gained " + size + " trade good" + (size == 1 ? "" : "s") + " ("
+                        String msg2 = "Gained " + StringHelper.pluralize(size, "trade good") + " ("
                                 + (keleres.getTg() - size) + " -> **" + keleres.getTg() + "**).";
                         ButtonHelperAgents.resolveArtunoCheck(keleres, size);
                         MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(), msg2);
@@ -2267,6 +2271,17 @@ public final class AgendaHelper {
                                     channel,
                                     identity
                                             + ", you have a _Project Rider_ to resolve. Use the button to retrieve the action cards you selected when you played it.",
+                                    buttons);
+                        }
+
+                        if (specificVote.contains("Classified Rider")) {
+                            List<Button> buttons = List.of(Buttons.green(
+                                    winningR.factionButtonChecker() + "resolveClassifiedRider",
+                                    "Resolve Classified Rider"));
+                            MessageHelper.sendMessageToChannelWithButtons(
+                                    channel,
+                                    identity
+                                            + ", you have a _Classified Rider_ to resolve. Use the button to choose 1 of the top 3 secret objectives.",
                                     buttons);
                         }
 

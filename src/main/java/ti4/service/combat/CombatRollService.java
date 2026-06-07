@@ -28,10 +28,12 @@ import ti4.contest.replay.core.CombatRollPayload.DieRollSource;
 import ti4.contest.replay.core.CombatRollPayload.RollSegmentType;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -53,6 +55,7 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -307,6 +310,10 @@ public class CombatRollService {
             tempMods.addAll(NetrunnersAbilitiesHandler.getPendingControlNetworkSpaceCannonModifier(
                     game, player, tile, combatOnHolder, rollType));
         }
+        if (player.hasTech("beironats")) {
+            extraRolls.addAll(IronFactionTechsHandler.getAdvancedTargetingSystemsExtraRollModifier(
+                    game, player, opponent, tile, combatOnHolder, rollType));
+        }
 
         CombatRollResult rollResult = rollForUnitsWithResult(
                 playerUnitsByQuantity,
@@ -404,13 +411,13 @@ public class CombatRollService {
             List<Button> buttons = new ArrayList<>();
             if (rollType == CombatRollType.combatround && opponent != player) {
                 if (combatOnHolder instanceof Planet) {
-                    String msg2 = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered " + h
-                            + " hit" + (h == 1 ? "" : "s") + " in round #" + round2 + ".";
+                    String msg2 = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered "
+                            + StringHelper.pluralize(h, "hit") + " in round #" + round2 + ".";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
                     if (!automated) {
                         if (h > 0) {
-                            String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit"
-                                    + (h == 1 ? "" : "s") + ".";
+                            String msg = opponent.getRepresentationUnfogged() + " you may autoassign "
+                                    + StringHelper.pluralize(h, "hit") + ".";
                             if (opponent.isDummy() || opponent.isNpc()) {
                                 if (round2 > round) {
                                     buttons.add(Buttons.blue(
@@ -499,8 +506,8 @@ public class CombatRollService {
                                     "Roll Dice For Combat Round #" + (round + 1)));
                         }
                     }
-                    String msg = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered " + h
-                            + " hit" + (h == 1 ? "" : "s") + " in round #" + round2 + ".";
+                    String msg = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered "
+                            + StringHelper.pluralize(h, "hit") + " in round #" + round2 + ".";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                     if (h > 0) {
                         String factionChecker = "FFCC_" + opponent.getFaction() + "_";
@@ -590,8 +597,8 @@ public class CombatRollService {
                     buttons.add(Buttons.green(
                             opponent.dummyPlayerSpoof() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_" + h,
                             "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
-                    String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit"
-                            + (h == 1 ? "" : "s") + ".";
+                    String msg = opponent.getRepresentationUnfogged() + " you may autoassign "
+                            + StringHelper.pluralize(h, "hit") + ".";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                 } else {
                     String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign "
@@ -617,8 +624,8 @@ public class CombatRollService {
                 && opponent != player) {
             MessageChannel channel =
                     isFoWPrivateChannelRoll(player, event) ? opponent.getCorrectChannel() : event.getMessageChannel();
-            String msg = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered " + h + " hit"
-                    + (h == 1 ? "" : "s") + " from SPACE CANNON against your ships.";
+            String msg = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered "
+                    + StringHelper.pluralize(h, "hit") + " from SPACE CANNON against your ships.";
             MessageHelper.sendMessageToChannel(channel, msg);
             List<Button> buttons = new ArrayList<>();
             String factionChecker = "FFCC_" + opponent.getFaction() + "_";
@@ -1160,7 +1167,7 @@ public class CombatRollService {
                         MessageHelper.sendMessageToChannel(
                                 event.getMessageChannel(),
                                 player.getRepresentation() + " please gain or convert 1 commodity a total of "
-                                        + hitRolls + " time" + (hitRolls == 1 ? "" : "s")
+                                        + StringHelper.pluralize(hitRolls, "time")
                                         + " due to your Uzean Wardog mech ability.");
                     }
                 }
@@ -1329,6 +1336,42 @@ public class CombatRollService {
                                     .append(unitRoll2);
                         }
                     }
+                }
+                if (IronLeadersHandler.shouldAutoRerollCommanderMechMisses(game, player, unitModel, rollType)
+                        && numMisses > 0) {
+                    resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numMisses);
+                    // Very important to remove the rerolled dice from the original dice pool
+                    resultRolls.removeIf(Predicate.not(Die::isSuccess));
+                    player.setExpectedHitsTimes10(
+                            player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
+                    chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numMisses);
+                    chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numMisses);
+                    maximumHits += numRolls * mult;
+                    int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
+                    totalHits += hitRolls2;
+                    String unitRoll2 = CombatMessageHelper.displayUnitRoll(
+                            unitModel, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
+                    payloadBuilder.addUnitRoll(
+                            unitModel,
+                            toHit,
+                            modifierToHit,
+                            numOfUnit,
+                            numRollsPerUnit,
+                            0,
+                            RollSegmentType.IRON_COMMANDER_REROLL_MISSES,
+                            resultRolls2,
+                            hitRolls2,
+                            DieRollSource.REROLL_MISS);
+                    resultBuilder
+                            .append("Rerolling ")
+                            .append(numMisses)
+                            .append(" miss")
+                            .append(numMisses == 1 ? "" : "es")
+                            .append(" due to Captain Vakros, the Iron Tide Commander:\n")
+                            .append(unitRoll2);
+                    resultRolls.addAll(resultRolls2);
+                    numMisses -= hitRolls2;
+                    resultRolls2 = new ArrayList<>();
                 }
                 if (rollType == CombatRollType.SpaceCannonOffence || rollType == CombatRollType.SpaceCannonDefence) {
                     if (player.ownsUnit("gledge_pds2") && totalHits > 0) {
@@ -1584,8 +1627,8 @@ public class CombatRollService {
         result += CombatMessageHelper.displayHitResults(totalHits, useDoubleBoomEmoji);
 
         if (totalHits > 0 && usesX89c4) {
-            result += "\n" + player.getFactionEmoji() + " produced " + (totalHits / 2) + " additional hit"
-                    + ((totalHits / 2) == 1 ? "" : "s") + " using "
+            result += "\n" + player.getFactionEmoji() + " produced "
+                    + StringHelper.pluralize((totalHits / 2), "additional hit") + " using "
                     + Mapper.getTech("x89c4").getNameRepresentation() + ".";
         }
 

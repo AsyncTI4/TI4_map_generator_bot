@@ -13,7 +13,8 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -27,6 +28,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
@@ -198,6 +200,9 @@ public class DestroyUnitService {
             case Infantry -> capturing.addAll(CaptureUnitService.listCapturingMechPlayers(game, allUnits, unit));
             case Mech -> {
                 handleSelfAssemblyRoutines(player, totalAmount, game);
+                if (player.hasUnit("iron_mech") || player.hasUnit("iron_mech2")) {
+                    IronUnitsHandler.resolveRiptideDestroy(event, game, player, unit);
+                }
                 if (player.hasUnit("dream_mech")) {
                     DreamButtonHandler.offerRecurringMechButtons(
                             event, game, player, totalAmount, unit.uh().getName(), unit.unitKey());
@@ -358,7 +363,7 @@ public class DestroyUnitService {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + " you gained " + min + " trade good" + (min == 1 ? "" : "s") + " (" + player.getTg()
+                            + " you gained " + StringHelper.pluralize(min, "trade good") + " (" + player.getTg()
                             + "->" + (player.getTg() + min)
                             + ") from _Self-Assembly Routines_ because of " + min + " of your mechs dying."
                             + " This is a mandatory gain" + (min > 1 ? ", and happens 1 trade good at a time" : "")

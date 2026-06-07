@@ -1312,16 +1312,16 @@ public final class ButtonHelperSCs {
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
-                    "You have " + (limit - ccCount) + " command token" + (limit - ccCount == 1 ? "" : "s")
-                            + " in your reinforcements that you could gain, and " + player.getTg() + " trade good"
-                            + (player.getTg() == 1 ? "" : "s") + " to spend.");
+                    "You have " + StringHelper.pluralize(limit - ccCount, "command token")
+                            + " in your reinforcements that you could gain, and "
+                            + StringHelper.pluralize(player.getTg(), "trade good") + " to spend.");
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getPrivateChannel(),
-                    "You have " + (limit - ccCount) + " command token" + (limit - ccCount == 1 ? "" : "s")
-                            + " in your reinforcements that you could gain, and " + player.getTg() + " trade good"
-                            + (player.getTg() == 1 ? "" : "s") + " to spend.");
+                    "You have " + StringHelper.pluralize(limit - ccCount, "command token")
+                            + " in your reinforcements that you could gain, and "
+                            + StringHelper.pluralize(player.getTg(), "trade good") + " to spend.");
             MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
         }
         // MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
