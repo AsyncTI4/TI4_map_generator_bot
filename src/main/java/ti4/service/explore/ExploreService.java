@@ -739,6 +739,13 @@ public class ExploreService {
                 MessageHelper.sendMessageToEventChannel(event, String.format(fragMessage, ExploreEmojis.IFrag));
             case "urf1", "urf2", "urf3" ->
                 MessageHelper.sendMessageToEventChannel(event, String.format(fragMessage, ExploreEmojis.UFrag));
+            case "culturalartifact", "hazardousartifact", "industrialartifact", "unknownartifact" -> {
+                game.purgeExplore(ogID);
+                player.addRelic(cardID);
+                message = new StringBuilder(
+                        "Card has been added to play area.\nAdded as a relic (not actually a relic).");
+                MessageHelper.sendMessageToEventChannel(event, message.toString());
+            }
             case "ed1", "ed2" -> {
                 message = new StringBuilder("_Enigmatic Device_ has been placed in play area.");
                 player.addRelic(Constants.ENIGMATIC_DEVICE);
