@@ -10,13 +10,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.function.Consumers;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
@@ -1456,7 +1458,7 @@ public final class ButtonHelperModifyUnits {
 
                 String unitName = unitKey.unitName();
                 String prettyName = unitKey.humanReadableName();
-                boolean canSustain = ButtonHelper.unitCanSustainDamage(game, player, tile, unitModel);
+                boolean canSustain = ButtonHelper.unitCanSustainDamage(game, p2, tile, unitModel);
                 for (UnitState state : UnitState.defaultRemoveOrder()) {
                     int amt = unitHolder.getUnitCountForState(unitKey, state);
                     if (amt == 0) continue;
