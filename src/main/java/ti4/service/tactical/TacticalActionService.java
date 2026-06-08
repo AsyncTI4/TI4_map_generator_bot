@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -410,7 +411,7 @@ public class TacticalActionService {
         for (Player p2 : game.getRealPlayers()) {
             if (player.getAllianceMembers().contains(p2.getFaction()) && !game.isFowMode()) {
                 if (FoWHelper.playerHasUnitsInSystem(p2, tile)
-                        && !CommandCounterHelper.hasCC(event, p2.getColor(), tile)) {
+                        && (!CommandCounterHelper.hasCC(event, p2.getColor(), tile))) {
                     hasUnits = true;
                 }
             }

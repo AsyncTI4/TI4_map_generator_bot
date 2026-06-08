@@ -544,6 +544,7 @@ public class PlayStrategyCardService {
                         && !p2.hasRelicReady("emelpar")
                         && !p2.hasUnexhaustedLeader("mahactagent")
                         && !p2.hasUnexhaustedLeader("yssarilagent")
+                        && !MindsieveService.canUseMindsieve(p2, player, scModel)
                         && scToPlay != 1) {
                     markPlayerAsAutoFollowing(playersToReact, game, p2, scToPlay, event);
                     MessageHelper.sendMessageToChannel(

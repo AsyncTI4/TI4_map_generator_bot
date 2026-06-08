@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -293,11 +294,6 @@ public class AutoPingCron {
             for (Player player : game.getRealPlayers()) {
                 if (game.getStoredValue("statusHomeworkReactionFor" + player.getFaction() + "Round" + game.getRound())
                         .isEmpty()) {
-                    if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannel(
-                                player.getCorrectChannel(),
-                                player.getRepresentationUnfogged() + ", please allocate command tokens.");
-                    }
                     msg.append(player.getRepresentation()).append(", ");
                 } else if (game.isFowMode()
                         && game.getStoredValue("fowStatusDone") != null
@@ -306,6 +302,11 @@ public class AutoPingCron {
                             player.getCorrectChannel(),
                             player.getRepresentationUnfogged() + ", please click \"Ready for "
                                     + (game.isCustodiansScored() ? "Agenda" : "Strategy") + " Phase\".");
+                }
+                if(game.isFowMode() && !game.getCurrentACDrawStatusInfo().contains(player.getFaction())){
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged() + ", please draw ACs.");
                 }
             }
             if (!game.isFowMode() && !msg.isEmpty()) {
