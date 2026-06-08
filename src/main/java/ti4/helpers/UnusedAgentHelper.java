@@ -20,12 +20,10 @@ public class UnusedAgentHelper {
     public static String getUnusedAgent(Game game, Set<ComponentSource> extraSources, Set<String> excludedAgents) {
         List<String> agents = new ArrayList<>();
         List<FactionModel> allFactions = Mapper.getFactionsValues().stream()
-                .filter(f -> game.isDiscordantStarsMode()
-                        ? f.getSource().isDs() || f.getSource().isOfficial() || extraSources.contains(f.getSource())
-                        : f.getSource().isOfficial() || extraSources.contains(f.getSource()))
-                .filter(f -> game.isBlueReverieMode()
-                        ? f.getSource().isBr() || f.getSource().isOfficial() || extraSources.contains(f.getSource())
-                        : f.getSource().isOfficial() || extraSources.contains(f.getSource()))
+                .filter(f -> f.getSource().isOfficial()
+                        || (game.isDiscordantStarsMode() && f.getSource() == ComponentSource.ds)
+                        || (game.isBlueReverieMode() && f.getSource().isBr())
+                        || extraSources.contains(f.getSource()))
                 .toList();
 
         for (FactionModel faction : allFactions) {

@@ -135,7 +135,7 @@ public class HomebrewService {
             case HBABSOLRELICSAGENDAS -> {
                 game.setAbsolMode(true);
                 game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"));
-                if (game.isDiscordantStarsMode() && game.getRelicDeckID().contains("ds")) {
+                if (game.isUnchartedSpaceStuff() && game.getRelicDeckID().contains("ds")) {
                     game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol_ds"));
                 } else {
                     game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol"));
@@ -155,7 +155,7 @@ public class HomebrewService {
             }
             case HBABSOLTECHSMECHS -> {
                 game.setAbsolMode(true);
-                if (game.isDiscordantStarsMode()) {
+                if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
                     game.setTechnologyDeckID("techs_ds_absol");
                 } else {
                     game.setTechnologyDeckID("techs_absol");
@@ -165,7 +165,6 @@ public class HomebrewService {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set the techs & mechs to Absol stuff.");
             }
             case HBDSEXPLORES -> {
-                game.setDiscordantStarsMode(true);
                 game.setUnchartedSpaceStuff(true);
                 game.validateAndSetExploreDeck(
                         event, Mapper.getDeck(game.isBlueReverieMode() ? "explores_BR" : "explores_DS"));
@@ -187,7 +186,7 @@ public class HomebrewService {
                     game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_br"));
                 }
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), "Set the explores/action cards/relics to Discordant Stars stuff.");
+                        event.getMessageChannel(), "Set the explores/action cards/relics to Uncharted Space stuff.");
             }
             case HBACDECK2 -> {
                 String acd2 = "action_deck_2";

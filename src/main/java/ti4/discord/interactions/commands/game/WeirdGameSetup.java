@@ -118,6 +118,38 @@ public class WeirdGameSetup extends GameStateSubcommand {
                             Mapper.getDeck(game.isBlueReverieContentMode() ? "relics_br" : "relics_ds"));
                     game.setTechnologyDeckID("techs_ds");
                 }
+            } else {
+                if (!game.isAcd2()
+                        && ("action_cards_ds".equalsIgnoreCase(game.getAcDeckID())
+                                || "action_cards_br".equalsIgnoreCase(game.getAcDeckID()))) {
+                    game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"));
+                }
+                if ("explores_ds".equalsIgnoreCase(game.getExplorationDeckID())
+                        || "explores_br".equalsIgnoreCase(game.getExplorationDeckID())) {
+                    game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_pok"));
+                }
+                if (game.isAbsolMode()) {
+                    if ("techs_ds_absol".equalsIgnoreCase(game.getTechnologyDeckID())) {
+                        game.setTechnologyDeckID("techs_absol");
+                    }
+                    if ("relics_absol_ds".equalsIgnoreCase(game.getRelicDeckID())) {
+                        game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol"));
+                    }
+                } else {
+                    if ("relics_ds".equalsIgnoreCase(game.getRelicDeckID())
+                            || "relics_br".equalsIgnoreCase(game.getRelicDeckID())) {
+                        game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok"));
+                    }
+                    if ("techs_ds".equalsIgnoreCase(game.getTechnologyDeckID())
+                            || "techs_ds_absol".equalsIgnoreCase(game.getTechnologyDeckID())) {
+                        game.setTechnologyDeckID("techs_pok_c4");
+                    }
+                }
+                if (!game.isAbsolMode()
+                        && ("agendas_br".equalsIgnoreCase(game.getAgendaDeckID())
+                                || "agendas_pok".equalsIgnoreCase(game.getAgendaDeckID()))) {
+                    game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_pok"));
+                }
             }
             syncBlueReverieContentDecks(event, game);
         }
@@ -471,40 +503,31 @@ public class WeirdGameSetup extends GameStateSubcommand {
     }
 
     private static void syncBlueReverieContentDecks(GenericInteractionCreateEvent event, Game game) {
-        boolean brContent = game.isBlueReverieContentMode();
-        boolean usContent = game.isUnchartedSpaceStuff();
+        if (!game.isBlueReverieContentMode()) {
+            return;
+        }
 
         if (!game.isAbsolMode()
                 && ("agendas_pok".equalsIgnoreCase(game.getAgendaDeckID())
                         || "agendas_br".equalsIgnoreCase(game.getAgendaDeckID()))) {
-            game.validateAndSetAgendaDeck(event, Mapper.getDeck(brContent ? "agendas_br" : "agendas_pok"));
+            game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_br"));
         }
 
         if (!game.isAcd2()
-                && ("action_cards_pok".equalsIgnoreCase(game.getAcDeckID())
-                        || "action_cards_ds".equalsIgnoreCase(game.getAcDeckID())
+                && ("action_cards_ds".equalsIgnoreCase(game.getAcDeckID())
                         || "action_cards_br".equalsIgnoreCase(game.getAcDeckID()))) {
-            String deckId = brContent ? "action_cards_br" : (usContent ? "action_cards_ds" : "action_cards_pok");
-            game.validateAndSetActionCardDeck(event, Mapper.getDeck(deckId));
+            game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_br"));
         }
 
-        if ("explores_pok".equalsIgnoreCase(game.getExplorationDeckID())
-                || "explores_ds".equalsIgnoreCase(game.getExplorationDeckID())
+        if ("explores_ds".equalsIgnoreCase(game.getExplorationDeckID())
                 || "explores_br".equalsIgnoreCase(game.getExplorationDeckID())) {
-            String deckId = brContent ? "explores_BR" : (usContent ? "explores_DS" : "explores_pok");
-            game.validateAndSetExploreDeck(event, Mapper.getDeck(deckId));
+            game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_BR"));
         }
 
-        if (game.isAbsolMode()) {
-            if ("relics_absol".equalsIgnoreCase(game.getRelicDeckID())
-                    || "relics_absol_ds".equalsIgnoreCase(game.getRelicDeckID())) {
-                game.validateAndSetRelicDeck(Mapper.getDeck(usContent ? "relics_absol_ds" : "relics_absol"));
-            }
-        } else if ("relics_pok".equalsIgnoreCase(game.getRelicDeckID())
-                || "relics_ds".equalsIgnoreCase(game.getRelicDeckID())
-                || "relics_br".equalsIgnoreCase(game.getRelicDeckID())) {
-            String deckId = brContent ? "relics_br" : (usContent ? "relics_ds" : "relics_pok");
-            game.validateAndSetRelicDeck(Mapper.getDeck(deckId));
+        if (!game.isAbsolMode()
+                && ("relics_ds".equalsIgnoreCase(game.getRelicDeckID())
+                        || "relics_br".equalsIgnoreCase(game.getRelicDeckID()))) {
+            game.validateAndSetRelicDeck(Mapper.getDeck("relics_br"));
         }
     }
 }

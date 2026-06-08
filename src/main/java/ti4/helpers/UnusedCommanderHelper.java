@@ -8,6 +8,7 @@ import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.image.Mapper;
 import ti4.model.FactionModel;
+import ti4.model.Source.ComponentSource;
 
 @UtilityClass
 public class UnusedCommanderHelper {
@@ -19,12 +20,9 @@ public class UnusedCommanderHelper {
     public static String getUnusedCommander(Game game, Set<String> excludedCommanders) {
         List<String> commanders = new ArrayList<>();
         List<FactionModel> allFactions = Mapper.getFactionsValues().stream()
-                .filter(f -> game.isDiscordantStarsMode()
-                        ? f.getSource().isDs() || f.getSource().isOfficial()
-                        : f.getSource().isOfficial())
-                .filter(f -> game.isBlueReverieMode()
-                        ? f.getSource().isBr() || f.getSource().isOfficial()
-                        : f.getSource().isOfficial())
+                .filter(f -> f.getSource().isOfficial()
+                        || (game.isDiscordantStarsMode() && f.getSource() == ComponentSource.ds)
+                        || (game.isBlueReverieMode() && f.getSource().isBr()))
                 .toList();
 
         for (FactionModel faction : allFactions) {

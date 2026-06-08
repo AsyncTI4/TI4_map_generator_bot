@@ -253,6 +253,7 @@ public class SourceSettings extends SettingsMenu {
                 boolean brContent = blueReverie.isVal() && us;
                 boolean both = abs && us;
                 boolean acd2 = actionCardDeck2.isVal();
+                boolean updateUsDecks = "UnchartSpace".equals(setting) || ("BlueReverie".equals(setting) && brContent);
 
                 // Decks with both
                 String relic = both
@@ -269,12 +270,17 @@ public class SourceSettings extends SettingsMenu {
                         ? getAcd2Version(pok, teDemo)
                         : (brContent ? "action_cards_br" : (us ? "action_cards_ds" : "action_cards_pok"));
 
-                // set 'em up
-                decks.getRelics().setChosenKey(relic);
                 decks.getTechs().setChosenKey(techs);
-                decks.getAgendas().setChosenKey(agenda);
-                decks.getExplores().setChosenKey(explore);
-                decks.getActionCards().setChosenKey(acs);
+                if ("Absol".equals(setting) || updateUsDecks) {
+                    decks.getRelics().setChosenKey(relic);
+                    decks.getAgendas().setChosenKey(agenda);
+                }
+                if (updateUsDecks) {
+                    decks.getExplores().setChosenKey(explore);
+                }
+                if ("ActionCardDeck2".equals(setting) || updateUsDecks) {
+                    decks.getActionCards().setChosenKey(acs);
+                }
 
                 var inclusions = new ArrayList<String>();
                 if (abs) inclusions.add("Absol Mod");
