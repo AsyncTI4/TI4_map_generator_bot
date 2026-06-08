@@ -6,7 +6,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -303,10 +302,9 @@ public class AutoPingCron {
                             player.getRepresentationUnfogged() + ", please click \"Ready for "
                                     + (game.isCustodiansScored() ? "Agenda" : "Strategy") + " Phase\".");
                 }
-                if(game.isFowMode() && !game.getCurrentACDrawStatusInfo().contains(player.getFaction())){
+                if (game.isFowMode() && !game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
                     MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentationUnfogged() + ", please draw ACs.");
+                            player.getCorrectChannel(), player.getRepresentationUnfogged() + ", please draw ACs.");
                 }
             }
             if (!game.isFowMode() && !msg.isEmpty()) {
