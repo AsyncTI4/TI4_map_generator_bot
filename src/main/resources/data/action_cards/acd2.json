@@ -4,7 +4,7 @@
         "name": "Amendment",
         "phase": "Action",
         "window": "At the end of the status phase",
-        "text": "Purge 1 public objective you have scored. Then, draw and reveal an objective from either public objective deck and place it near the other public objectives.",
+        "text": "Purge 1 public objective you have scored. Then, draw and reveal 1 card from either public objective deck and place it near the other public objectives.",
         "notes": "Players do not lose points when an objective they have scored is purged.",
         "automationID": "amendment",
         "flavorText": "Junn waddled away from the stunned hush that followed his announcements, a ghost of a smile betraying the victory he had labored years to secure.",
@@ -179,7 +179,7 @@
         "name": "Corruption",
         "phase": "Any",
         "window": "After a public objective is revealed",
-        "text": "Look at the top 2 cards of the deck that matches that objective; you may replace that objective with 1 of those cards. Then, shuffle that deck.",
+        "text": "Look at the top card of the deck that matches that objective; you may replace that objective with that card. Then, shuffle that deck.",
         "flavorText": "Just as the charges went public, over half of the Council's staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
         "source": "action_deck_2"
     },
@@ -629,8 +629,8 @@
         "alias": "pivot",
         "name": "Pivot",
         "phase": "Action",
-        "window": "ACTION",
-        "text": "Discard 1-3 action cards from your hand to draw an equal number of action cards. Then, you may discard 1 secret objective to draw 1 secret objective.",
+        "window": "At the start of your turn",
+        "text": "Discard up to 3 action cards to draw an equal number of action cards. Then, you may discard 1 secret objective to draw 1 secret objective.",
         "flavorText": "\"We must not become stagnant. Stagnation is what broke this galaxy,\" I48S said, barely hesitating at his patient's screams. \"Pain? Let's remove that.\"",
         "source": "action_deck_2"
     },
@@ -953,7 +953,16 @@
 
 
 
-
+    {
+        "alias": "abduction",
+        "name": "Abduction",
+        "phase": "Action",
+        "window": "At the start of your turn",
+        "text": "Take 1 of your neighbors' commanders. At the end of this turn, return that commander to that player.",
+        "flavorText": "Conner laughed. \"Kill you? You're much better use to us alive...\"",
+        "notes": "This may unlock the stolen commander. That player loses access to their commander ability, as does the player with their Alliance. You and the player with your Alliance gain its ability.",
+        "source": "action_deck_2"
+    },
     {
         "alias": "artifact_hunters",
         "name": "Artifact Hunters",
@@ -1048,22 +1057,13 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "oracle",
-        "name": "Oracle",
-        "phase": "Action",
-        "window": "ACTION",
-        "text": "Look at each unrevealed public objective and the top 5 cards of the secret objective deck. Then, shuffle the secret objective deck.",
-        "flavorText": "The Memoria loomed above Mecatol Rex, as it must. \"It is wrong,\" the Nomad said softly. \"Infinity before me, yet every choice I make collapses it. Foreknowledge diverts me onto a finite path and traps me in those deadly corridors.\"",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "reconstruction",
         "name": "Reconstruction",
         "phase": "Action",
         "window": "After you activate a system",
-        "automationID": "reconstruction",
         "text": "Choose 1 planet you control in that system. Ready that planet and reveal the top 3 cards of an exploration deck that matches it; attach each attachment that you reveal to it and discard the rest.",
         "flavorText": "Tungstantus collapsed mid-step as their energy depleted. The world was far from its former glory, and they would not rest until it was a paradise once more.",
+        "automationID": "reconstruction",
         "source": "action_deck_2"
     },
     {
@@ -1159,7 +1159,7 @@
         "name": "Arbitration",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose 1 non-home planet that contains ground forces and another player that does not control that planet. That player places 1 infantry from their reinforcements into coexistence on that planet.",
+        "text": "Place 1 infantry from another player's reinforcements into coexistence on a non-home planet.",
         "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more.",
         "source": "action_deck_2"
     },
