@@ -531,7 +531,7 @@ public class CombatModHelper {
                     }
                 }
                 for (UnitModel unitModel : unitsByQuantity.keySet()) {
-                    if (unitModel.getId().equalsIgnoreCase("xxcha_flagship")) {
+                    if ("xxcha_flagship".equalsIgnoreCase(unitModel.getId())) {
                         Tile tile2 = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship)
                                 .getFirst();
                         if (tile2 != null) {
