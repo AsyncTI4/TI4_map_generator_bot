@@ -560,6 +560,10 @@ public class StartPhaseService {
                             || !player2.getSCs().isEmpty()) {
                         continue;
                     }
+                    var userSettings = UserSettingsManager.get(player2.getUserID());
+                    if (!userSettings.isPrefersPrePassOnSC()) {
+                        continue;
+                    }
                     String msg = player2.getRepresentationUnfogged()
                             + " in order to speed up the Strategy Phase, you can now offer the bot a ranked list of your desired"
                             + " strategy cards, which it will pick for you when it's your turn to pick. If you do not wish to, that is fine, just decline.";

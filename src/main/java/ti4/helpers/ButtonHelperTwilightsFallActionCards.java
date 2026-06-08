@@ -470,6 +470,11 @@ public final class ButtonHelperTwilightsFallActionCards {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String ability1 = buttonID.split("_")[2];
         for (String ability : p2.getTechs()) {
+            if (p2.hasTech("tf-biosyntheticsynergy")
+                    && !"tf-biosyntheticsynergy".equals(ability)
+                    && !ability.contains("singularity")) {
+                continue;
+            }
             TechnologyModel tech = Mapper.getTech(ability);
             if (tech.getFaction().isEmpty()) {
                 continue;

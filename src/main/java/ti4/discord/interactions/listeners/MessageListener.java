@@ -62,12 +62,9 @@ class MessageListener extends ListenerAdapter {
             "personal attack",
             "harassment",
             "harassing",
-            "bullying",
             "you’re being rude",
-            "that was rude",
             "cheater",
             "bad faith",
-            "drop it",
             "calm down",
             "don’t make it personal",
             "keep it game-related");
@@ -361,7 +358,7 @@ class MessageListener extends ListenerAdapter {
     private static boolean addFactionEmojiReactionsToMessages(MessageReceivedEvent event, String gameName) {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame.getGame().isHiddenAgendaMode()
-                && !managedGame.getGame().getStoredValue("executiveOrder").isEmpty()
+                && managedGame.getGame().getStoredValue("executiveOrder").isEmpty()
                 && managedGame.getGame().getPhaseOfGame().toLowerCase().contains("agenda")) {
             Player player = getPlayer(event, managedGame.getGame());
             if (player == null

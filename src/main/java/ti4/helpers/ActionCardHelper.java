@@ -286,7 +286,7 @@ public class ActionCardHelper {
             if (prefix.startsWith("remove")) valid = factions != null && factions.contains(p.getFaction());
             if (valid) {
                 String id = prefix + plotID + "_" + p.getFaction();
-                buttons.add(Buttons.gray(id, "", p.getFactionEmojiOrColor()));
+                buttons.add(Buttons.green(id, "", p.getFactionEmojiOrColor()));
             }
         });
         buttons.add(Buttons.DONE_DELETE_BUTTONS);

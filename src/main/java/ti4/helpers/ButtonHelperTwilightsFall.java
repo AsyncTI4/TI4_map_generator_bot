@@ -815,14 +815,20 @@ public final class ButtonHelperTwilightsFall {
                         "savedSpliceCards",
                         game.getStoredValue("savedSpliceCards").replace(cardID + "_", ""));
             } else {
-                if (game.getStoredValue("savedSpliceCards").contains("_" + cardID)) {
+                if (game.getStoredValue("savedSpliceCards").contains("_" + cardID + "_")) {
                     game.setStoredValue(
                             "savedSpliceCards",
-                            game.getStoredValue("savedSpliceCards").replace("_" + cardID, ""));
+                            game.getStoredValue("savedSpliceCards").replace("_" + cardID + "_", "_"));
                 } else {
-                    game.setStoredValue(
-                            "savedSpliceCards",
-                            game.getStoredValue("savedSpliceCards").replace(cardID, ""));
+                    if (game.getStoredValue("savedSpliceCards").contains("_" + cardID)) {
+                        game.setStoredValue(
+                                "savedSpliceCards",
+                                game.getStoredValue("savedSpliceCards").replace("_" + cardID, ""));
+                    } else {
+                        game.setStoredValue(
+                                "savedSpliceCards",
+                                game.getStoredValue("savedSpliceCards").replace(cardID, ""));
+                    }
                 }
             }
             if (remove) {

@@ -1470,7 +1470,7 @@ public final class ButtonHelperModifyUnits {
 
                 String unitName = unitKey.unitName();
                 String prettyName = unitKey.humanReadableName();
-                boolean canSustain = ButtonHelper.unitCanSustainDamage(game, player, tile, unitModel);
+                boolean canSustain = ButtonHelper.unitCanSustainDamage(game, p2, tile, unitModel);
                 for (UnitState state : UnitState.defaultRemoveOrder()) {
                     int amt = unitHolder.getUnitCountForState(unitKey, state);
                     if (amt == 0) continue;
