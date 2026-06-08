@@ -215,6 +215,7 @@
             "shortcut3",
             "shortcut4",
 
+            "abduction",
             "artifact_hunters",
             "artifact_research",
             "black_market_raid",
@@ -225,7 +226,6 @@
             "frontier_rider",
             "heist",
             "mysterious_brokers",
-            "oracle",
             "reconstruction",
             "relic_rider",
             "simulacrum",
@@ -475,6 +475,7 @@
             "shortcut3",
             "shortcut4",
 
+            "abduction",
             "artifact_hunters",
             "artifact_research",
             "black_market_raid",
@@ -485,7 +486,6 @@
             "frontier_rider",
             "heist",
             "mysterious_brokers",
-            "oracle",
             "reconstruction",
             "relic_rider",
             "simulacrum",
