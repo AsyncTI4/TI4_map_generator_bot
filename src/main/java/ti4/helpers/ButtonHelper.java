@@ -1572,8 +1572,16 @@ public class ButtonHelper {
                 && !player.hasAbility("celestial_being")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "## " + player.getRepresentation()
+                    "## " + player.getRepresentationNoPing()
                             + ", this is a __friendly__ reminder that you do not own _Antimass Deflectors_.");
+        }
+        if (!game.isFowMode()
+                && activeSystem.isAsteroidField()
+                && ThreadLocalRandom.current().nextInt(1, 11) == 10) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "-# " + player.getRepresentationNoPing()
+                            + ", this is a friendly reminder that the odds of successfully navigating an asteroid field are approximately 3720:1.");
         }
         if (!game.isFowMode()
                 && activeSystem.isScar(game)

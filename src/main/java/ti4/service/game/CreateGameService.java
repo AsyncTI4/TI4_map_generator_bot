@@ -180,14 +180,23 @@ public class CreateGameService {
                 .addRolePermissionOverride(gameRoleID, permission, 0)
                 .complete();
         newGame.setMainChannelID(actionsChannel.getId());
-
-        Role bothelperRole = getRole("Bothelper", guild);
         List<Member> nonGameBothelpers = new ArrayList<>();
+        Role bothelperRole = getRole("Bothelper", guild);
         if (bothelperRole != null) {
             for (Member botHelper : guild.getMembersWithRoles(bothelperRole)) {
                 boolean inGame =
                         members.stream().anyMatch(member -> member.getId().equals(botHelper.getId()));
                 if (!inGame) {
+                    nonGameBothelpers.add(botHelper);
+                }
+            }
+        }
+        Role adminRole = getRole("Admin", guild);
+        if (adminRole != null) {
+            for (Member botHelper : guild.getMembersWithRoles(adminRole)) {
+                boolean inGame =
+                        members.stream().anyMatch(member -> member.getId().equals(botHelper.getId()));
+                if (!inGame && !nonGameBothelpers.contains(botHelper)) {
                     nonGameBothelpers.add(botHelper);
                 }
             }

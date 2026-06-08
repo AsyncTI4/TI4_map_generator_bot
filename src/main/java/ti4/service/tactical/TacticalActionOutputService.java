@@ -265,7 +265,7 @@ public class TacticalActionOutputService {
 
         StringBuilder output = new StringBuilder();
         int maxBonus = 0;
-        if (distance > moveValue && distance < 90) {
+        if (distance > moveValue && distance < 90 && !game.isL1Hero()) {
             output.append(" (distance exceeds move value (")
                     .append(distance)
                     .append(" > ")

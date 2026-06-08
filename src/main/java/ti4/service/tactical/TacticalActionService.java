@@ -410,7 +410,7 @@ public class TacticalActionService {
         for (Player p2 : game.getRealPlayers()) {
             if (player.getAllianceMembers().contains(p2.getFaction()) && !game.isFowMode()) {
                 if (FoWHelper.playerHasUnitsInSystem(p2, tile)
-                        && !CommandCounterHelper.hasCC(event, p2.getColor(), tile)) {
+                        && (!CommandCounterHelper.hasCC(event, p2.getColor(), tile))) {
                     hasUnits = true;
                 }
             }

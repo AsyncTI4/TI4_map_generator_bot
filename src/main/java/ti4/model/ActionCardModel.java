@@ -104,6 +104,10 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
 
         boolean useWildText = hasWildText(game);
         String cardText = useWildText ? wildWildText : text;
+        if (game != null && game.isTwilightKart() && "tf-starflare".equalsIgnoreCase(alias)) {
+            cardText =
+                    "Select a system that contains your ships and does not contain any planets, space stations, or printed wormholes. Then draw a random red-backed anomaly tile and replace the selected system with that tile.";
+        }
         String cardWindow = useWildText ? wildWildWindow : window;
 
         // DESCRIPTION

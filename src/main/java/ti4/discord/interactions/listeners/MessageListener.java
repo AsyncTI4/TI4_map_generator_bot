@@ -128,7 +128,7 @@ class MessageListener extends ListenerAdapter {
     private static void reportInterestingMessages(Message message) {
         String messageRaw = message.getContentRaw().toLowerCase();
         for (String phrase : INTERESTING_MESSAGES) {
-            if (messageRaw.contains(phrase)) {
+            if (messageRaw.contains(phrase) && !messageRaw.contains("gif")) {
                 String msg = "Someone used \"" + phrase + "\" at " + message.getJumpUrl() + ". Full message:\n> "
                         + message.getContentRaw().replace("\n", "\n> ");
                 sendMessageToModLog(msg);
