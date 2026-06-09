@@ -1,6 +1,6 @@
 package ti4.image;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -46,6 +46,7 @@ import ti4.model.ColorModel;
 import ti4.model.ColorableModelInterface;
 import ti4.model.CombatModifierModel;
 import ti4.model.DeckModel;
+import ti4.model.DeckModel.DeckType;
 import ti4.model.DraftErrataModel;
 import ti4.model.EventModel;
 import ti4.model.ExploreModel;
@@ -72,7 +73,6 @@ import ti4.model.TileModel;
 import ti4.model.TokenModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
-import ti4.model.DeckModel.DeckType;
 import ti4.service.emoji.CardEmojis;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
@@ -646,44 +646,111 @@ public class Mapper {
     }
 
     public static DeckModel getDeck(String deckID, Game game) {
-        if(game == null || (getDecks().get(deckID) != null)) return getDeck(deckID);
+        if (game == null || (getDecks().get(deckID) != null)) return getDeck(deckID);
 
         switch (deckID) {
-            case "relic" ->{
+            case "relic" -> {
                 return getDynamicRelicDeck(game);
+            }
+            case "ac" -> {
+                return getDynamicACDeck(game);
+            }
+            case "explore" -> {
+                return getDynamicExploreDeck(game);
             }
             default -> {
                 return null;
-            } 
+            }
         }
     }
 
-    public static DeckModel getDynamicRelicDeck(Game game){
+    public static DeckModel getDynamicExploreDeck(Game game) {
+        DeckModel deck = new DeckModel();
+        deck.setType(DeckType.EXPLORE);
+        deck.setName("Dynamic Explore Deck");
+        deck.setAlias("explore");
+        deck.setDescription("A dynamic explore deck for the game.");
+        List<String> cards = new ArrayList<>();
+        for (String explore : Mapper.getExplores().keySet()) {
+            ExploreModel exploreModel = Mapper.getExplore(explore);
+            if (exploreModel.getSource().isPok() && game.isProphecyOfKings()) {
+                cards.add(explore);
+            }
+            if (exploreModel.getSource() == ComponentSource.uncharted_space && game.isUnchartedSpaceStuff()) {
+                cards.add(explore);
+            }
+            if (exploreModel.getSource() == ComponentSource.blue_reverie && game.isBlueReverieMode()) {
+                cards.add(explore);
+            }
+        }
+        deck.setCardIDs(cards);
+        return deck;
+    }
+
+    public static DeckModel getDynamicRelicDeck(Game game) {
         DeckModel deck = new DeckModel();
         deck.setType(DeckType.RELIC);
         deck.setName("Dynamic Relic Deck");
         deck.setAlias("relic");
         deck.setDescription("A dynamic relic deck for the game.");
         List<String> cards = new ArrayList<>();
-        for(String relic : Mapper.getRelics().keySet()){
+        for (String relic : Mapper.getRelics().keySet()) {
             RelicModel relicModel = Mapper.getRelic(relic);
-            if(relicModel.getSource().isPok() && game.isProphecyOfKings() && !game.isAbsolMode()){
+            if (relicModel.isFakeRelic()) {
+                continue;
+            }
+            if (relicModel.getSource().isPok() && game.isProphecyOfKings() && !game.isAbsolMode()) {
                 cards.add(relic);
             }
-            if(relicModel.getSource() == ComponentSource.absol && game.isAbsolMode()){
+            if (relicModel.getSource() == ComponentSource.absol && game.isAbsolMode()) {
                 cards.add(relic);
             }
-            if(relicModel.getSource() == ComponentSource.thunders_edge && game.isThundersEdge()){
+            if (relicModel.getSource() == ComponentSource.thunders_edge && game.isThundersEdge()) {
                 cards.add(relic);
             }
-            if(relicModel.getSource() == ComponentSource.uncharted_space && game.isUnchartedSpaceStuff()){
+            if (relicModel.getSource() == ComponentSource.uncharted_space && game.isUnchartedSpaceStuff()) {
                 cards.add(relic);
             }
-            // if(relicModel.getSource() == ComponentSource.blue_reverie && game.isBlueReverie()){
-            //     cards.add(relic);
-            // }
+            if (relicModel.getSource() == ComponentSource.blue_reverie && game.isBlueReverieMode()) {
+                cards.add(relic);
+            }
+        }
+        deck.setCardIDs(cards);
+        return deck;
+    }
 
-
+    public static DeckModel getDynamicACDeck(Game game) {
+        // Implementation for dynamic AC deck
+        DeckModel deck = new DeckModel();
+        deck.setType(DeckType.ACTION_CARD);
+        deck.setName("Dynamic AC Deck");
+        deck.setAlias("ac");
+        deck.setDescription("A dynamic AC deck for the game.");
+        List<String> cards = new ArrayList<>();
+        for (String actionCard : Mapper.getActionCards().keySet()) {
+            ActionCardModel actionCardModel = Mapper.getActionCard(actionCard);
+            if (actionCardModel.getSource().isPok()
+                    && game.isProphecyOfKings()
+                    && (!game.isAcd2()
+                            || Mapper.getDeck("action_deck_2_te").getNewDeck().contains(actionCard))
+                    && !game.isTwilightsFallMode()) {
+                cards.add(actionCard);
+            }
+            if (actionCardModel.getSource() == ComponentSource.action_deck_2 && game.isAcd2()) {
+                cards.add(actionCard);
+            }
+            if (actionCardModel.getSource() == ComponentSource.thunders_edge
+                    && game.isThundersEdge()
+                    && !game.isAcd2()
+                    && !game.isTwilightsFallMode()) {
+                cards.add(actionCard);
+            }
+            if (actionCardModel.getSource() == ComponentSource.uncharted_space && game.isUnchartedSpaceStuff()) {
+                cards.add(actionCard);
+            }
+            if (actionCardModel.getSource() == ComponentSource.blue_reverie && game.isBlueReverieMode()) {
+                cards.add(actionCard);
+            }
         }
         deck.setCardIDs(cards);
         return deck;

@@ -247,12 +247,12 @@ public final class DSHelperBreakthroughs {
     public static void kolumeBTStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 Command Token"));
-        buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Spend 3 Influence To Research A Technology"));
+        buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Research A Technology"));
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation()
-                        + " is resolving _Synchronicity VI_, either to spend 3 influence to research 1 technology (that's the same colour as one of their exhausted technologies), or to or gain 1 command token.");
+                        + " is resolving _Synchronicity VI_, either to research 1 technology (that's the same colour as one of their exhausted technologies), or to or gain 1 command token.");
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation()
@@ -261,14 +261,14 @@ public final class DSHelperBreakthroughs {
     }
 
     public static void bentorBTStep1(Game game, Player p1) {
-        for (Player p2 : game.getRealPlayersExcludingThis(p1)) {
+        for (Player p2 : game.getRealPlayers()) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("acceptBentorBT_" + p1.getFaction(), "Explore 1 Planet"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(
                     p2.getCorrectChannel(),
                     p2.getRepresentationUnfogged() + ", " + p1.getFactionNameOrColor()
-                            + " has _Historian Conclave_. This allows to to explore a planet you control. If you do, they will gain 1 commodity.",
+                            + " has _Historian Conclave_. This allows to to explore a planet you control. (If you do and you are not them, they will gain 1 commodity.)",
                     buttons);
         }
         MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "Sent buttons to every player to resolve.");
@@ -277,15 +277,16 @@ public final class DSHelperBreakthroughs {
     @ButtonHandler("acceptBentorBT")
     public static void acceptBentorBT(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-
-        MessageHelper.sendMessageToChannel(
-                p2.getCorrectChannel(),
-                p2.getRepresentation() + ", your _Historian Conclave_ offer to " + p1.getFactionNameOrColor()
-                        + " has been accepted. "
-                        + (p2.getCommodities() >= p2.getCommoditiesTotal()
-                                ? "You would gain 1 commodity, but you are already at maximum commodities."
-                                : "You have gained 1 commodity."));
-        p2.gainCommodities(1);
+        if (p2 != p1) {
+            MessageHelper.sendMessageToChannel(
+                    p2.getCorrectChannel(),
+                    p2.getRepresentation() + ", your _Historian Conclave_ offer to " + p1.getFactionNameOrColor()
+                            + " has been accepted. "
+                            + (p2.getCommodities() >= p2.getCommoditiesTotal()
+                                    ? "You would gain 1 commodity, but you are already at maximum commodities."
+                                    : "You have gained 1 commodity."));
+            p2.gainCommodities(1);
+        }
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(p1, game);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
@@ -385,9 +386,10 @@ public final class DSHelperBreakthroughs {
                         + ("1".equals(originalBidFlorz) ? "" : "s") + " and " + p2.getRepresentation()
                         + " has chosen to spend " + originalBid + " trade good" + ("1".equals(originalBid) ? "" : "s")
                         + ". These trade goods have been returned to the supply."
-                        + (originalBid.equalsIgnoreCase(originalBidFlorz)
-                                ? "\nAs both players spend the same number of trade goods, " + p1.getRepresentation()
-                                        + " has sent a random promissory note to " + p2.getRepresentation() + "."
+                        + (!originalBid.equalsIgnoreCase(originalBidFlorz)
+                                ? "\nAs the two players did not spend the same number of trade goods, "
+                                        + p1.getRepresentation() + " has sent a random promissory note to "
+                                        + p2.getRepresentation() + "."
                                 : ""));
         ButtonHelper.deleteMessage(event);
         if (StringUtils.isNumeric(originalBidFlorz) && Integer.parseInt(originalBidFlorz) > 0) {
@@ -396,7 +398,7 @@ public final class DSHelperBreakthroughs {
         if (StringUtils.isNumeric(originalBid) && Integer.parseInt(originalBid) > 0) {
             p2.setTg(p2.getTg() - Integer.parseInt(originalBid));
         }
-        if (originalBid.equalsIgnoreCase(originalBidFlorz)) {
+        if (!originalBid.equalsIgnoreCase(originalBidFlorz)) {
             PromissoryNoteHelper.sendRandom(event, game, p1, p2);
         }
     }
