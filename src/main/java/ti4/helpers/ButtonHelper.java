@@ -7026,9 +7026,9 @@ public class ButtonHelper {
                 .filter(f -> game.getPlayerFromColorOrFaction(f.getAlias()) == null)
                 .toList();
         List<FactionModel> allFactions = Mapper.getFactionsValues().stream()
-                .filter(f -> game.isDiscordantStarsMode()
-                        ? f.getSource().isDs()
-                        : f.getSource().isOfficial())
+                .filter(f -> f.getSource().isOfficial()
+                        || (game.isDiscordantStarsMode() && f.getSource().isDs())
+                        || (game.isBlueReverieMode() && f.getSource().isBr()))
                 .filter(f -> game.getPlayerFromColorOrFaction(f.getAlias()) == null)
                 .sorted((f1, f2) -> factionsOnMap.contains(f1)
                         ? (factionsOnMap.contains(f2) ? 0 : -1)

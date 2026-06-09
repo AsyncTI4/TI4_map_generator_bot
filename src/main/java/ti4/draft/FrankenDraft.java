@@ -99,6 +99,10 @@ public class FrankenDraft extends BagDraft {
             factionSet.removeIf(factionModel ->
                     factionModel.getSource().isDs() && !factionModel.getSource().isTe());
         }
+        if (!game.isBlueReverieMode()) {
+            factionSet.removeIf(factionModel ->
+                    factionModel.getSource().isBr() && !factionModel.getSource().isTe());
+        }
         factionSet.removeIf(factionModel -> contains(results, factionModel.getAlias()));
 
         return factionSet;
@@ -126,6 +130,9 @@ public class FrankenDraft extends BagDraft {
             }
             if ((game == null || game.isDiscordantStarsMode())
                     && model.getSource().isDs()) {
+                return false;
+            }
+            if ((game == null || game.isBlueReverieMode()) && model.getSource().isBr()) {
                 return false;
             }
             return !model.getSource().isPok();

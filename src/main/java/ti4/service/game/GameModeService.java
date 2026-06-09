@@ -26,6 +26,7 @@ public class GameModeService {
                         Map.entry("Light Fog", (Supplier<Boolean>) game::isLightFogMode),
                         Map.entry("Absol", (Supplier<Boolean>) game::isAbsolMode),
                         Map.entry("Discordant Stars", (Supplier<Boolean>) game::isDiscordantStarsMode),
+                        Map.entry("Blue Reverie", (Supplier<Boolean>) game::isBlueReverieMode),
                         Map.entry("Uncharted Space", (Supplier<Boolean>) game::isUnchartedSpaceStuff),
                         Map.entry("Milty Mod", (Supplier<Boolean>) game::isMiltyModMode),
                         Map.entry("Promises, Promises", (Supplier<Boolean>) game::isPromisesPromisesMode),

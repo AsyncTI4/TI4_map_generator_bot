@@ -840,8 +840,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public void setCompetitiveTIGLGame(boolean competitiveTIGLGame) {
         boolean isFracturedTIGL = TIGLHelper.isFracturedTIGLGame(this);
         boolean hasAlwaysIncompatibleMode = isAllianceMode() || isCommunityMode();
-        boolean hasStandardOnlyIncompatibleMode =
-                isAbsolMode() || isMiltyModMode() || isDiscordantStarsMode() || isHomebrewSCMode() || isFowMode();
+        boolean hasStandardOnlyIncompatibleMode = isAbsolMode()
+                || isMiltyModMode()
+                || isDiscordantStarsMode()
+                || isBlueReverieMode()
+                || isHomebrewSCMode()
+                || isFowMode();
         if (hasAlwaysIncompatibleMode || (!isFracturedTIGL && hasStandardOnlyIncompatibleMode)) {
             competitiveTIGLGame = false;
         }
@@ -953,6 +957,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put(SourceEmojis.Absol + "Absol", isAbsolMode());
         gameModes.put("VotC", isVotcMode());
         gameModes.put(SourceEmojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
+        gameModes.put("BlueReverie", isBlueReverieMode());
         gameModes.put("HomebrewSC", isHomebrewSCMode());
         gameModes.put("AC Deck 2", isAcd2());
         gameModes.put("Omega Phase", isOmegaPhaseMode());
@@ -4626,6 +4631,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isLightFogMode()
                 || isRedTapeMode()
                 || isDiscordantStarsMode()
+                || isBlueReverieMode()
                 || isFrankenGame()
                 || isMiltyModMode()
                 || isThundersEdgeDemo()
