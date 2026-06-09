@@ -482,15 +482,18 @@ public class PlayStrategyCardService {
 
     public static String getSCFollowSummary(Game game, int scID, boolean ping) {
         StringBuilder followSummary = new StringBuilder("## __Following Summary__\n");
-        for (Player p : game.getRealPlayers()) {
-            if (ping) {
-                if (!game.getStoredValue("pingedSC" + scID + "_" + game.getRound())
-                        .isEmpty()) {
-                    ping = false;
-                } else {
-                    game.setStoredValue("pingedSC" + scID + "_" + game.getRound(), "yes");
-                }
+        if (ping) {
+            if (!game.getStoredValue("pingedSC" + scID + "_" + game.getRound()).isEmpty()) {
+                ping = false;
+            } else {
+                game.setStoredValue("pingedSC" + scID + "_" + game.getRound(), "yes");
             }
+        }
+        Player scHolder = game.getPlayerFromSC(scID);
+        if (scHolder == null) {
+            scHolder = game.getRealPlayers().get(0);
+        }
+        for (Player p : Helper.getSpeakerOrFullPriorityOrderFromPlayer(scHolder, game)) {
             String representation = ping ? p.getRepresentation() : p.getRepresentationNoPing();
             if (p.hasFollowedSC(scID)) {
                 if (p.getSCs().contains(scID)) {
