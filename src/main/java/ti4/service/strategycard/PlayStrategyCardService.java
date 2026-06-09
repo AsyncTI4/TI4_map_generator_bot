@@ -483,10 +483,13 @@ public class PlayStrategyCardService {
     public static String getSCFollowSummary(Game game, int scID, boolean ping) {
         StringBuilder followSummary = new StringBuilder("## __Following Summary__\n");
         for (Player p : game.getRealPlayers()) {
-            if (ping
-                    && !game.getStoredValue("followedSC" + scID + "_" + game.getRound())
-                            .isEmpty()) {
-                ping = false;
+            if (ping) {
+                if (!game.getStoredValue("pingedSC" + scID + "_" + game.getRound())
+                        .isEmpty()) {
+                    ping = false;
+                } else {
+                    game.setStoredValue("pingedSC" + scID + "_" + game.getRound(), "yes");
+                }
             }
             String representation = ping ? p.getRepresentation() : p.getRepresentationNoPing();
             if (p.hasFollowedSC(scID)) {
