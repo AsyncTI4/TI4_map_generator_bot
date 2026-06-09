@@ -21,7 +21,7 @@ public class UnusedAgentHelper {
         List<String> agents = new ArrayList<>();
         List<FactionModel> allFactions = Mapper.getFactionsValues().stream()
                 .filter(f -> f.getSource().isOfficial()
-                        || (game.isDiscordantStarsMode() && f.getSource() == ComponentSource.ds)
+                        || (game.isDiscordantStarsMode() && f.getSource().isDs())
                         || (game.isBlueReverieMode() && f.getSource().isBr())
                         || extraSources.contains(f.getSource()))
                 .toList();

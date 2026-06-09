@@ -166,10 +166,8 @@ public class HomebrewService {
             }
             case HBDSEXPLORES -> {
                 game.setUnchartedSpaceStuff(true);
-                game.validateAndSetExploreDeck(
-                        event, Mapper.getDeck(game.isBlueReverieMode() ? "explores_BR" : "explores_DS"));
-                game.validateAndSetActionCardDeck(
-                        event, Mapper.getDeck(game.isBlueReverieMode() ? "action_cards_br" : "action_cards_ds"));
+                game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"));
+                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"));
                 if (game.isAbsolMode()) {
                     if (game.getTechnologyDeckID().contains("absol")) {
                         game.setTechnologyDeckID("techs_ds_absol");
@@ -179,11 +177,8 @@ public class HomebrewService {
                     }
 
                 } else {
-                    game.validateAndSetRelicDeck(Mapper.getDeck(game.isBlueReverieMode() ? "relics_br" : "relics_ds"));
+                    game.validateAndSetRelicDeck(Mapper.getDeck("relics_ds"));
                     game.setTechnologyDeckID("techs_ds");
-                }
-                if (game.isBlueReverieMode() && !game.isAbsolMode()) {
-                    game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_br"));
                 }
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(), "Set the explores/action cards/relics to Uncharted Space stuff.");
@@ -210,17 +205,7 @@ public class HomebrewService {
             }
             case HBBRFACTIONS -> {
                 game.setBlueReverieMode(true);
-                if (game.isUnchartedSpaceStuff()) {
-                    game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_BR"));
-                    game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_br"));
-                    if (!game.isAbsolMode()) {
-                        game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_br"));
-                        game.validateAndSetRelicDeck(Mapper.getDeck("relics_br"));
-                    }
-                }
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        "Set game to Blue Reverie faction mode. Blue Reverie non-faction content is only added while Uncharted Space is also enabled.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set game to Blue Reverie faction mode.");
             }
             case HBHBSC -> {
                 game.setHomebrewSCMode(true);

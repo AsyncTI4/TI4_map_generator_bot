@@ -83,10 +83,8 @@ public class SourceSettings extends SettingsMenu {
 
         // Other Initialization
         discoStars.setExtraInfo("Adds Discordant Stars factions only.");
-        blueReverie.setExtraInfo(
-                "Adds Blue Reverie factions. Blue Reverie non-faction content only appears when Uncharted Space is also enabled.");
-        unchartedSpace.setExtraInfo(
-                "Adds Uncharted Space content, plus Blue Reverie non-faction content when Blue Reverie is enabled.");
+        blueReverie.setExtraInfo("Adds Blue Reverie factions only.");
+        unchartedSpace.setExtraInfo("Adds Uncharted Space content.");
         // miltymod.setExtraInfo("NOTE: this is NOT \"milty draft\", this is a homebrew mod that replaces components in
         // the game");
 
@@ -250,25 +248,20 @@ public class SourceSettings extends SettingsMenu {
             case "UnchartSpace", "BlueReverie", "Absol", "ActionCardDeck2" -> {
                 boolean abs = absol.isVal();
                 boolean us = unchartedSpace.isVal();
-                boolean brContent = blueReverie.isVal() && us;
                 boolean both = abs && us;
                 boolean acd2 = actionCardDeck2.isVal();
-                boolean updateUsDecks = "UnchartSpace".equals(setting) || ("BlueReverie".equals(setting) && brContent);
+                boolean updateUsDecks = "UnchartSpace".equals(setting);
 
                 // Decks with both
-                String relic = both
-                        ? "relics_absol_ds"
-                        : (abs ? "relics_absol" : (brContent ? "relics_br" : (us ? "relics_ds" : "relics_pok")));
+                String relic = both ? "relics_absol_ds" : (abs ? "relics_absol" : (us ? "relics_ds" : "relics_pok"));
                 String techs = both ? "techs_ds_absol" : (abs ? "techs_absol" : (us ? "techs_ds" : "techs_pok_c4"));
 
                 // Decks for ABSOL
-                String agenda = abs ? "agendas_absol" : (brContent ? "agendas_br" : "agendas_pok");
+                String agenda = abs ? "agendas_absol" : "agendas_pok";
 
                 // Decks for Uncharted Space
-                String explore = brContent ? "explores_BR" : (us ? "explores_DS" : "explores_pok");
-                String acs = acd2
-                        ? getAcd2Version(pok, teDemo)
-                        : (brContent ? "action_cards_br" : (us ? "action_cards_ds" : "action_cards_pok"));
+                String explore = us ? "explores_DS" : "explores_pok";
+                String acs = acd2 ? getAcd2Version(pok, teDemo) : (us ? "action_cards_ds" : "action_cards_pok");
 
                 decks.getTechs().setChosenKey(techs);
                 if ("Absol".equals(setting) || updateUsDecks) {
@@ -285,7 +278,6 @@ public class SourceSettings extends SettingsMenu {
                 var inclusions = new ArrayList<String>();
                 if (abs) inclusions.add("Absol Mod");
                 if (us) inclusions.add("Uncharted Space");
-                if (brContent) inclusions.add("Blue Reverie");
                 if (acd2) inclusions.add("Action Deck 2");
                 String message = inclusions.isEmpty()
                         ? "Reset your decks to include only PoK cards."
