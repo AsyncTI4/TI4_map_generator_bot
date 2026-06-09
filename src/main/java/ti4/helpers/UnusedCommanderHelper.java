@@ -19,9 +19,9 @@ public class UnusedCommanderHelper {
     public static String getUnusedCommander(Game game, Set<String> excludedCommanders) {
         List<String> commanders = new ArrayList<>();
         List<FactionModel> allFactions = Mapper.getFactionsValues().stream()
-                .filter(f -> game.isDiscordantStarsMode()
-                        ? f.getSource().isDs() || f.getSource().isOfficial()
-                        : f.getSource().isOfficial())
+                .filter(f -> f.getSource().isOfficial()
+                        || (game.isDiscordantStarsMode() && f.getSource().isDs())
+                        || (game.isBlueReverieMode() && f.getSource().isBr()))
                 .toList();
 
         for (FactionModel faction : allFactions) {

@@ -510,6 +510,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.DISCORDANT_STARS_MODE + " " + game.isDiscordantStarsMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.BLUE_REVERIE_MODE + " " + game.isBlueReverieMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.UNCHARTED_SPACE_STUFF + " " + game.isUnchartedSpaceStuff());
         writer.write(System.lineSeparator());
         writer.write(Constants.VERBOSITY + " " + game.getOutputVerbosity());

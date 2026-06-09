@@ -33,6 +33,8 @@ public class WeirdGameSetup extends GameStateSubcommand {
                 Constants.DISCORDANT_STARS_MODE,
                 "True to add the Discordant Stars factions to the pool."));
         addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.BLUE_REVERIE_MODE, "True to add the Blue Reverie factions to the pool."));
+        addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.UNCHARTED_SPACE_STUFF,
                 "True to add the Uncharted Space Stuff to the draft pool."));
@@ -186,6 +188,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
         if (event.getOption(Constants.TIGL_GAME) == null
                 && event.getOption(Constants.ABSOL_MODE) == null
                 && event.getOption(Constants.DISCORDANT_STARS_MODE) == null
+                && event.getOption(Constants.BLUE_REVERIE_MODE) == null
                 && event.getOption(Constants.BASE_GAME_MODE) == null
                 && event.getOption(Constants.MILTYMOD_MODE) == null
                 && event.getOption(Constants.VOTC_MODE) == null) {
@@ -198,11 +201,21 @@ public class WeirdGameSetup extends GameStateSubcommand {
                 event.getOption(Constants.MILTYMOD_MODE, game.isMiltyModMode(), OptionMapping::getAsBoolean);
         boolean discordantStarsMode = event.getOption(
                 Constants.DISCORDANT_STARS_MODE, game.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
+        boolean blueReverieMode =
+                event.getOption(Constants.BLUE_REVERIE_MODE, game.isBlueReverieMode(), OptionMapping::getAsBoolean);
         boolean baseGameMode =
                 event.getOption(Constants.BASE_GAME_MODE, game.isBaseGameMode(), OptionMapping::getAsBoolean);
         boolean votcMode = event.getOption(Constants.VOTC_MODE, game.isVotcMode(), OptionMapping::getAsBoolean);
         return setGameMode(
-                event, game, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame, votcMode);
+                event,
+                game,
+                baseGameMode,
+                absolMode,
+                miltyModMode,
+                discordantStarsMode,
+                blueReverieMode,
+                isTIGLGame,
+                votcMode);
     }
 
     // TODO: find a better way to handle this - this is annoying
@@ -214,6 +227,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
             boolean absolMode,
             boolean miltyModMode,
             boolean discordantStarsMode,
+            boolean blueReverieMode,
             boolean isTIGLGame,
             boolean votcMode) {
         if (isTIGLGame && (game.isAllianceMode() || game.isCommunityMode())) {
@@ -226,6 +240,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
                 && (baseGameMode
                         || absolMode
                         || discordantStarsMode
+                        || blueReverieMode
                         || game.isHomebrewSCMode()
                         || game.isFowMode()
                         || votcMode)) {
@@ -250,10 +265,10 @@ public class WeirdGameSetup extends GameStateSubcommand {
             return false;
         }
 
-        if (baseGameMode && (absolMode || discordantStarsMode)) {
+        if (baseGameMode && (absolMode || discordantStarsMode || blueReverieMode)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "No Expansion Mode is not supported with Discordant Stars or Absol Mode");
+                    "No Expansion Mode is not supported with Discordant Stars, Blue Reverie, or Absol Mode");
             return false;
         } else if (baseGameMode && miltyModMode) {
             if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_miltymod"))) return false;
@@ -282,6 +297,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
             game.setMiltyModMode(true);
             game.setAbsolMode(false);
             game.setDiscordantStarsMode(false);
+            game.setBlueReverieMode(false);
             return true;
         } else if (baseGameMode) {
             if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_base_game"))) return false;
@@ -304,6 +320,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
             game.setBaseGameMode(true);
             game.setAbsolMode(false);
             game.setDiscordantStarsMode(false);
+            game.setBlueReverieMode(false);
             return true;
         }
         game.setBaseGameMode(false);
@@ -347,6 +364,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
             game.swapOutVariantTechs();
         }
         game.setDiscordantStarsMode(discordantStarsMode);
+        game.setBlueReverieMode(blueReverieMode);
 
         // JUST ABSOL
         if (absolMode) {
@@ -399,6 +417,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
             game.setBaseGameMode(false);
             game.setAbsolMode(false);
             game.setDiscordantStarsMode(false);
+            game.setBlueReverieMode(false);
             game.swapInVariantTechs();
             game.swapInVariantUnits("pok");
             game.setScSetID("votc");
@@ -435,7 +454,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
         game.setThundersEdge(false);
         game.setTwilightsFallMode(false);
         game.removeStoredValue("useOldPok");
-        boolean success = setGameMode(event, game, true, false, false, false, false, false);
+        boolean success = setGameMode(event, game, true, false, false, false, false, false, false);
         if (success) {
             game.setStrategyCardSet("pok");
         }

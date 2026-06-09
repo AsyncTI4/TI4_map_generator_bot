@@ -34,7 +34,7 @@
         "name": "Free Trade Initiative",
         "phase": "Action",
         "window": "Action",
-        "text": "For each planet trait, if you control a planet of that trait, gain 2 commodities or convert 2 of your commodities to trade goods.",
+        "text": "If you control at least 1 cultural, 1 hazardous, or 1 industrial planet, for each of those planet traits you control, gain 2 commodities or convert 2 of your commodities to trade goods.",
         "flavorText": "Celdauri trade ports were a sight to behold, boasting goods from across the known galaxy.",
         "source": "ds",
         "actualSource": "uncharted_space"
@@ -96,8 +96,8 @@
         "alias": "freedom_fighters_ds",
         "name": "Freedom Fighters",
         "phase": "Action",
-        "window": "At the start of ground combat:",
-        "text": "You may place a number of infantry from your reinforcements on that planet equal to half that planet's influence value, rounded down.",
+        "window": "At the start of a ground combat you are participating in:",
+        "text": "You may place a number of infantry from your reinforcements on that planet equal to that planet's influence value.",
         "flavorText": "Otto's Outlaws were among the galaxy's most feared guerilla groups.",
         "source": "ds",
         "actualSource": "uncharted_space"
@@ -422,7 +422,7 @@
         "name": "Escape Clause",
         "phase": "Any",
         "window": "When another player would resolve your “Trade Agreement” promissory note:",
-        "text": "You do not give that player your commodities; that player returns your Trade Agreement promissory note.",
+        "text": "You do not give that player your commodities; that player returns that promissory note and gains 2 trade goods.",
         "flavorText": "“What do you mean?” The Vaden smiled, baring rows upon rows of teeth. “You read the contract, right?”",
         "source": "ds",
         "actualSource": "uncharted_space"

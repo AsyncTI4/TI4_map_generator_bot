@@ -21,6 +21,7 @@ public class FactionSourceSettings extends SettingsMenu {
             ComponentSource.base,
             ComponentSource.pok,
             ComponentSource.ds,
+            ComponentSource.blue_reverie,
             ComponentSource.thunders_edge,
             ComponentSource.eronous,
             ComponentSource.ignis_aurora,
@@ -30,6 +31,7 @@ public class FactionSourceSettings extends SettingsMenu {
     private final IntegerRangeSetting base;
     private final IntegerRangeSetting pok;
     private final IntegerRangeSetting ds;
+    private final IntegerRangeSetting blueReverie;
     private final IntegerRangeSetting thundersEdge;
     private final IntegerRangeSetting eronous;
     private final IntegerRangeSetting ignisAurora;
@@ -51,6 +53,7 @@ public class FactionSourceSettings extends SettingsMenu {
                 ComponentSource.codex3,
                 ComponentSource.codex4);
         int dsCount = countFactions(ComponentSource.ds);
+        int brCount = countFactions(ComponentSource.blue_reverie);
         int teCount = countFactions(ComponentSource.thunders_edge);
         int eronousCount = countFactions(ComponentSource.eronous);
         int ignisCount = countFactions(ComponentSource.ignis_aurora);
@@ -61,6 +64,8 @@ public class FactionSourceSettings extends SettingsMenu {
                 "FactionBase", "Base Game factions", 0, 0, baseCount, baseCount, 0, baseCount, 1);
         pok = new IntegerRangeSetting("FactionPoK", "PoK factions", 0, 0, pokCount, pokCount, 0, pokCount, 1);
         ds = new IntegerRangeSetting("FactionDS", "Discordant Stars factions", 0, 0, dsCount, dsCount, 0, dsCount, 1);
+        blueReverie =
+                new IntegerRangeSetting("FactionBR", "Blue Reverie factions", 0, 0, brCount, brCount, 0, brCount, 1);
         thundersEdge =
                 new IntegerRangeSetting("FactionTE", "Thunder's Edge factions", 0, 0, teCount, teCount, 0, teCount, 1);
         eronous = new IntegerRangeSetting(
@@ -87,6 +92,7 @@ public class FactionSourceSettings extends SettingsMenu {
             base.initialize(json.get("base"));
             pok.initialize(json.get("pok"));
             ds.initialize(json.get("ds"));
+            blueReverie.initialize(json.get("blueReverie"));
             thundersEdge.initialize(json.get("thundersEdge"));
             eronous.initialize(json.get("eronous"));
             ignisAurora.initialize(json.get("ignisAurora"));
@@ -137,6 +143,7 @@ public class FactionSourceSettings extends SettingsMenu {
             case base -> base;
             case pok -> pok;
             case ds -> ds;
+            case blue_reverie -> blueReverie;
             case thunders_edge -> thundersEdge;
             case eronous -> eronous;
             case ignis_aurora -> ignisAurora;

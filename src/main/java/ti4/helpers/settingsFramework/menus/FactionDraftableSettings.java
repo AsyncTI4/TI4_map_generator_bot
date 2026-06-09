@@ -89,7 +89,8 @@ public class FactionDraftableSettings extends SettingsMenu {
         List<Button> ls = new ArrayList<>(super.specialButtons());
 
         if (parent != null && parent instanceof MiltySettings ms) {
-            if (ms.getSourceSettings().getDiscoStars().isVal())
+            if (ms.getSourceSettings().getDiscoStars().isVal()
+                    || ms.getSourceSettings().getBlueReverie().isVal())
                 ls.add(Buttons.red(
                         idPrefix + "homebrewFactionsOnly", "Only Homebrew Factions", SourceEmojis.DiscordantStars));
         }

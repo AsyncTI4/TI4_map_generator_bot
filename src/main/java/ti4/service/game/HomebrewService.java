@@ -31,6 +31,7 @@ public class HomebrewService {
         HBABSOLRELICSAGENDAS("Absol Relics/Agendas", "Use Absol Relics and Agendas", SourceEmojis.Absol),
         HBABSOLTECHSMECHS("Absol Techs/Mechs", "Use Absol Techs and Mechs", SourceEmojis.Absol),
         HBDSFACTIONS("DS Factions", "Discordant Stars Factions", SourceEmojis.DiscordantStars),
+        HBBRFACTIONS("BR Factions", "Blue Reverie Factions", SourceEmojis.DiscordantStars),
         HBDSEXPLORES(
                 "US Explores/Relics/ACs",
                 "Uncharted Space Explores, Relics and Action Cards",
@@ -91,6 +92,8 @@ public class HomebrewService {
         game.setHomebrewSCMode(false);
         game.setRedTapeMode(false);
         game.setDiscordantStarsMode(false);
+        game.setBlueReverieMode(false);
+        game.setUnchartedSpaceStuff(false);
         game.setAbsolMode(false);
         game.setOmegaPhaseMode(false);
         game.setVotcMode(false);
@@ -132,7 +135,7 @@ public class HomebrewService {
             case HBABSOLRELICSAGENDAS -> {
                 game.setAbsolMode(true);
                 game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"));
-                if (game.isDiscordantStarsMode() && game.getRelicDeckID().contains("ds")) {
+                if (game.isUnchartedSpaceStuff() && game.getRelicDeckID().contains("ds")) {
                     game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol_ds"));
                 } else {
                     game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol"));
@@ -152,7 +155,7 @@ public class HomebrewService {
             }
             case HBABSOLTECHSMECHS -> {
                 game.setAbsolMode(true);
-                if (game.isDiscordantStarsMode()) {
+                if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
                     game.setTechnologyDeckID("techs_ds_absol");
                 } else {
                     game.setTechnologyDeckID("techs_absol");
@@ -162,7 +165,6 @@ public class HomebrewService {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set the techs & mechs to Absol stuff.");
             }
             case HBDSEXPLORES -> {
-                game.setDiscordantStarsMode(true);
                 game.setUnchartedSpaceStuff(true);
                 game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"));
                 game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"));
@@ -179,7 +181,7 @@ public class HomebrewService {
                     game.setTechnologyDeckID("techs_ds");
                 }
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), "Set the explores/action cards/relics to Discordant Stars stuff.");
+                        event.getMessageChannel(), "Set the explores/action cards/relics to Uncharted Space stuff.");
             }
             case HBACDECK2 -> {
                 String acd2 = "action_deck_2";
@@ -200,6 +202,10 @@ public class HomebrewService {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "Set game to Discordant Stars mode. Only includes factions and planets unless you also click/clicked the Discordant Stars Explores button.");
+            }
+            case HBBRFACTIONS -> {
+                game.setBlueReverieMode(true);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set game to Blue Reverie faction mode.");
             }
             case HBHBSC -> {
                 game.setHomebrewSCMode(true);
