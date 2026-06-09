@@ -72,6 +72,7 @@ import ti4.model.TileModel;
 import ti4.model.TokenModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
+import ti4.model.DeckModel.DeckType;
 import ti4.service.emoji.CardEmojis;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
@@ -642,6 +643,50 @@ public class Mapper {
 
     public static DeckModel getDeck(String deckID) {
         return getDecks().get(deckID);
+    }
+
+    public static DeckModel getDeck(String deckID, Game game) {
+        if(game == null || (getDecks().get(deckID) != null)) return getDeck(deckID);
+
+        switch (deckID) {
+            case "relic" ->{
+                return getDynamicRelicDeck(game);
+            }
+            default -> {
+                return null;
+            } 
+        }
+    }
+
+    public static DeckModel getDynamicRelicDeck(Game game){
+        DeckModel deck = new DeckModel();
+        deck.setType(DeckType.RELIC);
+        deck.setName("Dynamic Relic Deck");
+        deck.setAlias("relic");
+        deck.setDescription("A dynamic relic deck for the game.");
+        List<String> cards = new ArrayList<>();
+        for(String relic : Mapper.getRelics().keySet()){
+            RelicModel relicModel = Mapper.getRelic(relic);
+            if(relicModel.getSource().isPok() && game.isProphecyOfKings() && !game.isAbsolMode()){
+                cards.add(relic);
+            }
+            if(relicModel.getSource() == ComponentSource.absol && game.isAbsolMode()){
+                cards.add(relic);
+            }
+            if(relicModel.getSource() == ComponentSource.thunders_edge && game.isThundersEdge()){
+                cards.add(relic);
+            }
+            if(relicModel.getSource() == ComponentSource.uncharted_space && game.isUnchartedSpaceStuff()){
+                cards.add(relic);
+            }
+            // if(relicModel.getSource() == ComponentSource.blue_reverie && game.isBlueReverie()){
+            //     cards.add(relic);
+            // }
+
+
+        }
+        deck.setCardIDs(cards);
+        return deck;
     }
 
     public static boolean isValidDeck(String deckID) {
