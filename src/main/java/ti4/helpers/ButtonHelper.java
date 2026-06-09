@@ -5920,10 +5920,6 @@ public class ButtonHelper {
                 }
             }
         }
-        if (player.hasUnlockedBreakthrough("augersbt") && !buttons.isEmpty()) {
-            buttons.add(Buttons.green(
-                    "draw_1_ACDelete", "Draw 1 Action Card Instead With Breakthrough", FactionEmojis.augers));
-        }
         return buttons;
     }
 

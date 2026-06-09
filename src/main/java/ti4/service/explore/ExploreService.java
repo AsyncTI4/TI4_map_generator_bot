@@ -368,6 +368,29 @@ public class ExploreService {
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
             return;
         }
+        if (player.hasUnlockedBreakthrough("augersbt")) {
+            ExploreModel exploreModel = Mapper.getExplore(cardID);
+            String name1 = exploreModel.getName();
+            Button resolveExplore1 = Buttons.green(
+                    "absolsdn_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Resolve " + name1);
+            Button resolveExplore2 = Buttons.green(
+                    "draw_1_ACDelete", "Draw 1 Action Card Instead With Breakthrough", FactionEmojis.augers);
+            List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
+            String message = player.getRepresentationUnfogged()
+                    + " You have Augers Breakthrough, and thus may decline this exploration to draw 1 action card instead.";
+            if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
+                String pF = player.getFactionEmoji();
+                MessageHelper.sendMessageToChannel(
+                        game.getActionsChannel(), pF + " found a " + name1 + " on " + planetName + ".");
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(), "Found a " + name1 + " on " + planetName + ".");
+            }
+            ExploreModel exploreModel1 = Mapper.getExplore(cardID);
+            List<MessageEmbed> embeds = List.of(exploreModel1.getRepresentationEmbed());
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
+            return;
+        }
         if (player.hasTech("absol_sdn")) {
             ExploreModel exploreModel = Mapper.getExplore(cardID);
             String name1 = exploreModel.getName();
