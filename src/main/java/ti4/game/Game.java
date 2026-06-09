@@ -976,10 +976,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return getAcDeckID().startsWith("action_deck_2");
     }
 
-    public boolean isBlueReverieContentMode() {
-        return isBlueReverieMode() && isUnchartedSpaceStuff();
-    }
-
     public boolean isNormalGame() {
         return !hasHomebrew()
                 && !isMinorFactionsMode()

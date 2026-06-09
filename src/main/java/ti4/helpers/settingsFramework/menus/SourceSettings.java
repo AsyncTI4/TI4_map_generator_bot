@@ -263,17 +263,11 @@ public class SourceSettings extends SettingsMenu {
                 String explore = us ? "explores_DS" : "explores_pok";
                 String acs = acd2 ? getAcd2Version(pok, teDemo) : (us ? "action_cards_ds" : "action_cards_pok");
 
+                decks.getRelics().setChosenKey(relic);
                 decks.getTechs().setChosenKey(techs);
-                if ("Absol".equals(setting) || updateUsDecks) {
-                    decks.getRelics().setChosenKey(relic);
-                    decks.getAgendas().setChosenKey(agenda);
-                }
-                if (updateUsDecks) {
-                    decks.getExplores().setChosenKey(explore);
-                }
-                if ("ActionCardDeck2".equals(setting) || updateUsDecks) {
-                    decks.getActionCards().setChosenKey(acs);
-                }
+                decks.getAgendas().setChosenKey(agenda);
+                decks.getExplores().setChosenKey(explore);
+                decks.getActionCards().setChosenKey(acs);
 
                 var inclusions = new ArrayList<String>();
                 if (abs) inclusions.add("Absol Mod");
