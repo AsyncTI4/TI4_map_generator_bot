@@ -3,6 +3,7 @@ package ti4.discord.interactions.buttons.handlers.options;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -101,6 +102,24 @@ final class GameOptionButtonHandler {
 
     @ButtonHandler("setupBaseGameMode")
     public static void setupBaseGameMode(ButtonInteractionEvent event, Game game) {
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                """
+                ## Base Game Setup Warning
+                This will start the base game setup flow.
+
+                - It is for **base game only**, with no PoK expansion content.
+                - It swaps the game over to the base game component setup path.
+                - If you were planning to use PoK, Discordant Stars, Blue Reverie, Thunder's Edge, or other homebrew content, do not continue.
+
+                Press **Continue Base Game Setup** ___only___ if that is what you want.""",
+                java.util.List.of(
+                        Buttons.red("setupBaseGameMode_confirm", "Continue Base Game Setup"),
+                        Buttons.gray("deleteButtons", "Cancel")));
+    }
+
+    @ButtonHandler("setupBaseGameMode_confirm")
+    public static void confirmSetupBaseGameMode(ButtonInteractionEvent event, Game game) {
         game.initializeBaseGameMiniMiltySettings().postMessageAndButtons(event);
     }
 }
