@@ -55,6 +55,20 @@ public class CombatModHelper {
             Game game,
             CombatRollType rollType,
             String modifierType) {
+        return getModifiers(
+                player, opponent, unitsByQuantity, opponentUnitsByQuantity, tile, game, rollType, null, modifierType);
+    }
+
+    public static List<NamedCombatModifierModel> getModifiers(
+            Player player,
+            Player opponent,
+            Map<UnitModel, Integer> unitsByQuantity,
+            Map<UnitModel, Integer> opponentUnitsByQuantity,
+            TileModel tile,
+            Game game,
+            CombatRollType rollType,
+            UnitHolder unitHolder,
+            String modifierType) {
         List<NamedCombatModifierModel> modifiers = new ArrayList<>();
         Map<String, CombatModifierModel> combatModifiers = new HashMap<>(Mapper.getCombatModifiers());
         combatModifiers = new HashMap<>(combatModifiers.entrySet().stream()
@@ -185,6 +199,7 @@ public class CombatModHelper {
                             opponent,
                             unitsByQuantity,
                             opponentUnitsByQuantity,
+                            unitHolder,
                             game)) {
                 modifiers.add(new NamedCombatModifierModel(
                         relevantMod.get(), unit.getUnitEmoji() + " " + unit.getName() + " " + unit.getAbility()));
@@ -276,7 +291,8 @@ public class CombatModHelper {
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
             if (modifier.isInScopeForUnit(unit, playerUnits, rollType, game, player)) {
-                Integer modValue = getVariableModValue(modifier, player, opponent, game, unit, tile, unitHolder);
+                Integer modValue =
+                        getVariableModValue(modifier, player, opponent, game, unit, tile, rollType, unitHolder);
                 Integer perUnitCount = 1;
                 if (modifier.getApplyEachForQuantity()) {
                     perUnitCount = numOfUnit;
@@ -294,6 +310,19 @@ public class CombatModHelper {
             Player opponent,
             Map<UnitModel, Integer> unitsByQuantity,
             Map<UnitModel, Integer> opponentUnitsByQuantity,
+            Game game) {
+        return checkModPassesCondition(
+                modifier, onTile, player, opponent, unitsByQuantity, opponentUnitsByQuantity, null, game);
+    }
+
+    private static Boolean checkModPassesCondition(
+            CombatModifierModel modifier,
+            TileModel onTile,
+            Player player,
+            Player opponent,
+            Map<UnitModel, Integer> unitsByQuantity,
+            Map<UnitModel, Integer> opponentUnitsByQuantity,
+            UnitHolder unitHolder,
             Game game) {
         boolean meetsCondition = false;
 
@@ -492,6 +521,31 @@ public class CombatModHelper {
                         }
                     }
                 }
+                if (unitHolder != null) {
+                    for (UnitKey uk : unitHolder
+                            .getUnitsByStateForPlayer(player.getColorID())
+                            .keySet()) {
+                        if (unitHolder.getGalvanizedUnitCount(uk) > 0) {
+                            meetsCondition = true;
+                        }
+                    }
+                }
+                for (UnitModel unitModel : unitsByQuantity.keySet()) {
+                    if ("xxcha_flagship".equalsIgnoreCase(unitModel.getId())) {
+                        Tile tile2 = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship)
+                                .getFirst();
+                        if (tile2 != null) {
+                            for (UnitHolder uh : tile2.getUnitHolders().values()) {
+                                for (UnitKey uk : uh.getUnitsByStateForPlayer(player.getColorID())
+                                        .keySet()) {
+                                    if (uh.getGalvanizedUnitCount(uk) > 0) {
+                                        meetsCondition = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
             case "opponent_has_sftt" -> {
                 if (player.hasUnlockedBreakthrough("winnubt") && getOpponentSfttCount(opponent) > 0) {
@@ -611,6 +665,7 @@ public class CombatModHelper {
             Game game,
             UnitModel origUnit,
             Tile activeSystem,
+            CombatRollType rollType,
             UnitHolder unitHolder) {
         double value = mod.getValue().doubleValue();
         double multiplier = 1.0;
@@ -760,8 +815,18 @@ public class CombatModHelper {
                 }
                 case "opponent_sftt" -> scalingCount = getOpponentSfttCount(opponent);
                 case "nonhome_system_with_planet" -> scalingCount = getSystemsWithControlledPlanets(game, player);
-                case "galvanized_unit_count" ->
+                case "galvanized_unit_count" -> {
                     scalingCount = getGalvanizedUnitCount(game, unitHolder, origUnit, player);
+                    if (rollType == CombatRollType.SpaceCannonOffence && origUnit.getDeepSpaceCannon()) {
+                        for (String adjPos :
+                                FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+                            Tile tile = game.getTileByPosition(adjPos);
+                            for (UnitHolder uH : tile.getUnitHolders().values()) {
+                                scalingCount += getGalvanizedUnitCount(game, uH, origUnit, player);
+                            }
+                        }
+                    }
+                }
                 case "unique_ships" -> scalingCount = getUniqueNonFighterShipCount(activeSystem, player);
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {

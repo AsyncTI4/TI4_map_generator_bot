@@ -1493,7 +1493,7 @@ public final class ButtonHelperSCs {
                     game, ButtonHelper.getStratName(ButtonHelper.getStratName(scNum2), game));
             if (chan != null) {
                 chan.retrieveMessageById(gameMessage.messageId()).queue(mainMessage -> mainMessage
-                        .editMessage(PlayStrategyCardService.getSCFollowSummary(game, scNum2))
+                        .editMessage(PlayStrategyCardService.getSCFollowSummary(game, scNum2, true))
                         .queue());
             }
         }

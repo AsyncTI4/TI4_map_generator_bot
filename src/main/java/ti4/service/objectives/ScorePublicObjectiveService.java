@@ -150,7 +150,14 @@ public class ScorePublicObjectiveService {
         }
         if (!poName.toLowerCase().contains("custodian")
                 && (player.hasAbility("yin_breakthrough") || player.hasUnlockedBreakthrough("yinbt"))) {
-            if (Mapper.getPublicObjective(id) != null || Mapper.getSecretObjective(id) != null) {
+            boolean soToPo = false;
+            for (String so : game.getSoToPoList()) {
+                if (Mapper.getSecretObjectivesJustNames().get(so) != null
+                        && Mapper.getSecretObjectivesJustNames().get(so).equalsIgnoreCase(id)) {
+                    soToPo = true;
+                }
+            }
+            if (Mapper.getPublicObjective(id) != null || Mapper.getSecretObjective(id) != null || soToPo) {
                 BreakthroughHelper.resolveYinBreakthroughAbility(game, player);
             }
         }

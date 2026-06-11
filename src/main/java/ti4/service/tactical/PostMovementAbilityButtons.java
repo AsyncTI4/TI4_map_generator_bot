@@ -5,6 +5,7 @@ import ti4.service.tactical.postmovement.AtokeraHeroButton;
 import ti4.service.tactical.postmovement.BombardmentButton;
 import ti4.service.tactical.postmovement.CombatDronesButton;
 import ti4.service.tactical.postmovement.GhostCommanderButton;
+import ti4.service.tactical.postmovement.IronHeroButton;
 import ti4.service.tactical.postmovement.KhraskCommanderButton;
 import ti4.service.tactical.postmovement.MirvedaCommanderButton;
 import ti4.service.tactical.postmovement.MoveAvernusButton;
@@ -34,6 +35,7 @@ public final class PostMovementAbilityButtons {
             new CombatDronesButton(),
             new ShroudOfLithButton(),
             new MirvedaCommanderButton(),
+            new IronHeroButton(),
             new GhostCommanderButton(),
             new KhraskCommanderButton(),
             new NokarAgentButton(),

@@ -2113,7 +2113,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                         game, ButtonHelper.getStratName(ButtonHelper.getStratName(sc), game));
                 if (chan != null) {
                     chan.retrieveMessageById(gameMessage.messageId()).queue(mainMessage -> mainMessage
-                            .editMessage(PlayStrategyCardService.getSCFollowSummary(game, sc))
+                            .editMessage(PlayStrategyCardService.getSCFollowSummary(game, sc, true))
                             .queue());
                 }
             }

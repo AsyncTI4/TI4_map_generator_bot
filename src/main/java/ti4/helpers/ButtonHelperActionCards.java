@@ -37,7 +37,6 @@ import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
-import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
@@ -3141,12 +3140,6 @@ public final class ButtonHelperActionCards {
             }
             buttons.addAll(
                     getExplorationRiderPlanetButtons(player, game, remainingExplores, selectedPlanetsValue, planet));
-        }
-        if (!buttons.isEmpty() && player.hasUnlockedBreakthrough("augersbt")) {
-            buttons.add(Buttons.green(
-                    "resolveExplorationRiderDrawAc_" + remainingExplores + "_" + selectedPlanetsValue,
-                    "Draw 1 Action Card Instead With Breakthrough",
-                    FactionEmojis.augers));
         }
         return buttons;
     }

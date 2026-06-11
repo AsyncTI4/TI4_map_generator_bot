@@ -616,7 +616,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You assign hits this unit produces. While you control another flagship, this unit rolls 1 additional combat die.",
+        "ability": "You assign hits produced by this unit’s SPACE CANNON. While you control another flagship, this unit rolls 1 additional combat die.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/ds/flagships/celagrom.webp?raw=true"
     },
     {

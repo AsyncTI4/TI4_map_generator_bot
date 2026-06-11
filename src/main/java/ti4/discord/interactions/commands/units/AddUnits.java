@@ -88,8 +88,9 @@ public class AddUnits extends GameStateCommand {
                 && !doesTileHaveFloatingGF
                 && ButtonHelper.getOtherPlayersWithShipsInTheSystem(getPlayer(), game, tile)
                         .isEmpty()) {
-            doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0
-                    || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
+            doesTileHaveFloatingGF = (space.getUnitCount(UnitType.Mech, getPlayer()) > 0
+                            || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0)
+                    && !tile.getPlanetUnitHolders().isEmpty();
             if (doesTileHaveFloatingGF) {
                 List<Button> buttons = TacticalActionService.getLandingTroopsButtons(game, getPlayer(), tile);
                 Button concludeMove =

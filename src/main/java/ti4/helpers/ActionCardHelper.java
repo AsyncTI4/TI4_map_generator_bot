@@ -286,7 +286,7 @@ public class ActionCardHelper {
             if (prefix.startsWith("remove")) valid = factions != null && factions.contains(p.getFaction());
             if (valid) {
                 String id = prefix + plotID + "_" + p.getFaction();
-                buttons.add(Buttons.gray(id, "", p.getFactionEmojiOrColor()));
+                buttons.add(Buttons.green(id, "", p.getFactionEmojiOrColor()));
             }
         });
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
@@ -753,13 +753,17 @@ public class ActionCardHelper {
         }
         recordTrackedActionCardPlay(game, player, actionCardTitle);
 
-        boolean actionCardIsCancelable = isActionCardCancelable(actionCard) && !twinned;
+        boolean hasUnyieldingWill = player.hasTech("baarvag");
+        boolean actionCardIsCancelable = isActionCardCancelable(actionCard) && !twinned && !hasUnyieldingWill;
 
         String pingGame = actionCardIsCancelable ? game.getPing() + ", " : "";
         String message = pingGame + (game.isFowMode() ? "someone" : player.getRepresentationNoPing());
         message += fromGarbozia ? " purged " : " played ";
         message += "the action card _" + actionCardTitle + "_";
         message += fromGarbozia ? " using _Dok 'N Pic's Salvage Yard_." : ".";
+        if (hasUnyieldingWill && isActionCardCancelable(actionCard) && !twinned) {
+            message += " This card cannot be canceled due to _Unyielding Will_.";
+        }
 
         List<Button> buttons = new ArrayList<>();
 

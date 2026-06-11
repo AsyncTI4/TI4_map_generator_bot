@@ -1572,8 +1572,16 @@ public class ButtonHelper {
                 && !player.hasAbility("celestial_being")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "## " + player.getRepresentation()
+                    "## " + player.getRepresentationNoPing()
                             + ", this is a __friendly__ reminder that you do not own _Antimass Deflectors_.");
+        }
+        if (!game.isFowMode()
+                && activeSystem.isAsteroidField()
+                && ThreadLocalRandom.current().nextInt(1, 11) == 10) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "-# " + player.getRepresentationNoPing()
+                            + ", this is a friendly reminder that the odds of successfully navigating an asteroid field are approximately 3720:1.");
         }
         if (!game.isFowMode()
                 && activeSystem.isScar(game)
@@ -4024,6 +4032,8 @@ public class ButtonHelper {
         int fightersIgnored = 0;
         int numFighter2s = 0;
         int numFighter2sFleet = 0;
+        int numRiptide2s = 0;
+        int numRiptide2sFleet = 0;
         boolean capacityViolated = false;
         boolean fleetSupplyViolated = false;
         String tooManyDocks = "";
@@ -4146,16 +4156,14 @@ public class ButtonHelper {
                 if ("fighter".equalsIgnoreCase(unit.getBaseType())
                         || "infantry".equalsIgnoreCase(unit.getBaseType())
                         || "mech".equalsIgnoreCase(unit.getBaseType())) {
-                    if (Constants.SPACE.equals(spaceHolder.getName()) && "iron_mech2".equals(unit.getId())) {
-                        numOfCapitalShips += entry.getValue() * 2;
-                        unitTypesCounted.add(unit.getBaseType());
-                        continue;
-                    }
                     if ("fighter".equalsIgnoreCase(unit.getBaseType()) && player.hasFF2Tech()) {
                         numFighter2s += entry.getValue() - fightersIgnored;
                         if (numFighter2s < 0) {
                             numFighter2s = 0;
                         }
+                    }
+                    if ("iron_mech2".equals(unit.getId())) {
+                        numRiptide2s += entry.getValue();
                     }
                     if ("naaz_voltron".equalsIgnoreCase(unit.getId())) {
                         numFighter2s++;
@@ -4209,16 +4217,27 @@ public class ButtonHelper {
         }
 
         if (numInfNFightersNMechs > capacity) {
-            if (numInfNFightersNMechs - numFighter2s > capacity) {
+            int overflow = numInfNFightersNMechs - capacity;
+            int fighter2Overflow = Math.min(overflow, numFighter2s);
+            if (fighter2Overflow > 0) {
+                if (player.hasTech("hcf2") || player.hasTech("absol_hcf2") || player.hasUnit("tf-hcf")) {
+                    numFighter2sFleet += fighter2Overflow;
+                } else {
+                    numFighter2sFleet += fighter2Overflow * 2;
+                }
+                overflow -= fighter2Overflow;
+            }
+
+            int riptide2Overflow = Math.min(overflow, numRiptide2s);
+            if (riptide2Overflow > 0) {
+                numRiptide2sFleet += riptide2Overflow * 2;
+                overflow -= riptide2Overflow;
+            }
+
+            if (overflow > 0) {
                 capacityViolated = true;
             } else {
-                numFighter2s = numInfNFightersNMechs - capacity;
-                if (player.hasTech("hcf2") || player.hasTech("absol_hcf2") || player.hasUnit("tf-hcf")) {
-                    numFighter2sFleet += numFighter2s;
-                } else {
-                    numFighter2sFleet += numFighter2s * 2;
-                }
-                if (numFighter2sFleet + numOfCapitalShips > fleetCap) {
+                if (numFighter2sFleet + numRiptide2sFleet + numOfCapitalShips > fleetCap) {
                     fleetSupplyViolated = true;
                 }
             }
@@ -5900,10 +5919,6 @@ public class ButtonHelper {
                     buttons.add(Buttons.gray(buttonId2, buttonLabel2, ExploreEmojis.getTraitEmoji(trait)));
                 }
             }
-        }
-        if (player.hasUnlockedBreakthrough("augersbt") && !buttons.isEmpty()) {
-            buttons.add(Buttons.green(
-                    "draw_1_ACDelete", "Draw 1 Action Card Instead With Breakthrough", FactionEmojis.augers));
         }
         return buttons;
     }

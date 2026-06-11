@@ -21,6 +21,7 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -455,6 +456,7 @@ public final class ButtonHelperModifyUnits {
             buttons.add(Buttons.gray("deleteButtons", "Don't Remove Structures"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
         }
+        IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "groundcombat");
         event.getMessage();
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         return sardakkMechHits;
@@ -899,6 +901,7 @@ public final class ButtonHelperModifyUnits {
             }
         }
         if (!justSummarizing && event instanceof ButtonInteractionEvent bevent) {
+            IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "spacecombat");
             bevent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
         return msg.toString();
@@ -1467,7 +1470,7 @@ public final class ButtonHelperModifyUnits {
 
                 String unitName = unitKey.unitName();
                 String prettyName = unitKey.humanReadableName();
-                boolean canSustain = ButtonHelper.unitCanSustainDamage(game, player, tile, unitModel);
+                boolean canSustain = ButtonHelper.unitCanSustainDamage(game, p2, tile, unitModel);
                 for (UnitState state : UnitState.defaultRemoveOrder()) {
                     int amt = unitHolder.getUnitCountForState(unitKey, state);
                     if (amt == 0) continue;
