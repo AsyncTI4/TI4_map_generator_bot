@@ -65,11 +65,12 @@ public class FrankenDraft extends BagDraft {
     }
 
     public static int getItemLimitForCategory(DraftCategory category, Game game) {
-        if (!game.getStoredValue("frankenLimit" + category).isEmpty()) {
+        BagDraft activeDraft = game.getActiveBagDraft();
+        int baseLimit = activeDraft == null ? 0 : activeDraft.getItemLimitForCategory(category);
+        if (baseLimit > 0 && !game.getStoredValue("frankenLimit" + category).isEmpty()) {
             return Integer.parseInt(game.getStoredValue("frankenLimit" + category));
-        } else {
-            return game.getActiveBagDraft().getItemLimitForCategory(category);
         }
+        return baseLimit;
     }
 
     @Override
