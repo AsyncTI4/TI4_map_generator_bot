@@ -203,6 +203,11 @@ public class DestroyUnitService {
                 if (player.hasUnit("iron_mech") || player.hasUnit("iron_mech2")) {
                     IronUnitsHandler.resolveRiptideDestroy(event, game, player, unit);
                 }
+                if (combat
+                        && player.getPromissoryNotes().containsKey("bepniron")
+                        && !player.getPromissoryNotesOwned().contains("bepniron")) {
+                    IronUnitsHandler.resolveEjectionDestroy(event, game, player, unit, killers);
+                }
                 if (player.hasUnit("dream_mech")) {
                     DreamButtonHandler.offerRecurringMechButtons(
                             event, game, player, totalAmount, unit.uh().getName(), unit.unitKey());

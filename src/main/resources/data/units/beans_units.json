@@ -227,12 +227,12 @@
     "cost": 8,
     "combatHitsOn": 5,
     "combatDieCount": 2,
-    "afbHitsOn": 7,
-    "afbDieCount": 2,
+    "afbHitsOn": 5,
+    "afbDieCount": 3,
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "Your mechs in this system gain Anti-Fighter Barrage 7."
+    "ability": "Your mechs in the space area of this system gain Anti-Fighter Barrage 7(x2)."
   },
   {
     "id": "iron_mech",
