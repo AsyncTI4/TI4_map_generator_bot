@@ -158,7 +158,8 @@ public class SourceSettings extends SettingsMenu {
         if (codexes.isVal())
             sources.addAll(List.of(
                     ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
-        if (unchartedSpace.isVal() || discoStars.isVal()) sources.add(ComponentSource.uncharted_space);
+        if (discoStars.isVal()) sources.add(ComponentSource.ds);
+        if (unchartedSpace.isVal()) sources.add(ComponentSource.uncharted_space);
         if (absol.isVal()) sources.add(ComponentSource.absol);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
         return sources;
@@ -245,12 +246,11 @@ public class SourceSettings extends SettingsMenu {
                         .setEphemeral(true)
                         .queue(Consumers.nop(), BotLogger::catchRestError);
             }
-            case "UnchartSpace", "BlueReverie", "Absol", "ActionCardDeck2" -> {
+            case "UnchartSpace", "Absol", "ActionCardDeck2" -> {
                 boolean abs = absol.isVal();
                 boolean us = unchartedSpace.isVal();
                 boolean both = abs && us;
                 boolean acd2 = actionCardDeck2.isVal();
-                boolean updateUsDecks = "UnchartSpace".equals(setting);
 
                 // Decks with both
                 String relic = both ? "relics_absol_ds" : (abs ? "relics_absol" : (us ? "relics_ds" : "relics_pok"));
