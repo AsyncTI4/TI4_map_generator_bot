@@ -30,6 +30,7 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
@@ -1947,6 +1948,9 @@ public class CombatRollService {
         Map<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
                 .filter(entry -> entry.getKey() != null && entry.getKey().getAfbDieCount(player) > 0)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+        if (player.hasUnit("iron_flagship")) {
+            output.putAll(IronUnitsHandler.getIronFlagshipAfbUnits(player, tile));
+        }
         checkBadUnits(player, event, unitsByAsyncId, output);
 
         return output;
