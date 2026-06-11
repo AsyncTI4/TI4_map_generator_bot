@@ -2565,6 +2565,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             addOwnedUnitByID("tribune3");
             removeOwnedUnitByID("dreadnought2");
         }
+        if ("inf2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("uydaibt")) {
+            addOwnedUnitByID("death_commandos3");
+            removeOwnedUnitByID("infantry2");
+        }
     }
 
     // Provided because people make mistakes, also nekro exists, also weird homebrew exists
