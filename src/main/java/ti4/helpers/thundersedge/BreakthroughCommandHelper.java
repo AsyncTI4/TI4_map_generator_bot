@@ -221,6 +221,12 @@ public final class BreakthroughCommandHelper {
                     player.removeOwnedUnitByID("dreadnought2");
                 }
             }
+            if ("uydaibt".equalsIgnoreCase(bt.getID())) {
+                if (player.hasTech("inf2")) {
+                    player.addOwnedUnitByID("death_commandos3");
+                    player.removeOwnedUnitByID("infantry2");
+                }
+            }
             if ("veldyrbt".equalsIgnoreCase(bt.getID())) {
                 Tile tile = player.getHomeSystemTile();
                 if (tile != null) {
