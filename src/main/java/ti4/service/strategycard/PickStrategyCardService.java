@@ -17,6 +17,7 @@ import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.message.MessageHelper;
 import ti4.service.game.StartPhaseService;
 import ti4.service.player.PlayerStatsService;
+import ti4.service.webhook.GameWebhookNotifierFacade;
 
 @UtilityClass
 public class PickStrategyCardService {
@@ -37,6 +38,7 @@ public class PickStrategyCardService {
         }
 
         boolean nextCorrectPing = false;
+        String previousPhaseOfGame = game.getPhaseOfGame();
         Queue<Player> players = new ArrayDeque<>(activePlayers);
         while (players.iterator().hasNext()) {
             Player currentPlayer = players.poll();
@@ -66,6 +68,7 @@ public class PickStrategyCardService {
                 game.updateActivePlayer(privatePlayer);
                 game.setPhaseOfGame("strategy");
                 game.updateActivePlayer(privatePlayer);
+                GameWebhookNotifierFacade.phaseChanged(game, previousPhaseOfGame, "strategy");
                 boolean queuedPick = false;
                 if (event instanceof ButtonInteractionEvent bevent) {
                     queuedPick = checkForQueuedSCPick(bevent, privatePlayer, game, msgExtra);
@@ -80,6 +83,7 @@ public class PickStrategyCardService {
             if (!allPicked) {
                 game.updateActivePlayer(privatePlayer);
                 game.setPhaseOfGame("strategy");
+                GameWebhookNotifierFacade.phaseChanged(game, previousPhaseOfGame, "strategy");
                 boolean queuedPick;
                 if (event instanceof ButtonInteractionEvent bevent) {
                     queuedPick = checkForQueuedSCPick(bevent, privatePlayer, game, msgExtra);
