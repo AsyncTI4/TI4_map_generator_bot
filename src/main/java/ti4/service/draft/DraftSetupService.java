@@ -50,8 +50,10 @@ public class DraftSetupService {
         // Draft Manager Setup
         // --------------------------------------------------------------
         List<ComponentSource> sources = new ArrayList<>(specs.tileSources);
-        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+        if (game.isDiscordantStarsMode()) {
             sources.add(ComponentSource.ds);
+        }
+        if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
@@ -163,8 +165,10 @@ public class DraftSetupService {
         }
 
         List<ComponentSource> tileSources = new ArrayList<>(sourceSettings.getTileSources());
-        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+        if (game.isDiscordantStarsMode()) {
             tileSources.add(ComponentSource.ds);
+        }
+        if (game.isUnchartedSpaceStuff()) {
             tileSources.add(ComponentSource.uncharted_space);
         }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
