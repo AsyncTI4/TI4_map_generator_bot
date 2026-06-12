@@ -53,8 +53,8 @@
         "shortName": "Styx and\nStones",
         "faction": "onyxxa",
         "synergy": [
-            "CYBERNETIC",
-            "BIOTIC"
+            "BIOTIC",
+            "CYBERNETIC"
         ],
         "text": "When you resolve the primary ability of a strategy card, roll a die. On a result of 1 or 10, put The Fracture into play if it is not already; if it is, move an ingress token into a system that contains your units. At the start of a ground combat on a planet in The Fracture or in the wormhole nexus, you may choose any number of your infantry on that planet; replace each of those infantry with 1 mech from your reinforcements.",
         "source": "balacasi"
