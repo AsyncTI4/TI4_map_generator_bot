@@ -152,8 +152,8 @@
         "type": "commander",
         "name": "Strategist Kreel",
         "title": "The Judicial",
-        "abilityWindow": "After you draw a relic:",
-        "abilityText": "Gain 1 command token. After you gain control of a planet in The Fracture that was controlled by another player, gain 1 relic.",
+        "abilityWindow": "",
+        "abilityText": "After you draw a relic, gain 1 command token. After you gain control of a planet in The Fracture that was controlled by another player, gain 1 relic.",
         "unlockCondition": "Resolve the primary ability of a strategy card in 1 of your neighbors' play areas.",
         "source": "balacasi"
     },

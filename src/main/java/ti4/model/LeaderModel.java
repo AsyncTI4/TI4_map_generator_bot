@@ -242,7 +242,8 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         String abilityName = useTwilightsFallText ? " " : getAbilityName().orElse(" ");
         String abilityWindow =
                 useTwilightsFallText ? getTFAbilityWindow().orElse(this.abilityWindow) : this.abilityWindow;
-        String fieldTitle = abilityName + "\n**" + abilityWindow + "**";
+        String fieldTitle =
+                abilityName + (abilityWindow == null || abilityWindow.isBlank() ? "" : "\n**" + abilityWindow + "**");
         String fieldContent = useTwilightsFallText ? getTFAbilityText().orElse(abilityText) : abilityText;
         if (useTwilightsFallText && (tfNotes != null)) {
             fieldContent += "\n-# [" + tfNotes + "]";

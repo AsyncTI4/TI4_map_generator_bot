@@ -15,6 +15,8 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -445,6 +447,16 @@ public class PlayStrategyCardService {
             String message2 = player.getRepresentationUnfogged() + " please gain or flip 1 balance token.";
             List<Button> buttons2 = ButtonHelper.getBalanceButtons(player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons2);
+        }
+        if (player.hasUnlockedBreakthrough("onyxxabt")) {
+            OnyxxaBreakthroughButtonHandler.offerSCRollButton(game, player);
+        }
+        for (Player p : game.getRealPlayers()) {
+            if (p != player
+                    && !p.hasLeaderUnlocked("onyxxacommander")
+                    && p.getLeaderIDs().contains("onyxxacommander")) {
+                OnyxxaCommanderButtonHandler.offerCommanderUnlockButton(p);
+            }
         }
         if (scModel.usesAutomationForSCID("anarchy8")) {
             MessageHelper.sendMessageToChannel(
