@@ -239,6 +239,11 @@ public final class FoWHelper {
 
     public static Set<String> getAdjacentTiles(
             Game game, String position, Player player, boolean toShow, boolean includeTile) {
+        return getAdjacentTiles(game, position, player, toShow, includeTile, false);
+    }
+
+    public static Set<String> getAdjacentTiles(
+            Game game, String position, Player player, boolean toShow, boolean includeTile, boolean forDistance) {
         if (FOWPlusService.isVoid(game, position)) return new HashSet<>();
 
         Set<String> adjacentPositions = traverseAdjacencies(game, false, position);
@@ -267,7 +272,7 @@ public final class FoWHelper {
             }
         }
 
-        Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player, false);
+        Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player, false, forDistance);
         adjacentPositions.addAll(wormholeAdjacencies);
 
         Set<String> otherAdjacencies = getNonWormholeAdjacencies(game, position);
@@ -664,6 +669,11 @@ public final class FoWHelper {
      * Also takes into account player abilities and agendas
      */
     private static Set<String> getWormholeAdjacencies(Game game, String position, Player player, boolean neighbors) {
+        return getWormholeAdjacencies(game, position, player, neighbors, false);
+    }
+
+    private static Set<String> getWormholeAdjacencies(
+            Game game, String position, Player player, boolean neighbors, boolean forDistance) {
         Set<String> adjacentPositions = new HashSet<>();
         Set<Tile> allTiles = new HashSet<>(game.getTileMap().values());
         Tile tile = game.getTileByPosition(position);
@@ -713,6 +723,7 @@ public final class FoWHelper {
         if (player != null
                 && player.hasAbility("sundered")
                 && player == game.getActivePlayer()
+                && forDistance
                 && !game.getCurrentActiveSystem().isEmpty()) {
             Set<String> keepers = new HashSet<>(Set.of("epsilon"));
             if (hasQuantumEntanglement || wh_recon || absol_recon) {
@@ -773,6 +784,7 @@ public final class FoWHelper {
         if (!hasQuantumEntanglement
                 && !wh_recon
                 && !absol_recon
+                && forDistance
                 && ButtonHelper.isLawInPlay(game, "travel_ban")
                 && !neighbors) {
             wormholeIDs.remove(Constants.ALPHA);

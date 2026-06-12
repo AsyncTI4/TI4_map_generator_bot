@@ -481,6 +481,14 @@ class AgendaResolveButtonHandler {
     private static void handleMiscountRevote(Game game, String winner, ButtonInteractionEvent event) {
         game.removeLaw(winner);
         game.putAgendaBackIntoDeckOnTop(winner);
+        int aCount;
+        String agendaCount = game.getStoredValue("agendaCount");
+        if (agendaCount.isEmpty()) {
+            aCount = 0;
+        } else {
+            aCount = Integer.parseInt(agendaCount) - 1;
+        }
+        game.setStoredValue("agendaCount", aCount + "");
         AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
     }
 }

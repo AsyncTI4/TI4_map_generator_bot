@@ -1,7 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -2378,10 +2377,14 @@ public final class ButtonHelperAbilities {
                             && (planetUnit2.getUnits() == null
                                     || planetUnit2.getUnits().isEmpty())
                             && !planetsChecked.contains(planet2)) {
+
+                        String factionEmoji = Mapper.getFaction("neutral").getFactionEmoji();
+                        Player p2 = game.getPlanetOwner(planet);
+                        if (p2 != null) {
+                            factionEmoji = p2.getFactionEmoji();
+                        }
                         buttons.add(Buttons.green(
-                                factionChecker + "peaceAccords_" + planet2,
-                                planetRepresentation2,
-                                FactionEmojis.Xxcha));
+                                factionChecker + "peaceAccords_" + planet2, planetRepresentation2, factionEmoji));
                         planetsChecked.add(planet2);
                     }
                 }
