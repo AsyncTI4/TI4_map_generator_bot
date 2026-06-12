@@ -90,6 +90,7 @@ class ActionCardHandButtonHandler {
         boolean stalling = false;
         boolean drawReplacement = false;
         boolean retainButtons = false;
+        boolean arvaxiCommander = false;
         if (acIndex.contains("stall")) {
             acIndex = acIndex.replace("stall", "");
             stalling = true;
@@ -102,7 +103,6 @@ class ActionCardHandButtonHandler {
             acIndex = acIndex.replace("retain", "");
             retainButtons = true;
         }
-        boolean arvaxiCommander = false;
         if (acIndex.endsWith("arvaxicommander")) {
             acIndex = acIndex.replace("arvaxicommander", "");
             arvaxiCommander = true;

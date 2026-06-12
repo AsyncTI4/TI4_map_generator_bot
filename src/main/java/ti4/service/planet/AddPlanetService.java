@@ -158,6 +158,7 @@ public class AddPlanetService {
             }
         }
         boolean alreadyOwned = false;
+        Player previousOwner = null;
         for (Player player_ : game.getPlayers().values()) {
             if (player_ != player) {
                 List<String> planets = player_.getPlanets();
@@ -167,6 +168,7 @@ public class AddPlanetService {
                     }
                     if (player_.isRealPlayer()) {
                         alreadyOwned = true;
+                        previousOwner = player_;
                     }
                     player_.removePlanet(planet);
                     CommanderUnlockCheckService.checkPlayer(player_, "uydai");
@@ -382,7 +384,7 @@ public class AddPlanetService {
                 && !setup
                 && tile != null
                 && tile.getPosition().startsWith("frac")) {
-            OnyxxaCommanderButtonHandler.onGainFracturePlanet(event, player, game);
+            OnyxxaCommanderButtonHandler.onGainFracturePlanet(event, player, game, previousOwner);
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander") && !setup) {
             if (alreadyOwned && "mirage".equalsIgnoreCase(planet)) {

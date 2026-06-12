@@ -44,7 +44,9 @@ public class OnyxxaCommanderButtonHandler {
                 ButtonHelper.getGainCCButtons(player));
     }
 
-    public static void onGainFracturePlanet(GenericInteractionCreateEvent event, Player player, Game game) {
+    public static void onGainFracturePlanet(
+            GenericInteractionCreateEvent event, Player player, Game game, Player previousOwner) {
+        if (previousOwner != null && "onyxxa".equals(previousOwner.getFaction())) return;
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation(false, false) + " gains 1 relic from _Strategist Kreel_.");
