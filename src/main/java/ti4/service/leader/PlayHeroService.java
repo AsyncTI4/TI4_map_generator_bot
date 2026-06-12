@@ -195,7 +195,7 @@ public class PlayHeroService {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         player.getRepresentationUnfogged()
-                                + ", please choose a Plot car in your `#cards-info` thread to put into play.");
+                                + ", please choose a Plot card in your `#cards-info` thread to put into play.");
             }
             case "deepwroughthero" -> {
                 List<Button> buttons = new ArrayList<>();

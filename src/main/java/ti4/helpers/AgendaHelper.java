@@ -4262,6 +4262,20 @@ public final class AgendaHelper {
             }
             MessageHelper.sendMessageToChannel(channel, summary.toString());
         }
+        if (game.getCurrentAgendaInfo().startsWith("Law") && game.getLaws().size() == 2) {
+            MessageHelper.sendMessageToChannel(
+                    channel, "## A reminder that there are currently 2 laws in play, so this would be the 3rd law.");
+        }
+        if (game.getLaws().size() > 2 && game.getStoredValue("executiveOrder").isEmpty()) {
+            for (Player p : game.getRealPlayers()) {
+                if (p.getSecretsUnscored().containsKey("dp")) {
+                    MessageHelper.sendMessageToChannel(
+                            p.getCardsInfoThread(),
+                            p.getRepresentationUnfogged()
+                                    + ", a reminder that you have _Dictate Policy_, and there are 3 laws in play.");
+                }
+            }
+        }
     }
 
     public static void listVoteCount(SlashCommandInteractionEvent event, Game game) {
