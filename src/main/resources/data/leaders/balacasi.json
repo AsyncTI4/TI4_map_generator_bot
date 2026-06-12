@@ -244,7 +244,8 @@
         "name": "Rhino the Adventurer",
         "title": "The Wise",
         "abilityWindow": "ACTION:",
-        "abilityText": " Exhaust this card and choose another player. Choose a ship type that has a bounty token on that player’s faction sheet with a cost of 4 or less; the chosen player must choose 1 of their ships of that type in a system that contains 1 of their command tokens, if able. The chosen ship is destroyed and that player gains trade goods equal to its cost.",
+        "abilityText": "Exhaust this card and choose another player. Choose a ship type with a bounty token on that player’s faction sheet that costs 4 or less. That player must destroy 1 of their ships of that type from a system containing 1 of their command tokens, if able. That player gains trade goods equal to the destroyed ship’s cost, plus 1 for each unit removed due to capacity.",
+        "notes": "The destroyed ship must be in a system containing that player’s command token. If no such ship exists, nothing happens.",
         "unlockCondition": "Always Unlocked",
         "source": "balacasi"
     },
