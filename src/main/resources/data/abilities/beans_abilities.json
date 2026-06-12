@@ -50,7 +50,7 @@
         "id": "beauty_in_destruction",
         "name": "Beauty in Destruction",
         "faction": "ashen",
-        "window": "When one of your units is destroyed during combat:",
+        "window": "Once per action, when one of your units is destroyed during combat:",
         "windowEffect": "You may spend 1 token from your strategy pool to gain that unit's corresponding unit upgrade technology.",
         "source": "beans"
     },
