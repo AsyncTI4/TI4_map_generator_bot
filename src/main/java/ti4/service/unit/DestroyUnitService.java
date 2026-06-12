@@ -14,6 +14,8 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -147,6 +149,10 @@ public class DestroyUnitService {
             GenericInteractionCreateEvent event, Game game, List<RemovedUnit> units, boolean combat) {
         // batch up infantry for INF2-ish effects
         for (Player player : game.getRealPlayersNNeutral()) {
+            if (AshenUnitHandler.resolveAshenInfDestroy(game, player, units, event)) {
+                continue;
+            }
+
             int numInfantry = 0;
             for (RemovedUnit u : units) {
                 if (player.unitBelongsToPlayer(u.unitKey()) && u.unitKey().unitType() == UnitType.Infantry) {
@@ -173,6 +179,10 @@ public class DestroyUnitService {
             boolean combat) {
         int totalAmount = unit.getTotalRemoved();
         Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
+
+        if (combat) {
+            AshenAbilityHandler.offerBeautyInDestruction(game, player, unit, event);
+        }
 
         List<Player> capturing = CaptureUnitService.listCapturingFlagshipPlayers(game, allUnits, unit);
         List<Player> devours = CaptureUnitService.listCapturingCombatPlayers(game, unit);
