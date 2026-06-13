@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -196,7 +197,7 @@ class AssignHitsButtonHandlers {
                     UnitHolder holder =
                             planetName != null ? tile.getUnitHolderFromPlanet(planetName) : tile.getSpaceUnitHolder();
                     if (holder != null) holder.addDamagedUnit(Units.getUnitKey(type, player.getColorID()), amt);
-
+                    
                     String plural = (amt == 1 || "infantry".equalsIgnoreCase(type.humanReadableName())) ? "" : "s";
                     String msg = player.getRepresentationNoPing() + " sustained " + amt + " "
                             + (prefersState ? state.humanDescr() : "")
@@ -208,6 +209,9 @@ class AssignHitsButtonHandlers {
                     if (player.hasTech("nes"))
                         msg += "\n> These sustains cancel 2 hits due to _Non-Euclidean Shielding_.";
                     String assignHitsType = getAssignHitsType(game, player);
+                    if (assignHitsType.contains("combat")) {
+                        AshenUnitHandler.offerAshfallEngineOnSustain(event, game, player, tile, holder, type);
+                    }
                     List<Button> systemButtons =
                             ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, game, tile, assignHitsType);
                     MessageHelper.editMessageButtons(event, systemButtons);
