@@ -2,12 +2,14 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyx
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.RelicHelper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.UnlockLeaderService;
@@ -35,7 +37,19 @@ public class OnyxxaCommanderButtonHandler {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
-    // TODO: implement commander ability (Strategist Kreel):
-    // After you draw a relic: gain 1 command token.
-    // After you gain control of a planet in The Fracture that was controlled by another player: gain 1 relic.
+    public static void onDrawRelic(Player player) {
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + ", gain 1 command token from _Strategist Kreel_.",
+                ButtonHelper.getGainCCButtons(player));
+    }
+
+    public static void onGainFracturePlanet(
+            GenericInteractionCreateEvent event, Player player, Game game, Player previousOwner) {
+        if (previousOwner != null && "onyxxa".equals(previousOwner.getFaction())) return;
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation(false, false) + " gains 1 relic from _Strategist Kreel_.");
+        RelicHelper.drawRelicAndNotify(player, event, game);
+    }
 }

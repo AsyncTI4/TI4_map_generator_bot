@@ -202,21 +202,25 @@ public class MiltyService {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 } else {
                     MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
+
+                    game.setPhaseOfGame("miltydraft");
+                    // TODO: We should be locking since we're saving
                     for (String player : draftManager.getPlayers()) {
                         Player p = game.getPlayer(player);
                         game.setStoredValue(p.getUserID() + "queuedMiltyPick", "");
+                    }
+                    GameManager.save(game, "Milty");
+                    if (game.isThundersEdge()) {
+                        ThundersEdgeRulesService.alertTabletalkWithRulesAtStartOfDraft(game);
+                    }
+                    for (String player : draftManager.getPlayers()) {
+                        Player p = game.getPlayer(player);
                         if (p != draftManager.getCurrentDraftPlayer(game) && p.getCardsInfoThread() != null) {
                             MessageHelper.sendMessageToChannel(
                                     p.getCardsInfoThread(),
                                     p.getRepresentation() + " You can queue your choices with these buttons",
                                     draftManager.getQueueButtons(p, game));
                         }
-                    }
-                    game.setPhaseOfGame("miltydraft");
-                    // TODO: We should be locking since we're saving
-                    GameManager.save(game, "Milty");
-                    if (game.isThundersEdge()) {
-                        ThundersEdgeRulesService.alertTabletalkWithRulesAtStartOfDraft(game);
                     }
                 }
             });

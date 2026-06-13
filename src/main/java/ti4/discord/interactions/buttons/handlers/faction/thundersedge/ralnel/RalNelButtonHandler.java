@@ -1,9 +1,11 @@
 package ti4.discord.interactions.buttons.handlers.faction.thundersedge.ralnel;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -13,6 +15,7 @@ import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.CommandCounterHelper;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.MiscEmojis;
 
 @UtilityClass
 class RalNelButtonHandler {
@@ -28,7 +31,8 @@ class RalNelButtonHandler {
 
     @ButtonHandler("ralnelCommander_")
     public static void ralnelCommander(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        if (ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, game.getActiveSystem(), false, false)
+        String pos = buttonID.split("_")[1];
+        if (ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, pos, false, false)
                 .isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "## There are no valid systems to retreat to!");
@@ -44,5 +48,16 @@ class RalNelButtonHandler {
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + ", please choose which system you wish to move units to.",
                 buttons);
+        if (game.getTileByPosition(pos).isGravityRift()
+                && !player.hasRelic("circletofthevoid")
+                && !player.hasTech("tf-crucible")) {
+            Button rift = Buttons.green(
+                    player.factionButtonChecker() + "getRiftButtons_" + pos, "Rift Units", MiscEmojis.GravityRift);
+            buttons = new ArrayList<>();
+            buttons.add(rift);
+            String message2 = "## " + player.getRepresentationUnfogged()
+                    + ", if applicable, use this button to rift retreating units __before__ choosing where to retreat. It needs to be before you actually select where to retreat.";
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
+        }
     }
 }

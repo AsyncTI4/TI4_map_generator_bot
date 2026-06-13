@@ -2129,13 +2129,19 @@ public final class ButtonHelperModifyUnits {
                             + " in " + tile.getRepresentationForButtons(game, player)
                             + " using the **Cloaked Fleets** ability (limit of 2 ships may be captured per build).");
         } else {
+            if (game.isTwilightsFallMode() && "fighter".equalsIgnoreCase(name)) {
+                int count = 0;
+                if (!player.getStoredValue("crimsonHeroFF").isEmpty()) {
+                    count = Integer.parseInt(player.getStoredValue("crimsonHeroFF"));
+                }
+                game.setStoredValue("crimsonHeroFF", "" + (count + 1));
+            }
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " captured\\* 1 newly produced "
                             + UnitEmojis.getUnitEmoji(name)
                             + " in " + tile.getRepresentationForButtons(game, player)
-                            + " using the _Fragment Reality_ hero ability."
-                            + "\nThey will be able to mobilize all ships that are on the hero (represented as captured in async) later in a space combat of their choosing.");
+                            + " using the Crimson hero ability. They will be able to mobilize all ships that are on the hero (represented as captured in async) later in a space combat of their choosing.");
         }
         AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), unitID);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);

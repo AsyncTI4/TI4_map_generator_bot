@@ -161,6 +161,6 @@ public class CheckDistanceHelper {
     }
 
     private static Set<String> adjacentPositions(Game game, String position, Player player) {
-        return FoWHelper.getAdjacentTilesAndNotThisTile(game, position, player, false);
+        return FoWHelper.getAdjacentTiles(game, position, player, false, false, true);
     }
 }
