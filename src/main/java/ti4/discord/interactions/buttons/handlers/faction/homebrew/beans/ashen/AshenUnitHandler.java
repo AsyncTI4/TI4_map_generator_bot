@@ -325,10 +325,12 @@ public class AshenUnitHandler {
             useDoubleBoomEmoji = false;
         }
 
-        String combatSummary = CombatMessageHelper.displayCombatSummary(player, tile, space, CombatRollType.bombardment);
+        String combatSummary =
+                CombatMessageHelper.displayCombatSummary(player, tile, space, CombatRollType.bombardment);
         String unitRoll = CombatMessageHelper.displayUnitRoll(
                 unitModel, toHit, 0, triggerCount, rollsPerUnit, extraRolls, resultRolls, hits);
-        String message = combatSummary + unitRoll + CombatMessageHelper.displayHitResults(totalHits, useDoubleBoomEmoji);
+        String message =
+                combatSummary + unitRoll + CombatMessageHelper.displayHitResults(totalHits, useDoubleBoomEmoji);
         if (totalHits > 0 && usesX89c4) {
             message += "\n" + player.getFactionEmoji() + " produced "
                     + ((totalHits / 2) == 1 ? "1 additional hit" : (totalHits / 2) + " additional hits")
@@ -372,8 +374,8 @@ public class AshenUnitHandler {
                                 "Assign Hit" + (hits == 1 ? "" : "s")));
                         MessageHelper.sendMessageToChannelWithButtons(
                                 game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
-                                p2.getRepresentation() + ", please assign the BOMBARDMENT hit"
-                                        + (hits == 1 ? "" : "s") + ".",
+                                p2.getRepresentation() + ", please assign the BOMBARDMENT hit" + (hits == 1 ? "" : "s")
+                                        + ".",
                                 buttons);
                     } else {
                         List<Button> buttons2 = new ArrayList<>();
