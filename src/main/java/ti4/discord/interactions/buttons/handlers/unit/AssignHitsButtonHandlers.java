@@ -197,7 +197,7 @@ class AssignHitsButtonHandlers {
                     UnitHolder holder =
                             planetName != null ? tile.getUnitHolderFromPlanet(planetName) : tile.getSpaceUnitHolder();
                     if (holder != null) holder.addDamagedUnit(Units.getUnitKey(type, player.getColorID()), amt);
-                    
+
                     String plural = (amt == 1 || "infantry".equalsIgnoreCase(type.humanReadableName())) ? "" : "s";
                     String msg = player.getRepresentationNoPing() + " sustained " + amt + " "
                             + (prefersState ? state.humanDescr() : "")
