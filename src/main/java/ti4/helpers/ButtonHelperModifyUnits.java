@@ -22,6 +22,7 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -515,6 +516,7 @@ public final class ButtonHelperModifyUnits {
             boolean justSummarizing,
             boolean spaceCannonOffence) {
         UnitHolder unitHolder = tile.getUnitHolders().get("space");
+        int ashenAshfallSustains = 0;
         StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " assigned " + (hits == 1 ? "the hit" : "hits")
                 + " in the following way:\n");
         if (justSummarizing) {
@@ -586,6 +588,9 @@ public final class ButtonHelperModifyUnits {
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                         tile.addUnitDamage("space", unitKey, min);
+                        if ("ashen_dreadnought2".equals(unitModel.getId()) && !spaceCannonOffence) {
+                            ashenAshfallSustains += min;
+                        }
                         for (int x = 0; x < min; x++) {
                             ButtonHelperCommanders.resolveLetnevCommanderCheck(player, game, event);
                         }
@@ -664,6 +669,9 @@ public final class ButtonHelperModifyUnits {
                     }
                 }
             }
+        }
+        if (!justSummarizing && ashenAshfallSustains > 0) {
+            AshenUnitHandler.offerAshfallEngineOnAutoSustain(event, game, player, tile, ashenAshfallSustains);
         }
         List<String> assignHitOrder = new ArrayList<>(List.of(
                 "fighter",

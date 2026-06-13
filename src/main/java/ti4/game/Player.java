@@ -620,6 +620,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 || getTechs().contains("absol_inf2")
                 || getTechs().contains("dsqhetinf")
                 || getTechs().contains("dszeliinf")
+                || getUnitsOwned().contains("ashen_infantry")
+                || getUnitsOwned().contains("ashen_infantry2")
                 || getUnitsOwned().contains("pharadn_infantry")
                 || getUnitsOwned().contains("pharadn_infantry2");
     }
