@@ -181,8 +181,12 @@ public class DestroyUnitService {
         Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
 
         if (combat) {
-            AshenAbilityHandler.offerBeautyInDestruction(game, player, unit, event);
-            AshenUnitHandler.offerAshfallEngineOnDestroy(event, game, player, unit);
+            if (player.hasAbility("beauty_in_destruction")) {
+                AshenAbilityHandler.offerBeautyInDestruction(game, player, unit, event);
+            }
+            if (player.hasUnit("ashen_dreadnought") || player.hasUnit("ashen_dreadnought2")) {
+                AshenUnitHandler.offerAshfallEngineOnDestroy(event, game, player, unit);
+            }
         }
 
         List<Player> capturing = CaptureUnitService.listCapturingFlagshipPlayers(game, allUnits, unit);

@@ -10,6 +10,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.commands.CommandHelper;
@@ -83,6 +84,9 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("ironagent")) {
             buttons.add(IronLeadersHandler.getMasterOfDefenseCardsInfoButton());
+        }
+        if (player.hasUnexhaustedLeader("ashenagent")) {
+            buttons.add(AshenLeadersHandler.getAshTenderCardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("dreamagent")
                 && !DreamButtonHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {

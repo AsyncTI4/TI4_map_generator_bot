@@ -31,6 +31,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
@@ -654,7 +655,8 @@ public class CombatRollService {
 
         if (rollType == CombatRollType.bombardment) {
             if (h > 0) {
-                if (!game.isFowMode()) {
+                if (!AshenLeadersHandler.offerHeroBombardmentAssignButtons(event, game, player, h, bombardPlanet)
+                        && !game.isFowMode()) {
                     List<Button> buttons = new ArrayList<>();
 
                     buttons.add(Buttons.red(
