@@ -392,18 +392,6 @@ public final class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("resolveCompoundingInterests")
-    public static void resolveCompoundingInterests(Game game, Player player, ButtonInteractionEvent event) {
-        int tgGain = ButtonHelper.getTilesWithYourCC(player, game, event).size();
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                player.getRepresentationNoPing() + " gained " + StringHelper.pluralize(tgGain, "trade good")
-                        + " due to _Compounding Interests_ " + player.gainTG(tgGain) + ".");
-        ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, tgGain);
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler("resolveWarEffort")
     public static void resolveWarEffort(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>(

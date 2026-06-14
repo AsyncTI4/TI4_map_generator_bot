@@ -151,7 +151,7 @@
         "name": "Compounding Interests",
         "phase": "Action",
         "window": "At the end of your turn",
-        "text": "Gain commodities equal to the number of your command tokens on the game board.",
+        "text": "For each of your command tokens on the game board, either gain 1 commodity or convert 1 of your commodities to a trade good.",
         "flavorText": "\"A station over Ordinian? What could we gain from such a venture?\" Carth hissed. Harrugh snapped, \"Everything.\"",
         "source": "action_deck_2"
     },
