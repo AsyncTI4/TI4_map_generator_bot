@@ -63,7 +63,7 @@
         "name": "Black Market Intel",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Draw and reveal 2 secret objectives. Then, give 1 of those cards to another player that has less than 3 scored secret objectives, if able.",
+        "text": "Draw and reveal 2 secret objectives; give 1 of those cards to another player that has less than 3 scored secret objectives, if able.",
         "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother,\" they said in unison.",
         "notes": "Other players do not get to see which secret objective you gave away. You keep both secrets if no player can receive the other.",
         "source": "action_deck_2"
@@ -150,8 +150,8 @@
         "alias": "compounding_interests",
         "name": "Compounding Interests",
         "phase": "Action",
-        "window": "After you pass",
-        "text": "Gain trade goods equal to the number of your command tokens on the game board.",
+        "window": "At the end of your turn",
+        "text": "For each of your command tokens on the game board, either gain 1 commodity or convert 1 of your commodities to a trade good.",
         "flavorText": "\"A station over Ordinian? What could we gain from such a venture?\" Carth hissed. Harrugh snapped, \"Everything.\"",
         "source": "action_deck_2"
     },
@@ -400,7 +400,7 @@
         "name": "Incompetence",
         "phase": "Action",
         "window": "Before your opponent's units make combat rolls",
-        "text": "For up to 3 of those unmodified results of 1 or 2, produce 1 hit that your opponent must assign to 1 of their units.",
+        "text": "For up to 3 of those results of 2 or less, produce 1 hit that your opponent must assign to 1 of their units.",
         "flavorText": "\"Commander, the left flank is dissolving. Crossfire—\" A hull breach slammed Agnlan to the deck before they could reply, their pitiful whine broadcast across the rapidly deteriorating battle. \"Agnlan, what happened? Agnlan!? Agnlan—!\"",
         "source": "action_deck_2"
     },
@@ -456,7 +456,7 @@
         "name": "Liquidation",
         "phase": "Action",
         "window": "When 1 or more of your units use PRODUCTION",
-        "text": "Reduce the total PRODUCTION value of those units by up to 3 to gain an equal number of commodities and trade goods.",
+        "text": "Reduce the total PRODUCTION value of those units by up to 4 to reduce the combined cost of the produced units by twice that amount.",
         "notes": "These trade goods are available to be spent during this PRODUCTION.",
         "flavorText": "I48S found that cutting redundant cooling systems resulted in a 6% increase in risk, but they could reclaim enough polymer to satisfy the trade guilds. Plus, buyers would line up for what was left of any catastrophic failure.",
         "source": "action_deck_2"
@@ -506,42 +506,6 @@
         "text": "That unit is not destroyed instead.",
         "notes": "Combat hits are assigned simultaneously, and thus excess hits will not destroy this unit.",
         "flavorText": "Harrugh tumbled down the dune to a chorus of laughter—until the ridge he'd been standing on a heartbeat earlier erupted in plasma. The laughter died as their savior rose among them.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "mobilization1",
-        "name": "Mobilization",
-        "phase": "Any",
-        "window": "After you produce a unit",
-        "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
-        "flavorText": "The forges of Umbat's hearthworld never cooled. Ore fed into flame, flame into steel, steel into the teeth of a war that would not wait.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "mobilization2",
-        "name": "Mobilization",
-        "phase": "Any",
-        "window": "After you produce a unit",
-        "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
-        "flavorText": "From Umbat's hearthworld to distant suns, the shadow of his armada lengthened—stoked by their fury.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "mobilization3",
-        "name": "Mobilization",
-        "phase": "Any",
-        "window": "After you produce a unit",
-        "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
-        "flavorText": "Umbat's engineers broke into celebration as he called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "mobilization4",
-        "name": "Mobilization",
-        "phase": "Any",
-        "window": "After you produce a unit",
-        "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
-        "flavorText": "The warnings came too late for the Hylar. When an investigator from the Universities arrived weeks later to survey the carnage, naught was left but smoldering craters. The Gashlai's message was clear.",
         "source": "action_deck_2"
     },
     {
@@ -744,6 +708,42 @@
         "window": "At the start of the strategy phase",
         "text": "During this strategy phase, strategy card choices start with the speaker and proceed counterclockwise.",
         "flavorText": "In the distance, a huge explosion illuminated the sky. Brother Milor gripped the rails of his balcony as he watched the chaos unfolding in the streets below. The people demanded a revolution, and he would deliver one.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "sabotage1_acd2",
+        "name": "Sabotage",
+        "phase": "Any",
+        "window": "When another player plays an action card other than 'Sabotage'",
+        "text": "Cancel that action card.",
+        "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "sabotage2_acd2",
+        "name": "Sabotage",
+        "phase": "Any",
+        "window": "When another player plays an action card other than 'Sabotage'",
+        "text": "Cancel that action card.",
+        "flavorText": "The leaked documents brought a smile to Willard's face. Schemes upon schemes, none of which would ever reach fruition. ",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "sabotage3_acd2",
+        "name": "Sabotage",
+        "phase": "Any",
+        "window": "When another player plays an action card other than 'Sabotage'",
+        "text": "Cancel that action card.",
+        "flavorText": "Communications were jammed. Supply lines were harried. Staffing officers were found dead in their bunks. The grandeur of the scheme shocked Claire to her core.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "sabotage4_acd2",
+        "name": "Sabotage",
+        "phase": "Any",
+        "window": "When another player plays an action card other than 'Sabotage'",
+        "text": "Cancel that action card.",
+        "flavorText": "The growing creature spasmed in the genetic spinner's tank as Ssruu slowly emptied poison into its feeding pouch.",
         "source": "action_deck_2"
     },
     {
@@ -959,7 +959,7 @@
         "phase": "Action",
         "window": "At the start of your turn",
         "text": "Take 1 of your neighbors' commanders. At the end of this turn, return that commander to that player.",
-        "flavorText": "Conner laughed. \"Kill you? You're much better use to us alive...\"",
+        "flavorText": "",
         "notes": "This may unlock the stolen commander. That player loses access to their commander ability, as does the player with their Alliance. You and the player with your Alliance gain its ability.",
         "source": "action_deck_2"
     },
@@ -1288,7 +1288,7 @@
         "name": "Seized Research",
         "phase": "Any",
         "window": "After you gain control of a planet that has a technology speciality",
-        "text": "You may gain your breakthrough if its synergy matches that speciality; otherwise, research 1 technology that matches that speciality.",
+        "text": "Either gain your breakthrough or research 1 technology that matches that speciality.",
         "flavorText": "\"So, Doc,\" Connor said, playfully pointing his blaster at the Hylar as she cringed away. \"How about we start with a little tour of R&D?\"",
         "source": "action_deck_2"
     },
@@ -1308,7 +1308,7 @@
         "name": "Settlers",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose 1 non-home planet controlled by another player that contains units. That player may allow you to place 2 infantry from your reinforcements into coexistence on that planet. If they do not, exhaust that planet and destroy up to 2 units on it.",
+        "text": "Choose 1 non-home planet that contains another player's units. That player may allow you to place 2 infantry from your reinforcements into coexistence on that planet. If they do not, exhaust that planet and destroy up to 2 of units on it.",
         "flavorText": "Willard grumbled as another frigate shuttled toward the ocean-cities. They would soon be outnumbered.",
         "source": "action_deck_2"
     },
@@ -1329,43 +1329,6 @@
         "text": "Place each of your participating units into coexistence; the ground combat ends in a draw.",
         "notes": "This can be played if the player is already coexisting. It cannot be played if the player has no more units on the planet. The attacking player cannot choose to engage any coexisting units in combat after the combat ends in a draw.",
         "flavorText": "When the ink dried, Mot knew he would be remembered as a traitor. However, as irony would have it, he had bought the Nomad precisely what he needed—time.",
-        "source": "action_deck_2"
-    },
-
-    {
-        "alias": "sabotage1_acd2",
-        "name": "Sabotage",
-        "phase": "Any",
-        "window": "When another player plays an action card other than 'Sabotage'",
-        "text": "Cancel that action card.",
-        "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "sabotage2_acd2",
-        "name": "Sabotage",
-        "phase": "Any",
-        "window": "When another player plays an action card other than 'Sabotage'",
-        "text": "Cancel that action card.",
-        "flavorText": "The leaked documents brought a smile to Willard's face. Schemes upon schemes, none of which would ever reach fruition. ",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "sabotage3_acd2",
-        "name": "Sabotage",
-        "phase": "Any",
-        "window": "When another player plays an action card other than 'Sabotage'",
-        "text": "Cancel that action card.",
-        "flavorText": "Communications were jammed. Supply lines were harried. Staffing officers were found dead in their bunks. The grandeur of the scheme shocked Claire to her core.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "sabotage4_acd2",
-        "name": "Sabotage",
-        "phase": "Any",
-        "window": "When another player plays an action card other than 'Sabotage'",
-        "text": "Cancel that action card.",
-        "flavorText": "The growing creature spasmed in the genetic spinner's tank as Ssruu slowly emptied poison into its feeding pouch.",
         "source": "action_deck_2"
     }
 ]

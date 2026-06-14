@@ -1,6 +1,6 @@
 package ti4.image;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -664,15 +664,15 @@ public class Mapper {
         }
     }
 
-    public static DeckModel getDynamicExploreDeck(Game game) {
+    private static DeckModel getDynamicExploreDeck(Game game) {
         DeckModel deck = new DeckModel();
         deck.setType(DeckType.EXPLORE);
         deck.setName("Dynamic Explore Deck");
         deck.setAlias("explore");
         deck.setDescription("A dynamic explore deck for the game.");
         List<String> cards = new ArrayList<>();
-        for (String explore : Mapper.getExplores().keySet()) {
-            ExploreModel exploreModel = Mapper.getExplore(explore);
+        for (String explore : getExplores().keySet()) {
+            ExploreModel exploreModel = getExplore(explore);
             if (exploreModel.getSource().isPok() && game.isProphecyOfKings()) {
                 cards.add(explore);
             }
@@ -687,15 +687,15 @@ public class Mapper {
         return deck;
     }
 
-    public static DeckModel getDynamicRelicDeck(Game game) {
+    private static DeckModel getDynamicRelicDeck(Game game) {
         DeckModel deck = new DeckModel();
         deck.setType(DeckType.RELIC);
         deck.setName("Dynamic Relic Deck");
         deck.setAlias("relic");
         deck.setDescription("A dynamic relic deck for the game.");
         List<String> cards = new ArrayList<>();
-        for (String relic : Mapper.getRelics().keySet()) {
-            RelicModel relicModel = Mapper.getRelic(relic);
+        for (String relic : getRelics().keySet()) {
+            RelicModel relicModel = getRelic(relic);
             if (relicModel.isFakeRelic()) {
                 continue;
             }
@@ -719,7 +719,7 @@ public class Mapper {
         return deck;
     }
 
-    public static DeckModel getDynamicACDeck(Game game) {
+    private static DeckModel getDynamicACDeck(Game game) {
         // Implementation for dynamic AC deck
         DeckModel deck = new DeckModel();
         deck.setType(DeckType.ACTION_CARD);
@@ -727,12 +727,12 @@ public class Mapper {
         deck.setAlias("ac");
         deck.setDescription("A dynamic AC deck for the game.");
         List<String> cards = new ArrayList<>();
-        for (String actionCard : Mapper.getActionCards().keySet()) {
-            ActionCardModel actionCardModel = Mapper.getActionCard(actionCard);
+        for (String actionCard : getActionCards().keySet()) {
+            ActionCardModel actionCardModel = getActionCard(actionCard);
             if (actionCardModel.getSource().isPok()
                     && game.isProphecyOfKings()
                     && (!game.isAcd2()
-                            || Mapper.getDeck("action_deck_2_te").getNewDeck().contains(actionCard))
+                            || getDeck("action_deck_2_te").getNewDeck().contains(actionCard))
                     && !game.isTwilightsFallMode()) {
                 cards.add(actionCard);
             }
