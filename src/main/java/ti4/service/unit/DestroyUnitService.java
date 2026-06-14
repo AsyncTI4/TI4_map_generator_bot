@@ -180,7 +180,7 @@ public class DestroyUnitService {
         int totalAmount = unit.getTotalRemoved();
         Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
 
-        if (combat) {
+        if (combat && player != null) {
             if (player.hasAbility("beauty_in_destruction")) {
                 AshenAbilityHandler.offerBeautyInDestruction(game, player, unit, event);
             }
