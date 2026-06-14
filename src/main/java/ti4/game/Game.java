@@ -1,7 +1,7 @@
 package ti4.game;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.awt.Point;
 import java.util.AbstractMap.SimpleEntry;
@@ -3449,7 +3449,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         for (Player player : players.values()) {
             player.getActionCards().clear();
         }
-        ensureBastionAcd2SabotagesIncluded();
     }
 
     public boolean validateAndSetActionCardDeck(GenericInteractionCreateEvent event, DeckModel deck) {
@@ -3486,31 +3485,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
             Collections.shuffle(getActionCards());
         }
-        ensureBastionAcd2SabotagesIncluded();
-        return true;
-    }
-
-    public boolean ensureBastionAcd2SabotagesIncluded() {
-        if (!isAcd2() || getPlayerFromColorOrFaction("bastion") == null) return false;
-
-        List<String> bastionSabotageCards =
-                List.of("sabotage1_acd2", "sabotage2_acd2", "sabotage3_acd2", "sabotage4_acd2");
-        Set<String> existingCards = new HashSet<>(getActionCards());
-        existingCards.addAll(getDiscardActionCards().keySet());
-        for (Player player : players.values()) {
-            existingCards.addAll(player.getActionCards().keySet());
-        }
-
-        List<String> cardsToAdd = bastionSabotageCards.stream()
-                .filter(not(existingCards::contains))
-                .toList();
-        if (cardsToAdd.isEmpty()) return false;
-
-        getActionCards().addAll(cardsToAdd);
-        shuffleActionCards();
-        MessageHelper.sendMessageToChannel(
-                getMainGameChannel(),
-                "4 Sabotage cards have been added to the action card deck due to **Last Bastion** being in the game.");
         return true;
     }
 
