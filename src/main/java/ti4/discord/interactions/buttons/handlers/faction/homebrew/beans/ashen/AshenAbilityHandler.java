@@ -250,10 +250,10 @@ public class AshenAbilityHandler {
                 player.getRepresentationUnfogged()
                         + " spent 1 command token from their strategy pool to resolve _Beauty in Destruction_.");
         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "used _Beauty in Destruction_");
-        PlayerTechService.addTech(event, game, player, techId);
         if (player.hasLeader("ashencommander") && !player.hasLeaderUnlocked("ashencommander")) {
             UnlockLeaderService.unlockLeader("ashencommander", game, player);
         }
+        PlayerTechService.addTech(event, game, player, techId);
         ButtonHelper.deleteMessage(event);
     }
 

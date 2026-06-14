@@ -344,6 +344,7 @@ public class AshenUnitHandler {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
 
         if (totalHits > 0) {
+            AshenLeadersHandler.offerCommanderBombardmentButtons(event, game, player, totalHits);
             sendBombardmentHitButtons(event, game, player, tile, planet, totalHits);
         }
     }
