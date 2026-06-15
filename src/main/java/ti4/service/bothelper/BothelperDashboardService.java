@@ -43,13 +43,12 @@ public class BothelperDashboardService {
     // Dashboard content builder
     // ---------------------------------------------------------------------------
 
-    public static String buildDashboardContent() {
-        List<Guild> servers = JdaService.serversToCreateNewGamesOn;
+    private static String buildDashboardContent() {
         Set<String> uniqueUserIds = new HashSet<>();
         StringBuilder sb = new StringBuilder("# __Bothelper Dashboard__\n");
 
         StringBuilder serverBlocks = new StringBuilder();
-        for (Guild guild : servers) {
+        for (Guild guild : JdaService.serversToCreateNewGamesOn) {
             Role bothelperRole = CreateGameService.getRole(BOTHELPER_ROLE_NAME, guild);
             if (bothelperRole == null) continue;
             List<Member> members = guild.getMembersWithRoles(bothelperRole);
@@ -130,7 +129,7 @@ public class BothelperDashboardService {
     // ---------------------------------------------------------------------------
 
     private static void sendManageRolesMenu(User user, InteractionHook hook) {
-        List<Guild> servers = JdaService.serversToCreateNewGamesOn;
+        Set<Guild> servers = JdaService.serversToCreateNewGamesOn;
         if (servers.isEmpty()) {
             hook.editOriginal("No overflow servers are currently configured.")
                     .queue(Consumers.nop(), BotLogger::catchRestError);
@@ -178,13 +177,12 @@ public class BothelperDashboardService {
     @SelectionHandler(SELECTION_ID)
     public static void handleManageRolesSelection(StringSelectInteractionEvent event) {
         List<String> selectedGuildIds = event.getValues();
-        List<Guild> servers = JdaService.serversToCreateNewGamesOn;
 
         List<String> added = new ArrayList<>();
         List<String> removed = new ArrayList<>();
         List<String> skipped = new ArrayList<>();
 
-        for (Guild guild : servers) {
+        for (Guild guild : JdaService.serversToCreateNewGamesOn) {
             Role bothelperRole = CreateGameService.getRole(BOTHELPER_ROLE_NAME, guild);
             if (bothelperRole == null) {
                 skipped.add(guild.getName() + " (no Bothelper role found)");
