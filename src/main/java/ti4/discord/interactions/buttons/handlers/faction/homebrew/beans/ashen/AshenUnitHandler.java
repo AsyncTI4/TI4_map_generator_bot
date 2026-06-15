@@ -21,6 +21,7 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -29,6 +30,7 @@ import ti4.model.UnitModel;
 import ti4.service.combat.BombardmentService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
 @UtilityClass
@@ -36,9 +38,14 @@ public class AshenUnitHandler {
 
     private static final String ASHEN_INF_ID = "ashen_infantry";
     private static final String ASHEN_INF2_ID = "ashen_infantry2";
+    private static final String ASHEN_FLAGSHIP = "ashen_flagship";
+    private static final String ASHEN_MECH = "ashen_mech";
     private static final String ASHEN_DN = "ashen_dreadnought";
     private static final String ASHEN_DN2 = "ashen_dreadnought2";
     private static final String ASHFALL_ENGINE_PREFIX = "ashenAshfallEngine_";
+    private static final String ASHEN_MECH_REVIVE_PREFIX = "ashenMechRevive_";
+    private static final String ASHEN_MECH_PENDING_PREFIX = "ashenMechPending_";
+    private static final String ASHEN_FLAGSHIP_BOMBARDMENT_PREFIX = "ashenFlagshipBombard_";
 
     public static boolean resolveAshenInfDestroy(
             Game game, Player player, List<RemovedUnit> units, GenericInteractionCreateEvent event) {
@@ -52,6 +59,7 @@ public class AshenUnitHandler {
         MessageChannel resultChannel = player.getCorrectChannel();
         MessageChannel promptChannel = event == null ? resultChannel : event.getMessageChannel();
         boolean handled = false;
+        boolean offeredBtPrompt = false;
         for (RemovedUnit unit : units) {
             if (!player.unitBelongsToPlayer(unit.unitKey()) || unit.unitKey().unitType() != UnitType.Infantry) {
                 continue;
@@ -59,20 +67,162 @@ public class AshenUnitHandler {
 
             String planet = unit.uh() instanceof Planet ? unit.uh().getName() : null;
             for (int x = 0; x < unit.getTotalRemoved(); x++) {
-                resolveSingleAshenInfDestroy(game, player, unit.tile(), planet, resultChannel, promptChannel);
+                boolean btPromptedThisRoll = resolveSingleAshenInfDestroy(
+                        game, player, unit.tile(), planet, resultChannel, promptChannel, !offeredBtPrompt);
+                if (btPromptedThisRoll) {
+                    offeredBtPrompt = true;
+                }
             }
             handled = true;
         }
         return handled;
     }
 
-    private static void resolveSingleAshenInfDestroy(
+    public static void resolveAshenMechDestroy(Game game, Player player, RemovedUnit unit) {
+        if (game == null || player == null || unit == null || !player.hasUnit(ASHEN_MECH)) {
+            return;
+        }
+        if (!player.unitBelongsToPlayer(unit.unitKey()) || unit.unitKey().unitType() != UnitType.Mech) {
+            return;
+        }
+
+        UnitModel unitModel = player.getUnitFromUnitKey(unit.unitKey());
+        if (unitModel == null || !ASHEN_MECH.equals(unitModel.getId())) {
+            return;
+        }
+
+        int pending = getPendingAshenMechs(game, player) + unit.getTotalRemoved();
+        game.setStoredValue(getAshenMechPendingKey(player), Integer.toString(pending));
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " had "
+                        + StringHelper.pluralize(unit.getTotalRemoved(), unitModel.getName())
+                        + " destroyed. It will be placed on a planet you control in your home system at the start of"
+                        + " your next turn.");
+    }
+
+    public static void resolveAshenMechCheck(Player player, Game game) {
+        if (game == null || player == null) {
+            return;
+        }
+
+        int pending = getPendingAshenMechs(game, player);
+        if (pending < 1) {
+            return;
+        }
+
+        List<Button> buttons = getAshenMechRevivalButtons(player, game);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", you had "
+                            + StringHelper.pluralize(pending, "Balefire Sentinel")
+                            + " to revive, but the bot couldn't find any planets you control in your home system to"
+                            + " place them on.");
+            game.removeStoredValue(getAshenMechPendingKey(player));
+            return;
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", you have "
+                        + StringHelper.pluralize(pending, "Balefire Sentinel")
+                        + " to place on planets you control in your home system.",
+                buttons);
+    }
+
+    public static void clearFlagshipBombardmentContexts(Game game) {
+        if (game == null) {
+            return;
+        }
+        for (Tile tile : game.getTileMap().values()) {
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                game.removeStoredValue(getAshenFlagshipBombardmentKey(planet.getName()));
+            }
+        }
+    }
+
+    public static void prepareFlagshipBombardmentContext(Game game, Player player, String bombardPlanet) {
+        if (game == null || bombardPlanet == null || bombardPlanet.isBlank()) {
+            return;
+        }
+        game.removeStoredValue(getAshenFlagshipBombardmentKey(bombardPlanet));
+        if (player == null || !player.hasUnit(ASHEN_FLAGSHIP)) {
+            return;
+        }
+
+        String assignedUnits = game.getStoredValue("assignedBombardment" + player.getFaction());
+        if (assignedUnits.isBlank()) {
+            return;
+        }
+
+        boolean hasFlagshipAssigned = false;
+        for (String assignedUnit : assignedUnits.split(";")) {
+            if (assignedUnit.isBlank() || !assignedUnit.endsWith("_" + bombardPlanet)) {
+                continue;
+            }
+            String assignedAlias = assignedUnit.split("_", 2)[0];
+            if (isBombardmentModifierAssignment(assignedAlias)) {
+                continue;
+            }
+            if (!"fs".equals(assignedAlias)) {
+                return;
+            }
+            hasFlagshipAssigned = true;
+        }
+
+        if (hasFlagshipAssigned) {
+            game.setStoredValue(getAshenFlagshipBombardmentKey(bombardPlanet), player.getFaction());
+        }
+    }
+
+    public static void resolveFlagshipBombardmentInfantryDeath(
+            GenericInteractionCreateEvent event, Game game, Player defender, RemovedUnit unit) {
+        if (event == null
+                || game == null
+                || defender == null
+                || unit == null
+                || unit.unitKey().unitType() != UnitType.Infantry) {
+            return;
+        }
+        if (!(unit.uh() instanceof Planet planetHolder)) {
+            return;
+        }
+        if (!"bombardment".equalsIgnoreCase(game.getStoredValue(defender.getFaction() + "latestAssignHits"))) {
+            return;
+        }
+
+        String attackerFaction = game.getStoredValue(getAshenFlagshipBombardmentKey(planetHolder.getName()));
+        if (attackerFaction.isBlank()) {
+            return;
+        }
+
+        Player attacker = game.getPlayerFromColorOrFaction(attackerFaction);
+        if (attacker == null || !attacker.hasUnit(ASHEN_FLAGSHIP) || unit.tile() == null) {
+            return;
+        }
+
+        AddUnitService.addUnits(
+                event,
+                unit.tile(),
+                game,
+                attacker.getColor(),
+                unit.getTotalRemoved() + " infantry " + planetHolder.getName());
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                attacker.getRepresentation() + " committed "
+                        + StringHelper.pluralize(unit.getTotalRemoved(), "infantry") + " to "
+                        + Helper.getPlanetRepresentation(planetHolder.getName(), game) + " with _The Pyre_.");
+    }
+
+    private static boolean resolveSingleAshenInfDestroy(
             Game game,
             Player player,
             Tile tile,
             String planet,
             MessageChannel resultChannel,
-            MessageChannel promptChannel) {
+            MessageChannel promptChannel,
+            boolean canOfferBtPrompt) {
         int threshold = player.hasUnit(ASHEN_INF2_ID) ? 6 : 9;
         Die die = new Die(threshold);
 
@@ -81,6 +231,13 @@ public class AshenUnitHandler {
 
         if (!die.isSuccess()) {
             message.append(" Failure.");
+            boolean offeredBt = canOfferBtPrompt
+                    && AshenBreakthroughHandler.offerFromFireResolveInfantryButton(
+                            player, game, tile, planet, die, promptChannel);
+            if (offeredBt) {
+                message.append(
+                        " You may exhaust _From Fire, Resolve_ from your cards info thread to treat this roll as a 10 and start _Phoenix Rising_.");
+            }
             if (RandomHelper.isOneInX(20)) {
                 message.append(
                         " That infantry is now permanently dead, destined to be forgotten as just one more amongst untold billions who will die in this war.");
@@ -91,19 +248,20 @@ public class AshenUnitHandler {
                         .append(".");
             }
             MessageHelper.sendMessageToChannel(resultChannel, message.toString());
-            return;
+            return offeredBt;
         }
 
         if (AshenAbilityHandler.offerPhoenixRising(player, game, tile, planet, die, promptChannel)) {
             message.append(
                     " Success. You may use _Phoenix Rising_ to place that infantry back on the planet, or decline to choose a _Cinderborn_ revive with or without producing 1 hit.");
             MessageHelper.sendMessageToChannel(resultChannel, message.toString());
-            return;
+            return false;
         }
 
         message.append(" Success. You may revive that infantry with or without producing 1 hit.");
         MessageHelper.sendMessageToChannel(resultChannel, message.toString());
         AshenAbilityHandler.offerCinderbornReviveChoice(player, game, tile, planet, promptChannel);
+        return false;
     }
 
     public static void offerAshfallEngineOnDestroy(
@@ -234,6 +392,44 @@ public class AshenUnitHandler {
         offerAshfallEngineButtons(event, game, player, tile, planets, true, triggerCount, ASHEN_DN2);
     }
 
+    @ButtonHandler(ASHEN_MECH_REVIVE_PREFIX)
+    public static void reviveAshenMech(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        if (event == null || player == null || game == null) {
+            return;
+        }
+
+        int pending = getPendingAshenMechs(game, player);
+        if (pending < 1) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String planet = buttonID.substring(ASHEN_MECH_REVIVE_PREFIX.length());
+        Tile tile = game.getTileFromPlanet(planet);
+        Tile homeTile = player.getHomeSystemTile();
+        if (tile == null
+                || homeTile == null
+                || !homeTile.equals(tile)
+                || !player.getPlanets().contains(planet)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 mech " + planet);
+        pending--;
+        if (pending > 0) {
+            game.setStoredValue(getAshenMechPendingKey(player), Integer.toString(pending));
+            MessageHelper.editMessageButtons(event, getAshenMechRevivalButtons(player, game));
+        } else {
+            game.removeStoredValue(getAshenMechPendingKey(player));
+            ButtonHelper.deleteMessage(event);
+        }
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " placed 1 Balefire Sentinel on "
+                        + Helper.getPlanetRepresentation(planet, game) + ". You have " + pending + " left to place.");
+    }
+
     @ButtonHandler(ASHFALL_ENGINE_PREFIX)
     public static void resolveAshfallEngineRoll(
             ButtonInteractionEvent event, Player player, String buttonId, Game game) {
@@ -295,6 +491,7 @@ public class AshenUnitHandler {
             String planet,
             int triggerCount,
             String unitId) {
+        game.removeStoredValue(getAshenFlagshipBombardmentKey(planet));
         UnitModel unitModel = Mapper.getUnit(unitId);
         if (triggerCount < 1
                 || unitModel == null
@@ -393,5 +590,42 @@ public class AshenUnitHandler {
                 }
             }
         }
+    }
+
+    private static List<Button> getAshenMechRevivalButtons(Player player, Game game) {
+        List<Button> buttons = new ArrayList<>();
+        Tile home = player.getHomeSystemTile();
+        if (home == null) {
+            return buttons;
+        }
+
+        for (UnitHolder unitHolder : home.getUnitHolders().values()) {
+            if (unitHolder instanceof Planet planet
+                    && player.getPlanets().contains(planet.getName())
+                    && !planet.isSpaceStation()) {
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + ASHEN_MECH_REVIVE_PREFIX + planet.getName(),
+                        "Place 1 Mech on " + Helper.getPlanetRepresentation(planet.getName(), game),
+                        UnitEmojis.mech));
+            }
+        }
+        return buttons;
+    }
+
+    private static int getPendingAshenMechs(Game game, Player player) {
+        String pending = game.getStoredValue(getAshenMechPendingKey(player));
+        return pending.isBlank() ? 0 : Integer.parseInt(pending);
+    }
+
+    private static String getAshenMechPendingKey(Player player) {
+        return ASHEN_MECH_PENDING_PREFIX + player.getFaction();
+    }
+
+    private static String getAshenFlagshipBombardmentKey(String planet) {
+        return ASHEN_FLAGSHIP_BOMBARDMENT_PREFIX + planet;
+    }
+
+    private static boolean isBombardmentModifierAssignment(String assignedAlias) {
+        return "plasma".equals(assignedAlias) || "argentcommander".equals(assignedAlias);
     }
 }

@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisHeroButtonHandler;
 import ti4.game.Game;
@@ -188,6 +189,9 @@ public class StartTurnService {
             if (!goingToPass) {
                 MessageHelper.sendMessageToChannelWithButtons(gameChannel, buttonText, buttons);
             }
+        }
+        if (player.hasUnit("ashen_mech")) {
+            AshenUnitHandler.resolveAshenMechCheck(player, game);
         }
         ButtonHelperFactionSpecific.resolveMykoMechCheck(player, game);
         ButtonHelperFactionSpecific.resolveKolleccAbilities(player, game);

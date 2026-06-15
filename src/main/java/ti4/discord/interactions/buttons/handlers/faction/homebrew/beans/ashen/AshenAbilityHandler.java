@@ -53,6 +53,45 @@ public class AshenAbilityHandler {
             return false;
         }
 
+        sendPhoenixRisingPrompt(
+                player,
+                game,
+                tile,
+                planet,
+                channel,
+                player.getRepresentation() + ", you rolled a " + die.getResult()
+                        + " for _Cinderborn_, so you may use _Phoenix Rising_ to place that infantry on "
+                        + Helper.getPlanetRepresentation(planet, game)
+                        + ". If you decline, resolve _Cinderborn_ normally.");
+        return true;
+    }
+
+    public static boolean startPhoenixRisingFromBreakthrough(
+            Player player, Game game, Tile tile, String planet, MessageChannel channel) {
+        if (player == null
+                || game == null
+                || tile == null
+                || planet == null
+                || channel == null
+                || !player.hasAbility(PHOENIX_RISING)) {
+            return false;
+        }
+
+        sendPhoenixRisingPrompt(
+                player,
+                game,
+                tile,
+                planet,
+                channel,
+                player.getRepresentation()
+                        + " exhausted _From Fire, Resolve_ to treat an infantry revive roll as a 10, so you may use _Phoenix Rising_ to place that infantry on "
+                        + Helper.getPlanetRepresentation(planet, game)
+                        + ". If you decline, resolve _Cinderborn_ normally.");
+        return true;
+    }
+
+    private static void sendPhoenixRisingPrompt(
+            Player player, Game game, Tile tile, String planet, MessageChannel channel, String message) {
         List<Button> buttons = List.of(
                 Buttons.green(
                         player.factionButtonChecker() + PHOENIX_USE_PREFIX + tile.getPosition() + "_" + planet,
@@ -61,14 +100,7 @@ public class AshenAbilityHandler {
                 Buttons.red(
                         player.factionButtonChecker() + PHOENIX_DECLINE_PREFIX + tile.getPosition() + "_" + planet,
                         "Decline Phoenix Rising"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                channel,
-                player.getRepresentation() + ", you rolled a " + die.getResult()
-                        + " for _Cinderborn_, so you may use _Phoenix Rising_ to place that infantry on "
-                        + Helper.getPlanetRepresentation(planet, game)
-                        + ". If you decline, resolve _Cinderborn_ normally.",
-                buttons);
-        return true;
+        MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
     }
 
     public static void resolveCinderbornRevive(

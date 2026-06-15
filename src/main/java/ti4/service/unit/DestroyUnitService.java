@@ -212,9 +212,15 @@ public class DestroyUnitService {
         List<Player> killers = CaptureUnitService.listProbableKiller(game, unit);
 
         switch (unit.unitKey().unitType()) {
-            case Infantry -> capturing.addAll(CaptureUnitService.listCapturingMechPlayers(game, allUnits, unit));
+            case Infantry -> {
+                capturing.addAll(CaptureUnitService.listCapturingMechPlayers(game, allUnits, unit));
+                AshenUnitHandler.resolveFlagshipBombardmentInfantryDeath(event, game, player, unit);
+            }
             case Mech -> {
                 handleSelfAssemblyRoutines(player, totalAmount, game);
+                if (player != null && player.hasUnit("ashen_mech")) {
+                    AshenUnitHandler.resolveAshenMechDestroy(game, player, unit);
+                }
                 if (player.hasUnit("iron_mech") || player.hasUnit("iron_mech2")) {
                     IronUnitsHandler.resolveRiptideDestroy(event, game, player, unit);
                 }
