@@ -71,7 +71,7 @@ public class AshenLeadersHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged()
-                        + ", choose an eligible system for **Ashfall Effigy - Hell From Above**.",
+                        + ", choose an eligible system for **Ashfall Effigy - Hell From Above**.\n\n**NOTE**: Flagship ability is not automated with hero.",
                 buttons);
     }
 
@@ -107,6 +107,7 @@ public class AshenLeadersHandler {
                         + sourceTile.getRepresentationForButtons(game, player)
                         + ".");
         ButtonHelper.deleteMessage(event);
+        AshenUnitHandler.clearFlagshipBombardmentContexts(game);
 
         for (String planet : targetPlanets) {
             game.setStoredValue(getHeroBombardmentAssignKey(player), planet);
@@ -235,17 +236,22 @@ public class AshenLeadersHandler {
         if (event == null
                 || game == null
                 || player == null
-                || hits < 1
                 || !game.playerHasLeaderUnlockedOrAlliance(player, COMMANDER_ID)) {
             return;
         }
 
-        String message = player.getRepresentationUnfogged() + ", **Karos**: for each of these "
-                + StringHelper.pluralize(hits, "hit")
-                + ", you may either gain 1 commodity or convert 1 of your commodities to a trade good."
-                + "\n-# You have (" + player.getCommoditiesRepresentation() + ") commodities.";
+        int displayedHits = player.hasTech("x89c4") ? hits / 2 : hits;
+        String message = displayedHits > 0
+                ? player.getRepresentationUnfogged() + ", **Karos**: for each of these "
+                        + StringHelper.pluralize(displayedHits, "hit")
+                        + ", you may either gain 1 commodity or convert 1 of your commodities to a trade good."
+                        + "\n-# You have (" + player.getCommoditiesRepresentation() + ") commodities."
+                : player.getRepresentationUnfogged()
+                        + ", **Karos**: if you produced 1 or more BOMBARDMENT hits before modifiers, you may either gain 1 commodity or convert 1 of your commodities to a trade good for each such hit."
+                        + "\n-# You have (" + player.getCommoditiesRepresentation() + ") commodities.";
         List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, false);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        MessageChannel primaryChannel = event.getMessageChannel();
+        MessageHelper.sendMessageToChannelWithButtons(primaryChannel, message, buttons);
     }
 
     @ButtonHandler(AGENT_SELECT_TARGET)
