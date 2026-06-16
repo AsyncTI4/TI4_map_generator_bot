@@ -448,13 +448,11 @@ public class PlayStrategyCardService {
             List<Button> buttons2 = ButtonHelper.getBalanceButtons(player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons2);
         }
-        if (player.hasUnlockedBreakthrough("onyxxabt")) {
-            OnyxxaBreakthroughButtonHandler.offerSCRollButton(game, player);
-        }
         for (Player p : game.getRealPlayers()) {
-            if (p != player
-                    && !p.hasLeaderUnlocked("onyxxacommander")
-                    && p.getLeaderIDs().contains("onyxxacommander")) {
+            if (p.hasUnlockedBreakthrough("onyxxabt")) {
+                OnyxxaBreakthroughButtonHandler.offerSCRollButton(game, p);
+            }
+            if (p != player && !p.hasLeaderUnlocked("onyxxacommander") && p.hasLeader("onyxxacommander")) {
                 OnyxxaCommanderButtonHandler.offerCommanderUnlockButton(p);
             }
         }
