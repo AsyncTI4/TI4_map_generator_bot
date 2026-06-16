@@ -15,6 +15,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisHeroButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -192,6 +193,9 @@ public class StartTurnService {
         }
         if (player.hasUnit("ashen_mech")) {
             AshenUnitHandler.resolveAshenMechCheck(player, game);
+        }
+        if (player.hasAbility("planetary_reconfiguration")) {
+            TaAbilityHandler.sendPlanetaryReconfigurationStatus(player, game);
         }
         ButtonHelperFactionSpecific.resolveMykoMechCheck(player, game);
         ButtonHelperFactionSpecific.resolveKolleccAbilities(player, game);

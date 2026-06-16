@@ -42,6 +42,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
 import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
 import ti4.draft.BagDraft;
@@ -3887,6 +3888,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             String color = p.getColor();
             planet.removeAllUnits(color);
             PlanetRemove.removePlayerControlToken(p, planet);
+            if (planet instanceof Planet planetHolder && p.hasAbility("planetary_reconfiguration")) {
+                TaAbilityHandler.returnPlanetaryReconfigurationDesigns(p, this, planetHolder);
+            }
             p.removePlanet(planet.getName());
         }
     }

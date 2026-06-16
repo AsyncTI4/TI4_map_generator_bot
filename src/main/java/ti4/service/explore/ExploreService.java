@@ -19,6 +19,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -467,6 +469,9 @@ public class ExploreService {
             player.setAtsCount(player.getAtsCount() + numExplores);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "tacommander")) {
+            TaLeadersHandler.resolveTaCommander(player, tile, planetName);
         }
         if (ButtonHelper.isPlanetLegendaryOrTechSkip(planetName, game)
                 && Helper.getPlayerFromUnlockedLeader(game, "augersagent") != null) {
@@ -1243,6 +1248,10 @@ public class ExploreService {
         CommanderUnlockCheckService.checkPlayer(player, "kollecc", "bentor", "ghost");
         if (player.getPlanets().contains(planetID)) {
             ButtonHelperAbilities.offerOrladinPlunderButtons(player, game, planetID);
+        }
+
+        if (player.getPlanets().contains(planetID) && player.hasAbility("planetary_reconfiguration")) {
+            TaAbilityHandler.offerPlanetaryReconfigurationButtons(player, game, tile, planetID);
         }
 
         if (player.hasAbility("awaken")
