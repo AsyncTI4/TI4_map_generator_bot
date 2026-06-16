@@ -13,6 +13,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -361,6 +362,10 @@ public class CardsInfoService {
 
         if (player.hasRelicReady("heartofixth")) {
             buttons.add(Buttons.blue("exhaustRelic_heartofixth", "Exhaust Heart of Ixth"));
+        }
+
+        if (player.hasAbility("planetary_reconfiguration")) {
+            TaAbilityHandler.sendPlanetaryReconfigurationStatus(player, game);
         }
 
         if (player.hasAbility("divination")

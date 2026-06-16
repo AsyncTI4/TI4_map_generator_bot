@@ -1,0 +1,10 @@
+{
+    "id": "gedustation",
+    "tileId": null,
+    "name": "Gedu Station",
+    "aliases": ["gedustation"],
+    "resources": 3,
+    "influence": 3,
+    "planetTypes": ["SPACESTATION", "FAKE"],
+    "source": "blue_reverie"
+}
