@@ -50,7 +50,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.lunarium.LunariumAbilityButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityButtonHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
@@ -620,6 +620,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 || getTechs().contains("absol_inf2")
                 || getTechs().contains("dsqhetinf")
                 || getTechs().contains("dszeliinf")
+                || getUnitsOwned().contains("ashen_infantry")
+                || getUnitsOwned().contains("ashen_infantry2")
                 || getUnitsOwned().contains("pharadn_infantry")
                 || getUnitsOwned().contains("pharadn_infantry2");
     }
@@ -835,15 +837,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     @Override
     public Map<String, Integer> getPlotCards() {
-        Map<String, Integer> plots = new LinkedHashMap<>();
-        for (String plot : getPlotCardsRaw().keySet()) {
-            if (plot.startsWith("mutated")) {
-                String other = plot.replace("mutated_", "");
-                if (getPlotCardsRaw().containsKey(other)) continue;
-            }
-            plots.put(plot, getPlotCardsRaw().get(plot));
-        }
-        return MapUtils.unmodifiableMap(plots);
+        return MapUtils.unmodifiableMap(new LinkedHashMap<>(getPlotCardsRaw()));
     }
 
     public Map<String, List<String>> getPlotCardsFactionsRaw() {
@@ -853,7 +847,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     @Override
     public Map<String, List<String>> getPlotCardsFactions() {
         Map<String, List<String>> plots = new LinkedHashMap<>();
-        for (String plot : getPlotCards().keySet()) {
+        for (String plot : getPlotCardsRaw().keySet()) {
             List<String> puppets = getPlotCardsFactionsRaw().get(plot);
             if (puppets == null) puppets = List.of();
             plots.put(plot, puppets);
@@ -2121,7 +2115,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                         game, ButtonHelper.getStratName(ButtonHelper.getStratName(sc), game));
                 if (chan != null) {
                     chan.retrieveMessageById(gameMessage.messageId()).queue(mainMessage -> mainMessage
-                            .editMessage(PlayStrategyCardService.getSCFollowSummary(game, sc))
+                            .editMessage(PlayStrategyCardService.getSCFollowSummary(game, sc, true))
                             .queue());
                 }
             }
@@ -2572,6 +2566,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if ("dn2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("kortalibt")) {
             addOwnedUnitByID("tribune3");
             removeOwnedUnitByID("dreadnought2");
+        }
+        if ("inf2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("uydaibt")) {
+            addOwnedUnitByID("death_commandos3");
+            removeOwnedUnitByID("infantry2");
         }
     }
 

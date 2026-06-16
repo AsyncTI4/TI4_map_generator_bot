@@ -50,13 +50,19 @@ public class StandardBagDraft extends BagDraft {
             factionSet.removeIf(factionModel ->
                     factionModel.getSource().isDs() && !factionModel.getSource().isPok());
         }
+        if (!game.isBlueReverieMode()) {
+            factionSet.removeIf(factionModel ->
+                    factionModel.getSource().isBr() && !factionModel.getSource().isPok());
+        }
         return factionSet;
     }
 
     private static List<FactionModel> getAllLegalFactions() {
         List<FactionModel> factionSet = Mapper.getFactionsValues();
         factionSet.removeIf((FactionModel model) -> {
-            if (model.getSource().isPok() || model.getSource().isDs()) {
+            if (model.getSource().isPok()
+                    || model.getSource().isDs()
+                    || model.getSource().isBr()) {
                 for (String excludedFaction : excludedFactions) {
                     if (model.getAlias().contains(excludedFaction)) {
                         return true;

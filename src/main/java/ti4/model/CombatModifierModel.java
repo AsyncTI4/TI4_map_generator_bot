@@ -108,6 +108,13 @@ public class CombatModifierModel implements ModelInterface {
             if ("_groundforce_".equals(scope)) {
                 isInScope = unit.getIsGroundForce();
             }
+            if ("classifiedWeapons".equals(scope)) {
+                String storedValue = game.getStoredValue("classifiedWeapons");
+                int separatorIdx = storedValue.indexOf(';');
+                if (separatorIdx >= 0) {
+                    isInScope = storedValue.substring(separatorIdx + 1).equals(unit.getAsyncId());
+                }
+            }
         }
         return isInScope;
     }

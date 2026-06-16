@@ -429,7 +429,14 @@ public class CreateGameButtonHandler {
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
             int ongoingAmount = countOngoingGamesThatAffectJoinLimit(managedPlayer);
             int completedGames = countCompletedGamesThatAffectJoinLimit(managedPlayer);
-            if (ongoingAmount > completedGames + 2) {
+            int limitIncrease = 0;
+            if (event.getChannel() instanceof ThreadChannel channel) {
+                String parentName = channel.getParentChannel().getName();
+                if ("making-private-games".equalsIgnoreCase(parentName)) {
+                    limitIncrease = 1;
+                }
+            }
+            if (ongoingAmount > completedGames + 2 + limitIncrease) {
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(),
                         member.getUser().getAsMention()

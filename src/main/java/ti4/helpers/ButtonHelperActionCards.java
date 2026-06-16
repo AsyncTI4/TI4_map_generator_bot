@@ -37,7 +37,6 @@ import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
-import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
@@ -393,18 +392,6 @@ public final class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("resolveCompoundingInterests")
-    public static void resolveCompoundingInterests(Game game, Player player, ButtonInteractionEvent event) {
-        int tgGain = ButtonHelper.getTilesWithYourCC(player, game, event).size();
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                player.getRepresentationNoPing() + " gained " + tgGain + " trade good" + (tgGain == 1 ? "" : "s")
-                        + " due to _Compounding Interests_ " + player.gainTG(tgGain) + ".");
-        ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, tgGain);
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler("resolveWarEffort")
     public static void resolveWarEffort(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>(
@@ -415,7 +402,7 @@ public final class ButtonHelperActionCards {
     }
 
     @ButtonHandler("resolveFreeTrade")
-    public static void resolveFreeTrade(Game game, Player player, ButtonInteractionEvent event) {
+    public static void resolveFreeTrade(ButtonInteractionEvent event) {
         Button convert2CommButton =
                 Buttons.green("convert_2_comms_stay", "Convert 2 Commodities Into Trade Goods", MiscEmojis.Wash);
         Button get2CommButton = Buttons.blue("gain_2_comms_stay", "Gain 2 Commodities", MiscEmojis.comm);
@@ -428,7 +415,7 @@ public final class ButtonHelperActionCards {
     }
 
     @ButtonHandler("resolvePreparation")
-    public static void resolvePreparation(Game game, Player player, ButtonInteractionEvent event) {
+    public static void resolvePreparation(ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         String message = "Use button to draw 1 action card.";
         buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
@@ -505,15 +492,15 @@ public final class ButtonHelperActionCards {
     }
 
     @ButtonHandler("getDivertFundingButtons")
-    public static void getDivertFundingButtons(ButtonInteractionEvent event, Player player, Game game) {
+    public static void getDivertFundingButtons(ButtonInteractionEvent event, Player player) {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(),
                 "Please choose the technology you wish to return.",
-                getDivertFundingLoseTechOptions(player, game));
+                getDivertFundingLoseTechOptions(player));
         ButtonHelper.deleteMessage(event);
     }
 
-    private static List<Button> getDivertFundingLoseTechOptions(Player player, Game game) {
+    private static List<Button> getDivertFundingLoseTechOptions(Player player) {
         String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
@@ -2490,8 +2477,8 @@ public final class ButtonHelperActionCards {
         player.setTg(oldTg + resValue);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                player.getFactionEmoji() + " gained " + resValue + " trade good" + (resValue == 1 ? "" : "s") + " ("
-                        + oldTg + "->" + player.getTg() + ").");
+                player.getFactionEmoji() + " gained " + StringHelper.pluralize(resValue, "trade good") + " (" + oldTg
+                        + "->" + player.getTg() + ").");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, resValue);
         if (game.isFowMode()) {
@@ -2561,8 +2548,8 @@ public final class ButtonHelperActionCards {
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", you _Plague_'d " + planetRep + " and got " + hits + " hit"
-                            + (hits == 1 ? "" : "s"));
+                    player.getRepresentationUnfogged() + ", you _Plague_'d " + planetRep + " and got "
+                            + StringHelper.pluralize(hits, "hit"));
             MessageHelper.sendMessageToChannel(
                     p2.getCorrectChannel(),
                     p2.getRepresentationUnfogged() + ", your planet " + planetRep + " suffered a" + adjective
@@ -2612,12 +2599,12 @@ public final class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", you stormed " + tile.getRepresentationForButtons(game, player)
-                        + " and got " + hits + " hit" + (hits == 1 ? "" : "s"));
+                        + " and got " + StringHelper.pluralize(hits, "hit"));
         MessageHelper.sendMessageToChannel(
                 p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged() + ", your fighter" + (amount == 1 ? "" : "s") + " in "
                         + tile.getRepresentationForButtons(game, player) + " were hit by a storm and you lost "
-                        + hits + " fighter" + (hits == 1 ? "" : "s") + ".");
+                        + StringHelper.pluralize(hits, "fighter") + ".");
     }
 
     @ButtonHandler("crippleStep3_")
@@ -3029,7 +3016,7 @@ public final class ButtonHelperActionCards {
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                player.getFactionEmoji() + " gained " + count + " trade good" + (count == 1 ? "" : "s") + " (" + oldTg
+                player.getFactionEmoji() + " gained " + StringHelper.pluralize(count, "trade good") + " (" + oldTg
                         + "->" + player.getTg() + ").");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, count);
@@ -3055,7 +3042,7 @@ public final class ButtonHelperActionCards {
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                player.getFactionEmoji() + " gained " + count + " trade good" + (count == 1 ? "" : "s") + " (" + oldTg
+                player.getFactionEmoji() + " gained " + StringHelper.pluralize(count, "trade good") + " (" + oldTg
                         + "->" + player.getTg() + ") from mining " + bestPlanet + ".");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, count);
@@ -3141,12 +3128,6 @@ public final class ButtonHelperActionCards {
             }
             buttons.addAll(
                     getExplorationRiderPlanetButtons(player, game, remainingExplores, selectedPlanetsValue, planet));
-        }
-        if (!buttons.isEmpty() && player.hasUnlockedBreakthrough("augersbt")) {
-            buttons.add(Buttons.green(
-                    "resolveExplorationRiderDrawAc_" + remainingExplores + "_" + selectedPlanetsValue,
-                    "Draw 1 Action Card Instead With Breakthrough",
-                    FactionEmojis.augers));
         }
         return buttons;
     }

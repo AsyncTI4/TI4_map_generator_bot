@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 import ti4.ResourceHelper;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -233,8 +234,12 @@ class UnitRenderGenerator {
                 }
 
                 boolean wrongPlace = containsDMZ;
-                wrongPlace |= isSpace && unitModel.getIsPlanetOnly();
-                wrongPlace |= !isSpace && unitModel.getIsSpaceOnly();
+                wrongPlace |= isSpace
+                        && unitModel.getIsPlanetOnly()
+                        && !IronAbilitiesHandler.isExoAtmosphericMech(player, unitKey.unitType());
+                wrongPlace |= !isSpace
+                        && unitModel.getIsSpaceOnly()
+                        && !IronAbilitiesHandler.isExoAtmosphericMech(player, unitKey.unitType());
                 wrongPlace &= !unitModel.getIsStructure() || !player.hasAbility("miniaturization");
                 if (wrongPlace) {
                     String badPath = resourceHelper.getPositionFile(

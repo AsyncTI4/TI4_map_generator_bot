@@ -296,8 +296,10 @@ public class MiltyDraftHelper {
                 ComponentSource.codex3,
                 ComponentSource.codex4,
                 ComponentSource.pok));
-        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+        if (game.isDiscordantStarsMode()) {
             sources.add(ComponentSource.ds);
+        }
+        if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {

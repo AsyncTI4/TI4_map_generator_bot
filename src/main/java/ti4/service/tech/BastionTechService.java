@@ -22,6 +22,7 @@ import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RegexHelper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -189,8 +190,8 @@ public class BastionTechService {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), message + "\nRolled against " + p2.getRepresentationNoPing() + ".");
             if (h > 0) {
-                String msg = p2.getRepresentationUnfogged() + ", you may auto-assign " + h + " hit"
-                        + (h == 1 ? "" : "s") + ".";
+                String msg = p2.getRepresentationUnfogged() + ", you may auto-assign "
+                        + StringHelper.pluralize(h, "hit") + ".";
                 List<Button> buttons = new ArrayList<>();
                 String factionChecker = "FFCC_" + p2.getFaction() + "_";
                 buttons.add(Buttons.green(
@@ -215,14 +216,14 @@ public class BastionTechService {
                 if (planet.getGalvanizedUnitCount(p1.getColorID()) > 0 && h > 0) {
                     int oldH = h;
                     h = Math.max(0, h - planet.getGalvanizedUnitCount(p1.getColorID()));
-                    message += "\n_Proxima Targeting VI_ canceled " + (oldH - h) + " hit" + (oldH - h == 1 ? "" : "s")
+                    message += "\n_Proxima Targeting VI_ canceled " + StringHelper.pluralize(oldH - h, "hit")
                             + " automatically.";
                 }
             }
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), message + "\nRolled against " + p1.getRepresentationNoPing() + ".");
             if (h > 0) {
-                String msg = p1.getRepresentationUnfogged() + ", you may autoassign " + h + " hit" + (h == 1 ? "" : "s")
+                String msg = p1.getRepresentationUnfogged() + ", you may autoassign " + StringHelper.pluralize(h, "hit")
                         + ".";
                 List<Button> buttons = new ArrayList<>();
                 String factionChecker = "FFCC_" + p1.getFaction() + "_";

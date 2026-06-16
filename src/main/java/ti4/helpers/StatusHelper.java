@@ -26,6 +26,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
+import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -181,9 +182,10 @@ public final class StatusHelper {
                 player.setCommodities(player.getCommodities() + numScoredPos);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentationUnfogged() + " you gained " + numScoredSOs + " trade good"
-                                + (numScoredSOs == 1 ? "" : "s") + " and " + numScoredPos + " commodit"
-                                + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
+                        player.getRepresentationUnfogged() + " you gained "
+                                + StringHelper.pluralize(numScoredSOs, "trade good") + " and " + numScoredPos
+                                + " commodit" + (numScoredSOs == 1 ? "y" : "ies")
+                                + " due to Komdar Borodin, the Vaden Commander.");
             }
             if (player.hasTech("hydrothermal")) {
                 int oceans = 0;
@@ -196,8 +198,8 @@ public final class StatusHelper {
                     ButtonHelperAgents.resolveArtunoCheck(player, oceans);
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getRepresentationUnfogged() + ", you gained " + oceans + " trade good"
-                                    + (oceans == 1 ? "" : "s") + " due to _ Hydrothermal Mining_.");
+                            player.getRepresentationUnfogged() + ", you gained "
+                                    + StringHelper.pluralize(oceans, "trade good") + " due to _ Hydrothermal Mining_.");
                 }
             }
             if (player.hasTech("tf-geneticresearch")) {
@@ -210,8 +212,8 @@ public final class StatusHelper {
                 ButtonHelperAgents.resolveArtunoCheck(player, maxNum);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentationUnfogged() + ", you gained " + maxNum + " trade good"
-                                + (maxNum == 1 ? "" : "s") + " due to _Genetic Research_.");
+                        player.getRepresentationUnfogged() + ", you gained "
+                                + StringHelper.pluralize(maxNum, "trade good") + " due to _Genetic Research_.");
             }
             if (player.hasTech("tf-radicaladvancement")) {
                 List<Button> buttons = new ArrayList<>();
@@ -618,24 +620,40 @@ public final class StatusHelper {
     }
 
     private static void sendNeuralParasiteButtons(Game game) {
-        List<Player> firmaments = Helper.getPlayersFromTech(game, "parasite-firm");
-        if (firmaments.isEmpty()) return;
+        for (Player player : game.getRealPlayers()) {
+            boolean hasFrankenFirmParasite = game.isFrankenGame() && player.hasTech("parasite-firm_y");
+            boolean hasBaseFirmParasite = !game.isFrankenGame() && player.hasTech("parasite-firm");
 
-        for (Player player : firmaments) {
-            Tile home = player.getHomeSystemTile();
-            if (home == null) {
-                continue;
+            if (hasFrankenFirmParasite || hasBaseFirmParasite) {
+                Tile home = player.getHomeSystemTile();
+                if (home != null) {
+                    List<Button> buttons = new ArrayList<>();
+                    String infantryAmount = hasFrankenFirmParasite ? "4gf" : "gf";
+                    for (Planet planet : home.getPlanetUnitHolders()) {
+                        String id = player.factionButtonChecker() + "placeOneNDone_skipbuild_" + infantryAmount + "_"
+                                + planet.getName();
+                        String label = Helper.getUnitHolderRepresentation(home, planet.getName(), game, player);
+                        buttons.add(Buttons.green(id, label, PlanetEmojis.getPlanetEmoji(planet.getName())));
+                    }
+                    String parasiteAlias = hasFrankenFirmParasite ? "parasite-firm_y" : "parasite-firm";
+                    TechnologyModel parasiteModel = Mapper.getTech(parasiteAlias);
+                    String parasiteMsg = player.getRepresentationUnfogged() + ", a reminder to do "
+                            + parasiteModel.getNameRepresentation() + ".";
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), parasiteMsg, buttons);
+                }
             }
-            List<Button> buttons = new ArrayList<>();
-            for (Planet planet : home.getPlanetUnitHolders()) {
-                String id = player.factionButtonChecker() + "placeOneNDone_skipbuild_gf_" + planet.getName();
-                String label = Helper.getUnitHolderRepresentation(home, planet.getName(), game, player);
-                buttons.add(Buttons.green(id, label, PlanetEmojis.getPlanetEmoji(planet.getName())));
+
+            if (game.isFrankenGame()
+                    && player.hasTech("parasite-obs_y")
+                    && TeHelperTechs.playerHasInfantryOnMap(game, player)) {
+                List<Button> buttons = TeHelperTechs.neuralParasiteButtons(game, player);
+                if (!buttons.isEmpty()) {
+                    TechnologyModel parasiteModel = Mapper.getTech("parasite-obs_y");
+                    String parasiteMsg = player.getRepresentationUnfogged() + ", a reminder to do "
+                            + parasiteModel.getNameRepresentation() + ".";
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), parasiteMsg, buttons);
+                }
             }
-            TechnologyModel parasiteModel = Mapper.getTech("parasite-firm");
-            String parasiteMsg = player.getRepresentationUnfogged() + ", a reminder to do "
-                    + parasiteModel.getNameRepresentation() + ".";
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), parasiteMsg, buttons);
         }
     }
 
@@ -765,7 +783,7 @@ public final class StatusHelper {
             String scarMessage = player.getRepresentationUnfogged()
                     + " You have ships in an Entropic Scar anomaly. You may use these buttons to spend a token from your strategy pool to gain one of your faction technologies.";
             scarMessage +=
-                    "You currently have " + ccs + " command token" + (ccs == 1 ? "" : "s") + " in your strategy pool.";
+                    "You currently have " + StringHelper.pluralize(ccs, "command token") + " in your strategy pool.";
             if (player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar"))
                 scarMessage += "You also have the _" + RelicHelper.sillySpelling()
                         + "_ available to exhaust (this will be spent first).";

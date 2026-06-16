@@ -362,6 +362,14 @@
     },
     {
         "itemCategory": "BREAKTHROUGH",
+        "itemId": "sardakkbt",
+        "additionalComponents": [
+            "STARTINGTECH:sardakk"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
         "itemId": "titansbt",
         "undraftable": true,
         "source": "thunders_edge"
@@ -513,7 +521,7 @@
     {
         "itemCategory": "FLAGSHIP",
         "itemId": "nomad_flagship",
-        "optionalSwaps": [
+        "additionalComponents": [
             "TECH:m2"
         ],
         "source": "pok"

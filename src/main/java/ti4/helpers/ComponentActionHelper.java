@@ -14,7 +14,7 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.TyrisCommanderButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisCommanderButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -362,7 +362,8 @@ public class ComponentActionHelper {
                 String pnText = prom.getText();
                 if (pnText.toLowerCase().contains("action:")
                         && !"bmf".equalsIgnoreCase(pn)
-                        && !"acq".equalsIgnoreCase(pn)) {
+                        && !"acq".equalsIgnoreCase(pn)
+                        && !"bapnconc".equalsIgnoreCase(pn)) {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
                     String pnName = pnModel.getName();
                     Button pnButton = Buttons.red(factionChecker + prefix + "pn_" + pn, "Use " + pnName);
@@ -854,11 +855,11 @@ public class ComponentActionHelper {
                                 + " is exhausting the _Minister of War_ agenda and spending a command token from their strategy pool to remove 1 command token from the game board.");
                 if (p1.getStrategicCC() > 0) {
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
+                    int previousCC = p1.getStrategicCC() + 1;
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
                             factionEmoji
-                                    + ", you previously had " + (p1.getStrategicCC() + 1) + " command token"
-                                    + (p1.getStrategicCC() + 1 == 1 ? "" : "s")
+                                    + ", you previously had " + StringHelper.pluralize(previousCC, "command token")
                                     + " in your strategy pool and now you have " + p1.getStrategicCC() + ".");
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event);
                 }

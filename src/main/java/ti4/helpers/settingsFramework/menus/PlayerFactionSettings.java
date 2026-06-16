@@ -147,7 +147,8 @@ public class PlayerFactionSettings extends SettingsMenu {
         List<Button> ls = new ArrayList<>(super.specialButtons());
 
         if (parent != null && parent instanceof MiltySettings ms) {
-            if (ms.getSourceSettings().getDiscoStars().isVal())
+            if (ms.getSourceSettings().getDiscoStars().isVal()
+                    || ms.getSourceSettings().getBlueReverie().isVal())
                 ls.add(Buttons.red(
                         idPrefix + "dsFactionsOnly", "Only DS and BR Factions", SourceEmojis.DiscordantStars));
         }
@@ -172,11 +173,16 @@ public class PlayerFactionSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     private String prioritizeDSFactions() {
         if (parent != null && parent instanceof MiltySettings ms) {
-            if (!ms.getSourceSettings().getDiscoStars().isVal()) return "Discordant stars is not enabled";
+            boolean dsEnabled = ms.getSourceSettings().getDiscoStars().isVal();
+            boolean brEnabled = ms.getSourceSettings().getBlueReverie().isVal();
+            if (!dsEnabled && !brEnabled) return "Neither Discordant Stars nor Blue Reverie is enabled";
 
             List<String> newKeys = new ArrayList<>();
             for (FactionModel model : priFactions.getAllValues().values()) {
-                if (model.getSource() == ComponentSource.ds) newKeys.add(model.getAlias());
+                if ((dsEnabled && model.getSource() == ComponentSource.ds)
+                        || (brEnabled && model.getSource().isBr())) {
+                    newKeys.add(model.getAlias());
+                }
             }
             priFactions.setKeys(newKeys);
         }

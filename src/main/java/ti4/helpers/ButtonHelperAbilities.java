@@ -1,7 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,8 +18,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.PhantomEnergyHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.PhantomEnergyHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -2378,10 +2377,14 @@ public final class ButtonHelperAbilities {
                             && (planetUnit2.getUnits() == null
                                     || planetUnit2.getUnits().isEmpty())
                             && !planetsChecked.contains(planet2)) {
+
+                        String factionEmoji = Mapper.getFaction("neutral").getFactionEmoji();
+                        Player p2 = game.getPlanetOwner(planet);
+                        if (p2 != null) {
+                            factionEmoji = p2.getFactionEmoji();
+                        }
                         buttons.add(Buttons.green(
-                                factionChecker + "peaceAccords_" + planet2,
-                                planetRepresentation2,
-                                FactionEmojis.Xxcha));
+                                factionChecker + "peaceAccords_" + planet2, planetRepresentation2, factionEmoji));
                         planetsChecked.add(planet2);
                     }
                 }

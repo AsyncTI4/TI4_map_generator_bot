@@ -238,7 +238,8 @@ class Replace extends GameStateSubcommand {
         if (!replacementUser.isBot()) {
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getChannel(),
-                    "Should this game's stats be tracked for you, or the player you replaced?",
+                    replacementUser.getAsMention()
+                            + " Should this game's stats be tracked for you, or the player you replaced?",
                     List.of(
                             Buttons.green(
                                     StatsTrackingButtonHandler.statsTrackingButtonId("me", replacementUser.getId()),

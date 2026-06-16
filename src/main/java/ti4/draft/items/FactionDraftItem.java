@@ -172,14 +172,54 @@ public class FactionDraftItem extends DraftItem {
 
     private static void addIfAllowed(
             Game game, List<DraftItem> components, DraftCategory category, String itemId, String banValue) {
-        if (isBanned(game, category, banValue)) {
+        String resolvedItemId = resolveFrankenReplacement(game, category, itemId);
+        if (resolvedItemId == null) {
             return;
         }
-        DraftItem item = generate(category, itemId);
+        String resolvedBanValue = itemId.equals(banValue) ? resolvedItemId : banValue;
+        if (isBanned(game, category, resolvedBanValue)) {
+            return;
+        }
+        DraftItem item = generate(category, resolvedItemId);
         if (Boolean.TRUE.equals(item.getErrata().getUndraftable())) {
             return;
         }
         components.add(item);
+    }
+
+    private static String resolveFrankenReplacement(Game game, DraftCategory category, String itemId) {
+        if (!game.isFrankenGame()) {
+            return itemId;
+        }
+
+        DraftItem item = generate(category, itemId);
+        if (!Boolean.TRUE.equals(item.getErrata().getUndraftable())) {
+            return itemId;
+        }
+
+        String replacementId = itemId + "_y";
+        if (!isValidReplacement(category, replacementId)) {
+            return itemId;
+        }
+
+        DraftItem replacement = generate(category, replacementId);
+        if (Boolean.TRUE.equals(replacement.getErrata().getUndraftable())) {
+            return itemId;
+        }
+        return replacementId;
+    }
+
+    private static boolean isValidReplacement(DraftCategory category, String itemId) {
+        return switch (category) {
+            case ABILITY -> Mapper.isValidAbility(itemId);
+            case TECH -> Mapper.isValidTech(itemId);
+            case AGENT, COMMANDER, HERO -> Mapper.isValidLeader(itemId);
+            case MECH, FLAGSHIP, UNIT -> Mapper.isValidUnit(itemId);
+            case PN -> Mapper.isValidPromissoryNote(itemId);
+            case HOMESYSTEM, STARTINGTECH, STARTINGFLEET, COMMODITIES, FACTION -> Mapper.isValidFaction(itemId);
+            case BREAKTHROUGH -> Mapper.isValidBreakthrough(itemId);
+            default -> false;
+        };
     }
 
     private static boolean isBanned(Game game, DraftCategory category, String value) {

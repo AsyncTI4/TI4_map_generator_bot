@@ -55,6 +55,7 @@ import ti4.discord.interactions.buttons.handlers.agenda.resolver.VoiceOfTheCounc
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.WarrantAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.WormholeReconAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.WormholeResearchAgendaResolver;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -156,6 +157,7 @@ class AgendaResolveButtonHandler {
         }
         List<Player> riders = AgendaHelper.getWinningRiders(winner, game, event);
         List<Player> voters = AgendaHelper.getWinningVoters(winner, game);
+        TaAbilityHandler.resolveEfficientGovernance(game, winner);
         notifyIndoctrinationTeam(game, voters);
         checkFlorzenUnlock(voters, riders);
         processRiders(game, riders);
@@ -481,6 +483,14 @@ class AgendaResolveButtonHandler {
     private static void handleMiscountRevote(Game game, String winner, ButtonInteractionEvent event) {
         game.removeLaw(winner);
         game.putAgendaBackIntoDeckOnTop(winner);
+        int aCount;
+        String agendaCount = game.getStoredValue("agendaCount");
+        if (agendaCount.isEmpty()) {
+            aCount = 0;
+        } else {
+            aCount = Integer.parseInt(agendaCount) - 1;
+        }
+        game.setStoredValue("agendaCount", aCount + "");
         AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
     }
 }

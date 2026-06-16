@@ -24,6 +24,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -191,7 +192,7 @@ public class NetrunnersLeadersHandler {
         String source = "someone".equals(faction) || netrunner == null
                 ? ""
                 : " (from " + netrunner.getRepresentationNoPing() + ")";
-        return "> Used **Overclock**" + source + " for " + discount + " resource" + (discount == 1 ? "" : "s") + "\n";
+        return "> Used **Overclock**" + source + " for " + StringHelper.pluralize(discount, "resource") + "\n";
     }
 
     private static boolean isTargetPickerMessage(Message message) {

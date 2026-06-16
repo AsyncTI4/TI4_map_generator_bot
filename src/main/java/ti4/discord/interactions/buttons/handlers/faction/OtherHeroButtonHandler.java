@@ -213,6 +213,16 @@ class OtherHeroButtonHandler {
                     continue;
                 }
                 int amt = captureUnitHolder.getUnitCount(key);
+                if (player_.getUnitFromUnitKey(key).getUnitType() == UnitType.Fighter && game.isTwilightsFallMode()) {
+                    int count = 0;
+                    if (!player.getStoredValue("crimsonHeroFF").isEmpty()
+                            && (player.hasUnit("tf-vortexer") || player.hasTech("amalgamation"))) {
+                        count = Integer.parseInt(player.getStoredValue("crimsonHeroFF"));
+                    }
+                    if (count > 0) {
+                        amt = count;
+                    }
+                }
                 var removed = captureUnitHolder.removeUnit(key, amt);
                 spaceUnitHolder.addUnitsWithStates(key, removed);
             }

@@ -15,7 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -68,6 +69,7 @@ public class PlayerTechService {
 
     public static void addTech(GenericInteractionCreateEvent event, Game game, Player player, String techID) {
         player.addTech(techID);
+        AshenLeadersHandler.offerCommanderPlacementButtons(event, game, player, Mapper.getTech(techID));
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
         String message = player.getRepresentation() + " added technology: "
                 + Mapper.getTech(techID).getRepresentation(false) + ".";
@@ -641,6 +643,7 @@ public class PlayerTechService {
         }
         player.addTech(techID);
         if (techM.isUnitUpgrade()) {
+            AshenLeadersHandler.offerCommanderPlacementButtons(event, game, player, techM);
             if (player.hasUnexhaustedLeader("mirvedaagent") && player.getStrategicCC() > 0) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(

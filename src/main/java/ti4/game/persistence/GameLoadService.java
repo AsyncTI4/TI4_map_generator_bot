@@ -1,25 +1,7 @@
 package ti4.game.persistence;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static ti4.game.persistence.GamePersistenceKeys.ENDGAMEINFO;
-import static ti4.game.persistence.GamePersistenceKeys.ENDMAPINFO;
-import static ti4.game.persistence.GamePersistenceKeys.ENDPLAYER;
-import static ti4.game.persistence.GamePersistenceKeys.ENDPLAYERINFO;
-import static ti4.game.persistence.GamePersistenceKeys.ENDTILE;
-import static ti4.game.persistence.GamePersistenceKeys.ENDTOKENS;
-import static ti4.game.persistence.GamePersistenceKeys.ENDUNITHOLDER;
-import static ti4.game.persistence.GamePersistenceKeys.ENDUNITS;
-import static ti4.game.persistence.GamePersistenceKeys.GAMEINFO;
-import static ti4.game.persistence.GamePersistenceKeys.MAPINFO;
-import static ti4.game.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
-import static ti4.game.persistence.GamePersistenceKeys.PLANET_TOKENS;
-import static ti4.game.persistence.GamePersistenceKeys.PLAYER;
-import static ti4.game.persistence.GamePersistenceKeys.PLAYERINFO;
-import static ti4.game.persistence.GamePersistenceKeys.TILE;
-import static ti4.game.persistence.GamePersistenceKeys.TOKENS;
-import static ti4.game.persistence.GamePersistenceKeys.UNITHOLDER;
-import static ti4.game.persistence.GamePersistenceKeys.UNITS;
+import static org.apache.commons.lang3.StringUtils.*;
+import static ti4.game.persistence.GamePersistenceKeys.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -610,6 +592,7 @@ class GameLoadService {
                 case Constants.MILTYMOD_MODE -> game.setMiltyModMode(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_MAP_SETUP -> game.setShowMapSetup(parseBooleanOrDefault(info, false));
                 case Constants.DISCORDANT_STARS_MODE -> game.setDiscordantStarsMode(parseBooleanOrDefault(info, false));
+                case Constants.BLUE_REVERIE_MODE -> game.setBlueReverieMode(parseBooleanOrDefault(info, false));
                 case Constants.UNCHARTED_SPACE_STUFF -> game.setUnchartedSpaceStuff(parseBooleanOrDefault(info, false));
                 case Constants.VERBOSITY -> game.setOutputVerbosity(info);
                 case Constants.BETA_TEST_MODE -> game.setTestBetaFeaturesMode(parseBooleanOrDefault(info, false));
@@ -636,6 +619,7 @@ class GameLoadService {
                 case Constants.RAPID_MOBILIZATION_MODE ->
                     game.setRapidMobilizationMode(parseBooleanOrDefault(info, false));
                 case Constants.WILD_WILD_GALAXY_MODE -> game.setWildWildGalaxyMode(parseBooleanOrDefault(info, false));
+                case Constants.FEAST_OR_FAMINE_MODE -> game.setFeastOrFamineMode(parseBooleanOrDefault(info, false));
                 case Constants.WEIRD_WORMHOLES_MODE -> game.setWeirdWormholesMode(parseBooleanOrDefault(info, false));
                 case Constants.NO_FRACTURE -> game.setNoFractureMode(parseBooleanOrDefault(info, false));
                 case Constants.CALL_OF_THE_VOID_MODE -> game.setCallOfTheVoidMode(parseBooleanOrDefault(info, false));
@@ -703,6 +687,8 @@ class GameLoadService {
                 case Constants.DRAFT_SYSTEM_SETTINGS ->
                     game.setDraftSystemSettingsJson(info); // We will parse this later
                 case Constants.FRANKEN_DRAFT_SETTINGS -> game.setFrankenSettingsJson(info); // We will parse this later
+                case Constants.BASE_GAME_MINI_MILTY_SETTINGS ->
+                    game.setBaseGameMiniMiltySettingsJson(info); // We will parse this later
                 case Constants.GAME_TAGS -> game.setTags(getCardList(info));
                 case Constants.TIGL_RANK -> {
                     TIGLHelper.TIGLRank rank = TIGLHelper.TIGLRank.fromString(info);

@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -157,6 +159,7 @@ public class AddPlanetService {
             }
         }
         boolean alreadyOwned = false;
+        Player previousOwner = null;
         for (Player player_ : game.getPlayers().values()) {
             if (player_ != player) {
                 List<String> planets = player_.getPlanets();
@@ -166,6 +169,10 @@ public class AddPlanetService {
                     }
                     if (player_.isRealPlayer()) {
                         alreadyOwned = true;
+                        previousOwner = player_;
+                    }
+                    if (player_.hasAbility("planetary_reconfiguration")) {
+                        TaAbilityHandler.returnPlanetaryReconfigurationDesigns(player_, game, unitHolder);
                     }
                     player_.removePlanet(planet);
                     CommanderUnlockCheckService.checkPlayer(player_, "uydai");
@@ -376,6 +383,13 @@ public class AddPlanetService {
             }
         }
 
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")
+                && alreadyOwned
+                && !setup
+                && tile != null
+                && tile.getPosition().startsWith("frac")) {
+            OnyxxaCommanderButtonHandler.onGainFracturePlanet(event, player, game, previousOwner);
+        }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander") && !setup) {
             if (alreadyOwned && "mirage".equalsIgnoreCase(planet)) {
                 List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);

@@ -138,6 +138,7 @@ public class GameProperties {
     private @ExportableField boolean cosmicPhenomenaeMode;
     private @ExportableField boolean monumentToTheAgesMode;
     private @ExportableField boolean wildWildGalaxyMode;
+    private @ExportableField boolean feastOrFamineMode;
     private @ExportableField boolean zealousOrthodoxyMode;
     private @ExportableField boolean stellarAtomicsMode;
     private @ExportableField boolean noSwapMode;
@@ -156,6 +157,7 @@ public class GameProperties {
     private @ExportableField boolean cptiExploreMode;
     private @ExportableField boolean absolMode;
     private @ExportableField boolean discordantStarsMode;
+    private @ExportableField boolean blueReverieMode;
     private @ExportableField boolean unchartedSpaceStuff;
     private @ExportableField boolean miltyModMode;
     private @ExportableField boolean promisesPromisesMode;

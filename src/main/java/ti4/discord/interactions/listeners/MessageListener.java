@@ -1,7 +1,9 @@
 package ti4.discord.interactions.listeners;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -12,6 +14,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -40,7 +43,25 @@ class MessageListener extends ListenerAdapter {
 
         Please do not ping bothelper again, the first ping is enough, just explain without a 2nd ping.
         """;
-    private static final List<String> INTERESTING_MESSAGES = List.of("please stop");
+    private static final List<String> INTERESTING_MESSAGES = List.of(
+            "please stop",
+            "stop pinging",
+            "stop messaging",
+            "crybaby",
+            "stop crying",
+            "don’t talk to me",
+            "do not message me",
+            "this isn’t okay",
+            "crossed a line",
+            "personal attack",
+            "harassment",
+            "harassing",
+            "you’re being rude",
+            "cheater",
+            "bad faith",
+            "calm down",
+            "don’t make it personal",
+            "keep it game-related");
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
@@ -101,7 +122,7 @@ class MessageListener extends ListenerAdapter {
     private static void reportInterestingMessages(Message message) {
         String messageRaw = message.getContentRaw().toLowerCase();
         for (String phrase : INTERESTING_MESSAGES) {
-            if (messageRaw.contains(phrase)) {
+            if (messageRaw.contains(phrase) && !messageRaw.contains("gif")) {
                 String msg = "Someone used \"" + phrase + "\" at " + message.getJumpUrl() + ". Full message:\n> "
                         + message.getContentRaw().replace("\n", "\n> ");
                 sendMessageToModLog(msg);
@@ -116,6 +137,23 @@ class MessageListener extends ListenerAdapter {
                 .anyMatch(mentionedRole -> JdaService.bothelperRoles.stream()
                         .anyMatch(bothelperRole -> bothelperRole.getIdLong() == mentionedRole.getIdLong()));
         boolean shouldRespondToBotHelperPing = messageLikelyMissingExplanation && messageMentionsBotHelper;
+        if (messageMentionsBotHelper) {
+            TextChannel bothelperLogChannel =
+                    JdaService.guildPrimary.getTextChannelsByName("bothelper-ping-log", true).stream()
+                            .findFirst()
+                            .orElse(null);
+            if (bothelperLogChannel != null) {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green("markResolved", "Resolved?"));
+
+                String msgWithoutMentions = message.getContentRaw();
+                for (Role role : message.getMentions().getRoles()) {
+                    msgWithoutMentions = msgWithoutMentions.replace(role.getAsMention(), role.getName());
+                }
+                String msg = message.getJumpUrl() + ". Full message:\n> " + msgWithoutMentions.replace("\n", "\n> ");
+                MessageHelper.sendMessageToChannelWithButtons(bothelperLogChannel, msg, buttons);
+            }
+        }
         if (messageMentionsBotHelper
                 && message.getChannel().getName().toLowerCase().contains("cards info")
                 && !message.getAuthor().isBot()) {
@@ -197,7 +235,7 @@ class MessageListener extends ListenerAdapter {
     private static boolean addFactionEmojiReactionsToMessages(MessageReceivedEvent event, String gameName) {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame.getGame().isHiddenAgendaMode()
-                && !managedGame.getGame().getStoredValue("executiveOrder").isEmpty()
+                && managedGame.getGame().getStoredValue("executiveOrder").isEmpty()
                 && managedGame.getGame().getPhaseOfGame().toLowerCase().contains("agenda")) {
             Player player = getPlayer(event, managedGame.getGame());
             if (player == null

@@ -19,6 +19,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.abilities.MahactTokenService;
@@ -262,11 +263,11 @@ public class PickStrategyCardButtonHandler {
             tg += tgCount;
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
+                    player.getRepresentation() + " gained " + StringHelper.pluralize(tgCount, "trade good")
                             + " from picking **" + Helper.getSCName(scPicked, game) + "**.");
             if (game.isFowMode()) {
-                String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
-                        + " trade good" + (tgCount == 1 ? "" : "s") + " from picking **"
+                String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained "
+                        + StringHelper.pluralize(tgCount, "trade good") + " from picking **"
                         + Helper.getSCName(scPicked, game) + "**.";
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }

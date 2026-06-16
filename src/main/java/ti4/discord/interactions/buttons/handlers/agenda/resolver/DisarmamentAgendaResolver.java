@@ -9,6 +9,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.message.MessageHelper;
 import ti4.service.unit.DestroyUnitService;
@@ -57,7 +58,7 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
                     MessageHelper.sendMessageToChannel(
                             player.getPrivateChannel(),
                             "Destroyed all ground forces (" + units + ") on " + winner + ", and gave "
-                                    + player.getRepresentation() + " " + count + " trade good" + (count == 1 ? "" : "s")
+                                    + player.getRepresentation() + " " + StringHelper.pluralize(count, "trade good")
                                     + ".");
                     MessageHelper.sendMessageToChannel(
                             game.getMainGameChannel(),
@@ -66,7 +67,7 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
                     MessageHelper.sendMessageToChannel(
                             game.getMainGameChannel(),
                             "Destroyed all ground forces (" + units + ") on " + winner + ", and gave "
-                                    + player.getRepresentation() + " " + count + " trade good" + (count == 1 ? "" : "s")
+                                    + player.getRepresentation() + " " + StringHelper.pluralize(count, "trade good")
                                     + " in compensation.");
                 }
             }

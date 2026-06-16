@@ -18,6 +18,9 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -39,6 +42,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -366,6 +370,29 @@ public class ExploreService {
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
             return;
         }
+        if (player.hasUnlockedBreakthrough("augersbt")) {
+            ExploreModel exploreModel = Mapper.getExplore(cardID);
+            String name1 = exploreModel.getName();
+            Button resolveExplore1 = Buttons.green(
+                    "absolsdn_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Resolve " + name1);
+            Button resolveExplore2 = Buttons.green(
+                    "draw_1_ACDelete", "Draw 1 Action Card Instead With Breakthrough", FactionEmojis.augers);
+            List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
+            String message = player.getRepresentationUnfogged()
+                    + " You have Augers Breakthrough, and thus may decline this exploration to draw 1 action card instead.";
+            if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
+                String pF = player.getFactionEmoji();
+                MessageHelper.sendMessageToChannel(
+                        game.getActionsChannel(), pF + " found a " + name1 + " on " + planetName + ".");
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(), "Found a " + name1 + " on " + planetName + ".");
+            }
+            ExploreModel exploreModel1 = Mapper.getExplore(cardID);
+            List<MessageEmbed> embeds = List.of(exploreModel1.getRepresentationEmbed());
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
+            return;
+        }
         if (player.hasTech("absol_sdn")) {
             ExploreModel exploreModel = Mapper.getExplore(cardID);
             String name1 = exploreModel.getName();
@@ -442,6 +469,9 @@ public class ExploreService {
             player.setAtsCount(player.getAtsCount() + numExplores);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "tacommander")) {
+            TaLeadersHandler.resolveTaCommander(player, tile, planetName);
         }
         if (ButtonHelper.isPlanetLegendaryOrTechSkip(planetName, game)
                 && Helper.getPlayerFromUnlockedLeader(game, "augersagent") != null) {
@@ -738,6 +768,13 @@ public class ExploreService {
                 MessageHelper.sendMessageToEventChannel(event, String.format(fragMessage, ExploreEmojis.IFrag));
             case "urf1", "urf2", "urf3" ->
                 MessageHelper.sendMessageToEventChannel(event, String.format(fragMessage, ExploreEmojis.UFrag));
+            case "culturalartifact", "hazardousartifact", "industrialartifact", "unknownartifact" -> {
+                game.purgeExplore(ogID);
+                player.addRelic(cardID);
+                message = new StringBuilder(
+                        "Card has been added to play area.\nAdded as a relic (not actually a relic).");
+                MessageHelper.sendMessageToEventChannel(event, message.toString());
+            }
             case "ed1", "ed2" -> {
                 message = new StringBuilder("_Enigmatic Device_ has been placed in play area.");
                 player.addRelic(Constants.ENIGMATIC_DEVICE);
@@ -823,13 +860,12 @@ public class ExploreService {
                 resolveExplore(event, exploreID, tile, mirageID, exploredMessage, player, game);
             }
             case "fb1", "fb2", "fb3", "fb4" -> {
-                message = new StringBuilder(
-                        "Resolve _Functioning Base_:\n-# You currently have " + player.getTg() + " trade good"
-                                + (player.getTg() == 1 ? "" : "s") + ", "
-                                + player.getCommoditiesRepresentation() + " commodit"
-                                + (player.getCommodities() == 1 ? "y" : "ies") + ", and "
-                                + player.getActionCards().size() + " action card"
-                                + (player.getActionCards().size() == 1 ? "" : "s") + ".");
+                message = new StringBuilder("Resolve _Functioning Base_:\n-# You currently have "
+                        + StringHelper.pluralize(player.getTg(), "trade good") + ", "
+                        + player.getCommoditiesRepresentation() + " commodit"
+                        + (player.getCommodities() == 1 ? "y" : "ies") + ", and "
+                        + player.getActionCards().size() + " action card"
+                        + (player.getActionCards().size() == 1 ? "" : "s") + ".");
                 Button getACButton = Buttons.green(
                         "comm_for_AC",
                         "Spend 1 Trade Good or 1 Commodity For 1 Action Card",
@@ -937,8 +973,7 @@ public class ExploreService {
             case "lf1", "lf2", "lf3", "lf4" -> {
                 message = new StringBuilder(
                         player.getRepresentation() + " please resolve _Local Fabricators_:\n-# You currently have "
-                                + player.getTg()
-                                + " trade good" + (player.getTg() == 1 ? "" : "s") + " and "
+                                + StringHelper.pluralize(player.getTg(), "trade good") + " and "
                                 + player.getCommoditiesRepresentation() + " commodit"
                                 + (player.getCommodities() == 1 ? "y" : "ies") + ".");
                 Button getMechButton = Buttons.green(
@@ -1016,6 +1051,9 @@ public class ExploreService {
                 }
                 buttons.add(decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
+                if (player.hasUnlockedBreakthrough("ironbt")) {
+                    IronBreakthroughHandler.sendIronBtMessage(player, game);
+                }
             }
             case "frln1", "frln2", "frln3" -> {
                 message = new StringBuilder(player.getRepresentation() + ", please resolve _Freelancers_:\n-# "
@@ -1042,6 +1080,9 @@ public class ExploreService {
                 }
                 buttons.add(decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
+                if (player.hasUnlockedBreakthrough("ironbt")) {
+                    IronBreakthroughHandler.sendIronBtMessage(player, game);
+                }
             }
             case "vfs1", "vfs2", "vfs3" -> {
                 message = new StringBuilder(player.getRepresentation()
@@ -1065,6 +1106,9 @@ public class ExploreService {
                 }
                 buttons.add(decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
+                if (player.hasUnlockedBreakthrough("ironbt")) {
+                    IronBreakthroughHandler.sendIronBtMessage(player, game);
+                }
             }
             case "warforgeruins" -> {
                 message = new StringBuilder(
@@ -1094,6 +1138,9 @@ public class ExploreService {
                 }
                 buttons.add(decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
+                if (player.hasUnlockedBreakthrough("ironbt")) {
+                    IronBreakthroughHandler.sendIronBtMessage(player, game);
+                }
             }
             case "seedyspaceport" -> {
                 message = new StringBuilder(player.getRepresentation()
@@ -1134,6 +1181,9 @@ public class ExploreService {
                 buttons.add(decline);
 
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
+                if (player.hasUnlockedBreakthrough("ironbt")) {
+                    IronBreakthroughHandler.sendIronBtMessage(player, game);
+                }
             }
             case "hiddenlaboratory" -> {
                 MessageHelper.sendMessageToEventChannel(
@@ -1159,9 +1209,8 @@ public class ExploreService {
                 player.setTg(oldTg + tgGain);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getFactionEmojiOrColor() + " gained " + tgGain + " trade good"
-                                + (tgGain == 1 ? "" : "s") + " due to the _Forgotten Trade Station_ (" + oldTg + "->"
-                                + player.getTg() + ").");
+                        player.getFactionEmojiOrColor() + " gained " + StringHelper.pluralize(tgGain, "trade good")
+                                + " due to the _Forgotten Trade Station_ (" + oldTg + "->" + player.getTg() + ").");
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, tgGain);
             }
@@ -1199,6 +1248,10 @@ public class ExploreService {
         CommanderUnlockCheckService.checkPlayer(player, "kollecc", "bentor", "ghost");
         if (player.getPlanets().contains(planetID)) {
             ButtonHelperAbilities.offerOrladinPlunderButtons(player, game, planetID);
+        }
+
+        if (player.getPlanets().contains(planetID) && player.hasAbility("planetary_reconfiguration")) {
+            TaAbilityHandler.offerPlanetaryReconfigurationButtons(player, game, tile, planetID);
         }
 
         if (player.hasAbility("awaken")

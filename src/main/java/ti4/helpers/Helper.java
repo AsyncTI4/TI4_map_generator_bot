@@ -42,12 +42,14 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -827,8 +829,8 @@ public final class Helper {
             Button button;
             String label = getSCName(sc, game);
             if (game.getScTradeGoods().get(sc) > 0 && !game.isFowMode()) {
-                label += " [Has " + game.getScTradeGoods().get(sc) + " Trade Good"
-                        + (game.getScTradeGoods().get(sc) == 1 ? "" : "s") + "]";
+                label +=
+                        " [Has " + StringHelper.pluralize(game.getScTradeGoods().get(sc), "Trade Good") + "]";
             }
             if (game.isTwilightsFallMode() && game.getStoredValue("deflectedSC").equalsIgnoreCase(sc + "")) {
                 label += " [Has Tartarus On It]";
@@ -1828,9 +1830,8 @@ public final class Helper {
         int planetUnitVal = 0;
         if ("space".equals(uH.getName())) {
             if (tile.isSupernova()
-                    && player.hasTech("mr")
-                    && (FoWHelper.playerHasUnitsInSystem(player, tile)
-                            || (game.isTwilightsFallMode()
+                    && ((player.hasTech("mr") && (FoWHelper.playerHasUnitsInSystem(player, tile)))
+                            || (player.hasTech("tf-mr")
                                     && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)))) {
                 productionValueTotal += 5;
             } else {
@@ -2382,6 +2383,7 @@ public final class Helper {
             unitButtons.add(ff2Button);
         }
         boolean greenMechd = false;
+        boolean ironMechSpaceAdded = false;
 
         if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff)
                 && !"arboHeroBuild".equalsIgnoreCase(warfareNOtherstuff)
@@ -2526,6 +2528,20 @@ public final class Helper {
                 if (resourcelimit > 1 && !greenMechd) {
                     unitButtons.add(mfButton);
                 }
+                if (resourcelimit > 1 && !ironMechSpaceAdded && IronAbilitiesHandler.hasExoAtmospheric(player)) {
+                    Button spaceMechButton = Buttons.green(
+                            player.factionButtonChecker() + placePrefix + "_mech_space" + tile.getPosition(),
+                            "Produce Mech in space",
+                            UnitEmojis.mech);
+                    if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
+                        spaceMechButton = Buttons.gray(
+                                player.factionButtonChecker() + placePrefix + "_mech_space" + tile.getPosition(),
+                                "Produce Mech in space",
+                                UnitEmojis.mech);
+                    }
+                    unitButtons.add(spaceMechButton);
+                    ironMechSpaceAdded = true;
+                }
 
             } else if (ButtonHelper.canIBuildGFInSpace(player, tile, warfareNOtherstuff)
                     && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
@@ -2556,6 +2572,9 @@ public final class Helper {
         }
         if (!"sling".equalsIgnoreCase(warfareNOtherstuff) && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
             unitButtons.addAll(getPlaceUnitButtonsForSaarCommander(player, tile, game, placePrefix));
+        }
+        if (!"sling".equalsIgnoreCase(warfareNOtherstuff)) {
+            unitButtons.addAll(IronBreakthroughHandler.getPlaceUnitButtonsForIronBt(player, tile, game, placePrefix));
         }
         if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasUnit("netrunners_flagship"))
                 && NetrunnersUnitsHandler.empBlocksGroundForceProduction(game, player, tile)) {
@@ -3395,6 +3414,9 @@ public final class Helper {
     public static boolean mechCheck(String planetName, Game game, Player player) {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        if (player.hasUnlockedBreakthrough("ironbt")) {
+            return true;
+        }
         return unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0;
     }
 

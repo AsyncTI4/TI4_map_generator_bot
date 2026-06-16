@@ -59,6 +59,8 @@ public class AddTileService {
         sources.add(ComponentSource.pok);
         if (game.isDiscordantStarsMode()) {
             sources.add(ComponentSource.ds);
+        }
+        if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
         if (eronousTiles) {

@@ -14,19 +14,27 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.logging.BotLogger;
 
 @UtilityClass
-class CardsInfoPinCleanupService {
+public class CardsInfoPinCleanupService {
 
-    private static final long DRAIN_INTERVAL_MILLIS = 500;
+    private static final long PIN_RETRIEVAL_DRAIN_INTERVAL_MILLIS = 1000;
+    private static final long UNPIN_DRAIN_INTERVAL_MILLIS = 250;
+    private static final Queue<PinnedMessageCleanupRequest> PIN_RETRIEVAL_QUEUE = new ConcurrentLinkedQueue<>();
     private static final Queue<Message> UNPIN_QUEUE = new ConcurrentLinkedQueue<>();
+    private static final Set<String> QUEUED_THREAD_IDS = ConcurrentHashMap.newKeySet();
     private static final Set<String> QUEUED_MESSAGE_IDS = ConcurrentHashMap.newKeySet();
-    private static final ScheduledExecutorService UNPIN_DRAIN = Executors.newSingleThreadScheduledExecutor(
+    private static final ScheduledExecutorService PIN_CLEANUP_DRAIN = Executors.newSingleThreadScheduledExecutor(
             Thread.ofPlatform().daemon().name("cards-info-pin-cleanup").factory());
 
     static {
-        UNPIN_DRAIN.scheduleAtFixedRate(
-                CardsInfoPinCleanupService::drainOne,
-                DRAIN_INTERVAL_MILLIS,
-                DRAIN_INTERVAL_MILLIS,
+        PIN_CLEANUP_DRAIN.scheduleAtFixedRate(
+                CardsInfoPinCleanupService::drainOnePinnedMessageRetrieval,
+                PIN_RETRIEVAL_DRAIN_INTERVAL_MILLIS,
+                PIN_RETRIEVAL_DRAIN_INTERVAL_MILLIS,
+                TimeUnit.MILLISECONDS);
+        PIN_CLEANUP_DRAIN.scheduleAtFixedRate(
+                CardsInfoPinCleanupService::drainOneUnpin,
+                UNPIN_DRAIN_INTERVAL_MILLIS,
+                UNPIN_DRAIN_INTERVAL_MILLIS,
                 TimeUnit.MILLISECONDS);
     }
 
@@ -35,18 +43,36 @@ class CardsInfoPinCleanupService {
             return;
         }
 
-        threadChannel
+        String threadId = threadChannel.getId();
+        if (!QUEUED_THREAD_IDS.add(threadId)) return;
+        PIN_RETRIEVAL_QUEUE.add(new PinnedMessageCleanupRequest(
+                threadChannel, protectedMessageIds == null ? Set.of() : Set.copyOf(protectedMessageIds)));
+    }
+
+    private static void drainOnePinnedMessageRetrieval() {
+        PinnedMessageCleanupRequest request = PIN_RETRIEVAL_QUEUE.poll();
+        if (request == null) return;
+
+        request.threadChannel()
                 .retrievePinnedMessages()
                 .queue(
                         pinnedMessages -> {
+                            QUEUED_THREAD_IDS.remove(request.threadChannel().getId());
                             for (var pinnedMessage : pinnedMessages) {
                                 Message message = pinnedMessage.getMessage();
-                                if (isProtected(message, protectedMessageIds)) continue;
+                                if (message == null || isProtected(message, request.protectedMessageIds())) continue;
                                 if (!message.getAuthor().isBot()) continue;
                                 queueUnpin(message);
                             }
                         },
-                        BotLogger::catchRestError);
+                        error -> {
+                            QUEUED_THREAD_IDS.remove(request.threadChannel().getId());
+                            BotLogger.catchRestError(error);
+                        });
+    }
+
+    public static void queuePinnedBotMessageCleanup(ThreadChannel threadChannel) {
+        queueStalePinnedMessageCleanup(threadChannel, Set.of());
     }
 
     private static boolean isProtected(Message message, Set<String> protectedMessageIds) {
@@ -63,7 +89,7 @@ class CardsInfoPinCleanupService {
         UNPIN_QUEUE.add(message);
     }
 
-    private static void drainOne() {
+    private static void drainOneUnpin() {
         Message message = UNPIN_QUEUE.poll();
         if (message == null) return;
         String messageId = message.getId();
@@ -72,4 +98,6 @@ class CardsInfoPinCleanupService {
             BotLogger.catchRestError(error);
         });
     }
+
+    private record PinnedMessageCleanupRequest(ThreadChannel threadChannel, Set<String> protectedMessageIds) {}
 }

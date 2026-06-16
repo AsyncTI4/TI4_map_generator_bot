@@ -24,6 +24,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperTwilightsFall;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.RegexHelper;
@@ -259,9 +260,10 @@ public class TkHelperActionCards {
     @ButtonHandler("beginTkContract")
     private static void beginTkContract(ButtonInteractionEvent event, Game game, Player player) {
         Predicate<Tile> hasThreeShips = tile ->
-                tile.getSpaceUnitHolder().countPlayersUnitsWithModelCondition(player, UnitModel::isNonFighterShip) <= 3;
+                tile.getSpaceUnitHolder().countPlayersUnitsWithModelCondition(player, UnitModel::isNonFighterShip) <= 3
+                        && FoWHelper.playerHasActualShipsInSystem(player, tile);
         List<Button> buttons =
-                ButtonHelper.getTilesWithPredicateForAction(player, game, "resolveTkContract", hasThreeShips, false);
+                ButtonHelper.getTilesWithPredicateForAction(player, game, "resolveTkContract", hasThreeShips, true);
         String message =
                 player.getRepresentationUnfogged() + " choose a system to replace your ships with neutral ships.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
@@ -462,7 +464,7 @@ public class TkHelperActionCards {
 
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : player.getNeighbouringPlayers(true)) {
-            List<String> abilities = player.getTechs();
+            List<String> abilities = p2.getTechs();
             // If they have biosynthetic, then that is the only discardable ability
             if (p2.hasAbility("tf-biosyntheticsynergy")) abilities = List.of("tf-biosyntheticsynergy");
 

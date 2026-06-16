@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.actioncards;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +32,13 @@ import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperStats;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.UnusedCommanderHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -46,14 +50,19 @@ import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.RelicModel;
+import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.UnitModel;
+import ti4.service.RemoveCommandCounterService;
+import ti4.service.combat.CombatUnitSelectionHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
+import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
@@ -62,6 +71,8 @@ import ti4.service.planet.FlipTileService;
 import ti4.service.planet.PlanetService;
 import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.RemoveUnitService;
+import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
 @UtilityClass
 class ActionCardDeck2ButtonHandler {
@@ -99,6 +110,216 @@ class ActionCardDeck2ButtonHandler {
                 "Sent _Oracle_ results to " + player.getFactionEmojiOrColor()
                         + " `#cards-info` thread and shuffled the secret objective deck.");
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("resolveHiddenInitiatives")
+    public static void resolveHiddenInitiatives(Player player, Game game, ButtonInteractionEvent event) {
+        List<String> peekedSecrets = game.peekAtSecrets(2);
+        if (peekedSecrets.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", the secret objective deck is empty; _Hidden Initiatives_ cannot be resolved.");
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+
+        List<MessageEmbed> embeds = peekedSecrets.stream()
+                .map(id -> Mapper.getSecretObjective(id).getRepresentationEmbed(true))
+                .toList();
+        List<Button> buttons = new ArrayList<>();
+        for (String soId : peekedSecrets) {
+            String soName = Mapper.getSecretObjective(soId).getName();
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "resolveHiddenInitiativesStep2_" + soId,
+                    "Take \"" + soName + "\"",
+                    CardEmojis.SecretObjective));
+        }
+        buttons.add(Buttons.red(player.factionButtonChecker() + "resolveHiddenInitiativesNoSwap", "No Swap"));
+
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(
+                player,
+                player.getRepresentationUnfogged() + ", these are the top " + peekedSecrets.size()
+                        + " secret objective(s) from the deck. Choose one to replace an unscored secret objective, or decline.",
+                embeds);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + ", choose a secret objective to take, or decline.",
+                buttons);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), player.getFactionEmojiOrColor() + " is resolving _Hidden Initiatives_.");
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("resolveHiddenInitiativesStep2_")
+    public static void resolveHiddenInitiativesStep2(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String deckSOId = buttonID.replace("resolveHiddenInitiativesStep2_", "");
+        Map<String, Integer> unscoredSOs = player.getSecretsUnscored();
+        if (unscoredSOs.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + ", you have no unscored secret objectives to replace. The deck will be shuffled.");
+            Collections.shuffle(game.getSecretObjectives());
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : unscoredSOs.entrySet()) {
+            String soName = Mapper.getSecretObjective(entry.getKey()).getName();
+            buttons.add(Buttons.red(
+                    player.factionButtonChecker() + "resolveHiddenInitiativesStep3_" + deckSOId + "_"
+                            + entry.getValue(),
+                    "Replace \"" + soName + "\"",
+                    CardEmojis.SecretObjective));
+        }
+        buttons.add(Buttons.gray(player.factionButtonChecker() + "resolveHiddenInitiativesNoSwap", "No Swap"));
+
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged()
+                        + ", choose which of your unscored secret objectives to replace with \""
+                        + Mapper.getSecretObjective(deckSOId).getName() + "\".",
+                buttons);
+    }
+
+    @ButtonHandler("resolveHiddenInitiativesStep3_")
+    public static void resolveHiddenInitiativesStep3(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String payload = buttonID.replace("resolveHiddenInitiativesStep3_", "");
+        String[] parts = payload.split("_", 2);
+        if (parts.length < 2) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not resolve _Hidden Initiatives_: malformed button.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String deckSOId = parts[0];
+        int playerSONum;
+        try {
+            playerSONum = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not resolve _Hidden Initiatives_: invalid identifier.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        // Find the string ID of the player's SO by its numeric identifier.
+        String playerSOId = null;
+        for (Map.Entry<String, Integer> entry : player.getSecretsUnscored().entrySet()) {
+            if (entry.getValue().equals(playerSONum)) {
+                playerSOId = entry.getKey();
+                break;
+            }
+        }
+        if (playerSOId == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + ", could not find that secret objective in your hand. The deck will be shuffled.");
+            Collections.shuffle(game.getSecretObjectives());
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String replacedSOName = Mapper.getSecretObjective(playerSOId).getName();
+        String takenSOName = Mapper.getSecretObjective(deckSOId).getName();
+
+        // Return the player's SO to the deck, then draw the chosen deck SO for the player.
+        player.removeSecret(playerSONum);
+        game.addSOToGame(playerSOId);
+        game.drawSpecificSecretObjective(deckSOId, player.getUserID());
+        Collections.shuffle(game.getSecretObjectives());
+
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                game.getActionsChannel(),
+                player.getFactionEmojiOrColor()
+                        + " resolved _Hidden Initiatives_ and swapped a secret objective. The secret objective deck has been shuffled.");
+        MessageHelper.sendMessageToChannel(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + " replaced \"" + replacedSOName + "\" with \"" + takenSOName
+                        + "\" via _Hidden Initiatives_.");
+    }
+
+    @ButtonHandler("resolveHiddenInitiativesNoSwap")
+    public static void resolveHiddenInitiativesNoSwap(Player player, Game game, ButtonInteractionEvent event) {
+        Collections.shuffle(game.getSecretObjectives());
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                game.getActionsChannel(),
+                player.getFactionEmojiOrColor()
+                        + " resolved _Hidden Initiatives_ without swapping. The secret objective deck has been shuffled.");
+    }
+
+    @ButtonHandler("resolveClassifiedRider")
+    public static void resolveClassifiedRider(Player player, Game game, ButtonInteractionEvent event) {
+        List<String> peekedSecrets = game.peekAtSecrets(3);
+        if (peekedSecrets.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", the secret objective deck is empty; _Classified Rider_ cannot be resolved.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<MessageEmbed> embeds = peekedSecrets.stream()
+                .map(id -> Mapper.getSecretObjective(id).getRepresentationEmbed(true))
+                .toList();
+        List<Button> buttons = new ArrayList<>();
+        for (String soId : peekedSecrets) {
+            String soName = Mapper.getSecretObjective(soId).getName();
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "resolveClassifiedRiderStep2_" + soId,
+                    "Take \"" + soName + "\"",
+                    CardEmojis.SecretObjective));
+        }
+
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(
+                player,
+                player.getRepresentationUnfogged()
+                        + ", these are the top " + peekedSecrets.size()
+                        + " secret objective(s) from the deck. Choose one to draw for _Classified Rider_.",
+                embeds);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + ", choose a secret objective to draw for _Classified Rider_.",
+                buttons);
+    }
+
+    @ButtonHandler("resolveClassifiedRiderStep2_")
+    public static void resolveClassifiedRiderStep2(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String soId = buttonID.replace("resolveClassifiedRiderStep2_", "");
+        if (!game.getSecretObjectives().contains(soId)) {
+            Collections.shuffle(game.getSecretObjectives());
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + ", that secret objective is no longer available. The secret objective deck has been shuffled.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        game.drawSpecificSecretObjective(soId, player.getUserID());
+        Collections.shuffle(game.getSecretObjectives());
+        ButtonHelper.deleteMessage(event);
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
+        MessageHelper.sendMessageToChannel(
+                game.getActionsChannel(),
+                player.getFactionEmojiOrColor()
+                        + " resolved _Classified Rider_ and drew a secret objective. The secret objective deck has been shuffled.");
+        MessageHelper.sendMessageToChannel(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + " drew \""
+                        + Mapper.getSecretObjective(soId).getName() + "\" with _Classified Rider_.");
     }
 
     @ButtonHandler("resolveDataArchive")
@@ -196,13 +417,13 @@ class ActionCardDeck2ButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
 
-    @ButtonHandler("resolveRapidFulfillment")
-    public static void resolveRapidFulfillment(Player player, Game game, ButtonInteractionEvent event) {
+    @ButtonHandler("resolveContingency")
+    public static void resolveContingency(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         String type = "sling";
         String pos = game.getActiveSystem();
         List<Button> buttons = Helper.getPlaceUnitButtons(
-                event, player, game, game.getTileByPosition(pos), type, "placeOneNDone_dontskip");
+                event, player, game, game.getTileByPosition(pos), type, "placeOneNDone_dontskipcontingency");
         String message = player.getRepresentation()
                 + ", use the buttons to place up to 2 ships that have a combined cost of 3 or less.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -226,6 +447,26 @@ class ActionCardDeck2ButtonHandler {
                 player.getCorrectChannel(),
                 player.getFactionEmoji() + " placed 2 fighters in " + tile.getRepresentation()
                         + " with _Reinforcements_.");
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("resolveDecisiveVictory")
+    public static void resolveDecisiveVictory(Player player, Game game, ButtonInteractionEvent event) {
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+        if (tile == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " could not resolve _Decisive Victory_ because there is no active system.");
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+
+        RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
+        MessageHelper.sendMessageToChannel(
+                game.getActionsChannel(),
+                player.getFactionEmojiOrColor() + " resolved _Decisive Victory_ and removed their command token from "
+                        + tile.getRepresentationForButtons() + ".");
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
@@ -454,24 +695,76 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("resolveChainReaction")
-    public static void resolveChainReaction(ButtonInteractionEvent event) {
+    public static void resolveChainReaction(Player player, ButtonInteractionEvent event) {
+        List<Button> combatValueButtons = new ArrayList<>();
+        for (int combatValue = 1; combatValue <= 10; combatValue++) {
+            combatValueButtons.add(
+                    Buttons.gray("resolveChainReactionAt_" + combatValue, Integer.toString(combatValue)));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getChannel(),
+                player.getRepresentation() + " choose the destroyed ship's combat value for _Chain Reaction_.",
+                combatValueButtons);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(), "Effect changed, so old implementation was deprecated. Roll manually.");
-        //        StringBuilder msg = new StringBuilder("The _Chain Reaction_ rolled: ");
-        //        int currentRequirement = 7;
-        //        Die die;
-        //        while ((die = new Die(currentRequirement)).isSuccess()) {
-        //            hits++;
-        //            currentRequirement++;
-        //            msg.append(die.getResult()).append(" :boom: ");
-        //        }
-        //        msg.append(die.getResult());
-        //        List<Button> buttons = new ArrayList<>();
-        //        if (game.getActiveSystem() != null && !game.getActiveSystem().isEmpty()) {
-        //            buttons.add(Buttons.red("getDamageButtons_" + game.getActiveSystem() + "_" + "combat", "Assign
-        // Hit" + (hits == 1 ? "" : "s")));
-        //        }
+    }
+
+    @ButtonHandler("resolveChainReactionAt_")
+    public static void resolveChainReactionAt(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String combatValueText = buttonID.replace("resolveChainReactionAt_", "");
+        int combatValue;
+        try {
+            combatValue = Integer.parseInt(combatValueText);
+        } catch (NumberFormatException e) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "Could not resolve _Chain Reaction_ due to an invalid combat value.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (combatValue < 1 || combatValue > 10) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "Could not resolve _Chain Reaction_ due to an invalid combat value.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        int hits = 0;
+        int pendingRolls = 3;
+        List<DiceHelper.Die> rolls = new ArrayList<>();
+        while (pendingRolls > 0 && hits < 3) {
+            pendingRolls--;
+            DiceHelper.Die roll = new DiceHelper.Die(combatValue);
+            rolls.add(roll);
+            if (roll.isSuccess()) {
+                hits++;
+                if (hits < 3) {
+                    pendingRolls++;
+                }
+            }
+        }
+
+        StringBuilder message = new StringBuilder(player.getRepresentation())
+                .append(" rolled for _Chain Reaction_ (combat value ")
+                .append(combatValue)
+                .append(").\n")
+                .append(DiceHelper.formatDiceOutput(rolls));
+        if (hits == 3) {
+            message.append("\nMaximum hits reached.");
+        }
+        if (hits > 0) {
+            String activeSystem = game.getActiveSystem();
+            if (activeSystem == null || activeSystem.isEmpty()) {
+                message.append("\nCould not find the active system, so assign the hits manually.");
+            } else {
+                List<Button> buttons = List.of(Buttons.red(
+                        "getDamageButtons_" + activeSystem + "_spacecombat", "Assign Hit" + (hits == 1 ? "" : "s")));
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
+                ButtonHelper.deleteMessage(event);
+                return;
+            }
+        }
+
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("resolveExplorationRider")
@@ -666,6 +959,49 @@ class ActionCardDeck2ButtonHandler {
                 buttons);
     }
 
+    @ButtonHandler("resolveArmistice")
+    public static void resolveArmistice(Player player, Game game, ButtonInteractionEvent event) {
+        Player target = game.getActivePlayer();
+        if (target == null || target == player) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Target player not found.");
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+
+        String activeSystem = game.getActiveSystem();
+        Tile tile = StringUtils.isBlank(activeSystem) ? null : game.getTileByPosition(activeSystem);
+        if (tile == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active system not found.");
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+
+        if (CommandCounterHelper.hasCC(target, tile)) {
+            RemoveCommandCounterService.fromTile(target.getColor(), tile, game);
+            target.setTacticalCC(target.getTacticalCC() + 1);
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(),
+                    player.getFactionEmojiOrColor() + " resolved _Armistice_ and removed "
+                            + target.getFactionEmojiOrColor()
+                            + "'s command token from " + tile.getRepresentationForButtons() + ".");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(),
+                    player.getFactionEmojiOrColor() + " resolved _Armistice_. "
+                            + target.getFactionEmojiOrColor()
+                            + " had no command token in " + tile.getRepresentationForButtons() + " to remove.");
+        }
+
+        List<Button> conclusionButtons = new ArrayList<>();
+        conclusionButtons.add(ButtonHelper.getEndTurnButton(game, target));
+        MessageHelper.sendMessageToChannelWithButtons(
+                target.getCorrectChannel(),
+                target.getRepresentationUnfogged() + " your turn has been ended by _Armistice_."
+                        + " Use the buttons to resolve \"end of turn\" abilities and then end turn.",
+                conclusionButtons);
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
     @ButtonHandler("resolveArmsDeal")
     public static void resolveArmsDeal(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
@@ -689,6 +1025,115 @@ class ActionCardDeck2ButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", please choose which neighbor gets 1 cruiser and 1 destroyer.",
                 buttons);
+    }
+
+    @ButtonHandler("resolveBetrayal")
+    public static void resolveBetrayal(Player player, Game game, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (game.isFowMode()) {
+                buttons.add(Buttons.gray("resolveBetrayalStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Buttons.gray(
+                        "resolveBetrayalStep2_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", choose which player will receive your promissory note for _Betrayal_.",
+                buttons);
+    }
+
+    @ButtonHandler("resolveBetrayalStep2_")
+    public static void resolveBetrayalStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player chosenPlayer = game.getPlayerFromColorOrFaction(buttonID.replace("resolveBetrayalStep2_", ""));
+        if (chosenPlayer == null || chosenPlayer == player) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Betrayal_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<Button> promissoryButtons = ButtonHelper.getForcedPNSendButtons(game, chosenPlayer, player);
+        if (promissoryButtons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + ", you have no sendable promissory notes for _Betrayal_.");
+        } else {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + ", choose which promissory note to send to "
+                            + chosenPlayer.getColorIfCanSeeStats(player) + " for _Betrayal_.",
+                    promissoryButtons);
+        }
+
+        List<Player> playersToSendRandomAc = new ArrayList<>();
+        playersToSendRandomAc.add(chosenPlayer);
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2 == player || p2 == chosenPlayer) {
+                continue;
+            }
+            boolean hasYourPromissoryInPlayArea = p2.getPromissoryNotesInPlayArea().stream()
+                    .map(game::getPNOwner)
+                    .anyMatch(player::equals);
+            if (hasYourPromissoryInPlayArea) {
+                playersToSendRandomAc.add(p2);
+            }
+        }
+
+        List<String> playerNames = new ArrayList<>();
+        for (Player p2 : playersToSendRandomAc) {
+            playerNames.add(p2.getColorIfCanSeeStats(player));
+            if (p2.getActionCards().isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        p2.getCardsInfoThread(),
+                        p2.getRepresentationUnfogged() + ", you have no action cards to send for _Betrayal_.");
+                continue;
+            }
+
+            List<Button> buttons = List.of(Buttons.green(
+                    "resolveBetrayalCollect_" + player.getFaction(), "Send Random Action Card", CardEmojis.ActionCard));
+            String msg = p2.getRepresentationUnfogged() + ", _Betrayal_ requires you to send 1 random action card to "
+                    + (game.isFowMode() ? "another player." : player.getFactionEmojiOrColor() + ".");
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
+            if (p2.isNpc()) {
+                ActionCardHelper.sendRandomACPart2(event, game, p2, player);
+            }
+        }
+
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + " is resolving _Betrayal_. Random action card requests were sent to: "
+                        + String.join(", ", playerNames) + ".");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveBetrayalCollect_")
+    public static void resolveBetrayalCollect(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player targetPlayer = game.getPlayerFromColorOrFaction(buttonID.replace("resolveBetrayalCollect_", ""));
+        if (targetPlayer == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Betrayal_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (player.getActionCards().isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + ", you have no action cards to send for _Betrayal_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        ActionCardHelper.sendRandomACPart2(event, game, player, targetPlayer);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("resolveCache")
@@ -744,7 +1189,7 @@ class ActionCardDeck2ButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentation() + " exhausted "
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game)
-                        + " and gained " + tgGain + " trade good" + (tgGain == 1 ? "" : "s") + " from _Cache_.");
+                        + " and gained " + StringHelper.pluralize(tgGain, "trade good") + " from _Cache_.");
     }
 
     @ButtonHandler("resolveFreedomFighters")
@@ -2073,5 +2518,404 @@ class ActionCardDeck2ButtonHandler {
     public static void amendmentRevealStage2(Player player, Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
         RevealPublicObjectiveService.revealS2(game, event);
+    }
+
+    @ButtonHandler("resolveClassifiedWeapons")
+    public static void resolveClassifiedWeapons(Player player, Game game, ButtonInteractionEvent event) {
+        String factionChecker = player.factionButtonChecker();
+        List<Button> buttons = new ArrayList<>();
+        Tile activeTile = game.getTileByPosition(game.getActiveSystem());
+        if (activeTile != null) {
+            UnitHolder spaceHolder = activeTile.getUnitHolders().get(Constants.SPACE);
+            if (spaceHolder != null) {
+                Map<UnitModel, Integer> combatUnits =
+                        CombatUnitSelectionHelper.collectCombatRoundUnits(activeTile, spaceHolder, player);
+                for (UnitModel unit : combatUnits.keySet()) {
+                    buttons.add(Buttons.gray(
+                            factionChecker + "resolveClassifiedWeaponsUnit_" + unit.getAsyncId(),
+                            unit.getName(),
+                            unit.getUnitEmoji()));
+                }
+            }
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + " resolved _Classified Weapons_. Declare the unit now; it rolls 2 additional dice.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", please choose the unit that will roll 2 additional dice (_Classified Weapons_).",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveClassifiedWeaponsUnit_")
+    public static void resolveClassifiedWeaponsUnit(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String unitAsyncId = buttonID.replace("resolveClassifiedWeaponsUnit_", "");
+        UnitModel unit = player.getUnitFromAsyncID(unitAsyncId);
+        String unitName = unit != null ? unit.getName() : unitAsyncId;
+        game.setCurrentReacts("classifiedWeapons", player.getFaction() + ";" + unitAsyncId);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " chose " + unitName
+                        + " via _Classified Weapons_; it rolls 2 additional dice this combat round.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveBlackMarketIntel")
+    public static void resolveBlackMarketIntel(Player player, Game game, ButtonInteractionEvent event) {
+        String so1 = game.drawSecretObjective(player.getUserID());
+        String so2 = game.drawSecretObjective(player.getUserID());
+
+        String publicMsg = player.getRepresentationNoPing() + " drew 2 secret objectives using _Black Market Intel_.";
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), publicMsg);
+
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
+
+        List<Player> eligiblePlayers = game.getRealPlayers().stream()
+                .filter(p -> p != player && p.getSoScored() < 3)
+                .toList();
+
+        if (eligiblePlayers.isEmpty() || (so1 == null && so2 == null)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + ", no eligible player found to receive a secret objective (all players have 3 or more scored secret objectives). You keep both.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        for (String soID : List.of(so1 != null ? so1 : "", so2 != null ? so2 : "")) {
+            if (soID.isEmpty()) continue;
+            SecretObjectiveModel soModel = Mapper.getSecretObjective(soID);
+            String soName = soModel != null ? soModel.getName() : soID;
+            for (Player target : eligiblePlayers) {
+                String label = "Give '" + soName + "' to " + target.getColorIfCanSeeStats(player);
+                String buttonId =
+                        player.factionButtonChecker() + "blackMarketIntelGive_" + soID + "_" + target.getFaction();
+                buttons.add(Buttons.blue(buttonId, label));
+            }
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged()
+                        + ", choose which secret objective to give to another player with fewer than 3 scored secret objectives.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("blackMarketIntelGive_")
+    public static void blackMarketIntelGive(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String remainder = buttonID.replace("blackMarketIntelGive_", "");
+        int lastUnderscore = remainder.lastIndexOf('_');
+        if (lastUnderscore < 0) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String soID = remainder.substring(0, lastUnderscore);
+        String targetFaction = remainder.substring(lastUnderscore + 1);
+        Player target = game.getPlayerFromColorOrFaction(targetFaction);
+
+        if (target == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(), "Could not find target player; secret objective was not transferred.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        Integer soIdentifier = player.getSecretsUnscored().get(soID);
+        if (soIdentifier == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(), "Could not find that secret objective in your hand.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        player.removeSecret(soIdentifier);
+        target.setSecret(soID);
+
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, target);
+
+        String publicGiveMsg = player.getRepresentationNoPing()
+                + " gave a secret objective to "
+                + (game.isFowMode() ? "another player" : target.getRepresentationNoPing())
+                + " using _Black Market Intel_.";
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), publicGiveMsg);
+
+        if (!Objects.equals(player.getCardsInfoThread(), target.getCardsInfoThread())) {
+            MessageHelper.sendMessageToChannel(
+                    target.getCardsInfoThread(),
+                    target.getRepresentationUnfogged()
+                            + ", you received a secret objective from "
+                            + player.getColorIfCanSeeStats(target)
+                            + " via _Black Market Intel_.");
+        }
+
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveBlackMarketRaid")
+    public static void resolveBlackMarketRaid(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        int totalFragments = player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf();
+        int commandSheetTokens = player.getTacticalCC() + player.getStrategicCC() + player.getFleetCC();
+        List<Button> buttons = new ArrayList<>();
+        for (int fragsToPurge = 0; fragsToPurge <= Math.min(totalFragments, 3); fragsToPurge++) {
+            int tokenCost = 3 - fragsToPurge;
+            if (commandSheetTokens < tokenCost) {
+                continue;
+            }
+            String label = fragsToPurge == 0
+                    ? "Spend 3 command tokens (purge 0 fragments)"
+                    : "Purge " + fragsToPurge + " fragment" + (fragsToPurge == 1 ? "" : "s") + " (spend " + tokenCost
+                            + " command token" + (tokenCost == 1 ? "" : "s") + ")";
+            buttons.add(Buttons.green("resolveBlackMarketRaidStep2_" + fragsToPurge, label));
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " cannot resolve _Black Market Raid_: not enough command tokens or relic fragments.");
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", choose how many relic fragments to purge for _Black Market Raid_.",
+                buttons);
+    }
+
+    @ButtonHandler("resolveBlackMarketRaidStep2_")
+    public static void resolveBlackMarketRaidStep2(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        int fragsToPurge;
+        try {
+            fragsToPurge = Integer.parseInt(buttonID.replace("resolveBlackMarketRaidStep2_", ""));
+        } catch (NumberFormatException e) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Black Market Raid_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        ButtonHelper.deleteMessage(event);
+
+        // Purge relic fragments
+        StringBuilder resolveMsg = new StringBuilder(player.getRepresentationUnfogged());
+        resolveMsg.append(" resolved _Black Market Raid_");
+        if (fragsToPurge > 0) {
+            List<String> fragments = new ArrayList<>(player.getFragments());
+            int purged = 0;
+            StringBuilder fragMsg = new StringBuilder();
+            for (String fragId : fragments) {
+                if (purged >= fragsToPurge) break;
+                player.removeFragment(fragId);
+                game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+                String emoji =
+                        switch (Mapper.getExplore(fragId).getType().toLowerCase()) {
+                            case "cultural" -> ExploreEmojis.CFrag.toString();
+                            case "industrial" -> ExploreEmojis.IFrag.toString();
+                            case "hazardous" -> ExploreEmojis.HFrag.toString();
+                            default -> ExploreEmojis.UFrag.toString();
+                        };
+                fragMsg.append(emoji);
+                purged++;
+            }
+            resolveMsg
+                    .append(", purging ")
+                    .append(fragMsg)
+                    .append(" relic fragment")
+                    .append(purged == 1 ? "" : "s");
+        }
+        resolveMsg.append(".");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), resolveMsg.toString());
+
+        // Prompt player to manually remove command tokens if needed
+        int tokenCost = 3 - fragsToPurge;
+        if (tokenCost > 0) {
+            String tokenMsg = player.getRepresentationUnfogged() + ", you need to remove "
+                    + tokenCost + " command token" + (tokenCost == 1 ? "" : "s")
+                    + " from your tactic, strategy, or fleet pool. Your current tokens are "
+                    + player.getCCRepresentation() + ".";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), tokenMsg, ButtonHelper.getLoseCCButtons(player));
+        }
+
+        // Give a button to draw the relic rather than drawing it automatically
+        MessageHelper.sendMessageToChannelWithButton(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", use the button to draw a relic.",
+                Buttons.green(player.factionButtonChecker() + "drawRelic", "Draw Relic"));
+    }
+
+    @ButtonHandler("resolveCovertOperation")
+    public static void resolveCovertOperation(Player player, Game game, ButtonInteractionEvent event) {
+        List<Button> buttons = getCovertOperationTileButtons(game, player);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", you have no ships or ground forces on the game board to use for _Covert Operation_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", please choose the system containing the unit you wish to reposition for _Covert Operation_.",
+                buttons);
+    }
+
+    @ButtonHandler("covertOpTile_")
+    public static void resolveCovertOperationTileSelection(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.replace("covertOpTile_", "");
+        Tile tile = game.getTileByPosition(pos);
+        if (tile == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not find that system.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        List<Button> buttons = getCovertOperationUnitButtons(player, tile);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", no eligible units found in that system for _Covert Operation_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", please choose the unit to place in the active system for _Covert Operation_.",
+                buttons);
+    }
+
+    @ButtonHandler("covertOpUnit_")
+    public static void resolveCovertOperationUnitSelection(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        // buttonID format: covertOpUnit_<position>_<holder>_<unitName>[damaged]
+        String stripped = buttonID.replace("covertOpUnit_", "");
+        String[] parts = stripped.split("_", 3);
+        if (parts.length < 3) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Covert Operation_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        String pos = parts[0];
+        String holder = parts[1];
+        String unitName = parts[2];
+
+        String activePos = game.getActiveSystem();
+        if (activePos == null || activePos.isBlank()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", there is no active system. _Covert Operation_ cannot be completed.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        Tile sourceTile = game.getTileByPosition(pos);
+        Tile activeTile = game.getTileByPosition(activePos);
+        if (sourceTile == null || activeTile == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Covert Operation_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        boolean damaged = unitName.endsWith("damaged");
+        if (damaged) unitName = unitName.replace("damaged", "");
+
+        String unitSpec = Constants.SPACE.equals(holder) ? "1 " + unitName : "1 " + unitName + " " + holder;
+        List<RemovedUnit> removed =
+                RemoveUnitService.removeUnits(event, sourceTile, game, player.getColor(), unitSpec, damaged);
+        if (!removed.isEmpty()) {
+            String unitEmoji = removed.getFirst().unitKey().unitEmoji().toString();
+            AddUnitService.addUnits(event, activeTile, game, player.getColor(), "1 " + unitName, removed);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + " moved " + unitEmoji + " from "
+                            + sourceTile.getRepresentationForButtons(game, player) + " to the space area of "
+                            + activeTile.getRepresentationForButtons(game, player)
+                            + " via _Covert Operation_.");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + " could not remove the unit for _Covert Operation_.");
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static List<Button> getCovertOperationTileButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (tileHasPlayerMovableUnit(player, tile)) {
+                buttons.add(Buttons.gray(
+                        "covertOpTile_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+            }
+        }
+        return buttons;
+    }
+
+    private static boolean tileHasPlayerMovableUnit(Player player, Tile tile) {
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
+                if (!player.unitBelongsToPlayer(unitKey)) continue;
+                UnitModel model = player.getUnitFromUnitKey(unitKey);
+                if (model != null && (model.getIsShip() || model.getIsGroundForce())) return true;
+            }
+        }
+        return false;
+    }
+
+    private static List<Button> getCovertOperationUnitButtons(Player player, Tile tile) {
+        List<Button> buttons = new ArrayList<>();
+        String factionChecker = player.factionButtonChecker();
+        for (Map.Entry<String, UnitHolder> holderEntry : tile.getUnitHolders().entrySet()) {
+            String holderName = holderEntry.getKey();
+            UnitHolder unitHolder = holderEntry.getValue();
+            for (Map.Entry<UnitKey, Integer> unitEntry : new HashMap<>(unitHolder.getUnits()).entrySet()) {
+                UnitKey unitKey = unitEntry.getKey();
+                if (!player.unitBelongsToPlayer(unitKey)) continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                if (unitModel == null || (!unitModel.getIsShip() && !unitModel.getIsGroundForce())) continue;
+
+                String prettyName = unitModel.getName();
+                String unitName = unitKey.unitName();
+                int totalUnits = unitEntry.getValue();
+                int damagedUnits = 0;
+                if (unitHolder.getUnitDamage() != null) {
+                    damagedUnits = unitHolder.getUnitDamage().getOrDefault(unitKey, 0);
+                }
+
+                for (int x = 1; x <= damagedUnits && x < 2; x++) {
+                    buttons.add(Buttons.red(
+                            factionChecker + "covertOpUnit_" + tile.getPosition() + "_" + holderName + "_" + unitName
+                                    + "damaged",
+                            "Move A Damaged " + prettyName,
+                            unitKey.unitEmoji()));
+                }
+                totalUnits -= damagedUnits;
+                for (int x = 1; x <= totalUnits && x < 2; x++) {
+                    buttons.add(Buttons.gray(
+                            factionChecker + "covertOpUnit_" + tile.getPosition() + "_" + holderName + "_" + unitName,
+                            "Move " + prettyName,
+                            unitKey.unitEmoji()));
+                }
+            }
+        }
+        return buttons;
     }
 }

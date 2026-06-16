@@ -5,6 +5,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 
@@ -40,9 +41,9 @@ public class NetrunnersFactionTechsHandler {
 
         MessageHelper.sendMessageToChannel(
                 netrunner.getCorrectChannel(),
-                netrunner.getRepresentation() + " gained " + tgGain + " trade good" + (tgGain == 1 ? "" : "s")
-                        + " from **Data Mining** with " + tokenCount + " control token"
-                        + (tokenCount == 1 ? "" : "s") + " in their **"
+                netrunner.getRepresentation() + " gained " + StringHelper.pluralize(tgGain, "trade good")
+                        + " from **Data Mining** with " + StringHelper.pluralize(tokenCount, "control token")
+                        + " in their **"
                         + NetrunnersAbilitiesHandler.SYSTEM_BREACH_POOL + "** pool. "
                         + netrunner.gainTG(tgGain, true));
     }
@@ -63,7 +64,7 @@ public class NetrunnersFactionTechsHandler {
         if (discount < 1) {
             return "";
         }
-        return "\n**Siphon II** discounted this build by " + discount + " resource" + (discount == 1 ? "" : "s") + ".";
+        return "\n**Siphon II** discounted this build by " + StringHelper.pluralize(discount, "resource") + ".";
     }
 
     private static int getSiphonIIDiscount(Game game, Player player) {

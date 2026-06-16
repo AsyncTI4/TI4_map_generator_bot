@@ -1692,5 +1692,50 @@
         "playTiming": "AGENDA_AFTER",
         "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother,\" they said in unison.",
         "source": "deprecated"
+    },
+    {
+        "alias": "oracle",
+        "name": "Oracle",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Look at each unrevealed public objective and the top 5 cards of the secret objective deck. Then, shuffle the secret objective deck.",
+        "flavorText": "The Memoria loomed above Mecatol Rex, as it must. \"It is wrong,\" the Nomad said softly. \"Infinity before me, yet every choice I make collapses it. Foreknowledge diverts me onto a finite path and traps me in those deadly corridors.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "mobilization1",
+        "name": "Mobilization",
+        "phase": "Any",
+        "window": "After you produce a unit",
+        "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
+        "flavorText": "The forges of Umbat's hearthworld never cooled. Ore fed into flame, flame into steel, steel into the teeth of a war that would not wait.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "mobilization2",
+        "name": "Mobilization",
+        "phase": "Any",
+        "window": "After you produce a unit",
+        "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
+        "flavorText": "From Umbat's hearthworld to distant suns, the shadow of his armada lengthened—stoked by their fury.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "mobilization3",
+        "name": "Mobilization",
+        "phase": "Any",
+        "window": "After you produce a unit",
+        "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
+        "flavorText": "Umbat's engineers broke into celebration as he called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "mobilization4",
+        "name": "Mobilization",
+        "phase": "Any",
+        "window": "After you produce a unit",
+        "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
+        "flavorText": "The warnings came too late for the Hylar. When an investigator from the Universities arrived weeks later to survey the carnage, naught was left but smoldering craters. The Gashlai's message was clear.",
+        "source": "deprecated"
     }
 ]

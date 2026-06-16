@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
+import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -26,6 +27,7 @@ class StartMilty extends GameStateSubcommand {
                 .setRequiredRange(1, 25));
         addOptions(
                 new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_FACTIONS, "Include Discordant Stars Factions"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_BR_FACTIONS, "Include Blue Reverie Factions"));
         addOptions(
                 new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_TILES, "Include Uncharted Space Tiles (ds)"));
     }
@@ -50,6 +52,9 @@ class StartMilty extends GameStateSubcommand {
         OptionMapping includeDsFactionsOption = event.getOption(Constants.INCLUDE_DS_FACTIONS);
         if (includeDsFactionsOption != null && includeDsFactionsOption.getAsBoolean())
             specs.getFactionSources().add(ComponentSource.ds);
+        OptionMapping includeBrFactionsOption = event.getOption(Constants.INCLUDE_BR_FACTIONS);
+        if (includeBrFactionsOption != null && includeBrFactionsOption.getAsBoolean())
+            specs.getFactionSources().add(ComponentSource.blue_reverie);
 
         // Faction count & setup ------------------------------------------------------------------
         int factionCount = game.getPlayerCountForMap() + 1;
@@ -94,8 +99,8 @@ class StartMilty extends GameStateSubcommand {
         MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
 
         if (validTemplates.isEmpty()) {
-            String msg = "Milty draft in this bot does not know about any map layouts that support " + players
-                    + " player" + (players == 1 ? "" : "s") + " yet.";
+            String msg = "Milty draft in this bot does not know about any map layouts that support "
+                    + StringHelper.pluralize(players, "player") + " yet.";
             MessageHelper.sendMessageToChannel(event.getChannel(), msg);
             return null;
         }

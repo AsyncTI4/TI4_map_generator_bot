@@ -13,8 +13,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -265,7 +265,7 @@ public class TacticalActionOutputService {
 
         StringBuilder output = new StringBuilder();
         int maxBonus = 0;
-        if (distance > moveValue && distance < 90) {
+        if (distance > moveValue && distance < 90 && !game.isL1Hero()) {
             output.append(" (distance exceeds move value (")
                     .append(distance)
                     .append(" > ")

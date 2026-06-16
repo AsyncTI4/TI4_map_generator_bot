@@ -48,7 +48,7 @@ public class ReactionService {
                 } else if (message.contains("following")) {
                     text = player.getRepresentation(false, false) + " " + message;
                 } else {
-                    text = player.getRepresentation() + " " + message;
+                    text = player.getRepresentation(false, false) + " " + message;
                 }
 
                 if (isNotBlank(additionalMessage)) {

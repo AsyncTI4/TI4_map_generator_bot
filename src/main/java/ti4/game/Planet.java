@@ -1,7 +1,6 @@
 package ti4.game;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -154,13 +153,8 @@ public class Planet extends UnitHolder {
 
     public void updateGroveStats(Player player) {
         if ("grove".equals(getName())) {
-
             influenceModifier =
                     player.getGame().getPlanetsPlayerIsCoexistingOn(player).size();
-            resourcesModifier = 0;
-            if (influenceModifier == 0) {
-                resourcesModifier = -2;
-            }
         }
     }
 
@@ -243,7 +237,7 @@ public class Planet extends UnitHolder {
                 resourcesModifier += originalRes;
                 influenceModifier += originalInf;
             }
-            if ("designcombine".equalsIgnoreCase(attachment.getAlias())) {
+            if ("designunify".equalsIgnoreCase(attachment.getAlias())) {
                 resourcesModifier += originalInf;
                 influenceModifier += originalRes;
             }

@@ -1,7 +1,6 @@
 package ti4.discord;
 
 import jakarta.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -10,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -34,6 +34,7 @@ import ti4.contest.cron.CombatReplaySelectionCron;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.cron.AutoPingCron;
 import ti4.cron.BothelperDashboardCron;
+import ti4.cron.CardsInfoPinCleanupCron;
 import ti4.cron.CategoryCleanupCron;
 import ti4.cron.CloseLaunchThreadsCron;
 import ti4.cron.CronManager;
@@ -127,8 +128,8 @@ public class JdaService {
     private static Guild guildMegagame;
     private static Guild guildTourney;
     public static final Set<Guild> guilds = new HashSet<>();
-    public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
-    public static final List<Guild> fowServers = new ArrayList<>();
+    public static final Set<Guild> serversToCreateNewGamesOn = new HashSet<>();
+    public static final Set<Guild> fowServers = new HashSet<>();
 
     private static final ExecutorService EVENT_EXECUTOR = Executors.newFixedThreadPool(
             Runtime.getRuntime().availableProcessors(),
@@ -278,7 +279,8 @@ public class JdaService {
         BotLogger.info("FINISHED INITIALIZING SERVERS\n> "
                 + guilds.size() + " total servers connected\n> "
                 + serversToCreateNewGamesOn.size() + " Overflow servers for new games\n> "
-                + fowServers.size() + " Fog of War servers");
+                + fowServers.size() + " Fog of War servers"
+                + "\n> Guilds: " + jda.getGuilds().stream().map(Guild::getName).collect(Collectors.toSet()));
 
         // Attempt to start a "Search Only" version of the bot on eligible servers
         for (Guild searchGuild : jda.getGuilds()) {
@@ -326,6 +328,7 @@ public class JdaService {
         OldUndoFileCleanupCron.register();
         EndOldGamesCron.register();
         GameMessageCleanupCron.register();
+        CardsInfoPinCleanupCron.register();
         LogButtonRuntimeStatisticsCron.register();
         TechSummaryCron.register();
         SabotageAutoReactCron.register();

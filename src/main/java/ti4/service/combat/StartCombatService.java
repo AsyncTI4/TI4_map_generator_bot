@@ -22,10 +22,12 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -241,6 +243,11 @@ public class StartCombatService {
                 createSpectatorThread(game, player3, threadName, tile, event, "ground");
             }
         }
+        for (Player p : List.of(player, player2)) {
+            if (p.hasUnlockedBreakthrough("onyxxabt")) {
+                OnyxxaBreakthroughButtonHandler.offerGroundCombatMechButtons(game, p, unitHolder, tile);
+            }
+        }
     }
 
     private static void findOrCreateCombatThread(
@@ -379,6 +386,7 @@ public class StartCombatService {
         }
         game.setStoredValue("solagent", "");
         game.setStoredValue("letnevagent", "");
+        game.setStoredValue("classifiedWeapons", "");
 
         // sigma homebrew
         if (isSpaceCombat) {
@@ -648,7 +656,7 @@ public class StartCombatService {
                     + " with Ahk Siever, the Rebellion commander."
                     + "\n-# You have " + player.getCommoditiesRepresentation() + " commodities.";
             List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         }
     }
 
@@ -715,6 +723,9 @@ public class StartCombatService {
             return;
         }
         if (playersWithPds2.isEmpty() || (game.isFowMode() && !playersWithPds2.contains(activePlayer))) {
+            return;
+        }
+        if (!playersWithPds2.contains(activePlayer) && !FoWHelper.playerHasActualShipsInSystem(activePlayer, tile)) {
             return;
         }
         if (!game.isFowMode()) {
@@ -890,6 +901,18 @@ public class StartCombatService {
                         player.getCardsInfoThread(),
                         msg
                                 + ", a reminder that if you win this combat, you may resolve _N'orr Supremacy_ for a unit upgrade technology or a command token.",
+                        buttons);
+            }
+            if ("space".equalsIgnoreCase(type) && player.hasUnexhaustedLeader("kaloraagent")) {
+                buttons = new ArrayList<>();
+                buttons.add(Buttons.gray(
+                        player.factionButtonChecker() + "exhaustAgent_kaloraagent",
+                        "Use Valzor, the Kalora Agent",
+                        FactionEmojis.kalora));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        msg
+                                + ", a reminder that at the end of this space combat, you may exhaust the Kalora agent to allow a participating player to gain 1 command token.",
                         buttons);
             }
             if ("space".equalsIgnoreCase(type)
@@ -1158,6 +1181,12 @@ public class StartCombatService {
                 threadChannel, "Buttons to roll ANTI-FIGHTER BARRAGE (if applicable).", afbButtons);
         if (!game.isFowMode()) {
             for (Player player : combatPlayers) {
+                if (player.hasRelic("metalivoidarmaments")) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player.getRepresentationUnfogged()
+                                    + " Reminder that you have the Metal Void Armaments relic to use AFB 3x6.");
+                }
                 if ((ButtonHelper.doesPlayerHaveMechHere("naalu_mech_omega", player, tile)
                                 && !ButtonHelper.isLawInPlay(game, "articles_war"))
                         || ButtonHelper.doesPlayerHaveFSHere("sigma_naalu_flagship_1", player, tile)
@@ -1377,6 +1406,14 @@ public class StartCombatService {
                         p2.factionButtonChecker() + "applytempcombatmod__" + "tech" + "__" + "sc",
                         "Use Supercharge",
                         FactionEmojis.Naaz));
+            }
+        }
+        if (p1.hasTechReady("beironats") || (!game.isFowMode() && p2.hasTechReady("beironats"))) {
+            if (p1.hasTechReady("beironats")) {
+                IronFactionTechsHandler.addAdvancedTargetingSystemsButton(buttons, game, p1, p2, pos, groundOrSpace);
+            }
+            if (!game.isFowMode() && p2.hasTechReady("beironats")) {
+                IronFactionTechsHandler.addAdvancedTargetingSystemsButton(buttons, game, p2, p1, pos, groundOrSpace);
             }
         }
 

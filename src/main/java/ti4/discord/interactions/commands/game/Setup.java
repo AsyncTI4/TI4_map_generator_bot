@@ -155,10 +155,20 @@ class Setup extends GameStateSubcommand {
                 event.getOption(Constants.MILTYMOD_MODE, game.isMiltyModMode(), OptionMapping::getAsBoolean);
         boolean discordantStarsMode = event.getOption(
                 Constants.DISCORDANT_STARS_MODE, game.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
+        boolean blueReverieMode =
+                event.getOption(Constants.BLUE_REVERIE_MODE, game.isBlueReverieMode(), OptionMapping::getAsBoolean);
         boolean baseGameMode =
                 event.getOption(Constants.BASE_GAME_MODE, game.isBaseGameMode(), OptionMapping::getAsBoolean);
         boolean votcMode = event.getOption(Constants.VOTC_MODE, game.isVotcMode(), OptionMapping::getAsBoolean);
         return WeirdGameSetup.setGameMode(
-                event, game, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame, votcMode);
+                event,
+                game,
+                baseGameMode,
+                absolMode,
+                miltyModMode,
+                discordantStarsMode,
+                blueReverieMode,
+                isTIGLGame,
+                votcMode);
     }
 }

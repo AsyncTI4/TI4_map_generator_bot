@@ -1,0 +1,72 @@
+[
+    {
+        "id": "superweapon_availyn",
+        "name": "Superweapon Availyn",
+        "imagePath": "attachment_superweapon_availyn.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "superweapon_caled",
+        "name": "Superweapon Caled",
+        "imagePath": "attachment_superweapon_caled.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "superweapon_glatison",
+        "name": "Superweapon Glatison",
+        "imagePath": "attachment_superweapon_glatison.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "superweapon_mors",
+        "name": "Superweapon Mors",
+        "imagePath": "attachment_superweapon_mors.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "superweapon_grom",
+        "name": "Superweapon Grom",
+        "imagePath": "attachment_superweapon_grom.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "pharadn_tomb_token",
+        "name": "Pharadn Tomb Token",
+        "imagePath": "token_tomb.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "kaltrimshrine1",
+        "name": "Kaltrim Shring 1",
+        "imagePath": "token_kaltrimshrine1.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "kaltrimshrine2",
+        "name": "Kaltrim Shring 2",
+        "imagePath": "token_kaltrimshrine2.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "kaltrimshrine3",
+        "name": "Kaltrim Shring 3",
+        "imagePath": "token_kaltrimshrine3.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    },
+    {
+        "id": "kaltrimshrine4",
+        "name": "Kaltrim Shring 4",
+        "imagePath": "token_kaltrimshrine4.png",
+        "isFakeAttachment": true,
+        "source": "blue_reverie"
+    }
+]

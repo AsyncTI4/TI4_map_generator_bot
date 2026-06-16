@@ -42,6 +42,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
 import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
 import ti4.draft.BagDraft;
@@ -67,6 +68,7 @@ import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
+import ti4.helpers.settingsFramework.menus.BaseGameMiniMiltySettings;
 import ti4.helpers.settingsFramework.menus.DeckSettings;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.FrankenSettings;
@@ -264,6 +266,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     @Setter
     @Getter
+    private String baseGameMiniMiltySettingsJson;
+
+    @Setter
+    @Getter
     private String draftString;
 
     @Setter
@@ -274,6 +280,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     @Setter
     private FrankenSettings frankenSettings;
+
+    @Setter
+    private BaseGameMiniMiltySettings baseGameMiniMiltySettings;
 
     @Getter
     @Setter
@@ -483,6 +492,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         draftSystemSettingsJson = null;
         frankenSettings = null;
         frankenSettingsJson = null;
+        baseGameMiniMiltySettings = null;
+        baseGameMiniMiltySettingsJson = null;
     }
 
     @NotNull
@@ -522,6 +533,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return frankenSettings;
     }
 
+    public BaseGameMiniMiltySettings getBaseGameMiniMiltySettingsUnsafe() {
+        return baseGameMiniMiltySettings;
+    }
+
     public MiltySettings initializeMiltySettings() {
         if (miltySettings == null) {
             miltySettings = initializeSetting(
@@ -552,6 +567,18 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                     getActionsChannel());
         }
         return frankenSettings;
+    }
+
+    public BaseGameMiniMiltySettings initializeBaseGameMiniMiltySettings() {
+        if (baseGameMiniMiltySettings == null) {
+            baseGameMiniMiltySettings = initializeSetting(
+                    baseGameMiniMiltySettingsJson,
+                    BaseGameMiniMiltySettings::new,
+                    "base game Mini-Milty settings",
+                    Constants.jabberwockyPing(),
+                    getActionsChannel());
+        }
+        return baseGameMiniMiltySettings;
     }
 
     private <T> T initializeSetting(
@@ -814,8 +841,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public void setCompetitiveTIGLGame(boolean competitiveTIGLGame) {
         boolean isFracturedTIGL = TIGLHelper.isFracturedTIGLGame(this);
         boolean hasAlwaysIncompatibleMode = isAllianceMode() || isCommunityMode();
-        boolean hasStandardOnlyIncompatibleMode =
-                isAbsolMode() || isMiltyModMode() || isDiscordantStarsMode() || isHomebrewSCMode() || isFowMode();
+        boolean hasStandardOnlyIncompatibleMode = isAbsolMode()
+                || isMiltyModMode()
+                || isDiscordantStarsMode()
+                || isBlueReverieMode()
+                || isHomebrewSCMode()
+                || isFowMode();
         if (hasAlwaysIncompatibleMode || (!isFracturedTIGL && hasStandardOnlyIncompatibleMode)) {
             competitiveTIGLGame = false;
         }
@@ -906,6 +937,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("Weird Wormholes", isWeirdWormholesMode());
         gameModes.put("Cosmic Phenomenae", isCosmicPhenomenaeMode());
         gameModes.put("Wild wild Galaxy", isWildWildGalaxyMode());
+        gameModes.put("Feast or Famine", isFeastOrFamineMode());
         gameModes.put("Zealous Orthodoxy", isZealousOrthodoxyMode());
         gameModes.put("Mercenaries For Hire", isMercenariesForHireMode());
         gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
@@ -926,6 +958,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put(SourceEmojis.Absol + "Absol", isAbsolMode());
         gameModes.put("VotC", isVotcMode());
         gameModes.put(SourceEmojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
+        gameModes.put("BlueReverie", isBlueReverieMode());
         gameModes.put("HomebrewSC", isHomebrewSCMode());
         gameModes.put("AC Deck 2", isAcd2());
         gameModes.put("Omega Phase", isOmegaPhaseMode());
@@ -3417,7 +3450,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         for (Player player : players.values()) {
             player.getActionCards().clear();
         }
-        ensureBastionAcd2SabotagesIncluded();
     }
 
     public boolean validateAndSetActionCardDeck(GenericInteractionCreateEvent event, DeckModel deck) {
@@ -3454,31 +3486,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
             Collections.shuffle(getActionCards());
         }
-        ensureBastionAcd2SabotagesIncluded();
-        return true;
-    }
-
-    public boolean ensureBastionAcd2SabotagesIncluded() {
-        if (!isAcd2() || getPlayerFromColorOrFaction("bastion") == null) return false;
-
-        List<String> bastionSabotageCards =
-                List.of("sabotage1_acd2", "sabotage2_acd2", "sabotage3_acd2", "sabotage4_acd2");
-        Set<String> existingCards = new HashSet<>(getActionCards());
-        existingCards.addAll(getDiscardActionCards().keySet());
-        for (Player player : players.values()) {
-            existingCards.addAll(player.getActionCards().keySet());
-        }
-
-        List<String> cardsToAdd = bastionSabotageCards.stream()
-                .filter(not(existingCards::contains))
-                .toList();
-        if (cardsToAdd.isEmpty()) return false;
-
-        getActionCards().addAll(cardsToAdd);
-        shuffleActionCards();
-        MessageHelper.sendMessageToChannel(
-                getMainGameChannel(),
-                "4 Sabotage cards have been added to the action card deck due to **Last Bastion** being in the game.");
         return true;
     }
 
@@ -3881,6 +3888,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             String color = p.getColor();
             planet.removeAllUnits(color);
             PlanetRemove.removePlayerControlToken(p, planet);
+            if (planet instanceof Planet planetHolder && p.hasAbility("planetary_reconfiguration")) {
+                TaAbilityHandler.returnPlanetaryReconfigurationDesigns(p, this, planetHolder);
+            }
             p.removePlanet(planet.getName());
         }
     }
@@ -4599,6 +4609,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isLightFogMode()
                 || isRedTapeMode()
                 || isDiscordantStarsMode()
+                || isBlueReverieMode()
                 || isFrankenGame()
                 || isMiltyModMode()
                 || isThundersEdgeDemo()

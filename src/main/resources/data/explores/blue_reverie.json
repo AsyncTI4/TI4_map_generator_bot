@@ -1,0 +1,130 @@
+[
+    {
+        "id": "nomadictraders",
+        "name": "Nomadic Traders",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Place up to 1 infantry from your reinforcements on a planet in your home system, or into coexistence on a non-home planet one of your neighbors controls.",
+        "source": "blue_reverie"
+    },
+    {
+        "id": "grandbazaar",
+        "name": "Grand Bazaar",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Gain a number of commodities equal to the number of planets either in, or adjacent to, this system. Then, convert all of your commodities to trade goods.",
+        "source": "blue_reverie"
+    },
+    {
+        "id": "greatwork",
+        "name": "Great Work",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Ready a planet you control that has an influence value less than this planet's influence value.",
+        "source": "blue_reverie"
+    },
+    {
+        "id": "culturalartifact",
+        "name": "Cultural Artifact",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area; this card may be exchanged as part of a transaction.\nWhen an agenda is revealed: Discard this card and that agenda to reveal 1 agenda from the top of the deck. Players vote on this agenda instead.",
+        "source": "blue_reverie"
+    },
+    {
+        "id": "forgottenlegion",
+        "name": "Forgotten Legion",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "Place up to 3 neutral infantry on this planet and resolve ground combat. During that combat, for each of those units you destroy, gain 1 trade good.",
+        "source": "blue_reverie"
+    },
+    {
+        "id": "extractionrun",
+        "name": "Extraction Run",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, you may draw 1 secret objective, or spend 1 token from your command sheet to unlock your commander.",
+        "source": "blue_reverie"
+    },
+    {
+        "id": "localinstability",
+        "name": "Local Instability",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "Place 1 ingress token in this system if it does not contain one, or explore the frontier deck in this system. Then, purge this card.",
+        "source": "blue_reverie"
+    },
+    {
+        "id": "hazardousartifact",
+        "name": "Hazardous Artifact",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area; this card may be exchanged as part of a transaction.\nAfter a round of ground combat on a planet you do not control: Discard this card to force your opponent’s units into coexistence.",
+        "source": "blue_reverie"
+    },
+    {
+        "id": "overgrowninfrastructure",
+        "name": "Overgrown Infrastructure",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Gain 2 commodities or spend 2 commodities or 2 trade goods to place 1 structure from your reinforcements on this planet.",
+        "source": "blue_reverie"
+    },
+    {
+        "id": "materialcache",
+        "name": "Material Cache",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Gain 3 commodities or use the PRODUCTION ability of 1 of your units. Then, purge this card.",
+        "source": "blue_reverie"
+    },
+    {
+        "id": "fallenempire",
+        "name": "Fallen Empire",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Explore this planet once as each of two different planet types of your choice. Then, purge this card.",
+        "source": "blue_reverie"
+    },
+    {
+        "id": "industrialartifact",
+        "name": "Industrial Artifact",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area; this card may be exchanged as part of a transaction.\nAfter you produce a unit: Discard this card to gain 3 commodities, or spend 2 commodities or 2 trade goods to research that unit's unit upgrade technology.",
+        "source": "blue_reverie"
+    },
+    {
+        "id": "retiredadventurers",
+        "name": "Retired Adventurers",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Resolve 1 expedition without paying its cost, or place 3 infantry from your reinforcements into coexistence on Thunder's Edge, if able. Then, purge this card.",
+        "source": "blue_reverie"
+    },
+    {
+        "id": "recoveredmemorycore",
+        "name": "Recovered Memory Core",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Purge this card to gain the speaker token or 2 command tokens, if able.",
+        "source": "blue_reverie"
+    },
+    {
+        "id": "decodedbriefings",
+        "name": "Decoded Briefings",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Resolve the secondary ability of a readied or unchosen strategy card, without spending a command token, if able.",
+        "source": "blue_reverie"
+    },
+    {
+        "id": "unknownartifact",
+        "name": "Unknown Artifact",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area; this card may be exchanged as part of a transaction.\nAfter a player activates a system: Discard this card; until the end of this tactical action, the active player treats the move value of each of their ships as 1.",
+        "source": "blue_reverie"
+    }
+]
