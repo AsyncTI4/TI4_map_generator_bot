@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
 import ti4.logging.BotLogger;
 
@@ -24,7 +23,7 @@ class GuildWhitelistListener extends ListenerAdapter {
 
     private static void leaveGuild(Guild badGuild) {
         logLeavingGuildWarning(badGuild);
-        badGuild.leave().queue(Consumers.nop(), BotLogger::catchRestError);
+        //badGuild.leave().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static void logLeavingGuildWarning(Guild eventGuild) {
