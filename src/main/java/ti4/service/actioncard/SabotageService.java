@@ -1,7 +1,5 @@
 package ti4.service.actioncard;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -26,10 +24,6 @@ import ti4.service.unit.CheckUnitContainmentService;
 @UtilityClass
 public class SabotageService {
 
-    private static final Set<String> SHATTER_CARD_ALIASES = Set.of("tf-shatter1", "tf-shatter2");
-    private static final Set<String> SABOTAGE_CARD_ALIASES = Set.of("sabo1", "sabo2", "sabo3", "sabo4");
-    private static final Set<String> ACD2_SABOTAGE_CARD_ALIASES =
-            Set.of("sabotage1_acd2", "sabotage2_acd2", "sabotage3_acd2", "sabotage4_acd2");
     private static final Set<String> ALL_SABOTAGE_CARD_ALIASES = Set.of(
             "sabo1",
             "sabo2",
@@ -168,16 +162,7 @@ public class SabotageService {
         return null;
     }
 
-    private static final long ACD2_SABOTAGE_REMOVAL_CUTOFF = ZonedDateTime.of(
-                    2026, 5, 19, 0, 0, 0, 0, ZoneId.of("America/New_York"))
-            .toInstant()
-            .toEpochMilli();
-
     private static boolean allSabotagesAreDiscarded(Game game, Player player) {
-        if (game.isAcd2() && game.getCreationDateTime() < ACD2_SABOTAGE_REMOVAL_CUTOFF) {
-            return ACD2_SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
-        }
-
         return Mapper.getDeck(game.getAcDeckID()).getCardIDs().stream()
                 .filter(ALL_SABOTAGE_CARD_ALIASES::contains)
                 .allMatch(alias -> isActionCardNotPlayable(game, player, alias));

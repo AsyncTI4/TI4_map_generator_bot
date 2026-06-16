@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -284,6 +285,7 @@ public class CommanderUnlockCheckService {
             // BEANS
             case "dream" ->
                 shouldBeUnlocked = (DreamButtonHandler.getNexusTokenTiles(game).size() >= 3);
+            case "ta" -> shouldBeUnlocked = (TaAbilityHandler.getControlledPlanetCountWithAnyDesign(player, game) >= 4);
             case "netrunners" ->
                 shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false) >= 4);
         }

@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -169,6 +170,9 @@ public class AddPlanetService {
                     if (player_.isRealPlayer()) {
                         alreadyOwned = true;
                         previousOwner = player_;
+                    }
+                    if (player_.hasAbility("planetary_reconfiguration")) {
+                        TaAbilityHandler.returnPlanetaryReconfigurationDesigns(player_, game, unitHolder);
                     }
                     player_.removePlanet(planet);
                     CommanderUnlockCheckService.checkPlayer(player_, "uydai");

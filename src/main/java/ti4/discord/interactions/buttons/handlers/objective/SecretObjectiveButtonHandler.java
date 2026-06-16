@@ -162,8 +162,6 @@ class SecretObjectiveButtonHandler {
             return;
         }
 
-        game.ensureBastionAcd2SabotagesIncluded();
-
         DrawSecretService.dealSOToAll(event, 2, game);
         ButtonHelper.deleteMessage(event);
     }

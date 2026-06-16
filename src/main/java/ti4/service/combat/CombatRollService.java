@@ -31,6 +31,10 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
@@ -103,6 +107,7 @@ public class CombatRollService {
             String unitHolderName,
             CombatRollType rollType) {
         if (rollType == CombatRollType.bombardment) {
+            AshenUnitHandler.clearFlagshipBombardmentContexts(game);
             if (game.getStoredValue("assignedBombardment" + player.getFaction()).isEmpty()) {
                 BombardmentService.autoAssignAllBombardmentToAPlanet(player, game);
             }
@@ -174,6 +179,9 @@ public class CombatRollService {
                 && !game.getStoredValue("bombardmentTarget" + player.getFaction())
                         .isEmpty()) {
             bombardPlanet = game.getStoredValue("bombardmentTarget" + player.getFaction());
+            if (player.hasUnit("ashen_flagship")) {
+                AshenUnitHandler.prepareFlagshipBombardmentContext(game, player, bombardPlanet);
+            }
             String assignedUnits = game.getStoredValue("assignedBombardment" + player.getFaction());
             int count;
             List<UnitModel> unitMods = new ArrayList<>(playerUnitsByQuantity.keySet());
@@ -377,6 +385,9 @@ public class CombatRollService {
         if (message.endsWith(";\n")) {
             message = message.substring(0, message.length() - 2);
         }
+        if (player.hasBreakthrough("ashenbt")) {
+            message = AshenBreakthroughHandler.appendBombardmentManualReminder(player, rollType, message);
+        }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
         boolean trackedCandidateRoll =
@@ -449,6 +460,8 @@ public class CombatRollService {
                                         opponent.factionButtonChecker() + "cancelGroundHits_" + tile.getPosition() + "_"
                                                 + h,
                                         "Cancel a Hit"));
+                                AshenPromissoryHandler.addFromTheAshesButton(
+                                        buttons, game, opponent, player, tile, combatOnHolder, h);
                             }
                             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                             if (opponent.hasTech("vpw")) {
@@ -653,8 +666,10 @@ public class CombatRollService {
         }
 
         if (rollType == CombatRollType.bombardment) {
+            AshenLeadersHandler.offerCommanderBombardmentButtons(event, game, player, h);
             if (h > 0) {
-                if (!game.isFowMode()) {
+                if (!AshenLeadersHandler.offerHeroBombardmentAssignButtons(event, game, player, h, bombardPlanet)
+                        && !game.isFowMode()) {
                     List<Button> buttons = new ArrayList<>();
 
                     buttons.add(Buttons.red(

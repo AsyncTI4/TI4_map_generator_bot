@@ -340,7 +340,7 @@
         "itemCategory": "TECH",
         "itemId": "parasite-firm_y",
         "additionalComponents": [
-            "PLOT:mutated_asail",
+            "PLOT:mutated_assail",
             "ABILITY:puppetsoftheblade",
             "ABILITY:plotsplots"
         ],

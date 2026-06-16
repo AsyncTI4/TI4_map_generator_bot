@@ -237,7 +237,7 @@ public class Planet extends UnitHolder {
                 resourcesModifier += originalRes;
                 influenceModifier += originalInf;
             }
-            if ("designcombine".equalsIgnoreCase(attachment.getAlias())) {
+            if ("designunify".equalsIgnoreCase(attachment.getAlias())) {
                 resourcesModifier += originalInf;
                 influenceModifier += originalRes;
             }

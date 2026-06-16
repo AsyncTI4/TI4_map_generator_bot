@@ -10,8 +10,10 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -83,6 +85,9 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("ironagent")) {
             buttons.add(IronLeadersHandler.getMasterOfDefenseCardsInfoButton());
+        }
+        if (player.hasUnexhaustedLeader("ashenagent")) {
+            buttons.add(AshenLeadersHandler.getAshTenderCardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("dreamagent")
                 && !DreamButtonHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
@@ -357,6 +362,10 @@ public class CardsInfoService {
 
         if (player.hasRelicReady("heartofixth")) {
             buttons.add(Buttons.blue("exhaustRelic_heartofixth", "Exhaust Heart of Ixth"));
+        }
+
+        if (player.hasAbility("planetary_reconfiguration")) {
+            TaAbilityHandler.sendPlanetaryReconfigurationStatus(player, game);
         }
 
         if (player.hasAbility("divination")

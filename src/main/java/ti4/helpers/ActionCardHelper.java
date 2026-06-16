@@ -1411,12 +1411,6 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("compounding_interests".equals(automationID)) {
-                codedButtons.add(
-                        Buttons.green(player.factionButtonChecker() + "resolveCompoundingInterests", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
-            }
-
             if ("classified_weapons".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.factionButtonChecker() + "resolveClassifiedWeapons", buttonLabel));

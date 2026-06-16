@@ -35,6 +35,8 @@ public class AshenAbilityHandler {
     private static final String PHOENIX_RISING = "phoenix_rising";
     private static final String PHOENIX_USE_PREFIX = "ashenPhoenixUse_";
     private static final String PHOENIX_DECLINE_PREFIX = "ashenPhoenixDecline_";
+    private static final String CINDERBORN_HIT_PREFIX = "ashenCinderbornHit_";
+    private static final String CINDERBORN_NO_HIT_PREFIX = "ashenCinderbornNoHit_";
     private static final String BEAUTY_IN_DESTRUCTION = "beauty_in_destruction";
     private static final String BEAUTY_IN_DESTRUCTION_PREFIX = "ashenBeautyInDestruction_";
 
@@ -51,6 +53,45 @@ public class AshenAbilityHandler {
             return false;
         }
 
+        sendPhoenixRisingPrompt(
+                player,
+                game,
+                tile,
+                planet,
+                channel,
+                player.getRepresentation() + ", you rolled a " + die.getResult()
+                        + " for _Cinderborn_, so you may use _Phoenix Rising_ to place that infantry on "
+                        + Helper.getPlanetRepresentation(planet, game)
+                        + ". If you decline, resolve _Cinderborn_ normally.");
+        return true;
+    }
+
+    public static boolean startPhoenixRisingFromBreakthrough(
+            Player player, Game game, Tile tile, String planet, MessageChannel channel) {
+        if (player == null
+                || game == null
+                || tile == null
+                || planet == null
+                || channel == null
+                || !player.hasAbility(PHOENIX_RISING)) {
+            return false;
+        }
+
+        sendPhoenixRisingPrompt(
+                player,
+                game,
+                tile,
+                planet,
+                channel,
+                player.getRepresentation()
+                        + " exhausted _From Fire, Resolve_ to treat an infantry revive roll as a 10, so you may use _Phoenix Rising_ to place that infantry on "
+                        + Helper.getPlanetRepresentation(planet, game)
+                        + ". If you decline, resolve _Cinderborn_ normally.");
+        return true;
+    }
+
+    private static void sendPhoenixRisingPrompt(
+            Player player, Game game, Tile tile, String planet, MessageChannel channel, String message) {
         List<Button> buttons = List.of(
                 Buttons.green(
                         player.factionButtonChecker() + PHOENIX_USE_PREFIX + tile.getPosition() + "_" + planet,
@@ -59,14 +100,7 @@ public class AshenAbilityHandler {
                 Buttons.red(
                         player.factionButtonChecker() + PHOENIX_DECLINE_PREFIX + tile.getPosition() + "_" + planet,
                         "Decline Phoenix Rising"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                channel,
-                player.getRepresentation() + ", you rolled a " + die.getResult()
-                        + " for _Cinderborn_, so you may use _Phoenix Rising_ to place that infantry on "
-                        + Helper.getPlanetRepresentation(planet, game)
-                        + ". If you decline, resolve _Cinderborn_ normally.",
-                buttons);
-        return true;
+        MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
     }
 
     public static void resolveCinderbornRevive(
@@ -104,6 +138,48 @@ public class AshenAbilityHandler {
                         + Helper.getPlanetRepresentation(planet, game) + ". "
                         + opponent.getRepresentationUnfogged() + ", please assign it.",
                 hitButtons);
+    }
+
+    public static void offerCinderbornReviveChoice(
+            Player player, Game game, Tile tile, String planet, MessageChannel channel) {
+        if (player == null || game == null || tile == null || planet == null || channel == null) {
+            return;
+        }
+
+        List<Button> buttons = List.of(
+                Buttons.green(
+                        player.factionButtonChecker() + CINDERBORN_HIT_PREFIX + tile.getPosition() + "_" + planet,
+                        "Revive and Produce 1 Hit",
+                        UnitEmojis.infantry),
+                Buttons.blue(
+                        player.factionButtonChecker() + CINDERBORN_NO_HIT_PREFIX + tile.getPosition() + "_" + planet,
+                        "Revive With No Hit",
+                        UnitEmojis.infantry));
+        MessageHelper.sendMessageToChannelWithButtons(
+                channel,
+                player.getRepresentation() + ", _Cinderborn_ succeeded on "
+                        + Helper.getPlanetRepresentation(planet, game)
+                        + ". Choose whether to revive that infantry and produce 1 hit, or revive it with no hit.",
+                buttons);
+    }
+
+    public static void resolveCinderbornReviveNoHit(Player player, Game game, String planet, MessageChannel channel) {
+        if (player == null || game == null || channel == null) {
+            return;
+        }
+
+        player.setStasisInfantry(player.getStasisInfantry() + 1);
+        if (planet == null) {
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    player.getRepresentation() + " revived 1 infantry from _Cinderborn_ with no produced hit.");
+            return;
+        }
+
+        MessageHelper.sendMessageToChannel(
+                channel,
+                player.getRepresentation() + " revived 1 infantry from _Cinderborn_ with no produced hit on "
+                        + Helper.getPlanetRepresentation(planet, game) + ".");
     }
 
     public static void offerBeautyInDestruction(
@@ -161,7 +237,28 @@ public class AshenAbilityHandler {
         String tilePos = parts[1];
         String planet = parts[2];
 
+        offerCinderbornReviveChoice(player, game, game.getTileByPosition(tilePos), planet, event.getMessageChannel());
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(CINDERBORN_HIT_PREFIX)
+    public static void resolveCinderbornReviveWithHit(
+            ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String[] parts = buttonID.split("_", 3);
+        String tilePos = parts[1];
+        String planet = parts[2];
+
         resolveCinderbornRevive(player, game, game.getTileByPosition(tilePos), planet, event.getMessageChannel());
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(CINDERBORN_NO_HIT_PREFIX)
+    public static void resolveCinderbornReviveWithoutHit(
+            ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String[] parts = buttonID.split("_", 3);
+        String planet = parts[2];
+
+        resolveCinderbornReviveNoHit(player, game, planet, event.getMessageChannel());
         ButtonHelper.deleteMessage(event);
     }
 
@@ -185,10 +282,10 @@ public class AshenAbilityHandler {
                 player.getRepresentationUnfogged()
                         + " spent 1 command token from their strategy pool to resolve _Beauty in Destruction_.");
         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "used _Beauty in Destruction_");
-        PlayerTechService.addTech(event, game, player, techId);
         if (player.hasLeader("ashencommander") && !player.hasLeaderUnlocked("ashencommander")) {
             UnlockLeaderService.unlockLeader("ashencommander", game, player);
         }
+        PlayerTechService.addTech(event, game, player, techId);
         ButtonHelper.deleteMessage(event);
     }
 

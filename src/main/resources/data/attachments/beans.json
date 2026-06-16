@@ -23,8 +23,8 @@
         "source": "beans"
     },
     {
-        "id": "designcombine",
-        "name": "Combine (Design)",
+        "id": "designunify",
+        "name": "Unify (Design)",
         "imagePath": "attachment_designcombine.png",
         "isFakeAttachment": true,
         "source": "beans"
@@ -33,6 +33,7 @@
         "id": "designgrand",
         "name": "Grand Design",
         "imagePath": "attachment_designgrand.png",
+        "planetTypes": ["cultural", "hazardous", "industrial"],
         "isFakeAttachment": true,
         "source": "beans"
     },

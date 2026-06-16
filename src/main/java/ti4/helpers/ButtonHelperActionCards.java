@@ -392,18 +392,6 @@ public final class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("resolveCompoundingInterests")
-    public static void resolveCompoundingInterests(Game game, Player player, ButtonInteractionEvent event) {
-        int tgGain = ButtonHelper.getTilesWithYourCC(player, game, event).size();
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                player.getRepresentationNoPing() + " gained " + StringHelper.pluralize(tgGain, "trade good")
-                        + " due to _Compounding Interests_ " + player.gainTG(tgGain) + ".");
-        ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, tgGain);
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler("resolveWarEffort")
     public static void resolveWarEffort(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>(
@@ -414,7 +402,7 @@ public final class ButtonHelperActionCards {
     }
 
     @ButtonHandler("resolveFreeTrade")
-    public static void resolveFreeTrade(Game game, Player player, ButtonInteractionEvent event) {
+    public static void resolveFreeTrade(ButtonInteractionEvent event) {
         Button convert2CommButton =
                 Buttons.green("convert_2_comms_stay", "Convert 2 Commodities Into Trade Goods", MiscEmojis.Wash);
         Button get2CommButton = Buttons.blue("gain_2_comms_stay", "Gain 2 Commodities", MiscEmojis.comm);
@@ -427,7 +415,7 @@ public final class ButtonHelperActionCards {
     }
 
     @ButtonHandler("resolvePreparation")
-    public static void resolvePreparation(Game game, Player player, ButtonInteractionEvent event) {
+    public static void resolvePreparation(ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         String message = "Use button to draw 1 action card.";
         buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
@@ -504,15 +492,15 @@ public final class ButtonHelperActionCards {
     }
 
     @ButtonHandler("getDivertFundingButtons")
-    public static void getDivertFundingButtons(ButtonInteractionEvent event, Player player, Game game) {
+    public static void getDivertFundingButtons(ButtonInteractionEvent event, Player player) {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(),
                 "Please choose the technology you wish to return.",
-                getDivertFundingLoseTechOptions(player, game));
+                getDivertFundingLoseTechOptions(player));
         ButtonHelper.deleteMessage(event);
     }
 
-    private static List<Button> getDivertFundingLoseTechOptions(Player player, Game game) {
+    private static List<Button> getDivertFundingLoseTechOptions(Player player) {
         String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
