@@ -23,7 +23,7 @@ class GuildWhitelistListener extends ListenerAdapter {
 
     private static void leaveGuild(Guild badGuild) {
         logLeavingGuildWarning(badGuild);
-        //badGuild.leave().queue(Consumers.nop(), BotLogger::catchRestError);
+        // badGuild.leave().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static void logLeavingGuildWarning(Guild eventGuild) {
