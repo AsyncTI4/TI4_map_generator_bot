@@ -362,7 +362,8 @@ public class ComponentActionHelper {
                 String pnText = prom.getText();
                 if (pnText.toLowerCase().contains("action:")
                         && !"bmf".equalsIgnoreCase(pn)
-                        && !"acq".equalsIgnoreCase(pn)) {
+                        && !"acq".equalsIgnoreCase(pn)
+                        && !"bapnconc".equalsIgnoreCase(pn)) {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
                     String pnName = pnModel.getName();
                     Button pnButton = Buttons.red(factionChecker + prefix + "pn_" + pn, "Use " + pnName);
