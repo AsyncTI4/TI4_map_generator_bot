@@ -88,7 +88,7 @@ class MessageListener extends ListenerAdapter {
         }
 
         ExecutorServiceManager.runAsync(
-            "MessageListener task", EXECUTION_TIME_WARNING_THRESHOLD_SECONDS, () -> processMessage(event, message));
+                "MessageListener task", EXECUTION_TIME_WARNING_THRESHOLD_SECONDS, () -> processMessage(event, message));
     }
 
     private static void sendMessageToModLog(String msg) {
@@ -231,12 +231,13 @@ class MessageListener extends ListenerAdapter {
         String messageContent = StringUtils.substringAfter(messageText, " ");
 
         ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
-            Game game = GameManager.getManagedGame(gameName).getGame();
-            Player player = getPlayer(event, game);
-            RoundSummaryHelper.storeEndOfRoundSummary(
-                game, player, messageBeginning, messageContent, true, event.getChannel());
-            GameManager.save(game, "End of round summary.");
-        });
+                    Game game = GameManager.getManagedGame(gameName).getGame();
+                    Player player = getPlayer(event, game);
+                    RoundSummaryHelper.storeEndOfRoundSummary(
+                            game, player, messageBeginning, messageContent, true, event.getChannel());
+                    GameManager.save(game, "End of round summary.");
+                })
+                .run();
 
         return true;
     }
@@ -274,11 +275,12 @@ class MessageListener extends ListenerAdapter {
                 .replaceAll("");
 
         if ("futureme".equals(receivingColorOrFaction)) {
-            ExecutionLockManager.wrapWithTryLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
-                Game gameToSave = GameManager.getManagedGame(gameName).getGame();
-                whisperToFutureMe(event, gameToSave, sender);
-                GameManager.save(gameToSave, "Whisper to future by " + sender.getUserName());
-            });
+            ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
+                        Game gameToSave = GameManager.getManagedGame(gameName).getGame();
+                        whisperToFutureMe(event, gameToSave, sender);
+                        GameManager.save(gameToSave, "Whisper to future by " + sender.getUserName());
+                    })
+                    .run();
 
             return true;
         }
@@ -315,16 +317,23 @@ class MessageListener extends ListenerAdapter {
         }
 
         ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
-            Game gameToSave = GameManager.getManagedGame(gameName).getGame();
-            if (future) {
-                whisperToFutureColorOrFaction(event, gameToSave, messageContent, sender, receiver);
-            } else {
-                WhisperService.sendWhisper(
-                    gameToSave, sender, receiver, messageContent, "n", event.getChannel(), event.getGuild());
-                message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            GameManager.save(gameToSave, "Whisper");
-        });
+                    Game gameToSave = GameManager.getManagedGame(gameName).getGame();
+                    if (future) {
+                        whisperToFutureColorOrFaction(event, gameToSave, messageContent, sender, receiver);
+                    } else {
+                        WhisperService.sendWhisper(
+                                gameToSave,
+                                sender,
+                                receiver,
+                                messageContent,
+                                "n",
+                                event.getChannel(),
+                                event.getGuild());
+                        message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+                    }
+                    GameManager.save(gameToSave, "Whisper");
+                })
+                .run();
 
         return true;
     }
