@@ -17,6 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.executors.ExecutionLockManager;
+import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -86,7 +88,7 @@ class MessageListener extends ListenerAdapter {
         }
 
         ExecutorServiceManager.runAsync(
-                "MessageListener task", EXECUTION_TIME_WARNING_THRESHOLD_SECONDS, () -> processMessage(event, message));
+            "MessageListener task", EXECUTION_TIME_WARNING_THRESHOLD_SECONDS, () -> processMessage(event, message));
     }
 
     private static void sendMessageToModLog(String msg) {
@@ -228,13 +230,14 @@ class MessageListener extends ListenerAdapter {
         String messageBeginning = StringUtils.substringBefore(messageText, " ");
         String messageContent = StringUtils.substringAfter(messageText, " ");
 
-        Game game = GameManager.getManagedGame(gameName).getGame();
-        Player player = getPlayer(event, game);
-        RoundSummaryHelper.storeEndOfRoundSummary(
+        ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
+            Game game = GameManager.getManagedGame(gameName).getGame();
+            Player player = getPlayer(event, game);
+            RoundSummaryHelper.storeEndOfRoundSummary(
                 game, player, messageBeginning, messageContent, true, event.getChannel());
-        GameManager.save(
-                game,
-                "End of round summary."); // TODO: We should be locking since we're saving. Convert to ListenerContext?
+            GameManager.save(game, "End of round summary.");
+        });
+
         return true;
     }
 
@@ -271,10 +274,12 @@ class MessageListener extends ListenerAdapter {
                 .replaceAll("");
 
         if ("futureme".equals(receivingColorOrFaction)) {
-            whisperToFutureMe(event, game, sender);
-            GameManager.save(
-                    game,
-                    "Whisper to future by " + sender.getUserName()); // TODO: We should be locking since we're saving
+            ExecutionLockManager.wrapWithTryLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
+                Game gameToSave = GameManager.getManagedGame(gameName).getGame();
+                whisperToFutureMe(event, gameToSave, sender);
+                GameManager.save(gameToSave, "Whisper to future by " + sender.getUserName());
+            });
+
             return true;
         }
 
@@ -303,29 +308,35 @@ class MessageListener extends ListenerAdapter {
             return true;
         }
 
-        Player receiver = null;
-        for (Player player : game.getRealPlayers()) {
-            if (Objects.equals(receivingColorOrFaction, player.getFaction())
-                    || Objects.equals(receivingColorOrFaction, player.getColor())) {
-                receiver = player;
-                break;
-            }
-        }
-
+        Player receiver = getPlayer(game, receivingColorOrFaction);
         if (receiver == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found: " + receivingColorOrFaction);
             return true;
         }
 
-        if (future) {
-            whisperToFutureColorOrFaction(event, game, messageContent, sender, receiver);
-        } else {
-            WhisperService.sendWhisper(
-                    game, sender, receiver, messageContent, "n", event.getChannel(), event.getGuild());
-            message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        }
-        GameManager.save(game, "Whisper"); // TODO: We should be locking since we're saving
+        ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
+            Game gameToSave = GameManager.getManagedGame(gameName).getGame();
+            if (future) {
+                whisperToFutureColorOrFaction(event, gameToSave, messageContent, sender, receiver);
+            } else {
+                WhisperService.sendWhisper(
+                    gameToSave, sender, receiver, messageContent, "n", event.getChannel(), event.getGuild());
+                message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            }
+            GameManager.save(gameToSave, "Whisper");
+        });
+
         return true;
+    }
+
+    private static Player getPlayer(Game game, String receivingColorOrFaction) {
+        for (Player player : game.getRealPlayers()) {
+            if (Objects.equals(receivingColorOrFaction, player.getFaction())
+                    || Objects.equals(receivingColorOrFaction, player.getColor())) {
+                return player;
+            }
+        }
+        return null;
     }
 
     private static void whisperToFutureColorOrFaction(
