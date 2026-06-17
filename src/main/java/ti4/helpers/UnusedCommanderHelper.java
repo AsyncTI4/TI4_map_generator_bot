@@ -30,6 +30,7 @@ public class UnusedCommanderHelper {
                 commanderName = "kelerescommander";
             }
             if (game.getFactions().contains(faction.getAlias())
+                    || (game.isFrankenGame() && "mahactcommander".equalsIgnoreCase(commanderName))
                     || ("obsidian".equalsIgnoreCase(faction.getAlias())
                             && game.getFactions().contains("firmament"))
                     || ("firmament".equalsIgnoreCase(faction.getAlias())
