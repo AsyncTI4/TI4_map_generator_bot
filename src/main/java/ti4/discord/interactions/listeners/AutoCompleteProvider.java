@@ -115,6 +115,7 @@ class AutoCompleteProvider {
                 case Constants.DEVELOPER -> resolveDeveloperCommandAutoComplete(event, subCommandName, optionName);
                 case Constants.SEARCH, "search2" -> resolveSearchCommandAutoComplete(event, subCommandName, optionName);
                 case Constants.FRANKEN -> resolveFrankenAutoComplete(event, subCommandName, optionName);
+                case Constants.FRANKEN2 -> resolvePlotAutoComplete(event, optionName);
             }
             if (event.isAcknowledged()) return;
         }
@@ -1522,6 +1523,19 @@ class AutoCompleteProvider {
                 }
             }
         }
+    }
+
+    private static void resolvePlotAutoComplete(
+            @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String optionName) {
+        if (!Constants.PLOT_CARDS.equals(optionName)) return;
+
+        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+        List<Command.Choice> options = Mapper.getPlots().values().stream()
+                .filter(plot -> plot.search(enteredValue))
+                .limit(25)
+                .map(plot -> new Command.Choice(plot.getAutoCompleteName(), plot.getAlias()))
+                .collect(Collectors.toList());
+        event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static void resolveMapAutoComplete(
