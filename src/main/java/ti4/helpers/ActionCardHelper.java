@@ -2202,6 +2202,11 @@ public class ActionCardHelper {
     }
 
     public static void pickACardFromDiscardStep1(Game game, Player player, String buttonPrefix, String message) {
+        pickACardFromDiscardStep1(game, player, buttonPrefix, message, player.getCardsInfoThread());
+    }
+
+    public static void pickACardFromDiscardStep1(
+            Game game, Player player, String buttonPrefix, String message, MessageChannel channel) {
         List<Button> buttons = new ArrayList<>();
         for (String acStringID : game.getDiscardActionCards().keySet()) {
             if (!isDiscardActionCardPickable(game, acStringID)) {
@@ -2220,7 +2225,7 @@ public class ActionCardHelper {
         if (buttons.size() > 75) {
             buttons.add(75, Buttons.red("deleteButtons_3", "Delete These Buttons"));
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
     }
 
     public static void pickACardFromDiscardStep2(
