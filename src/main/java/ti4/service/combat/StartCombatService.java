@@ -49,6 +49,8 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
@@ -294,6 +296,7 @@ public class StartCombatService {
                 return;
             }
         }
+
         if (tile.isMecatol(game)) {
             CommanderUnlockCheckService.checkPlayer(player1, "winnu");
             CommanderUnlockCheckService.checkPlayer(player2, "winnu");
@@ -306,15 +309,18 @@ public class StartCombatService {
         // Create the thread
         String finalThreadName = threadName;
 
-        channel.sendMessage("Resolve combat in this thread:").queue(m -> {
-            ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, m.getId());
+        try {
+            var threadMessage =
+                    channel.sendMessage("Resolve combat in this thread:").complete();
+            ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, threadMessage.getId());
             if (game.isFowMode()) {
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
             } else {
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             }
-            threadChannel.queue(tc -> initializeCombatThread(
-                    tc,
+            // mutates game state, so much be done using complete rather than queue
+            initializeCombatThread(
+                    threadChannel.complete(),
                     game,
                     player1,
                     player2,
@@ -323,8 +329,10 @@ public class StartCombatService {
                     spaceOrGround,
                     systemWithContext,
                     unitHolderName,
-                    firstCombatThread));
-        });
+                    firstCombatThread);
+        } catch (Exception e) {
+            BotLogger.error(new LogOrigin(game), "Failed to create combat thread for game: " + game.getName(), e);
+        }
         CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
         CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
     }
@@ -573,7 +581,7 @@ public class StartCombatService {
         if (firstCombatThread) {
             for (Player p : game.getRealPlayers()) {
                 // offer buttons for all crimson commander holders
-                offerRedGhostCommanderButtons(p, game, tile, event);
+                offerRedGhostCommanderButtons(p, game);
 
                 boolean inExileRange = FoWHelper.isTileInExileRange(game, tile, p);
                 if (inExileRange) {
@@ -647,8 +655,7 @@ public class StartCombatService {
                 false);
     }
 
-    public static void offerRedGhostCommanderButtons(
-            Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
+    public static void offerRedGhostCommanderButtons(Player player, Game game) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")
                 || game.playerHasLeaderUnlockedOrAlliance(player, "crimsoncommander")) {
             String message = player.getRepresentation(true, true)

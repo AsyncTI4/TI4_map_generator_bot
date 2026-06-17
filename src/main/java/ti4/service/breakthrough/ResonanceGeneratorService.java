@@ -35,7 +35,7 @@ public class ResonanceGeneratorService {
                 if (tile.containsPlayersUnits(p2)) {
                     CommanderUnlockCheckService.checkPlayer(player, "crimson");
                     for (Player p : game.getRealPlayers()) {
-                        StartCombatService.offerRedGhostCommanderButtons(p, game, tile, null);
+                        StartCombatService.offerRedGhostCommanderButtons(p, game);
                     }
                     break;
                 }
