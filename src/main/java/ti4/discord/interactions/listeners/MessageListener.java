@@ -252,86 +252,79 @@ class MessageListener extends ListenerAdapter {
             return false;
         }
 
-        Game game = GameManager.getManagedGame(gameName).getGame();
-        if (game == null) {
+        ManagedGame managedGame = GameManager.getManagedGame(gameName);
+        if (managedGame == null) {
             return true;
         }
 
         // Prevent whispers from fow combat threads
-        if (game.isFowMode()
+        if (managedGame.isFowMode()
                 && event.getChannel() instanceof ThreadChannel
                 && event.getChannel().getName().contains("vs")
                 && event.getChannel().getName().contains("private")) {
             return false;
         }
 
-        Player sender = getPlayer(event, game);
-        if (sender == null || !sender.isRealPlayer()) {
-            return true;
-        }
-
-        String messageLowerCase = messageText.toLowerCase();
-        String receivingColorOrFaction = PATTERN.matcher(StringUtils.substringBetween(messageLowerCase, "to", " "))
-                .replaceAll("");
-
-        if ("futureme".equals(receivingColorOrFaction)) {
-            ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
-                        Game gameToSave = GameManager.getManagedGame(gameName).getGame();
-                        whisperToFutureMe(event, gameToSave, sender);
-                        GameManager.save(gameToSave, "Whisper to future by " + sender.getUserName());
-                    })
-                    .run();
-
-            return true;
-        }
-
-        boolean future = receivingColorOrFaction.startsWith("future");
-        receivingColorOrFaction = FUTURE.matcher(receivingColorOrFaction).replaceFirst("");
-        if (receivingColorOrFaction.isEmpty()) {
-            return true;
-        }
-
-        receivingColorOrFaction = AliasHandler.resolveFaction(receivingColorOrFaction);
-        if (!Mapper.isValidColor(receivingColorOrFaction) && !Mapper.isValidFaction(receivingColorOrFaction)) {
-            return true;
-        }
-
-        if (game.isWhispersDisabled()) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "Whispers are disabled in this game. To reenable them, use `/game setup whispers_enabled:true`.");
-            message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
-            return true;
-        }
-
-        String messageContent = StringUtils.substringAfter(messageText, " ");
-        if (messageContent.isEmpty()) {
-            message.reply("No message content?").queue(Consumers.nop(), BotLogger::catchRestError);
-            return true;
-        }
-
-        Player receiver = getPlayer(game, receivingColorOrFaction);
-        if (receiver == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found: " + receivingColorOrFaction);
-            return true;
-        }
-
         ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
-                    Game gameToSave = GameManager.getManagedGame(gameName).getGame();
+                    Game game = managedGame.getGame();
+                    Player sender = getPlayer(event, game);
+                    if (sender == null || !sender.isRealPlayer()) {
+                        return;
+                    }
+
+                    String messageLowerCase = messageText.toLowerCase();
+                    String receivingColorOrFaction = PATTERN.matcher(
+                                    StringUtils.substringBetween(messageLowerCase, "to", " "))
+                            .replaceAll("");
+
+                    if ("futureme".equals(receivingColorOrFaction)) {
+                        whisperToFutureMe(event, game, sender);
+                        GameManager.save(game, "Whisper to future by " + sender.getUserName());
+                        return;
+                    }
+
+                    boolean future = receivingColorOrFaction.startsWith("future");
+                    receivingColorOrFaction =
+                            FUTURE.matcher(receivingColorOrFaction).replaceFirst("");
+                    if (receivingColorOrFaction.isEmpty()) {
+                        return;
+                    }
+
+                    receivingColorOrFaction = AliasHandler.resolveFaction(receivingColorOrFaction);
+                    if (!Mapper.isValidColor(receivingColorOrFaction)
+                            && !Mapper.isValidFaction(receivingColorOrFaction)) {
+                        return;
+                    }
+
+                    if (game.isWhispersDisabled()) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getChannel(),
+                                "Whispers are disabled in this game. To reenable them, use `/game setup whispers_enabled:true`.");
+                        message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+                        return;
+                    }
+
+                    String messageContent = StringUtils.substringAfter(messageText, " ");
+                    if (messageContent.isEmpty()) {
+                        message.reply("No message content?").queue(Consumers.nop(), BotLogger::catchRestError);
+                        return;
+                    }
+
+                    Player receiver = getPlayer(game, receivingColorOrFaction);
+                    if (receiver == null) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getChannel(), "Player not found: " + receivingColorOrFaction);
+                        return;
+                    }
+
                     if (future) {
-                        whisperToFutureColorOrFaction(event, gameToSave, messageContent, sender, receiver);
+                        whisperToFutureColorOrFaction(event, game, messageContent, sender, receiver);
                     } else {
                         WhisperService.sendWhisper(
-                                gameToSave,
-                                sender,
-                                receiver,
-                                messageContent,
-                                "n",
-                                event.getChannel(),
-                                event.getGuild());
+                                game, sender, receiver, messageContent, "n", event.getChannel(), event.getGuild());
                         message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                     }
-                    GameManager.save(gameToSave, "Whisper");
+                    GameManager.save(game, "Whisper");
                 })
                 .run();
 
