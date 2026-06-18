@@ -148,8 +148,9 @@ public final class ButtonHelperTacticalAction {
         String message = player.getRepresentationUnfogged() + ", use buttons to end turn, or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageChannel channel = event.getMessageChannel();
+        LoreService.showSpaceBattleLore(player, game, game.getActiveSystem());
+        LoreService.showSystemLore(player, game, game.getActiveSystem(), LoreService.TRIGGER.CONTROLLED);
         if (game.isFowMode()) {
-            LoreService.showSystemLore(player, game, game.getActiveSystem(), LoreService.TRIGGER.CONTROLLED);
             channel = player.getPrivateChannel();
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, systemButtons);
@@ -517,6 +518,7 @@ public final class ButtonHelperTacticalAction {
         StringBuilder message = new StringBuilder(player.getRepresentationNoPing() + " activated "
                 + tile.getRepresentationForButtons(game, player) + ".");
 
+        LoreService.showSystemLore(player, game, pos, LoreService.TRIGGER.ACTIVATED);
         if (!game.isFowMode()) {
             for (Player player_ : game.getRealPlayers()) {
                 if (!game.isL1Hero()
@@ -538,7 +540,6 @@ public final class ButtonHelperTacticalAction {
                 }
             }
         } else {
-            LoreService.showSystemLore(player, game, pos, LoreService.TRIGGER.ACTIVATED);
             for (Player player_ : game.getRealPlayers()) {
                 if (player_ == player
                         || !FoWHelper.getTilePositionsToShow(game, player_).contains(pos)) {

@@ -260,6 +260,15 @@ public final class ButtonHelperModifyUnits {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "## End of Ground Combat");
+        // Mirror addPlanet: only fire GROUND_BATTLE if combat rounds were actually rolled
+        if (!game.getStoredValue("combatRoundTracker" + p1.getFaction() + tile.getPosition() + planet)
+                .isEmpty()) {
+            LoreService.showPlanetLore(p1, game, planet, LoreService.TRIGGER.GROUND_BATTLE);
+        }
+        if (!game.getStoredValue("combatRoundTracker" + p2.getFaction() + tile.getPosition() + planet)
+                .isEmpty()) {
+            LoreService.showPlanetLore(p2, game, planet, LoreService.TRIGGER.GROUND_BATTLE);
+        }
         String pos = tile.getPosition();
         FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition()).createFileUpload();
         MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);

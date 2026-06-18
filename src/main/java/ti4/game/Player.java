@@ -2649,7 +2649,23 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public void addPlanet(String planet) {
         if (!getPlanets().contains(planet)) {
             getPlanets().add(planet);
-            LoreService.showPlanetLore(this, game, planet, LoreService.TRIGGER.CONTROLLED);
+            Tile tile = game.getTileFromPlanet(planet);
+            if (tile != null
+                    && !game.getStoredValue("combatRoundTracker" + getFaction() + tile.getPosition() + planet)
+                            .isEmpty()) {
+                LoreService.showPlanetLore(this, game, planet, LoreService.TRIGGER.GROUND_BATTLE);
+                for (Player other : game.getRealPlayers()) {
+                    if (other == this) continue;
+                    if (!game.getStoredValue("combatRoundTracker" + other.getFaction() + tile.getPosition() + planet)
+                            .isEmpty()) {
+                        LoreService.showPlanetLore(other, game, planet, LoreService.TRIGGER.GROUND_BATTLE);
+                    }
+                }
+            }
+            // Only fire CONTROLLED lore during actual gameplay, not during setup (round 0)
+            if (game.getRound() > 0) {
+                LoreService.showPlanetLore(this, game, planet, LoreService.TRIGGER.CONTROLLED);
+            }
         }
     }
 

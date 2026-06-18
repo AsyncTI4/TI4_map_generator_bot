@@ -64,15 +64,22 @@ public final class LoreService {
             Buttons.DONE_DELETE_BUTTONS);
 
     private static final String SYSTEM_LORE_KEY = "fowSystemLore";
+    // TODO: export file is written to the JVM working directory and never deleted after sending.
     private static final String LORE_EXPORT_FILENAME = "_lore_export.txt";
     private static final int LORE_TEXT_MAX_LENGTH = 1000;
     private static final int FOOTER_TEXT_MAX_LENGTH = 200;
+    // TODO: editing existing lore does not re-validate RECEIVER against current game mode; an entry saved in FoW
+    //       mode with ADJACENT/GM receiver remains editable without correction in non-FoW mode.
+    // TODO: LORECACHE is a plain HashMap — not thread-safe and never evicted when a game ends.
 
     public enum RECEIVER {
         CURRENT("Current Player"),
         ADJACENT("Adjacent Players"),
         ALL("All Players"),
-        GM("GM");
+        GM("GM"),
+        CARDS("Private Card Thread"),
+        WINNER("Battle winner"),
+        LOSER("Battle loser");
         public final String name;
 
         RECEIVER(String name) {
@@ -83,7 +90,9 @@ public final class LoreService {
     public enum TRIGGER {
         ACTIVATED("Target is activated"),
         MOVED("Units are moved in"),
-        CONTROLLED("Target is in control");
+        CONTROLLED("Target is in control"),
+        SPACE_BATTLE("A space battle was fought here"),
+        GROUND_BATTLE("A ground battle was fought here");
         public final String name;
 
         TRIGGER(String name) {
@@ -145,6 +154,43 @@ public final class LoreService {
             return target + ";" + loreText + ";" + footerText + ";" + receiver + ";" + trigger + ";" + ping + ";"
                     + persistance;
         }
+
+        /** Footer lines beginning with '!' are machine-readable effects, not shown in the embed. */
+        public List<String> getEffectLines() {
+            List<String> out = new ArrayList<>();
+            for (String line : footerText.split("\n")) {
+                // Support multiple effects on one line: "!tg +2 !fleet +1"
+                for (String segment : line.split("(?<=\\s)(?=!)")) {
+                    String trimmed = segment.strip();
+                    if (trimmed.startsWith("!")) {
+                        out.add(trimmed.substring(1).strip());
+                    }
+                }
+            }
+            return out;
+        }
+
+        /** Footer text with effect lines removed, for display. */
+        public String getDisplayFooter() {
+            StringBuilder sb = new StringBuilder();
+            for (String line : footerText.split("\n")) {
+                // Strip effect segments from the line (same split as getEffectLines)
+                StringBuilder lineOut = new StringBuilder();
+                for (String segment : line.split("(?<=\\s)(?=!)")) {
+                    String trimmed = segment.strip();
+                    if (!trimmed.startsWith("!")) {
+                        if (lineOut.length() > 0) lineOut.append(' ');
+                        lineOut.append(trimmed);
+                    }
+                }
+                String displayLine = lineOut.toString().strip();
+                if (!displayLine.isEmpty()) {
+                    if (sb.length() > 0) sb.append('\n');
+                    sb.append(displayLine);
+                }
+            }
+            return sb.toString().strip();
+        }
     }
 
     @ButtonHandler(value = "gmLoreRefresh", save = false)
@@ -196,18 +242,30 @@ public final class LoreService {
 
         Map<String, LoreEntry> importedLore = readLore(loreString);
         // Validate
+        List<String> effectProblems = new ArrayList<>();
         for (Map.Entry<String, LoreEntry> entry : importedLore.entrySet()) {
             String validatedTarget = validateLore(entry.getKey(), entry.getValue(), importedLore, game);
             if (validatedTarget == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), entry.getKey() + " is invalid to import lore");
                 return;
             }
+            for (String problem : LoreEffects.validateEffects(entry.getValue(), game)) {
+                effectProblems.add(entry.getKey() + " — " + problem);
+            }
         }
 
         // Construct
         getGameLore(game).putAll(importedLore);
         saveLore(game);
-        MessageHelper.sendMessageToChannel(event.getChannel(), importedLore.size() + " lore entries imported.");
+
+        StringBuilder result = new StringBuilder(importedLore.size() + " lore entries imported.");
+        if (!effectProblems.isEmpty()) {
+            result.append("\n⚠️ Effect warnings (imported anyway; these lines are skipped until fixed):");
+            for (String problem : effectProblems) {
+                result.append("\n• ").append(problem);
+            }
+        }
+        MessageHelper.sendMessageToChannel(event.getChannel(), result.toString());
     }
 
     @ButtonHandler(value = "gmLore", save = false)
@@ -285,7 +343,7 @@ public final class LoreService {
         if (StringUtils.isBlank(menuId)) {
             return "";
         }
-        String[] selectedValues = menuId.split("_");
+        String[] selectedValues = menuId.split(":");
 
         StringBuilder sb = new StringBuilder("\n");
         if (selectedValues.length > 0) {
@@ -323,10 +381,12 @@ public final class LoreService {
     }
 
     @ButtonHandler("loreAdd0")
-    public static void addLoreStep1(ButtonInteractionEvent event) {
+    public static void addLoreStep1(ButtonInteractionEvent event, Game game) {
         StringSelectMenu.Builder selectMenu =
                 StringSelectMenu.create("loreAdd1_").setPlaceholder("Notify...");
         for (RECEIVER value : RECEIVER.values()) {
+            if (!game.isFowMode() && (value == RECEIVER.GM || value == RECEIVER.ADJACENT)) continue;
+            if (game.isFowMode() && value == RECEIVER.CARDS) continue;
             selectMenu.addOption(value.name, value.toString());
         }
 
@@ -346,12 +406,13 @@ public final class LoreService {
     }
 
     @SelectionHandler("loreAdd2")
-    public static void handleTriggerSelectionChange(StringSelectInteractionEvent event, String menuId) {
+    public static void handleTriggerSelectionChange(StringSelectInteractionEvent event, String menuId, Game game) {
         String selected =
-                menuId.replace("loreAdd2_", "") + "_" + event.getValues().getFirst();
+                menuId.replace("loreAdd2_", "") + ":" + event.getValues().getFirst();
         StringSelectMenu.Builder selectMenu =
                 StringSelectMenu.create("loreAdd3_" + selected).setPlaceholder("Ping GM...");
         for (PING value : PING.values()) {
+            if (!game.isFowMode() && value == PING.YES) continue;
             selectMenu.addOption(value.name, value.toString());
         }
 
@@ -361,7 +422,7 @@ public final class LoreService {
     @SelectionHandler("loreAdd3")
     public static void handlePingSelectionChange(StringSelectInteractionEvent event, String menuId) {
         String selected =
-                menuId.replace("loreAdd3_", "") + "_" + event.getValues().getFirst();
+                menuId.replace("loreAdd3_", "") + ":" + event.getValues().getFirst();
         StringSelectMenu.Builder selectMenu =
                 StringSelectMenu.create("loreAdd4_" + selected).setPlaceholder("Trigger...");
         for (PERSISTANCE value : PERSISTANCE.values()) {
@@ -374,7 +435,7 @@ public final class LoreService {
     @SelectionHandler("loreAdd4")
     public static void handlePersistanceSelectionChange(StringSelectInteractionEvent event, String menuId) {
         String selected =
-                menuId.replace("loreAdd4_", "") + "_" + event.getValues().getFirst();
+                menuId.replace("loreAdd4_", "") + ":" + event.getValues().getFirst();
         confirmAddLoreSettings(event.getChannel(), selected);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -383,7 +444,7 @@ public final class LoreService {
     public static void addDefaultLore(ButtonInteractionEvent event, Game game) {
         confirmAddLoreSettings(
                 event.getChannel(),
-                RECEIVER.CURRENT + "_" + TRIGGER.CONTROLLED + "_" + PING.NO + "_" + PERSISTANCE.ONCE);
+                RECEIVER.CURRENT + ":" + TRIGGER.CONTROLLED + ":" + PING.NO + ":" + PERSISTANCE.ONCE);
     }
 
     private static void confirmAddLoreSettings(MessageChannel channel, String selectedValues) {
@@ -406,9 +467,9 @@ public final class LoreService {
                 .setRequired(false)
                 .setPlaceholder("Once upon a time...")
                 .setMaxLength(LORE_TEXT_MAX_LENGTH);
-        TextInput.Builder footer = TextInput.create("footer", TextInputStyle.SHORT)
+        TextInput.Builder footer = TextInput.create("footer", TextInputStyle.PARAGRAPH)
                 .setRequired(false)
-                .setPlaceholder("Please use `/add_token token:gravityrift`")
+                .setPlaceholder("!tg +2\n!comms +3\n!ac 2\n!fleet +1\n!plastic red 2 infantry mr\n!token gravityrift")
                 .setMaxLength(FOOTER_TEXT_MAX_LENGTH);
 
         String selections = target.replace("NEW_", "");
@@ -419,7 +480,7 @@ public final class LoreService {
             if (!StringUtils.isBlank(entry.footerText)) {
                 footer.setValue(entry.footerText);
             }
-            selections = entry.receiver + "_" + entry.trigger + "_" + entry.ping + "_" + entry.persistance;
+            selections = entry.receiver + ":" + entry.trigger + ":" + entry.ping + ":" + entry.persistance;
         }
 
         Modal editLoreModal = Modal.create("gmLoreSave_" + selections, "Add Lore")
@@ -434,7 +495,7 @@ public final class LoreService {
     @ModalHandler("gmLoreSave_")
     public static void saveLoreFromModal(ModalInteractionEvent event, Game game) {
         String[] targets = event.getValue(Constants.POSITION).getAsString().split(",");
-        String[] selectedOptions = event.getModalId().replace("gmLoreSave_", "").split("_");
+        String[] selectedOptions = event.getModalId().replace("gmLoreSave_", "").split(":");
         Map<String, LoreEntry> loreMap = getGameLore(game);
 
         LoreEntry newEntry =
@@ -465,6 +526,14 @@ public final class LoreService {
 
         if (!validTargets.isEmpty()) {
             saveLore(game);
+        }
+
+        List<String> effectProblems = LoreEffects.validateEffects(newEntry, game);
+        if (!effectProblems.isEmpty()) {
+            sb.append("\n⚠️ Effect warnings (lore still saved; these lines are skipped until fixed):");
+            for (String problem : effectProblems) {
+                sb.append("\n• ").append(problem);
+            }
         }
 
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
@@ -581,7 +650,7 @@ public final class LoreService {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("⭐ Lore " + titleTile);
         eb.setDescription(lore.loreText);
-        eb.setFooter(lore.footerText);
+        eb.setFooter(lore.getDisplayFooter());
         eb.setColor(embedColor);
         return eb.build();
     }
@@ -590,11 +659,27 @@ public final class LoreService {
         return getGameLore(game).containsKey(target) && getGameLore(game).get(target).trigger == trigger;
     }
 
+    public static void showSpaceBattleLore(Player activePlayer, Game game, String position) {
+        showSystemLore(activePlayer, game, position, TRIGGER.SPACE_BATTLE);
+        for (Player other : game.getRealPlayers()) {
+            if (other == activePlayer) continue;
+            if (!game.getStoredValue("combatRoundTracker" + other.getFaction() + position + Constants.SPACE)
+                    .isEmpty()) {
+                showSystemLore(other, game, position, TRIGGER.SPACE_BATTLE);
+            }
+        }
+    }
+
     public static void showSystemLore(Player player, Game game, String position, TRIGGER trigger) {
         if (!hasLoreToShow(game, position, trigger)) return;
 
-        // TRIGGERS CONTROLLED and MOVED require player to have units in system
-        if (trigger != TRIGGER.ACTIVATED
+        if (trigger == TRIGGER.SPACE_BATTLE) {
+            // Only fire when combat rounds were actually rolled in this system
+            if (game.getStoredValue("combatRoundTracker" + player.getFaction() + position + Constants.SPACE)
+                    .isEmpty()) {
+                return;
+            }
+        } else if (trigger != TRIGGER.ACTIVATED
                 && !FoWHelper.playerHasUnitsInSystem(player, game.getTileByPosition(position))) {
             return;
         }
@@ -605,8 +690,7 @@ public final class LoreService {
     public static void showPlanetLore(Player player, Game game, String planet, TRIGGER trigger) {
         if (!hasLoreToShow(game, planet, trigger)) return;
 
-        // TRIGGER CONTROLLED requires player to control the planet
-        // TRIGGER MOVED requires player to have units on the planet
+        // CONTROLLED requires planet control; MOVED requires units on planet; GROUND_BATTLE has no extra guard
         if (trigger == TRIGGER.CONTROLLED && !player.getPlanets().contains(planet)
                 || trigger == TRIGGER.MOVED
                         && !FoWHelper.playerHasUnitsOnPlanet(player, game.getTileFromPlanet(planet), planet)) {
@@ -633,10 +717,22 @@ public final class LoreService {
             }
         }
 
+        // WINNER/LOSER: check unit presence to gate delivery
+        if (loreEntry.receiver == RECEIVER.WINNER || loreEntry.receiver == RECEIVER.LOSER) {
+            boolean hasUnits;
+            if (isSystemLore) {
+                hasUnits = FoWHelper.playerHasUnitsInSystem(player, game.getTileByPosition(target));
+            } else {
+                hasUnits = FoWHelper.playerHasUnitsOnPlanet(player, game.getTileFromPlanet(target), target);
+            }
+            if (loreEntry.receiver == RECEIVER.WINNER && !hasUnits) return;
+            if (loreEntry.receiver == RECEIVER.LOSER && hasUnits) return;
+        }
+
         Map<MessageChannel, String> channels = new HashMap<>();
         String who = player.getRepresentation() + " ";
         switch (loreEntry.receiver) {
-            case CURRENT:
+            case CURRENT, WINNER, LOSER:
                 channels.put(player.getCorrectChannel(), player.getRepresentationUnfogged());
                 break;
             case ADJACENT:
@@ -652,12 +748,58 @@ public final class LoreService {
                 channels.put(GMService.getGMChannel(game), GMService.gmPing(game));
                 who = player.getRepresentationUnfoggedNoPing() + " ";
                 break;
+            case CARDS:
+                var cardsThread = player.getCardsInfoThread();
+                if (cardsThread != null) {
+                    channels.put(cardsThread, player.getRepresentationUnfogged());
+                }
+                break;
         }
 
         MessageEmbed embed = buildLoreEmbed(game, target, loreEntry, isSystemLore);
         for (Map.Entry<MessageChannel, String> entry : channels.entrySet()) {
             MessageHelper.sendMessageToChannelWithEmbed(
                     entry.getKey(), entry.getValue() + ", Lore was discovered by " + who, embed);
+        }
+
+        LoreEffects.EffectResults results =
+                LoreEffects.applyLoreEffects(player, game, loreEntry, position, isSystemLore);
+        if (!results.mapChanges().isEmpty()) {
+            if (game.isFowMode()) {
+                // Each map change pings the system it affected so all players with visibility are notified.
+                // The triggering player is sent directly (pingSystem skips their color in the message).
+                MessageChannel privateChannel = player.getPrivateChannel();
+                MessageChannel gmChannel = GMService.getGMChannel(game);
+                for (LoreEffects.EffectDescription desc : results.mapChanges()) {
+                    String changeMsg = "**Map change from lore:** " + desc.text();
+                    String pingPosition = desc.tilePosition() != null ? desc.tilePosition() : position;
+                    FoWHelper.pingSystem(game, pingPosition, changeMsg, false);
+                    if (privateChannel != null) MessageHelper.sendMessageToChannel(privateChannel, changeMsg);
+                    if (gmChannel != null) MessageHelper.sendMessageToChannel(gmChannel, changeMsg);
+                }
+            } else {
+                String changeMsg = "**Map changes from lore:**\n"
+                        + results.mapChanges().stream()
+                                .map(LoreEffects.EffectDescription::text)
+                                .collect(Collectors.joining("\n"));
+                for (MessageChannel channel : channels.keySet()) {
+                    MessageHelper.sendMessageToChannel(channel, changeMsg);
+                }
+            }
+        }
+        if (!results.playerChanges().isEmpty()) {
+            String changeMsg = "**Player changes from lore:**\n" + String.join("\n", results.playerChanges());
+            if (game.isFowMode()) {
+                // Sheet info is private in FoW: only the player and GM see these
+                MessageChannel privateChannel = player.getPrivateChannel();
+                if (privateChannel != null) MessageHelper.sendMessageToChannel(privateChannel, changeMsg);
+                MessageChannel gmChannel = GMService.getGMChannel(game);
+                if (gmChannel != null) MessageHelper.sendMessageToChannel(gmChannel, changeMsg);
+            } else {
+                for (MessageChannel channel : channels.keySet()) {
+                    MessageHelper.sendMessageToChannel(channel, changeMsg);
+                }
+            }
         }
 
         GMService.logPlayerActivity(
