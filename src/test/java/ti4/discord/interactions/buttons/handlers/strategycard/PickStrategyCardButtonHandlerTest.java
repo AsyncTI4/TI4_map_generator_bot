@@ -48,6 +48,42 @@ class PickStrategyCardButtonHandlerTest extends BaseTi4Test {
     }
 
     @Test
+    void deflectionAllowsChooserToPayWithReadyEmelpar() {
+        Game game = new Game();
+        game.setStoredValue("deflectedSC", "4");
+
+        Player choosingPlayer = new Player("choosingPlayer", "", game);
+        choosingPlayer.setFleetCC(2);
+        choosingPlayer.setStrategicCC(0);
+        choosingPlayer.addRelic("emelpar");
+
+        boolean result = PickStrategyCardButtonHandler.applyDeflectionCostIfNeeded(game, choosingPlayer, 4, null);
+
+        assertThat(result).isTrue();
+        assertThat(choosingPlayer.getStrategicCC()).isZero();
+        assertThat(choosingPlayer.getFleetCC()).isEqualTo(2);
+        assertThat(choosingPlayer.getExhaustedRelics()).contains("emelpar");
+    }
+
+    @Test
+    void deflectionAllowsChooserToPayWithReadyAbsolEmelpar() {
+        Game game = new Game();
+        game.setStoredValue("deflectedSC", "4");
+
+        Player choosingPlayer = new Player("choosingPlayer", "", game);
+        choosingPlayer.setFleetCC(2);
+        choosingPlayer.setStrategicCC(0);
+        choosingPlayer.addRelic("absol_emelpar");
+
+        boolean result = PickStrategyCardButtonHandler.applyDeflectionCostIfNeeded(game, choosingPlayer, 4, null);
+
+        assertThat(result).isTrue();
+        assertThat(choosingPlayer.getStrategicCC()).isZero();
+        assertThat(choosingPlayer.getFleetCC()).isEqualTo(2);
+        assertThat(choosingPlayer.getExhaustedRelics()).contains("absol_emelpar");
+    }
+
+    @Test
     void deflectionDoesNothingForOtherStrategyCards() {
         Game game = new Game();
         game.setStoredValue("deflectedSC", "4");

@@ -147,9 +147,16 @@ public class PickStrategyCardButtonHandler {
         if (game.isTwilightsFallMode() || !isDeflectedStrategyCard(game, scpick)) {
             return true;
         }
-        if (player.getStrategicCC() < 1) {
-            return false;
+        if (player.hasRelicReady("emelpar")) {
+            player.addExhaustedRelic("emelpar");
+            return true;
         }
+        if (player.hasRelicReady("absol_emelpar")) {
+            player.addExhaustedRelic("absol_emelpar");
+            return true;
+        }
+        if (player.getStrategicCC() < 1) return false;
+
         player.setStrategicCC(player.getStrategicCC() - 1);
         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "picked a _Deflection_'d strategy card");
         return true;
