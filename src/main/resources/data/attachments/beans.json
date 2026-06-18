@@ -25,7 +25,7 @@
     {
         "id": "designunify",
         "name": "Unify (Design)",
-        "imagePath": "attachment_designcombine.png",
+        "imagePath": "attachment_designunify.png",
         "isFakeAttachment": true,
         "source": "beans"
     },

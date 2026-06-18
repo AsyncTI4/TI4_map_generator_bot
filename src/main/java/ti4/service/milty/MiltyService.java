@@ -192,38 +192,37 @@ public class MiltyService {
             specs.presetSlices.forEach(draftManager::addSlice);
             MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
         } else {
-            event.getMessageChannel().sendMessage(startMsg).queue((ignore) -> {
-                boolean slicesCreated = GenerateSlicesService.generateSlices(event, draftManager, specs);
-                if (!slicesCreated) {
-                    String msg = "Generating slices was too hard so I gave up.... Please try again.";
-                    if (specs.numSlices == maxSlices) {
-                        msg += "\n*...and maybe consider asking for fewer slices*";
-                    }
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-                } else {
-                    MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), startMsg);
+            boolean slicesCreated = GenerateSlicesService.generateSlices(event, draftManager, specs);
+            if (!slicesCreated) {
+                String msg = "Generating slices was too hard so I gave up.... Please try again.";
+                if (specs.numSlices == maxSlices) {
+                    msg += "\n*...and maybe consider asking for fewer slices*";
+                }
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            } else {
+                MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
 
-                    game.setPhaseOfGame("miltydraft");
-                    // TODO: We should be locking since we're saving
-                    for (String player : draftManager.getPlayers()) {
-                        Player p = game.getPlayer(player);
-                        game.setStoredValue(p.getUserID() + "queuedMiltyPick", "");
-                    }
-                    GameManager.save(game, "Milty");
-                    if (game.isThundersEdge()) {
-                        ThundersEdgeRulesService.alertTabletalkWithRulesAtStartOfDraft(game);
-                    }
-                    for (String player : draftManager.getPlayers()) {
-                        Player p = game.getPlayer(player);
-                        if (p != draftManager.getCurrentDraftPlayer(game) && p.getCardsInfoThread() != null) {
-                            MessageHelper.sendMessageToChannel(
-                                    p.getCardsInfoThread(),
-                                    p.getRepresentation() + " You can queue your choices with these buttons",
-                                    draftManager.getQueueButtons(p, game));
-                        }
+                game.setPhaseOfGame("miltydraft");
+                for (String player : draftManager.getPlayers()) {
+                    Player p = game.getPlayer(player);
+                    game.setStoredValue(p.getUserID() + "queuedMiltyPick", "");
+                }
+                // SPOOKY SAVE
+                GameManager.save(game, "Milty");
+                if (game.isThundersEdge()) {
+                    ThundersEdgeRulesService.alertTabletalkWithRulesAtStartOfDraft(game);
+                }
+                for (String player : draftManager.getPlayers()) {
+                    Player p = game.getPlayer(player);
+                    if (p != draftManager.getCurrentDraftPlayer(game) && p.getCardsInfoThread() != null) {
+                        MessageHelper.sendMessageToChannel(
+                                p.getCardsInfoThread(),
+                                p.getRepresentation() + " You can queue your choices with these buttons",
+                                draftManager.getQueueButtons(p, game));
                     }
                 }
-            });
+            }
         }
         return null;
     }
