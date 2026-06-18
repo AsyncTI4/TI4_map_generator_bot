@@ -1091,7 +1091,7 @@
         "name": "Survey",
         "phase": "Action",
         "window": "At the end of your turn",
-        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its matching discard pile instead.",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
         "flavorText": "As Tai announced that the expedition would continue despite safety concerns, a cadet gave an audible groan—followed by a yelp as Dart grabbed him by his Naaz. \"Any more backtalk from you and you'll get a clout in the ear!\"",
         "source": "action_deck_2"
     },
