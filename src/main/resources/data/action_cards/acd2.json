@@ -1100,7 +1100,7 @@
         "name": "Survey",
         "phase": "Action",
         "window": "At the end of your turn",
-        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its matching discard pile instead.",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
         "flavorText": "One of the cadets nearly fell over as they crested the lip of the ancient crater, revealing three massive, entangled ships jutting from the earth below. Tai gave a self-satisfied hmph.",
         "source": "action_deck_2"
     },
@@ -1109,7 +1109,7 @@
         "name": "Survey",
         "phase": "Action",
         "window": "At the end of your turn",
-        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its matching discard pile instead.",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
         "flavorText": "\"Careful!\" Tai cried as he heard what was undoubtedly a priceless relic shatter in the room next door. \"Who trained these fools?\" he grumbled. Dart didn't have the heart to remind him that they had.",
         "source": "action_deck_2"
     },
@@ -1118,7 +1118,7 @@
         "name": "Survey",
         "phase": "Action",
         "window": "At the end of your turn",
-        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its matching discard pile instead.",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
         "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—as Dart ran.",
         "source": "action_deck_2"
     },
