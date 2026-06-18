@@ -247,7 +247,7 @@ final class LoreEffects {
                 "comms",
                 "commodities");
         register(LoreEffects::effectAc, "ac");
-        register(LoreEffects::effectUnit, "unit");
+        register(LoreEffects::effectUnit, "unit", "plastic");
         register(LoreEffects::effectToken, "token");
         register(LoreEffects::effectRemoveUnit, "removeunit");
         register(LoreEffects::effectRemoveToken, "removetoken");
@@ -450,15 +450,15 @@ final class LoreEffects {
                     problems.add("`ac` needs a positive number, e.g. `!ac 2`" + where);
                 }
             }
-            case "unit" -> {
+            case "unit", "plastic" -> {
                 int idx = (!a.isEmpty() && !isSignedInt(a, 0)) ? 1 : 0;
                 if (a.size() < idx + 2) {
-                    problems.add(
-                            "`unit` needs `[neutral|<color>] <count> <unit> [planet]`, e.g. `!unit 2 infantry` or `!unit 2 infantry mr`"
-                                    + where);
+                    problems.add("`" + p.verb() + "` needs `[neutral|<color>] <count> <unit> [planet]`, e.g. `!"
+                            + p.verb() + " 2 infantry` or `!" + p.verb() + " 2 infantry mr`"
+                            + where);
                 } else {
                     if (!isSignedInt(a, idx)) {
-                        problems.add("`unit` count `" + a.get(idx) + "` isn't a number" + where);
+                        problems.add("`" + p.verb() + "` count `" + a.get(idx) + "` isn't a number" + where);
                     }
                     if (Units.findUnitType(a.get(idx + 1)) == null) {
                         problems.add("unknown unit `" + a.get(idx + 1) + "`" + where);

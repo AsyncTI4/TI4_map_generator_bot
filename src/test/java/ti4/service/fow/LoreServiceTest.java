@@ -2,6 +2,7 @@ package ti4.service.fow;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -85,6 +86,20 @@ class LoreServiceTest extends BaseTi4Test {
             LoreEntry e = entry();
             assertTrue(e.getEffectLines().isEmpty());
             assertTrue(e.getDisplayFooter().isEmpty());
+        }
+
+        @Test
+        void multipleEffectsOnOneLineAreSplit() {
+            // the "!a … !b …" same-line form documented on getEffectLines
+            LoreEntry e = entry("!tg +2 !fleet +1");
+            assertEquals(List.of("tg +2", "fleet +1"), e.getEffectLines());
+        }
+
+        @Test
+        void textBeforeEffectOnSameLineStaysInDisplay() {
+            LoreEntry e = entry("Flavor here !tg +2");
+            assertEquals(List.of("tg +2"), e.getEffectLines());
+            assertEquals("Flavor here", e.getDisplayFooter());
         }
     }
 
@@ -241,6 +256,14 @@ class LoreServiceTest extends BaseTi4Test {
             var descs = LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!ac 0"), systemTile, Constants.SPACE, true);
             assertTrue(descs.isEmpty());
+        }
+
+        @Test
+        void multipleEffectsOnOneLineApplied() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!tg +2 !fleet +1"), systemTile, Constants.SPACE, true);
+            assertEquals(7, player.getTg());
+            assertEquals(4, player.getFleetCC());
         }
     }
 
@@ -444,6 +467,195 @@ class LoreServiceTest extends BaseTi4Test {
                     player, game, entry("!comms +2"), systemTile, Constants.SPACE, true);
             assertEquals(1, descs.size());
             assertTrue(descs.get(0).contains("commodity"));
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 7. Remove-unit effects
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class RemoveUnitEffects {
+
+        private UnitKey redInfantry;
+
+        @BeforeEach
+        void seedUnits() {
+            redInfantry = Units.getUnitKey(UnitType.Infantry, "red");
+            systemTile.addUnit(Constants.SPACE, redInfantry, 3);
+        }
+
+        @Test
+        void removesRequestedCount() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!removeunit 2 infantry"), systemTile, Constants.SPACE, true);
+            assertEquals(1, systemTile.getUnitHolders().get(Constants.SPACE).getUnitCount(redInfantry));
+        }
+
+        @Test
+        void overRemovalClampsToZero() {
+            // documented behavior: removes whatever exists if fewer are present — silent partial removal
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!removeunit 5 infantry"), systemTile, Constants.SPACE, true);
+            assertEquals(0, systemTile.getUnitHolders().get(Constants.SPACE).getUnitCount(redInfantry));
+        }
+
+        @Test
+        void neutralColorRemoved() {
+            UnitKey grayFighter = Units.getUnitKey(UnitType.Fighter, "gray");
+            systemTile.addUnit(Constants.SPACE, grayFighter, 2);
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!removeunit neutral 1 fighter"), systemTile, Constants.SPACE, true);
+            assertEquals(1, systemTile.getUnitHolders().get(Constants.SPACE).getUnitCount(grayFighter));
+        }
+
+        @Test
+        void removesFromPlanetHolderOnly() {
+            systemTile.addUnit("mr", redInfantry, 2);
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!removeunit 1 infantry mr"), systemTile, Constants.SPACE, true);
+            assertEquals(1, systemTile.getUnitHolders().get("mr").getUnitCount(redInfantry));
+            // space holder is untouched
+            assertEquals(3, systemTile.getUnitHolders().get(Constants.SPACE).getUnitCount(redInfantry));
+        }
+
+        @Test
+        void describedAsMapChange() {
+            var descs = LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!removeunit 2 infantry"), systemTile, Constants.SPACE, true);
+            assertEquals(1, descs.size());
+            assertTrue(descs.get(0).contains("Removed")
+                    && descs.get(0).contains("red")
+                    && descs.get(0).contains("infantry"));
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 8. Remove-token effects
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class RemoveTokenEffects {
+
+        @Test
+        void removesExistingToken() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!token gravityrift"), systemTile, Constants.SPACE, true);
+            assertTrue(systemTile
+                    .getUnitHolders()
+                    .get(Constants.SPACE)
+                    .getTokenList()
+                    .contains("token_gravityrift.png"));
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!removetoken gravityrift"), systemTile, Constants.SPACE, true);
+            assertFalse(systemTile
+                    .getUnitHolders()
+                    .get(Constants.SPACE)
+                    .getTokenList()
+                    .contains("token_gravityrift.png"));
+        }
+
+        @Test
+        void removingExistingTokenIsDescribedAsMapChange() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!token gravityrift"), systemTile, Constants.SPACE, true);
+            var descs = LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!removetoken gravityrift"), systemTile, Constants.SPACE, true);
+            assertEquals(1, descs.size());
+            assertTrue(descs.get(0).contains("Removed") && descs.get(0).contains("gravityrift"));
+        }
+
+        @Test
+        void missingTokenReportsNothingRemoved() {
+            var descs = LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!removetoken gravityrift"), systemTile, Constants.SPACE, true);
+            assertEquals(1, descs.size());
+            assertTrue(descs.get(0).contains("nothing removed"));
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 9. Swap effects
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class SwapEffects {
+
+        @Test
+        void swapsTwoSystems() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!swap 001 002"), systemTile, Constants.SPACE, true);
+            assertEquals("19", game.getTileByPosition("001").getTileID());
+            assertEquals("18", game.getTileByPosition("002").getTileID());
+        }
+
+        @Test
+        void swapDescribedAsMapChange() {
+            var descs = LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!swap 001 002"), systemTile, Constants.SPACE, true);
+            assertEquals(1, descs.size());
+            assertTrue(descs.get(0).contains("001") && descs.get(0).contains("002"));
+        }
+
+        @Test
+        void samePositionIsNoOp() {
+            var descs = LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!swap 001 001"), systemTile, Constants.SPACE, true);
+            assertTrue(descs.isEmpty());
+            assertEquals("18", game.getTileByPosition("001").getTileID());
+        }
+
+        @Test
+        void unknownPositionIsNoOp() {
+            var descs = LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!swap 001 099"), systemTile, Constants.SPACE, true);
+            assertTrue(descs.isEmpty());
+            assertEquals("18", game.getTileByPosition("001").getTileID());
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 10. VP effects
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class VpEffects {
+
+        @Test
+        void grantsCustomVpUnderNamedObjective() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!vp 1 Ancient Relic"), systemTile, Constants.SPACE, true);
+            assertNotNull(game.getRevealedPublicObjectives().get("Ancient Relic"));
+            assertTrue(game.didPlayerScoreThisAlready(player.getUserID(), "Ancient Relic"));
+        }
+
+        @Test
+        void defaultLabelWhenNoneGiven() {
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!vp 2"), systemTile, Constants.SPACE, true);
+            assertTrue(game.getRevealedPublicObjectives().containsKey("Lore Reward"));
+            assertTrue(game.didPlayerScoreThisAlready(player.getUserID(), "Lore Reward"));
+        }
+
+        @Test
+        void repeatTriggersReuseOnePoAndScoreOnce() {
+            // documented limitation: same label reuses one PO, and a player can't score the same PO twice
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!vp 1 Relic"), systemTile, Constants.SPACE, true);
+            Integer firstIndex = game.getRevealedPublicObjectives().get("Relic");
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!vp 1 Relic"), systemTile, Constants.SPACE, true);
+            assertEquals(firstIndex, game.getRevealedPublicObjectives().get("Relic"));
+            // a single unscore proves the player was added to the score list only once
+            assertTrue(game.didPlayerScoreThisAlready(player.getUserID(), "Relic"));
+            game.unscorePublicObjective(player.getUserID(), "Relic");
+            assertFalse(game.didPlayerScoreThisAlready(player.getUserID(), "Relic"));
+        }
+
+        @Test
+        void vpDescribedAsPlayerChange() {
+            var descs = LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!vp 2 Big Win"), systemTile, Constants.SPACE, true);
+            assertEquals(1, descs.size());
+            assertTrue(descs.get(0).contains("VP") && descs.get(0).contains("Big Win"));
         }
     }
 }
