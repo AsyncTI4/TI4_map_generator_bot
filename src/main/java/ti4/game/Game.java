@@ -1,7 +1,7 @@
 package ti4.game;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
 import java.util.AbstractMap.SimpleEntry;
@@ -1022,7 +1022,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public String getTabletalkJumpLinkFormatted() {
         TextChannel tt = getTableTalkChannel();
         if (tt == null) return "[no tt]";
-        return String.format("[__[Tabletalk](%s)__]", tt.getJumpUrl());
+        return String.format("[__[" + tt.getName() + "](%s)__]", tt.getJumpUrl());
     }
 
     public String getActionsJumpLink() {

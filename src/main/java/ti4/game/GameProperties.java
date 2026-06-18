@@ -172,6 +172,7 @@ public class GameProperties {
     private @ExportableField boolean votcMode;
     private @ExportableField boolean reverseSpeakerOrder;
     private @ExportableField boolean twilightKart;
+    private @ExportableField boolean twilightDS;
 
     // Discord Snowflakes
     private @ExportableField String guildID;

@@ -50,7 +50,8 @@ public final class TeHelperTechs {
         String regex = "useMagenDefense_" + RegexHelper.posRegex(game);
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
-            resolveMagen(game, player, tile, false);
+            boolean bulwark = game.isTwilightsFallMode();
+            resolveMagen(game, player, tile, bulwark);
             ButtonHelper.deleteMessage(event);
         });
     }

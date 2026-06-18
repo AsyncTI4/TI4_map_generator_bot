@@ -1904,10 +1904,12 @@ public class ButtonHelper {
                             buttons);
                 }
             }
-
+            Player ralnel = nonActivePlayer;
             if (nonActivePlayer.hasAbility("survivalinstinct")
-                    && FoWHelper.playerHasActualShipsInSystem(nonActivePlayer, activeSystem)) {
-                Player ralnel = nonActivePlayer;
+                    && FoWHelper.playerHasActualShipsInSystem(nonActivePlayer, activeSystem)
+                    && TeHelperAbilities.getSurvivalInstinctSystemButtons(game, ralnel, activeSystem, null)
+                                    .size()
+                            > 1) {
                 List<Button> buttons =
                         TeHelperAbilities.getSurvivalInstinctSystemButtons(game, ralnel, activeSystem, null);
                 MessageHelper.sendMessageToChannelWithButtons(
