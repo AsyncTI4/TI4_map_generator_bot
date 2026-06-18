@@ -155,7 +155,7 @@
     "name": "Zul",
     "title": "Grand Architect",
     "abilityWindow": "When you explore a planet:",
-    "abilityText": "Gain 1 trade good. If the explored planet has an attachment, gain 1 additional trade good.",
+    "abilityText": "Gain 1 commodity. If the explored planet has an attachment, you may convert that commodity to a trade good.",
     "unlockCondition": "Control 4 planets with designs.",
     "source": "beans"
   },

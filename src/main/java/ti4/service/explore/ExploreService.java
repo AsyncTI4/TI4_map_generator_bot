@@ -471,7 +471,7 @@ public class ExploreService {
                     event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "tacommander")) {
-            TaLeadersHandler.resolveTaCommander(player, tile, planetName);
+            TaLeadersHandler.resolveTaCommander(player, tile, game, planetName);
         }
         if (ButtonHelper.isPlanetLegendaryOrTechSkip(planetName, game)
                 && Helper.getPlayerFromUnlockedLeader(game, "augersagent") != null) {
