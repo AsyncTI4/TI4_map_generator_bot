@@ -2685,7 +2685,7 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("resolveBlackMarketRaid")
-    public static void resolveBlackMarketRaid(Player player, Game game, ButtonInteractionEvent event) {
+    public static void resolveBlackMarketRaid(Player player, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
         int totalFragments = player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf();
         int commandSheetTokens = player.getTacticalCC() + player.getStrategicCC() + player.getFleetCC();
