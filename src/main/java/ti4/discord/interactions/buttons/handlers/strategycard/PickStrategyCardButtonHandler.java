@@ -17,12 +17,12 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.service.abilities.MahactTokenService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.game.StartPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -117,16 +117,12 @@ public class PickStrategyCardButtonHandler {
                 }
             }
         }
-        if (game.getStoredValue("deflectedSC").equalsIgnoreCase(num) && !game.isTwilightsFallMode()) {
-            if (player.getEffectiveFleetCC() < 1) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + ", you can't pick this strategy card because it has been targeted by _Deflection_, and you don't have a command token in your fleet pool to spend.");
-                return false;
-            } else {
-                MahactTokenService.removeFleetCC(game, player, "due to _Deflection_");
-            }
+        if (!applyDeflectionCostIfNeeded(game, player, scpick, event)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", you can't pick this strategy card because it has been targeted by _Deflection_, and you don't have a command token in your strategy pool to spend.");
+            return false;
         }
 
         if (game.getLaws().containsKey("checks") || game.getLaws().containsKey("absol_checks")) {
@@ -141,6 +137,29 @@ public class PickStrategyCardButtonHandler {
             }
         }
         return false;
+    }
+
+    static boolean isDeflectedStrategyCard(Game game, int scpick) {
+        return game.getStoredValue("deflectedSC").equalsIgnoreCase(String.valueOf(scpick));
+    }
+
+    static boolean applyDeflectionCostIfNeeded(Game game, Player player, int scpick, ButtonInteractionEvent event) {
+        if (game.isTwilightsFallMode() || !isDeflectedStrategyCard(game, scpick)) {
+            return true;
+        }
+        if (player.hasRelicReady("emelpar")) {
+            player.addExhaustedRelic("emelpar");
+            return true;
+        }
+        if (player.hasRelicReady("absol_emelpar")) {
+            player.addExhaustedRelic("absol_emelpar");
+            return true;
+        }
+        if (player.getStrategicCC() < 1) return false;
+
+        player.setStrategicCC(player.getStrategicCC() - 1);
+        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "picked a _Deflection_'d strategy card");
+        return true;
     }
 
     @ButtonHandler("checksNBalancesPt2_")
