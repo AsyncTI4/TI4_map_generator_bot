@@ -172,6 +172,7 @@ public class TaAbilityHandler {
         }
 
         tile.addToken(tokenPath, planetName);
+        TaUnitHandler.offerTaMechDeploy(event, player, game, tile, planetName);
         CommanderUnlockCheckService.checkPlayer(player, "ta");
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),

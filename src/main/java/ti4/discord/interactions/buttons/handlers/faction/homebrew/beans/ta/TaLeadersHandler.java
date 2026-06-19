@@ -418,6 +418,7 @@ public class TaLeadersHandler {
         String tokenPath = Mapper.getAttachmentImagePath("designgrand");
         if (tokenPath != null) {
             tile.addToken(tokenPath, planetName);
+            TaUnitHandler.offerTaMechDeploy(event, player, game, tile, planetName);
         }
 
         MessageHelper.sendMessageToChannel(

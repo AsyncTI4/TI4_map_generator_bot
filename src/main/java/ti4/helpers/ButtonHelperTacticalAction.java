@@ -13,6 +13,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -275,6 +276,9 @@ public final class ButtonHelperTacticalAction {
             String msg = player.getRepresentation()
                     + ", the Maximus (Dih-Mohn Flagship) moved into the active system, so you may produce up to 2 units with a combined cost of 4 or less.";
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), msg, produce);
+        }
+        if (unitsWereMoved && player.hasUnit("ta_flagship")) {
+            TaUnitHandler.resolveWorldshaperOnMove(event, game, player, tile);
         }
         EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
         if (unitsWereMoved) {
