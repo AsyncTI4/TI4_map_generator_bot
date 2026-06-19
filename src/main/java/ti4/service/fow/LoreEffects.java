@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -16,6 +17,8 @@ import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.service.fow.LoreService.LoreEntry;
+import ti4.service.fow.LoreService.RECEIVER;
+import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.map.CustomHyperlaneService;
 
 /**
@@ -44,17 +47,54 @@ final class LoreEffects {
         }
     }
 
+    /** Effect verbs that mutate shared board state — these must apply exactly once per lore trigger,
+     *  never repeated per recipient (see {@link #applyLoreEffectsPlayerOnly}). */
+    private static final Set<String> MAP_CHANGE_VERBS =
+            Set.of("unit", "plastic", "token", "removeunit", "removetoken", "swap");
+
+    static EffectResults applyLoreEffects(Player player, Game game, LoreEntry lore, boolean isSystemLore) {
+        return applyLoreEffects(player, game, lore, isSystemLore, null);
+    }
+
+    /**
+     * @param branch which tagged effect lines to include: {@code "accept"`/`"reject"`, or {@code null} to
+     *               apply only untagged (always-fire) lines — used for {@code !choice}-gated entries where
+     *               the resolving player's pick determines which tagged lines run.
+     */
     static EffectResults applyLoreEffects(
-            Player player, Game game, LoreEntry lore, String position, boolean isSystemLore) {
-        List<String> lines = lore.getEffectLines();
+            Player player, Game game, LoreEntry lore, boolean isSystemLore, String branch) {
+        return applyLoreEffects(player, game, lore, isSystemLore, branch, lore.getEffectLines());
+    }
+
+    /**
+     * Applies only the player-stat effect lines (skips anything in {@link #MAP_CHANGE_VERBS}). Used to give
+     * each additional ADJACENT/ALL recipient their own copy of the per-player reward without re-running
+     * board-mutating effects, which must fire exactly once for the whole lore trigger.
+     */
+    static EffectResults applyLoreEffectsPlayerOnly(
+            Player player, Game game, LoreEntry lore, boolean isSystemLore, String branch) {
+        List<String> lines = lore.getEffectLines().stream()
+                .filter(line -> {
+                    ParsedEffect p = parseLine(line);
+                    return p == null || !MAP_CHANGE_VERBS.contains(p.verb());
+                })
+                .toList();
+        return applyLoreEffects(player, game, lore, isSystemLore, branch, lines);
+    }
+
+    private static EffectResults applyLoreEffects(
+            Player player, Game game, LoreEntry lore, boolean isSystemLore, String branch, List<String> lines) {
         if (lines.isEmpty()) return new EffectResults(List.of(), List.of());
 
-        Tile tile = isSystemLore ? game.getTileByPosition(position) : game.getTileFromPlanet(position);
-        String holder = (!isSystemLore && tile != null && tile.getUnitHolders().containsKey(position))
-                ? position
+        // Use lore.target (the original system position or planet name) rather than the caller's
+        // "position" — for planet lore, that position has already been converted to the planet's
+        // *system* position by the time it reaches here, which would otherwise resolve the wrong tile.
+        Tile tile = isSystemLore ? game.getTileByPosition(lore.target) : game.getTileFromPlanet(lore.target);
+        String holder = (!isSystemLore && tile != null && tile.getUnitHolders().containsKey(lore.target))
+                ? lore.target
                 : Constants.SPACE;
 
-        return applyEffectLines(player, game, tile, holder, lines);
+        return applyEffectLines(player, game, tile, holder, lines, branch);
     }
 
     /**
@@ -64,7 +104,13 @@ final class LoreEffects {
      */
     static List<String> applyLoreEffectsForTest(
             Player player, Game game, LoreEntry lore, Tile tile, String holder, boolean isSystemLore) {
-        EffectResults results = applyEffectLines(player, game, tile, holder, lore.getEffectLines());
+        return applyLoreEffectsForTest(player, game, lore, tile, holder, isSystemLore, null);
+    }
+
+    /** Same as above, but lets tests exercise {@code accept:}/{@code reject:} tagged effect lines. */
+    static List<String> applyLoreEffectsForTest(
+            Player player, Game game, LoreEntry lore, Tile tile, String holder, boolean isSystemLore, String branch) {
+        EffectResults results = applyEffectLines(player, game, tile, holder, lore.getEffectLines(), branch);
         List<String> all = new ArrayList<>(results.playerChanges());
         results.mapChanges().forEach(d -> all.add(d.text()));
         return all;
@@ -87,18 +133,31 @@ final class LoreEffects {
             if (p.targetRef() != null && resolveTarget(game, p.targetRef()) == null) {
                 problems.add("couldn't find target `@" + p.targetRef() + "`" + where);
             }
+            if (p.branch() != null && !lore.isChoiceGated()) {
+                problems.add(
+                        "`" + p.branch() + ":` tag has no effect without a `!choice` marker in the footer" + where);
+            }
             problems.addAll(validateOperands(p, where));
+        }
+        if (lore.isChoiceGated()) {
+            if (lore.receiver == RECEIVER.WINNER || lore.receiver == RECEIVER.LOSER) {
+                problems.add(
+                        "`!choice` has no effect when the receiver is Battle winner/loser — that receiver already gates on the player's win/loss self-report");
+            } else if (lore.receiver == RECEIVER.GM) {
+                problems.add(
+                        "`!choice` has no effect when the receiver is GM — GMs are never offered the choice or its reward");
+            }
         }
         return problems;
     }
 
     private static EffectResults applyEffectLines(
-            Player player, Game game, Tile defaultTile, String defaultHolder, List<String> lines) {
+            Player player, Game game, Tile defaultTile, String defaultHolder, List<String> lines, String branch) {
         List<String> playerChanges = new ArrayList<>();
         List<EffectDescription> mapChanges = new ArrayList<>();
         for (String line : lines) {
             try {
-                EffectDescription desc = applyEffectLine(player, game, defaultTile, defaultHolder, line);
+                EffectDescription desc = applyEffectLine(player, game, defaultTile, defaultHolder, line, branch);
                 if (desc == null) continue;
                 if (desc.isMapChange()) mapChanges.add(desc);
                 else playerChanges.add(desc.text());
@@ -110,9 +169,10 @@ final class LoreEffects {
     }
 
     private static EffectDescription applyEffectLine(
-            Player player, Game game, Tile defaultTile, String defaultHolder, String line) {
+            Player player, Game game, Tile defaultTile, String defaultHolder, String line, String branch) {
         ParsedEffect parsed = parseLine(line);
         if (parsed == null) return null;
+        if (parsed.branch() != null && !parsed.branch().equals(branch)) return null;
 
         Tile tile = defaultTile;
         String holder = defaultHolder;
@@ -136,9 +196,22 @@ final class LoreEffects {
                 new EffectContext(player, game, tile, holder, parsed.args().toArray(new String[0])));
     }
 
-    /** Tokenises a single effect line into verb, operands, and an optional "@target"; null if blank. */
+    /**
+     * Tokenises a single effect line into verb, operands, an optional "@target", and an optional
+     * "accept:"/"reject:" branch tag (added by {@link LoreEntry#getEffectLines()}); null if blank.
+     */
     private static ParsedEffect parseLine(String line) {
-        List<String> tokens = new ArrayList<>(Arrays.asList(line.split("\\s+")));
+        String branch = null;
+        String body = line;
+        if (line.regionMatches(true, 0, "accept:", 0, 7)) {
+            branch = "accept";
+            body = line.substring(7);
+        } else if (line.regionMatches(true, 0, "reject:", 0, 7)) {
+            branch = "reject";
+            body = line.substring(7);
+        }
+
+        List<String> tokens = new ArrayList<>(Arrays.asList(body.split("\\s+")));
         tokens.removeIf(String::isEmpty);
         if (tokens.isEmpty()) return null;
 
@@ -152,10 +225,10 @@ final class LoreEffects {
                 args.add(token);
             }
         }
-        return new ParsedEffect(verb, args, targetRef);
+        return new ParsedEffect(verb, args, targetRef, branch);
     }
 
-    private record ParsedEffect(String verb, List<String> args, String targetRef) {}
+    private record ParsedEffect(String verb, List<String> args, String targetRef, String branch) {}
 
     /** Resolves an "@" target to a tile + unit-holder; tries planet name first, then board position. */
     private static TargetRef resolveTarget(Game game, String ref) {
@@ -253,6 +326,7 @@ final class LoreEffects {
         register(LoreEffects::effectRemoveToken, "removetoken");
         register(LoreEffects::effectSwap, "swap");
         register(LoreEffects::effectVp, "vp");
+        register(LoreEffects::effectSo, "so", "secretobjective");
     }
 
     private static EffectDescription playerChange(EffectContext ctx, int n, String resource) {
@@ -435,6 +509,24 @@ final class LoreEffects {
                 (count > 0 ? "Gained " : "Lost ") + Math.abs(count) + " VP (" + label + ").", false);
     }
 
+    // so [count]  -> draws secret objectives (default 1); pure deck draw first, then best-effort notification
+    private static EffectDescription effectSo(EffectContext ctx) {
+        int n = ctx.args.length == 0 ? 1 : ctx.signed(0);
+        if (n <= 0) return null;
+        for (int i = 0; i < n; i++) {
+            ctx.game.drawSecretObjective(ctx.player.getUserID());
+        }
+        try {
+            SecretObjectiveInfoService.sendSecretObjectiveInfo(ctx.game, ctx.player);
+        } catch (Exception e) {
+            BotLogger.warning("SO info update failed during lore", e);
+        }
+        String who = ctx.game.isFowMode()
+                ? ctx.player.getFactionEmojiOrColor()
+                : ctx.player.getRepresentationUnfoggedNoPing();
+        return new EffectDescription(who + " drew " + StringHelper.pluralize(n, "secret objective") + ".", false);
+    }
+
     private static List<String> validateOperands(ParsedEffect p, String where) {
         List<String> problems = new ArrayList<>();
         List<String> a = p.args();
@@ -497,6 +589,13 @@ final class LoreEffects {
             case "vp" -> {
                 if (!isSignedInt(a, 0) || Integer.parseInt(a.get(0).replace("+", "")) == 0) {
                     problems.add("`vp` needs a non-zero number, e.g. `!vp 1 Ancient Relic`" + where);
+                }
+            }
+            case "so", "secretobjective" -> {
+                if (!a.isEmpty()
+                        && (!isSignedInt(a, 0) || Integer.parseInt(a.get(0).replace("+", "")) <= 0)) {
+                    problems.add("`" + p.verb() + "` needs a positive number, e.g. `!" + p.verb()
+                            + " 2`, or no args for 1" + where);
                 }
             }
             default -> {

@@ -31,6 +31,7 @@ import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.draft.DraftManager;
+import ti4.service.fow.LoreService;
 import ti4.service.milty.MiltyDraftDisplayService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.settings.users.UserSettingsManager;
@@ -132,6 +133,7 @@ class Replace extends GameStateSubcommand {
 
         String oldPlayerUserId = replacedPlayer.getUserID();
         String oldPlayerUserName = replacedPlayer.getUserName();
+        LoreService.onPlayerReplaced(game, oldPlayerUserId, replacementUser.getId());
         replacedPlayer.setUserID(replacementUser.getId());
         replacedPlayer.setUserName(replacementUser.getName());
         replacedPlayer.setTotalTurnTime(0);

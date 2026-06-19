@@ -8,8 +8,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -38,6 +40,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
@@ -112,7 +115,8 @@ public final class LoreService {
 
     public enum PERSISTANCE {
         ONCE("Once"),
-        ALWAYS("Every time");
+        ALWAYS("Every time"),
+        ONCE_PER_PLAYER("Once per player");
         public final String name;
 
         PERSISTANCE(String name) {
@@ -155,28 +159,65 @@ public final class LoreService {
                     + persistance;
         }
 
-        /** Footer lines beginning with '!' are machine-readable effects, not shown in the embed. */
+        private static final String CHOICE_MARKER = "!choice";
+
+        /**
+         * A footer line that is just {@code !choice} gates the whole entry behind an Accept/Reject
+         * confirmation sent individually to each recipient — see {@code LoreService#requestChoiceConfirmation}.
+         */
+        public boolean isChoiceGated() {
+            for (String line : footerText.split("\n")) {
+                if (line.strip().equalsIgnoreCase(CHOICE_MARKER)) return true;
+            }
+            return false;
+        }
+
+        /** Strips a leading "accept:"/"reject:" tag (case-insensitive) from a footer line, if present. */
+        private static String stripBranchTag(String line) {
+            String lower = line.toLowerCase();
+            if (lower.startsWith("accept:") || lower.startsWith("reject:")) {
+                return line.substring(7).strip();
+            }
+            return line;
+        }
+
+        /**
+         * Footer lines beginning with '!' are machine-readable effects, not shown in the embed.
+         * A line prefixed with "accept:"/"reject:" only fires when a {@code !choice} gate is resolved
+         * that way; the tag is preserved on the returned line for {@link LoreEffects} to parse.
+         */
         public List<String> getEffectLines() {
             List<String> out = new ArrayList<>();
             for (String line : footerText.split("\n")) {
+                String stripped = line.strip();
+                if (stripped.equalsIgnoreCase(CHOICE_MARKER)) continue;
+
+                String lower = stripped.toLowerCase();
+                String tag = lower.startsWith("accept:") ? "accept:" : lower.startsWith("reject:") ? "reject:" : "";
+                String rest = tag.isEmpty() ? stripped : stripBranchTag(stripped);
+
                 // Support multiple effects on one line: "!tg +2 !fleet +1"
-                for (String segment : line.split("(?<=\\s)(?=!)")) {
+                for (String segment : rest.split("(?<=\\s)(?=!)")) {
                     String trimmed = segment.strip();
                     if (trimmed.startsWith("!")) {
-                        out.add(trimmed.substring(1).strip());
+                        out.add(tag + trimmed.substring(1).strip());
                     }
                 }
             }
             return out;
         }
 
-        /** Footer text with effect lines removed, for display. */
+        /** Footer text with the !choice marker and effect lines removed, for display. */
         public String getDisplayFooter() {
             StringBuilder sb = new StringBuilder();
             for (String line : footerText.split("\n")) {
+                String stripped = line.strip();
+                if (stripped.equalsIgnoreCase(CHOICE_MARKER)) continue;
+                stripped = stripBranchTag(stripped);
+
                 // Strip effect segments from the line (same split as getEffectLines)
                 StringBuilder lineOut = new StringBuilder();
-                for (String segment : line.split("(?<=\\s)(?=!)")) {
+                for (String segment : stripped.split("(?<=\\s)(?=!)")) {
                     String trimmed = segment.strip();
                     if (!trimmed.startsWith("!")) {
                         if (lineOut.length() > 0) lineOut.append(' ');
@@ -240,32 +281,113 @@ public final class LoreService {
             return;
         }
 
-        Map<String, LoreEntry> importedLore = readLore(loreString);
-        // Validate
-        List<String> effectProblems = new ArrayList<>();
-        for (Map.Entry<String, LoreEntry> entry : importedLore.entrySet()) {
-            String validatedTarget = validateLore(entry.getKey(), entry.getValue(), importedLore, game);
+        ImportResult result = parseLoreImport(loreString, game);
+
+        if (!result.entries().isEmpty()) {
+            getGameLore(game).putAll(result.entries());
+            saveLore(game);
+        }
+
+        StringBuilder sb = new StringBuilder(result.entries().size() + " lore entries imported.");
+        if (!result.errors().isEmpty()) {
+            sb.append("\n❌ Entries skipped (not imported):");
+            for (String error : result.errors()) {
+                sb.append("\n• ").append(error);
+            }
+        }
+        if (!result.warnings().isEmpty()) {
+            sb.append("\n⚠️ Effect warnings (imported anyway; these lines are skipped until fixed):");
+            for (String warning : result.warnings()) {
+                sb.append("\n• ").append(warning);
+            }
+        }
+        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+    }
+
+    /** {@code entries} only contains entries that parsed and validated cleanly; {@code errors} entries were skipped. */
+    record ImportResult(Map<String, LoreEntry> entries, List<String> errors, List<String> warnings) {}
+
+    /**
+     * Parses an export-format string entry by entry, tolerating bad entries instead of aborting the whole
+     * import: a malformed line, an unrecognized enum value, or an invalid target only drops that one entry
+     * and is reported with its 1-based position in the file so a GM can find and fix it.
+     */
+    static ImportResult parseLoreImport(String loreString, Game game) {
+        Map<String, LoreEntry> validEntries = new HashMap<>();
+        List<String> errors = new ArrayList<>();
+        List<String> warnings = new ArrayList<>();
+
+        if (StringUtils.isBlank(loreString)) {
+            return new ImportResult(validEntries, errors, warnings);
+        }
+
+        String[] rawEntries = loreString.split("\\|");
+        for (int i = 0; i < rawEntries.length; i++) {
+            String raw = rawEntries[i];
+            if (StringUtils.isBlank(raw)) continue;
+            String label = "entry #" + (i + 1);
+
+            String[] fields = raw.split(";");
+            if (fields.length < 2) {
+                errors.add(label + ": malformed — expected at least \"target;loreText\", found " + fields.length
+                        + " field(s)");
+                continue;
+            }
+
+            String badEnumField = findBadEnumField(fields);
+            if (badEnumField != null) {
+                errors.add(label + " (`" + fields[0].trim() + "`): " + badEnumField);
+                continue;
+            }
+
+            LoreEntry entry = LoreEntry.fromString(raw);
+            String rawTarget = fields[0].trim();
+            label += " (`" + rawTarget + "`)";
+
+            String validatedTarget = validateLore(rawTarget, entry, validEntries, game);
             if (validatedTarget == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), entry.getKey() + " is invalid to import lore");
-                return;
+                errors.add(label + ": target is not a valid system/planet on this map, or lore/footer text exceeds"
+                        + " the length limit");
+                continue;
             }
-            for (String problem : LoreEffects.validateEffects(entry.getValue(), game)) {
-                effectProblems.add(entry.getKey() + " — " + problem);
+            entry.target = validatedTarget;
+            validEntries.put(validatedTarget, entry);
+
+            for (String problem : LoreEffects.validateEffects(entry, game)) {
+                warnings.add(label + " — " + problem);
             }
         }
 
-        // Construct
-        getGameLore(game).putAll(importedLore);
-        saveLore(game);
+        return new ImportResult(validEntries, errors, warnings);
+    }
 
-        StringBuilder result = new StringBuilder(importedLore.size() + " lore entries imported.");
-        if (!effectProblems.isEmpty()) {
-            result.append("\n⚠️ Effect warnings (imported anyway; these lines are skipped until fixed):");
-            for (String problem : effectProblems) {
-                result.append("\n• ").append(problem);
-            }
+    /**
+     * {@code LoreEntry.fromString} silently falls back to defaults on a bad RECEIVER/TRIGGER/PING/PERSISTANCE
+     * name, which would otherwise import the entry with the wrong settings instead of flagging the typo.
+     */
+    private static String findBadEnumField(String[] fields) {
+        if (fields.length > 3 && !isValidEnumName(RECEIVER.class, fields[3])) {
+            return "unrecognized RECEIVER `" + fields[3] + "`";
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), result.toString());
+        if (fields.length > 4 && !isValidEnumName(TRIGGER.class, fields[4])) {
+            return "unrecognized TRIGGER `" + fields[4] + "`";
+        }
+        if (fields.length > 5 && !isValidEnumName(PING.class, fields[5])) {
+            return "unrecognized PING `" + fields[5] + "`";
+        }
+        if (fields.length > 6 && !isValidEnumName(PERSISTANCE.class, fields[6])) {
+            return "unrecognized PERSISTANCE `" + fields[6] + "`";
+        }
+        return null;
+    }
+
+    private static <E extends Enum<E>> boolean isValidEnumName(Class<E> type, String name) {
+        try {
+            Enum.valueOf(type, name);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     @ButtonHandler(value = "gmLore", save = false)
@@ -700,7 +822,7 @@ public final class LoreService {
         showLore(player, game, planet, false);
     }
 
-    private static void showLore(Player player, Game game, String target, boolean isSystemLore) {
+    static void showLore(Player player, Game game, String target, boolean isSystemLore) {
         if (!player.isRealPlayer()) return;
 
         Map<String, LoreEntry> gameLore = getGameLore(game);
@@ -708,6 +830,11 @@ public final class LoreService {
             return;
         }
         LoreEntry loreEntry = gameLore.get(target);
+
+        if (loreEntry.persistance == PERSISTANCE.ONCE_PER_PLAYER
+                && getStoredIdSet(game, loreDeliveredKey(target)).contains(player.getUserID())) {
+            return;
+        }
 
         String position = target;
         if (!isSystemLore) {
@@ -717,18 +844,287 @@ public final class LoreService {
             }
         }
 
-        // WINNER/LOSER: check unit presence to gate delivery
+        // WINNER/LOSER: ask the player to self-report the outcome rather than inferring it from unit
+        // presence (mutual annihilation / early retreat make presence sadly an unreliable proxy). NPCs
+        // can't click buttons, so there's no reliable way to self-report on their behalf — skip rather
+        // than guessing the outcome.
         if (loreEntry.receiver == RECEIVER.WINNER || loreEntry.receiver == RECEIVER.LOSER) {
-            boolean hasUnits;
-            if (isSystemLore) {
-                hasUnits = FoWHelper.playerHasUnitsInSystem(player, game.getTileByPosition(target));
-            } else {
-                hasUnits = FoWHelper.playerHasUnitsOnPlanet(player, game.getTileFromPlanet(target), target);
+            if (!player.isNpc()) {
+                requestBattleResultConfirmation(player, target, isSystemLore);
             }
-            if (loreEntry.receiver == RECEIVER.WINNER && !hasUnits) return;
-            if (loreEntry.receiver == RECEIVER.LOSER && hasUnits) return;
+            return;
         }
 
+        if (loreEntry.isChoiceGated()) {
+            requestChoiceConfirmation(player, game, target, isSystemLore, loreEntry, position);
+            return;
+        }
+
+        deliverLore(player, game, target, isSystemLore, loreEntry, position);
+    }
+
+    /**
+     * Everyone the entry would normally notify gets their own independent Accept/Reject buttons and
+     * their own personal reward — there's no shared "first click wins" state to fight over. CURRENT/CARDS
+     * resolve to just the triggering player; ADJACENT/ALL fan out to every player in scope. GM has no
+     * player audience (GMs never receive lore rewards), so a GM-receiver entry just delivers unconditionally.
+     */
+    static List<Player> computeChoiceAudience(
+            Game game, LoreEntry loreEntry, Player triggeringPlayer, String position) {
+        List<Player> audience =
+                switch (loreEntry.receiver) {
+                    case ADJACENT -> FoWHelper.getAdjacentPlayers(game, position, false);
+                    case ALL -> game.getRealPlayers();
+                    case GM -> List.of();
+                    default -> List.of(triggeringPlayer);
+                };
+        // NPC-controlled seats don't get interactive buttons, so they're excluded from the audience
+        // entirely rather than being left in it unresolved — otherwise they'd block round completion
+        // in maybeCompleteChoiceRound forever.
+        return audience.stream().filter(p -> !p.isNpc()).toList();
+    }
+
+    static String loreDeliveredKey(String target) {
+        return "loreDeliveredTo_" + target;
+    }
+
+    static String choiceOfferedKey(String target) {
+        return "loreChoiceOffered_" + target;
+    }
+
+    static String choiceResolvedKey(String target) {
+        return "loreChoiceResolved_" + target;
+    }
+
+    static String choiceMapAppliedKey(String target) {
+        return "loreChoiceMapApplied_" + target;
+    }
+
+    static Set<String> getStoredIdSet(Game game, String key) {
+        String raw = game.getStoredValue(key);
+        if (StringUtils.isBlank(raw)) return new HashSet<>();
+        return new HashSet<>(Arrays.asList(raw.split(",")));
+    }
+
+    static void addStoredId(Game game, String key, String userID) {
+        Set<String> set = getStoredIdSet(game, key);
+        set.add(userID);
+        game.setStoredValue(key, String.join(",", set));
+    }
+
+    private static final String[] LORE_USER_ID_KEY_PREFIXES = {
+        "loreDeliveredTo_", "loreChoiceOffered_", "loreChoiceResolved_"
+    };
+
+    /**
+     * Rewrites {@code oldUserId} to {@code newUserId} in every lore-related stored id-set (delivered/offered/
+     * resolved tracking, all keyed by userID and comma-joined per target) — called from the {@code /replace}
+     * flow so a seat's one-time/per-player lore progress survives the player being replaced, instead of the
+     * new account silently getting a second shot at "once per player" rewards or choices.
+     */
+    public static void onPlayerReplaced(Game game, String oldUserId, String newUserId) {
+        for (Map.Entry<String, String> entry : game.getStoredValueMap().entrySet()) {
+            String key = entry.getKey();
+            boolean isLoreIdKey = false;
+            for (String prefix : LORE_USER_ID_KEY_PREFIXES) {
+                if (key.startsWith(prefix)) {
+                    isLoreIdKey = true;
+                    break;
+                }
+            }
+            if (!isLoreIdKey) continue;
+
+            Set<String> ids = getStoredIdSet(game, key);
+            if (ids.remove(oldUserId)) {
+                ids.add(newUserId);
+                game.setStoredValue(key, String.join(",", ids));
+            }
+        }
+    }
+
+    /** Sends each not-yet-offered recipient their own Accept/Reject buttons in their own channel. */
+    static void requestChoiceConfirmation(
+            Player triggeringPlayer,
+            Game game,
+            String target,
+            boolean isSystemLore,
+            LoreEntry loreEntry,
+            String position) {
+        List<Player> audience = computeChoiceAudience(game, loreEntry, triggeringPlayer, position);
+        if (audience.isEmpty()) {
+            // No player audience to offer the choice to (e.g. RECEIVER.GM) — fall back to unconditional delivery.
+            deliverLore(triggeringPlayer, game, target, isSystemLore, loreEntry, position);
+            return;
+        }
+
+        String scope = isSystemLore ? "sys" : "planet";
+        MessageEmbed embed = buildLoreEmbed(game, target, loreEntry, isSystemLore);
+        Set<String> alreadyOffered = getStoredIdSet(game, choiceOfferedKey(target));
+        for (Player p : audience) {
+            if (!p.isRealPlayer() || alreadyOffered.contains(p.getUserID())) continue;
+            String acceptId = "loreChoice_accept_" + scope + "_" + p.getUserID() + "_" + target;
+            String rejectId = "loreChoice_reject_" + scope + "_" + p.getUserID() + "_" + target;
+            List<Button> buttons = Arrays.asList(Buttons.green(acceptId, "Accept"), Buttons.red(rejectId, "Reject"));
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    p.getCorrectChannel(), p.getRepresentationUnfogged() + ", Lore was discovered.", embed);
+            MessageHelper.sendMessageToChannel(
+                    p.getCorrectChannel(), p.getRepresentation() + ", Accept or reject?", buttons);
+            addStoredId(game, choiceOfferedKey(target), p.getUserID());
+        }
+    }
+
+    @ButtonHandler("loreChoice_")
+    private static void handleChoiceConfirmation(
+            ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        ButtonHelper.deleteMessage(event);
+
+        String[] parts = buttonID.split("_", 5);
+        String branch = parts[1];
+        boolean isSystemLore = "sys".equals(parts[2]);
+        String resolverUserID = parts[3];
+        String target = parts[4];
+
+        if (player == null || !resolverUserID.equals(player.getUserID())) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "This choice isn't yours to make.");
+            return;
+        }
+
+        LoreEntry loreEntry = getGameLore(game).get(target);
+        if (loreEntry == null) return;
+
+        addStoredId(game, choiceResolvedKey(target), player.getUserID());
+
+        String position = target;
+        if (!isSystemLore) {
+            Tile tile = game.getTileFromPlanet(target);
+            if (tile != null) {
+                position = tile.getPosition();
+            }
+        }
+        deliverChoiceLore(player, game, target, isSystemLore, loreEntry, position, branch);
+    }
+
+    /** Delivers (or withholds) lore + its tagged effects to a single resolver based on their accept/reject pick. */
+    static void deliverChoiceLore(
+            Player resolver,
+            Game game,
+            String target,
+            boolean isSystemLore,
+            LoreEntry loreEntry,
+            String position,
+            String branch) {
+        MessageChannel channel = resolver.getCorrectChannel();
+        if ("reject".equals(branch)) {
+            MessageHelper.sendMessageToChannel(
+                    channel, resolver.getRepresentationUnfoggedNoPing() + " rejected the lore's choice. No reward.");
+        } else {
+            MessageEmbed embed = buildLoreEmbed(game, target, loreEntry, isSystemLore);
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    channel, resolver.getRepresentationUnfogged() + " accepted the lore's choice!", embed);
+        }
+
+        // Each audience member resolves independently, but a map-mutating effect line must still apply
+        // exactly once for the whole entry — whichever resolver gets there first triggers it; everyone
+        // after only gets their own copy of the player-stat effects.
+        boolean mapEffectsAlreadyApplied =
+                !game.getStoredValue(choiceMapAppliedKey(target)).isEmpty();
+        LoreEffects.EffectResults results = mapEffectsAlreadyApplied
+                ? LoreEffects.applyLoreEffectsPlayerOnly(resolver, game, loreEntry, isSystemLore, branch)
+                : LoreEffects.applyLoreEffects(resolver, game, loreEntry, isSystemLore, branch);
+        if (!mapEffectsAlreadyApplied) {
+            game.setStoredValue(choiceMapAppliedKey(target), "true");
+        }
+        reportEffectResults(resolver, game, results, position, channel != null ? Set.of(channel) : Set.of());
+
+        GMService.logPlayerActivity(
+                game,
+                resolver,
+                resolver.getRepresentationUnfoggedNoPing() + " resolved a lore choice for " + target + " (" + branch
+                        + ")",
+                null,
+                loreEntry.ping == PING.YES);
+
+        if (loreEntry.persistance == PERSISTANCE.ONCE_PER_PLAYER) {
+            addStoredId(game, loreDeliveredKey(target), resolver.getUserID());
+        }
+        maybeCompleteChoiceRound(resolver, game, loreEntry, target, position);
+    }
+
+    /**
+     * Once every member of the current audience has resolved this round of the choice, clear the round's
+     * offered/resolved/map-applied bookkeeping. For {@code PERSISTANCE.ONCE} the entry is also removed for
+     * good (the round was its only chance). For {@code ALWAYS}, clearing the bookkeeping is what lets the
+     * choice be offered again — fresh — the next time the entry's trigger condition fires for any player;
+     * {@code ONCE_PER_PLAYER} doesn't need special handling here since it's already blocked independently
+     * at the top of {@link #showLore} via {@code loreDeliveredKey}.
+     */
+    static void maybeCompleteChoiceRound(
+            Player resolver, Game game, LoreEntry loreEntry, String target, String position) {
+        List<Player> currentAudience = computeChoiceAudience(game, loreEntry, resolver, position);
+        Set<String> resolved = getStoredIdSet(game, choiceResolvedKey(target));
+        boolean allResolved = !currentAudience.isEmpty()
+                && currentAudience.stream()
+                        .filter(Player::isRealPlayer)
+                        .allMatch(p -> resolved.contains(p.getUserID()));
+        if (allResolved) {
+            if (loreEntry.persistance == PERSISTANCE.ONCE) {
+                getGameLore(game).remove(target);
+                saveLore(game);
+            }
+            game.removeStoredValue(choiceMapAppliedKey(target));
+            game.removeStoredValue(choiceOfferedKey(target));
+            game.removeStoredValue(choiceResolvedKey(target));
+        }
+    }
+
+    /** Sends the "did you win or lose" buttons; delivery resumes in {@link #handleBattleResultConfirmation}. */
+    private static void requestBattleResultConfirmation(Player player, String target, boolean isSystemLore) {
+        String scope = isSystemLore ? "sys" : "planet";
+        String wonButtonId = "loreBattleResult_won_" + scope + "_" + target;
+        String lostButtonId = "loreBattleResult_lost_" + scope + "_" + target;
+        List<Button> buttons = Arrays.asList(
+                Buttons.green(wonButtonId, "I won this battle"), Buttons.red(lostButtonId, "I lost this battle"));
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", did you win or lose this battle? Lore awaits your answer.",
+                buttons);
+    }
+
+    @ButtonHandler("loreBattleResult_")
+    private static void handleBattleResultConfirmation(
+            ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        ButtonHelper.deleteMessage(event);
+
+        String[] parts = buttonID.split("_", 4);
+        String outcome = parts[1];
+        boolean isSystemLore = "sys".equals(parts[2]);
+        String target = parts[3];
+
+        LoreEntry loreEntry = getGameLore(game).get(target);
+        if (loreEntry == null) return;
+
+        boolean matches = (loreEntry.receiver == RECEIVER.WINNER && "won".equals(outcome))
+                || (loreEntry.receiver == RECEIVER.LOSER && "lost".equals(outcome));
+        if (!matches) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfoggedNoPing() + ", no lore for you this time.");
+            return;
+        }
+
+        String position = target;
+        if (!isSystemLore) {
+            Tile tile = game.getTileFromPlanet(target);
+            if (tile != null) {
+                position = tile.getPosition();
+            }
+        }
+        deliverLore(player, game, target, isSystemLore, loreEntry, position);
+    }
+
+    static void deliverLore(
+            Player player, Game game, String target, boolean isSystemLore, LoreEntry loreEntry, String position) {
+        Map<String, LoreEntry> gameLore = getGameLore(game);
         Map<MessageChannel, String> channels = new HashMap<>();
         String who = player.getRepresentation() + " ";
         switch (loreEntry.receiver) {
@@ -762,44 +1158,25 @@ public final class LoreService {
                     entry.getKey(), entry.getValue() + ", Lore was discovered by " + who, embed);
         }
 
-        LoreEffects.EffectResults results =
-                LoreEffects.applyLoreEffects(player, game, loreEntry, position, isSystemLore);
-        if (!results.mapChanges().isEmpty()) {
-            if (game.isFowMode()) {
-                // Each map change pings the system it affected so all players with visibility are notified.
-                // The triggering player is sent directly (pingSystem skips their color in the message).
-                MessageChannel privateChannel = player.getPrivateChannel();
-                MessageChannel gmChannel = GMService.getGMChannel(game);
-                for (LoreEffects.EffectDescription desc : results.mapChanges()) {
-                    String changeMsg = "**Map change from lore:** " + desc.text();
-                    String pingPosition = desc.tilePosition() != null ? desc.tilePosition() : position;
-                    FoWHelper.pingSystem(game, pingPosition, changeMsg, false);
-                    if (privateChannel != null) MessageHelper.sendMessageToChannel(privateChannel, changeMsg);
-                    if (gmChannel != null) MessageHelper.sendMessageToChannel(gmChannel, changeMsg);
-                }
-            } else {
-                String changeMsg = "**Map changes from lore:**\n"
-                        + results.mapChanges().stream()
-                                .map(LoreEffects.EffectDescription::text)
-                                .collect(Collectors.joining("\n"));
-                for (MessageChannel channel : channels.keySet()) {
-                    MessageHelper.sendMessageToChannel(channel, changeMsg);
-                }
-            }
-        }
-        if (!results.playerChanges().isEmpty()) {
-            String changeMsg = "**Player changes from lore:**\n" + String.join("\n", results.playerChanges());
-            if (game.isFowMode()) {
-                // Sheet info is private in FoW: only the player and GM see these
-                MessageChannel privateChannel = player.getPrivateChannel();
-                if (privateChannel != null) MessageHelper.sendMessageToChannel(privateChannel, changeMsg);
-                MessageChannel gmChannel = GMService.getGMChannel(game);
-                if (gmChannel != null) MessageHelper.sendMessageToChannel(gmChannel, changeMsg);
-            } else {
-                for (MessageChannel channel : channels.keySet()) {
-                    MessageHelper.sendMessageToChannel(channel, changeMsg);
-                }
-            }
+        LoreEffects.EffectResults results = LoreEffects.applyLoreEffects(player, game, loreEntry, isSystemLore);
+        reportEffectResults(player, game, results, position, channels.keySet());
+
+        // ADJACENT/ALL notify multiple players, but the call above only ever rewards the triggering
+        // player. Give every other recipient their own copy of the player-stat effects (map-mutating
+        // effects already applied exactly once above and must not repeat).
+        List<Player> extraRecipients =
+                switch (loreEntry.receiver) {
+                    case ADJACENT -> FoWHelper.getAdjacentPlayers(game, position, false);
+                    case ALL -> game.getRealPlayers();
+                    default -> List.of();
+                };
+        for (Player other : extraRecipients) {
+            if (other.equals(player)) continue;
+            LoreEffects.EffectResults otherResults =
+                    LoreEffects.applyLoreEffectsPlayerOnly(other, game, loreEntry, isSystemLore, null);
+            MessageChannel otherChannel = other.getCorrectChannel();
+            reportEffectResults(
+                    other, game, otherResults, position, otherChannel != null ? Set.of(otherChannel) : Set.of());
         }
 
         GMService.logPlayerActivity(
@@ -812,6 +1189,59 @@ public final class LoreService {
         if (loreEntry.persistance == PERSISTANCE.ONCE) {
             gameLore.remove(target);
             saveLore(game);
+        } else if (loreEntry.persistance == PERSISTANCE.ONCE_PER_PLAYER) {
+            addStoredId(game, loreDeliveredKey(target), player.getUserID());
+        }
+    }
+
+    /**
+     * Posts map/player-change summaries for an applied {@link LoreEffects.EffectResults}. In FoW, sheet
+     * and map info is private: only the  acting player's private channel and the GM activity thread see
+     * it. Outside FoW it's broadcast to every channel the lore was delivered to.
+     */
+    private static void reportEffectResults(
+            Player player,
+            Game game,
+            LoreEffects.EffectResults results,
+            String position,
+            Set<MessageChannel> channels) {
+        if (!results.mapChanges().isEmpty()) {
+            if (game.isFowMode()) {
+                // Each map change pings the system it affected so all players with visibility are notified.
+                // The triggering player is sent directly (pingSystem skips their color in the message).
+                MessageChannel privateChannel = player.getPrivateChannel();
+                for (LoreEffects.EffectDescription desc : results.mapChanges()) {
+                    String changeMsg = "**Map change from lore:** " + desc.text();
+                    String pingPosition = desc.tilePosition() != null ? desc.tilePosition() : position;
+                    FoWHelper.pingSystem(game, pingPosition, changeMsg, false);
+                    if (privateChannel != null) MessageHelper.sendMessageToChannel(privateChannel, changeMsg);
+                    GMService.postToActivityThread(game, changeMsg);
+                }
+                // Board changed — drop a fresh GM-view map into the activity thread.
+                GMService.refreshMapInActivityThread(game);
+            } else {
+                String changeMsg = "**Map changes from lore:**\n"
+                        + results.mapChanges().stream()
+                                .map(LoreEffects.EffectDescription::text)
+                                .collect(Collectors.joining("\n"));
+                for (MessageChannel channel : channels) {
+                    MessageHelper.sendMessageToChannel(channel, changeMsg);
+                }
+            }
+        }
+        if (!results.playerChanges().isEmpty()) {
+            String changeMsg = "**Player changes from lore:**\n" + String.join("\n", results.playerChanges());
+            if (game.isFowMode()) {
+                // Sheet info is private in FoW: only the triggering player (private channel) and the GM
+                // (activity thread) see these.
+                MessageChannel privateChannel = player.getPrivateChannel();
+                if (privateChannel != null) MessageHelper.sendMessageToChannel(privateChannel, changeMsg);
+                GMService.postToActivityThread(game, changeMsg);
+            } else {
+                for (MessageChannel channel : channels) {
+                    MessageHelper.sendMessageToChannel(channel, changeMsg);
+                }
+            }
         }
     }
 }
