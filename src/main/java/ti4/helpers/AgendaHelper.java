@@ -32,6 +32,7 @@ import ti4.cron.AutoPingCron;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -1127,11 +1128,13 @@ public final class AgendaHelper {
                 && !buttonID.contains("predictive")
                 && !buttonID.contains("everything")) {
             PlanetExhaust.doAction(player, planetName, game, false);
+            TaLeadersHandler.clearLenPredeclareForPlanet(game, player, planetName);
         }
         if (buttonID.contains("everything")) {
             for (String planet : player.getPlanets()) {
                 player.exhaustPlanet(planet);
             }
+            TaLeadersHandler.clearAllLenPredeclaresForPlayer(game, player);
         }
         String totalVotesSoFar = event.getMessage().getContentRaw();
         if (!buttonID.contains("argent")
@@ -2896,6 +2899,7 @@ public final class AgendaHelper {
                 voteAmount++;
             }
         }
+        voteAmount += TaLeadersHandler.getLenPredeclaredVoteBonus(game, player, planet);
         return voteAmount;
     }
 
@@ -2920,7 +2924,8 @@ public final class AgendaHelper {
             if (voteAmount != 0) {
                 Button button = Buttons.gray(
                         "exhaustForVotes_planet_" + planet,
-                        planetNameProper + " (" + voteAmount + ")",
+                        planetNameProper + " (" + voteAmount + ")"
+                                + TaLeadersHandler.getLenVoteLabelSuffix(game, player, planet),
                         PlanetEmojis.getPlanetEmoji(planet));
                 planetButtons.add(button);
             }

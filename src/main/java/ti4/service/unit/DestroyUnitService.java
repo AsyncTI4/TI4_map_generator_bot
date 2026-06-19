@@ -16,6 +16,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamBut
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -251,6 +252,9 @@ public class DestroyUnitService {
                 }
             }
             case Flagship -> {
+                if (player != null && player.hasUnit("ta_flagship")) {
+                    TaUnitHandler.clearWorldshaperOnFlagshipDestroy(player, unit);
+                }
                 if (player != null && player.hasUnit("yin_flagship")) {
                     String message1 = "Moments before disaster in game " + game.getName() + ".";
                     DisasterWatchHelper.postTileInDisasterWatch(game, event, unit.tile(), 0, message1);

@@ -1492,9 +1492,10 @@ public final class ButtonHelperSCs {
             ThreadChannel chan = ButtonHelper.getRightStratThread(
                     game, ButtonHelper.getStratName(ButtonHelper.getStratName(scNum2), game));
             if (chan != null) {
-                chan.retrieveMessageById(gameMessage.messageId()).queue(mainMessage -> mainMessage
-                        .editMessage(PlayStrategyCardService.getSCFollowSummary(game, scNum2, true))
-                        .queue());
+                String followSummary = PlayStrategyCardService.getSCFollowSummary(game, scNum2, true);
+                chan.retrieveMessageById(gameMessage.messageId())
+                        .queue(mainMessage ->
+                                mainMessage.editMessage(followSummary).queue());
             }
         }
     }

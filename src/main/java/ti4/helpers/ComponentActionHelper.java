@@ -362,7 +362,8 @@ public class ComponentActionHelper {
                 String pnText = prom.getText();
                 if (pnText.toLowerCase().contains("action:")
                         && !"bmf".equalsIgnoreCase(pn)
-                        && !"acq".equalsIgnoreCase(pn)) {
+                        && !"acq".equalsIgnoreCase(pn)
+                        && !"bapnconc".equalsIgnoreCase(pn)) {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
                     String pnName = pnModel.getName();
                     Button pnButton = Buttons.red(factionChecker + prefix + "pn_" + pn, "Use " + pnName);
@@ -610,7 +611,6 @@ public class ComponentActionHelper {
                     String successMessage = p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Sol
                             + "**Orbital Drop** (" + (p1.getStrategicCC()) + "->" + (p1.getStrategicCC() - 1) + ")";
                     if (!p1.hasRelicReady("emelpar")) {
-
                         p1.setStrategicCC(p1.getStrategicCC() - 1);
                         ButtonHelperCommanders.resolveMuaatCommanderCheck(
                                 p1, game, event, FactionEmojis.Sol + " **Orbital Drop**'d");

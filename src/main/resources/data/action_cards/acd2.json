@@ -325,7 +325,7 @@
         "name": "Espionage",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Look at another player's action cards. Then, that player gives you 1 action card, promissory note, or secret objective from their hand.",
+        "text": "Look at another player's action cards and choose 1 of those cards. That player may give you that card; if they do not, they must give you 1 random promissory note from their hand.",
         "flavorText": "Kyver waited patiently, cloaked outside the station in transparasteel plating. They loathed eliminating children, but this messiah must remain unrisen.",
         "source": "action_deck_2"
     },
@@ -1091,7 +1091,7 @@
         "name": "Survey",
         "phase": "Action",
         "window": "At the end of your turn",
-        "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may choose and resolve a card from its discard pile instead.",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
         "flavorText": "As Tai announced that the expedition would continue despite safety concerns, a cadet gave an audible groan—followed by a yelp as Dart grabbed him by his Naaz. \"Any more backtalk from you and you'll get a clout in the ear!\"",
         "source": "action_deck_2"
     },
@@ -1100,7 +1100,7 @@
         "name": "Survey",
         "phase": "Action",
         "window": "At the end of your turn",
-        "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may choose and resolve a card from its discard pile instead.",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
         "flavorText": "One of the cadets nearly fell over as they crested the lip of the ancient crater, revealing three massive, entangled ships jutting from the earth below. Tai gave a self-satisfied hmph.",
         "source": "action_deck_2"
     },
@@ -1109,7 +1109,7 @@
         "name": "Survey",
         "phase": "Action",
         "window": "At the end of your turn",
-        "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may choose and resolve a card from its discard pile instead.",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
         "flavorText": "\"Careful!\" Tai cried as he heard what was undoubtedly a priceless relic shatter in the room next door. \"Who trained these fools?\" he grumbled. Dart didn't have the heart to remind him that they had.",
         "source": "action_deck_2"
     },
@@ -1118,7 +1118,7 @@
         "name": "Survey",
         "phase": "Action",
         "window": "At the end of your turn",
-        "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may choose and resolve a card from its discard pile instead.",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
         "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—as Dart ran.",
         "source": "action_deck_2"
     },
@@ -1223,7 +1223,7 @@
         "name": "Privateers",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose a system that contains no more than 2 of your non-fighter ships. Replace each of your ships in that system with a neutral ship of the same type to gain trade goods equal to the combined cost of those non-fighter ships.",
+        "text": "Choose a system that contains your non-fighter ships. Replace each ship in that system with a neutral ship of the same type to gain trade goods equal to the cost of 1 of those non-fighter ships.",
         "flavorText": "Their sensors exploded with an array of damage alerts as a fleet of unmarked ships poured forth from the void, raining destruction upon the unsuspecting convoy.",
         "source": "action_deck_2"
     },

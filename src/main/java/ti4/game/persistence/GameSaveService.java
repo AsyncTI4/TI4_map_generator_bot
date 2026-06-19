@@ -1,6 +1,23 @@
 package ti4.game.persistence;
 
-import static ti4.game.persistence.GamePersistenceKeys.*;
+import static ti4.game.persistence.GamePersistenceKeys.ENDGAMEINFO;
+import static ti4.game.persistence.GamePersistenceKeys.ENDMAPINFO;
+import static ti4.game.persistence.GamePersistenceKeys.ENDPLAYER;
+import static ti4.game.persistence.GamePersistenceKeys.ENDPLAYERINFO;
+import static ti4.game.persistence.GamePersistenceKeys.ENDTILE;
+import static ti4.game.persistence.GamePersistenceKeys.ENDTOKENS;
+import static ti4.game.persistence.GamePersistenceKeys.ENDUNITHOLDER;
+import static ti4.game.persistence.GamePersistenceKeys.ENDUNITS;
+import static ti4.game.persistence.GamePersistenceKeys.GAMEINFO;
+import static ti4.game.persistence.GamePersistenceKeys.MAPINFO;
+import static ti4.game.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
+import static ti4.game.persistence.GamePersistenceKeys.PLANET_TOKENS;
+import static ti4.game.persistence.GamePersistenceKeys.PLAYER;
+import static ti4.game.persistence.GamePersistenceKeys.PLAYERINFO;
+import static ti4.game.persistence.GamePersistenceKeys.TILE;
+import static ti4.game.persistence.GamePersistenceKeys.TOKENS;
+import static ti4.game.persistence.GamePersistenceKeys.UNITHOLDER;
+import static ti4.game.persistence.GamePersistenceKeys.UNITS;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -244,9 +261,9 @@ class GameSaveService {
         writer.write(Constants.AGENDA_VOTE_INFO + " " + sb2);
         writer.write(System.lineSeparator());
 
-        Map<String, String> currentCheckingForAllReacts = game.getStoredValueMap();
+        Map<String, String> storedValueMap = game.getStoredValueMap();
         sb2 = new StringBuilder();
-        for (Map.Entry<String, String> entry : currentCheckingForAllReacts.entrySet()) {
+        for (Map.Entry<String, String> entry : storedValueMap.entrySet()) {
             sb2.append(entry.getKey())
                     .append(",")
                     .append(entry.getValue().replace("\n", ". "))
