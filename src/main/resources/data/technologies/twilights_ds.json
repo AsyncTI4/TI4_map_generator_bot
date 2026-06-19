@@ -410,8 +410,8 @@
         "faction": "khrask"
     },
     {
-        "alias": "tf-zealous",
-        "name": "Zealous",
+        "alias": "tf-zealousds",
+        "name": "Zealous DS",
         "types": [
             "WARFARE"
         ],
