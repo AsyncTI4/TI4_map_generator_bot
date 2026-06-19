@@ -50,7 +50,9 @@ public class AddUnitService {
                 NetrunnersLeadersHandler.checkCommanderUnlock(game, unit.unitKey());
             }
             Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
-            if (player != null && player.hasUnit("ta_flagship") && unit.unitKey().unitType() == UnitType.Flagship) {
+            if (player != null
+                    && player.hasUnit("ta_flagship")
+                    && unit.unitKey().unitType() == UnitType.Flagship) {
                 TaUnitHandler.offerWorldshaperOnFlagshipPlacement(
                         event, game, unit.unitKey(), unit.uh().getName(), tile);
             }
@@ -84,7 +86,8 @@ public class AddUnitService {
             if (game.getRealPlayers().stream().anyMatch(player -> player.hasLeader("netrunnerscommander"))) {
                 NetrunnersLeadersHandler.checkCommanderUnlock(game, parsedUnit.unitKey());
             }
-            Player player = game.getPlayerFromColorOrFaction(parsedUnit.unitKey().colorID());
+            Player player =
+                    game.getPlayerFromColorOrFaction(parsedUnit.unitKey().colorID());
             if (player != null
                     && player.hasUnit("ta_flagship")
                     && parsedUnit.unitKey().unitType() == UnitType.Flagship) {
@@ -114,7 +117,8 @@ public class AddUnitService {
             if (game.getRealPlayers().stream().anyMatch(player -> player.hasLeader("netrunnerscommander"))) {
                 NetrunnersLeadersHandler.checkCommanderUnlock(game, parsedUnit.unitKey());
             }
-            Player player = game.getPlayerFromColorOrFaction(parsedUnit.unitKey().colorID());
+            Player player =
+                    game.getPlayerFromColorOrFaction(parsedUnit.unitKey().colorID());
             if (player != null
                     && player.hasUnit("ta_flagship")
                     && parsedUnit.unitKey().unitType() == UnitType.Flagship) {
