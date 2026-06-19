@@ -1152,6 +1152,9 @@ public class ButtonHelper {
                 && tileHasShips) {
             return true;
         }
+        if (player.hasTech("tf-networkeddeployment") && CommandCounterHelper.hasCC(player, tile)) {
+            return true;
+        }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet) {
                 continue;
@@ -4192,6 +4195,9 @@ public class ButtonHelper {
                 } else if (unit.getIsShip()) {
                     if (player.hasAbility("capital_fleet") && unit.getBaseType().contains("destroyer")) {
                         numOfCapitalShips += entry.getValue();
+                    } else if (player.hasTech("tf-capitaldominance")
+                            && unit.getBaseType().contains("destroyer")) {
+                        // destroyers dont count towards fleet
                     } else {
                         numOfCapitalShips += entry.getValue() * 2;
                     }
@@ -4537,7 +4543,7 @@ public class ButtonHelper {
                     Buttons.green(factionChecker + "dataSkimmer_page0", "Use Data Skimmer", FactionEmojis.Ralnel));
         }
 
-        if (player.hasReadyBreakthrough("veldyrbt")) {
+        if (player.hasReadyBreakthrough("veldyrbt") || player.hasTech("tf-harnessedaurora")) {
             passButtons.add(Buttons.green(
                     factionChecker + "veldyrBTExplore", "Explore Frontier Deck At Home", FactionEmojis.veldyr));
         }
@@ -4734,11 +4740,11 @@ public class ButtonHelper {
             endButtons.add(Buttons.green(
                     player.factionButtonChecker() + "ravenMigration", "Use Migration", FactionEmojis.raven));
         }
-        if (player.hasReadyBreakthrough("axisbt")) {
+        if (player.hasReadyBreakthrough("axisbt") || player.hasTech("tf-armsbrokerage")) {
             endButtons.add(Buttons.green(
-                    player.factionButtonChecker() + "useAxisBT", "Use Axis Breakthrough", FactionEmojis.axis));
+                    player.factionButtonChecker() + "useAxisBT", "Use Arms Brokerage", FactionEmojis.axis));
         }
-        if (player.hasReadyBreakthrough("cheiranbt")) {
+        if (player.hasReadyBreakthrough("cheiranbt") || player.hasTech("tf-cheiranbt")) {
             endButtons.add(Buttons.green(
                     player.factionButtonChecker() + "exhaustBT_cheiranbt",
                     "Exhaust Cheiran Breakthrough",

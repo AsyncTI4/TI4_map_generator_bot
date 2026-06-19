@@ -60,12 +60,12 @@
         "faction": "cheiran"
     },
     {
-        "alias": "tf-autoneticsmadness",
+        "alias": "tf-autoneticmemory",
         "name": "Autonetic Madness",
         "types": [
             "BIOTIC"
         ],
-        "text": "When you would draw 1 or more action cards, you may draw 1 less card to either choose 1 card from the action card discard pile and add it to your hand, or place 1 infantry from your reinforcements on a planet you control. After you fully resolve an action card’s ability text, purge that card instead of discarding it.",
+        "text": "When you would draw 1 or more action cards, you may draw 1 less card to either choose 1 card from the action card discard pile and add it to your hand, or place 1 infantry from your reinforcements on a planet you control.",
         "source": "twilight_ds",
         "faction": "cymiae"
     },
@@ -160,7 +160,7 @@
         "faction": "freesystems"
     },
     {
-        "alias": "tf-rallythehorde",
+        "alias": "tf-rallyingmarshalls",
         "name": "Rallying Marshalls",
         "types": [
             "CYBERNETIC"
@@ -290,8 +290,8 @@
         "faction": "kollecc"
     },
     {
-        "alias": "tf-mediation",
-        "name": "Mediation",
+        "alias": "tf-meditation",
+        "name": "Meditation",
         "types": [
             "CYBERNETIC"
         ],
@@ -528,5 +528,205 @@
         "text": "ACTION: Exhaust this card to place 1 neutral cruiser and 2 neutral destroyers into a non-fracture system that contains no non-neutral ships. Once per action, when a neutral unit produces a hit, gain 1 commodity.",
         "source": "twilight_ds",
         "faction": "nokar"
+    },
+    {
+        "alias": "tf-desperados",
+        "name": "Desperados",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "After you produce 1 or more ships in system, place up to 1 destroyer in that system. Your destroyers may move out of systems that contain your command tokens.",
+        "source": "twilight_ds",
+        "faction": "nokar"
+    },
+    {
+        "alias": "tf-dsolrar",
+        "name": "False Flag Operations",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "At the start of your turn, you may exhaust this card and 1 planet you control to ready 1 non-home planet other than Mecatol Rex.",
+        "source": "twilight_ds",
+        "faction": "olradin"
+    },
+    {
+        "alias": "tf-policies",
+        "name": "Policies",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "When you gain this card, place or move the 3 “Policy” cards near your faction sheet, choose which side of each card to place face up. This card also has the abilities and effects listed on the face up side of each Policy card.",
+        "source": "twilight_ds",
+        "faction": "olradin"
+    },
+    {
+        "alias": "tf-forbiddenknowledge",
+        "name": "Forbidden Knowledge",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "When you participate in a splice, instead of choosing a card to keep, you may discard 1 of the available cards to draw 1 card from the bottom of the corresponding type’s deck instead.",
+        "source": "twilight_ds",
+        "faction": "zealots"
+    },
+    {
+        "alias": "tf-dsrhody",
+        "name": "Sanctification Field",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "When you activate a system, or a system that contains 1 or more of your units is activated, you may choose 1 ability another player controls; until the end of this tactical action, that card is treated as though it had no ability text.",
+        "source": "twilight_ds",
+        "faction": "zealots"
+    },
+    {
+        "alias": "tf-industrialjuggernaut",
+        "name": "Industrial Juggernaut",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "At the end of your turn, you may spend 6 resources to replace one of your space docks in a system that contains no other players' ships with 1 war sun from your reinforcements.",
+        "source": "twilight_ds",
+        "faction": "rohdhna"
+    },
+    {
+        "alias": "tf-recycledmaterials",
+        "name": "Recycled Materials",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "After you activate a system, you may return 1 cruiser, carrier, or dreadnought you control in that system to your reinforcements to gain a number of trade goods equal to 1 less than that unit’s cost value.",
+        "source": "twilight_ds",
+        "faction": "rohdhna"
+    },
+    {
+        "alias": "tf-plausibledeniability",
+        "name": "Plausible Deniability",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "At any time, if another player satisfies the requirements of one of your secret objectives, you may ignore its requirements; if you score that objective, draw 1 secret objective.",
+        "source": "twilight_ds",
+        "faction": "tnelis"
+    },
+    {
+        "alias": "tf-stealthcorps",
+        "name": "Stealth Corps",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "After you place 1 or more units on a planet, you may destroy up to 1 ground force on that planet.",
+        "source": "twilight_ds",
+        "faction": "tnelis"
+    },
+    {
+        "alias": "tf-cargoraiders",
+        "name": "Cargo Raiders",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "During the first round of a space combat, you may prevent your opponent from declaring a retreat unless they give you 1 trade good.",
+        "source": "twilight_ds",
+        "faction": "vaylerian"
+    },
+    {
+        "alias": "tf-dsvaylr",
+        "name": "Scavenger Exos",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "Once per action, after you win a ground combat, you may draw 1 action card.",
+        "source": "twilight_ds",
+        "faction": "vaylerian"
+    },
+    {
+        "alias": "tf-striketeams",
+        "name": "Strike Teams",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "After you activate a system: Choose 1 ship you control with a capacity value, apply +2 to that value during this tactical action",
+        "source": "twilight_ds",
+        "faction": "vaylerian"
+    },
+    {
+        "alias": "tf-dsvadey",
+        "name": "Krovoz Strike Teams",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "After another player’s unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities, you may exhaust this card to destroy that unit. After you produce 1 or more hits during a round of combat, you may spend 1 trade good to produce 1 additional hit.",
+        "source": "twilight_ds",
+        "faction": "vaden"
+    },
+    {
+        "alias": "tf-dsvadeb",
+        "name": "Midas Turbine",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "After you activate a system, you may exhaust this card and spend any number of trade goods; for each trade good you spent, apply +1 to the move value of 1 non-fighter ship you control.",
+        "source": "twilight_ds",
+        "faction": "vaden"
+    },
+    {
+        "alias": "tf-ruthlessbanking",
+        "name": "Ruthless Banking",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "At the start of the status phase: Gain 1 trade good for each secret objective you have scored and 1 commodity for each public objective you have scored.",
+        "source": "twilight_ds",
+        "faction": "vaden"
+    },
+    {
+        "alias": "tf-corporateimperialism",
+        "name": "Corporate Imperialism",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "Your commodity value is increased by 4.",
+        "source": "twilight_ds",
+        "faction": "veldyr"
+    },
+    {
+        "alias": "tf-harnessedaurora",
+        "name": "Harnessed Aurora",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "Your home system is also a nebula. Hits produced by the combat and ability rolls of your units in nebulae cannot be canceled. When you pass, explore the frontier deck in your home system.",
+        "source": "twilight_ds",
+        "faction": "veldyr"
+    },
+    {
+        "alias": "tf-siedrunleashed",
+        "name": "SIEDR Unleashed",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "At the end of each round of space combat, you may use the SPACE CANNON of 1 of your units in the active system against your opponent's ships. Capture units destroyed by your unit abilities. After you roll a combat or ability die you may return 1 of your captured units to apply +1 to the result.",
+        "source": "twilight_ds",
+        "faction": "veldyr"
+    },
+    {
+        "alias": "tf-shardsaturation",
+        "name": "Shard Saturation",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "When 1 or more of your units produce 1 or more hits during an ability roll, produce 1 additional hit for that roll.",
+        "source": "twilight_ds",
+        "faction": "zelian"
+    },
+    {
+        "alias": "tf-hostileplanetoids",
+        "name": "Hostile Planetoids",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "Your planets in the active system participate in space combat if that system contains 1 or more of your ships, and ground combat on themselves if they contain 1 or more of your infantry. Your planets cannot be assigned hits and have a combat value equal to 10 minus their resource value, minimum 1.",
+        "source": "twilight_ds",
+        "faction": "zelian"
     }
 ]

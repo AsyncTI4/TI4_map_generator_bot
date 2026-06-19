@@ -1846,6 +1846,9 @@ public final class Helper {
                     && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
                 productionValueTotal += tile.getWormholes(game).size();
             }
+            if (player.hasTech("tf-networkeddeployment") && CommandCounterHelper.hasCC(player, tile)) {
+                productionValueTotal++;
+            }
         }
 
         if (!player.getPlanets().contains(uH.getName())) {

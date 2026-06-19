@@ -4071,6 +4071,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if ("sardakkcommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-valkyrie")) {
             return true;
         }
+        if ("edyncommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-rampantgrace")) {
+            return true;
+        }
         if ("crimsoncommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-entropicharvest")) {
             return true;
         }
