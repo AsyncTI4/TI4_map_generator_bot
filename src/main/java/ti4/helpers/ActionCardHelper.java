@@ -1367,6 +1367,12 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
             }
 
+            if ("compounding_interests".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.factionButtonChecker() + "resolveCompoundingInterests", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("freedom_fighters".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFreedomFighters", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);

@@ -1,4 +1,4 @@
-package ti4.discord.interactions.buttons.handlers.actioncards;
+package ti4.discord.interactions.buttons.handlers.actioncards.acd2;
 
 import java.util.ArrayList;
 import java.util.List;
