@@ -958,8 +958,8 @@
         "name": "Abduction",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Take 1 of your neighbors' commanders. At the end of this turn, return that commander to that player.",
-        "flavorText": "",
+        "text": "Take 1 of your neighbors' agents or commanders; return it to that player at the end of this turn.",
+        "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'ula screamed from behind her gag as she watched him reroute the ship toward Arcturus.",
         "notes": "This may unlock the stolen commander. That player loses access to their commander ability, as does the player with their Alliance. You and the player with your Alliance gain its ability.",
         "source": "action_deck_2"
     },
