@@ -229,7 +229,7 @@ class DefectorsAcd2ButtonHandler {
 
         String destinationPos = buttonID.replace("defectorsPlaceTile_", "");
         Tile destination = game.getTileByPosition(destinationPos);
-        if (destination == null || !isDefectorsPlacementTileEligible(player, game, destination)) {
+        if (!isDefectorsPlacementTileEligible(player, game, destination)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + ", that destination is no longer eligible for _Defectors_.");
@@ -308,7 +308,7 @@ class DefectorsAcd2ButtonHandler {
                     Buttons.blue(player.factionButtonChecker() + "defectorsTarget_" + target.getFaction(), label);
             if (!game.isFowMode()) {
                 button = button.withEmoji(
-                        Emoji.fromFormatted(target.getFactionEmoji().toString()));
+                        Emoji.fromFormatted(target.getFactionEmoji()));
             }
             buttons.add(button);
         }

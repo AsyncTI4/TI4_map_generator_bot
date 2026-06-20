@@ -72,8 +72,10 @@ class FrankenHomebrewSettings extends SettingsMenu {
     private String homebrewNotes() {
         StringBuilder sb = new StringBuilder("""
 
-                > These toggles determine which homebrew Franken will use when the draft starts.\n
-                > Select "New PoK", "Old PoK", or "Thunder's Edge + New PoK" above to set official factions.\n""");
+                > These toggles determine which homebrew Franken will use when the draft starts.
+                
+                > Select "New PoK", "Old PoK", or "Thunder's Edge + New PoK" above to set official factions.
+                """);
 
         if (parent instanceof FrankenSettings fs && fs.isFrankendrazMode()) {
             sb.append("""

@@ -42,7 +42,7 @@ public class OnyxxaBreakthroughButtonHandler {
         DiceEmojis diceEmoji = result == 1 ? DiceEmojis.d10blue_1 : (result == 10 ? DiceEmojis.d10blue_0 : null);
         String diceStr = diceEmoji != null
                 ? diceEmoji.toString()
-                : DiceEmojis.getGrayDieEmoji(result).toString();
+                : DiceEmojis.getGrayDieEmoji(result);
 
         if (result == 1 || result == 10) {
             if (!FractureService.isFractureInPlay(game)) {
