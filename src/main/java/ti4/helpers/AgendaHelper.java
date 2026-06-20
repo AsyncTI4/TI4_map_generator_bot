@@ -1579,7 +1579,7 @@ public final class AgendaHelper {
         // Confounding & Confusing Legal Text
         if (game.getCurrentAgendaInfo().contains("Elect Player")) {
             if (!game.isACInDiscard("Confounding") || !game.isACInDiscard("Confusing")) {
-                String message = game.getPing() + " please confirm no _Confusing/Confounding Legal Texts_.";
+                String message = "Please confirm no _Confusing/Confounding Legal Texts_.";
                 Button noConfounding = Buttons.blue("generic_button_id_3", "Refuse Confounding Legal Text");
                 Button noConfusing = Buttons.blue("genericReact4", "Refuse Confusing Legal Text");
                 List<Button> buttons = List.of(noConfounding, noConfusing);
@@ -3806,15 +3806,15 @@ public final class AgendaHelper {
                                     + " Note that \"afters\" may be played before this occurs, and that _Confounding Legal Text_ and/or _Confounding Legal Text_ may still be played."
                                     + " You should probably wait and confirm no Legal Texts before resolving.");
                     game.removeLaw(game.getLaws().get("committee"));
-                    String message = game.getPing() + " please confirm no _Confusing/Confounding Legal Texts_.";
+                    String message = "Please confirm no _Confusing/Confounding Legal Texts_.";
                     Button noLegalText = Buttons.blue("generic_button_id_3", "Refuse Legal Texts");
                     String inDiscard = "";
                     if (game.isACInDiscard("Confounding")) {
-                        message = game.getPing() + " please confirm no _Confusing Legal Text_.";
+                        message = "Please confirm no _Confusing Legal Text_.";
                         noLegalText = Buttons.blue("generic_button_id_3", "Refuse Confusing Legal Text");
                         inDiscard = "Confounding";
                     } else if (game.isACInDiscard("Confusing")) {
-                        message = game.getPing() + " please confirm no _Confounding Legal Text_.";
+                        message = "Please confirm no _Confounding Legal Text_.";
                         noLegalText = Buttons.blue("generic_button_id_3", "Refuse Confounding Legal Text");
                         inDiscard = "Confusing";
                     }

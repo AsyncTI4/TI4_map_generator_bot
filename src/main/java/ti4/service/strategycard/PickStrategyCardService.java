@@ -123,7 +123,15 @@ public class PickStrategyCardService {
                     }
                 }
                 if (held) continue;
+                if (game.isTwilightsFallMode()
+                        && game.getStoredValue("deflectedSC").equalsIgnoreCase(sc + "")
+                        && Helper.getRemainingSCButtons(game, privatePlayer, false)
+                                        .size()
+                                > 1) {
+                    continue;
+                }
                 unpickedStrategyCard = sc;
+                break;
             }
             PlayerStatsService.secondHalfOfPickSC(event, game, privatePlayer, unpickedStrategyCard);
             secondHalfOfSCPick(event, privatePlayer, game, unpickedStrategyCard);

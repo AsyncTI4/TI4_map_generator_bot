@@ -214,7 +214,7 @@ public class AutoPingCron {
             buttons.add(Buttons.gray("deleteButtons", "Delete These Buttons"));
             MessageHelper.sendMessageToChannelWithButtons(
                     gameChannel,
-                    realIdentity + ", if the game is not waiting on you, you may disable the"
+                    player.getRepresentationNoPing() + ", if the game is not waiting on you, you may disable the"
                             + " auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
                     buttons);
         }

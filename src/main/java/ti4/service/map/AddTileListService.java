@@ -17,11 +17,13 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
@@ -107,6 +109,12 @@ public class AddTileListService {
                     if (game.getTileByPosition("bl") == null) {
                         game.setTile(new Tile("82a", "bl"));
                     }
+                }
+            }
+            if (Helper.getPlayerFromAbility(game, "diplomats") != null) {
+                Tile mallice = game.getTile("82a");
+                for (Planet uh : mallice.getPlanetUnitHolders()) {
+                    uh.addToken("token_freepeople.png");
                 }
             }
             if (game.getTileByPosition("000") == null) {

@@ -11,6 +11,7 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
@@ -41,6 +42,13 @@ public class FealtyUplinkService {
     }
 
     public void postInitialButtons(Game game, Player player, String planetName) {
+        UnitHolder unitHolder = game.getUnitHolderFromPlanet(planetName);
+        if (unitHolder != null) {
+            boolean containsDMZ = unitHolder.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
+            if (containsDMZ) {
+                return;
+            }
+        }
         String prettyPlanet = Helper.getPlanetRepresentationNoResInf(planetName, game);
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(

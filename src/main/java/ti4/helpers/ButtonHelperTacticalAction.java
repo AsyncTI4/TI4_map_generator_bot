@@ -559,7 +559,7 @@ public final class ButtonHelperTacticalAction {
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Activated "
                         + tile.getRepresentationForButtons(game, player) + ".");
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")
+        if ((game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander") || player.hasTech("tf-starbasewebway"))
                 && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
                         .contains(tile)) {
             List<Button> buttons = new ArrayList<>();

@@ -483,6 +483,7 @@ class AutoCompleteProvider {
                         "te",
                         "tf",
                         "twilightkart",
+                        "twilightds",
                         "tedemo",
                         "noswap");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);

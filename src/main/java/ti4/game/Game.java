@@ -1022,7 +1022,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public String getTabletalkJumpLinkFormatted() {
         TextChannel tt = getTableTalkChannel();
         if (tt == null) return "[no tt]";
-        return String.format("[__[Tabletalk](%s)__]", tt.getJumpUrl());
+        return String.format("[__[" + tt.getName() + "](%s)__]", tt.getJumpUrl());
     }
 
     public String getActionsJumpLink() {
@@ -1520,17 +1520,15 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public Map.Entry<String, Integer> revealStage1() {
         if (publicObjectives1Peekable.isEmpty() || getPhaseOfGame().contains("agenda")) {
             return revealNextPublicObjective(publicObjectives1);
-        } else {
-            return revealNextPublicObjective(publicObjectives1Peekable);
         }
+        return revealNextPublicObjective(publicObjectives1Peekable);
     }
 
     public Map.Entry<String, Integer> revealStage2() {
         if (publicObjectives2Peekable.isEmpty() || getPhaseOfGame().contains("agenda")) {
             return revealNextPublicObjective(publicObjectives2);
-        } else {
-            return revealNextPublicObjective(publicObjectives2Peekable);
         }
+        return revealNextPublicObjective(publicObjectives2Peekable);
     }
 
     public Map.Entry<String, Integer> revealStage2Random() {
@@ -1541,6 +1539,14 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public Map.Entry<String, Integer> revealStage1Random() {
         Collections.shuffle(publicObjectives1);
         return revealNextPublicObjective(publicObjectives1);
+    }
+
+    public Map.Entry<String, Integer> revealStage1FromDeck() {
+        return revealNextPublicObjective(publicObjectives1);
+    }
+
+    public Map.Entry<String, Integer> revealStage2FromDeck() {
+        return revealNextPublicObjective(publicObjectives2);
     }
 
     public void shuffleInBottomObjective(String cardIdToShuffle, int sizeOfBottom, int type) {
@@ -4069,6 +4075,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         if ("sardakkcommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-valkyrie")) {
+            return true;
+        }
+        if ("edyncommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-rampantgrace")) {
             return true;
         }
         if ("crimsoncommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-entropicharvest")) {

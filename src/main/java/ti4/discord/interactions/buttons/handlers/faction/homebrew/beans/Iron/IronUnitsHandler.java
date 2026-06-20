@@ -82,7 +82,7 @@ public class IronUnitsHandler {
 
     public static Map<UnitModel, Integer> getIronFlagshipAfbUnits(Player player, Tile tile) {
         Map<UnitModel, Integer> afbUnits = new HashMap<>();
-        if (player == null || tile == null || !ButtonHelper.doesPlayerHaveFSHere(IRON_FLAGSHIP_ID, player, tile)) {
+        if (player == null || !ButtonHelper.doesPlayerHaveFSHere(IRON_FLAGSHIP_ID, player, tile)) {
             return afbUnits;
         }
 
