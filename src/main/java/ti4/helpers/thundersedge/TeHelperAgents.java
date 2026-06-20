@@ -76,7 +76,7 @@ public final class TeHelperAgents {
 
     @ButtonHandler("handleRalNelAgent_")
     private static void handleRalNelAgent(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String part1 = "handleRalNelAgent_" + RegexHelper.acRegex(game);
+        String part1 = "handleRalNelAgent_" + RegexHelper.acRegex(game, player);
         RegexService.runMatcher(part1, buttonID, matcher -> {
             String acID = matcher.group("ac");
             String msg = player.getRepresentation(true, true) + ", please choose the player you wish to give _"
@@ -98,7 +98,8 @@ public final class TeHelperAgents {
     @ButtonHandler("handleRalNelAgentPt2_")
     private static void handleRalNelAgentPart2(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String regex = "handleRalNelAgentPt2_" + RegexHelper.acRegex(game) + "_" + RegexHelper.factionRegex(game);
+        String regex =
+                "handleRalNelAgentPt2_" + RegexHelper.acRegex(game, player) + "_" + RegexHelper.factionRegex(game);
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String acID = matcher.group("ac");
             String faction = matcher.group("faction");
