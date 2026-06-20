@@ -1,7 +1,7 @@
 package ti4.game;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.awt.Point;
 import java.util.AbstractMap.SimpleEntry;
@@ -1520,17 +1520,15 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public Map.Entry<String, Integer> revealStage1() {
         if (publicObjectives1Peekable.isEmpty() || getPhaseOfGame().contains("agenda")) {
             return revealNextPublicObjective(publicObjectives1);
-        } else {
-            return revealNextPublicObjective(publicObjectives1Peekable);
         }
+        return revealNextPublicObjective(publicObjectives1Peekable);
     }
 
     public Map.Entry<String, Integer> revealStage2() {
         if (publicObjectives2Peekable.isEmpty() || getPhaseOfGame().contains("agenda")) {
             return revealNextPublicObjective(publicObjectives2);
-        } else {
-            return revealNextPublicObjective(publicObjectives2Peekable);
         }
+        return revealNextPublicObjective(publicObjectives2Peekable);
     }
 
     public Map.Entry<String, Integer> revealStage2Random() {
@@ -1541,6 +1539,14 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public Map.Entry<String, Integer> revealStage1Random() {
         Collections.shuffle(publicObjectives1);
         return revealNextPublicObjective(publicObjectives1);
+    }
+
+    public Map.Entry<String, Integer> revealStage1FromDeck() {
+        return revealNextPublicObjective(publicObjectives1);
+    }
+
+    public Map.Entry<String, Integer> revealStage2FromDeck() {
+        return revealNextPublicObjective(publicObjectives2);
     }
 
     public void shuffleInBottomObjective(String cardIdToShuffle, int sizeOfBottom, int type) {
