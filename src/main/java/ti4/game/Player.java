@@ -2663,10 +2663,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                     }
                 }
             }
-            // Only fire CONTROLLED lore during actual gameplay, not during setup (round 0)
-            if (game.getRound() > 0) {
-                LoreService.showPlanetLore(this, game, planet, LoreService.TRIGGER.CONTROLLED);
-            }
+            LoreService.showPlanetLore(this, game, planet, LoreService.TRIGGER.CONTROLLED);
         }
     }
 
