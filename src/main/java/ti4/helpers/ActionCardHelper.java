@@ -1345,7 +1345,7 @@ public class ActionCardHelper {
             if ("espionage".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveEspionage", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
-                    channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
+                        channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
 
             if ("defectors".equals(automationID)) {
