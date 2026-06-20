@@ -4663,8 +4663,7 @@ public class ButtonHelper {
             // Check for special requirements
             if ("dsceldr".equals(tech) && !hasStratCC) continue;
             if ("absol_pa".equals(tech) && player.getActionCards().size() < 2) continue;
-            if ("betaro".equals(tech)
-                    && player.getReadiedPlanets().isEmpty()
+            if ("betaro".equals(tech) && player.getReadiedPlanets().isEmpty()
                     || player.getExhaustedPlanets().isEmpty()) continue;
 
             // Add the button
