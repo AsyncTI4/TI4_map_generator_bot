@@ -106,7 +106,8 @@ class SacrificeAcd2ButtonHandler {
                 if (locked.isEmpty()) {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getRepresentationUnfogged() + " has no locked breakthrough to gain for _Sacrifice_.");
+                            player.getRepresentationUnfogged()
+                                    + " has no locked breakthrough to gain for _Sacrifice_.");
                 } else {
                     BreakthroughCommandHelper.unlockBreakthroughs(game, player, locked);
                 }
@@ -146,8 +147,7 @@ class SacrificeAcd2ButtonHandler {
     private static void sendIngressFromButtons(Player player, Game game, String targetPos) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile != null
-                    && tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS)) {
+            if (tile != null && tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS)) {
                 buttons.add(Buttons.gray(
                         player.factionButtonChecker() + "sacrificeIngressFrom_" + targetPos + "_" + tile.getPosition(),
                         tile.getRepresentationForButtons(game, player)));

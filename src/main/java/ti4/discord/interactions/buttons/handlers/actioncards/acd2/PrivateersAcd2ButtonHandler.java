@@ -15,7 +15,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
-import ti4.service.emoji.MiscEmojis;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
@@ -32,12 +31,7 @@ class PrivateersAcd2ButtonHandler {
         UnitType.Warsun
     };
     private static final UnitType[] NON_FIGHTER_SHIPS = {
-        UnitType.Destroyer,
-        UnitType.Cruiser,
-        UnitType.Carrier,
-        UnitType.Dreadnought,
-        UnitType.Flagship,
-        UnitType.Warsun
+        UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought, UnitType.Flagship, UnitType.Warsun
     };
 
     @ButtonHandler("resolvePrivateers")

@@ -24,9 +24,7 @@ import ti4.service.unit.RemoveUnitService;
 @UtilityClass
 class SettlersAcd2ButtonHandler {
 
-    private static final UnitType[] GROUND_UNITS = {
-        UnitType.Infantry, UnitType.Mech, UnitType.Pds, UnitType.Spacedock
-    };
+    private static final UnitType[] GROUND_UNITS = {UnitType.Infantry, UnitType.Mech, UnitType.Pds, UnitType.Spacedock};
 
     @ButtonHandler("resolveSettlers")
     public static void resolveSettlers(Player player, Game game, ButtonInteractionEvent event) {
@@ -178,8 +176,8 @@ class SettlersAcd2ButtonHandler {
             int count = uH.getUnitCount(type, target);
             if (count > 0) {
                 buttons.add(Buttons.red(
-                        acting.factionButtonChecker() + "settlersDestroy_" + remaining + "_" + target.getFaction()
-                                + "_" + type.name() + "_" + planet,
+                        acting.factionButtonChecker() + "settlersDestroy_" + remaining + "_" + target.getFaction() + "_"
+                                + type.name() + "_" + planet,
                         "Destroy 1 " + type.humanReadableName() + " (" + count + " there)"));
             }
         }

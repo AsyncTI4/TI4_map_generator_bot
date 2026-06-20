@@ -33,8 +33,7 @@ class SettlementsAcd2ButtonHandler {
     public static void resolveSettlements(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons;
         try {
-            buttons = AgendaHelper.getAgendaButtons(
-                    null, game, player.factionButtonChecker() + "settlementsPredict_");
+            buttons = AgendaHelper.getAgendaButtons(null, game, player.factionButtonChecker() + "settlementsPredict_");
         } catch (Exception e) {
             buttons = new ArrayList<>();
         }

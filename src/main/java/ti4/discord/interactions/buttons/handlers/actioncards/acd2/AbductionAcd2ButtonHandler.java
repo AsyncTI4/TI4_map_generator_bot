@@ -28,8 +28,8 @@ class AbductionAcd2ButtonHandler {
                 if (!isAgent && !isUnlockedCommander) {
                     continue;
                 }
-                String label = leader.getName() + (game.isFowMode() ? "" : " (" + p2.getFactionModel().getShortName()
-                        + ")");
+                String label = leader.getName()
+                        + (game.isFowMode() ? "" : " (" + p2.getFactionModel().getShortName() + ")");
                 buttons.add(Buttons.gray(
                         player.factionButtonChecker() + "abductionTake_" + p2.getFaction() + "_" + leader.getId(),
                         label));
