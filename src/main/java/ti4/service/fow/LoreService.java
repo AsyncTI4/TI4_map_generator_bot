@@ -159,6 +159,19 @@ public final class LoreService {
                     + persistance;
         }
 
+        /** A field-for-field clone. Used when saving one set of lore settings to several targets at once so each
+         *  stored entry is its own instance instead of a shared, mutated reference. */
+        public LoreEntry copy() {
+            LoreEntry clone = new LoreEntry(loreText);
+            clone.target = target;
+            clone.footerText = footerText;
+            clone.receiver = receiver;
+            clone.trigger = trigger;
+            clone.ping = ping;
+            clone.persistance = persistance;
+            return clone;
+        }
+
         private static final String CHOICE_MARKER = "!choice";
 
         /**
@@ -167,7 +180,7 @@ public final class LoreService {
          */
         public boolean isChoiceGated() {
             for (String line : footerText.split("\n")) {
-                if (line.strip().equalsIgnoreCase(CHOICE_MARKER)) return true;
+                if (CHOICE_MARKER.equalsIgnoreCase(line.strip())) return true;
             }
             return false;
         }
@@ -190,7 +203,7 @@ public final class LoreService {
             List<String> out = new ArrayList<>();
             for (String line : footerText.split("\n")) {
                 String stripped = line.strip();
-                if (stripped.equalsIgnoreCase(CHOICE_MARKER)) continue;
+                if (CHOICE_MARKER.equalsIgnoreCase(stripped)) continue;
 
                 String lower = stripped.toLowerCase();
                 String tag = lower.startsWith("accept:") ? "accept:" : lower.startsWith("reject:") ? "reject:" : "";
@@ -212,7 +225,7 @@ public final class LoreService {
             StringBuilder sb = new StringBuilder();
             for (String line : footerText.split("\n")) {
                 String stripped = line.strip();
-                if (stripped.equalsIgnoreCase(CHOICE_MARKER)) continue;
+                if (CHOICE_MARKER.equalsIgnoreCase(stripped)) continue;
                 stripped = stripBranchTag(stripped);
 
                 // Strip effect segments from the line (same split as getEffectLines)
@@ -422,14 +435,22 @@ public final class LoreService {
                 if (tile == null) isValidLore = false;
 
                 buttonLabel = target;
-                emoji = tile != null ? tile.getTileModel().getEmoji().toString() : null;
+                emoji = tile != null
+                                && tile.getTileModel() != null
+                                && tile.getTileModel().getEmoji() != null
+                        ? tile.getTileModel().getEmoji().toString()
+                        : null;
             } else {
-                // Planet Lore
-                PlanetModel planet = Mapper.getPlanet(target);
-                if (!game.getPlanets().contains(target)) isValidLore = false;
+                // Planet Lore — targets are stored as canonical planet IDs, but resolve aliases defensively
+                // so a button still renders as valid if an entry was ever stored under an alias.
+                String planetId = AliasHandler.resolvePlanet(target);
+                PlanetModel planet = Mapper.getPlanet(planetId);
+                if (!game.getPlanets().contains(planetId)) isValidLore = false;
 
                 buttonLabel = planet == null ? target : planet.getName();
-                emoji = planet != null ? planet.getEmoji().toString() : null;
+                emoji = planet != null && planet.getEmoji() != null
+                        ? planet.getEmoji().toString()
+                        : null;
             }
 
             if (isValidLore) {
@@ -639,11 +660,13 @@ public final class LoreService {
             validTargets.add(validatedTarget);
         }
 
-        // Construct
+        // Construct — each target gets its own LoreEntry instance; a shared reference would leave every
+        // stored key pointing at the same object with whichever target was set last.
         StringBuilder sb = new StringBuilder();
         for (String target : validTargets) {
-            newEntry.target = target;
-            setLore(newEntry, game, sb);
+            LoreEntry entryForTarget = newEntry.copy();
+            entryForTarget.target = target;
+            setLore(entryForTarget, game, sb);
         }
 
         if (!validTargets.isEmpty()) {
@@ -960,8 +983,14 @@ public final class LoreService {
         String scope = isSystemLore ? "sys" : "planet";
         MessageEmbed embed = buildLoreEmbed(game, target, loreEntry, isSystemLore);
         Set<String> alreadyOffered = getStoredIdSet(game, choiceOfferedKey(target));
+        // ONCE_PER_PLAYER is tracked in loreDeliveredKey; showLore's check only covers the triggering player,
+        // so for ADJACENT/ALL audiences we must skip anyone who already received it here too.
+        Set<String> alreadyDelivered = loreEntry.persistance == PERSISTANCE.ONCE_PER_PLAYER
+                ? getStoredIdSet(game, loreDeliveredKey(target))
+                : Set.of();
         for (Player p : audience) {
-            if (!p.isRealPlayer() || alreadyOffered.contains(p.getUserID())) continue;
+            if (!p.isRealPlayer() || alreadyOffered.contains(p.getUserID()) || alreadyDelivered.contains(p.getUserID()))
+                continue;
             String acceptId = "loreChoice_accept_" + scope + "_" + p.getUserID() + "_" + target;
             String rejectId = "loreChoice_reject_" + scope + "_" + p.getUserID() + "_" + target;
             List<Button> buttons = Arrays.asList(Buttons.green(acceptId, "Accept"), Buttons.red(rejectId, "Reject"));
@@ -1054,18 +1083,24 @@ public final class LoreService {
      * Once every member of the current audience has resolved this round of the choice, clear the round's
      * offered/resolved/map-applied bookkeeping. For {@code PERSISTANCE.ONCE} the entry is also removed for
      * good (the round was its only chance). For {@code ALWAYS}, clearing the bookkeeping is what lets the
-     * choice be offered again — fresh — the next time the entry's trigger condition fires for any player;
-     * {@code ONCE_PER_PLAYER} doesn't need special handling here since it's already blocked independently
-     * at the top of {@link #showLore} via {@code loreDeliveredKey}.
+     * choice be offered again — fresh — the next time the entry's trigger condition fires for any player.
+     * {@code ONCE_PER_PLAYER} keeps the entry but skips already-delivered players when re-offering (see
+     * {@code requestChoiceConfirmation}); those players are also treated as resolved here so they don't
+     * block the round from completing.
      */
     static void maybeCompleteChoiceRound(
             Player resolver, Game game, LoreEntry loreEntry, String target, String position) {
         List<Player> currentAudience = computeChoiceAudience(game, loreEntry, resolver, position);
         Set<String> resolved = getStoredIdSet(game, choiceResolvedKey(target));
+        // For ONCE_PER_PLAYER, audience members who already received the lore in an earlier round are never
+        // re-offered (see requestChoiceConfirmation), so they shouldn't block this round from completing.
+        Set<String> alreadyDelivered = loreEntry.persistance == PERSISTANCE.ONCE_PER_PLAYER
+                ? getStoredIdSet(game, loreDeliveredKey(target))
+                : Set.of();
         boolean allResolved = !currentAudience.isEmpty()
                 && currentAudience.stream()
                         .filter(Player::isRealPlayer)
-                        .allMatch(p -> resolved.contains(p.getUserID()));
+                        .allMatch(p -> resolved.contains(p.getUserID()) || alreadyDelivered.contains(p.getUserID()));
         if (allResolved) {
             if (loreEntry.persistance == PERSISTANCE.ONCE) {
                 getGameLore(game).remove(target);

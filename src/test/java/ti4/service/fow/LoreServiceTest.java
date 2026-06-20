@@ -1311,4 +1311,105 @@ class LoreServiceTest extends BaseTi4Test {
             assertEquals(OLD_ID, game.getStoredValue("someUnrelatedKey_" + OLD_ID));
         }
     }
+
+    // -----------------------------------------------------------------------
+    // 19. LoreEntry.copy() produces an independent instance. Saving one set of
+    //     lore settings to several comma-separated targets at once relies on
+    //     this: a shared, mutated reference left every stored key pointing at
+    //     the same entry with whichever target was set last.
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class LoreEntryCopy {
+
+        @Test
+        void copyIsFieldForFieldEqualButIndependent() {
+            LoreEntry original = entry("!choice", "accept: !tg +2");
+            original.target = "001";
+            original.receiver = LoreService.RECEIVER.ADJACENT;
+            original.trigger = LoreService.TRIGGER.MOVED;
+            original.ping = LoreService.PING.YES;
+            original.persistance = LoreService.PERSISTANCE.ONCE_PER_PLAYER;
+
+            LoreEntry clone = original.copy();
+
+            assertEquals(original.toString(), clone.toString());
+
+            // Mutating the clone's target must not bleed back into the original.
+            clone.target = "002";
+            assertEquals("001", original.target);
+            assertEquals("002", clone.target);
+        }
+
+        @Test
+        void copiesSavedToSeveralTargetsKeepTheirOwnTarget() {
+            LoreEntry base = entry("!tg +1");
+            for (String target : List.of("001", "002")) {
+                LoreEntry forTarget = base.copy();
+                forTarget.target = target;
+                LoreService.getGameLore(game).put(target, forTarget);
+            }
+
+            // Each stored key must hold an entry whose own target matches the key — the multi-target
+            // save bug left both keys pointing at one shared object stuck on the last target.
+            assertEquals("001", LoreService.getGameLore(game).get("001").target);
+            assertEquals("002", LoreService.getGameLore(game).get("002").target);
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 20. ONCE_PER_PLAYER is enforced for ADJACENT/ALL choice-gated entries too:
+    //     showLore's check only covers the triggering player, so the choice
+    //     offering and round-completion paths must also skip already-delivered
+    //     audience members (otherwise such an entry behaves like ALWAYS).
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class OncePerPlayerChoiceAudience {
+
+        private Player otherPlayer;
+        private LoreEntry choiceEntry;
+
+        @BeforeEach
+        void setUp() {
+            otherPlayer = addRealPlayer("other-user-id", "jolnar", "blue");
+            otherPlayer.setTg(0);
+            choiceEntry = entry("!choice", "accept: !tg +2", "reject: !tg -1");
+            choiceEntry.target = "001";
+            choiceEntry.receiver = LoreService.RECEIVER.ALL;
+            choiceEntry.persistance = LoreService.PERSISTANCE.ONCE_PER_PLAYER;
+            LoreService.getGameLore(game).put("001", choiceEntry);
+        }
+
+        @Test
+        void alreadyDeliveredPlayerIsNotReOffered() {
+            LoreService.addStoredId(game, LoreService.loreDeliveredKey("001"), player.getUserID());
+
+            LoreService.requestChoiceConfirmation(player, game, "001", true, choiceEntry, "001");
+
+            var offered = LoreService.getStoredIdSet(game, LoreService.choiceOfferedKey("001"));
+            assertFalse(offered.contains(player.getUserID()), "a player who already received it must be skipped");
+            assertTrue(offered.contains(otherPlayer.getUserID()), "a player who hasn't received it is still offered");
+        }
+
+        @Test
+        void alreadyDeliveredPlayerDoesNotBlockRoundCompletion() {
+            // player already got it in a prior round; only otherPlayer is offered/resolves this round.
+            LoreService.addStoredId(game, LoreService.loreDeliveredKey("001"), player.getUserID());
+            LoreService.addStoredId(game, LoreService.choiceOfferedKey("001"), otherPlayer.getUserID());
+            LoreService.addStoredId(game, LoreService.choiceResolvedKey("001"), otherPlayer.getUserID());
+
+            LoreService.deliverChoiceLore(otherPlayer, game, "001", true, choiceEntry, "001", "accept");
+
+            // The round should complete (bookkeeping cleared) even though `player` never resolved it,
+            // because they're already in loreDeliveredKey and were never re-offered.
+            assertTrue(
+                    LoreService.getStoredIdSet(game, LoreService.choiceOfferedKey("001"))
+                            .isEmpty(),
+                    "round must complete despite the already-delivered player not resolving");
+            assertTrue(LoreService.getStoredIdSet(game, LoreService.choiceResolvedKey("001"))
+                    .isEmpty());
+            assertEquals(2, otherPlayer.getTg());
+        }
+    }
 }
