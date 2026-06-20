@@ -274,7 +274,7 @@ public class TaUnitHandler {
         Tile tile = game.getTileByPosition(parts[0]);
         String planetName = parts[1];
         if (!ButtonHelper.doesPlayerHaveFSHere(FLAGSHIP_ID, player, tile)
-            || !getFriendlyWorldshaperPlanets(player, tile).contains(planetName)) {
+                || !getFriendlyWorldshaperPlanets(player, tile).contains(planetName)) {
             return;
         }
 
@@ -307,7 +307,7 @@ public class TaUnitHandler {
         Tile tile = game.getTileByPosition(parts[0]);
         String planetName = parts[1];
         if (!ButtonHelper.doesPlayerHaveFSHere(FLAGSHIP_ID, player, tile)
-            || !getEnemyWorldshaperPlanets(game, player, tile).contains(planetName)) {
+                || !getEnemyWorldshaperPlanets(game, player, tile).contains(planetName)) {
             return;
         }
 

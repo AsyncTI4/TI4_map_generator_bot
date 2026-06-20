@@ -40,9 +40,7 @@ public class OnyxxaBreakthroughButtonHandler {
     public static void handleRoll(ButtonInteractionEvent event, Game game, Player player) {
         int result = new DiceHelper.Die(0).getResult();
         DiceEmojis diceEmoji = result == 1 ? DiceEmojis.d10blue_1 : (result == 10 ? DiceEmojis.d10blue_0 : null);
-        String diceStr = diceEmoji != null
-                ? diceEmoji.toString()
-                : DiceEmojis.getGrayDieEmoji(result);
+        String diceStr = diceEmoji != null ? diceEmoji.toString() : DiceEmojis.getGrayDieEmoji(result);
 
         if (result == 1 || result == 10) {
             if (!FractureService.isFractureInPlay(game)) {

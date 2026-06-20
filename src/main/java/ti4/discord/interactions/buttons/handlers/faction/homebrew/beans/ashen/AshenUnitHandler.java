@@ -407,9 +407,7 @@ public class AshenUnitHandler {
         String planet = buttonID.substring(ASHEN_MECH_REVIVE_PREFIX.length());
         Tile tile = game.getTileFromPlanet(planet);
         Tile homeTile = player.getHomeSystemTile();
-        if (homeTile == null
-            || !homeTile.equals(tile)
-            || !player.getPlanets().contains(planet)) {
+        if (homeTile == null || !homeTile.equals(tile) || !player.getPlanets().contains(planet)) {
             ButtonHelper.deleteMessage(event);
             return;
         }

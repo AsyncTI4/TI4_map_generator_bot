@@ -307,8 +307,7 @@ class DefectorsAcd2ButtonHandler {
             Button button =
                     Buttons.blue(player.factionButtonChecker() + "defectorsTarget_" + target.getFaction(), label);
             if (!game.isFowMode()) {
-                button = button.withEmoji(
-                        Emoji.fromFormatted(target.getFactionEmoji()));
+                button = button.withEmoji(Emoji.fromFormatted(target.getFactionEmoji()));
             }
             buttons.add(button);
         }

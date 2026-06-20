@@ -73,7 +73,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
         StringBuilder sb = new StringBuilder("""
 
                 > These toggles determine which homebrew Franken will use when the draft starts.
-                
+
                 > Select "New PoK", "Old PoK", or "Thunder's Edge + New PoK" above to set official factions.
                 """);
 
