@@ -1513,6 +1513,12 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("seized_research".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveSeizedResearch", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
+            }
+
             if ("stranded_ship".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "strandedShipStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(

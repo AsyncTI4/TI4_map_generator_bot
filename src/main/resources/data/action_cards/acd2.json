@@ -1291,6 +1291,7 @@
         "phase": "Any",
         "window": "After you gain control of a planet that has a technology speciality",
         "text": "Either research 1 technology that matches that speciality or gain your breakthrough.",
+        "automationID": "seized_research",
         "flavorText": "\"So, Doc,\" Connor said, playfully pointing his blaster at the Hylar as she cringed away. \"How about we start with a little tour of R&D?\"",
         "source": "action_deck_2"
     },
