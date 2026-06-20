@@ -1250,6 +1250,13 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "system"), codedButtons);
             }
 
+            if ("unexpected_strategy".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.factionButtonChecker() + "resolveUnexpectedStrategy", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "system"), codedButtons);
+            }
+
             if ("data_archive".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveDataArchive", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(

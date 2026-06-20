@@ -939,6 +939,7 @@
         "phase": "Any",
         "window": "When you would spend a command token from your strategy pool",
         "text": "Remove 1 of your command tokens from the game board instead.",
+        "automationID": "unexpected_strategy",
         "flavorText": "Kyver shivered as he slipped undetected past the Nekro fleet. Why? They had no way of knowing his plans—yet, he saw no sign of the Alastor and its escort.",
         "source": "action_deck_2"
     },
