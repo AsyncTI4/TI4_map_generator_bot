@@ -1368,8 +1368,8 @@ public class ActionCardHelper {
             }
 
             if ("compounding_interests".equals(automationID)) {
-                codedButtons.add(Buttons.green(
-                        player.factionButtonChecker() + "resolveCompoundingInterests", buttonLabel));
+                codedButtons.add(
+                        Buttons.green(player.factionButtonChecker() + "resolveCompoundingInterests", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 

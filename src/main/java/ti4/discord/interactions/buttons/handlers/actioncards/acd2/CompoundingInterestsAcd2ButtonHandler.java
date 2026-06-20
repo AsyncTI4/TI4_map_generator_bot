@@ -27,7 +27,8 @@ class CompoundingInterestsAcd2ButtonHandler {
         if (tokenCount == 0) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has no command tokens on the board; _Compounding Interests_ has no effect.");
+                    player.getRepresentation()
+                            + " has no command tokens on the board; _Compounding Interests_ has no effect.");
             return;
         }
         sendChoiceButtons(player, tokenCount);
@@ -64,19 +65,15 @@ class CompoundingInterestsAcd2ButtonHandler {
 
     private static void sendChoiceButtons(Player player, int remaining) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green(
-                "compoundingInterestsStep2_gain_" + remaining,
-                "Gain 1 Commodity",
-                MiscEmojis.comm));
+        buttons.add(Buttons.green("compoundingInterestsStep2_gain_" + remaining, "Gain 1 Commodity", MiscEmojis.comm));
         buttons.add(Buttons.blue(
-                "compoundingInterestsStep2_convert_" + remaining,
-                "Convert 1 Commodity to TG",
-                MiscEmojis.tg));
+                "compoundingInterestsStep2_convert_" + remaining, "Convert 1 Commodity to TG", MiscEmojis.tg));
         buttons.add(Buttons.red("deleteButtons", "Done"));
         String remainingText = remaining == 1 ? "1 choice remaining" : remaining + " choices remaining";
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", choose an option for _Compounding Interests_ (" + remainingText + ").",
+                player.getRepresentationUnfogged() + ", choose an option for _Compounding Interests_ (" + remainingText
+                        + ").",
                 buttons);
     }
 }
