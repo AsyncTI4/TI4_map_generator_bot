@@ -1065,6 +1065,38 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("artifact_hunters".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveArtifactHunters", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("artifact_research".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveArtifactResearch", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("bounty".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveBounty", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "destroyed unit"), codedButtons);
+            }
+
+            if ("heist".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveHeist", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("mysterious_brokers".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.factionButtonChecker() + "resolveMysteriousBrokers", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("survey".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveSurvey", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("alliance_rider".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.factionButtonChecker() + "allianceRiderRandomAlly", "Random Ally"));
@@ -1250,6 +1282,13 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "system"), codedButtons);
             }
 
+            if ("unexpected_strategy".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.factionButtonChecker() + "resolveUnexpectedStrategy", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "system"), codedButtons);
+            }
+
             if ("data_archive".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveDataArchive", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -1346,6 +1385,11 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveEspionage", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
+            }
+
+            if ("rehashed_debates".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveRehashedDebates", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
             if ("defectors".equals(automationID)) {

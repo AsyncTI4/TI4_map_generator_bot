@@ -939,6 +939,7 @@
         "phase": "Any",
         "window": "When you would spend a command token from your strategy pool",
         "text": "Remove 1 of your command tokens from the game board instead.",
+        "automationID": "unexpected_strategy",
         "flavorText": "Kyver shivered as he slipped undetected past the Nekro fleet. Why? They had no way of knowing his plans—yet, he saw no sign of the Alastor and its escort.",
         "source": "action_deck_2"
     },
@@ -1094,6 +1095,7 @@
         "phase": "Action",
         "window": "At the end of your turn",
         "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
+        "automationID": "survey",
         "flavorText": "As Tai announced that the expedition would continue despite safety concerns, a cadet gave an audible groan—followed by a yelp as Dart grabbed him by his Naaz. \"Any more backtalk from you and you'll get a clout in the ear!\"",
         "source": "action_deck_2"
     },
@@ -1103,6 +1105,7 @@
         "phase": "Action",
         "window": "At the end of your turn",
         "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
+        "automationID": "survey",
         "flavorText": "One of the cadets nearly fell over as they crested the lip of the ancient crater, revealing three massive, entangled ships jutting from the earth below. Tai gave a self-satisfied hmph.",
         "source": "action_deck_2"
     },
@@ -1112,6 +1115,7 @@
         "phase": "Action",
         "window": "At the end of your turn",
         "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
+        "automationID": "survey",
         "flavorText": "\"Careful!\" Tai cried as he heard what was undoubtedly a priceless relic shatter in the room next door. \"Who trained these fools?\" he grumbled. Dart didn't have the heart to remind him that they had.",
         "source": "action_deck_2"
     },
@@ -1121,6 +1125,7 @@
         "phase": "Action",
         "window": "At the end of your turn",
         "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
+        "automationID": "survey",
         "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—as Dart ran.",
         "source": "action_deck_2"
     },
