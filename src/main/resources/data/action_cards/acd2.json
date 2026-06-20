@@ -1195,6 +1195,7 @@
         "phase": "Action",
         "window": "After you resolve a tactical action during which you gained control of a planet that was controlled by another player",
         "text": "Resolve the secondary ability of 1 of that player's strategy cards; if that planet is in their home system, resolve the primary ability instead.",
+        "automationID": "overthrow",
         "flavorText": "Vos was out of the office before the Winnaran hit the floor. That would send a message to the loyalists.",
         "source": "action_deck_2"
     },
@@ -1204,6 +1205,7 @@
         "phase": "Action",
         "window": "After you resolve a tactical action during which you gained control of a planet that was controlled by another player",
         "text": "Resolve the secondary ability of 1 of that player's strategy cards; if that planet is in their home system, resolve the primary ability instead.",
+        "automationID": "overthrow",
         "flavorText": "The Hercant merchant's blood-slicked finger slipped from Vos's grip as the scanner chimed.",
         "source": "action_deck_2"
     },
@@ -1213,6 +1215,7 @@
         "phase": "Action",
         "window": "After you resolve a tactical action during which you gained control of a planet that was controlled by another player",
         "text": "Resolve the secondary ability of 1 of that player's strategy cards; if that planet is in their home system, resolve the primary ability instead.",
+        "automationID": "overthrow",
         "flavorText": "Vos sighed as he approached Mordai II. Sharsiss had given him tough orders before, but this?",
         "source": "action_deck_2"
     },
@@ -1222,6 +1225,7 @@
         "phase": "Action",
         "window": "After you resolve a tactical action during which you gained control of a planet that was controlled by another player",
         "text": "Resolve the secondary ability of 1 of that player's strategy cards; if that planet is in their home system, resolve the primary ability instead.",
+        "automationID": "overthrow",
         "flavorText": "Vos leapt toward the transport below as Connor fired from the balcony. \"See you, cowboy.\"",
         "source": "action_deck_2"
     },
@@ -1260,6 +1264,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
+        "automationID": "sacrifice",
         "flavorText": "Sharsiss exulted. Each puppet had done his bidding without notice. Their minds shattered at the merest glimpse of power—of what was to come, of what they would become.",
         "source": "action_deck_2"
     },
@@ -1269,6 +1274,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
+        "automationID": "sacrifice",
         "flavorText": "Mot was disturbed by the sight of the ivory monolith looming over the capitol. He was told that it was his idea to bring it here, but had no recollection of it.",
         "source": "action_deck_2"
     },
@@ -1278,6 +1284,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
+        "automationID": "sacrifice",
         "flavorText": "The insignificant device let off no energy, no known signals. It lay inert for untold ages. Yet, upon touch, innumerable, unspeakable truths were relayed in an instant. Then, there was only darkness.",
         "source": "action_deck_2"
     },
@@ -1287,6 +1294,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
+        "automationID": "sacrifice",
         "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "action_deck_2"
     },
@@ -1326,6 +1334,7 @@
         "phase": "Action",
         "window": "After you pass",
         "text": "Resolve the secondary ability of 1 readied or unchosen strategy card without spending a command token.",
+        "automationID": "strategic_focus",
         "flavorText": "\"With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Rinn sighed. \"We must remain focused. Steady.\"",
         "source": "action_deck_2"
     },
