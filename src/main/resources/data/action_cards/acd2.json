@@ -327,6 +327,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Look at another player's action cards and choose 1 of those cards. That player may give you that card; if they do not, they must give you 1 random promissory note from their hand.",
+        "automationID": "espionage",
         "flavorText": "Kyver waited patiently, cloaked outside the station in transparasteel plating. They loathed eliminating children, but this messiah must remain unrisen.",
         "source": "action_deck_2"
     },

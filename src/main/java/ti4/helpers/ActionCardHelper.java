@@ -1342,6 +1342,12 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
 
+            if ("espionage".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveEspionage", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
+            }
+
             if ("defectors".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveDefectors", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
