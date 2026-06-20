@@ -8,7 +8,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
 
 @UtilityClass
-class WillRevolutionAcd2ButtonHandler {
+class RevolutionAcd2ButtonHandler {
 
     @ButtonHandler("willRevolution")
     public static void willRevolution(ButtonInteractionEvent event, Game game) {
