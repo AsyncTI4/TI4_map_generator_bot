@@ -19,14 +19,14 @@ import ti4.service.emoji.MiscEmojis;
 class MysteriousBrokersAcd2ButtonHandler {
 
     @ButtonHandler("resolveMysteriousBrokers")
-    public static void resolveMysteriousBrokers(Player player, Game game, ButtonInteractionEvent event) {
+    public static void resolveMysteriousBrokers(Player player, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
 
         List<Button> buttons = new ArrayList<>();
         for (String relicId : player.getActualRelics()) {
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + "mysteriousBrokersPurge_" + relicId,
-                    "Purge " + Mapper.getRelic(relicId).getName() + " & Gain a Relic"));
+                    "Purge " + Mapper.getRelic(relicId).getName()));
         }
         int tgGain = neighborsNotPassed(player);
         buttons.add(Buttons.blue(
