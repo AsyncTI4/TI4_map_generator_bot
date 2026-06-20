@@ -4665,7 +4665,7 @@ public class ButtonHelper {
             if ("absol_pa".equals(tech) && player.getActionCards().size() < 2) continue;
             if ("betaro".equals(tech)
                     && player.getReadiedPlanets().isEmpty()
-                    && player.getExhaustedPlanets().isEmpty()) continue;
+                    || player.getExhaustedPlanets().isEmpty()) continue;
 
             // Add the button
             TechnologyModel model = Mapper.getTech(tech);
