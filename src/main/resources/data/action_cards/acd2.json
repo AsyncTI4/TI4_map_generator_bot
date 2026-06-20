@@ -1326,6 +1326,7 @@
         "phase": "Action",
         "window": "After you pass",
         "text": "Resolve the secondary ability of 1 readied or unchosen strategy card without spending a command token.",
+        "automationID": "strategic_focus",
         "flavorText": "\"With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Rinn sighed. \"We must remain focused. Steady.\"",
         "source": "action_deck_2"
     },
