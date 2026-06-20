@@ -36,6 +36,7 @@ public class Source {
         monuments,
         blue_reverie,
         twilight_kart,
+        twilight_ds,
 
         // lil homebrew
         lazax,
@@ -152,7 +153,7 @@ public class Source {
 
         public boolean isTwilightFallish() {
             return switch (this) {
-                case twilights_fall, twilight_kart -> true;
+                case twilights_fall, twilight_kart, twilight_ds -> true;
                 default -> false;
             };
         }
@@ -191,6 +192,7 @@ public class Source {
                         case salliance -> SourceEmojis.StrategicAlliance;
                         case monuments -> SourceEmojis.Monuments;
                         case twilight_kart -> SourceEmojis.TwilightKart;
+                        case twilight_ds -> SourceEmojis.DiscordantStars;
                         default -> null;
                     };
             return emoji == null ? "" : emoji.toString();

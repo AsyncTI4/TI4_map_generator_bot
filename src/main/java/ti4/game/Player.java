@@ -453,7 +453,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public void setBreakthroughExhausted(String bt, boolean exh) {
-        getBreakthroughExhausted().put(bt, exh);
+        if (hasBreakthrough(bt)) {
+            getBreakthroughExhausted().put(bt, exh);
+        }
     }
 
     public boolean isBreakthroughActive(String bt) {
@@ -1427,6 +1429,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
         if (hasAbility("harmony") && getStarbalanceCounter() != getSteelbalanceCounter()) {
             bonus -= 2;
+        }
+        if (hasTech("tf-corporateimperialism")) {
+            bonus += 4;
         }
 
         if (hasAbility("necrophage")) {

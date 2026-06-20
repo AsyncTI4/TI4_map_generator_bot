@@ -1,8 +1,6 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -143,6 +141,18 @@ public class CombatRollService {
         return metaliFakeUnit;
     }
 
+    public static UnitModel getZelianPlanetUnit(Player player, String planetName, int planetCombat) {
+        UnitModel zelianFakeUnit = new UnitModel();
+        zelianFakeUnit.setCombatDieCount(1);
+        zelianFakeUnit.setCombatHitsOn(planetCombat);
+        zelianFakeUnit.setName("Zelian Planet " + planetName);
+        zelianFakeUnit.setAsyncId("zelianplanet");
+        zelianFakeUnit.setId("zelianplanet");
+        zelianFakeUnit.setBaseType("dd");
+        zelianFakeUnit.setFaction(player.getFaction());
+        return zelianFakeUnit;
+    }
+
     public static int secondHalfOfCombatRoll(
             Player player,
             Game game,
@@ -173,6 +183,28 @@ public class CombatRollService {
                 getUnitsInCombat(tile, combatOnHolder, player, event, rollType, game);
         if (rollType == CombatRollType.AFB && player.hasRelic("metalivoidarmaments")) {
             playerUnitsByQuantity.put(getMetaliAFBUnit(player), 1);
+        }
+        if (rollType == CombatRollType.combatround && player.hasActiveBreakthrough("zelianbt")) {
+            for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                if (player.getPlanetsAllianceMode().contains(uH.getName())
+                        && ("space".equalsIgnoreCase(unitHolderName)
+                                || uH.getName().equalsIgnoreCase(unitHolderName))) {
+                    int resource = Helper.getPlanetResources(uH.getName(), game);
+                    playerUnitsByQuantity.put(
+                            getZelianPlanetUnit(player, Helper.getPlanetName(uH.getName()), 10 - resource), 1);
+                }
+            }
+        }
+        if (rollType == CombatRollType.combatround
+                && player.hasTech("tf-hostileplanetoids")
+                && "space".equalsIgnoreCase(unitHolderName)) {
+            for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                if (player.getPlanetsAllianceMode().contains(uH.getName())) {
+                    int resource = Helper.getPlanetResources(uH.getName(), game);
+                    playerUnitsByQuantity.put(
+                            getZelianPlanetUnit(player, Helper.getPlanetName(uH.getName()), 10 - resource), 1);
+                }
+            }
         }
         String bombardPlanet = "";
         if (rollType == CombatRollType.bombardment
@@ -1641,6 +1673,12 @@ public class CombatRollService {
         if (totalHits < 1) {
             useDoubleBoomEmoji = false;
         }
+        if (totalHits > 0 && rollType == CombatRollType.bombardment && player.hasTech("dszelir")) {
+            totalHits++;
+        }
+        if (totalHits > 0 && rollType != CombatRollType.combatround && player.hasTech("tf-shardsaturation")) {
+            totalHits++;
+        }
         result += CombatMessageHelper.displayHitResults(totalHits, useDoubleBoomEmoji);
 
         if (totalHits > 0 && usesX89c4) {
@@ -1669,7 +1707,11 @@ public class CombatRollService {
         }
         if (totalHits > 0 && rollType == CombatRollType.bombardment && player.hasTech("dszelir")) {
             result += "\n" + player.getFactionEmoji()
-                    + " You have _Shard Volley_ and thus should produce an additional hit to the ones rolled above.";
+                    + " You have _Shard Volley_ and thus produced an additional hit to the ones rolled above.";
+        }
+        if (totalHits > 0 && rollType != CombatRollType.combatround && player.hasTech("tf-shardsaturation")) {
+            result += "\n" + player.getFactionEmoji()
+                    + " You have _Shard Saturation_ and thus produced an additional hit to the ones rolled above.";
         }
         delayedAfterTotalNotes.forEach(payloadBuilder::addNote);
         if (!extra.isEmpty()) {

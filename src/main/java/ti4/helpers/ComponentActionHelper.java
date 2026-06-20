@@ -956,11 +956,15 @@ public class ComponentActionHelper {
             }
             case "exhaustBT" -> {
                 String btID = buttonID;
-                BreakthroughModel btModel = Mapper.getBreakthrough(btID);
-                p1.getBreakthroughExhausted().put(btID, true);
-                String message = p1.getRepresentation() + " exhausted _" + btModel.getName() + "_.";
-                MessageHelper.sendMessageToChannelWithEmbed(
-                        event.getMessageChannel(), message, btModel.getRepresentationEmbed());
+                if (!game.isTwilightsFallMode()) {
+                    BreakthroughModel btModel = Mapper.getBreakthrough(btID);
+                    p1.getBreakthroughExhausted().put(btID, true);
+                    String message = p1.getRepresentation() + " exhausted _" + btModel.getName() + "_.";
+                    MessageHelper.sendMessageToChannelWithEmbed(
+                            event.getMessageChannel(), message, btModel.getRepresentationEmbed());
+                } else {
+                    p1.exhaustTech("tf-" + btID);
+                }
                 boolean implemented = TeHelperBreakthroughs.handleBreakthroughExhaust(event, game, p1, buttonID);
 
                 if (!implemented) {
