@@ -85,35 +85,6 @@ class ActionCardDeck2ButtonHandler {
     private static final String SYNDICATE_CARDS_KEY = "syndicateRevealedCards";
     private static final String SYNDICATE_PLAYERS_KEY = "syndicateRemainingPlayers";
 
-    @ButtonHandler("resolveOracle")
-    public static void resolveOracle(Player player, Game game, ButtonInteractionEvent event) {
-        List<MessageEmbed> embeds = new ArrayList<>();
-        game.peekAtAllUnrevealedPublicObjectives(player);
-
-        for (String objectiveId : game.getPublicObjectives1Peekable()) {
-            embeds.add(Mapper.getPublicObjective(objectiveId).getRepresentationEmbed());
-        }
-
-        for (String objectiveId : game.getPublicObjectives2Peekable()) {
-            embeds.add(Mapper.getPublicObjective(objectiveId).getRepresentationEmbed());
-        }
-
-        for (String secretId : game.peekAtSecrets(5)) {
-            embeds.add(Mapper.getSecretObjective(secretId).getRepresentationEmbed(true));
-        }
-
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(
-                player,
-                "Showing all unrevealed public objectives and the top 5 secret objectives from the deck.",
-                embeds);
-        Collections.shuffle(game.getSecretObjectives());
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                "Sent _Oracle_ results to " + player.getFactionEmojiOrColor()
-                        + " `#cards-info` thread and shuffled the secret objective deck.");
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
     @ButtonHandler("resolveHiddenInitiatives")
     public static void resolveHiddenInitiatives(Player player, Game game, ButtonInteractionEvent event) {
         List<String> peekedSecrets = game.peekAtSecrets(2);
