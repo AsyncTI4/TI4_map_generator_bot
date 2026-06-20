@@ -1467,6 +1467,16 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("pivot".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolvePivot", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("mass_transference".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveMassTransference", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("freedom_fighters".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFreedomFighters", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
