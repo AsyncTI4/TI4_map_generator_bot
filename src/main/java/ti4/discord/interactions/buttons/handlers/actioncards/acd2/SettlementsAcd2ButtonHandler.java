@@ -5,10 +5,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.math.NumberUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -23,17 +23,19 @@ import ti4.message.MessageHelper;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
-class SettlementsAcd2ButtonHandler {
+public class SettlementsAcd2ButtonHandler {
 
-    private static String predictionKey(Player player) {
-        return "settlementsPrediction" + player.getFaction();
+    private static final String CARD_NAME = "Settlements";
+
+    private static String winnerKey(Player player) {
+        return "settlementsWinner" + player.getFaction();
     }
 
     @ButtonHandler("resolveSettlements")
     public static void resolveSettlements(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons;
         try {
-            buttons = AgendaHelper.getAgendaButtons(null, game, player.factionButtonChecker() + "settlementsPredict_");
+            buttons = AgendaHelper.getAgendaButtons(CARD_NAME, game, player.factionButtonChecker());
         } catch (Exception e) {
             buttons = new ArrayList<>();
         }
@@ -49,44 +51,26 @@ class SettlementsAcd2ButtonHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", predict aloud an outcome of this agenda for _Settlements_.",
+                player.getRepresentationUnfogged()
+                        + ", predict an outcome of this agenda for _Settlements_. If your prediction wins, you may"
+                        + " place up to 2 infantry into coexistence on voters' non-home planets.",
                 buttons);
     }
 
-    @ButtonHandler("settlementsPredict_")
-    public static void resolveSettlementsPredict(
-            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String outcome = buttonID.replace("settlementsPredict_", "");
-        game.setStoredValue(predictionKey(player), outcome);
-        ButtonHelper.deleteMessage(event);
-        Button placeButton = Buttons.green(
-                player.factionButtonChecker() + "settlementsPlace", "Place Infantry (after agenda resolves)");
-        MessageHelper.sendMessageToChannelWithButton(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " predicted **" + outcome + "** for _Settlements_. After the"
-                        + " agenda resolves, if your prediction is correct, use this button to place up to 2 infantry"
-                        + " into coexistence on voters' non-home planets.",
-                placeButton);
-    }
-
-    @ButtonHandler("settlementsPlace")
-    public static void resolveSettlementsPlace(Player player, Game game, ButtonInteractionEvent event) {
-        String outcome = game.getStoredValue(predictionKey(player));
-        ButtonHelper.deleteMessage(event);
-        if (outcome == null || outcome.isEmpty()) {
+    public static void resolveWinningSettlements(Game game, Player winningR, String winningOutcome) {
+        if (votersFor(game, winningOutcome).isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "No stored _Settlements_ prediction was found.");
+                    winningR.getCorrectChannel(),
+                    winningR.getRepresentationUnfogged()
+                            + ", your _Settlements_ prediction was correct, but no players voted for the winning"
+                            + " outcome.");
             return;
         }
-        Set<Player> voters = votersFor(game, outcome);
-        if (voters.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", could not find any players who voted for **" + outcome
-                            + "**. If your prediction was correct, place the infantry manually.");
-            return;
-        }
-        sendPlacementButtons(player, game, 2);
+        game.setStoredValue(winnerKey(winningR), winningOutcome);
+        MessageHelper.sendMessageToChannel(
+                winningR.getCorrectChannel(),
+                winningR.getRepresentationUnfogged() + ", your _Settlements_ prediction was correct.");
+        sendPlacementButtons(winningR, game, 2);
     }
 
     @ButtonHandler("settlementsPlaceOn_")
@@ -124,14 +108,15 @@ class SettlementsAcd2ButtonHandler {
 
         if (remaining > 1) {
             sendPlacementButtons(player, game, remaining - 1);
+        } else {
+            game.removeStoredValue(winnerKey(player));
         }
     }
 
     private static void sendPlacementButtons(Player player, Game game, int remaining) {
-        String outcome = game.getStoredValue(predictionKey(player));
-        Set<Player> voters = votersFor(game, outcome);
+        String outcome = game.getStoredValue(winnerKey(player));
         Set<String> planets = new LinkedHashSet<>();
-        for (Player voter : voters) {
+        for (Player voter : votersFor(game, outcome)) {
             for (String planet : voter.getPlanets()) {
                 Planet uH = game.getUnitHolderFromPlanet(planet);
                 if (uH != null && !uH.isHomePlanet(game)) {
@@ -167,18 +152,18 @@ class SettlementsAcd2ButtonHandler {
             return voters;
         }
         Map<String, String> votes = game.getCurrentAgendaVotes();
-        if (votes == null) {
-            return voters;
-        }
-        String voteInfo = votes.get(outcome);
+        String voteInfo = votes == null ? null : votes.get(outcome);
         if (voteInfo == null) {
             return voters;
         }
-        StringTokenizer tokenizer = new StringTokenizer(voteInfo, ";");
-        while (tokenizer.hasMoreTokens()) {
-            String token = tokenizer.nextToken();
+        for (String token : voteInfo.split(";")) {
             int underscore = token.indexOf('_');
-            if (underscore < 0) continue;
+            if (underscore < 0) {
+                continue;
+            }
+            if (!NumberUtils.isDigits(token.substring(underscore + 1))) {
+                continue; // skip riders / non-numeric entries
+            }
             Player voter = game.getPlayerFromColorOrFaction(token.substring(0, underscore));
             if (voter != null) {
                 voters.add(voter);

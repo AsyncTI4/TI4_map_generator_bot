@@ -1474,6 +1474,13 @@ public final class Helper {
                             .append(FactionEmojis.Ghost)
                             .append('\n');
                 }
+                if (thing.contains("liquidation")) {
+                    int reduce = thing.replace("liquidation", "").isEmpty()
+                            ? 0
+                            : Integer.parseInt(thing.replace("liquidation", ""));
+                    res += reduce * 2;
+                    msg.append("> Used _Liquidation_ for a ").append(reduce * 2).append(" resource discount.\n");
+                }
                 if (thing.contains("aida")) {
                     msg.append("Exhausted ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ ");
                     if (thing.contains("_")) {
@@ -1691,6 +1698,12 @@ public final class Helper {
                     boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
                     if (warM) {
                         productionLimit += 4;
+                    }
+                    for (String spent : player.getSpentThingsThisWindow()) {
+                        if (spent.startsWith("liquidation")
+                                && !spent.replace("liquidation", "").isEmpty()) {
+                            productionLimit -= Integer.parseInt(spent.replace("liquidation", ""));
+                        }
                     }
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
                         productionLimit += 2;
