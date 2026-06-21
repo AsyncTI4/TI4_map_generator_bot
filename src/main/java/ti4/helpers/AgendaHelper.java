@@ -2135,7 +2135,8 @@ public final class AgendaHelper {
                                     nekroBs);
                         }
 
-                        PublicOutrageAcd2ButtonHandler.resolveWinningPublicOutrage(game, winningR, winner, specificVote);
+                        PublicOutrageAcd2ButtonHandler.resolveWinningPublicOutrage(
+                                game, winningR, winner, specificVote);
 
                         if (specificVote.contains("Technology Rider") && !winningR.hasAbility("propagation")) {
 
