@@ -23,7 +23,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.AgendaHelper;
+import ti4.helpers.AgendaWhensAftersHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -209,14 +209,14 @@ public final class GMService {
                 StringBuilder sbAfters = new StringBuilder("Following players have \"after\"s in hand:\n");
 
                 for (Player player : game.getRealPlayers()) {
-                    List<String> whens = AgendaHelper.getPossibleWhenNames(player);
+                    List<String> whens = AgendaWhensAftersHelper.getPossibleWhenNames(player);
                     if (!whens.isEmpty()) {
                         sbWhens.append("> ")
                                 .append(player.getRepresentationUnfoggedNoPing())
                                 .append(": ");
                         sbWhens.append(String.join(", ", whens)).append('\n');
                     }
-                    List<String> afters = AgendaHelper.getPossibleAfterNames(player);
+                    List<String> afters = AgendaWhensAftersHelper.getPossibleAfterNames(player);
                     if (!afters.isEmpty()) {
                         sbAfters.append("> ")
                                 .append(player.getRepresentationUnfoggedNoPing())
@@ -355,7 +355,7 @@ public final class GMService {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " GM has forced you to pass on \"when\"s.");
-        AgendaHelper.declineToQueueAWhen(game, event, player);
+        AgendaWhensAftersHelper.declineToQueueAWhen(game, event, player);
     }
 
     @ButtonHandler("declineToQueueAnAfterFowGM_")
@@ -365,7 +365,7 @@ public final class GMService {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " GM has forced you to pass on \"after\"s.");
-        AgendaHelper.declineToQueueAnAfter(game, event, player);
+        AgendaWhensAftersHelper.declineToQueueAnAfter(game, event, player);
     }
 
     @ButtonHandler("fowCreateChannelFor_")

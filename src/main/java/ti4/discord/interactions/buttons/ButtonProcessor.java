@@ -21,7 +21,7 @@ import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.AgendaHelper;
+import ti4.helpers.AgendaWhensAftersHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -261,7 +261,7 @@ public class ButtonProcessor {
                 // Don't add anymore cases - use @ButtonHandler
                 case "play_when" -> {
                     trackButtonHandler("play_when");
-                    AgendaHelper.playWhen(event, game, player, mainGameChannel);
+                    AgendaWhensAftersHelper.playWhen(event, game, player, mainGameChannel);
                 }
                 case "gain_1_tg" -> {
                     trackButtonHandler("gain_1_tg");
