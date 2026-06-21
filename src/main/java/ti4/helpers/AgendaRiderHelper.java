@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -16,9 +17,8 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 
-public final class AgendaRiderHelper {
-
-    private AgendaRiderHelper() {}
+@UtilityClass
+public class AgendaRiderHelper {
 
     @ButtonHandler("reverse_")
     public static void reverseRider(String buttonID, Game game, Player player) {

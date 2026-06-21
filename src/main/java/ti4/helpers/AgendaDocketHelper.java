@@ -49,12 +49,12 @@ public final class AgendaDocketHelper {
         int amount = 0;
         for (Player player2 : game.getRealPlayers()) {
             if (game.getStoredValue("docketSpace1").equalsIgnoreCase(player2.getFaction())
-                    || player2.hasAbility("galatic_threat")
+                    || player2.hasAbility("galactic_threat")
                     || player2.getFaction().equalsIgnoreCase(game.getStoredValue("docketspace2"))) {
                 amount++;
                 continue;
             }
-            if (!game.getStoredValue("influenceBidFor" + player.getFaction()).isEmpty()) {
+            if (!game.getStoredValue("influenceBidFor" + player2.getFaction()).isEmpty()) {
                 amount++;
             }
         }
