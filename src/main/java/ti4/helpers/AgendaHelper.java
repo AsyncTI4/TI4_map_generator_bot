@@ -2079,12 +2079,14 @@ public final class AgendaHelper {
                     String specificVote = vote_info.nextToken();
                     String faction = specificVote.substring(0, specificVote.indexOf('_'));
                     Player winningR = game.getPlayerFromColorOrFaction(faction.toLowerCase());
+
                     if (winningR != null && specificVote.contains("Sanction")) {
                         List<Player> loseFleetPlayers = getWinningVoters(winner, game);
                         for (Player p2 : loseFleetPlayers) {
                             MahactTokenService.removeFleetCC(game, p2, "due to voting the same way as a _Sanction_");
                         }
                     }
+
                     if (winningR != null && specificVote.contains("Corporate Lobbying")) {
                         List<Player> loseFleetPlayers = getWinningVoters(winner, game);
                         for (Player p2 : loseFleetPlayers) {
@@ -2098,6 +2100,11 @@ public final class AgendaHelper {
                             ButtonHelper.checkFleetInEveryTile(p2, game);
                         }
                     }
+
+                    if (winningR != null && specificVote.contains("Public Outrage")) {
+                        PublicOutrageAcd2ButtonHandler.resolveWinningPublicOutrage(game, winningR, winner);
+                    }
+
                     if (winningR != null
                             && (specificVote.contains("Rider")
                                     || (winningR.hasAbility("future_sight")
@@ -2134,9 +2141,6 @@ public final class AgendaHelper {
                                     identity + ", please resolve **Galactic Threat** ability using the buttons.",
                                     nekroBs);
                         }
-
-                        PublicOutrageAcd2ButtonHandler.resolveWinningPublicOutrage(
-                                game, winningR, winner, specificVote);
 
                         if (specificVote.contains("Technology Rider") && !winningR.hasAbility("propagation")) {
 

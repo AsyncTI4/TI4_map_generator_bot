@@ -52,10 +52,7 @@ public class PublicOutrageAcd2ButtonHandler {
                 buttons);
     }
 
-    public static void resolveWinningPublicOutrage(
-            Game game, Player winningR, String winningOutcome, String specificVote) {
-        if (!specificVote.contains("Public Outrage")) return;
-
+    public static void resolveWinningPublicOutrage(Game game, Player winningR, String winningOutcome) {
         Map<String, String> votes = game.getCurrentAgendaVotes();
         String voteInfo = votes == null ? null : votes.get(winningOutcome);
         if (voteInfo == null) {
