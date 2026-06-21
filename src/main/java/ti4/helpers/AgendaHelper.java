@@ -4038,8 +4038,13 @@ public final class AgendaHelper {
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
         List<MessageEmbed> agendaEmbeds = new ArrayList<>();
         for (Map.Entry<String, Integer> entry : discardAgendas.entrySet()) {
-            agendaEmbeds.add(Mapper.getAgenda(entry.getKey()).getRepresentationEmbed());
-            sb2.append(Mapper.getAgenda(entry.getKey()).getName())
+            AgendaModel agenda = Mapper.getAgenda(entry.getKey());
+            if (agenda == null) {
+                BotLogger.error("showDiscards: unknown agenda id '" + entry.getKey() + "' in game " + game.getName());
+                continue;
+            }
+            agendaEmbeds.add(agenda.getRepresentationEmbed());
+            sb2.append(agenda.getName())
                     .append(" (ID: ")
                     .append(entry.getValue())
                     .append(")\n");
