@@ -16,6 +16,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -519,6 +520,12 @@ public class PlayerTechService {
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(), "Please choose a planet to explore.", buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
+            }
+            case "betaqr" -> { // Quantum Restructuring
+                TaFactionTechHandler.resolveQuantumRestructuring(event, game, player);
+            }
+            case "betaro" -> { // Resource Optimization
+                TaFactionTechHandler.resolveResOp(event, game, player);
             }
             default ->
                 MessageHelper.sendMessageToChannel(
