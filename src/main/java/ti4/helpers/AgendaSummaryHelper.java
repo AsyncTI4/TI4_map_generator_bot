@@ -41,12 +41,12 @@ public class AgendaSummaryHelper {
         for (Entry<String, String> entry : outcomes.entrySet()) {
             String outcome = entry.getKey();
             int totalVotes = 0;
-            StringTokenizer vote_info = new StringTokenizer(entry.getValue(), ";");
+            StringTokenizer voteInfo = new StringTokenizer(entry.getValue(), ";");
             String outcomeSummary;
             String outcomeName = AgendaHelper.getAgendaOutcomeName(game, outcome, capitalize);
             StringBuilder outcomeSummaryBuilder = new StringBuilder();
-            while (vote_info.hasMoreTokens()) {
-                String specificVote = vote_info.nextToken();
+            while (voteInfo.hasMoreTokens()) {
+                String specificVote = voteInfo.nextToken();
                 String faction = specificVote.substring(0, specificVote.indexOf('_'));
                 if (capitalize) {
                     Player p2 = game.getPlayerFromColorOrFaction(faction);
