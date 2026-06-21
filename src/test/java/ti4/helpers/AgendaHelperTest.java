@@ -18,7 +18,7 @@ class AgendaHelperTest extends BaseTi4Test {
         player.setStrategicCC(1);
         player.setActionCard("veto", 1);
 
-        assertThat(AgendaHelper.getPossibleWhenNames(player))
+        assertThat(AgendaWhensAftersHelper.getPossibleWhenNames(player))
                 .contains(Mapper.getAbility("quash").getName())
                 .doesNotContain(Mapper.getActionCard("veto").getName());
     }
@@ -29,7 +29,7 @@ class AgendaHelperTest extends BaseTi4Test {
         player.addAbility("conspirators");
         player.setActionCard("sanction", 1);
 
-        assertThat(AgendaHelper.getPossibleAfterNames(player))
+        assertThat(AgendaWhensAftersHelper.getPossibleAfterNames(player))
                 .contains(Mapper.getAbility("conspirators").getName())
                 .doesNotContain(Mapper.getActionCard("sanction").getName());
     }
