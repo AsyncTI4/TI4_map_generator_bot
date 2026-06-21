@@ -34,7 +34,7 @@ class FieldTestAcd2ButtonHandler {
         List<Button> buttons = new ArrayList<>();
         for (TechnologyType type : TYPES) {
             buttons.add(Buttons.green(
-                    player.factionButtonChecker() + "fieldTestType_" + type.name(), type.toString() + " Technology"));
+                    player.factionButtonChecker() + "fieldTestType_" + type.name(), type + " Technology"));
         }
         buttons.add(Buttons.red("deleteButtons", "Cancel"));
         ButtonHelper.deleteMessage(event);

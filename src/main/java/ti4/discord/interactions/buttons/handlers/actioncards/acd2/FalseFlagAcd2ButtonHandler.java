@@ -104,7 +104,7 @@ class FalseFlagAcd2ButtonHandler {
 
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile != null && FoWHelper.playerHasUnitsInSystem(player, tile)) {
+            if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + "falseFlagTo_" + target.getFaction() + "_" + tile.getPosition(),
                         tile.getRepresentationForButtons(game, player)));

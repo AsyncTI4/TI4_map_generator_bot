@@ -25,13 +25,22 @@ class PublicSupportAcd2ButtonHandler {
 
     @ButtonHandler("resolvePublicSupport")
     public static void resolvePublicSupport(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        if (isPlanetElectAgenda(game)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", choose an outcome of this elect-planet agenda aloud for _Public Support_. Each player"
+                            + " who casts votes for that outcome casts 3 additional votes and draws 1 action card"
+                            + " (resolve manually).");
+            return;
+        }
         List<Button> buttons;
         try {
-            buttons = AgendaHelper.getAgendaButtons(null, game, player.factionButtonChecker() + "publicSupportChoose_");
+            buttons = AgendaHelper.getAgendaButtons(null, game, player.factionButtonChecker() + "publicSupportChoose");
         } catch (Exception e) {
             buttons = new ArrayList<>();
         }
-        ButtonHelper.deleteMessage(event);
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -50,6 +59,9 @@ class PublicSupportAcd2ButtonHandler {
     public static void resolvePublicSupportChoose(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String outcome = buttonID.replace("publicSupportChoose_", "");
+        if (outcome.startsWith("_")) {
+            outcome = outcome.substring(1);
+        }
         game.removeStoredValue(claimedKey(outcome));
         ButtonHelper.deleteMessage(event);
         Button claimButton =
@@ -78,7 +90,7 @@ class PublicSupportAcd2ButtonHandler {
         }
 
         String claimed = game.getStoredValue(claimedKey(outcome));
-        if (claimed != null && claimed.contains(identifier)) {
+        if (alreadyClaimed(claimed, identifier)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + ", you have already claimed _Public Support_.");
@@ -95,6 +107,27 @@ class PublicSupportAcd2ButtonHandler {
                         + "** and drew 1 action card from _Public Support_.");
         MessageHelper.sendMessageToChannel(
                 game.getMainGameChannel(), AgendaHelper.getSummaryOfVotes(game, true) + "\n \n");
+    }
+
+    private static boolean isPlanetElectAgenda(Game game) {
+        try {
+            String details = game.getCurrentAgendaInfo().split("_")[1];
+            return details.toLowerCase().contains("planet");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private static boolean alreadyClaimed(String claimed, String identifier) {
+        if (claimed == null || claimed.isEmpty()) {
+            return false;
+        }
+        for (String token : claimed.split(";")) {
+            if (token.equals(identifier)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static String resolveOutcomeKey(Game game, String outcome) {

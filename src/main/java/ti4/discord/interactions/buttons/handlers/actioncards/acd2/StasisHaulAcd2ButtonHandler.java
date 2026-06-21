@@ -75,7 +75,8 @@ class StasisHaulAcd2ButtonHandler {
         }
         String where = tile == null ? "the active system" : tile.getRepresentationForButtons(game, player);
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("stasisHaulComm", "Gain 1 Commodity (per system)", MiscEmojis.comm));
+        buttons.add(Buttons.green(
+                player.factionButtonChecker() + "stasisHaulComm", "Gain 1 Commodity (per system)", MiscEmojis.comm));
         buttons.add(Buttons.red("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

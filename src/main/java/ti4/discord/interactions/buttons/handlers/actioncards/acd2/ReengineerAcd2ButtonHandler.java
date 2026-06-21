@@ -87,7 +87,9 @@ class ReengineerAcd2ButtonHandler {
         }
         String last = null;
         for (String acID : discard.keySet()) {
-            last = acID;
+            if (game.getDiscardACStatus().get(acID) == null) {
+                last = acID;
+            }
         }
         return last;
     }
