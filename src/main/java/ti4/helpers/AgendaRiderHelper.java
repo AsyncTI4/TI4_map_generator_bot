@@ -24,55 +24,53 @@ public class AgendaRiderHelper {
     public static void reverseRider(String buttonID, Game game, Player player) {
         String choice = buttonID.substring(buttonID.indexOf('_') + 1);
         String voteMessage = player.getFactionEmojiOrColor() + " Chose to reverse the " + choice + ".";
-        Map<String, String> outcomes = game.getCurrentAgendaVotes();
-        for (String outcome : outcomes.keySet()) {
-            String existingData = outcomes.getOrDefault(outcome, "empty");
-            if (existingData != null && !"empty".equalsIgnoreCase(existingData) && !"".equalsIgnoreCase(existingData)) {
-                String[] votingInfo = existingData.split(";");
-                StringBuilder totalBuilder = new StringBuilder();
-                for (String onePiece : votingInfo) {
-                    if (!onePiece.contains(choice)) {
-                        totalBuilder.append(";").append(onePiece);
-                    }
-                }
-                String total = totalBuilder.toString();
-                if (!total.isEmpty() && total.charAt(0) == ';') {
-                    total = total.substring(1);
-                }
-                game.setCurrentAgendaVote(outcome, total);
-            }
-        }
+
+        rewriteVotes(game, piece -> !piece.contains(choice), null);
+
         player.getCorrectChannel().sendMessage(voteMessage).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("eraseMyRiders")
     public static void reverseAllRiders(Game game, Player player) {
-        Map<String, String> outcomes = game.getCurrentAgendaVotes();
         if (player.hasAbility("galactic_threat")) {
             game.removeStoredValue("galacticThreatUsed");
         }
+        rewriteVotes(
+                game,
+                piece -> {
+                    String identifier = piece.split("_")[0];
+                    return !identifier.equalsIgnoreCase(player.getFaction())
+                            && !identifier.equalsIgnoreCase(player.getColor());
+                },
+                erased -> MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(), player.getFactionEmoji() + " erased " + erased.split("_")[1]));
+    }
+
+    /**
+     * Filters each outcome's voting pieces, keeping only those matching {@code keep}.
+     * Removed pieces are passed to {@code onRemove} (may be null).
+     */
+    private static void rewriteVotes(
+            Game game, java.util.function.Predicate<String> keep, java.util.function.Consumer<String> onRemove) {
+        Map<String, String> outcomes = game.getCurrentAgendaVotes();
         for (String outcome : outcomes.keySet()) {
             String existingData = outcomes.getOrDefault(outcome, "empty");
-            if (existingData != null && !"empty".equalsIgnoreCase(existingData) && !"".equalsIgnoreCase(existingData)) {
-                String[] votingInfo = existingData.split(";");
-                StringBuilder totalBuilder = new StringBuilder();
-                for (String onePiece : votingInfo) {
-                    String identifier = onePiece.split("_")[0];
-                    if (!identifier.equalsIgnoreCase(player.getFaction())
-                            && !identifier.equalsIgnoreCase(player.getColor())) {
-                        totalBuilder.append(";").append(onePiece);
-                    } else {
-                        MessageHelper.sendMessageToChannel(
-                                player.getCorrectChannel(),
-                                player.getFactionEmoji() + " erased " + onePiece.split("_")[1]);
-                    }
-                }
-                String total = totalBuilder.toString();
-                if (!total.isEmpty() && total.charAt(0) == ';') {
-                    total = total.substring(1);
-                }
-                game.setCurrentAgendaVote(outcome, total);
+            if (existingData == null || "empty".equalsIgnoreCase(existingData) || existingData.isEmpty()) {
+                continue;
             }
+            StringBuilder totalBuilder = new StringBuilder();
+            for (String onePiece : existingData.split(";")) {
+                if (keep.test(onePiece)) {
+                    totalBuilder.append(";").append(onePiece);
+                } else if (onRemove != null) {
+                    onRemove.accept(onePiece);
+                }
+            }
+            String total = totalBuilder.toString();
+            if (!total.isEmpty() && total.charAt(0) == ';') {
+                total = total.substring(1);
+            }
+            game.setCurrentAgendaVote(outcome, total);
         }
     }
 
@@ -92,12 +90,11 @@ public class AgendaRiderHelper {
             return;
         }
         String choice = choiceParams[1];
-
-        String rider = buttonID.substring(buttonID.lastIndexOf('_') + 1);
+        String rider = buttonID.substring(lastIndex + 1);
         String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
 
         String cleanedChoice = choice;
-        if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
+        if (agendaDetails.toLowerCase().contains("planet")) {
             cleanedChoice = Helper.getPlanetRepresentation(choice, game);
         }
         String voteMessage = "chose to put a " + rider + " on \"" + StringUtils.capitalize(cleanedChoice) + "\".";
@@ -105,24 +102,18 @@ public class AgendaRiderHelper {
                 ? player.getRepresentationNoPing() + " " + voteMessage
                 : StringUtils.capitalize(voteMessage);
 
-        String identifier;
-        if (game.isFowMode()) {
-            identifier = player.getColor();
-        } else {
-            identifier = player.getFaction();
-        }
+        String identifier = game.isFowMode() ? player.getColor() : player.getFaction();
+
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
         String existingData = outcomes.getOrDefault(choice, "empty");
-        if ("empty".equalsIgnoreCase(existingData)) {
-            existingData = identifier + "_" + rider;
-        } else {
-            existingData += ";" + identifier + "_" + rider;
-        }
+        existingData = "empty".equalsIgnoreCase(existingData)
+                ? identifier + "_" + rider
+                : existingData + ";" + identifier + "_" + rider;
         game.setCurrentAgendaVote(choice, existingData);
 
         MessageHelper.sendMessageToChannel(event.getChannel(), voteMessage);
-        String summary2 = AgendaSummaryHelper.getSummaryOfVotes(game, true);
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), summary2 + "\n \n");
+        String summary = AgendaSummaryHelper.getSummaryOfVotes(game, true);
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), summary + "\n \n");
 
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
@@ -133,15 +124,11 @@ public class AgendaRiderHelper {
 
     private static List<Button> getPlanetOutcomeButtons(Player player, Game game, String prefix, String rider) {
         List<Button> planetOutcomeButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        for (String planet : planets) {
-            Button button;
-            if (rider == null) {
-                button = Buttons.gray(prefix + "_" + planet, Helper.getPlanetRepresentation(planet, game));
-            } else {
-                button = Buttons.gray(
-                        prefix + "rider_planet;" + planet + "_" + rider, Helper.getPlanetRepresentation(planet, game));
-            }
+        for (String planet : new ArrayList<>(player.getPlanets())) {
+            String label = Helper.getPlanetRepresentation(planet, game);
+            Button button = rider == null
+                    ? Buttons.gray(prefix + "_" + planet, label)
+                    : Buttons.gray(prefix + "rider_planet;" + planet + "_" + rider, label);
             planetOutcomeButtons.add(button);
         }
         return planetOutcomeButtons;
@@ -149,32 +136,33 @@ public class AgendaRiderHelper {
 
     public static List<Button> getAgendaButtons(String riderName, Game game, String prefix) {
         String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
-        List<Button> outcomeActionRow;
-        if (agendaDetails.contains("For")) {
-            outcomeActionRow = VoteButtonHandler.getForAgainstOutcomeButtons(
-                    game, riderName, prefix, game.getCurrentAgendaInfo().split("_")[2], null);
-        } else if (agendaDetails.contains("Player") || agendaDetails.contains("player")) {
-            outcomeActionRow = VoteButtonHandler.getPlayerOutcomeButtons(game, riderName, prefix, null);
-        } else if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
-            if (riderName == null) {
-                outcomeActionRow =
-                        VoteButtonHandler.getPlayerOutcomeButtons(game, null, "tiedPlanets_" + prefix, "planetRider");
-            } else {
-                outcomeActionRow = VoteButtonHandler.getPlayerOutcomeButtons(game, riderName, prefix, "planetRider");
-            }
-        } else if (agendaDetails.contains("Secret") || agendaDetails.contains("secret")) {
-            outcomeActionRow = VoteButtonHandler.getSecretOutcomeButtons(game, riderName, prefix);
-        } else if (agendaDetails.contains("Strategy") || agendaDetails.contains("strategy")) {
-            outcomeActionRow = VoteButtonHandler.getStrategyOutcomeButtons(game, riderName, prefix);
-        } else if (agendaDetails.contains("unit upgrade")) {
-            outcomeActionRow = VoteButtonHandler.getUnitUpgradeOutcomeButtons(game, riderName, prefix);
-        } else if (agendaDetails.contains("Unit") || agendaDetails.contains("unit")) {
-            outcomeActionRow = VoteButtonHandler.getUnitOutcomeButtons(game, riderName, prefix);
-        } else {
-            outcomeActionRow = VoteButtonHandler.getLawOutcomeButtons(game, riderName, prefix);
-        }
+        String lower = agendaDetails.toLowerCase();
 
-        return outcomeActionRow;
+        if (agendaDetails.contains("For")) {
+            return VoteButtonHandler.getForAgainstOutcomeButtons(
+                    game, riderName, prefix, game.getCurrentAgendaInfo().split("_")[2], null);
+        }
+        if (lower.contains("player")) {
+            return VoteButtonHandler.getPlayerOutcomeButtons(game, riderName, prefix, null);
+        }
+        if (lower.contains("planet")) {
+            return riderName == null
+                    ? VoteButtonHandler.getPlayerOutcomeButtons(game, null, "tiedPlanets_" + prefix, "planetRider")
+                    : VoteButtonHandler.getPlayerOutcomeButtons(game, riderName, prefix, "planetRider");
+        }
+        if (lower.contains("secret")) {
+            return VoteButtonHandler.getSecretOutcomeButtons(game, riderName, prefix);
+        }
+        if (lower.contains("strategy")) {
+            return VoteButtonHandler.getStrategyOutcomeButtons(game, riderName, prefix);
+        }
+        if (agendaDetails.contains("unit upgrade")) {
+            return VoteButtonHandler.getUnitUpgradeOutcomeButtons(game, riderName, prefix);
+        }
+        if (lower.contains("unit")) {
+            return VoteButtonHandler.getUnitOutcomeButtons(game, riderName, prefix);
+        }
+        return VoteButtonHandler.getLawOutcomeButtons(game, riderName, prefix);
     }
 
     @ButtonHandler("planetRider_")
@@ -183,9 +171,11 @@ public class AgendaRiderHelper {
         String factionOrColor = buttonID.substring(0, buttonID.indexOf('_'));
         Player planetOwner = game.getPlayerFromColorOrFaction(factionOrColor);
         String voteMessage = "Chose to Rider for one of " + factionOrColor + "'s planets. Please choose which one.";
-        List<Button> outcomeActionRow;
-        buttonID = buttonID.replace(factionOrColor + "_", "");
-        outcomeActionRow = getPlanetOutcomeButtons(planetOwner, game, player.factionButtonChecker(), buttonID);
+
+        String rider = buttonID.replace(factionOrColor + "_", "");
+        List<Button> outcomeActionRow =
+                getPlanetOutcomeButtons(planetOwner, game, player.factionButtonChecker(), rider);
+
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, outcomeActionRow);
         ButtonHelper.deleteMessage(event);
     }

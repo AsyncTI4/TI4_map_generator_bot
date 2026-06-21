@@ -28,7 +28,7 @@ public class AgendaSummaryHelper {
         }
 
         StringBuilder summaryBuilder =
-            new StringBuilder("# _" + agendaName + "_\nCurrent status of votes and outcomes is: \n");
+                new StringBuilder("# _" + agendaName + "_\nCurrent status of votes and outcomes is: \n");
 
         for (Entry<String, String> entry : outcomes.entrySet()) {
             String outcome = entry.getKey();
@@ -57,13 +57,13 @@ public class AgendaSummaryHelper {
 
             if (capitalize) {
                 appendCapitalizedOutcome(
-                    game, summaryBuilder, outcome, outcomeName, totalVotes, outcomeSummary, redactFactionInfo);
+                        game, summaryBuilder, outcome, outcomeName, totalVotes, outcomeSummary, redactFactionInfo);
             } else {
                 summaryBuilder
-                    .append("- ")
-                    .append(outcomeName)
-                    .append(": Total votes ")
-                    .append(totalVotes);
+                        .append("- ")
+                        .append(outcomeName)
+                        .append(": Total votes ")
+                        .append(totalVotes);
                 if (!redactFactionInfo) {
                     summaryBuilder.append(". ").append(outcomeSummary);
                 }
@@ -80,13 +80,13 @@ public class AgendaSummaryHelper {
         }
         if (underscores > 3) {
             return Mapper.getAgendaTitleNoCap(
-                StringUtils.substringAfter(agendaDetails, agendaDetails.split("_")[2] + "_"));
+                    StringUtils.substringAfter(agendaDetails, agendaDetails.split("_")[2] + "_"));
         }
         return Mapper.getAgendaTitleNoCap(agendaDetails.split("_")[3]);
     }
 
     private static void appendCapitalizedVote(
-        Game game, boolean overwriteFog, StringBuilder builder, String faction, String vote) {
+            Game game, boolean overwriteFog, StringBuilder builder, String faction, String vote) {
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         String factionLabel = FactionEmojis.getFactionIcon(faction).toString();
         if (p2 != null) {
@@ -102,15 +102,14 @@ public class AgendaSummaryHelper {
             if (NumberUtils.isDigits(vote) && p2.hasTech("dskyrog")) {
                 builder.append(" (_Indoctrination Teams_)");
             }
-            if (p2.hasAbility("future_sight") && game.getStoredValue("executiveOrder").isEmpty()) {
+            if (p2.hasAbility("future_sight")
+                    && game.getStoredValue("executiveOrder").isEmpty()) {
                 builder.append(" (**Future Sight**)");
             }
-            if (p2.hasTech("dsatokcr")
-                && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, "cruiser", true) < 8) {
+            if (p2.hasTech("dsatokcr") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, "cruiser", true) < 8) {
                 builder.append(" (Mirrorshard DEPLOY)");
             }
-            if (p2.hasUnit("kaltrim_mech")
-                && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, "mech", true) < 4) {
+            if (p2.hasUnit("kaltrim_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, "mech", true) < 4) {
                 builder.append(" (Mech DEPLOY)");
             }
         }
@@ -126,13 +125,13 @@ public class AgendaSummaryHelper {
     }
 
     private static void appendCapitalizedOutcome(
-        Game game,
-        StringBuilder summaryBuilder,
-        String outcome,
-        String outcomeName,
-        int totalVotes,
-        String outcomeSummary,
-        boolean redactFactionInfo) {
+            Game game,
+            StringBuilder summaryBuilder,
+            String outcome,
+            String outcomeName,
+            int totalVotes,
+            String outcomeSummary,
+            boolean redactFactionInfo) {
         if (outcomeSummary.length() > 2) {
             outcomeSummary = outcomeSummary.substring(0, outcomeSummary.length() - 2);
         }
@@ -140,23 +139,30 @@ public class AgendaSummaryHelper {
         String agendaInfo = game.getCurrentAgendaInfo();
 
         if (!game.isFowMode() && agendaInfo.contains("Elect Player")) {
-            String emoji = FactionEmojis.getFactionIcon(outcomeName.toLowerCase()).toString();
+            String emoji =
+                    FactionEmojis.getFactionIcon(outcomeName.toLowerCase()).toString();
             Player outcomerP = game.getPlayerFromColorOrFaction(outcomeName.toLowerCase());
             if (outcomerP != null) {
                 emoji = outcomerP.getFactionEmoji();
             }
-            summaryBuilder.append("- ").append(emoji).append(' ').append(outcomeName).append(": ").append(totalVotes);
+            summaryBuilder
+                    .append("- ")
+                    .append(emoji)
+                    .append(' ')
+                    .append(outcomeName)
+                    .append(": ")
+                    .append(totalVotes);
         } else if (!game.isHomebrewSCMode()
-            && agendaInfo.contains("Elect Strategy Card")
-            && NumberUtils.isDigits(outcome)) {
+                && agendaInfo.contains("Elect Strategy Card")
+                && NumberUtils.isDigits(outcome)) {
             int scNumber = Integer.parseInt(outcome);
             summaryBuilder
-                .append("- ")
-                .append(CardEmojis.getSCFrontFromInteger(scNumber))
-                .append(" **")
-                .append(Helper.getSCName(scNumber, game))
-                .append("**: ")
-                .append(totalVotes);
+                    .append("- ")
+                    .append(CardEmojis.getSCFrontFromInteger(scNumber))
+                    .append(" **")
+                    .append(Helper.getSCName(scNumber, game))
+                    .append("**: ")
+                    .append(totalVotes);
         } else {
             summaryBuilder.append("- ").append(outcomeName).append(": ").append(totalVotes);
         }
