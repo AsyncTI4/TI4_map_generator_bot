@@ -46,10 +46,6 @@ public class AgendaRiderHelper {
                         player.getCorrectChannel(), player.getFactionEmoji() + " erased " + erased.split("_")[1]));
     }
 
-    /**
-     * Filters each outcome's voting pieces, keeping only those matching {@code keep}.
-     * Removed pieces are passed to {@code onRemove} (may be null).
-     */
     private static void rewriteVotes(
             Game game, java.util.function.Predicate<String> keep, java.util.function.Consumer<String> onRemove) {
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
