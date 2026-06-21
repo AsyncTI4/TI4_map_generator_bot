@@ -42,7 +42,7 @@ class AgendaHelperTest extends BaseTi4Test {
         game.setCurrentAgendaInfo("agenda_Elect Planet");
         game.setCurrentAgendaVote("mrte", "arborec_14");
 
-        assertThat(AgendaHelper.getSummaryOfVotes(game, true))
+        assertThat(AgendaSummaryHelper.getSummaryOfVotes(game, true))
                 .contains("Mecatol Rex: 14")
                 .doesNotContain("Mrte: 14");
     }
@@ -67,7 +67,7 @@ class AgendaHelperTest extends BaseTi4Test {
         game.setCurrentAgendaInfo("agenda_Elect Strategy Card");
         game.setCurrentAgendaVote("4", "arborec_10");
 
-        String summary = AgendaHelper.getSummaryOfVotes(game, true);
+        String summary = AgendaSummaryHelper.getSummaryOfVotes(game, true);
         assertThat(summary).contains("**Construction**");
     }
 
@@ -79,7 +79,7 @@ class AgendaHelperTest extends BaseTi4Test {
         game.setCurrentAgendaInfo("agenda_Elect Strategy Card");
         game.setCurrentAgendaVote("Construction", "arborec_10");
 
-        String summary = AgendaHelper.getSummaryOfVotes(game, true);
+        String summary = AgendaSummaryHelper.getSummaryOfVotes(game, true);
         assertThat(summary).contains("Construction: 10");
     }
 

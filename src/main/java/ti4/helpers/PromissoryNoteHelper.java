@@ -544,7 +544,7 @@ public class PromissoryNoteHelper {
             String riderName = "Keleres Rider";
             String finsFactionCheckerPrefix = player.factionButtonChecker();
 
-            List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
+            List<Button> riderButtons = AgendaRiderHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
             List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
             MessageHelper.sendMessageToChannelWithFactionReact(
                     player.getCorrectChannel(),
@@ -557,7 +557,7 @@ public class PromissoryNoteHelper {
             String riderName = "Edyn Rider";
             String finsFactionCheckerPrefix = player.factionButtonChecker();
 
-            List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
+            List<Button> riderButtons = AgendaRiderHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
             // List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
             MessageHelper.sendMessageToChannelWithFactionReact(
                     player.getCorrectChannel(),
@@ -570,7 +570,7 @@ public class PromissoryNoteHelper {
             String riderName = "Kyro Rider";
             String finsFactionCheckerPrefix = player.factionButtonChecker();
 
-            List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
+            List<Button> riderButtons = AgendaRiderHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
             // List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
             MessageHelper.sendMessageToChannelWithFactionReact(
                     player.getCorrectChannel(),

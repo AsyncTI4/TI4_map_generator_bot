@@ -13,7 +13,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
-import ti4.helpers.AgendaHelper;
+import ti4.helpers.AgendaRiderHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -31,7 +31,7 @@ public class PublicOutrageAcd2ButtonHandler {
     public static void resolvePublicOutrage(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons;
         try {
-            buttons = AgendaHelper.getAgendaButtons(CARD_NAME, game, player.factionButtonChecker());
+            buttons = AgendaRiderHelper.getAgendaButtons(CARD_NAME, game, player.factionButtonChecker());
         } catch (Exception e) {
             buttons = new ArrayList<>();
         }
