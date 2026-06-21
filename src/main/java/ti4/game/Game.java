@@ -2340,35 +2340,50 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean removeLaw(String id) {
-        if (!id.isEmpty()) {
-            if (Constants.VOICE_OF_THE_COUNCIL_ID.equalsIgnoreCase(id)) {
-                VoiceOfTheCouncilHelper.ResetVoiceOfTheCouncil(this);
-                return true;
-            }
-            if ("warrant".equalsIgnoreCase(id)) {
-                for (Player p2 : getRealPlayers()) {
-                    if (IsPlayerElectedService.isPlayerElected(this, p2, id)) {
-                        p2.setSearchWarrant(false);
-                    }
-                }
-            }
-            if ("censure".equalsIgnoreCase(id)) {
-                if (customPublicVP.get("Political Censure") != null) {
-                    Map<String, Integer> customPOs = new HashMap<>(revealedPublicObjectives);
-                    for (Entry<String, Integer> entry : customPOs.entrySet()) {
-                        if (entry.getKey().toLowerCase().contains("political censure")) {
-                            removeCustomPO(entry.getValue());
-                        }
-                    }
-                }
-            }
-            laws.remove(id);
-            lawsInfo.remove(id);
-            addDiscardAgenda(id);
+        if (id.isEmpty()) {
+            return false;
+        }
 
+        boolean isVoiceOfTheCouncil = Constants.VOICE_OF_THE_COUNCIL_ID.equalsIgnoreCase(id);
+        if (!laws.containsKey(id) && !isVoiceOfTheCouncil) {
+            return false;
+        }
+
+        if (isVoiceOfTheCouncil) {
+            VoiceOfTheCouncilHelper.ResetVoiceOfTheCouncil(this);
             return true;
         }
-        return false;
+
+        if ("warrant".equalsIgnoreCase(id)) {
+            removeSearchWarrant(id);
+        } else if ("censure".equalsIgnoreCase(id)) {
+            removePoliticalCensure();
+        }
+
+        laws.remove(id);
+        lawsInfo.remove(id);
+        addDiscardAgenda(id);
+        return true;
+    }
+
+    private void removeSearchWarrant(String id) {
+        for (Player p : getRealPlayers()) {
+            if (IsPlayerElectedService.isPlayerElected(this, p, id)) {
+                p.setSearchWarrant(false);
+            }
+        }
+    }
+
+    private void removePoliticalCensure() {
+        if (customPublicVP.get("Political Censure") == null) {
+            return;
+        }
+        Map<String, Integer> customPOs = new HashMap<>(revealedPublicObjectives);
+        for (Entry<String, Integer> entry : customPOs.entrySet()) {
+            if (entry.getKey().toLowerCase().contains("political censure")) {
+                removeCustomPO(entry.getValue());
+            }
+        }
     }
 
     public boolean putEventTop(Integer idNumber, Player player) {
