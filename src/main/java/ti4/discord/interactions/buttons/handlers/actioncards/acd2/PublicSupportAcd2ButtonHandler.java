@@ -12,7 +12,8 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
-import ti4.helpers.AgendaHelper;
+import ti4.helpers.AgendaRiderHelper;
+import ti4.helpers.AgendaSummaryHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
 
@@ -37,7 +38,8 @@ class PublicSupportAcd2ButtonHandler {
         }
         List<Button> buttons;
         try {
-            buttons = AgendaHelper.getAgendaButtons(null, game, player.factionButtonChecker() + "publicSupportChoose");
+            buttons = AgendaRiderHelper.getAgendaButtons(
+                    null, game, player.factionButtonChecker() + "publicSupportChoose");
         } catch (Exception e) {
             buttons = new ArrayList<>();
         }
@@ -106,7 +108,7 @@ class PublicSupportAcd2ButtonHandler {
                 player.getRepresentationNoPing() + " cast 3 additional votes for **" + outcome
                         + "** and drew 1 action card from _Public Support_.");
         MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(), AgendaHelper.getSummaryOfVotes(game, true) + "\n \n");
+                game.getMainGameChannel(), AgendaSummaryHelper.getSummaryOfVotes(game, true) + "\n \n");
     }
 
     private static boolean isPlanetElectAgenda(Game game) {

@@ -15,7 +15,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
-import ti4.helpers.AgendaHelper;
+import ti4.helpers.AgendaSummaryHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -108,7 +108,7 @@ public class VoteButtonHandler {
             ButtonHelper.deleteMessage(event);
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getChannel(),
-                    AgendaHelper.getSummaryOfVotes(game, true) + "\n\n" + voteMessage,
+                    AgendaSummaryHelper.getSummaryOfVotes(game, true) + "\n\n" + voteMessage,
                     outcomeActionRow);
         }
     }

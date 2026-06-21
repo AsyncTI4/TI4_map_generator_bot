@@ -15,7 +15,7 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.helpers.AgendaHelper;
+import ti4.helpers.AgendaRiderHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Helper;
@@ -35,7 +35,7 @@ public class SettlementsAcd2ButtonHandler {
     public static void resolveSettlements(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons;
         try {
-            buttons = AgendaHelper.getAgendaButtons(CARD_NAME, game, player.factionButtonChecker());
+            buttons = AgendaRiderHelper.getAgendaButtons(CARD_NAME, game, player.factionButtonChecker());
         } catch (Exception e) {
             buttons = new ArrayList<>();
         }
