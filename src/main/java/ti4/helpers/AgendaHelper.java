@@ -914,16 +914,6 @@ public final class AgendaHelper {
         return true;
     }
 
-    public static void offerEveryonePreAbstain(Game game) {
-        for (Player player : game.getRealPlayers()) {
-            int[] voteInfo = getVoteTotal(player, game);
-            if (voteInfo[0] < 1) {
-                continue;
-            }
-            offerPreVote(player);
-        }
-    }
-
     private static void offerPreVote(Player player) {
 
         Game game = player.getGame();
@@ -1425,11 +1415,11 @@ public final class AgendaHelper {
                 } else {
                     Abstain = Buttons.red(factionChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain");
                 }
-                Button ForcedAbstain = Buttons.gray(
+                Button forcedAbstain = Buttons.gray(
                         "forceAbstainForPlayer_" + nextInLine.getFaction(), "(For Others) Abstain for this player");
                 game.updateActivePlayer(nextInLine);
                 game.setStoredValue("preVoting" + nextInLine.getFaction(), "");
-                List<Button> buttons = List.of(Vote, Abstain, ForcedAbstain);
+                List<Button> buttons = List.of(Vote, Abstain, forcedAbstain);
                 if (game.isFowMode()) {
                     if (nextInLine.getPrivateChannel() != null) {
                         MessageHelper.sendMessageToChannel(
@@ -4207,7 +4197,6 @@ public final class AgendaHelper {
         eraseAgendaQueues(event, game);
         if (!action) {
             offerEveryonePrepassOnShenanigans(game);
-            // offerEveryonePreAbstain(game);
             offerEveryoneWhensQueue(game);
             checkForAssigningGeneticRecombination(game);
             CryypterHelper.checkForAssigningMentakEnvoy(game);
@@ -4478,12 +4467,10 @@ public final class AgendaHelper {
     }
 
     public static void sendTopAgendaToCardsInfoSkipCovert(Game game, Player player) {
-
         sendTopAgendaToCardsInfoSkipCovert(game, player, 1);
     }
 
     public static void sendTopAgendaToCardsInfoSkipCovert(Game game, Player player, int count) {
-
         int covert = 0;
         for (int x = 0; x < count; x++) {
             StringBuilder sb = new StringBuilder();
@@ -4630,7 +4617,6 @@ public final class AgendaHelper {
         String agendaid = game.getCurrentAgendaInfo().split("_")[2];
         if ("CL".equalsIgnoreCase(agendaid)) {
             String id2 = game.revealAgenda(false);
-            Map<String, Integer> discardAgendas = game.getDiscardAgendas();
             AgendaModel agendaDetails = Mapper.getAgenda(id2);
             String agendaName = agendaDetails.getName();
             MessageHelper.sendMessageToChannel(
@@ -4654,17 +4640,6 @@ public final class AgendaHelper {
             revealAgenda(event, false, game, event.getChannel());
         }
         ButtonHelper.deleteMessage(event);
-    }
-
-    public static void offerDocketBidding(Game game) {
-        for (Player player : game.getRealPlayers()) {
-            if (game.getStoredValue("docketSpace1").equalsIgnoreCase(player.getFaction())
-                    || player.hasAbility("galatic_threat")
-                    || player.getFaction().equalsIgnoreCase(game.getStoredValue("docketspace2"))) {
-                continue;
-            }
-            offerDocketBidding(game, player);
-        }
     }
 
     private static void offerDocketBidding(Game game, Player player) {
