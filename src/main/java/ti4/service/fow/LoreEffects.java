@@ -32,8 +32,8 @@ import ti4.service.map.CustomHyperlaneService;
  *   corrupt tile state at trigger time. validateEffects only checks that an arg is present.
  * - !vp with PERSISTANCE.ALWAYS: scorePublicObjective prevents a player from scoring the same PO twice, so
  *   repeat triggers for the same player are silently ignored. Use ONCE if only one VP grant is intended.
- * - LORECACHE (in LoreService) is a plain HashMap — not thread-safe under concurrent event handlers and never
- *   evicted on game end. Low risk for typical bot load but worth revisiting if memory or concurrency issues arise.
+ * - LORECACHE (in LoreService) is a plain HashMap — not thread-safe under concurrent event handlers. Evicted via
+ *   LoreService.evictGameLore when GameManager removes a game, so it no longer grows unbounded.
  * - getEffectLines regex split (?<=\s)(?=!) only splits on '!' preceded by whitespace; "!tg +2!fleet +1"
  *   (no space) is parsed as one malformed effect and silently fails.
  */

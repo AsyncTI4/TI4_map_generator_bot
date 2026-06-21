@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -73,7 +74,7 @@ public final class LoreService {
     private static final int FOOTER_TEXT_MAX_LENGTH = 200;
     // TODO: editing existing lore does not re-validate RECEIVER against current game mode; an entry saved in FoW
     //       mode with ADJACENT/GM receiver remains editable without correction in non-FoW mode.
-    // TODO: LORECACHE is a plain HashMap — not thread-safe and never evicted when a game ends.
+    // TODO: LORECACHE is a plain HashMap — not thread-safe under concurrent event handlers.
 
     public enum RECEIVER {
         CURRENT("Current Player"),
@@ -470,6 +471,10 @@ public final class LoreService {
         return LORECACHE.get(game.getName());
     }
 
+    public static void evictGameLore(String gameName) {
+        LORECACHE.remove(gameName);
+    }
+
     // position;loreText;footerText;receiver;trigger;ping;persistance|...
     private static Map<String, LoreEntry> readLore(String loreString) {
         Map<String, LoreEntry> loreMap = new HashMap<>();
@@ -800,7 +805,20 @@ public final class LoreService {
         return eb.build();
     }
 
+    // Games created before this gate shipped keep working as-is (grandfathered by creation date),
+    // since /special2 lore was already usable unrestricted in non-FoW games before lore_mode existed.
+    // Any game created after this cutoff is a fresh game and must opt in via /game weird-game-setup.
+    private static final long LORE_MODE_GATE_CUTOFF_MILLIS =
+            Instant.parse("2026-06-20T00:00:00Z").toEpochMilli();
+
+    // FoW games always have lore available. Non-FoW games created after the cutoff need lore_mode
+    // explicitly enabled via /game weird-game-setup.
+    public static boolean isLoreEnabled(Game game) {
+        return game.isFowMode() || game.isLoreMode() || game.getCreationDateTime() < LORE_MODE_GATE_CUTOFF_MILLIS;
+    }
+
     private static boolean hasLoreToShow(Game game, String target, TRIGGER trigger) {
+        if (!isLoreEnabled(game)) return false;
         return getGameLore(game).containsKey(target) && getGameLore(game).get(target).trigger == trigger;
     }
 

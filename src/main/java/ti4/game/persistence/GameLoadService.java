@@ -631,6 +631,7 @@ class GameLoadService {
                     game.setCivilizedSocietyMode(parseBooleanOrDefault(info, false));
                 case Constants.NO_SWAP_MODE -> game.setNoSwapMode(parseBooleanOrDefault(info, false));
                 case Constants.VEILED_HEART_MODE -> game.setVeiledHeartMode(parseBooleanOrDefault(info, false));
+                case Constants.LORE_MODE -> game.setLoreMode(parseBooleanOrDefault(info, false));
                 case Constants.LIMITED_WHISPERS_MODE -> game.setLimitedWhispersMode(parseBooleanOrDefault(info, false));
                 case Constants.WHISPERS_DISABLED -> game.setWhispersDisabled(parseBooleanOrDefault(info, false));
                 case Constants.ORDINIAN_C1_MODE -> game.setOrdinianC1Mode(parseBooleanOrDefault(info, false));

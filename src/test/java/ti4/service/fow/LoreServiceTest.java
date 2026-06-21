@@ -1412,4 +1412,59 @@ class LoreServiceTest extends BaseTi4Test {
             assertEquals(2, otherPlayer.getTg());
         }
     }
+
+    // -----------------------------------------------------------------------
+    // Lore enablement gating (FoW always on; non-FoW opt-in for games created after
+    // the gate shipped; games created before that cutoff are grandfathered in by date,
+    // since /special2 lore already worked unrestricted in non-FoW games before lore_mode existed)
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class LoreEnablementGating {
+
+        private static final long BEFORE_CUTOFF =
+                java.time.Instant.parse("2025-01-01T00:00:00Z").toEpochMilli();
+        private static final long AFTER_CUTOFF =
+                java.time.Instant.parse("2026-07-01T00:00:00Z").toEpochMilli();
+
+        @Test
+        void fowGameAlwaysEnabledRegardlessOfLoreModeOrCreationDate() {
+            game.setFowMode(true);
+            game.setCreationDateTime(AFTER_CUTOFF);
+            assertTrue(LoreService.isLoreEnabled(game));
+        }
+
+        @Test
+        void nonFowGameCreatedAfterCutoffWithoutLoreModeIsDisabled() {
+            game.setCreationDateTime(AFTER_CUTOFF);
+            assertFalse(game.isLoreMode());
+            assertFalse(LoreService.isLoreEnabled(game));
+        }
+
+        @Test
+        void nonFowGameCreatedAfterCutoffWithLoreModeEnabledIsEnabled() {
+            game.setCreationDateTime(AFTER_CUTOFF);
+            game.setLoreMode(true);
+            assertTrue(LoreService.isLoreEnabled(game));
+        }
+
+        @Test
+        void addingLoreAfterCutoffDoesNotSilentlyBypassTheGate() {
+            // Regression: adding lore content must NOT itself flip the gate open —
+            // only the explicit lore_mode toggle (or a pre-cutoff creation date) should.
+            game.setCreationDateTime(AFTER_CUTOFF);
+            game.setStoredValue("fowSystemLore", "001;Some lore;;ALL;ACTIVATED;NO;ONCE");
+            assertFalse(game.isLoreMode());
+            assertFalse(LoreService.isLoreEnabled(game));
+        }
+
+        @Test
+        void nonFowGameCreatedBeforeCutoffStaysEnabledWithoutLoreMode() {
+            // Grandfathered: this game could have already been using lore via /special2 lore
+            // before lore_mode existed, so it must keep working without any explicit opt-in.
+            game.setCreationDateTime(BEFORE_CUTOFF);
+            assertFalse(game.isLoreMode());
+            assertTrue(LoreService.isLoreEnabled(game));
+        }
+    }
 }
