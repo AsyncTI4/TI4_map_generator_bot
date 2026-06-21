@@ -30,6 +30,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.cron.AutoPingCron;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.acd2.PublicOutrageAcd2ButtonHandler;
 import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
@@ -2133,6 +2134,9 @@ public final class AgendaHelper {
                                     identity + ", please resolve **Galactic Threat** ability using the buttons.",
                                     nekroBs);
                         }
+
+                        PublicOutrageAcd2ButtonHandler.resolveWinningPublicOutrage(game, winningR, winner, specificVote);
+
                         if (specificVote.contains("Technology Rider") && !winningR.hasAbility("propagation")) {
 
                             MessageHelper.sendMessageToChannelWithButtons(
