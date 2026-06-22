@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -2301,23 +2300,6 @@ public final class AgendaHelper {
         }
 
         return additionalVotesAndSources;
-    }
-
-    public static EmbedBuilder buildAgendaEmbed(AgendaModel agenda) {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(agenda.getSource().emoji() + " " + agenda.getName());
-
-        StringBuilder desc = new StringBuilder("**")
-                .append(agenda.getType())
-                .append(":** *")
-                .append(agenda.getTarget())
-                .append("*\n");
-        desc.append("> ").append(agenda.getText1().replace("For:", "**For:**")).append('\n');
-        desc.append("> ").append(agenda.getText2().replace("Against:", "**Against:**"));
-        eb.setDescription(desc.toString());
-        eb.setFooter(agenda.footnote());
-
-        return eb;
     }
 
     @ButtonHandler("distinguishedReverse_")

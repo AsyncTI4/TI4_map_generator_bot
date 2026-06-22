@@ -22,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAgentButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -1976,7 +1975,7 @@ public class ActionCardHelper {
                             riderButtons);
                     for (Player p2 : game.getRealPlayers()) {
                         if (!game.getStoredValue("preVoting" + p2.getFaction()).isEmpty()) {
-                            VoteButtonHandler.erasePreVoteDueToAfterPlay(p2, game);
+                            AgendaWhensAftersHelper.erasePreVoteDueToAfterPlay(p2, game);
                         }
                     }
                 }
@@ -2009,7 +2008,7 @@ public class ActionCardHelper {
                             channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
                     for (Player p2 : game.getRealPlayers()) {
                         if (!game.getStoredValue("preVoting" + p2.getFaction()).isEmpty()) {
-                            VoteButtonHandler.erasePreVoteDueToAfterPlay(p2, game);
+                            AgendaWhensAftersHelper.erasePreVoteDueToAfterPlay(p2, game);
                         }
                     }
                 }
