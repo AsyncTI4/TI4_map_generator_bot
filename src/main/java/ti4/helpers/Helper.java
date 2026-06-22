@@ -49,6 +49,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
@@ -1838,6 +1839,11 @@ public final class Helper {
                 }
                 productionValueTotal += productionValue * uH.getUnits().get(unit);
             }
+        }
+        if (uH instanceof Planet planet
+                && TaPromissoryHandler.planetHasAdvancedStructuralEngineering(planet)
+                && player.getPlanets().contains(planet.getName())) {
+            productionValueTotal += Math.max(0, planet.getResources());
         }
         String planet = uH.getName();
         int planetUnitVal = 0;
