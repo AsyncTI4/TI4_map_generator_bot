@@ -19,6 +19,6 @@ public class MyGamesController {
     @PreAuthorize("isAuthenticated()")
     public List<MyGameSummary> get() {
         String userId = RequestContext.getUserId();
-        return myGamesService.getMyGames(userId);
+        return MyGamesService.getMyGames(userId);
     }
 }

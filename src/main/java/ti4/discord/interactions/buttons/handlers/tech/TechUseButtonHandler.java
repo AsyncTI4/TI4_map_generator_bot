@@ -21,6 +21,7 @@ import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.FactionModel;
 import ti4.model.TechnologyModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.TechEmojis;
@@ -53,8 +54,14 @@ class TechUseButtonHandler {
                         + StringHelper.pluralize(player.getSarweenCounter(), "resource") + " in this game so far. ";
                 int result = ThreadLocalRandom.current().nextInt(0, 5);
                 var userSettings = UserSettingsManager.get(player.getUserID());
-
-                if (userSettings.isPrefersSarweenMsg()) {
+                boolean startsWithSarween = false;
+                FactionModel fmod = Mapper.getFaction(player.getFaction());
+                if (fmod != null
+                        && fmod.getStartingTech() != null
+                        && fmod.getStartingTech().contains("st")) {
+                    startsWithSarween = true;
+                }
+                if (userSettings.isPrefersSarweenMsg() && !startsWithSarween) {
                     if (player.getSarweenCounter() < 6) {
 
                         List<String> lameMessages = Arrays.asList(

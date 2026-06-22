@@ -282,6 +282,22 @@ public final class FoWHelper {
         if (player != null && player.hasAbility("dream_nexus")) {
             adjacentPositions.addAll(DreamButtonHandler.getDreamNexusAdjacencies(game, player, position));
         }
+        if (player != null
+                && (game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")
+                        || player.hasTech("tf-starbasewebway"))
+                && player == game.getActivePlayer()
+                && forDistance
+                && !game.getCurrentActiveSystem().isEmpty()
+                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                        .contains(game.getTileByPosition(position))) {
+
+            for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
+                if (tile.getPosition().equalsIgnoreCase(position)) {
+                    continue;
+                }
+                adjacentPositions.add(tile.getPosition());
+            }
+        }
 
         // If player has ghoti commander, is active player and has activated a system
         if (player != null

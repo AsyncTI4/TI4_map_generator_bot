@@ -82,6 +82,15 @@ public class EndTurnService {
         game.removeStoredValue("mahactHeroTarget");
         game.removeStoredValue("possiblyUsedRift");
         game.removeStoredValue("heartWarnedThisTurn");
+        String fieldTestTech = game.getStoredValue("fieldTestTech" + player.getFaction());
+        if (!fieldTestTech.isEmpty()) {
+            player.removeTech(fieldTestTech);
+            game.removeStoredValue("fieldTestTech" + player.getFaction());
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing()
+                            + " lost temporary access to their _Field Test_ technology at the end of their turn.");
+        }
         game.setActiveSystem("");
     }
 

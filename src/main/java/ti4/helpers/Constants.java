@@ -1579,6 +1579,7 @@ public final class Constants {
     public static final String COEXIST = "coexist";
 
     public static final String TWILIGHT_KART = "twilight_kart";
+    public static final String TWILIGHT_DS = "twilight_ds";
     public static final String ABILITY_DECK_ID = "ability_deck_id";
     public static final String GENOME_DECK_ID = "genome_deck_id";
     public static final String PARADIGM_DECK_ID = "paradigm_deck_id";

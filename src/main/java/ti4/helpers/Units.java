@@ -15,6 +15,7 @@ import lombok.experimental.UtilityClass;
 import ti4.discord.JdaService;
 import ti4.image.Mapper;
 import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 
@@ -121,7 +122,8 @@ public class Units {
         Celagrom("celagrom"),
         Cavalry("cavalry"), // relics
         StarfallPds("starfallpds"),
-        MetaliVoidArmaments("metalivoidarmaments");
+        MetaliVoidArmaments("metalivoidarmaments"),
+        ZelianPlanet("zelianplanet");
 
         public final String value;
 
@@ -149,6 +151,7 @@ public class Units {
                 case Celagrom -> "The Celagrom";
                 case Monument -> "Monument";
                 case MetaliVoidArmaments -> "Metali Void Armaments";
+                case ZelianPlanet -> "Zelian Planet";
             };
         }
 
@@ -172,6 +175,7 @@ public class Units {
                 case Celagrom -> "celagrom";
                 case Monument -> "monument";
                 case MetaliVoidArmaments -> "metalivoidarmaments";
+                case ZelianPlanet -> "zelianplanet";
             };
         }
 
@@ -192,6 +196,7 @@ public class Units {
                 case Warsun -> UnitEmojis.warsun;
                 case Monument -> UnitEmojis.Monument;
                 case MetaliVoidArmaments -> ExploreEmojis.Relic;
+                case ZelianPlanet -> MiscEmojis.resources;
             };
         }
 
@@ -331,6 +336,7 @@ public class Units {
             case "cavalry" -> UnitType.Cavalry;
             case "starfallpds" -> UnitType.StarfallPds;
             case "metaliafb" -> UnitType.MetaliVoidArmaments;
+            case "zelianplanet" -> UnitType.ZelianPlanet;
             default -> null;
         };
     }

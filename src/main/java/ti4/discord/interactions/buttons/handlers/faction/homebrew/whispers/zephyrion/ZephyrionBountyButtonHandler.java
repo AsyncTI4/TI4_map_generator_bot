@@ -62,10 +62,11 @@ public class ZephyrionBountyButtonHandler {
         List<String> bounties = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
             for (UnitType unitType : UnitType.values()) {
-                String storedValue = game.getStoredValue("bounties" + player.getFaction()
-                        + unitType.humanReadableName().toLowerCase());
+                String humanReadableName = unitType.humanReadableName();
+                String storedValue =
+                        game.getStoredValue("bounties" + player.getFaction() + humanReadableName.toLowerCase());
                 if (!storedValue.isEmpty()) {
-                    bounties.add(StringUtils.capitalize(player.getFaction()) + " " + unitType.humanReadableName());
+                    bounties.add(StringUtils.capitalize(player.getFaction()) + " " + humanReadableName);
                 }
             }
         }
@@ -92,11 +93,13 @@ public class ZephyrionBountyButtonHandler {
                 UnitType.Flagship,
                 UnitType.Warsun);
         List<Button> buttons = new ArrayList<>();
+
         for (UnitType unitType : allowedUnits) {
+            String humanReadableName = unitType.humanReadableName();
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + "bountyPickShip_" + p2.getFaction() + "_"
-                            + unitType.humanReadableName().toLowerCase(),
-                    unitType.humanReadableName(),
+                            + humanReadableName.toLowerCase(),
+                    humanReadableName,
                     unitType.getUnitTypeEmoji()));
         }
         buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Delete These Buttons"));
@@ -145,9 +148,10 @@ public class ZephyrionBountyButtonHandler {
     }
 
     public static void claimBounty(Game game, Player bountyHolder, Player victim, UnitType unitType, boolean combat) {
-        String unitTypeString = unitType.humanReadableName().toLowerCase();
-        String faction = victim.getFaction();
         String ship = unitType.humanReadableName();
+        String unitTypeString = ship.toLowerCase();
+        String faction = victim.getFaction();
+
         game.removeStoredValue("bounties" + faction + unitTypeString);
         bountyHolder.gainTG(3, true);
         ButtonHelperAgents.resolveArtunoCheck(bountyHolder, 3);

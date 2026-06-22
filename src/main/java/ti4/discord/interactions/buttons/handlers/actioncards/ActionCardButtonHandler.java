@@ -7,7 +7,7 @@ import ti4.game.Game;
 import ti4.game.GameStats;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
-import ti4.helpers.AgendaHelper;
+import ti4.helpers.AgendaRiderHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
@@ -126,7 +126,7 @@ class ActionCardButtonHandler {
         }
 
         if (acName.contains("Rider") || acName.contains("Sanction")) {
-            AgendaHelper.reverseRider("reverse_" + acName, game, player);
+            AgendaRiderHelper.reverseRider("reverse_" + acName, game, player);
         }
         if (sendReact) {
             if (game.isFowMode()) {
