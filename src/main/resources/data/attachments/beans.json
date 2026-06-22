@@ -52,5 +52,12 @@
         "imagePath": "attachment_worldshapernegative.png",
         "isFakeAttachment": true,
         "source": "beans"
+    },
+    {
+        "id": "advancedstructuralengineering",
+        "name": "Advanced Structural Engineering",
+        "imagePath": "attachment_ase.png",
+        "isFakeAttachment": true,
+        "source": "beans"
     }
 ]
