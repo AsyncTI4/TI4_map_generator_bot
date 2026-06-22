@@ -54,7 +54,6 @@ import org.apache.commons.lang3.function.Consumers;
 import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
@@ -3678,7 +3677,7 @@ public class ButtonHelper {
     }
 
     public static List<Button> getButtonsForAgentSelection(Game game, String agent) {
-        return VoteButtonHandler.getPlayerOutcomeButtons(game, null, "exhaustAgent_" + agent, null);
+        return AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "exhaustAgent_" + agent, null);
     }
 
     @ButtonHandler("deleteMessage_") // deleteMessage_{Optional String to send to the event channel after}

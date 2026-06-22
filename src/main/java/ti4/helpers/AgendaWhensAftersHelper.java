@@ -12,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.cron.AutoPingCron;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -628,7 +627,7 @@ public final class AgendaWhensAftersHelper {
                         for (Player p2 : game.getRealPlayers()) {
                             if (!game.getStoredValue("preVoting" + p2.getFaction())
                                     .isEmpty()) {
-                                VoteButtonHandler.erasePreVoteDueToAfterPlay(p2, game);
+                                erasePreVoteDueToAfterPlay(p2, game);
                             }
                             if (!game.getStoredValue("queuedAftersLockedFor" + p2.getFaction())
                                     .isEmpty()) {
@@ -1194,5 +1193,19 @@ public final class AgendaWhensAftersHelper {
                 afterButtons,
                 GameMessageType.AGENDA_AFTER);
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static void erasePreVoteDueToAfterPlay(Player player, Game game) {
+        game.setStoredValue("preVoting" + player.getFaction(), "");
+        player.resetSpentThings();
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("preVote", "Pre-Vote"));
+        buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
+        buttons.add(Buttons.red("deleteButtons", "Don't do anything"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentation()
+                        + " due to the playing of an \"after\", your pre-vote was erased. You can use these buttons to pre-vote again.",
+                buttons);
     }
 }

@@ -17,7 +17,7 @@ import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 
 @UtilityClass
-public class AgendaDocketButtonHandler {
+class AgendaDocketButtonHandler {
 
     private static void offerDocketBidding(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
