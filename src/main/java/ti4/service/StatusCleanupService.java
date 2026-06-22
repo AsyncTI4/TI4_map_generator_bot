@@ -14,7 +14,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.AgendaHelper;
+import ti4.helpers.AgendaWhensAftersHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
@@ -127,8 +127,8 @@ public class StatusCleanupService {
                         game.getMainGameChannel(), "_" + pnModel.getName() + "_ has been returned.");
             }
             if (game.isCustodiansScored() && !game.isTwilightsFallMode()) {
-                List<String> whens = AgendaHelper.getPossibleWhenNames(player);
-                List<String> afters = AgendaHelper.getPossibleAfterNames(player);
+                List<String> whens = AgendaWhensAftersHelper.getPossibleWhenNames(player);
+                List<String> afters = AgendaWhensAftersHelper.getPossibleAfterNames(player);
                 if ((player.isAutoPassOnWhensAfters() && whens.isEmpty() && afters.isEmpty()) || player.isNpc()) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.red("undoPassOnAllWhensNAfters", "Undo Pass"));
@@ -140,7 +140,7 @@ public class StatusCleanupService {
                             buttons);
                     game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "Yes");
                 } else {
-                    AgendaHelper.offerPlayerPassOnWhensNAfters(player);
+                    AgendaWhensAftersHelper.offerPlayerPassOnWhensNAfters(player);
                 }
             }
         }

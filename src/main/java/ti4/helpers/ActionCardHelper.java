@@ -22,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAgentButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -1467,6 +1466,66 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("pivot".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolvePivot", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("mass_transference".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveMassTransference", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("joint_research".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveJointResearch", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("false_flag".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFalseFlag", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("ixthian_gift".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveIxthianGift", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("liquidation".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveLiquidation", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("public_outrage".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolvePublicOutrage", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("public_support".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolvePublicSupport", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("reengineer".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveReengineer", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("field_test".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFieldTest", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("retrofit".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveRetrofit", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("stasis_haul".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveStasisHaul", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("freedom_fighters".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFreedomFighters", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
@@ -1905,7 +1964,8 @@ public class ActionCardHelper {
 
                 String factionChecker = player.factionButtonChecker();
                 if (actionCard.getText().toLowerCase().contains("predict aloud")) {
-                    List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, game, factionChecker);
+                    List<Button> riderButtons =
+                            AgendaRiderHelper.getAgendaButtons(actionCardTitle, game, factionChecker);
                     MessageHelper.sendMessageToChannelWithFactionReact(
                             mainGameChannel,
                             (game.isFowMode() ? "P" : player.getRepresentation(false, true) + ", p")
@@ -1915,7 +1975,7 @@ public class ActionCardHelper {
                             riderButtons);
                     for (Player p2 : game.getRealPlayers()) {
                         if (!game.getStoredValue("preVoting" + p2.getFaction()).isEmpty()) {
-                            VoteButtonHandler.erasePreVoteDueToAfterPlay(p2, game);
+                            AgendaWhensAftersHelper.erasePreVoteDueToAfterPlay(p2, game);
                         }
                     }
                 }
@@ -1948,7 +2008,7 @@ public class ActionCardHelper {
                             channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
                     for (Player p2 : game.getRealPlayers()) {
                         if (!game.getStoredValue("preVoting" + p2.getFaction()).isEmpty()) {
-                            VoteButtonHandler.erasePreVoteDueToAfterPlay(p2, game);
+                            AgendaWhensAftersHelper.erasePreVoteDueToAfterPlay(p2, game);
                         }
                     }
                 }

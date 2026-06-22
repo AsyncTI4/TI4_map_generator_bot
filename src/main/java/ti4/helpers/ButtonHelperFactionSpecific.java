@@ -33,7 +33,6 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
@@ -100,7 +99,7 @@ public final class ButtonHelperFactionSpecific {
 
     @ButtonHandler("startIntrigueCard")
     public static void startIntrigueCard(Game game, Player player, ButtonInteractionEvent event) {
-        List<Button> buttons = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "intrigueCardOn", null);
+        List<Button> buttons = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "intrigueCardOn", null);
         if (player.getStrategicCC() < 1 && !player.hasRelicReady("emelpar")) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
@@ -1052,7 +1051,7 @@ public final class ButtonHelperFactionSpecific {
 
     @ButtonHandler("yssarilAgentAsJr")
     public static void yssarilAgentAsJr(Game game, Player player, ButtonInteractionEvent event) {
-        List<Button> buttons2 = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "jrResolution", null);
+        List<Button> buttons2 = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
         player.getLeader("yssarilagent").get().setExhausted(true);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),

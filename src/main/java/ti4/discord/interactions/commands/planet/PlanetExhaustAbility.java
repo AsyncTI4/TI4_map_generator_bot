@@ -10,7 +10,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
-import ti4.helpers.AgendaHelper;
+import ti4.helpers.AgendaRiderHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -163,7 +163,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             case "tarrock" -> {
                 String riderName = "Tarrock Ability";
                 List<Button> riderButtons =
-                        AgendaHelper.getAgendaButtons(riderName, game, player.factionButtonChecker());
+                        AgendaRiderHelper.getAgendaButtons(riderName, game, player.factionButtonChecker());
                 // List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
                 MessageHelper.sendMessageToChannelWithFactionReact(
                         player.getCorrectChannel(),
