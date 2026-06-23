@@ -140,7 +140,7 @@ class MatchmakingButtonHandler {
                 REQUIRE_SELECTION);
         CheckboxGroup restrictions = buildCheckboxGroup(
                 RESTRICTIONS_ID,
-                restrictionOptionsForMember(event),
+                filterRestrictionOptionsForMember(event),
                 userSettings.getMatchmakingRestrictions(),
                 DEFAULT_RESTRICTION_OPTIONS,
                 !REQUIRE_SELECTION);
@@ -344,7 +344,7 @@ class MatchmakingButtonHandler {
         return false;
     }
 
-    private static List<String> restrictionOptionsForMember(ButtonInteractionEvent event) {
+    private static List<String> filterRestrictionOptionsForMember(ButtonInteractionEvent event) {
         Member member = event.getMember();
         Guild guild = event.getGuild();
         if (member == null || guild == null) {
