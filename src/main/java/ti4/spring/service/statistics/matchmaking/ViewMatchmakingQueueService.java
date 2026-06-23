@@ -2,6 +2,8 @@ package ti4.spring.service.statistics.matchmaking;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -17,40 +19,41 @@ public class ViewMatchmakingQueueService {
 
     private static final int MAX_EMBED_DESCRIPTION_LENGTH = 4000;
 
-    private final MatchmakingQueueEntryRepository matchmakingQueueEntryRepository;
+    private final MatchmakingQueuePartyRepository partyRepository;
+    private final MatchmakingQueueMemberRepository memberRepository;
 
     public List<MessageEmbed> describeQueueFor(String requestingUserId) {
         if (DatabasePersistenceGate.isDisabled()) {
             return List.of(messageEmbed("Queueing is currently disabled."));
         }
 
-        List<MatchmakingQueueEntryEntity> entries = matchmakingQueueEntryRepository.findAllByOrderByQueuedAtAsc();
-        UserSettings requesterSettings = UserSettingsManager.get(requestingUserId);
-        List<String> requesterAvoidList = requesterSettings.getMatchmakingAvoidList();
-
-        List<String> playerLines = new ArrayList<>();
-        for (MatchmakingQueueEntryEntity entry : entries) {
-            String userId = entry.getUserId();
-
-            UserSettings settings = UserSettingsManager.get(userId);
-            if (requesterAvoidList.contains(userId)
-                    || settings.getMatchmakingAvoidList().contains(requestingUserId)) {
-                continue;
-            }
-            playerLines.add(describeQueuedPlayer(userId, settings));
+        List<MatchmakingQueueParty> parties = partyRepository.findAllByQueuedTrueOrderByQueuedAtAsc();
+        if (parties.isEmpty()) {
+            return List.of(messageEmbed("There are no players in the queue right now."));
         }
 
-        if (playerLines.isEmpty()) {
-            return List.of(messageEmbed("There are no players in the queue that you can be matched with right now."));
+        List<Long> partyIds = parties.stream().map(MatchmakingQueueParty::getId).toList();
+        Map<Long, List<MatchmakingQueueMember>> membersByParty = memberRepository.findAllByPartyIdIn(partyIds).stream()
+                .collect(Collectors.groupingBy(MatchmakingQueueMember::getPartyId));
+
+        List<String> partyLines = new ArrayList<>();
+        for (MatchmakingQueueParty party : parties) {
+            List<MatchmakingQueueMember> members = membersByParty.getOrDefault(party.getId(), List.of());
+            if (members.isEmpty()) continue;
+            partyLines.add(describeQueuedParty(members, UserSettingsManager.get(party.getLeaderId())));
         }
 
-        return paginateIntoEmbeds(playerLines);
+        if (partyLines.isEmpty()) {
+            return List.of(messageEmbed("There are no players in the queue right now."));
+        }
+
+        return paginateIntoEmbeds(partyLines);
     }
 
-    private static List<MessageEmbed> paginateIntoEmbeds(List<String> playerLines) {
+    private static List<MessageEmbed> paginateIntoEmbeds(List<String> partyLines) {
         List<String> pages = new ArrayList<>();
         StringBuilder page = new StringBuilder();
-        for (String line : playerLines) {
+        for (String line : partyLines) {
             if (!page.isEmpty() && page.length() + line.length() > MAX_EMBED_DESCRIPTION_LENGTH) {
                 pages.add(page.toString());
                 page.setLength(0);
@@ -81,14 +84,16 @@ public class ViewMatchmakingQueueService {
                 .build();
     }
 
-    private static String describeQueuedPlayer(String userId, UserSettings settings) {
-        StringBuilder line = new StringBuilder("\n• <@").append(userId).append("> — ");
-        line.append(joinOrAny(settings.getMatchmakingPlayerCounts())).append("p");
+    private static String describeQueuedParty(List<MatchmakingQueueMember> members, UserSettings settings) {
+        String mentions =
+                members.stream().map(member -> "<@" + member.getUserId() + ">").collect(Collectors.joining(", "));
+        StringBuilder line = new StringBuilder("\n• ").append(mentions).append(" — ");
+        line.append(join(settings.getMatchmakingPlayerCounts())).append("p");
         line.append(" · ")
-                .append(joinOrAny(settings.getMatchmakingVictoryPointGoals()))
+                .append(join(settings.getMatchmakingVictoryPointGoals()))
                 .append("vp");
-        line.append(" · ").append(joinOrAny(settings.getMatchmakingExpansions()));
-        line.append(" · ").append(joinOrAny(settings.getMatchmakingPaces()));
+        line.append(" · ").append(join(settings.getMatchmakingExpansions()));
+        line.append(" · ").append(join(settings.getMatchmakingPaces()));
         List<String> restrictions = settings.getMatchmakingRestrictions();
         if (!restrictions.isEmpty()) {
             line.append(" · ").append(String.join(", ", restrictions));
@@ -96,8 +101,8 @@ public class ViewMatchmakingQueueService {
         return line.toString();
     }
 
-    private static String joinOrAny(List<String> values) {
-        return values.isEmpty() ? "Any" : String.join("/", values);
+    private static String join(List<String> values) {
+        return String.join("/", values);
     }
 
     public static ViewMatchmakingQueueService get() {

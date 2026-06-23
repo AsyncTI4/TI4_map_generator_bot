@@ -7,17 +7,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.time.Instant;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** A player's membership in a {@link MatchmakingQueueParty}. A user can belong to at most one party at a time. */
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "matchmaking_queue", uniqueConstraints = @UniqueConstraint(columnNames = "user_id"))
-public class MatchmakingQueueEntryEntity {
+@Table(name = "matchmaking_queue_member", uniqueConstraints = @UniqueConstraint(columnNames = "user_id"))
+public class MatchmakingQueueMember {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,13 +26,6 @@ public class MatchmakingQueueEntryEntity {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(name = "queued_at", nullable = false)
-    private Instant queuedAt;
-
-    /**
-     * Shared identifier (the leader's user id) for all members of a party that queued together.
-     * {@code null} for solo entries.
-     */
-    @Column(name = "party_id")
-    private String partyId;
+    @Column(name = "party_id", nullable = false)
+    private long partyId;
 }

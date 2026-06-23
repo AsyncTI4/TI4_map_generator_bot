@@ -50,87 +50,148 @@ public class MatchmakerService {
     private static final int NEW_PLAYER_GAME_THRESHOLD = 3;
     private static final BigDecimal NEW_PLAYER_MATCHMAKING_RATING = BigDecimal.valueOf(20.0);
 
-    private final MatchmakingQueueEntryRepository matchmakingQueueEntryRepository;
-
-    @Transactional
-    public void queueUser(String userId) {
-        if (DatabasePersistenceGate.isDisabled()) return;
-        matchmakingQueueEntryRepository.deleteByUserId(userId);
-
-        MatchmakingQueueEntryEntity entry = new MatchmakingQueueEntryEntity();
-        entry.setUserId(userId);
-        entry.setQueuedAt(Instant.now());
-
-        matchmakingQueueEntryRepository.save(entry);
-    }
-
-    /**
-     * Queue a party (leader + members) together under the leader's preferences. Every member shares a {@code partyId}
-     * equal to the leader's user id and a single {@code queuedAt}.
-     *
-     * @return an error message if the party could not be queued (e.g. a member is already queued); empty on success.
-     */
-    @Transactional
-    public Optional<String> queueParty(String leaderId, List<String> memberIds) {
-        if (DatabasePersistenceGate.isDisabled()) return Optional.of("Queueing is currently disabled.");
-
-        List<String> allIds = distinctMembers(leaderId, memberIds);
-
-        List<String> alreadyQueued = allIds.stream()
-                .filter(id -> !id.equals(leaderId))
-                .filter(matchmakingQueueEntryRepository::existsByUserId)
-                .toList();
-        if (!alreadyQueued.isEmpty()) {
-            return Optional.of("These players are already in the queue and must leave it before joining your group: "
-                    + alreadyQueued.stream().map(id -> "<@" + id + ">").collect(Collectors.joining(", ")));
-        }
-
-        // Replace the leader's own existing entry (solo or stale), then queue everyone together.
-        matchmakingQueueEntryRepository.deleteByUserId(leaderId);
-
-        Instant now = Instant.now();
-        List<MatchmakingQueueEntryEntity> entries = new ArrayList<>();
-        for (String id : allIds) {
-            MatchmakingQueueEntryEntity entry = new MatchmakingQueueEntryEntity();
-            entry.setUserId(id);
-            entry.setQueuedAt(now);
-            entry.setPartyId(leaderId);
-            entries.add(entry);
-        }
-        matchmakingQueueEntryRepository.saveAll(entries);
-        return Optional.empty();
-    }
+    private final MatchmakingQueuePartyRepository partyRepository;
+    private final MatchmakingQueueMemberRepository memberRepository;
 
     public static boolean isQueueingDisabled() {
         return DatabasePersistenceGate.isDisabled();
     }
 
+    /** Whether the user is in a party that has been queued for a game. */
     public boolean isUserQueued(String userId) {
         if (DatabasePersistenceGate.isDisabled()) return false;
-        return matchmakingQueueEntryRepository.existsByUserId(userId);
+        return memberRepository
+                .findByUserId(userId)
+                .flatMap(member -> partyRepository.findById(member.getPartyId()))
+                .map(MatchmakingQueueParty::isQueued)
+                .orElse(false);
     }
 
+    /** Whether the user belongs to any party (formed or queued). */
+    public boolean isUserInParty(String userId) {
+        if (DatabasePersistenceGate.isDisabled()) return false;
+        return memberRepository.existsByUserId(userId);
+    }
+
+    /** The user ids of the user's party, or just the user themselves if they aren't in a party. */
+    public List<String> partyMemberIds(String userId) {
+        if (DatabasePersistenceGate.isDisabled()) return List.of(userId);
+        return memberRepository
+                .findByUserId(userId)
+                .map(member -> memberRepository.findAllByPartyId(member.getPartyId()).stream()
+                        .map(MatchmakingQueueMember::getUserId)
+                        .toList())
+                .filter(ids -> !ids.isEmpty())
+                .orElse(List.of(userId));
+    }
+
+    /**
+     * Create an unqueued group containing the creator and the selected members.
+     *
+     * @return an error message if the group can't be formed (a member is already in a party, or two members avoid each
+     *     other); empty on success.
+     */
+    @Transactional
+    public Optional<String> formGroup(String creatorId, List<String> memberIds) {
+        if (DatabasePersistenceGate.isDisabled()) return Optional.of("Queueing is currently disabled.");
+
+        List<String> allIds = distinctMembers(creatorId, memberIds);
+
+        List<String> alreadyGrouped =
+                allIds.stream().filter(memberRepository::existsByUserId).toList();
+        if (!alreadyGrouped.isEmpty()) {
+            return Optional.of("These players are already in a group or the queue and must leave first: "
+                    + alreadyGrouped.stream().map(id -> "<@" + id + ">").collect(Collectors.joining(", ")));
+        }
+
+        Optional<String> avoidConflict = firstAvoidConflict(allIds);
+        if (avoidConflict.isPresent()) return avoidConflict;
+
+        MatchmakingQueueParty party = new MatchmakingQueueParty();
+        party.setQueued(false);
+        long partyId = partyRepository.save(party).getId();
+
+        List<MatchmakingQueueMember> members = allIds.stream()
+                .map(id -> {
+                    MatchmakingQueueMember member = new MatchmakingQueueMember();
+                    member.setUserId(id);
+                    member.setPartyId(partyId);
+                    return member;
+                })
+                .toList();
+        memberRepository.saveAll(members);
+        return Optional.empty();
+    }
+
+    /**
+     * Queue the user. If they are in a formed group it becomes queued under the queuer's preferences; otherwise a solo
+     * party is created. The clicker's preferences must already be saved to their {@link UserSettings}.
+     *
+     * @return an error message if the party can't be queued; empty on success.
+     */
+    @Transactional
+    public Optional<String> queue(String queuerId) {
+        if (DatabasePersistenceGate.isDisabled()) return Optional.of("Queueing is currently disabled.");
+
+        Optional<MatchmakingQueueMember> memberOpt = memberRepository.findByUserId(queuerId);
+        if (memberOpt.isPresent()) {
+            MatchmakingQueueParty party =
+                    partyRepository.findById(memberOpt.get().getPartyId()).orElse(null);
+            if (party == null) {
+                memberRepository.delete(memberOpt.get()); // orphaned membership; fall through to a solo queue
+            } else if (party.isQueued()) {
+                return Optional.of("You are already queued for a game.");
+            } else {
+                List<String> otherIds = memberRepository.findAllByPartyId(party.getId()).stream()
+                        .map(MatchmakingQueueMember::getUserId)
+                        .filter(id -> !id.equals(queuerId))
+                        .toList();
+                Optional<String> error = validateParty(queuerId, otherIds);
+                if (error.isPresent()) return error;
+
+                party.setLeaderId(queuerId);
+                party.setQueued(true);
+                party.setQueuedAt(Instant.now());
+                partyRepository.save(party);
+                return Optional.empty();
+            }
+        }
+
+        Optional<String> error = validateParty(queuerId, List.of());
+        if (error.isPresent()) return error;
+
+        MatchmakingQueueParty party = new MatchmakingQueueParty();
+        party.setQueued(true);
+        party.setQueuedAt(Instant.now());
+        party.setLeaderId(queuerId);
+        long partyId = partyRepository.save(party).getId();
+
+        MatchmakingQueueMember member = new MatchmakingQueueMember();
+        member.setUserId(queuerId);
+        member.setPartyId(partyId);
+        memberRepository.save(member);
+        return Optional.empty();
+    }
+
+    /** Remove the user's whole party (formed or queued) from the queue and notify the other members. */
     @Transactional
     public boolean leaveQueue(String userId) {
         if (DatabasePersistenceGate.isDisabled()) return false;
-        Optional<MatchmakingQueueEntryEntity> entry = matchmakingQueueEntryRepository.findByUserId(userId);
-        if (entry.isEmpty()) return false;
+        Optional<MatchmakingQueueMember> memberOpt = memberRepository.findByUserId(userId);
+        if (memberOpt.isEmpty()) return false;
 
-        String partyId = entry.get().getPartyId();
-        if (partyId == null) {
-            return matchmakingQueueEntryRepository.deleteByUserId(userId) > 0;
-        }
-
-        // A party member leaving removes the whole group; notify the others.
-        List<MatchmakingQueueEntryEntity> partyMembers = matchmakingQueueEntryRepository.findAllByPartyId(partyId);
-        long deleted = matchmakingQueueEntryRepository.deleteByPartyId(partyId);
+        long partyId = memberOpt.get().getPartyId();
+        List<MatchmakingQueueMember> partyMembers = memberRepository.findAllByPartyId(partyId);
+        memberRepository.deleteAllByPartyIdIn(List.of(partyId));
+        partyRepository.deleteById(partyId);
         notifyPartyLeft(partyMembers, userId);
-        return deleted > 0;
+        return true;
     }
 
-    private void notifyPartyLeft(List<MatchmakingQueueEntryEntity> partyMembers, String leaverId) {
+    private void notifyPartyLeft(List<MatchmakingQueueMember> partyMembers, String leaverId) {
+        if (partyMembers.size() <= 1) return;
         String message = "Your matchmaking group was removed from the queue because <@" + leaverId + "> left it.";
-        for (MatchmakingQueueEntryEntity member : partyMembers) {
+        for (MatchmakingQueueMember member : partyMembers) {
             if (member.getUserId().equals(leaverId)) continue;
             User user = JdaService.jda.getUserById(member.getUserId());
             if (user == null) continue;
@@ -138,10 +199,28 @@ public class MatchmakerService {
         }
     }
 
+    private Optional<String> firstAvoidConflict(List<String> userIds) {
+        Map<String, List<String>> avoidById = new HashMap<>();
+        for (String id : userIds) {
+            avoidById.put(id, UserSettingsManager.get(id).getMatchmakingAvoidList());
+        }
+        for (int i = 0; i < userIds.size(); i++) {
+            for (int j = i + 1; j < userIds.size(); j++) {
+                String a = userIds.get(i);
+                String b = userIds.get(j);
+                if (avoidById.get(a).contains(b) || avoidById.get(b).contains(a)) {
+                    return Optional.of(
+                            "<@" + a + "> and <@" + b + "> have each other on an avoid list and can't be grouped.");
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
     /**
-     * Validate that a party can be queued under the leader's preferences: it must fit a chosen game size, every member
+     * Validate that a party can be queued under the queuer's preferences: it must fit a chosen game size, every member
      * must be eligible for the chosen pace and under their game limit, and every pair of members must be compatible
-     * under the leader's restrictions.
+     * under the queuer's restrictions.
      *
      * @return an error message describing the first problem found, or empty if the party is valid.
      */
@@ -225,127 +304,142 @@ public class MatchmakerService {
     public void processQueue() {
         if (DatabasePersistenceGate.isDisabled()) return;
 
-        List<MatchmakingQueueEntryEntity> entries = matchmakingQueueEntryRepository.findAllByOrderByQueuedAtAsc();
-        Map<MatchmakingQueueEntryEntity, UserSettings> settingsByCandidate = getUserSettings(entries);
-        List<MatchmakingQueueEntryEntity> candidates =
-                cleanAndRemoveExpiredEntries(entries, settingsByCandidate, Instant.now());
-
-        Map<MatchmakingQueueEntryEntity, PlayerMatchData> matchData = buildMatchData(candidates, settingsByCandidate);
-        List<Unit> units = buildUnits(candidates);
+        List<QueuedParty> active = removeExpiredParties(loadQueuedParties(), Instant.now());
+        Map<MatchmakingQueueMember, PlayerMatchData> matchData = buildMatchData(active);
 
         List<MatchedGame> gamesToCreate = new ArrayList<>();
-        Set<MatchmakingQueueEntryEntity> playersAddedToGames = new HashSet<>();
+        Set<MatchmakingQueueMember> playersAddedToGames = new HashSet<>();
 
         for (String playerCountOption : MatchmakingOptions.getPlayerCountOptionsDescending()) {
             for (String victoryPointGoalOption : MatchmakingOptions.getShuffledVictoryPointOptions()) {
                 for (String expansionOption : MatchmakingOptions.getShuffledExpansionsOptions()) {
                     for (String paceOption : MatchmakingOptions.getShuffledPaceRestrictions()) {
                         matchAndCollect(
-                                units,
+                                active,
                                 playersAddedToGames,
                                 gamesToCreate,
                                 playerCountOption,
                                 victoryPointGoalOption,
                                 expansionOption,
                                 paceOption,
-                                settingsByCandidate,
                                 matchData);
                     }
                 }
             }
         }
 
-        if (!playersAddedToGames.isEmpty()) {
-            matchmakingQueueEntryRepository.deleteAllInBatch(playersAddedToGames);
+        if (!gamesToCreate.isEmpty()) {
+            List<Long> matchedPartyIds = gamesToCreate.stream()
+                    .flatMap(game -> game.parties().stream())
+                    .map(MatchmakingQueueParty::getId)
+                    .toList();
+            memberRepository.deleteAllByPartyIdIn(matchedPartyIds);
+            partyRepository.deleteAllById(matchedPartyIds);
         }
 
         postMatchedGroupsToMakingNewGamesForum(gamesToCreate);
     }
 
+    private List<QueuedParty> loadQueuedParties() {
+        List<MatchmakingQueueParty> parties = partyRepository.findAllByQueuedTrueOrderByQueuedAtAsc();
+        if (parties.isEmpty()) return List.of();
+
+        List<Long> partyIds = parties.stream().map(MatchmakingQueueParty::getId).toList();
+        Map<Long, List<MatchmakingQueueMember>> membersByParty = memberRepository.findAllByPartyIdIn(partyIds).stream()
+                .collect(Collectors.groupingBy(MatchmakingQueueMember::getPartyId));
+
+        List<QueuedParty> queuedParties = new ArrayList<>();
+        for (MatchmakingQueueParty party : parties) {
+            List<MatchmakingQueueMember> members = membersByParty.getOrDefault(party.getId(), List.of());
+            if (members.isEmpty()) continue;
+            queuedParties.add(new QueuedParty(party, members, UserSettingsManager.get(party.getLeaderId())));
+        }
+        return queuedParties;
+    }
+
     /**
-     * Greedily fills games for one (playerCount, victoryPoint, expansion, pace) combination. Works on units (a party or
-     * a single solo player) so a party is always added or skipped as a whole. Solo-only queues behave as units of size
-     * one, reproducing the original individual matching.
+     * Greedily fills games for one (playerCount, victoryPoint, expansion, pace) combination. Each party is added or
+     * skipped as a whole; solo players are parties of one.
      */
     private void matchAndCollect(
-            List<Unit> units,
-            Set<MatchmakingQueueEntryEntity> playersAddedToGames,
+            List<QueuedParty> parties,
+            Set<MatchmakingQueueMember> playersAddedToGames,
             List<MatchedGame> gamesToCreate,
             String playerCountOption,
             String victoryPointGoalOption,
             String expansionOption,
             String paceOption,
-            Map<MatchmakingQueueEntryEntity, UserSettings> settingsByCandidate,
-            Map<MatchmakingQueueEntryEntity, PlayerMatchData> matchData) {
+            Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
         int playerCount = Integer.parseInt(playerCountOption);
 
-        List<Unit> remaining = units.stream()
-                .filter(unit -> unit.members().stream().noneMatch(playersAddedToGames::contains))
-                .filter(unit -> unit.size() <= playerCount)
-                .filter(unit -> {
-                    UserSettings settings = settingsByCandidate.get(unit.representative());
+        List<QueuedParty> remaining = parties.stream()
+                .filter(party -> party.members().stream().noneMatch(playersAddedToGames::contains))
+                .filter(party -> party.size() <= playerCount)
+                .filter(party -> {
+                    UserSettings settings = party.leaderSettings();
                     return settings.getMatchmakingPlayerCounts().contains(playerCountOption)
                             && settings.getMatchmakingVictoryPointGoals().contains(victoryPointGoalOption)
                             && settings.getMatchmakingExpansions().contains(expansionOption)
                             && settings.getMatchmakingPaces().contains(paceOption);
                 })
-                .sorted(Comparator.comparing((Unit unit) -> getHours(
-                                settingsByCandidate.get(unit.representative()).getMatchmakingMaxQueueTime()))
+                .sorted(Comparator.comparing((QueuedParty party) ->
+                                getHours(party.leaderSettings().getMatchmakingMaxQueueTime()))
                         .reversed()
-                        .thenComparing(unit -> unit.representative().getQueuedAt()))
+                        .thenComparing(party -> party.party().getQueuedAt()))
                 .collect(Collectors.toCollection(ArrayList::new));
 
         // Greedy grouping: seed from the front (longest queue time, then longest-waiting first),
-        // then fill the game with the first compatible units found.
+        // then fill the game with the first compatible parties found.
         while (totalPlayers(remaining) >= playerCount) {
-            Unit seed = remaining.getFirst();
-            List<MatchmakingQueueEntryEntity> group = new ArrayList<>(seed.members());
-            List<Unit> groupUnits = new ArrayList<>();
-            groupUnits.add(seed);
+            QueuedParty seed = remaining.getFirst();
+            List<MatchmakingQueueMember> group = new ArrayList<>(seed.members());
+            List<QueuedParty> groupParties = new ArrayList<>();
+            groupParties.add(seed);
 
-            for (Unit unit : remaining) {
-                if (groupUnits.contains(unit)) continue;
+            for (QueuedParty party : remaining) {
+                if (groupParties.contains(party)) continue;
                 if (group.size() == playerCount) break;
-                if (group.size() + unit.size() > playerCount) continue;
-                if (unitCompatibleWithGroup(unit, group, settingsByCandidate, matchData)) {
-                    group.addAll(unit.members());
-                    groupUnits.add(unit);
+                if (group.size() + party.size() > playerCount) continue;
+                if (partyCompatibleWithGroup(party, group, matchData)) {
+                    group.addAll(party.members());
+                    groupParties.add(party);
                 }
             }
 
             if (group.size() == playerCount) {
-                List<String> restrictions = group.stream()
-                        .flatMap(member -> settingsByCandidate.get(member).getMatchmakingRestrictions().stream())
+                List<String> restrictions = groupParties.stream()
+                        .flatMap(party -> party.leaderSettings().getMatchmakingRestrictions().stream())
                         .distinct()
                         .sorted()
                         .toList();
                 gamesToCreate.add(new MatchedGame(
                         new ArrayList<>(group),
+                        new ArrayList<>(
+                                groupParties.stream().map(QueuedParty::party).toList()),
                         playerCountOption,
                         victoryPointGoalOption,
                         expansionOption,
                         paceOption,
                         restrictions));
                 playersAddedToGames.addAll(group);
-                remaining.removeAll(groupUnits);
+                remaining.removeAll(groupParties);
             } else {
-                // This unit can't be completed into a full game right now; skip its seed.
+                // This party can't be completed into a full game right now; skip its seed.
                 remaining.remove(seed);
             }
         }
     }
 
-    private boolean unitCompatibleWithGroup(
-            Unit unit,
-            List<MatchmakingQueueEntryEntity> group,
-            Map<MatchmakingQueueEntryEntity, UserSettings> settingsByCandidate,
-            Map<MatchmakingQueueEntryEntity, PlayerMatchData> matchData) {
-        for (MatchmakingQueueEntryEntity newMember : unit.members()) {
-            for (MatchmakingQueueEntryEntity existing : group) {
-                boolean relaxed = isHalfQueueTimePassed(existing, settingsByCandidate)
-                        || isHalfQueueTimePassed(newMember, settingsByCandidate);
-                if (incompatibilityReason(matchData.get(existing), matchData.get(newMember), relaxed)
-                        .isPresent()) {
+    private boolean partyCompatibleWithGroup(
+            QueuedParty party,
+            List<MatchmakingQueueMember> group,
+            Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
+        for (MatchmakingQueueMember newMember : party.members()) {
+            for (MatchmakingQueueMember existing : group) {
+                PlayerMatchData a = matchData.get(existing);
+                PlayerMatchData b = matchData.get(newMember);
+                boolean relaxed = a.halfQueueTimePassed() || b.halfQueueTimePassed();
+                if (incompatibilityReason(a, b, relaxed).isPresent()) {
                     return false;
                 }
             }
@@ -353,30 +447,14 @@ public class MatchmakerService {
         return true;
     }
 
-    private static int totalPlayers(List<Unit> units) {
-        return units.stream().mapToInt(Unit::size).sum();
-    }
-
-    private List<Unit> buildUnits(List<MatchmakingQueueEntryEntity> candidates) {
-        Map<String, List<MatchmakingQueueEntryEntity>> partyMembers = new HashMap<>();
-        List<Unit> units = new ArrayList<>();
-        for (MatchmakingQueueEntryEntity candidate : candidates) {
-            if (candidate.getPartyId() != null) {
-                partyMembers
-                        .computeIfAbsent(candidate.getPartyId(), key -> new ArrayList<>())
-                        .add(candidate);
-            } else {
-                units.add(new Unit(List.of(candidate)));
-            }
-        }
-        partyMembers.values().forEach(members -> units.add(new Unit(List.copyOf(members))));
-        return units;
+    private static int totalPlayers(List<QueuedParty> parties) {
+        return parties.stream().mapToInt(QueuedParty::size).sum();
     }
 
     /**
      * The first incompatibility between two players under their (effective) restrictions, or empty if they are
      * compatible. Used both for cron-time matching (the reason is ignored) and submit-time party validation (the reason
-     * is surfaced to the leader).
+     * is surfaced to the queuer).
      */
     private Optional<String> incompatibilityReason(PlayerMatchData a, PlayerMatchData b, boolean relaxed) {
         if (a.avoidList().contains(b.userId())) {
@@ -462,43 +540,44 @@ public class MatchmakerService {
         return Optional.empty();
     }
 
-    private boolean isHalfQueueTimePassed(
-            MatchmakingQueueEntryEntity player,
-            Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate) {
-        double maxHours = getHours(userSettingsByCandidate.get(player).getMatchmakingMaxQueueTime());
-        double hoursWaited =
-                Duration.between(player.getQueuedAt(), Instant.now()).toMinutes() / 60.0;
+    private boolean isHalfQueueTimePassed(QueuedParty party, Instant now) {
+        double maxHours = getHours(party.leaderSettings().getMatchmakingMaxQueueTime());
+        double hoursWaited = Duration.between(party.party().getQueuedAt(), now).toMinutes() / 60.0;
         return hoursWaited >= maxHours / SIMILAR_SKILL_DIFFERENCE_THRESHOLD;
     }
 
     /**
-     * Build per-candidate matching data. Preferences (restrictions, avoid list) come from the effective settings (the
-     * leader's, for party members), while profile attributes (active hours, rating, completed games, roles) always come
-     * from the candidate's own account.
+     * Build per-member matching data for the queued parties. Restrictions come from the party's leader, while the avoid
+     * list and profile attributes (active hours, rating, completed games, roles) come from the member's own account.
      */
-    private Map<MatchmakingQueueEntryEntity, PlayerMatchData> buildMatchData(
-            List<MatchmakingQueueEntryEntity> candidates,
-            Map<MatchmakingQueueEntryEntity, UserSettings> settingsByCandidate) {
-        Set<String> userIds =
-                candidates.stream().map(MatchmakingQueueEntryEntity::getUserId).collect(Collectors.toSet());
+    private Map<MatchmakingQueueMember, PlayerMatchData> buildMatchData(List<QueuedParty> parties) {
+        Set<String> userIds = parties.stream()
+                .flatMap(party -> party.members().stream())
+                .map(MatchmakingQueueMember::getUserId)
+                .collect(Collectors.toSet());
         Map<String, BigDecimal> ratings = MatchmakingRatingEventService.get().getPlayerRatings(userIds);
         Guild guild = JdaService.guildPrimary;
+        Instant now = Instant.now();
 
-        Map<MatchmakingQueueEntryEntity, PlayerMatchData> matchData = new HashMap<>();
-        for (MatchmakingQueueEntryEntity candidate : candidates) {
-            UserSettings effectiveSettings = settingsByCandidate.get(candidate);
-            UserSettings ownSettings =
-                    candidate.getPartyId() != null ? UserSettingsManager.get(candidate.getUserId()) : effectiveSettings;
-            matchData.put(
-                    candidate,
-                    new PlayerMatchData(
-                            candidate.getUserId(),
-                            toCsv(effectiveSettings.getMatchmakingRestrictions()),
-                            effectiveSettings.getMatchmakingAvoidList(),
-                            ratings.getOrDefault(candidate.getUserId(), NEW_PLAYER_MATCHMAKING_RATING),
-                            computeActiveHourBuckets(ownSettings.getActiveHoursAsIntegers()),
-                            completedGames(candidate.getUserId()),
-                            roleNames(guild, candidate.getUserId())));
+        Map<MatchmakingQueueMember, PlayerMatchData> matchData = new HashMap<>();
+        for (QueuedParty party : parties) {
+            String leaderRestrictionsCsv = toCsv(party.leaderSettings().getMatchmakingRestrictions());
+            boolean halfQueueTimePassed = isHalfQueueTimePassed(party, now);
+            for (MatchmakingQueueMember member : party.members()) {
+                String id = member.getUserId();
+                UserSettings ownSettings = UserSettingsManager.get(id);
+                matchData.put(
+                        member,
+                        new PlayerMatchData(
+                                id,
+                                leaderRestrictionsCsv,
+                                ownSettings.getMatchmakingAvoidList(),
+                                ratings.getOrDefault(id, NEW_PLAYER_MATCHMAKING_RATING),
+                                computeActiveHourBuckets(ownSettings.getActiveHoursAsIntegers()),
+                                completedGames(id),
+                                roleNames(guild, id),
+                                halfQueueTimePassed));
+            }
         }
         return matchData;
     }
@@ -520,7 +599,8 @@ public class MatchmakerService {
                             ratings.getOrDefault(id, NEW_PLAYER_MATCHMAKING_RATING),
                             computeActiveHourBuckets(ownSettings.getActiveHoursAsIntegers()),
                             completedGames(id),
-                            roleNames(guild, id)));
+                            roleNames(guild, id),
+                            false));
         }
         return dataById;
     }
@@ -559,44 +639,33 @@ public class MatchmakerService {
     }
 
     @NonNull
-    private List<MatchmakingQueueEntryEntity> cleanAndRemoveExpiredEntries(
-            List<MatchmakingQueueEntryEntity> entries,
-            Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByEntry,
-            Instant now) {
-        List<MatchmakingQueueEntryEntity> expired = entries.stream()
-                .filter(entry -> entry.getQueuedAt()
-                        .plus(Duration.ofHours(
-                                getHours(userSettingsByEntry.get(entry).getMatchmakingMaxQueueTime())))
+    private List<QueuedParty> removeExpiredParties(List<QueuedParty> parties, Instant now) {
+        List<QueuedParty> expired = parties.stream()
+                .filter(party -> party.party()
+                        .getQueuedAt()
+                        .plus(Duration.ofHours(getHours(party.leaderSettings().getMatchmakingMaxQueueTime())))
                         .isBefore(now))
                 .toList();
         if (!expired.isEmpty()) {
-            BotLogger.info("Expiring " + expired.size() + " matchmaking queue entries.");
-            matchmakingQueueEntryRepository.deleteAllInBatch(expired);
+            List<Long> expiredIds =
+                    expired.stream().map(party -> party.party().getId()).toList();
+            BotLogger.info("Expiring " + expired.size() + " matchmaking parties.");
+            memberRepository.deleteAllByPartyIdIn(expiredIds);
+            partyRepository.deleteAllById(expiredIds);
+
             String expiryMessage =
                     "The matchmaking service wasn't able to find you a game in the time frame you selected. "
                             + "Queue again when ready and consider being open to additional game types or longer wait "
                             + "times.";
-            for (MatchmakingQueueEntryEntity entry : expired) {
-                userSettingsByEntry.remove(entry);
-
-                User user = JdaService.jda.getUserById(entry.getUserId());
-                if (user == null) continue;
-
-                MessageHelper.sendMessageToUser(expiryMessage, user);
+            for (QueuedParty party : expired) {
+                for (MatchmakingQueueMember member : party.members()) {
+                    User user = JdaService.jda.getUserById(member.getUserId());
+                    if (user == null) continue;
+                    MessageHelper.sendMessageToUser(expiryMessage, user);
+                }
             }
         }
-        return entries.stream().filter(entry -> !expired.contains(entry)).toList();
-    }
-
-    /**
-     * Effective settings per entry: a party member uses the leader's settings (party id == leader id), a solo player
-     * uses their own.
-     */
-    private Map<MatchmakingQueueEntryEntity, UserSettings> getUserSettings(List<MatchmakingQueueEntryEntity> entries) {
-        return entries.stream().collect(Collectors.toMap(entry -> entry, entry -> {
-            String settingsOwner = entry.getPartyId() != null ? entry.getPartyId() : entry.getUserId();
-            return UserSettingsManager.get(settingsOwner);
-        }));
+        return parties.stream().filter(party -> !expired.contains(party)).toList();
     }
 
     private static String toCsv(List<String> values) {
@@ -617,12 +686,12 @@ public class MatchmakerService {
         IThreadContainer threadContainer = forums.getFirst();
 
         for (MatchedGame game : gamesToCreate) {
-            List<MatchmakingQueueEntryEntity> queueEntries = game.entries();
-            List<Member> members = queueEntries.stream()
-                    .map(entry -> guild.getMemberById(entry.getUserId()))
+            List<MatchmakingQueueMember> queueMembers = game.members();
+            List<Member> members = queueMembers.stream()
+                    .map(member -> guild.getMemberById(member.getUserId()))
                     .filter(Objects::nonNull)
                     .toList();
-            if (members.size() != queueEntries.size()) continue;
+            if (members.size() != queueMembers.size()) continue;
 
             String gameFunName = CreateGameService.autoGenerateGameName();
             String threadTitle = "Matchmaker Game: " + gameFunName.replace(":", "");
@@ -634,14 +703,11 @@ public class MatchmakerService {
         }
     }
 
-    /** A party (members sharing a party id) or a single solo player, matched into a game as a whole. */
-    private record Unit(List<MatchmakingQueueEntryEntity> members) {
+    /** A queued party with its members and its leader's effective settings. */
+    private record QueuedParty(
+            MatchmakingQueueParty party, List<MatchmakingQueueMember> members, UserSettings leaderSettings) {
         private int size() {
             return members.size();
-        }
-
-        private MatchmakingQueueEntryEntity representative() {
-            return members.getFirst();
         }
     }
 
@@ -653,10 +719,12 @@ public class MatchmakerService {
             BigDecimal rating,
             Set<Integer> activeHourBuckets,
             int completedGames,
-            Set<String> roleNames) {}
+            Set<String> roleNames,
+            boolean halfQueueTimePassed) {}
 
     private record MatchedGame(
-            List<MatchmakingQueueEntryEntity> entries,
+            List<MatchmakingQueueMember> members,
+            List<MatchmakingQueueParty> parties,
             String playerCount,
             String victoryPointGoal,
             String expansion,

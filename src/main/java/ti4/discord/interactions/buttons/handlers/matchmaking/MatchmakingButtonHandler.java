@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.checkboxgroup.CheckboxGroup;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
@@ -29,7 +28,6 @@ import net.dv8tion.jda.api.interactions.modals.ModalInteraction;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.persistence.GameManager;
@@ -47,14 +45,12 @@ import ti4.spring.service.statistics.matchmaking.ViewMatchmakingQueueService;
 class MatchmakingButtonHandler {
 
     private static final String QUEUE_FOR_GAME_BUTTON_ID = "queueForGame~MDL";
-    private static final String QUEUE_AS_GROUP_BUTTON_ID = "queueAsGroup~MDL";
+    private static final String FORM_GROUP_BUTTON_ID = "formGroup~MDL";
     private static final String LEAVE_QUEUE_BUTTON_ID = "leaveQueueForGame";
     private static final String VIEW_QUEUE_BUTTON_ID = "viewMatchmakingQueue";
     private static final String ADDITIONAL_SETTINGS_BUTTON_ID = "queueForGameAdditionalSettings~MDL";
-    private static final String PICK_GROUP_MEMBERS_BUTTON_ID = "queueGroupPickMembers~MDL";
     private static final String QUEUE_FOR_GAME_MODAL_ID = "queueForGameModal";
-    private static final String QUEUE_AS_GROUP_MODAL_ID = "queueAsGroupModal";
-    private static final String GROUP_MEMBERS_MODAL_ID = "queueGroupMembersModal";
+    private static final String FORM_GROUP_MODAL_ID = "formGroupModal";
     private static final String ADDITIONAL_SETTINGS_MODAL_ID = "queueForGameAdditionalSettingsModal";
 
     private static final String EXPANSIONS_ID = "queue_expansions";
@@ -80,15 +76,20 @@ class MatchmakingButtonHandler {
     @ButtonHandler(value = QUEUE_FOR_GAME_BUTTON_ID, save = false)
     public static void offerQueueForGameModal(ButtonInteractionEvent event) {
         if (rejectIfCannotQueue(event)) return;
-        event.replyModal(buildQueueModal(QUEUE_FOR_GAME_MODAL_ID, "Queue for Game", event))
-                .queue(Consumers.nop(), BotLogger::catchRestError);
+        event.replyModal(buildQueueModal(event)).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    @ButtonHandler(value = QUEUE_AS_GROUP_BUTTON_ID, save = false)
-    public static void offerQueueAsGroupModal(ButtonInteractionEvent event) {
-        if (rejectIfCannotQueue(event)) return;
-        event.replyModal(buildQueueModal(QUEUE_AS_GROUP_MODAL_ID, "Queue as Group", event))
-                .queue(Consumers.nop(), BotLogger::catchRestError);
+    @ButtonHandler(value = FORM_GROUP_BUTTON_ID, save = false)
+    public static void offerFormGroupModal(ButtonInteractionEvent event) {
+        if (rejectIfCannotForm(event)) return;
+
+        EntitySelectMenu memberSelect = EntitySelectMenu.create(GROUP_MEMBERS_ID, SelectTarget.USER)
+                .setRequiredRange(1, MAX_GROUP_MEMBERS)
+                .build();
+        Modal modal = Modal.create(FORM_GROUP_MODAL_ID, "Form Group")
+                .addComponents(Label.of("Group Members (up to " + MAX_GROUP_MEMBERS + ")", memberSelect))
+                .build();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static boolean rejectIfCannotQueue(ButtonInteractionEvent event) {
@@ -109,9 +110,28 @@ class MatchmakingButtonHandler {
         return false;
     }
 
-    private static Modal buildQueueModal(String modalId, String title, ButtonInteractionEvent event) {
+    private static boolean rejectIfCannotForm(ButtonInteractionEvent event) {
+        MatchmakerService matchmakerService = SpringContext.getBean(MatchmakerService.class);
+        if (MatchmakerService.isQueueingDisabled()) {
+            event.reply("Queueing is currently disabled.")
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            return true;
+        }
+        if (matchmakerService.isUserInParty(event.getUser().getId())) {
+            event.reply("You're already in a group or the queue. Use the Leave Queue button first.")
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            return true;
+        }
+        return false;
+    }
+
+    private static Modal buildQueueModal(ButtonInteractionEvent event) {
         String userId = event.getUser().getId();
         UserSettings userSettings = UserSettingsManager.get(userId);
+        List<String> groupMemberIds =
+                SpringContext.getBean(MatchmakerService.class).partyMemberIds(userId);
 
         final boolean REQUIRE_SELECTION = true;
         CheckboxGroup expansions = buildCheckboxGroup(
@@ -122,7 +142,7 @@ class MatchmakingButtonHandler {
                 REQUIRE_SELECTION);
         CheckboxGroup playerCounts = buildCheckboxGroup(
                 PLAYER_COUNTS_ID,
-                PLAYER_COUNT_OPTIONS,
+                groupPlayerCountOptions(groupMemberIds.size()),
                 userSettings.getMatchmakingPlayerCounts(),
                 DEFAULT_PLAYER_COUNT_OPTIONS,
                 REQUIRE_SELECTION);
@@ -134,18 +154,18 @@ class MatchmakingButtonHandler {
                 REQUIRE_SELECTION);
         CheckboxGroup paces = buildCheckboxGroup(
                 PACE_RESTRICTIONS_ID,
-                filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(userId),
+                groupPaceOptions(groupMemberIds),
                 userSettings.getMatchmakingPaces(),
                 DEFAULT_PACE_OPTIONS,
                 REQUIRE_SELECTION);
         CheckboxGroup restrictions = buildCheckboxGroup(
                 RESTRICTIONS_ID,
-                filterRestrictionOptionsForMember(event),
+                groupRestrictionOptions(event, groupMemberIds),
                 userSettings.getMatchmakingRestrictions(),
                 DEFAULT_RESTRICTION_OPTIONS,
                 !REQUIRE_SELECTION);
 
-        return Modal.create(modalId, title)
+        return Modal.create(QUEUE_FOR_GAME_MODAL_ID, "Queue for Game")
                 .addComponents(Label.of("Expansions", expansions))
                 .addComponents(Label.of("Player Count", playerCounts))
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
@@ -189,7 +209,7 @@ class MatchmakingButtonHandler {
             return;
         }
         matchmakerService.leaveQueue(event.getUser().getId());
-        MessageHelper.sendEphemeralMessageToEventChannel(event, "You have left the matchmaking queue.");
+        MessageHelper.sendEphemeralMessageToEventChannel(event, "You (and your group, if any) have left the queue.");
     }
 
     @ButtonHandler(value = VIEW_QUEUE_BUTTON_ID, save = false)
@@ -215,89 +235,35 @@ class MatchmakingButtonHandler {
 
         saveMatchmakingPreferences(event, userSettings);
 
-        SpringContext.getBean(MatchmakerService.class).queueUser(userId);
-
-        event.getHook()
-                .setEphemeral(true)
-                .sendMessage("You have been added to the matchmaking queue.")
-                .queue(Consumers.nop(), BotLogger::catchRestError);
+        Optional<String> error = SpringContext.getBean(MatchmakerService.class).queue(userId);
+        if (error.isPresent()) {
+            replyEphemeral(event, error.get());
+            return;
+        }
+        replyEphemeral(event, "You have been added to the matchmaking queue.");
     }
 
-    @ModalHandler(QUEUE_AS_GROUP_MODAL_ID)
-    public static void submitQueueAsGroupModal(ModalInteractionEvent event) {
-        String userId = event.getUser().getId();
-        UserSettings userSettings = UserSettingsManager.get(userId);
-
-        if (isPlayerAtGameLimit(event, userId, userSettings)) return;
-
-        // Save the leader's preferences; the whole group will queue under them once members are picked.
-        saveMatchmakingPreferences(event, userSettings);
-
-        // A member picker can't live in the same modal (Discord caps modals at 5 components), so offer a
-        // button that opens a second modal for choosing the group.
-        event.getHook()
-                .setEphemeral(true)
-                .sendMessage("Your preferences are saved. Now pick the players to queue with.")
-                .addComponents(ActionRow.of(Buttons.green(PICK_GROUP_MEMBERS_BUTTON_ID, "Pick Group Members")))
-                .queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
-    @ButtonHandler(value = PICK_GROUP_MEMBERS_BUTTON_ID, save = false)
-    public static void offerGroupMembersModal(ButtonInteractionEvent event) {
-        if (rejectIfCannotQueue(event)) return;
-
-        EntitySelectMenu memberSelect = EntitySelectMenu.create(GROUP_MEMBERS_ID, SelectTarget.USER)
-                .setRequiredRange(1, MAX_GROUP_MEMBERS)
-                .build();
-        Modal modal = Modal.create(GROUP_MEMBERS_MODAL_ID, "Pick Group Members")
-                .addComponents(Label.of("Group Members (up to " + MAX_GROUP_MEMBERS + ")", memberSelect))
-                .build();
-        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
-    @ModalHandler(GROUP_MEMBERS_MODAL_ID)
-    public static void submitGroupMembersModal(ModalInteractionEvent event) {
-        MatchmakerService matchmakerService = SpringContext.getBean(MatchmakerService.class);
-        String leaderId = event.getUser().getId();
-
+    @ModalHandler(FORM_GROUP_MODAL_ID)
+    public static void submitFormGroupModal(ModalInteractionEvent event) {
+        String creatorId = event.getUser().getId();
         List<String> memberIds = getSelectedUserIds(event, GROUP_MEMBERS_ID).stream()
-                .filter(id -> !id.equals(leaderId))
+                .filter(id -> !id.equals(creatorId))
                 .distinct()
                 .toList();
         if (memberIds.isEmpty()) {
-            replyToGroupModal(event, "Select at least one other player to queue as a group.");
+            replyEphemeral(event, "Select at least one other player to form a group.");
             return;
         }
 
-        Optional<String> validationError = matchmakerService.validateParty(leaderId, memberIds);
-        if (validationError.isPresent()) {
-            replyToGroupModal(event, "Your group can't be queued: " + validationError.get());
+        Optional<String> error = SpringContext.getBean(MatchmakerService.class).formGroup(creatorId, memberIds);
+        if (error.isPresent()) {
+            replyEphemeral(event, "Couldn't form the group: " + error.get());
             return;
         }
-
-        Optional<String> queueError = matchmakerService.queueParty(leaderId, memberIds);
-        if (queueError.isPresent()) {
-            replyToGroupModal(event, queueError.get());
-            return;
-        }
-
-        replyToGroupModal(
-                event, "Your group of " + (memberIds.size() + 1) + " players has been added to the matchmaking queue.");
-    }
-
-    private static void replyToGroupModal(ModalInteractionEvent event, String message) {
-        event.getHook().setEphemeral(true).sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
-    private static void saveMatchmakingPreferences(ModalInteractionEvent event, UserSettings userSettings) {
-        userSettings.setMatchmakingExpansions(getSelectedValues(event, EXPANSIONS_ID));
-        userSettings.setMatchmakingPlayerCounts(getSelectedValues(event, PLAYER_COUNTS_ID));
-        userSettings.setMatchmakingVictoryPointGoals(getSelectedValues(event, VICTORY_POINTS_ID));
-        userSettings.setMatchmakingPaces(getSelectedValues(event, PACE_RESTRICTIONS_ID));
-        userSettings.setMatchmakingRestrictions(getSelectedValues(event, RESTRICTIONS_ID).stream()
-                .filter(restriction -> !PACE_RESTRICTION_OPTIONS.contains(restriction))
-                .toList());
-        UserSettingsManager.save(userSettings);
+        replyEphemeral(
+                event,
+                "Group formed with " + (memberIds.size() + 1)
+                        + " players. Click **Queue for Game** to enter the queue together.");
     }
 
     @ModalHandler(ADDITIONAL_SETTINGS_MODAL_ID)
@@ -311,10 +277,22 @@ class MatchmakingButtonHandler {
         userSettings.setMatchmakingAvoidList(avoidedUserIds);
         UserSettingsManager.save(userSettings);
 
-        event.getHook()
-                .setEphemeral(true)
-                .sendMessage("Additional settings saved.")
-                .queue(Consumers.nop(), BotLogger::catchRestError);
+        replyEphemeral(event, "Additional settings saved.");
+    }
+
+    private static void replyEphemeral(ModalInteractionEvent event, String message) {
+        event.getHook().setEphemeral(true).sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static void saveMatchmakingPreferences(ModalInteractionEvent event, UserSettings userSettings) {
+        userSettings.setMatchmakingExpansions(getSelectedValues(event, EXPANSIONS_ID));
+        userSettings.setMatchmakingPlayerCounts(getSelectedValues(event, PLAYER_COUNTS_ID));
+        userSettings.setMatchmakingVictoryPointGoals(getSelectedValues(event, VICTORY_POINTS_ID));
+        userSettings.setMatchmakingPaces(getSelectedValues(event, PACE_RESTRICTIONS_ID));
+        userSettings.setMatchmakingRestrictions(getSelectedValues(event, RESTRICTIONS_ID).stream()
+                .filter(restriction -> !PACE_RESTRICTION_OPTIONS.contains(restriction))
+                .toList());
+        UserSettingsManager.save(userSettings);
     }
 
     private static boolean isPlayerAtGameLimit(ModalInteractionEvent event, String userId, UserSettings userSettings) {
@@ -344,18 +322,50 @@ class MatchmakingButtonHandler {
         return false;
     }
 
-    private static List<String> filterRestrictionOptionsForMember(ButtonInteractionEvent event) {
-        Member member = event.getMember();
+    /** Player counts the whole group can fit into (≥ the group size). */
+    private static List<String> groupPlayerCountOptions(int groupSize) {
+        List<String> options = PLAYER_COUNT_OPTIONS.stream()
+                .filter(option -> Integer.parseInt(option) >= groupSize)
+                .toList();
+        return options.isEmpty() ? PLAYER_COUNT_OPTIONS : options;
+    }
+
+    /** Paces every member of the group is eligible for. */
+    private static List<String> groupPaceOptions(List<String> groupMemberIds) {
+        List<String> shared = null;
+        for (String id : groupMemberIds) {
+            List<String> eligible = filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(id);
+            if (shared == null) {
+                shared = new ArrayList<>(eligible);
+            } else {
+                shared.retainAll(eligible);
+            }
+        }
+        return shared == null || shared.isEmpty() ? List.of(NO_PACE_OPTION) : shared;
+    }
+
+    /** Base restrictions plus the role-match options that every member of the group qualifies for. */
+    private static List<String> groupRestrictionOptions(ButtonInteractionEvent event, List<String> groupMemberIds) {
         Guild guild = event.getGuild();
-        if (member == null || guild == null) {
+        if (guild == null) {
             return RESTRICTION_OPTIONS;
         }
-        List<String> roleRestrictionOptions = MatchmakingOptions.getRoleRestrictionOptions(guild, member);
-        if (roleRestrictionOptions.isEmpty()) {
+        List<String> sharedRoleOptions = null;
+        for (String id : groupMemberIds) {
+            Member member = guild.getMemberById(id);
+            List<String> roleOptions =
+                    member == null ? List.of() : MatchmakingOptions.getRoleRestrictionOptions(guild, member);
+            if (sharedRoleOptions == null) {
+                sharedRoleOptions = new ArrayList<>(roleOptions);
+            } else {
+                sharedRoleOptions.retainAll(roleOptions);
+            }
+        }
+        if (sharedRoleOptions == null || sharedRoleOptions.isEmpty()) {
             return RESTRICTION_OPTIONS;
         }
         List<String> options = new ArrayList<>(RESTRICTION_OPTIONS);
-        options.addAll(roleRestrictionOptions);
+        options.addAll(sharedRoleOptions);
         return options;
     }
 
