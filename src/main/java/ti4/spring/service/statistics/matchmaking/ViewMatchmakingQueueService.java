@@ -84,7 +84,9 @@ public class ViewMatchmakingQueueService {
     private static String describeQueuedPlayer(String userId, UserSettings settings) {
         StringBuilder line = new StringBuilder("\n• <@").append(userId).append("> — ");
         line.append(joinOrAny(settings.getMatchmakingPlayerCounts())).append("p");
-        line.append(" · ").append(joinOrAny(settings.getMatchmakingVictoryPointGoals())).append("vp");
+        line.append(" · ")
+                .append(joinOrAny(settings.getMatchmakingVictoryPointGoals()))
+                .append("vp");
         line.append(" · ").append(joinOrAny(settings.getMatchmakingExpansions()));
         line.append(" · ").append(joinOrAny(settings.getMatchmakingPaces()));
         List<String> restrictions = settings.getMatchmakingRestrictions();
