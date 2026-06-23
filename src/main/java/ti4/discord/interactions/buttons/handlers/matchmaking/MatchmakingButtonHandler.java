@@ -278,25 +278,21 @@ class MatchmakingButtonHandler {
         for (String option : options) {
             builder.addOption(option, option);
         }
-        return builder
-            .setRequired(requireSelection)
-            .setSelectedValues(normalizeSelectedValues(selectedValues, options, defaultValues))
-            .build();
+        return builder.setRequired(requireSelection)
+                .setSelectedValues(normalizeSelectedValues(selectedValues, options, defaultValues))
+                .build();
     }
 
     private static StringSelectMenu buildSingleSelect(
-            String id,
-            Collection<String> options,
-            List<String> selectedValues,
-            List<String> defaultValues) {
+            String id, Collection<String> options, List<String> selectedValues, List<String> defaultValues) {
         StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(id);
         for (String option : options) {
             menuBuilder.addOptions(SelectOption.of(option, option));
         }
         return menuBuilder
-            .setRequiredRange(1, 1)
-            .setDefaultValues(normalizeSelectedValues(selectedValues, options, defaultValues))
-            .build();
+                .setRequiredRange(1, 1)
+                .setDefaultValues(normalizeSelectedValues(selectedValues, options, defaultValues))
+                .build();
     }
 
     private static List<String> getSelectedValues(ModalInteraction event, String modalValueId) {
