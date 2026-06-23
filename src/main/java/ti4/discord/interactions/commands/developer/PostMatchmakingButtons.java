@@ -11,6 +11,7 @@ class PostMatchmakingButtons extends Subcommand {
 
     private static final String QUEUE_BUTTON_ID = "queueForGame~MDL";
     private static final String LEAVE_QUEUE_BUTTON_ID = "leaveQueueForGame";
+    private static final String VIEW_QUEUE_BUTTON_ID = "viewMatchmakingQueue";
     private static final String ADDITIONAL_SETTINGS_BUTTON_ID = "queueForGameAdditionalSettings~MDL";
 
     PostMatchmakingButtons() {
@@ -22,6 +23,7 @@ class PostMatchmakingButtons extends Subcommand {
         List<Button> buttons = List.of(
                 Buttons.green(QUEUE_BUTTON_ID, "Queue for Game"),
                 Buttons.red(LEAVE_QUEUE_BUTTON_ID, "Leave Queue"),
+                Buttons.blue(VIEW_QUEUE_BUTTON_ID, "View Queue"),
                 Buttons.gray(ADDITIONAL_SETTINGS_BUTTON_ID, "Additional Settings"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),

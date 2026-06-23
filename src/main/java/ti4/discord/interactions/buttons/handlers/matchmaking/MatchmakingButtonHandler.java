@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.components.selections.SelectOption;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -38,12 +39,14 @@ import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.statistics.UserGameInfoService;
 import ti4.spring.service.statistics.matchmaking.MatchmakerService;
+import ti4.spring.service.statistics.matchmaking.ViewMatchmakingQueueService;
 
 @UtilityClass
 class MatchmakingButtonHandler {
 
     private static final String QUEUE_FOR_GAME_BUTTON_ID = "queueForGame~MDL";
     private static final String LEAVE_QUEUE_BUTTON_ID = "leaveQueueForGame";
+    private static final String VIEW_QUEUE_BUTTON_ID = "viewMatchmakingQueue";
     private static final String ADDITIONAL_SETTINGS_BUTTON_ID = "queueForGameAdditionalSettings~MDL";
     private static final String QUEUE_FOR_GAME_MODAL_ID = "queueForGameModal";
     private static final String ADDITIONAL_SETTINGS_MODAL_ID = "queueForGameAdditionalSettingsModal";
@@ -167,6 +170,19 @@ class MatchmakingButtonHandler {
         }
         matchmakerService.leaveQueue(event.getUser().getId());
         MessageHelper.sendEphemeralMessageToEventChannel(event, "You have left the matchmaking queue.");
+    }
+
+    @ButtonHandler(value = VIEW_QUEUE_BUTTON_ID, save = false)
+    public static void viewQueue(ButtonInteractionEvent event) {
+        ViewMatchmakingQueueService viewMatchmakingQueueService =
+                SpringContext.getBean(ViewMatchmakingQueueService.class);
+        List<MessageEmbed> embeds = viewMatchmakingQueueService.describeQueueFor(event.getUser().getId());
+        for (MessageEmbed embed : embeds) {
+            event.getHook()
+                    .setEphemeral(true)
+                    .sendMessageEmbeds(embed)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+        }
     }
 
     @ModalHandler(QUEUE_FOR_GAME_MODAL_ID)
