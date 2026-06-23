@@ -2773,7 +2773,9 @@ public final class AgendaHelper {
             }
             MessageHelper.sendMessageToChannel(channel, summary.toString());
         }
-        if (game.getCurrentAgendaInfo().startsWith("Law") && game.getLaws().size() == 2 && !game.getCurrentAgendaInfo().contains("covert")) {
+        if (game.getCurrentAgendaInfo().startsWith("Law")
+                && game.getLaws().size() == 2
+                && !game.getCurrentAgendaInfo().contains("covert")) {
             MessageHelper.sendMessageToChannel(
                     channel, "## A reminder that there are currently 2 laws in play, so this would be the 3rd law.");
         }
