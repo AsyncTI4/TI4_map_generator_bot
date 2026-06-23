@@ -1,7 +1,6 @@
 package ti4.spring.service.statistics.matchmaking;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -47,7 +46,8 @@ public class MatchmakerService {
     private static final long ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT = 3;
     private static final double SIMILAR_SKILL_DIFFERENCE_THRESHOLD = 2.0;
     private static final double RELAXED_SIMILAR_SKILL_DIFFERENCE_THRESHOLD = 4.0;
-    private static final int NEW_PLAYER_GAME_THRESHOLD = 1;
+    private static final int NEW_PLAYER_GAME_THRESHOLD = 3;
+    private static final BigDecimal NEW_PLAYER_MATCHMAKING_RATING = BigDecimal.valueOf(20.0);
 
     private final MatchmakingQueueEntryRepository matchmakingQueueEntryRepository;
 
@@ -92,16 +92,11 @@ public class MatchmakerService {
                 cleanAndRemoveExpiredEntries(entries, candidateToUserSettings, Instant.now());
 
         Map<String, BigDecimal> playerRatings = getPlayerRatings(candidates);
-        BigDecimal averageRating = playerRatings.isEmpty()
-                ? BigDecimal.ZERO
-                : playerRatings.values().stream()
-                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-                        .divide(BigDecimal.valueOf(playerRatings.size()), MathContext.DECIMAL64);
         Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets =
                 getActiveHourBuckets(candidates, candidateToUserSettings);
         Map<MatchmakingQueueEntryEntity, Integer> playersToCompletedGameCounts = getCompletedGameCounts(candidates);
         Map<MatchmakingQueueEntryEntity, Set<String>> playersToRoleNames = getRoleNames(candidates);
-        List<List<MatchmakingQueueEntryEntity>> gamesToCreate = new ArrayList<>();
+        List<MatchedGame> gamesToCreate = new ArrayList<>();
         Set<MatchmakingQueueEntryEntity> playersAddedToGames = new HashSet<>();
 
         for (String playerCountOption : MatchmakingOptions.getPlayerCountOptionsDescending()) {
@@ -120,8 +115,7 @@ public class MatchmakerService {
                                 playersToActiveHourBuckets,
                                 playersToCompletedGameCounts,
                                 playersToRoleNames,
-                                playerRatings,
-                                averageRating);
+                                playerRatings);
                     }
                 }
             }
@@ -143,7 +137,7 @@ public class MatchmakerService {
     private void matchAndCollect(
             List<MatchmakingQueueEntryEntity> candidates,
             Set<MatchmakingQueueEntryEntity> playersAddedToGames,
-            List<List<MatchmakingQueueEntryEntity>> gamesToCreate,
+            List<MatchedGame> gamesToCreate,
             String playerCountOption,
             String victoryPointGoalOption,
             String expansionOption,
@@ -152,8 +146,7 @@ public class MatchmakerService {
             Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets,
             Map<MatchmakingQueueEntryEntity, Integer> playersToCompletedGameCounts,
             Map<MatchmakingQueueEntryEntity, Set<String>> playersToRoleNames,
-            Map<String, BigDecimal> playerRatings,
-            BigDecimal defaultRating) {
+            Map<String, BigDecimal> playerRatings) {
         List<MatchmakingQueueEntryEntity> eligible = candidates.stream()
                 .filter(candidate -> !playersAddedToGames.contains(candidate))
                 .filter(candidate -> userSettingsByCandidate
@@ -198,8 +191,7 @@ public class MatchmakerService {
                                 playersToActiveHourBuckets,
                                 playersToCompletedGameCounts,
                                 playersToRoleNames,
-                                playerRatings,
-                                defaultRating));
+                                playerRatings));
 
                 if (compatibleWithWholeGroup) {
                     group.add(candidate);
@@ -207,7 +199,18 @@ public class MatchmakerService {
             }
 
             if (group.size() == playerCount) {
-                gamesToCreate.add(new ArrayList<>(group));
+                List<String> restrictions = group.stream()
+                        .flatMap(member -> userSettingsByCandidate.get(member).getMatchmakingRestrictions().stream())
+                        .distinct()
+                        .sorted()
+                        .toList();
+                gamesToCreate.add(new MatchedGame(
+                        new ArrayList<>(group),
+                        playerCountOption,
+                        victoryPointGoalOption,
+                        expansionOption,
+                        paceOption,
+                        restrictions));
                 playersAddedToGames.addAll(group);
                 remaining.removeAll(group);
             } else {
@@ -224,8 +227,7 @@ public class MatchmakerService {
             Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets,
             Map<MatchmakingQueueEntryEntity, Integer> playersToCompletedGameCounts,
             Map<MatchmakingQueueEntryEntity, Set<String>> playersToRoleNames,
-            Map<String, BigDecimal> playerRatings,
-            BigDecimal defaultRating) {
+            Map<String, BigDecimal> playerRatings) {
         UserSettings player1Settings = userSettingsByCandidate.get(player1);
         UserSettings player2Settings = userSettingsByCandidate.get(player2);
         String player1Id = player1.getUserId();
@@ -276,8 +278,12 @@ public class MatchmakerService {
         boolean player1WantsSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(player1RestrictionsCsv);
         boolean player2WantsSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(player2RestrictionsCsv);
         if (player1WantsSimilarSkill || player2WantsSimilarSkill) {
-            BigDecimal player1Rating = playerRatings.getOrDefault(player1.getUserId(), defaultRating);
-            BigDecimal player2Rating = playerRatings.getOrDefault(player2.getUserId(), defaultRating);
+            BigDecimal player1Rating = player1IsNew
+                    ? NEW_PLAYER_MATCHMAKING_RATING
+                    : playerRatings.getOrDefault(player1.getUserId(), NEW_PLAYER_MATCHMAKING_RATING);
+            BigDecimal player2Rating = player2IsNew
+                    ? NEW_PLAYER_MATCHMAKING_RATING
+                    : playerRatings.getOrDefault(player2.getUserId(), NEW_PLAYER_MATCHMAKING_RATING);
 
             boolean relaxed = isHalfQueueTimePassed(player1, userSettingsByCandidate)
                     || isHalfQueueTimePassed(player2, userSettingsByCandidate);
@@ -408,7 +414,7 @@ public class MatchmakerService {
         return String.join(",", values);
     }
 
-    private void postMatchedGroupsToMakingNewGamesForum(List<List<MatchmakingQueueEntryEntity>> gamesToCreate) {
+    private void postMatchedGroupsToMakingNewGamesForum(List<MatchedGame> gamesToCreate) {
         Guild guild = JdaService.guildPrimary;
         if (gamesToCreate.isEmpty() || guild == null) return;
 
@@ -421,7 +427,8 @@ public class MatchmakerService {
         }
         IThreadContainer threadContainer = forums.getFirst();
 
-        for (List<MatchmakingQueueEntryEntity> queueEntries : gamesToCreate) {
+        for (MatchedGame game : gamesToCreate) {
+            List<MatchmakingQueueEntryEntity> queueEntries = game.entries();
             List<Member> members = queueEntries.stream()
                     .map(entry -> guild.getMemberById(entry.getUserId()))
                     .filter(Objects::nonNull)
@@ -430,9 +437,30 @@ public class MatchmakerService {
 
             String gameFunName = CreateGameService.autoGenerateGameName();
             String threadTitle = "Matchmaker Game: " + gameFunName.replace(":", "");
-            threadContainer
-                    .createThreadChannel(threadTitle)
-                    .queue(thread -> CreateGameLaunchPostService.postLaunchButtons(thread, members, gameFunName));
+            String setupMessage = game.describeSetup();
+            threadContainer.createThreadChannel(threadTitle).queue(thread -> {
+                MessageHelper.sendMessageToChannel(thread, setupMessage);
+                CreateGameLaunchPostService.postLaunchButtons(thread, members, gameFunName);
+            });
+        }
+    }
+
+    private record MatchedGame(
+            List<MatchmakingQueueEntryEntity> entries,
+            String playerCount,
+            String victoryPointGoal,
+            String expansion,
+            String pace,
+            List<String> restrictions) {
+
+        private String describeSetup() {
+            String restrictionsText = restrictions.isEmpty() ? "None" : String.join(", ", restrictions);
+            return "The players were matched on the following game setup:\n"
+                    + "- **Player count:** " + playerCount + "\n"
+                    + "- **Victory point goal:** " + victoryPointGoal + "\n"
+                    + "- **Expansion:** " + expansion + "\n"
+                    + "- **Pace:** " + pace + "\n"
+                    + "- **Restrictions:** " + restrictionsText;
         }
     }
 

@@ -78,7 +78,6 @@ public class MatchmakingOptions {
 
     public static List<String> getShuffledPaceRestrictions() {
         List<String> pacesRestrictions = new ArrayList<>(PACE_RESTRICTION_OPTIONS);
-        pacesRestrictions.remove(NO_PACE_OPTION);
         Collections.shuffle(pacesRestrictions);
         return pacesRestrictions;
     }
