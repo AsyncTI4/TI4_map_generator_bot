@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.matchmaking;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,6 +24,14 @@ public class MatchmakingOptions {
     private static final String SIMILAR_ACTIVE_HOURS_OPTION = "Similar Active Hours";
     private static final String SIMILAR_PLAYER_SKILL_OPTION = "Similar Player Skill";
     private static final String AVOID_NEW_PLAYERS_OPTION = "Avoid New Async Players";
+
+    public static final String FLOATERS_ROLE_ID = "1502332889541509262";
+    public static final String WARRIORS_ROLE_ID = "1502332581662953532";
+    private static final String ONLY_MATCH_FLOATERS_OPTION = "Only match with Floaters";
+    private static final String ONLY_MATCH_WARRIORS_OPTION = "Only match with Warriors";
+    private static final Map<String, String> ROLE_ID_TO_ONLY_MATCH_OPTION = Map.of(
+            FLOATERS_ROLE_ID, ONLY_MATCH_FLOATERS_OPTION,
+            WARRIORS_ROLE_ID, ONLY_MATCH_WARRIORS_OPTION);
     public static final String NO_PACE_OPTION = "No Pace";
     public static final String SLOW_PACE_OPTION = "Slow (90 days)";
     public static final String FAST_PACE_OPTION = "Average (30 days)";
@@ -95,5 +104,20 @@ public class MatchmakingOptions {
 
     public static boolean wantsToAvoidNewPlayers(String restrictionsCsv) {
         return restrictionsCsv.contains(AVOID_NEW_PLAYERS_OPTION);
+    }
+
+    public static List<String> getRoleRestrictionOptions(Collection<String> memberRoleIds) {
+        return ROLE_ID_TO_ONLY_MATCH_OPTION.entrySet().stream()
+                .filter(entry -> memberRoleIds.contains(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .toList();
+    }
+
+    public static boolean wantsOnlyFloaters(String restrictionsCsv) {
+        return restrictionsCsv.contains(ONLY_MATCH_FLOATERS_OPTION);
+    }
+
+    public static boolean wantsOnlyWarriors(String restrictionsCsv) {
+        return restrictionsCsv.contains(ONLY_MATCH_WARRIORS_OPTION);
     }
 }

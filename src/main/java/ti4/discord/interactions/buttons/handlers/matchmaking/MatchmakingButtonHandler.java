@@ -18,6 +18,8 @@ import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu.SelectTarget;
 import net.dv8tion.jda.api.components.selections.SelectOption;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -111,7 +113,7 @@ class MatchmakingButtonHandler {
                 REQUIRE_SELECTION);
         CheckboxGroup restrictions = buildCheckboxGroup(
                 RESTRICTIONS_ID,
-                RESTRICTION_OPTIONS,
+                restrictionOptionsForMember(event),
                 userSettings.getMatchmakingRestrictions(),
                 DEFAULT_RESTRICTION_OPTIONS,
                 !REQUIRE_SELECTION);
@@ -238,6 +240,21 @@ class MatchmakingButtonHandler {
             return true;
         }
         return false;
+    }
+
+    private static List<String> restrictionOptionsForMember(ButtonInteractionEvent event) {
+        Member member = event.getMember();
+        if (member == null) {
+            return RESTRICTION_OPTIONS;
+        }
+        List<String> roleIds = member.getRoles().stream().map(Role::getId).toList();
+        List<String> roleRestrictionOptions = MatchmakingOptions.getRoleRestrictionOptions(roleIds);
+        if (roleRestrictionOptions.isEmpty()) {
+            return RESTRICTION_OPTIONS;
+        }
+        List<String> options = new ArrayList<>(RESTRICTION_OPTIONS);
+        options.addAll(roleRestrictionOptions);
+        return options;
     }
 
     private static List<String> filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(String userId) {
