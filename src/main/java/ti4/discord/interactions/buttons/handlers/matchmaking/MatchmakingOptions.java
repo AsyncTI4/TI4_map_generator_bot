@@ -18,16 +18,16 @@ import ti4.discord.utility.DiscordRoleUtility;
 public class MatchmakingOptions {
 
     public static final List<String> EXPANSION_OPTIONS = List.of(
-            "Base Only",
-            "Prophecy of Kings Only",
-            "Thunder's Edge Only",
+            "Base only",
+            "Prophecy of Kings only",
+            "Thunder's Edge only",
             "Prophecy of Kings and Thunder's Edge",
             "Twilight's Fall");
     public static final List<String> PLAYER_COUNT_OPTIONS = List.of("3", "4", "5", "6", "7", "8");
     public static final List<String> VICTORY_POINT_OPTIONS = List.of("10", "12", "14");
-    private static final String SIMILAR_ACTIVE_HOURS_OPTION = "Similar Active Hours";
-    private static final String SIMILAR_PLAYER_SKILL_OPTION = "Similar Player Skill";
-    private static final String AVOID_NEW_PLAYERS_OPTION = "Avoid New Async Players";
+    private static final String SIMILAR_ACTIVE_HOURS_OPTION = "Similar active hours";
+    private static final String SIMILAR_PLAYER_SKILL_OPTION = "Similar player skill";
+    private static final String AVOID_NEW_PLAYERS_OPTION = "Avoid new async players";
 
     public static final String FLOATERS_ROLE_NAME = "Floaters";
     public static final String WARRIORS_ROLE_NAME = "Warriors";
@@ -36,7 +36,7 @@ public class MatchmakingOptions {
     private static final Map<String, String> ROLE_NAME_TO_ONLY_MATCH_OPTION = Map.of(
             FLOATERS_ROLE_NAME, ONLY_MATCH_FLOATERS_OPTION,
             WARRIORS_ROLE_NAME, ONLY_MATCH_WARRIORS_OPTION);
-    public static final String NO_PACE_OPTION = "No Pace";
+    public static final String NO_PACE_OPTION = "No pace";
     public static final String SLOW_PACE_OPTION = "Slow (90 days)";
     public static final String FAST_PACE_OPTION = "Average (30 days)";
     public static final String FASTER_PACE_OPTION = "Faster (15 days)";

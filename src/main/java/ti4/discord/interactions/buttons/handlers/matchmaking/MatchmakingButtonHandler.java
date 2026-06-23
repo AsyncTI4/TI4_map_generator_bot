@@ -65,6 +65,7 @@ class MatchmakingButtonHandler {
     private static final Map<String, Integer> PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT = Map.of(
             MatchmakingOptions.FASTER_PACE_OPTION, 19,
             MatchmakingOptions.FASTEST_PACE_OPTION, 10);
+    private static final int MAX_AVOID_PLAYERS = 25;
 
     @ButtonHandler(value = QUEUE_FOR_GAME_BUTTON_ID, save = false)
     public static void offerQueueForGameModal(ButtonInteractionEvent event) {
@@ -131,7 +132,6 @@ class MatchmakingButtonHandler {
     @ButtonHandler(value = ADDITIONAL_SETTINGS_BUTTON_ID, save = false)
     public static void offerQueueAdditionalSettingsModal(ButtonInteractionEvent event) {
         UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
-        final boolean REQUIRE_SELECTION = true;
         List<String> selectedMaxQueueTime = userSettings.getMatchmakingMaxQueueTime() == null
                 ? List.of()
                 : List.of(userSettings.getMatchmakingMaxQueueTime());
@@ -139,11 +139,10 @@ class MatchmakingButtonHandler {
                 MAX_QUEUE_TIME_ID,
                 MAX_QUEUE_TIME_OPTIONS_TO_HOURS.keySet(),
                 selectedMaxQueueTime,
-                List.of(DEFAULT_MAX_QUEUE_TIME),
-                REQUIRE_SELECTION);
+                List.of(DEFAULT_MAX_QUEUE_TIME));
         EntitySelectMenu avoidPlayers = EntitySelectMenu.create(AVOID_PLAYERS_ID, SelectTarget.USER)
                 .setRequired(false)
-                .setMaxValues(25)
+                .setMaxValues(MAX_AVOID_PLAYERS)
                 .setDefaultValues(userSettings.getMatchmakingAvoidList().stream()
                         .map(EntitySelectMenu.DefaultValue::user)
                         .toList())
@@ -275,12 +274,12 @@ class MatchmakingButtonHandler {
             List<String> selectedValues,
             List<String> defaultValues,
             boolean requireSelection) {
-        CheckboxGroup.Builder builder = CheckboxGroup.create(id);
+        CheckboxGroup.Builder builder = CheckboxGroup.create(id)
+            .setRequired(requireSelection)
+            .setSelectedValues(normalizeSelectedValues(selectedValues, options, defaultValues));
         for (String option : options) {
             builder.addOption(option, option);
         }
-        builder.setRequired(requireSelection);
-        builder.setSelectedValues(normalizeSelectedValues(selectedValues, options, defaultValues));
         return builder.build();
     }
 
@@ -288,16 +287,13 @@ class MatchmakingButtonHandler {
             String id,
             Collection<String> options,
             List<String> selectedValues,
-            List<String> defaultValues,
-            boolean requireSelection) {
-        StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(id);
+            List<String> defaultValues) {
+        StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(id)
+            .setRequiredRange(1, 1)
+            .setDefaultValues(normalizeSelectedValues(selectedValues, options, defaultValues));
         for (String option : options) {
             menuBuilder.addOptions(SelectOption.of(option, option));
         }
-        if (requireSelection) {
-            menuBuilder.setRequiredRange(1, 1);
-        }
-        menuBuilder.setDefaultValues(normalizeSelectedValues(selectedValues, options, defaultValues));
         return menuBuilder.build();
     }
 
