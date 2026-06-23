@@ -504,10 +504,14 @@ public final class ButtonHelperTwilightsFall {
                         "savedParticipants", game.getStoredValue("savedParticipants") + "_" + p.getFaction());
             }
         }
-        MessageHelper.sendMessageToChannel(
-                startPlayer.getCorrectChannel(),
-                "A splice has started with the following order of participants:\n"
-                        + getSpliceOrderString(participants));
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(startPlayer.getCorrectChannel(), "A splice has started.");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    startPlayer.getCorrectChannel(),
+                    "A splice has started with the following order of participants:\n"
+                            + getSpliceOrderString(participants));
+        }
 
         sendPlayerSpliceOptions(game, startPlayer);
         for (Player player2 : getParticipantsList(game)) {
@@ -564,9 +568,13 @@ public final class ButtonHelperTwilightsFall {
                         "savedParticipants", game.getStoredValue("savedParticipants") + "_" + p.getFaction());
             }
         }
-        MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(),
-                "The splice order has been reversed. The new order is: " + getSpliceOrderString(participants));
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "The splice order has been reversed.");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    "The splice order has been reversed. The new order is: " + getSpliceOrderString(participants));
+        }
 
         game.removeStoredValue("reverseSpliceOrder");
     }
