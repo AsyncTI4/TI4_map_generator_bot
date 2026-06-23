@@ -63,7 +63,7 @@ public class MatchmakerService {
         matchmakingQueueEntryRepository.save(entry);
     }
 
-    public boolean isQueueingDisabled() {
+    public static boolean isQueueingDisabled() {
         return DatabasePersistenceGate.isDisabled();
     }
 

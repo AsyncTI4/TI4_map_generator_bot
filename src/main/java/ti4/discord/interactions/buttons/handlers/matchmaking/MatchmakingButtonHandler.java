@@ -75,7 +75,7 @@ class MatchmakingButtonHandler {
     @ButtonHandler(value = QUEUE_FOR_GAME_BUTTON_ID, save = false)
     public static void offerQueueForGameModal(ButtonInteractionEvent event) {
         MatchmakerService matchmakerService = SpringContext.getBean(MatchmakerService.class);
-        if (matchmakerService.isQueueingDisabled()) {
+        if (MatchmakerService.isQueueingDisabled()) {
             event.reply("Queueing is currently disabled.")
                     .setEphemeral(true)
                     .queue(Consumers.nop(), BotLogger::catchRestError);
@@ -163,7 +163,7 @@ class MatchmakingButtonHandler {
     @ButtonHandler(value = LEAVE_QUEUE_BUTTON_ID, save = false)
     public static void leaveQueue(ButtonInteractionEvent event) {
         MatchmakerService matchmakerService = SpringContext.getBean(MatchmakerService.class);
-        if (matchmakerService.isQueueingDisabled()) {
+        if (MatchmakerService.isQueueingDisabled()) {
             MessageHelper.sendEphemeralMessageToEventChannel(
                     event, "Leaving queue is currently disabled. Try again later.");
             return;
@@ -188,16 +188,16 @@ class MatchmakingButtonHandler {
 
     @ModalHandler(QUEUE_FOR_GAME_MODAL_ID)
     public static void submitQueueForGameModal(ModalInteractionEvent event) {
+        String userId = event.getUser().getId();
+        UserSettings userSettings = UserSettingsManager.get(userId);
+
+        if (isPlayerAtGameLimit(event, userId, userSettings)) return;
+
         List<String> expansions = getSelectedValues(event, EXPANSIONS_ID);
         List<String> playerCounts = getSelectedValues(event, PLAYER_COUNTS_ID);
         List<String> victoryPoints = getSelectedValues(event, VICTORY_POINTS_ID);
         List<String> paces = getSelectedValues(event, PACE_RESTRICTIONS_ID);
         List<String> restrictions = getSelectedValues(event, RESTRICTIONS_ID);
-
-        String userId = event.getUser().getId();
-        UserSettings userSettings = UserSettingsManager.get(userId);
-
-        if (isPlayerAtGameLimit(event, userId, userSettings)) return;
 
         userSettings.setMatchmakingExpansions(expansions);
         userSettings.setMatchmakingPlayerCounts(playerCounts);
@@ -297,10 +297,10 @@ class MatchmakingButtonHandler {
         for (String option : options) {
             builder.addOption(option, option);
         }
-        if (requireSelection) {
-            builder.setRequired(requireSelection);
-        }
-        return builder.setSelectedValues(normalizeSelectedValues(selectedValues, options, defaultValues))
+        return builder
+                .setRequired(requireSelection)
+                .setRequiredRange(requireSelection ? 1 : 0, options.size())
+                .setSelectedValues(normalizeSelectedValues(selectedValues, options, defaultValues))
                 .build();
     }
 
