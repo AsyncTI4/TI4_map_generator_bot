@@ -28,4 +28,11 @@ public class MatchmakingQueueEntryEntity {
 
     @Column(name = "queued_at", nullable = false)
     private Instant queuedAt;
+
+    /**
+     * Shared identifier (the leader's user id) for all members of a party that queued together.
+     * {@code null} for solo entries.
+     */
+    @Column(name = "party_id")
+    private String partyId;
 }

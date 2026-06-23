@@ -10,6 +10,7 @@ import ti4.message.MessageHelper;
 class PostMatchmakingButtons extends Subcommand {
 
     private static final String QUEUE_BUTTON_ID = "queueForGame~MDL";
+    private static final String QUEUE_AS_GROUP_BUTTON_ID = "queueAsGroup~MDL";
     private static final String LEAVE_QUEUE_BUTTON_ID = "leaveQueueForGame";
     private static final String VIEW_QUEUE_BUTTON_ID = "viewMatchmakingQueue";
     private static final String ADDITIONAL_SETTINGS_BUTTON_ID = "queueForGameAdditionalSettings~MDL";
@@ -22,6 +23,7 @@ class PostMatchmakingButtons extends Subcommand {
     public void execute(SlashCommandInteractionEvent event) {
         List<Button> buttons = List.of(
                 Buttons.green(QUEUE_BUTTON_ID, "Queue for Game"),
+                Buttons.green(QUEUE_AS_GROUP_BUTTON_ID, "Queue as Group"),
                 Buttons.red(LEAVE_QUEUE_BUTTON_ID, "Leave Queue"),
                 Buttons.blue(VIEW_QUEUE_BUTTON_ID, "View Queue"),
                 Buttons.gray(ADDITIONAL_SETTINGS_BUTTON_ID, "Additional Settings"));

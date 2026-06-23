@@ -28,12 +28,12 @@ public class MatchmakingOptions {
     public static final List<String> VICTORY_POINT_OPTIONS = List.of("10", "12", "14");
     public static final String SIMILAR_ACTIVE_HOURS_OPTION = "Similar active hours";
     public static final String SIMILAR_PLAYER_SKILL_OPTION = "Similar player skill";
-    private static final String AVOID_NEW_PLAYERS_OPTION = "Avoid new async players";
+    public static final String AVOID_NEW_PLAYERS_OPTION = "Avoid new async players";
 
     public static final String FLOATERS_ROLE_NAME = "Floaters";
     public static final String WARRIORS_ROLE_NAME = "Warriors";
-    private static final String ONLY_MATCH_FLOATERS_OPTION = "Only match with Floaters";
-    private static final String ONLY_MATCH_WARRIORS_OPTION = "Only match with Warriors";
+    public static final String ONLY_MATCH_FLOATERS_OPTION = "Only match with Floaters";
+    public static final String ONLY_MATCH_WARRIORS_OPTION = "Only match with Warriors";
     private static final Map<String, String> ROLE_NAME_TO_ONLY_MATCH_OPTION = Map.of(
             FLOATERS_ROLE_NAME, ONLY_MATCH_FLOATERS_OPTION,
             WARRIORS_ROLE_NAME, ONLY_MATCH_WARRIORS_OPTION);
@@ -42,9 +42,17 @@ public class MatchmakingOptions {
     public static final String FAST_PACE_OPTION = "Average (30 days)";
     public static final String FASTER_PACE_OPTION = "Faster (15 days)";
     public static final String FASTEST_PACE_OPTION = "Fastest (7 days)";
-    private static final String TIGL_OPTION = "Twilight Imperium Global League";
+    public static final String TIGL_OPTION = "Twilight Imperium Global League";
     public static final List<String> PACE_RESTRICTION_OPTIONS =
             List.of(NO_PACE_OPTION, SLOW_PACE_OPTION, FAST_PACE_OPTION, FASTER_PACE_OPTION, FASTEST_PACE_OPTION);
+
+    /**
+     * Paces that require a recently completed game to select, mapped to the number of days within which a game must have
+     * been completed. Paces not listed have no eligibility requirement.
+     */
+    public static final Map<String, Integer> PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT =
+            Map.of(FASTER_PACE_OPTION, 19, FASTEST_PACE_OPTION, 10);
+
     public static final List<String> RESTRICTION_OPTIONS =
             List.of(SIMILAR_ACTIVE_HOURS_OPTION, SIMILAR_PLAYER_SKILL_OPTION, AVOID_NEW_PLAYERS_OPTION, TIGL_OPTION);
 
