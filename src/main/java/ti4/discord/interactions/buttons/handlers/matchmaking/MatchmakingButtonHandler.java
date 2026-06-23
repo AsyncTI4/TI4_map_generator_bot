@@ -274,13 +274,14 @@ class MatchmakingButtonHandler {
             List<String> selectedValues,
             List<String> defaultValues,
             boolean requireSelection) {
-        CheckboxGroup.Builder builder = CheckboxGroup.create(id)
-            .setRequired(requireSelection)
-            .setSelectedValues(normalizeSelectedValues(selectedValues, options, defaultValues));
+        CheckboxGroup.Builder builder = CheckboxGroup.create(id);
         for (String option : options) {
             builder.addOption(option, option);
         }
-        return builder.build();
+        return builder
+            .setRequired(requireSelection)
+            .setSelectedValues(normalizeSelectedValues(selectedValues, options, defaultValues))
+            .build();
     }
 
     private static StringSelectMenu buildSingleSelect(
@@ -288,13 +289,14 @@ class MatchmakingButtonHandler {
             Collection<String> options,
             List<String> selectedValues,
             List<String> defaultValues) {
-        StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(id)
-            .setRequiredRange(1, 1)
-            .setDefaultValues(normalizeSelectedValues(selectedValues, options, defaultValues));
+        StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(id);
         for (String option : options) {
             menuBuilder.addOptions(SelectOption.of(option, option));
         }
-        return menuBuilder.build();
+        return menuBuilder
+            .setRequiredRange(1, 1)
+            .setDefaultValues(normalizeSelectedValues(selectedValues, options, defaultValues))
+            .build();
     }
 
     private static List<String> getSelectedValues(ModalInteraction event, String modalValueId) {
