@@ -2773,7 +2773,9 @@ public final class AgendaHelper {
             }
             MessageHelper.sendMessageToChannel(channel, summary.toString());
         }
-        if (game.getCurrentAgendaInfo().startsWith("Law") && game.getLaws().size() == 2) {
+        if (!cov
+                && game.getCurrentAgendaInfo().startsWith("Law")
+                && game.getLaws().size() == 2) {
             MessageHelper.sendMessageToChannel(
                     channel, "## A reminder that there are currently 2 laws in play, so this would be the 3rd law.");
         }
