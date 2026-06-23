@@ -278,7 +278,10 @@ class MatchmakingButtonHandler {
         for (String option : options) {
             builder.addOption(option, option);
         }
-        return builder.setRequired(requireSelection)
+        if (requireSelection) {
+            builder.setRequiredRange(1, options.size());
+        }
+        return builder
                 .setSelectedValues(normalizeSelectedValues(selectedValues, options, defaultValues))
                 .build();
     }
