@@ -101,10 +101,11 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
                     .filter(tile -> withNebula == null || withNebula == tile.isNebula())
                     .filter(tile -> withSupernova == null || withSupernova == tile.isSupernova())
                     .filter(tile -> withLegendaries == null
-                            || withLegendaries == (tile.getPlanets() != null
-                                    && tile.getPlanets().stream()
-                                            .map(Mapper::getPlanet)
-                                            .anyMatch(PlanetModel::isLegendary)))
+                            || withLegendaries
+                                    == (tile.getPlanets() != null
+                                            && tile.getPlanets().stream()
+                                                    .map(Mapper::getPlanet)
+                                                    .anyMatch(PlanetModel::isLegendary)))
                     .sorted(Comparator.comparing(TileModel::getId))
                     .map(tile -> Map.entry(tile, tile.getRepresentationEmbed(includeAliases)))
                     .forEach(tileEmbeds::add);
