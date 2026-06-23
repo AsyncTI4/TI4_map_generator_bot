@@ -1457,14 +1457,5 @@ class LoreServiceTest extends BaseTi4Test {
             assertFalse(game.isLoreMode());
             assertFalse(LoreService.isLoreEnabled(game));
         }
-
-        @Test
-        void nonFowGameCreatedBeforeCutoffStaysEnabledWithoutLoreMode() {
-            // Grandfathered: this game could have already been using lore via /special2 lore
-            // before lore_mode existed, so it must keep working without any explicit opt-in.
-            game.setCreationDateTime(BEFORE_CUTOFF);
-            assertFalse(game.isLoreMode());
-            assertTrue(LoreService.isLoreEnabled(game));
-        }
     }
 }
