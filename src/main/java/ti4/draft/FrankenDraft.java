@@ -65,11 +65,12 @@ public class FrankenDraft extends BagDraft {
     }
 
     public static int getItemLimitForCategory(DraftCategory category, Game game) {
-        if (!game.getStoredValue("frankenLimit" + category).isEmpty()) {
+        BagDraft activeDraft = game.getActiveBagDraft();
+        int baseLimit = activeDraft == null ? 0 : activeDraft.getItemLimitForCategory(category);
+        if (baseLimit > 0 && !game.getStoredValue("frankenLimit" + category).isEmpty()) {
             return Integer.parseInt(game.getStoredValue("frankenLimit" + category));
-        } else {
-            return game.getActiveBagDraft().getItemLimitForCategory(category);
         }
+        return baseLimit;
     }
 
     @Override
@@ -89,7 +90,6 @@ public class FrankenDraft extends BagDraft {
         "kaltrim",
         "xin",
         "sarcosa",
-        "firmament",
         "obsidian"
     };
 
@@ -99,6 +99,10 @@ public class FrankenDraft extends BagDraft {
         if (!game.isDiscordantStarsMode()) {
             factionSet.removeIf(factionModel ->
                     factionModel.getSource().isDs() && !factionModel.getSource().isTe());
+        }
+        if (!game.isBlueReverieMode()) {
+            factionSet.removeIf(factionModel ->
+                    factionModel.getSource().isBr() && !factionModel.getSource().isTe());
         }
         factionSet.removeIf(factionModel -> contains(results, factionModel.getAlias()));
 
@@ -127,6 +131,9 @@ public class FrankenDraft extends BagDraft {
             }
             if ((game == null || game.isDiscordantStarsMode())
                     && model.getSource().isDs()) {
+                return false;
+            }
+            if ((game == null || game.isBlueReverieMode()) && model.getSource().isBr()) {
                 return false;
             }
             return !model.getSource().isPok();

@@ -1,5 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.agenda.resolver;
 
+import java.util.Objects;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -8,6 +9,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.message.MessageHelper;
 import ti4.service.unit.DestroyUnitService;
@@ -33,7 +35,8 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
                                 int amt = uH.getUnitCount(uk);
                                 count += amt;
                                 DestroyUnitService.destroyUnit(event, tile, game, uk, amt, uH, false);
-                                units.append(uk.unitEmoji().emojiString().repeat(amt));
+                                units.repeat(
+                                        Objects.requireNonNull(uk.unitEmoji().emojiString()), amt);
                             }
                         }
                     }
@@ -42,7 +45,7 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
                             int amt = uH.getUnitCount(uk);
                             count += amt;
                             DestroyUnitService.destroyUnit(event, tile, game, uk, amt, uH, false);
-                            units.append(uk.unitEmoji().emojiString().repeat(amt));
+                            units.repeat(Objects.requireNonNull(uk.unitEmoji().emojiString()), amt);
                         }
                     }
                     if (count > 0) {
@@ -55,7 +58,7 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
                     MessageHelper.sendMessageToChannel(
                             player.getPrivateChannel(),
                             "Destroyed all ground forces (" + units + ") on " + winner + ", and gave "
-                                    + player.getRepresentation() + " " + count + " trade good" + (count == 1 ? "" : "s")
+                                    + player.getRepresentation() + " " + StringHelper.pluralize(count, "trade good")
                                     + ".");
                     MessageHelper.sendMessageToChannel(
                             game.getMainGameChannel(),
@@ -64,7 +67,7 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
                     MessageHelper.sendMessageToChannel(
                             game.getMainGameChannel(),
                             "Destroyed all ground forces (" + units + ") on " + winner + ", and gave "
-                                    + player.getRepresentation() + " " + count + " trade good" + (count == 1 ? "" : "s")
+                                    + player.getRepresentation() + " " + StringHelper.pluralize(count, "trade good")
                                     + " in compensation.");
                 }
             }

@@ -75,6 +75,7 @@
     "title": "Ash-Tender",
     "abilityWindow": "When a player's ship would be destroyed during combat:",
     "abilityText": "You may exhaus this card to allow that player to remove that unit from the game board and place it in a different system that contains at least 1 of their ships and 1 of their command tokens.",
+    "notes": "In Async, this is triggered after the unit is destroyed, not when.",
     "unlockCondition": "Always Unlocked",
     "source": "beans"
   },
@@ -85,7 +86,8 @@
     "name": "Karos",
     "title": "Ember-Guide",
     "abilityWindow": "When you gain or research a unit upgrade technology:",
-    "abilityText": "Place 1 of the corresponding unit from your reinforcements into a system that contains a planet you control and no other player's ships. \n\nWhen you use BOMBARDMENT: \n\nFor each hit, you may either gain 1 commodity, or convert 1 of your commodities to a trade good.",
+    "abilityText": "Place 1 of the corresponding unit from your reinforcements into a system that contains a planet you control and no other player's ships. \n\nWhen you use your units BOMBARDMENT ability: \n\nFor each hit, before applying modifiers, you may either gain 1 commodity, or convert 1 of your commodities to a trade good.",
+    "notes": "This may be used on the unit that unlocked the commander.",
     "unlockCondition": "Use your Beauty in Destruction faction ability.",
     "source": "beans"
   },
@@ -97,7 +99,7 @@
     "title": "Flame-Warden",
     "abilityName": "Ashfall Effigy - Hell From Above",
     "abilityWindow": "ACTION:",
-    "abilityText": "Choose a system that contains 1 or more of your ships. Use each of your unit's BOMBARDMENT abilities in that system against each planet controlled by other players in and adjacent to that system. Then, purge this card.",
+    "abilityText": "Choose a system that contains 1 or more of your ships. Use each of your unit's BOMBARDMENT abilities in that system against each planet controlled by other players in and adjacent to that system, ignoring planetary shield. Hits produced by your flagship are assigned last. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans"
   },
@@ -153,7 +155,7 @@
     "name": "Zul",
     "title": "Grand Architect",
     "abilityWindow": "When you explore a planet:",
-    "abilityText": "Gain 1 trade good. If the explored planet has an attachment, gain 1 additional trade good.",
+    "abilityText": "Gain 1 commodity. If the explored planet has an attachment, you may convert that commodity to a trade good.",
     "unlockCondition": "Control 4 planets with designs.",
     "source": "beans"
   },

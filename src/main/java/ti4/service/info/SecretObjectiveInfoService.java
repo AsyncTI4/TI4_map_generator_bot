@@ -22,8 +22,6 @@ import ti4.service.emoji.CardEmojis;
 @UtilityClass
 public class SecretObjectiveInfoService {
 
-    private static final String PINNED_SO_INFO_MESSAGE_ID = "pinned_so_info_message_id";
-
     public static void sendSecretObjectiveInfo(Game game, Player player, ButtonInteractionEvent event) {
         sendSecretObjectiveInfo(game, player, event, false, false);
     }
@@ -66,8 +64,7 @@ public class SecretObjectiveInfoService {
     public static void sendSecretObjectiveInfo(
             Game game, Player player, boolean autoDiscardButtons, boolean autoScoreButtons) {
         // SO INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThreadAndPin(
-                game, player, PINNED_SO_INFO_MESSAGE_ID, getSecretObjectiveCardInfo(game, player));
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, getSecretObjectiveCardInfo(game, player));
 
         if (player.getSecretsUnscored().isEmpty()) return;
 

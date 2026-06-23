@@ -18,7 +18,7 @@ class AgendaHelperTest extends BaseTi4Test {
         player.setStrategicCC(1);
         player.setActionCard("veto", 1);
 
-        assertThat(AgendaHelper.getPossibleWhenNames(player))
+        assertThat(AgendaWhensAftersHelper.getPossibleWhenNames(player))
                 .contains(Mapper.getAbility("quash").getName())
                 .doesNotContain(Mapper.getActionCard("veto").getName());
     }
@@ -29,7 +29,7 @@ class AgendaHelperTest extends BaseTi4Test {
         player.addAbility("conspirators");
         player.setActionCard("sanction", 1);
 
-        assertThat(AgendaHelper.getPossibleAfterNames(player))
+        assertThat(AgendaWhensAftersHelper.getPossibleAfterNames(player))
                 .contains(Mapper.getAbility("conspirators").getName())
                 .doesNotContain(Mapper.getActionCard("sanction").getName());
     }
@@ -42,7 +42,7 @@ class AgendaHelperTest extends BaseTi4Test {
         game.setCurrentAgendaInfo("agenda_Elect Planet");
         game.setCurrentAgendaVote("mrte", "arborec_14");
 
-        assertThat(AgendaHelper.getSummaryOfVotes(game, true))
+        assertThat(AgendaSummaryHelper.getSummaryOfVotes(game, true))
                 .contains("Mecatol Rex: 14")
                 .doesNotContain("Mrte: 14");
     }
@@ -67,7 +67,7 @@ class AgendaHelperTest extends BaseTi4Test {
         game.setCurrentAgendaInfo("agenda_Elect Strategy Card");
         game.setCurrentAgendaVote("4", "arborec_10");
 
-        String summary = AgendaHelper.getSummaryOfVotes(game, true);
+        String summary = AgendaSummaryHelper.getSummaryOfVotes(game, true);
         assertThat(summary).contains("**Construction**");
     }
 
@@ -79,7 +79,7 @@ class AgendaHelperTest extends BaseTi4Test {
         game.setCurrentAgendaInfo("agenda_Elect Strategy Card");
         game.setCurrentAgendaVote("Construction", "arborec_10");
 
-        String summary = AgendaHelper.getSummaryOfVotes(game, true);
+        String summary = AgendaSummaryHelper.getSummaryOfVotes(game, true);
         assertThat(summary).contains("Construction: 10");
     }
 

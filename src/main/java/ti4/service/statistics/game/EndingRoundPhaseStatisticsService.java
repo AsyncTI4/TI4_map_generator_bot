@@ -1,5 +1,6 @@
 package ti4.service.statistics.game;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -164,8 +165,7 @@ class EndingRoundPhaseStatisticsService {
             return winsByRoundAndPhase.entrySet().stream()
                     .sorted(Map.Entry.comparingByKey())
                     .flatMap(roundEntry -> roundEntry.getValue().entrySet().stream()
-                            .sorted((left, right) -> Integer.compare(
-                                    getPhaseSortOrder(left.getKey()), getPhaseSortOrder(right.getKey())))
+                            .sorted(Comparator.comparingInt(left -> getPhaseSortOrder(left.getKey())))
                             .map(phaseEntry ->
                                     "R" + roundEntry.getKey() + phaseEntry.getKey() + ": " + phaseEntry.getValue()))
                     .collect(Collectors.joining(", "));

@@ -35,7 +35,7 @@ public class UserGameInfoService {
                 .map(UserGameInfoService::getDaysToComplete)
                 .filter(days -> days > 0)
                 .sorted()
-                .limit(3)
+                .limit(5)
                 .toList();
     }
 

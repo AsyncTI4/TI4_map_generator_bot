@@ -21,8 +21,7 @@
             "PROPULSION",
             "BIOTIC"
         ],
-        "text": "ACTION: Exhaust this card to allow each other player to explore a planet they control; gain a number of commodities equal to the number of players who do.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/bentorbt.webp?raw=true",
+        "text": "ACTION: Exhaust this card to allow each player to explore a planet they control; gain a number of commodities equal to the number of other players who do.",
         "source": "ds"
     },
     {
@@ -60,8 +59,7 @@
             "CYBERNETIC",
             "WARFARE"
         ],
-        "text": "At any time, you may discard 1 action card to cancel up to 2 hits produced against your ground forces.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/cymiaebt.webp?raw=true",
+        "text": "At any time, you may discard 1 action card to cancel up to 2 hits produced against your ground forces, or place 1 infantry from your reinforcements on a planet that contains your units. After you lose a ground combat, gain 1 commodity.",
         "source": "ds"
     },
     {
@@ -125,8 +123,7 @@
             "BIOTIC",
             "PROPULSION"
         ],
-        "text": "When you pass, you may exhaust this card to move 1 ingress token into an empty system. Your units may retreat to any empty system that does not contain another player's ships.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/ghotibt.webp?raw=true",
+        "text": "When you pass, you may exhaust this card to move 1 ingress token into an empty system, or move 1 of your ships to an adjacent system that contains your ships. Your units may retreat to any empty system that does not contain another player's ships.",
         "source": "ds"
     },
     {
@@ -151,8 +148,7 @@
             "CYBERNETIC",
             "BIOTIC"
         ],
-        "text": "When you would explore a planet, you may instead draw 1 action card.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/augersbt.webp?raw=true",
+        "text": "When you explore a planet, you may discard that card to draw 1 action card instead.",
         "source": "ds"
     },
     {
@@ -190,8 +186,7 @@
             "PROPULSION",
             "CYBERNETIC"
         ],
-        "text": "ACTION: Exhaust this card to either gain 1 command token, or spend 3 influence to research a technology of the same color as 1 of your exhausted technologies.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/kolumebt.webp?raw=true",
+        "text": "ACTION: Exhaust this card to either gain 1 command token, or research a technology of the same color as one of your exhausted technologies.",
         "source": "ds"
     },
     {
@@ -203,8 +198,7 @@
             "PROPULSION",
             "BIOTIC"
         ],
-        "text": "At the end of your turn, you may exhaust this card and choose 1 other player; you and that player each secretly spend 0, 1, or 2 trade goods. Then, reveal the spent trade goods; if you spent the same number of trade goods, take 1 promissory note from that player's hand, at random.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/florzenbt.webp?raw=true",
+        "text": "At the end of your turn, you may exhaust this card and choose 1 other player; you and that player each secretly spend 0, 1, or 2 trade goods. Then, reveal the spent trade goods; if you spent a different number of trade goods, you may take 1 promissory note from that player's hand, at random, or explore 1 planet you control.",
         "source": "ds"
     },
     {
@@ -229,8 +223,7 @@
             "CYBERNETIC",
             "WARFARE"
         ],
-        "text": "When researching a technology, you may discard an action card to ignore 1 of that technology's prerequisites. Other players must spend 1 influence as an additional cost to research or gain a technology you own.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/kyrobt.webp?raw=true",
+        "text": "When researching a technology, you may discard an action card to ignore 1 of that technology's prerequisites. Once per action, when you win a combat, for each technology your opponent owns, if you do not own that technology, gain 1 commodity or convert 1 of your commodities to a trade good.",
         "source": "ds"
     },
     {
@@ -268,8 +261,7 @@
             "BIOTIC",
             "CYBERNETIC"
         ],
-        "text": "When you resolve METEOR SLINGS, you may choose for your units to coexist instead; if you do, you may reroll each of your unit's BOMBARDMENT rolls. While you are coexisting on 1 or more planets, you control the Grove card.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/khraskbt.webp?raw=true",
+        "text": "Gain the Grove card. When you resolve METEOR SLINGS, you may place your units into coexistence to reroll any of your units' BOMBARDMENT rolls; you cannot commit those coexisting ground forces during this action.",
         "source": "ds"
     },
     {
@@ -333,8 +325,7 @@
             "CYBERNETIC",
             "WARFARE"
         ],
-        "text": "ACTION: Exhaust this card to place 1 neutral cruiser and 2 neutral destroyers into a non-fracture system that contains no non-neutral ships. After another player wins a space combat in a system that contains your ships, gain 2 commodities.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/nokarbt.webp?raw=true",
+        "text": "ACTION: Exhaust this card to place 1 neutral cruiser and 2 neutral destroyers into a non-fracture system that contains no non-neutral ships. After another player wins a space combat in a system that contains your ships, gain 2 commodities or 1 command token.",
         "source": "ds"
     },
     {
@@ -385,8 +376,7 @@
             "WARFARE",
             "PROPULSION"
         ],
-        "text": "During ground combat, you may exhaust this card; all your units on that planet enter coexistence and that combat ends in a draw. When a player ends coexistence with your units, draw 1 secret objective.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/tnelisbt.webp?raw=true",
+        "text": "During ground combat, if the active system does not contain 1 of your command tokens, you may place 1 token from your strategy pool in that system to have all your units enter coexistence. When a player ends coexistence with your units, draw 1 secret objective.",
         "source": "ds"
     },
     {
@@ -398,8 +388,7 @@
             "WARFARE",
             "BIOTIC"
         ],
-        "text": "Other players cannot take any of your trade goods, commodities, or relic fragments unless you allow it. When another player returns 1 of your promissory notes, place 1 of their control tokens on your faction sheet.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/vadenbt.webp?raw=true",
+        "text": "Other players cannot take or force you to give them any of your trade goods, commodities, or relic fragments, unless you allow it. When another player returns 1 of your promissory notes, place 1 of their control tokens on your faction sheet.",
         "source": "ds"
     },
     {

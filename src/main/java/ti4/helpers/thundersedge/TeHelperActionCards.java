@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -25,6 +27,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.SecretObjectiveHelper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -123,10 +126,11 @@ public class TeHelperActionCards {
         if (soCount != 0) {
             SecretObjectiveHelper.showAll(player, p2, game);
         }
-        String message = player.getRepresentation() + " discarded their " + acCount + " action card"
-                + (acCount == 1 ? "" : "s") + ", gave their " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
-                + " to " + p2.getRepresentationNoPing() + ", and showed their " + soCount + " unscored secret objective"
-                + (soCount == 1 ? "" : "s") + " to them as well.";
+        String message =
+                player.getRepresentation() + " discarded their " + StringHelper.pluralize(acCount, "action card")
+                        + ", gave their " + StringHelper.pluralize(tgCount, "trade good") + " to "
+                        + p2.getRepresentationNoPing() + ", and showed their "
+                        + StringHelper.pluralize(soCount, "unscored secret objective") + " to them as well.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
     }
@@ -262,7 +266,7 @@ public class TeHelperActionCards {
     }
 
     @ButtonHandler("loseAFleetCultural")
-    private static void loseAFleetCultural(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+    private static void loseAFleetCultural(Game game, Player player, ButtonInteractionEvent event) {
         String mahactReason = "due to failing to reach an agreement on _Exchange Program_";
         MahactTokenService.removeFleetCC(game, player, mahactReason);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -276,8 +280,7 @@ public class TeHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("strategize")
-    private static void resolveStrategize(Game game, Player player, ButtonInteractionEvent event) {
+    public static List<Button> getReadiedStrategyCardSecondaryButtons(Game game) {
         List<Button> buttons = new ArrayList<>();
 
         if (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1)) {
@@ -306,6 +309,13 @@ public class TeHelperActionCards {
             buttons.add(Buttons.green("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
 
+        return buttons;
+    }
+
+    @ButtonHandler("strategize")
+    private static void resolveStrategize(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = getReadiedStrategyCardSecondaryButtons(game);
+
         String message = player.getRepresentationUnfogged() + ", please resolve _Strategize_ using these buttons.";
         String msg2 = player.getRepresentation()
                 + ", A strategy token was auto deducted (if possible) due to so many people forgetting to do so. If you end up resolving leadership, please gain it back (the bot wont make you pay for it).";
@@ -316,6 +326,12 @@ public class TeHelperActionCards {
         buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
+        if (player.hasUnlockedBreakthrough("onyxxabt")) {
+            OnyxxaBreakthroughButtonHandler.offerSCRollButton(game, player);
+        }
+        if (!player.hasLeaderUnlocked("onyxxacommander") && "onyxxa".equals(player.getFaction())) {
+            OnyxxaCommanderButtonHandler.offerCommanderUnlockButton(player);
+        }
         ButtonHelper.deleteMessage(event);
     }
 

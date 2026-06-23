@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.PhantomEnergyHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.PhantomEnergyHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -82,6 +82,15 @@ public class EndTurnService {
         game.removeStoredValue("mahactHeroTarget");
         game.removeStoredValue("possiblyUsedRift");
         game.removeStoredValue("heartWarnedThisTurn");
+        String fieldTestTech = game.getStoredValue("fieldTestTech" + player.getFaction());
+        if (!fieldTestTech.isEmpty()) {
+            player.removeTech(fieldTestTech);
+            game.removeStoredValue("fieldTestTech" + player.getFaction());
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing()
+                            + " lost temporary access to their _Field Test_ technology at the end of their turn.");
+        }
         game.setActiveSystem("");
     }
 

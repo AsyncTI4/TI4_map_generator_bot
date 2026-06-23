@@ -6,9 +6,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -48,6 +49,13 @@ public class AddUnitService {
             if (game.getRealPlayers().stream().anyMatch(player -> player.hasLeader("netrunnerscommander"))) {
                 NetrunnersLeadersHandler.checkCommanderUnlock(game, unit.unitKey());
             }
+            Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
+            if (player != null
+                    && player.hasUnit("ta_flagship")
+                    && unit.unitKey().unitType() == UnitType.Flagship) {
+                TaUnitHandler.offerWorldshaperOnFlagshipPlacement(
+                        event, game, unit.unitKey(), unit.uh().getName(), tile);
+            }
 
             String color = unit.unitKey().colorID();
             handleFogOfWar(tile, color, game, unit.unitKey() + " " + unit.getTotalRemoved());
@@ -78,6 +86,14 @@ public class AddUnitService {
             if (game.getRealPlayers().stream().anyMatch(player -> player.hasLeader("netrunnerscommander"))) {
                 NetrunnersLeadersHandler.checkCommanderUnlock(game, parsedUnit.unitKey());
             }
+            Player player =
+                    game.getPlayerFromColorOrFaction(parsedUnit.unitKey().colorID());
+            if (player != null
+                    && player.hasUnit("ta_flagship")
+                    && parsedUnit.unitKey().unitType() == UnitType.Flagship) {
+                TaUnitHandler.offerWorldshaperOnFlagshipPlacement(
+                        event, game, parsedUnit.unitKey(), parsedUnit.location(), tile);
+            }
         }
 
         handleFogOfWar(tile, color, game, unitList);
@@ -100,6 +116,14 @@ public class AddUnitService {
             }
             if (game.getRealPlayers().stream().anyMatch(player -> player.hasLeader("netrunnerscommander"))) {
                 NetrunnersLeadersHandler.checkCommanderUnlock(game, parsedUnit.unitKey());
+            }
+            Player player =
+                    game.getPlayerFromColorOrFaction(parsedUnit.unitKey().colorID());
+            if (player != null
+                    && player.hasUnit("ta_flagship")
+                    && parsedUnit.unitKey().unitType() == UnitType.Flagship) {
+                TaUnitHandler.offerWorldshaperOnFlagshipPlacement(
+                        event, game, parsedUnit.unitKey(), parsedUnit.location(), tile);
             }
         }
 
@@ -184,6 +208,10 @@ public class AddUnitService {
             }
             if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasLeader("netrunnerscommander"))) {
                 NetrunnersLeadersHandler.checkCommanderUnlock(game, parsedUnit.unitKey());
+            }
+            if (player.hasUnit("ta_flagship") && parsedUnit.unitKey().unitType() == UnitType.Flagship) {
+                TaUnitHandler.offerWorldshaperOnFlagshipPlacement(
+                        event, game, parsedUnit.unitKey(), parsedUnit.location(), tile);
             }
             if (!first) {
                 unitListBuilder.append(", ");

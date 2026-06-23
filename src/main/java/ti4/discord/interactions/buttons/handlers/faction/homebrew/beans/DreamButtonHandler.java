@@ -448,7 +448,7 @@ public class DreamButtonHandler {
         }
         ButtonHelper.deleteMessage(event);
         Tile tile = game.getTileByPosition(buttonID.replace("dream_hero_add_nexus_", ""));
-        if (tile == null || !isDreamHeroNexusDestination(game, tile) || tileContainsNexusToken(game, tile, false)) {
+        if (!isDreamHeroNexusDestination(game, tile) || tileContainsNexusToken(game, tile, false)) {
             MessageHelper.sendMessageToEventChannel(event, "That is not a valid system for a nexus token.");
             return;
         }
@@ -523,7 +523,6 @@ public class DreamButtonHandler {
         Tile fromTile = game.getTileByPosition(parts[0]);
         Tile toTile = game.getTileByPosition(parts[1]);
         if (fromTile == null
-                || toTile == null
                 || !tileContainsNexusToken(game, fromTile, false)
                 || !isDreamHeroNexusDestination(game, toTile)
                 || tileContainsNexusToken(game, toTile, false)) {
@@ -663,7 +662,7 @@ public class DreamButtonHandler {
 
         int pageSize = Math.max(1, HERO_BUTTON_LIMIT - persistentCount - 2);
         int maxPage = (mainButtons.size() - 1) / pageSize;
-        int currentPage = Math.max(0, Math.min(page, maxPage));
+        int currentPage = Math.clamp(page, 0, maxPage);
         int fromIndex = currentPage * pageSize;
         int toIndex = Math.min(fromIndex + pageSize, mainButtons.size());
 
@@ -1076,8 +1075,8 @@ public class DreamButtonHandler {
             return;
         }
 
-        if (!tile.getPlanetUnitHolders().stream()
-                .anyMatch(p -> player.getPlanets().contains(p.getName()))) {
+        if (tile.getPlanetUnitHolders().stream()
+                .noneMatch(p -> player.getPlanets().contains(p.getName()))) {
             MessageHelper.sendMessageToEventChannel(event, "You do not control a planet in that system.");
             return;
         }

@@ -302,7 +302,6 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     private int getAfbHitsOn(Player player, boolean allowShrapnelTurrets) {
-        // if (player.hasRelic("metalivoidarmaments") && afbHitsOn == 0) return 6;
         if (allowShrapnelTurrets && shouldUseShrapnelTurrets(player)) {
             return 8;
         }

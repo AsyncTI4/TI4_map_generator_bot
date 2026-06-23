@@ -542,7 +542,7 @@ public class LazaxCombatSupport {
 
     private double safeRatio(double weaker, double stronger) {
         if (stronger <= 0) return 0.0;
-        return Math.max(0.0, Math.min(1.0, weaker / stronger));
+        return Math.clamp(weaker / stronger, 0.0, 1.0);
     }
 
     public record SpaceCombatSnapshot(

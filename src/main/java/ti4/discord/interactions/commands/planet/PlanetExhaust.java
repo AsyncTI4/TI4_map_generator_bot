@@ -1,6 +1,7 @@
 package ti4.discord.interactions.commands.planet;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -33,5 +34,6 @@ public class PlanetExhaust extends PlanetAddRemove {
             DiscordantStarsHelper.handleOlradinPoliciesWhenExhaustingPlanets(game, player, planet);
         }
         player.exhaustPlanet(planet);
+        TaAbilityHandler.resolveGrandDesign(player, game, planet);
     }
 }

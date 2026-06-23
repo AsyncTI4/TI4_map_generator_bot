@@ -237,7 +237,7 @@ public class CreateGameButtonHandler {
                             member.getUser().getId());
             if (!threeFastestDays.isEmpty()) {
                 memberList.append(" (");
-                for (int i = 0; i < threeFastestDays.size(); i++) {
+                for (int i = 0; i < threeFastestDays.size() && i < 3; i++) {
                     memberList.append("`").append(threeFastestDays.get(i)).append("`");
                     if (i != threeFastestDays.size() - 1) memberList.append(", ");
                 }
@@ -431,7 +431,14 @@ public class CreateGameButtonHandler {
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
             int ongoingAmount = UserGameInfoService.countOngoingGamesThatAffectJoinLimit(managedPlayer);
             int completedGames = UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer);
-            if (UserGameInfoService.isOverStandardGameLimit(managedPlayer)) {
+            int limitIncrease = 0;
+            if (event.getChannel() instanceof ThreadChannel channel) {
+                String parentName = channel.getParentChannel().getName();
+                if ("making-private-games".equalsIgnoreCase(parentName)) {
+                    limitIncrease = 1;
+                }
+            }
+            if (ongoingAmount > completedGames + 2 + limitIncrease) {
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(),
                         member.getUser().getAsMention()

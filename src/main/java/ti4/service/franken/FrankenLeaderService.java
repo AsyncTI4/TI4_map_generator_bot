@@ -56,7 +56,14 @@ public class FrankenLeaderService {
             sb.append("> ").append(leaderID).append(" (player had this leader)");
         } else {
             Leader leader = new Leader(leaderID);
-            sb.append("> ").append(Helper.getLeaderFullRepresentation(leader));
+            LeaderModel leaderModel = Mapper.getLeader(leaderID);
+            sb.append("> ")
+                    .append(FrankenAlternateTextService.getRepresentationWithAlternateText(
+                            player.getGame(),
+                            FrankenAlternateTextService.getLeaderCategory(leaderModel),
+                            leaderID,
+                            leaderModel.getNameRepresentation(),
+                            Helper.getLeaderFullRepresentation(leader)));
         }
         sb.append('\n');
         return sb.toString();

@@ -17,9 +17,9 @@ public class SetDeckService {
         if (deckModel == null) {
             return false;
         }
+        boolean resetDeck = event.getOption("reset_deck", Boolean.FALSE, OptionMapping::getAsBoolean);
         return switch (deckType) {
             case Constants.AC_DECK -> {
-                boolean resetDeck = event.getOption("reset_deck", Boolean.FALSE, OptionMapping::getAsBoolean);
                 if (resetDeck) {
                     game.resetActionCardDeck(deckModel);
                     yield true;
@@ -33,11 +33,17 @@ public class SetDeckService {
             case Constants.STAGE_1_PUBLIC_DECK -> {
                 game.setPublicObjectives1(new ArrayList<>(deckModel.getNewShuffledDeck()));
                 game.setStage1PublicDeckID(deckModel.getAlias());
+                if (resetDeck) {
+                    resetPeekableAndPeekedPublicObjectives(game, 1);
+                }
                 yield true;
             }
             case Constants.STAGE_2_PUBLIC_DECK -> {
                 game.setPublicObjectives2(new ArrayList<>(deckModel.getNewShuffledDeck()));
                 game.setStage2PublicDeckID(deckModel.getAlias());
+                if (resetDeck) {
+                    resetPeekableAndPeekedPublicObjectives(game, 2);
+                }
                 yield true;
             }
             case Constants.EXPLORATION_DECKS -> {
@@ -67,6 +73,24 @@ public class SetDeckService {
                 }
                 player.removeTech(tech);
             }
+        }
+    }
+
+    private static void resetPeekableAndPeekedPublicObjectives(Game game, int stage) {
+        if (stage == 1) {
+            game.getPublicObjectives1Peeked().clear();
+            game.getPublicObjectives1Peekable().clear();
+            game.setUpPeekableObjectives(5, 1);
+            game.getRevealedPublicObjectives()
+                    .keySet()
+                    .removeIf(Mapper.getPublicObjectivesStage1().keySet()::contains);
+        } else {
+            game.getPublicObjectives2Peeked().clear();
+            game.getPublicObjectives2Peekable().clear();
+            game.setUpPeekableObjectives(5, 2);
+            game.getRevealedPublicObjectives()
+                    .keySet()
+                    .removeIf(Mapper.getPublicObjectivesStage2().keySet()::contains);
         }
     }
 }

@@ -32,11 +32,10 @@ import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
 import ti4.draft.FrankenDrazDraft;
 import ti4.draft.InauguralSpliceFrankenDraft;
-import ti4.draft.items.AgentDraftItem;
 import ti4.draft.items.FactionDraftItem;
-import ti4.draft.items.HeroDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.StringHelper;
 import ti4.helpers.discord.ContainerHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -191,7 +190,7 @@ public class FrankenDraftBagService {
         StringBuilder sb = new StringBuilder();
         for (DraftCategory cat : DraftCategory.values()) {
             if (bag.getCategoryCount(cat) == 0) continue;
-            sb.append(cat.title(player.getGame()) + "\n");
+            sb.append(cat.title(player.getGame())).append("\n");
             for (DraftItem item : bag.Contents) {
                 if (item.getItemCategory() != cat) continue;
                 sb.append("> ").append(item.getShortDescription()).append('\n');
@@ -389,11 +388,7 @@ public class FrankenDraftBagService {
         sb.append("):\n");
         for (DraftItem item : bag.getCategory(cat)) {
             sb.append("> ").append(item.getShortDescription()).append('\n');
-            if (item instanceof AgentDraftItem || item instanceof HeroDraftItem) {
-                sb.append("> - ").append(item.getLongDescription(game)).append('\n');
-            } else {
-                sb.append("> - ").append(item.getLongDescription()).append('\n');
-            }
+            sb.append("> - ").append(item.getLongDescription(game)).append('\n');
         }
         return sb.toString();
     }
@@ -440,7 +435,7 @@ public class FrankenDraftBagService {
         List<Player> realPlayers = game.getRealPlayers();
         for (int i = 0; i < realPlayers.size(); i++) {
             Player player = realPlayers.get(i);
-            game.getActiveBagDraft().giveBagToPlayer(bags.get(i), player);
+            BagDraft.giveBagToPlayer(bags.get(i), player);
             player.resetDraftQueue();
 
             showPlayerBag(game, player);
@@ -467,19 +462,19 @@ public class FrankenDraftBagService {
         String message;
         if (first == next) {
             message = "# " + game.getPing() + " " + draftName + " has started!\n"
-                    + "As a reminder, you will pick " + first + " item" + (first == 1 ? "" : "s") + " from each bag.\n"
+                    + "As a reminder, you will pick " + StringHelper.pluralize(first, "item") + " from each bag.\n"
                     + "After each pick, the draft thread will be recreated. Sometimes Discord will lag while sending long messages, so the buttons may take a few seconds to show up.\n"
                     + "Once you have made your "
-                    + first + " pick" + (first == 1 ? "" : "s")
+                    + StringHelper.pluralize(first, "pick")
                     + ", the bags will automatically be passed once everyone is ready.";
         } else {
             message = "# " + game.getPing() + " " + draftName + " has started!\n"
                     + "As a reminder, for the first bag you pick "
-                    + first + " item" + (first == 1 ? "" : "s") + ", and for all the bags after that you pick "
-                    + next + " item" + (next == 1 ? "" : "s") + ".\n"
+                    + StringHelper.pluralize(first, "item") + ", and for all the bags after that you pick "
+                    + StringHelper.pluralize(next, "item") + ".\n"
                     + "After each pick, the draft thread will be recreated. Sometimes Discord will lag while sending long messages, so the buttons may take a few seconds to show up.\n"
                     + "Once you have made your "
-                    + next + " pick" + (next == 1 ? "" : "s") + " (" + first
+                    + StringHelper.pluralize(next, "pick") + " (" + first
                     + " in the first bag), the bags will automatically be passed once everyone is ready.";
         }
 

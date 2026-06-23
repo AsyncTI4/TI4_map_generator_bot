@@ -42,12 +42,15 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.MobilizationEngineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersFactionTechsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -827,8 +830,8 @@ public final class Helper {
             Button button;
             String label = getSCName(sc, game);
             if (game.getScTradeGoods().get(sc) > 0 && !game.isFowMode()) {
-                label += " [Has " + game.getScTradeGoods().get(sc) + " Trade Good"
-                        + (game.getScTradeGoods().get(sc) == 1 ? "" : "s") + "]";
+                label +=
+                        " [Has " + StringHelper.pluralize(game.getScTradeGoods().get(sc), "Trade Good") + "]";
             }
             if (game.isTwilightsFallMode() && game.getStoredValue("deflectedSC").equalsIgnoreCase(sc + "")) {
                 label += " [Has Tartarus On It]";
@@ -1472,6 +1475,13 @@ public final class Helper {
                             .append(FactionEmojis.Ghost)
                             .append('\n');
                 }
+                if (thing.contains("liquidation")) {
+                    int reduce = thing.replace("liquidation", "").isEmpty()
+                            ? 0
+                            : Integer.parseInt(thing.replace("liquidation", ""));
+                    res += reduce * 2;
+                    msg.append("> Used _Liquidation_ for a ").append(reduce * 2).append(" resource discount.\n");
+                }
                 if (thing.contains("aida")) {
                     msg.append("Exhausted ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ ");
                     if (thing.contains("_")) {
@@ -1611,7 +1621,10 @@ public final class Helper {
                     if (entry.getValue() < 10) {
                         localPlace
                                 .append("> ")
-                                .append(removedUnit.getUnitEmoji().toString().repeat(entry.getValue()))
+                                .repeat(
+                                        Objects.requireNonNull(
+                                                removedUnit.getUnitEmoji().toString()),
+                                        entry.getValue())
                                 .append('\n');
                     } else {
                         localPlace
@@ -1686,6 +1699,12 @@ public final class Helper {
                     boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
                     if (warM) {
                         productionLimit += 4;
+                    }
+                    for (String spent : player.getSpentThingsThisWindow()) {
+                        if (spent.startsWith("liquidation")
+                                && !spent.replace("liquidation", "").isEmpty()) {
+                            productionLimit -= Integer.parseInt(spent.replace("liquidation", ""));
+                        }
                     }
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
                         productionLimit += 2;
@@ -1821,13 +1840,17 @@ public final class Helper {
                 productionValueTotal += productionValue * uH.getUnits().get(unit);
             }
         }
+        if (uH instanceof Planet planet
+                && TaPromissoryHandler.planetHasAdvancedStructuralEngineering(planet)
+                && player.getPlanets().contains(planet.getName())) {
+            productionValueTotal += Math.max(0, planet.getResources());
+        }
         String planet = uH.getName();
         int planetUnitVal = 0;
         if ("space".equals(uH.getName())) {
             if (tile.isSupernova()
-                    && player.hasTech("mr")
-                    && (FoWHelper.playerHasUnitsInSystem(player, tile)
-                            || (game.isTwilightsFallMode()
+                    && ((player.hasTech("mr") && (FoWHelper.playerHasUnitsInSystem(player, tile)))
+                            || (player.hasTech("tf-mr")
                                     && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)))) {
                 productionValueTotal += 5;
             } else {
@@ -1841,6 +1864,9 @@ public final class Helper {
                     && !tile.getWormholes(game).isEmpty()
                     && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
                 productionValueTotal += tile.getWormholes(game).size();
+            }
+            if (player.hasTech("tf-networkeddeployment") && CommandCounterHelper.hasCC(player, tile)) {
+                productionValueTotal++;
             }
         }
 
@@ -2238,7 +2264,7 @@ public final class Helper {
                 ButtonHelper.isLawInPlay(game, "conscription") || ButtonHelper.isLawInPlay(game, "absol_conscription");
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String tp = tile.getPosition();
-        String remaining = "";
+        String remaining;
         if (!"solbtbuild".equalsIgnoreCase(warfareNOtherstuff)) {
             if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {
                 if (player.hasWarsunTech() && resourcelimit > 9) {
@@ -2379,6 +2405,7 @@ public final class Helper {
             unitButtons.add(ff2Button);
         }
         boolean greenMechd = false;
+        boolean ironMechSpaceAdded = false;
 
         if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff)
                 && !"arboHeroBuild".equalsIgnoreCase(warfareNOtherstuff)
@@ -2523,6 +2550,20 @@ public final class Helper {
                 if (resourcelimit > 1 && !greenMechd) {
                     unitButtons.add(mfButton);
                 }
+                if (resourcelimit > 1 && !ironMechSpaceAdded && IronAbilitiesHandler.hasExoAtmospheric(player)) {
+                    Button spaceMechButton = Buttons.green(
+                            player.factionButtonChecker() + placePrefix + "_mech_space" + tile.getPosition(),
+                            "Produce Mech in space",
+                            UnitEmojis.mech);
+                    if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
+                        spaceMechButton = Buttons.gray(
+                                player.factionButtonChecker() + placePrefix + "_mech_space" + tile.getPosition(),
+                                "Produce Mech in space",
+                                UnitEmojis.mech);
+                    }
+                    unitButtons.add(spaceMechButton);
+                    ironMechSpaceAdded = true;
+                }
 
             } else if (ButtonHelper.canIBuildGFInSpace(player, tile, warfareNOtherstuff)
                     && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
@@ -2553,6 +2594,9 @@ public final class Helper {
         }
         if (!"sling".equalsIgnoreCase(warfareNOtherstuff) && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
             unitButtons.addAll(getPlaceUnitButtonsForSaarCommander(player, tile, game, placePrefix));
+        }
+        if (!"sling".equalsIgnoreCase(warfareNOtherstuff)) {
+            unitButtons.addAll(IronBreakthroughHandler.getPlaceUnitButtonsForIronBt(player, tile, game, placePrefix));
         }
         if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasUnit("netrunners_flagship"))
                 && NetrunnersUnitsHandler.empBlocksGroundForceProduction(game, player, tile)) {
@@ -2755,7 +2799,11 @@ public final class Helper {
                 ccCount += player_.getStrategicCC();
                 ccCount += player_.getTacticalCC();
                 ccCount += player_.getFleetCC();
-            } else if (player_.hasAbility("imperia") || player_.hasAbility("edict")) {
+            } else if (player_.hasAbility("primacy")
+                    || player_.hasAbility("edict")
+                    || player_.hasAbility("edict_y")
+                    || player_.hasAbility("imperia")
+                    || player_.hasAbility("imperia_y")) {
                 for (String color_ : player_.getMahactCC()) {
                     ColorModel ccColor = Mapper.getColor(color_);
                     if (player.getColor().equalsIgnoreCase(ccColor.getName())) {
@@ -2972,7 +3020,7 @@ public final class Helper {
     private static void addPlayerPermissionsToPrivateChannels(Game game) {
         long permission = Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
         for (Player player : game.getPlayers().values()) {
-            TextChannel channel = (TextChannel) player.getPrivateChannel();
+            TextChannel channel = player.getPrivateChannel();
             if (channel != null) {
                 channel.getManager()
                         .putMemberPermissionOverride(player.getMember().getIdLong(), permission, 0)
@@ -3388,6 +3436,9 @@ public final class Helper {
     public static boolean mechCheck(String planetName, Game game, Player player) {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        if (player.hasUnlockedBreakthrough("ironbt")) {
+            return true;
+        }
         return unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0;
     }
 

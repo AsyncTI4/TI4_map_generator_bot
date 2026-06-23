@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.lunarium.LunariumAbilityButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -19,6 +19,7 @@ import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.button.ReactionService;
@@ -202,8 +203,8 @@ public class CommandCounterButtonHandler {
                         player.getCardsInfoThread(),
                         "## " + player.getRepresentationUnfogged()
                                 + ", heads up, the bot thinks you should gain " + (properGain == 1 ? "only " : "")
-                                + properGain + " command token"
-                                + (properGain == 1 ? "" : "s") + " now due to: " + reasons + ".");
+                                + StringHelper.pluralize(properGain, "command token") + " now due to: " + reasons
+                                + ".");
                 if (!player.getMahactCC().isEmpty() && mahactMalev) {
                     String malevMsg = "## " + player.getRepresentationUnfogged() + " you should gain your normal";
                     malevMsg += " amount of tokens now, and then you will have the option to lose your own or another";
@@ -260,15 +261,7 @@ public class CommandCounterButtonHandler {
 
     @ButtonHandler("gain_CC")
     public static void gainCC(ButtonInteractionEvent event, Player player, Game game) {
-        String message = "";
-
-        String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
-                + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
-        game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
-        List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
-
-        ReactionService.addReaction(event, game, player, message);
+        gainCCNoDelete(event, player, game);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
@@ -288,7 +281,7 @@ public class CommandCounterButtonHandler {
     @ButtonHandler("confirm_cc")
     public static void confirmCC(ButtonInteractionEvent event, Game game, Player player) {
         String message = "Confirmed command tokens: " + player.getTacticalCC() + "/" + player.getFleetCC();
-        if (!player.getMahactCC().isEmpty()) {
+        if (player.hasAbility("edict") || player.hasAbility("edict_y")) {
             message += "(+" + player.getMahactCC().size() + ")";
         }
         message += "/" + player.getStrategicCC();

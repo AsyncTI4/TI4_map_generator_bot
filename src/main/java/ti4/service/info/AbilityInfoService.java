@@ -11,6 +11,7 @@ import ti4.game.Player;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
+import ti4.service.franken.FrankenAlternateTextService;
 
 @UtilityClass
 public class AbilityInfoService {
@@ -31,7 +32,7 @@ public class AbilityInfoService {
                 .map(Mapper::getAbility)
                 .sorted(Comparator.comparing(AbilityModel::getAlias))
                 .toList()) {
-            MessageEmbed representationEmbed = model.getRepresentationEmbed();
+            MessageEmbed representationEmbed = FrankenAlternateTextService.getAbilityEmbed(player.getGame(), model);
             messageEmbeds.add(representationEmbed);
         }
         return messageEmbeds;

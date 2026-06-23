@@ -16,6 +16,7 @@ import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.model.LeaderModel;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.franken.FrankenAlternateTextService;
 
 @Getter
 public class Leader {
@@ -140,8 +141,8 @@ public class Leader {
             return null;
         }
         EmbedBuilder eb = new EmbedBuilder();
-        MessageEmbed modelEmbed =
-                getLeaderModel().get().getRepresentationEmbed(false, false, locked, false, game.isTwilightsFallMode());
+        MessageEmbed modelEmbed = FrankenAlternateTextService.getLeaderEmbed(
+                game, getLeaderModel().get(), false, false, locked, false, game.isTwilightsFallMode());
         eb.copyFrom(modelEmbed);
 
         if (tgCount > 0) {

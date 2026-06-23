@@ -115,7 +115,7 @@ class CombatReplaySideBetUiService {
         return buttons;
     }
 
-    private String buttonLabel(CombatSideBetType type, int profitPoints) {
+    private static String buttonLabel(CombatSideBetType type, int profitPoints) {
         return type.label() + " +" + profitPoints + " pts";
     }
 
@@ -233,7 +233,7 @@ class CombatReplaySideBetUiService {
         return message.toString().trim();
     }
 
-    private Comparator<CombatContestSideBetEntity> sideBetOrder() {
+    private static Comparator<CombatContestSideBetEntity> sideBetOrder() {
         return Comparator.comparing(
                         CombatContestSideBetEntity::getPlacedAt, Comparator.nullsLast(Comparator.naturalOrder()))
                 .thenComparing(CombatContestSideBetEntity::getId, Comparator.nullsLast(Comparator.naturalOrder()));
@@ -257,7 +257,7 @@ class CombatReplaySideBetUiService {
         return countsByBet;
     }
 
-    private Map<String, Long> sortBetCountsByQuantityDesc(Map<String, Long> countsByBet) {
+    private static Map<String, Long> sortBetCountsByQuantityDesc(Map<String, Long> countsByBet) {
         List<Map.Entry<String, Long>> entries = new ArrayList<>(countsByBet.entrySet());
         entries.sort(Map.Entry.<String, Long>comparingByValue(Comparator.reverseOrder())
                 .thenComparing(Map.Entry.comparingByKey()));
@@ -288,7 +288,7 @@ class CombatReplaySideBetUiService {
         return "### " + emoji + " " + label;
     }
 
-    private String buttonFactionIdLabel(Game game, String faction) {
+    private static String buttonFactionIdLabel(Game game, String faction) {
         if (faction == null || faction.isBlank()) return "?";
         if (game == null) return faction;
         Player target = game.getPlayerFromColorOrFaction(faction);
@@ -306,13 +306,13 @@ class CombatReplaySideBetUiService {
                 : target.getFactionModel().getFactionName();
     }
 
-    private String getFactionEmoji(Game game, String faction) {
+    private static String getFactionEmoji(Game game, String faction) {
         if (game == null || faction == null) return "";
         Player target = game.getPlayerFromColorOrFaction(faction);
         return target == null ? "" : target.getFactionEmoji();
     }
 
-    private Game loadReplayGame(CombatCandidateEntity candidate) {
+    private static Game loadReplayGame(CombatCandidateEntity candidate) {
         if (candidate == null || candidate.getGameName() == null) return null;
         if (!GameManager.isValid(candidate.getGameName())) return null;
         return GameManager.getManagedGame(candidate.getGameName()).getGame();

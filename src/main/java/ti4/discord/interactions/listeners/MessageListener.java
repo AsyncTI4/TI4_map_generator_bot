@@ -1,9 +1,11 @@
 package ti4.discord.interactions.listeners;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -14,6 +16,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.executors.ExecutionLockManager;
+import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -46,7 +51,27 @@ class MessageListener extends ListenerAdapter {
 
         Please do not ping bothelper again, the first ping is enough, just explain without a 2nd ping.
         """;
-    private static final List<String> INTERESTING_MESSAGES = List.of("please stop");
+    private static final List<String> INTERESTING_MESSAGES = List.of(
+            "please stop",
+            "stop pinging",
+            "stop messaging",
+            "crybaby",
+            "stop crying",
+            "don’t talk to me",
+            "do not message me",
+            "this isn’t okay",
+            "crossed a line",
+            "personal attack",
+            "harassment",
+            "harassing",
+            "you’re being rude",
+            "trying to cheat",
+            "so sensitive",
+            "cry about it",
+            "bad faith",
+            "calm down",
+            "don’t make it personal",
+            "keep it game-related");
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
@@ -107,7 +132,7 @@ class MessageListener extends ListenerAdapter {
     private static void reportInterestingMessages(Message message) {
         String messageRaw = message.getContentRaw().toLowerCase();
         for (String phrase : INTERESTING_MESSAGES) {
-            if (messageRaw.contains(phrase)) {
+            if (messageRaw.contains(phrase) && !messageRaw.contains("gif")) {
                 String msg = "Someone used \"" + phrase + "\" at " + message.getJumpUrl() + ". Full message:\n> "
                         + message.getContentRaw().replace("\n", "\n> ");
                 sendMessageToModLog(msg);
@@ -122,6 +147,23 @@ class MessageListener extends ListenerAdapter {
                 .anyMatch(mentionedRole -> JdaService.bothelperRoles.stream()
                         .anyMatch(bothelperRole -> bothelperRole.getIdLong() == mentionedRole.getIdLong()));
         boolean shouldRespondToBotHelperPing = messageLikelyMissingExplanation && messageMentionsBotHelper;
+        if (messageMentionsBotHelper) {
+            TextChannel bothelperLogChannel =
+                    JdaService.guildPrimary.getTextChannelsByName("bothelper-ping-log", true).stream()
+                            .findFirst()
+                            .orElse(null);
+            if (bothelperLogChannel != null) {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green("markResolved", "Resolved?"));
+
+                String msgWithoutMentions = message.getContentRaw();
+                for (Role role : message.getMentions().getRoles()) {
+                    msgWithoutMentions = msgWithoutMentions.replace(role.getAsMention(), role.getName());
+                }
+                String msg = message.getJumpUrl() + ". Full message:\n> " + msgWithoutMentions.replace("\n", "\n> ");
+                MessageHelper.sendMessageToChannelWithButtons(bothelperLogChannel, msg, buttons);
+            }
+        }
         if (messageMentionsBotHelper
                 && message.getChannel().getName().toLowerCase().contains("cards info")
                 && !message.getAuthor().isBot()) {
@@ -190,13 +232,15 @@ class MessageListener extends ListenerAdapter {
         String messageBeginning = StringUtils.substringBefore(messageText, " ");
         String messageContent = StringUtils.substringAfter(messageText, " ");
 
-        Game game = GameManager.getManagedGame(gameName).getGame();
-        Player player = getPlayer(event, game);
-        RoundSummaryHelper.storeEndOfRoundSummary(
-                game, player, messageBeginning, messageContent, true, event.getChannel());
-        GameManager.save(
-                game,
-                "End of round summary."); // TODO: We should be locking since we're saving. Convert to ListenerContext?
+        ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
+                    Game game = GameManager.getManagedGame(gameName).getGame();
+                    Player player = getPlayer(event, game);
+                    RoundSummaryHelper.storeEndOfRoundSummary(
+                            game, player, messageBeginning, messageContent, true, event.getChannel());
+                    GameManager.save(game, "End of round summary.");
+                })
+                .run();
+
         return true;
     }
 
@@ -210,76 +254,93 @@ class MessageListener extends ListenerAdapter {
             return false;
         }
 
-        Game game = GameManager.getManagedGame(gameName).getGame();
-        if (game == null) {
+        ManagedGame managedGame = GameManager.getManagedGame(gameName);
+        if (managedGame == null) {
             return true;
         }
 
         // Prevent whispers from fow combat threads
-        if (game.isFowMode()
+        if (managedGame.isFowMode()
                 && event.getChannel() instanceof ThreadChannel
                 && event.getChannel().getName().contains("vs")
                 && event.getChannel().getName().contains("private")) {
             return false;
         }
 
-        Player sender = getPlayer(event, game);
-        if (sender == null || !sender.isRealPlayer()) {
-            return true;
-        }
+        ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
+                    Game game = managedGame.getGame();
+                    Player sender = getPlayer(event, game);
+                    if (sender == null || !sender.isRealPlayer()) {
+                        return;
+                    }
 
-        String messageLowerCase = messageText.toLowerCase();
-        String receivingColorOrFaction = PATTERN.matcher(StringUtils.substringBetween(messageLowerCase, "to", " "))
-                .replaceAll("");
+                    String messageLowerCase = messageText.toLowerCase();
+                    String receivingColorOrFaction = PATTERN.matcher(
+                                    StringUtils.substringBetween(messageLowerCase, "to", " "))
+                            .replaceAll("");
 
-        if ("futureme".equals(receivingColorOrFaction)) {
-            whisperToFutureMe(event, game, sender);
-            GameManager.save(
-                    game,
-                    "Whisper to future by " + sender.getUserName()); // TODO: We should be locking since we're saving
-            return true;
-        }
+                    if ("futureme".equals(receivingColorOrFaction)) {
+                        whisperToFutureMe(event, game, sender);
+                        GameManager.save(game, "Whisper to future by " + sender.getUserName());
+                        return;
+                    }
 
-        boolean future = receivingColorOrFaction.startsWith("future");
-        receivingColorOrFaction = FUTURE.matcher(receivingColorOrFaction).replaceFirst("");
-        if (receivingColorOrFaction.isEmpty()) {
-            return true;
-        }
+                    boolean future = receivingColorOrFaction.startsWith("future");
+                    receivingColorOrFaction =
+                            FUTURE.matcher(receivingColorOrFaction).replaceFirst("");
+                    if (receivingColorOrFaction.isEmpty()) {
+                        return;
+                    }
 
-        receivingColorOrFaction = AliasHandler.resolveFaction(receivingColorOrFaction);
-        if (!Mapper.isValidColor(receivingColorOrFaction) && !Mapper.isValidFaction(receivingColorOrFaction)) {
-            return true;
-        }
+                    receivingColorOrFaction = AliasHandler.resolveFaction(receivingColorOrFaction);
+                    if (!Mapper.isValidColor(receivingColorOrFaction)
+                            && !Mapper.isValidFaction(receivingColorOrFaction)) {
+                        return;
+                    }
 
-        String messageContent = StringUtils.substringAfter(messageText, " ");
-        if (messageContent.isEmpty()) {
-            message.reply("No message content?").queue(Consumers.nop(), BotLogger::catchRestError);
-            return true;
-        }
+                    if (game.isWhispersDisabled()) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getChannel(),
+                                "Whispers are disabled in this game. To reenable them, use `/game setup whispers_enabled:true`.");
+                        message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+                        return;
+                    }
 
-        Player receiver = null;
+                    String messageContent = StringUtils.substringAfter(messageText, " ");
+                    if (messageContent.isEmpty()) {
+                        message.reply("No message content?").queue(Consumers.nop(), BotLogger::catchRestError);
+                        return;
+                    }
+
+                    Player receiver = getPlayer(game, receivingColorOrFaction);
+                    if (receiver == null) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getChannel(), "Player not found: " + receivingColorOrFaction);
+                        return;
+                    }
+
+                    if (future) {
+                        whisperToFutureColorOrFaction(event, game, messageContent, sender, receiver);
+                    } else {
+                        WhisperService.sendWhisper(
+                                game, sender, receiver, messageContent, "n", event.getChannel(), event.getGuild());
+                        message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+                    }
+                    GameManager.save(game, "Whisper");
+                })
+                .run();
+
+        return true;
+    }
+
+    private static Player getPlayer(Game game, String receivingColorOrFaction) {
         for (Player player : game.getRealPlayers()) {
             if (Objects.equals(receivingColorOrFaction, player.getFaction())
                     || Objects.equals(receivingColorOrFaction, player.getColor())) {
-                receiver = player;
-                break;
+                return player;
             }
         }
-
-        if (receiver == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found: " + receivingColorOrFaction);
-            return true;
-        }
-
-        if (future) {
-            whisperToFutureColorOrFaction(event, game, messageContent, sender, receiver);
-        } else {
-            WhisperService.sendWhisper(
-                    game, sender, receiver, messageContent, "n", event.getChannel(), event.getGuild());
-            message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        }
-        GameManager.save(game, "Whisper"); // TODO: We should be locking since we're saving
-        return true;
+        return null;
     }
 
     private static void whisperToFutureColorOrFaction(
@@ -312,7 +373,7 @@ class MessageListener extends ListenerAdapter {
     private static boolean addFactionEmojiReactionsToMessages(MessageReceivedEvent event, String gameName) {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame.getGame().isHiddenAgendaMode()
-                && !managedGame.getGame().getStoredValue("executiveOrder").isEmpty()
+                && managedGame.getGame().getStoredValue("executiveOrder").isEmpty()
                 && managedGame.getGame().getPhaseOfGame().toLowerCase().contains("agenda")) {
             Player player = getPlayer(event, managedGame.getGame());
             if (player == null

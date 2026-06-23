@@ -51,6 +51,7 @@ import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.settingsFramework.menus.BaseGameMiniMiltySettings;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.FrankenSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
@@ -260,9 +261,9 @@ class GameSaveService {
         writer.write(Constants.AGENDA_VOTE_INFO + " " + sb2);
         writer.write(System.lineSeparator());
 
-        Map<String, String> currentCheckingForAllReacts = game.getStoredValueMap();
+        Map<String, String> storedValueMap = game.getStoredValueMap();
         sb2 = new StringBuilder();
-        for (Map.Entry<String, String> entry : currentCheckingForAllReacts.entrySet()) {
+        for (Map.Entry<String, String> entry : storedValueMap.entrySet()) {
             sb2.append(entry.getKey())
                     .append(",")
                     .append(entry.getValue().replace("\n", ". "))
@@ -526,6 +527,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.DISCORDANT_STARS_MODE + " " + game.isDiscordantStarsMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.BLUE_REVERIE_MODE + " " + game.isBlueReverieMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.UNCHARTED_SPACE_STUFF + " " + game.isUnchartedSpaceStuff());
         writer.write(System.lineSeparator());
         writer.write(Constants.VERBOSITY + " " + game.getOutputVerbosity());
@@ -568,6 +571,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.WILD_WILD_GALAXY_MODE + " " + game.isWildWildGalaxyMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.FEAST_OR_FAMINE_MODE + " " + game.isFeastOrFamineMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.COSMIC_PHENOMENAE_MODE + " " + game.isCosmicPhenomenaeMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.MERCENARIES_FOR_HIRE_MODE + " " + game.isMercenariesForHireMode());
@@ -579,6 +584,8 @@ class GameSaveService {
         writer.write(Constants.VEILED_HEART_MODE + " " + game.isVeiledHeartMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.LIMITED_WHISPERS_MODE + " " + game.isLimitedWhispersMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.WHISPERS_DISABLED + " " + game.isWhispersDisabled());
         writer.write(System.lineSeparator());
         writer.write(Constants.AGE_OF_COMMERCE_MODE + " " + game.isAgeOfCommerceMode());
         writer.write(System.lineSeparator());
@@ -639,6 +646,7 @@ class GameSaveService {
         writeStrLine(writer, Constants.PARADIGM_DECK_ID, game.getParadigmSpliceDeckID());
         writeStrLine(writer, Constants.UNITUPGRADE_DECK_ID, game.getUnitSpliceDeckID());
         writeBoolLine(writer, Constants.TWILIGHT_KART, game.isTwilightKart());
+        writeBoolLine(writer, Constants.TWILIGHT_DS, game.isTwilightDS());
 
         writer.write(Constants.BAG_DRAFT + " "
                 + (game.getActiveBagDraft() == null
@@ -693,6 +701,15 @@ class GameSaveService {
             writer.write(System.lineSeparator());
         } else if (game.getFrankenSettingsJson() != null) {
             writer.write(Constants.FRANKEN_DRAFT_SETTINGS + " " + game.getFrankenSettingsJson());
+            writer.write(System.lineSeparator());
+        }
+
+        BaseGameMiniMiltySettings baseGameMiniMiltySettings = game.getBaseGameMiniMiltySettingsUnsafe();
+        if (baseGameMiniMiltySettings != null) {
+            writer.write(Constants.BASE_GAME_MINI_MILTY_SETTINGS + " " + baseGameMiniMiltySettings.json());
+            writer.write(System.lineSeparator());
+        } else if (game.getBaseGameMiniMiltySettingsJson() != null) {
+            writer.write(Constants.BASE_GAME_MINI_MILTY_SETTINGS + " " + game.getBaseGameMiniMiltySettingsJson());
             writer.write(System.lineSeparator());
         }
 

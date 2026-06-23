@@ -214,7 +214,7 @@ public class AutoPingCron {
             buttons.add(Buttons.gray("deleteButtons", "Delete These Buttons"));
             MessageHelper.sendMessageToChannelWithButtons(
                     gameChannel,
-                    realIdentity + ", if the game is not waiting on you, you may disable the"
+                    player.getRepresentationNoPing() + ", if the game is not waiting on you, you may disable the"
                             + " auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
                     buttons);
         }
@@ -293,11 +293,6 @@ public class AutoPingCron {
             for (Player player : game.getRealPlayers()) {
                 if (game.getStoredValue("statusHomeworkReactionFor" + player.getFaction() + "Round" + game.getRound())
                         .isEmpty()) {
-                    if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannel(
-                                player.getCorrectChannel(),
-                                player.getRepresentationUnfogged() + ", please allocate command tokens.");
-                    }
                     msg.append(player.getRepresentation()).append(", ");
                 } else if (game.isFowMode()
                         && game.getStoredValue("fowStatusDone") != null
@@ -306,6 +301,10 @@ public class AutoPingCron {
                             player.getCorrectChannel(),
                             player.getRepresentationUnfogged() + ", please click \"Ready for "
                                     + (game.isCustodiansScored() ? "Agenda" : "Strategy") + " Phase\".");
+                }
+                if (game.isFowMode() && !game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(), player.getRepresentationUnfogged() + ", please draw ACs.");
                 }
             }
             if (!game.isFowMode() && !msg.isEmpty()) {

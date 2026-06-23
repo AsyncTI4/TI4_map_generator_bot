@@ -429,6 +429,9 @@ public final class ButtonHelperTwilightsFall {
         Tile tile = FrankenHomeService.getPlayerHs(player);
         if (tile != null) {
             String unitList = Mapper.getFaction(factionFleet).getStartingFleet();
+            if (game.isFrankenGame() && "muaat".equalsIgnoreCase(factionFleet) && !hasFactionWarsunUpgrade(player)) {
+                unitList = unitList.replaceFirst("\\bws\\b", "flagship");
+            }
             AddUnitService.addUnitsToDefaultLocations(event, tile, game, player.getColor(), unitList);
 
             String succ = player.getRepresentation() + ", you've set your starting units successfully.";
@@ -439,6 +442,16 @@ public final class ButtonHelperTwilightsFall {
         }
 
         ButtonHelper.deleteMessage(event);
+    }
+
+    private static boolean hasFactionWarsunUpgrade(Player player) {
+        return player.getFactionTechs().stream()
+                .map(Mapper::getTech)
+                .filter(Objects::nonNull)
+                .filter(TechnologyModel::isUnitUpgrade)
+                .map(tech -> Mapper.getUnitModelByTechUpgrade(tech.getAlias()))
+                .filter(Objects::nonNull)
+                .anyMatch(unit -> "warsun".equalsIgnoreCase(unit.getBaseType()));
     }
 
     // @ButtonHandler("initiateASplice_")
@@ -802,14 +815,20 @@ public final class ButtonHelperTwilightsFall {
                         "savedSpliceCards",
                         game.getStoredValue("savedSpliceCards").replace(cardID + "_", ""));
             } else {
-                if (game.getStoredValue("savedSpliceCards").contains("_" + cardID)) {
+                if (game.getStoredValue("savedSpliceCards").contains("_" + cardID + "_")) {
                     game.setStoredValue(
                             "savedSpliceCards",
-                            game.getStoredValue("savedSpliceCards").replace("_" + cardID, ""));
+                            game.getStoredValue("savedSpliceCards").replace("_" + cardID + "_", "_"));
                 } else {
-                    game.setStoredValue(
-                            "savedSpliceCards",
-                            game.getStoredValue("savedSpliceCards").replace(cardID, ""));
+                    if (game.getStoredValue("savedSpliceCards").contains("_" + cardID)) {
+                        game.setStoredValue(
+                                "savedSpliceCards",
+                                game.getStoredValue("savedSpliceCards").replace("_" + cardID, ""));
+                    } else {
+                        game.setStoredValue(
+                                "savedSpliceCards",
+                                game.getStoredValue("savedSpliceCards").replace(cardID, ""));
+                    }
                 }
             }
             if (remove) {

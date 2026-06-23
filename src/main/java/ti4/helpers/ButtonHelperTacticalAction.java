@@ -11,8 +11,9 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -275,6 +276,9 @@ public final class ButtonHelperTacticalAction {
                     + ", the Maximus (Dih-Mohn Flagship) moved into the active system, so you may produce up to 2 units with a combined cost of 4 or less.";
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), msg, produce);
         }
+        if (unitsWereMoved && player.hasUnit("ta_flagship")) {
+            TaUnitHandler.resolveWorldshaperOnMove(event, game, player, tile);
+        }
         EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
         if (unitsWereMoved) {
             CommanderUnlockCheckService.checkPlayer(
@@ -341,8 +345,8 @@ public final class ButtonHelperTacticalAction {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         title
-                                + "There " + (playersWithPds2.size() == 1 ? "is " : "are ") + playersWithPds2.size()
-                                + " player" + (playersWithPds2.size() == 1 ? "" : "s")
+                                + "There " + (playersWithPds2.size() == 1 ? "is " : "are ")
+                                + StringHelper.pluralize(playersWithPds2.size(), "player")
                                 + " with Space Cannon Offence coverage in this system.\n"
                                 + "Please resolve those before continuing, or float the window if irrelevant.");
             }
@@ -351,7 +355,7 @@ public final class ButtonHelperTacticalAction {
                 spaceCannonButtons.add(
                         Buttons.red("declinePDS_" + tile.getTileID() + "_" + player.getFaction(), "Decline PDS"));
                 if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasAbility("control_network"))
-                        && (!game.getRealPlayers().stream().anyMatch(player_ -> player_.hasUnit("netrunners_flagship"))
+                        && (game.getRealPlayers().stream().noneMatch(player_ -> player_.hasUnit("netrunners_flagship"))
                                 || !NetrunnersUnitsHandler.empBlocksSpaceCannonAgainstOpponent(
                                         game, playerWithPds, tile, CombatRollType.SpaceCannonOffence))) {
                     spaceCannonButtons.addAll(NetrunnersAbilitiesHandler.getControlNetworkSpaceCannonButtons(
@@ -423,8 +427,7 @@ public final class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, ringButtons);
         }
         // Offer the Dreaming Throne promissory 'Visions' buttons
-        if (player != null
-                && !"dream".equalsIgnoreCase(player.getFaction())
+        if (!"dream".equalsIgnoreCase(player.getFaction())
                 && player.getPromissoryNotes().containsKey("bepndream")) {
             DreamButtonHandler.offerVisionsPromissoryAtTacticalStart(game, player);
         }
@@ -556,7 +559,7 @@ public final class ButtonHelperTacticalAction {
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Activated "
                         + tile.getRepresentationForButtons(game, player) + ".");
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")
+        if ((game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander") || player.hasTech("tf-starbasewebway"))
                 && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
                         .contains(tile)) {
             List<Button> buttons = new ArrayList<>();
@@ -574,7 +577,7 @@ public final class ButtonHelperTacticalAction {
                 if (playerWithPds == player) {
                     continue;
                 }
-                mentions.add(playerWithPds.getRepresentation());
+                mentions.add(playerWithPds.getRepresentationNoPing());
             }
             if (!mentions.isEmpty()) {
                 message.append('\n')

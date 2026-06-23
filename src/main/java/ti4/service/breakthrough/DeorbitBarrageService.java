@@ -20,6 +20,7 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
+import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
@@ -110,8 +111,8 @@ public class DeorbitBarrageService {
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " is targeting " + planetRep + ". They spent " + amount
-                        + " resource" + (amount == 1 ? "" : "s") + " to roll " + amount
+                player.getRepresentationNoPing() + " is targeting " + planetRep + ". They spent "
+                        + StringHelper.pluralize(amount, "resource") + " to roll " + amount
                         + " dice, hitting on a 4+.");
         ButtonHelper.deleteMessage(event);
         if (amount > 0) {
@@ -146,7 +147,7 @@ public class DeorbitBarrageService {
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    "Please pay " + amount + " resource" + (amount == 1 ? "" : "s") + " for the rolled dice.",
+                    "Please pay " + StringHelper.pluralize(amount, "resource") + " for the rolled dice.",
                     buttons);
         }
     }

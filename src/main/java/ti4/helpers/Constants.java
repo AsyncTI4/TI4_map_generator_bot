@@ -116,6 +116,7 @@ public final class Constants {
     public static final String FLAGSHIPPING = "flagshipping";
     public static final String JUST_UNITS = "just_units";
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
+    public static final String BLUE_REVERIE_MODE = "blue_reverie_mode";
     public static final String UNCHARTED_SPACE_STUFF = "uncharted_space_stuff";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
     public static final String THUNDERSEDGE = "thundersedge";
@@ -498,6 +499,7 @@ public final class Constants {
     public static final String ANOMALIES_CAN_TOUCH = "anomalies_can_touch";
     public static final String INCLUDE_DS_TILES = "include_ds_tiles";
     public static final String INCLUDE_DS_FACTIONS = "include_ds_factions";
+    public static final String INCLUDE_BR_FACTIONS = "include_br_factions";
     public static final String USE_MAP_TEMPLATE = "use_map_template";
 
     // /custom command
@@ -1061,6 +1063,7 @@ public final class Constants {
     public static final String INCLUDE_OPTIONS = "include_options";
     public static final String CARDS_INFO = "cards_info";
     public static final String FRANKEN = "franken";
+    public static final String FRANKEN2 = "franken2";
     public static final String FRANKENDRAZ = "frankendraz";
     public static final String SHOW_GAME_AS_PLAYER = "show_game_as";
     public static final String CHECK_PRIVATE_COMMUNICATIONS = "check_private_communications";
@@ -1072,6 +1075,7 @@ public final class Constants {
     public static final String DRAFT_MANAGER = "draft_manager";
     public static final String DRAFT_SYSTEM_SETTINGS = "draft_system_settings";
     public static final String FRANKEN_DRAFT_SETTINGS = "franken_draft_settings";
+    public static final String BASE_GAME_MINI_MILTY_SETTINGS = "base_game_mini_milty_settings";
     public static final String DRAFT = "draft";
 
     // groups
@@ -1270,10 +1274,13 @@ public final class Constants {
     public static final String NO_FRACTURE = "no_fracture";
     public static final String CALL_OF_THE_VOID_MODE = "call_of_the_void_mode";
     public static final String WILD_WILD_GALAXY_MODE = "wild_wild_galaxy_mode";
+    public static final String FEAST_OR_FAMINE_MODE = "feast_or_famine_mode";
     public static final String STELLAR_ATOMICS_MODE = "stellar_atomics_mode";
     public static final String NO_SWAP_MODE = "no_swap_mode";
     public static final String VEILED_HEART_MODE = "veiled_heart_mode";
     public static final String LIMITED_WHISPERS_MODE = "limited_whispers_mode";
+    public static final String WHISPERS_ENABLED = "whispers_enabled";
+    public static final String WHISPERS_DISABLED = "whispers_disabled";
     public static final String ORDINIAN_C1_MODE = "ordinian_c1_mode";
     public static final String LIBERATION_C4_MODE = "liberation_c4_mode";
     public static final String FAKE_COMMANDERS = "fake_commanders";
@@ -1571,6 +1578,7 @@ public final class Constants {
     public static final String COEXIST = "coexist";
 
     public static final String TWILIGHT_KART = "twilight_kart";
+    public static final String TWILIGHT_DS = "twilight_ds";
     public static final String ABILITY_DECK_ID = "ability_deck_id";
     public static final String GENOME_DECK_ID = "genome_deck_id";
     public static final String PARADIGM_DECK_ID = "paradigm_deck_id";

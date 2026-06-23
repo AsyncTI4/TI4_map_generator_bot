@@ -84,6 +84,12 @@ public class CombatRollPayloadRenderer {
                         .append(" miss")
                         .append(count == 1 ? "" : "es")
                         .append(" due to Ta Zern, the Jol-Nar Commander:\n");
+            case IRON_COMMANDER_REROLL_MISSES ->
+                message.append("Rerolling ")
+                        .append(count)
+                        .append(" miss")
+                        .append(count == 1 ? "" : "es")
+                        .append(" due to Captain Vakros, the Iron Tide Commander:\n");
             case KALTRIM_COMMANDER_REROLL_ONES ->
                 message.append("Rerolling ")
                         .append(count)

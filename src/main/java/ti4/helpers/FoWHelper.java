@@ -60,9 +60,9 @@ public final class FoWHelper {
     }
 
     public static boolean isPrivateGame(
-            Game game, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel_) {
+            Game game, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel2) {
         Channel eventChannel = event == null ? null : event.getChannel();
-        Channel channel = channel_ != null ? channel_ : eventChannel;
+        Channel channel = channel2 != null ? channel2 : eventChannel;
         if (channel == null) {
             return game.isFowMode();
         }
@@ -77,7 +77,7 @@ public final class FoWHelper {
             }
             game = GameManager.getManagedGame(gameName).getGame();
         }
-        if (game.isFowMode() && channel_ != null || event != null) {
+        if (game.isFowMode() && channel2 != null || event != null) {
             return channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
         }
         return false;
@@ -239,6 +239,11 @@ public final class FoWHelper {
 
     public static Set<String> getAdjacentTiles(
             Game game, String position, Player player, boolean toShow, boolean includeTile) {
+        return getAdjacentTiles(game, position, player, toShow, includeTile, false);
+    }
+
+    public static Set<String> getAdjacentTiles(
+            Game game, String position, Player player, boolean toShow, boolean includeTile, boolean forDistance) {
         if (FOWPlusService.isVoid(game, position)) return new HashSet<>();
 
         Set<String> adjacentPositions = traverseAdjacencies(game, false, position);
@@ -267,7 +272,7 @@ public final class FoWHelper {
             }
         }
 
-        Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player, false);
+        Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player, false, forDistance);
         adjacentPositions.addAll(wormholeAdjacencies);
 
         Set<String> otherAdjacencies = getNonWormholeAdjacencies(game, position);
@@ -276,6 +281,22 @@ public final class FoWHelper {
         // Nexus Token Adjacency for Dreaming Throne
         if (player != null && player.hasAbility("dream_nexus")) {
             adjacentPositions.addAll(DreamButtonHandler.getDreamNexusAdjacencies(game, player, position));
+        }
+        if (player != null
+                && (game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")
+                        || player.hasTech("tf-starbasewebway"))
+                && player == game.getActivePlayer()
+                && forDistance
+                && !game.getCurrentActiveSystem().isEmpty()
+                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                        .contains(game.getTileByPosition(position))) {
+
+            for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
+                if (tile.getPosition().equalsIgnoreCase(position)) {
+                    continue;
+                }
+                adjacentPositions.add(tile.getPosition());
+            }
         }
 
         // If player has ghoti commander, is active player and has activated a system
@@ -664,6 +685,11 @@ public final class FoWHelper {
      * Also takes into account player abilities and agendas
      */
     private static Set<String> getWormholeAdjacencies(Game game, String position, Player player, boolean neighbors) {
+        return getWormholeAdjacencies(game, position, player, neighbors, false);
+    }
+
+    private static Set<String> getWormholeAdjacencies(
+            Game game, String position, Player player, boolean neighbors, boolean forDistance) {
         Set<String> adjacentPositions = new HashSet<>();
         Set<Tile> allTiles = new HashSet<>(game.getTileMap().values());
         Tile tile = game.getTileByPosition(position);
@@ -713,6 +739,7 @@ public final class FoWHelper {
         if (player != null
                 && player.hasAbility("sundered")
                 && player == game.getActivePlayer()
+                && forDistance
                 && !game.getCurrentActiveSystem().isEmpty()) {
             Set<String> keepers = new HashSet<>(Set.of("epsilon"));
             if (hasQuantumEntanglement || wh_recon || absol_recon) {
@@ -773,6 +800,7 @@ public final class FoWHelper {
         if (!hasQuantumEntanglement
                 && !wh_recon
                 && !absol_recon
+                && forDistance
                 && ButtonHelper.isLawInPlay(game, "travel_ban")
                 && !neighbors) {
             wormholeIDs.remove(Constants.ALPHA);

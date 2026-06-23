@@ -231,39 +231,67 @@ public final class Buttons {
 
     public static List<ActionRow> paginateButtons(
             List<Button> mainButtons, List<Button> persistentButtons, int page, String pageButtonId) {
-        int totalPages = (int) Math.ceil((double) mainButtons.size() / PAGE_SIZE);
-        int currentPage = Math.max(1, Math.min(page, totalPages));
-        int fromIndex = (currentPage - 1) * PAGE_SIZE;
-        int toIndex = Math.min(fromIndex + PAGE_SIZE, mainButtons.size());
+        Page pagination = paginate(mainButtons, page);
 
-        List<Button> pageButtons = new ArrayList<>(mainButtons.subList(fromIndex, toIndex));
+        List<ActionRow> rows = new ArrayList<>(partitionIntoRows(pagination.items()));
 
-        // Split main buttons into rows of max 5 (Discord limit)
-        List<ActionRow> rows = new ArrayList<>();
-        for (int i = 0; i < pageButtons.size(); i += 5) {
-            rows.add(ActionRow.of(pageButtons.subList(i, Math.min(i + 5, pageButtons.size()))));
-        }
-
-        // Prepare persistent + navigation buttons for their own row
-        List<Button> persistentAndNav = new ArrayList<>();
-        if (persistentButtons != null && !persistentButtons.isEmpty()) {
-            for (int i = 0; i < Math.min(3, persistentButtons.size()); i++) {
-                persistentAndNav.add(persistentButtons.get(i));
-            }
-        }
-        // Add navigation buttons if more than one page
-        if (totalPages > 1) {
-            if (currentPage > 1) {
-                persistentAndNav.add(gray(pageButtonId + "_page" + (currentPage - 1), "Previous Page", "⏪"));
-            }
-            if (currentPage < totalPages) {
-                persistentAndNav.add(gray(pageButtonId + "_page" + (currentPage + 1), "Next Page", "⏩"));
-            }
-        }
-        if (!persistentAndNav.isEmpty()) {
-            rows.add(ActionRow.of(persistentAndNav));
+        List<Button> navRow = buildPersistentAndNavigationButtonsRow(persistentButtons, pagination, pageButtonId);
+        if (!navRow.isEmpty()) {
+            rows.add(ActionRow.of(navRow));
         }
 
         return rows;
+    }
+
+    private static Page paginate(List<Button> buttons, int page) {
+        if (buttons.isEmpty()) return new Page(1, 0, List.of());
+
+        int total = (int) Math.ceil((double) buttons.size() / PAGE_SIZE);
+        int current = Math.clamp(page, 1, total);
+        int from = (current - 1) * PAGE_SIZE;
+        int to = Math.min(from + PAGE_SIZE, buttons.size());
+        return new Page(current, total, buttons.subList(from, to));
+    }
+
+    private static List<ActionRow> partitionIntoRows(List<Button> buttons) {
+        List<ActionRow> rows = new ArrayList<>();
+        for (int i = 0; i < buttons.size(); i += 5) {
+            rows.add(ActionRow.of(buttons.subList(i, Math.min(i + 5, buttons.size()))));
+        }
+        return rows;
+    }
+
+    private static List<Button> buildPersistentAndNavigationButtonsRow(
+            List<Button> persistentButtons, Page page, String pageButtonId) {
+        List<Button> navRow = new ArrayList<>();
+
+        if (persistentButtons != null) {
+            persistentButtons.stream().limit(3).forEach(navRow::add);
+        }
+
+        if (page.isMultiPage()) {
+            if (page.hasPrevious()) {
+                navRow.add(gray(pageButtonId + "_page" + (page.current() - 1), "Previous Page", "⏪"));
+            }
+            if (page.hasNext()) {
+                navRow.add(gray(pageButtonId + "_page" + (page.current() + 1), "Next Page", "⏩"));
+            }
+        }
+
+        return navRow;
+    }
+
+    private record Page(int current, int total, List<Button> items) {
+        boolean hasPrevious() {
+            return current > 1;
+        }
+
+        boolean hasNext() {
+            return current < total;
+        }
+
+        boolean isMultiPage() {
+            return total > 1;
+        }
     }
 }

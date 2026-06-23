@@ -22,10 +22,12 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.arvaxi.ArvaxiCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -47,6 +49,8 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
@@ -241,6 +245,11 @@ public class StartCombatService {
                 createSpectatorThread(game, player3, threadName, tile, event, "ground");
             }
         }
+        for (Player p : List.of(player, player2)) {
+            if (p.hasUnlockedBreakthrough("onyxxabt")) {
+                OnyxxaBreakthroughButtonHandler.offerGroundCombatMechButtons(game, p, unitHolder, tile);
+            }
+        }
     }
 
     private static void findOrCreateCombatThread(
@@ -287,6 +296,7 @@ public class StartCombatService {
                 return;
             }
         }
+
         if (tile.isMecatol(game)) {
             CommanderUnlockCheckService.checkPlayer(player1, "winnu");
             CommanderUnlockCheckService.checkPlayer(player2, "winnu");
@@ -299,15 +309,18 @@ public class StartCombatService {
         // Create the thread
         String finalThreadName = threadName;
 
-        channel.sendMessage("Resolve combat in this thread:").queue(m -> {
-            ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, m.getId());
+        try {
+            var threadMessage =
+                    channel.sendMessage("Resolve combat in this thread:").complete();
+            ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, threadMessage.getId());
             if (game.isFowMode()) {
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
             } else {
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             }
-            threadChannel.queue(tc -> initializeCombatThread(
-                    tc,
+            // mutates game state, so much be done using complete rather than queue
+            initializeCombatThread(
+                    threadChannel.complete(),
                     game,
                     player1,
                     player2,
@@ -316,8 +329,10 @@ public class StartCombatService {
                     spaceOrGround,
                     systemWithContext,
                     unitHolderName,
-                    firstCombatThread));
-        });
+                    firstCombatThread);
+        } catch (Exception e) {
+            BotLogger.error(new LogOrigin(game), "Failed to create combat thread for game: " + game.getName(), e);
+        }
         CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
         CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
     }
@@ -379,6 +394,7 @@ public class StartCombatService {
         }
         game.setStoredValue("solagent", "");
         game.setStoredValue("letnevagent", "");
+        game.setStoredValue("classifiedWeapons", "");
 
         // sigma homebrew
         if (isSpaceCombat) {
@@ -565,7 +581,7 @@ public class StartCombatService {
         if (firstCombatThread) {
             for (Player p : game.getRealPlayers()) {
                 // offer buttons for all crimson commander holders
-                offerRedGhostCommanderButtons(p, game, tile, event);
+                offerRedGhostCommanderButtons(p, game);
 
                 boolean inExileRange = FoWHelper.isTileInExileRange(game, tile, p);
                 if (inExileRange) {
@@ -639,8 +655,7 @@ public class StartCombatService {
                 false);
     }
 
-    public static void offerRedGhostCommanderButtons(
-            Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
+    public static void offerRedGhostCommanderButtons(Player player, Game game) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")
                 || game.playerHasLeaderUnlockedOrAlliance(player, "crimsoncommander")) {
             String message = player.getRepresentation(true, true)
@@ -648,7 +663,7 @@ public class StartCombatService {
                     + " with Ahk Siever, the Rebellion commander."
                     + "\n-# You have " + player.getCommoditiesRepresentation() + " commodities.";
             List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         }
     }
 
@@ -663,7 +678,7 @@ public class StartCombatService {
                 new TileGenerator(game, event, null, 0, tile.getPosition(), player).createFileUpload();
 
         // Use existing thread, if it exists
-        TextChannel textChannel = (TextChannel) player.getPrivateChannel();
+        TextChannel textChannel = player.getPrivateChannel();
         for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
             if (threadChannel_.getName().equals(threadName)) {
                 initializeSpectatorThread(threadChannel_, game, player, tile, event, systemWithContext, spaceOrGround);
@@ -715,6 +730,9 @@ public class StartCombatService {
             return;
         }
         if (playersWithPds2.isEmpty() || (game.isFowMode() && !playersWithPds2.contains(activePlayer))) {
+            return;
+        }
+        if (!playersWithPds2.contains(activePlayer) && !FoWHelper.playerHasActualShipsInSystem(activePlayer, tile)) {
             return;
         }
         if (!game.isFowMode()) {
@@ -859,19 +877,25 @@ public class StartCombatService {
                         buttons2);
             }
 
-            if ((player.hasAbility("edict") || player.hasAbility("imperia"))
+            if ((player.hasAbility("primacy")
+                            || player.hasAbility("edict")
+                            || player.hasAbility("edict_y")
+                            || player.hasAbility("imperia")
+                            || player.hasAbility("imperia_y"))
                     && !player.getMahactCC().contains(otherPlayer.getColor())
                     && !"neutral".equalsIgnoreCase(otherPlayer.getFaction())) {
                 buttons = new ArrayList<>();
                 String factionChecker = player.factionButtonChecker();
+                String location = player.hasAbility("primacy") ? "Primacy" : "Fleet";
                 buttons.add(Buttons.gray(
                         factionChecker + "mahactStealCC_" + otherPlayer.getColor(),
-                        "Add " + otherPlayer.getColor() + " Token to Fleet",
+                        "Add " + otherPlayer.getColor() + " Token to " + location,
                         FactionEmojis.Mahact));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         msg + ", a reminder that if you win this combat, you may add the opponents ("
-                                + otherPlayer.getColor() + ") command token to your fleet pool.",
+                                + otherPlayer.getColor() + ") command token to your "
+                                + (player.hasAbility("primacy") ? "Primacy ability." : "fleet pool."),
                         buttons);
             }
             if (player.hasUnlockedBreakthrough("sardakkbt")) {
@@ -884,6 +908,18 @@ public class StartCombatService {
                         player.getCardsInfoThread(),
                         msg
                                 + ", a reminder that if you win this combat, you may resolve _N'orr Supremacy_ for a unit upgrade technology or a command token.",
+                        buttons);
+            }
+            if ("space".equalsIgnoreCase(type) && player.hasUnexhaustedLeader("kaloraagent")) {
+                buttons = new ArrayList<>();
+                buttons.add(Buttons.gray(
+                        player.factionButtonChecker() + "exhaustAgent_kaloraagent",
+                        "Use Valzor, the Kalora Agent",
+                        FactionEmojis.kalora));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        msg
+                                + ", a reminder that at the end of this space combat, you may exhaust the Kalora agent to allow a participating player to gain 1 command token.",
                         buttons);
             }
             if ("space".equalsIgnoreCase(type)
@@ -1152,6 +1188,12 @@ public class StartCombatService {
                 threadChannel, "Buttons to roll ANTI-FIGHTER BARRAGE (if applicable).", afbButtons);
         if (!game.isFowMode()) {
             for (Player player : combatPlayers) {
+                if (player.hasRelic("metalivoidarmaments")) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player.getRepresentationUnfogged()
+                                    + " Reminder that you have the Metal Void Armaments relic to use AFB 3x6.");
+                }
                 if ((ButtonHelper.doesPlayerHaveMechHere("naalu_mech_omega", player, tile)
                                 && !ButtonHelper.isLawInPlay(game, "articles_war"))
                         || ButtonHelper.doesPlayerHaveFSHere("sigma_naalu_flagship_1", player, tile)
@@ -1371,6 +1413,14 @@ public class StartCombatService {
                         p2.factionButtonChecker() + "applytempcombatmod__" + "tech" + "__" + "sc",
                         "Use Supercharge",
                         FactionEmojis.Naaz));
+            }
+        }
+        if (p1.hasTechReady("beironats") || (!game.isFowMode() && p2.hasTechReady("beironats"))) {
+            if (p1.hasTechReady("beironats")) {
+                IronFactionTechsHandler.addAdvancedTargetingSystemsButton(buttons, game, p1, p2, pos, groundOrSpace);
+            }
+            if (!game.isFowMode() && p2.hasTechReady("beironats")) {
+                IronFactionTechsHandler.addAdvancedTargetingSystemsButton(buttons, game, p2, p1, pos, groundOrSpace);
             }
         }
 

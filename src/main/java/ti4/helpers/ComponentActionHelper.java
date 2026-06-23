@@ -13,8 +13,7 @@ import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.tyris.TyrisCommanderButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisCommanderButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -276,7 +275,9 @@ public class ComponentActionHelper {
                 }
             }
         }
-        if (game.playerHasLeaderUnlockedOrAlliance(p1, "mahactcommander")
+        boolean hasMahactCommander = game.playerHasLeaderUnlockedOrAlliance(p1, "mahactcommander")
+                || game.playerHasLeaderUnlockedOrAlliance(p1, "mahactcommander_y");
+        if (hasMahactCommander
                 && p1.getTacticalCC() > 0
                 && !ButtonHelper.getTilesWithYourCC(p1, game, event).isEmpty()) {
 
@@ -360,7 +361,8 @@ public class ComponentActionHelper {
                 String pnText = prom.getText();
                 if (pnText.toLowerCase().contains("action:")
                         && !"bmf".equalsIgnoreCase(pn)
-                        && !"acq".equalsIgnoreCase(pn)) {
+                        && !"acq".equalsIgnoreCase(pn)
+                        && !"bapnconc".equalsIgnoreCase(pn)) {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
                     String pnName = pnModel.getName();
                     Button pnButton = Buttons.red(factionChecker + prefix + "pn_" + pn, "Use " + pnName);
@@ -608,7 +610,6 @@ public class ComponentActionHelper {
                     String successMessage = p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Sol
                             + "**Orbital Drop** (" + (p1.getStrategicCC()) + "->" + (p1.getStrategicCC() - 1) + ")";
                     if (!p1.hasRelicReady("emelpar")) {
-
                         p1.setStrategicCC(p1.getStrategicCC() - 1);
                         ButtonHelperCommanders.resolveMuaatCommanderCheck(
                                 p1, game, event, FactionEmojis.Sol + " **Orbital Drop**'d");
@@ -852,11 +853,11 @@ public class ComponentActionHelper {
                                 + " is exhausting the _Minister of War_ agenda and spending a command token from their strategy pool to remove 1 command token from the game board.");
                 if (p1.getStrategicCC() > 0) {
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
+                    int previousCC = p1.getStrategicCC() + 1;
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
                             factionEmoji
-                                    + ", you previously had " + (p1.getStrategicCC() + 1) + " command token"
-                                    + (p1.getStrategicCC() + 1 == 1 ? "" : "s")
+                                    + ", you previously had " + StringHelper.pluralize(previousCC, "command token")
                                     + " in your strategy pool and now you have " + p1.getStrategicCC() + ".");
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event);
                 }
@@ -954,11 +955,15 @@ public class ComponentActionHelper {
             }
             case "exhaustBT" -> {
                 String btID = buttonID;
-                BreakthroughModel btModel = Mapper.getBreakthrough(btID);
-                p1.getBreakthroughExhausted().put(btID, true);
-                String message = p1.getRepresentation() + " exhausted _" + btModel.getName() + "_.";
-                MessageHelper.sendMessageToChannelWithEmbed(
-                        event.getMessageChannel(), message, btModel.getRepresentationEmbed());
+                if (!game.isTwilightsFallMode()) {
+                    BreakthroughModel btModel = Mapper.getBreakthrough(btID);
+                    p1.getBreakthroughExhausted().put(btID, true);
+                    String message = p1.getRepresentation() + " exhausted _" + btModel.getName() + "_.";
+                    MessageHelper.sendMessageToChannelWithEmbed(
+                            event.getMessageChannel(), message, btModel.getRepresentationEmbed());
+                } else {
+                    p1.exhaustTech("tf-" + btID);
+                }
                 boolean implemented = TeHelperBreakthroughs.handleBreakthroughExhaust(event, game, p1, buttonID);
 
                 if (!implemented) {
@@ -1070,7 +1075,7 @@ public class ComponentActionHelper {
         String purgeOrExhaust = "purged";
         List<String> juniorRelics = List.of("titanprototype", "absol_jr");
         if (juniorRelics.contains(relicID)) { // EXHAUST THE RELIC
-            List<Button> buttons2 = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "jrResolution", null);
+            List<Button> buttons2 = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
             player.addExhaustedRelic(relicID);
             purgeOrExhaust = "exhausted";
             MessageHelper.sendMessageToChannelWithButtons(

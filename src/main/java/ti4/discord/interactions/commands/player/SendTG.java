@@ -11,6 +11,7 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.TransactionHelper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
@@ -70,7 +71,7 @@ class SendTG extends GameStateSubcommand {
             targetPlayer.clearDebt(player, sendTG);
             MessageHelper.sendMessageToEventChannel(
                     event,
-                    targetPlayer.getRepresentation() + " cleared " + sendTG + " debt token" + (sendTG == 1 ? "" : "s")
+                    targetPlayer.getRepresentation() + " cleared " + StringHelper.pluralize(sendTG, "debt token")
                             + " owned by " + player.getRepresentation() + ", from their \"Debt Account\" pool.");
         }
 

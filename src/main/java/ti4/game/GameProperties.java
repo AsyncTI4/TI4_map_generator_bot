@@ -138,11 +138,13 @@ public class GameProperties {
     private @ExportableField boolean cosmicPhenomenaeMode;
     private @ExportableField boolean monumentToTheAgesMode;
     private @ExportableField boolean wildWildGalaxyMode;
+    private @ExportableField boolean feastOrFamineMode;
     private @ExportableField boolean zealousOrthodoxyMode;
     private @ExportableField boolean stellarAtomicsMode;
     private @ExportableField boolean noSwapMode;
     private @ExportableField boolean veiledHeartMode;
     private @ExportableField boolean limitedWhispersMode;
+    private @ExportableField boolean whispersDisabled;
     private @ExportableField boolean ageOfCommerceMode;
     private @ExportableField boolean hiddenAgendaMode;
     private @ExportableField boolean ordinianC1Mode;
@@ -155,6 +157,7 @@ public class GameProperties {
     private @ExportableField boolean cptiExploreMode;
     private @ExportableField boolean absolMode;
     private @ExportableField boolean discordantStarsMode;
+    private @ExportableField boolean blueReverieMode;
     private @ExportableField boolean unchartedSpaceStuff;
     private @ExportableField boolean miltyModMode;
     private @ExportableField boolean promisesPromisesMode;
@@ -169,6 +172,7 @@ public class GameProperties {
     private @ExportableField boolean votcMode;
     private @ExportableField boolean reverseSpeakerOrder;
     private @ExportableField boolean twilightKart;
+    private @ExportableField boolean twilightDS;
 
     // Discord Snowflakes
     private @ExportableField String guildID;

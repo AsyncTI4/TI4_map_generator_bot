@@ -5,6 +5,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -58,6 +60,7 @@ class AssignHitsButtonHandlers {
                         RemoveUnitService.removeUnit(event, tile, game, unit, state);
                     } else {
                         DestroyUnitService.destroyUnit(event, tile, game, unit, combat, state);
+                        IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, holder, assignHitsType);
                     }
 
                     String verb = remove ? " removed " : " destroyed ";
@@ -92,6 +95,7 @@ class AssignHitsButtonHandlers {
                     switch (matcher.group("cmd")) {
                         case "All" -> {
                             DestroyUnitService.destroyAllPlayerUnitsInSystem(event, game, player, tile, combat);
+                            IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, null, assignHitsType);
                             msg += tile.getRepresentationForButtons(game, player);
                         }
                         case "AllShips" -> {
@@ -107,6 +111,7 @@ class AssignHitsButtonHandlers {
                                     RemoveUnitService.removeUnit(event, tile, game, unit);
                                 }
                             }
+                            IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, space, assignHitsType);
                             msg += "the space area of " + tile.getRepresentationForButtons(game, player);
                             msg +=
                                     ".\n-# Ground forces that were in space were removed, instead of destroyed. If this is not correct, please resolve it manually.";
@@ -204,6 +209,9 @@ class AssignHitsButtonHandlers {
                     if (player.hasTech("nes"))
                         msg += "\n> These sustains cancel 2 hits due to _Non-Euclidean Shielding_.";
                     String assignHitsType = getAssignHitsType(game, player);
+                    if (assignHitsType.contains("combat")) {
+                        AshenUnitHandler.offerAshfallEngineOnSustain(event, game, player, tile, holder, type);
+                    }
                     List<Button> systemButtons =
                             ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, game, tile, assignHitsType);
                     MessageHelper.editMessageButtons(event, systemButtons);

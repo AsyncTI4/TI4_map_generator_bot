@@ -144,7 +144,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
         testSuccessfulNucleusForMiltySettings(game, settings);
     }
 
-    private void testSuccessfulNucleusForMiltySettings(Game game, MiltySettings settings) {
+    private static void testSuccessfulNucleusForMiltySettings(Game game, MiltySettings settings) {
         DraftSpec specs = DraftSpec.createFromMiltySettings(settings);
 
         MapTemplateModel normalTemplate =
@@ -164,7 +164,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
         }
     }
 
-    private void runTest(Game game, MapTemplateModel mapTemplate, DraftSpec specs, boolean strictMode) {
+    private static void runTest(Game game, MapTemplateModel mapTemplate, DraftSpec specs, boolean strictMode) {
         // Test that generator can succeed with these settings (often enough to be a unit test)
         NucleusOutcome outcome;
         Map<String, Integer> failureReasons = new HashMap<>();
@@ -186,7 +186,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
         assertNull(mostCommonFailure);
     }
 
-    private Game createTestGame(int playerCount) {
+    private static Game createTestGame(int playerCount) {
         Game game = new Game();
         game.setName("testGame");
         for (int i = 0; i < playerCount; i++) {

@@ -4,7 +4,6 @@ import static java.util.function.Predicate.not;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.awt.Point;
-import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.Getter;
@@ -34,6 +34,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -41,6 +42,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
 import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
 import ti4.draft.BagDraft;
@@ -57,7 +59,6 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.helpers.DistanceTool;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
@@ -67,6 +68,7 @@ import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
+import ti4.helpers.settingsFramework.menus.BaseGameMiniMiltySettings;
 import ti4.helpers.settingsFramework.menus.DeckSettings;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.FrankenSettings;
@@ -246,7 +248,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     private MiltyDraftManager miltyDraftManager;
     private DraftTileManager draftTileManager;
     private DraftManager draftManager;
-    private DistanceTool distanceTool;
 
     @Getter
     private final Expeditions expeditions = new Expeditions();
@@ -265,6 +266,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     @Setter
     @Getter
+    private String baseGameMiniMiltySettingsJson;
+
+    @Setter
+    @Getter
     private String draftString;
 
     @Setter
@@ -275,6 +280,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     @Setter
     private FrankenSettings frankenSettings;
+
+    @Setter
+    private BaseGameMiniMiltySettings baseGameMiniMiltySettings;
 
     @Getter
     @Setter
@@ -446,25 +454,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return soNum;
     }
 
-    public Map<String, Object> getExportableFieldMap() {
-        Class<GameProperties> aClass = GameProperties.class;
-        Field[] fields = aClass.getDeclaredFields();
-        Map<String, Object> returnValue = new HashMap<>();
-
-        for (Field field : fields) {
-            field.setAccessible(true);
-            if (field.getDeclaredAnnotation(ExportableField.class) != null) {
-                try {
-                    returnValue.put(field.getName(), field.get(this));
-                } catch (IllegalAccessException e) {
-                    // This shouldn't really happen since we can even see private fields.
-                    BotLogger.error(new LogOrigin(this), "Unknown error exporting fields from Game.", e);
-                }
-            }
-        }
-        return returnValue;
-    }
-
     public MiltyDraftManager getMiltyDraftManagerUnsafe() {
         return miltyDraftManager;
     }
@@ -503,6 +492,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         draftSystemSettingsJson = null;
         frankenSettings = null;
         frankenSettingsJson = null;
+        baseGameMiniMiltySettings = null;
+        baseGameMiniMiltySettingsJson = null;
     }
 
     @NotNull
@@ -529,42 +520,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return draftManager;
     }
 
-    public DistanceTool getDistanceTool() {
-        if (distanceTool != null) {
-            return distanceTool;
-        }
-        if (getMapTemplateID() == null) {
-            BotLogger.warning(new LogOrigin(this), "Map template ID is null, distance tool cannot be created.");
-            return null;
-        }
-        distanceTool = new DistanceTool(this);
-        return distanceTool;
-    }
-
     @Nullable
     public MiltySettings getMiltySettingsUnsafe() {
-        return miltySettings;
-    }
-
-    public MiltySettings initializeMiltySettings() {
-        if (miltySettings == null) {
-            if (miltyJson != null) {
-                try {
-                    JsonNode json = mapper.readTree(miltyJson);
-                    miltySettings = new MiltySettings(this, json);
-                } catch (Exception e) {
-                    BotLogger.error(
-                            new LogOrigin(this),
-                            "Failed loading milty draft settings for `" + getName() + "` " + Constants.jazzPing(),
-                            e);
-                    MessageHelper.sendMessageToChannel(
-                            getActionsChannel(), "Milty draft settings failed to load. Resetting to default.");
-                    miltySettings = new MiltySettings(this, null);
-                }
-            } else {
-                miltySettings = new MiltySettings(this, null);
-            }
-        }
         return miltySettings;
     }
 
@@ -572,54 +529,70 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return draftSystemSettings;
     }
 
-    public DraftSystemSettings initializeDraftSystemSettings() {
-        if (draftSystemSettings == null) {
-            if (draftSystemSettingsJson != null) {
-                try {
-                    JsonNode json = mapper.readTree(draftSystemSettingsJson);
-                    draftSystemSettings = new DraftSystemSettings(this, json);
-                } catch (Exception e) {
-                    BotLogger.error(
-                            new LogOrigin(this),
-                            "Failed loading draft system settings for `" + getName() + "` "
-                                    + Constants.jabberwockyPing(),
-                            e);
-                    MessageHelper.sendMessageToChannel(
-                            getActionsChannel(), "Draft system settings failed to load. Resetting to default.");
-                    draftSystemSettings = new DraftSystemSettings(this, null);
-                }
-            } else {
-                draftSystemSettings = new DraftSystemSettings(this, null);
-            }
-        }
-        return draftSystemSettings;
-    }
-
     public FrankenSettings getFrankenSettingsUnsafe() {
         return frankenSettings;
     }
 
+    public BaseGameMiniMiltySettings getBaseGameMiniMiltySettingsUnsafe() {
+        return baseGameMiniMiltySettings;
+    }
+
+    public MiltySettings initializeMiltySettings() {
+        if (miltySettings == null) {
+            miltySettings = initializeSetting(
+                    miltyJson, MiltySettings::new, "milty draft settings", Constants.jazzPing(), getActionsChannel());
+        }
+        return miltySettings;
+    }
+
+    public DraftSystemSettings initializeDraftSystemSettings() {
+        if (draftSystemSettings == null) {
+            draftSystemSettings = initializeSetting(
+                    draftSystemSettingsJson,
+                    DraftSystemSettings::new,
+                    "draft system settings",
+                    Constants.jabberwockyPing(),
+                    getActionsChannel());
+        }
+        return draftSystemSettings;
+    }
+
     public FrankenSettings initializeFrankenSettings() {
         if (frankenSettings == null) {
-            if (frankenSettingsJson != null) {
-                try {
-                    JsonNode json = mapper.readTree(frankenSettingsJson);
-                    frankenSettings = new FrankenSettings(this, json);
-                } catch (Exception e) {
-                    BotLogger.error(
-                            new LogOrigin(this),
-                            "Failed loading franken draft settings for `" + getName() + "` "
-                                    + Constants.jabberwockyPing(),
-                            e);
-                    MessageHelper.sendMessageToChannel(
-                            getActionsChannel(), "Franken draft settings failed to load. Resetting to default.");
-                    frankenSettings = new FrankenSettings(this, null);
-                }
-            } else {
-                frankenSettings = new FrankenSettings(this, null);
-            }
+            frankenSettings = initializeSetting(
+                    frankenSettingsJson,
+                    FrankenSettings::new,
+                    "franken draft settings",
+                    Constants.jabberwockyPing(),
+                    getActionsChannel());
         }
         return frankenSettings;
+    }
+
+    public BaseGameMiniMiltySettings initializeBaseGameMiniMiltySettings() {
+        if (baseGameMiniMiltySettings == null) {
+            baseGameMiniMiltySettings = initializeSetting(
+                    baseGameMiniMiltySettingsJson,
+                    BaseGameMiniMiltySettings::new,
+                    "base game Mini-Milty settings",
+                    Constants.jabberwockyPing(),
+                    getActionsChannel());
+        }
+        return baseGameMiniMiltySettings;
+    }
+
+    private <T> T initializeSetting(
+            String json, BiFunction<Game, JsonNode, T> factory, String label, String ping, MessageChannel channel) {
+        if (json != null) {
+            try {
+                JsonNode node = mapper.readTree(json);
+                return factory.apply(this, node);
+            } catch (Exception e) {
+                BotLogger.error(new LogOrigin(this), "Failed loading " + label + " for `" + getName() + "` " + ping, e);
+                MessageHelper.sendMessageToChannel(channel, label + " failed to load. Resetting to default.");
+            }
+        }
+        return factory.apply(this, null);
     }
 
     public void setPurgedPN(String purgedPN) {
@@ -868,8 +841,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public void setCompetitiveTIGLGame(boolean competitiveTIGLGame) {
         boolean isFracturedTIGL = TIGLHelper.isFracturedTIGLGame(this);
         boolean hasAlwaysIncompatibleMode = isAllianceMode() || isCommunityMode();
-        boolean hasStandardOnlyIncompatibleMode =
-                isAbsolMode() || isMiltyModMode() || isDiscordantStarsMode() || isHomebrewSCMode() || isFowMode();
+        boolean hasStandardOnlyIncompatibleMode = isAbsolMode()
+                || isMiltyModMode()
+                || isDiscordantStarsMode()
+                || isBlueReverieMode()
+                || isHomebrewSCMode()
+                || isFowMode();
         if (hasAlwaysIncompatibleMode || (!isFracturedTIGL && hasStandardOnlyIncompatibleMode)) {
             competitiveTIGLGame = false;
         }
@@ -960,6 +937,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("Weird Wormholes", isWeirdWormholesMode());
         gameModes.put("Cosmic Phenomenae", isCosmicPhenomenaeMode());
         gameModes.put("Wild wild Galaxy", isWildWildGalaxyMode());
+        gameModes.put("Feast or Famine", isFeastOrFamineMode());
         gameModes.put("Zealous Orthodoxy", isZealousOrthodoxyMode());
         gameModes.put("Mercenaries For Hire", isMercenariesForHireMode());
         gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
@@ -980,6 +958,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put(SourceEmojis.Absol + "Absol", isAbsolMode());
         gameModes.put("VotC", isVotcMode());
         gameModes.put(SourceEmojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
+        gameModes.put("BlueReverie", isBlueReverieMode());
         gameModes.put("HomebrewSC", isHomebrewSCMode());
         gameModes.put("AC Deck 2", isAcd2());
         gameModes.put("Omega Phase", isOmegaPhaseMode());
@@ -1043,7 +1022,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public String getTabletalkJumpLinkFormatted() {
         TextChannel tt = getTableTalkChannel();
         if (tt == null) return "[no tt]";
-        return String.format("[__[Tabletalk](%s)__]", tt.getJumpUrl());
+        return String.format("[__[" + tt.getName() + "](%s)__]", tt.getJumpUrl());
     }
 
     public String getActionsJumpLink() {
@@ -1562,6 +1541,14 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return revealNextPublicObjective(publicObjectives1);
     }
 
+    public Map.Entry<String, Integer> revealStage1FromDeck() {
+        return revealNextPublicObjective(publicObjectives1);
+    }
+
+    public Map.Entry<String, Integer> revealStage2FromDeck() {
+        return revealNextPublicObjective(publicObjectives2);
+    }
+
     public void shuffleInBottomObjective(String cardIdToShuffle, int sizeOfBottom, int type) {
         List<String> objectiveList = type == 1 ? publicObjectives1Peekable : publicObjectives2Peekable;
         if (objectiveList.size() + 1 < sizeOfBottom) {
@@ -1578,38 +1565,21 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public void setUpPeekableObjectives(int num, int type) {
         if (type == 1) {
-            var maxSize = publicObjectives1.size() + publicObjectives1Peekable.size();
-            if (num > maxSize) {
-                num = maxSize;
-            }
-            while (publicObjectives1Peekable.size() != num) {
-                if (publicObjectives1Peekable.size() > num) {
-                    String id = publicObjectives1Peekable.removeLast();
-                    publicObjectives1.add(id);
-                    Collections.shuffle(publicObjectives1);
-                } else {
-                    Collections.shuffle(publicObjectives1);
-                    String id = publicObjectives1.getFirst();
-                    publicObjectives1.remove(id);
-                    publicObjectives1Peekable.add(id);
-                }
-            }
+            adjustPeekable(num, publicObjectives1, publicObjectives1Peekable);
         } else {
-            var maxSize = publicObjectives2.size() + publicObjectives2Peekable.size();
-            if (num > maxSize) {
-                num = maxSize;
-            }
-            while (publicObjectives2Peekable.size() != num) {
-                if (publicObjectives2Peekable.size() > num) {
-                    String id = publicObjectives2Peekable.removeLast();
-                    publicObjectives2.add(id);
-                    Collections.shuffle(publicObjectives2);
-                } else {
-                    Collections.shuffle(publicObjectives2);
-                    String id = publicObjectives2.getFirst();
-                    publicObjectives2.remove(id);
-                    publicObjectives2Peekable.add(id);
-                }
+            adjustPeekable(num, publicObjectives2, publicObjectives2Peekable);
+        }
+    }
+
+    private void adjustPeekable(int num, List<String> objectiveDeck, List<String> peekable) {
+        num = Math.min(num, objectiveDeck.size() + peekable.size());
+        while (peekable.size() != num) {
+            if (peekable.size() > num) {
+                objectiveDeck.add(peekable.removeLast());
+                Collections.shuffle(objectiveDeck);
+            } else {
+                Collections.shuffle(objectiveDeck);
+                peekable.add(objectiveDeck.removeFirst());
             }
         }
     }
@@ -2370,35 +2340,50 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public boolean removeLaw(String id) {
-        if (!id.isEmpty()) {
-            if (Constants.VOICE_OF_THE_COUNCIL_ID.equalsIgnoreCase(id)) {
-                VoiceOfTheCouncilHelper.ResetVoiceOfTheCouncil(this);
-                return true;
-            }
-            if ("warrant".equalsIgnoreCase(id)) {
-                for (Player p2 : getRealPlayers()) {
-                    if (IsPlayerElectedService.isPlayerElected(this, p2, id)) {
-                        p2.setSearchWarrant(false);
-                    }
-                }
-            }
-            if ("censure".equalsIgnoreCase(id)) {
-                if (customPublicVP.get("Political Censure") != null) {
-                    Map<String, Integer> customPOs = new HashMap<>(revealedPublicObjectives);
-                    for (Entry<String, Integer> entry : customPOs.entrySet()) {
-                        if (entry.getKey().toLowerCase().contains("political censure")) {
-                            removeCustomPO(entry.getValue());
-                        }
-                    }
-                }
-            }
-            laws.remove(id);
-            lawsInfo.remove(id);
-            addDiscardAgenda(id);
+        if (id.isEmpty()) {
+            return false;
+        }
 
+        boolean isVoiceOfTheCouncil = Constants.VOICE_OF_THE_COUNCIL_ID.equalsIgnoreCase(id);
+        if (!laws.containsKey(id) && !isVoiceOfTheCouncil) {
+            return false;
+        }
+
+        if (isVoiceOfTheCouncil) {
+            VoiceOfTheCouncilHelper.ResetVoiceOfTheCouncil(this);
             return true;
         }
-        return false;
+
+        if ("warrant".equalsIgnoreCase(id)) {
+            removeSearchWarrant(id);
+        } else if ("censure".equalsIgnoreCase(id)) {
+            removePoliticalCensure();
+        }
+
+        laws.remove(id);
+        lawsInfo.remove(id);
+        addDiscardAgenda(id);
+        return true;
+    }
+
+    private void removeSearchWarrant(String id) {
+        for (Player p : getRealPlayers()) {
+            if (IsPlayerElectedService.isPlayerElected(this, p, id)) {
+                p.setSearchWarrant(false);
+            }
+        }
+    }
+
+    private void removePoliticalCensure() {
+        if (customPublicVP.get("Political Censure") == null) {
+            return;
+        }
+        Map<String, Integer> customPOs = new HashMap<>(revealedPublicObjectives);
+        for (Entry<String, Integer> entry : customPOs.entrySet()) {
+            if (entry.getKey().toLowerCase().contains("political censure")) {
+                removeCustomPO(entry.getValue());
+            }
+        }
     }
 
     public boolean putEventTop(Integer idNumber, Player player) {
@@ -2987,17 +2972,17 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public String drawSecretObjective(String userID) {
-        if (!getSecretObjectives().isEmpty()) {
-            String id = getSecretObjectives().getFirst();
-            Player player = getPlayer(userID);
-            if (player != null) {
-                removeSOFromGame(id);
-                player.setSecret(id);
-                checkSOLimit(player);
-            }
-            return id;
+        if (getSecretObjectives().isEmpty()) {
+            return null;
         }
-        return null;
+        String id = getSecretObjectives().getFirst();
+        Player player = getPlayer(userID);
+        if (player != null) {
+            removeSOFromGame(id);
+            player.setSecret(id);
+            checkSOLimit(player);
+        }
+        return id;
     }
 
     @Nullable
@@ -3058,56 +3043,57 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (status != null) getDiscardACStatus().put(id, status);
     }
 
-    public void setPurgedActionCard(String id) {
+    private void setPurgedActionCard(String id) {
         setDiscardActionCard(id, ACStatus.purged);
     }
 
     public boolean discardActionCard(String userID, Integer acIDNumber) {
         Player player = getPlayer(userID);
-        if (player != null) {
-            Map<String, Integer> actionCards = player.getActionCards();
-            String acID = "";
-            for (Entry<String, Integer> ac : actionCards.entrySet()) {
-                if (ac.getValue().equals(acIDNumber)) {
-                    acID = ac.getKey();
-                    break;
-                }
+        if (player == null) {
+            return false;
+        }
+        Map<String, Integer> actionCards = player.getActionCards();
+        String acID = "";
+        for (Entry<String, Integer> ac : actionCards.entrySet()) {
+            if (ac.getValue().equals(acIDNumber)) {
+                acID = ac.getKey();
+                break;
             }
-            if (!acID.isEmpty()) {
-                player.removeActionCard(acIDNumber);
-                ACStatus status = shouldPutCardOnRalnel(player) ? ACStatus.ralnelbt : null;
-                setDiscardActionCard(acID, status);
-                return true;
-            }
+        }
+        if (!acID.isEmpty()) {
+            player.removeActionCard(acIDNumber);
+            ACStatus status = shouldPutCardOnRalnel(player) ? ACStatus.ralnelbt : null;
+            setDiscardActionCard(acID, status);
+            return true;
         }
         return false;
     }
 
     public boolean purgedActionCard(String userID, Integer acIDNumber) {
         Player player = getPlayer(userID);
-        if (player != null) {
-            Map<String, Integer> actionCards = player.getActionCards();
-            String acID = "";
-            for (Entry<String, Integer> ac : actionCards.entrySet()) {
-                if (ac.getValue().equals(acIDNumber)) {
+        if (player == null) {
+            return false;
+        }
+        Map<String, Integer> actionCards = player.getActionCards();
+        String acID = "";
+        for (Entry<String, Integer> ac : actionCards.entrySet()) {
+            if (ac.getValue().equals(acIDNumber)) {
+                acID = ac.getKey();
+                break;
+            }
+        }
+        if (player.getPlanets().contains("garbozia")) { // allow checking for garbozia
+            for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
+                if (ac.getValue().equals(acIDNumber) && getDiscardACStatus().get(ac.getKey()) == ACStatus.garbozia) {
                     acID = ac.getKey();
                     break;
                 }
             }
-            if (player.getPlanets().contains("garbozia")) { // allow checking for garbozia
-                for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
-                    if (ac.getValue().equals(acIDNumber)
-                            && getDiscardACStatus().get(ac.getKey()) == ACStatus.garbozia) {
-                        acID = ac.getKey();
-                        break;
-                    }
-                }
-            }
-            if (!acID.isEmpty()) {
-                player.removeActionCard(acIDNumber);
-                setPurgedActionCard(acID);
-                return true;
-            }
+        }
+        if (!acID.isEmpty()) {
+            player.removeActionCard(acIDNumber);
+            setPurgedActionCard(acID);
+            return true;
         }
         return false;
     }
@@ -3124,42 +3110,44 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public boolean pickActionCard(String userID, Integer acIDNumber) {
         Player player = getPlayer(userID);
-        if (player != null) {
-            String acID = "";
-            for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
-                ACStatus status = getDiscardACStatus().get(ac.getKey());
-                if (ac.getValue().equals(acIDNumber) && status != ACStatus.purged) {
-                    acID = ac.getKey();
-                    break;
-                }
+        if (player == null) {
+            return false;
+        }
+        String acID = "";
+        for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
+            ACStatus status = getDiscardACStatus().get(ac.getKey());
+            if (ac.getValue().equals(acIDNumber) && status != ACStatus.purged) {
+                acID = ac.getKey();
+                break;
             }
-            if (!acID.isEmpty()) {
-                getDiscardActionCards().remove(acID);
-                getDiscardACStatus().remove(acID);
-                player.setActionCard(acID);
-                return true;
-            }
+        }
+        if (!acID.isEmpty()) {
+            getDiscardActionCards().remove(acID);
+            getDiscardACStatus().remove(acID);
+            player.setActionCard(acID);
+            return true;
         }
         return false;
     }
 
     public boolean pickActionCardFromPurged(String userID, Integer acIDNumber) {
         Player player = getPlayer(userID);
-        if (player != null) {
-            String acID = "";
-            for (Map.Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
-                ACStatus status = getDiscardACStatus().get(ac.getKey());
-                if (ac.getValue().equals(acIDNumber) && status == ACStatus.purged) {
-                    acID = ac.getKey();
-                    break;
-                }
+        if (player == null) {
+            return false;
+        }
+        String acID = "";
+        for (Map.Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
+            ACStatus status = getDiscardACStatus().get(ac.getKey());
+            if (ac.getValue().equals(acIDNumber) && status == ACStatus.purged) {
+                acID = ac.getKey();
+                break;
             }
-            if (!acID.isEmpty()) {
-                getDiscardActionCards().remove(acID);
-                getDiscardACStatus().remove(acID);
-                player.setActionCard(acID);
-                return true;
-            }
+        }
+        if (!acID.isEmpty()) {
+            getDiscardActionCards().remove(acID);
+            getDiscardACStatus().remove(acID);
+            player.setActionCard(acID);
+            return true;
         }
         return false;
     }
@@ -3204,82 +3192,86 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public boolean scoreSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
-        if (player != null) {
-            Map<String, Integer> secrets = player.getSecrets();
-            String soID = "";
-            for (Entry<String, Integer> so : secrets.entrySet()) {
-                if (so.getValue().equals(soIDNumber)) {
-                    soID = so.getKey();
-                    break;
-                }
+        if (player == null) {
+            return false;
+        }
+        Map<String, Integer> secrets = player.getSecrets();
+        String soID = "";
+        for (Entry<String, Integer> so : secrets.entrySet()) {
+            if (so.getValue().equals(soIDNumber)) {
+                soID = so.getKey();
+                break;
             }
-            if (!soID.isEmpty()) {
-                player.removeSecret(soIDNumber);
-                player.setSecretScored(soID);
-                return true;
-            }
+        }
+        if (!soID.isEmpty()) {
+            player.removeSecret(soIDNumber);
+            player.setSecretScored(soID);
+            return true;
         }
         return false;
     }
 
     public boolean unscoreSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
-        if (player != null) {
-            Map<String, Integer> secrets = player.getSecretsScored();
-            String soID = "";
-            for (Entry<String, Integer> so : secrets.entrySet()) {
-                if (so.getValue().equals(soIDNumber)) {
-                    soID = so.getKey();
-                    break;
-                }
+        if (player == null) {
+            return false;
+        }
+        Map<String, Integer> secrets = player.getSecretsScored();
+        String soID = "";
+        for (Entry<String, Integer> so : secrets.entrySet()) {
+            if (so.getValue().equals(soIDNumber)) {
+                soID = so.getKey();
+                break;
             }
-            if (!soID.isEmpty()) {
-                player.removeSecretScored(soIDNumber);
-                player.setSecret(soID);
-                return true;
-            }
+        }
+        if (!soID.isEmpty()) {
+            player.removeSecretScored(soIDNumber);
+            player.setSecret(soID);
+            return true;
         }
         return false;
     }
 
     public boolean unscoreAndShuffleSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
-        if (player != null) {
-            Map<String, Integer> secrets = player.getSecretsScored();
-            String soID = "";
-            for (Entry<String, Integer> so : secrets.entrySet()) {
-                if (so.getValue().equals(soIDNumber)) {
-                    soID = so.getKey();
-                    break;
-                }
+        if (player == null) {
+            return false;
+        }
+        Map<String, Integer> secrets = player.getSecretsScored();
+        String soID = "";
+        for (Entry<String, Integer> so : secrets.entrySet()) {
+            if (so.getValue().equals(soIDNumber)) {
+                soID = so.getKey();
+                break;
             }
-            if (!soID.isEmpty()) {
-                player.removeSecretScored(soIDNumber);
-                getSecretObjectives().add(soID);
-                Collections.shuffle(getSecretObjectives());
-                return true;
-            }
+        }
+        if (!soID.isEmpty()) {
+            player.removeSecretScored(soIDNumber);
+            getSecretObjectives().add(soID);
+            Collections.shuffle(getSecretObjectives());
+            return true;
         }
         return false;
     }
 
     public boolean discardSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
-        if (player != null) {
-            Map<String, Integer> secrets = player.getSecrets();
-            String soID = "";
-            for (Entry<String, Integer> so : secrets.entrySet()) {
-                if (so.getValue().equals(soIDNumber)) {
-                    soID = so.getKey();
-                    break;
-                }
+        if (player == null) {
+            return false;
+        }
+        Map<String, Integer> secrets = player.getSecrets();
+        String soID = "";
+        for (Entry<String, Integer> so : secrets.entrySet()) {
+            if (so.getValue().equals(soIDNumber)) {
+                soID = so.getKey();
+                break;
             }
-            if (!soID.isEmpty()) {
-                player.removeSecret(soIDNumber);
-                getSecretObjectives().add(soID);
-                Collections.shuffle(getSecretObjectives());
-                return true;
-            }
+        }
+        if (!soID.isEmpty()) {
+            player.removeSecret(soIDNumber);
+            getSecretObjectives().add(soID);
+            Collections.shuffle(getSecretObjectives());
+            return true;
         }
         return false;
     }
@@ -3479,7 +3471,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         for (Player player : players.values()) {
             player.getActionCards().clear();
         }
-        ensureBastionAcd2SabotagesIncluded();
     }
 
     public boolean validateAndSetActionCardDeck(GenericInteractionCreateEvent event, DeckModel deck) {
@@ -3516,31 +3507,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
             Collections.shuffle(getActionCards());
         }
-        ensureBastionAcd2SabotagesIncluded();
-        return true;
-    }
-
-    public boolean ensureBastionAcd2SabotagesIncluded() {
-        if (!isAcd2() || getPlayerFromColorOrFaction("bastion") == null) return false;
-
-        List<String> bastionSabotageCards =
-                List.of("sabotage1_acd2", "sabotage2_acd2", "sabotage3_acd2", "sabotage4_acd2");
-        Set<String> existingCards = new HashSet<>(getActionCards());
-        existingCards.addAll(getDiscardActionCards().keySet());
-        for (Player player : players.values()) {
-            existingCards.addAll(player.getActionCards().keySet());
-        }
-
-        List<String> cardsToAdd = bastionSabotageCards.stream()
-                .filter(not(existingCards::contains))
-                .toList();
-        if (cardsToAdd.isEmpty()) return false;
-
-        getActionCards().addAll(cardsToAdd);
-        shuffleActionCards();
-        MessageHelper.sendMessageToChannel(
-                getMainGameChannel(),
-                "4 Sabotage cards have been added to the action card deck due to **Last Bastion** being in the game.");
         return true;
     }
 
@@ -3724,11 +3690,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     private Role getGameRole() {
-        if (getGuild() != null) {
-            for (Role role : getGuild().getRoles()) {
-                if (getName().equals(role.getName().toLowerCase())) {
-                    return role;
-                }
+        if (getGuild() == null) {
+            return null;
+        }
+        for (Role role : getGuild().getRoles()) {
+            if (getName().equals(role.getName().toLowerCase())) {
+                return role;
             }
         }
         return null;
@@ -3942,6 +3909,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             String color = p.getColor();
             planet.removeAllUnits(color);
             PlanetRemove.removePlayerControlToken(p, planet);
+            if (planet instanceof Planet planetHolder && p.hasAbility("planetary_reconfiguration")) {
+                TaAbilityHandler.returnPlanetaryReconfigurationDesigns(p, this, planetHolder);
+            }
             p.removePlanet(planet.getName());
         }
     }
@@ -3958,39 +3928,40 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public Set<String> getPlanets() {
-        if (planets.isEmpty()) {
-            for (Tile tile : tileMap.values()) {
-                for (Entry<String, UnitHolder> unitHolderEntry :
-                        tile.getUnitHolders().entrySet()) {
-                    if (unitHolderEntry.getValue() instanceof Planet p) {
-                        planets.put(unitHolderEntry.getKey(), p);
-                    }
+        if (!planets.isEmpty()) {
+            return planets.keySet();
+        }
+        for (Tile tile : tileMap.values()) {
+            for (Entry<String, UnitHolder> unitHolderEntry :
+                    tile.getUnitHolders().entrySet()) {
+                if (unitHolderEntry.getValue() instanceof Planet p) {
+                    planets.put(unitHolderEntry.getKey(), p);
                 }
             }
-            planets.put("custodiavigilia", new Planet("custodiavigilia", new Point(0, 0)));
-            if ("custodiavigilia".equalsIgnoreCase(getStoredValue("terraformedPlanet"))) {
-                planets.get("custodiavigilia").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
-            }
-            if (isThundersEdge()) {
-                planets.get("custodiavigilia").addToken("attachment_negativeinf.png");
-            }
-            planets.put("custodiavigiliaplus", new Planet("custodiavigiliaplus", new Point(0, 0)));
-            planets.put("nevermore", new Planet("nevermore", new Point(0, 0)));
-            planets.put("ghoti", new Planet("ghoti", new Point(0, 0)));
-            if ("ghoti".equalsIgnoreCase(getStoredValue("terraformedPlanet"))) {
-                planets.get("ghoti").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
-            }
-            planets.put("ocean1", new Planet("ocean1", new Point(0, 0)));
-            planets.put("ocean2", new Planet("ocean2", new Point(0, 0)));
-            planets.put("ocean3", new Planet("ocean3", new Point(0, 0)));
-            planets.put("bannerhall1", new Planet("bannerhall1", new Point(0, 0)));
-            planets.put("bannerhall2", new Planet("bannerhall2", new Point(0, 0)));
-            planets.put("bannerhall3", new Planet("bannerhall3", new Point(0, 0)));
-            planets.put("ocean4", new Planet("ocean4", new Point(0, 0)));
-            planets.put("ocean5", new Planet("ocean5", new Point(0, 0)));
-            planets.put("triad", new Planet("triad", new Point(0, 0)));
-            planets.put("grove", new Planet("grove", new Point(0, 0)));
         }
+        planets.put("custodiavigilia", new Planet("custodiavigilia", new Point(0, 0)));
+        if ("custodiavigilia".equalsIgnoreCase(getStoredValue("terraformedPlanet"))) {
+            planets.get("custodiavigilia").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
+        }
+        if (isThundersEdge()) {
+            planets.get("custodiavigilia").addToken("attachment_negativeinf.png");
+        }
+        planets.put("custodiavigiliaplus", new Planet("custodiavigiliaplus", new Point(0, 0)));
+        planets.put("nevermore", new Planet("nevermore", new Point(0, 0)));
+        planets.put("ghoti", new Planet("ghoti", new Point(0, 0)));
+        if ("ghoti".equalsIgnoreCase(getStoredValue("terraformedPlanet"))) {
+            planets.get("ghoti").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
+        }
+        planets.put("ocean1", new Planet("ocean1", new Point(0, 0)));
+        planets.put("ocean2", new Planet("ocean2", new Point(0, 0)));
+        planets.put("ocean3", new Planet("ocean3", new Point(0, 0)));
+        planets.put("bannerhall1", new Planet("bannerhall1", new Point(0, 0)));
+        planets.put("bannerhall2", new Planet("bannerhall2", new Point(0, 0)));
+        planets.put("bannerhall3", new Planet("bannerhall3", new Point(0, 0)));
+        planets.put("ocean4", new Planet("ocean4", new Point(0, 0)));
+        planets.put("ocean5", new Planet("ocean5", new Point(0, 0)));
+        planets.put("triad", new Planet("triad", new Point(0, 0)));
+        planets.put("grove", new Planet("grove", new Point(0, 0)));
         return planets.keySet();
     }
 
@@ -4083,28 +4054,30 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void addFakeCommander(String leaderID) {
-        if (leaderID.contains("commander")) {
-            String fakeString = getStoredValue("fakeCommanders");
-            if (StringUtils.isBlank(fakeString)) {
-                setStoredValue("fakeCommanders", leaderID);
-            } else {
-                Set<String> leaders = new HashSet<>(Arrays.asList(fakeString.split("\\|")));
-                leaders.add(leaderID);
-                setStoredValue("fakeCommanders", String.join("|", leaders));
-            }
+        if (!leaderID.contains("commander")) {
+            return;
+        }
+        String fakeString = getStoredValue("fakeCommanders");
+        if (StringUtils.isBlank(fakeString)) {
+            setStoredValue("fakeCommanders", leaderID);
+        } else {
+            Set<String> leaders = new HashSet<>(Arrays.asList(fakeString.split("\\|")));
+            leaders.add(leaderID);
+            setStoredValue("fakeCommanders", String.join("|", leaders));
         }
     }
 
     public void addFakeAgent(String leaderID) {
-        if (leaderID.contains("agent")) {
-            String fakeString = getStoredValue("fakeAgents");
-            if (StringUtils.isBlank(fakeString)) {
-                setStoredValue("fakeAgents", leaderID);
-            } else {
-                Set<String> leaders = new HashSet<>(Arrays.asList(fakeString.split("\\|")));
-                leaders.add(leaderID);
-                setStoredValue("fakeAgents", String.join("|", leaders));
-            }
+        if (!leaderID.contains("agent")) {
+            return;
+        }
+        String fakeString = getStoredValue("fakeAgents");
+        if (StringUtils.isBlank(fakeString)) {
+            setStoredValue("fakeAgents", leaderID);
+        } else {
+            Set<String> leaders = new HashSet<>(Arrays.asList(fakeString.split("\\|")));
+            leaders.add(leaderID);
+            setStoredValue("fakeAgents", String.join("|", leaders));
         }
     }
 
@@ -4117,6 +4090,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         if ("sardakkcommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-valkyrie")) {
+            return true;
+        }
+        if ("edyncommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-rampantgrace")) {
             return true;
         }
         if ("crimsoncommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-entropicharvest")) {
@@ -4136,7 +4112,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
         // check if player has Imperia and if any of the stolen CCs are owned by players
         // that have the leader unlocked
-        if (player.hasAbility("imperia")) {
+        if (player.hasAbility("imperia") || player.hasAbility("imperia_y")) {
             for (Player player_ : getRealPlayersNDummies()) {
                 if (player_.getFaction().equalsIgnoreCase(player.getFaction())) continue;
                 if (player.getMahactCC().contains(player_.getColor()) && player_.hasLeaderUnlocked(leaderID)) {
@@ -4171,7 +4147,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
         // check if player has Imperia and if any of the stolen CCs are owned by players
         // that have the leader unlocked
-        if (player.hasAbility("imperia")) {
+        if (player.hasAbility("imperia") || player.hasAbility("imperia_y")) {
             for (Player otherPlayer : getRealPlayers()) {
                 if (otherPlayer.equals(player)) continue;
                 if (player.getMahactCC().contains(otherPlayer.getColor())) {
@@ -4657,6 +4633,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isLightFogMode()
                 || isRedTapeMode()
                 || isDiscordantStarsMode()
+                || isBlueReverieMode()
                 || isFrankenGame()
                 || isMiltyModMode()
                 || isThundersEdgeDemo()

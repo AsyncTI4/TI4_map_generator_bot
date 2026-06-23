@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -95,6 +96,9 @@ public class RelicHelper {
                 player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
         resolveRelicEffects(event, game, player, relicID);
         TeHelperUnits.serveIconoclastDeployAbility(game, player);
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")) {
+            OnyxxaCommanderButtonHandler.onDrawRelic(player);
+        }
 
         if (checked) game.shuffleRelics();
     }

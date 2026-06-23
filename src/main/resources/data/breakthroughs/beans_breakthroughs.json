@@ -12,7 +12,7 @@
         "source": "beans"
     },
     {
-        "alias": "crystbt",
+        "alias": "crystellumbt",
         "name": "Defensive Architecture",
         "shortName": "Defensive\nArchitecture",
         "faction": "crystellum",
@@ -56,7 +56,7 @@
             "CYBERNETIC",
             "WARFARE"
         ],
-        "text": "ACTION: Exhaust this card or spend 1 token from your strategy pool to remove 1 design from a planet and attach it to a different planet in an adjacent system that does not have a design attached to it. Then, ready that planet.",
+        "text": "At the end of your turn, you may exhaust this card or spend 1 token from your strategy pool to remove 1 design from a non-home planet and attach it to a different non-home planet in an adjacent system that does not have a design attached to it. Then, ready that planet.",
         "source": "beans"
     },
     {

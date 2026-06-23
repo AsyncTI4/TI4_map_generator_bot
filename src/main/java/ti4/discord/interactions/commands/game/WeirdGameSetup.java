@@ -19,7 +19,7 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
-class WeirdGameSetup extends GameStateSubcommand {
+public class WeirdGameSetup extends GameStateSubcommand {
 
     WeirdGameSetup() {
         super(Constants.WEIRD_GAME_SETUP, "Game Setup for Weird Games", true, false);
@@ -32,6 +32,8 @@ class WeirdGameSetup extends GameStateSubcommand {
                 OptionType.BOOLEAN,
                 Constants.DISCORDANT_STARS_MODE,
                 "True to add the Discordant Stars factions to the pool."));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.BLUE_REVERIE_MODE, "True to add the Blue Reverie factions to the pool."));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.UNCHARTED_SPACE_STUFF,
@@ -55,6 +57,8 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(
                 new OptionData(OptionType.BOOLEAN, Constants.THUNDERS_EDGE_MODE, "True to enable Thunder's Edge Mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.VEILED_HEART_MODE, "True to enable Veiled Heart Mode"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.FEAST_OR_FAMINE_MODE, "True to enable Feast or Famine Mode"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 FOWOption.RIFTSET_MODE.toString(),
@@ -123,6 +127,9 @@ class WeirdGameSetup extends GameStateSubcommand {
         Boolean veiledHeartMode = event.getOption(Constants.VEILED_HEART_MODE, null, OptionMapping::getAsBoolean);
         if (veiledHeartMode != null) game.setVeiledHeartMode(veiledHeartMode);
 
+        Boolean feastOrFamineMode = event.getOption(Constants.FEAST_OR_FAMINE_MODE, null, OptionMapping::getAsBoolean);
+        if (feastOrFamineMode != null) game.setFeastOrFamineMode(feastOrFamineMode);
+
         Boolean limitedMode = event.getOption(Constants.LIMITED_WHISPERS_MODE, null, OptionMapping::getAsBoolean);
         if (limitedMode != null) game.setLimitedWhispersMode(limitedMode);
 
@@ -181,6 +188,7 @@ class WeirdGameSetup extends GameStateSubcommand {
         if (event.getOption(Constants.TIGL_GAME) == null
                 && event.getOption(Constants.ABSOL_MODE) == null
                 && event.getOption(Constants.DISCORDANT_STARS_MODE) == null
+                && event.getOption(Constants.BLUE_REVERIE_MODE) == null
                 && event.getOption(Constants.BASE_GAME_MODE) == null
                 && event.getOption(Constants.MILTYMOD_MODE) == null
                 && event.getOption(Constants.VOTC_MODE) == null) {
@@ -193,11 +201,21 @@ class WeirdGameSetup extends GameStateSubcommand {
                 event.getOption(Constants.MILTYMOD_MODE, game.isMiltyModMode(), OptionMapping::getAsBoolean);
         boolean discordantStarsMode = event.getOption(
                 Constants.DISCORDANT_STARS_MODE, game.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
+        boolean blueReverieMode =
+                event.getOption(Constants.BLUE_REVERIE_MODE, game.isBlueReverieMode(), OptionMapping::getAsBoolean);
         boolean baseGameMode =
                 event.getOption(Constants.BASE_GAME_MODE, game.isBaseGameMode(), OptionMapping::getAsBoolean);
         boolean votcMode = event.getOption(Constants.VOTC_MODE, game.isVotcMode(), OptionMapping::getAsBoolean);
         return setGameMode(
-                event, game, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame, votcMode);
+                event,
+                game,
+                baseGameMode,
+                absolMode,
+                miltyModMode,
+                discordantStarsMode,
+                blueReverieMode,
+                isTIGLGame,
+                votcMode);
     }
 
     // TODO: find a better way to handle this - this is annoying
@@ -209,6 +227,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             boolean absolMode,
             boolean miltyModMode,
             boolean discordantStarsMode,
+            boolean blueReverieMode,
             boolean isTIGLGame,
             boolean votcMode) {
         if (isTIGLGame && (game.isAllianceMode() || game.isCommunityMode())) {
@@ -221,6 +240,7 @@ class WeirdGameSetup extends GameStateSubcommand {
                 && (baseGameMode
                         || absolMode
                         || discordantStarsMode
+                        || blueReverieMode
                         || game.isHomebrewSCMode()
                         || game.isFowMode()
                         || votcMode)) {
@@ -245,10 +265,10 @@ class WeirdGameSetup extends GameStateSubcommand {
             return false;
         }
 
-        if (baseGameMode && (absolMode || discordantStarsMode)) {
+        if (baseGameMode && (absolMode || discordantStarsMode || blueReverieMode)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "No Expansion Mode is not supported with Discordant Stars or Absol Mode");
+                    "No Expansion Mode is not supported with Discordant Stars, Blue Reverie, or Absol Mode");
             return false;
         } else if (baseGameMode && miltyModMode) {
             if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_miltymod"))) return false;
@@ -277,6 +297,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             game.setMiltyModMode(true);
             game.setAbsolMode(false);
             game.setDiscordantStarsMode(false);
+            game.setBlueReverieMode(false);
             return true;
         } else if (baseGameMode) {
             if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_base_game"))) return false;
@@ -285,8 +306,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_base")))
                 return false;
             if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_base"))) return false;
-            if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_basegame_and_codex1")))
-                return false;
+            if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_basegame"))) return false;
             if (!game.validateAndSetRelicDeck(Mapper.getDeck("relics_base"))) return false;
             if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_base"))) return false;
 
@@ -300,6 +320,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             game.setBaseGameMode(true);
             game.setAbsolMode(false);
             game.setDiscordantStarsMode(false);
+            game.setBlueReverieMode(false);
             return true;
         }
         game.setBaseGameMode(false);
@@ -343,6 +364,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             game.swapOutVariantTechs();
         }
         game.setDiscordantStarsMode(discordantStarsMode);
+        game.setBlueReverieMode(blueReverieMode);
 
         // JUST ABSOL
         if (absolMode) {
@@ -395,6 +417,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             game.setBaseGameMode(false);
             game.setAbsolMode(false);
             game.setDiscordantStarsMode(false);
+            game.setBlueReverieMode(false);
             game.swapInVariantTechs();
             game.swapInVariantUnits("pok");
             game.setScSetID("votc");
@@ -425,5 +448,16 @@ class WeirdGameSetup extends GameStateSubcommand {
         }
 
         return true;
+    }
+
+    public static boolean applyBaseGameMode(GenericInteractionCreateEvent event, Game game) {
+        game.setThundersEdge(false);
+        game.setTwilightsFallMode(false);
+        game.removeStoredValue("useOldPok");
+        boolean success = setGameMode(event, game, true, false, false, false, false, false, false);
+        if (success) {
+            game.setStrategyCardSet("pok");
+        }
+        return success;
     }
 }

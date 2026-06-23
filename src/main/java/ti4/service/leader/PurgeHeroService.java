@@ -10,6 +10,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.service.franken.FrankenAlternateTextService;
 
 @UtilityClass
 public class PurgeHeroService {
@@ -26,7 +27,8 @@ public class PurgeHeroService {
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " is playing " + heroTitle + ".",
-                    leaderModel.getRepresentationEmbed(false, true, true, showFlavourText, game.isTwilightsFallMode()));
+                    FrankenAlternateTextService.getLeaderEmbed(
+                            game, leaderModel, false, true, true, showFlavourText, game.isTwilightsFallMode()));
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

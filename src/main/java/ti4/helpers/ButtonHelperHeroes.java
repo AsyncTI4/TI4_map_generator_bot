@@ -454,7 +454,7 @@ public class ButtonHelperHeroes {
         int size = revealedRelics.size();
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getFactionEmoji() + " may gain " + size + " command token" + (size == 1 ? "" : "s") + ".");
+                player.getFactionEmoji() + " may gain " + StringHelper.pluralize(size, "command token") + ".");
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
         String trueIdentity = player.getRepresentationUnfogged();
         String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()

@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.lunarium.LunariumAbilityButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.SecretObjectiveHelper;
@@ -90,7 +90,7 @@ public class DrawSecretService {
                 game.getMainGameChannel(),
                 count + " " + CardEmojis.SecretObjective + " dealt to all players. Check your `#cards-info` threads.");
         if (game.getRound() == 1) {
-            RoundOneService.RoundOne(event, game);
+            RoundOneService.roundOne(event, game);
         }
     }
 }

@@ -9,14 +9,13 @@ import ti4.service.objectives.DiscardSecretService;
 
 class DiscardSO extends GameStateSubcommand {
 
-    public DiscardSO() {
+    DiscardSO() {
         super(Constants.DISCARD_SO, "Discard Secret Objective", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER,
                         Constants.SECRET_OBJECTIVE_ID,
                         "Secret objective ID, which is found between ()")
-                .setRequired(true)
-                .setAutoComplete(true));
+                .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color who discards")
                 .setAutoComplete(true));
     }

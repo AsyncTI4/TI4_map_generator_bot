@@ -180,14 +180,23 @@ public class CreateGameService {
                 .addRolePermissionOverride(gameRoleID, permission, 0)
                 .complete();
         newGame.setMainChannelID(actionsChannel.getId());
-
-        Role bothelperRole = getRole("Bothelper", guild);
         List<Member> nonGameBothelpers = new ArrayList<>();
+        Role bothelperRole = getRole("Bothelper", guild);
         if (bothelperRole != null) {
             for (Member botHelper : guild.getMembersWithRoles(bothelperRole)) {
                 boolean inGame =
                         members.stream().anyMatch(member -> member.getId().equals(botHelper.getId()));
                 if (!inGame) {
+                    nonGameBothelpers.add(botHelper);
+                }
+            }
+        }
+        Role adminRole = getRole("Admin", guild);
+        if (adminRole != null) {
+            for (Member botHelper : guild.getMembersWithRoles(adminRole)) {
+                boolean inGame =
+                        members.stream().anyMatch(member -> member.getId().equals(botHelper.getId()));
+                if (!inGame && !nonGameBothelpers.contains(botHelper)) {
                     nonGameBothelpers.add(botHelper);
                 }
             }
@@ -309,10 +318,10 @@ public class CreateGameService {
 
                 -# Please realize that these are broad overviews and that some small components may not fit perfectly into these categories.""";
         MessageHelper.sendMessageToChannelWithButtons(actionsChannel, expMsg, buttons);
-        Button baseGameModeButton = Buttons.green("setupBaseGameMode", "Setup Base Game Only");
+        Button baseGameModeButton = Buttons.green("setupBaseGameMode", "Start Base Game Only Setup");
         MessageHelper.sendMessageToChannelWithButton(
                 actionsChannel,
-                "Use the below button to set the game to the base game with PoK strategy cards.\n\n**NOTE: Do not press the button below unless you intend to play the base game only, no expansions.**",
+                "## Use this button to setup a base mode game of TI4.\n\n-# This will set the game to base game with no expansions, and PoK strategy cards.",
                 baseGameModeButton);
     }
 
@@ -592,7 +601,7 @@ public class CreateGameService {
 
     private static int getMaxGamesPerCategory() {
         int maxGamesPerCategory = GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.getAsInt(10);
-        return Math.max(1, Math.min(25, maxGamesPerCategory));
+        return Math.clamp(maxGamesPerCategory, 1, 25);
     }
 
     private static int getChannelCountForNewCategory() {

@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.draft.DraftCategory;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -134,6 +135,7 @@ public class PuppetSoftHeBladeService {
         List<String> output = new ArrayList<>();
         output.add(flipFirmamentHomeSystem(player));
         output.addAll(flipFirmamentFactionTechs(player));
+        output.addAll(flipFrankenFirmamentAbilities(player));
         output.addAll(flipFirmamentLeaders(player));
         output.add(flipFirmamentMech(player));
         output.add(flipFirmamentFlagship(player));
@@ -150,6 +152,7 @@ public class PuppetSoftHeBladeService {
     @Nullable
     private static String flipFirmamentHomeSystem(Player player) {
         Tile oldHome = player.getHomeSystemTile();
+        if (oldHome == null) return null;
         if (!"96a".equals(oldHome.getTileID())) return null;
         Game game = player.getGame();
         // Replace the home system
@@ -173,14 +176,20 @@ public class PuppetSoftHeBladeService {
         game.removeTile(oldHome.getPosition());
         game.setTile(newHome);
         player.setHomeSystemPosition(newHome.getPosition());
+        replaceAppliedFrankenItemAliases(player, DraftCategory.HOMESYSTEM, "firmament", "obsidian");
 
         return "Sucessfully replaced home system tile.";
     }
 
     private static List<String> flipFirmamentFactionTechs(Player player) {
         List<String> outputs = new ArrayList<>();
-
-        Map<String, String> techs = Map.of("planesplitter-firm", "planesplitter-obs", "parasite-firm", "parasite-obs");
+        Map<String, String> techs = new HashMap<>();
+        techs.put("planesplitter-firm", "planesplitter-obs");
+        if (player.getGame().isFrankenGame()) {
+            techs.put("parasite-firm_y", "parasite-obs_y");
+        } else {
+            techs.put("parasite-firm", "parasite-obs");
+        }
         for (Entry<String, String> e : techs.entrySet()) {
             String oldTech = e.getKey();
             String newTech = e.getValue();
@@ -190,16 +199,46 @@ public class PuppetSoftHeBladeService {
                 TechnologyModel newModel = Mapper.getTech(newTech);
                 player.removeFactionTech(oldTech);
                 player.addFactionTech(newTech);
+                replaceAppliedFrankenItemAliases(player, DraftCategory.TECH, oldTech, newTech);
                 outputs.add("Flipped _" + oldModel.getName() + "_ to _" + newModel.getName() + "_.");
             }
-            for (Player p2 : player.getGame().getRealPlayers()) {
-                if (p2.hasTech(oldTech)) {
-                    p2.removeTech(oldTech);
-                    p2.addTech(newTech);
+            if (player.hasTech(oldTech)) {
+                player.removeTech(oldTech);
+                player.addTech(newTech);
+            }
+            if (!player.getGame().isFrankenGame()) {
+                for (Player p2 : player.getGame().getRealPlayers()) {
+                    if (p2 == player) {
+                        continue;
+                    }
+                    if (p2.hasTech(oldTech)) {
+                        p2.removeTech(oldTech);
+                        p2.addTech(newTech);
+                    }
                 }
             }
         }
         return outputs;
+    }
+
+    private static List<String> flipFrankenFirmamentAbilities(Player player) {
+        if (!player.getGame().isFrankenGame()) return List.of();
+
+        List<String> outputs = new ArrayList<>();
+        outputs.add(flipFirmamentAbility(player, "plotsplots", "marionettes"));
+        outputs.add(flipFirmamentAbility(player, "puppetsoftheblade", "bladesorchestra"));
+        return outputs.stream().filter(Objects::nonNull).toList();
+    }
+
+    @Nullable
+    private static String flipFirmamentAbility(Player player, String oldAbility, String newAbility) {
+        if (!player.hasAbility(oldAbility)) return null;
+
+        player.removeAbility(oldAbility);
+        player.addAbility(newAbility);
+        replaceAppliedFrankenItemAliases(player, DraftCategory.ABILITY, oldAbility, newAbility);
+        return "Successfully flipped _" + Mapper.getAbility(oldAbility).getName() + "_ to _"
+                + Mapper.getAbility(newAbility).getName() + "_.";
     }
 
     private static List<String> flipFirmamentLeaders(Player player) {
@@ -209,6 +248,7 @@ public class PuppetSoftHeBladeService {
             player.removeLeader(oldLeader);
             Leader newLeader = new Leader("obsidianagent");
             player.addLeader(newLeader);
+            replaceAppliedFrankenItemAliases(player, DraftCategory.AGENT, "firmamentagent", "obsidianagent");
             output.add(String.format(fmt, oldLeader.getName(), newLeader.getName()));
         });
         player.getLeaderByID("firmamentcommander").ifPresent(oldLeader -> {
@@ -216,13 +256,23 @@ public class PuppetSoftHeBladeService {
             Leader newLeader = new Leader("obsidiancommander");
             player.addLeader(newLeader);
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
+            replaceAppliedFrankenItemAliases(
+                    player, DraftCategory.COMMANDER, "firmamentcommander", "obsidiancommander");
             output.add(String.format(fmt, oldLeader.getName(), newLeader.getName()));
         });
-        player.getLeaderByID("firmamenthero").ifPresent(player::removeLeader);
-        Leader newLeader = new Leader("obsidianhero");
-        player.addLeader(newLeader);
-        HeroUnlockCheckService.checkIfHeroUnlocked(player.getGame(), player);
-        output.add(String.format(fmt, Mapper.getLeader("firmamenthero").getName(), newLeader.getName()));
+        boolean frankenHero = player.getStoredList("appliedFrankenItems").contains("HERO:firmamenthero");
+        boolean shouldFlipHero = !player.getGame().isFrankenGame() || frankenHero || player.hasLeader("firmamenthero");
+        if (shouldFlipHero) {
+            String oldHeroName = Mapper.getLeader("firmamenthero").getName();
+            String newHeroName = Mapper.getLeader("obsidianhero").getName();
+            player.getLeaderByID("firmamenthero").ifPresent(player::removeLeader);
+            player.addLeader("obsidianhero");
+            HeroUnlockCheckService.checkIfHeroUnlocked(player.getGame(), player);
+            if (frankenHero) {
+                replaceAppliedFrankenItemAliases(player, DraftCategory.HERO, "firmamenthero", "obsidianhero");
+            }
+            output.add(String.format(fmt, oldHeroName, newHeroName));
+        }
         return output;
     }
 
@@ -231,6 +281,7 @@ public class PuppetSoftHeBladeService {
         if (!player.hasUnit("firmament_mech")) return null;
         player.removeOwnedUnitByID("firmament_mech");
         player.addOwnedUnitByID("obsidian_mech");
+        replaceAppliedFrankenItemAliases(player, DraftCategory.MECH, "firmament_mech", "obsidian_mech");
         String emojis = FactionEmojis.Firma_Obs + " " + UnitEmojis.mech;
         return "Successfully flipped " + emojis + " _Viper EX-23_ to _Viper Hollow_.";
     }
@@ -240,12 +291,14 @@ public class PuppetSoftHeBladeService {
         if (!player.hasUnit("firmament_flagship")) return null;
         player.removeOwnedUnitByID("firmament_flagship");
         player.addOwnedUnitByID("obsidian_flagship");
+        replaceAppliedFrankenItemAliases(player, DraftCategory.FLAGSHIP, "firmament_flagship", "obsidian_flagship");
         String emojis = FactionEmojis.Firma_Obs + " " + UnitEmojis.flagship;
         return "Successfully flipped " + emojis + " _Heaven's Eye_ to _Heaven's Hollow_.";
     }
 
     @Nullable
     private static String flipFirmamentPromissoryNote(Player player) {
+        if (player.getGame().isFrankenGame()) return null;
         // Black Ops is automated by removing it from the list of notes owned,
         // which makes it annoying to resolve in franken.
         boolean modelOwnsPN = player.getFactionModel().getPromissoryNotes().contains("blackops");
@@ -270,6 +323,7 @@ public class PuppetSoftHeBladeService {
     private static String flipFirmamentBreakthrough(Player player) {
         if (!player.hasBreakthrough("firmamentbt")) return null;
         if (!player.changeBreakthrough("firmamentbt", "obsidianbt")) return null;
+        replaceAppliedFrankenItemAliases(player, DraftCategory.BREAKTHROUGH, "firmamentbt", "obsidianbt");
         BreakthroughModel firma = Mapper.getBreakthrough("firmamentbt");
         BreakthroughModel obs = Mapper.getBreakthrough("obsidianbt");
         return "Successfully flipped " + firma.getNameRepresentation() + " to " + obs.getNameRepresentation() + ".";
@@ -296,7 +350,7 @@ public class PuppetSoftHeBladeService {
                 String singular = "planet has been taken control of by your Viper";
                 msg = msg.replace(singular, plural);
             }
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), output.toString());
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         }
     }
 
@@ -422,5 +476,22 @@ public class PuppetSoftHeBladeService {
             game.getExpeditions().setSecret(newAlias);
 
         return "Successfully updated game stored values.";
+    }
+
+    private static void replaceAppliedFrankenItemAliases(
+            Player player, DraftCategory category, String oldItemID, String newItemID) {
+        if (!player.getGame().isFrankenGame()) return;
+
+        String oldAlias = category + ":" + oldItemID;
+        long occurrences = player.getStoredList("appliedFrankenItems").stream()
+                .filter(oldAlias::equals)
+                .count();
+        if (occurrences == 0) return;
+
+        String newAlias = category + ":" + newItemID;
+        for (long i = 0; i < occurrences; i++) {
+            player.removeFromStoredList("appliedFrankenItems", oldAlias);
+            player.addToStoredList("appliedFrankenItems", newAlias);
+        }
     }
 }

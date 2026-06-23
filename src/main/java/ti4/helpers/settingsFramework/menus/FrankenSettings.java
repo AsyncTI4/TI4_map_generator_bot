@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -18,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.franken.ban.BanService;
 import ti4.discord.interactions.routing.ButtonHandler;
-import ti4.draft.FrankenDraft;
 import ti4.game.Game;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -28,6 +28,7 @@ import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
 import ti4.model.FactionModel;
+import ti4.model.Source.ComponentSource;
 import ti4.service.franken.FrankenBanList;
 import ti4.service.franken.FrankenDraftMode;
 import ti4.service.franken.FrankenDraftStartService;
@@ -37,12 +38,31 @@ import tools.jackson.databind.JsonNode;
 public class FrankenSettings extends SettingsMenu {
 
     private static final String MENU_ID = "franken";
-    private static final String STANDARD_DRAFT = "standard";
+    static final String STANDARD_DRAFT = "standard";
+    private static final Set<String> ALWAYS_DISABLED_FACTIONS = Set.of(
+            "lazax",
+            "admins",
+            "franken",
+            "keleresm",
+            "keleresx",
+            "miltymod",
+            "qulane",
+            "neutral",
+            "kaltrim",
+            "xin",
+            "sarcosa",
+            "obsidian");
 
     private final ChoiceSetting<String> draftMode;
     private final BooleanSetting force;
+    private final BooleanSetting banAllDsFactions;
+    private final BooleanSetting banAllBrFactions;
     private final ListSetting<FactionModel> bannedFactions;
     private final ListSetting<FrankenBanList> banLists;
+    private final FrankenHomebrewSettings homebrewSettings;
+
+    @JsonIgnore
+    private final FrankenDraftLimitSettings draftLimitSettings;
 
     @JsonIgnore
     private final Game game;
@@ -56,15 +76,17 @@ public class FrankenSettings extends SettingsMenu {
         draftMode.setShow(FrankenSettings::draftModeLabel);
 
         force = new BooleanSetting("Force", "Force overwrite existing player setups", false);
+        banAllDsFactions = new BooleanSetting("BanAllDS", "DS Factions", true);
+        banAllBrFactions = new BooleanSetting("BanAllBR", "BR Factions", true);
 
         Set<String> empty = new HashSet<>();
         bannedFactions =
-                new ListSetting<FactionModel>(
+                new ListSetting<>(
                         "BannedFactions",
                         "Banned Factions",
                         "Ban faction",
                         "Unban faction",
-                        legalFactionOptions(game),
+                        legalFactionOptions(game.isThundersEdge(), false, false).entrySet(),
                         empty,
                         empty) {
                     @Override
@@ -87,9 +109,14 @@ public class FrankenSettings extends SettingsMenu {
         if (isMenuJson(json, MENU_ID)) {
             draftMode.initialize(json.get("draftMode"));
             force.initialize(json.get("force"));
+            banAllDsFactions.initialize(json.get("banAllDsFactions"));
+            banAllBrFactions.initialize(json.get("banAllBrFactions"));
             bannedFactions.initialize(json.get("bannedFactions"));
             banLists.initialize(json.get("banLists"));
         }
+
+        homebrewSettings = new FrankenHomebrewSettings(game, json, this);
+        draftLimitSettings = new FrankenDraftLimitSettings(game, json, this);
 
         if (json != null && json.has("messageId")) {
             setMessageId(json.get("messageId").asText(null));
@@ -98,12 +125,21 @@ public class FrankenSettings extends SettingsMenu {
 
     @Override
     protected List<SettingInterface> settings() {
-        return List.of(draftMode, force, bannedFactions, banLists);
+        List<SettingInterface> settings = new ArrayList<>(List.of(draftMode, force));
+        if (isFrankendrazMode()) {
+            settings.add(banAllDsFactions);
+            settings.add(banAllBrFactions);
+        }
+        settings.add(bannedFactions);
+        if (!isFrankendrazMode()) {
+            settings.add(banLists);
+        }
+        return settings;
     }
 
     @Override
     protected List<SettingsMenu> categories() {
-        return List.of();
+        return List.of(homebrewSettings, draftLimitSettings);
     }
 
     @Override
@@ -124,10 +160,37 @@ public class FrankenSettings extends SettingsMenu {
 
     @Override
     public String menuSummaryString(String lastSettingTouched) {
-        return super.menuSummaryString(lastSettingTouched) + frankenNotes();
+        if (lastSettingTouched == null
+                || "DraftMode".equals(lastSettingTouched)
+                || "BanAllDS".equals(lastSettingTouched)
+                || "BanAllBR".equals(lastSettingTouched)
+                || "DiscoStars".equals(lastSettingTouched)
+                || "BlueReverie".equals(lastSettingTouched)) {
+            syncFrankendrazDsBrState(lastSettingTouched);
+        }
+        String summary = super.menuSummaryString(lastSettingTouched) + frankenNotes();
+        game.setFrankenSettings(this);
+        game.setFrankenSettingsJson(json());
+        return summary;
+    }
+
+    @Override
+    protected String resetSettings() {
+        String err = super.resetSettings();
+        if (err != null) return err;
+        homebrewSettings.resetSettings();
+        draftLimitSettings.resetSettings();
+        if (isFrankendrazMode()) {
+            banAllDsFactions.setVal(true);
+            banAllBrFactions.setVal(true);
+            homebrewSettings.getDiscoStars().setVal(true);
+            homebrewSettings.getBlueReverie().setVal(true);
+        }
+        return null;
     }
 
     private String startDraft(GenericInteractionCreateEvent event) {
+        applyHomebrewSettings();
         String validationError = FrankenDraftStartService.validateStartFrankenDraft(game, force.isVal());
         if (validationError != null) {
             return validationError;
@@ -137,12 +200,40 @@ public class FrankenSettings extends SettingsMenu {
     }
 
     private void applyBanSettings() {
+        game.setStoredValue("bannedFactions", "");
         BanService banService = new BanService();
+        applySourceFactionBans(banService, ComponentSource.ds, !banAllDsFactions.isVal());
+        applySourceFactionBans(banService, ComponentSource.blue_reverie, !banAllBrFactions.isVal());
         for (String faction : bannedFactions.getKeys()) {
             banService.applyOption(game, Constants.BAN_FACTION, faction);
         }
         for (String banList : banLists.getKeys()) {
             banService.applyBanList(game, FrankenBanList.fromString(banList));
+        }
+    }
+
+    private void applySourceFactionBans(BanService banService, ComponentSource source, boolean enabled) {
+        if (!enabled) return;
+        Mapper.getFactionsValues().stream()
+                .filter(faction -> faction.getSource() == source)
+                .map(FactionModel::getAlias)
+                .forEach(faction -> banService.applyOption(game, Constants.BAN_FACTION, faction));
+    }
+
+    @Override
+    protected void updateTransientSettings() {
+        bannedFactions.setAllValues(legalFactionOptions(
+                game.isThundersEdge(), isEffectiveDiscordantStarsEnabled(), isEffectiveBlueReverieEnabled()));
+    }
+
+    void applyHomebrewSettings() {
+        game.setDiscordantStarsMode(isEffectiveDiscordantStarsEnabled());
+        game.setBlueReverieMode(isEffectiveBlueReverieEnabled());
+        game.setUnchartedSpaceStuff(homebrewSettings.getUnchartedSpace().isVal());
+
+        if (!game.isAcd2()) {
+            String acDeck = game.isUnchartedSpaceStuff() ? "action_cards_ds" : "action_cards_te";
+            game.resetActionCardDeck(Mapper.getDeck(acDeck));
         }
     }
 
@@ -154,10 +245,68 @@ public class FrankenSettings extends SettingsMenu {
         return FrankenDraftMode.fromString(selected);
     }
 
+    boolean isFrankendrazMode() {
+        return FrankenDraftMode.FRANKENDRAZ.toString().equals(draftMode.getValue());
+    }
+
+    boolean isEffectiveDiscordantStarsEnabled() {
+        return isFrankendrazMode()
+                ? banAllDsFactions.isVal()
+                : homebrewSettings.getDiscoStars().isVal();
+    }
+
+    boolean isEffectiveBlueReverieEnabled() {
+        return isFrankendrazMode()
+                ? banAllBrFactions.isVal()
+                : homebrewSettings.getBlueReverie().isVal();
+    }
+
+    void syncFrankendrazDsBrState(String lastSettingTouched) {
+        if (!isFrankendrazMode()) return;
+        if (lastSettingTouched == null) {
+            banAllDsFactions.setVal(homebrewSettings.getDiscoStars().isVal());
+            banAllBrFactions.setVal(homebrewSettings.getBlueReverie().isVal());
+            return;
+        }
+        switch (lastSettingTouched) {
+            case "DraftMode" -> {
+                banAllDsFactions.setVal(true);
+                banAllBrFactions.setVal(true);
+                homebrewSettings.getDiscoStars().setVal(true);
+                homebrewSettings.getBlueReverie().setVal(true);
+            }
+            case "BanAllDS" -> homebrewSettings.getDiscoStars().setVal(banAllDsFactions.isVal());
+            case "BanAllBR" -> homebrewSettings.getBlueReverie().setVal(banAllBrFactions.isVal());
+            case "DiscoStars" ->
+                banAllDsFactions.setVal(homebrewSettings.getDiscoStars().isVal());
+            case "BlueReverie" ->
+                banAllBrFactions.setVal(homebrewSettings.getBlueReverie().isVal());
+            default -> {
+                banAllDsFactions.setVal(homebrewSettings.getDiscoStars().isVal());
+                banAllBrFactions.setVal(homebrewSettings.getBlueReverie().isVal());
+            }
+        }
+    }
+
     private String effectiveBannedFactionSummary() {
         Map<String, Set<String>> banListSources = selectedBanListSources(Constants.BAN_FACTION);
         Set<String> effectiveBans = new HashSet<>(bannedFactions.getKeys());
         effectiveBans.addAll(banListSources.keySet());
+        if (!banAllDsFactions.isVal()) {
+            Mapper.getFactionsValues().stream()
+                    .filter(f -> f.getSource() == ComponentSource.ds)
+                    .filter(f -> !ALWAYS_DISABLED_FACTIONS.contains(f.getAlias()))
+                    .map(FactionModel::getAlias)
+                    .forEach(effectiveBans::add);
+        }
+
+        if (!banAllBrFactions.isVal()) {
+            Mapper.getFactionsValues().stream()
+                    .filter(f -> f.getSource() == ComponentSource.blue_reverie)
+                    .filter(f -> !ALWAYS_DISABLED_FACTIONS.contains(f.getAlias()))
+                    .map(FactionModel::getAlias)
+                    .forEach(effectiveBans::add);
+        }
         List<String> values = effectiveBans.stream()
                 .map(key -> factionBanLabel(key, banListSources.getOrDefault(key, Set.of())))
                 .sorted()
@@ -166,10 +315,10 @@ public class FrankenSettings extends SettingsMenu {
     }
 
     private static String frankenNotes() {
-        return "\n\n"
-                + "**Notes:**\n"
-                + "> Use the game options and homebrew settings above to enable homebrew. DS auto includes BR, if you want to play without them, add the BR ban list.\n\n"
-                + "> Due to discord message limits, component bans must be handled manually via slash command. The ban list options have popular component bans.";
+        return """
+
+
+            > Due to discord message limits, component bans must be handled manually via slash command. The ban list options have popular component bans.""";
     }
 
     Map<String, Set<String>> selectedBanListSources(String banType) {
@@ -185,7 +334,7 @@ public class FrankenSettings extends SettingsMenu {
     List<FrankenBanList> selectedBanLists() {
         return banLists.getKeys().stream()
                 .map(FrankenBanList::fromString)
-                .filter(banList -> banList != null)
+                .filter(Objects::nonNull)
                 .toList();
     }
 
@@ -240,10 +389,23 @@ public class FrankenSettings extends SettingsMenu {
         return mode == null ? key : mode.getAutoCompleteName();
     }
 
-    private static Set<Entry<String, FactionModel>> legalFactionOptions(Game game) {
-        return FrankenDraft.getAllFrankenLegalFactions(game).stream()
-                .collect(Collectors.toMap(FactionModel::getAlias, faction -> faction))
-                .entrySet();
+    private static Map<String, FactionModel> legalFactionOptions(
+            boolean teEnabled, boolean dsEnabled, boolean brEnabled) {
+        return Mapper.getFactionsValues().stream()
+                .filter(faction -> isLegalFrankenFaction(faction, teEnabled, dsEnabled, brEnabled))
+                .collect(Collectors.toMap(FactionModel::getAlias, faction -> faction));
+    }
+
+    private static boolean isLegalFrankenFaction(
+            FactionModel faction, boolean teEnabled, boolean dsEnabled, boolean brEnabled) {
+        String alias = faction.getAlias();
+        if (ALWAYS_DISABLED_FACTIONS.contains(alias)) {
+            return false;
+        }
+        if (teEnabled && faction.getSource().isTe()) return true;
+        if (dsEnabled && faction.getSource() == ComponentSource.ds) return true;
+        if (brEnabled && faction.getSource() == ComponentSource.blue_reverie) return true;
+        return faction.getSource().isPok();
     }
 
     private static Set<Entry<String, FrankenBanList>> banListOptions() {

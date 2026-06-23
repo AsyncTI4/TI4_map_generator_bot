@@ -14,9 +14,20 @@ public enum FrankenBanList {
             "Removes Weak/Boring Components for a more empowered draft",
             Map.ofEntries(
                     Map.entry(
+                            Constants.BREAKTHROUGH,
+                            List.of(
+                                    "florzenbt",
+                                    "axisbt",
+                                    "cymiaebt",
+                                    "mortheusbt",
+                                    "mykomentoribt",
+                                    "vaylerianbt",
+                                    "argentbt",
+                                    "firmamentbt",
+                                    "bastionbt")),
+                    Map.entry(
                             Constants.ABILITY,
                             List.of(
-                                    "hired_guns",
                                     "deep_mining",
                                     "orbital_foundries",
                                     "rule_of_two",
@@ -25,7 +36,6 @@ public enum FrankenBanList {
                                     "information_brokers",
                                     "munitions",
                                     "starfall_gunnery",
-                                    "plague_reservoir",
                                     "zeal",
                                     "illusory_presence",
                                     "foresight",
@@ -38,6 +48,7 @@ public enum FrankenBanList {
                             Constants.LEADER,
                             List.of(
                                     "argentagent",
+                                    "keleresagent",
                                     "l1z1xagent",
                                     "dihmohnagent",
                                     "letnevagent",
@@ -47,7 +58,6 @@ public enum FrankenBanList {
                                     "florzenagent",
                                     "solagent",
                                     "nivynagent",
-                                    "ghostcommander",
                                     "cymiaecommander",
                                     "zeliancommander",
                                     "mortheuscommander",
@@ -60,7 +70,6 @@ public enum FrankenBanList {
                                     "mentakcommander",
                                     "naalucommander",
                                     "kjalengardcommander",
-                                    "naaluhero",
                                     "kolumehero",
                                     "keleresheroodlynn")),
                     Map.entry(
@@ -127,14 +136,17 @@ public enum FrankenBanList {
                                     "zelian_flagship",
                                     "augers_flagship",
                                     "vaylerian_mech",
-                                    "rohdhna_mech",
                                     "cabal_mech",
-                                    "nivyn_mech",
                                     "l1z1x_mech",
                                     "mortheus_mech",
                                     "keleres_mech",
                                     "zelian_mech",
-                                    "mirveda_mech")))),
+                                    "mirveda_mech",
+                                    "florzen_mech",
+                                    "mykomentori_mech",
+                                    "nokar_mech",
+                                    "mortheus_mech",
+                                    "axis_mech")))),
 
     OP_Components(
             "OP Components",
@@ -142,14 +154,11 @@ public enum FrankenBanList {
             Map.ofEntries(
                     Map.entry(
                             Constants.LEADER,
-                            List.of(
-                                    "winnuhero",
-                                    "mahactcommander",
-                                    "xxchahero",
-                                    "naaluagent",
-                                    "edynhero",
-                                    "lanefirhero")),
+                            List.of("winnuhero", "mahactcommander", "naaluagent", "edynhero", "lanefirhero")),
                     Map.entry(Constants.TECH, List.of("lw2", "dt2", "ffac2", "qdn", "asn", "dsuydab")),
+                    Map.entry(
+                            Constants.BREAKTHROUGH,
+                            List.of("solbt", "letnevbt", "lanefirbt", "sardakkbt", "rhodunbt", "nomadbt", "kyrobt")),
                     Map.entry(Constants.UNIT_ID, List.of("mahact_mech")),
                     Map.entry(
                             Constants.ABILITY,
@@ -157,17 +166,9 @@ public enum FrankenBanList {
                                     "telepathic",
                                     "technological_singularity",
                                     "pillage",
-                                    "technological_singularity",
                                     "classified_developments",
-                                    "data_recovery",
                                     "honor_bound",
-                                    "prescience")))),
-
-    Blue_Reverie(
-            "Blue Reverie",
-            "Removes BR factions.",
-            Map.ofEntries(Map.entry(
-                    Constants.BAN_FACTION, List.of("atokera", "belkosea", "qhet", "pharadn", "toldar", "uydai"))));
+                                    "prescience"))));
 
     private final String id;
 

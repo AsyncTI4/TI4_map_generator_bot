@@ -113,6 +113,7 @@
     },
 
     
+    
 
     {
         "itemCategory": "ABILITY",
@@ -181,18 +182,12 @@
     },
 
     
-
     {
-        "itemCategory": "HOMESYSTEM",
-        "itemId": "firmament",
-        "additionalComponents": [
-            "PN:blackops",
-            "PLOT:mutated_enervate",
-            "ABILITY:plotsplots",
-            "ABILITY:puppetsoftheblade"        
-        ],
+        "itemCategory": "ABILITY",
+        "itemId": "plotsplots",
+        "undraftable": true,
         "source": "thunders_edge"
-    },
+    }, 
     {
         "itemCategory": "HOMESYSTEM",
         "itemId": "obsidian",
@@ -268,25 +263,6 @@
     },
     {
         "itemCategory": "ABILITY",
-        "itemId": "plotsplots",
-        "additionalComponents": [
-            "PLOT:enervate",
-            "PLOT:siphon",
-            "PLOT:seethe",
-            "PLOT:assail",
-            "PLOT:extract",
-            "ABILITY:puppetsoftheblade"
-        ],
-        "optionalSwaps": [
-            "AGENT:firmamentagent",
-            "COMMANDER:firmamentcommander",
-            "HERO:firmamenthero",
-            "FLAGSHIP:firmament_flagship"
-        ],
-        "source": "thunders_edge"
-    }, 
-    {
-        "itemCategory": "ABILITY",
         "itemId": "puppetsoftheblade",
         "undraftable": true,
         "source": "thunders_edge"
@@ -322,10 +298,21 @@
         "source": "thunders_edge"
     },
     {
+        "itemCategory": "HOMESYSTEM",
+        "itemId": "firmament",
+        "additionalComponents": [
+            "PN:blackops",
+            "PLOT:mutated_enervate",
+            "ABILITY:plotsplots",
+            "ABILITY:puppetsoftheblade"        
+        ],
+        "source": "thunders_edge"
+    },
+    {
         "itemCategory": "TECH",
         "itemId": "planesplitter-firm",
         "additionalComponents": [
-            "PLOT:enervate",
+            "PLOT:seethe",
             "ABILITY:puppetsoftheblade",
             "ABILITY:plotsplots"
         ],
@@ -340,11 +327,7 @@
     {
         "itemCategory": "TECH",
         "itemId": "parasite-firm",
-        "additionalComponents": [
-            "PLOT:enervate",
-            "ABILITY:puppetsoftheblade",
-            "ABILITY:plotsplots"
-        ],
+        "undraftable": true,
         "source": "thunders_edge"
     },
     {
@@ -352,6 +335,23 @@
         "itemId": "parasite-obs",
         "undraftable": true,
         "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "parasite-firm_y",
+        "additionalComponents": [
+            "PLOT:mutated_assail",
+            "ABILITY:puppetsoftheblade",
+            "ABILITY:plotsplots"
+        ],
+        "alwaysAddToPool": true,
+        "source": "franken"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "parasite-obs_y",
+        "undraftable": true,
+        "source": "franken"
     },
     {
         "itemCategory": "FLAGSHIP",
@@ -380,7 +380,14 @@
     {
         "itemCategory": "COMMANDER",
         "itemId": "firmamentcommander",
-        "undraftable": true,
+        "additionalComponents": [
+            "PLOT:mutated_enervate",
+            "ABILITY:puppetsoftheblade",
+            "ABILITY:plotsplots"
+        ],
+        "optionalSwaps": [
+            "AGENT:firmamentagent"
+        ],
         "source": "thunders_edge"
     },
     {
@@ -392,7 +399,10 @@
     {
         "itemCategory": "HERO",
         "itemId": "firmamenthero",
-        "undraftable": true,
+        "additionalComponents": [
+            "PLOT:extract",
+            "ABILITY:puppetsoftheblade"
+        ],
         "source": "thunders_edge"
     },
     {
@@ -411,7 +421,7 @@
         "itemCategory": "MECH",
         "itemId": "firmament_mech",
         "additionalComponents": [
-            "PLOT:siphon",
+            "PLOT:mutated_extract",
             "ABILITY:puppetsoftheblade",
             "ABILITY:plotsplots"
         ],
@@ -428,12 +438,15 @@
         "itemId": "firmamentbt",
         "additionalComponents": [
             "PLOT:assail",
-            "PLOT:mutated_enervate",
-            "PLOT:mutated_siphon",
+            "PLOT:enervate",
+            "PLOT:siphon",
             "PLOT:mutated_seethe",
             "PLOT:mutated_extract",
             "ABILITY:puppetsoftheblade",
             "ABILITY:plotsplots"
+        ],
+        "optionalSwaps": [
+         "FLAGSHIP:firmament_flagship"
         ],
         "source": "thunders_edge"
     },
