@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedPlayer;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameLaunchPostService;
@@ -32,18 +34,19 @@ import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.statistics.UserGameInfoService;
 
 @AllArgsConstructor
 @Service
 public class MatchmakerService {
 
-    private static final int DEFAULT_MAX_QUEUE_TIME_HOURS = 8;
     private static final int NUMBER_OF_ACTIVE_HOUR_BUCKETS = 6;
     private static final int ACTIVE_HOUR_BUCKET_SIZE = 4;
     private static final int ACTIVE_HOUR_BUCKET_MATCH_THRESHOLD = 3;
     private static final long ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT = 3;
     private static final double SIMILAR_SKILL_DIFFERENCE_THRESHOLD = 2.0;
     private static final double RELAXED_SIMILAR_SKILL_DIFFERENCE_THRESHOLD = 4.0;
+    public static final int NEW_PLAYER_GAME_THRESHOLD = 1;
 
     private final MatchmakingQueueEntryRepository matchmakingQueueEntryRepository;
 
@@ -94,6 +97,7 @@ public class MatchmakerService {
                         .divide(BigDecimal.valueOf(playerRatings.size()), MathContext.DECIMAL64);
         Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets =
                 getActiveHourBuckets(candidates, candidateToUserSettings);
+        Map<MatchmakingQueueEntryEntity, Integer> playersToCompletedGameCounts = getCompletedGameCounts(candidates);
         List<List<MatchmakingQueueEntryEntity>> gamesToCreate = new ArrayList<>();
         Set<MatchmakingQueueEntryEntity> playersAddedToGames = new HashSet<>();
 
@@ -111,6 +115,7 @@ public class MatchmakerService {
                                 paceOption,
                                 candidateToUserSettings,
                                 playersToActiveHourBuckets,
+                                playersToCompletedGameCounts,
                                 playerRatings,
                                 averageRating);
                     }
@@ -141,6 +146,7 @@ public class MatchmakerService {
             String paceOption,
             Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate,
             Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets,
+            Map<MatchmakingQueueEntryEntity, Integer> playersToCompletedGameCounts,
             Map<String, BigDecimal> playerRatings,
             BigDecimal defaultRating) {
         List<MatchmakingQueueEntryEntity> eligible = candidates.stream()
@@ -185,6 +191,7 @@ public class MatchmakerService {
                                 candidate,
                                 userSettingsByCandidate,
                                 playersToActiveHourBuckets,
+                                playersToCompletedGameCounts,
                                 playerRatings,
                                 defaultRating));
 
@@ -209,6 +216,7 @@ public class MatchmakerService {
             MatchmakingQueueEntryEntity player2,
             Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate,
             Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets,
+            Map<MatchmakingQueueEntryEntity, Integer> playersToCompletedGameCounts,
             Map<String, BigDecimal> playerRatings,
             BigDecimal defaultRating) {
         UserSettings player1Settings = userSettingsByCandidate.get(player1);
@@ -226,6 +234,17 @@ public class MatchmakerService {
         boolean player1WantsTigl = MatchmakingOptions.wantsTigl(player1RestrictionsCsv);
         boolean player2WantsTigl = MatchmakingOptions.wantsTigl(player2RestrictionsCsv);
         if (player1WantsTigl != player2WantsTigl) {
+            return false;
+        }
+
+        int player1CompletedGames = playersToCompletedGameCounts.getOrDefault(player1, 0);
+        int player2CompletedGames = playersToCompletedGameCounts.getOrDefault(player2, 0);
+        boolean player1IsNew = player1CompletedGames < NEW_PLAYER_GAME_THRESHOLD;
+        boolean player2IsNew = player2CompletedGames < NEW_PLAYER_GAME_THRESHOLD;
+        if (player2IsNew && MatchmakingOptions.wantsToAvoidNewPlayers(player1RestrictionsCsv)) {
+            return false;
+        }
+        if (player1IsNew && MatchmakingOptions.wantsToAvoidNewPlayers(player2RestrictionsCsv)) {
             return false;
         }
 
@@ -263,6 +282,17 @@ public class MatchmakerService {
         double hoursWaited =
                 Duration.between(player.getQueuedAt(), Instant.now()).toMinutes() / 60.0;
         return hoursWaited >= maxHours / SIMILAR_SKILL_DIFFERENCE_THRESHOLD;
+    }
+
+    private Map<MatchmakingQueueEntryEntity, Integer> getCompletedGameCounts(
+            List<MatchmakingQueueEntryEntity> candidates) {
+        Map<MatchmakingQueueEntryEntity, Integer> completedGameCounts = new HashMap<>();
+        for (MatchmakingQueueEntryEntity candidate : candidates) {
+            ManagedPlayer managedPlayer = GameManager.getManagedPlayer(candidate.getUserId());
+            completedGameCounts.put(
+                    candidate, UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer));
+        }
+        return completedGameCounts;
     }
 
     private Map<MatchmakingQueueEntryEntity, Set<Integer>> getActiveHourBuckets(

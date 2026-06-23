@@ -22,6 +22,7 @@ public class MatchmakingOptions {
     public static final List<String> VICTORY_POINT_OPTIONS = List.of("10", "12", "14");
     private static final String SIMILAR_ACTIVE_HOURS_OPTION = "Similar Active Hours";
     private static final String SIMILAR_PLAYER_SKILL_OPTION = "Similar Player Skill";
+    private static final String AVOID_NEW_PLAYERS_OPTION = "Avoid New Async Players";
     public static final String NO_PACE_OPTION = "No Pace";
     public static final String SLOW_PACE_OPTION = "Slow (90 days)";
     public static final String FAST_PACE_OPTION = "Average (30 days)";
@@ -31,7 +32,7 @@ public class MatchmakingOptions {
     public static final List<String> PACE_RESTRICTION_OPTIONS =
             List.of(NO_PACE_OPTION, SLOW_PACE_OPTION, FAST_PACE_OPTION, FASTER_PACE_OPTION, FASTEST_PACE_OPTION);
     public static final List<String> RESTRICTION_OPTIONS =
-            List.of(SIMILAR_ACTIVE_HOURS_OPTION, SIMILAR_PLAYER_SKILL_OPTION, TIGL_OPTION);
+            List.of(SIMILAR_ACTIVE_HOURS_OPTION, SIMILAR_PLAYER_SKILL_OPTION, AVOID_NEW_PLAYERS_OPTION, TIGL_OPTION);
 
     public static final Map<String, Integer> MAX_QUEUE_TIME_OPTIONS_TO_HOURS;
 
@@ -90,5 +91,9 @@ public class MatchmakingOptions {
 
     public static boolean wantsTigl(String restrictionsCsv) {
         return restrictionsCsv.contains(TIGL_OPTION);
+    }
+
+    public static boolean wantsToAvoidNewPlayers(String restrictionsCsv) {
+        return restrictionsCsv.contains(AVOID_NEW_PLAYERS_OPTION);
     }
 }
