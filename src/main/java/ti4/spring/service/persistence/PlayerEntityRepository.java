@@ -7,6 +7,13 @@ import org.springframework.data.repository.query.Param;
 
 public interface PlayerEntityRepository extends JpaRepository<PlayerEntity, Long> {
 
+    void deleteByGame_GameName(String gameName);
+
+    boolean existsByUser_Id(String userId);
+
+    @Query("SELECT DISTINCT p.user.id FROM PlayerEntity p WHERE p.game.gameName = :gameName")
+    List<String> findDistinctUserIdsByGameName(@Param("gameName") String gameName);
+
     @Query("SELECT p FROM PlayerEntity p JOIN FETCH p.user u")
     List<PlayerEntity> findAllWithUsers();
 

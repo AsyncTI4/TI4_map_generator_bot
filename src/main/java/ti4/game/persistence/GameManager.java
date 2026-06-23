@@ -21,6 +21,8 @@ import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.logging.BotLogger;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.persistence.GameEntitySyncService;
 
 @UtilityClass
 public class GameManager {
@@ -87,6 +89,7 @@ public class GameManager {
         if (managedGame != null) {
             managedGame.getPlayers().forEach(player -> player.removeGame(gameName));
         }
+        deletePersistedGame(gameName);
     }
 
     public static boolean isValid(String gameName) {
@@ -105,6 +108,7 @@ public class GameManager {
 
         gameNames.add(game.getName());
         gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
+        syncPersistedGame(game);
 
         boolean isActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
                 .map(ManagedGame::isActive)
@@ -132,6 +136,7 @@ public class GameManager {
 
     private static Game handleUndo(Game undo) {
         handleMissingMatchingManagedGame(undo);
+        syncPersistedGame(undo);
         return undo;
     }
 
@@ -157,9 +162,15 @@ public class GameManager {
         Game game = GameLoadService.load(gameName);
         if (game == null) {
             game = GameUndoService.loadUndoForMissingGame(gameName);
-            handleUndo(game);
+            if (game != null) {
+                return handleUndo(game);
+            } else {
+                handleManagedGameRemoval(gameName);
+                return null;
+            }
         }
         handleMissingMatchingManagedGame(game);
+        syncPersistedGame(game);
         return game;
     }
 
@@ -241,6 +252,26 @@ public class GameManager {
     public static int getAndIncrementLatestPbdNumber() {
         waitFor(gameNamesLoadedLatch);
         return latestPbdNumber.incrementAndGet();
+    }
+
+    private static void syncPersistedGame(@Nullable Game game) {
+        if (game == null) return;
+        getGameEntitySyncService().ifPresent(service -> service.sync(game));
+    }
+
+    private static void deletePersistedGame(String gameName) {
+        getGameEntitySyncService().ifPresent(service -> service.delete(gameName));
+    }
+
+    private static Optional<GameEntitySyncService> getGameEntitySyncService() {
+        try {
+            return Optional.of(SpringContext.getBean(GameEntitySyncService.class));
+        } catch (IllegalStateException e) {
+            if ("ApplicationContext not initialized".equals(e.getMessage())) {
+                return Optional.empty();
+            }
+            throw e;
+        }
     }
 
     public static void resetLatestPbdNumberFrom(int toResetFrom) {
