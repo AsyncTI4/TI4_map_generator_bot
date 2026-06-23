@@ -18,8 +18,8 @@ import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu.SelectTarget;
 import net.dv8tion.jda.api.components.selections.SelectOption;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -244,11 +244,11 @@ class MatchmakingButtonHandler {
 
     private static List<String> restrictionOptionsForMember(ButtonInteractionEvent event) {
         Member member = event.getMember();
-        if (member == null) {
+        Guild guild = event.getGuild();
+        if (member == null || guild == null) {
             return RESTRICTION_OPTIONS;
         }
-        List<String> roleIds = member.getRoles().stream().map(Role::getId).toList();
-        List<String> roleRestrictionOptions = MatchmakingOptions.getRoleRestrictionOptions(roleIds);
+        List<String> roleRestrictionOptions = MatchmakingOptions.getRoleRestrictionOptions(guild, member);
         if (roleRestrictionOptions.isEmpty()) {
             return RESTRICTION_OPTIONS;
         }

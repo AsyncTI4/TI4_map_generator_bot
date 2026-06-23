@@ -1,7 +1,7 @@
 package ti4.logging;
 
-import static ti4.helpers.discord.DiscordErrorUtility.isDiscordServerError;
-import static ti4.helpers.discord.DiscordErrorUtility.isIgnorableError;
+import static ti4.discord.utility.DiscordErrorUtility.isDiscordServerError;
+import static ti4.discord.utility.DiscordErrorUtility.isIgnorableError;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -2,21 +2,25 @@ package ti4.discord.interactions.buttons.handlers.matchmaking;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import ti4.discord.utility.DiscordRoleUtility;
 
 @UtilityClass
 public class MatchmakingOptions {
 
     public static final List<String> EXPANSION_OPTIONS = List.of(
             "Base Only",
-            "Prophecy of Kings",
-            "Thunder's Edge",
+            "Prophecy of Kings Only",
+            "Thunder's Edge Only",
             "Prophecy of Kings and Thunder's Edge",
             "Twilight's Fall");
     public static final List<String> PLAYER_COUNT_OPTIONS = List.of("3", "4", "5", "6", "7", "8");
@@ -25,13 +29,13 @@ public class MatchmakingOptions {
     private static final String SIMILAR_PLAYER_SKILL_OPTION = "Similar Player Skill";
     private static final String AVOID_NEW_PLAYERS_OPTION = "Avoid New Async Players";
 
-    public static final String FLOATERS_ROLE_ID = "1502332889541509262";
-    public static final String WARRIORS_ROLE_ID = "1502332581662953532";
+    public static final String FLOATERS_ROLE_NAME = "Floaters";
+    public static final String WARRIORS_ROLE_NAME = "Warriors";
     private static final String ONLY_MATCH_FLOATERS_OPTION = "Only match with Floaters";
     private static final String ONLY_MATCH_WARRIORS_OPTION = "Only match with Warriors";
-    private static final Map<String, String> ROLE_ID_TO_ONLY_MATCH_OPTION = Map.of(
-            FLOATERS_ROLE_ID, ONLY_MATCH_FLOATERS_OPTION,
-            WARRIORS_ROLE_ID, ONLY_MATCH_WARRIORS_OPTION);
+    private static final Map<String, String> ROLE_NAME_TO_ONLY_MATCH_OPTION = Map.of(
+            FLOATERS_ROLE_NAME, ONLY_MATCH_FLOATERS_OPTION,
+            WARRIORS_ROLE_NAME, ONLY_MATCH_WARRIORS_OPTION);
     public static final String NO_PACE_OPTION = "No Pace";
     public static final String SLOW_PACE_OPTION = "Slow (90 days)";
     public static final String FAST_PACE_OPTION = "Average (30 days)";
@@ -71,10 +75,6 @@ public class MatchmakingOptions {
         return expansionsPlusBase;
     }
 
-    private static boolean csvContains(String csv, String value) {
-        return Arrays.asList(csv.split(",")).contains(value);
-    }
-
     public static List<String> getShuffledPaceRestrictions() {
         List<String> pacesRestrictions = new ArrayList<>(PACE_RESTRICTION_OPTIONS);
         pacesRestrictions.remove(NO_PACE_OPTION);
@@ -82,42 +82,48 @@ public class MatchmakingOptions {
         return pacesRestrictions;
     }
 
-    public static List<Predicate<String>> getTiglRestrictionPredicates() {
-        return buildRestrictionPredicates(restrictionsCsv -> csvContains(restrictionsCsv, TIGL_OPTION));
+    public static Set<String> getHeldOnlyMatchRoleNames(Guild guild, Member member) {
+        Set<String> heldRoleNames = new HashSet<>();
+        for (String roleName : ROLE_NAME_TO_ONLY_MATCH_OPTION.keySet()) {
+            Role role = DiscordRoleUtility.getRole(roleName, guild);
+            if (role != null && member.getRoles().contains(role)) {
+                heldRoleNames.add(roleName);
+            }
+        }
+        return heldRoleNames;
     }
 
-    private static List<Predicate<String>> buildRestrictionPredicates(Predicate<String> predicate) {
-        return List.of(predicate, predicate.negate());
-    }
-
-    public static boolean wantsSimilarActiveHours(String restrictionsCsv) {
-        return restrictionsCsv.contains(SIMILAR_ACTIVE_HOURS_OPTION);
-    }
-
-    public static boolean wantsSimilarPlayerSkill(String restrictionsCsv) {
-        return restrictionsCsv.contains(SIMILAR_PLAYER_SKILL_OPTION);
-    }
-
-    public static boolean wantsTigl(String restrictionsCsv) {
-        return restrictionsCsv.contains(TIGL_OPTION);
-    }
-
-    public static boolean wantsToAvoidNewPlayers(String restrictionsCsv) {
-        return restrictionsCsv.contains(AVOID_NEW_PLAYERS_OPTION);
-    }
-
-    public static List<String> getRoleRestrictionOptions(Collection<String> memberRoleIds) {
-        return ROLE_ID_TO_ONLY_MATCH_OPTION.entrySet().stream()
-                .filter(entry -> memberRoleIds.contains(entry.getKey()))
-                .map(Map.Entry::getValue)
+    public static List<String> getRoleRestrictionOptions(Guild guild, Member member) {
+        return getHeldOnlyMatchRoleNames(guild, member).stream()
+                .map(ROLE_NAME_TO_ONLY_MATCH_OPTION::get)
                 .toList();
     }
 
+    private static boolean csvContains(String csv, String value) {
+        return Arrays.asList(csv.split(",")).contains(value);
+    }
+
+    public static boolean wantsSimilarActiveHours(String restrictionsCsv) {
+        return csvContains(restrictionsCsv, SIMILAR_ACTIVE_HOURS_OPTION);
+    }
+
+    public static boolean wantsSimilarPlayerSkill(String restrictionsCsv) {
+        return csvContains(restrictionsCsv, SIMILAR_PLAYER_SKILL_OPTION);
+    }
+
+    public static boolean wantsTigl(String restrictionsCsv) {
+        return csvContains(restrictionsCsv, TIGL_OPTION);
+    }
+
+    public static boolean wantsToAvoidNewPlayers(String restrictionsCsv) {
+        return csvContains(restrictionsCsv, AVOID_NEW_PLAYERS_OPTION);
+    }
+
     public static boolean wantsOnlyFloaters(String restrictionsCsv) {
-        return restrictionsCsv.contains(ONLY_MATCH_FLOATERS_OPTION);
+        return csvContains(restrictionsCsv, ONLY_MATCH_FLOATERS_OPTION);
     }
 
     public static boolean wantsOnlyWarriors(String restrictionsCsv) {
-        return restrictionsCsv.contains(ONLY_MATCH_WARRIORS_OPTION);
+        return csvContains(restrictionsCsv, ONLY_MATCH_WARRIORS_OPTION);
     }
 }

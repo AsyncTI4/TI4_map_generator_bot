@@ -1,4 +1,4 @@
-package ti4.helpers.discord;
+package ti4.discord.utility;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;

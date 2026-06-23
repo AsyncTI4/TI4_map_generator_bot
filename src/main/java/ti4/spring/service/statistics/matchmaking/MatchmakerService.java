@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
@@ -101,7 +100,7 @@ public class MatchmakerService {
         Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets =
                 getActiveHourBuckets(candidates, candidateToUserSettings);
         Map<MatchmakingQueueEntryEntity, Integer> playersToCompletedGameCounts = getCompletedGameCounts(candidates);
-        Map<MatchmakingQueueEntryEntity, Set<String>> playersToRoleIds = getRoleIds(candidates);
+        Map<MatchmakingQueueEntryEntity, Set<String>> playersToRoleNames = getRoleNames(candidates);
         List<List<MatchmakingQueueEntryEntity>> gamesToCreate = new ArrayList<>();
         Set<MatchmakingQueueEntryEntity> playersAddedToGames = new HashSet<>();
 
@@ -120,7 +119,7 @@ public class MatchmakerService {
                                 candidateToUserSettings,
                                 playersToActiveHourBuckets,
                                 playersToCompletedGameCounts,
-                                playersToRoleIds,
+                                playersToRoleNames,
                                 playerRatings,
                                 averageRating);
                     }
@@ -152,7 +151,7 @@ public class MatchmakerService {
             Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate,
             Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets,
             Map<MatchmakingQueueEntryEntity, Integer> playersToCompletedGameCounts,
-            Map<MatchmakingQueueEntryEntity, Set<String>> playersToRoleIds,
+            Map<MatchmakingQueueEntryEntity, Set<String>> playersToRoleNames,
             Map<String, BigDecimal> playerRatings,
             BigDecimal defaultRating) {
         List<MatchmakingQueueEntryEntity> eligible = candidates.stream()
@@ -198,7 +197,7 @@ public class MatchmakerService {
                                 userSettingsByCandidate,
                                 playersToActiveHourBuckets,
                                 playersToCompletedGameCounts,
-                                playersToRoleIds,
+                                playersToRoleNames,
                                 playerRatings,
                                 defaultRating));
 
@@ -224,7 +223,7 @@ public class MatchmakerService {
             Map<MatchmakingQueueEntryEntity, UserSettings> userSettingsByCandidate,
             Map<MatchmakingQueueEntryEntity, Set<Integer>> playersToActiveHourBuckets,
             Map<MatchmakingQueueEntryEntity, Integer> playersToCompletedGameCounts,
-            Map<MatchmakingQueueEntryEntity, Set<String>> playersToRoleIds,
+            Map<MatchmakingQueueEntryEntity, Set<String>> playersToRoleNames,
             Map<String, BigDecimal> playerRatings,
             BigDecimal defaultRating) {
         UserSettings player1Settings = userSettingsByCandidate.get(player1);
@@ -245,10 +244,10 @@ public class MatchmakerService {
             return false;
         }
 
-        Set<String> player1RoleIds = playersToRoleIds.getOrDefault(player1, Set.of());
-        Set<String> player2RoleIds = playersToRoleIds.getOrDefault(player2, Set.of());
-        if (violatesRoleRestriction(player1RestrictionsCsv, player1RoleIds, player2RoleIds)
-                || violatesRoleRestriction(player2RestrictionsCsv, player2RoleIds, player1RoleIds)) {
+        Set<String> player1RoleNames = playersToRoleNames.getOrDefault(player1, Set.of());
+        Set<String> player2RoleNames = playersToRoleNames.getOrDefault(player2, Set.of());
+        if (violatesRoleRestriction(player1RestrictionsCsv, player1RoleNames, player2RoleNames)
+                || violatesRoleRestriction(player2RestrictionsCsv, player2RoleNames, player1RoleNames)) {
             return false;
         }
 
@@ -300,28 +299,27 @@ public class MatchmakerService {
     }
 
     private static boolean violatesRoleRestriction(
-            String chooserRestrictionsCsv, Set<String> chooserRoleIds, Set<String> otherRoleIds) {
-        if (chooserRoleIds.contains(MatchmakingOptions.FLOATERS_ROLE_ID)
+            String chooserRestrictionsCsv, Set<String> chooserRoleNames, Set<String> otherRoleNames) {
+        if (chooserRoleNames.contains(MatchmakingOptions.FLOATERS_ROLE_NAME)
                 && MatchmakingOptions.wantsOnlyFloaters(chooserRestrictionsCsv)
-                && !otherRoleIds.contains(MatchmakingOptions.FLOATERS_ROLE_ID)) {
+                && !otherRoleNames.contains(MatchmakingOptions.FLOATERS_ROLE_NAME)) {
             return true;
         }
-        return chooserRoleIds.contains(MatchmakingOptions.WARRIORS_ROLE_ID)
+        return chooserRoleNames.contains(MatchmakingOptions.WARRIORS_ROLE_NAME)
                 && MatchmakingOptions.wantsOnlyWarriors(chooserRestrictionsCsv)
-                && !otherRoleIds.contains(MatchmakingOptions.WARRIORS_ROLE_ID);
+                && !otherRoleNames.contains(MatchmakingOptions.WARRIORS_ROLE_NAME);
     }
 
-    private Map<MatchmakingQueueEntryEntity, Set<String>> getRoleIds(List<MatchmakingQueueEntryEntity> candidates) {
+    private Map<MatchmakingQueueEntryEntity, Set<String>> getRoleNames(List<MatchmakingQueueEntryEntity> candidates) {
         Guild guild = JdaService.guildPrimary;
-        Map<MatchmakingQueueEntryEntity, Set<String>> roleIdsByCandidate = new HashMap<>();
+        Map<MatchmakingQueueEntryEntity, Set<String>> roleNamesByCandidate = new HashMap<>();
         for (MatchmakingQueueEntryEntity candidate : candidates) {
             Member member = guild == null ? null : guild.getMemberById(candidate.getUserId());
-            Set<String> roleIds = member == null
-                    ? Set.of()
-                    : member.getRoles().stream().map(Role::getId).collect(Collectors.toSet());
-            roleIdsByCandidate.put(candidate, roleIds);
+            Set<String> roleNames =
+                    member == null ? Set.of() : MatchmakingOptions.getHeldOnlyMatchRoleNames(guild, member);
+            roleNamesByCandidate.put(candidate, roleNames);
         }
-        return roleIdsByCandidate;
+        return roleNamesByCandidate;
     }
 
     private Map<MatchmakingQueueEntryEntity, Integer> getCompletedGameCounts(
