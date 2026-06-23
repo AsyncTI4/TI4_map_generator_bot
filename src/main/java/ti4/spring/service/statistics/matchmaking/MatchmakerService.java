@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -200,10 +201,9 @@ public class MatchmakerService {
 
             if (group.size() == playerCount) {
                 List<String> restrictions = group.stream()
-                        .flatMap(member -> userSettingsByCandidate.get(member).getMatchmakingRestrictions().stream())
-                        .distinct()
-                        .sorted()
-                        .toList();
+                        .findFirst()
+                        .map(member -> userSettingsByCandidate.get(member).getMatchmakingRestrictions())
+                        .orElse(Collections.emptyList());
                 gamesToCreate.add(new MatchedGame(
                         new ArrayList<>(group),
                         playerCountOption,
