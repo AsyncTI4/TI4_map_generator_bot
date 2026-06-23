@@ -17,16 +17,17 @@ import ti4.discord.utility.DiscordRoleUtility;
 @UtilityClass
 public class MatchmakingOptions {
 
+    public static final String POK_AND_TE_EXPANSION_OPTION = "Prophecy of Kings and Thunder's Edge";
     public static final List<String> EXPANSION_OPTIONS = List.of(
             "Base only",
             "Prophecy of Kings only",
             "Thunder's Edge only",
-            "Prophecy of Kings and Thunder's Edge",
+            POK_AND_TE_EXPANSION_OPTION,
             "Twilight's Fall");
     public static final List<String> PLAYER_COUNT_OPTIONS = List.of("3", "4", "5", "6", "7", "8");
     public static final List<String> VICTORY_POINT_OPTIONS = List.of("10", "12", "14");
-    private static final String SIMILAR_ACTIVE_HOURS_OPTION = "Similar active hours";
-    private static final String SIMILAR_PLAYER_SKILL_OPTION = "Similar player skill";
+    public static final String SIMILAR_ACTIVE_HOURS_OPTION = "Similar active hours";
+    public static final String SIMILAR_PLAYER_SKILL_OPTION = "Similar player skill";
     private static final String AVOID_NEW_PLAYERS_OPTION = "Avoid new async players";
 
     public static final String FLOATERS_ROLE_NAME = "Floaters";

@@ -57,11 +57,13 @@ class MatchmakingButtonHandler {
     private static final String AVOID_PLAYERS_ID = "queue_avoid_players";
 
     private static final String DEFAULT_MAX_QUEUE_TIME = "8 hours";
-    private static final List<String> DEFAULT_EXPANSION_OPTIONS = List.of("Prophecy of Kings and Thunder's Edge");
+    private static final List<String> DEFAULT_EXPANSION_OPTIONS =
+            List.of(MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION);
     private static final List<String> DEFAULT_PLAYER_COUNT_OPTIONS = List.of("6");
     private static final List<String> DEFAULT_VICTORY_POINT_OPTIONS = List.of("10");
     private static final List<String> DEFAULT_PACE_OPTIONS = List.of(NO_PACE_OPTION);
-    private static final List<String> DEFAULT_RESTRICTION_OPTIONS = List.of("Similar Active Hours");
+    private static final List<String> DEFAULT_RESTRICTION_OPTIONS =
+            List.of(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION, MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION);
     private static final Map<String, Integer> PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT = Map.of(
             MatchmakingOptions.FASTER_PACE_OPTION, 19,
             MatchmakingOptions.FASTEST_PACE_OPTION, 10);
@@ -278,23 +280,19 @@ class MatchmakingButtonHandler {
         for (String option : options) {
             builder.addOption(option, option);
         }
-        if (requireSelection) {
-            builder.setRequiredRange(1, options.size());
-        }
-        return builder
+        return builder.setRequired(requireSelection)
                 .setSelectedValues(normalizeSelectedValues(selectedValues, options, defaultValues))
                 .build();
     }
 
     private static StringSelectMenu buildSingleSelect(
             String id, Collection<String> options, List<String> selectedValues, List<String> defaultValues) {
-        StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(id);
+        StringSelectMenu.Builder builder = StringSelectMenu.create(id);
         for (String option : options) {
-            menuBuilder.addOptions(SelectOption.of(option, option));
+            builder.addOptions(SelectOption.of(option, option));
         }
-        return menuBuilder
+        return builder.setDefaultValues(normalizeSelectedValues(selectedValues, options, defaultValues))
                 .setRequiredRange(1, 1)
-                .setDefaultValues(normalizeSelectedValues(selectedValues, options, defaultValues))
                 .build();
     }
 
