@@ -814,7 +814,7 @@ public final class LoreService {
     // FoW games always have lore available. Non-FoW games created after the cutoff need lore_mode
     // explicitly enabled via /game weird-game-setup.
     public static boolean isLoreEnabled(Game game) {
-        return game.isFowMode() || game.isLoreMode() || game.getCreationDateTime() < LORE_MODE_GATE_CUTOFF_MILLIS;
+        return game.isFowMode() || game.isLoreMode();
     }
 
     private static boolean hasLoreToShow(Game game, String target, TRIGGER trigger) {
