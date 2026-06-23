@@ -2655,6 +2655,19 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public void addPlanet(String planet) {
         if (!getPlanets().contains(planet)) {
             getPlanets().add(planet);
+            Tile tile = game.getTileFromPlanet(planet);
+            if (tile != null
+                    && !game.getStoredValue("combatRoundTracker" + getFaction() + tile.getPosition() + planet)
+                            .isEmpty()) {
+                LoreService.showPlanetLore(this, game, planet, LoreService.TRIGGER.GROUND_BATTLE);
+                for (Player other : game.getRealPlayers()) {
+                    if (other == this) continue;
+                    if (!game.getStoredValue("combatRoundTracker" + other.getFaction() + tile.getPosition() + planet)
+                            .isEmpty()) {
+                        LoreService.showPlanetLore(other, game, planet, LoreService.TRIGGER.GROUND_BATTLE);
+                    }
+                }
+            }
             LoreService.showPlanetLore(this, game, planet, LoreService.TRIGGER.CONTROLLED);
         }
     }

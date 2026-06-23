@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
@@ -26,10 +27,12 @@ import ti4.game.Player;
 import ti4.helpers.AgendaWhensAftersHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadGetter;
+import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
@@ -135,6 +138,36 @@ public final class GMService {
                                         MessageHelper.sendMessageToChannel(threadChannel, log + " - " + latestJumpUrl));
                     }
                 });
+    }
+
+    /** Posts a message to the FoW activity-log thread (inside the GM channel). No-op outside FoW. */
+    public static void postToActivityThread(Game game, String message) {
+        if (!game.isFowMode()) return;
+        ThreadGetter.getThreadInChannel(
+                getGMChannel(game),
+                game.getName() + ACTIVITY_LOG_THREAD,
+                true,
+                false,
+                threadChannel -> MessageHelper.sendMessageToChannel(threadChannel, message));
+    }
+
+    /**
+     * Renders the full (unfogged) map and posts it into the FoW activity-log thread. The thread lives
+     * in the GM-only channel, so the unfogged view leaks nothing. A null render event keeps the map
+     * unfogged (see {@code MapGenerator.isFowModeActive}). No-op outside FoW.
+     */
+    public static void refreshMapInActivityThread(Game game) {
+        if (!game.isFowMode()) return;
+        MapRenderPipeline.queue(
+                game,
+                (GenericInteractionCreateEvent) null,
+                DisplayType.all,
+                fileUpload -> ThreadGetter.getThreadInChannel(
+                        getGMChannel(game),
+                        game.getName() + ACTIVITY_LOG_THREAD,
+                        true,
+                        false,
+                        threadChannel -> MessageHelper.sendFileUploadToChannel(threadChannel, fileUpload)));
     }
 
     private static void jumpToLatestMessage(Player player, Consumer<String> callback) {

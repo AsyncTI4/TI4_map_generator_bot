@@ -583,6 +583,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.VEILED_HEART_MODE + " " + game.isVeiledHeartMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.LORE_MODE + " " + game.isLoreMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.LIMITED_WHISPERS_MODE + " " + game.isLimitedWhispersMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.WHISPERS_DISABLED + " " + game.isWhispersDisabled());

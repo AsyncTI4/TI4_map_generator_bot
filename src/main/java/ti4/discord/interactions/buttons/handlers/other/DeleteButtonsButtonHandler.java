@@ -409,9 +409,8 @@ class DeleteButtonsButtonHandler {
                     player = game.getPlayer(game.getActivePlayerID());
                 }
 
-                if (game.isFowMode()) {
-                    LoreService.showSystemLore(player, game, game.getActiveSystem(), LoreService.TRIGGER.CONTROLLED);
-                }
+                LoreService.showSpaceBattleLore(player, game, game.getActiveSystem());
+                LoreService.showSystemLore(player, game, game.getActiveSystem(), LoreService.TRIGGER.CONTROLLED);
 
                 game.removeStoredValue("producedUnitCostFor" + player.getFaction());
 
