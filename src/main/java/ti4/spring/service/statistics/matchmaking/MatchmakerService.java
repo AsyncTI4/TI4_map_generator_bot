@@ -47,6 +47,8 @@ public class MatchmakerService {
     private static final long ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT = 3;
     private static final double SIMILAR_SKILL_DIFFERENCE_THRESHOLD = 2.0;
     private static final double RELAXED_SIMILAR_SKILL_DIFFERENCE_THRESHOLD = 4.0;
+    // Fraction of a party's max queue time after which restrictions are relaxed.
+    private static final double QUEUE_TIME_RELAX_FRACTION = 0.5;
     private static final int NEW_PLAYER_GAME_THRESHOLD = 3;
     private static final BigDecimal NEW_PLAYER_MATCHMAKING_RATING = BigDecimal.valueOf(20.0);
 
@@ -298,9 +300,11 @@ public class MatchmakerService {
 
     private static int getHours(String maxQueueTime) {
         if (maxQueueTime == null) return DEFAULT_MAX_QUEUE_TIME_HOURS;
-        return MatchmakingOptions.MAX_QUEUE_TIME_OPTIONS_TO_HOURS.get(maxQueueTime.trim());
+        return MatchmakingOptions.MAX_QUEUE_TIME_OPTIONS_TO_HOURS.getOrDefault(
+                maxQueueTime.trim(), DEFAULT_MAX_QUEUE_TIME_HOURS);
     }
 
+    @Transactional
     public void processQueue() {
         if (DatabasePersistenceGate.isDisabled()) return;
 
@@ -466,8 +470,8 @@ public class MatchmakerService {
                     + " Remove them from your avoid list (Additional Settings) to queue with that player.");
         }
 
-        String aRestrictions = a.restrictionsCsv();
-        String bRestrictions = b.restrictionsCsv();
+        List<String> aRestrictions = a.restrictions();
+        List<String> bRestrictions = b.restrictions();
 
         if (MatchmakingOptions.wantsTigl(aRestrictions) != MatchmakingOptions.wantsTigl(bRestrictions)) {
             return Optional.of("<@" + a.userId() + "> and <@" + b.userId() + "> disagree on the \""
@@ -524,15 +528,18 @@ public class MatchmakerService {
     }
 
     private static Optional<String> roleViolationReason(
-            String chooserRestrictionsCsv, Set<String> chooserRoleNames, Set<String> otherRoleNames, String otherId) {
+            List<String> chooserRestrictions,
+            Set<String> chooserRoleNames,
+            Set<String> otherRoleNames,
+            String otherId) {
         if (chooserRoleNames.contains(MatchmakingOptions.FLOATERS_ROLE_NAME)
-                && MatchmakingOptions.wantsOnlyFloaters(chooserRestrictionsCsv)
+                && MatchmakingOptions.wantsOnlyFloaters(chooserRestrictions)
                 && !otherRoleNames.contains(MatchmakingOptions.FLOATERS_ROLE_NAME)) {
             return Optional.of("<@" + otherId + "> doesn't have the " + MatchmakingOptions.FLOATERS_ROLE_NAME + " role."
                     + removeOptionHint(MatchmakingOptions.ONLY_MATCH_FLOATERS_OPTION));
         }
         if (chooserRoleNames.contains(MatchmakingOptions.WARRIORS_ROLE_NAME)
-                && MatchmakingOptions.wantsOnlyWarriors(chooserRestrictionsCsv)
+                && MatchmakingOptions.wantsOnlyWarriors(chooserRestrictions)
                 && !otherRoleNames.contains(MatchmakingOptions.WARRIORS_ROLE_NAME)) {
             return Optional.of("<@" + otherId + "> doesn't have the " + MatchmakingOptions.WARRIORS_ROLE_NAME + " role."
                     + removeOptionHint(MatchmakingOptions.ONLY_MATCH_WARRIORS_OPTION));
@@ -543,7 +550,7 @@ public class MatchmakerService {
     private boolean isHalfQueueTimePassed(QueuedParty party, Instant now) {
         double maxHours = getHours(party.leaderSettings().getMatchmakingMaxQueueTime());
         double hoursWaited = Duration.between(party.party().getQueuedAt(), now).toMinutes() / 60.0;
-        return hoursWaited >= maxHours / SIMILAR_SKILL_DIFFERENCE_THRESHOLD;
+        return hoursWaited >= maxHours * QUEUE_TIME_RELAX_FRACTION;
     }
 
     /**
@@ -561,7 +568,7 @@ public class MatchmakerService {
 
         Map<MatchmakingQueueMember, PlayerMatchData> matchData = new HashMap<>();
         for (QueuedParty party : parties) {
-            String leaderRestrictionsCsv = toCsv(party.leaderSettings().getMatchmakingRestrictions());
+            List<String> leaderRestrictions = party.leaderSettings().getMatchmakingRestrictions();
             boolean halfQueueTimePassed = isHalfQueueTimePassed(party, now);
             for (MatchmakingQueueMember member : party.members()) {
                 String id = member.getUserId();
@@ -570,7 +577,7 @@ public class MatchmakerService {
                         member,
                         new PlayerMatchData(
                                 id,
-                                leaderRestrictionsCsv,
+                                leaderRestrictions,
                                 ownSettings.getMatchmakingAvoidList(),
                                 ratings.getOrDefault(id, NEW_PLAYER_MATCHMAKING_RATING),
                                 computeActiveHourBuckets(ownSettings.getActiveHoursAsIntegers()),
@@ -585,7 +592,7 @@ public class MatchmakerService {
     private Map<String, PlayerMatchData> buildValidationData(List<String> userIds, UserSettings leaderSettings) {
         Map<String, BigDecimal> ratings = MatchmakingRatingEventService.get().getPlayerRatings(new HashSet<>(userIds));
         Guild guild = JdaService.guildPrimary;
-        String leaderRestrictionsCsv = toCsv(leaderSettings.getMatchmakingRestrictions());
+        List<String> leaderRestrictions = leaderSettings.getMatchmakingRestrictions();
 
         Map<String, PlayerMatchData> dataById = new HashMap<>();
         for (String id : userIds) {
@@ -594,7 +601,7 @@ public class MatchmakerService {
                     id,
                     new PlayerMatchData(
                             id,
-                            leaderRestrictionsCsv,
+                            leaderRestrictions,
                             ownSettings.getMatchmakingAvoidList(),
                             ratings.getOrDefault(id, NEW_PLAYER_MATCHMAKING_RATING),
                             computeActiveHourBuckets(ownSettings.getActiveHoursAsIntegers()),
@@ -668,10 +675,6 @@ public class MatchmakerService {
         return parties.stream().filter(party -> !expired.contains(party)).toList();
     }
 
-    private static String toCsv(List<String> values) {
-        return String.join(",", values);
-    }
-
     private void postMatchedGroupsToMakingNewGamesForum(List<MatchedGame> gamesToCreate) {
         Guild guild = JdaService.guildPrimary;
         if (gamesToCreate.isEmpty() || guild == null) return;
@@ -714,7 +717,7 @@ public class MatchmakerService {
     /** Pre-computed matching inputs for one player. */
     private record PlayerMatchData(
             String userId,
-            String restrictionsCsv,
+            List<String> restrictions,
             List<String> avoidList,
             BigDecimal rating,
             Set<Integer> activeHourBuckets,

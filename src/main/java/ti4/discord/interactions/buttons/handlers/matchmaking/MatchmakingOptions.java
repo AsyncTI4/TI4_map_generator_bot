@@ -1,7 +1,7 @@
 package ti4.discord.interactions.buttons.handlers.matchmaking;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -107,31 +107,27 @@ public class MatchmakingOptions {
                 .toList();
     }
 
-    private static boolean csvContains(String csv, String value) {
-        return Arrays.asList(csv.split(",")).contains(value);
+    public static boolean wantsSimilarActiveHours(Collection<String> restrictions) {
+        return restrictions.contains(SIMILAR_ACTIVE_HOURS_OPTION);
     }
 
-    public static boolean wantsSimilarActiveHours(String restrictionsCsv) {
-        return csvContains(restrictionsCsv, SIMILAR_ACTIVE_HOURS_OPTION);
+    public static boolean wantsSimilarPlayerSkill(Collection<String> restrictions) {
+        return restrictions.contains(SIMILAR_PLAYER_SKILL_OPTION);
     }
 
-    public static boolean wantsSimilarPlayerSkill(String restrictionsCsv) {
-        return csvContains(restrictionsCsv, SIMILAR_PLAYER_SKILL_OPTION);
+    public static boolean wantsTigl(Collection<String> restrictions) {
+        return restrictions.contains(TIGL_OPTION);
     }
 
-    public static boolean wantsTigl(String restrictionsCsv) {
-        return csvContains(restrictionsCsv, TIGL_OPTION);
+    public static boolean wantsToAvoidNewPlayers(Collection<String> restrictions) {
+        return restrictions.contains(AVOID_NEW_PLAYERS_OPTION);
     }
 
-    public static boolean wantsToAvoidNewPlayers(String restrictionsCsv) {
-        return csvContains(restrictionsCsv, AVOID_NEW_PLAYERS_OPTION);
+    public static boolean wantsOnlyFloaters(Collection<String> restrictions) {
+        return restrictions.contains(ONLY_MATCH_FLOATERS_OPTION);
     }
 
-    public static boolean wantsOnlyFloaters(String restrictionsCsv) {
-        return csvContains(restrictionsCsv, ONLY_MATCH_FLOATERS_OPTION);
-    }
-
-    public static boolean wantsOnlyWarriors(String restrictionsCsv) {
-        return csvContains(restrictionsCsv, ONLY_MATCH_WARRIORS_OPTION);
+    public static boolean wantsOnlyWarriors(Collection<String> restrictions) {
+        return restrictions.contains(ONLY_MATCH_WARRIORS_OPTION);
     }
 }
