@@ -1,6 +1,9 @@
 package ti4.spring.service.statistics.matchmaking;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ti4.cache.CacheManager;
 import ti4.message.MessageHelper;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.PlayerEntity;
@@ -22,6 +26,11 @@ public class MatchmakingRatingEventService {
 
     private static final int MAX_LIST_SIZE = 50;
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
+    private static final Duration RATINGS_CACHE_TTL = Duration.ofMinutes(30);
+    private static final String RATINGS_CACHE_NAME = "matchmakingDefaultRatingsCache";
+    private static final String RATINGS_CACHE_KEY = "default";
+
+    private final Cache<String, List<MatchmakingRating>> defaultRatingsCache = createRatingsCache();
 
     private final PlayerEntityRepository playerEntityRepository;
 
@@ -36,16 +45,30 @@ public class MatchmakingRatingEventService {
     }
 
     public Map<String, BigDecimal> getPlayerRatings(Set<String> userIds) {
-        return getPlayerRatings(false).stream()
+        return getCachedDefaultPlayerRatings().stream()
                 .filter(matchmakingRating -> userIds.contains(matchmakingRating.userId()))
                 .collect(Collectors.toMap(MatchmakingRating::userId, MatchmakingRating::rating));
     }
 
-    public List<MatchmakingRating> getPlayerRatings(boolean onlyTiglGames) {
+    private List<MatchmakingRating> getCachedDefaultPlayerRatings() {
+        return defaultRatingsCache.get(RATINGS_CACHE_KEY, _ -> getPlayerRatings(false));
+    }
+
+    private static Cache<String, List<MatchmakingRating>> createRatingsCache() {
+        Cache<String, List<MatchmakingRating>> cache = Caffeine.newBuilder()
+                .maximumSize(1)
+                .expireAfterWrite(RATINGS_CACHE_TTL)
+                .recordStats()
+                .build();
+        CacheManager.registerCache(RATINGS_CACHE_NAME, cache);
+        return cache;
+    }
+
+    private List<MatchmakingRating> getPlayerRatings(boolean onlyTiglGames) {
         return getPlayerRatings(onlyTiglGames, false);
     }
 
-    public List<MatchmakingRating> getPlayerRatings(boolean onlyTiglGames, boolean useConservativeRating) {
+    private List<MatchmakingRating> getPlayerRatings(boolean onlyTiglGames, boolean useConservativeRating) {
         List<PlayerEntity> players =
                 playerEntityRepository.findAllWithUsersAndGamesByCompletedSixPlayerNonAllianceGame(onlyTiglGames);
         List<MatchmakingGame> games = MatchmakingGame.getMatchmakingGames(players);
