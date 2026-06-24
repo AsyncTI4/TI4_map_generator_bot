@@ -22,7 +22,7 @@ public class ViewMatchmakingQueueService {
     private final MatchmakingQueuePartyRepository partyRepository;
     private final MatchmakingQueueMemberRepository memberRepository;
 
-    public List<MessageEmbed> describeQueueFor(String requestingUserId) {
+    public List<MessageEmbed> getMessageEmbeds() {
         if (DatabasePersistenceGate.isDisabled()) {
             return List.of(messageEmbed("Queueing is currently disabled."));
         }
@@ -39,12 +39,7 @@ public class ViewMatchmakingQueueService {
         List<String> partyLines = new ArrayList<>();
         for (MatchmakingQueueParty party : parties) {
             List<MatchmakingQueueMember> members = membersByParty.getOrDefault(party.getId(), List.of());
-            if (members.isEmpty()) continue;
             partyLines.add(describeQueuedParty(members, UserSettingsManager.get(party.getLeaderId())));
-        }
-
-        if (partyLines.isEmpty()) {
-            return List.of(messageEmbed("There are no players in the queue right now."));
         }
 
         return paginateIntoEmbeds(partyLines);

@@ -216,8 +216,7 @@ class MatchmakingButtonHandler {
     public static void viewQueue(ButtonInteractionEvent event) {
         ViewMatchmakingQueueService viewMatchmakingQueueService =
                 SpringContext.getBean(ViewMatchmakingQueueService.class);
-        List<MessageEmbed> embeds =
-                viewMatchmakingQueueService.describeQueueFor(event.getUser().getId());
+        List<MessageEmbed> embeds = viewMatchmakingQueueService.getMessageEmbeds();
         for (MessageEmbed embed : embeds) {
             event.getHook()
                     .setEphemeral(true)
