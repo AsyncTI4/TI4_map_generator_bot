@@ -58,6 +58,10 @@ public class WeirdGameSetup extends GameStateSubcommand {
                 new OptionData(OptionType.BOOLEAN, Constants.THUNDERS_EDGE_MODE, "True to enable Thunder's Edge Mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.VEILED_HEART_MODE, "True to enable Veiled Heart Mode"));
         addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.LORE_MODE,
+                "True to enable Lore triggers in this non-FoW game (always on in FoW games)"));
+        addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.FEAST_OR_FAMINE_MODE, "True to enable Feast or Famine Mode"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
@@ -126,6 +130,9 @@ public class WeirdGameSetup extends GameStateSubcommand {
 
         Boolean veiledHeartMode = event.getOption(Constants.VEILED_HEART_MODE, null, OptionMapping::getAsBoolean);
         if (veiledHeartMode != null) game.setVeiledHeartMode(veiledHeartMode);
+
+        Boolean loreMode = event.getOption(Constants.LORE_MODE, null, OptionMapping::getAsBoolean);
+        if (loreMode != null) game.setLoreMode(loreMode);
 
         Boolean feastOrFamineMode = event.getOption(Constants.FEAST_OR_FAMINE_MODE, null, OptionMapping::getAsBoolean);
         if (feastOrFamineMode != null) game.setFeastOrFamineMode(feastOrFamineMode);

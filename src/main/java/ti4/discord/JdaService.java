@@ -486,6 +486,7 @@ public class JdaService {
         adminRoles.add(jda.getRoleById("1465619434839347276")); // Ariel's server
         adminRoles.add(jda.getRoleById("1487725249398308884")); // Balacasi's server
         adminRoles.add(jda.getRoleById("1500012691224395906")); // BEANS's server
+        adminRoles.add(jda.getRoleById("1516450864376578238")); // Stabar's Server
 
         adminRoles.removeIf(Objects::isNull);
 
@@ -524,6 +525,7 @@ public class JdaService {
         developerRoles.add(jda.getRoleById("1465619572718567526")); // Ariel's server
         developerRoles.add(jda.getRoleById("1487725369766449173")); // Balacasi's server
         developerRoles.add(jda.getRoleById("1500012939326001263")); // BEANS's server
+        developerRoles.add(jda.getRoleById("1516450864376578238")); // Stabar's Server
 
         developerRoles.removeIf(Objects::isNull);
 
@@ -566,6 +568,7 @@ public class JdaService {
         bothelperRoles.add(jda.getRoleById("1465619810577678442")); // Ariel's server
         bothelperRoles.add(jda.getRoleById("1487725393673719950")); // Balacasi's server
         bothelperRoles.add(jda.getRoleById("1500013009492246558")); // BEANS's server
+        bothelperRoles.add(jda.getRoleById("1516450864376578238")); // Stabar's Server
 
         bothelperRoles.removeIf(Objects::isNull);
     }
