@@ -18,7 +18,6 @@ import ti4.spring.context.SpringContext;
 public class MatchmakerService {
 
     private final MatchmakingQueueStore queueStore;
-    private final MatchmakingGrouper grouper;
 
     public static boolean isQueueingDisabled() {
         return DatabasePersistenceGate.isDisabled();
@@ -52,8 +51,8 @@ public class MatchmakerService {
                     + alreadyGrouped.stream().map(id -> "<@" + id + ">").collect(Collectors.joining(", ")));
         }
 
-        Optional<String> avoidConflict = PartyValidator.firstAvoidConflict(allIds);
-        if (avoidConflict.isPresent()) return avoidConflict;
+        Optional<String> hasAvoidListConflict = PartyValidator.hasAvoidListConflicts(allIds);
+        if (hasAvoidListConflict.isPresent()) return hasAvoidListConflict;
 
         queueStore.createUnqueuedGroup(allIds);
         return Optional.empty();
@@ -121,7 +120,7 @@ public class MatchmakerService {
         }
 
         Map<MatchmakingQueueMember, PlayerMatchData> matchData = PlayerMatchDataFactory.buildForParties(active);
-        List<MatchedGame> gamesToCreate = grouper.formGames(active, matchData);
+        List<MatchedGame> gamesToCreate = MatchmakingGrouper.formGames(active, matchData);
 
         if (!gamesToCreate.isEmpty()) {
             queueStore.deleteParties(gamesToCreate.stream()

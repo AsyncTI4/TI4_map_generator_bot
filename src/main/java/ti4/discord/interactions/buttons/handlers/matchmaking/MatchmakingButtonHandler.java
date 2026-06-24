@@ -39,6 +39,7 @@ import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.statistics.UserGameInfoService;
 import ti4.spring.service.statistics.matchmaking.queue.MatchmakerService;
+import ti4.spring.service.statistics.matchmaking.queue.PartyValidator;
 import ti4.spring.service.statistics.matchmaking.queue.ViewMatchmakingQueueService;
 
 @UtilityClass
@@ -345,9 +346,12 @@ class MatchmakingButtonHandler {
     }
 
     private static List<String> groupRestrictionOptions(ButtonInteractionEvent event, List<String> groupMemberIds) {
+        List<String> options =
+                new ArrayList<>(PartyValidator.getValidRestrictions(groupMemberIds, RESTRICTION_OPTIONS));
+
         Guild guild = event.getGuild();
         if (guild == null) {
-            return RESTRICTION_OPTIONS;
+            return options;
         }
         List<String> sharedRoleOptions = null;
         for (String id : groupMemberIds) {
@@ -360,11 +364,9 @@ class MatchmakingButtonHandler {
                 sharedRoleOptions.retainAll(roleOptions);
             }
         }
-        if (sharedRoleOptions == null || sharedRoleOptions.isEmpty()) {
-            return RESTRICTION_OPTIONS;
+        if (sharedRoleOptions != null) {
+            options.addAll(sharedRoleOptions);
         }
-        List<String> options = new ArrayList<>(RESTRICTION_OPTIONS);
-        options.addAll(sharedRoleOptions);
         return options;
     }
 

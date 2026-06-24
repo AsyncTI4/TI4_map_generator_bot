@@ -7,16 +7,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
+import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 import ti4.settings.users.UserSettings;
 
-@Service
-@AllArgsConstructor
-public class MatchmakingGrouper {
+@UtilityClass
+class MatchmakingGrouper {
 
-    List<MatchedGame> formGames(List<QueuedParty> parties, Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
+    static List<MatchedGame> formGames(
+        List<QueuedParty> parties,
+        Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
         List<MatchedGame> gamesToCreate = new ArrayList<>();
         Set<MatchmakingQueueMember> playersAddedToGames = new HashSet<>();
 
@@ -40,15 +40,15 @@ public class MatchmakingGrouper {
         return gamesToCreate;
     }
 
-    private void matchAndCollect(
-            List<QueuedParty> parties,
-            Set<MatchmakingQueueMember> playersAddedToGames,
-            List<MatchedGame> gamesToCreate,
-            String playerCountOption,
-            String victoryPointGoalOption,
-            String expansionOption,
-            String paceOption,
-            Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
+    private static void matchAndCollect(
+        List<QueuedParty> parties,
+        Set<MatchmakingQueueMember> playersAddedToGames,
+        List<MatchedGame> gamesToCreate,
+        String playerCountOption,
+        String victoryPointGoalOption,
+        String expansionOption,
+        String paceOption,
+        Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
         int playerCount = Integer.parseInt(playerCountOption);
 
         List<QueuedParty> remaining = parties.stream()
@@ -113,17 +113,16 @@ public class MatchmakingGrouper {
                 .thenComparing(party -> party.party().getQueuedAt());
     }
 
-    private boolean partyCompatibleWithGroup(
-            QueuedParty party,
-            List<MatchmakingQueueMember> group,
-            Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
+    private static boolean partyCompatibleWithGroup(
+        QueuedParty party,
+        List<MatchmakingQueueMember> group,
+        Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
         for (MatchmakingQueueMember newMember : party.members()) {
             for (MatchmakingQueueMember existing : group) {
                 PlayerMatchData a = matchData.get(existing);
                 PlayerMatchData b = matchData.get(newMember);
                 boolean relaxed = a.halfQueueTimePassed() || b.halfQueueTimePassed();
-                if (MatchmakingCompatibilityService.incompatibilityReason(a, b, relaxed)
-                        .isPresent()) {
+                if (MatchmakingCompatibilityService.areIncompatible(a, b, relaxed)) {
                     return false;
                 }
             }

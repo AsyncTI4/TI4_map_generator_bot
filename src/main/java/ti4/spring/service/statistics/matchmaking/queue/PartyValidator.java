@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
-import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedPlayer;
 import ti4.settings.users.UserSettings;
@@ -17,37 +16,36 @@ import ti4.spring.service.statistics.UserGameInfoService;
 public class PartyValidator {
 
     public static Optional<String> validate(String leaderId, List<String> memberIds) {
-        List<String> allIds = distinctMembers(leaderId, memberIds);
-        UserSettings leaderSettings = UserSettingsManager.get(leaderId);
-
-        int largestChosenPlayerCount = leaderSettings.getMatchmakingPlayerCounts().stream()
-                .mapToInt(Integer::parseInt)
-                .max()
-                .orElse(0);
-        if (allIds.size() > largestChosenPlayerCount) {
-            return Optional.of("Your group has " + allIds.size()
-                    + " players, which is larger than the biggest player count you selected ("
-                    + largestChosenPlayerCount + "). Pick fewer players or allow a larger game size.");
-        }
-
-        Optional<String> paceProblem = validatePaceEligibility(allIds, leaderSettings);
-        if (paceProblem.isPresent()) return paceProblem;
-
-        Optional<String> gameLimitProblem = validateGameLimits(allIds);
-        if (gameLimitProblem.isPresent()) return gameLimitProblem;
-
-        Map<String, PlayerMatchData> dataById = PlayerMatchDataFactory.buildForUsers(allIds, leaderSettings);
-        for (int i = 0; i < allIds.size(); i++) {
-            for (int j = i + 1; j < allIds.size(); j++) {
-                Optional<String> reason = MatchmakingCompatibilityService.incompatibilityReason(
-                        dataById.get(allIds.get(i)), dataById.get(allIds.get(j)), false);
-                if (reason.isPresent()) return reason;
-            }
-        }
-        return Optional.empty();
+        return validateGameLimits(distinctMembers(leaderId, memberIds));
     }
 
-    static Optional<String> firstAvoidConflict(List<String> userIds) {
+    public static List<String> getValidRestrictions(List<String> userIds, List<String> restrictions) {
+        List<String> members = userIds.stream().distinct().toList();
+        if (members.size() < 2) return restrictions;
+
+        List<String> available = new ArrayList<>();
+        for (String restriction : restrictions) {
+            Map<String, PlayerMatchData> dataById = PlayerMatchDataFactory.buildForUsers(members, List.of(restriction));
+            if (groupInternallyCompatible(members, dataById)) {
+                available.add(restriction);
+            }
+        }
+        return available;
+    }
+
+    private static boolean groupInternallyCompatible(List<String> members, Map<String, PlayerMatchData> dataById) {
+        for (int i = 0; i < members.size(); i++) {
+            for (int j = i + 1; j < members.size(); j++) {
+                if (MatchmakingCompatibilityService.areIncompatible(
+                        dataById.get(members.get(i)), dataById.get(members.get(j)), false)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    static Optional<String> hasAvoidListConflicts(List<String> userIds) {
         Map<String, List<String>> avoidById = new HashMap<>();
         for (String id : userIds) {
             avoidById.put(id, UserSettingsManager.get(id).getMatchmakingAvoidList());
@@ -72,22 +70,6 @@ public class PartyValidator {
             if (!allIds.contains(id)) allIds.add(id);
         }
         return allIds;
-    }
-
-    private static Optional<String> validatePaceEligibility(List<String> userIds, UserSettings leaderSettings) {
-        UserGameInfoService userGameInfoService = UserGameInfoService.get();
-        for (String pace : leaderSettings.getMatchmakingPaces()) {
-            Integer requirement = MatchmakingOptions.PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT.get(pace);
-            if (requirement == null) continue;
-            for (String id : userIds) {
-                if (!userGameInfoService.hasCompletedGameInDays(id, requirement)) {
-                    return Optional.of("<@" + id + "> isn't eligible for the \"" + pace
-                            + "\" pace (it requires a game completed within " + requirement + " days)."
-                            + " Deselect the \"" + pace + "\" pace to queue with that player.");
-                }
-            }
-        }
-        return Optional.empty();
     }
 
     private static Optional<String> validateGameLimits(List<String> userIds) {

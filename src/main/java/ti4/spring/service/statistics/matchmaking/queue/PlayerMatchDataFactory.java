@@ -56,10 +56,9 @@ class PlayerMatchDataFactory {
         return hoursWaited >= maxHours * QUEUE_TIME_RELAX_FRACTION;
     }
 
-    static Map<String, PlayerMatchData> buildForUsers(List<String> userIds, UserSettings leaderSettings) {
+    static Map<String, PlayerMatchData> buildForUsers(List<String> userIds, List<String> leaderRestrictions) {
         Map<String, BigDecimal> ratings = MatchmakingRatingEventService.get().getPlayerRatings(new HashSet<>(userIds));
         Guild guild = JdaService.guildPrimary;
-        List<String> leaderRestrictions = leaderSettings.getMatchmakingRestrictions();
 
         Map<String, PlayerMatchData> dataById = new HashMap<>();
         for (String id : userIds) {
