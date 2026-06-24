@@ -67,7 +67,7 @@ public class MatchmakerService {
             MatchmakingQueueParty party =
                     queueStore.findParty(memberOpt.get().getPartyId()).orElse(null);
             if (party == null) {
-                queueStore.deleteMember(memberOpt.get()); // orphaned membership; fall through to a solo queue
+                queueStore.deleteMember(memberOpt.get());
             } else if (party.isQueued()) {
                 return Optional.of("You are already queued for a game.");
             } else {
