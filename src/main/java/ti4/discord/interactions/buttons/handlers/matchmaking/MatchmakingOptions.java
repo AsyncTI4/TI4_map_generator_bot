@@ -46,10 +46,6 @@ public class MatchmakingOptions {
     public static final List<String> PACE_RESTRICTION_OPTIONS =
             List.of(NO_PACE_OPTION, SLOW_PACE_OPTION, FAST_PACE_OPTION, FASTER_PACE_OPTION, FASTEST_PACE_OPTION);
 
-    /**
-     * Paces that require a recently completed game to select, mapped to the number of days within which a game must have
-     * been completed. Paces not listed have no eligibility requirement.
-     */
     public static final Map<String, Integer> PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT =
             Map.of(FASTER_PACE_OPTION, 19, FASTEST_PACE_OPTION, 10);
 

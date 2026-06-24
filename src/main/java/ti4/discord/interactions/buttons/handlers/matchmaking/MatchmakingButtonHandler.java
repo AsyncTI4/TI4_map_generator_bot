@@ -322,7 +322,6 @@ class MatchmakingButtonHandler {
         return false;
     }
 
-    /** Player counts the whole group can fit into (≥ the group size). */
     private static List<String> groupPlayerCountOptions(int groupSize) {
         List<String> options = PLAYER_COUNT_OPTIONS.stream()
                 .filter(option -> Integer.parseInt(option) >= groupSize)
@@ -330,7 +329,6 @@ class MatchmakingButtonHandler {
         return options.isEmpty() ? PLAYER_COUNT_OPTIONS : options;
     }
 
-    /** Paces every member of the group is eligible for. */
     private static List<String> groupPaceOptions(List<String> groupMemberIds) {
         List<String> shared = null;
         for (String id : groupMemberIds) {
@@ -344,7 +342,6 @@ class MatchmakingButtonHandler {
         return shared == null || shared.isEmpty() ? List.of(NO_PACE_OPTION) : shared;
     }
 
-    /** Base restrictions plus the role-match options that every member of the group qualifies for. */
     private static List<String> groupRestrictionOptions(ButtonInteractionEvent event, List<String> groupMemberIds) {
         Guild guild = event.getGuild();
         if (guild == null) {

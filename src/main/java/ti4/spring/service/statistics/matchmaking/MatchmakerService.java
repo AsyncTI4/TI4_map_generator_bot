@@ -47,7 +47,6 @@ public class MatchmakerService {
     private static final long ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT = 3;
     private static final double SIMILAR_SKILL_DIFFERENCE_THRESHOLD = 2.0;
     private static final double RELAXED_SIMILAR_SKILL_DIFFERENCE_THRESHOLD = 4.0;
-    // Fraction of a party's max queue time after which restrictions are relaxed.
     private static final double QUEUE_TIME_RELAX_FRACTION = 0.5;
     private static final int NEW_PLAYER_GAME_THRESHOLD = 3;
     private static final BigDecimal NEW_PLAYER_MATCHMAKING_RATING = BigDecimal.valueOf(20.0);
@@ -59,7 +58,6 @@ public class MatchmakerService {
         return DatabasePersistenceGate.isDisabled();
     }
 
-    /** Whether the user is in a party that has been queued for a game. */
     public boolean isUserQueued(String userId) {
         if (DatabasePersistenceGate.isDisabled()) return false;
         return memberRepository
@@ -69,13 +67,11 @@ public class MatchmakerService {
                 .orElse(false);
     }
 
-    /** Whether the user belongs to any party (formed or queued). */
     public boolean isUserInParty(String userId) {
         if (DatabasePersistenceGate.isDisabled()) return false;
         return memberRepository.existsByUserId(userId);
     }
 
-    /** The user ids of the user's party, or just the user themselves if they aren't in a party. */
     public List<String> partyMemberIds(String userId) {
         if (DatabasePersistenceGate.isDisabled()) return List.of(userId);
         return memberRepository
@@ -87,12 +83,6 @@ public class MatchmakerService {
                 .orElse(List.of(userId));
     }
 
-    /**
-     * Create an unqueued group containing the creator and the selected members.
-     *
-     * @return an error message if the group can't be formed (a member is already in a party, or two members avoid each
-     *     other); empty on success.
-     */
     @Transactional
     public Optional<String> formGroup(String creatorId, List<String> memberIds) {
         if (DatabasePersistenceGate.isDisabled()) return Optional.of("Queueing is currently disabled.");
@@ -125,12 +115,6 @@ public class MatchmakerService {
         return Optional.empty();
     }
 
-    /**
-     * Queue the user. If they are in a formed group it becomes queued under the queuer's preferences; otherwise a solo
-     * party is created. The clicker's preferences must already be saved to their {@link UserSettings}.
-     *
-     * @return an error message if the party can't be queued; empty on success.
-     */
     @Transactional
     public Optional<String> queue(String queuerId) {
         if (DatabasePersistenceGate.isDisabled()) return Optional.of("Queueing is currently disabled.");
@@ -175,7 +159,6 @@ public class MatchmakerService {
         return Optional.empty();
     }
 
-    /** Remove the user's whole party (formed or queued) from the queue and notify the other members. */
     @Transactional
     public boolean leaveQueue(String userId) {
         if (DatabasePersistenceGate.isDisabled()) return false;
@@ -190,7 +173,7 @@ public class MatchmakerService {
         return true;
     }
 
-    private void notifyPartyLeft(List<MatchmakingQueueMember> partyMembers, String leaverId) {
+    private static void notifyPartyLeft(List<MatchmakingQueueMember> partyMembers, String leaverId) {
         if (partyMembers.size() <= 1) return;
         String message = "Your matchmaking group was removed from the queue because <@" + leaverId + "> left it.";
         for (MatchmakingQueueMember member : partyMembers) {
@@ -201,7 +184,7 @@ public class MatchmakerService {
         }
     }
 
-    private Optional<String> firstAvoidConflict(List<String> userIds) {
+    private static Optional<String> firstAvoidConflict(List<String> userIds) {
         Map<String, List<String>> avoidById = new HashMap<>();
         for (String id : userIds) {
             avoidById.put(id, UserSettingsManager.get(id).getMatchmakingAvoidList());
@@ -219,14 +202,7 @@ public class MatchmakerService {
         return Optional.empty();
     }
 
-    /**
-     * Validate that a party can be queued under the queuer's preferences: it must fit a chosen game size, every member
-     * must be eligible for the chosen pace and under their game limit, and every pair of members must be compatible
-     * under the queuer's restrictions.
-     *
-     * @return an error message describing the first problem found, or empty if the party is valid.
-     */
-    public Optional<String> validateParty(String leaderId, List<String> memberIds) {
+    private static Optional<String> validateParty(String leaderId, List<String> memberIds) {
         List<String> allIds = distinctMembers(leaderId, memberIds);
         UserSettings leaderSettings = UserSettingsManager.get(leaderId);
 
@@ -361,11 +337,7 @@ public class MatchmakerService {
         return queuedParties;
     }
 
-    /**
-     * Greedily fills games for one (playerCount, victoryPoint, expansion, pace) combination. Each party is added or
-     * skipped as a whole; solo players are parties of one.
-     */
-    private void matchAndCollect(
+    private static void matchAndCollect(
             List<QueuedParty> parties,
             Set<MatchmakingQueueMember> playersAddedToGames,
             List<MatchedGame> gamesToCreate,
@@ -434,7 +406,7 @@ public class MatchmakerService {
         }
     }
 
-    private boolean partyCompatibleWithGroup(
+    private static boolean partyCompatibleWithGroup(
             QueuedParty party,
             List<MatchmakingQueueMember> group,
             Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
@@ -455,12 +427,7 @@ public class MatchmakerService {
         return parties.stream().mapToInt(QueuedParty::size).sum();
     }
 
-    /**
-     * The first incompatibility between two players under their (effective) restrictions, or empty if they are
-     * compatible. Used both for cron-time matching (the reason is ignored) and submit-time party validation (the reason
-     * is surfaced to the queuer).
-     */
-    private Optional<String> incompatibilityReason(PlayerMatchData a, PlayerMatchData b, boolean relaxed) {
+    private static Optional<String> incompatibilityReason(PlayerMatchData a, PlayerMatchData b, boolean relaxed) {
         if (a.avoidList().contains(b.userId())) {
             return Optional.of("<@" + a.userId() + "> has <@" + b.userId() + "> on their avoid list."
                     + " Remove them from your avoid list (Additional Settings) to queue with that player.");
@@ -547,17 +514,13 @@ public class MatchmakerService {
         return Optional.empty();
     }
 
-    private boolean isHalfQueueTimePassed(QueuedParty party, Instant now) {
+    private static boolean isHalfQueueTimePassed(QueuedParty party, Instant now) {
         double maxHours = getHours(party.leaderSettings().getMatchmakingMaxQueueTime());
         double hoursWaited = Duration.between(party.party().getQueuedAt(), now).toMinutes() / 60.0;
         return hoursWaited >= maxHours * QUEUE_TIME_RELAX_FRACTION;
     }
 
-    /**
-     * Build per-member matching data for the queued parties. Restrictions come from the party's leader, while the avoid
-     * list and profile attributes (active hours, rating, completed games, roles) come from the member's own account.
-     */
-    private Map<MatchmakingQueueMember, PlayerMatchData> buildMatchData(List<QueuedParty> parties) {
+    private static Map<MatchmakingQueueMember, PlayerMatchData> buildMatchData(List<QueuedParty> parties) {
         Set<String> userIds = parties.stream()
                 .flatMap(party -> party.members().stream())
                 .map(MatchmakingQueueMember::getUserId)
@@ -589,7 +552,7 @@ public class MatchmakerService {
         return matchData;
     }
 
-    private Map<String, PlayerMatchData> buildValidationData(List<String> userIds, UserSettings leaderSettings) {
+    private static Map<String, PlayerMatchData> buildValidationData(List<String> userIds, UserSettings leaderSettings) {
         Map<String, BigDecimal> ratings = MatchmakingRatingEventService.get().getPlayerRatings(new HashSet<>(userIds));
         Guild guild = JdaService.guildPrimary;
         List<String> leaderRestrictions = leaderSettings.getMatchmakingRestrictions();
@@ -623,7 +586,7 @@ public class MatchmakerService {
         return member == null ? Set.of() : MatchmakingOptions.getHeldOnlyMatchRoleNames(guild, member);
     }
 
-    private Set<Integer> computeActiveHourBuckets(Set<Integer> activeHours) {
+    private static Set<Integer> computeActiveHourBuckets(Set<Integer> activeHours) {
         Set<Integer> matchedBuckets = new HashSet<>();
         for (int i = 0; i < NUMBER_OF_ACTIVE_HOUR_BUCKETS; i++) {
             int startHour = i * ACTIVE_HOUR_BUCKET_SIZE;
@@ -635,7 +598,7 @@ public class MatchmakerService {
         return matchedBuckets;
     }
 
-    private int getBucketScore(Set<Integer> activeHours, int startInclusive, int endInclusive) {
+    private static int getBucketScore(Set<Integer> activeHours, int startInclusive, int endInclusive) {
         int score = 0;
         for (int hour : activeHours) {
             if (hour >= startInclusive && hour <= endInclusive) {
@@ -675,7 +638,7 @@ public class MatchmakerService {
         return parties.stream().filter(party -> !expired.contains(party)).toList();
     }
 
-    private void postMatchedGroupsToMakingNewGamesForum(List<MatchedGame> gamesToCreate) {
+    private static void postMatchedGroupsToMakingNewGamesForum(List<MatchedGame> gamesToCreate) {
         Guild guild = JdaService.guildPrimary;
         if (gamesToCreate.isEmpty() || guild == null) return;
 
@@ -706,7 +669,6 @@ public class MatchmakerService {
         }
     }
 
-    /** A queued party with its members and its leader's effective settings. */
     private record QueuedParty(
             MatchmakingQueueParty party, List<MatchmakingQueueMember> members, UserSettings leaderSettings) {
         private int size() {
@@ -714,7 +676,6 @@ public class MatchmakerService {
         }
     }
 
-    /** Pre-computed matching inputs for one player. */
     private record PlayerMatchData(
             String userId,
             List<String> restrictions,
