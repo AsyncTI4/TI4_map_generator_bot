@@ -34,7 +34,7 @@
         "id": "fragmentation",
         "name": "Fragmentation",
         "faction": "crystellum",
-        "window": "After one of your non-fighter ships in the active system is destroyed during combat:",
+        "window": "After one or more of your non-fighter ships in the active system is destroyed during combat:",
         "windowEffect": "You may place 1 fighter from your reinforcements in that system.",
         "source": "beans"
     },
