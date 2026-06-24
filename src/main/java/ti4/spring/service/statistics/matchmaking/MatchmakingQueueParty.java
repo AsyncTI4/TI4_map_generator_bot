@@ -11,10 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * A matchmaking party. Every queued player belongs to one (a solo player is a party of one). A party is created
- * unqueued by "Form Group"; it becomes queued when a member clicks "Queue for Game".
- */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,14 +25,9 @@ public class MatchmakingQueueParty {
     @Column(name = "queued", nullable = false)
     private boolean queued;
 
-    /** Set when the party is queued; {@code null} while the party is only formed. */
     @Column(name = "queued_at")
     private Instant queuedAt;
 
-    /**
-     * The member whose {@link ti4.settings.users.UserSettings} provide the party's effective preferences. {@code null}
-     * until a member queues the party, then set to that player and never changed.
-     */
     @Column(name = "leader_id")
     private String leaderId;
 }
