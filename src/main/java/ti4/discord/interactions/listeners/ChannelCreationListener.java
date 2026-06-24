@@ -1,6 +1,5 @@
 package ti4.discord.interactions.listeners;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Member;
@@ -42,8 +41,7 @@ class ChannelCreationListener extends ListenerAdapter {
             Member owner = channel.getOwner();
             if (owner == null || owner.getUser().isBot()) return;
 
-            List<Member> membersOG = new ArrayList<>(List.of(owner));
-            CreateGameLaunchPostService.postLaunchButtons(channel, membersOG, "");
+            CreateGameLaunchPostService.postLaunchButtons(channel, List.of(owner), "");
         } else if (FOW_MAKING_GAMES_CHANNEL.equalsIgnoreCase(parentName) && !hasTag(channel, FOW_REPLACEMENT_TAG)) {
             String message = """
                 To launch a new Fog of War game, please run the command `/fow create_fow_game_button`, \
