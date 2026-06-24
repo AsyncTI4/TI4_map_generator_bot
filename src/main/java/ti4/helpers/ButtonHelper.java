@@ -3027,19 +3027,21 @@ public class ButtonHelper {
             List<Button> planetsWithSleepers = new ArrayList<>();
             planetsWithSleepers.add(Buttons.green(
                     factionChecker + "replaceSleeperWith_pds_" + planet,
-                    "Replace Sleeper on " + planet + " With 1 PDS."));
+                    "Replace Sleeper on " + Helper.getPlanetRepresentation(planet, game) + " With 1 PDS."));
             if (getNumberOfUnitsOnTheBoard(game, player, "mech") < 4
                     && player.hasUnit("titans_mech")
                     && !tile.isScar()
                     && !isLawInPlay(game, "articles_war")) {
                 planetsWithSleepers.add(Buttons.green(
                         factionChecker + "replaceSleeperWith_mech_" + planet,
-                        "Replace Sleeper on " + planet + " With 1 Mech & Infantry."));
+                        "Replace Sleeper on " + Helper.getPlanetRepresentation(planet, game)
+                                + " With 1 Mech & Infantry."));
             }
             planetsWithSleepers.add(Buttons.red("deleteButtons", "Delete These Buttons"));
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
-                    "Use buttons to resolve the replacement of the Sleeper token on " + planet + ".",
+                    "Use buttons to resolve the replacement of the Sleeper token on "
+                            + Helper.getPlanetRepresentation(planet, game) + ".",
                     planetsWithSleepers);
         }
     }
@@ -3067,8 +3069,9 @@ public class ButtonHelper {
         String factionChecker = player.factionButtonChecker();
         List<Button> planetsWithSleepers = new ArrayList<>();
         for (String planet : game.getAllPlanetsWithSleeperTokens()) {
-            planetsWithSleepers.add(
-                    Buttons.green(factionChecker + "removeSleeperFromPlanet_" + planet, "Remove Sleeper on " + planet));
+            planetsWithSleepers.add(Buttons.green(
+                    factionChecker + "removeSleeperFromPlanet_" + planet,
+                    "Remove Sleeper on " + Helper.getPlanetRepresentation(planet, game)));
         }
         planetsWithSleepers.add(Buttons.red("deleteButtons", "Delete These Buttons"));
         return planetsWithSleepers;
@@ -5802,7 +5805,9 @@ public class ButtonHelper {
                     && player.getPlanets().contains(planetID)
                     && !game.isTwilightsFallMode()) {
                 Button placeSleeper = Buttons.green(
-                        "putSleeperOnPlanet_" + planetID, "Put Sleeper on " + planetID, MiscEmojis.Sleeper);
+                        "putSleeperOnPlanet_" + planetID,
+                        "Put Sleeper on " + Helper.getPlanetRepresentation(planetID, game),
+                        MiscEmojis.Sleeper);
                 Button decline = Buttons.red("deleteButtons", "Decline To Put a Sleeper Down");
                 List<Button> buttons = List.of(placeSleeper, decline);
                 MessageHelper.sendMessageToChannelWithButtons(

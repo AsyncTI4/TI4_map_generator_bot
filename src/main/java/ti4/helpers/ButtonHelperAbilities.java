@@ -1971,7 +1971,8 @@ public final class ButtonHelperAbilities {
     public static void removeSleeper(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         buttonID = buttonID.replace("removeSleeperFromPlanet_", "");
         String planet = buttonID;
-        String message = player.getFactionEmojiOrColor() + " removed a Sleeper from " + planet;
+        String message = player.getFactionEmojiOrColor() + " removed a Sleeper from "
+                + Helper.getPlanetRepresentation(planet, game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         SleeperTokenHelper.addOrRemoveSleeper(event, game, planet, player);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
