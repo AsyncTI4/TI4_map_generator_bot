@@ -64,6 +64,8 @@ public class MatchmakingOptions {
         MAX_QUEUE_TIME_OPTIONS_TO_HOURS.put("1 week", 168);
     }
 
+    private static final int DEFAULT_MAX_QUEUE_TIME_HOURS = 8;
+
     public static List<String> getPlayerCountOptionsDescending() {
         return PLAYER_COUNT_OPTIONS.stream().sorted(Collections.reverseOrder()).toList();
     }
@@ -125,5 +127,10 @@ public class MatchmakingOptions {
 
     public static boolean wantsOnlyWarriors(Collection<String> restrictions) {
         return restrictions.contains(ONLY_MATCH_WARRIORS_OPTION);
+    }
+
+    public static int getHours(String maxQueueTime) {
+        if (maxQueueTime == null) return DEFAULT_MAX_QUEUE_TIME_HOURS;
+        return MAX_QUEUE_TIME_OPTIONS_TO_HOURS.getOrDefault(maxQueueTime.trim(), DEFAULT_MAX_QUEUE_TIME_HOURS);
     }
 }
