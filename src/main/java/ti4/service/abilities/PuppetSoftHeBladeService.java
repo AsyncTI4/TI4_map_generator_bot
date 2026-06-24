@@ -244,7 +244,9 @@ public class PuppetSoftHeBladeService {
     private static List<String> flipFirmamentLeaders(Player player) {
         String fmt = "Successfully replaced %s with %s.";
         List<String> output = new ArrayList<>();
-        if (player.getGame().isFrankenGame() ? player.hasLeader("firmamentagent") : player.getLeaderByID("firmamentagent").isPresent()) {
+        if (player.getGame().isFrankenGame()
+                ? player.hasLeader("firmamentagent")
+                : player.getLeaderByID("firmamentagent").isPresent()) {
             Leader oldLeader = player.getGame().isFrankenGame()
                     ? player.unsafeGetLeader("firmamentagent")
                     : player.getLeaderByID("firmamentagent").orElse(null);
