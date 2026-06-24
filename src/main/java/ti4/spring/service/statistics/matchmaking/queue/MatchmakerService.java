@@ -95,9 +95,7 @@ public class MatchmakerService {
         if (memberOpt.isEmpty()) return false;
 
         long partyId = memberOpt.get().getPartyId();
-        List<MatchmakingQueueMember> partyMembers = queueStore.membersOf(partyId);
         queueStore.deleteParties(List.of(partyId));
-        MatchmakingNotifier.notifyPartyRemoved(partyMembers, userId);
         return true;
     }
 

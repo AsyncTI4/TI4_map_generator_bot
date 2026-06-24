@@ -30,10 +30,6 @@ public class MatchmakingQueueStore {
         return partyRepository.findById(partyId);
     }
 
-    List<MatchmakingQueueMember> membersOf(long partyId) {
-        return memberRepository.findAllByPartyId(partyId);
-    }
-
     void deleteMember(MatchmakingQueueMember member) {
         memberRepository.delete(member);
     }
