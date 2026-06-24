@@ -268,7 +268,7 @@
         "title": "The Invincible",
         "abilityName": "Titles Are Silly",
         "abilityWindow": "After you destroy a unit with a bounty token on its unit space during combat:",
-        "abilityText": "If it was a flagship or War Sun, gain 1 victory point. Otherwise, place all units of that type from your reinforcements in systems that contain 1 or more of your ships. Then, purge this card.",
+        "abilityText": "You may purge this card. If you do, if it was a flagship or War Sun, gain 1 victory point; otherwise, place all units of that type from your reinforcements in systems that contain 1 or more of your ships.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "balacasi"
     }

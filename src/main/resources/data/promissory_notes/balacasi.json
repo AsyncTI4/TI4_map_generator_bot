@@ -24,6 +24,7 @@
         "faction": "kalora",
         "color": "",
         "playArea": true,
+        "playImmediately": true,
         "source": "balacasi",
         "text": "If you are not the Kalora player, place this card face up in your play area. You may use the Kalora’s PRIMORDIAL faction ability. Both you and the Kalora player consider yourself as first to score an objective if no player other than each other has scored that objective. If you activate a system containing 1 or more of Kalora’s units, return this card to the Kalora player."
     },
