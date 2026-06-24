@@ -38,8 +38,8 @@ import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.statistics.UserGameInfoService;
-import ti4.spring.service.statistics.matchmaking.MatchmakerService;
-import ti4.spring.service.statistics.matchmaking.ViewMatchmakingQueueService;
+import ti4.spring.service.statistics.matchmaking.queue.MatchmakerService;
+import ti4.spring.service.statistics.matchmaking.queue.ViewMatchmakingQueueService;
 
 @UtilityClass
 class MatchmakingButtonHandler {

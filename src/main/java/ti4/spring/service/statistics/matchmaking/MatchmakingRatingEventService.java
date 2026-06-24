@@ -35,7 +35,7 @@ public class MatchmakingRatingEventService {
         sendMessage(event, playerRatings, showRating, conservativeRating);
     }
 
-    Map<String, BigDecimal> getPlayerRatings(Set<String> userIds) {
+    public Map<String, BigDecimal> getPlayerRatings(Set<String> userIds) {
         return getPlayerRatings(false).stream()
                 .filter(matchmakingRating -> userIds.contains(matchmakingRating.userId()))
                 .collect(Collectors.toMap(MatchmakingRating::userId, MatchmakingRating::rating));

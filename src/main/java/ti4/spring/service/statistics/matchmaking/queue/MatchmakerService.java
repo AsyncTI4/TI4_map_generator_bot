@@ -1,4 +1,4 @@
-package ti4.spring.service.statistics.matchmaking;
+package ti4.spring.service.statistics.matchmaking.queue;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -35,6 +35,7 @@ import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.statistics.UserGameInfoService;
+import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
 
 @AllArgsConstructor
 @Service

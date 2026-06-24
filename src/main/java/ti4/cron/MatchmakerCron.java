@@ -5,7 +5,7 @@ import lombok.experimental.UtilityClass;
 import ti4.logging.BotLogger;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.deploy.ActiveLeaseService;
-import ti4.spring.service.statistics.matchmaking.MatchmakerService;
+import ti4.spring.service.statistics.matchmaking.queue.MatchmakerService;
 
 @UtilityClass
 public class MatchmakerCron {

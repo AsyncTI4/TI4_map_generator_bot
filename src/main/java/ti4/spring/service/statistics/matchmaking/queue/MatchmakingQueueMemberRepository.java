@@ -1,4 +1,4 @@
-package ti4.spring.service.statistics.matchmaking;
+package ti4.spring.service.statistics.matchmaking.queue;
 
 import java.util.Collection;
 import java.util.List;

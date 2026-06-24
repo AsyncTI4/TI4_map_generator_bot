@@ -31,7 +31,7 @@ import ti4.service.game.CreateGameService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.statistics.AverageTurnTimeService;
 import ti4.spring.service.statistics.UserGameInfoService;
-import ti4.spring.service.statistics.matchmaking.MatchmakerService;
+import ti4.spring.service.statistics.matchmaking.queue.MatchmakerService;
 
 @UtilityClass
 public class CreateGameButtonHandler {
