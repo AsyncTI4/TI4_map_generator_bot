@@ -15,8 +15,7 @@ import ti4.settings.users.UserSettings;
 class MatchmakingGrouper {
 
     static List<MatchedGame> formGames(
-        List<QueuedParty> parties,
-        Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
+            List<QueuedParty> parties, Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
         List<MatchedGame> gamesToCreate = new ArrayList<>();
         Set<MatchmakingQueueMember> playersAddedToGames = new HashSet<>();
 
@@ -41,14 +40,14 @@ class MatchmakingGrouper {
     }
 
     private static void matchAndCollect(
-        List<QueuedParty> parties,
-        Set<MatchmakingQueueMember> playersAddedToGames,
-        List<MatchedGame> gamesToCreate,
-        String playerCountOption,
-        String victoryPointGoalOption,
-        String expansionOption,
-        String paceOption,
-        Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
+            List<QueuedParty> parties,
+            Set<MatchmakingQueueMember> playersAddedToGames,
+            List<MatchedGame> gamesToCreate,
+            String playerCountOption,
+            String victoryPointGoalOption,
+            String expansionOption,
+            String paceOption,
+            Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
         int playerCount = Integer.parseInt(playerCountOption);
 
         List<QueuedParty> remaining = parties.stream()
@@ -114,9 +113,9 @@ class MatchmakingGrouper {
     }
 
     private static boolean partyCompatibleWithGroup(
-        QueuedParty party,
-        List<MatchmakingQueueMember> group,
-        Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
+            QueuedParty party,
+            List<MatchmakingQueueMember> group,
+            Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
         for (MatchmakingQueueMember newMember : party.members()) {
             for (MatchmakingQueueMember existing : group) {
                 PlayerMatchData a = matchData.get(existing);

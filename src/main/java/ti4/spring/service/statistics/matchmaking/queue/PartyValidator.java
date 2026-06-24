@@ -15,10 +15,6 @@ import ti4.spring.service.statistics.UserGameInfoService;
 @UtilityClass
 public class PartyValidator {
 
-    public static Optional<String> validate(String leaderId, List<String> memberIds) {
-        return validateGameLimits(distinctMembers(leaderId, memberIds));
-    }
-
     public static List<String> getValidRestrictions(List<String> userIds, List<String> restrictions) {
         List<String> members = userIds.stream().distinct().toList();
         if (members.size() < 2) return restrictions;
@@ -72,7 +68,7 @@ public class PartyValidator {
         return allIds;
     }
 
-    private static Optional<String> validateGameLimits(List<String> userIds) {
+    static Optional<String> validateGameLimits(List<String> userIds) {
         for (String id : userIds) {
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(id);
             if (managedPlayer == null) continue;

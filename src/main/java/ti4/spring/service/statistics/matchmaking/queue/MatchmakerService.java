@@ -54,6 +54,9 @@ public class MatchmakerService {
         Optional<String> hasAvoidListConflict = PartyValidator.hasAvoidListConflicts(allIds);
         if (hasAvoidListConflict.isPresent()) return hasAvoidListConflict;
 
+        Optional<String> gameLimitProblem = PartyValidator.validateGameLimits(allIds);
+        if (gameLimitProblem.isPresent()) return gameLimitProblem;
+
         queueStore.createUnqueuedGroup(allIds);
         return Optional.empty();
     }
@@ -62,28 +65,23 @@ public class MatchmakerService {
     public Optional<String> queue(String queuerId) {
         if (DatabasePersistenceGate.isDisabled()) return Optional.of("Queueing is currently disabled.");
 
-        Optional<MatchmakingQueueMember> memberOpt = queueStore.findMember(queuerId);
-        if (memberOpt.isPresent()) {
+        Optional<MatchmakingQueueMember> optionalMember = queueStore.findMember(queuerId);
+        if (optionalMember.isPresent()) {
+            MatchmakingQueueMember member = optionalMember.get();
             MatchmakingQueueParty party =
-                    queueStore.findParty(memberOpt.get().getPartyId()).orElse(null);
-            if (party == null) {
-                queueStore.deleteMember(memberOpt.get());
-            } else if (party.isQueued()) {
-                return Optional.of("You are already queued for a game.");
-            } else {
-                List<String> otherIds = queueStore.membersOf(party.getId()).stream()
-                        .map(MatchmakingQueueMember::getUserId)
-                        .filter(id -> !id.equals(queuerId))
-                        .toList();
-                Optional<String> error = PartyValidator.validate(queuerId, otherIds);
-                if (error.isPresent()) return error;
+                    queueStore.findParty(member.getPartyId()).orElse(null);
+            if (party != null) {
+                if (party.isQueued()) return Optional.of("You are already queued for a game.");
 
                 queueStore.markQueued(party, queuerId);
                 return Optional.empty();
             }
+            // This is defensive, in case we have an orphaned member
+            queueStore.deleteMember(member);
         }
 
-        Optional<String> error = PartyValidator.validate(queuerId, List.of());
+        // Solo queuer (group queue checks game limits on formation, so need to do so for solo here)
+        Optional<String> error = PartyValidator.validateGameLimits(List.of(queuerId));
         if (error.isPresent()) return error;
 
         queueStore.createSoloQueuedParty(queuerId);
