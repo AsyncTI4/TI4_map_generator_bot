@@ -77,9 +77,9 @@ public class MatchmakingOptions {
     }
 
     public static List<String> getShuffledExpansionsOptions() {
-        var expansionsPlusBase = new ArrayList<>(EXPANSION_OPTIONS);
-        Collections.shuffle(expansionsPlusBase);
-        return expansionsPlusBase;
+        var expansionOptions = new ArrayList<>(EXPANSION_OPTIONS);
+        Collections.shuffle(expansionOptions);
+        return expansionOptions;
     }
 
     public static List<String> getShuffledPaceRestrictions() {
