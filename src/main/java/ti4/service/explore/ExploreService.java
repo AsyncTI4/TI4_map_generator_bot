@@ -21,6 +21,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityButtonHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -425,18 +426,7 @@ public class ExploreService {
                             + " has been automatically readied because you have _Pre-Fab Arcologies_.");
         }
         if (player.hasAbility("ultimate_authority")) {
-            Planet plan = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
-            if (plan != null) {
-                if (plan.getUnitCount(player.getColorID()) >= 3) {
-                    List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
-                    MessageHelper.sendMessageToChannel(
-                            (MessageChannel) event.getChannel(),
-                            player.getRepresentation()
-                                    + ", please draw an action card because of **Ultimate Authority**.",
-                            buttons);
-                }
-            }
+            ArvaxiAbilityButtonHandler.onExplorePlanet(player, game, planetName);
         }
         if (ButtonHelper.doesPlayerHaveFSHere("ghemina_flagship_lord", player, tile)) {
             AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planetName);
