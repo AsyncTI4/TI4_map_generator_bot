@@ -11,7 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** A player's membership in a {@link MatchmakingQueueParty}. A user can belong to at most one party at a time. */
 @Getter
 @Setter
 @NoArgsConstructor

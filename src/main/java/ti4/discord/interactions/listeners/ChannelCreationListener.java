@@ -40,9 +40,8 @@ class ChannelCreationListener extends ListenerAdapter {
         String parentName = channel.getParentChannel().getName();
         if (CreateGameLaunchPostService.isCreateGameLaunchParentName(parentName)) {
             Member owner = channel.getOwner();
-            if (owner == null || owner.getUser().isBot()) {
-                return;
-            }
+            if (owner == null || owner.getUser().isBot()) return;
+
             List<Member> membersOG = new ArrayList<>(List.of(owner));
             CreateGameLaunchPostService.postLaunchButtons(channel, membersOG, "");
         } else if (FOW_MAKING_GAMES_CHANNEL.equalsIgnoreCase(parentName) && !hasTag(channel, FOW_REPLACEMENT_TAG)) {
