@@ -58,18 +58,16 @@ public class MatchmakingRatingEventService {
             boolean showRating,
             boolean conservativeRating) {
         int maxListSize = Math.min(MAX_LIST_SIZE, playerRatings.size());
-        StringBuilder sb = new StringBuilder();
         String ratingLabel = conservativeRating ? "Conservative Rating" : "Rating";
-        sb.append("__**Player Matchmaking Ratings:**__\n");
+        StringBuilder stringBuilder = new StringBuilder().append("__**Player Matchmaking Ratings:**__\n");
         for (int i = 0, listSize = 0; i < playerRatings.size() && listSize < maxListSize; i++) {
             var playerRating = playerRatings.get(i);
-            if (playerRating.calibrationPercent().compareTo(ONE_HUNDRED) < 0) {
-                continue;
-            }
+            if (playerRating.calibrationPercent().compareTo(ONE_HUNDRED) < 0) continue;
+
             listSize++;
             String formattedString = String.format(
                     "%d. `%s` `%s=%.3f`\n", listSize, playerRating.username(), ratingLabel, playerRating.rating());
-            sb.append(formattedString);
+            stringBuilder.append(formattedString);
         }
 
         BigDecimal averageRating = playerRatings.isEmpty()
@@ -84,7 +82,7 @@ public class MatchmakingRatingEventService {
 
                 The average %s of the player base is `%.3f`
                 """, maxListSize, ratingLabel.toLowerCase(), averageRating);
-        sb.append(formattedString);
+        stringBuilder.append(formattedString);
 
         playerRatings.stream()
                 .filter(playerRating ->
@@ -92,20 +90,20 @@ public class MatchmakingRatingEventService {
                 .findFirst()
                 .ifPresent(playerRating -> {
                     if (showRating && playerRating.calibrationPercent().compareTo(ONE_HUNDRED) == 0) {
-                        sb.append(String.format(
+                        stringBuilder.append(String.format(
                                 "\nYour %s is `%.3f`.", ratingLabel.toLowerCase(), playerRating.rating()));
                     } else {
-                        sb.append(String.format(
+                        stringBuilder.append(String.format(
                                 "\nWe are `%.1f%%` of the way to a high confidence in your rating.",
                                 playerRating.calibrationPercent()));
                         if (showRating) {
-                            sb.append(" We cannot show your rating until it reaches high confidence.");
+                            stringBuilder.append(" We cannot show your rating until it reaches high confidence.");
                         }
                     }
                 });
 
         MessageHelper.sendMessageToThread(
-                (MessageChannelUnion) event.getMessageChannel(), "Player Matchmaking Ratings", sb.toString());
+                (MessageChannelUnion) event.getMessageChannel(), "Player Matchmaking Ratings", stringBuilder.toString());
     }
 
     public static MatchmakingRatingEventService get() {
