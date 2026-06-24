@@ -33,6 +33,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
@@ -563,6 +564,17 @@ public class CombatRollService {
                                     opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
                                     "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
 
+                        } else if (opponent.hasAbility("refraction")) {
+                            buttons.add(Buttons.green(
+                                    factionChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
+                                    "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                            buttons.add(Buttons.red(
+                                    "getDamageButtons_" + tile.getPosition() + "deleteThis_spacecombat",
+                                    "Manually Assign Hit" + (h == 1 ? "" : "s")));
+                            buttons.add(Buttons.gray(
+                                    factionChecker + "cancelSpaceHits_" + tile.getPosition() + "_" + h,
+                                    "Cancel a Hit"));
+                            CrystellumAbilityHandler.addRefractionButtonIfRelevant(buttons, opponent, game, tile, h);
                         } else {
                             buttons.add(Buttons.green(
                                     factionChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
