@@ -103,7 +103,9 @@ public class MatchmakingRatingEventService {
                 });
 
         MessageHelper.sendMessageToThread(
-                (MessageChannelUnion) event.getMessageChannel(), "Player Matchmaking Ratings", stringBuilder.toString());
+                (MessageChannelUnion) event.getMessageChannel(),
+                "Player Matchmaking Ratings",
+                stringBuilder.toString());
     }
 
     public static MatchmakingRatingEventService get() {
