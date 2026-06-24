@@ -244,13 +244,16 @@ public class PuppetSoftHeBladeService {
     private static List<String> flipFirmamentLeaders(Player player) {
         String fmt = "Successfully replaced %s with %s.";
         List<String> output = new ArrayList<>();
-        player.getLeaderByID("firmamentagent").ifPresent(oldLeader -> {
+        if (player.getGame().isFrankenGame() ? player.hasLeader("firmamentagent") : player.getLeaderByID("firmamentagent").isPresent()) {
+            Leader oldLeader = player.getGame().isFrankenGame()
+                    ? player.unsafeGetLeader("firmamentagent")
+                    : player.getLeaderByID("firmamentagent").orElse(null);
             player.removeLeader(oldLeader);
             Leader newLeader = new Leader("obsidianagent");
             player.addLeader(newLeader);
             replaceAppliedFrankenItemAliases(player, DraftCategory.AGENT, "firmamentagent", "obsidianagent");
             output.add(String.format(fmt, oldLeader.getName(), newLeader.getName()));
-        });
+        }
         player.getLeaderByID("firmamentcommander").ifPresent(oldLeader -> {
             player.removeLeader(oldLeader);
             Leader newLeader = new Leader("obsidiancommander");
