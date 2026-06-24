@@ -61,7 +61,6 @@ class MatchmakingButtonHandler {
     private static final String MAX_QUEUE_TIME_ID = "queue_max_time";
     private static final String AVOID_PLAYERS_ID = "queue_avoid_players";
     private static final String GROUP_MEMBERS_ID = "queue_group_members";
-    private static final int MAX_GROUP_MEMBERS = 7;
 
     private static final String DEFAULT_MAX_QUEUE_TIME = "8 hours";
     private static final List<String> DEFAULT_EXPANSION_OPTIONS =
@@ -71,17 +70,19 @@ class MatchmakingButtonHandler {
     private static final List<String> DEFAULT_PACE_OPTIONS = List.of(NO_PACE_OPTION);
     private static final List<String> DEFAULT_RESTRICTION_OPTIONS =
             List.of(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION, MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION);
+
+    private static final int MAX_GROUP_MEMBERS = 7;
     private static final int MAX_AVOID_PLAYERS = 25;
 
     @ButtonHandler(value = QUEUE_FOR_GAME_BUTTON_ID, save = false)
     public static void offerQueueForGameModal(ButtonInteractionEvent event) {
-        if (rejectIfCannotQueue(event)) return;
+        if (cannotQueue(event)) return;
         event.replyModal(buildQueueModal(event)).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler(value = FORM_GROUP_BUTTON_ID, save = false)
     public static void offerFormGroupModal(ButtonInteractionEvent event) {
-        if (rejectIfCannotForm(event)) return;
+        if (cannotForm(event)) return;
 
         EntitySelectMenu memberSelect = EntitySelectMenu.create(GROUP_MEMBERS_ID, SelectTarget.USER)
                 .setRequiredRange(1, MAX_GROUP_MEMBERS)
@@ -92,7 +93,7 @@ class MatchmakingButtonHandler {
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    private static boolean rejectIfCannotQueue(ButtonInteractionEvent event) {
+    private static boolean cannotQueue(ButtonInteractionEvent event) {
         MatchmakerService matchmakerService = SpringContext.getBean(MatchmakerService.class);
         if (MatchmakerService.isQueueingDisabled()) {
             event.reply("Queueing is currently disabled.")
@@ -110,7 +111,7 @@ class MatchmakingButtonHandler {
         return false;
     }
 
-    private static boolean rejectIfCannotForm(ButtonInteractionEvent event) {
+    private static boolean cannotForm(ButtonInteractionEvent event) {
         MatchmakerService matchmakerService = SpringContext.getBean(MatchmakerService.class);
         if (MatchmakerService.isQueueingDisabled()) {
             event.reply("Queueing is currently disabled.")
@@ -239,6 +240,7 @@ class MatchmakingButtonHandler {
             replyEphemeral(event, error.get());
             return;
         }
+
         replyEphemeral(event, "You have been added to the matchmaking queue.");
     }
 
@@ -259,6 +261,7 @@ class MatchmakingButtonHandler {
             replyEphemeral(event, "Couldn't form the group: " + error.get());
             return;
         }
+
         replyEphemeral(
                 event,
                 "Group formed with " + (memberIds.size() + 1)
