@@ -18,7 +18,6 @@ import ti4.spring.context.SpringContext;
 public class MatchmakerService {
 
     private final MatchmakingQueueStore queueStore;
-    private final MatchmakingGrouper grouper;
 
     public static boolean isQueueingDisabled() {
         return DatabasePersistenceGate.isDisabled();
@@ -52,8 +51,11 @@ public class MatchmakerService {
                     + alreadyGrouped.stream().map(id -> "<@" + id + ">").collect(Collectors.joining(", ")));
         }
 
-        Optional<String> avoidConflict = PartyValidator.firstAvoidConflict(allIds);
-        if (avoidConflict.isPresent()) return avoidConflict;
+        Optional<String> hasAvoidListConflict = PartyValidator.hasAvoidListConflicts(allIds);
+        if (hasAvoidListConflict.isPresent()) return hasAvoidListConflict;
+
+        Optional<String> gameLimitProblem = PartyValidator.validateGameLimits(allIds);
+        if (gameLimitProblem.isPresent()) return gameLimitProblem;
 
         queueStore.createUnqueuedGroup(allIds);
         return Optional.empty();
@@ -63,28 +65,23 @@ public class MatchmakerService {
     public Optional<String> queue(String queuerId) {
         if (DatabasePersistenceGate.isDisabled()) return Optional.of("Queueing is currently disabled.");
 
-        Optional<MatchmakingQueueMember> memberOpt = queueStore.findMember(queuerId);
-        if (memberOpt.isPresent()) {
+        Optional<MatchmakingQueueMember> optionalMember = queueStore.findMember(queuerId);
+        if (optionalMember.isPresent()) {
+            MatchmakingQueueMember member = optionalMember.get();
             MatchmakingQueueParty party =
-                    queueStore.findParty(memberOpt.get().getPartyId()).orElse(null);
-            if (party == null) {
-                queueStore.deleteMember(memberOpt.get()); // orphaned membership; fall through to a solo queue
-            } else if (party.isQueued()) {
-                return Optional.of("You are already queued for a game.");
-            } else {
-                List<String> otherIds = queueStore.membersOf(party.getId()).stream()
-                        .map(MatchmakingQueueMember::getUserId)
-                        .filter(id -> !id.equals(queuerId))
-                        .toList();
-                Optional<String> error = PartyValidator.validate(queuerId, otherIds);
-                if (error.isPresent()) return error;
+                    queueStore.findParty(member.getPartyId()).orElse(null);
+            if (party != null) {
+                if (party.isQueued()) return Optional.of("You are already queued for a game.");
 
                 queueStore.markQueued(party, queuerId);
                 return Optional.empty();
             }
+            // This is defensive, in case we have an orphaned member
+            queueStore.deleteMember(member);
         }
 
-        Optional<String> error = PartyValidator.validate(queuerId, List.of());
+        // Solo queuer (group queue checks game limits on formation, so need to do so for solo here)
+        Optional<String> error = PartyValidator.validateGameLimits(List.of(queuerId));
         if (error.isPresent()) return error;
 
         queueStore.createSoloQueuedParty(queuerId);
@@ -98,9 +95,7 @@ public class MatchmakerService {
         if (memberOpt.isEmpty()) return false;
 
         long partyId = memberOpt.get().getPartyId();
-        List<MatchmakingQueueMember> partyMembers = queueStore.membersOf(partyId);
         queueStore.deleteParties(List.of(partyId));
-        MatchmakingNotifier.notifyPartyRemoved(partyMembers, userId);
         return true;
     }
 
@@ -121,7 +116,7 @@ public class MatchmakerService {
         }
 
         Map<MatchmakingQueueMember, PlayerMatchData> matchData = PlayerMatchDataFactory.buildForParties(active);
-        List<MatchedGame> gamesToCreate = grouper.formGames(active, matchData);
+        List<MatchedGame> gamesToCreate = MatchmakingGrouper.formGames(active, matchData);
 
         if (!gamesToCreate.isEmpty()) {
             queueStore.deleteParties(gamesToCreate.stream()

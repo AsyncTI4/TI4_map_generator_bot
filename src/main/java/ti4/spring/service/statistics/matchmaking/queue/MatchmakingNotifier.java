@@ -17,28 +17,16 @@ import ti4.service.game.CreateGameService;
 @UtilityClass
 class MatchmakingNotifier {
 
-    static void notifyPartyRemoved(List<MatchmakingQueueMember> partyMembers, String leaverId) {
-        if (partyMembers.size() <= 1) return;
-        String message = "Your matchmaking group was removed from the queue because <@" + leaverId + "> left it.";
-        for (MatchmakingQueueMember member : partyMembers) {
-            if (member.getUserId().equals(leaverId)) continue;
-            User user = JdaService.jda.getUserById(member.getUserId());
-            if (user == null) continue;
-            MessageHelper.sendMessageToUser(message, user);
-        }
-    }
-
     static void notifyExpired(List<QueuedParty> expired) {
         if (expired.isEmpty()) return;
         BotLogger.info("Expiring " + expired.size() + " matchmaking parties.");
         String expiryMessage = "The matchmaking service wasn't able to find you a game in the time frame you selected. "
                 + "Queue again when ready and consider being open to additional game types or longer wait times.";
         for (QueuedParty party : expired) {
-            for (MatchmakingQueueMember member : party.members()) {
-                User user = JdaService.jda.getUserById(member.getUserId());
-                if (user == null) continue;
-                MessageHelper.sendMessageToUser(expiryMessage, user);
-            }
+            if (party.members().size() != 1) continue;
+            User user = JdaService.jda.getUserById(party.members().getFirst().getUserId());
+            if (user == null) continue;
+            MessageHelper.sendMessageToUser(expiryMessage, user);
         }
     }
 

@@ -14,9 +14,9 @@ class MatchmakingCompatibilityServiceTest {
 
     @Test
     void compatiblePlayersHaveNoReason() {
-        assertThat(MatchmakingCompatibilityService.incompatibilityReason(
+        assertThat(MatchmakingCompatibilityService.areIncompatible(
                         player("a").build(), player("b").build(), false))
-                .isEmpty();
+                .isFalse();
     }
 
     @Test
@@ -24,10 +24,8 @@ class MatchmakingCompatibilityServiceTest {
         PlayerMatchData a = player("a").avoidList("b").build();
         PlayerMatchData b = player("b").build();
 
-        assertThat(MatchmakingCompatibilityService.incompatibilityReason(a, b, false))
-                .isPresent();
-        assertThat(MatchmakingCompatibilityService.incompatibilityReason(b, a, false))
-                .isPresent();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, false)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(b, a, false)).isTrue();
     }
 
     @Test
@@ -36,10 +34,8 @@ class MatchmakingCompatibilityServiceTest {
                 player("a").restrictions(MatchmakingOptions.TIGL_OPTION).build();
         PlayerMatchData b = player("b").build();
 
-        assertThat(MatchmakingCompatibilityService.incompatibilityReason(a, b, false))
-                .isPresent();
-        assertThat(MatchmakingCompatibilityService.incompatibilityReason(b, a, false))
-                .isPresent();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, false)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(b, a, false)).isTrue();
     }
 
     @Test
@@ -50,10 +46,10 @@ class MatchmakingCompatibilityServiceTest {
                 .build();
         PlayerMatchData nonFloater = player("b").build();
 
-        assertThat(MatchmakingCompatibilityService.incompatibilityReason(floater, nonFloater, false))
-                .isPresent();
-        assertThat(MatchmakingCompatibilityService.incompatibilityReason(nonFloater, floater, false))
-                .isPresent();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(floater, nonFloater, false))
+                .isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(nonFloater, floater, false))
+                .isTrue();
     }
 
     @Test
@@ -64,8 +60,8 @@ class MatchmakingCompatibilityServiceTest {
                 .build();
         PlayerMatchData nonWarrior = player("b").build();
 
-        assertThat(MatchmakingCompatibilityService.incompatibilityReason(warrior, nonWarrior, false))
-                .isPresent();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(warrior, nonWarrior, false))
+                .isTrue();
     }
 
     @Test
@@ -75,10 +71,10 @@ class MatchmakingCompatibilityServiceTest {
                 .build();
         PlayerMatchData newcomer = player("b").completedGames(1).build();
 
-        assertThat(MatchmakingCompatibilityService.incompatibilityReason(veteran, newcomer, false))
-                .isPresent();
-        assertThat(MatchmakingCompatibilityService.incompatibilityReason(newcomer, veteran, false))
-                .isPresent();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(veteran, newcomer, false))
+                .isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(newcomer, veteran, false))
+                .isTrue();
     }
 
     @Test
@@ -90,10 +86,10 @@ class MatchmakingCompatibilityServiceTest {
         PlayerMatchData fewShared = player("b").activeHourBuckets(0, 4, 5).build();
         PlayerMatchData manyShared = player("c").activeHourBuckets(0, 1, 2, 5).build();
 
-        assertThat(MatchmakingCompatibilityService.incompatibilityReason(picky, fewShared, false))
-                .isPresent();
-        assertThat(MatchmakingCompatibilityService.incompatibilityReason(picky, manyShared, false))
-                .isEmpty();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(picky, fewShared, false))
+                .isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(picky, manyShared, false))
+                .isFalse();
     }
 
     @Test
@@ -104,10 +100,8 @@ class MatchmakingCompatibilityServiceTest {
                 .build();
         PlayerMatchData b = player("b").rating(23).build();
 
-        assertThat(MatchmakingCompatibilityService.incompatibilityReason(a, b, false))
-                .isPresent();
-        assertThat(MatchmakingCompatibilityService.incompatibilityReason(a, b, true))
-                .isEmpty();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, false)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, true)).isFalse();
     }
 
     @Test
@@ -120,8 +114,7 @@ class MatchmakingCompatibilityServiceTest {
                 .build();
         PlayerMatchData b = player("b").rating(21).build();
 
-        assertThat(MatchmakingCompatibilityService.incompatibilityReason(a, b, false))
-                .isEmpty();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, false)).isFalse();
     }
 
     private static Builder player(String userId) {

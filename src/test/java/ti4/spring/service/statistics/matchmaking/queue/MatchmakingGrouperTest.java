@@ -19,7 +19,6 @@ class MatchmakingGrouperTest {
     private static final String EXPANSION = MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION;
     private static final String PACE = MatchmakingOptions.NO_PACE_OPTION;
 
-    private final MatchmakingGrouper grouper = new MatchmakingGrouper();
     private final Map<MatchmakingQueueMember, PlayerMatchData> matchData = new HashMap<>();
     private final List<QueuedParty> parties = new ArrayList<>();
     private long nextPartyId = 1;
@@ -30,7 +29,7 @@ class MatchmakingGrouperTest {
         addSolo("p2");
         addSolo("p3");
 
-        List<MatchedGame> games = grouper.formGames(parties, matchData);
+        List<MatchedGame> games = MatchmakingGrouper.formGames(parties, matchData);
 
         assertThat(games).hasSize(1);
         assertThat(games.getFirst().playerCount()).isEqualTo("3");
@@ -46,7 +45,7 @@ class MatchmakingGrouperTest {
             addSolo(id, defaultData(id), List.of("3", "4"));
         }
 
-        List<MatchedGame> games = grouper.formGames(parties, matchData);
+        List<MatchedGame> games = MatchmakingGrouper.formGames(parties, matchData);
 
         assertThat(games).hasSize(1);
         assertThat(games.getFirst().playerCount()).isEqualTo("4");
@@ -58,7 +57,7 @@ class MatchmakingGrouperTest {
         addParty(List.of("a1", "a2"));
         addSolo("s1");
 
-        List<MatchedGame> games = grouper.formGames(parties, matchData);
+        List<MatchedGame> games = MatchmakingGrouper.formGames(parties, matchData);
 
         assertThat(games).hasSize(1);
         assertThat(games.getFirst().members())
@@ -72,7 +71,7 @@ class MatchmakingGrouperTest {
         addParty(List.of("a1", "a2"));
         addParty(List.of("b1", "b2"));
 
-        assertThat(grouper.formGames(parties, matchData)).isEmpty();
+        assertThat(MatchmakingGrouper.formGames(parties, matchData)).isEmpty();
     }
 
     @Test
@@ -81,7 +80,7 @@ class MatchmakingGrouperTest {
         addSolo("p2");
         addSolo("p3");
 
-        assertThat(grouper.formGames(parties, matchData)).isEmpty();
+        assertThat(MatchmakingGrouper.formGames(parties, matchData)).isEmpty();
     }
 
     @Test
@@ -92,14 +91,14 @@ class MatchmakingGrouperTest {
         addSolo("a", new Data("a", skill, 20, false), List.of("3"));
         addSolo("b", new Data("b", skill, 23, false), List.of("3"));
         addSolo("c", new Data("c", skill, 23, false), List.of("3"));
-        assertThat(grouper.formGames(parties, matchData)).isEmpty();
+        assertThat(MatchmakingGrouper.formGames(parties, matchData)).isEmpty();
 
         parties.clear();
         matchData.clear();
         addSolo("a", new Data("a", skill, 20, true), List.of("3"));
         addSolo("b", new Data("b", skill, 23, true), List.of("3"));
         addSolo("c", new Data("c", skill, 23, true), List.of("3"));
-        assertThat(grouper.formGames(parties, matchData)).hasSize(1);
+        assertThat(MatchmakingGrouper.formGames(parties, matchData)).hasSize(1);
     }
 
     private void addSolo(String userId) {
