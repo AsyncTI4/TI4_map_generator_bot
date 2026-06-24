@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static ti4.helpers.discord.DiscordErrorUtility.*;
+import static ti4.discord.utility.DiscordErrorUtility.isIgnorableError;
 
 import java.util.ArrayList;
 import java.util.HashMap;

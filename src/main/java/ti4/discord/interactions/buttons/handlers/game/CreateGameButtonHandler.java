@@ -3,8 +3,6 @@ package ti4.discord.interactions.buttons.handlers.game;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
@@ -24,18 +22,16 @@ import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
-import ti4.game.Player;
 import ti4.game.persistence.GameManager;
-import ti4.game.persistence.ManagedGame;
 import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.SearchGameHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
-import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.statistics.AverageTurnTimeService;
 import ti4.spring.service.statistics.UserGameInfoService;
+import ti4.spring.service.statistics.matchmaking.queue.MatchmakerService;
 
 @UtilityClass
 public class CreateGameButtonHandler {
@@ -224,9 +220,9 @@ public class CreateGameButtonHandler {
             memberList.append('\n').append(playerNumber).append(". ").append(mention);
 
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
-            int ongoingAmount = countOngoingGamesThatAffectJoinLimit(managedPlayer);
-            int completedGames = countCompletedGamesThatAffectJoinLimit(managedPlayer);
-            if (ongoingAmount > completedGames + 2) {
+            int ongoingAmount = UserGameInfoService.countOngoingGamesThatAffectJoinLimit(managedPlayer);
+            int completedGames = UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer);
+            if (UserGameInfoService.isOverStandardGameLimit(managedPlayer)) {
                 memberList
                         .append("⚠️ (Above or equal game limit: ")
                         .append(ongoingAmount)
@@ -248,7 +244,7 @@ public class CreateGameButtonHandler {
                 memberList.append(" fastest 6 player game length(s) in days) ");
             }
             var userSettings = UserSettingsManager.get(member.getId());
-            String activeHoursSummary = UserSettings.summarizeActiveHoursEmoji(userSettings.getActiveHours());
+            String activeHoursSummary = userSettings.summarizeActiveHoursEmoji(userSettings.getActiveHours());
             if (activeHoursSummary != null) {
                 if (activityList.isEmpty()) {
                     activityList
@@ -273,8 +269,14 @@ public class CreateGameButtonHandler {
         }
         event.getMessage()
                 .editMessage(generateMemberListMessage(members, fetchSillyNameFromMessage(event)))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " joined the game.");
+        if (MatchmakerService.get().leaveQueue(event.getUser().getId())) {
+            event.getHook()
+                    .setEphemeral(true)
+                    .sendMessage("Because you joined a game, you are no longer queued to find a game.")
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+        }
     }
 
     @ButtonHandler(value = "leaveGameList", save = false)
@@ -283,7 +285,7 @@ public class CreateGameButtonHandler {
         members.remove(event.getMember());
         event.getMessage()
                 .editMessage(generateMemberListMessage(members, fetchSillyNameFromMessage(event)))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " left the game.");
     }
 
@@ -427,8 +429,8 @@ public class CreateGameButtonHandler {
                 && !CommandHelper.hasRole(event, JdaService.developerRoles)
                 && !CommandHelper.hasRole(event, JdaService.bothelperRoles)) {
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
-            int ongoingAmount = countOngoingGamesThatAffectJoinLimit(managedPlayer);
-            int completedGames = countCompletedGamesThatAffectJoinLimit(managedPlayer);
+            int ongoingAmount = UserGameInfoService.countOngoingGamesThatAffectJoinLimit(managedPlayer);
+            int completedGames = UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer);
             int limitIncrease = 0;
             if (event.getChannel() instanceof ThreadChannel channel) {
                 String parentName = channel.getParentChannel().getName();
@@ -458,36 +460,6 @@ public class CreateGameButtonHandler {
             }
         }
         return true;
-    }
-
-    private static int countOngoingGamesThatAffectJoinLimit(ManagedPlayer managedPlayer) {
-        if (managedPlayer == null) return 0;
-        Set<ManagedGame> managedGames = managedPlayer.getGames();
-        return (int) managedGames.stream()
-                .filter(managedGame -> !managedGame.isHasEnded())
-                .map(ManagedGame::getGame)
-                .filter(isRealPlayerIn3PlusPlayerGame(managedPlayer))
-                .count();
-    }
-
-    private static int countCompletedGamesThatAffectJoinLimit(ManagedPlayer managedPlayer) {
-        if (managedPlayer == null) return 0;
-        Set<ManagedGame> managedGames = managedPlayer.getGames();
-        return (int) managedGames.stream()
-                .filter(managedGame -> managedGame.isHasEnded() && managedGame.isHasWinner())
-                .map(ManagedGame::getGame)
-                .filter(isRealPlayerIn3PlusPlayerGame(managedPlayer))
-                .count();
-    }
-
-    private static Predicate<Game> isRealPlayerIn3PlusPlayerGame(ManagedPlayer managedPlayer) {
-        return game -> {
-            List<Player> realAndEliminatedPlayers = game.getRealAndEliminatedPlayers();
-            return realAndEliminatedPlayers.size() >= 3
-                    && realAndEliminatedPlayers.stream()
-                            .map(Player::getUserID)
-                            .anyMatch(id -> managedPlayer.getId().equals(id));
-        };
     }
 
     private static boolean isLikelyDoublePressedButton(List<Member> members, ButtonInteractionEvent event) {
