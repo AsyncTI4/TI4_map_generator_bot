@@ -47,7 +47,7 @@ class FrankenDraftLimitSettings extends SettingsMenu {
     FrankenDraftLimitSettings(Game game, JsonNode json, FrankenSettings parent) {
         super(MENU_ID, "Draft Limits", "Adjust per-category draft limits for the selected Franken mode.", parent);
         this.game = game;
-        this.parentSettings = parent;
+        parentSettings = parent;
 
         for (DraftCategory category : CATEGORIES) {
             FrankenLimitSetting setting = new FrankenLimitSetting(category, defaultLimit(category));

@@ -461,7 +461,7 @@ public class ExploreService {
                     event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "tacommander")) {
-            TaLeadersHandler.resolveTaCommander(player, tile, planetName);
+            TaLeadersHandler.resolveTaCommander(player, tile, game, planetName);
         }
         if (ButtonHelper.isPlanetLegendaryOrTechSkip(planetName, game)
                 && Helper.getPlayerFromUnlockedLeader(game, "augersagent") != null) {
@@ -1248,8 +1248,10 @@ public class ExploreService {
                 && !game.getAllPlanetsWithSleeperTokens().contains(planetID)
                 && player.getPlanetsAllianceMode().contains(planetID)
                 && !game.isTwilightsFallMode()) {
-            Button placeSleeper =
-                    Buttons.green("putSleeperOnPlanet_" + planetID, "Put Sleeper on " + planetID, MiscEmojis.Sleeper);
+            Button placeSleeper = Buttons.green(
+                    "putSleeperOnPlanet_" + planetID,
+                    "Put Sleeper on " + Helper.getPlanetRepresentation(planetID, game),
+                    MiscEmojis.Sleeper);
             Button declineSleeper = Buttons.red("deleteButtons", "Decline To Put a Sleeper Down");
             List<Button> buttons = List.of(placeSleeper, declineSleeper);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);

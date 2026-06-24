@@ -318,7 +318,7 @@ public final class CryypterHelper {
     }
 
     public static void handleWinningRiders(Game game, String winningOutcome) {
-        // AgendaHelper.placeRider()
+        // AgendaRiderHelper.placeRider()
         // format of stored votes and outcomes (identifier can be either color or name): [faction
         // identifier]_[number];[faction identifier]_[rider name]
         if (game.isVotcMode()) {

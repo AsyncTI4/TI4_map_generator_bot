@@ -296,6 +296,9 @@ public final class DSHelperBreakthroughs {
     @ButtonHandler("useAxisBT")
     public static void useAxisBT(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
         p1.setBreakthroughExhausted("axisbt", true);
+        if (p1.hasTech("tf-armsbrokerage")) {
+            p1.exhaustTech("tf-armsbrokerage");
+        }
         MessageHelper.sendMessageToChannel(
                 p1.getCorrectChannel(),
                 p1.getRepresentation()

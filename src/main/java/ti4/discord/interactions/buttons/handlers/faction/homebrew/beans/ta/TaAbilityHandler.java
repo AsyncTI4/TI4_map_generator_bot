@@ -28,7 +28,7 @@ public class TaAbilityHandler {
     private static final String EFFICIENT_GOVERNANCE = "efficient_governance";
     private static final String ATTACH_DESIGN_PREFIX = "taAttachDesign_";
     private static final List<String> ATTACHABLE_DESIGNS =
-            List.of("designcombine", "designtranspose", "designprestige", "designabundance");
+            List.of("designunify", "designtranspose", "designprestige", "designabundance");
 
     public static void sendPlanetaryReconfigurationStatus(Player player, Game game) {
         if (player == null
@@ -113,6 +113,7 @@ public class TaAbilityHandler {
                             + design,
                     "Attach " + getDesignName(design)));
         }
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
 
         String message = player.getRepresentationUnfogged()
                 + ", you may attach 1 design from your reinforcements to "
@@ -171,6 +172,7 @@ public class TaAbilityHandler {
         }
 
         tile.addToken(tokenPath, planetName);
+        TaUnitHandler.offerTaMechDeploy(event, player, game, tile, planetName);
         CommanderUnlockCheckService.checkPlayer(player, "ta");
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),

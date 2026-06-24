@@ -453,7 +453,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public void setBreakthroughExhausted(String bt, boolean exh) {
-        getBreakthroughExhausted().put(bt, exh);
+        if (hasBreakthrough(bt)) {
+            getBreakthroughExhausted().put(bt, exh);
+        }
     }
 
     public boolean isBreakthroughActive(String bt) {
@@ -1428,6 +1430,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (hasAbility("harmony") && getStarbalanceCounter() != getSteelbalanceCounter()) {
             bonus -= 2;
         }
+        if (hasTech("tf-corporateimperialism")) {
+            bonus += 4;
+        }
 
         if (hasAbility("necrophage")) {
             bonus += ButtonHelper.getNumberOfUnitsOnTheBoard(
@@ -2114,9 +2119,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 ThreadChannel chan = ButtonHelper.getRightStratThread(
                         game, ButtonHelper.getStratName(ButtonHelper.getStratName(sc), game));
                 if (chan != null) {
-                    chan.retrieveMessageById(gameMessage.messageId()).queue(mainMessage -> mainMessage
-                            .editMessage(PlayStrategyCardService.getSCFollowSummary(game, sc, true))
-                            .queue());
+                    String followSummary = PlayStrategyCardService.getSCFollowSummary(game, sc, true);
+                    chan.retrieveMessageById(gameMessage.messageId())
+                            .queue(mainMessage ->
+                                    mainMessage.editMessage(followSummary).queue());
                 }
             }
         }
@@ -2649,6 +2655,19 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public void addPlanet(String planet) {
         if (!getPlanets().contains(planet)) {
             getPlanets().add(planet);
+            Tile tile = game.getTileFromPlanet(planet);
+            if (tile != null
+                    && !game.getStoredValue("combatRoundTracker" + getFaction() + tile.getPosition() + planet)
+                            .isEmpty()) {
+                LoreService.showPlanetLore(this, game, planet, LoreService.TRIGGER.GROUND_BATTLE);
+                for (Player other : game.getRealPlayers()) {
+                    if (other == this) continue;
+                    if (!game.getStoredValue("combatRoundTracker" + other.getFaction() + tile.getPosition() + planet)
+                            .isEmpty()) {
+                        LoreService.showPlanetLore(other, game, planet, LoreService.TRIGGER.GROUND_BATTLE);
+                    }
+                }
+            }
             LoreService.showPlanetLore(this, game, planet, LoreService.TRIGGER.CONTROLLED);
         }
     }

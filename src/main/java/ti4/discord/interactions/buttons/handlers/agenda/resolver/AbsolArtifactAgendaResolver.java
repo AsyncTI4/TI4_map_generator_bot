@@ -7,7 +7,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.helpers.AgendaHelper;
+import ti4.helpers.AgendaSummaryHelper;
 import ti4.helpers.Helper;
 import ti4.image.TileGenerator;
 import ti4.message.MessageHelper;
@@ -30,7 +30,7 @@ public class AbsolArtifactAgendaResolver implements ForAgainstAgendaResolver {
                 FileUpload systemWithContext =
                         new TileGenerator(game, event, null, 1, tile.getPosition()).createFileUpload();
                 String message = "# _Ixthian Artifact_ has resolved! " + watchPartyPing + "\n"
-                        + AgendaHelper.getSummaryOfVotes(game, true).replace("# _Ixthian Artifact_\n", "")
+                        + AgendaSummaryHelper.getSummaryOfVotes(game, true).replace("# _Ixthian Artifact_\n", "")
                         + "\nSurrounding Mecatol Rex in " + game.getName() + ".";
                 MessageHelper.sendMessageWithFile(watchParty, systemWithContext, message, false);
             }

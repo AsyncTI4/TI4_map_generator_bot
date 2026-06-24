@@ -54,9 +54,9 @@ import org.apache.commons.lang3.function.Consumers;
 import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.PhantomEnergyHandler;
@@ -1152,6 +1152,9 @@ public class ButtonHelper {
                 && tileHasShips) {
             return true;
         }
+        if (player.hasTech("tf-networkeddeployment") && CommandCounterHelper.hasCC(player, tile)) {
+            return true;
+        }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet) {
                 continue;
@@ -1904,10 +1907,12 @@ public class ButtonHelper {
                             buttons);
                 }
             }
-
+            Player ralnel = nonActivePlayer;
             if (nonActivePlayer.hasAbility("survivalinstinct")
-                    && FoWHelper.playerHasActualShipsInSystem(nonActivePlayer, activeSystem)) {
-                Player ralnel = nonActivePlayer;
+                    && FoWHelper.playerHasActualShipsInSystem(nonActivePlayer, activeSystem)
+                    && TeHelperAbilities.getSurvivalInstinctSystemButtons(game, ralnel, activeSystem, null)
+                                    .size()
+                            > 1) {
                 List<Button> buttons =
                         TeHelperAbilities.getSurvivalInstinctSystemButtons(game, ralnel, activeSystem, null);
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -3022,19 +3027,21 @@ public class ButtonHelper {
             List<Button> planetsWithSleepers = new ArrayList<>();
             planetsWithSleepers.add(Buttons.green(
                     factionChecker + "replaceSleeperWith_pds_" + planet,
-                    "Replace Sleeper on " + planet + " With 1 PDS."));
+                    "Replace Sleeper on " + Helper.getPlanetRepresentation(planet, game) + " With 1 PDS."));
             if (getNumberOfUnitsOnTheBoard(game, player, "mech") < 4
                     && player.hasUnit("titans_mech")
                     && !tile.isScar()
                     && !isLawInPlay(game, "articles_war")) {
                 planetsWithSleepers.add(Buttons.green(
                         factionChecker + "replaceSleeperWith_mech_" + planet,
-                        "Replace Sleeper on " + planet + " With 1 Mech & Infantry."));
+                        "Replace Sleeper on " + Helper.getPlanetRepresentation(planet, game)
+                                + " With 1 Mech & Infantry."));
             }
             planetsWithSleepers.add(Buttons.red("deleteButtons", "Delete These Buttons"));
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
-                    "Use buttons to resolve the replacement of the Sleeper token on " + planet + ".",
+                    "Use buttons to resolve the replacement of the Sleeper token on "
+                            + Helper.getPlanetRepresentation(planet, game) + ".",
                     planetsWithSleepers);
         }
     }
@@ -3062,8 +3069,9 @@ public class ButtonHelper {
         String factionChecker = player.factionButtonChecker();
         List<Button> planetsWithSleepers = new ArrayList<>();
         for (String planet : game.getAllPlanetsWithSleeperTokens()) {
-            planetsWithSleepers.add(
-                    Buttons.green(factionChecker + "removeSleeperFromPlanet_" + planet, "Remove Sleeper on " + planet));
+            planetsWithSleepers.add(Buttons.green(
+                    factionChecker + "removeSleeperFromPlanet_" + planet,
+                    "Remove Sleeper on " + Helper.getPlanetRepresentation(planet, game)));
         }
         planetsWithSleepers.add(Buttons.red("deleteButtons", "Delete These Buttons"));
         return planetsWithSleepers;
@@ -3673,7 +3681,7 @@ public class ButtonHelper {
     }
 
     public static List<Button> getButtonsForAgentSelection(Game game, String agent) {
-        return VoteButtonHandler.getPlayerOutcomeButtons(game, null, "exhaustAgent_" + agent, null);
+        return AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "exhaustAgent_" + agent, null);
     }
 
     @ButtonHandler("deleteMessage_") // deleteMessage_{Optional String to send to the event channel after}
@@ -4190,6 +4198,9 @@ public class ButtonHelper {
                 } else if (unit.getIsShip()) {
                     if (player.hasAbility("capital_fleet") && unit.getBaseType().contains("destroyer")) {
                         numOfCapitalShips += entry.getValue();
+                    } else if (player.hasTech("tf-capitaldominance")
+                            && unit.getBaseType().contains("destroyer")) {
+                        // destroyers dont count towards fleet
                     } else {
                         numOfCapitalShips += entry.getValue() * 2;
                     }
@@ -4535,7 +4546,7 @@ public class ButtonHelper {
                     Buttons.green(factionChecker + "dataSkimmer_page0", "Use Data Skimmer", FactionEmojis.Ralnel));
         }
 
-        if (player.hasReadyBreakthrough("veldyrbt")) {
+        if (player.hasReadyBreakthrough("veldyrbt") || player.hasTech("tf-harnessedaurora")) {
             passButtons.add(Buttons.green(
                     factionChecker + "veldyrBTExplore", "Explore Frontier Deck At Home", FactionEmojis.veldyr));
         }
@@ -4655,13 +4666,16 @@ public class ButtonHelper {
                 "miltymod_hm",
                 "absol_hm",
                 "absol_nm",
-                "absol_pa");
+                "absol_pa",
+                "betaro");
         for (String tech : endOfTurnTechs) {
             if (!player.hasTechReady(tech)) continue;
 
             // Check for special requirements
             if ("dsceldr".equals(tech) && !hasStratCC) continue;
             if ("absol_pa".equals(tech) && player.getActionCards().size() < 2) continue;
+            if ("betaro".equals(tech) && player.getReadiedPlanets().isEmpty()
+                    || player.getExhaustedPlanets().isEmpty()) continue;
 
             // Add the button
             TechnologyModel model = Mapper.getTech(tech);
@@ -4732,11 +4746,11 @@ public class ButtonHelper {
             endButtons.add(Buttons.green(
                     player.factionButtonChecker() + "ravenMigration", "Use Migration", FactionEmojis.raven));
         }
-        if (player.hasReadyBreakthrough("axisbt")) {
+        if (player.hasReadyBreakthrough("axisbt") || player.hasTech("tf-armsbrokerage")) {
             endButtons.add(Buttons.green(
-                    player.factionButtonChecker() + "useAxisBT", "Use Axis Breakthrough", FactionEmojis.axis));
+                    player.factionButtonChecker() + "useAxisBT", "Use Arms Brokerage", FactionEmojis.axis));
         }
-        if (player.hasReadyBreakthrough("cheiranbt")) {
+        if (player.hasReadyBreakthrough("cheiranbt") || player.hasTech("tf-cheiranbt")) {
             endButtons.add(Buttons.green(
                     player.factionButtonChecker() + "exhaustBT_cheiranbt",
                     "Exhaust Cheiran Breakthrough",
@@ -4747,6 +4761,10 @@ public class ButtonHelper {
                     player.factionButtonChecker() + "useFlorzenBT",
                     "Exhaust Florzen Breakthrough",
                     FactionEmojis.florzen));
+        }
+        if (TaBreakthroughHandler.hasAdaptiveEconomyTargets(player, game)
+                && (player.hasReadyBreakthrough("tabt") || player.getStrategicCC() > 0)) {
+            endButtons.add(Buttons.red(player.factionButtonChecker() + "offerAdaptiveEconomy", "Use Adaptive Economy"));
         }
         return endButtons;
     }
@@ -5787,7 +5805,9 @@ public class ButtonHelper {
                     && player.getPlanets().contains(planetID)
                     && !game.isTwilightsFallMode()) {
                 Button placeSleeper = Buttons.green(
-                        "putSleeperOnPlanet_" + planetID, "Put Sleeper on " + planetID, MiscEmojis.Sleeper);
+                        "putSleeperOnPlanet_" + planetID,
+                        "Put Sleeper on " + Helper.getPlanetRepresentation(planetID, game),
+                        MiscEmojis.Sleeper);
                 Button decline = Buttons.red("deleteButtons", "Decline To Put a Sleeper Down");
                 List<Button> buttons = List.of(placeSleeper, decline);
                 MessageHelper.sendMessageToChannelWithButtons(

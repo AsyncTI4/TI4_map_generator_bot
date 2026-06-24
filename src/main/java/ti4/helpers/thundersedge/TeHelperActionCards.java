@@ -266,7 +266,7 @@ public class TeHelperActionCards {
     }
 
     @ButtonHandler("loseAFleetCultural")
-    private static void loseAFleetCultural(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+    private static void loseAFleetCultural(Game game, Player player, ButtonInteractionEvent event) {
         String mahactReason = "due to failing to reach an agreement on _Exchange Program_";
         MahactTokenService.removeFleetCC(game, player, mahactReason);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -280,8 +280,7 @@ public class TeHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("strategize")
-    private static void resolveStrategize(Game game, Player player, ButtonInteractionEvent event) {
+    public static List<Button> getReadiedStrategyCardSecondaryButtons(Game game) {
         List<Button> buttons = new ArrayList<>();
 
         if (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1)) {
@@ -309,6 +308,13 @@ public class TeHelperActionCards {
         if (game.getScPlayed().get(8) == null || !game.getScPlayed().get(8)) {
             buttons.add(Buttons.green("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
+
+        return buttons;
+    }
+
+    @ButtonHandler("strategize")
+    private static void resolveStrategize(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = getReadiedStrategyCardSecondaryButtons(game);
 
         String message = player.getRepresentationUnfogged() + ", please resolve _Strategize_ using these buttons.";
         String msg2 = player.getRepresentation()

@@ -241,6 +241,14 @@ public class Planet extends UnitHolder {
                 resourcesModifier += originalInf;
                 influenceModifier += originalRes;
             }
+            if ("worldshapernegative".equalsIgnoreCase(attachment.getAlias())) {
+                if (originalRes > 0) {
+                    resourcesModifier -= 1;
+                }
+                if (originalInf > 0) {
+                    influenceModifier -= 1;
+                }
+            }
             for (String planetType : attachment.getPlanetTypes()) {
                 addType(planetType);
             }

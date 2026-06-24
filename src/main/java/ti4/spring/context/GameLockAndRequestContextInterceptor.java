@@ -111,20 +111,20 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
             Exception exception) {
         try {
             var game = RequestContext.getGame();
-            if (game != null) {
-                if (exception == null && RequestContext.shouldSaveGame()) {
-                    if (activeLeaseService.mayMutate()) {
-                        var player = RequestContext.getPlayer();
-                        GameManager.save(game, player.getUserName() + " called " + request.getRequestURI());
-                    } else {
-                        BotLogger.warning(
-                                "Skipped web mutation save because this instance no longer owns the active lease. "
-                                        + request.getRequestURI());
-                    }
-                }
+            if (game == null) return;
 
-                unlockGame(game.getName(), RequestContext.shouldSaveGame());
+            if (exception == null && RequestContext.shouldSaveGame()) {
+                if (activeLeaseService.mayMutate()) {
+                    var player = RequestContext.getPlayer();
+                    GameManager.save(game, player.getUserName() + " called " + request.getRequestURI());
+                } else {
+                    BotLogger.warning(
+                            "Skipped web mutation save because this instance no longer owns the active lease. "
+                                    + request.getRequestURI());
+                }
             }
+
+            unlockGame(game.getName(), RequestContext.shouldSaveGame());
         } finally {
             RequestContext.clearContext();
         }

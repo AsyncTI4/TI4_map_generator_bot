@@ -21,6 +21,7 @@ import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.logging.BotLogger;
+import ti4.service.fow.LoreService;
 
 @UtilityClass
 public class GameManager {
@@ -87,6 +88,7 @@ public class GameManager {
         if (managedGame != null) {
             managedGame.getPlayers().forEach(player -> player.removeGame(gameName));
         }
+        LoreService.evictGameLore(gameName);
     }
 
     public static boolean isValid(String gameName) {

@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -215,6 +216,14 @@ public class PromissoryNoteHelper {
         String pnName = pn.getName();
         // String pnOwner = Mapper.getPromissoryNoteOwner(id);
         Player owner = game.getPNOwner(id);
+        if ("bepnta".equalsIgnoreCase(id)
+                && !TaPromissoryHandler.hasLegalAdvancedStructuralEngineeringTargets(player, game)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", there are no legal non-home planets for _Advanced Structural Engineering_.");
+            return;
+        }
         if (pn.getPlayArea() && !player.isPlayerMemberOfAlliance(owner)) {
             player.addPromissoryNoteToPlayArea(id);
         } else {
@@ -544,8 +553,8 @@ public class PromissoryNoteHelper {
             String riderName = "Keleres Rider";
             String finsFactionCheckerPrefix = player.factionButtonChecker();
 
-            List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
-            List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
+            List<Button> riderButtons = AgendaRiderHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
+            List<Button> afterButtons = AgendaWhensAftersHelper.getAfterButtons(game);
             MessageHelper.sendMessageToChannelWithFactionReact(
                     player.getCorrectChannel(),
                     player.getRepresentation() + "Please choose your Rider target.",
@@ -557,8 +566,8 @@ public class PromissoryNoteHelper {
             String riderName = "Edyn Rider";
             String finsFactionCheckerPrefix = player.factionButtonChecker();
 
-            List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
-            // List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
+            List<Button> riderButtons = AgendaRiderHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
+            // List<Button> afterButtons = AgendaWhensAftersHelper.getAfterButtons(game);
             MessageHelper.sendMessageToChannelWithFactionReact(
                     player.getCorrectChannel(),
                     player.getRepresentation() + "Please choose your Rider target.",
@@ -570,8 +579,8 @@ public class PromissoryNoteHelper {
             String riderName = "Kyro Rider";
             String finsFactionCheckerPrefix = player.factionButtonChecker();
 
-            List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
-            // List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
+            List<Button> riderButtons = AgendaRiderHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
+            // List<Button> afterButtons = AgendaWhensAftersHelper.getAfterButtons(game);
             MessageHelper.sendMessageToChannelWithFactionReact(
                     player.getCorrectChannel(),
                     player.getRepresentation() + "Please choose your Rider target.",
@@ -663,6 +672,9 @@ public class PromissoryNoteHelper {
                             + " -> " + (oldTgs + 4)
                             + ") from playing _Primitivism_. Please use the button to gain your command token.",
                     transact2);
+        }
+        if ("bepnta".equalsIgnoreCase(id)) {
+            TaPromissoryHandler.offerAdvancedStructuralEngineeringButtons(event, player, game);
         }
         if (pn.getText().toLowerCase().contains("action:") && !"acq".equalsIgnoreCase(id)) {
             ComponentActionHelper.serveNextComponentActionButtons(event, game, player);

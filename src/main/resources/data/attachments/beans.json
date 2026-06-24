@@ -25,7 +25,7 @@
     {
         "id": "designunify",
         "name": "Unify (Design)",
-        "imagePath": "attachment_designcombine.png",
+        "imagePath": "attachment_designunify.png",
         "isFakeAttachment": true,
         "source": "beans"
     },
@@ -43,14 +43,21 @@
         "imagePath": "attachment_worldshaperpositive.png",
         "resourcesModifier": 1,
         "influenceModifier": 1,
+        "isFakeAttachment": true,
         "source": "beans"
     },
     {
         "id": "worldshapernegative",
         "name": "Worldshaper (Negative)",
         "imagePath": "attachment_worldshapernegative.png",
-        "resourcesModifier": -1,
-        "influenceModifier": -1,
+        "isFakeAttachment": true,
+        "source": "beans"
+    },
+    {
+        "id": "advancedstructuralengineering",
+        "name": "Advanced Structural Engineering",
+        "imagePath": "attachment_ase.png",
+        "isFakeAttachment": true,
         "source": "beans"
     }
 ]

@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
@@ -23,13 +24,15 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.AgendaHelper;
+import ti4.helpers.AgendaWhensAftersHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadGetter;
+import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
@@ -137,6 +140,36 @@ public final class GMService {
                 });
     }
 
+    /** Posts a message to the FoW activity-log thread (inside the GM channel). No-op outside FoW. */
+    public static void postToActivityThread(Game game, String message) {
+        if (!game.isFowMode()) return;
+        ThreadGetter.getThreadInChannel(
+                getGMChannel(game),
+                game.getName() + ACTIVITY_LOG_THREAD,
+                true,
+                false,
+                threadChannel -> MessageHelper.sendMessageToChannel(threadChannel, message));
+    }
+
+    /**
+     * Renders the full (unfogged) map and posts it into the FoW activity-log thread. The thread lives
+     * in the GM-only channel, so the unfogged view leaks nothing. A null render event keeps the map
+     * unfogged (see {@code MapGenerator.isFowModeActive}). No-op outside FoW.
+     */
+    public static void refreshMapInActivityThread(Game game) {
+        if (!game.isFowMode()) return;
+        MapRenderPipeline.queue(
+                game,
+                (GenericInteractionCreateEvent) null,
+                DisplayType.all,
+                fileUpload -> ThreadGetter.getThreadInChannel(
+                        getGMChannel(game),
+                        game.getName() + ACTIVITY_LOG_THREAD,
+                        true,
+                        false,
+                        threadChannel -> MessageHelper.sendFileUploadToChannel(threadChannel, fileUpload)));
+    }
+
     private static void jumpToLatestMessage(Player player, Consumer<String> callback) {
         MessageChannel privateChannel = player != null ? player.getPrivateChannel() : null;
         if (privateChannel != null) {
@@ -209,14 +242,14 @@ public final class GMService {
                 StringBuilder sbAfters = new StringBuilder("Following players have \"after\"s in hand:\n");
 
                 for (Player player : game.getRealPlayers()) {
-                    List<String> whens = AgendaHelper.getPossibleWhenNames(player);
+                    List<String> whens = AgendaWhensAftersHelper.getPossibleWhenNames(player);
                     if (!whens.isEmpty()) {
                         sbWhens.append("> ")
                                 .append(player.getRepresentationUnfoggedNoPing())
                                 .append(": ");
                         sbWhens.append(String.join(", ", whens)).append('\n');
                     }
-                    List<String> afters = AgendaHelper.getPossibleAfterNames(player);
+                    List<String> afters = AgendaWhensAftersHelper.getPossibleAfterNames(player);
                     if (!afters.isEmpty()) {
                         sbAfters.append("> ")
                                 .append(player.getRepresentationUnfoggedNoPing())
@@ -355,7 +388,7 @@ public final class GMService {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " GM has forced you to pass on \"when\"s.");
-        AgendaHelper.declineToQueueAWhen(game, event, player);
+        AgendaWhensAftersHelper.declineToQueueAWhen(game, event, player);
     }
 
     @ButtonHandler("declineToQueueAnAfterFowGM_")
@@ -365,7 +398,7 @@ public final class GMService {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " GM has forced you to pass on \"after\"s.");
-        AgendaHelper.declineToQueueAnAfter(game, event, player);
+        AgendaWhensAftersHelper.declineToQueueAnAfter(game, event, player);
     }
 
     @ButtonHandler("fowCreateChannelFor_")

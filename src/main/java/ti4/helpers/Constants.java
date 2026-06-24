@@ -1063,6 +1063,7 @@ public final class Constants {
     public static final String INCLUDE_OPTIONS = "include_options";
     public static final String CARDS_INFO = "cards_info";
     public static final String FRANKEN = "franken";
+    public static final String FRANKEN2 = "franken2";
     public static final String FRANKENDRAZ = "frankendraz";
     public static final String SHOW_GAME_AS_PLAYER = "show_game_as";
     public static final String CHECK_PRIVATE_COMMUNICATIONS = "check_private_communications";
@@ -1277,6 +1278,7 @@ public final class Constants {
     public static final String STELLAR_ATOMICS_MODE = "stellar_atomics_mode";
     public static final String NO_SWAP_MODE = "no_swap_mode";
     public static final String VEILED_HEART_MODE = "veiled_heart_mode";
+    public static final String LORE_MODE = "lore_mode";
     public static final String LIMITED_WHISPERS_MODE = "limited_whispers_mode";
     public static final String WHISPERS_ENABLED = "whispers_enabled";
     public static final String WHISPERS_DISABLED = "whispers_disabled";
@@ -1577,6 +1579,7 @@ public final class Constants {
     public static final String COEXIST = "coexist";
 
     public static final String TWILIGHT_KART = "twilight_kart";
+    public static final String TWILIGHT_DS = "twilight_ds";
     public static final String ABILITY_DECK_ID = "ability_deck_id";
     public static final String GENOME_DECK_ID = "genome_deck_id";
     public static final String PARADIGM_DECK_ID = "paradigm_deck_id";

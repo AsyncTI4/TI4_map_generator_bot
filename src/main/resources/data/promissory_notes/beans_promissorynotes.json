@@ -40,7 +40,9 @@
         "name": "Advanced Structural Engineering",
         "faction": "ta",
         "color": "",
-        "playArea": false,
+        "playArea": true,
+        "playImmediately": false,
+        "attachment": "ase",
         "source": "beans",
         "text": "ACTION: Attach this card to a non-home planet you control. This planet gains PRODUCTION as if it were a unit equal to its resource value. PRODUCTION X."
     },
