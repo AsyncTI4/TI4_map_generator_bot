@@ -86,7 +86,6 @@ import ti4.service.milty.MiltyDraftTile;
 import ti4.service.statistics.PlayerStatTypes;
 import ti4.service.statistics.game.GameStatTypes;
 import ti4.settings.GlobalSettings;
-import ti4.spring.service.statistics.matchmaking.MatchmakingMedal;
 
 @UtilityClass
 class AutoCompleteProvider {
@@ -488,18 +487,6 @@ class AutoCompleteProvider {
                         "tedemo",
                         "noswap");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
-                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            case GameStatisticsFilterer.MMR_BRACKET_FILTER -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Arrays.stream(MatchmakingMedal.values())
-                        .flatMap(medal -> Stream.of(
-                                ">= " + medal.getAutoCompleteName(),
-                                "== " + medal.getAutoCompleteName(),
-                                "<= " + medal.getAutoCompleteName()))
-                        .filter(option -> option.toLowerCase().contains(enteredValue.toLowerCase()))
-                        .map(option -> new Command.Choice(option, option))
-                        .toList();
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case Constants.DECK_NAME -> {

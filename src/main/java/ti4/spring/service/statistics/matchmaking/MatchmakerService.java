@@ -17,8 +17,8 @@ import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -649,7 +649,7 @@ public class MatchmakerService {
                     + CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL + ".");
             return;
         }
-        IThreadContainer threadContainer = forums.getFirst();
+        ForumChannel forum = forums.getFirst();
 
         for (MatchedGame game : gamesToCreate) {
             List<MatchmakingQueueMember> queueMembers = game.members();
@@ -662,10 +662,12 @@ public class MatchmakerService {
             String gameFunName = CreateGameService.autoGenerateGameName();
             String threadTitle = "Matchmaker Game: " + gameFunName.replace(":", "");
             String setupMessage = game.describeSetup();
-            threadContainer.createThreadChannel(threadTitle).queue(thread -> {
-                MessageHelper.sendMessageToChannel(thread, setupMessage);
-                CreateGameLaunchPostService.postLaunchButtons(thread, members, gameFunName);
-            });
+            // Forum channels require an initial message payload, so the setup text becomes the post body.
+            forum.createForumPost(threadTitle, MessageCreateData.fromContent(setupMessage))
+                    .queue(
+                            forumPost -> CreateGameLaunchPostService.postLaunchButtons(
+                                    forumPost.getThreadChannel(), members, gameFunName),
+                            BotLogger::catchRestError);
         }
     }
 
