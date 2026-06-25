@@ -38,6 +38,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaUnitButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -1022,6 +1023,11 @@ public class CombatRollService {
                     && player.hasTech("baconcg")
                     && game.getPlayedSCs().containsAll(opponent.getSCs())) {
                 modifierToHit += 1;
+            }
+            if (rollType == CombatRollType.combatround
+                    && "onyxxa_mech".equalsIgnoreCase(unitModel.getId())
+                    && unitHolder != null) {
+                modifierToHit += OnyxxaUnitButtonHandler.getObeliskCombatModifier(player, unitHolder);
             }
             int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player);
             if (rollType == CombatRollType.combatround) {

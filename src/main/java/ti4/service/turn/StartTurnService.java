@@ -465,9 +465,7 @@ public class StartTurnService {
         boolean hadAnyUnplayedSCs = false;
 
         if (doneActionThisTurn
-                && (player.hasTech("fl")
-                        || !game.getStoredValue("tyrisHeroRound" + game.getRound() + "_" + player.getFaction())
-                                .isEmpty())) {
+                && (player.hasTech("fl") || TyrisHeroButtonHandler.isHeroActiveThisRound(game, player))) {
             confirmed2ndAction = true;
         }
         if (!doneActionThisTurn || confirmed2ndAction) {
