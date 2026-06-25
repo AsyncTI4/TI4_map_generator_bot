@@ -164,7 +164,7 @@ class MatchmakingButtonHandler {
                 RESTRICTIONS_ID,
                 groupRestrictionOptions(event, groupMemberIds),
                 userSettings.getMatchmakingRestrictions(),
-                DEFAULT_RESTRICTION_OPTIONS,
+                userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
                 !REQUIRE_SELECTION);
 
         return Modal.create(QUEUE_FOR_GAME_MODAL_ID, "Queue for Game")
