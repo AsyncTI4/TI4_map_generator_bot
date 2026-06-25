@@ -1096,6 +1096,16 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("hostages".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveHostages", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("mobilization".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveMobilization", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("alliance_rider".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.factionButtonChecker() + "allianceRiderRandomAlly", "Random Ally"));

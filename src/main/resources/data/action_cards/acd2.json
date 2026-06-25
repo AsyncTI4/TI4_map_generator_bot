@@ -502,6 +502,7 @@
     {
         "alias": "mobilization1",
         "name": "Mobilization",
+        "automationID": "mobilization",
         "phase": "Action",
         "window": "At the start of your turn",
         "text": "Produce up to 4 units in a system that contains 1 of your command tokens and no other players' units.",
@@ -511,6 +512,7 @@
     {
         "alias": "mobilization2",
         "name": "Mobilization",
+        "automationID": "mobilization",
         "phase": "Action",
         "window": "At the start of your turn",
         "text": "Produce up to 4 units in a system that contains 1 of your command tokens and no other players' units.",
@@ -520,6 +522,7 @@
     {
         "alias": "mobilization3",
         "name": "Mobilization",
+        "automationID": "mobilization",
         "phase": "Action",
         "window": "At the start of your turn",
         "text": "Produce up to 4 units in a system that contains 1 of your command tokens and no other players' units.",
@@ -529,6 +532,7 @@
     {
         "alias": "mobilization4",
         "name": "Mobilization",
+        "automationID": "mobilization",
         "phase": "Action",
         "window": "At the start of your turn",
         "text": "Produce up to 4 units in a system that contains 1 of your command tokens and no other players' units.",
