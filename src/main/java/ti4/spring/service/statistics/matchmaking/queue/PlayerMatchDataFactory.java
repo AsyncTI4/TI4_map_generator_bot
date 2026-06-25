@@ -1,6 +1,6 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
-import java.math.BigDecimal;
+import de.gesundkrank.jskills.Rating;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -27,13 +27,14 @@ class PlayerMatchDataFactory {
     private static final int NUMBER_OF_ACTIVE_HOUR_BUCKETS = 6;
     private static final int ACTIVE_HOUR_BUCKET_SIZE = 4;
     private static final int ACTIVE_HOUR_BUCKET_MATCH_THRESHOLD = 3;
+    private static final Rating DEFAULT_NEW_PLAYER_RATING = new Rating(25.0, 8.333);
 
     static Map<MatchmakingQueueMember, PlayerMatchmakingData> buildForParties(List<QueuedParty> parties) {
         Set<String> userIds = parties.stream()
                 .flatMap(party -> party.members().stream())
                 .map(MatchmakingQueueMember::getUserId)
                 .collect(Collectors.toSet());
-        Map<String, BigDecimal> ratings = MatchmakingRatingEventService.get().getPlayerRatings(userIds);
+        Map<String, Rating> ratings = MatchmakingRatingEventService.get().getPlayerRatings(userIds);
         Guild guild = JdaService.guildPrimary;
         Instant now = Instant.now();
 
@@ -54,7 +55,7 @@ class PlayerMatchDataFactory {
     }
 
     static Map<String, PlayerMatchmakingData> buildForUsers(List<String> userIds, List<String> leaderRestrictions) {
-        Map<String, BigDecimal> ratings = MatchmakingRatingEventService.get().getPlayerRatings(new HashSet<>(userIds));
+        Map<String, Rating> ratings = MatchmakingRatingEventService.get().getPlayerRatings(new HashSet<>(userIds));
         Guild guild = JdaService.guildPrimary;
 
         Map<String, PlayerMatchmakingData> dataById = new HashMap<>();
@@ -67,7 +68,7 @@ class PlayerMatchDataFactory {
     private static PlayerMatchmakingData build(
             String userId,
             List<String> leaderRestrictions,
-            Map<String, BigDecimal> ratings,
+            Map<String, Rating> ratings,
             Guild guild,
             boolean halfQueueTimePassed) {
         UserSettings ownSettings = UserSettingsManager.get(userId);
@@ -75,7 +76,7 @@ class PlayerMatchDataFactory {
                 userId,
                 leaderRestrictions,
                 ownSettings.getMatchmakingAvoidList(),
-                ratings.getOrDefault(userId, MatchmakingCompatibilityService.NEW_PLAYER_MATCHMAKING_RATING),
+                ratings.getOrDefault(userId, DEFAULT_NEW_PLAYER_RATING),
                 computeActiveHourBuckets(ownSettings.getActiveHoursAsIntegers()),
                 completedGames(userId),
                 roleNames(guild, userId),

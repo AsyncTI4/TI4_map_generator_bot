@@ -2,7 +2,7 @@ package ti4.spring.service.statistics.matchmaking.queue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.math.BigDecimal;
+import de.gesundkrank.jskills.Rating;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,17 +87,18 @@ class MatchmakingGrouperTest {
     void halfQueueTimePassedRelaxesSkillMatching() {
         List<String> skill = List.of(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION);
 
-        // Ratings 20/23/23: the 20-vs-23 gap exceeds the strict tolerance (2) but is within the relaxed one (4).
+        // Ratings 20/24.5/24.5: the 20-vs-24.5 skill gap gives a 1v1 match quality (~0.73) that fails the
+        // strict 0.80 gate but clears the relaxed 0.65 gate, so the trio only forms once constraints relax.
         addSolo("a", new Data("a", skill, 20, false), List.of("3"));
-        addSolo("b", new Data("b", skill, 23, false), List.of("3"));
-        addSolo("c", new Data("c", skill, 23, false), List.of("3"));
+        addSolo("b", new Data("b", skill, 24.5, false), List.of("3"));
+        addSolo("c", new Data("c", skill, 24.5, false), List.of("3"));
         assertThat(MatchmakingGrouper.formGames(parties, matchData)).isEmpty();
 
         parties.clear();
         matchData.clear();
         addSolo("a", new Data("a", skill, 20, true), List.of("3"));
-        addSolo("b", new Data("b", skill, 23, true), List.of("3"));
-        addSolo("c", new Data("c", skill, 23, true), List.of("3"));
+        addSolo("b", new Data("b", skill, 24.5, true), List.of("3"));
+        addSolo("c", new Data("c", skill, 24.5, true), List.of("3"));
         assertThat(MatchmakingGrouper.formGames(parties, matchData)).hasSize(1);
     }
 
@@ -172,7 +173,7 @@ class MatchmakingGrouperTest {
                     userId,
                     restrictions,
                     avoidList,
-                    BigDecimal.valueOf(rating),
+                    new Rating(rating, 1.5),
                     Set.of(0, 1, 2, 3, 4, 5),
                     5,
                     Set.of(),

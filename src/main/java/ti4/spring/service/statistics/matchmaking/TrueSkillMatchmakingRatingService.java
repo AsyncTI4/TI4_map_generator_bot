@@ -78,7 +78,8 @@ class TrueSkillMatchmakingRatingService {
                             .multiply(ONE_HUNDRED);
                     BigDecimal calibrationPercent = calculatedPercent.min(ONE_HUNDRED);
                     double rawRating = useConservativeRating ? rating.getConservativeRating() : rating.getMean();
-                    return new MatchmakingRating(userId, username, BigDecimal.valueOf(rawRating), calibrationPercent);
+                    return new MatchmakingRating(
+                            userId, username, BigDecimal.valueOf(rawRating), standardDeviation, calibrationPercent);
                 })
                 .sorted(Comparator.comparing(MatchmakingRating::rating).reversed())
                 .toList();

@@ -1,6 +1,10 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
-import java.math.BigDecimal;
+import de.gesundkrank.jskills.GameInfo;
+import de.gesundkrank.jskills.ITeam;
+import de.gesundkrank.jskills.Player;
+import de.gesundkrank.jskills.Team;
+import de.gesundkrank.jskills.trueskill.FactorGraphTrueSkillCalculator;
 import java.util.List;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -10,10 +14,10 @@ import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 class MatchmakingCompatibilityService {
 
     private static final long ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT = 3;
-    private static final double SIMILAR_SKILL_DIFFERENCE_THRESHOLD = 2.0;
-    private static final double RELAXED_SIMILAR_SKILL_DIFFERENCE_THRESHOLD = 5.0;
+    private static final double MIN_MATCH_QUALITY = 0.70;
+    private static final double RELAXED_MIN_MATCH_QUALITY = 0.5;
     private static final int NEW_PLAYER_GAME_THRESHOLD = 3;
-    static final BigDecimal NEW_PLAYER_MATCHMAKING_RATING = BigDecimal.valueOf(20.0);
+    private static final GameInfo GAME_INFO = GameInfo.getDefaultGameInfo();
 
     static boolean areIncompatible(PlayerMatchmakingData a, PlayerMatchmakingData b, boolean relaxed) {
         if (a.avoidList().contains(b.userId()) || b.avoidList().contains(a.userId())) {
@@ -53,11 +57,13 @@ class MatchmakingCompatibilityService {
 
         if (MatchmakingOptions.wantsSimilarPlayerSkill(aRestrictions)
                 || MatchmakingOptions.wantsSimilarPlayerSkill(bRestrictions)) {
-            BigDecimal aRating = aIsNew ? NEW_PLAYER_MATCHMAKING_RATING : a.rating();
-            BigDecimal bRating = bIsNew ? NEW_PLAYER_MATCHMAKING_RATING : b.rating();
-            double tolerance =
-                    relaxed ? RELAXED_SIMILAR_SKILL_DIFFERENCE_THRESHOLD : SIMILAR_SKILL_DIFFERENCE_THRESHOLD;
-            return aRating.subtract(bRating).abs().compareTo(BigDecimal.valueOf(tolerance)) > 0;
+
+            List<ITeam> teams = List.of(
+                    new Team(new Player<>(a.userId()), a.rating()), new Team(new Player<>(b.userId()), b.rating()));
+            double matchQuality = new FactorGraphTrueSkillCalculator().calculateMatchQuality(GAME_INFO, teams);
+
+            double minQuality = relaxed ? RELAXED_MIN_MATCH_QUALITY : MIN_MATCH_QUALITY;
+            return matchQuality < minQuality;
         }
 
         return false;

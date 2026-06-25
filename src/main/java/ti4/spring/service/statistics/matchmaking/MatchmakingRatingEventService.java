@@ -2,6 +2,7 @@ package ti4.spring.service.statistics.matchmaking;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import de.gesundkrank.jskills.Rating;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.List;
@@ -47,8 +48,12 @@ public class MatchmakingRatingEventService {
         sendMessage(event, playerRatings, showRating, conservativeRating);
     }
 
-    public Map<String, BigDecimal> getPlayerRatings(Set<String> userIds) {
-        return filterRatingsByUserIds(getCachedDefaultPlayerRatings(), userIds);
+    public Map<String, Rating> getPlayerRatings(Set<String> userIds) {
+        return getCachedDefaultPlayerRatings().stream()
+                .filter(mr -> userIds.contains(mr.userId()))
+                .collect(Collectors.toMap(
+                        MatchmakingRating::userId,
+                        mr -> new Rating(mr.rating().doubleValue(), mr.sigma().doubleValue())));
     }
 
     public Map<String, BigDecimal> getConservativePlayerRatings(Set<String> userIds) {

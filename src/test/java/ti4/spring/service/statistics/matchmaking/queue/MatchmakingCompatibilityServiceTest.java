@@ -2,7 +2,7 @@ package ti4.spring.service.statistics.matchmaking.queue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.math.BigDecimal;
+import de.gesundkrank.jskills.Rating;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -95,11 +95,13 @@ class MatchmakingCompatibilityServiceTest {
 
     @Test
     void similarSkillToleranceWidensWhenRelaxed() {
+        // A 4.5-point skill gap (between confident ratings) yields a 1v1 match quality of ~0.73,
+        // which fails the strict 0.80 gate but clears the relaxed 0.65 gate.
         PlayerMatchmakingData a = player("a")
                 .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
                 .rating(20)
                 .build();
-        PlayerMatchmakingData b = player("b").rating(23).build();
+        PlayerMatchmakingData b = player("b").rating(24.5).build();
 
         assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, false)).isTrue();
         assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, true)).isFalse();
@@ -124,10 +126,13 @@ class MatchmakingCompatibilityServiceTest {
 
     /** A small fluent builder so each test only states the attributes it cares about. */
     private static final class Builder {
+        // Confident sigma so 1v1 match quality is driven by the mean skill gap, as for calibrated players.
+        private static final double CONFIDENT_SIGMA = 1.5;
+
         private final String userId;
         private List<String> restrictions = List.of();
         private List<String> avoidList = List.of();
-        private BigDecimal rating = BigDecimal.valueOf(25);
+        private Rating rating = new Rating(25, CONFIDENT_SIGMA);
         private Set<Integer> activeHourBuckets = ALL_BUCKETS;
         private int completedGames = 5;
         private Set<String> roleNames = Set.of();
@@ -147,7 +152,7 @@ class MatchmakingCompatibilityServiceTest {
         }
 
         private Builder rating(double value) {
-            rating = BigDecimal.valueOf(value);
+            rating = new Rating(value, CONFIDENT_SIGMA);
             return this;
         }
 
