@@ -120,7 +120,7 @@ class MatchmakingGrouper {
             for (MatchmakingQueueMember existing : group) {
                 PlayerMatchData a = matchData.get(existing);
                 PlayerMatchData b = matchData.get(newMember);
-                boolean relaxed = a.halfQueueTimePassed() || b.halfQueueTimePassed();
+                boolean relaxed = a.relaxConstraints() || b.relaxConstraints();
                 if (MatchmakingCompatibilityService.areIncompatible(a, b, relaxed)) {
                     return false;
                 }
