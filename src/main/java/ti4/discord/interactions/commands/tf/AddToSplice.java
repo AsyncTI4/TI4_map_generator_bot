@@ -67,10 +67,15 @@ class AddToSplice extends GameStateSubcommand {
                             "savedParticipants", game.getStoredValue("savedParticipants") + "_" + p.getFaction());
                 }
             }
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "The splice has the following order of participants:\n"
-                            + ButtonHelperTwilightsFall.getSpliceOrderString(participants));
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), "The splice participant order has been updated.");
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        "The splice has the following order of participants:\n"
+                                + ButtonHelperTwilightsFall.getSpliceOrderString(participants));
+            }
         }
         ButtonHelperTwilightsFall.sendPlayerSpliceOptions(game, participants.getFirst());
     }

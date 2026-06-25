@@ -8,13 +8,14 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
 import ti4.service.actioncard.ForceGiveActionCardService;
 
 @UtilityClass
-class ArvaxiAbilityButtonHandler {
+public class ArvaxiAbilityButtonHandler {
 
     @ButtonHandler("underhandedManeuverPickNeighbor")
     public static void underhandedManeuverPickNeighbor(ButtonInteractionEvent event, Player player, Game game) {
@@ -51,5 +52,17 @@ class ArvaxiAbilityButtonHandler {
                 player.getCorrectChannel(),
                 "Sent " + target.getColor() + " the buttons for resolving Underhanded Maneuver.");
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static void onExplorePlanet(Player player, Game game, String planetName) {
+        Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+        if (planet != null && planet.getUnitCount(player.getColorID()) >= 3) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", please draw an action card because of **Ultimate Authority**.",
+                    buttons);
+        }
     }
 }

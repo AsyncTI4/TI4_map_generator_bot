@@ -26,9 +26,9 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.SelectionHandler;
+import ti4.discord.utility.DiscordRoleUtility;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.service.game.CreateGameService;
 
 @UtilityClass
 public class BothelperDashboardService {
@@ -49,7 +49,7 @@ public class BothelperDashboardService {
 
         StringBuilder serverBlocks = new StringBuilder();
         for (Guild guild : JdaService.serversToCreateNewGamesOn) {
-            Role bothelperRole = CreateGameService.getRole(BOTHELPER_ROLE_NAME, guild);
+            Role bothelperRole = DiscordRoleUtility.getRole(BOTHELPER_ROLE_NAME, guild);
             if (bothelperRole == null) continue;
             List<Member> members = guild.getMembersWithRoles(bothelperRole);
             serverBlocks
@@ -154,7 +154,7 @@ public class BothelperDashboardService {
         List<String> preselected = new ArrayList<>();
         for (Guild guild : servers.stream().limit(MAX_SELECT_OPTIONS).toList()) {
             SelectOption option = SelectOption.of(guild.getName(), guild.getId());
-            Role bothelperRole = CreateGameService.getRole(BOTHELPER_ROLE_NAME, guild);
+            Role bothelperRole = DiscordRoleUtility.getRole(BOTHELPER_ROLE_NAME, guild);
             if (bothelperRole != null) {
                 Member member = guild.getMember(user);
                 if (member != null && member.getRoles().contains(bothelperRole)) {
@@ -183,7 +183,7 @@ public class BothelperDashboardService {
         List<String> skipped = new ArrayList<>();
 
         for (Guild guild : JdaService.serversToCreateNewGamesOn) {
-            Role bothelperRole = CreateGameService.getRole(BOTHELPER_ROLE_NAME, guild);
+            Role bothelperRole = DiscordRoleUtility.getRole(BOTHELPER_ROLE_NAME, guild);
             if (bothelperRole == null) {
                 skipped.add(guild.getName() + " (no Bothelper role found)");
                 continue;
