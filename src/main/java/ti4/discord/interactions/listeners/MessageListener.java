@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.utility.DiscordRoleUtility;
 import ti4.executors.ExecutionLockManager;
 import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
@@ -34,7 +35,6 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.WhisperService;
-import ti4.service.game.CreateGameService;
 import ti4.service.game.GameNameService;
 import ti4.spring.service.deploy.ActiveLeaseService;
 import ti4.spring.service.messagecache.SavedBotMessagesService;
@@ -210,7 +210,7 @@ class MessageListener extends ListenerAdapter {
         if (!(event.getChannel() instanceof ThreadChannel)) {
             return false;
         }
-        Role lfgRole = CreateGameService.getRole("LFG", event.getGuild()); // 947310962485108816
+        Role lfgRole = DiscordRoleUtility.getRole("LFG", event.getGuild()); // 947310962485108816
         if (lfgRole == null || !message.getContentRaw().contains(lfgRole.getAsMention())) {
             return false;
         }

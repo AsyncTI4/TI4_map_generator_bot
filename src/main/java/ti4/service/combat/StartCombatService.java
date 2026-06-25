@@ -24,6 +24,7 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiCommanderHandler;
@@ -274,6 +275,10 @@ public class StartCombatService {
         game.setStoredValue(combatName2, "");
         combatName2 = "combatRoundTracker" + player2.getFaction() + tile.getPosition() + unitHolderName;
         game.setStoredValue(combatName2, "");
+        if (player1.hasAbility("refraction") || player2.hasAbility("refraction")) {
+            CrystellumAbilityHandler.resetRefractionForCombat(game, player1, tile);
+            CrystellumAbilityHandler.resetRefractionForCombat(game, player2, tile);
+        }
 
         TextChannel textChannel = (TextChannel) channel;
 

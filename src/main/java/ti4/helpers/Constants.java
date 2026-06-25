@@ -1278,6 +1278,7 @@ public final class Constants {
     public static final String STELLAR_ATOMICS_MODE = "stellar_atomics_mode";
     public static final String NO_SWAP_MODE = "no_swap_mode";
     public static final String VEILED_HEART_MODE = "veiled_heart_mode";
+    public static final String LORE_MODE = "lore_mode";
     public static final String LIMITED_WHISPERS_MODE = "limited_whispers_mode";
     public static final String WHISPERS_ENABLED = "whispers_enabled";
     public static final String WHISPERS_DISABLED = "whispers_disabled";

@@ -1276,7 +1276,7 @@ public final class ButtonHelperAgents {
                     p2 = game.getPlayerFromColorOrFaction(posNPlanet);
                 }
                 List<Button> buttons = new ArrayList<>(
-                        ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game, "l1z1x"));
+                        ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(p2, game, "l1z1x"));
                 String message2 = p2.getRepresentationUnfogged() + ", use buttons to resolve " + ssruuClever
                         + "I48S, the L1Z1X" + ssruuSlash + " agent.";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message2, buttons);

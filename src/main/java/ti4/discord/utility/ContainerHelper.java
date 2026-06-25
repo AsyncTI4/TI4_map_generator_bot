@@ -1,4 +1,4 @@
-package ti4.helpers.discord;
+package ti4.discord.utility;
 
 import java.util.ArrayList;
 import java.util.Collections;
