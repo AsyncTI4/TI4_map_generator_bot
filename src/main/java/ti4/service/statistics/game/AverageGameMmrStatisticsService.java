@@ -35,7 +35,7 @@ class AverageGameMmrStatisticsService {
         ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
                 game -> {
-                    List<String> ids = game.getRealPlayers().stream()
+                    List<String> ids = game.getRealAndEliminatedPlayers().stream()
                             .map(Player::getUserID)
                             .toList();
                     if (ids.isEmpty()) {
@@ -47,7 +47,9 @@ class AverageGameMmrStatisticsService {
                 },
                 ExecutionLockType.READ);
 
-        Map<String, BigDecimal> ratings = MatchmakingRatingEventService.get().getPlayerRatings(allUserIds);
+        Map<String, BigDecimal> ratings = MatchmakingRatingEventService.get().getConservativePlayerRatings(allUserIds);
+
+        String runnerUserId = event.getUser().getId();
 
         List<Map.Entry<String, BigDecimal>> gameAverages = new ArrayList<>();
         for (Map.Entry<String, List<String>> entry : gamePlayerIds.entrySet()) {
@@ -73,7 +75,11 @@ class AverageGameMmrStatisticsService {
             if (isNotBlank(customName)) {
                 sb.append(String.format(" `%s`", customName));
             }
-            sb.append(String.format(" (rated %.3f)%n", entry.getValue()));
+            sb.append(String.format(" (rated %.3f)", entry.getValue()));
+            if (gamePlayerIds.get(gameName).contains(runnerUserId)) {
+                sb.append("  👀 **YOU!**");
+            }
+            sb.append(System.lineSeparator());
         }
 
         if (gameAverages.isEmpty()) {
@@ -83,7 +89,10 @@ class AverageGameMmrStatisticsService {
                     .map(Map.Entry::getValue)
                     .reduce(BigDecimal.ZERO, BigDecimal::add)
                     .divide(BigDecimal.valueOf(gameAverages.size()), MathContext.DECIMAL64);
-            sb.append(String.format("%nThe average MMR across these games is `%.3f`%n", overallAverage));
+            // gameAverages is sorted highest-to-lowest, so the last entry is the lowest MMR game.
+            BigDecimal lowestGameMmr = gameAverages.get(gameAverages.size() - 1).getValue();
+            sb.append(String.format("%nThe average MMR across all games is `%.3f`.%n", overallAverage));
+            sb.append(String.format("The lowest MMR game is `%.3f`.%n", lowestGameMmr));
         }
 
         MessageHelper.sendMessageToThread(

@@ -28,9 +28,12 @@ public class MatchmakingRatingEventService {
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
     private static final Duration RATINGS_CACHE_TTL = Duration.ofMinutes(30);
     private static final String RATINGS_CACHE_NAME = "matchmakingDefaultRatingsCache";
+    private static final String CONSERVATIVE_RATINGS_CACHE_NAME = "matchmakingConservativeRatingsCache";
     private static final String RATINGS_CACHE_KEY = "default";
 
-    private final Cache<String, List<MatchmakingRating>> defaultRatingsCache = createRatingsCache();
+    private final Cache<String, List<MatchmakingRating>> defaultRatingsCache = createRatingsCache(RATINGS_CACHE_NAME);
+    private final Cache<String, List<MatchmakingRating>> conservativeRatingsCache =
+            createRatingsCache(CONSERVATIVE_RATINGS_CACHE_NAME);
 
     private final PlayerEntityRepository playerEntityRepository;
 
@@ -45,27 +48,36 @@ public class MatchmakingRatingEventService {
     }
 
     public Map<String, BigDecimal> getPlayerRatings(Set<String> userIds) {
-        return getCachedDefaultPlayerRatings().stream()
+        return filterRatingsByUserIds(getCachedDefaultPlayerRatings(), userIds);
+    }
+
+    public Map<String, BigDecimal> getConservativePlayerRatings(Set<String> userIds) {
+        return filterRatingsByUserIds(getCachedConservativePlayerRatings(), userIds);
+    }
+
+    private static Map<String, BigDecimal> filterRatingsByUserIds(
+            List<MatchmakingRating> ratings, Set<String> userIds) {
+        return ratings.stream()
                 .filter(matchmakingRating -> userIds.contains(matchmakingRating.userId()))
                 .collect(Collectors.toMap(MatchmakingRating::userId, MatchmakingRating::rating));
     }
 
     private List<MatchmakingRating> getCachedDefaultPlayerRatings() {
-        return defaultRatingsCache.get(RATINGS_CACHE_KEY, _ -> getPlayerRatings(false));
+        return defaultRatingsCache.get(RATINGS_CACHE_KEY, _ -> getPlayerRatings(false, false));
     }
 
-    private static Cache<String, List<MatchmakingRating>> createRatingsCache() {
+    private List<MatchmakingRating> getCachedConservativePlayerRatings() {
+        return conservativeRatingsCache.get(RATINGS_CACHE_KEY, _ -> getPlayerRatings(false, true));
+    }
+
+    private static Cache<String, List<MatchmakingRating>> createRatingsCache(String cacheName) {
         Cache<String, List<MatchmakingRating>> cache = Caffeine.newBuilder()
                 .maximumSize(1)
                 .expireAfterWrite(RATINGS_CACHE_TTL)
                 .recordStats()
                 .build();
-        CacheManager.registerCache(RATINGS_CACHE_NAME, cache);
+        CacheManager.registerCache(cacheName, cache);
         return cache;
-    }
-
-    private List<MatchmakingRating> getPlayerRatings(boolean onlyTiglGames) {
-        return getPlayerRatings(onlyTiglGames, false);
     }
 
     private List<MatchmakingRating> getPlayerRatings(boolean onlyTiglGames, boolean useConservativeRating) {
