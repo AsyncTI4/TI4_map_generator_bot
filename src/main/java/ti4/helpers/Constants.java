@@ -516,6 +516,7 @@ public final class Constants {
     public static final String REMOVE_SO_FROM_GAME = "remove_so_from_game";
     public static final String REMOVE_PO_FROM_GAME = "remove_po_from_game";
     public static final String REMOVE_SC_FROM_GAME = "remove_sc_from_game";
+    public static final String REMOVE_RELIC_FROM_GAME = "remove_relic_from_game";
 
     public static final String SET_PO_DECK = "set_po_deck";
     public static final String SET_PO_DECK_STAGE1_LIST = "stage1_ids";
