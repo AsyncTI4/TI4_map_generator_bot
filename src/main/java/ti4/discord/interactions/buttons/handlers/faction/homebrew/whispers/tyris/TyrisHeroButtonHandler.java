@@ -13,6 +13,11 @@ import ti4.service.emoji.FactionEmojis;
 @UtilityClass
 public class TyrisHeroButtonHandler {
 
+    public static boolean isHeroActiveThisRound(Game game, Player player) {
+        return !game.getStoredValue("tyrisHeroRound" + game.getRound() + "_" + player.getFaction())
+                .isEmpty();
+    }
+
     public static void offerHeroAtStartOfTurn(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(

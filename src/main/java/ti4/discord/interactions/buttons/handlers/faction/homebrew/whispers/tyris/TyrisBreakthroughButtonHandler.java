@@ -142,7 +142,7 @@ public class TyrisBreakthroughButtonHandler {
             TechnologyModel m = Mapper.getTech(removed);
             String name = m != null ? "_" + m.getName() + "_" : removed;
             MessageHelper.sendMessageToChannel(
-                    p.getCardsInfoThread(),
+                    p.getCorrectChannel(),
                     p.getRepresentation() + "'s " + name
                             + " was removed from _Non-Linear Time Progression_ because a player passed.");
         } else {

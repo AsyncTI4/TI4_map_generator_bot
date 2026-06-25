@@ -29,7 +29,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaUnitButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBreakthroughButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -917,20 +920,12 @@ public class StartCombatService {
                         buttons);
             }
             if ("space".equalsIgnoreCase(type) && player.hasUnexhaustedLeader("kaloraagent")) {
-                buttons = new ArrayList<>();
-                buttons.add(Buttons.gray(
-                        player.factionButtonChecker() + "exhaustAgent_kaloraagent",
-                        "Use Valzor, the Kalora Agent",
-                        FactionEmojis.kalora));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(),
-                        msg
-                                + ", a reminder that at the end of this space combat, you may exhaust the Kalora agent to allow a participating player to gain 1 command token.",
-                        buttons);
+                KaloraButtonHandler.offerKaloraAgentButtons(player, msg);
             }
-            if ("space".equalsIgnoreCase(type)
-                    && (player.getLeaderIDs().contains("arvaxicommander")
-                            || game.playerHasLeaderUnlockedOrAlliance(player, "arvaxicommander"))) {
+            if ("space".equalsIgnoreCase(type) && ButtonHelper.doesPlayerHaveFSHere("onyxxa_flagship", player, tile)) {
+                OnyxxaUnitButtonHandler.offerFlagshipWinButton(player, msg);
+            }
+            if ("space".equalsIgnoreCase(type) && game.playerHasLeaderUnlockedOrAlliance(player, "arvaxicommander")) {
                 ArvaxiCommanderHandler.sendCombatButtons(player, otherPlayer, game, msg);
             }
             if (player.hasTechReady("dskortg") && CommandCounterHelper.hasCC(player, tile)) {
@@ -953,16 +948,7 @@ public class StartCombatService {
             if (player.hasUnlockedBreakthrough("zephyrionbt")
                     && "space".equalsIgnoreCase(type)
                     && ButtonHelper.isTileInOrAdjacentToPlayersHome(game, tile, otherPlayer, player)) {
-                buttons = new ArrayList<>();
-                buttons.add(Buttons.gray(
-                        player.factionButtonChecker() + "zephyrionbtRes_" + otherPlayer.getFaction(),
-                        "Resolve Subdue Chancellor (Upon Win)",
-                        FactionEmojis.zephyrion));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(),
-                        msg
-                                + ", a reminder that if you win this space combat, you may resolve _Subdue Chancellor_ to draw an unused agent.",
-                        buttons);
+                ZephyrionBreakthroughButtonHandler.offerBtCombatButtons(player, otherPlayer, game, msg);
             }
             if (player.hasAbility("technological_singularity")
                     && !otherPlayer.isDummy()
