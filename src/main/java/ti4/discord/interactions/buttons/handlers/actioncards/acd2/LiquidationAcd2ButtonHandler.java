@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
-import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
@@ -16,9 +15,9 @@ import ti4.message.MessageHelper;
 class LiquidationAcd2ButtonHandler {
 
     @ButtonHandler("resolveLiquidation")
-    public static void resolveLiquidation(Player player, Game game, ButtonInteractionEvent event) {
+    public static void resolveLiquidation(Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        for (int reduce = 1; reduce <= 4; reduce++) {
+        for (int reduce = 1; reduce <= 3; reduce++) {
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + "liquidationReduce_" + reduce,
                     "Reduce PRODUCTION by " + reduce + " (cost -" + (reduce * 2) + ")"));
@@ -33,8 +32,7 @@ class LiquidationAcd2ButtonHandler {
     }
 
     @ButtonHandler("liquidationReduce_")
-    public static void resolveLiquidationReduce(
-            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolveLiquidationReduce(Player player, ButtonInteractionEvent event, String buttonID) {
         int reduce;
         try {
             reduce = Integer.parseInt(buttonID.replace("liquidationReduce_", ""));

@@ -11,7 +11,7 @@ class MatchmakingCompatibilityService {
 
     private static final long ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT = 3;
     private static final double SIMILAR_SKILL_DIFFERENCE_THRESHOLD = 2.0;
-    private static final double RELAXED_SIMILAR_SKILL_DIFFERENCE_THRESHOLD = 4.0;
+    private static final double RELAXED_SIMILAR_SKILL_DIFFERENCE_THRESHOLD = 5.0;
     private static final int NEW_PLAYER_GAME_THRESHOLD = 3;
     static final BigDecimal NEW_PLAYER_MATCHMAKING_RATING = BigDecimal.valueOf(20.0);
 
