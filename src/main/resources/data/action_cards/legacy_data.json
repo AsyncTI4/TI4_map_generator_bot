@@ -1666,15 +1666,6 @@
         "source": "deprecated"
     },
     {
-        "alias": "survey",
-        "name": "Survey",
-        "phase": "Action",
-        "window": "ACTION",
-        "text": "Explore 1 planet you control; when you would draw from the exploration deck, you may choose and resolve a card from its discard pile instead.",
-        "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
-        "source": "deprecated"
-    },
-    {
         "alias": "relay_assembly",
         "name": "Relay Assembly",
         "phase": "Action",
@@ -1703,39 +1694,72 @@
         "source": "deprecated"
     },
     {
-        "alias": "mobilization1",
-        "name": "Mobilization",
-        "phase": "Any",
-        "window": "After you produce a unit",
-        "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
-        "flavorText": "The forges of Umbat's hearthworld never cooled. Ore fed into flame, flame into steel, steel into the teeth of a war that would not wait.",
+        "alias": "survey1",
+        "name": "Survey",
+        "phase": "Action",
+        "window": "At the end of your turn",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
+        "automationID": "survey",
+        "flavorText": "As Tai announced that the expedition would continue despite safety concerns, a cadet gave an audible groan—followed by a yelp as Dart grabbed him by his Naaz. \"Any more backtalk from you and you'll get a clout in the ear!\"",
         "source": "deprecated"
     },
     {
-        "alias": "mobilization2",
-        "name": "Mobilization",
-        "phase": "Any",
-        "window": "After you produce a unit",
-        "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
-        "flavorText": "From Umbat's hearthworld to distant suns, the shadow of his armada lengthened—stoked by their fury.",
+        "alias": "survey2",
+        "name": "Survey",
+        "phase": "Action",
+        "window": "At the end of your turn",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
+        "automationID": "survey",
+        "flavorText": "One of the cadets nearly fell over as they crested the lip of the ancient crater, revealing three massive, entangled ships jutting from the earth below. Tai gave a self-satisfied hmph.",
         "source": "deprecated"
     },
     {
-        "alias": "mobilization3",
-        "name": "Mobilization",
-        "phase": "Any",
-        "window": "After you produce a unit",
-        "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
-        "flavorText": "Umbat's engineers broke into celebration as he called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
+        "alias": "survey3",
+        "name": "Survey",
+        "phase": "Action",
+        "window": "At the end of your turn",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
+        "automationID": "survey",
+        "flavorText": "\"Careful!\" Tai cried as he heard what was undoubtedly a priceless relic shatter in the room next door. \"Who trained these fools?\" he grumbled. Dart didn't have the heart to remind him that they had.",
         "source": "deprecated"
     },
     {
-        "alias": "mobilization4",
-        "name": "Mobilization",
-        "phase": "Any",
-        "window": "After you produce a unit",
-        "text": "Produce up to 2 units of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced units by 2.",
-        "flavorText": "The warnings came too late for the Hylar. When an investigator from the Universities arrived weeks later to survey the carnage, naught was left but smoldering craters. The Gashlai's message was clear.",
+        "alias": "survey4",
+        "name": "Survey",
+        "phase": "Action",
+        "window": "At the end of your turn",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
+        "automationID": "survey",
+        "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—as Dart ran.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "final_mission",
+        "name": "Final Mission",
+        "phase": "Action",
+        "window": "After 1 of your non-fighter ships is destroyed",
+        "text": "Choose 1 planet in that unit's system. Destroy 1 ground force and 1 PDS on that planet.",
+        "notes": "You are not required to destroy both to play this card.",
+        "flavorText": "The Exotrireme became a guided missile in its death-throes, transforming the Sol base into a burning crater of steel and death.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "void_path",
+        "name": "Void Path",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "Choose 1 system that does not contain planets. You treat that system as if it contains an alpha, beta, and gamma wormhole during this tactical action.",
+        "flavorText": "\"As we lack the form of your world, you will lack that of ours,\" Taivra said without tone. \"Let us hope you are better prepared for your first pilgrimage than we were for ours.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "swindle",
+        "name": "Swindle",
+        "phase": "Action",
+        "window": "When another player gains 2 or more trade goods",
+        "text": "Take 2 of those trade goods and gain 1 trade good.",
+        "notes": "Gaining trade goods includes any time your number of trade goods go up, other than converting your own commodities. This includes from transactions.",
+        "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
         "source": "deprecated"
     }
 ]
