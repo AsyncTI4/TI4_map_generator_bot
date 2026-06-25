@@ -11,6 +11,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
@@ -96,6 +97,9 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("dreamagent")
                 && !DreamButtonHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
             buttons.add(DreamButtonHandler.getDreamAgentCardsInfoButton(player));
+        }
+        if (player.hasUnexhaustedLeader("crystellumagent")) {
+            buttons.add(CrystellumLeadersHandler.getCrystellumAgentButton(player));
         }
         if (player.hasAbility("intrigue")) {
             buttons.add(Buttons.blue("startIntrigueCard", "Pay For Intrigue Card", FactionEmojis.xin));

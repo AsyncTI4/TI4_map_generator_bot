@@ -40,7 +40,7 @@
     "name": "Shardwright Veyla",
     "title": "Fleet Control",
     "abilityWindow": "At the end of a player's turn:",
-    "abilityText": "You may exhaust this card to allow that player to place a number of fighters from their reinforcements in the active system up to the number of non-fighter ships in that system. If that player was another player, gain trade goods equal to half of the amount of fighters placed rounded down.",
+    "abilityText": "You may exhaust this card to allow that player to place a number of fighters from their reinforcements in the active system up to the number of non-fighter ships in that system. If that player was another player, gain trade goods equal to the amount of fighters placed.",
     "unlockCondition": "Always Unlocked",
     "source": "beans"
   },
