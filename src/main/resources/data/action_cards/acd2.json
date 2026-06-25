@@ -316,7 +316,7 @@
         "name": "Espionage",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Look at another player's action cards and choose 1 of those cards. That player must give you that card or 1 random promissory note from their hand.",
+        "text": "Choose 1 player that has 1 or more action cards. That player may allow you to look at their action cards and take 1 of those cards. If they do not, they must give you 1 random promissory note from their hand.",
         "automationID": "espionage",
         "flavorText": "The informant continued, \"And get this, apparently the councilor is a ghostwriter for a series about dating Dirzuga!\" Connor yawned, \"Gesundheit.\"",
         "source": "action_deck_2"

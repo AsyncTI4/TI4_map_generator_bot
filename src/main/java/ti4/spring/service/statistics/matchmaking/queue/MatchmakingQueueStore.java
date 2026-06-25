@@ -93,6 +93,13 @@ public class MatchmakingQueueStore {
         partyRepository.deleteAllById(partyIds);
     }
 
+    long clearAll() {
+        long clearedParties = partyRepository.count();
+        memberRepository.deleteAll();
+        partyRepository.deleteAll();
+        return clearedParties;
+    }
+
     List<QueuedParty> loadQueuedParties() {
         List<MatchmakingQueueParty> parties = partyRepository.findAllByQueuedTrueOrderByQueuedAtAsc();
         if (parties.isEmpty()) return List.of();
