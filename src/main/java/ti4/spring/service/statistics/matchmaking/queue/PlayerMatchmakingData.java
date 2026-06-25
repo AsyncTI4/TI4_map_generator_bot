@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
-record PlayerMatchData(
+record PlayerMatchmakingData(
         String userId,
         List<String> restrictions,
         List<String> avoidList,

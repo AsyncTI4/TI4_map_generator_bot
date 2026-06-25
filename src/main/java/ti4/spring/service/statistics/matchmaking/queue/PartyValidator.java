@@ -21,7 +21,8 @@ public class PartyValidator {
 
         List<String> available = new ArrayList<>();
         for (String restriction : restrictions) {
-            Map<String, PlayerMatchData> dataById = PlayerMatchDataFactory.buildForUsers(members, List.of(restriction));
+            Map<String, PlayerMatchmakingData> dataById =
+                    PlayerMatchDataFactory.buildForUsers(members, List.of(restriction));
             if (groupInternallyCompatible(members, dataById)) {
                 available.add(restriction);
             }
@@ -29,7 +30,8 @@ public class PartyValidator {
         return available;
     }
 
-    private static boolean groupInternallyCompatible(List<String> members, Map<String, PlayerMatchData> dataById) {
+    private static boolean groupInternallyCompatible(
+            List<String> members, Map<String, PlayerMatchmakingData> dataById) {
         for (int i = 0; i < members.size(); i++) {
             for (int j = i + 1; j < members.size(); j++) {
                 if (MatchmakingCompatibilityService.areIncompatible(

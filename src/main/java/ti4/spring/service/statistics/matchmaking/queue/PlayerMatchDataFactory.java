@@ -28,7 +28,7 @@ class PlayerMatchDataFactory {
     private static final int ACTIVE_HOUR_BUCKET_SIZE = 4;
     private static final int ACTIVE_HOUR_BUCKET_MATCH_THRESHOLD = 3;
 
-    static Map<MatchmakingQueueMember, PlayerMatchData> buildForParties(List<QueuedParty> parties) {
+    static Map<MatchmakingQueueMember, PlayerMatchmakingData> buildForParties(List<QueuedParty> parties) {
         Set<String> userIds = parties.stream()
                 .flatMap(party -> party.members().stream())
                 .map(MatchmakingQueueMember::getUserId)
@@ -37,7 +37,7 @@ class PlayerMatchDataFactory {
         Guild guild = JdaService.guildPrimary;
         Instant now = Instant.now();
 
-        Map<MatchmakingQueueMember, PlayerMatchData> matchData = new HashMap<>();
+        Map<MatchmakingQueueMember, PlayerMatchmakingData> matchData = new HashMap<>();
         for (QueuedParty party : parties) {
             List<String> leaderRestrictions = party.leaderSettings().getMatchmakingRestrictions();
             boolean relaxConstraints = shouldRelaxConstraints(party, now);
@@ -53,25 +53,25 @@ class PlayerMatchDataFactory {
         return hoursWaited >= 4;
     }
 
-    static Map<String, PlayerMatchData> buildForUsers(List<String> userIds, List<String> leaderRestrictions) {
+    static Map<String, PlayerMatchmakingData> buildForUsers(List<String> userIds, List<String> leaderRestrictions) {
         Map<String, BigDecimal> ratings = MatchmakingRatingEventService.get().getPlayerRatings(new HashSet<>(userIds));
         Guild guild = JdaService.guildPrimary;
 
-        Map<String, PlayerMatchData> dataById = new HashMap<>();
+        Map<String, PlayerMatchmakingData> dataById = new HashMap<>();
         for (String id : userIds) {
             dataById.put(id, build(id, leaderRestrictions, ratings, guild, false));
         }
         return dataById;
     }
 
-    private static PlayerMatchData build(
+    private static PlayerMatchmakingData build(
             String userId,
             List<String> leaderRestrictions,
             Map<String, BigDecimal> ratings,
             Guild guild,
             boolean halfQueueTimePassed) {
         UserSettings ownSettings = UserSettingsManager.get(userId);
-        return new PlayerMatchData(
+        return new PlayerMatchmakingData(
                 userId,
                 leaderRestrictions,
                 ownSettings.getMatchmakingAvoidList(),

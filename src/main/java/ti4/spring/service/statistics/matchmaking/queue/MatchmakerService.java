@@ -91,6 +91,7 @@ public class MatchmakerService {
     @Transactional
     public boolean leaveQueue(String userId) {
         if (DatabasePersistenceGate.isDisabled()) return false;
+
         Optional<MatchmakingQueueMember> memberOpt = queueStore.findMember(userId);
         if (memberOpt.isEmpty()) return false;
 
@@ -109,20 +110,18 @@ public class MatchmakerService {
     public void processQueue() {
         if (DatabasePersistenceGate.isDisabled()) return;
 
-        Instant now = Instant.now();
-        Map<Boolean, List<QueuedParty>> byExpired = queueStore.loadQueuedParties().stream()
-                .collect(Collectors.partitioningBy(party -> isExpired(party, now)));
-        List<QueuedParty> expired = byExpired.get(true);
-        List<QueuedParty> active = byExpired.get(false);
+        Map<Boolean, List<QueuedParty>> queuedPartyByExpired = queueStore.loadQueuedParties().stream()
+                .collect(Collectors.partitioningBy(MatchmakerService::isExpired));
+        List<QueuedParty> expiredParties = queuedPartyByExpired.get(true);
 
-        if (!expired.isEmpty()) {
+        if (!expiredParties.isEmpty()) {
             queueStore.deleteParties(
-                    expired.stream().map(party -> party.party().getId()).toList());
-            MatchmakingNotifier.notifyExpired(expired);
+                    expiredParties.stream().map(party -> party.party().getId()).toList());
+            MatchmakingNotifier.notifyExpired(expiredParties);
         }
 
-        Map<MatchmakingQueueMember, PlayerMatchData> matchData = PlayerMatchDataFactory.buildForParties(active);
-        List<MatchedGame> gamesToCreate = MatchmakingGrouper.formGames(active, matchData);
+        List<QueuedParty> activeParties = queuedPartyByExpired.get(false);
+        List<MatchedGame> gamesToCreate = MatchmakingGrouper.formGames(activeParties);
 
         if (!gamesToCreate.isEmpty()) {
             queueStore.deleteParties(gamesToCreate.stream()
@@ -134,12 +133,13 @@ public class MatchmakerService {
         MatchmakingNotifier.postMatchedGames(gamesToCreate);
     }
 
-    private static boolean isExpired(QueuedParty party, Instant now) {
-        Instant expiry = party.party()
+    private static boolean isExpired(QueuedParty queuedParty) {
+        return queuedParty
+                .party()
                 .getQueuedAt()
                 .plus(Duration.ofHours(
-                        MatchmakingOptions.getHours(party.leaderSettings().getMatchmakingMaxQueueTime())));
-        return expiry.isBefore(now);
+                        MatchmakingOptions.getHours(queuedParty.leaderSettings().getMatchmakingMaxQueueTime())))
+                .isBefore(Instant.now());
     }
 
     public static MatchmakerService get() {

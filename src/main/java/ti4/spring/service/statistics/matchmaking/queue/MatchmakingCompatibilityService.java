@@ -15,7 +15,7 @@ class MatchmakingCompatibilityService {
     private static final int NEW_PLAYER_GAME_THRESHOLD = 3;
     static final BigDecimal NEW_PLAYER_MATCHMAKING_RATING = BigDecimal.valueOf(20.0);
 
-    static boolean areIncompatible(PlayerMatchData a, PlayerMatchData b, boolean relaxed) {
+    static boolean areIncompatible(PlayerMatchmakingData a, PlayerMatchmakingData b, boolean relaxed) {
         if (a.avoidList().contains(b.userId()) || b.avoidList().contains(a.userId())) {
             return true;
         }

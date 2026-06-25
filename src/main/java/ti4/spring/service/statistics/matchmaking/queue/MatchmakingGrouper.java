@@ -1,7 +1,11 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
+import static java.util.function.Predicate.not;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,94 +18,103 @@ import ti4.settings.users.UserSettings;
 @UtilityClass
 class MatchmakingGrouper {
 
-    static List<MatchedGame> formGames(
-            List<QueuedParty> parties, Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
+    static List<MatchedGame> formGames(List<QueuedParty> parties) {
         List<MatchedGame> gamesToCreate = new ArrayList<>();
-        Set<MatchmakingQueueMember> playersAddedToGames = new HashSet<>();
+        Set<QueuedParty> partiesAddedToGames = new HashSet<>();
 
-        for (String playerCountOption : MatchmakingOptions.getPlayerCountOptionsDescending()) {
-            for (String victoryPointGoalOption : MatchmakingOptions.getShuffledVictoryPointOptions()) {
-                for (String expansionOption : MatchmakingOptions.getShuffledExpansionsOptions()) {
-                    for (String paceOption : MatchmakingOptions.getShuffledPaceRestrictions()) {
-                        matchAndCollect(
-                                parties,
-                                playersAddedToGames,
-                                gamesToCreate,
-                                playerCountOption,
-                                victoryPointGoalOption,
-                                expansionOption,
-                                paceOption,
-                                matchData);
-                    }
-                }
-            }
+        Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData =
+                PlayerMatchDataFactory.buildForParties(parties);
+        Map<GameConfig, List<QueuedParty>> partiesByConfig = groupPartiesByConfig(parties);
+
+        List<GameConfig> configsToTry = getRandomizedKeysThenSortByPlayerCount(partiesByConfig);
+        for (GameConfig config : configsToTry) {
+            matchAndCollect(
+                    partiesByConfig.get(config), partiesAddedToGames, gamesToCreate, config, playerMatchmakingData);
         }
         return gamesToCreate;
     }
 
+    private static List<GameConfig> getRandomizedKeysThenSortByPlayerCount(
+            Map<GameConfig, List<QueuedParty>> partiesByConfig) {
+        List<GameConfig> configsToTry = new ArrayList<>(partiesByConfig.keySet());
+        Collections.shuffle(configsToTry);
+        configsToTry.sort(Comparator.comparingInt(GameConfig::playerCountValue).reversed());
+        return configsToTry;
+    }
+
+    private static Map<GameConfig, List<QueuedParty>> groupPartiesByConfig(List<QueuedParty> parties) {
+        Map<GameConfig, List<QueuedParty>> partiesByConfig = new HashMap<>();
+        for (QueuedParty party : parties) {
+            UserSettings settings = party.leaderSettings();
+            for (String playerCountOption : settings.getMatchmakingPlayerCounts()) {
+                if (party.size() > Integer.parseInt(playerCountOption)) continue;
+                for (String victoryPointGoalOption : settings.getMatchmakingVictoryPointGoals()) {
+                    for (String expansionOption : settings.getMatchmakingExpansions()) {
+                        for (String paceOption : settings.getMatchmakingPaces()) {
+                            GameConfig config = new GameConfig(
+                                    playerCountOption, victoryPointGoalOption, expansionOption, paceOption);
+                            partiesByConfig
+                                    .computeIfAbsent(config, _ -> new ArrayList<>())
+                                    .add(party);
+                        }
+                    }
+                }
+            }
+        }
+        return partiesByConfig;
+    }
+
     private static void matchAndCollect(
             List<QueuedParty> parties,
-            Set<MatchmakingQueueMember> playersAddedToGames,
+            Set<QueuedParty> partiesAddedToGames,
             List<MatchedGame> gamesToCreate,
-            String playerCountOption,
-            String victoryPointGoalOption,
-            String expansionOption,
-            String paceOption,
-            Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
-        int playerCount = Integer.parseInt(playerCountOption);
-
-        List<QueuedParty> remaining = parties.stream()
-                .filter(party -> party.members().stream().noneMatch(playersAddedToGames::contains))
-                .filter(party -> party.size() <= playerCount)
-                .filter(party -> {
-                    UserSettings settings = party.leaderSettings();
-                    return settings.getMatchmakingPlayerCounts().contains(playerCountOption)
-                            && settings.getMatchmakingVictoryPointGoals().contains(victoryPointGoalOption)
-                            && settings.getMatchmakingExpansions().contains(expansionOption)
-                            && settings.getMatchmakingPaces().contains(paceOption);
-                })
+            GameConfig config,
+            Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData) {
+        List<QueuedParty> partiesStillSearching = parties.stream()
+                .filter(not(partiesAddedToGames::contains))
                 .sorted(prioritizeByQueuedAtTime())
                 .collect(Collectors.toCollection(ArrayList::new));
-
-        // Greedy grouping: seed from the front (longest queue time, then longest-waiting first),
+        int playerCount = config.playerCountValue();
+        // Greedy grouping: seed from the front (longest queue time),
         // then fill the game with the first compatible parties found.
-        while (totalPlayers(remaining) >= playerCount) {
-            QueuedParty seed = remaining.getFirst();
-            List<MatchmakingQueueMember> group = new ArrayList<>(seed.members());
-            List<QueuedParty> groupParties = new ArrayList<>();
-            groupParties.add(seed);
+        while (totalPlayers(partiesStillSearching) >= playerCount) {
+            QueuedParty seed = partiesStillSearching.getFirst();
+            List<MatchmakingQueueMember> matchMembers = new ArrayList<>(seed.members());
+            List<QueuedParty> matchParties = new ArrayList<>();
+            matchParties.add(seed);
 
-            for (QueuedParty party : remaining) {
-                if (groupParties.contains(party)) continue;
-                if (group.size() == playerCount) break;
-                if (group.size() + party.size() > playerCount) continue;
-                if (partyCompatibleWithGroup(party, group, matchData)) {
-                    group.addAll(party.members());
-                    groupParties.add(party);
+            for (QueuedParty party : partiesStillSearching) {
+                if (matchParties.contains(party)) continue;
+                if (matchMembers.size() == playerCount) break;
+                if (matchMembers.size() + party.size() > playerCount) continue;
+                if (isPartyCompatibleForMatch(party, matchMembers, playerMatchmakingData)) {
+                    matchMembers.addAll(party.members());
+                    matchParties.add(party);
                 }
             }
 
-            if (group.size() == playerCount) {
-                List<String> restrictions = groupParties.stream()
-                        .flatMap(party -> party.leaderSettings().getMatchmakingRestrictions().stream())
-                        .distinct()
-                        .sorted()
-                        .toList();
-                gamesToCreate.add(new MatchedGame(
-                        new ArrayList<>(group),
-                        new ArrayList<>(
-                                groupParties.stream().map(QueuedParty::party).toList()),
-                        playerCountOption,
-                        victoryPointGoalOption,
-                        expansionOption,
-                        paceOption,
-                        restrictions));
-                playersAddedToGames.addAll(group);
-                remaining.removeAll(groupParties);
-            } else {
-                // This party can't be completed into a full game right now; skip its seed.
-                remaining.remove(seed);
+            if (matchMembers.size() != playerCount) {
+                // This party can't find a game of this type right now; skip it.
+                partiesStillSearching.remove(seed);
+                continue;
             }
+
+            List<String> matchRestrictions = matchParties.stream()
+                    .flatMap(party -> party.leaderSettings().getMatchmakingRestrictions().stream())
+                    .distinct()
+                    .sorted()
+                    .toList();
+            gamesToCreate.add(new MatchedGame(
+                    new ArrayList<>(matchMembers),
+                    new ArrayList<>(
+                            matchParties.stream().map(QueuedParty::party).toList()),
+                    config.playerCount(),
+                    config.victoryPointGoal(),
+                    config.expansion(),
+                    config.pace(),
+                    matchRestrictions));
+            partiesAddedToGames.addAll(matchParties);
+            partiesStillSearching.removeAll(matchParties);
         }
     }
 
@@ -112,14 +125,14 @@ class MatchmakingGrouper {
                 .thenComparing(party -> party.party().getQueuedAt());
     }
 
-    private static boolean partyCompatibleWithGroup(
+    private static boolean isPartyCompatibleForMatch(
             QueuedParty party,
             List<MatchmakingQueueMember> group,
-            Map<MatchmakingQueueMember, PlayerMatchData> matchData) {
+            Map<MatchmakingQueueMember, PlayerMatchmakingData> matchData) {
         for (MatchmakingQueueMember newMember : party.members()) {
             for (MatchmakingQueueMember existing : group) {
-                PlayerMatchData a = matchData.get(existing);
-                PlayerMatchData b = matchData.get(newMember);
+                PlayerMatchmakingData a = matchData.get(existing);
+                PlayerMatchmakingData b = matchData.get(newMember);
                 boolean relaxed = a.relaxConstraints() || b.relaxConstraints();
                 if (MatchmakingCompatibilityService.areIncompatible(a, b, relaxed)) {
                     return false;

@@ -19,7 +19,7 @@ class MatchmakingGrouperTest {
     private static final String EXPANSION = MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION;
     private static final String PACE = MatchmakingOptions.SLOWER_PACE_OPTION;
 
-    private final Map<MatchmakingQueueMember, PlayerMatchData> matchData = new HashMap<>();
+    private final Map<MatchmakingQueueMember, PlayerMatchmakingData> matchData = new HashMap<>();
     private final List<QueuedParty> parties = new ArrayList<>();
     private long nextPartyId = 1;
 
@@ -167,8 +167,8 @@ class MatchmakingGrouperTest {
             return this;
         }
 
-        private PlayerMatchData toPlayerMatchData() {
-            return new PlayerMatchData(
+        private PlayerMatchmakingData toPlayerMatchData() {
+            return new PlayerMatchmakingData(
                     userId,
                     restrictions,
                     avoidList,

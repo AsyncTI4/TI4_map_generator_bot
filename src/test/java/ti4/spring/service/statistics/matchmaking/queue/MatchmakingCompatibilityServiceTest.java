@@ -21,8 +21,8 @@ class MatchmakingCompatibilityServiceTest {
 
     @Test
     void avoidListBlocksInEitherDirection() {
-        PlayerMatchData a = player("a").avoidList("b").build();
-        PlayerMatchData b = player("b").build();
+        PlayerMatchmakingData a = player("a").avoidList("b").build();
+        PlayerMatchmakingData b = player("b").build();
 
         assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, false)).isTrue();
         assertThat(MatchmakingCompatibilityService.areIncompatible(b, a, false)).isTrue();
@@ -30,9 +30,9 @@ class MatchmakingCompatibilityServiceTest {
 
     @Test
     void disagreeingOnTiglIsIncompatible() {
-        PlayerMatchData a =
+        PlayerMatchmakingData a =
                 player("a").restrictions(MatchmakingOptions.TIGL_OPTION).build();
-        PlayerMatchData b = player("b").build();
+        PlayerMatchmakingData b = player("b").build();
 
         assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, false)).isTrue();
         assertThat(MatchmakingCompatibilityService.areIncompatible(b, a, false)).isTrue();
@@ -40,11 +40,11 @@ class MatchmakingCompatibilityServiceTest {
 
     @Test
     void onlyMatchFloatersBlocksNonFloatersEitherDirection() {
-        PlayerMatchData floater = player("a")
+        PlayerMatchmakingData floater = player("a")
                 .restrictions(MatchmakingOptions.ONLY_MATCH_FLOATERS_OPTION)
                 .roleNames(MatchmakingOptions.FLOATERS_ROLE_NAME)
                 .build();
-        PlayerMatchData nonFloater = player("b").build();
+        PlayerMatchmakingData nonFloater = player("b").build();
 
         assertThat(MatchmakingCompatibilityService.areIncompatible(floater, nonFloater, false))
                 .isTrue();
@@ -54,11 +54,11 @@ class MatchmakingCompatibilityServiceTest {
 
     @Test
     void onlyMatchWarriorsBlocksNonWarriors() {
-        PlayerMatchData warrior = player("a")
+        PlayerMatchmakingData warrior = player("a")
                 .restrictions(MatchmakingOptions.ONLY_MATCH_WARRIORS_OPTION)
                 .roleNames(MatchmakingOptions.WARRIORS_ROLE_NAME)
                 .build();
-        PlayerMatchData nonWarrior = player("b").build();
+        PlayerMatchmakingData nonWarrior = player("b").build();
 
         assertThat(MatchmakingCompatibilityService.areIncompatible(warrior, nonWarrior, false))
                 .isTrue();
@@ -66,10 +66,10 @@ class MatchmakingCompatibilityServiceTest {
 
     @Test
     void avoidNewPlayersBlocksNewPlayerEitherDirection() {
-        PlayerMatchData veteran = player("a")
+        PlayerMatchmakingData veteran = player("a")
                 .restrictions(MatchmakingOptions.AVOID_NEW_PLAYERS_OPTION)
                 .build();
-        PlayerMatchData newcomer = player("b").completedGames(1).build();
+        PlayerMatchmakingData newcomer = player("b").completedGames(1).build();
 
         assertThat(MatchmakingCompatibilityService.areIncompatible(veteran, newcomer, false))
                 .isTrue();
@@ -79,12 +79,13 @@ class MatchmakingCompatibilityServiceTest {
 
     @Test
     void similarActiveHoursRequiresSharedBuckets() {
-        PlayerMatchData picky = player("a")
+        PlayerMatchmakingData picky = player("a")
                 .restrictions(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION)
                 .activeHourBuckets(0, 1, 2)
                 .build();
-        PlayerMatchData fewShared = player("b").activeHourBuckets(0, 4, 5).build();
-        PlayerMatchData manyShared = player("c").activeHourBuckets(0, 1, 2, 5).build();
+        PlayerMatchmakingData fewShared = player("b").activeHourBuckets(0, 4, 5).build();
+        PlayerMatchmakingData manyShared =
+                player("c").activeHourBuckets(0, 1, 2, 5).build();
 
         assertThat(MatchmakingCompatibilityService.areIncompatible(picky, fewShared, false))
                 .isTrue();
@@ -94,11 +95,11 @@ class MatchmakingCompatibilityServiceTest {
 
     @Test
     void similarSkillToleranceWidensWhenRelaxed() {
-        PlayerMatchData a = player("a")
+        PlayerMatchmakingData a = player("a")
                 .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
                 .rating(20)
                 .build();
-        PlayerMatchData b = player("b").rating(23).build();
+        PlayerMatchmakingData b = player("b").rating(23).build();
 
         assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, false)).isTrue();
         assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, true)).isFalse();
@@ -107,12 +108,12 @@ class MatchmakingCompatibilityServiceTest {
     @Test
     void newPlayersAreComparedAtTheNewPlayerRating() {
         // 'a' is new, so its high stored rating is ignored in favour of the default new-player rating (20).
-        PlayerMatchData a = player("a")
+        PlayerMatchmakingData a = player("a")
                 .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
                 .rating(50)
                 .completedGames(1)
                 .build();
-        PlayerMatchData b = player("b").rating(21).build();
+        PlayerMatchmakingData b = player("b").rating(21).build();
 
         assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, false)).isFalse();
     }
@@ -165,8 +166,8 @@ class MatchmakingCompatibilityServiceTest {
             return this;
         }
 
-        private PlayerMatchData build() {
-            return new PlayerMatchData(
+        private PlayerMatchmakingData build() {
+            return new PlayerMatchmakingData(
                     userId, restrictions, avoidList, rating, activeHourBuckets, completedGames, roleNames, false);
         }
     }
