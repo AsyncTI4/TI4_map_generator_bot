@@ -29,6 +29,7 @@ public class DeveloperCommand implements ParentCommand {
                     new DatabasePersistence(),
                     new DeleteUserMessages(),
                     new PostMatchmakingButtons(),
+                    new ClearMatchmakingQueue(),
                     new RunSql())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

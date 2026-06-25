@@ -316,7 +316,7 @@
         "name": "Espionage",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Look at another player's action cards and choose 1 of those cards. That player must give you that card or 1 random promissory note from their hand.",
+        "text": "Choose 1 player that has 1 or more action cards. That player may allow you to look at their action cards and take 1 of those cards. If they do not, they must give you 1 random promissory note from their hand.",
         "automationID": "espionage",
         "flavorText": "The informant continued, \"And get this, apparently the councilor is a ghostwriter for a series about dating Dirzuga!\" Connor yawned, \"Gesundheit.\"",
         "source": "action_deck_2"
@@ -502,6 +502,7 @@
     {
         "alias": "mobilization1",
         "name": "Mobilization",
+        "automationID": "mobilization",
         "phase": "Action",
         "window": "At the start of your turn",
         "text": "Produce up to 4 units in a system that contains 1 of your command tokens and no other players' units.",
@@ -511,6 +512,7 @@
     {
         "alias": "mobilization2",
         "name": "Mobilization",
+        "automationID": "mobilization",
         "phase": "Action",
         "window": "At the start of your turn",
         "text": "Produce up to 4 units in a system that contains 1 of your command tokens and no other players' units.",
@@ -520,6 +522,7 @@
     {
         "alias": "mobilization3",
         "name": "Mobilization",
+        "automationID": "mobilization",
         "phase": "Action",
         "window": "At the start of your turn",
         "text": "Produce up to 4 units in a system that contains 1 of your command tokens and no other players' units.",
@@ -529,6 +532,7 @@
     {
         "alias": "mobilization4",
         "name": "Mobilization",
+        "automationID": "mobilization",
         "phase": "Action",
         "window": "At the start of your turn",
         "text": "Produce up to 4 units in a system that contains 1 of your command tokens and no other players' units.",
@@ -1319,7 +1323,7 @@
         "name": "Settlers",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose 1 non-home planet that contains another player's units. That player may allow you to place 2 infantry from your reinforcements into coexistence on that planet. If they do not, exhaust that planet and destroy up to 2 of units on it.",
+        "text": "Choose 1 non-home planet that contains another player's units. That player may allow you to place 2 infantry from your reinforcements into coexistence on that planet. If they do not, exhaust that planet and destroy up to 2 units on it.",
         "flavorText": "Willard grumbled as another frigate shuttled toward the ocean-cities. They would soon be outnumbered.",
         "source": "action_deck_2"
     },

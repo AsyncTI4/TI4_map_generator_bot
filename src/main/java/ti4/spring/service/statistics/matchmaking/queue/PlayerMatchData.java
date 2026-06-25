@@ -12,4 +12,4 @@ record PlayerMatchData(
         Set<Integer> activeHourBuckets,
         int completedGames,
         Set<String> roleNames,
-        boolean halfQueueTimePassed) {}
+        boolean relaxConstraints) {}

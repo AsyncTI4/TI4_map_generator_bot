@@ -100,6 +100,12 @@ public class MatchmakerService {
     }
 
     @Transactional
+    public long clearQueue() {
+        if (DatabasePersistenceGate.isDisabled()) return 0;
+        return queueStore.clearAll();
+    }
+
+    @Transactional
     public void processQueue() {
         if (DatabasePersistenceGate.isDisabled()) return;
 

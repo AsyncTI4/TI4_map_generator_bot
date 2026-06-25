@@ -41,19 +41,17 @@ class PlayerMatchDataFactory {
         Map<MatchmakingQueueMember, PlayerMatchData> matchData = new HashMap<>();
         for (QueuedParty party : parties) {
             List<String> leaderRestrictions = party.leaderSettings().getMatchmakingRestrictions();
-            boolean halfQueueTimePassed = isHalfQueueTimePassed(party, now);
+            boolean relaxConstraints = shouldRelaxConstraints(party, now);
             for (MatchmakingQueueMember member : party.members()) {
-                matchData.put(
-                        member, build(member.getUserId(), leaderRestrictions, ratings, guild, halfQueueTimePassed));
+                matchData.put(member, build(member.getUserId(), leaderRestrictions, ratings, guild, relaxConstraints));
             }
         }
         return matchData;
     }
 
-    private static boolean isHalfQueueTimePassed(QueuedParty party, Instant now) {
-        double maxHours = MatchmakingOptions.getHours(party.leaderSettings().getMatchmakingMaxQueueTime());
+    private static boolean shouldRelaxConstraints(QueuedParty party, Instant now) {
         double hoursWaited = Duration.between(party.party().getQueuedAt(), now).toMinutes() / 60.0;
-        return hoursWaited >= maxHours * QUEUE_TIME_RELAX_FRACTION;
+        return hoursWaited >= 4;
     }
 
     static Map<String, PlayerMatchData> buildForUsers(List<String> userIds, List<String> leaderRestrictions) {
