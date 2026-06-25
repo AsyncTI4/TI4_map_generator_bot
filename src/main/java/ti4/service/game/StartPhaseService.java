@@ -244,7 +244,9 @@ public class StartPhaseService {
             game.setRound(round);
         }
         if (game.getRound() == 1) {
-            Helper.setOrder(game);
+            if (!game.isSpeakerOrderEstablished()) {
+                Helper.setOrder(game);
+            }
             if (game.getActionsChannel() != null) {
                 for (ThreadChannel threadChannel : game.getActionsChannel().getThreadChannels()) {
                     if ((!threadChannel.getName().contains("Cards Info-" + game.getName())

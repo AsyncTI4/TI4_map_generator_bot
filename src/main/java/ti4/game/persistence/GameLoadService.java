@@ -536,6 +536,8 @@ class GameLoadService {
                 case Constants.BOT_COLOR_REACTS -> game.setBotColorReacts(parseBooleanOrDefault(info, false));
                 case Constants.BOT_STRAT_REACTS -> game.setBotStratReacts(parseBooleanOrDefault(info, false));
                 case Constants.HAS_HAD_A_STATUS_PHASE -> game.setHasHadAStatusPhase(parseBooleanOrDefault(info, false));
+                case Constants.SPEAKER_ORDER_ESTABLISHED ->
+                    game.setSpeakerOrderEstablished(parseBooleanOrDefault(info, false));
                 case Constants.BOT_SHUSHING -> game.setBotShushing(parseBooleanOrDefault(info, false));
                 case Constants.COMMUNITY_MODE -> game.setCommunityMode(parseBooleanOrDefault(info, false));
                 case Constants.ALLIANCE_MODE -> game.setAllianceMode(parseBooleanOrDefault(info, false));
