@@ -1096,8 +1096,8 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("hostages".equals(automationID)) {
-                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveHostages", buttonLabel));
+            if ("prisoners_of_war".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolvePrisonersOfWar", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 

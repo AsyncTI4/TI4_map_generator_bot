@@ -20,16 +20,16 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 
 @UtilityClass
-class HostagesAcd2ButtonHandler {
+class PrisonersOfWarAcd2ButtonHandler {
 
-    @ButtonHandler("resolveHostages")
-    public static void resolveHostages(Player player, Game game, ButtonInteractionEvent event) {
+    @ButtonHandler("resolvePrisonersOfWar")
+    public static void resolvePrisonersOfWar(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player target : game.getRealPlayers()) {
             if (target == player) {
                 continue;
             }
-            String id = player.factionButtonChecker() + "hostagesTarget_" + target.getFaction();
+            String id = player.factionButtonChecker() + "prisonersOfWarTarget_" + target.getFaction();
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray(id, target.getColor()));
             } else {
@@ -42,22 +42,23 @@ class HostagesAcd2ButtonHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", there are no opponents to target with _Hostages_.");
+                    player.getRepresentationUnfogged() + ", there are no opponents to target with _Prisoners of War_.");
             return;
         }
         buttons.add(Buttons.red("deleteButtons", "Cancel"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", choose your opponent for _Hostages_.",
+                player.getRepresentationUnfogged() + ", choose your opponent for _Prisoners of War_.",
                 buttons);
     }
 
-    @ButtonHandler("hostagesTarget_")
-    public static void resolveHostagesTarget(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        Player target = game.getPlayerFromColorOrFaction(buttonID.replace("hostagesTarget_", ""));
+    @ButtonHandler("prisonersOfWarTarget_")
+    public static void resolvePrisonersOfWarTarget(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player target = game.getPlayerFromColorOrFaction(buttonID.replace("prisonersOfWarTarget_", ""));
         ButtonHelper.deleteMessage(event);
         if (target == null || target == player) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Hostages_.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Prisoners of War_.");
             return;
         }
 
@@ -66,8 +67,8 @@ class HostagesAcd2ButtonHandler {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     target.getRepresentationNoPing()
-                            + " has no promissory notes in hand to give for _Hostages_. Continue by placing their"
-                            + " command token.");
+                            + " has no promissory notes in hand to give for _Prisoners of War_. Continue by placing"
+                            + " their command token.");
             sendCommandTokenButtons(player, game, target);
             return;
         }
@@ -75,25 +76,27 @@ class HostagesAcd2ButtonHandler {
         List<Button> buttons = new ArrayList<>();
         for (String pnId : sendablePNs) {
             buttons.add(Buttons.green(
-                    target.factionButtonChecker() + "hostagesGivePN_" + player.getFaction() + "_" + pnId,
+                    target.factionButtonChecker() + "prisonersOfWarGivePN_" + player.getFaction() + "_" + pnId,
                     Mapper.getPromissoryNote(pnId).getName(),
                     CardEmojis.PN));
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCardsInfoThread(),
                 target.getRepresentationUnfogged() + ", choose which promissory note to give to "
-                        + (game.isFowMode() ? "your opponent" : player.getFactionEmojiOrColor()) + " for _Hostages_.",
+                        + (game.isFowMode() ? "your opponent" : player.getFactionEmojiOrColor())
+                        + " for _Prisoners of War_.",
                 buttons);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", " + target.getFactionEmojiOrColor()
-                        + " was asked to give you a promissory note for _Hostages_.");
+                        + " was asked to give you a promissory note for _Prisoners of War_.");
     }
 
-    @ButtonHandler("hostagesGivePN_")
-    public static void resolveHostagesGivePN(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    @ButtonHandler("prisonersOfWarGivePN_")
+    public static void resolvePrisonersOfWarGivePN(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         // player == the opponent giving the promissory note
-        String[] parts = buttonID.replace("hostagesGivePN_", "").split("_", 2);
+        String[] parts = buttonID.replace("prisonersOfWarGivePN_", "").split("_", 2);
         ButtonHelper.deleteMessage(event);
         if (parts.length < 2) {
             return;
@@ -103,7 +106,7 @@ class HostagesAcd2ButtonHandler {
         Integer pnIndex = player.getPromissoryNotes().get(pnId);
         if (receiver == null || pnIndex == null) {
             MessageHelper.sendMessageToChannel(
-                    player.getCardsInfoThread(), "That promissory note is no longer available for _Hostages_.");
+                    player.getCardsInfoThread(), "That promissory note is no longer available for _Prisoners of War_.");
             return;
         }
 
@@ -115,18 +118,20 @@ class HostagesAcd2ButtonHandler {
         String pnName = Mapper.getPromissoryNote(pnId).getName();
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
-                "# " + player.getRepresentation() + " you gave the promissory note _" + pnName + "_ for _Hostages_.");
+                "# " + player.getRepresentation() + " you gave the promissory note _" + pnName
+                        + "_ for _Prisoners of War_.");
         MessageHelper.sendMessageToChannel(
                 receiver.getCardsInfoThread(),
                 "# " + receiver.getRepresentation() + " you gained the promissory note _" + pnName
-                        + "_ from _Hostages_.");
+                        + "_ from _Prisoners of War_.");
 
         sendCommandTokenButtons(receiver, game, player);
     }
 
-    @ButtonHandler("hostagesPlaceCC_")
-    public static void resolveHostagesPlaceCC(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String[] parts = buttonID.replace("hostagesPlaceCC_", "").split("_", 2);
+    @ButtonHandler("prisonersOfWarPlaceCC_")
+    public static void resolvePrisonersOfWarPlaceCC(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String[] parts = buttonID.replace("prisonersOfWarPlaceCC_", "").split("_", 2);
         ButtonHelper.deleteMessage(event);
         if (parts.length < 2) {
             return;
@@ -134,7 +139,7 @@ class HostagesAcd2ButtonHandler {
         Player target = game.getPlayerFromColorOrFaction(parts[0]);
         Tile destTile = game.getTileByPosition(parts[1]);
         if (target == null || destTile == null) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Hostages_.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Prisoners of War_.");
             return;
         }
 
@@ -143,7 +148,7 @@ class HostagesAcd2ButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " placed " + target.getRepresentationNoPing()
                         + "'s command token in " + destTile.getRepresentationForButtons(game, player)
-                        + " for _Hostages_.");
+                        + " for _Prisoners of War_.");
     }
 
     private static void sendCommandTokenButtons(Player player, Game game, Player target) {
@@ -151,7 +156,7 @@ class HostagesAcd2ButtonHandler {
         for (Tile tile : game.getTileMap().values()) {
             if (tile != null && !tile.isHomeSystem(game) && FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 buttons.add(Buttons.green(
-                        player.factionButtonChecker() + "hostagesPlaceCC_" + target.getFaction() + "_"
+                        player.factionButtonChecker() + "prisonersOfWarPlaceCC_" + target.getFaction() + "_"
                                 + tile.getPosition(),
                         tile.getRepresentationForButtons(game, player)));
             }
@@ -161,14 +166,14 @@ class HostagesAcd2ButtonHandler {
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
                             + ", you have no non-home system containing your units to place "
-                            + target.getRepresentationNoPing() + "'s command token in for _Hostages_.");
+                            + target.getRepresentationNoPing() + "'s command token in for _Prisoners of War_.");
             return;
         }
         buttons.add(Buttons.red("deleteButtons", "Cancel"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose a non-home system containing your units to place "
-                        + target.getRepresentationNoPing() + "'s command token in for _Hostages_.",
+                        + target.getRepresentationNoPing() + "'s command token in for _Prisoners of War_.",
                 buttons);
     }
 
