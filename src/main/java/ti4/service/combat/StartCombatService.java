@@ -25,6 +25,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiCommanderHandler;
@@ -1333,6 +1334,13 @@ public class StartCombatService {
         if ((p1.hasAbility("facsimile") && p1 != game.getActivePlayer())
                 || p2.hasAbility("facsimile") && p2 != game.getActivePlayer() && !game.isFowMode()) {
             buttons.add(Buttons.gray("startFacsimile_" + tile.getPosition(), "Facsimile", FactionEmojis.mortheus));
+        }
+
+        // Facet
+        if (CrystellumLeadersHandler.canUseCrystellumHero(p1)) {
+            buttons.add(CrystellumLeadersHandler.getCrystellumHeroButton(p1, tile));
+        } else if (CrystellumLeadersHandler.canUseCrystellumHero(p2)) {
+            buttons.add(CrystellumLeadersHandler.getCrystellumHeroButton(p2, tile));
         }
 
         // mercenaries

@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
@@ -133,6 +134,7 @@ public final class ButtonHelperTacticalAction {
             if (player.hasAbility("dream_nexus")) {
                 DreamButtonHandler.offerLiturgyButtons(event, game, player);
             }
+            CrystellumLeadersHandler.clearFacetBypass(game, player);
             resetStoredValuesForTacticalAction(game);
         }
     }
@@ -292,7 +294,8 @@ public final class ButtonHelperTacticalAction {
                     "tyris",
                     "lunarium",
                     "zephyrion",
-                    "vyserix");
+                    "vyserix",
+                    "crystellum");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "cabal");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "naalu");
@@ -845,6 +848,9 @@ public final class ButtonHelperTacticalAction {
                 systemButtons);
 
         // Resolve other abilities
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "crystellumcommander")) {
+            CrystellumLeadersHandler.giveCommanderReminder(player, game);
+        }
         if (player.hasAbility("recycled_materials")) {
             List<Button> buttons = ButtonHelperFactionSpecific.getRohDhnaRecycleButtons(game, tile, player);
             if (!buttons.isEmpty()) {
