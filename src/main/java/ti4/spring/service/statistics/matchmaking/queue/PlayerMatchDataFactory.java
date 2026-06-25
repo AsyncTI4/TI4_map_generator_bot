@@ -24,7 +24,6 @@ import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
 @UtilityClass
 class PlayerMatchDataFactory {
 
-    private static final double QUEUE_TIME_RELAX_FRACTION = 0.5;
     private static final int NUMBER_OF_ACTIVE_HOUR_BUCKETS = 6;
     private static final int ACTIVE_HOUR_BUCKET_SIZE = 4;
     private static final int ACTIVE_HOUR_BUCKET_MATCH_THRESHOLD = 3;

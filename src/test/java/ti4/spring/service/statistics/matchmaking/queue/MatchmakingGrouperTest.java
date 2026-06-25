@@ -17,7 +17,7 @@ class MatchmakingGrouperTest {
 
     private static final String VICTORY_POINTS = "10";
     private static final String EXPANSION = MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION;
-    private static final String PACE = MatchmakingOptions.NO_PACE_OPTION;
+    private static final String PACE = MatchmakingOptions.SLOWER_PACE_OPTION;
 
     private final Map<MatchmakingQueueMember, PlayerMatchData> matchData = new HashMap<>();
     private final List<QueuedParty> parties = new ArrayList<>();
