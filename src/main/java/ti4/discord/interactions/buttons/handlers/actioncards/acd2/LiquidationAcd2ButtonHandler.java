@@ -32,8 +32,7 @@ class LiquidationAcd2ButtonHandler {
     }
 
     @ButtonHandler("liquidationReduce_")
-    public static void resolveLiquidationReduce(
-            Player player, ButtonInteractionEvent event, String buttonID) {
+    public static void resolveLiquidationReduce(Player player, ButtonInteractionEvent event, String buttonID) {
         int reduce;
         try {
             reduce = Integer.parseInt(buttonID.replace("liquidationReduce_", ""));

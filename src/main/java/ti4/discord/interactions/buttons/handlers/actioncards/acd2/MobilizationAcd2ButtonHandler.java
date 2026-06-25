@@ -61,8 +61,7 @@ class MobilizationAcd2ButtonHandler {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Mobilization_.");
             return;
         }
-        if (!CommandCounterHelper.hasCC(player, tile)
-                || FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
+        if (!CommandCounterHelper.hasCC(player, tile) || FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "That system no longer contains 1 of your command tokens and no other players' units"

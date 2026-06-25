@@ -115,8 +115,7 @@ class HostagesAcd2ButtonHandler {
         String pnName = Mapper.getPromissoryNote(pnId).getName();
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
-                "# " + player.getRepresentation() + " you gave the promissory note _" + pnName
-                        + "_ for _Hostages_.");
+                "# " + player.getRepresentation() + " you gave the promissory note _" + pnName + "_ for _Hostages_.");
         MessageHelper.sendMessageToChannel(
                 receiver.getCardsInfoThread(),
                 "# " + receiver.getRepresentation() + " you gained the promissory note _" + pnName
