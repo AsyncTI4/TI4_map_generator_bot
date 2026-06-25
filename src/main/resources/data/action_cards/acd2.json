@@ -811,7 +811,7 @@
         "phase": "Action",
         "window": "After you activate a system",
         "text": "Choose 1 system that does not contain other players' units. All systems adjacent to that system are adjacent to each other during this tactical action.",
-        "flavorText": "\"Oy, Captain, best ye lock in,\" the wily pilot chuckled. \"I learned this little maneuver in me scavenging days.\" Before Mendosa could protest, the ship began to groan under the strain, alerts flashing as they screamed ahead.",
+        "flavorText": "\"Oy, Captain, best ye lock in,\" the wily pilot chuckled. \"I learned this little maneuver in me scavenging days.\" Before Mendosa could protest, the ship began to groan under the strain.",
         "notes": "Think of this as letting you skip any 1 system.",
         "source": "action_deck_2"
     },
@@ -821,7 +821,7 @@
         "phase": "Action",
         "window": "After you activate a system",
         "text": "Choose 1 system that does not contain other players' units. All systems adjacent to that system are adjacent to each other during this tactical action.",
-        "flavorText": "\"Wait for the computer to chart, Douglas!\" Mendosa barked. The pilot laughed and pointed to his head. \"Oy, they call me Doug, sir—Deft Doug if ye like. I've got a keen eye for charting, and a good nose too.\" Then, it was dark.",
+        "flavorText": "\"Wait for the computer to chart, Douglas!\" Mendosa barked. The pilot laughed. \"They call me Doug, sir—Deft Doug if ye like. I've got a keen eye for charting, and a good nose too.\" Then, it was dark.",
         "notes": "Think of this as letting you skip any 1 system.",
         "source": "action_deck_2"
     },
