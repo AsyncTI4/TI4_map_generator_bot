@@ -23,7 +23,9 @@ public class MatchmakingOptions {
             "Prophecy of Kings only",
             "Thunder's Edge only",
             POK_AND_TE_EXPANSION_OPTION,
-            "Twilight's Fall");
+            "Discordant Stars (Homebrew)",
+            "Twilight's Fall",
+            "Franken (Homebrew)");
     public static final List<String> PLAYER_COUNT_OPTIONS = List.of("3", "4", "5", "6", "7", "8");
     public static final List<String> VICTORY_POINT_OPTIONS = List.of("10", "12", "14");
     public static final String SIMILAR_ACTIVE_HOURS_OPTION = "Similar active hours";

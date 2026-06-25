@@ -1,8 +1,11 @@
 package ti4.service.statistics.game;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,9 +25,11 @@ import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
 class AverageGameMmrStatisticsService {
 
     private static final BigDecimal DEFAULT_RATING = BigDecimal.valueOf(20);
+    private static final int MAX_LIST_SIZE = 100;
 
     static void showAverageGameMmr(SlashCommandInteractionEvent event) {
         Map<String, List<String>> gamePlayerIds = new LinkedHashMap<>();
+        Map<String, String> gameCustomNames = new HashMap<>();
         Set<String> allUserIds = new HashSet<>();
 
         ConsumeGameUtility.consumeAllGames(
@@ -37,6 +42,7 @@ class AverageGameMmrStatisticsService {
                         return;
                     }
                     gamePlayerIds.put(game.getName(), ids);
+                    gameCustomNames.put(game.getName(), game.getCustomName());
                     allUserIds.addAll(ids);
                 },
                 ExecutionLockType.READ);
@@ -57,8 +63,17 @@ class AverageGameMmrStatisticsService {
         StringBuilder sb = new StringBuilder("__**Average MMR per game:**__\n");
         int index = 0;
         for (Map.Entry<String, BigDecimal> entry : gameAverages) {
+            if (index >= MAX_LIST_SIZE) {
+                break;
+            }
             index++;
-            sb.append(String.format("%d. `%s` (rated %.3f)%n", index, entry.getKey(), entry.getValue()));
+            String gameName = entry.getKey();
+            sb.append(String.format("%d. `%s`", index, gameName));
+            String customName = gameCustomNames.get(gameName);
+            if (isNotBlank(customName)) {
+                sb.append(String.format(" `%s`", customName));
+            }
+            sb.append(String.format(" (rated %.3f)%n", entry.getValue()));
         }
 
         if (gameAverages.isEmpty()) {
