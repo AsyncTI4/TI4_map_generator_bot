@@ -1,5 +1,6 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
+import de.gesundkrank.jskills.GameInfo;
 import de.gesundkrank.jskills.Rating;
 import java.time.Duration;
 import java.time.Instant;
@@ -27,7 +28,8 @@ class PlayerMatchDataFactory {
     private static final int NUMBER_OF_ACTIVE_HOUR_BUCKETS = 6;
     private static final int ACTIVE_HOUR_BUCKET_SIZE = 4;
     private static final int ACTIVE_HOUR_BUCKET_MATCH_THRESHOLD = 3;
-    private static final Rating DEFAULT_NEW_PLAYER_RATING = new Rating(25.0, 8.333);
+    private static final Rating DEFAULT_NEW_PLAYER_RATING =
+            GameInfo.getDefaultGameInfo().getDefaultRating();
 
     static Map<MatchmakingQueueMember, PlayerMatchmakingData> buildForParties(List<QueuedParty> parties) {
         Set<String> userIds = parties.stream()

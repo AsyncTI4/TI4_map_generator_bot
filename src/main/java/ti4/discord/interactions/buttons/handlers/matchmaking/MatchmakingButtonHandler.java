@@ -70,7 +70,7 @@ class MatchmakingButtonHandler {
     private static final List<String> DEFAULT_VICTORY_POINT_OPTIONS = List.of("10");
     private static final List<String> DEFAULT_PACE_OPTIONS = List.of(SLOWER_PACE_OPTION);
     private static final List<String> DEFAULT_RESTRICTION_OPTIONS =
-            List.of(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION, MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION);
+            List.of(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION);
 
     private static final int MAX_GROUP_MEMBERS = 7;
     private static final int MAX_AVOID_PLAYERS = 25;

@@ -21,7 +21,7 @@ class MatchmakingCompatibilityService {
     private static final Duration SIMILAR_SKILL_DECAY_INTERVAL = Duration.ofMinutes(30);
     private static final double SIMILAR_SKILL_MIN_THRESHOLD = 0.40;
 
-    private static final int NEW_PLAYER_GAME_THRESHOLD = 3;
+    static final int NEW_PLAYER_GAME_THRESHOLD = 3;
     private static final GameInfo GAME_INFO = GameInfo.getDefaultGameInfo();
 
     static boolean areIncompatible(PlayerMatchmakingData a, PlayerMatchmakingData b) {
