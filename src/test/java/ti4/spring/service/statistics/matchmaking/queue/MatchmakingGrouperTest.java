@@ -38,9 +38,6 @@ class MatchmakingGrouperTest extends BaseTi4Test {
 
     @BeforeEach
     void mockRatingService() {
-        // formGames builds its player data through PlayerMatchDataFactory, which fetches ratings from the
-        // MatchmakingRatingEventService Spring bean. There is no Spring context in a unit test, so stub the
-        // static accessor to hand back a mock seeded with the ratings each test sets up.
         MatchmakingRatingEventService serviceMock = mock(MatchmakingRatingEventService.class);
         when(serviceMock.getPlayerRatings(any())).thenReturn(ratingsByUser);
         ratingService = Mockito.mockStatic(MatchmakingRatingEventService.class);
