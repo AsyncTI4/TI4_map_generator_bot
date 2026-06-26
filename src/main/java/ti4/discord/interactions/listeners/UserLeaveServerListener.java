@@ -139,9 +139,7 @@ class UserLeaveServerListener extends ListenerAdapter {
         String websiteLink = String.format("[__[%s](https://asyncti4.com/game/%s)__]", game.getName(), game.getName());
         String faction = player.getFactionEmoji();
         TextChannel channel = game.getTableTalkChannel();
-        String tabletalkLink = String.format(
-                "[__[" + channel.getName() + "](%s)__]",
-                channel.getJumpUrl());
+        String tabletalkLink = String.format("[__[" + channel.getName() + "](%s)__]", channel.getJumpUrl());
         String actionsLink =
                 String.format("[__[Actions](%s)__]", game.getActionsChannel().getJumpUrl());
         String round = "(Round " + game.getRound() + ")";
