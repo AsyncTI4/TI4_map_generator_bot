@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedPlayer;
 import ti4.settings.users.UserSettings;
@@ -17,11 +18,13 @@ public class PartyValidator {
 
     public static List<String> getValidRestrictions(List<String> userIds, List<String> restrictions) {
         List<String> members = userIds.stream().distinct().toList();
-        if (members.size() < 2) return restrictions;
+        List<String> candidateRestrictions = restrictionsAllowedForMembers(members, restrictions);
+        if (members.size() < 2) return candidateRestrictions;
 
         List<String> available = new ArrayList<>();
-        for (String restriction : restrictions) {
-            Map<String, PlayerMatchData> dataById = PlayerMatchDataFactory.buildForUsers(members, List.of(restriction));
+        for (String restriction : candidateRestrictions) {
+            Map<String, PlayerMatchmakingData> dataById =
+                    PlayerMatchDataFactory.buildForUsers(members, List.of(restriction));
             if (groupInternallyCompatible(members, dataById)) {
                 available.add(restriction);
             }
@@ -29,11 +32,28 @@ public class PartyValidator {
         return available;
     }
 
-    private static boolean groupInternallyCompatible(List<String> members, Map<String, PlayerMatchData> dataById) {
+    private static List<String> restrictionsAllowedForMembers(List<String> members, List<String> restrictions) {
+        if (members.stream().noneMatch(PartyValidator::isNewPlayer)) {
+            return restrictions;
+        }
+        return restrictions.stream()
+                .filter(restriction -> !MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION.equals(restriction))
+                .toList();
+    }
+
+    private static boolean isNewPlayer(String userId) {
+        ManagedPlayer managedPlayer = GameManager.getManagedPlayer(userId);
+        int completedGames =
+                managedPlayer == null ? 0 : UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer);
+        return completedGames < MatchmakingCompatibilityService.NEW_PLAYER_GAME_THRESHOLD;
+    }
+
+    private static boolean groupInternallyCompatible(
+            List<String> members, Map<String, PlayerMatchmakingData> dataById) {
         for (int i = 0; i < members.size(); i++) {
             for (int j = i + 1; j < members.size(); j++) {
                 if (MatchmakingCompatibilityService.areIncompatible(
-                        dataById.get(members.get(i)), dataById.get(members.get(j)), false)) {
+                        dataById.get(members.get(i)), dataById.get(members.get(j)))) {
                     return false;
                 }
             }

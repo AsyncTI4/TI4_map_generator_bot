@@ -1,6 +1,11 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
-import java.math.BigDecimal;
+import de.gesundkrank.jskills.GameInfo;
+import de.gesundkrank.jskills.ITeam;
+import de.gesundkrank.jskills.Player;
+import de.gesundkrank.jskills.Team;
+import de.gesundkrank.jskills.trueskill.FactorGraphTrueSkillCalculator;
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -10,12 +15,16 @@ import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 class MatchmakingCompatibilityService {
 
     private static final long ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT = 3;
-    private static final double SIMILAR_SKILL_DIFFERENCE_THRESHOLD = 2.0;
-    private static final double RELAXED_SIMILAR_SKILL_DIFFERENCE_THRESHOLD = 5.0;
-    private static final int NEW_PLAYER_GAME_THRESHOLD = 3;
-    static final BigDecimal NEW_PLAYER_MATCHMAKING_RATING = BigDecimal.valueOf(20.0);
 
-    static boolean areIncompatible(PlayerMatchData a, PlayerMatchData b, boolean relaxed) {
+    private static final double SIMILAR_SKILL_STARTING_THRESHOLD = 0.70;
+    private static final double SIMILAR_SKILL_THRESHOLD_DECAY_PER_INTERVAL = 0.10;
+    private static final Duration SIMILAR_SKILL_DECAY_INTERVAL = Duration.ofMinutes(30);
+    private static final double SIMILAR_SKILL_MIN_THRESHOLD = 0.40;
+
+    static final int NEW_PLAYER_GAME_THRESHOLD = 3;
+    private static final GameInfo GAME_INFO = GameInfo.getDefaultGameInfo();
+
+    static boolean areIncompatible(PlayerMatchmakingData a, PlayerMatchmakingData b) {
         if (a.avoidList().contains(b.userId()) || b.avoidList().contains(a.userId())) {
             return true;
         }
@@ -34,33 +43,41 @@ class MatchmakingCompatibilityService {
 
         boolean aIsNew = a.completedGames() < NEW_PLAYER_GAME_THRESHOLD;
         boolean bIsNew = b.completedGames() < NEW_PLAYER_GAME_THRESHOLD;
-        if (bIsNew && MatchmakingOptions.wantsToAvoidNewPlayers(aRestrictions)) {
-            return true;
-        }
-        if (aIsNew && MatchmakingOptions.wantsToAvoidNewPlayers(bRestrictions)) {
-            return true;
-        }
+        if (bIsNew && MatchmakingOptions.wantsToAvoidNewPlayers(aRestrictions)) return true;
+        if (aIsNew && MatchmakingOptions.wantsToAvoidNewPlayers(bRestrictions)) return true;
 
         if (MatchmakingOptions.wantsSimilarActiveHours(aRestrictions)
                 || MatchmakingOptions.wantsSimilarActiveHours(bRestrictions)) {
             long sharedBuckets = a.activeHourBuckets().stream()
                     .filter(b.activeHourBuckets()::contains)
                     .count();
-            if (sharedBuckets < ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT) {
-                return true;
-            }
+            if (sharedBuckets < ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT) return true;
         }
 
-        if (MatchmakingOptions.wantsSimilarPlayerSkill(aRestrictions)
-                || MatchmakingOptions.wantsSimilarPlayerSkill(bRestrictions)) {
-            BigDecimal aRating = aIsNew ? NEW_PLAYER_MATCHMAKING_RATING : a.rating();
-            BigDecimal bRating = bIsNew ? NEW_PLAYER_MATCHMAKING_RATING : b.rating();
-            double tolerance =
-                    relaxed ? RELAXED_SIMILAR_SKILL_DIFFERENCE_THRESHOLD : SIMILAR_SKILL_DIFFERENCE_THRESHOLD;
-            return aRating.subtract(bRating).abs().compareTo(BigDecimal.valueOf(tolerance)) > 0;
+        boolean aWantsSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(aRestrictions);
+        boolean bWantsSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(bRestrictions);
+        if (aWantsSimilarSkill || bWantsSimilarSkill) {
+            double skillSimilarity = calculateSkillSimilarity(a, b);
+            if (aWantsSimilarSkill && skillSimilarity < getSimilarSkillThreshold(a.queueWait())) {
+                return true;
+            }
+            return bWantsSimilarSkill && skillSimilarity < getSimilarSkillThreshold(b.queueWait());
         }
 
         return false;
+    }
+
+    private static double calculateSkillSimilarity(PlayerMatchmakingData a, PlayerMatchmakingData b) {
+        List<ITeam> teams =
+                List.of(new Team(new Player<>(a.userId()), a.rating()), new Team(new Player<>(b.userId()), b.rating()));
+        return new FactorGraphTrueSkillCalculator().calculateMatchQuality(GAME_INFO, teams);
+    }
+
+    private static double getSimilarSkillThreshold(Duration waited) {
+        long intervalsElapsed = waited.toMinutes() / SIMILAR_SKILL_DECAY_INTERVAL.toMinutes();
+        double decayed =
+                SIMILAR_SKILL_STARTING_THRESHOLD - SIMILAR_SKILL_THRESHOLD_DECAY_PER_INTERVAL * intervalsElapsed;
+        return Math.max(SIMILAR_SKILL_MIN_THRESHOLD, decayed);
     }
 
     private static boolean violatesRoleRestriction(

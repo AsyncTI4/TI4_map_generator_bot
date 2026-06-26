@@ -1,10 +1,10 @@
 package ti4.discord.interactions.buttons.handlers.matchmaking;
 
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.MAX_QUEUE_TIME_OPTIONS_TO_HOURS;
-import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.NO_PACE_OPTION;
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.PACE_RESTRICTION_OPTIONS;
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.PLAYER_COUNT_OPTIONS;
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.RESTRICTION_OPTIONS;
+import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.SLOWER_PACE_OPTION;
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.VICTORY_POINT_OPTIONS;
 
 import java.util.ArrayList;
@@ -68,9 +68,9 @@ class MatchmakingButtonHandler {
             List.of(MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION);
     private static final List<String> DEFAULT_PLAYER_COUNT_OPTIONS = List.of("6");
     private static final List<String> DEFAULT_VICTORY_POINT_OPTIONS = List.of("10");
-    private static final List<String> DEFAULT_PACE_OPTIONS = List.of(NO_PACE_OPTION);
+    private static final List<String> DEFAULT_PACE_OPTIONS = List.of(SLOWER_PACE_OPTION);
     private static final List<String> DEFAULT_RESTRICTION_OPTIONS =
-            List.of(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION, MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION);
+            List.of(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION);
 
     private static final int MAX_GROUP_MEMBERS = 7;
     private static final int MAX_AVOID_PLAYERS = 25;
@@ -164,7 +164,7 @@ class MatchmakingButtonHandler {
                 RESTRICTIONS_ID,
                 groupRestrictionOptions(event, groupMemberIds),
                 userSettings.getMatchmakingRestrictions(),
-                DEFAULT_RESTRICTION_OPTIONS,
+                userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
                 !REQUIRE_SELECTION);
 
         return Modal.create(QUEUE_FOR_GAME_MODAL_ID, "Queue for Game")
@@ -342,7 +342,7 @@ class MatchmakingButtonHandler {
                 shared.retainAll(eligible);
             }
         }
-        return shared == null || shared.isEmpty() ? List.of(NO_PACE_OPTION) : shared;
+        return shared == null || shared.isEmpty() ? List.of(SLOWER_PACE_OPTION) : shared;
     }
 
     private static List<String> groupRestrictionOptions(ButtonInteractionEvent event, List<String> groupMemberIds) {

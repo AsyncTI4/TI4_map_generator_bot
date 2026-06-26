@@ -24,6 +24,7 @@ public enum GameStatTypes {
     SUPPORT_WIN_COUNT("Wins with SftT", "Shows a count of wins that occurred holding a Support for the Throne"),
     SECRET_OBJECTIVE_WIN_CHANCE("Secret objective win chance", "Shows win chance for secrets"),
     GAME_MODE_COUNT("Game count by mode", "Shows game counts and percentages for each game mode"),
+    AVERAGE_MMR("Average MMR", "Show the average matchmaking rating of each game's players"),
     GAME_COUNT("Total game count", "Shows the total game count");
 
     private final String name;
