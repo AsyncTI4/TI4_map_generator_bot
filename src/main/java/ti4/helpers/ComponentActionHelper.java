@@ -312,7 +312,16 @@ public class ComponentActionHelper {
                     if (enigmaticSeen) {
                         continue;
                     }
-                    rButton = Buttons.red(factionChecker + prefix + "relic_" + relic, "Purge Enigmatic Device");
+                    String label = "Purge Enigmatic Device";
+                    if (game.isTwilightsFallMode()) {
+                        if (p1.getTechs().contains("wavelength")
+                                && p1.getTechs().contains("antimatter")) {
+                            label += " (for 2 Command tokens)";
+                        } else {
+                            label += " (for faction tech)";
+                        }
+                    }
+                    rButton = Buttons.red(factionChecker + prefix + "relic_" + relic, label);
                     enigmaticSeen = true;
                 } else {
                     List<String> exhaustRelics = List.of(

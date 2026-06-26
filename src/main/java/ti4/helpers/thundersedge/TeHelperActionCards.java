@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
-
-import org.apache.commons.lang3.function.Consumers;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderButtonHandler;
@@ -264,13 +262,14 @@ public class TeHelperActionCards {
                 + Helper.getPlanetRepresentation(planet, game) + ". ";
 
         Player owner = null;
-        for(Player p : game.getRealPlayers()){
-            if(p.getPlanets().contains(planet)){
+        for (Player p : game.getRealPlayers()) {
+            if (p.getPlanets().contains(planet)) {
                 owner = p;
             }
         }
-        if(owner != null && !game.isFowMode()){
-            message += owner.getRepresentation() + " since this is your planet, you are getting a ping here to let you know.";
+        if (owner != null && !game.isFowMode()) {
+            message += owner.getRepresentation()
+                    + " since this is your planet, you are getting a ping here to let you know.";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
