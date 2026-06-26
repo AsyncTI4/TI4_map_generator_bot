@@ -3,6 +3,7 @@ package ti4.discord.interactions.buttons.handlers.matchmaking;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,14 +19,21 @@ import ti4.discord.utility.DiscordRoleUtility;
 public class MatchmakingOptions {
 
     public static final String POK_AND_TE_EXPANSION_OPTION = "Prophecy of Kings and Thunder's Edge";
+    public static final String DISCORDANT_STARS_EXPANSION_OPTION = "Discordant Stars (Homebrew)";
+    public static final String TWILIGHTS_FALL_EXPANSION_OPTION = "Twilight's Fall";
+    public static final String FRANKEN_EXPANSION_OPTION = "Franken (Homebrew)";
     public static final List<String> EXPANSION_OPTIONS = List.of(
             "Base only",
             "Prophecy of Kings only",
             "Thunder's Edge only",
             POK_AND_TE_EXPANSION_OPTION,
-            "Discordant Stars (Homebrew)",
-            "Twilight's Fall",
-            "Franken (Homebrew)");
+            DISCORDANT_STARS_EXPANSION_OPTION,
+            TWILIGHTS_FALL_EXPANSION_OPTION,
+            FRANKEN_EXPANSION_OPTION);
+
+    // Non-standard (homebrew) games are ranked on the TIGL Fractured ladder rather than the standard one.
+    public static final Set<String> NON_STANDARD_EXPANSION_OPTIONS =
+            Set.of(DISCORDANT_STARS_EXPANSION_OPTION, TWILIGHTS_FALL_EXPANSION_OPTION, FRANKEN_EXPANSION_OPTION);
     public static final List<String> PLAYER_COUNT_OPTIONS = List.of("3", "4", "5", "6", "7", "8");
     public static final List<String> VICTORY_POINT_OPTIONS = List.of("10", "12", "14");
     public static final String SIMILAR_ACTIVE_HOURS_OPTION = "Similar active hours";
@@ -52,6 +60,12 @@ public class MatchmakingOptions {
 
     public static final List<String> RESTRICTION_OPTIONS =
             List.of(SIMILAR_ACTIVE_HOURS_OPTION, SIMILAR_PLAYER_SKILL_OPTION, AVOID_NEW_PLAYERS_OPTION, TIGL_OPTION);
+
+    public static final String UNRANKED_OPTION = "Unranked";
+    public static final List<String> TIGL_RANK_OPTIONS =
+            List.of(UNRANKED_OPTION, "Minister", "Agent", "Commander", "Hero");
+    public static final List<String> TIGL_FRACTURED_RANK_OPTIONS = List.of(
+            UNRANKED_OPTION, "Thrall", "Acolyte", "Legionnaire", "Starlancer", "Gene-Sorcerer", "Ixth-Lord", "Archon");
 
     public static final Map<String, Integer> MAX_QUEUE_TIME_OPTIONS_TO_HOURS;
 
@@ -116,6 +130,29 @@ public class MatchmakingOptions {
 
     public static boolean wantsTigl(Collection<String> restrictions) {
         return restrictions.contains(TIGL_OPTION);
+    }
+
+    public static boolean usesFracturedRank(String expansion) {
+        return NON_STANDARD_EXPANSION_OPTIONS.contains(expansion);
+    }
+
+    public static String normalizeTiglRank(String rank) {
+        return rank == null || rank.isBlank() ? UNRANKED_OPTION : rank;
+    }
+
+    public static String lowestTiglRank(Collection<String> ranks) {
+        return lowestRank(TIGL_RANK_OPTIONS, ranks);
+    }
+
+    public static String lowestTiglFracturedRank(Collection<String> ranks) {
+        return lowestRank(TIGL_FRACTURED_RANK_OPTIONS, ranks);
+    }
+
+    private static String lowestRank(List<String> ladderLowToHigh, Collection<String> ranks) {
+        return ranks.stream()
+                .map(MatchmakingOptions::normalizeTiglRank)
+                .min(Comparator.comparingInt(rank -> Math.max(0, ladderLowToHigh.indexOf(rank))))
+                .orElse(UNRANKED_OPTION);
     }
 
     public static boolean wantsToAvoidNewPlayers(Collection<String> restrictions) {

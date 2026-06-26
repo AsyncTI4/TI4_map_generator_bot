@@ -40,6 +40,84 @@ class MatchmakingCompatibilityServiceTest {
     }
 
     @Test
+    void tiglPlayersOfDifferentRankAreIncompatibleInStandardGame() {
+        PlayerMatchmakingData hero = player("a")
+                .restrictions(MatchmakingOptions.TIGL_OPTION)
+                .tiglRank("Hero")
+                .build();
+        PlayerMatchmakingData agent = player("b")
+                .restrictions(MatchmakingOptions.TIGL_OPTION)
+                .tiglRank("Agent")
+                .build();
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(
+                        hero, agent, MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION))
+                .isTrue();
+    }
+
+    @Test
+    void tiglPlayersOfSameRankAreCompatibleInStandardGame() {
+        PlayerMatchmakingData a = player("a")
+                .restrictions(MatchmakingOptions.TIGL_OPTION)
+                .tiglRank("Hero")
+                .build();
+        PlayerMatchmakingData b = player("b")
+                .restrictions(MatchmakingOptions.TIGL_OPTION)
+                .tiglRank("Hero")
+                .build();
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(
+                        a, b, MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION))
+                .isFalse();
+    }
+
+    @Test
+    void nonStandardGamesMatchOnFracturedRank() {
+        // Same standard rank but different Fractured rank: incompatible for a Franken (non-standard) game.
+        PlayerMatchmakingData a = player("a")
+                .restrictions(MatchmakingOptions.TIGL_OPTION)
+                .tiglRank("Hero")
+                .tiglFracturedRank("Archon")
+                .build();
+        PlayerMatchmakingData b = player("b")
+                .restrictions(MatchmakingOptions.TIGL_OPTION)
+                .tiglRank("Hero")
+                .tiglFracturedRank("Thrall")
+                .build();
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, MatchmakingOptions.FRANKEN_EXPANSION_OPTION))
+                .isTrue();
+        // The standard ranks match, so a standard game pairs them fine.
+        assertThat(MatchmakingCompatibilityService.areIncompatible(
+                        a, b, MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION))
+                .isFalse();
+    }
+
+    @Test
+    void rankIsIgnoredWhenTiglNotChosen() {
+        PlayerMatchmakingData a = player("a").tiglRank("Hero").build();
+        PlayerMatchmakingData b = player("b").tiglRank("Agent").build();
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(
+                        a, b, MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION))
+                .isFalse();
+    }
+
+    @Test
+    void rankIsIgnoredWhenNoExpansionContext() {
+        PlayerMatchmakingData hero = player("a")
+                .restrictions(MatchmakingOptions.TIGL_OPTION)
+                .tiglRank("Hero")
+                .build();
+        PlayerMatchmakingData agent = player("b")
+                .restrictions(MatchmakingOptions.TIGL_OPTION)
+                .tiglRank("Agent")
+                .build();
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(hero, agent)).isFalse();
+    }
+
+    @Test
     void onlyMatchFloatersBlocksNonFloatersEitherDirection() {
         PlayerMatchmakingData floater = player("a")
                 .restrictions(MatchmakingOptions.ONLY_MATCH_FLOATERS_OPTION)
@@ -165,6 +243,8 @@ class MatchmakingCompatibilityServiceTest {
         private int completedGames = 5;
         private Set<String> roleNames = Set.of();
         private Duration queueWait = Duration.ZERO;
+        private String tiglRank = MatchmakingOptions.UNRANKED_OPTION;
+        private String tiglFracturedRank = MatchmakingOptions.UNRANKED_OPTION;
 
         private Builder(String userId) {
             this.userId = userId;
@@ -205,9 +285,28 @@ class MatchmakingCompatibilityServiceTest {
             return this;
         }
 
+        private Builder tiglRank(String value) {
+            tiglRank = value;
+            return this;
+        }
+
+        private Builder tiglFracturedRank(String value) {
+            tiglFracturedRank = value;
+            return this;
+        }
+
         private PlayerMatchmakingData build() {
             return new PlayerMatchmakingData(
-                    userId, restrictions, avoidList, rating, activeHourBuckets, completedGames, roleNames, queueWait);
+                    userId,
+                    restrictions,
+                    avoidList,
+                    rating,
+                    activeHourBuckets,
+                    completedGames,
+                    roleNames,
+                    queueWait,
+                    tiglRank,
+                    tiglFracturedRank);
         }
     }
 }

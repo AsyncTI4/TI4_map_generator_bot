@@ -33,12 +33,22 @@ public class PartyValidator {
     }
 
     private static List<String> restrictionsAllowedForMembers(List<String> members, List<String> restrictions) {
-        if (members.stream().noneMatch(PartyValidator::isNewPlayer)) {
-            return restrictions;
+        List<String> allowed = restrictions;
+        if (members.stream().anyMatch(PartyValidator::isNewPlayer)) {
+            allowed = allowed.stream()
+                    .filter(restriction -> !MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION.equals(restriction))
+                    .toList();
         }
-        return restrictions.stream()
-                .filter(restriction -> !MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION.equals(restriction))
-                .toList();
+        if (!members.stream().allMatch(PartyValidator::hasSetTiglRank)) {
+            allowed = allowed.stream()
+                    .filter(restriction -> !MatchmakingOptions.TIGL_OPTION.equals(restriction))
+                    .toList();
+        }
+        return allowed;
+    }
+
+    private static boolean hasSetTiglRank(String userId) {
+        return UserSettingsManager.get(userId).hasSetTiglRank();
     }
 
     private static boolean isNewPlayer(String userId) {
