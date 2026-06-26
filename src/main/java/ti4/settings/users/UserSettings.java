@@ -83,6 +83,10 @@ public class UserSettings {
         return Objects.requireNonNullElse(matchmakingRestrictions, Collections.emptyList());
     }
 
+    public boolean hasConfiguredMatchmakingRestrictions() {
+        return matchmakingRestrictions != null;
+    }
+
     public List<String> getMatchmakingAvoidList() {
         return Objects.requireNonNullElse(matchmakingAvoidList, Collections.emptyList());
     }

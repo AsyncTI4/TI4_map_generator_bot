@@ -6,44 +6,31 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import org.assertj.core.util.Lists;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 class MatchmakingRatingServiceTest {
 
+    // Ratings only count players with at least three completed games, so fixtures repeat the same game thrice.
+    private static final int GAMES_TO_QUALIFY = 3;
+    private static final int[] RANKS = {1, 2, 2, 3, 3, 3};
+
     @Test
     void generatingRatingsTwiceGivesSameResult() {
-        MatchmakingGame game = buildMatchmakingGame("game1", new int[] {1, 2, 2, 3, 3, 3});
-
-        List<MatchmakingRating> ratings = TrueSkillMatchmakingRatingService.calculateRatings(Lists.newArrayList(game));
-        List<MatchmakingRating> sortedRatings = ratings.stream()
-                .sorted(Comparator.comparing(MatchmakingRating::rating)
-                        .reversed()
-                        .thenComparing(MatchmakingRating::userId))
-                .toList();
-
-        List<MatchmakingRating> ratings2 = TrueSkillMatchmakingRatingService.calculateRatings(Lists.newArrayList(game));
-        List<MatchmakingRating> sortedRatings2 = ratings2.stream()
-                .sorted(Comparator.comparing(MatchmakingRating::rating)
-                        .reversed()
-                        .thenComparing(MatchmakingRating::userId))
-                .toList();
+        List<MatchmakingRating> sortedRatings = sortedByRating(
+                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS)));
+        List<MatchmakingRating> sortedRatings2 = sortedByRating(
+                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS)));
 
         assertThat(sortedRatings).isEqualTo(sortedRatings2);
     }
 
     @Test
     void generatesSensibleRatings() {
-        MatchmakingGame game = buildMatchmakingGame("game1", new int[] {1, 2, 2, 3, 3, 3});
+        List<MatchmakingRating> ratings =
+                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS));
 
-        List<MatchmakingRating> ratings = TrueSkillMatchmakingRatingService.calculateRatings(Lists.newArrayList(game));
-
-        List<MatchmakingRating> sortedRatings = ratings.stream()
-                .sorted(Comparator.comparing(MatchmakingRating::rating)
-                        .reversed()
-                        .thenComparing(MatchmakingRating::userId))
-                .toList();
+        List<MatchmakingRating> sortedRatings = sortedByRating(ratings);
 
         assertThat(ratings).hasSize(6);
 
@@ -59,19 +46,43 @@ class MatchmakingRatingServiceTest {
     }
 
     @Test
-    void conservativeRatingsUseConservativeTrueSkillValue() {
-        MatchmakingGame game = buildMatchmakingGame("game1", new int[] {1, 2, 2, 3, 3, 3});
+    void excludesPlayersWithFewerThanThreeCompletedGames() {
+        // Two games each means every player has only two completed games, below the three-game minimum.
+        assertThat(TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(2, RANKS)))
+                .isEmpty();
+        assertThat(TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(3, RANKS)))
+                .hasSize(6);
+    }
 
+    @Test
+    void conservativeRatingsUseConservativeTrueSkillValue() {
         List<MatchmakingRating> meanRatings =
-                TrueSkillMatchmakingRatingService.calculateRatings(Lists.newArrayList(game));
+                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS));
         List<MatchmakingRating> conservativeRatings =
-                TrueSkillMatchmakingRatingService.calculateRatings(Lists.newArrayList(game), true);
+                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS), true);
 
         MatchmakingRating meanWinnerRating = findRatingForUser(meanRatings, "p0");
         MatchmakingRating conservativeWinnerRating = findRatingForUser(conservativeRatings, "p0");
 
         assertThat(conservativeWinnerRating.rating()).isLessThan(meanWinnerRating.rating());
         assertThat(conservativeWinnerRating.calibrationPercent()).isEqualTo(meanWinnerRating.calibrationPercent());
+    }
+
+    private static List<MatchmakingRating> sortedByRating(List<MatchmakingRating> ratings) {
+        return ratings.stream()
+                .sorted(Comparator.comparing(MatchmakingRating::rating)
+                        .reversed()
+                        .thenComparing(MatchmakingRating::userId))
+                .toList();
+    }
+
+    @NotNull
+    private static List<MatchmakingGame> buildRankedGames(int gameCount, int[] ranks) {
+        List<MatchmakingGame> games = new ArrayList<>();
+        for (int i = 0; i < gameCount; i++) {
+            games.add(buildMatchmakingGame("game" + i, ranks));
+        }
+        return games;
     }
 
     @NotNull

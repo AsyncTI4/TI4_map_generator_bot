@@ -2,7 +2,8 @@ package ti4.spring.service.statistics.matchmaking.queue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.math.BigDecimal;
+import de.gesundkrank.jskills.Rating;
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -15,121 +16,155 @@ class MatchmakingCompatibilityServiceTest {
     @Test
     void compatiblePlayersHaveNoReason() {
         assertThat(MatchmakingCompatibilityService.areIncompatible(
-                        player("a").build(), player("b").build(), false))
+                        player("a").build(), player("b").build()))
                 .isFalse();
     }
 
     @Test
     void avoidListBlocksInEitherDirection() {
-        PlayerMatchData a = player("a").avoidList("b").build();
-        PlayerMatchData b = player("b").build();
+        PlayerMatchmakingData a = player("a").avoidList("b").build();
+        PlayerMatchmakingData b = player("b").build();
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, false)).isTrue();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(b, a, false)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(b, a)).isTrue();
     }
 
     @Test
     void disagreeingOnTiglIsIncompatible() {
-        PlayerMatchData a =
+        PlayerMatchmakingData a =
                 player("a").restrictions(MatchmakingOptions.TIGL_OPTION).build();
-        PlayerMatchData b = player("b").build();
+        PlayerMatchmakingData b = player("b").build();
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, false)).isTrue();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(b, a, false)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(b, a)).isTrue();
     }
 
     @Test
     void onlyMatchFloatersBlocksNonFloatersEitherDirection() {
-        PlayerMatchData floater = player("a")
+        PlayerMatchmakingData floater = player("a")
                 .restrictions(MatchmakingOptions.ONLY_MATCH_FLOATERS_OPTION)
                 .roleNames(MatchmakingOptions.FLOATERS_ROLE_NAME)
                 .build();
-        PlayerMatchData nonFloater = player("b").build();
+        PlayerMatchmakingData nonFloater = player("b").build();
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(floater, nonFloater, false))
+        assertThat(MatchmakingCompatibilityService.areIncompatible(floater, nonFloater))
                 .isTrue();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(nonFloater, floater, false))
+        assertThat(MatchmakingCompatibilityService.areIncompatible(nonFloater, floater))
                 .isTrue();
     }
 
     @Test
     void onlyMatchWarriorsBlocksNonWarriors() {
-        PlayerMatchData warrior = player("a")
+        PlayerMatchmakingData warrior = player("a")
                 .restrictions(MatchmakingOptions.ONLY_MATCH_WARRIORS_OPTION)
                 .roleNames(MatchmakingOptions.WARRIORS_ROLE_NAME)
                 .build();
-        PlayerMatchData nonWarrior = player("b").build();
+        PlayerMatchmakingData nonWarrior = player("b").build();
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(warrior, nonWarrior, false))
+        assertThat(MatchmakingCompatibilityService.areIncompatible(warrior, nonWarrior))
                 .isTrue();
     }
 
     @Test
     void avoidNewPlayersBlocksNewPlayerEitherDirection() {
-        PlayerMatchData veteran = player("a")
+        PlayerMatchmakingData veteran = player("a")
                 .restrictions(MatchmakingOptions.AVOID_NEW_PLAYERS_OPTION)
                 .build();
-        PlayerMatchData newcomer = player("b").completedGames(1).build();
+        PlayerMatchmakingData newcomer = player("b").completedGames(1).build();
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(veteran, newcomer, false))
+        assertThat(MatchmakingCompatibilityService.areIncompatible(veteran, newcomer))
                 .isTrue();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(newcomer, veteran, false))
+        assertThat(MatchmakingCompatibilityService.areIncompatible(newcomer, veteran))
                 .isTrue();
     }
 
     @Test
     void similarActiveHoursRequiresSharedBuckets() {
-        PlayerMatchData picky = player("a")
+        PlayerMatchmakingData picky = player("a")
                 .restrictions(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION)
                 .activeHourBuckets(0, 1, 2)
                 .build();
-        PlayerMatchData fewShared = player("b").activeHourBuckets(0, 4, 5).build();
-        PlayerMatchData manyShared = player("c").activeHourBuckets(0, 1, 2, 5).build();
+        PlayerMatchmakingData fewShared = player("b").activeHourBuckets(0, 4, 5).build();
+        PlayerMatchmakingData manyShared =
+                player("c").activeHourBuckets(0, 1, 2, 5).build();
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(picky, fewShared, false))
+        assertThat(MatchmakingCompatibilityService.areIncompatible(picky, fewShared))
                 .isTrue();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(picky, manyShared, false))
+        assertThat(MatchmakingCompatibilityService.areIncompatible(picky, manyShared))
                 .isFalse();
     }
 
     @Test
-    void similarSkillToleranceWidensWhenRelaxed() {
-        PlayerMatchData a = player("a")
+    void getSimilarSkillThresholdDecaysWithQueueTime() {
+        // A 6-point skill gap (between confident ratings) yields a 1v1 match quality of ~0.59, which fails the
+        // starting 0.70 threshold. Only 'a' asks for similar skill, so only 'a's threshold is checked.
+        PlayerMatchmakingData freshlyQueued = player("a")
                 .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
                 .rating(20)
                 .build();
-        PlayerMatchData b = player("b").rating(23).build();
+        PlayerMatchmakingData b = player("b").rating(26).build();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(freshlyQueued, b))
+                .isTrue();
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, false)).isTrue();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, true)).isFalse();
+        // After an hour 'a's threshold has decayed two steps (0.70 -> 0.50), which the ~0.59 quality clears.
+        PlayerMatchmakingData patient = player("a")
+                .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
+                .rating(20)
+                .queueWait(Duration.ofMinutes(60))
+                .build();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(patient, b)).isFalse();
     }
 
     @Test
-    void newPlayersAreComparedAtTheNewPlayerRating() {
-        // 'a' is new, so its high stored rating is ignored in favour of the default new-player rating (20).
-        PlayerMatchData a = player("a")
+    void bothDirectionsMustClearWhenBothWantSimilarSkill() {
+        // 'a' has waited to the 0.40 floor and accepts the ~0.59 gap, but 'b' just queued at the 0.70 threshold
+        // and still wants similar skill, so the stricter direction blocks the match.
+        PlayerMatchmakingData patientA = player("a")
                 .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
-                .rating(50)
-                .completedGames(1)
+                .rating(20)
+                .queueWait(Duration.ofMinutes(90))
                 .build();
-        PlayerMatchData b = player("b").rating(21).build();
+        PlayerMatchmakingData freshB = player("b")
+                .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
+                .rating(26)
+                .build();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(patientA, freshB))
+                .isTrue();
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, false)).isFalse();
+        // Once 'b' has also waited out its threshold, both directions clear the floor.
+        PlayerMatchmakingData patientB = player("b")
+                .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
+                .rating(26)
+                .queueWait(Duration.ofMinutes(90))
+                .build();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(patientA, patientB))
+                .isFalse();
+    }
+
+    @Test
+    void skillGapIsIgnoredWhenNeitherWantsSimilarSkill() {
+        PlayerMatchmakingData a = player("a").rating(20).build();
+        PlayerMatchmakingData b = player("b").rating(40).build();
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isFalse();
     }
 
     private static Builder player(String userId) {
         return new Builder(userId);
     }
 
-    /** A small fluent builder so each test only states the attributes it cares about. */
     private static final class Builder {
+        // Confident sigma so 1v1 match quality is driven by the mean skill gap, as for calibrated players.
+        private static final double CONFIDENT_SIGMA = 1.5;
+
         private final String userId;
         private List<String> restrictions = List.of();
         private List<String> avoidList = List.of();
-        private BigDecimal rating = BigDecimal.valueOf(25);
+        private Rating rating = new Rating(25, CONFIDENT_SIGMA);
         private Set<Integer> activeHourBuckets = ALL_BUCKETS;
         private int completedGames = 5;
         private Set<String> roleNames = Set.of();
+        private Duration queueWait = Duration.ZERO;
 
         private Builder(String userId) {
             this.userId = userId;
@@ -146,7 +181,7 @@ class MatchmakingCompatibilityServiceTest {
         }
 
         private Builder rating(double value) {
-            rating = BigDecimal.valueOf(value);
+            rating = new Rating(value, CONFIDENT_SIGMA);
             return this;
         }
 
@@ -165,9 +200,14 @@ class MatchmakingCompatibilityServiceTest {
             return this;
         }
 
-        private PlayerMatchData build() {
-            return new PlayerMatchData(
-                    userId, restrictions, avoidList, rating, activeHourBuckets, completedGames, roleNames, false);
+        private Builder queueWait(Duration value) {
+            queueWait = value;
+            return this;
+        }
+
+        private PlayerMatchmakingData build() {
+            return new PlayerMatchmakingData(
+                    userId, restrictions, avoidList, rating, activeHourBuckets, completedGames, roleNames, queueWait);
         }
     }
 }
