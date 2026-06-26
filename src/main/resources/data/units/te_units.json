@@ -60,11 +60,11 @@
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/helios2.jpg?raw=true",
         "source": "thunders_edge",
         "faction": "bastion",
-        "productionValue": 4,
+        "productionValue": "+4",
         "basicProduction": "res",
         "capacityValue": 3,
         "isStructure": true,
-        "ability": "The resource value of this planet is increased by 2."
+        "ability": "The resource value of this planet is increased by 2. This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity"
     },
     {
         "id": "deepwrought_flagship",
