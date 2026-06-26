@@ -6,6 +6,8 @@ import de.gesundkrank.jskills.Rating;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +29,7 @@ import ti4.spring.service.persistence.PlayerEntityRepository;
 public class MatchmakingRatingEventService {
 
     private static final int MAX_LIST_SIZE = 50;
+    private static final int INACTIVITY_MONTHS = 6;
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
     private static final Duration RATINGS_CACHE_TTL = Duration.ofMinutes(30);
     private static final String RATINGS_CACHE_NAME = "matchmakingDefaultRatingsCache";
@@ -47,10 +50,9 @@ public class MatchmakingRatingEventService {
     public void calculateRatings(SlashCommandInteractionEvent event) {
         boolean onlyTiglGames = event.getOption("tigl_only", Boolean.FALSE, OptionMapping::getAsBoolean);
         boolean showRating = event.getOption("show_my_rating", Boolean.FALSE, OptionMapping::getAsBoolean);
-        boolean conservativeRating = event.getOption("conservative", Boolean.FALSE, OptionMapping::getAsBoolean);
 
-        List<MatchmakingRating> playerRatings = getPlayerRatings(onlyTiglGames, conservativeRating);
-        sendMessage(event, playerRatings, showRating, conservativeRating);
+        List<MatchmakingRating> playerRatings = getPlayerRatings(onlyTiglGames, true);
+        sendMessage(event, playerRatings, showRating);
     }
 
     public static long toDisplayRating(BigDecimal rating) {
@@ -114,16 +116,19 @@ public class MatchmakingRatingEventService {
     }
 
     private static void sendMessage(
-            SlashCommandInteractionEvent event,
-            List<MatchmakingRating> playerRatings,
-            boolean showRating,
-            boolean conservativeRating) {
+            SlashCommandInteractionEvent event, List<MatchmakingRating> playerRatings, boolean showRating) {
         int maxListSize = Math.min(MAX_LIST_SIZE, playerRatings.size());
-        String ratingLabel = conservativeRating ? "Conservative Rating" : "Rating";
+        String ratingLabel = "Rating";
+        long inactivityCutoff = Instant.now()
+                .atZone(ZoneOffset.UTC)
+                .minusMonths(INACTIVITY_MONTHS)
+                .toInstant()
+                .toEpochMilli();
         StringBuilder stringBuilder = new StringBuilder().append("__**Player Matchmaking Ratings:**__\n");
         for (int i = 0, listSize = 0; i < playerRatings.size() && listSize < maxListSize; i++) {
             var playerRating = playerRatings.get(i);
             if (playerRating.calibrationPercent().compareTo(ONE_HUNDRED) < 0) continue;
+            if (playerRating.lastGameEndedDate() < inactivityCutoff) continue;
 
             listSize++;
             String formattedString = String.format(
