@@ -609,8 +609,6 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.HAS_HAD_A_STATUS_PHASE + " " + game.isHasHadAStatusPhase());
         writer.write(System.lineSeparator());
-        writer.write(Constants.SPEAKER_ORDER_ESTABLISHED + " " + game.isSpeakerOrderEstablished());
-        writer.write(System.lineSeparator());
         writer.write(Constants.BOT_SHUSHING + " " + game.isBotShushing());
         writer.write(System.lineSeparator());
         writer.write(Constants.HOMEBREW_SC_MODE + " " + game.isHomebrewSCMode());

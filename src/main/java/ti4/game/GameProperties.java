@@ -74,7 +74,6 @@ public class GameProperties {
     private String playersWhoHitPersistentNoWhen = "";
     private String savedMessage;
     private boolean hasHadAStatusPhase;
-    private boolean speakerOrderEstablished;
     private boolean naaluAgent;
     private boolean warfareAction;
     private boolean l1Hero;

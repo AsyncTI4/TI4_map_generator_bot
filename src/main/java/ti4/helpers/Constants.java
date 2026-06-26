@@ -1225,7 +1225,6 @@ public final class Constants {
     public static final String BOT_COLOR_REACTS = "bot_color_reacts";
     public static final String BOT_STRAT_REACTS = "bot_strat_reacts";
     public static final String HAS_HAD_A_STATUS_PHASE = "has_had_a_status_phase";
-    public static final String SPEAKER_ORDER_ESTABLISHED = "speaker_order_established";
     public static final String BOT_SHUSHING = "bot_shushing";
     public static final String RELIC_SEND = "send";
     public static final String FOLLOWED_SC = "followed_sc";

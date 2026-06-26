@@ -28,7 +28,6 @@ public class SetOrderService {
                 newPlayerOrder.putAll(players);
             }
             game.setPlayers(newPlayerOrder);
-            game.setSpeakerOrderEstablished(true);
         } catch (Exception e) {
             game.setPlayers(playersBackup);
         }
