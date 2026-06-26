@@ -3,6 +3,7 @@ package ti4.spring.service.statistics.matchmaking;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -11,9 +12,9 @@ import org.junit.jupiter.api.Test;
 
 class MatchmakingRatingServiceTest {
 
-    // Ratings only count players with at least three completed games, so fixtures repeat the same game thrice.
     private static final int GAMES_TO_QUALIFY = 3;
     private static final int[] RANKS = {1, 2, 2, 3, 3, 3};
+    private static final long GAME_ENDED_EPOCH_MILLIS = Instant.now().toEpochMilli();
 
     @Test
     void generatingRatingsTwiceGivesSameResult() {
@@ -91,7 +92,7 @@ class MatchmakingRatingServiceTest {
         for (int i = 0; i < ranks.length; i++) {
             players.add(new MatchmakingPlayer("p" + i, "player" + i, ranks[i]));
         }
-        return new MatchmakingGame(name, System.currentTimeMillis(), players);
+        return new MatchmakingGame(name, GAME_ENDED_EPOCH_MILLIS, players);
     }
 
     private static MatchmakingRating findRatingForUser(List<MatchmakingRating> ratings, String userId) {
