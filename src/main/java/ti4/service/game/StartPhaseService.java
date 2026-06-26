@@ -244,7 +244,7 @@ public class StartPhaseService {
             round++;
             game.setRound(round);
         }
-        if (game.getRound() == 1) {
+        if (game.getRound() == 1 && !game.isFowMode()) {
             Helper.setOrder(game);
             if (game.getActionsChannel() != null) {
                 for (ThreadChannel threadChannel : game.getActionsChannel().getThreadChannels()) {
