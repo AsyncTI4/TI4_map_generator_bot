@@ -48,7 +48,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "After 1 of your war suns is destroyed, replace this unit with a war sun. This unit has capacity equal to your war sun unit's capacity."
+        "ability": "After 1 of your war suns is destroyed, you may replace this unit with a war sun. This unit has capacity equal to your war sun unit's capacity."
     },
     {
         "id": "xan_mech",
