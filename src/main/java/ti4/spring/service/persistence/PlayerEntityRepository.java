@@ -52,6 +52,6 @@ public interface PlayerEntityRepository extends JpaRepository<PlayerEntity, Long
               AND g.playerCount <= 8
               AND (:onlyTiglGames IS FALSE OR g.twilightImperiumGlobalLeague IS TRUE)
             """)
-    List<PlayerEntity> findAllWithUsersAndGamesByCompletedSixPlayerNonAllianceGame(
+    List<PlayerEntity> findAllWithUsersAndGamesByCompletedNonAllianceGame(
             @Param("onlyTiglGames") boolean onlyTiglGames);
 }

@@ -108,7 +108,7 @@ public class MatchmakingRatingEventService {
 
     private List<MatchmakingRating> getPlayerRatings(boolean onlyTiglGames, boolean useConservativeRating) {
         List<PlayerEntity> players =
-                playerEntityRepository.findAllWithUsersAndGamesByCompletedSixPlayerNonAllianceGame(onlyTiglGames);
+                playerEntityRepository.findAllWithUsersAndGamesByCompletedNonAllianceGame(onlyTiglGames);
         List<MatchmakingGame> games = MatchmakingGame.getMatchmakingGames(players);
         return TrueSkillMatchmakingRatingService.calculateRatings(games, useConservativeRating);
     }
