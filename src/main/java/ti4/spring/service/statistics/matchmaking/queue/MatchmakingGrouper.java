@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
+import ti4.logging.BotLogger;
 import ti4.settings.users.UserSettings;
 
 @UtilityClass
@@ -113,16 +114,34 @@ class MatchmakingGrouper {
                     config.expansion(),
                     config.pace(),
                     matchRestrictions));
+            logMatchFormed(config, matchMembers, playerMatchmakingData);
             partiesAddedToGames.addAll(matchParties);
             partiesStillSearching.removeAll(matchParties);
         }
+    }
+
+    private static void logMatchFormed(
+            GameConfig config,
+            List<MatchmakingQueueMember> matchMembers,
+            Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData) {
+        String playerDetails = matchMembers.stream()
+                .map(playerMatchmakingData::get)
+                .map(String::valueOf)
+                .collect(Collectors.joining("\n  "));
+        BotLogger.info("Matchmaking formed a %d-player game (%s VP, %s, %s):%n  %s"
+                .formatted(
+                        config.playerCountValue(),
+                        config.victoryPointGoal(),
+                        config.expansion(),
+                        config.pace(),
+                        playerDetails));
     }
 
     private static Comparator<QueuedParty> prioritizeByQueuedAtTime() {
         return Comparator.comparing((QueuedParty party) ->
                         MatchmakingOptions.getHours(party.leaderSettings().getMatchmakingMaxQueueTime()))
                 .reversed()
-                .thenComparing(party -> party.party().getQueuedAt());
+                .thenComparing(queuedParty -> queuedParty.party().getQueuedAt());
     }
 
     private static boolean isPartyCompatibleForMatch(
@@ -133,8 +152,7 @@ class MatchmakingGrouper {
             for (MatchmakingQueueMember existing : group) {
                 PlayerMatchmakingData a = matchData.get(existing);
                 PlayerMatchmakingData b = matchData.get(newMember);
-                boolean relaxed = a.relaxConstraints() || b.relaxConstraints();
-                if (MatchmakingCompatibilityService.areIncompatible(a, b, relaxed)) {
+                if (MatchmakingCompatibilityService.areIncompatible(a, b)) {
                     return false;
                 }
             }

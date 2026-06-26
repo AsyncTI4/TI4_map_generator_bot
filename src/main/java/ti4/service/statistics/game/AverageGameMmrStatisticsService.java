@@ -75,7 +75,7 @@ class AverageGameMmrStatisticsService {
             if (isNotBlank(customName)) {
                 sb.append(String.format(" `%s`", customName));
             }
-            sb.append(String.format(" (rated %.3f)", entry.getValue()));
+            sb.append(String.format(" (rated %d)", MatchmakingRatingEventService.toDisplayRating(entry.getValue())));
             if (gamePlayerIds.get(gameName).contains(runnerUserId)) {
                 sb.append("  👀 **YOU!**");
             }
@@ -89,7 +89,9 @@ class AverageGameMmrStatisticsService {
                     .map(Map.Entry::getValue)
                     .reduce(BigDecimal.ZERO, BigDecimal::add)
                     .divide(BigDecimal.valueOf(gameAverages.size()), MathContext.DECIMAL64);
-            sb.append(String.format("%nThe average MMR across all games is `%.3f`.%n", overallAverage));
+            sb.append(String.format(
+                    "%nThe average MMR across all games is `%d`.%n",
+                    MatchmakingRatingEventService.toDisplayRating(overallAverage)));
         }
 
         MessageHelper.sendMessageToThread(

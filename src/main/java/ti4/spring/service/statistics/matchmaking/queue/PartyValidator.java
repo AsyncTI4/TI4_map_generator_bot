@@ -35,7 +35,7 @@ public class PartyValidator {
         for (int i = 0; i < members.size(); i++) {
             for (int j = i + 1; j < members.size(); j++) {
                 if (MatchmakingCompatibilityService.areIncompatible(
-                        dataById.get(members.get(i)), dataById.get(members.get(j)), false)) {
+                        dataById.get(members.get(i)), dataById.get(members.get(j)))) {
                     return false;
                 }
             }

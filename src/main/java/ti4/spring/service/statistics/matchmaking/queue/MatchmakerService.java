@@ -115,8 +115,9 @@ public class MatchmakerService {
         List<QueuedParty> expiredParties = queuedPartyByExpired.get(true);
 
         if (!expiredParties.isEmpty()) {
-            queueStore.deleteParties(
-                    expiredParties.stream().map(party -> party.party().getId()).toList());
+            queueStore.deleteParties(expiredParties.stream()
+                    .map(queuedParty -> queuedParty.party().getId())
+                    .toList());
             MatchmakingNotifier.notifyExpired(expiredParties);
         }
 

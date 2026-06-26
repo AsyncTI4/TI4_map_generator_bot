@@ -39,19 +39,14 @@ class PlayerMatchDataFactory {
         Instant now = Instant.now();
 
         Map<MatchmakingQueueMember, PlayerMatchmakingData> matchData = new HashMap<>();
-        for (QueuedParty party : parties) {
-            List<String> leaderRestrictions = party.leaderSettings().getMatchmakingRestrictions();
-            boolean relaxConstraints = shouldRelaxConstraints(party, now);
-            for (MatchmakingQueueMember member : party.members()) {
-                matchData.put(member, build(member.getUserId(), leaderRestrictions, ratings, guild, relaxConstraints));
+        for (QueuedParty queuedParty : parties) {
+            List<String> leaderRestrictions = queuedParty.leaderSettings().getMatchmakingRestrictions();
+            Duration queueWait = Duration.between(queuedParty.party().getQueuedAt(), now);
+            for (MatchmakingQueueMember member : queuedParty.members()) {
+                matchData.put(member, build(member.getUserId(), leaderRestrictions, ratings, guild, queueWait));
             }
         }
         return matchData;
-    }
-
-    private static boolean shouldRelaxConstraints(QueuedParty party, Instant now) {
-        double hoursWaited = Duration.between(party.party().getQueuedAt(), now).toMinutes() / 60.0;
-        return hoursWaited >= 4;
     }
 
     static Map<String, PlayerMatchmakingData> buildForUsers(List<String> userIds, List<String> leaderRestrictions) {
@@ -60,7 +55,7 @@ class PlayerMatchDataFactory {
 
         Map<String, PlayerMatchmakingData> dataById = new HashMap<>();
         for (String id : userIds) {
-            dataById.put(id, build(id, leaderRestrictions, ratings, guild, false));
+            dataById.put(id, build(id, leaderRestrictions, ratings, guild, Duration.ZERO));
         }
         return dataById;
     }
@@ -70,7 +65,7 @@ class PlayerMatchDataFactory {
             List<String> leaderRestrictions,
             Map<String, Rating> ratings,
             Guild guild,
-            boolean halfQueueTimePassed) {
+            Duration queueWait) {
         UserSettings ownSettings = UserSettingsManager.get(userId);
         return new PlayerMatchmakingData(
                 userId,
@@ -80,7 +75,7 @@ class PlayerMatchDataFactory {
                 computeActiveHourBuckets(ownSettings.getActiveHoursAsIntegers()),
                 completedGames(userId),
                 roleNames(guild, userId),
-                halfQueueTimePassed);
+                queueWait);
     }
 
     private static int completedGames(String userId) {

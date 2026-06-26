@@ -1,6 +1,7 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
 import de.gesundkrank.jskills.Rating;
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 
@@ -12,4 +13,4 @@ record PlayerMatchmakingData(
         Set<Integer> activeHourBuckets,
         int completedGames,
         Set<String> roleNames,
-        boolean relaxConstraints) {}
+        Duration queueWait) {}

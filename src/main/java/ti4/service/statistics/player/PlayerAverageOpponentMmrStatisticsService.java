@@ -92,7 +92,7 @@ class PlayerAverageOpponentMmrStatisticsService {
                     .append(". `")
                     .append(StringUtils.leftPad(participantIdToUsername.get(entry.getKey()), 4))
                     .append("` ")
-                    .append(String.format("%.3f", entry.getValue()))
+                    .append(MatchmakingRatingEventService.toDisplayRating(entry.getValue()))
                     .append(" (")
                     .append(playerGameCount.get(entry.getKey()))
                     .append(" games)")

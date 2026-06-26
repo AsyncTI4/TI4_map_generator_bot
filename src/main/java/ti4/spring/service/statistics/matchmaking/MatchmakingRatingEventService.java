@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import de.gesundkrank.jskills.Rating;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,10 @@ public class MatchmakingRatingEventService {
 
         List<MatchmakingRating> playerRatings = getPlayerRatings(onlyTiglGames, conservativeRating);
         sendMessage(event, playerRatings, showRating, conservativeRating);
+    }
+
+    public static long toDisplayRating(BigDecimal rating) {
+        return rating.multiply(ONE_HUNDRED).setScale(0, RoundingMode.HALF_UP).longValueExact();
     }
 
     public Map<String, Rating> getPlayerRatings(Set<String> userIds) {
@@ -106,7 +111,8 @@ public class MatchmakingRatingEventService {
 
             listSize++;
             String formattedString = String.format(
-                    "%d. `%s` `%s=%.3f`\n", listSize, playerRating.username(), ratingLabel, playerRating.rating());
+                    "%d. `%s` `%s=%d`\n",
+                    listSize, playerRating.username(), ratingLabel, toDisplayRating(playerRating.rating()));
             stringBuilder.append(formattedString);
         }
 
@@ -116,12 +122,13 @@ public class MatchmakingRatingEventService {
                         .map(MatchmakingRating::rating)
                         .reduce(BigDecimal.ZERO, BigDecimal::add)
                         .divide(BigDecimal.valueOf(playerRatings.size()), java.math.MathContext.DECIMAL64);
-        String formattedString = String.format("""
+        String formattedString =
+                String.format("""
 
                 This list only includes the top %d players with a high confidence in their rating.
 
-                The average %s of the player base is `%.3f`
-                """, maxListSize, ratingLabel.toLowerCase(), averageRating);
+                The average %s of the player base is `%d`
+                """, maxListSize, ratingLabel.toLowerCase(), toDisplayRating(averageRating));
         stringBuilder.append(formattedString);
 
         playerRatings.stream()
@@ -131,7 +138,8 @@ public class MatchmakingRatingEventService {
                 .ifPresent(playerRating -> {
                     if (showRating && playerRating.calibrationPercent().compareTo(ONE_HUNDRED) == 0) {
                         stringBuilder.append(String.format(
-                                "\nYour %s is `%.3f`.", ratingLabel.toLowerCase(), playerRating.rating()));
+                                "\nYour %s is `%d`.",
+                                ratingLabel.toLowerCase(), toDisplayRating(playerRating.rating())));
                     } else {
                         stringBuilder.append(String.format(
                                 "\nWe are `%.1f%%` of the way to a high confidence in your rating.",
