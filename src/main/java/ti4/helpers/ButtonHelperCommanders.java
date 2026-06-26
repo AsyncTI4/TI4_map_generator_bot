@@ -432,7 +432,6 @@ public class ButtonHelperCommanders {
         }
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
-        player.addSpentThing(msg);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
 
@@ -729,6 +728,7 @@ public class ButtonHelperCommanders {
             String msg = "Please choose the system in which you wish to produce a ship using ";
             msg += Mapper.getUnit("tk-sumerianrelay").getNameRepresentation() + ".";
             List<Button> buttons = PlayerTechService.getSlingRelayButtons(game, player);
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
     }

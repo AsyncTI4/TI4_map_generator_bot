@@ -2439,6 +2439,7 @@ public class ButtonHelper {
     public static boolean canMoveOutOfLockedSystems(Player player, Game game) {
         if (game.isDominusOrb()
                 || game.isL1Hero()
+                || player.hasTech("tf-desperados")
                 || !game.getStoredValue("phantomEnergy").isEmpty()) {
             return true;
         }
@@ -8463,6 +8464,18 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), message, List.of(codex1, codex2, codex3));
+    }
+
+    @ButtonHandler("desperadoDestroyer_")
+    public static void desperadoDestroyer(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String tilePos = buttonID.split("_")[1];
+        Tile tile = game.getTileByPosition(tilePos);
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "dd");
+        ButtonHelper.deleteTheOneButton(event);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing() + " used the desperado ability to place a destroyer in tile "
+                        + tile.getRepresentationForButtons());
     }
 
     @ButtonHandler("sarMechStep1_")

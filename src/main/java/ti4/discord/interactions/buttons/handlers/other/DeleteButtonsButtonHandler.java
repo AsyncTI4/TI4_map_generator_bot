@@ -314,6 +314,7 @@ class DeleteButtonsButtonHandler {
                     player.addSpentThing("manifest");
                     game.removeStoredValue("manifestDiscount");
                 }
+
                 if (player.hasUnlockedBreakthrough("ghostbt")
                         && tile != null
                         && !tile.getWormholes(game).isEmpty()) {

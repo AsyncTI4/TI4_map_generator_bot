@@ -600,7 +600,7 @@
         "faction": "rohdhna"
     },
     {
-        "alias": "tf-plausibledeniability",
+        "alias": "tf-plausibled",
         "name": "Plausible Deniability",
         "types": [
             "BIOTIC"
