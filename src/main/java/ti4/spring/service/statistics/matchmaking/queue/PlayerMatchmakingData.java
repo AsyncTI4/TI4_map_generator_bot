@@ -13,4 +13,6 @@ record PlayerMatchmakingData(
         Set<Integer> activeHourBuckets,
         int completedGames,
         Set<String> roleNames,
-        Duration queueWait) {}
+        Duration queueWait,
+        String tiglRank,
+        String tiglFracturedRank) {}

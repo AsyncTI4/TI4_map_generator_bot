@@ -77,7 +77,9 @@ class PlayerMatchDataFactory {
                 computeActiveHourBuckets(ownSettings.getActiveHoursAsIntegers()),
                 completedGames(userId),
                 roleNames(guild, userId),
-                queueWait);
+                queueWait,
+                MatchmakingOptions.normalizeTiglRank(ownSettings.getMatchmakingTiglRank()),
+                MatchmakingOptions.normalizeTiglRank(ownSettings.getMatchmakingTiglFracturedRank()));
     }
 
     private static int completedGames(String userId) {
