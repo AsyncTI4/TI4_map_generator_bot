@@ -327,7 +327,8 @@ public final class DSHelperBreakthroughs {
                 p1.getRepresentation()
                         + " has used _Arms Brokerage_."
                         + " They will choose another player, and both players will secretly choose to spend 0, 1, or 2 trade goods."
-                        + " If both players spent the same, the chosen player must give " + p1.getRepresentationNoPing()
+                        + " If the players spend different amounts, the chosen player must give "
+                        + p1.getRepresentationNoPing()
                         + " a random promissory note.");
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         String message = ", please choose the target player.";

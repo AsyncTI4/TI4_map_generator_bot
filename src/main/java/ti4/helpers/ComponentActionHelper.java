@@ -312,7 +312,16 @@ public class ComponentActionHelper {
                     if (enigmaticSeen) {
                         continue;
                     }
-                    rButton = Buttons.red(factionChecker + prefix + "relic_" + relic, "Purge Enigmatic Device");
+                    String label = "Purge Enigmatic Device";
+                    if (game.isTwilightsFallMode()) {
+                        if (p1.getTechs().contains("wavelength")
+                                && p1.getTechs().contains("antimatter")) {
+                            label += " (for 2 Command tokens)";
+                        } else {
+                            label += " (for faction tech)";
+                        }
+                    }
+                    rButton = Buttons.red(factionChecker + prefix + "relic_" + relic, label);
                     enigmaticSeen = true;
                 } else {
                     List<String> exhaustRelics = List.of(
@@ -400,12 +409,8 @@ public class ComponentActionHelper {
                     Buttons.green(factionChecker + prefix + "ability_orbitalDrop", "Orbital Drop", FactionEmojis.Sol);
             compButtons.add(abilityButton);
         }
-        if (game.playerHasLeaderUnlockedOrAlliance(p1, "tyriscommander")
-                && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar"))) {
-            compButtons.add(Buttons.green(
-                    factionChecker + prefix + "ability_tyrisCommanderMech",
-                    "Place Mech for 1 Token",
-                    FactionEmojis.tyris));
+        if (game.playerHasLeaderUnlockedOrAlliance(p1, "tyriscommander")) {
+            TyrisCommanderButtonHandler.addCommanderActionButton(p1, factionChecker, prefix, compButtons);
         }
         if (p1.hasAbility("mutineers")
                 && !ButtonHelperAbilities.getTilesToMutineers(game, p1).isEmpty()

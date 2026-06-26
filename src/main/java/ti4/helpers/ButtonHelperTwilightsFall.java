@@ -1654,7 +1654,9 @@ public final class ButtonHelperTwilightsFall {
 
     public static void startInauguralSplice(Game game) {
         // The inaugural splice uses the seating order, so it's set here already
-        Helper.setOrder(game);
+        if (!game.isFowMode()) {
+            Helper.setOrder(game);
+        }
         game.setBagDraft(new InauguralSpliceFrankenDraft(game));
         FrankenDraftBagService.startDraft(game);
     }

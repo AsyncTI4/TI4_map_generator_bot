@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixAbilityButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -454,12 +455,7 @@ public class AddPlanetService {
                 && !doubleCheck
                 && !setup
                 && !unitHolder.getTechSpecialities().isEmpty()) {
-            String fac = player.getFactionEmoji();
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    fac + " placed 1 PDS on " + Helper.getPlanetRepresentation(unitHolder.getName(), game)
-                            + " due to the Veiled Ember Forge ability. This is optional but was done automatically.");
-            AddUnitService.addUnits(event, tile, game, player.getColor(), "pds " + unitHolder.getName());
+            VyserixAbilityButtonHandler.onGainPlanetWithTechSpec(player, game, event, tile, unitHolder);
         }
         if ((game.getPhaseOfGame().contains("agenda")
                         || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
