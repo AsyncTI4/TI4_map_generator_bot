@@ -716,7 +716,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             if (DiscordErrorUtility.isUnknownChannelError(e)) {
                 return null;
             }
-            throw e;
+            BotLogger.error("**CardsInfoThreadError**", e);
+            return null;
+            // throw e;
         }
     }
 

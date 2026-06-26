@@ -2406,7 +2406,12 @@ public final class Helper {
         }
         boolean greenMechd = false;
         boolean ironMechSpaceAdded = false;
-
+        if (player.hasTech("tf-desperados")) {
+            unitButtons.add(Buttons.blue(
+                    player.factionButtonChecker() + "desperadoDestroyer_" + tile.getPosition(),
+                    "Place Desperado Destroyer",
+                    FactionEmojis.nokar));
+        }
         if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff)
                 && !"arboHeroBuild".equalsIgnoreCase(warfareNOtherstuff)
                 && !"solBtBuild".equalsIgnoreCase(warfareNOtherstuff)
