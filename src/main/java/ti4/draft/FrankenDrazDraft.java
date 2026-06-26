@@ -36,7 +36,6 @@ import ti4.message.componentsV2.MessageV2Editor;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.franken.FrankenDraftBagService;
-import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 
 public class FrankenDrazDraft extends FrankenDraft {
@@ -128,7 +127,7 @@ public class FrankenDrazDraft extends FrankenDraft {
 
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
         draftManager.clear();
-        MiltyDraftHelper.initDraftTiles(draftManager, game);
+        initFrankenDraftTiles(draftManager, game);
         allDraftableItems.put(DraftCategory.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftManager, game));
         allDraftableItems.put(DraftCategory.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager, game));
 

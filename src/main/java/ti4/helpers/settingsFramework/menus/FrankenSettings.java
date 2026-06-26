@@ -230,11 +230,9 @@ public class FrankenSettings extends SettingsMenu {
         game.setDiscordantStarsMode(isEffectiveDiscordantStarsEnabled());
         game.setBlueReverieMode(isEffectiveBlueReverieEnabled());
         game.setUnchartedSpaceStuff(homebrewSettings.getUnchartedSpace().isVal());
-
-        if (!game.isAcd2()) {
-            String acDeck = game.isUnchartedSpaceStuff() ? "action_cards_ds" : "action_cards_te";
-            game.resetActionCardDeck(Mapper.getDeck(acDeck));
-        }
+        game.setStoredValue(
+                Constants.INCLUDE_ERONOUS_TILES,
+                Boolean.toString(homebrewSettings.getEronous().isVal()));
     }
 
     private FrankenDraftMode selectedDraftMode() {

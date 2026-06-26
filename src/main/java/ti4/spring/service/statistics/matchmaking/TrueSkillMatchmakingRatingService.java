@@ -19,8 +19,10 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 class TrueSkillMatchmakingRatingService {
 
+    private static final FactorGraphTrueSkillCalculator CALCULATOR = new FactorGraphTrueSkillCalculator();
     private static final double SIGMA_CALIBRATION_THRESHOLD = 1.5;
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
+    private static final int MINIMUM_GAMES_FOR_RANKING = 3;
 
     static List<MatchmakingRating> calculateRatings(List<MatchmakingGame> games) {
         return calculateRatings(games, false);
@@ -33,6 +35,8 @@ class TrueSkillMatchmakingRatingService {
         Map<String, Player<String>> userIdToTrueSkillPlayer = new HashMap<>();
         Map<IPlayer, Rating> trueSkillPlayerToRating = new HashMap<>();
         Map<String, String> userIdToUsername = new HashMap<>();
+        Map<String, Integer> gamesPlayedByUserId = new HashMap<>();
+        Map<String, Long> lastGameEndedDateByUserId = new HashMap<>();
 
         for (MatchmakingGame game : games) {
             List<MatchmakingPlayer> gamePlayers = game.players();
@@ -45,6 +49,8 @@ class TrueSkillMatchmakingRatingService {
                 Rating rating =
                         trueSkillPlayerToRating.computeIfAbsent(trueSkillPlayer, _ -> gameInfo.getDefaultRating());
                 userIdToUsername.put(gamePlayer.userId(), gamePlayer.username());
+                gamesPlayedByUserId.merge(gamePlayer.userId(), 1, Integer::sum);
+                lastGameEndedDateByUserId.merge(gamePlayer.userId(), game.endedDate(), Math::max);
 
                 var team = new Team();
                 team.addPlayer(trueSkillPlayer, rating);
@@ -52,21 +58,28 @@ class TrueSkillMatchmakingRatingService {
                 ranks[i] = gamePlayer.rank();
             }
 
-            Map<IPlayer, Rating> newRatings =
-                    new FactorGraphTrueSkillCalculator().calculateNewRatings(gameInfo, teams, ranks);
+            Map<IPlayer, Rating> newRatings = CALCULATOR.calculateNewRatings(gameInfo, teams, ranks);
             trueSkillPlayerToRating.putAll(newRatings);
         }
 
         return buildMatchmakingRatings(
-                userIdToTrueSkillPlayer, trueSkillPlayerToRating, userIdToUsername, useConservativeRating);
+                userIdToTrueSkillPlayer,
+                trueSkillPlayerToRating,
+                userIdToUsername,
+                gamesPlayedByUserId,
+                lastGameEndedDateByUserId,
+                useConservativeRating);
     }
 
     private static List<MatchmakingRating> buildMatchmakingRatings(
             Map<String, Player<String>> players,
             Map<IPlayer, Rating> ratings,
             Map<String, String> userIdToUsername,
+            Map<String, Integer> gamesPlayedByUserId,
+            Map<String, Long> lastGameEndedDateByUserId,
             boolean useConservativeRating) {
         return players.entrySet().stream()
+                .filter(entry -> gamesPlayedByUserId.getOrDefault(entry.getKey(), 0) >= MINIMUM_GAMES_FOR_RANKING)
                 .map(entry -> {
                     String userId = entry.getKey();
                     String username = userIdToUsername.get(userId);
@@ -78,7 +91,14 @@ class TrueSkillMatchmakingRatingService {
                             .multiply(ONE_HUNDRED);
                     BigDecimal calibrationPercent = calculatedPercent.min(ONE_HUNDRED);
                     double rawRating = useConservativeRating ? rating.getConservativeRating() : rating.getMean();
-                    return new MatchmakingRating(userId, username, BigDecimal.valueOf(rawRating), calibrationPercent);
+                    long lastGameEndedDate = lastGameEndedDateByUserId.getOrDefault(userId, 0L);
+                    return new MatchmakingRating(
+                            userId,
+                            username,
+                            BigDecimal.valueOf(rawRating),
+                            standardDeviation,
+                            calibrationPercent,
+                            lastGameEndedDate);
                 })
                 .sorted(Comparator.comparing(MatchmakingRating::rating).reversed())
                 .toList();

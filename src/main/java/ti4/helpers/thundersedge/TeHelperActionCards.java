@@ -259,7 +259,18 @@ public class TeHelperActionCards {
         game.removeStoredValue("coexistFlag");
 
         String message = player.getRepresentation() + " placed an infantry into coexistence on the planet of "
-                + Helper.getPlanetRepresentation(planet, game) + ".";
+                + Helper.getPlanetRepresentation(planet, game) + ". ";
+
+        Player owner = null;
+        for (Player p : game.getRealPlayers()) {
+            if (p.getPlanets().contains(planet)) {
+                owner = p;
+            }
+        }
+        if (owner != null && !game.isFowMode()) {
+            message += owner.getRepresentation()
+                    + " since this is your planet, you are getting a ping here to let you know.";
+        }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
         ButtonHelperAbilities.oceanBoundCheck(game);

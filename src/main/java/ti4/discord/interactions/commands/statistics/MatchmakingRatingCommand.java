@@ -15,11 +15,7 @@ class MatchmakingRatingCommand extends Subcommand {
                 new OptionData(
                         OptionType.BOOLEAN,
                         "show_my_rating",
-                        "If true, shows your rating instead of calibration percent when fully calibrated"),
-                new OptionData(
-                        OptionType.BOOLEAN,
-                        "conservative",
-                        "True to use conservative TrueSkill ratings instead of mean ratings"));
+                        "If true, shows your rating instead of calibration percent when fully calibrated"));
     }
 
     @Override

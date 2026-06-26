@@ -91,7 +91,8 @@ public class SusSlashCommandService {
         if (managedGame != null) {
             TextChannel mainGameChannel = managedGame.getMainGameChannel();
             TextChannel tableTalkChannel = managedGame.getTableTalkChannel();
-            String tabletalkLink = String.format("[__[Tabletalk](%s)__]", tableTalkChannel.getJumpUrl());
+            String tabletalkLink =
+                    String.format("[__[" + tableTalkChannel.getName() + "](%s)__]", tableTalkChannel.getJumpUrl());
             String actionsLink = String.format("[__[Actions](%s)__]", mainGameChannel.getJumpUrl());
             message.append(" ").append(actionsLink);
             message.append(" ").append(tabletalkLink);

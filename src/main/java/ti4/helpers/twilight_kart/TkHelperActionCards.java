@@ -224,7 +224,8 @@ public class TkHelperActionCards {
             Tile tile = game.getTileFromPlanet(planet);
             String units = "mech " + planet + ", pds " + planet;
             TeHelperActionCards.resolvePiratesGeneric(event, game, player, tile, units);
-            String message = player.getRepresentation() + " 'commissioned' some mercenaries to post up at "
+            player.setTg(player.getTg() - 2);
+            String message = player.getRepresentation() + " paid some mercenaries 2 trade goods to post up at "
                     + Helper.getPlanetRepresentation(planet, game) + ".";
             if (tile != null && tile.getPosition().contains("frac")) {
                 Planet uh = game.getUnitHolderFromPlanet(planet);
