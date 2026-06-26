@@ -31,6 +31,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.acd2.PublicOutrageA
 import ti4.discord.interactions.buttons.handlers.actioncards.acd2.SettlementsAcd2ButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanAbilityButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -3240,13 +3241,7 @@ public final class AgendaHelper {
                     player.getRepresentationNoPing() + " has the opportunity to resolve a Minister of Industry build.");
         }
         if (player.hasAbility("quantum_fabrication") && !tile.isScar(game)) {
-            String msg = player.getRepresentationUnfogged()
-                    + ", if you placed this space dock via **Construction**, you may use its PRODUCTION ability immediately in "
-                    + tile.getRepresentationForButtons(game, player) + " via **Quantum Fabrication**.";
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(),
-                    msg,
-                    Helper.getPlaceUnitButtons(event, player, game, tile, "ministerBuild", "place"));
+            XanAbilityButtonHandler.offerQuantumFabrication(player, game, event, tile);
         }
     }
 }

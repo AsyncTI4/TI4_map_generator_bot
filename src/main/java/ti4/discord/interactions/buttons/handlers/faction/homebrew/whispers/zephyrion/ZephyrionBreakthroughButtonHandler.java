@@ -20,10 +20,24 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.ExhaustLeaderService;
 
 @UtilityClass
-class ZephyrionBreakthroughButtonHandler {
+public class ZephyrionBreakthroughButtonHandler {
+
+    public static void offerBtCombatButtons(Player player, Player otherPlayer, Game game, String msg) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.gray(
+                player.factionButtonChecker() + "zephyrionbtRes_" + otherPlayer.getFaction(),
+                "Resolve Subdue Chancellor (Upon Win)",
+                FactionEmojis.zephyrion));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                msg
+                        + ", a reminder that if you win this space combat, you may resolve _Subdue Chancellor_ to draw an unused agent.",
+                buttons);
+    }
 
     @ButtonHandler("zephyrionbtRes_")
     public static void zephyrionbtRes(String buttonID, ButtonInteractionEvent event, Game game, Player player) {

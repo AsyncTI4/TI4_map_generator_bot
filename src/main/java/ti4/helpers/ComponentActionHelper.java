@@ -400,12 +400,8 @@ public class ComponentActionHelper {
                     Buttons.green(factionChecker + prefix + "ability_orbitalDrop", "Orbital Drop", FactionEmojis.Sol);
             compButtons.add(abilityButton);
         }
-        if (game.playerHasLeaderUnlockedOrAlliance(p1, "tyriscommander")
-                && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar"))) {
-            compButtons.add(Buttons.green(
-                    factionChecker + prefix + "ability_tyrisCommanderMech",
-                    "Place Mech for 1 Token",
-                    FactionEmojis.tyris));
+        if (game.playerHasLeaderUnlockedOrAlliance(p1, "tyriscommander")) {
+            TyrisCommanderButtonHandler.addCommanderActionButton(p1, factionChecker, prefix, compButtons);
         }
         if (p1.hasAbility("mutineers")
                 && !ButtonHelperAbilities.getTilesToMutineers(game, p1).isEmpty()

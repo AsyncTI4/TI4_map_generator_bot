@@ -40,6 +40,13 @@ public class TyrisCommanderButtonHandler {
                 buttons);
     }
 
+    public static void addCommanderActionButton(
+            Player p1, String factionChecker, String prefix, List<Button> compButtons) {
+        if (p1.getStrategicCC() <= 0 && !p1.hasRelicReady("emelpar")) return;
+        compButtons.add(Buttons.green(
+                factionChecker + prefix + "ability_tyrisCommanderMech", "Place Mech for 1 Token", FactionEmojis.tyris));
+    }
+
     public static void offerInfantry(Game game, Player player) {
         List<Button> buttons =
                 new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "gf", "placeOneNDone_skipbuild"));

@@ -13,6 +13,7 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
 import ti4.service.actioncard.ForceGiveActionCardService;
+import ti4.service.emoji.FactionEmojis;
 
 @UtilityClass
 public class ArvaxiAbilityButtonHandler {
@@ -52,6 +53,19 @@ public class ArvaxiAbilityButtonHandler {
                 player.getCorrectChannel(),
                 "Sent " + target.getColor() + " the buttons for resolving Underhanded Maneuver.");
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static void offerUndHandManeuver(Player player) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.gray(
+                player.factionButtonChecker() + "underhandedManeuverPickNeighbor",
+                "Use Underhanded Maneuver",
+                FactionEmojis.arvaxi));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + ", use buttons to resolve _Underhanded Maneuver_.",
+                buttons);
     }
 
     public static void onExplorePlanet(Player player, Game game, String planetName) {

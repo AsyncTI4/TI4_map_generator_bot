@@ -75,20 +75,35 @@ public class ZephyrionAgentButtonHandler {
 
         UnitType type = Mapper.getUnitKey(AliasHandler.resolveUnit(unitTypeString), p2.getColorID())
                 .unitType();
-        List<Button> destroyButtons = new ArrayList<>();
+        List<Tile> validTiles = new ArrayList<>();
         for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, type)) {
             UnitHolder space = tile.getSpaceUnitHolder();
             if (space.getUnitCount(type, p2.getColor()) > 0 && CommandCounterHelper.hasCC(p2, tile)) {
+                validTiles.add(tile);
+            }
+        }
+        if (validTiles.size() == 1) {
+            zephShipDestroy(
+                    "zephShipDestroy_" + faction + "_" + unitTypeString + "_"
+                            + validTiles.getFirst().getPosition(),
+                    event,
+                    game,
+                    player);
+        } else {
+            List<Button> destroyButtons = new ArrayList<>();
+            for (Tile tile : validTiles) {
                 destroyButtons.add(Buttons.red(
                         p2.factionButtonChecker() + "zephShipDestroy_" + faction + "_" + unitTypeString + "_"
                                 + tile.getPosition(),
                         StringUtils.capitalize(unitTypeString) + " in " + tile.getRepresentationForButtons(game, p2)));
             }
+            destroyButtons.add(Buttons.gray("deleteButtons", "Done"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    game.getMainGameChannel(),
+                    p2.getRepresentation() + ", choose which ship to destroy.",
+                    destroyButtons);
+            ButtonHelper.deleteMessage(event);
         }
-        destroyButtons.add(Buttons.gray("deleteButtons", "Done"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                game.getMainGameChannel(), p2.getRepresentation() + ", choose which ship to destroy.", destroyButtons);
-        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("zephShipDestroy_")
