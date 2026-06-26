@@ -6,11 +6,13 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.edict.EdictPhaseHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -224,7 +226,8 @@ public class TkHelperActionCards {
             Tile tile = game.getTileFromPlanet(planet);
             String units = "mech " + planet + ", pds " + planet;
             TeHelperActionCards.resolvePiratesGeneric(event, game, player, tile, units);
-            String message = player.getRepresentation() + " 'commissioned' some mercenaries to post up at "
+            player.setTg(player.getTg() - 2);
+            String message = player.getRepresentation() + " paid some mercenaries 2 trade goods to post up at "
                     + Helper.getPlanetRepresentation(planet, game) + ".";
             if (tile != null && tile.getPosition().contains("frac")) {
                 Planet uh = game.getUnitHolderFromPlanet(planet);

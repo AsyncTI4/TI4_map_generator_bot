@@ -6,9 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -327,7 +329,7 @@ public final class DSHelperBreakthroughs {
                 p1.getRepresentation()
                         + " has used _Arms Brokerage_."
                         + " They will choose another player, and both players will secretly choose to spend 0, 1, or 2 trade goods."
-                        + " If both players spent the same, the chosen player must give " + p1.getRepresentationNoPing()
+                        + " If the players spend different amounts, the chosen player must give " + p1.getRepresentationNoPing()
                         + " a random promissory note.");
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         String message = ", please choose the target player.";
