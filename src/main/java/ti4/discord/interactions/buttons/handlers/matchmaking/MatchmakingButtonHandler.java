@@ -432,7 +432,7 @@ class MatchmakingButtonHandler {
         if (selectedValue != null && options.contains(selectedValue)) {
             builder.setDefaultValues(List.of(selectedValue));
         }
-        return builder.setRequiredRange(0, 1).build();
+        return builder.setRequired(false).setRequiredRange(0, 1).build();
     }
 
     private static List<String> getSelectedValues(ModalInteraction event, String modalValueId) {
