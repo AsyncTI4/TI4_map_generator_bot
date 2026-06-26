@@ -13,6 +13,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CommandCounterHelper;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -33,9 +34,11 @@ public class KaloraAbilityHandler {
     public static void carapaceRegeneration(Player player, Tile destTile, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
         UnitHolder space = destTile.getSpaceUnitHolder();
-        space.getUnitDamage().entrySet().stream()
-                .filter(e -> e.getKey().colorID().equals(colorID) && e.getKey().unitType() != UnitType.Mech)
-                .forEach(e -> space.removeDamagedUnit(e.getKey(), e.getValue()));
+        for (UnitType unitType : UnitType.values()) {
+            if (unitType == UnitType.Mech) continue;
+            int damaged = space.getDamagedUnitCount(unitType, colorID);
+            if (damaged > 0) space.removeDamagedUnit(Units.getUnitKey(unitType, colorID), damaged);
+        }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getFactionEmoji()
