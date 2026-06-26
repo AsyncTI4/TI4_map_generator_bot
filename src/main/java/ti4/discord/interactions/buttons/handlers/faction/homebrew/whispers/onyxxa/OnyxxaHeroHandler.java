@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
 
 @UtilityClass
-public class OnyxxaHeroButtonHandler {
+public class OnyxxaHeroHandler {
 
     public static void postInitialButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();

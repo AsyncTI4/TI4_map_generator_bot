@@ -12,7 +12,7 @@ import ti4.helpers.Units.UnitState;
 import ti4.message.MessageHelper;
 
 @UtilityClass
-public class XanHeroButtonHandler {
+public class XanHeroHandler {
 
     public static void postInitialButtons(Game game, Player player) {
         int amount = 0;

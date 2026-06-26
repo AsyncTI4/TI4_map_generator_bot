@@ -38,7 +38,11 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaUnitButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -112,6 +116,7 @@ public class CombatRollService {
                 BombardmentService.autoAssignAllBombardmentToAPlanet(player, game);
             }
             boolean hasValidBombardment = false;
+            List<String> bombardedPlanets = new ArrayList<>();
             for (String planet : BombardmentService.getBombardablePlanets(player, game, tile)) {
                 if (game.getStoredValue("assignedBombardment" + player.getFaction())
                         .contains(planet)) {
@@ -119,12 +124,16 @@ public class CombatRollService {
                     secondHalfOfCombatRoll(
                             player, game, event, tile, unitHolderName, CombatRollType.bombardment, false);
                     hasValidBombardment = true;
+                    bombardedPlanets.add(planet);
                 }
             }
             if (!hasValidBombardment) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "No valid bombardment target found. Please assign bombardment to a planet using the buttons and try again.");
+            } else if (ButtonHelper.doesPlayerHaveFSHere("kalora_flagship", player, tile)) {
+                KaloraUnitHandler.flagshipBombardmentReroll(
+                        player, event.getMessageChannel(), tile.getPosition(), bombardedPlanets);
             }
             return 0;
         }
@@ -1027,7 +1036,16 @@ public class CombatRollService {
             if (rollType == CombatRollType.combatround
                     && "onyxxa_mech".equalsIgnoreCase(unitModel.getId())
                     && unitHolder != null) {
-                modifierToHit += OnyxxaUnitButtonHandler.getObeliskCombatModifier(player, unitHolder);
+                modifierToHit += OnyxxaUnitHandler.getObeliskCombatModifier(player, unitHolder);
+            }
+            if (rollType == CombatRollType.combatround
+                    && "xan_mech".equals(unitModel.getId())
+                    && unitHolder != null
+                    && XanUnitHandler.countSpaceDocksOnHolder(unitHolder, game) > 0) {
+                modifierToHit += 2;
+            }
+            if (unitHolder != null) {
+                modifierToHit += VyserixUnitHandler.getTechnotemplarModifier(player, unitHolder, rollType);
             }
             int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player);
             if (rollType == CombatRollType.combatround) {
@@ -1036,6 +1054,10 @@ public class CombatRollService {
                 toHit = combatRoundProfile.hitsOn();
                 numRollsPerUnit = combatRoundProfile.diceCount();
             }
+            if (rollType == CombatRollType.combatround && "xan_warsun2".equals(unitModel.getId())) {
+                numRollsPerUnit += XanUnitHandler.countSpaceDocksInTile(activeSystem, game);
+            }
+
             boolean extraRollsCount = false;
             if ((numRollsPerUnit > 1 || extraRollsForUnit > 0) && isThalnosReroll) {
                 extraRollsCount = true;
@@ -2100,7 +2122,9 @@ public class CombatRollService {
                 .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount(player) > 0)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
         checkBadUnits(player, event, unitsByAsyncId, output);
-
+        if (player.getGame() != null && player.getGame().playerHasLeaderUnlockedOrAlliance(player, "kaloracommander")) {
+            KaloraCommanderHandler.addCommanderBombardmentUnits(player, tile, output);
+        }
         return output;
     }
 

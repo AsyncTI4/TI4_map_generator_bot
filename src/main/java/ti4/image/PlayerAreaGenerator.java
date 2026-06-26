@@ -42,7 +42,7 @@ import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.JdaService;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -2562,7 +2562,7 @@ public class PlayerAreaGenerator {
     private int techInfo(Player player, int x, int y, Game game) {
         List<String> techs = new ArrayList<>(player.getTechs());
         if (player.hasUnlockedBreakthrough("tyrisbt")) {
-            techs.addAll(TyrisBreakthroughButtonHandler.getTyrisBTTechs(player, game));
+            techs.addAll(TyrisBreakthroughHandler.getTyrisBTTechs(player, game));
         }
         Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : techs) {

@@ -25,10 +25,12 @@ import ti4.draft.items.StartingTechDraftItem;
 import ti4.draft.items.TechDraftItem;
 import ti4.draft.items.UnitDraftItem;
 import ti4.game.Game;
+import ti4.helpers.Constants;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Source.ComponentSource;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 
@@ -196,7 +198,7 @@ public class FrankenDraft extends BagDraft {
 
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
         draftManager.clear();
-        MiltyDraftHelper.initDraftTiles(draftManager, game);
+        initFrankenDraftTiles(draftManager, game);
         allDraftableItems.put(DraftCategory.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftManager, game));
         allDraftableItems.put(DraftCategory.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager, game));
 
@@ -239,6 +241,29 @@ public class FrankenDraft extends BagDraft {
         }
 
         return bags;
+    }
+
+    protected void initFrankenDraftTiles(MiltyDraftManager draftManager, Game game) {
+        List<ComponentSource> sources = new ArrayList<>(List.of(
+                ComponentSource.base,
+                ComponentSource.codex1,
+                ComponentSource.codex2,
+                ComponentSource.codex3,
+                ComponentSource.codex4,
+                ComponentSource.pok));
+        if (game.isDiscordantStarsMode()) {
+            sources.add(ComponentSource.ds);
+        }
+        if (game.isUnchartedSpaceStuff()) {
+            sources.add(ComponentSource.uncharted_space);
+        }
+        if (Boolean.parseBoolean(game.getStoredValue(Constants.INCLUDE_ERONOUS_TILES))) {
+            sources.add(ComponentSource.eronous);
+        }
+        if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
+            sources.add(ComponentSource.thunders_edge);
+        }
+        MiltyDraftHelper.initDraftTiles(draftManager, sources);
     }
 
     @Override

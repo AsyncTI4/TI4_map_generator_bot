@@ -10,8 +10,8 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -338,10 +338,10 @@ public class TeHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         if (player.hasUnlockedBreakthrough("onyxxabt")) {
-            OnyxxaBreakthroughButtonHandler.offerSCRollButton(game, player);
+            OnyxxaBreakthroughHandler.offerSCRollButton(game, player);
         }
         if (!player.hasLeaderUnlocked("onyxxacommander") && "onyxxa".equals(player.getFaction())) {
-            OnyxxaCommanderButtonHandler.offerCommanderUnlockButton(player);
+            OnyxxaCommanderHandler.offerCommanderUnlockButton(player);
         }
         ButtonHelper.deleteMessage(event);
     }

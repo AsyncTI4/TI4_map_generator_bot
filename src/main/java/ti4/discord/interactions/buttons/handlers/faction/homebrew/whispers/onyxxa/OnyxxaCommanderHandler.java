@@ -15,7 +15,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.UnlockLeaderService;
 
 @UtilityClass
-public class OnyxxaCommanderButtonHandler {
+public class OnyxxaCommanderHandler {
 
     // Commander: Strategist Kreel — unlock condition:
     // "Resolve the primary ability of a strategy card in 1 of your neighbors' play areas."

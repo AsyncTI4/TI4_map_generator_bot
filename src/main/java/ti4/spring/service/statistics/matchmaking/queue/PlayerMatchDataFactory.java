@@ -1,6 +1,7 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
-import java.math.BigDecimal;
+import de.gesundkrank.jskills.GameInfo;
+import de.gesundkrank.jskills.Rating;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -24,63 +25,59 @@ import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
 @UtilityClass
 class PlayerMatchDataFactory {
 
-    private static final double QUEUE_TIME_RELAX_FRACTION = 0.5;
     private static final int NUMBER_OF_ACTIVE_HOUR_BUCKETS = 6;
     private static final int ACTIVE_HOUR_BUCKET_SIZE = 4;
     private static final int ACTIVE_HOUR_BUCKET_MATCH_THRESHOLD = 3;
+    private static final Rating DEFAULT_NEW_PLAYER_RATING =
+            GameInfo.getDefaultGameInfo().getDefaultRating();
 
-    static Map<MatchmakingQueueMember, PlayerMatchData> buildForParties(List<QueuedParty> parties) {
+    static Map<MatchmakingQueueMember, PlayerMatchmakingData> buildForParties(List<QueuedParty> parties) {
         Set<String> userIds = parties.stream()
                 .flatMap(party -> party.members().stream())
                 .map(MatchmakingQueueMember::getUserId)
                 .collect(Collectors.toSet());
-        Map<String, BigDecimal> ratings = MatchmakingRatingEventService.get().getPlayerRatings(userIds);
+        Map<String, Rating> ratings = MatchmakingRatingEventService.get().getPlayerRatings(userIds);
         Guild guild = JdaService.guildPrimary;
         Instant now = Instant.now();
 
-        Map<MatchmakingQueueMember, PlayerMatchData> matchData = new HashMap<>();
-        for (QueuedParty party : parties) {
-            List<String> leaderRestrictions = party.leaderSettings().getMatchmakingRestrictions();
-            boolean relaxConstraints = shouldRelaxConstraints(party, now);
-            for (MatchmakingQueueMember member : party.members()) {
-                matchData.put(member, build(member.getUserId(), leaderRestrictions, ratings, guild, relaxConstraints));
+        Map<MatchmakingQueueMember, PlayerMatchmakingData> matchData = new HashMap<>();
+        for (QueuedParty queuedParty : parties) {
+            List<String> leaderRestrictions = queuedParty.leaderSettings().getMatchmakingRestrictions();
+            Duration queueWait = Duration.between(queuedParty.party().getQueuedAt(), now);
+            for (MatchmakingQueueMember member : queuedParty.members()) {
+                matchData.put(member, build(member.getUserId(), leaderRestrictions, ratings, guild, queueWait));
             }
         }
         return matchData;
     }
 
-    private static boolean shouldRelaxConstraints(QueuedParty party, Instant now) {
-        double hoursWaited = Duration.between(party.party().getQueuedAt(), now).toMinutes() / 60.0;
-        return hoursWaited >= 4;
-    }
-
-    static Map<String, PlayerMatchData> buildForUsers(List<String> userIds, List<String> leaderRestrictions) {
-        Map<String, BigDecimal> ratings = MatchmakingRatingEventService.get().getPlayerRatings(new HashSet<>(userIds));
+    static Map<String, PlayerMatchmakingData> buildForUsers(List<String> userIds, List<String> leaderRestrictions) {
+        Map<String, Rating> ratings = MatchmakingRatingEventService.get().getPlayerRatings(new HashSet<>(userIds));
         Guild guild = JdaService.guildPrimary;
 
-        Map<String, PlayerMatchData> dataById = new HashMap<>();
+        Map<String, PlayerMatchmakingData> dataById = new HashMap<>();
         for (String id : userIds) {
-            dataById.put(id, build(id, leaderRestrictions, ratings, guild, false));
+            dataById.put(id, build(id, leaderRestrictions, ratings, guild, Duration.ZERO));
         }
         return dataById;
     }
 
-    private static PlayerMatchData build(
+    private static PlayerMatchmakingData build(
             String userId,
             List<String> leaderRestrictions,
-            Map<String, BigDecimal> ratings,
+            Map<String, Rating> ratings,
             Guild guild,
-            boolean halfQueueTimePassed) {
+            Duration queueWait) {
         UserSettings ownSettings = UserSettingsManager.get(userId);
-        return new PlayerMatchData(
+        return new PlayerMatchmakingData(
                 userId,
                 leaderRestrictions,
                 ownSettings.getMatchmakingAvoidList(),
-                ratings.getOrDefault(userId, MatchmakingCompatibilityService.NEW_PLAYER_MATCHMAKING_RATING),
+                ratings.getOrDefault(userId, DEFAULT_NEW_PLAYER_RATING),
                 computeActiveHourBuckets(ownSettings.getActiveHoursAsIntegers()),
                 completedGames(userId),
                 roleNames(guild, userId),
-                halfQueueTimePassed);
+                queueWait);
     }
 
     private static int completedGames(String userId) {

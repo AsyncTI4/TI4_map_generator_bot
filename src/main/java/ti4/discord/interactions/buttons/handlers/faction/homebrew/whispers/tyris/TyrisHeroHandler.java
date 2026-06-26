@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 
 @UtilityClass
-public class TyrisHeroButtonHandler {
+public class TyrisHeroHandler {
 
     public static boolean isHeroActiveThisRound(Game game, Player player) {
         return !game.getStoredValue("tyrisHeroRound" + game.getRound() + "_" + player.getFaction())

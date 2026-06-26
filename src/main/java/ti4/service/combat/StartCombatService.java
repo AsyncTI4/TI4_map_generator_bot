@@ -29,10 +29,11 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiCommanderHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaUnitButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBreakthroughButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAgentHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -252,7 +253,7 @@ public class StartCombatService {
         }
         for (Player p : List.of(player, player2)) {
             if (p.hasUnlockedBreakthrough("onyxxabt")) {
-                OnyxxaBreakthroughButtonHandler.offerGroundCombatMechButtons(game, p, unitHolder, tile);
+                OnyxxaBreakthroughHandler.offerGroundCombatMechButtons(game, p, unitHolder, tile);
             }
         }
     }
@@ -920,10 +921,10 @@ public class StartCombatService {
                         buttons);
             }
             if ("space".equalsIgnoreCase(type) && player.hasUnexhaustedLeader("kaloraagent")) {
-                KaloraButtonHandler.offerKaloraAgentButtons(player, msg);
+                KaloraAgentHandler.offerKaloraAgentButtons(player, msg);
             }
             if ("space".equalsIgnoreCase(type) && ButtonHelper.doesPlayerHaveFSHere("onyxxa_flagship", player, tile)) {
-                OnyxxaUnitButtonHandler.offerFlagshipWinButton(player, msg);
+                OnyxxaUnitHandler.offerFlagshipWinButton(player, msg);
             }
             if ("space".equalsIgnoreCase(type) && game.playerHasLeaderUnlockedOrAlliance(player, "arvaxicommander")) {
                 ArvaxiCommanderHandler.sendCombatButtons(player, otherPlayer, game, msg);
@@ -948,7 +949,10 @@ public class StartCombatService {
             if (player.hasUnlockedBreakthrough("zephyrionbt")
                     && "space".equalsIgnoreCase(type)
                     && ButtonHelper.isTileInOrAdjacentToPlayersHome(game, tile, otherPlayer, player)) {
-                ZephyrionBreakthroughButtonHandler.offerBtCombatButtons(player, otherPlayer, game, msg);
+                ZephyrionBreakthroughHandler.offerBtCombatButtons(player, otherPlayer, game, msg);
+            }
+            if (player.hasTechReady("bakalor") && "space".equalsIgnoreCase(type) && !tile.isHomeSystem(game)) {
+                KaloraAbilityHandler.chitinShielding(player, otherPlayer, game);
             }
             if (player.hasAbility("technological_singularity")
                     && !otherPlayer.isDummy()

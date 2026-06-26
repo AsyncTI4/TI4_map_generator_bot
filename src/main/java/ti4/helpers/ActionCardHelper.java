@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAgentButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAgentHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -2052,7 +2052,7 @@ public class ActionCardHelper {
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
                 }
             }
-            ArvaxiAgentButtonHandler.postInitialButtons(game, player, acID);
+            ArvaxiAgentHandler.postInitialButtons(game, player, acID);
         }
 
         // Fog of war ping

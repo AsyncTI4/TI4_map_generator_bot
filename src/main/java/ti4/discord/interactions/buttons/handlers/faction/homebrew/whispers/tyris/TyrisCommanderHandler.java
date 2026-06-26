@@ -16,7 +16,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
 
 @UtilityClass
-public class TyrisCommanderButtonHandler {
+public class TyrisCommanderHandler {
 
     public static void resolveMechAction(Player player, Game game, ButtonInteractionEvent event) {
         String successMessage = player.getFactionEmoji()

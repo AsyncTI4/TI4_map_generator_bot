@@ -23,7 +23,9 @@ public class MatchmakingOptions {
             "Prophecy of Kings only",
             "Thunder's Edge only",
             POK_AND_TE_EXPANSION_OPTION,
-            "Twilight's Fall");
+            "Discordant Stars (Homebrew)",
+            "Twilight's Fall",
+            "Franken (Homebrew)");
     public static final List<String> PLAYER_COUNT_OPTIONS = List.of("3", "4", "5", "6", "7", "8");
     public static final List<String> VICTORY_POINT_OPTIONS = List.of("10", "12", "14");
     public static final String SIMILAR_ACTIVE_HOURS_OPTION = "Similar active hours";
@@ -37,14 +39,13 @@ public class MatchmakingOptions {
     private static final Map<String, String> ROLE_NAME_TO_ONLY_MATCH_OPTION = Map.of(
             FLOATERS_ROLE_NAME, ONLY_MATCH_FLOATERS_OPTION,
             WARRIORS_ROLE_NAME, ONLY_MATCH_WARRIORS_OPTION);
-    public static final String NO_PACE_OPTION = "No pace";
-    public static final String SLOW_PACE_OPTION = "Slow (90 days)";
+    public static final String SLOWER_PACE_OPTION = "Slower";
     public static final String FAST_PACE_OPTION = "Average (30 days)";
     public static final String FASTER_PACE_OPTION = "Faster (15 days)";
     public static final String FASTEST_PACE_OPTION = "Fastest (7 days)";
     public static final String TIGL_OPTION = "Twilight Imperium Global League";
     public static final List<String> PACE_RESTRICTION_OPTIONS =
-            List.of(NO_PACE_OPTION, SLOW_PACE_OPTION, FAST_PACE_OPTION, FASTER_PACE_OPTION, FASTEST_PACE_OPTION);
+            List.of(SLOWER_PACE_OPTION, FAST_PACE_OPTION, FASTER_PACE_OPTION, FASTEST_PACE_OPTION);
 
     public static final Map<String, Integer> PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT =
             Map.of(FASTER_PACE_OPTION, 19, FASTEST_PACE_OPTION, 10);

@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 
 @UtilityClass
-public class LunariumAbilityButtonHandler {
+public class LunariumAbilityHandler {
 
     private static final String CC_KEY = "lunariumFactionSheetCCFor";
 

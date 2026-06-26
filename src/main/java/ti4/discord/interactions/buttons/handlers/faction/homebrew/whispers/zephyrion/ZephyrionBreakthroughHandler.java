@@ -24,7 +24,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.ExhaustLeaderService;
 
 @UtilityClass
-public class ZephyrionBreakthroughButtonHandler {
+public class ZephyrionBreakthroughHandler {
 
     public static void offerBtCombatButtons(Player player, Player otherPlayer, Game game, String msg) {
         List<Button> buttons = new ArrayList<>();

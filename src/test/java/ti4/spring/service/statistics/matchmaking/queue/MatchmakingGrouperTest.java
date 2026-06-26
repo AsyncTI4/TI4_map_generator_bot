@@ -1,27 +1,53 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import java.math.BigDecimal;
+import de.gesundkrank.jskills.Rating;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 import ti4.settings.users.UserSettings;
+import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
+import ti4.testUtils.BaseTi4Test;
 
-class MatchmakingGrouperTest {
+class MatchmakingGrouperTest extends BaseTi4Test {
 
     private static final String VICTORY_POINTS = "10";
     private static final String EXPANSION = MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION;
-    private static final String PACE = MatchmakingOptions.NO_PACE_OPTION;
+    private static final String PACE = MatchmakingOptions.SLOWER_PACE_OPTION;
+    // Confident sigma so 1v1 match quality is driven by the mean skill gap, as for calibrated players.
+    private static final double CONFIDENT_SIGMA = 1.5;
 
-    private final Map<MatchmakingQueueMember, PlayerMatchData> matchData = new HashMap<>();
     private final List<QueuedParty> parties = new ArrayList<>();
+    private final Map<String, Rating> ratingsByUser = new HashMap<>();
     private long nextPartyId = 1;
+
+    private MockedStatic<MatchmakingRatingEventService> ratingService;
+
+    @BeforeEach
+    void mockRatingService() {
+        MatchmakingRatingEventService serviceMock = mock(MatchmakingRatingEventService.class);
+        when(serviceMock.getPlayerRatings(any())).thenReturn(ratingsByUser);
+        ratingService = Mockito.mockStatic(MatchmakingRatingEventService.class);
+        ratingService.when(MatchmakingRatingEventService::get).thenReturn(serviceMock);
+    }
+
+    @AfterEach
+    void closeRatingService() {
+        ratingService.close();
+    }
 
     @Test
     void formsOneGameFromThreeCompatibleSoloPlayers() {
@@ -29,7 +55,7 @@ class MatchmakingGrouperTest {
         addSolo("p2");
         addSolo("p3");
 
-        List<MatchedGame> games = MatchmakingGrouper.formGames(parties, matchData);
+        List<MatchedGame> games = MatchmakingGrouper.formGames(parties);
 
         assertThat(games).hasSize(1);
         assertThat(games.getFirst().playerCount()).isEqualTo("3");
@@ -42,10 +68,10 @@ class MatchmakingGrouperTest {
     void prefersTheLargestSelectedPlayerCount() {
         // Four players who would accept either a 3- or 4-player game should be packed into a single 4-player game.
         for (String id : List.of("p1", "p2", "p3", "p4")) {
-            addSolo(id, defaultData(id), List.of("3", "4"));
+            addSolo(id, List.of("3", "4"));
         }
 
-        List<MatchedGame> games = MatchmakingGrouper.formGames(parties, matchData);
+        List<MatchedGame> games = MatchmakingGrouper.formGames(parties);
 
         assertThat(games).hasSize(1);
         assertThat(games.getFirst().playerCount()).isEqualTo("4");
@@ -57,7 +83,7 @@ class MatchmakingGrouperTest {
         addParty(List.of("a1", "a2"));
         addSolo("s1");
 
-        List<MatchedGame> games = MatchmakingGrouper.formGames(parties, matchData);
+        List<MatchedGame> games = MatchmakingGrouper.formGames(parties);
 
         assertThat(games).hasSize(1);
         assertThat(games.getFirst().members())
@@ -71,112 +97,84 @@ class MatchmakingGrouperTest {
         addParty(List.of("a1", "a2"));
         addParty(List.of("b1", "b2"));
 
-        assertThat(MatchmakingGrouper.formGames(parties, matchData)).isEmpty();
+        assertThat(MatchmakingGrouper.formGames(parties)).isEmpty();
     }
 
     @Test
     void formsNoGameWhenAPairIsIncompatible() {
-        addSolo("p1", defaultData("p1").withAvoid("p2"), List.of("3"));
+        // p1 wants a TIGL game while the others do not, so no compatible trio can be assembled.
+        addParty(List.of("p1"), List.of(MatchmakingOptions.TIGL_OPTION), List.of("3"), Duration.ZERO);
         addSolo("p2");
         addSolo("p3");
 
-        assertThat(MatchmakingGrouper.formGames(parties, matchData)).isEmpty();
+        assertThat(MatchmakingGrouper.formGames(parties)).isEmpty();
     }
 
     @Test
-    void halfQueueTimePassedRelaxesSkillMatching() {
+    void queueTimeDecaysSkillMatching() {
         List<String> skill = List.of(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION);
 
-        // Ratings 20/23/23: the 20-vs-23 gap exceeds the strict tolerance (2) but is within the relaxed one (4).
-        addSolo("a", new Data("a", skill, 20, false), List.of("3"));
-        addSolo("b", new Data("b", skill, 23, false), List.of("3"));
-        addSolo("c", new Data("c", skill, 23, false), List.of("3"));
-        assertThat(MatchmakingGrouper.formGames(parties, matchData)).isEmpty();
+        // Ratings 20/26/26: the 20-vs-26 skill gap gives a 1v1 match quality (~0.59) that fails the starting
+        // 0.70 threshold but clears the 0.40 floor, so the trio only forms once the threshold has decayed.
+        rate("a", 20);
+        rate("b", 26);
+        rate("c", 26);
+        addParty(List.of("a"), skill, List.of("3"), Duration.ZERO);
+        addParty(List.of("b"), skill, List.of("3"), Duration.ZERO);
+        addParty(List.of("c"), skill, List.of("3"), Duration.ZERO);
+        assertThat(MatchmakingGrouper.formGames(parties)).isEmpty();
 
         parties.clear();
-        matchData.clear();
-        addSolo("a", new Data("a", skill, 20, true), List.of("3"));
-        addSolo("b", new Data("b", skill, 23, true), List.of("3"));
-        addSolo("c", new Data("c", skill, 23, true), List.of("3"));
-        assertThat(MatchmakingGrouper.formGames(parties, matchData)).hasSize(1);
+        // After 90 minutes the threshold has decayed three steps (0.70 -> 0.40), low enough to accept the gap.
+        addParty(List.of("a"), skill, List.of("3"), Duration.ofMinutes(90));
+        addParty(List.of("b"), skill, List.of("3"), Duration.ofMinutes(90));
+        addParty(List.of("c"), skill, List.of("3"), Duration.ofMinutes(90));
+        assertThat(MatchmakingGrouper.formGames(parties)).hasSize(1);
     }
 
     private void addSolo(String userId) {
-        addSolo(userId, defaultData(userId), List.of("3"));
+        addSolo(userId, List.of("3"));
     }
 
-    private void addSolo(String userId, Data data, List<String> playerCounts) {
-        addParty(List.of(userId), List.of(data), playerCounts);
+    private void addSolo(String userId, List<String> playerCounts) {
+        addParty(List.of(userId), List.of(), playerCounts, Duration.ZERO);
     }
 
     private void addParty(List<String> userIds) {
-        addParty(userIds, userIds.stream().map(this::defaultData).toList(), List.of("3"));
+        addParty(userIds, List.of(), List.of("3"), Duration.ZERO);
     }
 
-    private void addParty(List<String> userIds, List<Data> datas, List<String> playerCounts) {
+    private void addParty(
+            List<String> userIds, List<String> restrictions, List<String> playerCounts, Duration queueWait) {
         long partyId = nextPartyId;
         nextPartyId++;
         List<MatchmakingQueueMember> members = new ArrayList<>();
-        for (int i = 0; i < userIds.size(); i++) {
+        for (String userId : userIds) {
             MatchmakingQueueMember member = new MatchmakingQueueMember();
-            member.setUserId(userIds.get(i));
+            member.setUserId(userId);
             member.setPartyId(partyId);
             members.add(member);
-            matchData.put(member, datas.get(i).toPlayerMatchData());
         }
         MatchmakingQueueParty party = new MatchmakingQueueParty();
         party.setId(partyId);
         party.setQueued(true);
-        party.setQueuedAt(Instant.EPOCH.plusSeconds(partyId));
+        party.setQueuedAt(Instant.now().minus(queueWait));
         party.setLeaderId(userIds.getFirst());
-        parties.add(new QueuedParty(party, members, settings(playerCounts)));
+        parties.add(new QueuedParty(party, members, settings(playerCounts, restrictions)));
     }
 
-    private Data defaultData(String userId) {
-        return new Data(userId, List.of(), 25, false);
+    private void rate(String userId, double mean) {
+        ratingsByUser.put(userId, new Rating(mean, CONFIDENT_SIGMA));
     }
 
-    private static UserSettings settings(List<String> playerCounts) {
+    private static UserSettings settings(List<String> playerCounts, List<String> restrictions) {
         UserSettings settings = new UserSettings();
         settings.setMatchmakingPlayerCounts(playerCounts);
         settings.setMatchmakingVictoryPointGoals(List.of(VICTORY_POINTS));
         settings.setMatchmakingExpansions(List.of(EXPANSION));
         settings.setMatchmakingPaces(List.of(PACE));
-        settings.setMatchmakingRestrictions(List.of());
+        settings.setMatchmakingRestrictions(restrictions);
         settings.setMatchmakingMaxQueueTime("8 hours");
         return settings;
-    }
-
-    /** Test fixture for one player's match data; defaults to a veteran with no restrictions or avoid list. */
-    private static final class Data {
-        private final String userId;
-        private final List<String> restrictions;
-        private final double rating;
-        private final boolean halfQueueTimePassed;
-        private List<String> avoidList = List.of();
-
-        private Data(String userId, List<String> restrictions, double rating, boolean halfQueueTimePassed) {
-            this.userId = userId;
-            this.restrictions = restrictions;
-            this.rating = rating;
-            this.halfQueueTimePassed = halfQueueTimePassed;
-        }
-
-        private Data withAvoid(String avoidedUserId) {
-            avoidList = List.of(avoidedUserId);
-            return this;
-        }
-
-        private PlayerMatchData toPlayerMatchData() {
-            return new PlayerMatchData(
-                    userId,
-                    restrictions,
-                    avoidList,
-                    BigDecimal.valueOf(rating),
-                    Set.of(0, 1, 2, 3, 4, 5),
-                    5,
-                    Set.of(),
-                    halfQueueTimePassed);
-        }
     }
 }
