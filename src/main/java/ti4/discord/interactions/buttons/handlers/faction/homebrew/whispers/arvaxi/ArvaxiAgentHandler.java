@@ -17,7 +17,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.leader.ExhaustLeaderService;
 
 @UtilityClass
-public class ArvaxiAgentButtonHandler {
+public class ArvaxiAgentHandler {
 
     public static void postInitialButtons(Game game, Player discarder, String acID) {
         if (ActionCardHelper.isSabotageOrShatter(acID)) return;

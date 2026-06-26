@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
-public class VyserixAbilityButtonHandler {
+public class VyserixAbilityHandler {
 
     public static void onGainPlanetWithTechSpec(
             Player player, Game game, GenericInteractionCreateEvent event, Tile tile, UnitHolder unitHolder) {

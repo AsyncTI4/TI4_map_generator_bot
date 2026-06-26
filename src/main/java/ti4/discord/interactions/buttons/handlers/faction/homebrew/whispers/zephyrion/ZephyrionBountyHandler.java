@@ -18,7 +18,7 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 
 @UtilityClass
-public class ZephyrionBountyButtonHandler {
+public class ZephyrionBountyHandler {
 
     public static void offerBountyButtons(Game game, Player player) {
         offerBountyButtons(game, player, true);

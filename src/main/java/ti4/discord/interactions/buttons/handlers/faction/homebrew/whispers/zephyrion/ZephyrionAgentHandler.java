@@ -25,10 +25,10 @@ import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 
 @UtilityClass
-public class ZephyrionAgentButtonHandler {
+public class ZephyrionAgentHandler {
 
     public static void postInitialButtons(Game game, Player player) {
-        List<String> bounties = ZephyrionBountyButtonHandler.getBountiesForPlayer(game);
+        List<String> bounties = ZephyrionBountyHandler.getBountiesForPlayer(game);
         List<Button> buttons = new ArrayList<>();
         for (Player otherPlayer : game.getRealPlayersExcludingThis(player)) {
             for (String bounty : bounties) {
@@ -70,7 +70,7 @@ public class ZephyrionAgentButtonHandler {
                     p2.getCorrectChannel(),
                     p2.getRepresentationNoPing() + " received " + (int) unit.getCost()
                             + " trade good(s) equal to the ship's cost.");
-            ZephyrionBountyButtonHandler.claimBounty(game, player, p2, unit.getUnitType(), false);
+            ZephyrionBountyHandler.claimBounty(game, player, p2, unit.getUnitType(), false);
         }
 
         UnitType type = Mapper.getUnitKey(AliasHandler.resolveUnit(unitTypeString), p2.getColorID())

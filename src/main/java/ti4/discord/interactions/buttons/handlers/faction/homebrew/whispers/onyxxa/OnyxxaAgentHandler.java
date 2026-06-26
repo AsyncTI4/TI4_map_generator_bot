@@ -12,7 +12,7 @@ import ti4.helpers.FoWHelper;
 import ti4.message.MessageHelper;
 
 @UtilityClass
-public class OnyxxaAgentButtonHandler {
+public class OnyxxaAgentHandler {
 
     public static void postInitialButtons(Game game, Player targetPlayer) {
         String msg = targetPlayer.getRepresentationUnfogged()

@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 
 @UtilityClass
-public class TyrisBreakthroughButtonHandler {
+public class TyrisBreakthroughHandler {
 
     private static final String STORED_KEY_SUFFIX = "tyrisBTTechs";
 

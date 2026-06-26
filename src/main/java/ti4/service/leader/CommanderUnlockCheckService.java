@@ -263,7 +263,7 @@ public class CommanderUnlockCheckService {
             case "atokera", "belkosea", "pharadn", "qhet", "toldar", "uydai", "kaltrim" -> shouldBeUnlocked = true;
 
             // Balacasi
-            case "arvaxi" -> shouldBeUnlocked = true;
+            case "arvaxi", "kalora" -> shouldBeUnlocked = true;
             case "lunarium" ->
                 shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "carrier", false) >= 4);
             case "tyris" ->

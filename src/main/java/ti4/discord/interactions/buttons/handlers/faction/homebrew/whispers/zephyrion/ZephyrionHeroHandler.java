@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 import ti4.service.leader.PlayHeroService;
 
 @UtilityClass
-public class ZephyrionHeroButtonHandler {
+public class ZephyrionHeroHandler {
 
     @ButtonHandler("zephHeroRes_")
     public static void resolveZephyrionHero(String buttonID, ButtonInteractionEvent event, Game game, Player player) {

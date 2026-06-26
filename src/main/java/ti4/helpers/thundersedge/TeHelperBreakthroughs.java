@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.SecretObjectiveHelper;
@@ -24,7 +24,7 @@ public class TeHelperBreakthroughs {
     public static boolean handleBreakthroughExhaust(
             GenericInteractionCreateEvent event, Game game, Player player, String breakthroughID) {
         switch (breakthroughID) {
-            case "arvaxibt" -> ArvaxiBreakthroughButtonHandler.postInitialButtons(event, game, player);
+            case "arvaxibt" -> ArvaxiBreakthroughHandler.postInitialButtons(event, game, player);
             case "arborecbt" -> PsychosporeService.postInitialButtons(event, game, player);
             case "zooidbt" -> {
                 ThreadChannel channel = player.getCardsInfoThread();
