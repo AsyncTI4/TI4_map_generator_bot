@@ -19,6 +19,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 class TrueSkillMatchmakingRatingService {
 
+    private static final FactorGraphTrueSkillCalculator CALCULATOR = new FactorGraphTrueSkillCalculator();
     private static final double SIGMA_CALIBRATION_THRESHOLD = 1.5;
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
     private static final int MINIMUM_GAMES_FOR_RANKING = 3;
@@ -55,8 +56,7 @@ class TrueSkillMatchmakingRatingService {
                 ranks[i] = gamePlayer.rank();
             }
 
-            Map<IPlayer, Rating> newRatings =
-                    new FactorGraphTrueSkillCalculator().calculateNewRatings(gameInfo, teams, ranks);
+            Map<IPlayer, Rating> newRatings = CALCULATOR.calculateNewRatings(gameInfo, teams, ranks);
             trueSkillPlayerToRating.putAll(newRatings);
         }
 

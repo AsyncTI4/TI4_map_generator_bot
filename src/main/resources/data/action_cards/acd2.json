@@ -1050,7 +1050,7 @@
         "phase": "Action",
         "window": "After you pass",
         "text": "You may purge 1 of your relics to gain 1 relic. If you do not, gain trade goods equal to the number of neighbors you have that have not passed.",
-        "flavorText": "As the Druaa grabbed the ink-black shard, her stoic face broke into an unnatural, wicked grin.",
+        "flavorText": "As the Druaa grabbed the ink-black shard, his stoic face broke into an unnatural, wicked grin.",
         "source": "action_deck_2"
     },
     {
