@@ -313,6 +313,13 @@ public class TacticalActionOutputService {
                 }
                 game.setStoredValue("possiblyUsedRift", "yes");
             }
+            if (player.hasTech("bedreamneg")) {
+                output.append(
+                        " starting system containing a nexus token gives +1 to move value with Non-Euclidean Geometries.");
+            }
+            if (player.hasTech("becrystrd")) {
+                output.append(" (has _Resonance Drive_ for +1 to each ship at capacity. This is not automated.");
+            }
         }
         if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
             GMService.logPlayerActivity(game, player, output.toString());
@@ -325,10 +332,6 @@ public class TacticalActionOutputService {
         }
         if (player.hasAbility("celestial_guides")) {
             game.setStoredValue("possiblyUsedRift", "");
-        }
-        if (distance > moveValue && player.hasTech("bedreamneg")) {
-            output.append(
-                    " starting system containing a nexus token gives +1 to move value with Non-Euclidean Geometries.");
         }
         return output.toString();
     }
