@@ -18,7 +18,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -255,6 +256,11 @@ public class DestroyUnitService {
                     MessageHelper.sendMessageToEventChannel(event, message);
                 }
             }
+            case Warsun -> {
+                if (player != null && player.hasUnit("xan_flagship")) {
+                    XanUnitHandler.offerFlagshipReplace(event, game, player);
+                }
+            }
             case Flagship -> {
                 if (player != null && player.hasUnit("ta_flagship")) {
                     TaUnitHandler.clearWorldshaperOnFlagshipDestroy(player, unit);
@@ -383,7 +389,7 @@ public class DestroyUnitService {
                     && activePlayer != null
                     && activePlayer.hasAbility("marked_prey")
                     && !activePlayer.equals(player)) {
-                ZephyrionBountyButtonHandler.claimBounty(
+                ZephyrionBountyHandler.claimBounty(
                         game, activePlayer, player, unit.unitKey().unitType(), combat);
             }
         }

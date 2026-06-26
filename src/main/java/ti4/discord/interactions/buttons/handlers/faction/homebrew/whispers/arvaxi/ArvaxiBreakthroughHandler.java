@@ -18,7 +18,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
 @UtilityClass
-public class ArvaxiBreakthroughButtonHandler {
+public class ArvaxiBreakthroughHandler {
 
     private static final String BOON_TEXT =
             "The printed values of this unit have been adjusted: Cost -1, Combat -1, Move +1, Capacity +1.";

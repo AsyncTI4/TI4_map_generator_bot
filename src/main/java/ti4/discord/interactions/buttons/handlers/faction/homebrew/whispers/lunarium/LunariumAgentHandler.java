@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 import ti4.service.leader.ExhaustLeaderService;
 
 @UtilityClass
-public class LunariumAgentButtonHandler {
+public class LunariumAgentHandler {
 
     @ButtonHandler("exhaustAgent_lunariumagent")
     public static void exhaustLunariumAgent(ButtonInteractionEvent event, Game game, Player player) {

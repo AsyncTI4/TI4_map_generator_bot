@@ -50,7 +50,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.discord.utility.DiscordErrorUtility;
 import ti4.draft.DraftBag;
@@ -1201,7 +1201,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public int getMaxSOCount() {
         int maxSOCount = hasAbility("multitasking")
-                ? LunariumAbilityButtonHandler.getFactionSheetCCs(game, this)
+                ? LunariumAbilityHandler.getFactionSheetCCs(game, this)
                 : game.getMaxSOCountPerPlayer();
         int bonus = 0;
         if (hasRelic("obsidian")) bonus++;

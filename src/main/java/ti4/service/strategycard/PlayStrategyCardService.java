@@ -15,8 +15,8 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -450,10 +450,10 @@ public class PlayStrategyCardService {
         }
         for (Player p : game.getRealPlayers()) {
             if (p.hasUnlockedBreakthrough("onyxxabt")) {
-                OnyxxaBreakthroughButtonHandler.offerSCRollButton(game, p);
+                OnyxxaBreakthroughHandler.offerSCRollButton(game, p);
             }
             if (p != player && !p.hasLeaderUnlocked("onyxxacommander") && p.hasLeader("onyxxacommander")) {
-                OnyxxaCommanderButtonHandler.offerCommanderUnlockButton(p);
+                OnyxxaCommanderHandler.offerCommanderUnlockButton(p);
             }
         }
         if (scModel.usesAutomationForSCID("anarchy8")) {

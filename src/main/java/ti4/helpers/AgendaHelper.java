@@ -31,7 +31,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.acd2.PublicOutrageA
 import ti4.discord.interactions.buttons.handlers.actioncards.acd2.SettlementsAcd2ButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanAbilityButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanAbilityHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -3241,7 +3241,7 @@ public final class AgendaHelper {
                     player.getRepresentationNoPing() + " has the opportunity to resolve a Minister of Industry build.");
         }
         if (player.hasAbility("quantum_fabrication") && !tile.isScar(game)) {
-            XanAbilityButtonHandler.offerQuantumFabrication(player, game, event, tile);
+            XanAbilityHandler.offerQuantumFabrication(player, game, event, tile);
         }
     }
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -14,26 +14,38 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
+import ti4.service.combat.CombatRollService;
+import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.ExploreEmojis;
-import ti4.service.emoji.FactionEmojis;
 import ti4.service.explore.ExploreService;
-import ti4.service.leader.ExhaustLeaderService;
 
 @UtilityClass
-public class KaloraButtonHandler {
+public class KaloraUnitHandler {
 
-    @ButtonHandler("exhaustAgent_kaloraagent")
-    public static void exhaustKaloraAgent(ButtonInteractionEvent event, Game game, Player player) {
-        var leader = player.getLeader("kaloraagent").orElse(null);
-        if (leader == null) return;
-        ExhaustLeaderService.exhaustLeader(game, player, leader);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), player.getRepresentation() + " has exhausted Valzor, the Kalora agent.");
-        List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+    public static void flagshipBombardmentReroll(
+            Player player, MessageChannel channel, String tilePos, List<String> planets) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : planets) {
+            buttons.add(Buttons.blue(
+                    player.factionButtonChecker() + "kaloraFlagshipReroll_" + tilePos + "_" + planet,
+                    "Reroll vs. " + planet));
+        }
+        buttons.add(Buttons.gray(player.factionButtonChecker() + "deleteButtons", "Delete These Buttons"));
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", please use the buttons to gain 1 command token.",
+                channel,
+                player.getFactionEmoji()
+                        + " **Razor's Edge**: you may reroll all bombardment dice against each planet.",
                 buttons);
+    }
+
+    @ButtonHandler("kaloraFlagshipReroll_")
+    public static void kaloraFlagshipReroll(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] parts = buttonID.replace("kaloraFlagshipReroll_", "").split("_", 2);
+        String tilePos = parts[0];
+        String planet = parts[1];
+        game.setStoredValue("bombardmentTarget" + player.getFaction(), planet);
+        CombatRollService.secondHalfOfCombatRoll(
+                player, game, event, game.getTileByPosition(tilePos), "space", CombatRollType.bombardment, false);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
@@ -42,26 +54,6 @@ public class KaloraButtonHandler {
         String pos = buttonID.replace("kaloraExploreFront_", "");
         ExploreService.expFront(event, game.getTileByPosition(pos), game, player, true, null);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-    }
-
-    public static void offerKaloraAgentButtons(Player player, String msg) {
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.gray(
-                player.factionButtonChecker() + "exhaustAgent_kaloraagent",
-                "Use Valzor, the Kalora Agent",
-                FactionEmojis.kalora));
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                msg
-                        + ", a reminder that at the end of this space combat, you may exhaust the Kalora agent to allow a participating player to gain 1 command token.",
-                buttons);
-    }
-
-    public static void onEusocialityRetreat(Player player, GenericInteractionCreateEvent event) {
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getFactionEmoji()
-                        + " did not place a command token in system they retreated to due to **Eusociality**.");
     }
 
     public static void offerMechButtons(Player player, Game game, Tile tile) {
@@ -84,7 +76,7 @@ public class KaloraButtonHandler {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
-                            + ", please explore systems equal to the number of mechs you have here.",
+                            + ", you may explore the frontier deck in a planetless system containing your ships via **Broodwatcher**.",
                     buttons);
         }
     }

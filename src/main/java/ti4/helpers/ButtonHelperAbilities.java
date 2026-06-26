@@ -19,7 +19,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.PhantomEnergyHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -2239,7 +2239,7 @@ public final class ButtonHelperAbilities {
                 rollOmenDiceAtStartOfStrat(game, player);
             }
             if (player.hasAbility("marked_prey")) {
-                ZephyrionBountyButtonHandler.offerBountyButtons(game, player, false);
+                ZephyrionBountyHandler.offerBountyButtons(game, player, false);
             }
             PhantomEnergyHandler.checkFlagshipPhantomEnergy(game, player);
             if (player.hasAbility("protocols")) {

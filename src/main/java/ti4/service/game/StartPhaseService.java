@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -596,7 +596,7 @@ public class StartPhaseService {
             }
             if (player2.hasAbility("underhanded_maneuver")
                     && !player2.getNeighbouringPlayers(true).isEmpty()) {
-                ArvaxiAbilityButtonHandler.offerUndHandManeuver(player2);
+                ArvaxiAbilityHandler.offerUndHandManeuver(player2);
             }
             for (String pn : player2.getPromissoryNotes().keySet()) {
                 if (!player2.ownsPromissoryNote("scepter") && "scepter".equalsIgnoreCase(pn)) {
