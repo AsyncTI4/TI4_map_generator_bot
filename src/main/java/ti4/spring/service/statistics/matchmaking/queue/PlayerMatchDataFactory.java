@@ -4,6 +4,7 @@ import de.gesundkrank.jskills.GameInfo;
 import de.gesundkrank.jskills.Rating;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -44,8 +45,13 @@ class PlayerMatchDataFactory {
         for (QueuedParty queuedParty : parties) {
             List<String> leaderRestrictions = queuedParty.leaderSettings().getMatchmakingRestrictions();
             Duration queueWait = Duration.between(queuedParty.party().getQueuedAt(), now);
+            List<String> memberIds = queuedParty.members().stream()
+                    .map(MatchmakingQueueMember::getUserId)
+                    .toList();
+            GroupTiglRank groupRank = groupTiglRank(memberIds);
             for (MatchmakingQueueMember member : queuedParty.members()) {
-                matchData.put(member, build(member.getUserId(), leaderRestrictions, ratings, guild, queueWait));
+                matchData.put(
+                        member, build(member.getUserId(), leaderRestrictions, ratings, guild, queueWait, groupRank));
             }
         }
         return matchData;
@@ -54,20 +60,37 @@ class PlayerMatchDataFactory {
     static Map<String, PlayerMatchmakingData> buildForUsers(List<String> userIds, List<String> leaderRestrictions) {
         Map<String, Rating> ratings = MatchmakingRatingEventService.get().getPlayerRatings(new HashSet<>(userIds));
         Guild guild = JdaService.guildPrimary;
+        GroupTiglRank groupRank = groupTiglRank(userIds);
 
         Map<String, PlayerMatchmakingData> dataById = new HashMap<>();
         for (String id : userIds) {
-            dataById.put(id, build(id, leaderRestrictions, ratings, guild, Duration.ZERO));
+            dataById.put(id, build(id, leaderRestrictions, ratings, guild, Duration.ZERO, groupRank));
         }
         return dataById;
     }
+
+    private static GroupTiglRank groupTiglRank(List<String> memberIds) {
+        List<String> standardRanks = new ArrayList<>();
+        List<String> fracturedRanks = new ArrayList<>();
+        for (String id : memberIds) {
+            UserSettings settings = UserSettingsManager.get(id);
+            standardRanks.add(settings.getMatchmakingTiglRank());
+            fracturedRanks.add(settings.getMatchmakingTiglFracturedRank());
+        }
+        return new GroupTiglRank(
+                MatchmakingOptions.lowestTiglRank(standardRanks),
+                MatchmakingOptions.lowestTiglFracturedRank(fracturedRanks));
+    }
+
+    private record GroupTiglRank(String standard, String fractured) {}
 
     private static PlayerMatchmakingData build(
             String userId,
             List<String> leaderRestrictions,
             Map<String, Rating> ratings,
             Guild guild,
-            Duration queueWait) {
+            Duration queueWait,
+            GroupTiglRank groupRank) {
         UserSettings ownSettings = UserSettingsManager.get(userId);
         return new PlayerMatchmakingData(
                 userId,
@@ -78,8 +101,8 @@ class PlayerMatchDataFactory {
                 completedGames(userId),
                 roleNames(guild, userId),
                 queueWait,
-                MatchmakingOptions.normalizeTiglRank(ownSettings.getMatchmakingTiglRank()),
-                MatchmakingOptions.normalizeTiglRank(ownSettings.getMatchmakingTiglFracturedRank()));
+                groupRank.standard(),
+                groupRank.fractured());
     }
 
     private static int completedGames(String userId) {

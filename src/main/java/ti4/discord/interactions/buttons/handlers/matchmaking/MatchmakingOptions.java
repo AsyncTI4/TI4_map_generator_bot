@@ -3,6 +3,7 @@ package ti4.discord.interactions.buttons.handlers.matchmaking;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -137,6 +138,21 @@ public class MatchmakingOptions {
 
     public static String normalizeTiglRank(String rank) {
         return rank == null || rank.isBlank() ? UNRANKED_OPTION : rank;
+    }
+
+    public static String lowestTiglRank(Collection<String> ranks) {
+        return lowestRank(TIGL_RANK_OPTIONS, ranks);
+    }
+
+    public static String lowestTiglFracturedRank(Collection<String> ranks) {
+        return lowestRank(TIGL_FRACTURED_RANK_OPTIONS, ranks);
+    }
+
+    private static String lowestRank(List<String> ladderLowToHigh, Collection<String> ranks) {
+        return ranks.stream()
+                .map(MatchmakingOptions::normalizeTiglRank)
+                .min(Comparator.comparingInt(rank -> Math.max(0, ladderLowToHigh.indexOf(rank))))
+                .orElse(UNRANKED_OPTION);
     }
 
     public static boolean wantsToAvoidNewPlayers(Collection<String> restrictions) {
