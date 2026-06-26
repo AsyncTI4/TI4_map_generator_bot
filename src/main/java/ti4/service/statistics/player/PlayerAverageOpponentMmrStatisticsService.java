@@ -23,8 +23,6 @@ import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
 @UtilityClass
 class PlayerAverageOpponentMmrStatisticsService {
 
-    private static final BigDecimal DEFAULT_RATING = BigDecimal.valueOf(20);
-
     void showPlayerAverageOpponentMmr(SlashCommandInteractionEvent event) {
         List<GamePlayers> games = new ArrayList<>();
         Map<String, String> participantIdToUsername = new HashMap<>();
@@ -49,19 +47,20 @@ class PlayerAverageOpponentMmrStatisticsService {
                 },
                 ExecutionLockType.READ);
 
-        Map<String, BigDecimal> ratings =
-                MatchmakingRatingEventService.get().getConservativePlayerRatings(allRatingUserIds);
+        MatchmakingRatingEventService ratingService = MatchmakingRatingEventService.get();
+        Map<String, BigDecimal> ratings = ratingService.getConservativePlayerRatings(allRatingUserIds);
+        BigDecimal defaultRating = ratingService.getAverageConservativeRating();
 
         Map<String, BigDecimal> playerOpponentMmrSum = new HashMap<>();
         Map<String, Integer> playerGameCount = new HashMap<>();
         for (GamePlayers game : games) {
             int size = game.ratingUserIds().size();
             BigDecimal total = game.ratingUserIds().stream()
-                    .map(id -> ratings.getOrDefault(id, DEFAULT_RATING))
+                    .map(id -> ratings.getOrDefault(id, defaultRating))
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             BigDecimal opponentCount = BigDecimal.valueOf(size - 1L);
             for (int i = 0; i < size; i++) {
-                BigDecimal ownRating = ratings.getOrDefault(game.ratingUserIds().get(i), DEFAULT_RATING);
+                BigDecimal ownRating = ratings.getOrDefault(game.ratingUserIds().get(i), defaultRating);
                 BigDecimal opponentAverage = total.subtract(ownRating).divide(opponentCount, MathContext.DECIMAL64);
                 String statsId = game.participantIds().get(i);
                 playerOpponentMmrSum.merge(statsId, opponentAverage, BigDecimal::add);

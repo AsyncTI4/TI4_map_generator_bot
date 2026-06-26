@@ -24,7 +24,6 @@ import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
 @UtilityClass
 class AverageGameMmrStatisticsService {
 
-    private static final BigDecimal DEFAULT_RATING = BigDecimal.valueOf(20);
     private static final int MAX_LIST_SIZE = 100;
 
     static void showAverageGameMmr(SlashCommandInteractionEvent event) {
@@ -47,7 +46,9 @@ class AverageGameMmrStatisticsService {
                 },
                 ExecutionLockType.READ);
 
-        Map<String, BigDecimal> ratings = MatchmakingRatingEventService.get().getConservativePlayerRatings(allUserIds);
+        MatchmakingRatingEventService ratingService = MatchmakingRatingEventService.get();
+        Map<String, BigDecimal> ratings = ratingService.getConservativePlayerRatings(allUserIds);
+        BigDecimal defaultRating = ratingService.getAverageConservativeRating();
 
         String runnerUserId = event.getUser().getId();
 
@@ -55,7 +56,7 @@ class AverageGameMmrStatisticsService {
         for (Map.Entry<String, List<String>> entry : gamePlayerIds.entrySet()) {
             List<String> ids = entry.getValue();
             BigDecimal average = ids.stream()
-                    .map(id -> ratings.getOrDefault(id, DEFAULT_RATING))
+                    .map(id -> ratings.getOrDefault(id, defaultRating))
                     .reduce(BigDecimal.ZERO, BigDecimal::add)
                     .divide(BigDecimal.valueOf(ids.size()), MathContext.DECIMAL64);
             gameAverages.add(Map.entry(entry.getKey(), average));

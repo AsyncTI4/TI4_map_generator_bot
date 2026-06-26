@@ -36,6 +36,10 @@ public class MatchmakingRatingEventService {
     private final Cache<String, List<MatchmakingRating>> defaultRatingsCache = createRatingsCache(RATINGS_CACHE_NAME);
     private final Cache<String, List<MatchmakingRating>> conservativeRatingsCache =
             createRatingsCache(CONSERVATIVE_RATINGS_CACHE_NAME);
+    private final Cache<String, BigDecimal> averageConservativeRatingCache = Caffeine.newBuilder()
+            .maximumSize(1)
+            .expireAfterWrite(RATINGS_CACHE_TTL)
+            .build();
 
     private final PlayerEntityRepository playerEntityRepository;
 
@@ -63,6 +67,18 @@ public class MatchmakingRatingEventService {
 
     public Map<String, BigDecimal> getConservativePlayerRatings(Set<String> userIds) {
         return filterRatingsByUserIds(getCachedConservativePlayerRatings(), userIds);
+    }
+
+    public BigDecimal getAverageConservativeRating() {
+        return averageConservativeRatingCache.get(RATINGS_CACHE_KEY, _ -> computeAverageConservativeRating());
+    }
+
+    private BigDecimal computeAverageConservativeRating() {
+        List<MatchmakingRating> ratings = getCachedConservativePlayerRatings();
+        return ratings.stream()
+                .map(MatchmakingRating::rating)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .divide(BigDecimal.valueOf(ratings.size()), java.math.MathContext.DECIMAL64);
     }
 
     private static Map<String, BigDecimal> filterRatingsByUserIds(
