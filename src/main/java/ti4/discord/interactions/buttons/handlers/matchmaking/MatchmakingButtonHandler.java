@@ -168,8 +168,6 @@ class MatchmakingButtonHandler {
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
                 .addComponents(Label.of("Pace", paces));
 
-        // A group may have no restrictions that all members are eligible for; skip the field rather than show an empty
-        // one.
         List<String> restrictionOptions = groupRestrictionOptions(event, groupMemberIds);
         if (!restrictionOptions.isEmpty()) {
             CheckboxGroup restrictions = buildCheckboxGroup(

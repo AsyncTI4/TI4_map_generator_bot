@@ -13,10 +13,6 @@ import ti4.logging.BotLogger;
 @UtilityClass
 class MatchDescriber {
 
-    /**
-     * Compact, human-readable name for the matchmaking game thread, e.g.
-     * "6p, 10vp, PoK + TE, average (30 days) pace, similar timezone, TIGL (Hero)".
-     */
     static String threadTitle(MatchedGame game) {
         StringBuilder title = new StringBuilder("%sp, %svp, %s, %s pace"
                 .formatted(
@@ -51,7 +47,6 @@ class MatchDescriber {
         BotLogger.info(log.toString());
     }
 
-    // Only a curated subset of restrictions is worth surfacing in the thread name.
     private static String titleRestrictions(MatchedGame game) {
         List<String> restrictions = game.restrictions();
         List<String> labels = new ArrayList<>();

@@ -34,7 +34,6 @@ public class MatchmakingOptions {
             TWILIGHTS_FALL_EXPANSION_OPTION,
             FRANKEN_EXPANSION_OPTION);
 
-    // Compact labels for the matchmaking game/thread name.
     private static final Map<String, String> EXPANSION_SHORT_NAMES = Map.of(
             BASE_ONLY_EXPANSION_OPTION, "base game",
             POK_ONLY_EXPANSION_OPTION, "PoK",
@@ -44,7 +43,6 @@ public class MatchmakingOptions {
             TWILIGHTS_FALL_EXPANSION_OPTION, "TFall",
             FRANKEN_EXPANSION_OPTION, "Franken");
 
-    // Non-standard (homebrew) games are ranked on the TIGL Fractured ladder rather than the standard one.
     public static final Set<String> NON_STANDARD_EXPANSION_OPTIONS =
             Set.of(DISCORDANT_STARS_EXPANSION_OPTION, TWILIGHTS_FALL_EXPANSION_OPTION, FRANKEN_EXPANSION_OPTION);
     public static final List<String> PLAYER_COUNT_OPTIONS = List.of("3", "4", "5", "6", "7", "8");
