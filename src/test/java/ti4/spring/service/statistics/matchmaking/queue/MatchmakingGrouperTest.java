@@ -115,7 +115,7 @@ class MatchmakingGrouperTest extends BaseTi4Test {
         List<String> skill = List.of(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION);
 
         // Ratings 20/26/26: the 20-vs-26 skill gap gives a 1v1 match quality (~0.59) that fails the starting
-        // 0.70 threshold but clears the 0.40 floor, so the trio only forms once the threshold has decayed.
+        // 0.80 threshold but clears the 0.30 floor, so the trio only forms once the threshold has decayed.
         rate("a", 20);
         rate("b", 26);
         rate("c", 26);
@@ -125,11 +125,55 @@ class MatchmakingGrouperTest extends BaseTi4Test {
         assertThat(MatchmakingGrouper.formGames(parties)).isEmpty();
 
         parties.clear();
-        // After 90 minutes the threshold has decayed three steps (0.70 -> 0.40), low enough to accept the gap.
-        addParty(List.of("a"), skill, List.of("3"), Duration.ofMinutes(90));
-        addParty(List.of("b"), skill, List.of("3"), Duration.ofMinutes(90));
-        addParty(List.of("c"), skill, List.of("3"), Duration.ofMinutes(90));
+        // After four hours the threshold has decayed to 0.40 (0.80 - 4*0.10), low enough to accept the gap.
+        addParty(List.of("a"), skill, List.of("3"), Duration.ofHours(4));
+        addParty(List.of("b"), skill, List.of("3"), Duration.ofHours(4));
+        addParty(List.of("c"), skill, List.of("3"), Duration.ofHours(4));
         assertThat(MatchmakingGrouper.formGames(parties)).hasSize(1);
+    }
+
+    @Test
+    void formsNearMatchWhenOneShortWithANearExpiryPlayer() {
+        // Two players want a 3p game but only two are available; one is within an hour of expiring (8h max).
+        addParty(List.of("p1"), List.of(), List.of("3"), Duration.ofHours(7).plusMinutes(30));
+        addParty(List.of("p2"), List.of(), List.of("3"), Duration.ZERO);
+
+        List<MatchedGame> games = MatchmakingGrouper.formGames(parties);
+
+        assertThat(games).hasSize(1);
+        assertThat(games.getFirst().needsOneMore()).isTrue();
+        assertThat(games.getFirst().playerCount()).isEqualTo("3");
+        assertThat(games.getFirst().members())
+                .extracting(MatchmakingQueueMember::getUserId)
+                .containsExactlyInAnyOrder("p1", "p2");
+    }
+
+    @Test
+    void doesNotFormNearMatchWhenNoOneIsNearExpiry() {
+        addParty(List.of("p1"), List.of(), List.of("3"), Duration.ZERO);
+        addParty(List.of("p2"), List.of(), List.of("3"), Duration.ZERO);
+
+        assertThat(MatchmakingGrouper.formGames(parties)).isEmpty();
+    }
+
+    @Test
+    void realizesTheLargerNearMatchFirstAndSkipsOverlappingOnes() {
+        // p1 (near-expiry) fits both a 4p and a 3p near match; the 4p one (more players) wins and consumes p1,
+        // so the overlapping 3p near match with s1 is skipped.
+        addParty(
+                List.of("p1"), List.of(), List.of("3", "4"), Duration.ofHours(7).plusMinutes(30));
+        addParty(List.of("q1"), List.of(), List.of("4"), Duration.ZERO);
+        addParty(List.of("r1"), List.of(), List.of("4"), Duration.ZERO);
+        addParty(List.of("s1"), List.of(), List.of("3"), Duration.ZERO);
+
+        List<MatchedGame> games = MatchmakingGrouper.formGames(parties);
+
+        assertThat(games).hasSize(1);
+        assertThat(games.getFirst().needsOneMore()).isTrue();
+        assertThat(games.getFirst().playerCount()).isEqualTo("4");
+        assertThat(games.getFirst().members())
+                .extracting(MatchmakingQueueMember::getUserId)
+                .containsExactlyInAnyOrder("p1", "q1", "r1");
     }
 
     private void addSolo(String userId) {

@@ -113,7 +113,7 @@ class PlayerMatchDataFactory {
 
     private static Set<String> roleNames(Guild guild, String userId) {
         Member member = guild == null ? null : guild.getMemberById(userId);
-        return member == null ? Set.of() : MatchmakingOptions.getHeldOnlyMatchRoleNames(guild, member);
+        return member == null ? Set.of() : MatchmakingOptions.getHeldRoleNames(guild, member);
     }
 
     private static Set<Integer> computeActiveHourBuckets(Set<Integer> activeHours) {

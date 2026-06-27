@@ -9,4 +9,6 @@ record MatchedGame(
         String victoryPointGoal,
         String expansion,
         String pace,
-        List<String> restrictions) {}
+        List<String> restrictions,
+        String tiglRank,
+        boolean needsOneMore) {}

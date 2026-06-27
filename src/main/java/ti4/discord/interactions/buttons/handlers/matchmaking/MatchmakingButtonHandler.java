@@ -18,8 +18,6 @@ import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu.SelectTarget;
 import net.dv8tion.jda.api.components.selections.SelectOption;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -162,20 +160,23 @@ class MatchmakingButtonHandler {
                 userSettings.getMatchmakingPaces(),
                 DEFAULT_PACE_OPTIONS,
                 REQUIRE_SELECTION);
-        CheckboxGroup restrictions = buildCheckboxGroup(
-                RESTRICTIONS_ID,
-                groupRestrictionOptions(event, groupMemberIds),
-                userSettings.getMatchmakingRestrictions(),
-                userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
-                !REQUIRE_SELECTION);
-
-        return Modal.create(QUEUE_FOR_GAME_MODAL_ID, "Queue for Game")
+        Modal.Builder modal = Modal.create(QUEUE_FOR_GAME_MODAL_ID, "Queue for Game")
                 .addComponents(Label.of("Expansions", expansions))
                 .addComponents(Label.of("Player Count", playerCounts))
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
-                .addComponents(Label.of("Pace", paces))
-                .addComponents(Label.of("Restrictions", restrictions))
-                .build();
+                .addComponents(Label.of("Pace", paces));
+
+        List<String> restrictionOptions = groupRestrictionOptions(groupMemberIds);
+        if (!restrictionOptions.isEmpty()) {
+            CheckboxGroup restrictions = buildCheckboxGroup(
+                    RESTRICTIONS_ID,
+                    restrictionOptions,
+                    userSettings.getMatchmakingRestrictions(),
+                    userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
+                    !REQUIRE_SELECTION);
+            modal.addComponents(Label.of("Restrictions", restrictions));
+        }
+        return modal.build();
     }
 
     @ButtonHandler(value = ADDITIONAL_SETTINGS_BUTTON_ID, save = false)
@@ -360,29 +361,8 @@ class MatchmakingButtonHandler {
         return shared == null || shared.isEmpty() ? List.of(SLOWER_PACE_OPTION) : shared;
     }
 
-    private static List<String> groupRestrictionOptions(ButtonInteractionEvent event, List<String> groupMemberIds) {
-        List<String> options =
-                new ArrayList<>(PartyValidator.getValidRestrictions(groupMemberIds, RESTRICTION_OPTIONS));
-
-        Guild guild = event.getGuild();
-        if (guild == null) {
-            return options;
-        }
-        List<String> sharedRoleOptions = null;
-        for (String id : groupMemberIds) {
-            Member member = guild.getMemberById(id);
-            List<String> roleOptions =
-                    member == null ? List.of() : MatchmakingOptions.getRoleRestrictionOptions(guild, member);
-            if (sharedRoleOptions == null) {
-                sharedRoleOptions = new ArrayList<>(roleOptions);
-            } else {
-                sharedRoleOptions.retainAll(roleOptions);
-            }
-        }
-        if (sharedRoleOptions != null) {
-            options.addAll(sharedRoleOptions);
-        }
-        return options;
+    private static List<String> groupRestrictionOptions(List<String> groupMemberIds) {
+        return new ArrayList<>(PartyValidator.getValidRestrictions(groupMemberIds, RESTRICTION_OPTIONS));
     }
 
     private static List<String> filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(String userId) {
