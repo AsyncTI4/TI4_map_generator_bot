@@ -99,8 +99,9 @@ public class ViewMatchmakingQueueService {
         String paces = settings.getMatchmakingPaces().stream()
                 .sorted(byCanonicalOrder(MatchmakingOptions.PACE_RESTRICTION_OPTIONS))
                 .map(MatchmakingOptions::shortPaceName)
+                .map(String::toLowerCase)
                 .collect(Collectors.joining("/"));
-        line.append(" · ").append(paces);
+        line.append(" · ").append(paces).append(" pace");
         List<String> restrictions = settings.getMatchmakingRestrictions();
         if (!restrictions.isEmpty()) {
             String restrictionsText = restrictions.stream()
