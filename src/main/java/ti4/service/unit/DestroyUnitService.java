@@ -17,6 +17,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyButtonHandler;
 import ti4.game.Game;
@@ -273,6 +274,9 @@ public class DestroyUnitService {
                     }
                     DisasterWatchHelper.postTileInDisasterWatch(
                             game, event, unit.tile(), 0, player.getRepresentation() + " has detonated the bomb.");
+                }
+                if (player != null && player.hasUnit("crystellum_flagship")) {
+                    CrystellumUnitHandler.resolveCrystFlagDestroy(event, player, game, unit);
                 }
             }
             default -> Consumers.nop();
