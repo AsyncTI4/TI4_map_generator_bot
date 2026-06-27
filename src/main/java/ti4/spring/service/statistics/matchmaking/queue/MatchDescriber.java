@@ -39,11 +39,11 @@ class MatchDescriber {
 
     static void logFormedMatch(
             MatchedGame game, Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData) {
-        StringBuilder log = new StringBuilder(" Matchmaking formed a %s-player game — %s VP · %s · %s"
-                .formatted(game.playerCount(), game.victoryPointGoal(), game.expansion(), game.pace()));
+        StringBuilder log = new StringBuilder(" Matchmade: ").append("\n``` • ").append(threadTitle(game));
         for (MatchmakingQueueMember member : game.members()) {
             log.append("\n  • ").append(describePlayer(playerMatchmakingData.get(member), game.expansion()));
         }
+        log.append("```");
         BotLogger.info(log.toString());
     }
 
@@ -68,9 +68,7 @@ class MatchDescriber {
     private static String describePlayer(PlayerMatchmakingData player, String expansion) {
         String name = JdaService.getUsername(player.userId());
         StringBuilder details = new StringBuilder(name != null ? name : "Unknown")
-                .append(" (")
-                .append(player.userId())
-                .append(") — rating ")
+                .append(" — rating ")
                 .append("%.1f".formatted(player.rating().getMean()))
                 .append(" · ")
                 .append(player.completedGames())
