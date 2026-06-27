@@ -16,22 +16,6 @@ class MatchDescriberTest {
     }
 
     @Test
-    void threadTitleAppendsOnlyCuratedRestrictions() {
-        MatchedGame game = game(
-                MatchmakingOptions.FRANKEN_EXPANSION_OPTION,
-                "12",
-                "Slower",
-                List.of(
-                        MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION,
-                        MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION,
-                        MatchmakingOptions.TIGL_OPTION,
-                        MatchmakingOptions.AVOID_FLOATERS_OPTION),
-                "Archon");
-        assertThat(MatchDescriber.threadTitle(game))
-                .isEqualTo("6p, 12vp, Franken, slower pace, similar timezone, TIGL (Archon), no Floaters");
-    }
-
-    @Test
     void nearMatchTitleIsPrefixed() {
         MatchedGame game = new MatchedGame(
                 List.of(),

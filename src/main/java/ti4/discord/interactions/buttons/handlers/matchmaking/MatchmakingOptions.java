@@ -1,8 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.matchmaking;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -98,28 +96,6 @@ public class MatchmakingOptions {
 
     private static final int DEFAULT_MAX_QUEUE_TIME_HOURS = 8;
 
-    public static List<String> getPlayerCountOptionsDescending() {
-        return PLAYER_COUNT_OPTIONS.stream().sorted(Collections.reverseOrder()).toList();
-    }
-
-    public static List<String> getShuffledVictoryPointOptions() {
-        var victoryPointOptions = new ArrayList<>(VICTORY_POINT_OPTIONS);
-        Collections.shuffle(victoryPointOptions);
-        return victoryPointOptions;
-    }
-
-    public static List<String> getShuffledExpansionsOptions() {
-        var expansionOptions = new ArrayList<>(EXPANSION_OPTIONS);
-        Collections.shuffle(expansionOptions);
-        return expansionOptions;
-    }
-
-    public static List<String> getShuffledPaceRestrictions() {
-        List<String> pacesRestrictions = new ArrayList<>(PACE_RESTRICTION_OPTIONS);
-        Collections.shuffle(pacesRestrictions);
-        return pacesRestrictions;
-    }
-
     public static Set<String> getHeldRoleNames(Guild guild, Member member) {
         Set<String> heldRoleNames = new HashSet<>();
         for (String roleName : AVOIDABLE_ROLE_NAMES) {
@@ -155,7 +131,7 @@ public class MatchmakingOptions {
         return PACE_SHORT_NAMES.getOrDefault(pace, pace);
     }
 
-    public static String normalizeTiglRank(String rank) {
+    private static String normalizeTiglRank(String rank) {
         return rank == null || rank.isBlank() ? UNRANKED_OPTION : rank;
     }
 
