@@ -52,8 +52,8 @@ class MatchmakingNotifier {
             if (members.size() != queueMembers.size()) continue;
 
             String gameFunName = CreateGameService.autoGenerateGameName();
-            String threadTitle = "Matchmaker Game: " + gameFunName.replace(":", "");
-            String setupMessage = describeSetup(game);
+            String threadTitle = MatchDescriber.threadTitle(game);
+            String setupMessage = MatchDescriber.setupBody(game);
             // Forum channels require an initial message payload, so the setup text becomes the post body.
             forum.createForumPost(threadTitle, MessageCreateData.fromContent(setupMessage))
                     .queue(
@@ -61,15 +61,5 @@ class MatchmakingNotifier {
                                     forumPost.getThreadChannel(), members, gameFunName),
                             BotLogger::catchRestError);
         }
-    }
-
-    private static String describeSetup(MatchedGame game) {
-        String restrictionsText = game.restrictions().isEmpty() ? "None" : String.join(", ", game.restrictions());
-        return "The players were matched on the following game setup:\n"
-                + "- **Player count:** " + game.playerCount() + "\n"
-                + "- **Victory point goal:** " + game.victoryPointGoal() + "\n"
-                + "- **Expansion:** " + game.expansion() + "\n"
-                + "- **Pace:** " + game.pace() + "\n"
-                + "- **Restrictions:** " + restrictionsText;
     }
 }

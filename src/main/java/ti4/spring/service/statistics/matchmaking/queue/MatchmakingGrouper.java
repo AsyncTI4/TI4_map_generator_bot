@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
-import ti4.logging.BotLogger;
 import ti4.settings.users.UserSettings;
 
 @UtilityClass
@@ -105,7 +104,7 @@ class MatchmakingGrouper {
                     .distinct()
                     .sorted()
                     .toList();
-            gamesToCreate.add(new MatchedGame(
+            MatchedGame game = new MatchedGame(
                     new ArrayList<>(matchMembers),
                     new ArrayList<>(
                             matchParties.stream().map(QueuedParty::party).toList()),
@@ -113,28 +112,28 @@ class MatchmakingGrouper {
                     config.victoryPointGoal(),
                     config.expansion(),
                     config.pace(),
-                    matchRestrictions));
-            logMatchFormed(config, matchMembers, playerMatchmakingData);
+                    matchRestrictions,
+                    tiglRankForGame(matchRestrictions, matchMembers, config, playerMatchmakingData));
+            gamesToCreate.add(game);
+            MatchDescriber.logFormedMatch(game, playerMatchmakingData);
             partiesAddedToGames.addAll(matchParties);
             partiesStillSearching.removeAll(matchParties);
         }
     }
 
-    private static void logMatchFormed(
-            GameConfig config,
+    // All matched players share the rank relevant to this game's expansion, so any member is representative.
+    private static String tiglRankForGame(
+            List<String> matchRestrictions,
             List<MatchmakingQueueMember> matchMembers,
+            GameConfig config,
             Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData) {
-        String playerDetails = matchMembers.stream()
-                .map(playerMatchmakingData::get)
-                .map(String::valueOf)
-                .collect(Collectors.joining("\n  "));
-        BotLogger.info("Matchmaking formed a %d-player game (%s VP, %s, %s):%n  %s"
-                .formatted(
-                        config.playerCountValue(),
-                        config.victoryPointGoal(),
-                        config.expansion(),
-                        config.pace(),
-                        playerDetails));
+        if (!matchRestrictions.contains(MatchmakingOptions.TIGL_OPTION)) {
+            return null;
+        }
+        PlayerMatchmakingData representative = playerMatchmakingData.get(matchMembers.getFirst());
+        return MatchmakingOptions.usesFracturedRank(config.expansion())
+                ? representative.tiglFracturedRank()
+                : representative.tiglRank();
     }
 
     private static Comparator<QueuedParty> prioritizeByQueuedAtTime() {

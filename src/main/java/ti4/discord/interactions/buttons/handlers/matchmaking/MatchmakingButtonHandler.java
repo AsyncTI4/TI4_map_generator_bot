@@ -162,20 +162,25 @@ class MatchmakingButtonHandler {
                 userSettings.getMatchmakingPaces(),
                 DEFAULT_PACE_OPTIONS,
                 REQUIRE_SELECTION);
-        CheckboxGroup restrictions = buildCheckboxGroup(
-                RESTRICTIONS_ID,
-                groupRestrictionOptions(event, groupMemberIds),
-                userSettings.getMatchmakingRestrictions(),
-                userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
-                !REQUIRE_SELECTION);
-
-        return Modal.create(QUEUE_FOR_GAME_MODAL_ID, "Queue for Game")
+        Modal.Builder modal = Modal.create(QUEUE_FOR_GAME_MODAL_ID, "Queue for Game")
                 .addComponents(Label.of("Expansions", expansions))
                 .addComponents(Label.of("Player Count", playerCounts))
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
-                .addComponents(Label.of("Pace", paces))
-                .addComponents(Label.of("Restrictions", restrictions))
-                .build();
+                .addComponents(Label.of("Pace", paces));
+
+        // A group may have no restrictions that all members are eligible for; skip the field rather than show an empty
+        // one.
+        List<String> restrictionOptions = groupRestrictionOptions(event, groupMemberIds);
+        if (!restrictionOptions.isEmpty()) {
+            CheckboxGroup restrictions = buildCheckboxGroup(
+                    RESTRICTIONS_ID,
+                    restrictionOptions,
+                    userSettings.getMatchmakingRestrictions(),
+                    userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
+                    !REQUIRE_SELECTION);
+            modal.addComponents(Label.of("Restrictions", restrictions));
+        }
+        return modal.build();
     }
 
     @ButtonHandler(value = ADDITIONAL_SETTINGS_BUTTON_ID, save = false)
