@@ -91,24 +91,71 @@ public class ViewMatchmakingQueueService {
                 .append(joinInOrder(
                         settings.getMatchmakingVictoryPointGoals(), MatchmakingOptions.VICTORY_POINT_OPTIONS, "/"))
                 .append("vp");
-        line.append(" · ")
-                .append(joinInOrder(settings.getMatchmakingExpansions(), MatchmakingOptions.EXPANSION_OPTIONS, "/"));
-        line.append(" · ")
-                .append(joinInOrder(settings.getMatchmakingPaces(), MatchmakingOptions.PACE_RESTRICTION_OPTIONS, "/"));
+        String expansions = settings.getMatchmakingExpansions().stream()
+                .sorted(byCanonicalOrder(MatchmakingOptions.EXPANSION_OPTIONS))
+                .map(MatchmakingOptions::shortExpansionName)
+                .collect(Collectors.joining("/"));
+        line.append(" · ").append(expansions);
+        String paces = settings.getMatchmakingPaces().stream()
+                .sorted(byCanonicalOrder(MatchmakingOptions.PACE_RESTRICTION_OPTIONS))
+                .map(MatchmakingOptions::shortPaceName)
+                .collect(Collectors.joining("/"));
+        line.append(" · ").append(paces);
         List<String> restrictions = settings.getMatchmakingRestrictions();
         if (!restrictions.isEmpty()) {
-            line.append(" · ").append(joinInOrder(restrictions, MatchmakingOptions.RESTRICTION_OPTIONS, ", "));
+            String restrictionsText = restrictions.stream()
+                    .sorted(byCanonicalOrder(MatchmakingOptions.RESTRICTION_OPTIONS))
+                    .map(restriction -> labelRestriction(restriction, members, settings))
+                    .collect(Collectors.joining(", "));
+            line.append(" · ").append(restrictionsText);
         }
         return line.toString();
     }
 
+    private static String labelRestriction(
+            String restriction, List<MatchmakingQueueMember> members, UserSettings settings) {
+        if (MatchmakingOptions.TIGL_OPTION.equals(restriction)) {
+            return "TIGL (" + groupTiglRank(members, settings) + ")";
+        }
+        if (MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION.equals(restriction)) {
+            return "similar hours";
+        }
+        if (MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION.equals(restriction)) {
+            return "similar skills";
+        }
+        if (MatchmakingOptions.ONLY_MATCH_FLOATERS_OPTION.equals(restriction)) {
+            return "Floaters only";
+        }
+        if (MatchmakingOptions.ONLY_MATCH_WARRIORS_OPTION.equals(restriction)) {
+            return "Warriors only";
+        }
+        return restriction;
+    }
+
+    private static String groupTiglRank(List<MatchmakingQueueMember> members, UserSettings settings) {
+        List<String> expansions = settings.getMatchmakingExpansions();
+        boolean fractured =
+                !expansions.isEmpty() && expansions.stream().allMatch(MatchmakingOptions::usesFracturedRank);
+        List<String> ranks = members.stream()
+                .map(member -> {
+                    UserSettings memberSettings = UserSettingsManager.get(member.getUserId());
+                    return fractured
+                            ? memberSettings.getMatchmakingTiglFracturedRank()
+                            : memberSettings.getMatchmakingTiglRank();
+                })
+                .toList();
+        return fractured ? MatchmakingOptions.lowestTiglFracturedRank(ranks) : MatchmakingOptions.lowestTiglRank(ranks);
+    }
+
+    private static Comparator<String> byCanonicalOrder(List<String> canonicalOrder) {
+        return Comparator.comparingInt(value -> {
+            int index = canonicalOrder.indexOf(value);
+            return index < 0 ? Integer.MAX_VALUE : index;
+        });
+    }
+
     private static String joinInOrder(List<String> values, List<String> canonicalOrder, String separator) {
-        return values.stream()
-                .sorted(Comparator.comparingInt(value -> {
-                    int index = canonicalOrder.indexOf(value);
-                    return index < 0 ? Integer.MAX_VALUE : index;
-                }))
-                .collect(Collectors.joining(separator));
+        return values.stream().sorted(byCanonicalOrder(canonicalOrder)).collect(Collectors.joining(separator));
     }
 
     public static ViewMatchmakingQueueService get() {

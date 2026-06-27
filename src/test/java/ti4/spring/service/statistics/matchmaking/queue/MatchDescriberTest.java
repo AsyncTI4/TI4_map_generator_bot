@@ -24,7 +24,6 @@ class MatchDescriberTest {
                 List.of(
                         MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION,
                         MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION,
-                        MatchmakingOptions.AVOID_NEW_PLAYERS_OPTION,
                         MatchmakingOptions.TIGL_OPTION,
                         MatchmakingOptions.ONLY_MATCH_FLOATERS_OPTION),
                 "Archon");

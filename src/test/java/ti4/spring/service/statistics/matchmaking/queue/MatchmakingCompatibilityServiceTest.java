@@ -144,19 +144,6 @@ class MatchmakingCompatibilityServiceTest {
     }
 
     @Test
-    void avoidNewPlayersBlocksNewPlayerEitherDirection() {
-        PlayerMatchmakingData veteran = player("a")
-                .restrictions(MatchmakingOptions.AVOID_NEW_PLAYERS_OPTION)
-                .build();
-        PlayerMatchmakingData newcomer = player("b").completedGames(1).build();
-
-        assertThat(MatchmakingCompatibilityService.areIncompatible(veteran, newcomer))
-                .isTrue();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(newcomer, veteran))
-                .isTrue();
-    }
-
-    @Test
     void similarActiveHoursRequiresSharedBuckets() {
         PlayerMatchmakingData picky = player("a")
                 .restrictions(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION)

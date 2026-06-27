@@ -49,11 +49,6 @@ class MatchmakingCompatibilityService {
             return true;
         }
 
-        boolean aIsNew = a.completedGames() < NEW_PLAYER_GAME_THRESHOLD;
-        boolean bIsNew = b.completedGames() < NEW_PLAYER_GAME_THRESHOLD;
-        if (bIsNew && MatchmakingOptions.wantsToAvoidNewPlayers(aRestrictions)) return true;
-        if (aIsNew && MatchmakingOptions.wantsToAvoidNewPlayers(bRestrictions)) return true;
-
         if (MatchmakingOptions.wantsSimilarActiveHours(aRestrictions)
                 || MatchmakingOptions.wantsSimilarActiveHours(bRestrictions)) {
             long sharedBuckets = a.activeHourBuckets().stream()

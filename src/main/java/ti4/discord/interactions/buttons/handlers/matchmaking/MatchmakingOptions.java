@@ -37,10 +37,10 @@ public class MatchmakingOptions {
     private static final Map<String, String> EXPANSION_SHORT_NAMES = Map.of(
             BASE_ONLY_EXPANSION_OPTION, "base game",
             POK_ONLY_EXPANSION_OPTION, "PoK",
-            TE_ONLY_EXPANSION_OPTION, "TEdge",
+            TE_ONLY_EXPANSION_OPTION, "TE",
             POK_AND_TE_EXPANSION_OPTION, "PoK + TE",
             DISCORDANT_STARS_EXPANSION_OPTION, "DS",
-            TWILIGHTS_FALL_EXPANSION_OPTION, "TFall",
+            TWILIGHTS_FALL_EXPANSION_OPTION, "TF",
             FRANKEN_EXPANSION_OPTION, "Franken");
 
     public static final Set<String> NON_STANDARD_EXPANSION_OPTIONS =
@@ -49,7 +49,6 @@ public class MatchmakingOptions {
     public static final List<String> VICTORY_POINT_OPTIONS = List.of("10", "12", "14");
     public static final String SIMILAR_ACTIVE_HOURS_OPTION = "Similar active hours";
     public static final String SIMILAR_PLAYER_SKILL_OPTION = "Similar player skill";
-    public static final String AVOID_NEW_PLAYERS_OPTION = "Avoid new async players";
 
     public static final String FLOATERS_ROLE_NAME = "Floaters";
     public static final String WARRIORS_ROLE_NAME = "Warriors";
@@ -70,7 +69,13 @@ public class MatchmakingOptions {
             Map.of(FASTER_PACE_OPTION, 19, FASTEST_PACE_OPTION, 10);
 
     public static final List<String> RESTRICTION_OPTIONS =
-            List.of(SIMILAR_ACTIVE_HOURS_OPTION, SIMILAR_PLAYER_SKILL_OPTION, AVOID_NEW_PLAYERS_OPTION, TIGL_OPTION);
+            List.of(SIMILAR_ACTIVE_HOURS_OPTION, SIMILAR_PLAYER_SKILL_OPTION, TIGL_OPTION);
+
+    private static final Map<String, String> PACE_SHORT_NAMES = Map.of(
+            SLOWER_PACE_OPTION, "Slower",
+            FAST_PACE_OPTION, "Average",
+            FASTER_PACE_OPTION, "Faster",
+            FASTEST_PACE_OPTION, "Fastest");
 
     public static final String UNRANKED_OPTION = "Unranked";
     public static final List<String> TIGL_RANK_OPTIONS =
@@ -150,6 +155,10 @@ public class MatchmakingOptions {
         return EXPANSION_SHORT_NAMES.getOrDefault(expansion, expansion);
     }
 
+    public static String shortPaceName(String pace) {
+        return PACE_SHORT_NAMES.getOrDefault(pace, pace);
+    }
+
     public static String normalizeTiglRank(String rank) {
         return rank == null || rank.isBlank() ? UNRANKED_OPTION : rank;
     }
@@ -167,10 +176,6 @@ public class MatchmakingOptions {
                 .map(MatchmakingOptions::normalizeTiglRank)
                 .min(Comparator.comparingInt(rank -> Math.max(0, ladderLowToHigh.indexOf(rank))))
                 .orElse(UNRANKED_OPTION);
-    }
-
-    public static boolean wantsToAvoidNewPlayers(Collection<String> restrictions) {
-        return restrictions.contains(AVOID_NEW_PLAYERS_OPTION);
     }
 
     public static boolean wantsOnlyFloaters(Collection<String> restrictions) {
