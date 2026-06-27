@@ -62,6 +62,8 @@ class MatchmakingButtonHandler {
     private static final String MAX_QUEUE_TIME_ID = "queue_max_time";
     private static final String AVOID_PLAYERS_ID = "queue_avoid_players";
     private static final String GROUP_MEMBERS_ID = "queue_group_members";
+    private static final String TIGL_RANK_ID = "queue_tigl_rank";
+    private static final String TIGL_FRACTURED_RANK_ID = "queue_tigl_fractured_rank";
 
     private static final String DEFAULT_MAX_QUEUE_TIME = "8 hours";
     private static final List<String> DEFAULT_EXPANSION_OPTIONS =
@@ -194,10 +196,18 @@ class MatchmakingButtonHandler {
                         .map(EntitySelectMenu.DefaultValue::user)
                         .toList())
                 .build();
+        StringSelectMenu tiglRank = buildOptionalSingleSelect(
+                TIGL_RANK_ID, MatchmakingOptions.TIGL_RANK_OPTIONS, userSettings.getMatchmakingTiglRank());
+        StringSelectMenu tiglFracturedRank = buildOptionalSingleSelect(
+                TIGL_FRACTURED_RANK_ID,
+                MatchmakingOptions.TIGL_FRACTURED_RANK_OPTIONS,
+                userSettings.getMatchmakingTiglFracturedRank());
 
         Modal modal = Modal.create(ADDITIONAL_SETTINGS_MODAL_ID, "Additional Queue Settings")
                 .addComponents(Label.of("Max Queue Time", maxQueueTime))
                 .addComponents(Label.of("Avoid List", avoidPlayers))
+                .addComponents(Label.of("Twilight Imperium Global League Rank", tiglRank))
+                .addComponents(Label.of("TIGL Fractured Rank", tiglFracturedRank))
                 .build();
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -273,11 +283,16 @@ class MatchmakingButtonHandler {
     public static void submitQueueForGameAdditionalSettingsModal(ModalInteractionEvent event) {
         List<String> selectedMaxQueueTime = getSelectedValues(event, MAX_QUEUE_TIME_ID);
         List<String> avoidedUserIds = getSelectedUserIds(event, AVOID_PLAYERS_ID);
+        List<String> selectedTiglRank = getSelectedValues(event, TIGL_RANK_ID);
+        List<String> selectedTiglFracturedRank = getSelectedValues(event, TIGL_FRACTURED_RANK_ID);
 
         UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
         userSettings.setMatchmakingMaxQueueTime(
                 selectedMaxQueueTime.isEmpty() ? DEFAULT_MAX_QUEUE_TIME : selectedMaxQueueTime.getFirst());
         userSettings.setMatchmakingAvoidList(avoidedUserIds);
+        userSettings.setMatchmakingTiglRank(selectedTiglRank.isEmpty() ? null : selectedTiglRank.getFirst());
+        userSettings.setMatchmakingTiglFracturedRank(
+                selectedTiglFracturedRank.isEmpty() ? null : selectedTiglFracturedRank.getFirst());
         UserSettingsManager.save(userSettings);
 
         replyEphemeral(event, "Additional settings saved.");
@@ -407,6 +422,17 @@ class MatchmakingButtonHandler {
         return builder.setDefaultValues(normalizeSelectedValues(selectedValues, options, defaultValues))
                 .setRequiredRange(1, 1)
                 .build();
+    }
+
+    private static StringSelectMenu buildOptionalSingleSelect(String id, List<String> options, String selectedValue) {
+        StringSelectMenu.Builder builder = StringSelectMenu.create(id);
+        for (String option : options) {
+            builder.addOptions(SelectOption.of(option, option));
+        }
+        if (selectedValue != null && options.contains(selectedValue)) {
+            builder.setDefaultValues(List.of(selectedValue));
+        }
+        return builder.setRequired(false).setRequiredRange(0, 1).build();
     }
 
     private static List<String> getSelectedValues(ModalInteraction event, String modalValueId) {

@@ -9,7 +9,7 @@ import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 
 @UtilityClass
-public class XanAbilityButtonHandler {
+public class XanAbilityHandler {
 
     public static void offerQuantumFabrication(
             Player player, Game game, GenericInteractionCreateEvent event, Tile tile) {

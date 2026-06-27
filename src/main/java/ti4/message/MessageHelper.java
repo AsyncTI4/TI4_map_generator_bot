@@ -740,17 +740,7 @@ public class MessageHelper {
         sb.append(errorHeader);
         sb.append("\n```").append(error.getMessage()).append("```");
         if (messageCreateData != null && !isDiscordServerError(error)) {
-            String messageJSON = messageCreateData.toData().toPrettyString();
             sb.append("\nMessageContent: ").append(messageCreateData.getContent());
-            int maxJSONLength = 1500;
-            if (messageJSON.length() < maxJSONLength) {
-                sb.append("\nJSON:\n```json").append(messageJSON).append("```");
-            } else {
-                sb.append("\nJSON:\n```json")
-                        .append(StringUtils.left(messageJSON, maxJSONLength))
-                        .append("```");
-                sb.append("\nMessageData JSON was too long and was truncated");
-            }
         }
         return sb.toString();
     }

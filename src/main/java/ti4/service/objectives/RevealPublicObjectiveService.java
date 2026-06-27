@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.RewriteDestinyHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisCommanderButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisCommanderHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -59,7 +59,7 @@ public class RevealPublicObjectiveService {
                 RewriteDestinyHandler.offerRewriteDestiny(game, player, objective.getKey(), 2);
             }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "tyriscommander")) {
-                TyrisCommanderButtonHandler.offerInfantry(game, player);
+                TyrisCommanderHandler.offerInfantry(game, player);
             }
         }
         var channel = game.getActionsChannel();
@@ -206,7 +206,7 @@ public class RevealPublicObjectiveService {
                 RewriteDestinyHandler.offerRewriteDestiny(game, player, objective.getKey(), 1);
             }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "tyriscommander")) {
-                TyrisCommanderButtonHandler.offerInfantry(game, player);
+                TyrisCommanderHandler.offerInfantry(game, player);
             }
         }
         if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {

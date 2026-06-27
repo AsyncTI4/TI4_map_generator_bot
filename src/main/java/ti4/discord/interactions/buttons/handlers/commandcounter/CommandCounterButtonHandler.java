@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -221,7 +221,7 @@ public class CommandCounterButtonHandler {
             }
         }
         if (player.hasAbility("multitasking")) {
-            LunariumAbilityButtonHandler.offerFactionSheetCCButtons(game, player);
+            LunariumAbilityHandler.offerFactionSheetCCButtons(game, player);
         }
     }
 

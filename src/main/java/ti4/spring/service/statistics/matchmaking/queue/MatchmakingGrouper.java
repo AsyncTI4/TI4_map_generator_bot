@@ -88,7 +88,7 @@ class MatchmakingGrouper {
                 if (matchParties.contains(party)) continue;
                 if (matchMembers.size() == playerCount) break;
                 if (matchMembers.size() + party.size() > playerCount) continue;
-                if (isPartyCompatibleForMatch(party, matchMembers, playerMatchmakingData)) {
+                if (isPartyCompatibleForMatch(party, matchMembers, playerMatchmakingData, config)) {
                     matchMembers.addAll(party.members());
                     matchParties.add(party);
                 }
@@ -147,12 +147,13 @@ class MatchmakingGrouper {
     private static boolean isPartyCompatibleForMatch(
             QueuedParty party,
             List<MatchmakingQueueMember> group,
-            Map<MatchmakingQueueMember, PlayerMatchmakingData> matchData) {
+            Map<MatchmakingQueueMember, PlayerMatchmakingData> matchData,
+            GameConfig config) {
         for (MatchmakingQueueMember newMember : party.members()) {
             for (MatchmakingQueueMember existing : group) {
                 PlayerMatchmakingData a = matchData.get(existing);
                 PlayerMatchmakingData b = matchData.get(newMember);
-                if (MatchmakingCompatibilityService.areIncompatible(a, b)) {
+                if (MatchmakingCompatibilityService.areIncompatible(a, b, config.expansion())) {
                     return false;
                 }
             }

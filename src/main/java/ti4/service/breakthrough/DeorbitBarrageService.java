@@ -75,7 +75,7 @@ public class DeorbitBarrageService {
             String prefixID = player.factionButtonChecker() + "deorbitBarragePlanet_";
             List<Button> buttons = getAllPlanetsInRange(game, player).stream()
                     .filter(planet -> planet.getUnitCount(player2.getColorID()) > 0)
-                    .map(pl -> Buttons.gray(prefixID + pl.getName(), "Target " + pl.getName()))
+                    .map(pl -> Buttons.gray(prefixID + pl.getName(), "Target " + Helper.getPlanetName(pl.getName())))
                     .toList();
 
             MessageHelper.sendMessageToChannelWithButtons(

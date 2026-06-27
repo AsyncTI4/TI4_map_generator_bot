@@ -11,8 +11,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixAbilityButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -389,7 +389,7 @@ public class AddPlanetService {
                 && !setup
                 && tile != null
                 && tile.getPosition().startsWith("frac")) {
-            OnyxxaCommanderButtonHandler.onGainFracturePlanet(event, player, game, previousOwner);
+            OnyxxaCommanderHandler.onGainFracturePlanet(event, player, game, previousOwner);
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander") && !setup) {
             if (alreadyOwned && "mirage".equalsIgnoreCase(planet)) {
@@ -455,7 +455,7 @@ public class AddPlanetService {
                 && !doubleCheck
                 && !setup
                 && !unitHolder.getTechSpecialities().isEmpty()) {
-            VyserixAbilityButtonHandler.onGainPlanetWithTechSpec(player, game, event, tile, unitHolder);
+            VyserixAbilityHandler.onGainPlanetWithTechSpec(player, game, event, tile, unitHolder);
         }
         if ((game.getPhaseOfGame().contains("agenda")
                         || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))

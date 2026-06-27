@@ -59,10 +59,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.PhantomEnergyHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisHeroButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisHeroHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.selections.selectmenus.SelectFaction;
@@ -728,7 +728,7 @@ public class ButtonHelper {
         }
         if ((whatIsItFor.contains("res") || whatIsItFor.contains("both"))
                 && player.hasUnlockedBreakthrough("tyrisbt")) {
-            TyrisBreakthroughButtonHandler.getPlaceButton(player, game).ifPresent(buttons::add);
+            TyrisBreakthroughHandler.getPlaceButton(player, game).ifPresent(buttons::add);
         }
         buttons.add(Buttons.gray("resetSpend_" + whatIsItFor, "Reset Spent Planets and Trade Goods"));
         return buttons;
@@ -2439,6 +2439,7 @@ public class ButtonHelper {
     public static boolean canMoveOutOfLockedSystems(Player player, Game game) {
         if (game.isDominusOrb()
                 || game.isL1Hero()
+                || player.hasTech("tf-desperados")
                 || !game.getStoredValue("phantomEnergy").isEmpty()) {
             return true;
         }
@@ -5078,7 +5079,7 @@ public class ButtonHelper {
                 && !player.hasPlanet("thundersedge")
                 && !game.playerHasLeaderUnlockedOrAlliance(player, "kelerescommander")
                 && !player.hasAbility("arrow_of_time")
-                && !TyrisHeroButtonHandler.isHeroActiveThisRound(game, player)) {
+                && !TyrisHeroHandler.isHeroActiveThisRound(game, player)) {
             MessageHelper.sendEphemeralMessageToEventChannel(
                     event,
                     "## " + player.getRepresentation()
@@ -5546,7 +5547,7 @@ public class ButtonHelper {
             }
         }
         if (player.hasUnit("kalora_mech")) {
-            KaloraButtonHandler.offerMechButtons(player, game, tile);
+            KaloraUnitHandler.offerMechButtons(player, game, tile);
         }
         if (player.hasUnit("qhet_mech") && !isLawInPlay(game, "articles_war")) {
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
@@ -8463,6 +8464,18 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), message, List.of(codex1, codex2, codex3));
+    }
+
+    @ButtonHandler("desperadoDestroyer_")
+    public static void desperadoDestroyer(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String tilePos = buttonID.split("_")[1];
+        Tile tile = game.getTileByPosition(tilePos);
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "dd");
+        ButtonHelper.deleteTheOneButton(event);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing() + " used the desperado ability to place a destroyer in tile "
+                        + tile.getRepresentationForButtons());
     }
 
     @ButtonHandler("sarMechStep1_")

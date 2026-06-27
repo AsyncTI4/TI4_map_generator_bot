@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
@@ -68,6 +69,12 @@ public class ScorePublicObjectiveService {
                     player.getFactionEmoji() + ", no such public objective ID found, or already scored, please retry.");
         } else {
             informAboutScoring(event, channel, game, player, poID);
+            if (player.hasAbility("primordial")) {
+                KaloraAbilityHandler.primordial(player, game);
+            }
+            if (player.getPromissoryNotesInPlayArea().contains("bapnkalo")) {
+                KaloraAbilityHandler.sharedTreasure(player, game);
+            }
             for (Player p2 : player.getNeighbouringPlayers(true)) {
                 if (p2.hasLeaderUnlocked("syndicatecommander")) {
                     p2.setTg(p2.getTg() + 1);

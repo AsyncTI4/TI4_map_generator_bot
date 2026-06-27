@@ -25,6 +25,10 @@ class MatchmakingCompatibilityService {
     private static final GameInfo GAME_INFO = GameInfo.getDefaultGameInfo();
 
     static boolean areIncompatible(PlayerMatchmakingData a, PlayerMatchmakingData b) {
+        return areIncompatible(a, b, null);
+    }
+
+    static boolean areIncompatible(PlayerMatchmakingData a, PlayerMatchmakingData b, String expansion) {
         if (a.avoidList().contains(b.userId()) || b.avoidList().contains(a.userId())) {
             return true;
         }
@@ -33,6 +37,10 @@ class MatchmakingCompatibilityService {
         List<String> bRestrictions = b.restrictions();
 
         if (MatchmakingOptions.wantsTigl(aRestrictions) != MatchmakingOptions.wantsTigl(bRestrictions)) {
+            return true;
+        }
+
+        if (expansion != null && MatchmakingOptions.wantsTigl(aRestrictions) && hasDifferentTiglRank(a, b, expansion)) {
             return true;
         }
 
@@ -65,6 +73,13 @@ class MatchmakingCompatibilityService {
         }
 
         return false;
+    }
+
+    private static boolean hasDifferentTiglRank(PlayerMatchmakingData a, PlayerMatchmakingData b, String expansion) {
+        if (MatchmakingOptions.usesFracturedRank(expansion)) {
+            return !a.tiglFracturedRank().equals(b.tiglFracturedRank());
+        }
+        return !a.tiglRank().equals(b.tiglRank());
     }
 
     private static double calculateSkillSimilarity(PlayerMatchmakingData a, PlayerMatchmakingData b) {

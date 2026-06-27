@@ -17,7 +17,7 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -375,7 +375,7 @@ public class PlayerTechService {
                         event.getMessageChannel(), message, List.of(Buttons.REDISTRIBUTE_CCs, deleteButton));
             }
             case "dsvadeb" -> ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, event);
-            case "bazephy" -> ZephyrionBountyButtonHandler.offerBountyButtons(game, player);
+            case "bazephy" -> ZephyrionBountyHandler.offerBountyButtons(game, player);
             case "mi" -> { // Mageon
                 deleteIfButtonEvent(event);
                 List<Button> buttons = getMageonImplantsButtons(game, player);

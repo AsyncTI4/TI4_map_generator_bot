@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 
 @UtilityClass
-public class OnyxxaUnitButtonHandler {
+public class OnyxxaUnitHandler {
 
     public static int getObeliskCombatModifier(Player player, UnitHolder unitHolder) {
         int totalMechs = unitHolder.getUnitCount(UnitType.Mech, player.getColor());

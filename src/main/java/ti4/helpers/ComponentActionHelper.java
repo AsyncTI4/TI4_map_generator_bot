@@ -13,7 +13,7 @@ import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisCommanderButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisCommanderHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -410,7 +410,7 @@ public class ComponentActionHelper {
             compButtons.add(abilityButton);
         }
         if (game.playerHasLeaderUnlockedOrAlliance(p1, "tyriscommander")) {
-            TyrisCommanderButtonHandler.addCommanderActionButton(p1, factionChecker, prefix, compButtons);
+            TyrisCommanderHandler.addCommanderActionButton(p1, factionChecker, prefix, compButtons);
         }
         if (p1.hasAbility("mutineers")
                 && !ButtonHelperAbilities.getTilesToMutineers(game, p1).isEmpty()
@@ -629,7 +629,7 @@ public class ComponentActionHelper {
                             Helper.getPlanetPlaceUnitButtons(p1, game, "2gf", "placeOneNDone_skipbuildorbital"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("tyrisCommanderMech".equalsIgnoreCase(buttonID)) {
-                    TyrisCommanderButtonHandler.resolveMechAction(p1, game, event);
+                    TyrisCommanderHandler.resolveMechAction(p1, game, event);
                 } else if ("mutineers".equalsIgnoreCase(buttonID)) {
                     String factionEmoji = p1.getFactionEmoji();
                     String successMessage = factionEmoji + " spent 1 strategy token using "

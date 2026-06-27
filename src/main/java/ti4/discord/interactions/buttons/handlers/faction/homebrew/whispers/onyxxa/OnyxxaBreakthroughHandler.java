@@ -24,7 +24,7 @@ import ti4.service.map.FractureService;
 import ti4.service.unit.MoveUnitService;
 
 @UtilityClass
-public class OnyxxaBreakthroughButtonHandler {
+public class OnyxxaBreakthroughHandler {
 
     public static void offerSCRollButton(Game game, Player player) {
         Button rollButton = Buttons.green(
