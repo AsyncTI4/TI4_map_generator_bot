@@ -84,7 +84,6 @@ public class MatchmakingOptions {
 
     static {
         MAX_QUEUE_TIME_OPTIONS_TO_HOURS = new LinkedHashMap<>();
-        MAX_QUEUE_TIME_OPTIONS_TO_HOURS.put("1 hour", 1);
         MAX_QUEUE_TIME_OPTIONS_TO_HOURS.put("4 hours", 4);
         MAX_QUEUE_TIME_OPTIONS_TO_HOURS.put("8 hours", 8);
         MAX_QUEUE_TIME_OPTIONS_TO_HOURS.put("24 hours", 24);

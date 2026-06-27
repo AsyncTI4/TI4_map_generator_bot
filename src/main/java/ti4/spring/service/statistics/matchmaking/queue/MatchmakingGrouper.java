@@ -121,7 +121,6 @@ class MatchmakingGrouper {
         }
     }
 
-    // All matched players share the rank relevant to this game's expansion, so any member is representative.
     private static String tiglRankForGame(
             List<String> matchRestrictions,
             List<MatchmakingQueueMember> matchMembers,

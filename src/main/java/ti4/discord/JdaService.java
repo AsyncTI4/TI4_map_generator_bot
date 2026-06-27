@@ -596,9 +596,9 @@ public class JdaService {
 
     @Nullable
     public static String getUsername(String userId) {
-        Member member = guildPrimary == null ? null : guildPrimary.getMemberById(userId);
+        Member member = guildPrimary.getMemberById(userId);
         if (member != null) return member.getEffectiveName();
-        User user = jda == null ? null : jda.getUserById(userId);
+        User user = jda.getUserById(userId);
         if (user != null) return user.getEffectiveName();
         return null;
     }

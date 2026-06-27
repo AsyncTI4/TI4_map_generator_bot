@@ -10,5 +10,4 @@ record MatchedGame(
         String expansion,
         String pace,
         List<String> restrictions,
-        // The shared TIGL rank of the matched players, or null when this isn't a TIGL game.
         String tiglRank) {}
