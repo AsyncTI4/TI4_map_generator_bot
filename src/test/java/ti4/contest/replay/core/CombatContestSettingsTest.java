@@ -24,6 +24,7 @@ class CombatContestSettingsTest {
 
         assertTrue(settings.isProd());
         assertTrue(settings.isEnabled());
+        assertFalse(settings.getPromotion().isEnabled());
         assertFalse(settings.getRuntime().isDevMode());
         assertEquals(8, settings.getCandidateSelection().getTargetCandidatesPerHour());
         assertEquals(86_400, settings.getReplayExecution().getStartDelaySeconds());

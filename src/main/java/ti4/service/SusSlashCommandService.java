@@ -45,7 +45,9 @@ public class SusSlashCommandService {
                 && !isSinglePlayerGame
                 && (isPrivateThread || isNotGameChannel)
                 && !isPublicThread) {
-            reportToSusSlashCommandLog(event, jumpUrl, gameName);
+            if (!"player cc".equalsIgnoreCase(event.getFullCommandName())) {
+                reportToSusSlashCommandLog(event, jumpUrl, gameName);
+            }
             String sb = event.getUser().getEffectiveName() + " privately used the command: " + "`"
                     + event.getFullCommandName() + "`";
             MessageHelper.sendMessageToChannel(managedGame.getMainGameChannel(), sb);
@@ -91,7 +93,8 @@ public class SusSlashCommandService {
         if (managedGame != null) {
             TextChannel mainGameChannel = managedGame.getMainGameChannel();
             TextChannel tableTalkChannel = managedGame.getTableTalkChannel();
-            String tabletalkLink = String.format("[__[Tabletalk](%s)__]", tableTalkChannel.getJumpUrl());
+            String tabletalkLink =
+                    String.format("[__[" + tableTalkChannel.getName() + "](%s)__]", tableTalkChannel.getJumpUrl());
             String actionsLink = String.format("[__[Actions](%s)__]", mainGameChannel.getJumpUrl());
             message.append(" ").append(actionsLink);
             message.append(" ").append(tabletalkLink);

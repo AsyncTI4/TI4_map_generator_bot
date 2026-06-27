@@ -16,7 +16,11 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamBut
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -166,6 +170,9 @@ public class DestroyUnitService {
             }
         }
 
+        // Would normally gate the hook, but I loop and check for ability in the handler
+        CrystellumAbilityHandler.offerFragmentationForBatchIfRelevant(event, game, units, combat);
+
         // Handle other destroyed units individually
         for (RemovedUnit u : units) handleDestroyedUnit(event, game, units, u, combat);
     }
@@ -250,7 +257,15 @@ public class DestroyUnitService {
                     MessageHelper.sendMessageToEventChannel(event, message);
                 }
             }
+            case Warsun -> {
+                if (player != null && player.hasUnit("xan_flagship")) {
+                    XanUnitHandler.offerFlagshipReplace(event, game, player);
+                }
+            }
             case Flagship -> {
+                if (player != null && player.hasUnit("ta_flagship")) {
+                    TaUnitHandler.clearWorldshaperOnFlagshipDestroy(player, unit);
+                }
                 if (player != null && player.hasUnit("yin_flagship")) {
                     String message1 = "Moments before disaster in game " + game.getName() + ".";
                     DisasterWatchHelper.postTileInDisasterWatch(game, event, unit.tile(), 0, message1);
@@ -265,6 +280,9 @@ public class DestroyUnitService {
                     }
                     DisasterWatchHelper.postTileInDisasterWatch(
                             game, event, unit.tile(), 0, player.getRepresentation() + " has detonated the bomb.");
+                }
+                if (player != null && player.hasUnit("crystellum_flagship")) {
+                    CrystellumUnitHandler.resolveCrystFlagDestroy(event, player, game, unit);
                 }
             }
             default -> Consumers.nop();
@@ -375,7 +393,7 @@ public class DestroyUnitService {
                     && activePlayer != null
                     && activePlayer.hasAbility("marked_prey")
                     && !activePlayer.equals(player)) {
-                ZephyrionBountyButtonHandler.claimBounty(
+                ZephyrionBountyHandler.claimBounty(
                         game, activePlayer, player, unit.unitKey().unitType(), combat);
             }
         }

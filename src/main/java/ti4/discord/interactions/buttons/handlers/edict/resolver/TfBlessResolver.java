@@ -54,6 +54,9 @@ public class TfBlessResolver implements EdictResolver {
         }
     }
 
+    // NOTE: alreadyResolved() only blocks a player once ALL their boons are used (3 for tyrant, 1 for others) —
+    // the tyrant can currently reclick the same boon button instead of picking each of the 3 distinct boons.
+    // Pre-existing in non-FoW mode; now also reachable in FoW mode since the tyrant's buttons stay alive across picks.
     private static boolean alreadyResolved(Player player) {
         boolean isTyrant = EdictResolveButtonHandler.isEdictResolver(player);
         boolean resolvedTG = player.hasStoredValue("blessBoonTg");
@@ -104,7 +107,10 @@ public class TfBlessResolver implements EdictResolver {
 
     private static void afterResolve(ButtonInteractionEvent event, Game game, Player player) {
         if (game.isFowMode()) {
-            ButtonHelper.deleteMessage(event);
+            if (alreadyResolved(player)) {
+                ButtonHelper.deleteMessage(event);
+            }
+            return;
         }
         if (game.getRealPlayers().stream().allMatch(TfBlessResolver::alreadyResolved)) {
             clearResolved(game);

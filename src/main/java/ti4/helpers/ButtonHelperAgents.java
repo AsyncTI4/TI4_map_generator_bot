@@ -19,10 +19,9 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAgentButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionAgentButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAgentHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionAgentHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -707,7 +706,7 @@ public final class ButtonHelperAgents {
             } else {
                 message = trueIdentity + ", please choose the faction on which you wish to use " + ssruuClever
                         + "Yvin Korduul, the Vaylerian" + ssruuSlash + " agent.";
-                List<Button> buttons = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "vaylerianAgent", null);
+                List<Button> buttons = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "vaylerianAgent", null);
                 MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
             }
         }
@@ -755,7 +754,7 @@ public final class ButtonHelperAgents {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
                     + "Rhino the Adventurer, the Zephyrion" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
-            ZephyrionAgentButtonHandler.postInitialButtons(game, player);
+            ZephyrionAgentHandler.postInitialButtons(game, player);
         }
         if ("tyrisagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
@@ -922,7 +921,7 @@ public final class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             message = trueIdentity + ", please choose the faction on which you wish to use " + ssruuClever
                     + "Nekro Malleon, the Nekro" + ssruuSlash + " agent.";
-            List<Button> buttons = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "nekroAgentRes", null);
+            List<Button> buttons = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "nekroAgentRes", null);
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
         if ("kolleccagent".equalsIgnoreCase(agent)) {
@@ -931,7 +930,7 @@ public final class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             message = trueIdentity + ", please choose the faction on which you wish to use " + ssruuClever
                     + "Captain Dust, the Kollecc" + ssruuSlash + " agent.";
-            List<Button> buttons = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "kolleccAgentRes", null);
+            List<Button> buttons = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "kolleccAgentRes", null);
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
 
@@ -941,7 +940,7 @@ public final class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             message = trueIdentity + ", please choose the faction on which you wish to use " + ssruuClever
                     + "Carth of Golden Sands, the Hacan" + ssruuSlash + " agent.";
-            List<Button> buttons = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "hacanAgentRefresh", null);
+            List<Button> buttons = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "hacanAgentRefresh", null);
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
         if ("pharadnagent".equalsIgnoreCase(agent)) {
@@ -950,7 +949,7 @@ public final class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             message = trueIdentity + ", please choose the faction on which you wish to use " + ssruuClever
                     + "Avhkan, the Pharadn" + ssruuSlash + " agent.";
-            List<Button> buttons = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "pharadnAgentSelect", null);
+            List<Button> buttons = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "pharadnAgentSelect", null);
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
         if ("fogallianceagent".equalsIgnoreCase(agent)) {
@@ -978,7 +977,7 @@ public final class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.replace("onyxxaagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
-            OnyxxaAgentButtonHandler.postInitialButtons(game, p2);
+            OnyxxaAgentHandler.postInitialButtons(game, p2);
         }
 
         if ("redcreussagent".equalsIgnoreCase(agent) || "crimsonagent".equalsIgnoreCase(agent)) {
@@ -1277,7 +1276,7 @@ public final class ButtonHelperAgents {
                     p2 = game.getPlayerFromColorOrFaction(posNPlanet);
                 }
                 List<Button> buttons = new ArrayList<>(
-                        ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game, "l1z1x"));
+                        ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(p2, game, "l1z1x"));
                 String message2 = p2.getRepresentationUnfogged() + ", use buttons to resolve " + ssruuClever
                         + "I48S, the L1Z1X" + ssruuSlash + " agent.";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message2, buttons);
@@ -1577,7 +1576,7 @@ public final class ButtonHelperAgents {
 
     @ButtonHandler("presetEdynAgentStep1")
     public static void presetEdynAgentStep1(Game game, Player player) {
-        List<Button> buttons = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "presetEdynAgentStep2", null);
+        List<Button> buttons = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "presetEdynAgentStep2", null);
         String msg = player.getRepresentationUnfogged()
                 + ", please choose the player who you wish to take the action when the time comes (probably yourself).";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -1627,7 +1626,7 @@ public final class ButtonHelperAgents {
     public static void presetEdynAgentStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String faction = buttonID.split("_")[1];
         List<Button> buttons =
-                VoteButtonHandler.getPlayerOutcomeButtons(game, null, "presetEdynAgentStep3_" + faction, null);
+                AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "presetEdynAgentStep3_" + faction, null);
         String msg = player.getRepresentationUnfogged()
                 + ", please choose the passing player who will set off the trigger. When this player passes, the player you chose in the last step will get an action.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);

@@ -35,6 +35,7 @@ import ti4.discord.interactions.commands.milty.MiltyCommand;
 import ti4.discord.interactions.commands.omega_phase.OmegaPhaseCommand;
 import ti4.discord.interactions.commands.planet.PlanetCommand;
 import ti4.discord.interactions.commands.player.PlayerCommand;
+import ti4.discord.interactions.commands.plot.FrankenCommand2;
 import ti4.discord.interactions.commands.relic.RelicCommand;
 import ti4.discord.interactions.commands.rules.RulesCommand;
 import ti4.discord.interactions.commands.search.FindCommand;
@@ -140,6 +141,7 @@ public class SlashCommandManager {
                     new StatisticsCommand2(),
                     new TechCommand(),
                     new BreakthroughCommand(),
+                    new FrankenCommand2(),
                     new PlanetCommand(),
                     new SelectionBoxDemoCommand(),
                     new UserCommand(),

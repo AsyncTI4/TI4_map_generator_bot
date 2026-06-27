@@ -77,6 +77,9 @@ public class DataSkimmerService {
         List<Button> peekButton = List.of(Buttons.gray("peekDataSkimmer", "See Cards on Data Skimmer", "👀"));
 
         String message = "Use these buttons to pick a card from _Data Skimmer_, to add to your hand.";
+        if (pickButtons.isEmpty()) {
+            message = "There are no cards on Data Skimmer at the moment, and so you cannot use it to pick one up.";
+        }
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 null, ralnel.getCorrectChannel(), pickButtons, peekButton, message, buttonPrefix, buttonID)) {
             ButtonHelper.deleteMessage(event);

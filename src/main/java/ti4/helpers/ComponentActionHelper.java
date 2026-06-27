@@ -13,8 +13,7 @@ import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.agenda.VoteButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisCommanderButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisCommanderHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -313,7 +312,16 @@ public class ComponentActionHelper {
                     if (enigmaticSeen) {
                         continue;
                     }
-                    rButton = Buttons.red(factionChecker + prefix + "relic_" + relic, "Purge Enigmatic Device");
+                    String label = "Purge Enigmatic Device";
+                    if (game.isTwilightsFallMode()) {
+                        if (p1.getTechs().contains("wavelength")
+                                && p1.getTechs().contains("antimatter")) {
+                            label += " (for 2 Command tokens)";
+                        } else {
+                            label += " (for faction tech)";
+                        }
+                    }
+                    rButton = Buttons.red(factionChecker + prefix + "relic_" + relic, label);
                     enigmaticSeen = true;
                 } else {
                     List<String> exhaustRelics = List.of(
@@ -401,12 +409,8 @@ public class ComponentActionHelper {
                     Buttons.green(factionChecker + prefix + "ability_orbitalDrop", "Orbital Drop", FactionEmojis.Sol);
             compButtons.add(abilityButton);
         }
-        if (game.playerHasLeaderUnlockedOrAlliance(p1, "tyriscommander")
-                && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar"))) {
-            compButtons.add(Buttons.green(
-                    factionChecker + prefix + "ability_tyrisCommanderMech",
-                    "Place Mech for 1 Token",
-                    FactionEmojis.tyris));
+        if (game.playerHasLeaderUnlockedOrAlliance(p1, "tyriscommander")) {
+            TyrisCommanderHandler.addCommanderActionButton(p1, factionChecker, prefix, compButtons);
         }
         if (p1.hasAbility("mutineers")
                 && !ButtonHelperAbilities.getTilesToMutineers(game, p1).isEmpty()
@@ -611,7 +615,6 @@ public class ComponentActionHelper {
                     String successMessage = p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Sol
                             + "**Orbital Drop** (" + (p1.getStrategicCC()) + "->" + (p1.getStrategicCC() - 1) + ")";
                     if (!p1.hasRelicReady("emelpar")) {
-
                         p1.setStrategicCC(p1.getStrategicCC() - 1);
                         ButtonHelperCommanders.resolveMuaatCommanderCheck(
                                 p1, game, event, FactionEmojis.Sol + " **Orbital Drop**'d");
@@ -626,7 +629,7 @@ public class ComponentActionHelper {
                             Helper.getPlanetPlaceUnitButtons(p1, game, "2gf", "placeOneNDone_skipbuildorbital"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("tyrisCommanderMech".equalsIgnoreCase(buttonID)) {
-                    TyrisCommanderButtonHandler.resolveMechAction(p1, game, event);
+                    TyrisCommanderHandler.resolveMechAction(p1, game, event);
                 } else if ("mutineers".equalsIgnoreCase(buttonID)) {
                     String factionEmoji = p1.getFactionEmoji();
                     String successMessage = factionEmoji + " spent 1 strategy token using "
@@ -957,11 +960,15 @@ public class ComponentActionHelper {
             }
             case "exhaustBT" -> {
                 String btID = buttonID;
-                BreakthroughModel btModel = Mapper.getBreakthrough(btID);
-                p1.getBreakthroughExhausted().put(btID, true);
-                String message = p1.getRepresentation() + " exhausted _" + btModel.getName() + "_.";
-                MessageHelper.sendMessageToChannelWithEmbed(
-                        event.getMessageChannel(), message, btModel.getRepresentationEmbed());
+                if (!game.isTwilightsFallMode()) {
+                    BreakthroughModel btModel = Mapper.getBreakthrough(btID);
+                    p1.getBreakthroughExhausted().put(btID, true);
+                    String message = p1.getRepresentation() + " exhausted _" + btModel.getName() + "_.";
+                    MessageHelper.sendMessageToChannelWithEmbed(
+                            event.getMessageChannel(), message, btModel.getRepresentationEmbed());
+                } else {
+                    p1.exhaustTech("tf-" + btID);
+                }
                 boolean implemented = TeHelperBreakthroughs.handleBreakthroughExhaust(event, game, p1, buttonID);
 
                 if (!implemented) {
@@ -1073,7 +1080,7 @@ public class ComponentActionHelper {
         String purgeOrExhaust = "purged";
         List<String> juniorRelics = List.of("titanprototype", "absol_jr");
         if (juniorRelics.contains(relicID)) { // EXHAUST THE RELIC
-            List<Button> buttons2 = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "jrResolution", null);
+            List<Button> buttons2 = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
             player.addExhaustedRelic(relicID);
             purgeOrExhaust = "exhausted";
             MessageHelper.sendMessageToChannelWithButtons(

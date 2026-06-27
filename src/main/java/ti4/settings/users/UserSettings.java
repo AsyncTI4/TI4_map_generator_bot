@@ -5,9 +5,12 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -44,6 +47,15 @@ public class UserSettings {
     private String takebackPref = "No Preference";
     private String metaPref = "No Preference";
     private String trackRecord = "";
+    private List<String> matchmakingExpansions;
+    private List<String> matchmakingPlayerCounts;
+    private List<String> matchmakingVictoryPointGoals;
+    private List<String> matchmakingPaces;
+    private List<String> matchmakingRestrictions;
+    private String matchmakingMaxQueueTime;
+    private List<String> matchmakingAvoidList;
+    private String matchmakingTiglRank;
+    private String matchmakingTiglFracturedRank;
 
     UserSettings(String userId) {
         this.userId = userId;
@@ -53,12 +65,48 @@ public class UserSettings {
         return Objects.requireNonNullElse(preferredColors, Collections.emptyList());
     }
 
+    public List<String> getMatchmakingExpansions() {
+        return Objects.requireNonNullElse(matchmakingExpansions, Collections.emptyList());
+    }
+
+    public List<String> getMatchmakingPlayerCounts() {
+        return Objects.requireNonNullElse(matchmakingPlayerCounts, Collections.emptyList());
+    }
+
+    public List<String> getMatchmakingVictoryPointGoals() {
+        return Objects.requireNonNullElse(matchmakingVictoryPointGoals, Collections.emptyList());
+    }
+
+    public List<String> getMatchmakingPaces() {
+        return Objects.requireNonNullElse(matchmakingPaces, Collections.emptyList());
+    }
+
+    public List<String> getMatchmakingRestrictions() {
+        return Objects.requireNonNullElse(matchmakingRestrictions, Collections.emptyList());
+    }
+
+    public boolean hasConfiguredMatchmakingRestrictions() {
+        return matchmakingRestrictions != null;
+    }
+
+    public boolean hasSetTiglRank() {
+        return !isBlank(matchmakingTiglRank) || !isBlank(matchmakingTiglFracturedRank);
+    }
+
+    public List<String> getMatchmakingAvoidList() {
+        return Objects.requireNonNullElse(matchmakingAvoidList, Collections.emptyList());
+    }
+
     public void addAfkHour(String hour) {
         if (isBlank(afkHours)) {
             afkHours = hour;
         } else {
             afkHours += ";" + hour;
         }
+    }
+
+    public Set<Integer> getActiveHoursAsIntegers() {
+        return getHotHours(activeHours);
     }
 
     public void addActiveHour(int utcHour) {
@@ -81,21 +129,9 @@ public class UserSettings {
         activeHours = newActiveHours.substring(0, newActiveHours.length() - 1);
     }
 
-    public static String summarizeActiveHours(String activity) {
-        // Parse the input string
-        if (isBlank(activity)) {
-            activity = "0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0";
-        }
-        String[] hourStrings = activity.split(";");
-        int[] checkins = new int[24];
-        int heat = 0;
-
-        for (int i = 0; i < hourStrings.length; i++) {
-            checkins[i] = Integer.parseInt(hourStrings[i].trim());
-            heat += checkins[i];
-        }
-
-        if (heat < 150) {
+    public String summarizeActiveHours(String activity) {
+        Set<Integer> hotHours = getHotHours(activity);
+        if (hotHours.isEmpty()) {
             return null;
         }
 
@@ -103,7 +139,7 @@ public class UserSettings {
         int rangeStart = -1;
         long midnight = 1767225600L; // midnight Jan 1st 2026 UTC
         for (int hour = 0; hour < 24; hour++) {
-            if (checkins[hour] > (heat / 30)) {
+            if (hotHours.contains(hour)) {
                 // Start or continue a range
                 if (rangeStart == -1) {
                     rangeStart = hour;
@@ -137,26 +173,15 @@ public class UserSettings {
         return result.isEmpty() ? null : result.toString();
     }
 
-    public static String summarizeActiveHoursEmoji(String activity) {
-        if (isBlank(activity)) {
-            activity = "0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0";
-        }
-        String[] hourStrings = activity.split(";");
-        int[] checkins = new int[24];
-        int heat = 0;
-
-        for (int i = 0; i < hourStrings.length; i++) {
-            checkins[i] = Integer.parseInt(hourStrings[i].trim());
-            heat += checkins[i];
-        }
-
-        if (heat < 150) {
+    public String summarizeActiveHoursEmoji(String activity) {
+        Set<Integer> hotHours = getHotHours(activity);
+        if (hotHours.isEmpty()) {
             return "Not enough data.";
         }
 
         StringBuilder result = new StringBuilder();
         for (int hour = 0; hour < 24; hour++) {
-            if (checkins[hour] > (heat / 30)) {
+            if (hotHours.contains(hour)) {
                 result.append("🟩");
             } else {
                 result.append("🟥");
@@ -164,6 +189,35 @@ public class UserSettings {
         }
 
         return result.isEmpty() ? null : result.toString();
+    }
+
+    private static Set<Integer> getHotHours(String activity) {
+        int[] checkinsByHour = parseActiveHourCheckins(activity);
+        int heat = Arrays.stream(checkinsByHour).sum();
+        if (heat < 150) {
+            return Collections.emptySet();
+        }
+        int threshold = heat / 30;
+        Set<Integer> hotHours = new LinkedHashSet<>();
+        for (int hour = 0; hour < checkinsByHour.length; hour++) {
+            if (checkinsByHour[hour] > threshold) {
+                hotHours.add(hour);
+            }
+        }
+        return hotHours;
+    }
+
+    private static int[] parseActiveHourCheckins(String activity) {
+        if (isBlank(activity)) {
+            return new int[24];
+        }
+        String[] hourStrings = activity.split(";");
+        int[] checkinsByHour = new int[24];
+        int hourLimit = Math.min(hourStrings.length, checkinsByHour.length);
+        for (int i = 0; i < hourLimit; i++) {
+            checkinsByHour[i] = Integer.parseInt(hourStrings[i].trim());
+        }
+        return checkinsByHour;
     }
 
     @JsonGetter("myDateTime")

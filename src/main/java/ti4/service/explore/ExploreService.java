@@ -15,12 +15,14 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -425,18 +427,7 @@ public class ExploreService {
                             + " has been automatically readied because you have _Pre-Fab Arcologies_.");
         }
         if (player.hasAbility("ultimate_authority")) {
-            Planet plan = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
-            if (plan != null) {
-                if (plan.getUnitCount(player.getColorID()) >= 3) {
-                    List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
-                    MessageHelper.sendMessageToChannel(
-                            (MessageChannel) event.getChannel(),
-                            player.getRepresentation()
-                                    + ", please draw an action card because of **Ultimate Authority**.",
-                            buttons);
-                }
-            }
+            ArvaxiAbilityHandler.onExplorePlanet(player, game, planetName);
         }
         if (ButtonHelper.doesPlayerHaveFSHere("ghemina_flagship_lord", player, tile)) {
             AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planetName);
@@ -471,7 +462,7 @@ public class ExploreService {
                     event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "tacommander")) {
-            TaLeadersHandler.resolveTaCommander(player, tile, planetName);
+            TaLeadersHandler.resolveTaCommander(player, tile, game, planetName);
         }
         if (ButtonHelper.isPlanetLegendaryOrTechSkip(planetName, game)
                 && Helper.getPlayerFromUnlockedLeader(game, "augersagent") != null) {
@@ -1258,8 +1249,10 @@ public class ExploreService {
                 && !game.getAllPlanetsWithSleeperTokens().contains(planetID)
                 && player.getPlanetsAllianceMode().contains(planetID)
                 && !game.isTwilightsFallMode()) {
-            Button placeSleeper =
-                    Buttons.green("putSleeperOnPlanet_" + planetID, "Put Sleeper on " + planetID, MiscEmojis.Sleeper);
+            Button placeSleeper = Buttons.green(
+                    "putSleeperOnPlanet_" + planetID,
+                    "Put Sleeper on " + Helper.getPlanetRepresentation(planetID, game),
+                    MiscEmojis.Sleeper);
             Button declineSleeper = Buttons.red("deleteButtons", "Decline To Put a Sleeper Down");
             List<Button> buttons = List.of(placeSleeper, declineSleeper);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
@@ -1284,7 +1277,8 @@ public class ExploreService {
                 space.removeToken(frontierFilename);
             }
             cardID = cardID == null ? game.drawExplore(Constants.FRONTIER) : cardID;
-            String messageText = player.getRepresentation() + (force ? " force" : "") + " explored the "
+            boolean isSlashForce = force && event instanceof SlashCommandInteractionEvent;
+            String messageText = player.getRepresentation() + (isSlashForce ? " force" : "") + " explored the "
                     + ExploreEmojis.Frontier + "frontier token in tile " + tile.getPosition() + ":";
             resolveExplore(event, cardID, tile, null, messageText, player, game);
 

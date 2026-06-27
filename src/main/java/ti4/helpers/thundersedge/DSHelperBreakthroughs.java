@@ -296,6 +296,9 @@ public final class DSHelperBreakthroughs {
     @ButtonHandler("useAxisBT")
     public static void useAxisBT(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
         p1.setBreakthroughExhausted("axisbt", true);
+        if (p1.hasTech("tf-armsbrokerage")) {
+            p1.exhaustTech("tf-armsbrokerage");
+        }
         MessageHelper.sendMessageToChannel(
                 p1.getCorrectChannel(),
                 p1.getRepresentation()
@@ -324,7 +327,8 @@ public final class DSHelperBreakthroughs {
                 p1.getRepresentation()
                         + " has used _Arms Brokerage_."
                         + " They will choose another player, and both players will secretly choose to spend 0, 1, or 2 trade goods."
-                        + " If both players spent the same, the chosen player must give " + p1.getRepresentationNoPing()
+                        + " If the players spend different amounts, the chosen player must give "
+                        + p1.getRepresentationNoPing()
                         + " a random promissory note.");
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         String message = ", please choose the target player.";

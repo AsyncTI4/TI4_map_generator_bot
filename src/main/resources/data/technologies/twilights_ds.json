@@ -1,0 +1,732 @@
+[
+    {
+        "alias": "tf-axisbt",
+        "name": "Arms Brokerage",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "At the end of your turn, you may exhaust this card to move any number of your ships between two systems that contain your space docks and no other player’s ships.",
+        "source": "twilight_ds",
+        "faction": "axis"
+    },
+    {
+        "alias": "tf-networkeddeployment",
+        "name": "Networked Deployment",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "Your command tokens in systems have PRODUCTION 1 as if they were your units. After a player activates a system, you may exhaust this card to place 1 structure from your reinforcements on a planet you control in that system.",
+        "source": "twilight_ds",
+        "faction": "axis"
+    },
+    {
+        "alias": "tf-projectionofpower",
+        "name": "Projection of Power",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "At the start of space combat, you may use ANTI-FIGHTER BARRAGE 6(x2) against a player’s fighters in the active system (even if you are not participating in that combat).",
+        "source": "twilight_ds",
+        "faction": "celdauri"
+    },
+    {
+        "alias": "tf-starbasewebway",
+        "name": "Starbase Webway",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "After you activate a system that contains 1 or more of your space docks, gain 1 commodity. Your ships may treat systems that contain 1 or more of your space docks as adjacent to each other.",
+        "source": "twilight_ds",
+        "faction": "celdauri"
+    },
+    {
+        "alias": "tf-md",
+        "name": "Abyssal Defense Grid",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "When any player activates a system that contains 1 or more of your structures, place 1 infantry from your reinforcements with each of those structures. At the start of ground combat on a planet that contains 1 or more of your structures, produce 1 hit and assign it to 1 of your opponent's ground forces.",
+        "source": "twilight_ds",
+        "faction": "cheiran"
+    },
+    {
+        "alias": "tf-cheiranbt",
+        "name": "Matriphagy",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "At the end of your turn, you may exhaust this card to choose 1 of your non-fighter ships on the game board; replace that ship with 1 or more units from your reinforcements that have a total combined cost less than that ship's cost value.",
+        "source": "twilight_ds",
+        "faction": "cheiran"
+    },
+    {
+        "alias": "tf-autoneticmemory",
+        "name": "Autonetic Madness",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "When you would draw 1 or more action cards, you may draw 1 less card to either choose 1 card from the action card discard pile and add it to your hand, or place 1 infantry from your reinforcements on a planet you control.",
+        "source": "twilight_ds",
+        "faction": "cymiae"
+    },
+    {
+        "alias": "tf-dscymiy",
+        "name": "Recursive Worm",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "At the start of your turn, you may exhaust this card to choose 1 non-home system other than Mecatol Rex that contains 1 or more of your units; place 1 other player’s command token from their reinforcements in that system.",
+        "source": "twilight_ds",
+        "faction": "cymiae"
+    },
+    {
+        "alias": "tf-capitaldominance",
+        "name": "Capital Dominance",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "Destroyers do not count against your fleet pool.",
+        "source": "twilight_ds",
+        "faction": "dihmohn"
+    },
+    {
+        "alias": "tf-dsdihmy",
+        "name": "Impressment Programs",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "When you explore a planet, you may produce 1 ship in that planet’s system.\nACTION: Exhaust this card and 1 planet you control to explore that planet.",
+        "source": "twilight_ds",
+        "faction": "dihmohn"
+    },
+    {
+        "alias": "tf-radiantsigils",
+        "name": "Radiant Sigils",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "At any time, you may exhaust this card to place or move 1 sigil token into any system. Systems that contain sigil tokens are anomalies; you may prevent ships from moving through anomalies that contain your ground forces.",
+        "source": "twilight_ds",
+        "faction": "edyn"
+    },
+    {
+        "alias": "tf-rampantgrace",
+        "name": "Rampant Grace",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "When any game effect would allow you to score a public objective, you may instead draw 1 secret objective.",
+        "source": "twilight_ds",
+        "faction": "edyn"
+    },
+    {
+        "alias": "tf-dataleak",
+        "name": "Data Leak",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "When you would gain a relic, you may draw 1 additional card; choose 1 to gain and return the rest to the relic deck. Then, shuffle the relic deck.",
+        "source": "twilight_ds",
+        "faction": "florzen"
+    },
+    {
+        "alias": "tf-mercenaries",
+        "name": "Mercenaries",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "At the start of any space combat, you may remove up to 2 fighters you control in a system adjacent to the active system. Then, choose 1 player participating in that combat; that player places the same number of fighters from their reinforcements in the active system.",
+        "source": "twilight_ds",
+        "faction": "florzen"
+    },
+    {
+        "alias": "tf-blackmarkets",
+        "name": "Shadow Markets",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "When you explore a planet, you may treat that planet as if it had the same trait as another planet you control.",
+        "source": "twilight_ds",
+        "faction": "florzen"
+    },
+    {
+        "alias": "tf-rallythehorde",
+        "name": "Rally the Horde",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "Once per action, after you produce 1 or more ships, you may place 1 neutral unit of the same type as one of those ships in a system that contains no non-neutral units.",
+        "source": "twilight_ds",
+        "faction": "freesystems"
+    },
+    {
+        "alias": "tf-rallyingmarshalls",
+        "name": "Rallying Marshalls",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "Your infantry tokens on planets you control can be accompanied by your control tokens instead of plastic pieces. After you spend a strategy token, place 1 infantry from your reinforcements into coexistence on any cultural, hazardous, or industrial planet that contains the active player's ground forces.",
+        "source": "twilight_ds",
+        "faction": "freesystems"
+    },
+    {
+        "alias": "tf-abyssaltunneling",
+        "name": "Abyssal Tunneling",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "After you activate a system: You may treat systems that contain no planets as adjacent to each other during this tactical action.",
+        "source": "twilight_ds",
+        "faction": "ghoti"
+    },
+    {
+        "alias": "tf-dsghoty",
+        "name": "Parallel Production",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "When you produce 1 or more units, you may produce 1 additional unit in each of 2 systems that contain 1 or more of your ships and 1 of your command tokens.",
+        "source": "twilight_ds",
+        "faction": "ghoti"
+    },
+    {
+        "alias": "tf-mantlecracking",
+        "name": "Mantle Cracking",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "ACTION: Place 1 \"Core\" token on a non-home planet you control other than Mecatol Rex to destroy all units on that planet and gain 4 trade goods. Planets that contain Core tokens are stations with a resource value of 2 and influence value of 0. Core tokens cannot be removed from the planet that contains them.",
+        "source": "twilight_ds",
+        "faction": "ghoti"
+    },
+    {
+        "alias": "tf-deepinstallations",
+        "name": "Deep Installations",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "When you would explore a planet that contains 1 of your mechs or structures, you may instead gain 2 trade goods. Stations you control have SPACE CANNON 5(x2)",
+        "source": "twilight_ds",
+        "faction": "ghoti"
+    },
+    {
+        "alias": "tf-oracularalgorithms",
+        "name": "Oracular Algorithms",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "ACTION: Exhaust this card too look at 1 unrevealed public objective.",
+        "source": "twilight_ds",
+        "faction": "augers"
+    },
+    {
+        "alias": "tf-psychographics",
+        "name": "Psychographics",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "During the status phase, you may score 1 additional public objective instead of a secret objective.",
+        "source": "twilight_ds",
+        "faction": "augers"
+    },
+    {
+        "alias": "tf-sentientdatapool",
+        "name": "Sentient Datapool",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "At the start of the status phase, you may spend 4 trade goods to draw 1 ability card.",
+        "source": "twilight_ds",
+        "faction": "augers"
+    },
+    {
+        "alias": "tf-glorioushalls",
+        "name": "Glorious Halls",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "After you win a combat, you may place or move a Glory token into the active system. For each Glory token on the game board, you control 1 Bannerhall card. When units make a combat roll in a system that contains a Glory token, each result of 10, before applying modifiers, produces 1 additional hit.",
+        "source": "twilight_ds",
+        "faction": "kjalengard"
+    },
+    {
+        "alias": "tf-valor",
+        "name": "Valor",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "When each of your units makes a combat roll, each result of 10, before applying modifiers, produces 1 additional hit.",
+        "source": "twilight_ds",
+        "faction": "kjalengard"
+    },
+    {
+        "alias": "tf-shroudedfleets",
+        "name": "Shrouded Fleets",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "After you produce 1 or more units, you may place up to 3 of those ships on your faction sheet; those ships are captured. After movement, if the active system contains 1 or more of your non-fighter ships, you may place up to 2 of your captured ships and 2 of your captured ground forces from your faction sheet in that system’s space area.",
+        "source": "twilight_ds",
+        "faction": "kollecc"
+    },
+    {
+        "alias": "tf-treasurehunters",
+        "name": "Treasure Hunters",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "At the start of your turn, you may look at the top card of the cultural, hazardous, and industrial exploration deck. At the end of your turn, shuffle those decks.",
+        "source": "twilight_ds",
+        "faction": "kollecc"
+    },
+    {
+        "alias": "tf-logisticalcoordination",
+        "name": "Logistical Coordination",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "When you retreat, if the active system does not contain 1 of your command tokens, you do not place a command token in the system your ships retreated to.",
+        "source": "twilight_ds",
+        "faction": "kollecc"
+    },
+    {
+        "alias": "tf-meditation",
+        "name": "Meditation",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "ACTION: Spend 1 token from your strategy pool to ready 1 of your abilities.",
+        "source": "twilight_ds",
+        "faction": "kolume"
+    },
+    {
+        "alias": "tf-kinematicstarfall",
+        "name": "Kinematic Starfall",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "Apply +1 to each of your unit's ability rolls. During each of your actions, up to 2 of your non-fighter ships gain SPACE CANNON 9.",
+        "source": "twilight_ds",
+        "faction": "kolume"
+    },
+    {
+        "alias": "tf-dskortg",
+        "name": "Tempest Drive",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "After you win a combat in a system, you may exhaust this card to remove 1 command token from that system.",
+        "source": "twilight_ds",
+        "faction": "kortali"
+    },
+    {
+        "alias": "tf-contagion",
+        "name": "Contagion",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "After you resolve the primary or secondary ability of the \"Tyrannus\" strategy card, commit 1 infantry from your reinforcements to a planet that is in or adjacent to a system that contains a planet you control; resolve invasion on that planet.",
+        "source": "twilight_ds",
+        "faction": "kyro"
+    },
+    {
+        "alias": "tf-subversive",
+        "name": "Subversive",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "When participating in a combat that would end in a draw, you are treated as the winner instead.",
+        "source": "twilight_ds",
+        "faction": "kyro"
+    },
+    {
+        "alias": "tf-warstories",
+        "name": "War Stories",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "Once per action, after you win a combat, you may explore 1 planet you control, or if the active system does not contain any planets, the frontier exploration deck in the active system.",
+        "source": "twilight_ds",
+        "faction": "lanefir"
+    },
+    {
+        "alias": "tf-dslaneb",
+        "name": "Spark Thrusters",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "ACTION: Spend 1 token from your strategy pool or purge 1 relic fragment or ability card to move 1 of your ships to an adjacent system that contains no other player’s ships. If you spent a command token, exhaust this card.",
+        "source": "twilight_ds",
+        "faction": "lanefir"
+    },
+    {
+        "alias": "tf-dslaner",
+        "name": "ATS Integration",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "After you explore a planet: You may place 1 infantry from your reinforcements on that planet and 1 commodity token on this card. At the start of a round of combat, remove any number of tokens from this card to reroll up to that many of your dice during this round of combat.",
+        "source": "twilight_ds",
+        "faction": "lanefir"
+    },
+    {
+        "alias": "tf-cunning",
+        "name": "Cunning",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "At the end of your turn, you may attach or move 1 “Trap” card or attachment onto a planet that contains 1 or more of your infantry units. Trap attachments do not count for the purpose of scoring public objectives, are attached face-down, and remain hidden until revealed; you may look at Trap attachments at any time.",
+        "source": "twilight_ds",
+        "faction": "lizho"
+    },
+    {
+        "alias": "tf-dslizhb",
+        "name": "Wraith Engine",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "After you activate a non-home system, you may exhaust this card to choose 1 ship you control; you may treat that ship as adjacent to the active system until the end of this tactical action.",
+        "source": "twilight_ds",
+        "faction": "lizho"
+    },
+    {
+        "alias": "tf-meteorslings",
+        "name": "Meteor Slings",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "When your units use BOMBARDMENT against a planet another player controls, you may cancel any number of hits you produce to place that many infantry from your reinforcements onto that planet. Those units participate in ground combat, if able.",
+        "source": "twilight_ds",
+        "faction": "khrask"
+    },
+    {
+        "alias": "tf-dskhrag",
+        "name": "Stone’s Embrace",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "When you would spend a token from your strategy pool, you may exhaust 1 planet you control to spend 1 token from your reinforcements instead.",
+        "source": "twilight_ds",
+        "faction": "khrask"
+    },
+    {
+        "alias": "tf-zealousds",
+        "name": "Zealous DS",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "When you spend a command token to resolve the secondary ability of the \"Calamatis\" strategy card, you may resolve the primary ability of Warfare instead. (the token lift one)",
+        "source": "twilight_ds",
+        "faction": "khrask"
+    },
+    {
+        "alias": "tf-dronehosts",
+        "name": "Drone's Hosts",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "During invasion, you may replace each of your fighters with an infantry unit (these infantry do not count against your ships’ capacity during invasion). When you transport infantry units, you may replace any of those units with fighters.",
+        "source": "twilight_ds",
+        "faction": "mirveda"
+    },
+    {
+        "alias": "tf-orbitaldefensegrid",
+        "name": "Orbital Defense Grid",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "At the start of invasion, choose up to 1 unit you control in the active system; that unit gains PLANETARY SHIELD.",
+        "source": "twilight_ds",
+        "faction": "mirveda"
+    },
+    {
+        "alias": "tf-facsimile",
+        "name": "Facsimile",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "At the start of a space combat while you are the defender, you may spend influence equal to the cost value of 1 of your opponent's ships in the active system to place 1 unit of that type from your reinforcements in that system.",
+        "source": "twilight_ds",
+        "faction": "mortheus"
+    },
+    {
+        "alias": "tf-fabricationgrid",
+        "name": "Fabrication Grid",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "Each system that contains 1 or more of your ships and no planets gains PRODUCTION 2 as if it were a unit you control.",
+        "source": "twilight_ds",
+        "faction": "mortheus"
+    },
+    {
+        "alias": "tf-fraactalspikedrives",
+        "name": "Fractal Spike Drives",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "Units your ships transport can be moved out of systems that contain your command tokens. You may treat wormholes as ingress tokens or gravity rifts.",
+        "source": "twilight_ds",
+        "faction": "mortheus"
+    },
+    {
+        "alias": "tf-prescientdivination",
+        "name": "Prescient Divination",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "You have 4 “Omen” Dice. At the start of the strategy phase, roll all 4 Omen dice and place them near your faction sheet. Before you would roll a die, you may instead return 1 Omen die near your faction sheet to your reinforcements to resolve that roll as if it had the result of that die.",
+        "source": "twilight_ds",
+        "faction": "mykomentori"
+    },
+    {
+        "alias": "tf-predictivecommand",
+        "name": "Predictive Command",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "At any time, you may exhaust this card to redistribute your command tokens.",
+        "source": "twilight_ds",
+        "faction": "mykomentori"
+    },
+    {
+        "alias": "tf-celestialguides",
+        "name": "Celestial Guides",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "Your units do not roll for gravity rifts. You may ignore the movement effects of anomalies in systems that contain or are adjacent to 1 or more of your structures.",
+        "source": "twilight_ds",
+        "faction": "nivyn"
+    },
+    {
+        "alias": "tf-inquisition",
+        "name": "Inquisition",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "When 1 or more of your damaged units make a combat roll, up to 2 of those units may roll an additional combat die.",
+        "source": "twilight_ds",
+        "faction": "nivyn"
+    },
+    {
+        "alias": "tf-singularitypoint",
+        "name": "Singularity Point",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "At the end of your turn, you may exhaust this card to place or move the wound token into a system that contains or is adjacent to your units. The system that contains the wound token is a nebula, a gravity rift, and an entropic scar. You may ignore the effects of entropic scars.",
+        "source": "twilight_ds",
+        "faction": "nivyn"
+    },
+    {
+        "alias": "tf-mercenarycaptains",
+        "name": "Mercenary Captains",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "ACTION: Exhaust this card to place 1 neutral cruiser and 2 neutral destroyers into a non-fracture system that contains no non-neutral ships. Once per action, when a neutral unit produces a hit, gain 1 commodity.",
+        "source": "twilight_ds",
+        "faction": "nokar"
+    },
+    {
+        "alias": "tf-desperados",
+        "name": "Desperados",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "After you produce 1 or more ships in system, place up to 1 destroyer in that system. Your destroyers may move out of systems that contain your command tokens.",
+        "source": "twilight_ds",
+        "faction": "nokar"
+    },
+    {
+        "alias": "tf-dsolrar",
+        "name": "False Flag Operations",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "At the start of your turn, you may exhaust this card and 1 planet you control to ready 1 non-home planet other than Mecatol Rex.",
+        "source": "twilight_ds",
+        "faction": "olradin"
+    },
+    {
+        "alias": "tf-policies",
+        "name": "Policies",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "When you gain this card, place or move the 3 “Policy” cards near your faction sheet, choose which side of each card to place face up. This card also has the abilities and effects listed on the face up side of each Policy card.",
+        "source": "twilight_ds",
+        "faction": "olradin"
+    },
+    {
+        "alias": "tf-forbiddenknowledge",
+        "name": "Forbidden Knowledge",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "When you participate in a splice, instead of choosing a card to keep, you may discard 1 of the available cards to draw 1 card from the bottom of the corresponding type’s deck instead.",
+        "source": "twilight_ds",
+        "faction": "zealots"
+    },
+    {
+        "alias": "tf-dsrhody",
+        "name": "Sanctification Field",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "When you activate a system, or a system that contains 1 or more of your units is activated, you may choose 1 ability another player controls; until the end of this tactical action, that card is treated as though it had no ability text.",
+        "source": "twilight_ds",
+        "faction": "zealots"
+    },
+    {
+        "alias": "tf-industrialjuggernaut",
+        "name": "Industrial Juggernaut",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "At the end of your turn, you may spend 6 resources to replace one of your space docks in a system that contains no other players' ships with 1 war sun from your reinforcements.",
+        "source": "twilight_ds",
+        "faction": "rohdhna"
+    },
+    {
+        "alias": "tf-recycledmaterials",
+        "name": "Recycled Materials",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "After you activate a system, you may return 1 cruiser, carrier, or dreadnought you control in that system to your reinforcements to gain a number of trade goods equal to 1 less than that unit’s cost value.",
+        "source": "twilight_ds",
+        "faction": "rohdhna"
+    },
+    {
+        "alias": "tf-plausibled",
+        "name": "Plausible Deniability",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "At any time, if another player satisfies the requirements of one of your secret objectives, you may ignore its requirements; if you score that objective, draw 1 secret objective.",
+        "source": "twilight_ds",
+        "faction": "tnelis"
+    },
+    {
+        "alias": "tf-stealthcorps",
+        "name": "Stealth Corps",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "After you place 1 or more units on a planet, you may destroy up to 1 ground force on that planet.",
+        "source": "twilight_ds",
+        "faction": "tnelis"
+    },
+    {
+        "alias": "tf-cargoraiders",
+        "name": "Cargo Raiders",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "During the first round of a space combat, you may prevent your opponent from declaring a retreat unless they give you 1 trade good.",
+        "source": "twilight_ds",
+        "faction": "vaylerian"
+    },
+    {
+        "alias": "tf-dsvaylr",
+        "name": "Scavenger Exos",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "Once per action, after you win a ground combat, you may draw 1 action card.",
+        "source": "twilight_ds",
+        "faction": "vaylerian"
+    },
+    {
+        "alias": "tf-striketeams",
+        "name": "Strike Teams",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "After you activate a system: Choose 1 ship you control with a capacity value, apply +2 to that value during this tactical action",
+        "source": "twilight_ds",
+        "faction": "vaylerian"
+    },
+    {
+        "alias": "tf-dsvadey",
+        "name": "Krovoz Strike Teams",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "After another player’s unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities, you may exhaust this card to destroy that unit. After you produce 1 or more hits during a round of combat, you may spend 1 trade good to produce 1 additional hit.",
+        "source": "twilight_ds",
+        "faction": "vaden"
+    },
+    {
+        "alias": "tf-dsvadeb",
+        "name": "Midas Turbine",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "After you activate a system, you may exhaust this card and spend any number of trade goods; for each trade good you spent, apply +1 to the move value of 1 non-fighter ship you control.",
+        "source": "twilight_ds",
+        "faction": "vaden"
+    },
+    {
+        "alias": "tf-ruthlessbanking",
+        "name": "Ruthless Banking",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "At the start of the status phase: Gain 1 trade good for each secret objective you have scored and 1 commodity for each public objective you have scored.",
+        "source": "twilight_ds",
+        "faction": "vaden"
+    },
+    {
+        "alias": "tf-corporateimperialism",
+        "name": "Corporate Imperialism",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "Your commodity value is increased by 4.",
+        "source": "twilight_ds",
+        "faction": "veldyr"
+    },
+    {
+        "alias": "tf-harnessedaurora",
+        "name": "Harnessed Aurora",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "Your home system is also a nebula. Hits produced by the combat and ability rolls of your units in nebulae cannot be canceled. When you pass, explore the frontier deck in your home system.",
+        "source": "twilight_ds",
+        "faction": "veldyr"
+    },
+    {
+        "alias": "tf-siedrunleashed",
+        "name": "SIEDR Unleashed",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "At the end of each round of space combat, you may use the SPACE CANNON of 1 of your units in the active system against your opponent's ships. Capture units destroyed by your unit abilities. After you roll a combat or ability die you may return 1 of your captured units to apply +1 to the result.",
+        "source": "twilight_ds",
+        "faction": "veldyr"
+    },
+    {
+        "alias": "tf-shardsaturation",
+        "name": "Shard Saturation",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "When 1 or more of your units produce 1 or more hits during an ability roll, produce 1 additional hit for that roll.",
+        "source": "twilight_ds",
+        "faction": "zelian"
+    },
+    {
+        "alias": "tf-hostileplanetoids",
+        "name": "Hostile Planetoids",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "Your planets in the active system participate in space combat if that system contains 1 or more of your ships, and ground combat on themselves if they contain 1 or more of your infantry. Your planets cannot be assigned hits and have a combat value equal to 10 minus their resource value, minimum 1.",
+        "source": "twilight_ds",
+        "faction": "zelian"
+    }
+]

@@ -278,8 +278,7 @@ public class RegexHelper {
         } else {
             allACs.addAll(Mapper.getActionCards().keySet());
         }
-        allACs.addAll(
-                player.getActionCards().values().stream().map(Object::toString).toList());
+        allACs.addAll(player.getActionCards().keySet());
         return regexBuilder("ac", allACs);
     }
 

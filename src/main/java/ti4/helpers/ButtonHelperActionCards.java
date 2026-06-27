@@ -2855,7 +2855,7 @@ public final class ButtonHelperActionCards {
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.doesTileHaveWHs(game, tile.getPosition())) {
                 boolean hasOtherShip = false;
-                for (Player p2 : game.getRealPlayers()) {
+                for (Player p2 : game.getRealPlayersNNeutral()) {
                     if (p2 == player) {
                         continue;
                     }

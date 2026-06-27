@@ -49,6 +49,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
@@ -1474,6 +1475,13 @@ public final class Helper {
                             .append(FactionEmojis.Ghost)
                             .append('\n');
                 }
+                if (thing.contains("liquidation")) {
+                    int reduce = thing.replace("liquidation", "").isEmpty()
+                            ? 0
+                            : Integer.parseInt(thing.replace("liquidation", ""));
+                    res += reduce * 2;
+                    msg.append("> Used _Liquidation_ for a ").append(reduce * 2).append(" resource discount.\n");
+                }
                 if (thing.contains("aida")) {
                     msg.append("Exhausted ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ ");
                     if (thing.contains("_")) {
@@ -1692,6 +1700,12 @@ public final class Helper {
                     if (warM) {
                         productionLimit += 4;
                     }
+                    for (String spent : player.getSpentThingsThisWindow()) {
+                        if (spent.startsWith("liquidation")
+                                && !spent.replace("liquidation", "").isEmpty()) {
+                            productionLimit -= Integer.parseInt(spent.replace("liquidation", ""));
+                        }
+                    }
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
                         productionLimit += 2;
                     }
@@ -1826,6 +1840,11 @@ public final class Helper {
                 productionValueTotal += productionValue * uH.getUnits().get(unit);
             }
         }
+        if (uH instanceof Planet planet
+                && TaPromissoryHandler.planetHasAdvancedStructuralEngineering(planet)
+                && player.getPlanets().contains(planet.getName())) {
+            productionValueTotal += Math.max(0, planet.getResources());
+        }
         String planet = uH.getName();
         int planetUnitVal = 0;
         if ("space".equals(uH.getName())) {
@@ -1845,6 +1864,9 @@ public final class Helper {
                     && !tile.getWormholes(game).isEmpty()
                     && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
                 productionValueTotal += tile.getWormholes(game).size();
+            }
+            if (player.hasTech("tf-networkeddeployment") && CommandCounterHelper.hasCC(player, tile)) {
+                productionValueTotal++;
             }
         }
 
@@ -2384,7 +2406,12 @@ public final class Helper {
         }
         boolean greenMechd = false;
         boolean ironMechSpaceAdded = false;
-
+        if (player.hasTech("tf-desperados")) {
+            unitButtons.add(Buttons.blue(
+                    player.factionButtonChecker() + "desperadoDestroyer_" + tile.getPosition(),
+                    "Place Desperado Destroyer",
+                    FactionEmojis.nokar));
+        }
         if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff)
                 && !"arboHeroBuild".equalsIgnoreCase(warfareNOtherstuff)
                 && !"solBtBuild".equalsIgnoreCase(warfareNOtherstuff)

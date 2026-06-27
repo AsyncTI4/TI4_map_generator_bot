@@ -10,8 +10,8 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -259,14 +259,25 @@ public class TeHelperActionCards {
         game.removeStoredValue("coexistFlag");
 
         String message = player.getRepresentation() + " placed an infantry into coexistence on the planet of "
-                + Helper.getPlanetRepresentation(planet, game) + ".";
+                + Helper.getPlanetRepresentation(planet, game) + ". ";
+
+        Player owner = null;
+        for (Player p : game.getRealPlayers()) {
+            if (p.getPlanets().contains(planet)) {
+                owner = p;
+            }
+        }
+        if (owner != null && !game.isFowMode()) {
+            message += owner.getRepresentation()
+                    + " since this is your planet, you are getting a ping here to let you know.";
+        }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
         ButtonHelperAbilities.oceanBoundCheck(game);
     }
 
     @ButtonHandler("loseAFleetCultural")
-    private static void loseAFleetCultural(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+    private static void loseAFleetCultural(Game game, Player player, ButtonInteractionEvent event) {
         String mahactReason = "due to failing to reach an agreement on _Exchange Program_";
         MahactTokenService.removeFleetCC(game, player, mahactReason);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -280,8 +291,7 @@ public class TeHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("strategize")
-    private static void resolveStrategize(Game game, Player player, ButtonInteractionEvent event) {
+    public static List<Button> getReadiedStrategyCardSecondaryButtons(Game game) {
         List<Button> buttons = new ArrayList<>();
 
         if (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1)) {
@@ -310,6 +320,13 @@ public class TeHelperActionCards {
             buttons.add(Buttons.green("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
 
+        return buttons;
+    }
+
+    @ButtonHandler("strategize")
+    private static void resolveStrategize(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = getReadiedStrategyCardSecondaryButtons(game);
+
         String message = player.getRepresentationUnfogged() + ", please resolve _Strategize_ using these buttons.";
         String msg2 = player.getRepresentation()
                 + ", A strategy token was auto deducted (if possible) due to so many people forgetting to do so. If you end up resolving leadership, please gain it back (the bot wont make you pay for it).";
@@ -321,10 +338,10 @@ public class TeHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         if (player.hasUnlockedBreakthrough("onyxxabt")) {
-            OnyxxaBreakthroughButtonHandler.offerSCRollButton(game, player);
+            OnyxxaBreakthroughHandler.offerSCRollButton(game, player);
         }
         if (!player.hasLeaderUnlocked("onyxxacommander") && "onyxxa".equals(player.getFaction())) {
-            OnyxxaCommanderButtonHandler.offerCommanderUnlockButton(player);
+            OnyxxaCommanderHandler.offerCommanderUnlockButton(player);
         }
         ButtonHelper.deleteMessage(event);
     }

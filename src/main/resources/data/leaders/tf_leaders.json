@@ -58,7 +58,7 @@
         "tfShrinkName": true,
         "title": "Jol Nar Paradigm",
         "abilityWindow": "ACTION:",
-        "abilityText": "Gain 1 genome, 1 unit upgrade, and 1 ability. Then purge this card.",
+        "abilityText": "Draw 1 genome, 1 unit upgrade, and 1 ability. Then purge this card.",
         "unlockCondition": "Always Unlocked",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/jolnar_paradigm.png?raw=true",
         "source": "twilights_fall"

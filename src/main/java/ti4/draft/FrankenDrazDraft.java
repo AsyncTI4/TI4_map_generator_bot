@@ -36,7 +36,6 @@ import ti4.message.componentsV2.MessageV2Editor;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.franken.FrankenDraftBagService;
-import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 
 public class FrankenDrazDraft extends FrankenDraft {
@@ -128,7 +127,7 @@ public class FrankenDrazDraft extends FrankenDraft {
 
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
         draftManager.clear();
-        MiltyDraftHelper.initDraftTiles(draftManager, game);
+        initFrankenDraftTiles(draftManager, game);
         allDraftableItems.put(DraftCategory.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftManager, game));
         allDraftableItems.put(DraftCategory.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager, game));
 
@@ -139,7 +138,7 @@ public class FrankenDrazDraft extends FrankenDraft {
 
             for (Map.Entry<DraftCategory, List<DraftItem>> draftableCollection : allDraftableItems.entrySet()) {
                 DraftCategory category = draftableCollection.getKey();
-                int categoryLimit = FrankenDraft.getItemLimitForCategory(category, game);
+                int categoryLimit = getItemLimitForCategory(category, game);
                 for (int j = 0; j < categoryLimit; j++) {
                     if (!draftableCollection.getValue().isEmpty()) {
                         bag.Contents.add(draftableCollection.getValue().removeFirst());
@@ -181,11 +180,11 @@ public class FrankenDrazDraft extends FrankenDraft {
             DraftBag hand = player.getDraftHand();
             if (hand.getCategoryCount(DraftCategory.FACTION) > 0
                     || hand.getCategoryCount(DraftCategory.BLUETILE)
-                            != FrankenDraft.getItemLimitForCategory(DraftCategory.BLUETILE, getOwner())
+                            != getItemLimitForCategory(DraftCategory.BLUETILE, getOwner())
                     || hand.getCategoryCount(DraftCategory.REDTILE)
-                            != FrankenDraft.getItemLimitForCategory(DraftCategory.REDTILE, getOwner())
+                            != getItemLimitForCategory(DraftCategory.REDTILE, getOwner())
                     || hand.getCategoryCount(DraftCategory.DRAFTORDER)
-                            != FrankenDraft.getItemLimitForCategory(DraftCategory.DRAFTORDER, getOwner())) {
+                            != getItemLimitForCategory(DraftCategory.DRAFTORDER, getOwner())) {
                 return false;
             }
         }
@@ -340,10 +339,10 @@ public class FrankenDrazDraft extends FrankenDraft {
 
     @Override
     public int getBagSize() {
-        return FrankenDraft.getItemLimitForCategory(DraftCategory.FACTION, getOwner())
-                + FrankenDraft.getItemLimitForCategory(DraftCategory.BLUETILE, getOwner())
-                + FrankenDraft.getItemLimitForCategory(DraftCategory.REDTILE, getOwner())
-                + FrankenDraft.getItemLimitForCategory(DraftCategory.DRAFTORDER, getOwner());
+        return getItemLimitForCategory(DraftCategory.FACTION, getOwner())
+                + getItemLimitForCategory(DraftCategory.BLUETILE, getOwner())
+                + getItemLimitForCategory(DraftCategory.REDTILE, getOwner())
+                + getItemLimitForCategory(DraftCategory.DRAFTORDER, getOwner());
     }
 
     private List<Player> getOwnerPlayers() {

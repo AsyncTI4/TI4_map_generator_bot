@@ -578,7 +578,8 @@ public class Tile {
             return true;
         if (game != null) {
             for (Player p : game.getPlayers().values()) {
-                if (p.hasUnlockedBreakthrough("veldyrbt") && p.getHomeSystemTile() == this) {
+                if ((p.hasUnlockedBreakthrough("veldyrbt") || p.hasTech("tf-harnessedaurora"))
+                        && p.getHomeSystemTile() == this) {
                     return true;
                 }
             }

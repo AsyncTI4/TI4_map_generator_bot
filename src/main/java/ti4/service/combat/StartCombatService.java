@@ -24,10 +24,16 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiCommanderHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAgentHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -49,6 +55,8 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
@@ -245,7 +253,7 @@ public class StartCombatService {
         }
         for (Player p : List.of(player, player2)) {
             if (p.hasUnlockedBreakthrough("onyxxabt")) {
-                OnyxxaBreakthroughButtonHandler.offerGroundCombatMechButtons(game, p, unitHolder, tile);
+                OnyxxaBreakthroughHandler.offerGroundCombatMechButtons(game, p, unitHolder, tile);
             }
         }
     }
@@ -272,6 +280,10 @@ public class StartCombatService {
         game.setStoredValue(combatName2, "");
         combatName2 = "combatRoundTracker" + player2.getFaction() + tile.getPosition() + unitHolderName;
         game.setStoredValue(combatName2, "");
+        if (player1.hasAbility("refraction") || player2.hasAbility("refraction")) {
+            CrystellumAbilityHandler.resetRefractionForCombat(game, player1, tile);
+            CrystellumAbilityHandler.resetRefractionForCombat(game, player2, tile);
+        }
 
         TextChannel textChannel = (TextChannel) channel;
 
@@ -294,6 +306,7 @@ public class StartCombatService {
                 return;
             }
         }
+
         if (tile.isMecatol(game)) {
             CommanderUnlockCheckService.checkPlayer(player1, "winnu");
             CommanderUnlockCheckService.checkPlayer(player2, "winnu");
@@ -306,15 +319,18 @@ public class StartCombatService {
         // Create the thread
         String finalThreadName = threadName;
 
-        channel.sendMessage("Resolve combat in this thread:").queue(m -> {
-            ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, m.getId());
+        try {
+            var threadMessage =
+                    channel.sendMessage("Resolve combat in this thread:").complete();
+            ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, threadMessage.getId());
             if (game.isFowMode()) {
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
             } else {
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             }
-            threadChannel.queue(tc -> initializeCombatThread(
-                    tc,
+            // mutates game state, so much be done using complete rather than queue
+            initializeCombatThread(
+                    threadChannel.complete(),
                     game,
                     player1,
                     player2,
@@ -323,8 +339,10 @@ public class StartCombatService {
                     spaceOrGround,
                     systemWithContext,
                     unitHolderName,
-                    firstCombatThread));
-        });
+                    firstCombatThread);
+        } catch (Exception e) {
+            BotLogger.error(new LogOrigin(game), "Failed to create combat thread for game: " + game.getName(), e);
+        }
         CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
         CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
     }
@@ -573,7 +591,7 @@ public class StartCombatService {
         if (firstCombatThread) {
             for (Player p : game.getRealPlayers()) {
                 // offer buttons for all crimson commander holders
-                offerRedGhostCommanderButtons(p, game, tile, event);
+                offerRedGhostCommanderButtons(p, game);
 
                 boolean inExileRange = FoWHelper.isTileInExileRange(game, tile, p);
                 if (inExileRange) {
@@ -647,8 +665,7 @@ public class StartCombatService {
                 false);
     }
 
-    public static void offerRedGhostCommanderButtons(
-            Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
+    public static void offerRedGhostCommanderButtons(Player player, Game game) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")
                 || game.playerHasLeaderUnlockedOrAlliance(player, "crimsoncommander")) {
             String message = player.getRepresentation(true, true)
@@ -904,20 +921,12 @@ public class StartCombatService {
                         buttons);
             }
             if ("space".equalsIgnoreCase(type) && player.hasUnexhaustedLeader("kaloraagent")) {
-                buttons = new ArrayList<>();
-                buttons.add(Buttons.gray(
-                        player.factionButtonChecker() + "exhaustAgent_kaloraagent",
-                        "Use Valzor, the Kalora Agent",
-                        FactionEmojis.kalora));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(),
-                        msg
-                                + ", a reminder that at the end of this space combat, you may exhaust the Kalora agent to allow a participating player to gain 1 command token.",
-                        buttons);
+                KaloraAgentHandler.offerKaloraAgentButtons(player, msg);
             }
-            if ("space".equalsIgnoreCase(type)
-                    && (player.getLeaderIDs().contains("arvaxicommander")
-                            || game.playerHasLeaderUnlockedOrAlliance(player, "arvaxicommander"))) {
+            if ("space".equalsIgnoreCase(type) && ButtonHelper.doesPlayerHaveFSHere("onyxxa_flagship", player, tile)) {
+                OnyxxaUnitHandler.offerFlagshipWinButton(player, msg);
+            }
+            if ("space".equalsIgnoreCase(type) && game.playerHasLeaderUnlockedOrAlliance(player, "arvaxicommander")) {
                 ArvaxiCommanderHandler.sendCombatButtons(player, otherPlayer, game, msg);
             }
             if (player.hasTechReady("dskortg") && CommandCounterHelper.hasCC(player, tile)) {
@@ -940,16 +949,10 @@ public class StartCombatService {
             if (player.hasUnlockedBreakthrough("zephyrionbt")
                     && "space".equalsIgnoreCase(type)
                     && ButtonHelper.isTileInOrAdjacentToPlayersHome(game, tile, otherPlayer, player)) {
-                buttons = new ArrayList<>();
-                buttons.add(Buttons.gray(
-                        player.factionButtonChecker() + "zephyrionbtRes_" + otherPlayer.getFaction(),
-                        "Resolve Subdue Chancellor (Upon Win)",
-                        FactionEmojis.zephyrion));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(),
-                        msg
-                                + ", a reminder that if you win this space combat, you may resolve _Subdue Chancellor_ to draw an unused agent.",
-                        buttons);
+                ZephyrionBreakthroughHandler.offerBtCombatButtons(player, otherPlayer, game, msg);
+            }
+            if (player.hasTechReady("bakalor") && "space".equalsIgnoreCase(type) && !tile.isHomeSystem(game)) {
+                KaloraAbilityHandler.chitinShielding(player, otherPlayer, game);
             }
             if (player.hasAbility("technological_singularity")
                     && !otherPlayer.isDummy()
@@ -1321,6 +1324,13 @@ public class StartCombatService {
         if ((p1.hasAbility("facsimile") && p1 != game.getActivePlayer())
                 || p2.hasAbility("facsimile") && p2 != game.getActivePlayer() && !game.isFowMode()) {
             buttons.add(Buttons.gray("startFacsimile_" + tile.getPosition(), "Facsimile", FactionEmojis.mortheus));
+        }
+
+        // Facet
+        if (CrystellumLeadersHandler.canUseCrystellumHero(p1)) {
+            buttons.add(CrystellumLeadersHandler.getCrystellumHeroButton(p1, tile));
+        } else if (CrystellumLeadersHandler.canUseCrystellumHero(p2)) {
+            buttons.add(CrystellumLeadersHandler.getCrystellumHeroButton(p2, tile));
         }
 
         // mercenaries

@@ -1,8 +1,6 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,10 +33,17 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -112,6 +117,7 @@ public class CombatRollService {
                 BombardmentService.autoAssignAllBombardmentToAPlanet(player, game);
             }
             boolean hasValidBombardment = false;
+            List<String> bombardedPlanets = new ArrayList<>();
             for (String planet : BombardmentService.getBombardablePlanets(player, game, tile)) {
                 if (game.getStoredValue("assignedBombardment" + player.getFaction())
                         .contains(planet)) {
@@ -119,12 +125,16 @@ public class CombatRollService {
                     secondHalfOfCombatRoll(
                             player, game, event, tile, unitHolderName, CombatRollType.bombardment, false);
                     hasValidBombardment = true;
+                    bombardedPlanets.add(planet);
                 }
             }
             if (!hasValidBombardment) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "No valid bombardment target found. Please assign bombardment to a planet using the buttons and try again.");
+            } else if (ButtonHelper.doesPlayerHaveFSHere("kalora_flagship", player, tile)) {
+                KaloraUnitHandler.flagshipBombardmentReroll(
+                        player, event.getMessageChannel(), tile.getPosition(), bombardedPlanets);
             }
             return 0;
         }
@@ -141,6 +151,18 @@ public class CombatRollService {
         metaliFakeUnit.setBaseType("dd");
         metaliFakeUnit.setFaction(player.getFaction());
         return metaliFakeUnit;
+    }
+
+    public static UnitModel getZelianPlanetUnit(Player player, String planetName, int planetCombat) {
+        UnitModel zelianFakeUnit = new UnitModel();
+        zelianFakeUnit.setCombatDieCount(1);
+        zelianFakeUnit.setCombatHitsOn(planetCombat);
+        zelianFakeUnit.setName("Zelian Planet " + planetName);
+        zelianFakeUnit.setAsyncId("zelianplanet");
+        zelianFakeUnit.setId("zelianplanet");
+        zelianFakeUnit.setBaseType("dd");
+        zelianFakeUnit.setFaction(player.getFaction());
+        return zelianFakeUnit;
     }
 
     public static int secondHalfOfCombatRoll(
@@ -173,6 +195,28 @@ public class CombatRollService {
                 getUnitsInCombat(tile, combatOnHolder, player, event, rollType, game);
         if (rollType == CombatRollType.AFB && player.hasRelic("metalivoidarmaments")) {
             playerUnitsByQuantity.put(getMetaliAFBUnit(player), 1);
+        }
+        if (rollType == CombatRollType.combatround && player.hasActiveBreakthrough("zelianbt")) {
+            for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                if (player.getPlanetsAllianceMode().contains(uH.getName())
+                        && ("space".equalsIgnoreCase(unitHolderName)
+                                || uH.getName().equalsIgnoreCase(unitHolderName))) {
+                    int resource = Helper.getPlanetResources(uH.getName(), game);
+                    playerUnitsByQuantity.put(
+                            getZelianPlanetUnit(player, Helper.getPlanetName(uH.getName()), 10 - resource), 1);
+                }
+            }
+        }
+        if (rollType == CombatRollType.combatround
+                && player.hasTech("tf-hostileplanetoids")
+                && "space".equalsIgnoreCase(unitHolderName)) {
+            for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                if (player.getPlanetsAllianceMode().contains(uH.getName())) {
+                    int resource = Helper.getPlanetResources(uH.getName(), game);
+                    playerUnitsByQuantity.put(
+                            getZelianPlanetUnit(player, Helper.getPlanetName(uH.getName()), 10 - resource), 1);
+                }
+            }
         }
         String bombardPlanet = "";
         if (rollType == CombatRollType.bombardment
@@ -462,6 +506,10 @@ public class CombatRollService {
                                         "Cancel a Hit"));
                                 AshenPromissoryHandler.addFromTheAshesButton(
                                         buttons, game, opponent, player, tile, combatOnHolder, h);
+                                if (opponent.hasUnit("crystellum_mech")) {
+                                    CrystellumUnitHandler.offerRefractumButtonIfRelevant(
+                                            buttons, opponent, game, tile, combatOnHolder, h);
+                                }
                             }
                             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                             if (opponent.hasTech("vpw")) {
@@ -531,6 +579,17 @@ public class CombatRollService {
                                     opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
                                     "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
 
+                        } else if (opponent.hasAbility("refraction")) {
+                            buttons.add(Buttons.green(
+                                    factionChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
+                                    "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                            buttons.add(Buttons.red(
+                                    "getDamageButtons_" + tile.getPosition() + "deleteThis_spacecombat",
+                                    "Manually Assign Hit" + (h == 1 ? "" : "s")));
+                            buttons.add(Buttons.gray(
+                                    factionChecker + "cancelSpaceHits_" + tile.getPosition() + "_" + h,
+                                    "Cancel a Hit"));
+                            CrystellumAbilityHandler.addRefractionButtonIfRelevant(buttons, opponent, game, tile, h);
                         } else {
                             buttons.add(Buttons.green(
                                     factionChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
@@ -979,6 +1038,20 @@ public class CombatRollService {
                     && game.getPlayedSCs().containsAll(opponent.getSCs())) {
                 modifierToHit += 1;
             }
+            if (rollType == CombatRollType.combatround
+                    && "onyxxa_mech".equalsIgnoreCase(unitModel.getId())
+                    && unitHolder != null) {
+                modifierToHit += OnyxxaUnitHandler.getObeliskCombatModifier(player, unitHolder);
+            }
+            if (rollType == CombatRollType.combatround
+                    && "xan_mech".equals(unitModel.getId())
+                    && unitHolder != null
+                    && XanUnitHandler.countSpaceDocksOnHolder(unitHolder, game) > 0) {
+                modifierToHit += 2;
+            }
+            if (unitHolder != null) {
+                modifierToHit += VyserixUnitHandler.getTechnotemplarModifier(player, unitHolder, rollType);
+            }
             int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player);
             if (rollType == CombatRollType.combatround) {
                 CombatStatsService.CombatRoundProfile combatRoundProfile = CombatStatsService.getCombatRoundProfile(
@@ -986,6 +1059,10 @@ public class CombatRollService {
                 toHit = combatRoundProfile.hitsOn();
                 numRollsPerUnit = combatRoundProfile.diceCount();
             }
+            if (rollType == CombatRollType.combatround && "xan_warsun2".equals(unitModel.getId())) {
+                numRollsPerUnit += XanUnitHandler.countSpaceDocksInTile(activeSystem, game);
+            }
+
             boolean extraRollsCount = false;
             if ((numRollsPerUnit > 1 || extraRollsForUnit > 0) && isThalnosReroll) {
                 extraRollsCount = true;
@@ -1641,6 +1718,12 @@ public class CombatRollService {
         if (totalHits < 1) {
             useDoubleBoomEmoji = false;
         }
+        if (totalHits > 0 && rollType == CombatRollType.bombardment && player.hasTech("dszelir")) {
+            totalHits++;
+        }
+        if (totalHits > 0 && rollType != CombatRollType.combatround && player.hasTech("tf-shardsaturation")) {
+            totalHits++;
+        }
         result += CombatMessageHelper.displayHitResults(totalHits, useDoubleBoomEmoji);
 
         if (totalHits > 0 && usesX89c4) {
@@ -1669,7 +1752,11 @@ public class CombatRollService {
         }
         if (totalHits > 0 && rollType == CombatRollType.bombardment && player.hasTech("dszelir")) {
             result += "\n" + player.getFactionEmoji()
-                    + " You have _Shard Volley_ and thus should produce an additional hit to the ones rolled above.";
+                    + " You have _Shard Volley_ and thus produced an additional hit to the ones rolled above.";
+        }
+        if (totalHits > 0 && rollType != CombatRollType.combatround && player.hasTech("tf-shardsaturation")) {
+            result += "\n" + player.getFactionEmoji()
+                    + " You have _Shard Saturation_ and thus produced an additional hit to the ones rolled above.";
         }
         delayedAfterTotalNotes.forEach(payloadBuilder::addNote);
         if (!extra.isEmpty()) {
@@ -2040,7 +2127,9 @@ public class CombatRollService {
                 .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount(player) > 0)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
         checkBadUnits(player, event, unitsByAsyncId, output);
-
+        if (player.getGame() != null && player.getGame().playerHasLeaderUnlockedOrAlliance(player, "kaloracommander")) {
+            KaloraCommanderHandler.addCommanderBombardmentUnits(player, tile, output);
+        }
         return output;
     }
 

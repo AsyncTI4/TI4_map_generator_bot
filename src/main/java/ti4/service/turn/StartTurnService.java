@@ -16,7 +16,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamBut
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisHeroButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisHeroHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -200,7 +200,7 @@ public class StartTurnService {
         ButtonHelperFactionSpecific.resolveMykoMechCheck(player, game);
         ButtonHelperFactionSpecific.resolveKolleccAbilities(player, game);
         if (player.hasLeaderUnlocked("tyrishero")) {
-            TyrisHeroButtonHandler.offerHeroAtStartOfTurn(game, player);
+            TyrisHeroHandler.offerHeroAtStartOfTurn(game, player);
         }
         if (!game.getStoredValue("futureMessageFor" + player.getFaction()).isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -464,10 +464,7 @@ public class StartTurnService {
         List<Button> startButtons = new ArrayList<>();
         boolean hadAnyUnplayedSCs = false;
 
-        if (doneActionThisTurn
-                && (player.hasTech("fl")
-                        || !game.getStoredValue("tyrisHeroRound" + game.getRound() + "_" + player.getFaction())
-                                .isEmpty())) {
+        if (doneActionThisTurn && (player.hasTech("fl") || TyrisHeroHandler.isHeroActiveThisRound(game, player))) {
             confirmed2ndAction = true;
         }
         if (!doneActionThisTurn || confirmed2ndAction) {

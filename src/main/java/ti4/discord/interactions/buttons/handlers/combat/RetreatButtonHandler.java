@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -103,6 +105,12 @@ class RetreatButtonHandler {
                         event.getChannel().getName());
         LoreService.showSystemLore(player, game, pos2, LoreService.TRIGGER.CONTROLLED);
         CommanderUnlockCheckService.checkPlayer(player, "kalora");
+        if (player.hasAbility("carapace_regeneration")) {
+            KaloraAbilityHandler.carapaceRegeneration(player, game.getTileByPosition(pos2), event);
+        }
+        if (player.hasUnlockedBreakthrough("kalorabt")) {
+            KaloraBreakthroughHandler.bypassOperationsRetreat(player, game, game.getTileByPosition(pos1), event);
+        }
         FOWCombatThreadMirroring.mirrorMessage(
                 event, game, player.getRepresentationNoPing() + " retreated all units in space.");
         String message =

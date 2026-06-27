@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -139,7 +139,7 @@ public class RoundOneService {
             }
 
             if (player.hasAbility("initiation")) {
-                LunariumAbilityButtonHandler.setFactionSheetCCs(game, player, 1);
+                LunariumAbilityHandler.setFactionSheetCCs(game, player, 1);
             }
 
             if (player.hasAbility("questing_prince")) {

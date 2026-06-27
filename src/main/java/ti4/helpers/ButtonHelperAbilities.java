@@ -19,7 +19,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.PhantomEnergyHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -1971,7 +1971,8 @@ public final class ButtonHelperAbilities {
     public static void removeSleeper(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         buttonID = buttonID.replace("removeSleeperFromPlanet_", "");
         String planet = buttonID;
-        String message = player.getFactionEmojiOrColor() + " removed a Sleeper from " + planet;
+        String message = player.getFactionEmojiOrColor() + " removed a Sleeper from "
+                + Helper.getPlanetRepresentation(planet, game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         SleeperTokenHelper.addOrRemoveSleeper(event, game, planet, player);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -2238,7 +2239,7 @@ public final class ButtonHelperAbilities {
                 rollOmenDiceAtStartOfStrat(game, player);
             }
             if (player.hasAbility("marked_prey")) {
-                ZephyrionBountyButtonHandler.offerBountyButtons(game, player, false);
+                ZephyrionBountyHandler.offerBountyButtons(game, player, false);
             }
             PhantomEnergyHandler.checkFlagshipPhantomEnergy(game, player);
             if (player.hasAbility("protocols")) {

@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import software.amazon.awssdk.utils.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.draft.FrankenButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -504,10 +505,14 @@ public final class ButtonHelperTwilightsFall {
                         "savedParticipants", game.getStoredValue("savedParticipants") + "_" + p.getFaction());
             }
         }
-        MessageHelper.sendMessageToChannel(
-                startPlayer.getCorrectChannel(),
-                "A splice has started with the following order of participants:\n"
-                        + getSpliceOrderString(participants));
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(startPlayer.getCorrectChannel(), "A splice has started.");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    startPlayer.getCorrectChannel(),
+                    "A splice has started with the following order of participants:\n"
+                            + getSpliceOrderString(participants));
+        }
 
         sendPlayerSpliceOptions(game, startPlayer);
         for (Player player2 : getParticipantsList(game)) {
@@ -564,9 +569,13 @@ public final class ButtonHelperTwilightsFall {
                         "savedParticipants", game.getStoredValue("savedParticipants") + "_" + p.getFaction());
             }
         }
-        MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(),
-                "The splice order has been reversed. The new order is: " + getSpliceOrderString(participants));
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "The splice order has been reversed.");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    "The splice order has been reversed. The new order is: " + getSpliceOrderString(participants));
+        }
 
         game.removeStoredValue("reverseSpliceOrder");
     }
@@ -837,7 +846,25 @@ public final class ButtonHelperTwilightsFall {
                         player.getRepresentation() + " has removed a spliced card from the draft.");
             } else {
                 if (!game.isVeiledHeartMode()) {
+                    if (player.hasAbility("tf-forbiddenknowledge")) {
+                        List<Button> buttons2 = new ArrayList<>();
+                        buttons2.add(Buttons.red(
+                                "discardSpliceCard_" + type, "Discard 1 " + StringUtils.capitalize(type) + " Card"));
+                        buttons2.add(Buttons.green(
+                                "drawSingularNewSpliceCard_" + type,
+                                "Draw 1 " + StringUtils.capitalize(type) + " Card"));
+                        buttons2.add(Buttons.gray("deleteButtons", "Decline"));
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentation()
+                                        + " reminder that instead of keeping that card, you can choose to discard it and draw a random one due to your forbidden knowledge ability. If you choose to do so, use the buttons to gain a card and then discard the chosen card.");
+                    }
                     if ("ability".equalsIgnoreCase(type)) {
+                        if (Mapper.getTech(cardID) == null) {
+                            MessageHelper.sendMessageToChannel(
+                                    player.getCorrectChannel(), "Cannot find a " + type + " with the ID of " + cardID);
+                            return;
+                        }
                         player.addTech(cardID);
                         MessageHelper.sendMessageToChannelWithEmbed(
                                 player.getCorrectChannel(),
@@ -846,6 +873,11 @@ public final class ButtonHelperTwilightsFall {
                                 Mapper.getTech(cardID).getRepresentationEmbed());
                     }
                     if ("genome".equalsIgnoreCase(type)) {
+                        if (Mapper.getLeader(cardID) == null) {
+                            MessageHelper.sendMessageToChannel(
+                                    player.getCorrectChannel(), "Cannot find a " + type + " with the ID of " + cardID);
+                            return;
+                        }
                         player.addLeader(cardID);
                         MessageHelper.sendMessageToChannelWithEmbed(
                                 player.getCorrectChannel(),
@@ -854,6 +886,11 @@ public final class ButtonHelperTwilightsFall {
                                 Mapper.getLeader(cardID).getRepresentationEmbed(false, true, false, false, true));
                     }
                     if ("units".equalsIgnoreCase(type)) {
+                        if (Mapper.getUnit(cardID) == null) {
+                            MessageHelper.sendMessageToChannel(
+                                    player.getCorrectChannel(), "Cannot find a " + type + " with the ID of " + cardID);
+                            return;
+                        }
                         UnitModel unitModel = Mapper.getUnit(cardID);
                         String asyncId = unitModel.getAsyncId();
                         if (!"fs".equalsIgnoreCase(asyncId) && !"mf".equalsIgnoreCase(asyncId)) {
@@ -1646,7 +1683,9 @@ public final class ButtonHelperTwilightsFall {
 
     public static void startInauguralSplice(Game game) {
         // The inaugural splice uses the seating order, so it's set here already
-        Helper.setOrder(game);
+        if (!game.isFowMode()) {
+            Helper.setOrder(game);
+        }
         game.setBagDraft(new InauguralSpliceFrankenDraft(game));
         FrankenDraftBagService.startDraft(game);
     }

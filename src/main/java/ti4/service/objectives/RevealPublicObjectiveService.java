@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.RewriteDestinyHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisCommanderButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisCommanderHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -35,12 +35,17 @@ public class RevealPublicObjectiveService {
     }
 
     public static void revealS2(Game game, GenericInteractionCreateEvent event, boolean random) {
-        Map.Entry<String, Integer> objective;
-        if (random) {
-            objective = game.revealStage2Random();
-        } else {
-            objective = game.revealStage2();
-        }
+        Map.Entry<String, Integer> objective = random ? game.revealStage2Random() : game.revealStage2();
+        handleStage2Revealed(game, event, objective);
+    }
+
+    /** Reveals a stage 2 objective from the deck itself (ignoring the peekable upcoming objectives). */
+    public static void revealS2FromDeck(Game game, GenericInteractionCreateEvent event) {
+        handleStage2Revealed(game, event, game.revealStage2FromDeck());
+    }
+
+    private static void handleStage2Revealed(
+            Game game, GenericInteractionCreateEvent event, Map.Entry<String, Integer> objective) {
         if (objective == null) {
             MessageHelper.sendMessageToChannel(
                     game.getActionsChannel(), "No unrevealed stage 2 public objectives remain.");
@@ -54,7 +59,7 @@ public class RevealPublicObjectiveService {
                 RewriteDestinyHandler.offerRewriteDestiny(game, player, objective.getKey(), 2);
             }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "tyriscommander")) {
-                TyrisCommanderButtonHandler.offerInfantry(game, player);
+                TyrisCommanderHandler.offerInfantry(game, player);
             }
         }
         var channel = game.getActionsChannel();
@@ -178,12 +183,17 @@ public class RevealPublicObjectiveService {
     }
 
     public String revealS1(Game game, GenericInteractionCreateEvent event, boolean random) {
-        Map.Entry<String, Integer> objective;
-        if (random) {
-            objective = game.revealStage1Random();
-        } else {
-            objective = game.revealStage1();
-        }
+        Map.Entry<String, Integer> objective = random ? game.revealStage1Random() : game.revealStage1();
+        return handleStage1Revealed(game, event, objective);
+    }
+
+    /** Reveals a stage 1 objective from the deck itself (ignoring the peekable upcoming objectives). */
+    public String revealS1FromDeck(Game game, GenericInteractionCreateEvent event) {
+        return handleStage1Revealed(game, event, game.revealStage1FromDeck());
+    }
+
+    private String handleStage1Revealed(
+            Game game, GenericInteractionCreateEvent event, Map.Entry<String, Integer> objective) {
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         var channel = game.getActionsChannel();
         MessageHelper.sendMessageToChannel(
@@ -196,7 +206,7 @@ public class RevealPublicObjectiveService {
                 RewriteDestinyHandler.offerRewriteDestiny(game, player, objective.getKey(), 1);
             }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "tyriscommander")) {
-                TyrisCommanderButtonHandler.offerInfantry(game, player);
+                TyrisCommanderHandler.offerInfantry(game, player);
             }
         }
         if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {

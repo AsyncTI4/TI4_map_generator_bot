@@ -11,9 +11,12 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumFactionTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -91,9 +94,18 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("ashenagent")) {
             buttons.add(AshenLeadersHandler.getAshTenderCardsInfoButton(player));
         }
+        if (player.hasUnexhaustedLeader("taagent")) {
+            buttons.add(TaLeadersHandler.getLenCardsInfoButton());
+        }
         if (player.hasUnexhaustedLeader("dreamagent")
                 && !DreamButtonHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
             buttons.add(DreamButtonHandler.getDreamAgentCardsInfoButton(player));
+        }
+        if (player.hasUnexhaustedLeader("crystellumagent")) {
+            buttons.add(CrystellumLeadersHandler.getCrystellumAgentButton(player));
+        }
+        if (player.hasTech("becrystmb") && player.isActivePlayer()) {
+            buttons.add(CrystellumFactionTechHandler.getMolecularBindingButton(player));
         }
         if (player.hasAbility("intrigue")) {
             buttons.add(Buttons.blue("startIntrigueCard", "Pay For Intrigue Card", FactionEmojis.xin));

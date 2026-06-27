@@ -17,6 +17,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
     private final BooleanSetting discoStars;
     private final BooleanSetting blueReverie;
     private final BooleanSetting unchartedSpace;
+    private final BooleanSetting eronous;
 
     FrankenHomebrewSettings(Game game, JsonNode json, SettingsMenu parent) {
         super(
@@ -28,9 +29,11 @@ class FrankenHomebrewSettings extends SettingsMenu {
         discoStars = new BooleanSetting("DiscoStars", "Discordant Stars", game.isDiscordantStarsMode());
         blueReverie = new BooleanSetting("BlueReverie", "Blue Reverie", game.isBlueReverieMode());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
+        eronous = new BooleanSetting("Eronous", "Eronous Tiles", false);
 
         discoStars.setEmoji(SourceEmojis.DiscordantStars);
         unchartedSpace.setEmoji(SourceEmojis.DiscordantStars);
+        eronous.setEmoji(SourceEmojis.Eronous);
         discoStars.setExtraInfo("Adds Discordant Stars faions only.");
         blueReverie.setExtraInfo("Adds Blue Reverie factions only.");
         unchartedSpace.setExtraInfo("Adds Uncharted Space content.");
@@ -42,6 +45,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
             discoStars.initialize(json.get("discoStars"));
             blueReverie.initialize(json.get("blueReverie"));
             unchartedSpace.initialize(json.get("unchartedSpace"));
+            eronous.initialize(json.get("eronous"));
         }
     }
 
@@ -55,7 +59,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
 
     @Override
     protected List<SettingInterface> settings() {
-        return new ArrayList<>(List.of(discoStars, blueReverie, unchartedSpace));
+        return new ArrayList<>(List.of(discoStars, blueReverie, unchartedSpace, eronous));
     }
 
     @Override
@@ -72,13 +76,16 @@ class FrankenHomebrewSettings extends SettingsMenu {
     private String homebrewNotes() {
         StringBuilder sb = new StringBuilder("""
 
-                > These toggles determine which homebrew Franken will use when the draft starts.\n
-                > Select "New PoK", "Old PoK", or "Thunder's Edge + New PoK" above to set official factions.\n""");
+                > These toggles determine which homebrew Franken will use when the draft starts.
+
+                > Select "New PoK", "Old PoK", or "Thunder's Edge + New PoK" above to set official factions.
+                """);
 
         if (parent instanceof FrankenSettings fs && fs.isFrankendrazMode()) {
             sb.append("""
 
-                > Discordant Stars and Blue Reverie are enabled by default in FrankenDraz. Disable them using the "Disable DS Factions" and "Disable BR Factions" toggles in the main menu.""");
+                > Discordant Stars and Blue Reverie are enabled by default in FrankenDraz. Disable them using the "Disable DS Factions" and "Disable BR Factions" toggles in the main menu.
+                > **NOTE**: If you do not have DS/BR on, the max amount of factions per player is 5 for a 6 player game and 7 for a 4 player game.""");
         }
         return sb.toString();
     }

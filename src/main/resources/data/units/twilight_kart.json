@@ -392,7 +392,7 @@
         "combatDieCount": 1,
         "isUpgrade": true,
         "isShip": true,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.  Once per combat, after 1 of your opponent's units is destroyed, you may destroy this unit and discard 1 of your abilities to draw 1 ability.",
+        "ability": "This unit may move without being transported. Fighters in excess of your ships’ capacity count against your fleet pool.  Once per combat this unit participates in, after 1 of your opponent's units is destroyed, you may discard 1 of your abilities to draw 1 ability.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-maleagant.png?raw=true",
         "source": "twilight_kart"
     },

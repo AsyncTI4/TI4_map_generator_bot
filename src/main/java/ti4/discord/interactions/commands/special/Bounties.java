@@ -1,7 +1,7 @@
 package ti4.discord.interactions.commands.special;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -23,6 +23,6 @@ class Bounties extends GameStateSubcommand {
                     event, "You do not have the Marked Prey ability and cannot manage bounties.");
             return;
         }
-        ZephyrionBountyButtonHandler.offerBountyButtons(game, player);
+        ZephyrionBountyHandler.offerBountyButtons(game, player);
     }
 }

@@ -50,6 +50,7 @@ public class WinningPathHelper {
                 .filter(entry -> entry.getValue().contains(userId))
                 .map(Map.Entry::getKey)
                 .filter(poID -> Mapper.getPublicObjective(poID) == null)
+                .filter(poID -> !isZeroVictoryPointObjective(game, poID))
                 .collect(Collectors.toMap(
                         WinningPathHelper::normalizeVictoryPointKey,
                         key -> Collections.frequency(
@@ -62,6 +63,11 @@ public class WinningPathHelper {
                         .thenComparing(Map.Entry.comparingByKey()))
                 .map(entry -> entry.getValue() + " " + entry.getKey())
                 .collect(Collectors.joining(", "));
+    }
+
+    private static boolean isZeroVictoryPointObjective(Game game, String poID) {
+        Integer vp = game.getCustomPublicVP().get(poID);
+        return vp != null && vp == 0;
     }
 
     private static String normalizeVictoryPointKey(String poID) {

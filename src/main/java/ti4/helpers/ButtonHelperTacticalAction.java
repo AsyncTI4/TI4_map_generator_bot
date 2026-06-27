@@ -11,8 +11,10 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -132,6 +134,7 @@ public final class ButtonHelperTacticalAction {
             if (player.hasAbility("dream_nexus")) {
                 DreamButtonHandler.offerLiturgyButtons(event, game, player);
             }
+            CrystellumLeadersHandler.clearFacetBypass(game, player);
             resetStoredValuesForTacticalAction(game);
         }
     }
@@ -148,8 +151,9 @@ public final class ButtonHelperTacticalAction {
         String message = player.getRepresentationUnfogged() + ", use buttons to end turn, or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageChannel channel = event.getMessageChannel();
+        LoreService.showSpaceBattleLore(player, game, game.getActiveSystem());
+        LoreService.showSystemLore(player, game, game.getActiveSystem(), LoreService.TRIGGER.CONTROLLED);
         if (game.isFowMode()) {
-            LoreService.showSystemLore(player, game, game.getActiveSystem(), LoreService.TRIGGER.CONTROLLED);
             channel = player.getPrivateChannel();
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, systemButtons);
@@ -275,6 +279,9 @@ public final class ButtonHelperTacticalAction {
                     + ", the Maximus (Dih-Mohn Flagship) moved into the active system, so you may produce up to 2 units with a combined cost of 4 or less.";
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), msg, produce);
         }
+        if (unitsWereMoved && player.hasUnit("ta_flagship")) {
+            TaUnitHandler.resolveWorldshaperOnMove(event, game, player, tile);
+        }
         EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
         if (unitsWereMoved) {
             CommanderUnlockCheckService.checkPlayer(
@@ -287,7 +294,8 @@ public final class ButtonHelperTacticalAction {
                     "tyris",
                     "lunarium",
                     "zephyrion",
-                    "vyserix");
+                    "vyserix",
+                    "crystellum");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "cabal");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "naalu");
@@ -517,6 +525,7 @@ public final class ButtonHelperTacticalAction {
         StringBuilder message = new StringBuilder(player.getRepresentationNoPing() + " activated "
                 + tile.getRepresentationForButtons(game, player) + ".");
 
+        LoreService.showSystemLore(player, game, pos, LoreService.TRIGGER.ACTIVATED);
         if (!game.isFowMode()) {
             for (Player player_ : game.getRealPlayers()) {
                 if (!game.isL1Hero()
@@ -538,7 +547,6 @@ public final class ButtonHelperTacticalAction {
                 }
             }
         } else {
-            LoreService.showSystemLore(player, game, pos, LoreService.TRIGGER.ACTIVATED);
             for (Player player_ : game.getRealPlayers()) {
                 if (player_ == player
                         || !FoWHelper.getTilePositionsToShow(game, player_).contains(pos)) {
@@ -555,7 +563,7 @@ public final class ButtonHelperTacticalAction {
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Activated "
                         + tile.getRepresentationForButtons(game, player) + ".");
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")
+        if ((game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander") || player.hasTech("tf-starbasewebway"))
                 && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
                         .contains(tile)) {
             List<Button> buttons = new ArrayList<>();
@@ -840,6 +848,9 @@ public final class ButtonHelperTacticalAction {
                 systemButtons);
 
         // Resolve other abilities
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "crystellumcommander")) {
+            CrystellumLeadersHandler.giveCommanderReminder(player, game);
+        }
         if (player.hasAbility("recycled_materials")) {
             List<Button> buttons = ButtonHelperFactionSpecific.getRohDhnaRecycleButtons(game, tile, player);
             if (!buttons.isEmpty()) {

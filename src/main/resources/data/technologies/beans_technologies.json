@@ -121,7 +121,7 @@
         "requirements": "GGG",
         "faction": "ta",
         "source": "beans",
-        "text": "You may exhaust this card and 1 planet you control at any time to ready 1 planet you control. If that planet has an ability card, you may ready it as well."
+        "text": "At the end of your turn, you may exhaust this card and 1 planet you control to ready 1 other planet you control. If that planet has an ability card, you may ready it as well."
     },
     {
         "alias": "benetrunnersdm",

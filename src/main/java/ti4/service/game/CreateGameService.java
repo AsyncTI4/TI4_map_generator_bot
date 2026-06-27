@@ -35,6 +35,7 @@ import ti4.ResourceHelper;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.utility.DiscordRoleUtility;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -181,7 +182,7 @@ public class CreateGameService {
                 .complete();
         newGame.setMainChannelID(actionsChannel.getId());
         List<Member> nonGameBothelpers = new ArrayList<>();
-        Role bothelperRole = getRole("Bothelper", guild);
+        Role bothelperRole = DiscordRoleUtility.getRole("Bothelper", guild);
         if (bothelperRole != null) {
             for (Member botHelper : guild.getMembersWithRoles(bothelperRole)) {
                 boolean inGame =
@@ -191,7 +192,7 @@ public class CreateGameService {
                 }
             }
         }
-        Role adminRole = getRole("Admin", guild);
+        Role adminRole = DiscordRoleUtility.getRole("Admin", guild);
         if (adminRole != null) {
             for (Member botHelper : guild.getMembersWithRoles(adminRole)) {
                 boolean inGame =
@@ -681,9 +682,9 @@ public class CreateGameService {
 
         EnumSet<Permission> allow = EnumSet.of(Permission.VIEW_CHANNEL);
         EnumSet<Permission> deny = EnumSet.of(Permission.VIEW_CHANNEL);
-        Role bothelperRole = getRole("Bothelper", guild);
-        Role spectatorRole = getRole("Spectator", guild);
-        Role everyoneRole = getRole("@everyone", guild);
+        Role bothelperRole = DiscordRoleUtility.getRole("Bothelper", guild);
+        Role spectatorRole = DiscordRoleUtility.getRole("Spectator", guild);
+        Role everyoneRole = DiscordRoleUtility.getRole("@everyone", guild);
         ChannelAction<Category> createCategoryAction = guild.createCategory(categoryName);
         if (bothelperRole != null)
             createCategoryAction =
@@ -694,10 +695,6 @@ public class CreateGameService {
         if (everyoneRole != null)
             createCategoryAction = createCategoryAction.addRolePermissionOverride(everyoneRole.getIdLong(), null, deny);
         return createCategoryAction.complete();
-    }
-
-    public static Role getRole(String name, Guild guild) {
-        return guild.getRolesByName(name, true).stream().findFirst().orElse(null);
     }
 
     public static String getNewPlayerInfoText() {

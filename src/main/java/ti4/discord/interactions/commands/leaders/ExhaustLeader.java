@@ -50,13 +50,13 @@ class ExhaustLeader extends GameStateSubcommand {
         }
 
         Integer tgCount = event.getOption(Constants.TG, null, OptionMapping::getAsInt);
-        if (leaderID.contains("agent") && !leaderID.contains("artuno")) {
-            if ("hyperagent".equalsIgnoreCase(leaderID)) {
-                MessageHelper.sendMessageToEventChannel(
-                        event,
-                        "Hyper Agent cannot be exhausted with this command. Use the button that appears in cards info (/cards_info refresh if you dont see it).");
-                return;
-            }
+        if ("hyperagent".equalsIgnoreCase(leaderID)) {
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "Hyper Agent cannot be exhausted with this command. Use the button that appears in cards info (/cards_info refresh if you dont see it).");
+            return;
+        }
+        if (leaderID.contains("researchagent")) {
             ButtonHelperAgents.exhaustAgent(leaderID, event, game, player);
         } else {
             ExhaustLeaderService.exhaustLeader(game, player, playerLeader, tgCount);

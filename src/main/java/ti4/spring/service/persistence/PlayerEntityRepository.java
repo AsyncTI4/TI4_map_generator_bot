@@ -33,14 +33,25 @@ public interface PlayerEntityRepository extends JpaRepository<PlayerEntity, Long
     List<PlayerEntity> findAllWithGamesByUserIdEquals(@Param("userId") String userId);
 
     @Query("""
+        SELECT p FROM PlayerEntity p
+                JOIN FETCH p.game g
+                WHERE p.user.id = (:userId)
+                        AND p.replaced IS FALSE
+                        AND g.completed IS TRUE
+                        AND g.endedEpochMilliseconds IS NOT NULL
+        """)
+    List<PlayerEntity> findAllWithCompletedGamesByUserIdEquals(@Param("userId") String userId);
+
+    @Query("""
             SELECT p FROM PlayerEntity p
             JOIN FETCH p.user u
             JOIN FETCH p.game g
             WHERE g.completed IS TRUE
               AND g.allianceMode IS FALSE
-              AND g.playerCount = 6
+              AND g.playerCount >= 3
+              AND g.playerCount <= 8
               AND (:onlyTiglGames IS FALSE OR g.twilightImperiumGlobalLeague IS TRUE)
             """)
-    List<PlayerEntity> findAllWithUsersAndGamesByCompletedSixPlayerNonAllianceGame(
+    List<PlayerEntity> findAllWithUsersAndGamesByCompletedNonAllianceGame(
             @Param("onlyTiglGames") boolean onlyTiglGames);
 }

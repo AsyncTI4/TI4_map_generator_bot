@@ -1,9 +1,9 @@
 package ti4.message;
 
-import static ti4.helpers.discord.DiscordErrorUtility.isDiscordServerError;
-import static ti4.helpers.discord.DiscordErrorUtility.isIgnorableError;
-import static ti4.helpers.discord.DiscordErrorUtility.isUnknownEmojiError;
-import static ti4.helpers.discord.DiscordErrorUtility.isUnknownMessageError;
+import static ti4.discord.utility.DiscordErrorUtility.isDiscordServerError;
+import static ti4.discord.utility.DiscordErrorUtility.isIgnorableError;
+import static ti4.discord.utility.DiscordErrorUtility.isUnknownEmojiError;
+import static ti4.discord.utility.DiscordErrorUtility.isUnknownMessageError;
 
 import java.io.File;
 import java.net.SocketTimeoutException;
@@ -740,17 +740,7 @@ public class MessageHelper {
         sb.append(errorHeader);
         sb.append("\n```").append(error.getMessage()).append("```");
         if (messageCreateData != null && !isDiscordServerError(error)) {
-            String messageJSON = messageCreateData.toData().toPrettyString();
             sb.append("\nMessageContent: ").append(messageCreateData.getContent());
-            int maxJSONLength = 1500;
-            if (messageJSON.length() < maxJSONLength) {
-                sb.append("\nJSON:\n```json").append(messageJSON).append("```");
-            } else {
-                sb.append("\nJSON:\n```json")
-                        .append(StringUtils.left(messageJSON, maxJSONLength))
-                        .append("```");
-                sb.append("\nMessageData JSON was too long and was truncated");
-            }
         }
         return sb.toString();
     }

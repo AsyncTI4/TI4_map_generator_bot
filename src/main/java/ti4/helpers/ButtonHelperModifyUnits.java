@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static ti4.helpers.discord.DiscordErrorUtility.*;
+import static ti4.discord.utility.DiscordErrorUtility.isIgnorableError;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +23,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -260,6 +261,15 @@ public final class ButtonHelperModifyUnits {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "## End of Ground Combat");
+        // Mirror addPlanet: only fire GROUND_BATTLE if combat rounds were actually rolled
+        if (!game.getStoredValue("combatRoundTracker" + p1.getFaction() + tile.getPosition() + planet)
+                .isEmpty()) {
+            LoreService.showPlanetLore(p1, game, planet, LoreService.TRIGGER.GROUND_BATTLE);
+        }
+        if (!game.getStoredValue("combatRoundTracker" + p2.getFaction() + tile.getPosition() + planet)
+                .isEmpty()) {
+            LoreService.showPlanetLore(p2, game, planet, LoreService.TRIGGER.GROUND_BATTLE);
+        }
         String pos = tile.getPosition();
         FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition()).createFileUpload();
         MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
@@ -1015,10 +1025,11 @@ public final class ButtonHelperModifyUnits {
                             || type == UnitType.Fighter
                             || type == UnitType.Infantry
                             || game.getActiveSystem().equalsIgnoreCase(tile.getPosition())) {
+                        String humanReadableName = type.humanReadableName();
                         buttons.add(Buttons.red(
-                                "removeNCaptureThisTypeOfUnit_" + type.humanReadableName() + "_" + tile.getPosition()
-                                        + "_" + uH.getName() + "_" + vuilraith.getColor(),
-                                type.humanReadableName() + " from " + tile.getRepresentation() + " "
+                                "removeNCaptureThisTypeOfUnit_" + humanReadableName + "_" + tile.getPosition() + "_"
+                                        + uH.getName() + "_" + vuilraith.getColor(),
+                                humanReadableName + " from " + tile.getRepresentation() + " "
                                         + ("space".equals(uH.getName())
                                                 ? "in Space"
                                                 : "on " + StringUtils.capitalize(uH.getName()))));
@@ -1703,12 +1714,7 @@ public final class ButtonHelperModifyUnits {
                     player.getFactionEmoji()
                             + " did not place a command token in system they retreated to due to Kado S'mah-Qar, the Kollecc commander.");
         } else {
-            if (player.hasAbility("eusociality") && !CommandCounterHelper.hasCC(event, player.getColor(), tile1)) {
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        player.getFactionEmoji()
-                                + " did not place a command token in system they retreated to due to **Eusosociality**.");
-            } else {
+            if (!player.hasAbility("eusociality") || !KaloraAbilityHandler.eusocialityRetreat(player, event, tile1)) {
                 if (game.isTwilightsFallMode() && buttonID.contains("skilled") && buttonID.contains("feint")) {
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),

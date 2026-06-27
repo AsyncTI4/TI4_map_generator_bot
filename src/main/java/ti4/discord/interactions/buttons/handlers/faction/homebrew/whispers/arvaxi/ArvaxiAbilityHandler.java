@@ -1,0 +1,82 @@
+package ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi;
+
+import java.util.ArrayList;
+import java.util.List;
+import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.helpers.ButtonHelper;
+import ti4.message.MessageHelper;
+import ti4.service.actioncard.ForceGiveActionCardService;
+import ti4.service.emoji.FactionEmojis;
+
+@UtilityClass
+public class ArvaxiAbilityHandler {
+
+    @ButtonHandler("underhandedManeuverPickNeighbor")
+    public static void underhandedManeuverPickNeighbor(ButtonInteractionEvent event, Player player, Game game) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player neighbor : player.getNeighbouringPlayers(true)) {
+            buttons.add(Buttons.green(
+                    "FFCC_" + player.getFaction() + "_underhandedManeuverTarget_" + neighbor.getFaction(),
+                    neighbor.getFactionNameOrColor(),
+                    neighbor.fogSafeEmoji()));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + ", choose a neighbor to take an action card from.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("underhandedManeuverTarget_")
+    public static void underhandedManeuverTarget(
+            ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String targetFaction = buttonID.replace("underhandedManeuverTarget_", "");
+        Player target = game.getPlayerFromColorOrFaction(targetFaction);
+        if (target == null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "Could not find target, please resolve manually.");
+            return;
+        }
+        ForceGiveActionCardService.sendGiveACButtons(
+                player,
+                target,
+                game,
+                "Underhanded Maneuver has been used against you. Please choose which action card to hand over.");
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                "Sent " + target.getColor() + " the buttons for resolving Underhanded Maneuver.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void offerUndHandManeuver(Player player) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.gray(
+                player.factionButtonChecker() + "underhandedManeuverPickNeighbor",
+                "Use Underhanded Maneuver",
+                FactionEmojis.arvaxi));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + ", use buttons to resolve _Underhanded Maneuver_.",
+                buttons);
+    }
+
+    public static void onExplorePlanet(Player player, Game game, String planetName) {
+        Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+        if (planet != null && planet.getUnitCount(player.getColorID()) >= 3) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", please draw an action card because of **Ultimate Authority**.",
+                    buttons);
+        }
+    }
+}
