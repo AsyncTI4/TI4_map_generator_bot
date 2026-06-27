@@ -18,6 +18,7 @@ import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.draft.DraftSetupService;
 import ti4.service.emoji.MiltyDraftEmojis;
+import ti4.service.milty.MiltyRandomSetupService;
 import ti4.service.milty.MiltyService;
 import tools.jackson.databind.JsonNode;
 
@@ -187,6 +188,6 @@ public class MiltySettings extends SettingsMenu {
         if (draftMode.getValue() != DraftingMode.milty) {
             return "Random setup is only implemented for Milty-style setup.";
         }
-        return MiltyService.randomSetupFromSettings(event, this);
+        return MiltyRandomSetupService.randomSetupFromSettings(event, this);
     }
 }
