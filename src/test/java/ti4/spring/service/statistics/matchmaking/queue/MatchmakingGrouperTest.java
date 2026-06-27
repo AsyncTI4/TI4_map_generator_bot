@@ -115,7 +115,7 @@ class MatchmakingGrouperTest extends BaseTi4Test {
         List<String> skill = List.of(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION);
 
         // Ratings 20/26/26: the 20-vs-26 skill gap gives a 1v1 match quality (~0.59) that fails the starting
-        // 0.70 threshold but clears the 0.40 floor, so the trio only forms once the threshold has decayed.
+        // 0.80 threshold but clears the 0.30 floor, so the trio only forms once the threshold has decayed.
         rate("a", 20);
         rate("b", 26);
         rate("c", 26);
@@ -125,10 +125,10 @@ class MatchmakingGrouperTest extends BaseTi4Test {
         assertThat(MatchmakingGrouper.formGames(parties)).isEmpty();
 
         parties.clear();
-        // After 90 minutes the threshold has decayed three steps (0.70 -> 0.40), low enough to accept the gap.
-        addParty(List.of("a"), skill, List.of("3"), Duration.ofMinutes(90));
-        addParty(List.of("b"), skill, List.of("3"), Duration.ofMinutes(90));
-        addParty(List.of("c"), skill, List.of("3"), Duration.ofMinutes(90));
+        // After four hours the threshold has decayed to 0.40 (0.80 - 4*0.10), low enough to accept the gap.
+        addParty(List.of("a"), skill, List.of("3"), Duration.ofHours(4));
+        addParty(List.of("b"), skill, List.of("3"), Duration.ofHours(4));
+        addParty(List.of("c"), skill, List.of("3"), Duration.ofHours(4));
         assertThat(MatchmakingGrouper.formGames(parties)).hasSize(1);
     }
 

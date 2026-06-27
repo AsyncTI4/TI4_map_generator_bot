@@ -118,28 +118,39 @@ class MatchmakingCompatibilityServiceTest {
     }
 
     @Test
-    void onlyMatchFloatersBlocksNonFloatersEitherDirection() {
-        PlayerMatchmakingData floater = player("a")
-                .restrictions(MatchmakingOptions.ONLY_MATCH_FLOATERS_OPTION)
-                .roleNames(MatchmakingOptions.FLOATERS_ROLE_NAME)
+    void avoidFloatersBlocksFloatersEitherDirection() {
+        PlayerMatchmakingData avoider = player("a")
+                .restrictions(MatchmakingOptions.AVOID_FLOATERS_OPTION)
                 .build();
-        PlayerMatchmakingData nonFloater = player("b").build();
+        PlayerMatchmakingData floater =
+                player("b").roleNames(MatchmakingOptions.FLOATERS_ROLE_NAME).build();
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(floater, nonFloater))
+        assertThat(MatchmakingCompatibilityService.areIncompatible(avoider, floater))
                 .isTrue();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(nonFloater, floater))
+        assertThat(MatchmakingCompatibilityService.areIncompatible(floater, avoider))
                 .isTrue();
     }
 
     @Test
-    void onlyMatchWarriorsBlocksNonWarriors() {
-        PlayerMatchmakingData warrior = player("a")
-                .restrictions(MatchmakingOptions.ONLY_MATCH_WARRIORS_OPTION)
-                .roleNames(MatchmakingOptions.WARRIORS_ROLE_NAME)
+    void avoidFloatersAllowsNonFloaters() {
+        PlayerMatchmakingData avoider = player("a")
+                .restrictions(MatchmakingOptions.AVOID_FLOATERS_OPTION)
                 .build();
-        PlayerMatchmakingData nonWarrior = player("b").build();
+        PlayerMatchmakingData nonFloater = player("b").build();
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(warrior, nonWarrior))
+        assertThat(MatchmakingCompatibilityService.areIncompatible(avoider, nonFloater))
+                .isFalse();
+    }
+
+    @Test
+    void avoidWarriorsBlocksWarriors() {
+        PlayerMatchmakingData avoider = player("a")
+                .restrictions(MatchmakingOptions.AVOID_WARRIORS_OPTION)
+                .build();
+        PlayerMatchmakingData warrior =
+                player("b").roleNames(MatchmakingOptions.WARRIORS_ROLE_NAME).build();
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(avoider, warrior))
                 .isTrue();
     }
 
@@ -162,7 +173,7 @@ class MatchmakingCompatibilityServiceTest {
     @Test
     void getSimilarSkillThresholdDecaysWithQueueTime() {
         // A 6-point skill gap (between confident ratings) yields a 1v1 match quality of ~0.59, which fails the
-        // starting 0.70 threshold. Only 'a' asks for similar skill, so only 'a's threshold is checked.
+        // starting 0.80 threshold. Only 'a' asks for similar skill, so only 'a's threshold is checked.
         PlayerMatchmakingData freshlyQueued = player("a")
                 .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
                 .rating(20)
@@ -171,23 +182,23 @@ class MatchmakingCompatibilityServiceTest {
         assertThat(MatchmakingCompatibilityService.areIncompatible(freshlyQueued, b))
                 .isTrue();
 
-        // After an hour 'a's threshold has decayed two steps (0.70 -> 0.50), which the ~0.59 quality clears.
+        // After four hours 'a's threshold has decayed to 0.40 (0.80 - 4*0.10), which the ~0.59 quality clears.
         PlayerMatchmakingData patient = player("a")
                 .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
                 .rating(20)
-                .queueWait(Duration.ofMinutes(60))
+                .queueWait(Duration.ofHours(4))
                 .build();
         assertThat(MatchmakingCompatibilityService.areIncompatible(patient, b)).isFalse();
     }
 
     @Test
     void bothDirectionsMustClearWhenBothWantSimilarSkill() {
-        // 'a' has waited to the 0.40 floor and accepts the ~0.59 gap, but 'b' just queued at the 0.70 threshold
-        // and still wants similar skill, so the stricter direction blocks the match.
+        // 'a' has waited its threshold down to 0.40 and accepts the ~0.59 gap, but 'b' just queued at the 0.80
+        // threshold and still wants similar skill, so the stricter direction blocks the match.
         PlayerMatchmakingData patientA = player("a")
                 .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
                 .rating(20)
-                .queueWait(Duration.ofMinutes(90))
+                .queueWait(Duration.ofHours(4))
                 .build();
         PlayerMatchmakingData freshB = player("b")
                 .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
@@ -200,7 +211,7 @@ class MatchmakingCompatibilityServiceTest {
         PlayerMatchmakingData patientB = player("b")
                 .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
                 .rating(26)
-                .queueWait(Duration.ofMinutes(90))
+                .queueWait(Duration.ofHours(4))
                 .build();
         assertThat(MatchmakingCompatibilityService.areIncompatible(patientA, patientB))
                 .isFalse();

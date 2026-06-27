@@ -25,10 +25,10 @@ class MatchDescriberTest {
                         MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION,
                         MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION,
                         MatchmakingOptions.TIGL_OPTION,
-                        MatchmakingOptions.ONLY_MATCH_FLOATERS_OPTION),
+                        MatchmakingOptions.AVOID_FLOATERS_OPTION),
                 "Archon");
         assertThat(MatchDescriber.threadTitle(game))
-                .isEqualTo("6p, 12vp, Franken, slower pace, similar timezone, TIGL (Archon), Floaters");
+                .isEqualTo("6p, 12vp, Franken, slower pace, similar timezone, TIGL (Archon), no Floaters");
     }
 
     @Test

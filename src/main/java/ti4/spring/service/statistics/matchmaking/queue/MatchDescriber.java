@@ -60,11 +60,11 @@ class MatchDescriber {
         if (restrictions.contains(MatchmakingOptions.TIGL_OPTION)) {
             labels.add("TIGL (" + game.tiglRank() + ")");
         }
-        if (restrictions.contains(MatchmakingOptions.ONLY_MATCH_FLOATERS_OPTION)) {
-            labels.add("Floaters");
+        if (restrictions.contains(MatchmakingOptions.AVOID_FLOATERS_OPTION)) {
+            labels.add("no Floaters");
         }
-        if (restrictions.contains(MatchmakingOptions.ONLY_MATCH_WARRIORS_OPTION)) {
-            labels.add("Warriors");
+        if (restrictions.contains(MatchmakingOptions.AVOID_WARRIORS_OPTION)) {
+            labels.add("no Warriors");
         }
         return String.join(", ", labels);
     }

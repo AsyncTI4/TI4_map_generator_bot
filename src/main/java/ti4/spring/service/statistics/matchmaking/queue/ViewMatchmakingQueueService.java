@@ -123,12 +123,6 @@ public class ViewMatchmakingQueueService {
         if (MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION.equals(restriction)) {
             return "similar skills";
         }
-        if (MatchmakingOptions.ONLY_MATCH_FLOATERS_OPTION.equals(restriction)) {
-            return "Floaters only";
-        }
-        if (MatchmakingOptions.ONLY_MATCH_WARRIORS_OPTION.equals(restriction)) {
-            return "Warriors only";
-        }
         return restriction;
     }
 

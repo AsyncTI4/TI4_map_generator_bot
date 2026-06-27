@@ -52,11 +52,9 @@ public class MatchmakingOptions {
 
     public static final String FLOATERS_ROLE_NAME = "Floaters";
     public static final String WARRIORS_ROLE_NAME = "Warriors";
-    public static final String ONLY_MATCH_FLOATERS_OPTION = "Only match with Floaters";
-    public static final String ONLY_MATCH_WARRIORS_OPTION = "Only match with Warriors";
-    private static final Map<String, String> ROLE_NAME_TO_ONLY_MATCH_OPTION = Map.of(
-            FLOATERS_ROLE_NAME, ONLY_MATCH_FLOATERS_OPTION,
-            WARRIORS_ROLE_NAME, ONLY_MATCH_WARRIORS_OPTION);
+    public static final String AVOID_FLOATERS_OPTION = "Avoid Boat Floaters";
+    public static final String AVOID_WARRIORS_OPTION = "Avoid Warriors";
+    private static final Set<String> AVOIDABLE_ROLE_NAMES = Set.of(FLOATERS_ROLE_NAME, WARRIORS_ROLE_NAME);
     public static final String SLOWER_PACE_OPTION = "Slower";
     public static final String FAST_PACE_OPTION = "Average (30 days)";
     public static final String FASTER_PACE_OPTION = "Faster (15 days)";
@@ -68,8 +66,12 @@ public class MatchmakingOptions {
     public static final Map<String, Integer> PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT =
             Map.of(FASTER_PACE_OPTION, 19, FASTEST_PACE_OPTION, 10);
 
-    public static final List<String> RESTRICTION_OPTIONS =
-            List.of(SIMILAR_ACTIVE_HOURS_OPTION, SIMILAR_PLAYER_SKILL_OPTION, TIGL_OPTION);
+    public static final List<String> RESTRICTION_OPTIONS = List.of(
+            SIMILAR_ACTIVE_HOURS_OPTION,
+            SIMILAR_PLAYER_SKILL_OPTION,
+            AVOID_FLOATERS_OPTION,
+            AVOID_WARRIORS_OPTION,
+            TIGL_OPTION);
 
     private static final Map<String, String> PACE_SHORT_NAMES = Map.of(
             SLOWER_PACE_OPTION, "Slower",
@@ -118,21 +120,15 @@ public class MatchmakingOptions {
         return pacesRestrictions;
     }
 
-    public static Set<String> getHeldOnlyMatchRoleNames(Guild guild, Member member) {
+    public static Set<String> getHeldRoleNames(Guild guild, Member member) {
         Set<String> heldRoleNames = new HashSet<>();
-        for (String roleName : ROLE_NAME_TO_ONLY_MATCH_OPTION.keySet()) {
+        for (String roleName : AVOIDABLE_ROLE_NAMES) {
             Role role = DiscordRoleUtility.getRole(roleName, guild);
             if (role != null && member.getRoles().contains(role)) {
                 heldRoleNames.add(roleName);
             }
         }
         return heldRoleNames;
-    }
-
-    public static List<String> getRoleRestrictionOptions(Guild guild, Member member) {
-        return getHeldOnlyMatchRoleNames(guild, member).stream()
-                .map(ROLE_NAME_TO_ONLY_MATCH_OPTION::get)
-                .toList();
     }
 
     public static boolean wantsSimilarActiveHours(Collection<String> restrictions) {
@@ -178,12 +174,12 @@ public class MatchmakingOptions {
                 .orElse(UNRANKED_OPTION);
     }
 
-    public static boolean wantsOnlyFloaters(Collection<String> restrictions) {
-        return restrictions.contains(ONLY_MATCH_FLOATERS_OPTION);
+    public static boolean wantsToAvoidFloaters(Collection<String> restrictions) {
+        return restrictions.contains(AVOID_FLOATERS_OPTION);
     }
 
-    public static boolean wantsOnlyWarriors(Collection<String> restrictions) {
-        return restrictions.contains(ONLY_MATCH_WARRIORS_OPTION);
+    public static boolean wantsToAvoidWarriors(Collection<String> restrictions) {
+        return restrictions.contains(AVOID_WARRIORS_OPTION);
     }
 
     public static int getHours(String maxQueueTime) {

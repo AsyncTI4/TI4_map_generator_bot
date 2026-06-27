@@ -44,8 +44,8 @@ class MatchmakingCompatibilityService {
             return true;
         }
 
-        if (violatesRoleRestriction(aRestrictions, a.roleNames(), b.roleNames())
-                || violatesRoleRestriction(bRestrictions, b.roleNames(), a.roleNames())) {
+        if (avoidsAnotherPlayersRole(aRestrictions, b.roleNames())
+                || avoidsAnotherPlayersRole(bRestrictions, a.roleNames())) {
             return true;
         }
 
@@ -90,15 +90,12 @@ class MatchmakingCompatibilityService {
         return Math.max(SIMILAR_SKILL_MIN_THRESHOLD, decayed);
     }
 
-    private static boolean violatesRoleRestriction(
-            List<String> chooserRestrictions, Set<String> chooserRoleNames, Set<String> otherRoleNames) {
-        if (chooserRoleNames.contains(MatchmakingOptions.FLOATERS_ROLE_NAME)
-                && MatchmakingOptions.wantsOnlyFloaters(chooserRestrictions)
-                && !otherRoleNames.contains(MatchmakingOptions.FLOATERS_ROLE_NAME)) {
+    private static boolean avoidsAnotherPlayersRole(List<String> chooserRestrictions, Set<String> otherRoleNames) {
+        if (MatchmakingOptions.wantsToAvoidFloaters(chooserRestrictions)
+                && otherRoleNames.contains(MatchmakingOptions.FLOATERS_ROLE_NAME)) {
             return true;
         }
-        return chooserRoleNames.contains(MatchmakingOptions.WARRIORS_ROLE_NAME)
-                && MatchmakingOptions.wantsOnlyWarriors(chooserRestrictions)
-                && !otherRoleNames.contains(MatchmakingOptions.WARRIORS_ROLE_NAME);
+        return MatchmakingOptions.wantsToAvoidWarriors(chooserRestrictions)
+                && otherRoleNames.contains(MatchmakingOptions.WARRIORS_ROLE_NAME);
     }
 }
