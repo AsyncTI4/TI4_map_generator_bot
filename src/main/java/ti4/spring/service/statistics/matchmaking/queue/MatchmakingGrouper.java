@@ -2,6 +2,8 @@ package ti4.spring.service.statistics.matchmaking.queue;
 
 import static java.util.function.Predicate.not;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,6 +20,8 @@ import ti4.settings.users.UserSettings;
 @UtilityClass
 class MatchmakingGrouper {
 
+    private static final Duration NEAR_QUEUE_EXPIRY_HOURS = Duration.ofHours(1);
+
     static List<MatchedGame> formGames(List<QueuedParty> parties) {
         List<MatchedGame> gamesToCreate = new ArrayList<>();
         Set<QueuedParty> partiesAddedToGames = new HashSet<>();
@@ -25,14 +29,57 @@ class MatchmakingGrouper {
         Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData =
                 PlayerMatchDataFactory.buildForParties(parties);
         Map<GameConfig, List<QueuedParty>> partiesByConfig = groupPartiesByConfig(parties);
-
         List<GameConfig> configsToTry = getRandomizedKeysThenSortByPlayerCount(partiesByConfig);
+
         for (GameConfig config : configsToTry) {
-            matchAndCollect(
-                    partiesByConfig.get(config), partiesAddedToGames, gamesToCreate, config, playerMatchmakingData);
+            List<QueuedParty> available = ungrouped(partiesByConfig.get(config), partiesAddedToGames);
+            for (List<QueuedParty> group :
+                    formGroupsOfSize(available, config.playerCountValue(), config, playerMatchmakingData)) {
+                collectGames(group, config, playerMatchmakingData, gamesToCreate, partiesAddedToGames, false);
+            }
         }
+
+        formNearMatches(configsToTry, partiesByConfig, partiesAddedToGames, gamesToCreate, playerMatchmakingData);
         return gamesToCreate;
     }
+
+    // Detect candidates from the parties that ended up in no full game; a candidate is a compatible
+    // group one player short of a full game that contains at least one near-expiry party.
+    private static void formNearMatches(
+            List<GameConfig> configsToTry,
+            Map<GameConfig, List<QueuedParty>> partiesByConfig,
+            Set<QueuedParty> partiesAddedToGames,
+            List<MatchedGame> gamesToCreate,
+            Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData) {
+        Instant now = Instant.now();
+        List<NearMatchCandidate> candidates = new ArrayList<>();
+        for (GameConfig config : configsToTry) {
+            int targetSize = config.playerCountValue() - 1;
+            if (targetSize < 1) continue;
+            List<QueuedParty> available = ungrouped(partiesByConfig.get(config), partiesAddedToGames);
+            for (List<QueuedParty> group : formGroupsOfSize(available, targetSize, config, playerMatchmakingData)) {
+                if (group.stream().anyMatch(party -> isNearExpiry(party, now))) {
+                    candidates.add(new NearMatchCandidate(config, group));
+                }
+            }
+        }
+
+        candidates.sort(Comparator.comparingInt((NearMatchCandidate candidate) -> totalPlayers(candidate.parties()))
+                .reversed()
+                .thenComparing(candidate -> getEarliestExpiry(candidate.parties())));
+        for (NearMatchCandidate candidate : candidates) {
+            if (candidate.parties().stream().anyMatch(partiesAddedToGames::contains)) continue;
+            collectGames(
+                    candidate.parties(),
+                    candidate.config(),
+                    playerMatchmakingData,
+                    gamesToCreate,
+                    partiesAddedToGames,
+                    true);
+        }
+    }
+
+    private record NearMatchCandidate(GameConfig config, List<QueuedParty> parties) {}
 
     private static List<GameConfig> getRandomizedKeysThenSortByPlayerCount(
             Map<GameConfig, List<QueuedParty>> partiesByConfig) {
@@ -64,61 +111,89 @@ class MatchmakingGrouper {
         return partiesByConfig;
     }
 
-    private static void matchAndCollect(
-            List<QueuedParty> parties,
-            Set<QueuedParty> partiesAddedToGames,
-            List<MatchedGame> gamesToCreate,
+    private static List<List<QueuedParty>> formGroupsOfSize(
+            List<QueuedParty> available,
+            int targetSize,
             GameConfig config,
             Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData) {
-        List<QueuedParty> partiesStillSearching = parties.stream()
-                .filter(not(partiesAddedToGames::contains))
-                .sorted(prioritizeByQueuedAtTime())
-                .collect(Collectors.toCollection(ArrayList::new));
-        int playerCount = config.playerCountValue();
-        // Greedy grouping: seed from the front (longest queue time),
-        // then fill the game with the first compatible parties found.
-        while (totalPlayers(partiesStillSearching) >= playerCount) {
-            QueuedParty seed = partiesStillSearching.getFirst();
-            List<MatchmakingQueueMember> matchMembers = new ArrayList<>(seed.members());
-            List<QueuedParty> matchParties = new ArrayList<>();
-            matchParties.add(seed);
+        List<List<QueuedParty>> groups = new ArrayList<>();
+        List<QueuedParty> searching =
+                available.stream().sorted(prioritizeByQueuedAtTime()).collect(Collectors.toCollection(ArrayList::new));
+        while (totalPlayers(searching) >= targetSize) {
+            QueuedParty seed = searching.getFirst();
+            List<MatchmakingQueueMember> members = new ArrayList<>(seed.members());
+            List<QueuedParty> group = new ArrayList<>();
+            group.add(seed);
 
-            for (QueuedParty party : partiesStillSearching) {
-                if (matchParties.contains(party)) continue;
-                if (matchMembers.size() == playerCount) break;
-                if (matchMembers.size() + party.size() > playerCount) continue;
-                if (isPartyCompatibleForMatch(party, matchMembers, playerMatchmakingData, config)) {
-                    matchMembers.addAll(party.members());
-                    matchParties.add(party);
+            for (QueuedParty party : searching) {
+                if (group.contains(party)) continue;
+                if (members.size() == targetSize) break;
+                if (members.size() + party.size() > targetSize) continue;
+                if (isPartyCompatibleForMatch(party, members, playerMatchmakingData, config)) {
+                    members.addAll(party.members());
+                    group.add(party);
                 }
             }
 
-            if (matchMembers.size() != playerCount) {
-                // This party can't find a game of this type right now; skip it.
-                partiesStillSearching.remove(seed);
+            if (members.size() != targetSize) {
+                // This party can't be completed into a group of the target size right now; skip its seed.
+                searching.remove(seed);
                 continue;
             }
-
-            List<String> matchRestrictions = matchParties.stream()
-                    .flatMap(party -> party.leaderSettings().getMatchmakingRestrictions().stream())
-                    .distinct()
-                    .sorted()
-                    .toList();
-            MatchedGame game = new MatchedGame(
-                    new ArrayList<>(matchMembers),
-                    new ArrayList<>(
-                            matchParties.stream().map(QueuedParty::party).toList()),
-                    config.playerCount(),
-                    config.victoryPointGoal(),
-                    config.expansion(),
-                    config.pace(),
-                    matchRestrictions,
-                    tiglRankForGame(matchRestrictions, matchMembers, config, playerMatchmakingData));
-            gamesToCreate.add(game);
-            MatchDescriber.logFormedMatch(game, playerMatchmakingData);
-            partiesAddedToGames.addAll(matchParties);
-            partiesStillSearching.removeAll(matchParties);
+            groups.add(group);
+            searching.removeAll(group);
         }
+        return groups;
+    }
+
+    private static void collectGames(
+            List<QueuedParty> groupParties,
+            GameConfig config,
+            Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData,
+            List<MatchedGame> gamesToCreate,
+            Set<QueuedParty> partiesAddedToGames,
+            boolean needsOneMore) {
+        List<MatchmakingQueueMember> members = groupParties.stream()
+                .flatMap(party -> party.members().stream())
+                .collect(Collectors.toCollection(ArrayList::new));
+        List<String> restrictions = groupParties.stream()
+                .flatMap(party -> party.leaderSettings().getMatchmakingRestrictions().stream())
+                .distinct()
+                .sorted()
+                .toList();
+        MatchedGame game = new MatchedGame(
+                members,
+                new ArrayList<>(groupParties.stream().map(QueuedParty::party).toList()),
+                config.playerCount(),
+                config.victoryPointGoal(),
+                config.expansion(),
+                config.pace(),
+                restrictions,
+                tiglRankForGame(restrictions, members, config, playerMatchmakingData),
+                needsOneMore);
+        gamesToCreate.add(game);
+        MatchDescriber.logFormedMatch(game, playerMatchmakingData);
+        partiesAddedToGames.addAll(groupParties);
+    }
+
+    private static List<QueuedParty> ungrouped(List<QueuedParty> parties, Set<QueuedParty> partiesAddedToGames) {
+        return parties.stream().filter(not(partiesAddedToGames::contains)).toList();
+    }
+
+    private static boolean isNearExpiry(QueuedParty party, Instant now) {
+        return getExpirationInstant(party).minus(NEAR_QUEUE_EXPIRY_HOURS).isBefore(now);
+    }
+
+    private static Instant getEarliestExpiry(List<QueuedParty> parties) {
+        return parties.stream()
+                .map(MatchmakingGrouper::getExpirationInstant)
+                .min(Comparator.naturalOrder())
+                .orElse(Instant.MAX);
+    }
+
+    private static Instant getExpirationInstant(QueuedParty party) {
+        int maxHours = MatchmakingOptions.getHours(party.leaderSettings().getMatchmakingMaxQueueTime());
+        return party.party().getQueuedAt().plus(Duration.ofHours(maxHours));
     }
 
     private static String tiglRankForGame(

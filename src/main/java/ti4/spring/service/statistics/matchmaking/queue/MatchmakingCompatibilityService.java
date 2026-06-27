@@ -16,10 +16,10 @@ class MatchmakingCompatibilityService {
 
     private static final long ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT = 3;
 
-    private static final double SIMILAR_SKILL_STARTING_THRESHOLD = 0.70;
+    private static final double SIMILAR_SKILL_STARTING_THRESHOLD = 0.80;
     private static final double SIMILAR_SKILL_THRESHOLD_DECAY_PER_INTERVAL = 0.10;
-    private static final Duration SIMILAR_SKILL_DECAY_INTERVAL = Duration.ofMinutes(30);
-    private static final double SIMILAR_SKILL_MIN_THRESHOLD = 0.40;
+    private static final Duration SIMILAR_SKILL_DECAY_INTERVAL = Duration.ofHours(1);
+    private static final double SIMILAR_SKILL_MIN_THRESHOLD = 0.30;
 
     static final int NEW_PLAYER_GAME_THRESHOLD = 3;
     private static final GameInfo GAME_INFO = GameInfo.getDefaultGameInfo();

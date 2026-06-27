@@ -1,6 +1,8 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
@@ -34,16 +36,14 @@ class MatchmakingNotifier {
         Guild guild = JdaService.guildPrimary;
         if (gamesToCreate.isEmpty() || guild == null) return;
 
-        List<ForumChannel> forums =
-                guild.getForumChannelsByName(CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL, true);
-        if (forums.isEmpty()) {
-            BotLogger.error("MatchmakerService could not find a thread container named #"
-                    + CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL + ".");
-            return;
-        }
-        ForumChannel forum = forums.getFirst();
-
+        Map<String, ForumChannel> forumByNameCache = new HashMap<>();
         for (MatchedGame game : gamesToCreate) {
+            String forumName = game.tiglRank() != null
+                    ? CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL
+                    : CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL;
+            ForumChannel forum = forumByNameCache.computeIfAbsent(forumName, name -> findForum(guild, name));
+            if (forum == null) continue;
+
             List<MatchmakingQueueMember> queueMembers = game.members();
             List<Member> members = queueMembers.stream()
                     .map(member -> guild.getMemberById(member.getUserId()))
@@ -61,5 +61,14 @@ class MatchmakingNotifier {
                                     forumPost.getThreadChannel(), members, gameFunName),
                             BotLogger::catchRestError);
         }
+    }
+
+    private static ForumChannel findForum(Guild guild, String forumName) {
+        List<ForumChannel> forums = guild.getForumChannelsByName(forumName, true);
+        if (forums.isEmpty()) {
+            BotLogger.error("MatchmakerService could not find a thread container named #" + forumName + ".");
+            return null;
+        }
+        return forums.getFirst();
     }
 }

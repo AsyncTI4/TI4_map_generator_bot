@@ -32,8 +32,25 @@ class MatchDescriberTest {
                 .isEqualTo("6p, 12vp, Franken, slower pace, similar timezone, TIGL (Archon), Floaters");
     }
 
+    @Test
+    void nearMatchTitleIsPrefixed() {
+        MatchedGame game = new MatchedGame(
+                List.of(),
+                List.of(),
+                "6",
+                "10",
+                MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION,
+                "Average (30 days)",
+                List.of(),
+                null,
+                true);
+        assertThat(MatchDescriber.threadTitle(game))
+                .isEqualTo("NEED 1 MORE: 6p, 10vp, PoK + TE, average (30 days) pace");
+    }
+
     private static MatchedGame game(
             String expansion, String victoryPoints, String pace, List<String> restrictions, String tiglRank) {
-        return new MatchedGame(List.of(), List.of(), "6", victoryPoints, expansion, pace, restrictions, tiglRank);
+        return new MatchedGame(
+                List.of(), List.of(), "6", victoryPoints, expansion, pace, restrictions, tiglRank, false);
     }
 }
