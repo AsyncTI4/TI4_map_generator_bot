@@ -9,8 +9,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.game.Player;
 import ti4.game.Planet;
+import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
@@ -199,8 +199,7 @@ public class CrystellumUnitHandler {
                     "getDamageButtons_" + tile.getPosition() + "_groundcombat",
                     "Manually Assign Hit" + (remainingHits == 1 ? "" : "s")));
             updatedButtons.add(Buttons.gray(
-                    factionChecker + "cancelGroundHits_" + tile.getPosition() + "_" + remainingHits,
-                    "Cancel a Hit"));
+                    factionChecker + "cancelGroundHits_" + tile.getPosition() + "_" + remainingHits, "Cancel a Hit"));
 
             String msg2 = player.getRepresentation() + " you may autoassign "
                     + StringHelper.pluralize(remainingHits, "hit") + ".";
