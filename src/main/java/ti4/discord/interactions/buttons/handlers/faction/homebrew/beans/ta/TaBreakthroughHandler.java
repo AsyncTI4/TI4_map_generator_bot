@@ -20,6 +20,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AttachmentModel;
 import ti4.service.planet.PlanetService;
+import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class TaBreakthroughHandler {
@@ -385,6 +386,7 @@ public class TaBreakthroughHandler {
 
         sourceTile.removeToken(designToken, sourcePlanet);
         targetTile.addToken(designToken, targetPlanet);
+        AddUnitService.addUnits(event, targetTile, game, player.getColor(), "2 infantry " + targetPlanet);
         PlanetService.refreshPlanet(player, targetPlanet);
 
         MessageHelper.sendMessageToChannel(
@@ -394,7 +396,7 @@ public class TaBreakthroughHandler {
                         + Helper.getPlanetRepresentation(sourcePlanet, game)
                         + " to "
                         + Helper.getPlanetRepresentation(targetPlanet, game)
-                        + ", then readied that planet.");
+                        + ", then placed 2 infantry on it and readied it.");
 
         ButtonHelper.deleteMessage(event);
     }
