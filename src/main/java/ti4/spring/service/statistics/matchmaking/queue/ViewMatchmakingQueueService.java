@@ -1,6 +1,7 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -8,6 +9,7 @@ import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.springframework.stereotype.Service;
+import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
@@ -83,21 +85,72 @@ public class ViewMatchmakingQueueService {
         String mentions =
                 members.stream().map(member -> "<@" + member.getUserId() + ">").collect(Collectors.joining(", "));
         StringBuilder line = new StringBuilder("\n• ").append(mentions).append(" — ");
-        line.append(join(settings.getMatchmakingPlayerCounts())).append("p");
+        line.append(joinInOrder(settings.getMatchmakingPlayerCounts(), MatchmakingOptions.PLAYER_COUNT_OPTIONS, "/"))
+                .append("p");
         line.append(" · ")
-                .append(join(settings.getMatchmakingVictoryPointGoals()))
+                .append(joinInOrder(
+                        settings.getMatchmakingVictoryPointGoals(), MatchmakingOptions.VICTORY_POINT_OPTIONS, "/"))
                 .append("vp");
-        line.append(" · ").append(join(settings.getMatchmakingExpansions()));
-        line.append(" · ").append(join(settings.getMatchmakingPaces()));
+        String expansions = settings.getMatchmakingExpansions().stream()
+                .sorted(byCanonicalOrder(MatchmakingOptions.EXPANSION_OPTIONS))
+                .map(MatchmakingOptions::shortExpansionName)
+                .collect(Collectors.joining("/"));
+        line.append(" · ").append(expansions);
+        String paces = settings.getMatchmakingPaces().stream()
+                .sorted(byCanonicalOrder(MatchmakingOptions.PACE_RESTRICTION_OPTIONS))
+                .map(MatchmakingOptions::shortPaceName)
+                .map(String::toLowerCase)
+                .collect(Collectors.joining("/"));
+        line.append(" · ").append(paces).append(" pace");
         List<String> restrictions = settings.getMatchmakingRestrictions();
         if (!restrictions.isEmpty()) {
-            line.append(" · ").append(String.join(", ", restrictions));
+            String restrictionsText = restrictions.stream()
+                    .sorted(byCanonicalOrder(MatchmakingOptions.RESTRICTION_OPTIONS))
+                    .map(restriction -> labelRestriction(restriction, members, settings))
+                    .collect(Collectors.joining(", "));
+            line.append(" · ").append(restrictionsText);
         }
         return line.toString();
     }
 
-    private static String join(List<String> values) {
-        return String.join("/", values);
+    private static String labelRestriction(
+            String restriction, List<MatchmakingQueueMember> members, UserSettings settings) {
+        if (MatchmakingOptions.TIGL_OPTION.equals(restriction)) {
+            return "TIGL (" + groupTiglRank(members, settings) + ")";
+        }
+        if (MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION.equals(restriction)) {
+            return "similar hours";
+        }
+        if (MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION.equals(restriction)) {
+            return "similar skills";
+        }
+        return restriction;
+    }
+
+    private static String groupTiglRank(List<MatchmakingQueueMember> members, UserSettings settings) {
+        List<String> expansions = settings.getMatchmakingExpansions();
+        boolean fractured =
+                !expansions.isEmpty() && expansions.stream().allMatch(MatchmakingOptions::usesFracturedRank);
+        List<String> ranks = members.stream()
+                .map(member -> {
+                    UserSettings memberSettings = UserSettingsManager.get(member.getUserId());
+                    return fractured
+                            ? memberSettings.getMatchmakingTiglFracturedRank()
+                            : memberSettings.getMatchmakingTiglRank();
+                })
+                .toList();
+        return fractured ? MatchmakingOptions.lowestTiglFracturedRank(ranks) : MatchmakingOptions.lowestTiglRank(ranks);
+    }
+
+    private static Comparator<String> byCanonicalOrder(List<String> canonicalOrder) {
+        return Comparator.comparingInt(value -> {
+            int index = canonicalOrder.indexOf(value);
+            return index < 0 ? Integer.MAX_VALUE : index;
+        });
+    }
+
+    private static String joinInOrder(List<String> values, List<String> canonicalOrder, String separator) {
+        return values.stream().sorted(byCanonicalOrder(canonicalOrder)).collect(Collectors.joining(separator));
     }
 
     public static ViewMatchmakingQueueService get() {

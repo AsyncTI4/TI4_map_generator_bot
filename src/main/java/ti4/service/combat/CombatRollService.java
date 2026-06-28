@@ -34,6 +34,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
@@ -505,6 +506,10 @@ public class CombatRollService {
                                         "Cancel a Hit"));
                                 AshenPromissoryHandler.addFromTheAshesButton(
                                         buttons, game, opponent, player, tile, combatOnHolder, h);
+                                if (opponent.hasUnit("crystellum_mech")) {
+                                    CrystellumUnitHandler.offerRefractumButtonIfRelevant(
+                                            buttons, opponent, game, tile, combatOnHolder, h);
+                                }
                             }
                             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                             if (opponent.hasTech("vpw")) {

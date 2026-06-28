@@ -7,11 +7,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.ApplicationEmojiService;
 
 class SetFactionIcon extends GameStateSubcommand {
 
@@ -48,6 +50,19 @@ class SetFactionIcon extends GameStateSubcommand {
             player.setFactionEmoji(null);
             return;
         }
+
+        if (factionEmoji instanceof CustomEmoji customEmoji
+                && !ApplicationEmojiService.isValidAppEmoji(customEmoji)
+                && JdaService.jda.getEmojiById(customEmoji.getId()) == null) {
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    factionEmojiString
+                            + " is a custom emoji the bot cannot access, so it cannot be displayed."
+                            + " Please choose a default emoji or one from a server the bot is in. Resetting to default.");
+            player.setFactionEmoji(null);
+            return;
+        }
+
         MessageHelper.sendMessageToEventChannel(
                 event,
                 player.getRepresentationUnfogged() + " is setting their faction icon to " + factionEmojiString + ".");

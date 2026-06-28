@@ -2,10 +2,15 @@ package ti4.spring.service.statistics.matchmaking.queue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedPlayer;
@@ -33,12 +38,49 @@ public class PartyValidator {
     }
 
     private static List<String> restrictionsAllowedForMembers(List<String> members, List<String> restrictions) {
-        if (members.stream().noneMatch(PartyValidator::isNewPlayer)) {
-            return restrictions;
+        List<String> allowed = restrictions;
+        if (members.stream().anyMatch(PartyValidator::isNewPlayer)) {
+            allowed = allowed.stream()
+                    .filter(restriction -> !MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION.equals(restriction))
+                    .toList();
         }
-        return restrictions.stream()
-                .filter(restriction -> !MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION.equals(restriction))
-                .toList();
+        if (!members.stream().allMatch(PartyValidator::hasSetTiglRank)) {
+            allowed = allowed.stream()
+                    .filter(restriction -> !MatchmakingOptions.TIGL_OPTION.equals(restriction))
+                    .toList();
+        }
+
+        Set<String> groupRoles = groupRoleNames(members);
+        boolean hasFloater = groupRoles.contains(MatchmakingOptions.FLOATERS_ROLE_NAME);
+        boolean hasWarrior = groupRoles.contains(MatchmakingOptions.WARRIORS_ROLE_NAME);
+        if (hasFloater || !hasWarrior) {
+            allowed = allowed.stream()
+                    .filter(restriction -> !MatchmakingOptions.AVOID_FLOATERS_OPTION.equals(restriction))
+                    .toList();
+        }
+        if (hasWarrior || !hasFloater) {
+            allowed = allowed.stream()
+                    .filter(restriction -> !MatchmakingOptions.AVOID_WARRIORS_OPTION.equals(restriction))
+                    .toList();
+        }
+        return allowed;
+    }
+
+    private static Set<String> groupRoleNames(List<String> userIds) {
+        Guild guild = JdaService.guildPrimary;
+        if (guild == null) return Set.of();
+        Set<String> roleNames = new HashSet<>();
+        for (String userId : userIds) {
+            Member member = guild.getMemberById(userId);
+            if (member != null) {
+                roleNames.addAll(MatchmakingOptions.getHeldRoleNames(guild, member));
+            }
+        }
+        return roleNames;
+    }
+
+    private static boolean hasSetTiglRank(String userId) {
+        return UserSettingsManager.get(userId).hasSetTiglRank();
     }
 
     private static boolean isNewPlayer(String userId) {

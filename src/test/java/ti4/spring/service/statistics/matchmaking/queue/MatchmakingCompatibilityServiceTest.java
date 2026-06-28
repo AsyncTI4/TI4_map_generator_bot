@@ -40,41 +40,117 @@ class MatchmakingCompatibilityServiceTest {
     }
 
     @Test
-    void onlyMatchFloatersBlocksNonFloatersEitherDirection() {
-        PlayerMatchmakingData floater = player("a")
-                .restrictions(MatchmakingOptions.ONLY_MATCH_FLOATERS_OPTION)
-                .roleNames(MatchmakingOptions.FLOATERS_ROLE_NAME)
+    void tiglPlayersOfDifferentRankAreIncompatibleInStandardGame() {
+        PlayerMatchmakingData hero = player("a")
+                .restrictions(MatchmakingOptions.TIGL_OPTION)
+                .tiglRank("Hero")
+                .build();
+        PlayerMatchmakingData agent = player("b")
+                .restrictions(MatchmakingOptions.TIGL_OPTION)
+                .tiglRank("Agent")
+                .build();
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(
+                        hero, agent, MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION))
+                .isTrue();
+    }
+
+    @Test
+    void tiglPlayersOfSameRankAreCompatibleInStandardGame() {
+        PlayerMatchmakingData a = player("a")
+                .restrictions(MatchmakingOptions.TIGL_OPTION)
+                .tiglRank("Hero")
+                .build();
+        PlayerMatchmakingData b = player("b")
+                .restrictions(MatchmakingOptions.TIGL_OPTION)
+                .tiglRank("Hero")
+                .build();
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(
+                        a, b, MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION))
+                .isFalse();
+    }
+
+    @Test
+    void nonStandardGamesMatchOnFracturedRank() {
+        // Same standard rank but different Fractured rank: incompatible for a Franken (non-standard) game.
+        PlayerMatchmakingData a = player("a")
+                .restrictions(MatchmakingOptions.TIGL_OPTION)
+                .tiglRank("Hero")
+                .tiglFracturedRank("Archon")
+                .build();
+        PlayerMatchmakingData b = player("b")
+                .restrictions(MatchmakingOptions.TIGL_OPTION)
+                .tiglRank("Hero")
+                .tiglFracturedRank("Thrall")
+                .build();
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, MatchmakingOptions.FRANKEN_EXPANSION_OPTION))
+                .isTrue();
+        // The standard ranks match, so a standard game pairs them fine.
+        assertThat(MatchmakingCompatibilityService.areIncompatible(
+                        a, b, MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION))
+                .isFalse();
+    }
+
+    @Test
+    void rankIsIgnoredWhenTiglNotChosen() {
+        PlayerMatchmakingData a = player("a").tiglRank("Hero").build();
+        PlayerMatchmakingData b = player("b").tiglRank("Agent").build();
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(
+                        a, b, MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION))
+                .isFalse();
+    }
+
+    @Test
+    void rankIsIgnoredWhenNoExpansionContext() {
+        PlayerMatchmakingData hero = player("a")
+                .restrictions(MatchmakingOptions.TIGL_OPTION)
+                .tiglRank("Hero")
+                .build();
+        PlayerMatchmakingData agent = player("b")
+                .restrictions(MatchmakingOptions.TIGL_OPTION)
+                .tiglRank("Agent")
+                .build();
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(hero, agent)).isFalse();
+    }
+
+    @Test
+    void avoidFloatersBlocksFloatersEitherDirection() {
+        PlayerMatchmakingData avoider = player("a")
+                .restrictions(MatchmakingOptions.AVOID_FLOATERS_OPTION)
+                .build();
+        PlayerMatchmakingData floater =
+                player("b").roleNames(MatchmakingOptions.FLOATERS_ROLE_NAME).build();
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(avoider, floater))
+                .isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(floater, avoider))
+                .isTrue();
+    }
+
+    @Test
+    void avoidFloatersAllowsNonFloaters() {
+        PlayerMatchmakingData avoider = player("a")
+                .restrictions(MatchmakingOptions.AVOID_FLOATERS_OPTION)
                 .build();
         PlayerMatchmakingData nonFloater = player("b").build();
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(floater, nonFloater))
-                .isTrue();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(nonFloater, floater))
-                .isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(avoider, nonFloater))
+                .isFalse();
     }
 
     @Test
-    void onlyMatchWarriorsBlocksNonWarriors() {
-        PlayerMatchmakingData warrior = player("a")
-                .restrictions(MatchmakingOptions.ONLY_MATCH_WARRIORS_OPTION)
-                .roleNames(MatchmakingOptions.WARRIORS_ROLE_NAME)
+    void avoidWarriorsBlocksWarriors() {
+        PlayerMatchmakingData avoider = player("a")
+                .restrictions(MatchmakingOptions.AVOID_WARRIORS_OPTION)
                 .build();
-        PlayerMatchmakingData nonWarrior = player("b").build();
+        PlayerMatchmakingData warrior =
+                player("b").roleNames(MatchmakingOptions.WARRIORS_ROLE_NAME).build();
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(warrior, nonWarrior))
-                .isTrue();
-    }
-
-    @Test
-    void avoidNewPlayersBlocksNewPlayerEitherDirection() {
-        PlayerMatchmakingData veteran = player("a")
-                .restrictions(MatchmakingOptions.AVOID_NEW_PLAYERS_OPTION)
-                .build();
-        PlayerMatchmakingData newcomer = player("b").completedGames(1).build();
-
-        assertThat(MatchmakingCompatibilityService.areIncompatible(veteran, newcomer))
-                .isTrue();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(newcomer, veteran))
+        assertThat(MatchmakingCompatibilityService.areIncompatible(avoider, warrior))
                 .isTrue();
     }
 
@@ -97,7 +173,7 @@ class MatchmakingCompatibilityServiceTest {
     @Test
     void getSimilarSkillThresholdDecaysWithQueueTime() {
         // A 6-point skill gap (between confident ratings) yields a 1v1 match quality of ~0.59, which fails the
-        // starting 0.70 threshold. Only 'a' asks for similar skill, so only 'a's threshold is checked.
+        // starting 0.80 threshold. Only 'a' asks for similar skill, so only 'a's threshold is checked.
         PlayerMatchmakingData freshlyQueued = player("a")
                 .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
                 .rating(20)
@@ -106,23 +182,23 @@ class MatchmakingCompatibilityServiceTest {
         assertThat(MatchmakingCompatibilityService.areIncompatible(freshlyQueued, b))
                 .isTrue();
 
-        // After an hour 'a's threshold has decayed two steps (0.70 -> 0.50), which the ~0.59 quality clears.
+        // After four hours 'a's threshold has decayed to 0.40 (0.80 - 4*0.10), which the ~0.59 quality clears.
         PlayerMatchmakingData patient = player("a")
                 .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
                 .rating(20)
-                .queueWait(Duration.ofMinutes(60))
+                .queueWait(Duration.ofHours(4))
                 .build();
         assertThat(MatchmakingCompatibilityService.areIncompatible(patient, b)).isFalse();
     }
 
     @Test
     void bothDirectionsMustClearWhenBothWantSimilarSkill() {
-        // 'a' has waited to the 0.40 floor and accepts the ~0.59 gap, but 'b' just queued at the 0.70 threshold
-        // and still wants similar skill, so the stricter direction blocks the match.
+        // 'a' has waited its threshold down to 0.40 and accepts the ~0.59 gap, but 'b' just queued at the 0.80
+        // threshold and still wants similar skill, so the stricter direction blocks the match.
         PlayerMatchmakingData patientA = player("a")
                 .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
                 .rating(20)
-                .queueWait(Duration.ofMinutes(90))
+                .queueWait(Duration.ofHours(4))
                 .build();
         PlayerMatchmakingData freshB = player("b")
                 .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
@@ -135,7 +211,7 @@ class MatchmakingCompatibilityServiceTest {
         PlayerMatchmakingData patientB = player("b")
                 .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
                 .rating(26)
-                .queueWait(Duration.ofMinutes(90))
+                .queueWait(Duration.ofHours(4))
                 .build();
         assertThat(MatchmakingCompatibilityService.areIncompatible(patientA, patientB))
                 .isFalse();
@@ -165,6 +241,8 @@ class MatchmakingCompatibilityServiceTest {
         private int completedGames = 5;
         private Set<String> roleNames = Set.of();
         private Duration queueWait = Duration.ZERO;
+        private String tiglRank = MatchmakingOptions.UNRANKED_OPTION;
+        private String tiglFracturedRank = MatchmakingOptions.UNRANKED_OPTION;
 
         private Builder(String userId) {
             this.userId = userId;
@@ -205,9 +283,28 @@ class MatchmakingCompatibilityServiceTest {
             return this;
         }
 
+        private Builder tiglRank(String value) {
+            tiglRank = value;
+            return this;
+        }
+
+        private Builder tiglFracturedRank(String value) {
+            tiglFracturedRank = value;
+            return this;
+        }
+
         private PlayerMatchmakingData build() {
             return new PlayerMatchmakingData(
-                    userId, restrictions, avoidList, rating, activeHourBuckets, completedGames, roleNames, queueWait);
+                    userId,
+                    restrictions,
+                    avoidList,
+                    rating,
+                    activeHourBuckets,
+                    completedGames,
+                    roleNames,
+                    queueWait,
+                    tiglRank,
+                    tiglFracturedRank);
         }
     }
 }
