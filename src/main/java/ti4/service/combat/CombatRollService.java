@@ -611,6 +611,10 @@ public class CombatRollService {
                             msg2 += "\nReminder: You have the _" + relicModel.getName()
                                     + "_ relic, you may SUSTAIN DAMAGE on one of your none-fighter ships instead of taking a hit.";
                         }
+                        if (opponent.hasUnlockedBreakthrough("crystellumbt") && round2 == 1) {
+                            msg2 +=
+                                    "\nReminder: You have _Defensive Architecture_.\nFor each unit in the active system that is at capacity, you may give one other non-fighter ship in the same system SUSTAIN DAMAGE until the end of this combat. This is not tracked by the bot.";
+                        }
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
                     } else {
                         String msg2 = opponent.getRepresentationUnfogged() + " you may roll dice for Combat Round #"
@@ -824,6 +828,12 @@ public class CombatRollService {
             RelicModel relicModel = Mapper.getRelic("metalivoidshielding");
             msg2 += "\nReminder: You have the _" + relicModel.getName() + "_ relic,";
             msg2 += " you may SUSTAIN DAMAGE on one of your none-fighter ships instead of taking a hit.";
+        }
+        String combatRoundKey = "combatRoundTracker" + opponent.getFaction() + tile.getPosition() + "space";
+        String combatRoundValue = game.getStoredValue(combatRoundKey);
+        if (opponent.hasUnlockedBreakthrough("crystellumbt") && "1".equals(combatRoundValue)) {
+            msg2 +=
+                    "\nReminder: You have _Defensive Architecture_.\nFor each unit in the active system that is at capacity, you may give one other non-fighter ship in the same system SUSTAIN DAMAGE until the end of this combat. This is not tracked by the bot.";
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
     }
