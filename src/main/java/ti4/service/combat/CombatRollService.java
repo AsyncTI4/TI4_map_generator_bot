@@ -12,15 +12,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import org.apache.commons.collections4.IterableUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.collections4.IterableUtils;
 import ti4.contest.replay.core.CombatRollPayload;
 import ti4.contest.replay.core.CombatRollPayload.CombatRollNotePlacement;
 import ti4.contest.replay.core.CombatRollPayload.CombatRollNoteType;
@@ -1163,6 +1161,7 @@ public class CombatRollService {
                         maximumHits += 1;
                     }
                 }
+
                 if (rollType == CombatRollType.bombardment && "tf-dragonfreed".equalsIgnoreCase(unitModel.getId())) {
                     if (!game.isFowMode() && hitRolls > 0) {
 
@@ -1227,9 +1226,9 @@ public class CombatRollService {
                     }
                 }
                 Player gloryHolder = Helper.getPlayerFromAbility(game, "valor");
-                if(gloryHolder == null){
-                    for(Player p2 : game.getRealPlayers()){
-                        if(p2.hasTech("tf-glorioushalls")){
+                if (gloryHolder == null) {
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (p2.hasTech("tf-glorioushalls")) {
                             gloryHolder = p2;
                         }
                     }
@@ -1243,18 +1242,18 @@ public class CombatRollService {
                         if (die.getResult() >= 10) {
                             hitRolls += 1;
                             String valor = "Valor";
-                            if(game.isTwilightsFallMode()){
+                            if (game.isTwilightsFallMode()) {
                                 valor = "Glorious Halls";
                             }
                             MessageHelper.sendMessageToChannel(
                                     event.getMessageChannel(),
-                                    player.getRepresentation()
-                                            + " got an extra hit due to the **"+valor+"** ability (it has been accounted for in the hit count).");
+                                    player.getRepresentation() + " got an extra hit due to the **" + valor
+                                            + "** ability (it has been accounted for in the hit count).");
                         }
                         maximumHits += 1;
                     }
                 }
-                if(player.hasTech("tf-valortf")){
+                if (player.hasTech("tf-valortf")) {
                     chanceOfAllHits *= Math.pow(1.0 / (11 - toHit + modifierToHit), numRolls * mult);
                     for (Die die : resultRolls) {
                         if (die.getResult() >= 10) {
@@ -1697,6 +1696,20 @@ public class CombatRollService {
                     }
                     argentInfKills =
                             Math.min(argentInfKills, space.getUnitCount(Units.UnitType.Infantry, opponent.getColor()));
+                }
+                if (totalHits > 0
+                        && "neutral".equalsIgnoreCase(player.getFaction())
+                        && game.getStoredValue("mercenarycaptaintrigged").isEmpty()) {
+                    for (Player p : game.getRealPlayers()) {
+                        if (p.hasTech("tf-mercenarycaptains")) {
+                            p.setCommodities(p.getCommodities() + 1);
+                            MessageHelper.sendMessageToChannel(
+                                    p.getCorrectChannel(),
+                                    p.getRepresentation()
+                                            + " you gained 1 commodity due to the mercenary captains ability.");
+                            game.setStoredValue("mercenarycaptaintrigged", "yes");
+                        }
+                    }
                 }
                 if (argentInfKills > 0) {
                     String kills = "\nDue to the Strike Wing Alpha II destroyer ability, " + argentInfKills + " of "

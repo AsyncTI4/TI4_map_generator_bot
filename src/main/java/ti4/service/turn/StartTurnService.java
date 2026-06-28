@@ -726,9 +726,12 @@ public class StartTurnService {
             startButtons.add(
                     Buttons.green(factionChecker + "getPsychoButtons", "Use Psychoarcheology", TechEmojis.BioticTech));
         }
-        if (player.hasTech("tf-predictivecommand") && !player.getExhaustedTechs().contains("tf-predictivecommand")) {
+        if (player.hasTech("tf-predictivecommand")
+                && !player.getExhaustedTechs().contains("tf-predictivecommand")) {
             startButtons.add(Buttons.gray(
-                    factionChecker + "exhaustTech_tf-predictivecommand", "Exhaust Predictive Command", FactionEmojis.mykomentori));
+                    factionChecker + "exhaustTech_tf-predictivecommand",
+                    "Exhaust Predictive Command",
+                    FactionEmojis.mykomentori));
         }
         if (player.hasTechReady("dsuydag")) {
             startButtons.add(Buttons.green(

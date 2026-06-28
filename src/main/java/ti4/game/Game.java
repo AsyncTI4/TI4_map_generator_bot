@@ -24,13 +24,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
-
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -44,6 +38,9 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
@@ -4110,7 +4107,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if ("vayleriancommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-striketeams")) {
             return true;
         }
-        if("vadencommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-ruthlessbanking")) {
+        if ("vadencommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-ruthlessbanking")) {
             return true;
         }
         if ("edyncommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-rampantgrace")) {

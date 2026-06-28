@@ -9,7 +9,8 @@ import ti4.service.tactical.PostMovementButtonContext;
 
 public final class MirvedaCommanderButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.game().playerHasLeaderUnlockedOrAlliance(ctx.player(), "mirvedacommander") || ctx.player().hasTech("tf-dronehosts");
+        return ctx.game().playerHasLeaderUnlockedOrAlliance(ctx.player(), "mirvedacommander")
+                || ctx.player().hasTech("tf-dronehosts");
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {

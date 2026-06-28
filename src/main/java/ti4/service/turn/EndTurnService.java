@@ -5,14 +5,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.function.Consumers;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.PhantomEnergyHandler;
 import ti4.game.Game;
@@ -112,9 +110,10 @@ public class EndTurnService {
             MessageHelper.sendMessageToChannel(mainPlayer.getCardsInfoThread(), msg, buttons);
         }
 
-        if(mainPlayer.hasTech("tf-treasurehunters")){
+        if (mainPlayer.hasTech("tf-treasurehunters")) {
             game.shuffleExplores();
-            MessageHelper.sendMessageToChannel(mainPlayer.getCorrectChannel(), "Shuffled the explore decks due to the treasure hunter ability");
+            MessageHelper.sendMessageToChannel(
+                    mainPlayer.getCorrectChannel(), "Shuffled the explore decks due to the treasure hunter ability");
         }
 
         CommanderUnlockCheckService.checkPlayer(mainPlayer, "sol", "hacan");
