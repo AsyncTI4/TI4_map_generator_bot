@@ -52,17 +52,17 @@ class MatchmakingCompatibilityService {
             return true;
         }
 
-        return hasSimilarSkill(a, b);
+        return isSkillGapTooLarge(a, b);
     }
 
-    private static boolean hasSimilarSkill(PlayerMatchmakingData a, PlayerMatchmakingData b) {
+    private static boolean isSkillGapTooLarge(PlayerMatchmakingData a, PlayerMatchmakingData b) {
         Duration maxWait = getMaxQueueWaitTime(a, b);
         double similarSkillWindow = getSimilarSkillWindow(maxWait);
 
         double aRating = a.rating().getMean();
         double bRating = b.rating().getMean();
         double ratingDifference = Math.abs(aRating - bRating);
-        return ratingDifference <= similarSkillWindow;
+        return ratingDifference > similarSkillWindow;
     }
 
     private static Duration getMaxQueueWaitTime(PlayerMatchmakingData a, PlayerMatchmakingData b) {
@@ -87,10 +87,10 @@ class MatchmakingCompatibilityService {
         Duration maxWait = getMaxQueueWaitTime(a, b);
         if (maxWait.toHours() >= HOURS_TO_AVOID_FLOATERS_WARRIORS) return false;
 
-        if (a.roleNames().contains(PlayerMatchDataFactory.FLOATERS_ROLE_NAME)
-                && b.roleNames().contains(PlayerMatchDataFactory.WARRIORS_ROLE_NAME)) return true;
+        if (a.roleNames().contains(MatchmakingOptions.FLOATERS_ROLE_NAME)
+                && b.roleNames().contains(MatchmakingOptions.WARRIORS_ROLE_NAME)) return true;
 
-        return a.roleNames().contains(PlayerMatchDataFactory.WARRIORS_ROLE_NAME)
-                && b.roleNames().contains(PlayerMatchDataFactory.FLOATERS_ROLE_NAME);
+        return a.roleNames().contains(MatchmakingOptions.WARRIORS_ROLE_NAME)
+                && b.roleNames().contains(MatchmakingOptions.FLOATERS_ROLE_NAME);
     }
 }

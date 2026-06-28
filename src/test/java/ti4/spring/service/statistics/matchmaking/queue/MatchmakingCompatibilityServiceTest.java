@@ -134,9 +134,66 @@ class MatchmakingCompatibilityServiceTest {
     }
 
     @Test
-    void skillGapIsIgnoredWhenNeitherWantsSimilarSkill() {
+    void largeSkillGapBlocksFreshlyQueuedPlayers() {
+        // Fresh queue: the window is the 4-point starting threshold, so a 20-point gap is too large.
         PlayerMatchmakingData a = player("a").rating(20).build();
         PlayerMatchmakingData b = player("b").rating(40).build();
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isTrue();
+    }
+
+    @Test
+    void smallSkillGapIsAllowed() {
+        PlayerMatchmakingData a = player("a").rating(24).build();
+        PlayerMatchmakingData b = player("b").rating(26).build();
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isFalse();
+    }
+
+    @Test
+    void skillWindowWidensWithQueueTime() {
+        // A 6-point gap exceeds the fresh 4-point window, but after 4 hours the window widens to 6 (4 + 2 steps).
+        PlayerMatchmakingData fresh = player("a").rating(20).build();
+        PlayerMatchmakingData b = player("b").rating(26).build();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(fresh, b)).isTrue();
+
+        PlayerMatchmakingData patient =
+                player("a").rating(20).queueWait(Duration.ofHours(4)).build();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(patient, b)).isFalse();
+    }
+
+    @Test
+    void floaterAndWarriorAreKeptApartWhileQueueIsShort() {
+        PlayerMatchmakingData floater =
+                player("a").roleNames(MatchmakingOptions.FLOATERS_ROLE_NAME).build();
+        PlayerMatchmakingData warrior =
+                player("b").roleNames(MatchmakingOptions.WARRIORS_ROLE_NAME).build();
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(floater, warrior))
+                .isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(warrior, floater))
+                .isTrue();
+    }
+
+    @Test
+    void floaterAndWarriorMatchAfterEightHourWait() {
+        PlayerMatchmakingData floater = player("a")
+                .roleNames(MatchmakingOptions.FLOATERS_ROLE_NAME)
+                .queueWait(Duration.ofHours(8))
+                .build();
+        PlayerMatchmakingData warrior =
+                player("b").roleNames(MatchmakingOptions.WARRIORS_ROLE_NAME).build();
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(floater, warrior))
+                .isFalse();
+    }
+
+    @Test
+    void twoFloatersAreNotKeptApart() {
+        PlayerMatchmakingData a =
+                player("a").roleNames(MatchmakingOptions.FLOATERS_ROLE_NAME).build();
+        PlayerMatchmakingData b =
+                player("b").roleNames(MatchmakingOptions.FLOATERS_ROLE_NAME).build();
 
         assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isFalse();
     }

@@ -27,9 +27,8 @@ import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
 @UtilityClass
 class PlayerMatchDataFactory {
 
-    public static final String FLOATERS_ROLE_NAME = "Floaters";
-    public static final String WARRIORS_ROLE_NAME = "Warriors";
-    private static final List<String> ROLES_TO_TRACK = List.of(FLOATERS_ROLE_NAME, WARRIORS_ROLE_NAME);
+    private static final List<String> ROLES_TO_TRACK =
+            List.of(MatchmakingOptions.FLOATERS_ROLE_NAME, MatchmakingOptions.WARRIORS_ROLE_NAME);
     private static final int NUMBER_OF_ACTIVE_HOUR_BUCKETS = 6;
     private static final int ACTIVE_HOUR_BUCKET_SIZE = 4;
     private static final int ACTIVE_HOUR_BUCKET_MATCH_THRESHOLD = 3;

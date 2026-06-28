@@ -42,6 +42,10 @@ public class MatchmakingOptions {
     public static final List<String> VICTORY_POINT_OPTIONS = List.of("10", "12", "14");
     public static final String SIMILAR_ACTIVE_HOURS_OPTION = "Similar active hours";
 
+    // Discord role names the matchmaker tracks to keep Floaters and Warriors apart.
+    public static final String FLOATERS_ROLE_NAME = "Floaters";
+    public static final String WARRIORS_ROLE_NAME = "Warriors";
+
     public static final String SLOWER_PACE_OPTION = "Slower";
     public static final String FAST_PACE_OPTION = "Average (30 days)";
     public static final String FASTER_PACE_OPTION = "Faster (15 days)";
