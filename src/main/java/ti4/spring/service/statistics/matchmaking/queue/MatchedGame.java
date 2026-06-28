@@ -10,4 +10,4 @@ record MatchedGame(
         String expansion,
         String pace,
         List<String> restrictions,
-        String tiglRank) {}
+        List<String> tiglRanks) {}

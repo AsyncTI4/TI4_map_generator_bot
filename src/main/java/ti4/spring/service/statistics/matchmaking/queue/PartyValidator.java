@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
-import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedPlayer;
 import ti4.settings.users.UserSettings;
@@ -18,11 +17,10 @@ public class PartyValidator {
 
     public static List<String> getValidRestrictions(List<String> userIds, List<String> restrictions) {
         List<String> members = userIds.stream().distinct().toList();
-        List<String> candidateRestrictions = restrictionsAllowedForMembers(members, restrictions);
-        if (members.size() < 2) return candidateRestrictions;
+        if (members.size() < 2) return restrictions;
 
         List<String> available = new ArrayList<>();
-        for (String restriction : candidateRestrictions) {
+        for (String restriction : restrictions) {
             Map<String, PlayerMatchmakingData> dataById =
                     PlayerMatchDataFactory.buildForUsers(members, List.of(restriction));
             if (groupInternallyCompatible(members, dataById)) {
@@ -30,20 +28,6 @@ public class PartyValidator {
             }
         }
         return available;
-    }
-
-    private static List<String> restrictionsAllowedForMembers(List<String> members, List<String> restrictions) {
-        List<String> allowed = restrictions;
-        if (!members.stream().allMatch(PartyValidator::hasSetTiglRank)) {
-            allowed = allowed.stream()
-                    .filter(restriction -> !MatchmakingOptions.TIGL_OPTION.equals(restriction))
-                    .toList();
-        }
-        return allowed;
-    }
-
-    private static boolean hasSetTiglRank(String userId) {
-        return UserSettingsManager.get(userId).hasSetTiglRank();
     }
 
     private static boolean groupInternallyCompatible(

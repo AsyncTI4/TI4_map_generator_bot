@@ -40,7 +40,7 @@ class MatchmakingNotifier {
 
         Map<String, ForumChannel> forumByNameCache = new HashMap<>();
         for (MatchedGame game : gamesToCreate) {
-            String forumName = game.tiglRank() != null
+            String forumName = !game.tiglRanks().isEmpty()
                     ? CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL
                     : CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL;
             ForumChannel forum = forumByNameCache.computeIfAbsent(forumName, name -> findForum(guild, name));
@@ -69,7 +69,7 @@ class MatchmakingNotifier {
     }
 
     private static void postLfgPing(ThreadChannel thread, MatchedGame game) {
-        if (game.tiglRank() != null) return;
+        if (!game.tiglRanks().isEmpty()) return;
 
         int playersNeeded =
                 Integer.parseInt(game.playerCount()) - game.members().size();

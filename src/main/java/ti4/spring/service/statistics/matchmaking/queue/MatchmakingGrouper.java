@@ -36,7 +36,7 @@ class MatchmakingGrouper {
         for (GameConfig config : configsToTry) {
             List<QueuedParty> available = ungrouped(partiesByConfig.get(config), partiesAddedToGames);
             for (List<QueuedParty> group :
-                    formGroupsOfSize(available, config.playerCountValue(), config, playerMatchmakingData)) {
+                    formGroupsOfSize(available, config.playerCountValue(), playerMatchmakingData)) {
                 collectGames(group, config, playerMatchmakingData, gamesToCreate, partiesAddedToGames);
             }
         }
@@ -60,7 +60,7 @@ class MatchmakingGrouper {
             int targetSize = config.playerCountValue() - 1;
             if (targetSize < 1) continue;
             List<QueuedParty> available = ungrouped(partiesByConfig.get(config), partiesAddedToGames);
-            for (List<QueuedParty> group : formGroupsOfSize(available, targetSize, config, playerMatchmakingData)) {
+            for (List<QueuedParty> group : formGroupsOfSize(available, targetSize, playerMatchmakingData)) {
                 if (qualifiesAsNearMatch(group, now)) {
                     candidates.add(new NearMatchCandidate(config, group));
                 }
@@ -122,7 +122,6 @@ class MatchmakingGrouper {
     private static List<List<QueuedParty>> formGroupsOfSize(
             List<QueuedParty> available,
             int targetSize,
-            GameConfig config,
             Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData) {
         List<List<QueuedParty>> groups = new ArrayList<>();
         List<QueuedParty> searching =
@@ -137,7 +136,7 @@ class MatchmakingGrouper {
                 if (group.contains(party)) continue;
                 if (members.size() == targetSize) break;
                 if (members.size() + party.size() > targetSize) continue;
-                if (isPartyCompatibleForMatch(party, members, playerMatchmakingData, config)) {
+                if (isPartyCompatibleForMatch(party, members, playerMatchmakingData)) {
                     members.addAll(party.members());
                     group.add(party);
                 }
@@ -176,7 +175,7 @@ class MatchmakingGrouper {
                 config.expansion(),
                 config.pace(),
                 restrictions,
-                tiglRankForGame(restrictions, members, config, playerMatchmakingData));
+                tiglRanksForGame(members, playerMatchmakingData));
         gamesToCreate.add(game);
         MatchDescriber.logFormedMatch(game, playerMatchmakingData);
         partiesAddedToGames.addAll(groupParties);
@@ -202,18 +201,38 @@ class MatchmakingGrouper {
         return party.party().getQueuedAt().plus(Duration.ofHours(maxHours));
     }
 
-    private static String tiglRankForGame(
-            List<String> matchRestrictions,
+    private static List<String> tiglRanksForGame(
             List<MatchmakingQueueMember> matchMembers,
-            GameConfig config,
             Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData) {
-        if (!matchRestrictions.contains(MatchmakingOptions.TIGL_OPTION)) {
-            return null;
+        if (!isTiglGroup(matchMembers, playerMatchmakingData)) {
+            return List.of();
         }
-        PlayerMatchmakingData representative = playerMatchmakingData.get(matchMembers.getFirst());
-        return MatchmakingOptions.usesFracturedRank(config.expansion())
-                ? representative.tiglFracturedRank()
-                : representative.tiglRank();
+        Set<String> common = getMatchingTiglRanks(matchMembers, playerMatchmakingData);
+        return MatchmakingOptions.TIGL_RANK_OPTIONS.stream()
+                .filter(common::contains)
+                .toList();
+    }
+
+    private static boolean isTiglGroup(
+            List<MatchmakingQueueMember> members,
+            Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData) {
+        return members.stream()
+                .anyMatch(member -> playerMatchmakingData.get(member).tigl());
+    }
+
+    private static Set<String> getMatchingTiglRanks(
+            List<MatchmakingQueueMember> members,
+            Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData) {
+        Set<String> common = null;
+        for (MatchmakingQueueMember member : members) {
+            Set<String> ranks = new HashSet<>(playerMatchmakingData.get(member).tiglRanks());
+            if (common == null) {
+                common = ranks;
+            } else {
+                common.retainAll(ranks);
+            }
+        }
+        return common == null ? Set.of() : common;
     }
 
     private static Comparator<QueuedParty> prioritizeByQueuedAtTime() {
@@ -226,18 +245,21 @@ class MatchmakingGrouper {
     private static boolean isPartyCompatibleForMatch(
             QueuedParty party,
             List<MatchmakingQueueMember> group,
-            Map<MatchmakingQueueMember, PlayerMatchmakingData> matchData,
-            GameConfig config) {
+            Map<MatchmakingQueueMember, PlayerMatchmakingData> matchData) {
         for (MatchmakingQueueMember newMember : party.members()) {
             for (MatchmakingQueueMember existing : group) {
                 PlayerMatchmakingData a = matchData.get(existing);
                 PlayerMatchmakingData b = matchData.get(newMember);
-                if (MatchmakingCompatibilityService.areIncompatible(a, b, config.expansion())) {
+                if (MatchmakingCompatibilityService.areIncompatible(a, b)) {
                     return false;
                 }
             }
         }
-        return true;
+
+        List<MatchmakingQueueMember> combined = new ArrayList<>(group);
+        combined.addAll(party.members());
+        return !isTiglGroup(combined, matchData)
+                || !getMatchingTiglRanks(combined, matchData).isEmpty();
     }
 
     private static int totalPlayers(List<QueuedParty> parties) {

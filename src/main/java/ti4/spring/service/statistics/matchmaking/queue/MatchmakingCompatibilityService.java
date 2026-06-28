@@ -1,6 +1,7 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
@@ -17,10 +18,6 @@ class MatchmakingCompatibilityService {
     private static final int HOURS_TO_AVOID_FLOATERS_WARRIORS = 8;
 
     static boolean areIncompatible(PlayerMatchmakingData a, PlayerMatchmakingData b) {
-        return areIncompatible(a, b, null);
-    }
-
-    static boolean areIncompatible(PlayerMatchmakingData a, PlayerMatchmakingData b, String expansion) {
         if (a.avoidList().contains(b.userId()) || b.avoidList().contains(a.userId())) {
             return true;
         }
@@ -36,17 +33,15 @@ class MatchmakingCompatibilityService {
             if (sharedBuckets < ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT) return true;
         }
 
-        boolean aWantsTigl = MatchmakingOptions.wantsTigl(aRestrictions);
-        boolean bWantsTigl = MatchmakingOptions.wantsTigl(bRestrictions);
-        if (aWantsTigl != bWantsTigl) {
+        // TIGL parties only match other TIGL parties.
+        if (a.tigl() != b.tigl()) {
             return true;
         }
-        if (expansion != null && aWantsTigl && hasDifferentTiglRank(a, b, expansion)) {
-            return true;
+        if (a.tigl()) {
+            // the grouper enforces a rank common to the whole game.
+            // We also don't want to block TIGL games on roles/skill, so we return here.
+            return Collections.disjoint(a.tiglRanks(), b.tiglRanks());
         }
-
-        // We don't want to block TIGL games on roles/skill
-        if (aWantsTigl) return false;
 
         if (shouldAvoidFloaterOrWarrior(a, b)) {
             return true;
@@ -69,13 +64,6 @@ class MatchmakingCompatibilityService {
         Duration aWait = a.queueWait();
         Duration bWait = b.queueWait();
         return aWait.compareTo(bWait) >= 0 ? aWait : bWait;
-    }
-
-    private static boolean hasDifferentTiglRank(PlayerMatchmakingData a, PlayerMatchmakingData b, String expansion) {
-        if (MatchmakingOptions.usesFracturedRank(expansion)) {
-            return !a.tiglFracturedRank().equals(b.tiglFracturedRank());
-        }
-        return !a.tiglRank().equals(b.tiglRank());
     }
 
     private static double getSimilarSkillWindow(Duration waited) {

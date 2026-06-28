@@ -101,11 +101,36 @@ class MatchmakingGrouperTest extends BaseTi4Test {
     }
 
     @Test
-    void formsNoGameWhenAPairIsIncompatible() {
+    void formsNoGameWhenTiglPlayerMixedWithNonTigl() {
         // p1 wants a TIGL game while the others do not, so no compatible trio can be assembled.
-        addParty(List.of("p1"), List.of(MatchmakingOptions.TIGL_OPTION), List.of("3"), Duration.ZERO);
+        addTiglParty(List.of("p1"), List.of("3"), Duration.ZERO, List.of("Hero"));
         addSolo("p2");
         addSolo("p3");
+
+        assertThat(MatchmakingGrouper.formGames(parties)).isEmpty();
+    }
+
+    @Test
+    void formsTiglGameWhenAllPlayersShareARank() {
+        addTiglParty(List.of("p1"), List.of("3"), Duration.ZERO, List.of("Hero", "Commander"));
+        addTiglParty(List.of("p2"), List.of("3"), Duration.ZERO, List.of("Commander", "Agent"));
+        addTiglParty(List.of("p3"), List.of("3"), Duration.ZERO, List.of("Commander"));
+
+        List<MatchedGame> games = MatchmakingGrouper.formGames(parties);
+
+        assertThat(games).hasSize(1);
+        assertThat(games.getFirst().tiglRanks()).containsExactly("Commander");
+        assertThat(games.getFirst().members())
+                .extracting(MatchmakingQueueMember::getUserId)
+                .containsExactlyInAnyOrder("p1", "p2", "p3");
+    }
+
+    @Test
+    void formsNoTiglGameWhenNoRankIsCommonToAllDespitePairwiseOverlap() {
+        // Every pair shares a rank, but no single rank is accepted by all three, so the game cannot form.
+        addTiglParty(List.of("p1"), List.of("3"), Duration.ZERO, List.of("Hero", "Commander"));
+        addTiglParty(List.of("p2"), List.of("3"), Duration.ZERO, List.of("Commander", "Agent"));
+        addTiglParty(List.of("p3"), List.of("3"), Duration.ZERO, List.of("Agent", "Hero"));
 
         assertThat(MatchmakingGrouper.formGames(parties)).isEmpty();
     }
@@ -201,6 +226,17 @@ class MatchmakingGrouperTest extends BaseTi4Test {
             List<String> playerCounts,
             Duration queueWait,
             String maxQueueTime) {
+        addPartyWithSettings(userIds, queueWait, settings(playerCounts, restrictions, maxQueueTime), false);
+    }
+
+    private void addTiglParty(
+            List<String> userIds, List<String> playerCounts, Duration queueWait, List<String> tiglRanks) {
+        UserSettings settings = settings(playerCounts, List.of(), "8 hours");
+        settings.setMatchmakingTiglRanks(tiglRanks);
+        addPartyWithSettings(userIds, queueWait, settings, true);
+    }
+
+    private void addPartyWithSettings(List<String> userIds, Duration queueWait, UserSettings settings, boolean tigl) {
         long partyId = nextPartyId;
         nextPartyId++;
         List<MatchmakingQueueMember> members = new ArrayList<>();
@@ -213,9 +249,10 @@ class MatchmakingGrouperTest extends BaseTi4Test {
         MatchmakingQueueParty party = new MatchmakingQueueParty();
         party.setId(partyId);
         party.setQueued(true);
+        party.setTigl(tigl);
         party.setQueuedAt(Instant.now().minus(queueWait));
         party.setLeaderId(userIds.getFirst());
-        parties.add(new QueuedParty(party, members, settings(playerCounts, restrictions, maxQueueTime)));
+        parties.add(new QueuedParty(party, members, settings));
     }
 
     private void rate(String userId, double mean) {

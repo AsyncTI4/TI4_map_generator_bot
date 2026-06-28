@@ -31,8 +31,7 @@ class MatchmakingCompatibilityServiceTest {
 
     @Test
     void disagreeingOnTiglIsIncompatible() {
-        PlayerMatchmakingData a =
-                player("a").restrictions(MatchmakingOptions.TIGL_OPTION).build();
+        PlayerMatchmakingData a = player("a").tigl(true).tiglRanks("Hero").build();
         PlayerMatchmakingData b = player("b").build();
 
         assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isTrue();
@@ -40,81 +39,40 @@ class MatchmakingCompatibilityServiceTest {
     }
 
     @Test
-    void tiglPlayersOfDifferentRankAreIncompatibleInStandardGame() {
-        PlayerMatchmakingData hero = player("a")
-                .restrictions(MatchmakingOptions.TIGL_OPTION)
-                .tiglRank("Hero")
-                .build();
-        PlayerMatchmakingData agent = player("b")
-                .restrictions(MatchmakingOptions.TIGL_OPTION)
-                .tiglRank("Agent")
-                .build();
+    void tiglPlayersWithDisjointRanksAreIncompatible() {
+        PlayerMatchmakingData hero = player("a").tigl(true).tiglRanks("Hero").build();
+        PlayerMatchmakingData agent = player("b").tigl(true).tiglRanks("Agent").build();
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(
-                        hero, agent, MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION))
-                .isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(hero, agent)).isTrue();
     }
 
     @Test
-    void tiglPlayersOfSameRankAreCompatibleInStandardGame() {
-        PlayerMatchmakingData a = player("a")
-                .restrictions(MatchmakingOptions.TIGL_OPTION)
-                .tiglRank("Hero")
-                .build();
-        PlayerMatchmakingData b = player("b")
-                .restrictions(MatchmakingOptions.TIGL_OPTION)
-                .tiglRank("Hero")
-                .build();
+    void tiglPlayersSharingARankAreCompatible() {
+        PlayerMatchmakingData a =
+                player("a").tigl(true).tiglRanks("Hero", "Commander").build();
+        PlayerMatchmakingData b =
+                player("b").tigl(true).tiglRanks("Commander", "Agent").build();
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(
-                        a, b, MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION))
-                .isFalse();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isFalse();
     }
 
     @Test
-    void nonStandardGamesMatchOnFracturedRank() {
-        // Same standard rank but different Fractured rank: incompatible for a Franken (non-standard) game.
-        PlayerMatchmakingData a = player("a")
-                .restrictions(MatchmakingOptions.TIGL_OPTION)
-                .tiglRank("Hero")
-                .tiglFracturedRank("Archon")
-                .build();
-        PlayerMatchmakingData b = player("b")
-                .restrictions(MatchmakingOptions.TIGL_OPTION)
-                .tiglRank("Hero")
-                .tiglFracturedRank("Thrall")
-                .build();
+    void tiglGamesAreNotBlockedBySkillGap() {
+        // Both TIGL and sharing a rank: a wide skill gap that would block a normal match is ignored.
+        PlayerMatchmakingData a =
+                player("a").tigl(true).tiglRanks("Hero").rating(20).build();
+        PlayerMatchmakingData b =
+                player("b").tigl(true).tiglRanks("Hero").rating(40).build();
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b, MatchmakingOptions.FRANKEN_EXPANSION_OPTION))
-                .isTrue();
-        // The standard ranks match, so a standard game pairs them fine.
-        assertThat(MatchmakingCompatibilityService.areIncompatible(
-                        a, b, MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION))
-                .isFalse();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isFalse();
     }
 
     @Test
     void rankIsIgnoredWhenTiglNotChosen() {
-        PlayerMatchmakingData a = player("a").tiglRank("Hero").build();
-        PlayerMatchmakingData b = player("b").tiglRank("Agent").build();
+        PlayerMatchmakingData a = player("a").tiglRanks("Hero").build();
+        PlayerMatchmakingData b = player("b").tiglRanks("Agent").build();
 
-        assertThat(MatchmakingCompatibilityService.areIncompatible(
-                        a, b, MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION))
-                .isFalse();
-    }
-
-    @Test
-    void rankIsIgnoredWhenNoExpansionContext() {
-        PlayerMatchmakingData hero = player("a")
-                .restrictions(MatchmakingOptions.TIGL_OPTION)
-                .tiglRank("Hero")
-                .build();
-        PlayerMatchmakingData agent = player("b")
-                .restrictions(MatchmakingOptions.TIGL_OPTION)
-                .tiglRank("Agent")
-                .build();
-
-        assertThat(MatchmakingCompatibilityService.areIncompatible(hero, agent)).isFalse();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isFalse();
     }
 
     @Test
@@ -214,8 +172,8 @@ class MatchmakingCompatibilityServiceTest {
         private int completedGames = 5;
         private Set<String> roleNames = Set.of();
         private Duration queueWait = Duration.ZERO;
-        private String tiglRank = MatchmakingOptions.UNRANKED_OPTION;
-        private String tiglFracturedRank = MatchmakingOptions.UNRANKED_OPTION;
+        private boolean tigl = false;
+        private List<String> tiglRanks = List.of(MatchmakingOptions.UNRANKED_OPTION);
 
         private Builder(String userId) {
             this.userId = userId;
@@ -256,13 +214,13 @@ class MatchmakingCompatibilityServiceTest {
             return this;
         }
 
-        private Builder tiglRank(String value) {
-            tiglRank = value;
+        private Builder tigl(boolean value) {
+            tigl = value;
             return this;
         }
 
-        private Builder tiglFracturedRank(String value) {
-            tiglFracturedRank = value;
+        private Builder tiglRanks(String... values) {
+            tiglRanks = List.of(values);
             return this;
         }
 
@@ -276,8 +234,8 @@ class MatchmakingCompatibilityServiceTest {
                     completedGames,
                     roleNames,
                     queueWait,
-                    tiglRank,
-                    tiglFracturedRank);
+                    tigl,
+                    tiglRanks);
         }
     }
 }

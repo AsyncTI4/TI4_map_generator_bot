@@ -42,7 +42,7 @@ class MatchDescriber {
             MatchedGame game, Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData) {
         StringBuilder log = new StringBuilder(" Matchmade: ").append("\n``` • ").append(threadTitle(game));
         for (MatchmakingQueueMember member : game.members()) {
-            log.append("\n  • ").append(describePlayer(playerMatchmakingData.get(member), game.expansion()));
+            log.append("\n  • ").append(describePlayer(playerMatchmakingData.get(member)));
         }
         log.append("```");
         BotLogger.info(log.toString());
@@ -54,13 +54,13 @@ class MatchDescriber {
         if (restrictions.contains(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION)) {
             labels.add("similar timezone");
         }
-        if (restrictions.contains(MatchmakingOptions.TIGL_OPTION)) {
-            labels.add("TIGL (" + game.tiglRank() + ")");
+        if (!game.tiglRanks().isEmpty()) {
+            labels.add("TIGL (" + String.join("/", game.tiglRanks()) + ")");
         }
         return String.join(", ", labels);
     }
 
-    private static String describePlayer(PlayerMatchmakingData player, String expansion) {
+    private static String describePlayer(PlayerMatchmakingData player) {
         String name = JdaService.getUsername(player.userId());
         StringBuilder details = new StringBuilder(name != null ? name : "Unknown")
                 .append(" — rating ")
@@ -69,10 +69,8 @@ class MatchDescriber {
                 .append(player.completedGames())
                 .append(" games · waited ")
                 .append(formatDuration(player.queueWait()));
-        if (MatchmakingOptions.wantsTigl(player.restrictions())) {
-            String rank =
-                    MatchmakingOptions.usesFracturedRank(expansion) ? player.tiglFracturedRank() : player.tiglRank();
-            details.append(" · TIGL ").append(rank);
+        if (player.tigl()) {
+            details.append(" · TIGL ").append(String.join("/", player.tiglRanks()));
         }
         if (!player.restrictions().isEmpty()) {
             details.append(" · ").append(String.join(", ", player.restrictions()));

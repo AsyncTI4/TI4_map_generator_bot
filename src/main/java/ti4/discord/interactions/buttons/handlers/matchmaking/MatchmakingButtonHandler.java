@@ -44,11 +44,13 @@ import ti4.spring.service.statistics.matchmaking.queue.ViewMatchmakingQueueServi
 class MatchmakingButtonHandler {
 
     private static final String QUEUE_FOR_GAME_BUTTON_ID = "queueForGame~MDL";
+    private static final String QUEUE_FOR_TIGL_BUTTON_ID = "queueForTigl~MDL";
     private static final String FORM_GROUP_BUTTON_ID = "formGroup~MDL";
     private static final String LEAVE_QUEUE_BUTTON_ID = "leaveQueueForGame";
     private static final String VIEW_QUEUE_BUTTON_ID = "viewMatchmakingQueue";
     private static final String ADDITIONAL_SETTINGS_BUTTON_ID = "queueForGameAdditionalSettings~MDL";
     private static final String QUEUE_FOR_GAME_MODAL_ID = "queueForGameModal";
+    private static final String QUEUE_FOR_TIGL_MODAL_ID = "queueForTiglModal";
     private static final String FORM_GROUP_MODAL_ID = "formGroupModal";
     private static final String ADDITIONAL_SETTINGS_MODAL_ID = "queueForGameAdditionalSettingsModal";
 
@@ -60,8 +62,7 @@ class MatchmakingButtonHandler {
     private static final String MAX_QUEUE_TIME_ID = "queue_max_time";
     private static final String AVOID_PLAYERS_ID = "queue_avoid_players";
     private static final String GROUP_MEMBERS_ID = "queue_group_members";
-    private static final String TIGL_RANK_ID = "queue_tigl_rank";
-    private static final String TIGL_FRACTURED_RANK_ID = "queue_tigl_fractured_rank";
+    private static final String TIGL_RANKS_ID = "queue_tigl_ranks";
 
     private static final String DEFAULT_MAX_QUEUE_TIME = "8 hours";
     private static final List<String> DEFAULT_EXPANSION_OPTIONS =
@@ -71,6 +72,7 @@ class MatchmakingButtonHandler {
     private static final List<String> DEFAULT_PACE_OPTIONS = List.of(SLOWER_PACE_OPTION);
     private static final List<String> DEFAULT_RESTRICTION_OPTIONS =
             List.of(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION);
+    private static final List<String> DEFAULT_TIGL_RANK_OPTIONS = List.of(MatchmakingOptions.UNRANKED_OPTION);
 
     private static final int MAX_GROUP_MEMBERS = 7;
     private static final int MAX_AVOID_PLAYERS = 25;
@@ -79,6 +81,12 @@ class MatchmakingButtonHandler {
     public static void offerQueueForGameModal(ButtonInteractionEvent event) {
         if (cannotQueue(event)) return;
         event.replyModal(buildQueueModal(event)).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler(value = QUEUE_FOR_TIGL_BUTTON_ID, save = false)
+    public static void offerQueueForTiglModal(ButtonInteractionEvent event) {
+        if (cannotQueue(event)) return;
+        event.replyModal(buildTiglQueueModal(event)).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler(value = FORM_GROUP_BUTTON_ID, save = false)
@@ -179,6 +187,56 @@ class MatchmakingButtonHandler {
         return modal.build();
     }
 
+    private static Modal buildTiglQueueModal(ButtonInteractionEvent event) {
+        String userId = event.getUser().getId();
+        UserSettings userSettings = UserSettingsManager.get(userId);
+        List<String> groupMemberIds =
+                SpringContext.getBean(MatchmakerService.class).partyMemberIds(userId);
+
+        final boolean REQUIRE_SELECTION = true;
+        CheckboxGroup playerCounts = buildCheckboxGroup(
+                PLAYER_COUNTS_ID,
+                groupPlayerCountOptions(groupMemberIds.size()),
+                userSettings.getMatchmakingPlayerCounts(),
+                DEFAULT_PLAYER_COUNT_OPTIONS,
+                REQUIRE_SELECTION);
+        CheckboxGroup victoryPoints = buildCheckboxGroup(
+                VICTORY_POINTS_ID,
+                VICTORY_POINT_OPTIONS,
+                userSettings.getMatchmakingVictoryPointGoals(),
+                DEFAULT_VICTORY_POINT_OPTIONS,
+                REQUIRE_SELECTION);
+        CheckboxGroup paces = buildCheckboxGroup(
+                PACE_RESTRICTIONS_ID,
+                groupPaceOptions(groupMemberIds),
+                userSettings.getMatchmakingPaces(),
+                DEFAULT_PACE_OPTIONS,
+                REQUIRE_SELECTION);
+        CheckboxGroup ranks = buildCheckboxGroup(
+                TIGL_RANKS_ID,
+                MatchmakingOptions.TIGL_RANK_OPTIONS,
+                userSettings.getMatchmakingTiglRanks(),
+                DEFAULT_TIGL_RANK_OPTIONS,
+                REQUIRE_SELECTION);
+        Modal.Builder modal = Modal.create(QUEUE_FOR_TIGL_MODAL_ID, "Queue for TIGL")
+                .addComponents(Label.of("Player Count", playerCounts))
+                .addComponents(Label.of("Victory Point Goal", victoryPoints))
+                .addComponents(Label.of("Pace", paces))
+                .addComponents(Label.of("Rank", ranks));
+
+        List<String> restrictionOptions = groupRestrictionOptions(groupMemberIds);
+        if (!restrictionOptions.isEmpty()) {
+            CheckboxGroup restrictions = buildCheckboxGroup(
+                    RESTRICTIONS_ID,
+                    restrictionOptions,
+                    userSettings.getMatchmakingRestrictions(),
+                    userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
+                    !REQUIRE_SELECTION);
+            modal.addComponents(Label.of("Restrictions", restrictions));
+        }
+        return modal.build();
+    }
+
     @ButtonHandler(value = ADDITIONAL_SETTINGS_BUTTON_ID, save = false)
     public static void offerQueueAdditionalSettingsModal(ButtonInteractionEvent event) {
         UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
@@ -197,18 +255,9 @@ class MatchmakingButtonHandler {
                         .map(EntitySelectMenu.DefaultValue::user)
                         .toList())
                 .build();
-        StringSelectMenu tiglRank = buildOptionalSingleSelect(
-                TIGL_RANK_ID, MatchmakingOptions.TIGL_RANK_OPTIONS, userSettings.getMatchmakingTiglRank());
-        StringSelectMenu tiglFracturedRank = buildOptionalSingleSelect(
-                TIGL_FRACTURED_RANK_ID,
-                MatchmakingOptions.TIGL_FRACTURED_RANK_OPTIONS,
-                userSettings.getMatchmakingTiglFracturedRank());
-
         Modal modal = Modal.create(ADDITIONAL_SETTINGS_MODAL_ID, "Additional Queue Settings")
                 .addComponents(Label.of("Max Queue Time", maxQueueTime))
                 .addComponents(Label.of("Avoid List", avoidPlayers))
-                .addComponents(Label.of("Twilight Imperium Global League Rank", tiglRank))
-                .addComponents(Label.of("TIGL Fractured Rank", tiglFracturedRank))
                 .build();
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -247,13 +296,31 @@ class MatchmakingButtonHandler {
 
         saveMatchmakingPreferences(event, userSettings);
 
-        Optional<String> error = SpringContext.getBean(MatchmakerService.class).queue(userId);
+        Optional<String> error = SpringContext.getBean(MatchmakerService.class).queue(userId, false);
         if (error.isPresent()) {
             replyEphemeral(event, error.get());
             return;
         }
 
         replyEphemeral(event, "You have been added to the matchmaking queue.");
+    }
+
+    @ModalHandler(QUEUE_FOR_TIGL_MODAL_ID)
+    public static void submitQueueForTiglModal(ModalInteractionEvent event) {
+        String userId = event.getUser().getId();
+        UserSettings userSettings = UserSettingsManager.get(userId);
+
+        if (isPlayerAtGameLimit(event, userId, userSettings)) return;
+
+        saveTiglMatchmakingPreferences(event, userSettings);
+
+        Optional<String> error = SpringContext.getBean(MatchmakerService.class).queue(userId, true);
+        if (error.isPresent()) {
+            replyEphemeral(event, error.get());
+            return;
+        }
+
+        replyEphemeral(event, "You have been added to the TIGL matchmaking queue.");
     }
 
     @ModalHandler(FORM_GROUP_MODAL_ID)
@@ -284,16 +351,11 @@ class MatchmakingButtonHandler {
     public static void submitQueueForGameAdditionalSettingsModal(ModalInteractionEvent event) {
         List<String> selectedMaxQueueTime = getSelectedValues(event, MAX_QUEUE_TIME_ID);
         List<String> avoidedUserIds = getSelectedUserIds(event, AVOID_PLAYERS_ID);
-        List<String> selectedTiglRank = getSelectedValues(event, TIGL_RANK_ID);
-        List<String> selectedTiglFracturedRank = getSelectedValues(event, TIGL_FRACTURED_RANK_ID);
 
         UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
         userSettings.setMatchmakingMaxQueueTime(
                 selectedMaxQueueTime.isEmpty() ? DEFAULT_MAX_QUEUE_TIME : selectedMaxQueueTime.getFirst());
         userSettings.setMatchmakingAvoidList(avoidedUserIds);
-        userSettings.setMatchmakingTiglRank(selectedTiglRank.isEmpty() ? null : selectedTiglRank.getFirst());
-        userSettings.setMatchmakingTiglFracturedRank(
-                selectedTiglFracturedRank.isEmpty() ? null : selectedTiglFracturedRank.getFirst());
         UserSettingsManager.save(userSettings);
 
         replyEphemeral(event, "Additional settings saved.");
@@ -311,6 +373,18 @@ class MatchmakingButtonHandler {
         userSettings.setMatchmakingRestrictions(getSelectedValues(event, RESTRICTIONS_ID).stream()
                 .filter(restriction -> !PACE_RESTRICTION_OPTIONS.contains(restriction))
                 .toList());
+        UserSettingsManager.save(userSettings);
+    }
+
+    private static void saveTiglMatchmakingPreferences(ModalInteractionEvent event, UserSettings userSettings) {
+        userSettings.setMatchmakingExpansions(List.of(MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION));
+        userSettings.setMatchmakingPlayerCounts(getSelectedValues(event, PLAYER_COUNTS_ID));
+        userSettings.setMatchmakingVictoryPointGoals(getSelectedValues(event, VICTORY_POINTS_ID));
+        userSettings.setMatchmakingPaces(getSelectedValues(event, PACE_RESTRICTIONS_ID));
+        userSettings.setMatchmakingRestrictions(getSelectedValues(event, RESTRICTIONS_ID).stream()
+                .filter(restriction -> !PACE_RESTRICTION_OPTIONS.contains(restriction))
+                .toList());
+        userSettings.setMatchmakingTiglRanks(getSelectedValues(event, TIGL_RANKS_ID));
         UserSettingsManager.save(userSettings);
     }
 
@@ -402,17 +476,6 @@ class MatchmakingButtonHandler {
         return builder.setDefaultValues(normalizeSelectedValues(selectedValues, options, defaultValues))
                 .setRequiredRange(1, 1)
                 .build();
-    }
-
-    private static StringSelectMenu buildOptionalSingleSelect(String id, List<String> options, String selectedValue) {
-        StringSelectMenu.Builder builder = StringSelectMenu.create(id);
-        for (String option : options) {
-            builder.addOptions(SelectOption.of(option, option));
-        }
-        if (selectedValue != null && options.contains(selectedValue)) {
-            builder.setDefaultValues(List.of(selectedValue));
-        }
-        return builder.setRequired(false).setRequiredRange(0, 1).build();
     }
 
     private static List<String> getSelectedValues(ModalInteraction event, String modalValueId) {
