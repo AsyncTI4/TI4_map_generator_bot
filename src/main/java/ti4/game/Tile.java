@@ -1,8 +1,5 @@
 package ti4.game;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,12 +12,19 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
+
 import javax.annotation.Nullable;
-import lombok.Getter;
-import lombok.Setter;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Getter;
+import lombok.Setter;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CalendarHelper;
@@ -594,8 +598,11 @@ public class Tile {
     }
 
     @JsonIgnore
-    public boolean isGravityRift(Game game) {
+    public boolean isGravityRift(Game game, Player player) {
         if (hasAnyToken("token_gravityrift.png", "token_ds_wound.png", "token_vortex.png")) return true;
+        if(player != null && player.hasTech("tf-fraactalspikedrives") && getWormholes(game).size() > 0){
+            return true;
+        }
         return getTileModel().isGravityRift() || hasCabalSpaceDockOrGravRiftToken(game);
     }
 
@@ -673,12 +680,12 @@ public class Tile {
 
     @JsonIgnore
     public boolean isAnomaly() {
-        return isAnomaly(null);
+        return isAnomaly(null, null);
     }
 
     @JsonIgnore
-    public boolean isAnomaly(Game game) {
-        if (isAsteroidField() || isSupernova() || isNebula(game) || isGravityRift(game) || isScar(game)) {
+    public boolean isAnomaly(Game game, Player player) {
+        if (isAsteroidField() || isSupernova() || isNebula(game) || isGravityRift(game, player) || isScar(game)) {
             return true;
         }
         return hasAnyToken("token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png");

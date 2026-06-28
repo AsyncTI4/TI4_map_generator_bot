@@ -21,7 +21,13 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import javax.annotation.Nullable;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.springframework.util.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -49,9 +55,6 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
@@ -2440,6 +2443,7 @@ public class ButtonHelper {
         if (game.isDominusOrb()
                 || game.isL1Hero()
                 || player.hasTech("tf-desperados")
+                || player.hasTech("tf-fraactalspikedrives")
                 || !game.getStoredValue("phantomEnergy").isEmpty()) {
             return true;
         }
@@ -2508,7 +2512,7 @@ public class ButtonHelper {
         int totalNumber = 0;
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.playerHasUnitsInSystem(player, tile) && tile.isAnomaly() && !tile.isHomeSystem(game)) {
-                if (tile.isGravityRift(game) && grav < 1) {
+                if (tile.isGravityRift(game, player) && grav < 1) {
                     grav = 1;
                 }
                 if (tile.isNebula(game) && nebula < 1) {
@@ -2517,7 +2521,7 @@ public class ButtonHelper {
                 if (tile.isAsteroidField() && asteroids < 1) {
                     asteroids = 1;
                 }
-                if (!tile.isGravityRift(game) && !tile.isNebula(game) && !tile.isAsteroidField()) {
+                if (!tile.isGravityRift(game, player) && !tile.isNebula(game) && !tile.isAsteroidField()) {
                     count = 1;
                 }
 
@@ -7564,7 +7568,7 @@ public class ButtonHelper {
 
     public static int getNumberOfGravRiftsPlayerIsIn(Player player, Game game) {
         return (int) game.getTileMap().values().stream()
-                .filter(tile -> tile.isGravityRift(game) && tile.containsPlayersUnits(player))
+                .filter(tile -> tile.isGravityRift(game, player) && tile.containsPlayersUnits(player))
                 .count();
     }
 
@@ -7611,6 +7615,12 @@ public class ButtonHelper {
         }
         if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos), game)
                 && player.hasAbility("starfall_gunnery")
+                && checkNumberNonFighterShipsWithoutSpaceCannon(player, game.getTileByPosition(tilePos)) > 0) {
+            playersWithPds2.add(player);
+        }
+
+        if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos), game)
+                && player.hasTech("tf-kinematicstarfall")
                 && checkNumberNonFighterShipsWithoutSpaceCannon(player, game.getTileByPosition(tilePos)) > 0) {
             playersWithPds2.add(player);
         }

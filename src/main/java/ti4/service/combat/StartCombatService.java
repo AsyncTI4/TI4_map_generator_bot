@@ -851,7 +851,7 @@ public class StartCombatService {
                         msg + ", a reminder that if you win the combat, you could score _Spark a Rebellion_.",
                         buttons2);
             }
-            if (player.getSecretsUnscored().containsKey("btv") && tile.isAnomaly(game)) {
+            if (player.getSecretsUnscored().containsKey("btv") && tile.isAnomaly(game, player)) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         msg + ", a reminder that if you win the combat, you could score _Brave the Void_.",

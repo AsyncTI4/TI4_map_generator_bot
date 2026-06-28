@@ -10,13 +10,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
-import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.game.Game;
@@ -357,6 +360,12 @@ public final class FoWHelper {
             adjToFeatures.add(Feature.egress);
         }
 
+        if (game.getActivePlayer() != null
+                && game.getActivePlayer().hasTech("tf-fraactalspikedrives")
+                && !tile.getWormholes(game).isEmpty()) {
+            adjToFeatures.add(Feature.egress);
+        }
+
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             for (String token : unitHolder.getTokenList()) {
                 switch (token) {
@@ -535,7 +544,7 @@ public final class FoWHelper {
 
     public static boolean isTileAdjacentToAnAnomaly(Game game, String position, Player player) {
         for (String adjPos : getAdjacentTilesAndNotThisTile(game, position, player, false)) {
-            if (game.getTileByPosition(adjPos).isAnomaly(game)) {
+            if (game.getTileByPosition(adjPos).isAnomaly(game, player)) {
                 return true;
             }
         }
@@ -997,7 +1006,7 @@ public final class FoWHelper {
             if (p2.hasTech("ah") && ButtonHelperAgents.doesTileHaveAStructureInIt(p2, tile)) {
                 return true;
             }
-            if (p2.hasAbility("decree") && tile.isAnomaly(game)) {
+            if (p2.hasAbility("decree") && tile.isAnomaly(game, player)) {
                 List<Tile> tiles = new ArrayList<>();
                 tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Infantry));
                 tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Mech));

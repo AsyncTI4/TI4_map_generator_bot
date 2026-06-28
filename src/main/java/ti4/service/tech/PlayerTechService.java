@@ -366,7 +366,7 @@ public class PlayerTechService {
                             .queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }
-            case "pi", "absol_pi" -> { // Predictive Intelligence
+            case "pi", "absol_pi", "tf-predictivecommand" -> { // Predictive Intelligence
                 deleteTheOneButtonIfButtonEvent(event);
                 Button deleteButton =
                         Buttons.red("FFCC_" + player.getFaction() + "_deleteButtons", "Delete These Buttons");

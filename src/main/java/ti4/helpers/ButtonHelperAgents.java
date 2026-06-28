@@ -8,14 +8,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
@@ -1090,7 +1092,7 @@ public final class ButtonHelperAgents {
             List<Button> buttons = GalvanizeService.getToggleGalvanizeButtons(
                     p2, game, game.getTileByPosition(game.getActiveSystem()));
             MessageHelper.sendMessageToChannel(
-                    channel2, p2.getRepresentation() + ", please choose the unit you wish to galvanize.", buttons);
+                    channel2, p2.getRepresentation() + ", please choose the unit that should be galvanized.", buttons);
         }
         if ("obsidianagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted the " + ssruuClever + "_Obsidian Agent_.";
@@ -1200,8 +1202,8 @@ public final class ButtonHelperAgents {
             if (p2.getTg() > 0) {
                 p2.setTg(p2.getTg() - 1);
                 player.gainTG(1, true);
-                successMessage2 += " and gave 1 TG to " + player.getFactionEmoji() + ".";
-                successMessage += " and took 1 TG from " + p2.getFactionEmoji() + ".";
+                successMessage2 += " and gave 1 TG to " + player.getFactionEmojiOrColor() + ".";
+                successMessage += " and took 1 TG from " + p2.getFactionEmojiOrColor() + ".";
             } else {
                 successMessage += ".";
                 successMessage2 += ".";

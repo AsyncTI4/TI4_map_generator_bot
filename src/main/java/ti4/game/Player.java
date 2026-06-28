@@ -1,6 +1,5 @@
 package ti4.game;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +19,17 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import javax.annotation.Nullable;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.SetUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -43,11 +52,6 @@ import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.exceptions.MissingAccessException;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.collections4.SetUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
@@ -60,6 +64,7 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -781,6 +786,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if ("researchteam".equalsIgnoreCase(ability) && getTechs().contains("tf-pacifist")) {
             return true;
         }
+        if ("cloaked_fleets".equalsIgnoreCase(ability) && getTechs().contains("tf-shroudoflith")) {
+            return true;
+        }
         if (getTechs().contains("tf-" + ability.replace("_", ""))) {
             return true;
         }
@@ -1447,7 +1455,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             if (Mapper.getPlanet(planet) != null && Mapper.getPlanet(planet).isSpaceStation()) {
                 bonus++;
             }
-            if (hasUnlockedBreakthrough("gledgebt")) {
+            if (hasUnlockedBreakthrough("gledgebt") || hasTech("tf-mantlecracking")) {
                 Planet planetObj = game.getUnitHolderFromPlanet(planet);
                 if (planetObj != null && planetObj.getTokenList().contains(Constants.GLEDGE_CORE_PNG)) {
                     bonus++;
@@ -2525,6 +2533,31 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         // Set ATS Armaments to 0 when adding tech (if it was removed we reset it)
         if ("dslaner".equalsIgnoreCase(techID)) {
             setAtsCount(0);
+        }
+
+        if("tf-policies".equalsIgnoreCase(techID)){
+            addAbility("policy_the_people_connect");
+            addAbility("policy_the_environment_preserve");
+            addAbility("policy_the_economy_empower");
+            removeOwnedUnitByID("olradin_mech");
+            addOwnedUnitByID("olradin_mech_positive");
+            MessageHelper.sendMessageToChannel(
+                    getCorrectChannel(),
+                    getRepresentationUnfogged()
+                            + ", the bot has automatically set all of your Policies to the positive side, but you can flip any of them now with these buttons.");
+            ButtonHelperHeroes.offerOlradinHeroFlips(this);
+            ButtonHelperHeroes.offerOlradinHeroFlips(this);
+            ButtonHelperHeroes.offerOlradinHeroFlips(this);
+            
+        }
+        if ("tf-cunning".equalsIgnoreCase(techID)) {
+            Map<String, GenericCardModel> traps = Mapper.getTraps();
+            for (Map.Entry<String, GenericCardModel> entry : traps.entrySet()) {
+                String key = entry.getKey();
+                if (key.endsWith(Constants.LIZHO)) {
+                    setTrapCard(key);
+                }
+            }
         }
 
         if ("tf-telepathic".equalsIgnoreCase(techID)) {

@@ -308,7 +308,7 @@ public class TileGenerator {
                 tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
 
                 // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
-                if (tile.isAnomaly(game) && tileShipPositions != null) {
+                if (tile.isAnomaly(game, null) && tileShipPositions != null) {
                     BufferedImage anomalyImage =
                             ImageHelper.read(ResourceHelper.getInstance().getTileFile("tile_anomaly.png"));
                     switch (tileShipPositions.toString().toUpperCase()) {
@@ -773,7 +773,7 @@ public class TileGenerator {
                 int x = TILE_PADDING;
                 int y = TILE_PADDING;
 
-                if (!tile.isAnomaly(game)) {
+                if (!tile.isAnomaly(game, null)) {
                     BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
                     tileGraphics.drawImage(fogging, x, y, null);
                 } else {
@@ -1476,7 +1476,7 @@ public class TileGenerator {
                 tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
 
                 // COPY BASE TILE GEN - ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
-                if (tile.isAnomaly(game) && tileShipPositions != null) {
+                if (tile.isAnomaly(game, null) && tileShipPositions != null) {
                     BufferedImage anomalyImage =
                             ImageHelper.read(ResourceHelper.getInstance().getTileFile("tile_anomaly.png"));
                     switch (tileShipPositions.toString().toUpperCase()) {

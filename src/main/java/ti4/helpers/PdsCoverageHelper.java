@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -41,6 +42,11 @@ public final class PdsCoverageHelper {
             if (player.hasAbility("starfall_gunnery")) {
                 for (int i = checkNumberNonFighterShipsWithoutSpaceCannon(player, tile); i > 0; i--) {
                     diceCount.add(8 - mod);
+                }
+            }
+            if (player.hasTech("tf-kinematicstarfall")) {
+                for (int i = checkNumberNonFighterShipsWithoutSpaceCannon(player, tile); i > 0; i--) {
+                    diceCount.add(9 - mod);
                 }
             }
 

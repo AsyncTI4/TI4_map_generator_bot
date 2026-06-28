@@ -773,7 +773,7 @@ public class CombatModHelper {
                     for (String pos :
                             FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
                         Tile tile = game.getTileByPosition(pos);
-                        if (tile.isAnomaly(game)) {
+                        if (tile.isAnomaly(game, player)) {
                             scalingCount += 1;
                         }
                     }

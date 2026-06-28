@@ -10,7 +10,7 @@ import ti4.service.tactical.PostMovementButtonContext;
 
 public final class CombatDronesButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.player().hasAbility("combat_drones")
+        return (ctx.player().hasAbility("combat_drones") || ctx.player().hasTech("tf-dronehosts"))
                 && FoWHelper.playerHasFightersInSystem(ctx.player(), ctx.tile());
     }
 
