@@ -111,28 +111,6 @@ class MatchmakingGrouperTest extends BaseTi4Test {
     }
 
     @Test
-    void queueTimeDecaysSkillMatching() {
-        List<String> skill = List.of(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION);
-
-        // Ratings 20/26/26: the 20-vs-26 skill gap gives a 1v1 match quality (~0.59) that fails the starting
-        // 0.80 threshold but clears the 0.30 floor, so the trio only forms once the threshold has decayed.
-        rate("a", 20);
-        rate("b", 26);
-        rate("c", 26);
-        addParty(List.of("a"), skill, List.of("3"), Duration.ZERO);
-        addParty(List.of("b"), skill, List.of("3"), Duration.ZERO);
-        addParty(List.of("c"), skill, List.of("3"), Duration.ZERO);
-        assertThat(MatchmakingGrouper.formGames(parties)).isEmpty();
-
-        parties.clear();
-        // After four hours the threshold has decayed to 0.40 (0.80 - 4*0.10), low enough to accept the gap.
-        addParty(List.of("a"), skill, List.of("3"), Duration.ofHours(4));
-        addParty(List.of("b"), skill, List.of("3"), Duration.ofHours(4));
-        addParty(List.of("c"), skill, List.of("3"), Duration.ofHours(4));
-        assertThat(MatchmakingGrouper.formGames(parties)).hasSize(1);
-    }
-
-    @Test
     void formsNearMatchWhenOneShortWithANearExpiryPlayer() {
         // Two players want a 3p game but only two are available; one is within an hour of expiring (8h max).
         addParty(List.of("p1"), List.of(), List.of("3"), Duration.ofHours(7).plusMinutes(30));

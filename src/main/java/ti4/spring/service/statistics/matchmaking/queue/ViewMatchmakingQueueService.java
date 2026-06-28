@@ -121,9 +121,6 @@ public class ViewMatchmakingQueueService {
         if (MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION.equals(restriction)) {
             return "similar hours";
         }
-        if (MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION.equals(restriction)) {
-            return "similar skills";
-        }
         return restriction;
     }
 

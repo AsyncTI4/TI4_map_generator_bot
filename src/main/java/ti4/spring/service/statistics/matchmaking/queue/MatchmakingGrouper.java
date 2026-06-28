@@ -21,6 +21,7 @@ import ti4.settings.users.UserSettings;
 class MatchmakingGrouper {
 
     private static final Duration NEAR_QUEUE_EXPIRY_HOURS = Duration.ofHours(1);
+    private static final Duration LONG_QUEUE_DURATION = Duration.ofHours(8);
 
     static List<MatchedGame> formGames(List<QueuedParty> parties) {
         List<MatchedGame> gamesToCreate = new ArrayList<>();
@@ -44,7 +45,8 @@ class MatchmakingGrouper {
     }
 
     // Detect candidates from the parties that ended up in no full game; a candidate is a compatible
-    // group one player short of a full game that contains at least one near-expiry party.
+    // group one player short of a full game that contains at least one player that has waited 8 hours
+    // or is near expiry
     private static void formNearMatches(
             List<GameConfig> configsToTry,
             Map<GameConfig, List<QueuedParty>> partiesByConfig,
@@ -58,7 +60,7 @@ class MatchmakingGrouper {
             if (targetSize < 1) continue;
             List<QueuedParty> available = ungrouped(partiesByConfig.get(config), partiesAddedToGames);
             for (List<QueuedParty> group : formGroupsOfSize(available, targetSize, config, playerMatchmakingData)) {
-                if (group.stream().anyMatch(party -> isNearExpiry(party, now))) {
+                if (group.stream().anyMatch(party -> hasLongQueueDuration(party, now) || isNearExpiry(party, now))) {
                     candidates.add(new NearMatchCandidate(config, group));
                 }
             }
@@ -79,7 +81,10 @@ class MatchmakingGrouper {
         }
     }
 
-    private record NearMatchCandidate(GameConfig config, List<QueuedParty> parties) {}
+    private static boolean hasLongQueueDuration(QueuedParty queuedParty, Instant now) {
+        Duration queuedFor = Duration.between(queuedParty.party().getQueuedAt(), now);
+        return queuedFor.compareTo(LONG_QUEUE_DURATION) >= 0;
+    }
 
     private static List<GameConfig> getRandomizedKeysThenSortByPlayerCount(
             Map<GameConfig, List<QueuedParty>> partiesByConfig) {
@@ -237,4 +242,6 @@ class MatchmakingGrouper {
     private static int totalPlayers(List<QueuedParty> parties) {
         return parties.stream().mapToInt(QueuedParty::size).sum();
     }
+
+    private record NearMatchCandidate(GameConfig config, List<QueuedParty> parties) {}
 }

@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
+import ti4.discord.utility.DiscordRoleUtility;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedPlayer;
 import ti4.settings.users.UserSettings;
@@ -26,6 +27,9 @@ import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
 @UtilityClass
 class PlayerMatchDataFactory {
 
+    public static final String FLOATERS_ROLE_NAME = "Floaters";
+    public static final String WARRIORS_ROLE_NAME = "Warriors";
+    private static final List<String> ROLES_TO_TRACK = List.of(FLOATERS_ROLE_NAME, WARRIORS_ROLE_NAME);
     private static final int NUMBER_OF_ACTIVE_HOUR_BUCKETS = 6;
     private static final int ACTIVE_HOUR_BUCKET_SIZE = 4;
     private static final int ACTIVE_HOUR_BUCKET_MATCH_THRESHOLD = 3;
@@ -113,7 +117,13 @@ class PlayerMatchDataFactory {
 
     private static Set<String> roleNames(Guild guild, String userId) {
         Member member = guild == null ? null : guild.getMemberById(userId);
-        return member == null ? Set.of() : MatchmakingOptions.getHeldRoleNames(guild, member);
+        Set<String> roles = new HashSet<>();
+        for (String role : ROLES_TO_TRACK) {
+            if (DiscordRoleUtility.hasRole(guild, member, role)) {
+                roles.add(role);
+            }
+        }
+        return roles;
     }
 
     private static Set<Integer> computeActiveHourBuckets(Set<Integer> activeHours) {

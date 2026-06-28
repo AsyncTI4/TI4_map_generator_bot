@@ -1,13 +1,7 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
-import de.gesundkrank.jskills.GameInfo;
-import de.gesundkrank.jskills.ITeam;
-import de.gesundkrank.jskills.Player;
-import de.gesundkrank.jskills.Team;
-import de.gesundkrank.jskills.trueskill.FactorGraphTrueSkillCalculator;
 import java.time.Duration;
 import java.util.List;
-import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 
@@ -16,13 +10,11 @@ class MatchmakingCompatibilityService {
 
     private static final long ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT = 3;
 
-    private static final double SIMILAR_SKILL_STARTING_THRESHOLD = 0.80;
-    private static final double SIMILAR_SKILL_THRESHOLD_DECAY_PER_INTERVAL = 0.10;
-    private static final Duration SIMILAR_SKILL_DECAY_INTERVAL = Duration.ofHours(1);
-    private static final double SIMILAR_SKILL_MIN_THRESHOLD = 0.30;
+    private static final double SKILL_DIFFERENCE_STARTING_THRESHOLD = 4;
+    private static final double SKILL_DIFFERENCE_WIDENING_PER_WINDOW = 1;
+    private static final Duration SIMILAR_SKILL_DECAY_INTERVAL = Duration.ofHours(2);
 
-    static final int NEW_PLAYER_GAME_THRESHOLD = 3;
-    private static final GameInfo GAME_INFO = GameInfo.getDefaultGameInfo();
+    private static final int HOURS_TO_AVOID_FLOATERS_WARRIORS = 8;
 
     static boolean areIncompatible(PlayerMatchmakingData a, PlayerMatchmakingData b) {
         return areIncompatible(a, b, null);
@@ -36,19 +28,6 @@ class MatchmakingCompatibilityService {
         List<String> aRestrictions = a.restrictions();
         List<String> bRestrictions = b.restrictions();
 
-        if (MatchmakingOptions.wantsTigl(aRestrictions) != MatchmakingOptions.wantsTigl(bRestrictions)) {
-            return true;
-        }
-
-        if (expansion != null && MatchmakingOptions.wantsTigl(aRestrictions) && hasDifferentTiglRank(a, b, expansion)) {
-            return true;
-        }
-
-        if (avoidsAnotherPlayersRole(aRestrictions, b.roleNames())
-                || avoidsAnotherPlayersRole(bRestrictions, a.roleNames())) {
-            return true;
-        }
-
         if (MatchmakingOptions.wantsSimilarActiveHours(aRestrictions)
                 || MatchmakingOptions.wantsSimilarActiveHours(bRestrictions)) {
             long sharedBuckets = a.activeHourBuckets().stream()
@@ -57,17 +36,39 @@ class MatchmakingCompatibilityService {
             if (sharedBuckets < ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT) return true;
         }
 
-        boolean aWantsSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(aRestrictions);
-        boolean bWantsSimilarSkill = MatchmakingOptions.wantsSimilarPlayerSkill(bRestrictions);
-        if (aWantsSimilarSkill || bWantsSimilarSkill) {
-            double skillSimilarity = calculateSkillSimilarity(a, b);
-            if (aWantsSimilarSkill && skillSimilarity < getSimilarSkillThreshold(a.queueWait())) {
-                return true;
-            }
-            return bWantsSimilarSkill && skillSimilarity < getSimilarSkillThreshold(b.queueWait());
+        boolean aWantsTigl = MatchmakingOptions.wantsTigl(aRestrictions);
+        boolean bWantsTigl = MatchmakingOptions.wantsTigl(bRestrictions);
+        if (aWantsTigl != bWantsTigl) {
+            return true;
+        }
+        if (expansion != null && aWantsTigl && hasDifferentTiglRank(a, b, expansion)) {
+            return true;
         }
 
-        return false;
+        // We don't want to block TIGL games on roles/skill
+        if (aWantsTigl) return false;
+
+        if (shouldAvoidFloaterOrWarrior(a, b)) {
+            return true;
+        }
+
+        return hasSimilarSkill(a, b);
+    }
+
+    private static boolean hasSimilarSkill(PlayerMatchmakingData a, PlayerMatchmakingData b) {
+        Duration maxWait = getMaxQueueWaitTime(a, b);
+        double similarSkillWindow = getSimilarSkillWindow(maxWait);
+
+        double aRating = a.rating().getMean();
+        double bRating = b.rating().getMean();
+        double ratingDifference = Math.abs(aRating - bRating);
+        return ratingDifference <= similarSkillWindow;
+    }
+
+    private static Duration getMaxQueueWaitTime(PlayerMatchmakingData a, PlayerMatchmakingData b) {
+        Duration aWait = a.queueWait();
+        Duration bWait = b.queueWait();
+        return aWait.compareTo(bWait) >= 0 ? aWait : bWait;
     }
 
     private static boolean hasDifferentTiglRank(PlayerMatchmakingData a, PlayerMatchmakingData b, String expansion) {
@@ -77,25 +78,19 @@ class MatchmakingCompatibilityService {
         return !a.tiglRank().equals(b.tiglRank());
     }
 
-    private static double calculateSkillSimilarity(PlayerMatchmakingData a, PlayerMatchmakingData b) {
-        List<ITeam> teams =
-                List.of(new Team(new Player<>(a.userId()), a.rating()), new Team(new Player<>(b.userId()), b.rating()));
-        return new FactorGraphTrueSkillCalculator().calculateMatchQuality(GAME_INFO, teams);
-    }
-
-    private static double getSimilarSkillThreshold(Duration waited) {
+    private static double getSimilarSkillWindow(Duration waited) {
         long intervalsElapsed = waited.toMinutes() / SIMILAR_SKILL_DECAY_INTERVAL.toMinutes();
-        double decayed =
-                SIMILAR_SKILL_STARTING_THRESHOLD - SIMILAR_SKILL_THRESHOLD_DECAY_PER_INTERVAL * intervalsElapsed;
-        return Math.max(SIMILAR_SKILL_MIN_THRESHOLD, decayed);
+        return SKILL_DIFFERENCE_STARTING_THRESHOLD + intervalsElapsed * SKILL_DIFFERENCE_WIDENING_PER_WINDOW;
     }
 
-    private static boolean avoidsAnotherPlayersRole(List<String> chooserRestrictions, Set<String> otherRoleNames) {
-        if (MatchmakingOptions.wantsToAvoidFloaters(chooserRestrictions)
-                && otherRoleNames.contains(MatchmakingOptions.FLOATERS_ROLE_NAME)) {
-            return true;
-        }
-        return MatchmakingOptions.wantsToAvoidWarriors(chooserRestrictions)
-                && otherRoleNames.contains(MatchmakingOptions.WARRIORS_ROLE_NAME);
+    private static boolean shouldAvoidFloaterOrWarrior(PlayerMatchmakingData a, PlayerMatchmakingData b) {
+        Duration maxWait = getMaxQueueWaitTime(a, b);
+        if (maxWait.toHours() >= HOURS_TO_AVOID_FLOATERS_WARRIORS) return false;
+
+        if (a.roleNames().contains(PlayerMatchDataFactory.FLOATERS_ROLE_NAME)
+                && b.roleNames().contains(PlayerMatchDataFactory.WARRIORS_ROLE_NAME)) return true;
+
+        return a.roleNames().contains(PlayerMatchDataFactory.WARRIORS_ROLE_NAME)
+                && b.roleNames().contains(PlayerMatchDataFactory.FLOATERS_ROLE_NAME);
     }
 }

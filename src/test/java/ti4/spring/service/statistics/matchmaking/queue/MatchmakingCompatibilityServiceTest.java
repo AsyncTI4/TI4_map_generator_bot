@@ -118,43 +118,6 @@ class MatchmakingCompatibilityServiceTest {
     }
 
     @Test
-    void avoidFloatersBlocksFloatersEitherDirection() {
-        PlayerMatchmakingData avoider = player("a")
-                .restrictions(MatchmakingOptions.AVOID_FLOATERS_OPTION)
-                .build();
-        PlayerMatchmakingData floater =
-                player("b").roleNames(MatchmakingOptions.FLOATERS_ROLE_NAME).build();
-
-        assertThat(MatchmakingCompatibilityService.areIncompatible(avoider, floater))
-                .isTrue();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(floater, avoider))
-                .isTrue();
-    }
-
-    @Test
-    void avoidFloatersAllowsNonFloaters() {
-        PlayerMatchmakingData avoider = player("a")
-                .restrictions(MatchmakingOptions.AVOID_FLOATERS_OPTION)
-                .build();
-        PlayerMatchmakingData nonFloater = player("b").build();
-
-        assertThat(MatchmakingCompatibilityService.areIncompatible(avoider, nonFloater))
-                .isFalse();
-    }
-
-    @Test
-    void avoidWarriorsBlocksWarriors() {
-        PlayerMatchmakingData avoider = player("a")
-                .restrictions(MatchmakingOptions.AVOID_WARRIORS_OPTION)
-                .build();
-        PlayerMatchmakingData warrior =
-                player("b").roleNames(MatchmakingOptions.WARRIORS_ROLE_NAME).build();
-
-        assertThat(MatchmakingCompatibilityService.areIncompatible(avoider, warrior))
-                .isTrue();
-    }
-
-    @Test
     void similarActiveHoursRequiresSharedBuckets() {
         PlayerMatchmakingData picky = player("a")
                 .restrictions(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION)
@@ -167,53 +130,6 @@ class MatchmakingCompatibilityServiceTest {
         assertThat(MatchmakingCompatibilityService.areIncompatible(picky, fewShared))
                 .isTrue();
         assertThat(MatchmakingCompatibilityService.areIncompatible(picky, manyShared))
-                .isFalse();
-    }
-
-    @Test
-    void getSimilarSkillThresholdDecaysWithQueueTime() {
-        // A 6-point skill gap (between confident ratings) yields a 1v1 match quality of ~0.59, which fails the
-        // starting 0.80 threshold. Only 'a' asks for similar skill, so only 'a's threshold is checked.
-        PlayerMatchmakingData freshlyQueued = player("a")
-                .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
-                .rating(20)
-                .build();
-        PlayerMatchmakingData b = player("b").rating(26).build();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(freshlyQueued, b))
-                .isTrue();
-
-        // After four hours 'a's threshold has decayed to 0.40 (0.80 - 4*0.10), which the ~0.59 quality clears.
-        PlayerMatchmakingData patient = player("a")
-                .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
-                .rating(20)
-                .queueWait(Duration.ofHours(4))
-                .build();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(patient, b)).isFalse();
-    }
-
-    @Test
-    void bothDirectionsMustClearWhenBothWantSimilarSkill() {
-        // 'a' has waited its threshold down to 0.40 and accepts the ~0.59 gap, but 'b' just queued at the 0.80
-        // threshold and still wants similar skill, so the stricter direction blocks the match.
-        PlayerMatchmakingData patientA = player("a")
-                .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
-                .rating(20)
-                .queueWait(Duration.ofHours(4))
-                .build();
-        PlayerMatchmakingData freshB = player("b")
-                .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
-                .rating(26)
-                .build();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(patientA, freshB))
-                .isTrue();
-
-        // Once 'b' has also waited out its threshold, both directions clear the floor.
-        PlayerMatchmakingData patientB = player("b")
-                .restrictions(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION)
-                .rating(26)
-                .queueWait(Duration.ofHours(4))
-                .build();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(patientA, patientB))
                 .isFalse();
     }
 
