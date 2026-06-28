@@ -16,7 +16,7 @@ class MatchDescriberTest {
     }
 
     @Test
-    void nearMatchTitleIsPrefixed() {
+    void nearMatchTitleTest() {
         MatchedGame game = new MatchedGame(
                 List.of(),
                 List.of(),
@@ -25,15 +25,12 @@ class MatchDescriberTest {
                 MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION,
                 "Average (30 days)",
                 List.of(),
-                null,
-                true);
-        assertThat(MatchDescriber.threadTitle(game))
-                .isEqualTo("NEED 1 MORE: 6p, 10vp, PoK + TE, average (30 days) pace");
+                null);
+        assertThat(MatchDescriber.threadTitle(game)).isEqualTo("6p, 10vp, PoK + TE, average (30 days) pace");
     }
 
     private static MatchedGame game(
             String expansion, String victoryPoints, String pace, List<String> restrictions, String tiglRank) {
-        return new MatchedGame(
-                List.of(), List.of(), "6", victoryPoints, expansion, pace, restrictions, tiglRank, false);
+        return new MatchedGame(List.of(), List.of(), "6", victoryPoints, expansion, pace, restrictions, tiglRank);
     }
 }

@@ -15,9 +15,6 @@ class MatchDescriber {
 
     static String threadTitle(MatchedGame game) {
         StringBuilder title = new StringBuilder();
-        if (game.needsOneMore()) {
-            title.append("NEED 1 MORE: ");
-        }
         title.append("%sp, %svp, %s, %s pace"
                 .formatted(
                         game.playerCount(),

@@ -22,6 +22,7 @@ class MatchmakingGrouper {
 
     private static final Duration NEAR_QUEUE_EXPIRY_HOURS = Duration.ofHours(1);
     private static final Duration LONG_QUEUE_DURATION = Duration.ofHours(8);
+    private static final int MIN_PLAYERS_FOR_NEAR_EXPIRY_MATCH = 4;
 
     static List<MatchedGame> formGames(List<QueuedParty> parties) {
         List<MatchedGame> gamesToCreate = new ArrayList<>();
@@ -36,7 +37,7 @@ class MatchmakingGrouper {
             List<QueuedParty> available = ungrouped(partiesByConfig.get(config), partiesAddedToGames);
             for (List<QueuedParty> group :
                     formGroupsOfSize(available, config.playerCountValue(), config, playerMatchmakingData)) {
-                collectGames(group, config, playerMatchmakingData, gamesToCreate, partiesAddedToGames, false);
+                collectGames(group, config, playerMatchmakingData, gamesToCreate, partiesAddedToGames);
             }
         }
 
@@ -45,8 +46,8 @@ class MatchmakingGrouper {
     }
 
     // Detect candidates from the parties that ended up in no full game; a candidate is a compatible
-    // group one player short of a full game that contains at least one player that has waited 8 hours
-    // or is near expiry
+    // group one player short of a full game that either has a player who waited the full long-queue
+    // duration, or has a near-expiry player.
     private static void formNearMatches(
             List<GameConfig> configsToTry,
             Map<GameConfig, List<QueuedParty>> partiesByConfig,
@@ -60,7 +61,7 @@ class MatchmakingGrouper {
             if (targetSize < 1) continue;
             List<QueuedParty> available = ungrouped(partiesByConfig.get(config), partiesAddedToGames);
             for (List<QueuedParty> group : formGroupsOfSize(available, targetSize, config, playerMatchmakingData)) {
-                if (group.stream().anyMatch(party -> hasLongQueueDuration(party, now) || isNearExpiry(party, now))) {
+                if (qualifiesAsNearMatch(group, now)) {
                     candidates.add(new NearMatchCandidate(config, group));
                 }
             }
@@ -72,13 +73,15 @@ class MatchmakingGrouper {
         for (NearMatchCandidate candidate : candidates) {
             if (candidate.parties().stream().anyMatch(partiesAddedToGames::contains)) continue;
             collectGames(
-                    candidate.parties(),
-                    candidate.config(),
-                    playerMatchmakingData,
-                    gamesToCreate,
-                    partiesAddedToGames,
-                    true);
+                    candidate.parties(), candidate.config(), playerMatchmakingData, gamesToCreate, partiesAddedToGames);
         }
+    }
+
+    private static boolean qualifiesAsNearMatch(List<QueuedParty> group, Instant now) {
+        boolean longestQueuedWaitedLongEnough = group.stream().anyMatch(party -> hasLongQueueDuration(party, now));
+        boolean nearExpiryAndHasMinimumPlayerCount = totalPlayers(group) >= MIN_PLAYERS_FOR_NEAR_EXPIRY_MATCH
+                && group.stream().anyMatch(party -> isNearExpiry(party, now));
+        return longestQueuedWaitedLongEnough || nearExpiryAndHasMinimumPlayerCount;
     }
 
     private static boolean hasLongQueueDuration(QueuedParty queuedParty, Instant now) {
@@ -156,8 +159,7 @@ class MatchmakingGrouper {
             GameConfig config,
             Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData,
             List<MatchedGame> gamesToCreate,
-            Set<QueuedParty> partiesAddedToGames,
-            boolean needsOneMore) {
+            Set<QueuedParty> partiesAddedToGames) {
         List<MatchmakingQueueMember> members = groupParties.stream()
                 .flatMap(party -> party.members().stream())
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -174,8 +176,7 @@ class MatchmakingGrouper {
                 config.expansion(),
                 config.pace(),
                 restrictions,
-                tiglRankForGame(restrictions, members, config, playerMatchmakingData),
-                needsOneMore);
+                tiglRankForGame(restrictions, members, config, playerMatchmakingData));
         gamesToCreate.add(game);
         MatchDescriber.logFormedMatch(game, playerMatchmakingData);
         partiesAddedToGames.addAll(groupParties);
