@@ -222,9 +222,9 @@
     "type": "commander",
     "name": "Kaethos",
     "title": "The Unyielding",
-    "abilityWindow": "When any player scores a secret objective:",
-    "abilityText": "You may draw 1 secret objective, or gain 1 command token.",
-    "unlockCondition": "Have all of your doctrines in your play area exhausted.",
+    "abilityWindow": "During the status phase:",
+    "abilityText": "You may score an additional public or secret objective.",
+    "unlockCondition": "Have units in or adjacent to 3 different systems that contain anomalies.",
     "source": "beans"
   },
   {
