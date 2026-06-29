@@ -128,7 +128,7 @@
         "id": "paradigm",
         "name": "Paradigm",
         "faction": "natau",
-        "window": "At the start of the strategy phase:",
+        "window": "At the start of the status phase:",
         "windowEffect": "Ready each doctrine. Then, replace 1 of the doctrines in your play area with a doctrine from your reinforcements.",
         "source": "beans"
     },

@@ -117,7 +117,8 @@ public class NatauAbilityHandler {
                 sb.append("\n\n");
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+        Button button = Buttons.red("deleteButtons", "Done Viewing");
+        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), sb.toString(), button);
     }
 
     public static void offerDoctrineSetupButtons(GenericInteractionCreateEvent event, Game game, Player player) {
