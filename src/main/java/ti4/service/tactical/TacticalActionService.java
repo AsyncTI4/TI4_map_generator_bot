@@ -180,7 +180,8 @@ public class TacticalActionService {
                 "tyris",
                 "lunarium",
                 "zephyrion",
-                "vyserix");
+                "vyserix",
+                "natau");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
 
         if (tile.getPosition().startsWith("frac")) {
