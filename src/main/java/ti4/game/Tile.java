@@ -615,7 +615,8 @@ public class Tile {
         if (hasAnyToken("token_entropicscar_async.png")) return true;
         if (game != null) {
             for (Player p2 : game.getPlayers().values()) {
-                if (p2.hasUnlockedBreakthrough("nivynbt") && hasAnyToken("token_ds_wound.png")) {
+                if ((p2.hasUnlockedBreakthrough("nivynbt") || p2.hasTech("tf-singularitypoint"))
+                        && hasAnyToken("token_ds_wound.png")) {
                     return true;
                 }
             }

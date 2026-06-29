@@ -2047,7 +2047,7 @@ public final class Helper {
                 }
             }
         }
-        if (tile.isScar(game) && !player.hasUnlockedBreakthrough("nivynbt")) {
+        if (tile.isScar(game) && !player.hasUnlockedBreakthrough("nivynbt") && !player.hasTech("tf-singularitypoint")) {
             return 0;
         }
         if (TeHelperUnits.affectedByQuietus(game, player, tile)) {

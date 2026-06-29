@@ -188,12 +188,19 @@ public class PlayStrategyCardService {
             });
         } else {
             Player propagationPlayer = Helper.getPlayerFromAbility(game, "propagation");
-            if (propagationPlayer != null) {
-                boolean shouldAddNekroTechButton = scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode();
-                if (shouldAddNekroTechButton) {
-                    String ffcc = propagationPlayer.factionButtonChecker();
-                    scButtons.add(Buttons.gray(ffcc + "nekroFollowTech", "Get Command Tokens", FactionEmojis.Nekro));
-                }
+            if (propagationPlayer != null && scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode()) {
+                scButtons.add(Buttons.gray(
+                        propagationPlayer.factionButtonChecker() + "nekroFollowTech",
+                        "Get Command Tokens",
+                        FactionEmojis.Nekro));
+            }
+
+            Player zealousPlayer = Helper.getPlayerFromAbility(game, "zealousds");
+            if (zealousPlayer != null && scModel.usesAutomationForSCID("tf6") && !game.isFowMode()) {
+                scButtons.add(Buttons.gray(
+                        zealousPlayer.factionButtonChecker() + "primaryOfWarfare",
+                        "Do Zealous",
+                        zealousPlayer.getFactionEmoji()));
             }
 
             Player titansMechPlayer = Helper.getPlayerFromUnit(game, "titans_mech");

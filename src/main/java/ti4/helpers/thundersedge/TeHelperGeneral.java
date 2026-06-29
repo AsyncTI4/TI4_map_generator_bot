@@ -94,8 +94,12 @@ public class TeHelperGeneral {
         if (newOwner == null) {
             return;
         }
+
         for (Planet station : tile.getSpaceStations()) {
             Player prevOwner = game.getPlayerThatControlsPlanet(station.getName());
+            if (newOwner == prevOwner) {
+                continue;
+            }
             if (prevOwner != null && FoWHelper.playerHasActualShipsInSystem(prevOwner, tile)) continue;
 
             AddPlanetService.addPlanet(newOwner, station.getName(), game, event, false);

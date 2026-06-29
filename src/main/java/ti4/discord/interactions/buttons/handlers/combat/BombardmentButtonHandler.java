@@ -63,7 +63,9 @@ class BombardmentButtonHandler {
         if (game.getActiveSystem() == null) {
             return;
         }
-        if (game.getTileByPosition(game.getActiveSystem()).isScar()) {
+        if (game.getTileByPosition(game.getActiveSystem()).isScar(game)
+                && !player.hasUnlockedBreakthrough("nivynbt")
+                && !player.hasTech("tf-singularitypoint")) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     player.getRepresentation()

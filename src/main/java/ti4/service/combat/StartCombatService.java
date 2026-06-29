@@ -1446,6 +1446,12 @@ public class StartCombatService {
                                 + "Agent",
                         FactionEmojis.Titans));
             }
+            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasRelicReady("heartofixth")) {
+                buttons.add(Buttons.blue(
+                        factionChecker + "exhaustRelic_heartofixth",
+                        "Exhaust Heart of Ixth",
+                        agentHolder.getFactionEmoji()));
+            }
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("gheminaagent")) {
                 buttons.add(Buttons.gray(
                         factionChecker + "exhaustAgent_gheminaagent",

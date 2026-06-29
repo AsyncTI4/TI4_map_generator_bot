@@ -1591,6 +1591,8 @@ public class ButtonHelper {
         if (!game.isFowMode()
                 && activeSystem.isScar(game)
                 && !player.getRelics().contains("circletofthevoid")
+                && !player.hasUnlockedBreakthrough("nivynbt")
+                && !player.hasTech("tf-singularitypoint")
                 && !player.hasAbility("celestial_being")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -4666,12 +4668,14 @@ public class ButtonHelper {
         List<String> endOfTurnTechs = List.of(
                 "pi",
                 "absol_pi",
+                "tf-singularitypoint",
                 "bs",
                 "absol_bs",
                 "dsceldr",
                 "dsbelky",
                 "miltymod_hm",
                 "absol_hm",
+                "tf-industrialjuggernaut",
                 "absol_nm",
                 "absol_pa",
                 "betaro");
@@ -4687,8 +4691,11 @@ public class ButtonHelper {
             // Add the button
             TechnologyModel model = Mapper.getTech(tech);
             endButtons.add(Buttons.red(
-                    player.factionButtonChecker() + ("absol_pa".equals(tech) ? "use" : "exhaust") + "Tech_" + tech,
-                    ("absol_pa".equals(tech) ? "Use" : "Exhaust") + " " + model.getName()));
+                    player.factionButtonChecker()
+                            + (("absol_pa".equals(tech) || "tf-industrialjuggernaut".equals(tech)) ? "use" : "exhaust")
+                            + "Tech_" + tech,
+                    (("absol_pa".equals(tech) || "tf-industrialjuggernaut".equals(tech)) ? "Use" : "Exhaust") + " "
+                            + model.getName()));
         }
 
         // Agents
@@ -6148,7 +6155,7 @@ public class ButtonHelper {
         }
         Tile tile = game.getTileByPosition(pos);
 
-        if (tile.isScar()) {
+        if (tile.isScar(game) && !player.hasUnlockedBreakthrough("nivynbt") && !player.hasTech("tf-singularitypoint")) {
             String message = "";
             switch (rollTypeString) {
                 case "afb" ->

@@ -97,7 +97,8 @@ public final class ButtonHelperModifyUnits {
         if (game.getActiveSystem() != null
                 && game.getTileByPosition(game.getActiveSystem()) != null
                 && game.getTileByPosition(game.getActiveSystem()).isScar(game)
-                && !player.hasUnlockedBreakthrough("nivynbt")) {
+                && !player.hasUnlockedBreakthrough("nivynbt")
+                && !player.hasTech("tf-singularitypoint")) {
             return 0;
         }
         mentakFS = Helper.getPlayerFromUnit(game, "sigma_mentak_flagship_2");
