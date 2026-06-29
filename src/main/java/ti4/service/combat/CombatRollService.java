@@ -42,7 +42,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvax
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
@@ -1081,9 +1080,9 @@ public class CombatRollService {
                     && XanUnitHandler.countSpaceDocksOnHolder(unitHolder, game) > 0) {
                 modifierToHit += 2;
             }
-            if (unitHolder != null) {
-                modifierToHit += VyserixUnitHandler.getTechnotemplarModifier(player, unitHolder, rollType);
-            }
+            // if (unitHolder != null) {
+            //     modifierToHit += VyserixUnitHandler.getTechnotemplarModifier(player, unitHolder, rollType);
+            // }
             int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player);
             if (rollType == CombatRollType.combatround) {
                 CombatStatsService.CombatRoundProfile combatRoundProfile = CombatStatsService.getCombatRoundProfile(
