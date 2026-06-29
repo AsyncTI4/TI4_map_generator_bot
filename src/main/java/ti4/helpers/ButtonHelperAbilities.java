@@ -200,6 +200,15 @@ public final class ButtonHelperAbilities {
                 getTilesToRallyToTheCause(game, player));
     }
 
+    @ButtonHandler("startRallyTheHorde")
+    public static void startRallyTheHorde(Game game, Player player, ButtonInteractionEvent event) {
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                "Please choose the system to produce up to 2 ships in.",
+                getTilesToRallyToTheCause(game, player));
+    }
+
     @ButtonHandler("startBestow")
     public static void startBestow(Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -292,6 +301,19 @@ public final class ButtonHelperAbilities {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
+    @ButtonHandler("rallyTheHordeStep2_")
+    public static void rallyTheHordeStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        String type = "sling";
+        List<Button> buttons = Helper.getPlaceUnitButtons(
+                event, game.getNeutral(), game, game.getTileByPosition(pos), type, "placeOneNDone_skipbuild");
+        String message =
+                player.getRepresentation() + " Use the buttons to place a neutral ship of a type you just produced.";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
     public static List<Button> getTilesToRallyToTheCause(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
@@ -304,6 +326,24 @@ public final class ButtonHelperAbilities {
             }
             buttons.add(Buttons.green(
                     "rallyToTheCauseStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+        }
+        return buttons;
+    }
+
+    public static List<Button> getTilesToRallyTheHorde(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            boolean empty = true;
+            for (Player p : game.getRealPlayers()) {
+                if (FoWHelper.playerHasActualShipsInSystem(p, tile)) {
+                    empty = false;
+                    break;
+                }
+            }
+            if (empty) {
+                buttons.add(Buttons.green(
+                        "rallyTheHordeStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+            }
         }
         return buttons;
     }
@@ -2648,9 +2688,13 @@ public final class ButtonHelperAbilities {
             ExploreService.explorePlanet(
                     event, game.getTileFromPlanet(info[1]), info[1], info[2], player, true, game, 1, false);
         } else {
-            message = player.getFactionEmoji() + " used their **Deep Mining** ability to gain 1 trade good "
-                    + player.gainTG(1) + ".";
-            ButtonHelperAgents.resolveArtunoCheck(player, 1);
+            int deep = 1;
+            if (game.isTwilightsFallMode()) {
+                deep = 2;
+            }
+            message = player.getFactionEmoji() + " used their **Deep Mining** ability to gain " + deep + " trade good "
+                    + player.gainTG(deep) + ".";
+            ButtonHelperAgents.resolveArtunoCheck(player, deep);
             pillageCheck(player, game);
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         }

@@ -1,11 +1,15 @@
 package ti4.discord.interactions.commands.game;
 
 import java.util.ArrayList;
+import java.util.List;
+import net.dv8tion.jda.api.components.container.Container;
+import net.dv8tion.jda.api.components.container.ContainerChildComponent;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -14,10 +18,12 @@ import ti4.helpers.TIGLHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.message.componentsV2.MessageV2Builder;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.option.TEOptionService;
 
 public class WeirdGameSetup extends GameStateSubcommand {
 
@@ -84,7 +90,18 @@ public class WeirdGameSetup extends GameStateSubcommand {
         if (fowMode != null) game.setFowMode(fowMode);
 
         Boolean tfMode = event.getOption(Constants.TWILIGHTS_FALL_MODE, null, OptionMapping::getAsBoolean);
-        if (tfMode != null) game.setTwilightsFallMode(tfMode);
+        if (tfMode != null) {
+            game.setTwilightsFallMode(tfMode);
+            if (game.isTwilightsFallMode()) {
+                String msg = "Use the buttons to enable or disable various homebrew options:";
+                List<ContainerChildComponent> sections = TEOptionService.getTFHomebrewInfo(game);
+                MessageV2Builder builder = new MessageV2Builder(game.getMainGameChannel());
+                builder.append(msg);
+                builder.append(Container.of(sections));
+                builder.append(Buttons.DONE_DELETE_BUTTONS);
+                builder.send();
+            }
+        }
 
         if (!setGameMode(event, game)) {
             MessageHelper.sendMessageToChannel(

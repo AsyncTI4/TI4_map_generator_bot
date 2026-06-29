@@ -1003,7 +1003,7 @@ public final class FoWHelper {
             if (p2.hasTech("ah") && ButtonHelperAgents.doesTileHaveAStructureInIt(p2, tile)) {
                 return true;
             }
-            if (p2.hasAbility("decree") && tile.isAnomaly(game, player)) {
+            if ((p2.hasAbility("decree") || p2.hasTech("tf-radiantsigils")) && tile.isAnomaly(game, p2)) {
                 List<Tile> tiles = new ArrayList<>();
                 tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Infantry));
                 tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Mech));

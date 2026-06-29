@@ -18,7 +18,7 @@ import ti4.model.RelicModel;
 public class RelicInfoService {
 
     public static void sendRelicInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
+        String headerText = player.getRepresentationNoPing() + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendRelicInfo(player);
     }

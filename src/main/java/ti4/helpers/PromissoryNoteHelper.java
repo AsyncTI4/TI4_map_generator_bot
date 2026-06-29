@@ -45,7 +45,7 @@ public class PromissoryNoteHelper {
             Game game, Player player, boolean longFormat, GenericInteractionCreateEvent event) {
         checkAndAddPNs(game, player);
         game.checkPromissoryNotes();
-        String headerText = player.getRepresentationUnfogged() + ", heads up, someone refreshed your promissory notes.";
+        String headerText = player.getRepresentationNoPing() + ", heads up, someone refreshed your promissory notes.";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendPromissoryNoteInfo(game, player, longFormat);
     }

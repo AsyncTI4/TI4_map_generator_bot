@@ -136,7 +136,7 @@ public class BanService implements IBanService {
         return s == null || s.trim().isEmpty();
     }
 
-    private static void appendStoredValue(Game game, String key, String value) {
+    public static void appendStoredValue(Game game, String key, String value) {
         String prev = game.getStoredValue(key);
         Set<String> values = new LinkedHashSet<>();
         if (!prev.isEmpty()) values.addAll(List.of(prev.split(Constants.FIN_SEPARATOR)));

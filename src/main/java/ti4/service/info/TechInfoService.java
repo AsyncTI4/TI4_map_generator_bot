@@ -18,7 +18,7 @@ import ti4.service.franken.FrankenAlternateTextService;
 public class TechInfoService {
 
     public static void sendTechInfo(Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + " Somebody" + CommandHelper.getHeaderText(event);
+        String headerText = player.getRepresentationNoPing() + " Somebody" + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendTechInfo(player);
     }

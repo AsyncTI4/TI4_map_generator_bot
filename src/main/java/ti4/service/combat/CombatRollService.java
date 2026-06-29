@@ -153,6 +153,22 @@ public class CombatRollService {
         return metaliFakeUnit;
     }
 
+    public static UnitModel getProjectionUnit(Player player, boolean tf) {
+        UnitModel metaliFakeUnit = new UnitModel();
+        int proj = 2;
+        if (!tf) {
+            proj = 1;
+        }
+        metaliFakeUnit.setAfbDieCount(proj);
+        metaliFakeUnit.setAfbHitsOn(6);
+        metaliFakeUnit.setName("Projection of Power");
+        metaliFakeUnit.setAsyncId("projectionafb");
+        metaliFakeUnit.setId("projectionafb");
+        metaliFakeUnit.setBaseType("dd");
+        metaliFakeUnit.setFaction(player.getFaction());
+        return metaliFakeUnit;
+    }
+
     public static UnitModel getZelianPlanetUnit(Player player, String planetName, int planetCombat) {
         UnitModel zelianFakeUnit = new UnitModel();
         zelianFakeUnit.setCombatDieCount(1);
@@ -195,6 +211,22 @@ public class CombatRollService {
                 getUnitsInCombat(tile, combatOnHolder, player, event, rollType, game);
         if (rollType == CombatRollType.AFB && player.hasRelic("metalivoidarmaments")) {
             playerUnitsByQuantity.put(getMetaliAFBUnit(player), 1);
+        }
+        if (rollType == CombatRollType.AFB && player.hasTech("tf-projectionofpow")) {
+            playerUnitsByQuantity.put(getProjectionUnit(player, true), 1);
+        }
+        if (player.hasAbility("projection_of_power")) {
+            boolean adj = false;
+            for (Tile tile2 : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
+                if (FoWHelper.getAdjacentTiles(game, tile2.getPosition(), player, false, true)
+                        .contains(tile.getPosition())) {
+                    adj = true;
+                    break;
+                }
+            }
+            if (adj) {
+                playerUnitsByQuantity.put(getProjectionUnit(player, false), 1);
+            }
         }
         if (rollType == CombatRollType.combatround && player.hasActiveBreakthrough("zelianbt")) {
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
@@ -2283,6 +2315,36 @@ public class CombatRollService {
                     planetFakeUnit.setBaseType("pds");
                     planetFakeUnit.setFaction(player.getFaction());
                     unitsOnTile.put(planetFakeUnit, 1);
+                }
+                boolean spaceStation =
+                        (player.hasUnlockedBreakthrough("gledgebt") || player.hasTech("tf-mantlecracking"))
+                                && planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG);
+                if ((planet.isSpaceStation() || spaceStation)
+                        && player.getPlanets().contains(planet.getName())) {
+                    if (player.hasUnlockedBreakthrough("gledgebt")) {
+                        UnitModel planetFakeUnit = new UnitModel();
+                        planetFakeUnit.setSpaceCannonHitsOn(5);
+                        planetFakeUnit.setSpaceCannonDieCount(1);
+                        planetFakeUnit.setName(
+                                Helper.getPlanetRepresentationPlusEmoji(planetModel.getId()) + " space cannon");
+                        planetFakeUnit.setAsyncId(planet.getName() + "pds");
+                        planetFakeUnit.setId(planet.getName() + "pds");
+                        planetFakeUnit.setBaseType("pds");
+                        planetFakeUnit.setFaction(player.getFaction());
+                        unitsOnTile.put(planetFakeUnit, 1);
+                    }
+                    if (player.hasTech("tf-deepinstallations")) {
+                        UnitModel planetFakeUnit = new UnitModel();
+                        planetFakeUnit.setSpaceCannonHitsOn(5);
+                        planetFakeUnit.setSpaceCannonDieCount(2);
+                        planetFakeUnit.setName(
+                                Helper.getPlanetRepresentationPlusEmoji(planetModel.getId()) + " space cannon");
+                        planetFakeUnit.setAsyncId(planet.getName() + "pds");
+                        planetFakeUnit.setId(planet.getName() + "pds");
+                        planetFakeUnit.setBaseType("pds");
+                        planetFakeUnit.setFaction(player.getFaction());
+                        unitsOnTile.put(planetFakeUnit, 1);
+                    }
                 }
             }
         }

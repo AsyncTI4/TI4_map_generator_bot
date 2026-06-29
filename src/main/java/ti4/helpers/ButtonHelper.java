@@ -4764,7 +4764,7 @@ public class ButtonHelper {
             endButtons.add(Buttons.green(
                     player.factionButtonChecker() + "useAxisBT", "Use Arms Brokerage", FactionEmojis.axis));
         }
-        if (player.hasReadyBreakthrough("cheiranbt") || player.hasTech("tf-cheiranbt")) {
+        if (player.hasReadyBreakthrough("cheiranbt") || player.hasTech("tf-matriphagy")) {
             endButtons.add(Buttons.green(
                     player.factionButtonChecker() + "exhaustBT_cheiranbt",
                     "Exhaust Cheiran Breakthrough",
@@ -7141,7 +7141,6 @@ public class ButtonHelper {
                         new LogOrigin(game), "Failing to set up player #cards-info thread in " + game.getName(), e);
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
     }
 
     public static void offerRedTapeButtons(Game game, Player player) {

@@ -20,7 +20,6 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.franken.ban.BanService;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
@@ -416,6 +415,6 @@ public class FrankenSettings extends SettingsMenu {
     public static void setup(ButtonInteractionEvent event, Game game) {
         FrankenSettings menu = game.initializeFrankenSettings();
         menu.postMessageAndButtons(event);
-        ButtonHelper.deleteMessage(event);
+        // ButtonHelper.deleteMessage(event);
     }
 }

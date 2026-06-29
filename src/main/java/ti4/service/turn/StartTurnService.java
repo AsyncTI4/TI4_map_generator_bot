@@ -733,6 +733,10 @@ public class StartTurnService {
                     "Exhaust Predictive Command",
                     FactionEmojis.mykomentori));
         }
+        if (player.hasTech("tf-radiantsigils") && !player.getExhaustedTechs().contains("tf-radiantsigils")) {
+            startButtons.add(
+                    Buttons.gray("exhaustTech_tf-radiantsigils", "Exhaust Radiant Sigils", FactionEmojis.edyn));
+        }
         if (player.hasTechReady("dsuydag")) {
             startButtons.add(Buttons.green(
                     factionChecker + "exhaustTech_dsuydag", "Exhaust Messiah Protocols", TechEmojis.BioticTech));
