@@ -199,7 +199,6 @@ class MatchmakingButtonHandler {
         String userId = event.getUser().getId();
         UserSettings userSettings = UserSettingsManager.get(userId);
 
-        // TIGL games are always 6 players, so there is no player count picker.
         final boolean REQUIRE_SELECTION = true;
         CheckboxGroup victoryPoints = buildCheckboxGroup(
                 VICTORY_POINTS_ID,
@@ -373,7 +372,6 @@ class MatchmakingButtonHandler {
     }
 
     private static void saveTiglMatchmakingPreferences(ModalInteractionEvent event, UserSettings userSettings) {
-        // TIGL games are always 6 players, PoK + TE.
         userSettings.setMatchmakingExpansions(List.of(MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION));
         userSettings.setMatchmakingPlayerCounts(List.of("6"));
         userSettings.setMatchmakingVictoryPointGoals(getSelectedValues(event, VICTORY_POINTS_ID));
