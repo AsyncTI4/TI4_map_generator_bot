@@ -25,7 +25,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "At the start of space combat, you may use ANTI-FIGHTER BARRAGE 6(x2) against a player’s fighters in the active system (even if you are not participating in that combat).",
+        "text": "At the start of space combat, you may use ANTI-FIGHTER BARRAGE 6(x2) against a player’s fighters in the active system.",
         "source": "twilight_ds",
         "faction": "celdauri"
     },
@@ -220,7 +220,7 @@
         "faction": "augers"
     },
     {
-        "alias": "tf-psychographics",
+        "alias": "tf-dsaugug",
         "name": "Psychographics",
         "types": [
             "BIOTIC"
@@ -250,7 +250,7 @@
         "faction": "kjalengard"
     },
     {
-        "alias": "tf-valor",
+        "alias": "tf-valortf",
         "name": "Valor",
         "types": [
             "BIOTIC"
@@ -260,7 +260,7 @@
         "faction": "kjalengard"
     },
     {
-        "alias": "tf-shroudedfleets",
+        "alias": "tf-shroudoflith",
         "name": "Shrouded Fleets",
         "types": [
             "PROPULSION"
@@ -411,7 +411,7 @@
     },
     {
         "alias": "tf-zealousds",
-        "name": "Zealous DS",
+        "name": "Zealous (DS)",
         "types": [
             "WARFARE"
         ],
@@ -450,7 +450,7 @@
         "faction": "mortheus"
     },
     {
-        "alias": "tf-fabricationgrid",
+        "alias": "tf-dsmorty",
         "name": "Fabrication Grid",
         "types": [
             "CYBERNETIC"
@@ -470,7 +470,7 @@
         "faction": "mortheus"
     },
     {
-        "alias": "tf-prescientdivination",
+        "alias": "tf-divination",
         "name": "Prescient Divination",
         "types": [
             "CYBERNETIC"

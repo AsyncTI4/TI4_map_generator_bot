@@ -1592,6 +1592,8 @@ public class ButtonHelper {
         if (!game.isFowMode()
                 && activeSystem.isScar(game)
                 && !player.getRelics().contains("circletofthevoid")
+                && !player.hasUnlockedBreakthrough("nivynbt")
+                && !player.hasTech("tf-singularitypoint")
                 && !player.hasAbility("celestial_being")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -2441,6 +2443,7 @@ public class ButtonHelper {
         if (game.isDominusOrb()
                 || game.isL1Hero()
                 || player.hasTech("tf-desperados")
+                || player.hasTech("tf-fraactalspikedrives")
                 || !game.getStoredValue("phantomEnergy").isEmpty()) {
             return true;
         }
@@ -2509,7 +2512,7 @@ public class ButtonHelper {
         int totalNumber = 0;
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.playerHasUnitsInSystem(player, tile) && tile.isAnomaly() && !tile.isHomeSystem(game)) {
-                if (tile.isGravityRift(game) && grav < 1) {
+                if (tile.isGravityRift(game, player) && grav < 1) {
                     grav = 1;
                 }
                 if (tile.isNebula(game) && nebula < 1) {
@@ -2518,7 +2521,7 @@ public class ButtonHelper {
                 if (tile.isAsteroidField() && asteroids < 1) {
                     asteroids = 1;
                 }
-                if (!tile.isGravityRift(game) && !tile.isNebula(game) && !tile.isAsteroidField()) {
+                if (!tile.isGravityRift(game, player) && !tile.isNebula(game) && !tile.isAsteroidField()) {
                     count = 1;
                 }
 
@@ -4666,12 +4669,14 @@ public class ButtonHelper {
         List<String> endOfTurnTechs = List.of(
                 "pi",
                 "absol_pi",
+                "tf-singularitypoint",
                 "bs",
                 "absol_bs",
                 "dsceldr",
                 "dsbelky",
                 "miltymod_hm",
                 "absol_hm",
+                "tf-industrialjuggernaut",
                 "absol_nm",
                 "absol_pa",
                 "betaro");
@@ -4687,8 +4692,11 @@ public class ButtonHelper {
             // Add the button
             TechnologyModel model = Mapper.getTech(tech);
             endButtons.add(Buttons.red(
-                    player.factionButtonChecker() + ("absol_pa".equals(tech) ? "use" : "exhaust") + "Tech_" + tech,
-                    ("absol_pa".equals(tech) ? "Use" : "Exhaust") + " " + model.getName()));
+                    player.factionButtonChecker()
+                            + (("absol_pa".equals(tech) || "tf-industrialjuggernaut".equals(tech)) ? "use" : "exhaust")
+                            + "Tech_" + tech,
+                    (("absol_pa".equals(tech) || "tf-industrialjuggernaut".equals(tech)) ? "Use" : "Exhaust") + " "
+                            + model.getName()));
         }
 
         // Agents
@@ -6148,7 +6156,7 @@ public class ButtonHelper {
         }
         Tile tile = game.getTileByPosition(pos);
 
-        if (tile.isScar()) {
+        if (tile.isScar(game) && !player.hasUnlockedBreakthrough("nivynbt") && !player.hasTech("tf-singularitypoint")) {
             String message = "";
             switch (rollTypeString) {
                 case "afb" ->
@@ -7566,7 +7574,7 @@ public class ButtonHelper {
 
     public static int getNumberOfGravRiftsPlayerIsIn(Player player, Game game) {
         return (int) game.getTileMap().values().stream()
-                .filter(tile -> tile.isGravityRift(game) && tile.containsPlayersUnits(player))
+                .filter(tile -> tile.isGravityRift(game, player) && tile.containsPlayersUnits(player))
                 .count();
     }
 
@@ -7613,6 +7621,12 @@ public class ButtonHelper {
         }
         if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos), game)
                 && player.hasAbility("starfall_gunnery")
+                && checkNumberNonFighterShipsWithoutSpaceCannon(player, game.getTileByPosition(tilePos)) > 0) {
+            playersWithPds2.add(player);
+        }
+
+        if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos), game)
+                && player.hasTech("tf-kinematicstarfall")
                 && checkNumberNonFighterShipsWithoutSpaceCannon(player, game.getTileByPosition(tilePos)) > 0) {
             playersWithPds2.add(player);
         }

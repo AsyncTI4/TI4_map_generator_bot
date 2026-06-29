@@ -39,6 +39,7 @@ import ti4.model.StrategyCardModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.MindsieveService;
+import ti4.service.breakthrough.StoneEmbraceService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -187,12 +188,19 @@ public class PlayStrategyCardService {
             });
         } else {
             Player propagationPlayer = Helper.getPlayerFromAbility(game, "propagation");
-            if (propagationPlayer != null) {
-                boolean shouldAddNekroTechButton = scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode();
-                if (shouldAddNekroTechButton) {
-                    String ffcc = propagationPlayer.factionButtonChecker();
-                    scButtons.add(Buttons.gray(ffcc + "nekroFollowTech", "Get Command Tokens", FactionEmojis.Nekro));
-                }
+            if (propagationPlayer != null && scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode()) {
+                scButtons.add(Buttons.gray(
+                        propagationPlayer.factionButtonChecker() + "nekroFollowTech",
+                        "Get Command Tokens",
+                        FactionEmojis.Nekro));
+            }
+
+            Player zealousPlayer = Helper.getPlayerFromAbility(game, "zealousds");
+            if (zealousPlayer != null && scModel.usesAutomationForSCID("tf6") && !game.isFowMode()) {
+                scButtons.add(Buttons.gray(
+                        zealousPlayer.factionButtonChecker() + "primaryOfWarfare",
+                        "Do Zealous",
+                        zealousPlayer.getFactionEmoji()));
             }
 
             Player titansMechPlayer = Helper.getPlayerFromUnit(game, "titans_mech");
@@ -379,6 +387,7 @@ public class PlayStrategyCardService {
                 }
 
                 MindsieveService.serveMindsieveButtons(game, player3, scToPlay);
+                StoneEmbraceService.serveStoneEmbraceButtons(game, player3, scToPlay);
                 List<Button> empNMahButtons = new ArrayList<>();
                 Button deleteB = Buttons.red("deleteButtons", "Delete These Buttons");
                 empNMahButtons.add(deleteB);
@@ -562,6 +571,7 @@ public class PlayStrategyCardService {
                         && !p2.hasUnexhaustedLeader("mahactagent")
                         && !p2.hasUnexhaustedLeader("yssarilagent")
                         && !MindsieveService.canUseMindsieve(p2, player, scModel)
+                        && !StoneEmbraceService.canUseStoneEmbrace(p2, player, scModel)
                         && scToPlay != 1) {
                     markPlayerAsAutoFollowing(playersToReact, game, p2, scToPlay, event);
                     MessageHelper.sendMessageToChannel(

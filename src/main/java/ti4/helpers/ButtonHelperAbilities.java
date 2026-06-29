@@ -2029,7 +2029,7 @@ public final class ButtonHelperAbilities {
 
     public static void oceanBoundCheck(Game game) {
         for (Player player : game.getRealPlayers()) {
-            if (player.hasUnlockedBreakthrough("kjalengardbt")) {
+            if (player.hasUnlockedBreakthrough("kjalengardbt") || player.hasTech("tf-glorioushalls")) {
                 int bannerHalls =
                         3 - ButtonHelperAgents.getGloryTokensLeft(game).size();
                 for (int x = 1; x <= bannerHalls; x++) {

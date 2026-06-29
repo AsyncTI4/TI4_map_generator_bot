@@ -1171,6 +1171,7 @@ public class CombatRollService {
                         maximumHits += 1;
                     }
                 }
+
                 if (rollType == CombatRollType.bombardment && "tf-dragonfreed".equalsIgnoreCase(unitModel.getId())) {
                     if (!game.isFowMode() && hitRolls > 0) {
 
@@ -1235,10 +1236,34 @@ public class CombatRollService {
                     }
                 }
                 Player gloryHolder = Helper.getPlayerFromAbility(game, "valor");
+                if (gloryHolder == null) {
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (p2.hasTech("tf-glorioushalls")) {
+                            gloryHolder = p2;
+                        }
+                    }
+                }
                 if (rollType == CombatRollType.combatround
                         && gloryHolder != null
                         && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
                     ButtonHelperAbilities.readyBannerHalls(game);
+                    chanceOfAllHits *= Math.pow(1.0 / (11 - toHit + modifierToHit), numRolls * mult);
+                    for (Die die : resultRolls) {
+                        if (die.getResult() >= 10) {
+                            hitRolls += 1;
+                            String valor = "Valor";
+                            if (game.isTwilightsFallMode()) {
+                                valor = "Glorious Halls";
+                            }
+                            MessageHelper.sendMessageToChannel(
+                                    event.getMessageChannel(),
+                                    player.getRepresentation() + " got an extra hit due to the **" + valor
+                                            + "** ability (it has been accounted for in the hit count).");
+                        }
+                        maximumHits += 1;
+                    }
+                }
+                if (player.hasTech("tf-valortf")) {
                     chanceOfAllHits *= Math.pow(1.0 / (11 - toHit + modifierToHit), numRolls * mult);
                     for (Die die : resultRolls) {
                         if (die.getResult() >= 10) {
@@ -1681,6 +1706,20 @@ public class CombatRollService {
                     }
                     argentInfKills =
                             Math.min(argentInfKills, space.getUnitCount(Units.UnitType.Infantry, opponent.getColor()));
+                }
+                if (totalHits > 0
+                        && "neutral".equalsIgnoreCase(player.getFaction())
+                        && game.getStoredValue("mercenarycaptaintrigged").isEmpty()) {
+                    for (Player p : game.getRealPlayers()) {
+                        if (p.hasTech("tf-mercenarycaptains")) {
+                            p.setCommodities(p.getCommodities() + 1);
+                            MessageHelper.sendMessageToChannel(
+                                    p.getCorrectChannel(),
+                                    p.getRepresentation()
+                                            + " you gained 1 commodity due to the mercenary captains ability.");
+                            game.setStoredValue("mercenarycaptaintrigged", "yes");
+                        }
+                    }
                 }
                 if (argentInfKills > 0) {
                     String kills = "\nDue to the Strike Wing Alpha II destroyer ability, " + argentInfKills + " of "
@@ -2277,6 +2316,23 @@ public class CombatRollService {
                         player.getFactionEmoji()
                                 + ", a reminder that due to the **Starfall Gunnery** ability, the SPACE CANNON of only 1 unit should be counted at this point."
                                 + " Hopefully you declared beforehand what that unit was, but by default it's probably the best one. Only look at/count the rolls of that one unit.");
+            }
+        }
+
+        if (player.hasTech("tf-kinematicstarfall")) {
+            if (player == game.getActivePlayer()) {
+                int count = Math.min(2, ButtonHelper.checkNumberNonFighterShipsWithoutSpaceCannon(player, tile));
+                if (count > 0) {
+                    UnitModel starfallFakeUnit = new UnitModel();
+                    starfallFakeUnit.setSpaceCannonHitsOn(9);
+                    starfallFakeUnit.setSpaceCannonDieCount(1);
+                    starfallFakeUnit.setName("Starfall Gunnery space cannon");
+                    starfallFakeUnit.setAsyncId("starfallpds");
+                    starfallFakeUnit.setId("starfallpds");
+                    starfallFakeUnit.setBaseType("pds");
+                    starfallFakeUnit.setFaction(player.getFaction());
+                    unitsOnTile.put(starfallFakeUnit, count);
+                }
             }
         }
 

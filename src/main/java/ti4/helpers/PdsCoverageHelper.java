@@ -43,6 +43,11 @@ public final class PdsCoverageHelper {
                     diceCount.add(8 - mod);
                 }
             }
+            if (player.hasTech("tf-kinematicstarfall")) {
+                for (int i = checkNumberNonFighterShipsWithoutSpaceCannon(player, tile); i > 0; i--) {
+                    diceCount.add(9 - mod);
+                }
+            }
 
             // Check adjacent tiles for PDS coverage
             for (String adjTilePos : FoWHelper.getAdjacentTiles(game, tilePos, player, false, true)) {

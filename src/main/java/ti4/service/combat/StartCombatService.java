@@ -851,7 +851,7 @@ public class StartCombatService {
                         msg + ", a reminder that if you win the combat, you could score _Spark a Rebellion_.",
                         buttons2);
             }
-            if (player.getSecretsUnscored().containsKey("btv") && tile.isAnomaly(game)) {
+            if (player.getSecretsUnscored().containsKey("btv") && tile.isAnomaly(game, player)) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         msg + ", a reminder that if you win the combat, you could score _Brave the Void_.",
@@ -1445,6 +1445,12 @@ public class StartCombatService {
                         "Use Titans " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                                 + "Agent",
                         FactionEmojis.Titans));
+            }
+            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasRelicReady("heartofixth")) {
+                buttons.add(Buttons.blue(
+                        factionChecker + "exhaustRelic_heartofixth",
+                        "Exhaust Heart of Ixth",
+                        agentHolder.getFactionEmoji()));
             }
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("gheminaagent")) {
                 buttons.add(Buttons.gray(

@@ -491,7 +491,7 @@ public final class TeHelperTechs {
         List<Button> buttons = new ArrayList<>();
         if (player.hasUnlockedBreakthrough("cabalbt")) {
             for (Tile tile : game.getTileMap().values()) {
-                if (tile.isGravityRift(game)) {
+                if (tile.isGravityRift(game, player)) {
                     buttons.add(
                             Buttons.blue(prefix + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
                 }

@@ -505,7 +505,7 @@ public class ListPlayerInfoService {
                 int counter = 0;
                 for (Tile tile : game.getTileMap().values()) {
                     boolean tileCounts =
-                            tile.isMecatol(game) || tile.isAnomaly(game) || ButtonHelper.isTileLegendary(tile);
+                            tile.isMecatol(game) || tile.isAnomaly(game, player) || ButtonHelper.isTileLegendary(tile);
                     if (FoWHelper.playerHasUnitsInSystem(player, tile) && tileCounts) {
                         counter++;
                     }
@@ -935,7 +935,7 @@ public class ListPlayerInfoService {
                     if (ButtonHelper.checkNumberShips(player, tile) > 0) {
                         for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, false)) {
                             Tile tile2 = game.getTileByPosition(pos);
-                            if (tile2.isAnomaly(game)) {
+                            if (tile2.isAnomaly(game, player)) {
                                 count++;
                                 break;
                             }

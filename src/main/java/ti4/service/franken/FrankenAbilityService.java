@@ -69,7 +69,7 @@ public class FrankenAbilityService {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
-                                + ", I have automatically set all of your Policies to the positive side, but you can flip any of them now with these buttons.");
+                                + ", the bot has automatically set all of your Policies to the positive side, but you can flip any of them now with these buttons.");
                 ButtonHelperHeroes.offerOlradinHeroFlips(player);
                 ButtonHelperHeroes.offerOlradinHeroFlips(player);
                 ButtonHelperHeroes.offerOlradinHeroFlips(player);

@@ -247,7 +247,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         String fieldContent = useTwilightsFallText ? getTFAbilityText().orElse(abilityText) : abilityText;
         if (useTwilightsFallText && (tfNotes != null)) {
             fieldContent += "\n-# [" + tfNotes + "]";
-        } else if (!useTwilightsFallText && (notes != null)) {
+        } else if (notes != null) {
             fieldContent += "\n-# [" + notes + "]";
         }
         eb.addField(fieldTitle, fieldContent, false);
