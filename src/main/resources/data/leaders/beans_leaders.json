@@ -223,7 +223,7 @@
     "name": "Kaethos",
     "title": "The Unyielding",
     "abilityWindow": "During the status phase:",
-    "abilityText": "You may score an additional public or secret objective.",
+    "abilityText": "You may score an additional secret objective.",
     "unlockCondition": "Have units in or adjacent to 3 different systems that contain anomalies.",
     "source": "beans"
   },
