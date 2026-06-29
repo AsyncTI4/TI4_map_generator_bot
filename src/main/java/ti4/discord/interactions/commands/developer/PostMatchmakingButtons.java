@@ -1,5 +1,6 @@
 package ti4.discord.interactions.commands.developer;
 
+import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -33,12 +34,14 @@ class PostMatchmakingButtons extends Subcommand {
         Button queueButton = tigl
                 ? Buttons.green(QUEUE_TIGL_BUTTON_ID, "Queue for TIGL")
                 : Buttons.green(QUEUE_BUTTON_ID, "Queue for Game");
-        List<Button> buttons = List.of(
-                queueButton,
-                Buttons.red(LEAVE_QUEUE_BUTTON_ID, "Leave Queue"),
-                Buttons.blue(VIEW_QUEUE_BUTTON_ID, "View Queue"),
-                Buttons.green(FORM_GROUP_BUTTON_ID, "Form Group"),
-                Buttons.gray(ADDITIONAL_SETTINGS_BUTTON_ID, "Additional Settings"));
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(queueButton);
+        buttons.add(Buttons.red(LEAVE_QUEUE_BUTTON_ID, "Leave Queue"));
+        buttons.add(Buttons.blue(VIEW_QUEUE_BUTTON_ID, "View Queue"));
+        if (!tigl) {
+            buttons.add(Buttons.green(FORM_GROUP_BUTTON_ID, "Form Group"));
+        }
+        buttons.add(Buttons.gray(ADDITIONAL_SETTINGS_BUTTON_ID, "Additional Settings"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 "You can use these buttons to search for a game. The more specific your preferences are, "

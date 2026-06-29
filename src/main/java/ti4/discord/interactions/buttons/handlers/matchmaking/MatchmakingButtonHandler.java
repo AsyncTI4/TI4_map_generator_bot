@@ -86,6 +86,14 @@ class MatchmakingButtonHandler {
     @ButtonHandler(value = QUEUE_FOR_TIGL_BUTTON_ID, save = false)
     public static void offerQueueForTiglModal(ButtonInteractionEvent event) {
         if (cannotQueue(event)) return;
+        if (SpringContext.getBean(MatchmakerService.class)
+                .isUserInParty(event.getUser().getId())) {
+            event.reply(
+                            "You cannot queue for TIGL as part of a group. Use the Leave Queue button to leave your group first.")
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
         event.replyModal(buildTiglQueueModal(event)).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
@@ -190,13 +198,11 @@ class MatchmakingButtonHandler {
     private static Modal buildTiglQueueModal(ButtonInteractionEvent event) {
         String userId = event.getUser().getId();
         UserSettings userSettings = UserSettingsManager.get(userId);
-        List<String> groupMemberIds =
-                SpringContext.getBean(MatchmakerService.class).partyMemberIds(userId);
 
         final boolean REQUIRE_SELECTION = true;
         CheckboxGroup playerCounts = buildCheckboxGroup(
                 PLAYER_COUNTS_ID,
-                groupPlayerCountOptions(groupMemberIds.size()),
+                PLAYER_COUNT_OPTIONS,
                 userSettings.getMatchmakingPlayerCounts(),
                 DEFAULT_PLAYER_COUNT_OPTIONS,
                 REQUIRE_SELECTION);
@@ -208,7 +214,7 @@ class MatchmakingButtonHandler {
                 REQUIRE_SELECTION);
         CheckboxGroup paces = buildCheckboxGroup(
                 PACE_RESTRICTIONS_ID,
-                groupPaceOptions(groupMemberIds),
+                filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(userId),
                 userSettings.getMatchmakingPaces(),
                 DEFAULT_PACE_OPTIONS,
                 REQUIRE_SELECTION);
@@ -218,23 +224,19 @@ class MatchmakingButtonHandler {
                 userSettings.getMatchmakingTiglRanks(),
                 DEFAULT_TIGL_RANK_OPTIONS,
                 REQUIRE_SELECTION);
-        Modal.Builder modal = Modal.create(QUEUE_FOR_TIGL_MODAL_ID, "Queue for TIGL")
+        CheckboxGroup restrictions = buildCheckboxGroup(
+                RESTRICTIONS_ID,
+                RESTRICTION_OPTIONS,
+                userSettings.getMatchmakingRestrictions(),
+                userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
+                !REQUIRE_SELECTION);
+        return Modal.create(QUEUE_FOR_TIGL_MODAL_ID, "Queue for TIGL")
                 .addComponents(Label.of("Player Count", playerCounts))
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
                 .addComponents(Label.of("Pace", paces))
-                .addComponents(Label.of("Rank", ranks));
-
-        List<String> restrictionOptions = groupRestrictionOptions(groupMemberIds);
-        if (!restrictionOptions.isEmpty()) {
-            CheckboxGroup restrictions = buildCheckboxGroup(
-                    RESTRICTIONS_ID,
-                    restrictionOptions,
-                    userSettings.getMatchmakingRestrictions(),
-                    userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
-                    !REQUIRE_SELECTION);
-            modal.addComponents(Label.of("Restrictions", restrictions));
-        }
-        return modal.build();
+                .addComponents(Label.of("Rank", ranks))
+                .addComponents(Label.of("Restrictions", restrictions))
+                .build();
     }
 
     @ButtonHandler(value = ADDITIONAL_SETTINGS_BUTTON_ID, save = false)
