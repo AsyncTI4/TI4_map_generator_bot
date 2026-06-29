@@ -294,6 +294,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     private Map<String, String> debtPoolIcons = new HashMap<>();
 
+    public Game getSelf() {
+        return this;
+    }
+
     public Game() {
         long currentTimeMillis = System.currentTimeMillis();
         setCreationDate(Helper.getDateRepresentation(currentTimeMillis));

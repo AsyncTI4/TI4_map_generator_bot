@@ -1,8 +1,13 @@
 package ti4.game.helper;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import ti4.game.Game;
 import ti4.game.Player;
 import ti4.image.Mapper;
+import ti4.model.Source.ComponentSource;
+import ti4.model.TechnologyModel;
 
 public interface TwilightFallDeckFuncs {
 
@@ -11,6 +16,8 @@ public interface TwilightFallDeckFuncs {
     String getStoredValue(String val);
 
     boolean isVeiledHeartMode();
+
+    Game getSelf();
 
     String getAbilitySpliceDeckID();
 
@@ -26,6 +33,25 @@ public interface TwilightFallDeckFuncs {
             deckID = "techs_tf";
         }
         List<String> allCards = Mapper.getDeck(deckID).getNewShuffledDeck();
+        Game game = getSelf();
+        List<String> bannedCards = new ArrayList<>();
+        for (String card : allCards) {
+            if (game.getStoredValue("bannedTechs").contains(card)) {
+                bannedCards.add(card);
+            }
+        }
+
+        if (game != null && game.isTwilightDS()) {
+            for (TechnologyModel tech : Mapper.getTechs().values()) {
+                if (tech.getSource() == ComponentSource.twilight_ds) {
+                    allCards.add(tech.getID());
+                }
+            }
+            Collections.shuffle(allCards);
+        }
+        for (String card : bannedCards) {
+            allCards.remove(card);
+        }
         for (Player p : getRealPlayersNNeutral()) {
             for (String tech : p.getTechs()) {
                 allCards.remove(tech);

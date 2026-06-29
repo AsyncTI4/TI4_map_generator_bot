@@ -214,6 +214,17 @@ public class SecretObjectiveHelper {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
 
+        if (player.hasTech("tf-plausibled")) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
+            buttons.add(Buttons.red("deleteButtons", "Done"));
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " if another player satisfied the requirements of the SO you just scored, you can use this button to draw an SO via your plausible deniability ability.",
+                    buttons);
+        }
+
         if (player.hasTech("tf-yinascendant")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

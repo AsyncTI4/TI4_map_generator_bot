@@ -269,6 +269,9 @@ public class CardsInfoService {
             buttons.add(Buttons.gray(
                     "exhaustTech_tf-predictivecommand", "Exhaust Predictive Command", FactionEmojis.mykomentori));
         }
+        if (player.hasTech("tf-radiantsigils") && !player.getExhaustedTechs().contains("tf-radiantsigils")) {
+            buttons.add(Buttons.gray("exhaustTech_tf-radiantsigils", "Exhaust Radiant Sigils", FactionEmojis.edyn));
+        }
         if (player.hasUnexhaustedLeader("firmamentagent")) {
             buttons.add(
                     Buttons.gray("getAgentSelection_firmamentagent", "Use Firmament Agent", FactionEmojis.Firmament));

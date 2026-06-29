@@ -53,6 +53,9 @@ public class TfForetellResolver implements EdictResolver {
         }
 
         String peaks = game.getStoredValue("foretellPeaks") + "x";
+        if (buttonID.contains("oracular")) {
+            peaks = "xxx";
+        }
         game.setStoredValue("foretellPeaks", peaks);
         if (peaks.length() >= 3) {
             game.removeStoredValue("foretellPeaks");

@@ -123,6 +123,7 @@ public class Units {
         Cavalry("cavalry"), // relics
         StarfallPds("starfallpds"),
         MetaliVoidArmaments("metalivoidarmaments"),
+        ProjectionOfPower("projectionofpower"),
         ZelianPlanet("zelianplanet");
 
         public final String value;
@@ -151,6 +152,7 @@ public class Units {
                 case Celagrom -> "The Celagrom";
                 case Monument -> "Monument";
                 case MetaliVoidArmaments -> "Metali Void Armaments";
+                case ProjectionOfPower -> "Projection of Power";
                 case ZelianPlanet -> "Zelian Planet";
             };
         }
@@ -175,6 +177,7 @@ public class Units {
                 case Celagrom -> "celagrom";
                 case Monument -> "monument";
                 case MetaliVoidArmaments -> "metalivoidarmaments";
+                case ProjectionOfPower -> "projectionofpower";
                 case ZelianPlanet -> "zelianplanet";
             };
         }
@@ -196,6 +199,7 @@ public class Units {
                 case Warsun -> UnitEmojis.warsun;
                 case Monument -> UnitEmojis.Monument;
                 case MetaliVoidArmaments -> ExploreEmojis.Relic;
+                case ProjectionOfPower -> UnitEmojis.spacedock;
                 case ZelianPlanet -> MiscEmojis.resources;
             };
         }
@@ -336,6 +340,7 @@ public class Units {
             case "cavalry" -> UnitType.Cavalry;
             case "starfallpds" -> UnitType.StarfallPds;
             case "metaliafb" -> UnitType.MetaliVoidArmaments;
+            case "projectionafb" -> UnitType.ProjectionOfPower;
             case "zelianplanet" -> UnitType.ZelianPlanet;
             default -> null;
         };

@@ -404,6 +404,33 @@ public class PlayerTechService {
             case "tf-mercenarycaptains" -> {
                 TeHelperActionCards.beginPirates(game, player, "resolveNokarBt", 0, false);
             }
+            case "tf-radiantsigils" -> {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + " unfortunately at this time I am too lazy to offer an elegant solution to this tech. Use ./add_token token:sigil tile_name: to add the sigil, and /remove_token if you're moving it from somewhere.");
+            }
+            case "tf-oracularalgorithms" -> {
+                List<Button> buttons = new ArrayList<>();
+                for (int loc = 1; loc <= game.getPublicObjectives1Peekable().size(); loc++) {
+                    String id = player.factionButtonChecker() + "foretellPeak_1_" + loc + "_oracular";
+                    String label = "Stage 1, Position " + loc;
+                    buttons.add(Buttons.green(id, label, CardEmojis.Public1alt));
+                }
+                for (int loc = 1; loc <= game.getPublicObjectives2Peekable().size(); loc++) {
+                    String id = player.factionButtonChecker() + "foretellPeak_2_" + loc + "_oracular";
+                    String label = "Stage 2, Position " + loc;
+                    buttons.add(Buttons.blue(id, label, CardEmojis.Public2alt));
+                }
+                buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Done Peeking"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationNoPing() + " use buttons to resolve.",
+                        buttons);
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        "## A rules note: the speaker can choose which objective to reveal during status phase. Normally this doesnt matter, but if certain objectives have been peeked at, the speaker can purposely choose to reveal or not reveal those particular objectives (provided there are other valid options to choose from).");
+            }
             case "mi" -> { // Mageon
                 deleteIfButtonEvent(event);
                 List<Button> buttons = getMageonImplantsButtons(game, player);

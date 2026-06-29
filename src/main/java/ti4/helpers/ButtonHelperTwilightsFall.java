@@ -1511,6 +1511,13 @@ public final class ButtonHelperTwilightsFall {
         if (buttonID.contains("_")) {
             type = buttonID.split("_")[1];
         }
+        if (buttonID.contains("sentient")) {
+            player.setTg(player.getTg() - 4);
+            ButtonHelper.deleteMessage(event);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + " paid 4tg to resolve sentient datapool.");
+        }
         List<String> cardsToDraw = getDeckForSplicing(game, type, 1);
         if (cardsToDraw.isEmpty()) {
             String messageText = "There are no more cards in the " + type + " deck.";

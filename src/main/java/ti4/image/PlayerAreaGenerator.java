@@ -1706,7 +1706,7 @@ public class PlayerAreaGenerator {
                         ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
 
                 int numInReinforcements = unitCap - count;
-                if (player.hasUnlockedBreakthrough("freesystemsbt")
+                if ((player.hasUnlockedBreakthrough("freesystemsbt") || player.hasTech("tf-rallyingmarshalls"))
                         && model != null
                         && model.getUnitType() == UnitType.Infantry) {
                     for (String planet : player.getPlanetsAllianceMode()) {

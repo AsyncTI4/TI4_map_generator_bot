@@ -2265,6 +2265,10 @@ public final class Helper {
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String tp = tile.getPosition();
         String remaining;
+        String checker = player.factionButtonChecker();
+        if (player.isDummy()) {
+            checker = player.dummyPlayerSpoof();
+        }
         if (!"solbtbuild".equalsIgnoreCase(warfareNOtherstuff)) {
             if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {
                 if (player.hasWarsunTech() && resourcelimit > 9) {
@@ -2273,13 +2277,11 @@ public final class Helper {
                                     game, Mapper.getUnitKey(AliasHandler.resolveUnit("warsun"), player.getColorID()))
                             + ")";
                     Button wsButton = Buttons.green(
-                            player.factionButtonChecker() + placePrefix + "_warsun_" + tp,
-                            "Produce War Sun" + remaining,
-                            UnitEmojis.warsun);
+                            checker + placePrefix + "_warsun_" + tp, "Produce War Sun" + remaining, UnitEmojis.warsun);
                     if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
                             game, Mapper.getUnitKey(AliasHandler.resolveUnit("warsun"), player.getColorID()))) {
                         wsButton = Buttons.gray(
-                                player.factionButtonChecker() + placePrefix + "_warsun_" + tp,
+                                checker + placePrefix + "_warsun_" + tp,
                                 "Produce War Sun" + remaining,
                                 UnitEmojis.warsun);
                     }
@@ -2291,26 +2293,20 @@ public final class Helper {
                         + ")";
                 if (player.ownsUnit("ghemina_flagship_lady") && resourcelimit > 7) {
                     Button wsButton = Buttons.green(
-                            player.factionButtonChecker() + placePrefix + "_lady_" + tp,
-                            "Produce The Lady",
-                            UnitEmojis.flagship);
+                            checker + placePrefix + "_lady_" + tp, "Produce The Lady", UnitEmojis.flagship);
                     unitButtons.add(wsButton);
                 }
                 if (player.ownsUnit("celdauri_celagrom") && resourcelimit > 4) {
                     Button wsButton = Buttons.green(
-                            player.factionButtonChecker() + placePrefix + "_celagrom_" + tp,
-                            "Produce The Celagrom",
-                            UnitEmojis.flagship);
+                            checker + placePrefix + "_celagrom_" + tp, "Produce The Celagrom", UnitEmojis.flagship);
                     unitButtons.add(wsButton);
                 }
                 Button fsButton = Buttons.green(
-                        player.factionButtonChecker() + placePrefix + "_flagship_" + tp,
-                        "Produce Flagship" + remaining,
-                        UnitEmojis.flagship);
+                        checker + placePrefix + "_flagship_" + tp, "Produce Flagship" + remaining, UnitEmojis.flagship);
                 if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
                         game, Mapper.getUnitKey(AliasHandler.resolveUnit("flagship"), player.getColorID()))) {
                     fsButton = Buttons.gray(
-                            player.factionButtonChecker() + placePrefix + "_flagship_" + tp,
+                            checker + placePrefix + "_flagship_" + tp,
                             "Produce Flagship" + remaining,
                             UnitEmojis.flagship);
                 }
@@ -2323,13 +2319,13 @@ public final class Helper {
                             game, Mapper.getUnitKey(AliasHandler.resolveUnit("dreadnought"), player.getColorID()))
                     + ")";
             Button dnButton = Buttons.green(
-                    player.factionButtonChecker() + placePrefix + "_dreadnought_" + tp,
+                    checker + placePrefix + "_dreadnought_" + tp,
                     "Produce Dreadnought" + remaining,
                     UnitEmojis.dreadnought);
             if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
                     game, Mapper.getUnitKey(AliasHandler.resolveUnit("dreadnought"), player.getColorID()))) {
                 dnButton = Buttons.gray(
-                        player.factionButtonChecker() + placePrefix + "_dreadnought_" + tp,
+                        checker + placePrefix + "_dreadnought_" + tp,
                         "Produce Dreadnought" + remaining,
                         UnitEmojis.dreadnought);
             }
@@ -2341,9 +2337,7 @@ public final class Helper {
                             game, Mapper.getUnitKey(AliasHandler.resolveUnit("carrier"), player.getColorID()))
                     + ")";
             Button cvButton = Buttons.green(
-                    player.factionButtonChecker() + placePrefix + "_carrier_" + tp,
-                    "Produce Carrier" + remaining,
-                    UnitEmojis.carrier);
+                    checker + placePrefix + "_carrier_" + tp, "Produce Carrier" + remaining, UnitEmojis.carrier);
             if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
                     game, Mapper.getUnitKey(AliasHandler.resolveUnit("carrier"), player.getColorID()))) {
                 cvButton = cvButton.withStyle(ButtonStyle.SECONDARY);
@@ -2356,15 +2350,11 @@ public final class Helper {
                             game, Mapper.getUnitKey(AliasHandler.resolveUnit("cruiser"), player.getColorID()))
                     + ")";
             Button caButton = Buttons.green(
-                    player.factionButtonChecker() + placePrefix + "_cruiser_" + tp,
-                    "Produce Cruiser" + remaining,
-                    UnitEmojis.cruiser);
+                    checker + placePrefix + "_cruiser_" + tp, "Produce Cruiser" + remaining, UnitEmojis.cruiser);
             if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
                     game, Mapper.getUnitKey(AliasHandler.resolveUnit("cruiser"), player.getColorID()))) {
                 caButton = Buttons.gray(
-                        player.factionButtonChecker() + placePrefix + "_cruiser_" + tp,
-                        "Produce Cruiser" + remaining,
-                        UnitEmojis.cruiser);
+                        checker + placePrefix + "_cruiser_" + tp, "Produce Cruiser" + remaining, UnitEmojis.cruiser);
             }
             if (resourcelimit > 1) {
                 unitButtons.add(caButton);
@@ -2374,13 +2364,11 @@ public final class Helper {
                             game, Mapper.getUnitKey(AliasHandler.resolveUnit("destroyer"), player.getColorID()))
                     + ")";
             Button ddButton = Buttons.green(
-                    player.factionButtonChecker() + placePrefix + "_destroyer_" + tp,
-                    "Produce Destroyer" + remaining,
-                    UnitEmojis.destroyer);
+                    checker + placePrefix + "_destroyer_" + tp, "Produce Destroyer" + remaining, UnitEmojis.destroyer);
             if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
                     game, Mapper.getUnitKey(AliasHandler.resolveUnit("destroyer"), player.getColorID()))) {
                 ddButton = Buttons.gray(
-                        player.factionButtonChecker() + placePrefix + "_destroyer_" + tp,
+                        checker + placePrefix + "_destroyer_" + tp,
                         "Produce Destroyer" + remaining,
                         UnitEmojis.destroyer);
             }

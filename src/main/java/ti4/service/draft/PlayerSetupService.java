@@ -509,7 +509,7 @@ public class PlayerSetupService {
 
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Player: " + player.getRepresentation() + " has been set up");
+                    game.getMainGameChannel(), "Player: " + player.getRepresentationNoPing() + " has been set up");
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player was set up.");
         }

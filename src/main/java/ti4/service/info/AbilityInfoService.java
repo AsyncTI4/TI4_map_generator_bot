@@ -17,7 +17,7 @@ import ti4.service.franken.FrankenAlternateTextService;
 public class AbilityInfoService {
 
     public static void sendAbilityInfo(Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + " Somebody" + CommandHelper.getHeaderText(event);
+        String headerText = player.getRepresentationNoPing() + " Somebody" + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendAbilityInfo(player);
     }
