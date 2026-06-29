@@ -54,8 +54,7 @@ public class UserSettings {
     private List<String> matchmakingRestrictions;
     private String matchmakingMaxQueueTime;
     private List<String> matchmakingAvoidList;
-    private String matchmakingTiglRank;
-    private String matchmakingTiglFracturedRank;
+    private List<String> matchmakingTiglRanks;
 
     UserSettings(String userId) {
         this.userId = userId;
@@ -89,8 +88,8 @@ public class UserSettings {
         return matchmakingRestrictions != null;
     }
 
-    public boolean hasSetTiglRank() {
-        return !isBlank(matchmakingTiglRank) || !isBlank(matchmakingTiglFracturedRank);
+    public List<String> getMatchmakingTiglRanks() {
+        return Objects.requireNonNullElse(matchmakingTiglRanks, Collections.emptyList());
     }
 
     public List<String> getMatchmakingAvoidList() {

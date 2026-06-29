@@ -4,7 +4,6 @@ import de.gesundkrank.jskills.GameInfo;
 import de.gesundkrank.jskills.Rating;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +15,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
+import ti4.discord.utility.DiscordRoleUtility;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedPlayer;
 import ti4.settings.users.UserSettings;
@@ -26,6 +26,8 @@ import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
 @UtilityClass
 class PlayerMatchDataFactory {
 
+    private static final List<String> ROLES_TO_TRACK =
+            List.of(MatchmakingOptions.FLOATERS_ROLE_NAME, MatchmakingOptions.WARRIORS_ROLE_NAME);
     private static final int NUMBER_OF_ACTIVE_HOUR_BUCKETS = 6;
     private static final int ACTIVE_HOUR_BUCKET_SIZE = 4;
     private static final int ACTIVE_HOUR_BUCKET_MATCH_THRESHOLD = 3;
@@ -43,15 +45,15 @@ class PlayerMatchDataFactory {
 
         Map<MatchmakingQueueMember, PlayerMatchmakingData> matchData = new HashMap<>();
         for (QueuedParty queuedParty : parties) {
-            List<String> leaderRestrictions = queuedParty.leaderSettings().getMatchmakingRestrictions();
+            UserSettings leaderSettings = queuedParty.leaderSettings();
+            List<String> leaderRestrictions = leaderSettings.getMatchmakingRestrictions();
+            boolean tigl = queuedParty.party().isTigl();
+            List<String> tiglRanks = tigl ? leaderSettings.getMatchmakingTiglRanks() : List.of();
             Duration queueWait = Duration.between(queuedParty.party().getQueuedAt(), now);
-            List<String> memberIds = queuedParty.members().stream()
-                    .map(MatchmakingQueueMember::getUserId)
-                    .toList();
-            GroupTiglRank groupRank = groupTiglRank(memberIds);
             for (MatchmakingQueueMember member : queuedParty.members()) {
                 matchData.put(
-                        member, build(member.getUserId(), leaderRestrictions, ratings, guild, queueWait, groupRank));
+                        member,
+                        build(member.getUserId(), leaderRestrictions, ratings, guild, queueWait, tigl, tiglRanks));
             }
         }
         return matchData;
@@ -60,29 +62,13 @@ class PlayerMatchDataFactory {
     static Map<String, PlayerMatchmakingData> buildForUsers(List<String> userIds, List<String> leaderRestrictions) {
         Map<String, Rating> ratings = MatchmakingRatingEventService.get().getPlayerRatings(new HashSet<>(userIds));
         Guild guild = JdaService.guildPrimary;
-        GroupTiglRank groupRank = groupTiglRank(userIds);
 
         Map<String, PlayerMatchmakingData> dataById = new HashMap<>();
         for (String id : userIds) {
-            dataById.put(id, build(id, leaderRestrictions, ratings, guild, Duration.ZERO, groupRank));
+            dataById.put(id, build(id, leaderRestrictions, ratings, guild, Duration.ZERO, false, List.of()));
         }
         return dataById;
     }
-
-    private static GroupTiglRank groupTiglRank(List<String> memberIds) {
-        List<String> standardRanks = new ArrayList<>();
-        List<String> fracturedRanks = new ArrayList<>();
-        for (String id : memberIds) {
-            UserSettings settings = UserSettingsManager.get(id);
-            standardRanks.add(settings.getMatchmakingTiglRank());
-            fracturedRanks.add(settings.getMatchmakingTiglFracturedRank());
-        }
-        return new GroupTiglRank(
-                MatchmakingOptions.lowestTiglRank(standardRanks),
-                MatchmakingOptions.lowestTiglFracturedRank(fracturedRanks));
-    }
-
-    private record GroupTiglRank(String standard, String fractured) {}
 
     private static PlayerMatchmakingData build(
             String userId,
@@ -90,7 +76,8 @@ class PlayerMatchDataFactory {
             Map<String, Rating> ratings,
             Guild guild,
             Duration queueWait,
-            GroupTiglRank groupRank) {
+            boolean tigl,
+            List<String> tiglRanks) {
         UserSettings ownSettings = UserSettingsManager.get(userId);
         return new PlayerMatchmakingData(
                 userId,
@@ -101,8 +88,8 @@ class PlayerMatchDataFactory {
                 completedGames(userId),
                 roleNames(guild, userId),
                 queueWait,
-                groupRank.standard(),
-                groupRank.fractured());
+                tigl,
+                tiglRanks);
     }
 
     private static int completedGames(String userId) {
@@ -113,7 +100,13 @@ class PlayerMatchDataFactory {
 
     private static Set<String> roleNames(Guild guild, String userId) {
         Member member = guild == null ? null : guild.getMemberById(userId);
-        return member == null ? Set.of() : MatchmakingOptions.getHeldRoleNames(guild, member);
+        Set<String> roles = new HashSet<>();
+        for (String role : ROLES_TO_TRACK) {
+            if (DiscordRoleUtility.hasRole(guild, member, role)) {
+                roles.add(role);
+            }
+        }
+        return roles;
     }
 
     private static Set<Integer> computeActiveHourBuckets(Set<Integer> activeHours) {

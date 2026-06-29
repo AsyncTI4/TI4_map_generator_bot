@@ -1,17 +1,10 @@
 package ti4.discord.interactions.buttons.handlers.matchmaking;
 
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import ti4.discord.utility.DiscordRoleUtility;
 
 @UtilityClass
 public class MatchmakingOptions {
@@ -41,35 +34,25 @@ public class MatchmakingOptions {
             TWILIGHTS_FALL_EXPANSION_OPTION, "TF",
             FRANKEN_EXPANSION_OPTION, "Franken");
 
-    public static final Set<String> NON_STANDARD_EXPANSION_OPTIONS =
-            Set.of(DISCORDANT_STARS_EXPANSION_OPTION, TWILIGHTS_FALL_EXPANSION_OPTION, FRANKEN_EXPANSION_OPTION);
     public static final List<String> PLAYER_COUNT_OPTIONS = List.of("3", "4", "5", "6", "7", "8");
     public static final List<String> VICTORY_POINT_OPTIONS = List.of("10", "12", "14");
     public static final String SIMILAR_ACTIVE_HOURS_OPTION = "Similar active hours";
-    public static final String SIMILAR_PLAYER_SKILL_OPTION = "Similar player skill";
 
+    // Discord role names the matchmaker tracks to keep Floaters and Warriors apart.
     public static final String FLOATERS_ROLE_NAME = "Floaters";
     public static final String WARRIORS_ROLE_NAME = "Warriors";
-    public static final String AVOID_FLOATERS_OPTION = "Avoid Boat Floaters";
-    public static final String AVOID_WARRIORS_OPTION = "Avoid Warriors";
-    private static final Set<String> AVOIDABLE_ROLE_NAMES = Set.of(FLOATERS_ROLE_NAME, WARRIORS_ROLE_NAME);
+
     public static final String SLOWER_PACE_OPTION = "Slower";
     public static final String FAST_PACE_OPTION = "Average (30 days)";
     public static final String FASTER_PACE_OPTION = "Faster (15 days)";
     public static final String FASTEST_PACE_OPTION = "Fastest (7 days)";
-    public static final String TIGL_OPTION = "Twilight Imperium Global League";
     public static final List<String> PACE_RESTRICTION_OPTIONS =
             List.of(SLOWER_PACE_OPTION, FAST_PACE_OPTION, FASTER_PACE_OPTION, FASTEST_PACE_OPTION);
 
     public static final Map<String, Integer> PACE_RESTRICTION_TO_GAME_DAYS_TO_COMPLETE_REQUIREMENT =
-            Map.of(FASTER_PACE_OPTION, 19, FASTEST_PACE_OPTION, 10);
+            Map.of(FASTER_PACE_OPTION, 21, FASTEST_PACE_OPTION, 11);
 
-    public static final List<String> RESTRICTION_OPTIONS = List.of(
-            SIMILAR_ACTIVE_HOURS_OPTION,
-            SIMILAR_PLAYER_SKILL_OPTION,
-            AVOID_FLOATERS_OPTION,
-            AVOID_WARRIORS_OPTION,
-            TIGL_OPTION);
+    public static final List<String> RESTRICTION_OPTIONS = List.of(SIMILAR_ACTIVE_HOURS_OPTION);
 
     private static final Map<String, String> PACE_SHORT_NAMES = Map.of(
             SLOWER_PACE_OPTION, "Slower",
@@ -80,8 +63,6 @@ public class MatchmakingOptions {
     public static final String UNRANKED_OPTION = "Unranked";
     public static final List<String> TIGL_RANK_OPTIONS =
             List.of(UNRANKED_OPTION, "Minister", "Agent", "Commander", "Hero");
-    public static final List<String> TIGL_FRACTURED_RANK_OPTIONS = List.of(
-            UNRANKED_OPTION, "Thrall", "Acolyte", "Legionnaire", "Starlancer", "Gene-Sorcerer", "Ixth-Lord", "Archon");
 
     public static final Map<String, Integer> MAX_QUEUE_TIME_OPTIONS_TO_HOURS;
 
@@ -96,31 +77,8 @@ public class MatchmakingOptions {
 
     private static final int DEFAULT_MAX_QUEUE_TIME_HOURS = 8;
 
-    public static Set<String> getHeldRoleNames(Guild guild, Member member) {
-        Set<String> heldRoleNames = new HashSet<>();
-        for (String roleName : AVOIDABLE_ROLE_NAMES) {
-            Role role = DiscordRoleUtility.getRole(roleName, guild);
-            if (role != null && member.getRoles().contains(role)) {
-                heldRoleNames.add(roleName);
-            }
-        }
-        return heldRoleNames;
-    }
-
     public static boolean wantsSimilarActiveHours(Collection<String> restrictions) {
         return restrictions.contains(SIMILAR_ACTIVE_HOURS_OPTION);
-    }
-
-    public static boolean wantsSimilarPlayerSkill(Collection<String> restrictions) {
-        return restrictions.contains(SIMILAR_PLAYER_SKILL_OPTION);
-    }
-
-    public static boolean wantsTigl(Collection<String> restrictions) {
-        return restrictions.contains(TIGL_OPTION);
-    }
-
-    public static boolean usesFracturedRank(String expansion) {
-        return NON_STANDARD_EXPANSION_OPTIONS.contains(expansion);
     }
 
     public static String shortExpansionName(String expansion) {
@@ -129,33 +87,6 @@ public class MatchmakingOptions {
 
     public static String shortPaceName(String pace) {
         return PACE_SHORT_NAMES.getOrDefault(pace, pace);
-    }
-
-    private static String normalizeTiglRank(String rank) {
-        return rank == null || rank.isBlank() ? UNRANKED_OPTION : rank;
-    }
-
-    public static String lowestTiglRank(Collection<String> ranks) {
-        return lowestRank(TIGL_RANK_OPTIONS, ranks);
-    }
-
-    public static String lowestTiglFracturedRank(Collection<String> ranks) {
-        return lowestRank(TIGL_FRACTURED_RANK_OPTIONS, ranks);
-    }
-
-    private static String lowestRank(List<String> ladderLowToHigh, Collection<String> ranks) {
-        return ranks.stream()
-                .map(MatchmakingOptions::normalizeTiglRank)
-                .min(Comparator.comparingInt(rank -> Math.max(0, ladderLowToHigh.indexOf(rank))))
-                .orElse(UNRANKED_OPTION);
-    }
-
-    public static boolean wantsToAvoidFloaters(Collection<String> restrictions) {
-        return restrictions.contains(AVOID_FLOATERS_OPTION);
-    }
-
-    public static boolean wantsToAvoidWarriors(Collection<String> restrictions) {
-        return restrictions.contains(AVOID_WARRIORS_OPTION);
     }
 
     public static int getHours(String maxQueueTime) {
