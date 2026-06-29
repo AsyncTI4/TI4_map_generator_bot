@@ -24,6 +24,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
@@ -55,6 +56,9 @@ public class AddUnitService {
                     && unit.unitKey().unitType() == UnitType.Flagship) {
                 TaUnitHandler.offerWorldshaperOnFlagshipPlacement(
                         event, game, unit.unitKey(), unit.uh().getName(), tile);
+            }
+            if (player != null && player.hasLeader("nataucommander")) {
+                CommanderUnlockCheckService.checkPlayer(player, "natau");
             }
 
             String color = unit.unitKey().colorID();
@@ -94,6 +98,9 @@ public class AddUnitService {
                 TaUnitHandler.offerWorldshaperOnFlagshipPlacement(
                         event, game, parsedUnit.unitKey(), parsedUnit.location(), tile);
             }
+            if (player != null && player.hasLeader("nataucommander")) {
+                CommanderUnlockCheckService.checkPlayer(player, "natau");
+            }
         }
 
         handleFogOfWar(tile, color, game, unitList);
@@ -124,6 +131,9 @@ public class AddUnitService {
                     && parsedUnit.unitKey().unitType() == UnitType.Flagship) {
                 TaUnitHandler.offerWorldshaperOnFlagshipPlacement(
                         event, game, parsedUnit.unitKey(), parsedUnit.location(), tile);
+            }
+            if (player != null && player.hasLeader("nataucommander")) {
+                CommanderUnlockCheckService.checkPlayer(player, "natau");
             }
         }
 
@@ -199,19 +209,15 @@ public class AddUnitService {
             tile.addUnit(parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count());
             tile = FlipTileService.flipTileIfNeeded(tile, game);
             AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.location(), game);
-            if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasAbility("system_breach"))) {
-                NetrunnersAbilitiesHandler.resolveSystemBreach(game, parsedUnit.unitKey(), parsedUnit.count());
-            }
-            if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasUnit("netrunners_mech"))) {
-                NetrunnersUnitsHandler.offerDeployMechWithStructure(
-                        event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), parsedUnit.count());
-            }
             if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasLeader("netrunnerscommander"))) {
                 NetrunnersLeadersHandler.checkCommanderUnlock(game, parsedUnit.unitKey());
             }
             if (player.hasUnit("ta_flagship") && parsedUnit.unitKey().unitType() == UnitType.Flagship) {
                 TaUnitHandler.offerWorldshaperOnFlagshipPlacement(
                         event, game, parsedUnit.unitKey(), parsedUnit.location(), tile);
+            }
+            if (player.hasLeader("nataucommander")) {
+                CommanderUnlockCheckService.checkPlayer(player, "natau");
             }
             if (!first) {
                 unitListBuilder.append(", ");
