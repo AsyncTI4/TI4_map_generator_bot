@@ -199,13 +199,8 @@ class MatchmakingButtonHandler {
         String userId = event.getUser().getId();
         UserSettings userSettings = UserSettingsManager.get(userId);
 
+        // TIGL games are always 6 players, so there is no player count picker.
         final boolean REQUIRE_SELECTION = true;
-        CheckboxGroup playerCounts = buildCheckboxGroup(
-                PLAYER_COUNTS_ID,
-                PLAYER_COUNT_OPTIONS,
-                userSettings.getMatchmakingPlayerCounts(),
-                DEFAULT_PLAYER_COUNT_OPTIONS,
-                REQUIRE_SELECTION);
         CheckboxGroup victoryPoints = buildCheckboxGroup(
                 VICTORY_POINTS_ID,
                 VICTORY_POINT_OPTIONS,
@@ -231,7 +226,6 @@ class MatchmakingButtonHandler {
                 userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
                 !REQUIRE_SELECTION);
         return Modal.create(QUEUE_FOR_TIGL_MODAL_ID, "Queue for TIGL")
-                .addComponents(Label.of("Player Count", playerCounts))
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
                 .addComponents(Label.of("Pace", paces))
                 .addComponents(Label.of("Rank", ranks))
@@ -379,8 +373,9 @@ class MatchmakingButtonHandler {
     }
 
     private static void saveTiglMatchmakingPreferences(ModalInteractionEvent event, UserSettings userSettings) {
+        // TIGL games are always 6 players, PoK + TE.
         userSettings.setMatchmakingExpansions(List.of(MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION));
-        userSettings.setMatchmakingPlayerCounts(getSelectedValues(event, PLAYER_COUNTS_ID));
+        userSettings.setMatchmakingPlayerCounts(List.of("6"));
         userSettings.setMatchmakingVictoryPointGoals(getSelectedValues(event, VICTORY_POINTS_ID));
         userSettings.setMatchmakingPaces(getSelectedValues(event, PACE_RESTRICTIONS_ID));
         userSettings.setMatchmakingRestrictions(getSelectedValues(event, RESTRICTIONS_ID).stream()
