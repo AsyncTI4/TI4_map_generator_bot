@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -3801,19 +3798,21 @@ public final class ButtonHelperFactionSpecific {
         }
         sb.append(".");
         boolean damaged = false;
-        for (UnitHolder uH : tile.getUnitHolders().values()) {
-            int count = uH.getUnitCount(UnitType.Mech, player.getColor())
-                    - uH.getDamagedUnitCount(UnitType.Mech, player.getColorID());
-            if (count > 0 && !damaged) {
-                damaged = true;
-                uH.addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), 1);
-                sb.append('\n')
-                        .append(player.getFactionEmoji())
-                        .append(" damaged 1 mech on ")
-                        .append(tile.getRepresentation())
-                        .append("(")
-                        .append(uH.getName())
-                        .append(").");
+        if (!game.isTwilightsFallMode()) {
+            for (UnitHolder uH : tile.getUnitHolders().values()) {
+                int count = uH.getUnitCount(UnitType.Mech, player.getColor())
+                        - uH.getDamagedUnitCount(UnitType.Mech, player.getColorID());
+                if (count > 0 && !damaged) {
+                    damaged = true;
+                    uH.addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), 1);
+                    sb.append('\n')
+                            .append(player.getFactionEmoji())
+                            .append(" damaged 1 mech on ")
+                            .append(tile.getRepresentation())
+                            .append("(")
+                            .append(uH.getName())
+                            .append(").");
+                }
             }
         }
         String msg = sb.toString();

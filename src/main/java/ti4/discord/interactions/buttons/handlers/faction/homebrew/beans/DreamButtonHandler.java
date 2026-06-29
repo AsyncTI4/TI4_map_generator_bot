@@ -359,7 +359,7 @@ public class DreamButtonHandler {
             return;
         }
         Tile tile = game.getTileByPosition(parts[1]);
-        if (tile == null || tile.isHomeSystem(game) || !tile.isAnomaly(game)) {
+        if (tile == null || tile.isHomeSystem(game) || !tile.isAnomaly(game, player)) {
             MessageHelper.sendMessageToEventChannel(event, "That is not a valid non-home anomaly.");
             return;
         }
@@ -386,7 +386,7 @@ public class DreamButtonHandler {
     public static List<Tile> getDreamAgentAnomalyTiles(Game game) {
         return game.getTileMap().values().stream()
                 .filter(tile -> !tile.isHomeSystem(game))
-                .filter(tile -> tile.isAnomaly(game))
+                .filter(tile -> tile.isAnomaly(game, null))
                 .toList();
     }
 

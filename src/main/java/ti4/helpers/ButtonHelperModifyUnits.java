@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static ti4.discord.utility.DiscordErrorUtility.isIgnorableError;
+import static ti4.discord.utility.DiscordErrorUtility.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -97,7 +97,8 @@ public final class ButtonHelperModifyUnits {
         if (game.getActiveSystem() != null
                 && game.getTileByPosition(game.getActiveSystem()) != null
                 && game.getTileByPosition(game.getActiveSystem()).isScar(game)
-                && !player.hasUnlockedBreakthrough("nivynbt")) {
+                && !player.hasUnlockedBreakthrough("nivynbt")
+                && !player.hasTech("tf-singularitypoint")) {
             return 0;
         }
         mentakFS = Helper.getPlayerFromUnit(game, "sigma_mentak_flagship_2");
@@ -1597,6 +1598,7 @@ public final class ButtonHelperModifyUnits {
                 + ("ruthless".equals(source) ? " by **Ruthless**" : "")
                 + ". Please either cancel the hit somehow, or accept the loss of the unit.";
         List<Button> buttons = new ArrayList<>();
+        game.setStoredValue(player.getFaction() + "latestAssignHits", "combat");
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
         UnitModel unitModel = player.getUnitFromUnitKey(key);
 

@@ -8,6 +8,7 @@
         "title": "Bastion Valiant",
         "abilityWindow": "When a player's unit is destroyed",
         "abilityText": "You may exhaust this card to galvanize another of that player's units in the destroyed unit's system.",
+        "notes": "The agent's owner chooses which unit is galvanized.",
         "unlockCondition": "Always Unlocked",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/bastionagent.png?raw=true",
         "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/bastionagent.png?raw=true",

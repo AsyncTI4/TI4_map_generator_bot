@@ -335,7 +335,7 @@ class Stats extends GameStateSubcommand {
                             channel.getJumpUrl() + " Round " + game.getRound() + "; Space Resources: "
                                     + player.getTotalResourceValueOfUnits("space") + "; VP: "
                                     + player.getTotalVictoryPoints() + ";\nTrack record: "
-                                    + userSettings.getTrackRecord());
+                                    + userSettings.getTrackRecord() + "\nFor user: " + player.getDisplayName());
                 }
                 userSettings.setTrackRecord(
                         userSettings.getTrackRecord() + " Was set as an NPC in " + game.getName() + ". ");

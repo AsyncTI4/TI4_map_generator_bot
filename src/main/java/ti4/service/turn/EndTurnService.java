@@ -110,6 +110,12 @@ public class EndTurnService {
             MessageHelper.sendMessageToChannel(mainPlayer.getCardsInfoThread(), msg, buttons);
         }
 
+        if (mainPlayer.hasTech("tf-treasurehunters")) {
+            game.shuffleExplores();
+            MessageHelper.sendMessageToChannel(
+                    mainPlayer.getCorrectChannel(), "Shuffled the explore decks due to the treasure hunter ability");
+        }
+
         CommanderUnlockCheckService.checkPlayer(mainPlayer, "sol", "hacan");
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {

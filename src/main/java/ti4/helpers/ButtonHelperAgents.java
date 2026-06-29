@@ -1090,7 +1090,7 @@ public final class ButtonHelperAgents {
             List<Button> buttons = GalvanizeService.getToggleGalvanizeButtons(
                     p2, game, game.getTileByPosition(game.getActiveSystem()));
             MessageHelper.sendMessageToChannel(
-                    channel2, p2.getRepresentation() + ", please choose the unit you wish to galvanize.", buttons);
+                    channel2, p2.getRepresentation() + ", please choose the unit that should be galvanized.", buttons);
         }
         if ("obsidianagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted the " + ssruuClever + "_Obsidian Agent_.";
@@ -1200,8 +1200,8 @@ public final class ButtonHelperAgents {
             if (p2.getTg() > 0) {
                 p2.setTg(p2.getTg() - 1);
                 player.gainTG(1, true);
-                successMessage2 += " and gave 1 TG to " + player.getFactionEmoji() + ".";
-                successMessage += " and took 1 TG from " + p2.getFactionEmoji() + ".";
+                successMessage2 += " and gave 1 TG to " + player.getFactionEmojiOrColor() + ".";
+                successMessage += " and took 1 TG from " + p2.getFactionEmojiOrColor() + ".";
             } else {
                 successMessage += ".";
                 successMessage2 += ".";

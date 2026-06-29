@@ -269,7 +269,7 @@ public final class StatusHelper {
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
                     game.getPing()
-                            + ", players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.",
+                            + ", players will be forced to score in order. Any preemptive scores will be queued. In the event of a bug, you may turn this off at any time by pressing this button, but that will not resolve the queue, it will just abandon it.",
                     buttons);
             for (Player player : getPlayersInScoringOrder(game)) {
                 game.setStoredValue(key3, game.getStoredValue(key3) + player.getFaction() + "*");

@@ -399,6 +399,7 @@ public final class ButtonHelperTacticalAction {
         game.setWarfareAction(false);
         game.setL1Hero(false);
         game.removeStoredValue("violatedSystems");
+        game.removeStoredValue("mercenarycaptaintrigged");
         game.removeStoredValue("vaylerianHeroActive");
         game.removeStoredValue("tnelisCommanderTracker");
         for (Player player : game.getRealPlayers()) {

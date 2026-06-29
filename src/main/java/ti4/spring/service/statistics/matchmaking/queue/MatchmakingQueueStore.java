@@ -59,16 +59,18 @@ public class MatchmakingQueueStore {
         saveMembers(userIds, partyId);
     }
 
-    void markQueued(MatchmakingQueueParty party, String leaderId) {
+    void markQueued(MatchmakingQueueParty party, String leaderId, boolean tigl) {
         party.setLeaderId(leaderId);
         party.setQueued(true);
+        party.setTigl(tigl);
         party.setQueuedAt(Instant.now());
         partyRepository.save(party);
     }
 
-    void createSoloQueuedParty(String leaderId) {
+    void createSoloQueuedParty(String leaderId, boolean tigl) {
         MatchmakingQueueParty party = new MatchmakingQueueParty();
         party.setQueued(true);
+        party.setTigl(tigl);
         party.setQueuedAt(Instant.now());
         party.setLeaderId(leaderId);
         long partyId = partyRepository.save(party).getId();

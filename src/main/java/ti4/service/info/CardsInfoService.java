@@ -264,6 +264,11 @@ public class CardsInfoService {
             buttons.add(Buttons.gray(
                     "getAgentSelection_hyperagent", "Use Hyper Agent on Someone Else", FactionEmojis.Mentak));
         }
+        if (player.hasTech("tf-predictivecommand")
+                && !player.getExhaustedTechs().contains("tf-predictivecommand")) {
+            buttons.add(Buttons.gray(
+                    "exhaustTech_tf-predictivecommand", "Exhaust Predictive Command", FactionEmojis.mykomentori));
+        }
         if (player.hasUnexhaustedLeader("firmamentagent")) {
             buttons.add(
                     Buttons.gray("getAgentSelection_firmamentagent", "Use Firmament Agent", FactionEmojis.Firmament));

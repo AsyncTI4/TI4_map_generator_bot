@@ -60,6 +60,7 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -781,6 +782,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if ("researchteam".equalsIgnoreCase(ability) && getTechs().contains("tf-pacifist")) {
             return true;
         }
+        if ("cloaked_fleets".equalsIgnoreCase(ability) && getTechs().contains("tf-shroudoflith")) {
+            return true;
+        }
         if (getTechs().contains("tf-" + ability.replace("_", ""))) {
             return true;
         }
@@ -1447,7 +1451,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             if (Mapper.getPlanet(planet) != null && Mapper.getPlanet(planet).isSpaceStation()) {
                 bonus++;
             }
-            if (hasUnlockedBreakthrough("gledgebt")) {
+            if (hasUnlockedBreakthrough("gledgebt") || hasTech("tf-mantlecracking")) {
                 Planet planetObj = game.getUnitHolderFromPlanet(planet);
                 if (planetObj != null && planetObj.getTokenList().contains(Constants.GLEDGE_CORE_PNG)) {
                     bonus++;
@@ -2525,6 +2529,30 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         // Set ATS Armaments to 0 when adding tech (if it was removed we reset it)
         if ("dslaner".equalsIgnoreCase(techID)) {
             setAtsCount(0);
+        }
+
+        if ("tf-policies".equalsIgnoreCase(techID)) {
+            addAbility("policy_the_people_connect");
+            addAbility("policy_the_environment_preserve");
+            addAbility("policy_the_economy_empower");
+            removeOwnedUnitByID("olradin_mech");
+            addOwnedUnitByID("olradin_mech_positive");
+            MessageHelper.sendMessageToChannel(
+                    getCorrectChannel(),
+                    getRepresentationUnfogged()
+                            + ", the bot has automatically set all of your Policies to the positive side, but you can flip any of them now with these buttons.");
+            ButtonHelperHeroes.offerOlradinHeroFlips(this);
+            ButtonHelperHeroes.offerOlradinHeroFlips(this);
+            ButtonHelperHeroes.offerOlradinHeroFlips(this);
+        }
+        if ("tf-cunning".equalsIgnoreCase(techID)) {
+            Map<String, GenericCardModel> traps = Mapper.getTraps();
+            for (Map.Entry<String, GenericCardModel> entry : traps.entrySet()) {
+                String key = entry.getKey();
+                if (key.endsWith(Constants.LIZHO)) {
+                    setTrapCard(key);
+                }
+            }
         }
 
         if ("tf-telepathic".equalsIgnoreCase(techID)) {

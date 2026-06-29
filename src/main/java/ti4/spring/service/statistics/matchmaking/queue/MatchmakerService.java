@@ -62,7 +62,7 @@ public class MatchmakerService {
     }
 
     @Transactional
-    public Optional<String> queue(String queuerId) {
+    public Optional<String> queue(String queuerId, boolean tigl) {
         if (DatabasePersistenceGate.isDisabled()) return Optional.of("Queueing is currently disabled.");
 
         Optional<MatchmakingQueueMember> optionalMember = queueStore.findMember(queuerId);
@@ -72,8 +72,9 @@ public class MatchmakerService {
                     queueStore.findParty(member.getPartyId()).orElse(null);
             if (party != null) {
                 if (party.isQueued()) return Optional.of("You are already queued for a game.");
+                if (tigl) return Optional.of("You cannot queue for TIGL as a group. Leave your group first.");
 
-                queueStore.markQueued(party, queuerId);
+                queueStore.markQueued(party, queuerId, tigl);
                 return Optional.empty();
             }
             // This is defensive, in case we have an orphaned member
@@ -84,7 +85,7 @@ public class MatchmakerService {
         Optional<String> error = PartyValidator.validateGameLimits(List.of(queuerId));
         if (error.isPresent()) return error;
 
-        queueStore.createSoloQueuedParty(queuerId);
+        queueStore.createSoloQueuedParty(queuerId, tigl);
         return Optional.empty();
     }
 

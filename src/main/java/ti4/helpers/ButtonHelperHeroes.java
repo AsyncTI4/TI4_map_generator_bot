@@ -1258,7 +1258,7 @@ public class ButtonHelperHeroes {
         List<Tile> tiles = new ArrayList<>();
         if (game.isTwilightsFallMode()) {
             for (Tile tile : game.getTileMap().values()) {
-                if (tile.isGravityRift(game)) {
+                if (tile.isGravityRift(game, player)) {
                     tiles.add(tile);
                 }
             }
