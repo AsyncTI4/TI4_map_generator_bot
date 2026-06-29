@@ -277,7 +277,7 @@
         "alias": "natau",
         "factionName": "The Natau Priesthood",
         "homeSystem": "be7",
-        "startingFleet": "1 cv, 1 dd, 1 dn, 2 ff, 1 inf decay, 1 inf demise, 2 inf disorder, sd disorder",
+        "startingFleet": "1 cv, 1 cr, 1 dd, 2 ff, 1 inf decay, 1 inf demise, 2 inf disorder, sd disorder",
         "commodities": 3,
         "factionTech": [
             "benataudo",
