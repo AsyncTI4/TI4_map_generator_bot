@@ -58,6 +58,20 @@ public final class CombatMessageHelper {
             int extraRolls,
             List<Die> resultRolls,
             int numHit) {
+        return displayUnitRoll(
+                unitModel, toHit, modifier, unitQuantity, numRollsPerUnit, extraRolls, resultRolls, numHit, "");
+    }
+
+    public static String displayUnitRoll(
+            UnitModel unitModel,
+            int toHit,
+            int modifier,
+            int unitQuantity,
+            int numRollsPerUnit,
+            int extraRolls,
+            List<Die> resultRolls,
+            int numHit,
+            String holderLabel) {
         String hitsSuffix = "";
         if (numHit > 1) {
             hitsSuffix = "s";
@@ -94,7 +108,11 @@ public final class CombatMessageHelper {
             upgradedUnitName = unitModel.getName();
         }
 
-        List<String> optionalInfoParts = Arrays.asList(upgradedUnitName, unitRollsTextInfo, unitTypeHitsInfo);
+        String holderLabelSep = StringUtils.isNotBlank(holderLabel) && StringUtils.isBlank(unitRollsTextInfo)
+                ? holderLabel + ","
+                : holderLabel;
+        List<String> optionalInfoParts =
+                Arrays.asList(upgradedUnitName, holderLabelSep, unitRollsTextInfo, unitTypeHitsInfo);
         String optionalText =
                 optionalInfoParts.stream().filter(StringUtils::isNotBlank).collect(Collectors.joining(" "));
 

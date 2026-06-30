@@ -4,8 +4,11 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -1062,6 +1065,11 @@ public class CombatRollService {
                         Map.of("modifier", Integer.toString(letnevBTBoost))));
             }
         }
+        MergeResult mergeResult = mergeAndDetectDivergence(
+                playerUnits, mods, rollType, player, opponent, game, playerUnitsList, activeSystem);
+        playerUnits = mergeResult.units();
+        Set<String> divergingModels = mergeResult.divergingModels();
+        Set<String> consumedBestMods = new HashSet<>();
         for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : playerUnits.entrySet()) {
             UnitModel unitModel = entry.getKey().getLeft();
             UnitHolder perUnitHolder = entry.getKey().getRight();
@@ -1080,10 +1088,13 @@ public class CombatRollService {
                     rollType,
                     activeSystem,
                     perUnitHolder);
+            List<NamedCombatModifierModel> availableExtraRolls = extraRolls.stream()
+                    .filter(m -> !consumedBestMods.contains(m.getModifier().getAlias()))
+                    .collect(Collectors.toList());
             int extraRollsForUnit = CombatModHelper.getCombinedModifierForUnit(
                     unitModel,
                     numOfUnit,
-                    extraRolls,
+                    availableExtraRolls,
                     player,
                     opponent,
                     game,
@@ -1091,6 +1102,16 @@ public class CombatRollService {
                     rollType,
                     activeSystem,
                     perUnitHolder);
+            if (extraRollsForUnit > 0) {
+                for (NamedCombatModifierModel m : availableExtraRolls) {
+                    String sc = m.getModifier().getScope();
+                    if (("_best_".equals(sc) || "_bestCap_".equals(sc) || (sc != null && sc.contains("_mostdice_")))
+                            && Boolean.TRUE.equals(m.getModifier()
+                                    .isInScopeForUnit(unitModel, playerUnitsList, rollType, game, player))) {
+                        consumedBestMods.add(m.getModifier().getAlias());
+                    }
+                }
+            }
 
             int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player);
             if (rollType == CombatRollType.combatround) {
@@ -1390,6 +1411,9 @@ public class CombatRollService {
 
                 totalHits += hitRolls;
 
+                String holderLabel = divergingModels.contains(unitModel.getId()) && perUnitHolder instanceof Planet p
+                        ? "on **" + Helper.getPlanetRepresentationNoResInf(p.getName(), game) + "**"
+                        : "";
                 String unitRoll = CombatMessageHelper.displayUnitRoll(
                         unitModel,
                         toHit,
@@ -1398,7 +1422,8 @@ public class CombatRollService {
                         numRollsPerUnit,
                         extraRollsForUnit,
                         resultRolls,
-                        hitRolls);
+                        hitRolls,
+                        holderLabel);
                 resultBuilder.append(unitRoll);
                 payloadBuilder.addUnitRoll(
                         unitModel,
@@ -2482,6 +2507,70 @@ public class CombatRollService {
         Map<UnitModel, Integer> result = new HashMap<>();
         map.forEach((k, v) -> result.merge(k.getLeft(), v, Integer::sum));
         return result;
+    }
+
+    record MergeResult(Map<Pair<UnitModel, UnitHolder>, Integer> units, Set<String> divergingModels) {}
+
+    static MergeResult mergeAndDetectDivergence(
+            Map<Pair<UnitModel, UnitHolder>, Integer> playerUnits,
+            List<NamedCombatModifierModel> mods,
+            CombatRollType rollType,
+            Player player,
+            Player opponent,
+            Game game,
+            List<UnitModel> playerUnitsList,
+            Tile activeSystem) {
+
+        IdentityHashMap<Pair<UnitModel, UnitHolder>, Integer> countByIdentity = new IdentityHashMap<>();
+        playerUnits.forEach(countByIdentity::put);
+        Map<String, List<Pair<UnitModel, UnitHolder>>> modelKeys = new LinkedHashMap<>();
+        for (Pair<UnitModel, UnitHolder> key : countByIdentity.keySet()) {
+            modelKeys
+                    .computeIfAbsent(key.getLeft().getId(), k -> new ArrayList<>())
+                    .add(key);
+        }
+        Set<String> divergingModels = new HashSet<>();
+        Map<Pair<UnitModel, UnitHolder>, Integer> merged = new LinkedHashMap<>();
+        for (Map.Entry<String, List<Pair<UnitModel, UnitHolder>>> modelEntry : modelKeys.entrySet()) {
+            List<Pair<UnitModel, UnitHolder>> keys = modelEntry.getValue();
+            if (keys.size() == 1) {
+                Pair<UnitModel, UnitHolder> k = keys.get(0);
+                merged.put(k, countByIdentity.get(k));
+                continue;
+            }
+            IdentityHashMap<Pair<UnitModel, UnitHolder>, Integer> perKeyToHit = new IdentityHashMap<>();
+            for (Pair<UnitModel, UnitHolder> key : keys) {
+                UnitModel m = key.getLeft();
+                UnitHolder h = key.getRight();
+                int toHit = m.getCombatDieHitsOnForAbility(rollType, player);
+                if (rollType == CombatRollType.combatround) {
+                    toHit = CombatStatsService.getCombatRoundProfile(true, m, player, activeSystem, opponent, false)
+                            .hitsOn();
+                }
+                int mod = CombatModHelper.getCombinedModifierForUnit(
+                        m,
+                        countByIdentity.get(key),
+                        mods,
+                        player,
+                        opponent,
+                        game,
+                        playerUnitsList,
+                        rollType,
+                        activeSystem,
+                        h);
+                perKeyToHit.put(key, toHit - mod);
+            }
+            Set<Integer> distinctToHits = new HashSet<>(perKeyToHit.values());
+            if (distinctToHits.size() > 1) {
+                divergingModels.add(modelEntry.getKey());
+                keys.sort(Comparator.comparingInt(perKeyToHit::get));
+                for (Pair<UnitModel, UnitHolder> k : keys) merged.put(k, countByIdentity.get(k));
+            } else {
+                int totalCount = keys.stream().mapToInt(countByIdentity::get).sum();
+                merged.put(keys.get(0), totalCount);
+            }
+        }
+        return new MergeResult(merged, divergingModels);
     }
 
     private static void checkBadUnits(
