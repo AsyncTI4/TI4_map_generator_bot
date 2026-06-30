@@ -1177,6 +1177,13 @@ public class CombatRollService {
                     }
                 }
 
+                if ((rollType == CombatRollType.SpaceCannonDefence || rollType == CombatRollType.SpaceCannonOffence)
+                        && game.playerHasLeaderUnlockedOrAlliance(player, "zephyrioncommander")) {
+                    for (Die die : resultRolls) {
+                        if (die.getResult() == 10) hitRolls += 1;
+                        maximumHits += 1;
+                    }
+                }
                 if (rollType == CombatRollType.bombardment && "tf-dragonfreed".equalsIgnoreCase(unitModel.getId())) {
                     if (!game.isFowMode() && hitRolls > 0) {
 
