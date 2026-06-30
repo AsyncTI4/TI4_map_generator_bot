@@ -18,6 +18,7 @@ import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.draft.DraftSetupService;
 import ti4.service.emoji.MiltyDraftEmojis;
+import ti4.service.milty.MiltyRandomSetupService;
 import ti4.service.milty.MiltyService;
 import tools.jackson.databind.JsonNode;
 
@@ -37,6 +38,8 @@ public class MiltySettings extends SettingsMenu {
     // Bonus Attributes
     @JsonIgnore
     private final Game game;
+
+    private boolean randomSetup;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -70,6 +73,7 @@ public class MiltySettings extends SettingsMenu {
                 && json.has("menuId")
                 && historicIDs.contains(json.get("menuId").asString(""))) {
             draftMode.initialize(json.get("draftMode"));
+            randomSetup = json.has("randomSetup") && json.get("randomSetup").asBoolean(false);
         }
 
         // initialize categories
@@ -110,7 +114,11 @@ public class MiltySettings extends SettingsMenu {
         List<Button> buttons = new ArrayList<>();
         String prefix = menuAction + "_" + navId() + "_";
 
-        buttons.add(Buttons.green(prefix + "startMilty", "Start Milty Draft!"));
+        if (randomSetup) {
+            buttons.add(Buttons.green(prefix + "startRandomSetup", "Start Random Setup!"));
+        } else {
+            buttons.add(Buttons.green(prefix + "startMilty", "Start Milty Draft!"));
+        }
         return buttons;
     }
 
@@ -119,9 +127,14 @@ public class MiltySettings extends SettingsMenu {
         String error =
                 switch (action) {
                     case "startMilty" -> startDraft(event);
+                    case "startRandomSetup" -> startRandomSetup(event);
                     default -> null;
                 };
         return (error == null ? "success" : error);
+    }
+
+    public void setRandomSetup(boolean randomSetup) {
+        this.randomSetup = randomSetup;
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -169,5 +182,12 @@ public class MiltySettings extends SettingsMenu {
         }
 
         return "This draft mode isn't implemented yet!";
+    }
+
+    private String startRandomSetup(GenericInteractionCreateEvent event) {
+        if (draftMode.getValue() != DraftingMode.milty) {
+            return "Random setup is only implemented for Milty-style setup.";
+        }
+        return MiltyRandomSetupService.randomSetupFromSettings(event, this);
     }
 }
