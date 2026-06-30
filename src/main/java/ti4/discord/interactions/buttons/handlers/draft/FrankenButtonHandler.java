@@ -159,13 +159,14 @@ public class FrankenButtonHandler {
         tabletalk.send();
 
         FrankenDraftBagService.updateFinishedBuildingMessage(game);
+        ButtonHelper.deleteMessage(event);
         for (Player p : game.getRealPlayers()) {
             if ("n".equals(p.getStoredValue(key))) return;
         }
 
         MessageChannel channel = game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel();
         MessageV2Builder builder = new MessageV2Builder(channel);
-        ButtonHelper.deleteMessage(event);
+
         if (game.isTwilightsFallMode()) {
             return;
         }
