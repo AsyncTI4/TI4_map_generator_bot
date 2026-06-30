@@ -12,6 +12,7 @@ import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 class ShowUserSettings extends Subcommand {
 
@@ -42,7 +43,9 @@ class ShowUserSettings extends Subcommand {
 
     private static String getJSONRaw(UserSettings userSettings) {
         try {
-            return mapper.writeValueAsString(userSettings);
+            ObjectNode node = mapper.valueToTree(userSettings);
+            node.remove("trackRecord");
+            return mapper.writeValueAsString(node);
         } catch (Exception e) {
             return "Failed to serialize UserSettings";
         }
