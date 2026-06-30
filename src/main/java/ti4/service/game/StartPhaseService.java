@@ -73,6 +73,7 @@ import ti4.service.map.SpinService;
 import ti4.service.planet.PlanetService;
 import ti4.service.strategycard.PickStrategyCardService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.webhook.GameEventNotifierFacade;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -84,7 +85,9 @@ public class StartPhaseService {
             case "voting", "agendaVoting" -> AgendaHelper.startTheVoting(game);
             case "shuffleDecks" -> game.shuffleDecks();
             case "agenda" -> {
+                String previousPhase = game.getPhaseOfGame();
                 game.setPhaseOfGame("agenda");
+                GameEventNotifierFacade.notifyPhaseChanged(game, previousPhase, "agenda");
                 Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
                 List<Button> buttons = List.of(flipAgenda);
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -545,7 +548,9 @@ public class StartPhaseService {
         }
         String message = firstSCPicker.getRepresentationUnfogged() + " is up to pick a strategy card.";
         game.updateActivePlayer(firstSCPicker);
+        String previousPhase = game.getPhaseOfGame();
         game.setPhaseOfGame("strategy");
+        GameEventNotifierFacade.notifyPhaseChanged(game, previousPhase, "strategy");
         GMService.logActivity(game, "**Strategy** Phase for Round " + game.getRound() + " started.", true);
         FowCommunicationThreadService.checkAllCommThreads(game);
         SpinService.executeSpinsForTrigger(game, SpinService.AutoTrigger.STRATEGY);
@@ -844,7 +849,9 @@ public class StartPhaseService {
     }
 
     public static void startStatusHomework(GenericInteractionCreateEvent event, Game game) {
+        String previousPhase = game.getPhaseOfGame();
         game.setPhaseOfGame("statusHomework");
+        GameEventNotifierFacade.notifyPhaseChanged(game, previousPhase, "statusHomework");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusHomework", System.currentTimeMillis() + "");
         GMService.logActivity(game, "**StatusHomework** Phase for Round " + game.getRound() + " started.", true);
         // first do cleanup if necessary
@@ -1126,7 +1133,9 @@ public class StartPhaseService {
     public static void startActionPhase(GenericInteractionCreateEvent event, Game game, boolean incrementTgs) {
         boolean isFowPrivateGame = game.isFowMode();
         game.setStoredValue("willRevolution", "");
+        String previousPhase = game.getPhaseOfGame();
         game.setPhaseOfGame("action");
+        GameEventNotifierFacade.notifyPhaseChanged(game, previousPhase, "action");
         GMService.logActivity(game, "**Action** Phase for Round " + game.getRound() + " started.", true);
         for (Player p2 : game.getRealPlayers()) {
             ButtonHelperActionCards.checkForAssigningExtremeDuress(game, p2);

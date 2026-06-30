@@ -51,3 +51,63 @@ python scripts/convert_and_upload_to_s3.py
 ### Infrastructure
 
 AWS infrastructure is managed via Terraform in the `aws-resources` repository. The setup uses OIDC for keyless authentication via the `GithubActionsRole` IAM role.
+
+## Game Event Webhooks
+
+The bot supports outbound webhook subscriptions for lightweight website event integration.
+
+### Configuration
+
+Manage subscriptions through the public API:
+
+- `GET /api/webhooks/games/event-types` lists supported event types.
+- `POST /api/webhooks/games/subscriptions` replaces a user subscription for a game.
+
+### Event Types
+
+The bot emits these event types:
+
+- `active_player_changed`
+- `phase_changed` (only strategy/action/status/agenda transitions)
+- `agenda_voting_started`
+- `agenda_resolved`
+- `player_passed`
+- `game_ended`
+
+### Payload Schema
+
+Each webhook POST sends JSON with this shape:
+
+- `gameName` (string)
+- `eventType` (string)
+- `phaseOfGame` (string)
+- `round` (number)
+- `activePlayerId` (string or null)
+- `activeFaction` (string or null)
+- `timestamp` (ISO-8601 string)
+- `metadata` (object, optional)
+
+Example:
+
+```json
+{
+  "gameName": "pbd1234",
+  "eventType": "player_passed",
+  "phaseOfGame": "action",
+  "round": 4,
+  "activePlayerId": "123456789012345678",
+  "activeFaction": "hacan",
+  "timestamp": "2026-05-31T00:00:00Z",
+  "metadata": {
+    "passedPlayerId": "123456789012345678",
+    "passedFaction": "hacan",
+    "autoPass": false
+  }
+}
+```
+
+### Delivery Semantics
+
+- Best-effort delivery.
+- At-most-once from game-flow perspective (events are triggered only on meaningful transitions).
+- Dispatch is non-blocking; game flow continues if webhook delivery fails.
