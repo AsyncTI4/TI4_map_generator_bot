@@ -98,7 +98,8 @@ class BombardmentButtonHandler {
         if (tile == null) {
             return buttons;
         }
-        Map<UnitModel, Integer> bombardUnits = CombatRollService.getUnitsInBombardment(tile, player, null);
+        Map<UnitModel, Integer> bombardUnits =
+                CombatRollService.flattenUnitMap(CombatRollService.getUnitsInBombardment(tile, player, null));
         String assignedUnits = game.getStoredValue("assignedBombardment" + player.getFaction());
         List<String> usedLabels = new ArrayList<>();
         for (Map.Entry<UnitModel, Integer> entry : bombardUnits.entrySet()) {
