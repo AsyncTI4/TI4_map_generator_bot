@@ -13,7 +13,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.message.MessageHelper;
@@ -29,7 +28,7 @@ class SacrificeAcd2ButtonHandler {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             Planet uH = game.getUnitHolderFromPlanet(planet);
-            if (uH != null && FoWHelper.playerHasUnitsOnPlanet(player, uH)) {
+            if (uH != null && uH.getUnitCount(player.getColor()) >= 2) {
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + "sacrificePlanet_" + planet,
                         Helper.getPlanetRepresentation(planet, game)));
@@ -39,7 +38,7 @@ class SacrificeAcd2ButtonHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", you do not control a planet that contains your units"
+                    player.getRepresentationUnfogged() + ", you do not control a planet that contains 2 of your units"
                             + " for _Sacrifice_.");
             return;
         }
