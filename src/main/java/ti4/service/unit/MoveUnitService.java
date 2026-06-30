@@ -1,6 +1,7 @@
 package ti4.service.unit;
 
 import java.util.List;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.game.Game;
@@ -61,9 +62,10 @@ public class MoveUnitService {
             UnitType oldType,
             UnitType newType,
             int amt) {
-        RemoveUnitService.removeUnit(event, tile, game, player, uh, oldType, amt);
         String unitList = amt + " " + newType.getValue();
         if (uh instanceof Planet) unitList += " " + uh.getName();
         AddUnitService.addUnits(event, tile, game, player.getColor(), unitList);
+        RemoveUnitService.removeUnit(event, tile, game, player, uh, oldType, amt);
+        
     }
 }
