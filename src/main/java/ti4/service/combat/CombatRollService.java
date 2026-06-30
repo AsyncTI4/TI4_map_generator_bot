@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -2519,8 +2520,11 @@ public class CombatRollService {
             Game game,
             List<UnitModel> playerUnitsList,
             Tile activeSystem) {
+
+        IdentityHashMap<Pair<UnitModel, UnitHolder>, Integer> countByIdentity = new IdentityHashMap<>();
+        playerUnits.forEach(countByIdentity::put);
         Map<String, List<Pair<UnitModel, UnitHolder>>> modelKeys = new LinkedHashMap<>();
-        for (Pair<UnitModel, UnitHolder> key : playerUnits.keySet()) {
+        for (Pair<UnitModel, UnitHolder> key : countByIdentity.keySet()) {
             modelKeys
                     .computeIfAbsent(key.getLeft().getId(), k -> new ArrayList<>())
                     .add(key);
@@ -2531,10 +2535,10 @@ public class CombatRollService {
             List<Pair<UnitModel, UnitHolder>> keys = modelEntry.getValue();
             if (keys.size() == 1) {
                 Pair<UnitModel, UnitHolder> k = keys.get(0);
-                merged.put(k, playerUnits.get(k));
+                merged.put(k, countByIdentity.get(k));
                 continue;
             }
-            Map<Pair<UnitModel, UnitHolder>, Integer> perKeyToHit = new HashMap<>();
+            IdentityHashMap<Pair<UnitModel, UnitHolder>, Integer> perKeyToHit = new IdentityHashMap<>();
             for (Pair<UnitModel, UnitHolder> key : keys) {
                 UnitModel m = key.getLeft();
                 UnitHolder h = key.getRight();
@@ -2545,7 +2549,7 @@ public class CombatRollService {
                 }
                 int mod = CombatModHelper.getCombinedModifierForUnit(
                         m,
-                        playerUnits.get(key),
+                        countByIdentity.get(key),
                         mods,
                         player,
                         opponent,
@@ -2560,9 +2564,9 @@ public class CombatRollService {
             if (distinctToHits.size() > 1) {
                 divergingModels.add(modelEntry.getKey());
                 keys.sort(Comparator.comparingInt(perKeyToHit::get));
-                for (Pair<UnitModel, UnitHolder> k : keys) merged.put(k, playerUnits.get(k));
+                for (Pair<UnitModel, UnitHolder> k : keys) merged.put(k, countByIdentity.get(k));
             } else {
-                int totalCount = keys.stream().mapToInt(playerUnits::get).sum();
+                int totalCount = keys.stream().mapToInt(countByIdentity::get).sum();
                 merged.put(keys.get(0), totalCount);
             }
         }
