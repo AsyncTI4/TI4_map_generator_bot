@@ -1637,6 +1637,140 @@
         "forCombatAbility": "AFB"
     },
     {
+        "alias": "xan_warsun2_extra_dice_per_space_dock",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "space_docks_in_tile",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "xan_warsun2",
+                "message": "+1 roll for each space dock in this system"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "plus_2_xan_mech_with_space_dock",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "CONDITIONAL",
+        "condition": "space_dock_on_holder",
+        "scope": "mf",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "xan_mech",
+                "message": "+2 when on a planet with a space dock"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "arvaxi_mobilization_engine",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "arvaxi_engine",
+        "persistenceType": "CONDITIONAL",
+        "condition": "arvaxi_engine",
+        "scope": "",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Mobilization Engine"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "plus_1_onyxxa_mech_per_other_mech_on_planet",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "mechs_on_planet_minus_one",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "onyxxa_mech",
+                "message": "+1 for each other Onyxxa mech on this planet"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "plus_1_opponent_strat_cards_exhausted",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "opponent_strat_cards_exhausted",
+        "scope": "",
+        "related": [
+            {
+                "type": "tech",
+                "alias": "baconcg"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "plus_2_for_each_mech_space_cannon_defence",
+        "type": "mods",
+        "value": "+2",
+        "valueScalingType": "mechs_on_planet",
+        "persistenceType": "CONDITIONAL",
+        "condition": "technotemplar",
+        "scope": "",
+        "displayUnitAlias": "vyserix_mech",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "+2 for each Vyserix mech on planet"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonDefence"
+    },
+    {
+        "alias": "plus_2_for_each_mech_space_cannon_offence",
+        "type": "mods",
+        "value": "+2",
+        "valueScalingType": "mechs_on_planet",
+        "persistenceType": "CONDITIONAL",
+        "condition": "technotemplar",
+        "scope": "",
+        "displayUnitAlias": "vyserix_mech",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "+2 for each Vyserix mech on planet"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "plus_2_for_each_mech_anti_fighter_barrage",
+        "type": "mods",
+        "value": "+2",
+        "valueScalingType": "mechs_on_planet",
+        "persistenceType": "CONDITIONAL",
+        "condition": "technotemplar",
+        "scope": "",
+        "displayUnitAlias": "vyserix_mech",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "+2 for each Vyserix mech on planet"
+            }
+        ],
+        "forCombatAbility": "AFB"
+    },
+    {
         "alias": "roll_1_for_every_adjacent_mech_bomb",
         "type": "extrarolls",
         "value": "+1",
