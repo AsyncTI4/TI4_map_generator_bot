@@ -7,11 +7,13 @@ import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.discord.JdaService;
+import ti4.discord.utility.DiscordRoleUtility;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -75,7 +77,11 @@ class MatchmakingNotifier {
                 Integer.parseInt(game.playerCount()) - game.members().size();
         if (playersNeeded <= 0) return;
 
-        String message = "@LFG this game needs " + StringHelper.pluralize(playersNeeded, "player") + " to start.";
+        Role lfgRole = DiscordRoleUtility.getRole("LFG", thread.getGuild());
+        String message = lfgRole == null
+                ? "Ping the `@LFG` role to find additional members, if the game doesn't fill soon."
+                : lfgRole.getAsMention() + " this game needs " + StringHelper.pluralize(playersNeeded, "player")
+                        + " to start.";
         MessageHelper.sendMessageToChannel(thread, message);
     }
 
