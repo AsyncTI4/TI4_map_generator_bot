@@ -2743,6 +2743,13 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             techDeck.add("wavelength");
             techDeck.add("antimatter");
         }
+        if (isTwilightDS()) {
+            for (TechnologyModel tech : Mapper.getTechs().values()) {
+                if (tech.getSource() == ComponentSource.twilight_ds) {
+                    techDeck.add(tech.getID());
+                }
+            }
+        }
         return techDeck;
     }
 
