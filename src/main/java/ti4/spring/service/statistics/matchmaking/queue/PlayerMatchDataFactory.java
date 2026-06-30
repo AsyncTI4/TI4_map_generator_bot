@@ -24,7 +24,7 @@ import ti4.spring.service.statistics.UserGameInfoService;
 import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
 
 @UtilityClass
-class PlayerMatchDataFactory {
+class PlayermatchmakingDataFactory {
 
     private static final List<String> ROLES_TO_TRACK =
             List.of(MatchmakingOptions.FLOATERS_ROLE_NAME, MatchmakingOptions.WARRIORS_ROLE_NAME);
@@ -43,7 +43,7 @@ class PlayerMatchDataFactory {
         Guild guild = JdaService.guildPrimary;
         Instant now = Instant.now();
 
-        Map<MatchmakingQueueMember, PlayerMatchmakingData> matchData = new HashMap<>();
+        Map<MatchmakingQueueMember, PlayerMatchmakingData> matchmakingData = new HashMap<>();
         for (QueuedParty queuedParty : parties) {
             UserSettings leaderSettings = queuedParty.leaderSettings();
             List<String> leaderRestrictions = leaderSettings.getMatchmakingRestrictions();
@@ -51,12 +51,12 @@ class PlayerMatchDataFactory {
             List<String> tiglRanks = tigl ? leaderSettings.getMatchmakingTiglRanks() : List.of();
             Duration queueWait = Duration.between(queuedParty.party().getQueuedAt(), now);
             for (MatchmakingQueueMember member : queuedParty.members()) {
-                matchData.put(
+                matchmakingData.put(
                         member,
                         build(member.getUserId(), leaderRestrictions, ratings, guild, queueWait, tigl, tiglRanks));
             }
         }
-        return matchData;
+        return matchmakingData;
     }
 
     static Map<String, PlayerMatchmakingData> buildForUsers(List<String> userIds, List<String> leaderRestrictions) {

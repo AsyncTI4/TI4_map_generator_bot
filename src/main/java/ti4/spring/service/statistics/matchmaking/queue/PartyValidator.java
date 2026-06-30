@@ -22,7 +22,7 @@ public class PartyValidator {
         List<String> available = new ArrayList<>();
         for (String restriction : restrictions) {
             Map<String, PlayerMatchmakingData> dataById =
-                    PlayerMatchDataFactory.buildForUsers(members, List.of(restriction));
+                    PlayermatchmakingDataFactory.buildForUsers(members, List.of(restriction));
             if (groupInternallyCompatible(members, dataById)) {
                 available.add(restriction);
             }

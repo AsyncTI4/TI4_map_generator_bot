@@ -40,7 +40,11 @@ class MatchDescriber {
 
     static void logFormedMatch(
             MatchedGame game, Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData) {
-        StringBuilder log = new StringBuilder(" Matchmade: ").append("\n``` • ").append(threadTitle(game));
+        double matchQuality = MatchQualityCalculator.matchQuality(game.members(), playerMatchmakingData);
+        StringBuilder log = new StringBuilder(" Matchmade: ")
+                .append("\n``` • ")
+                .append(threadTitle(game))
+                .append(" — match quality %.1f%%".formatted(matchQuality * 100));
         for (MatchmakingQueueMember member : game.members()) {
             log.append("\n  • ").append(describePlayer(playerMatchmakingData.get(member)));
         }
