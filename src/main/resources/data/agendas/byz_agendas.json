@@ -9,23 +9,13 @@
         "source": "byz_agendas"
     },
     {
-        "alias": "byz_arms_reduction",
-        "name": "Arms Reduction",
+        "alias": "byz_articles_of_war",
+        "name": "Articles of War",
         "category": "agenda",
-        "type": "Directive",
+        "type": "Law",
         "target": "For/Against",
-        "text1": "For: Each player must destroy all but 2 of their dreadnoughts and all but 2 of their carriers.",
-        "text2": "Against: Each player must destroy 2 PDS outside their home system, if able.",
-        "source": "byz_agendas"
-    },
-    {
-        "alias": "byz_clandestine_operations",
-        "name": "Clandestine Operations",
-        "category": "agenda",
-        "type": "Directive",
-        "target": "For/Against",
-        "text1": "For: Each player who voted “For” gains one command token.",
-        "text2": "Against: Each player who voted “For” removes 2 command tokens from their fleet pool and returns those tokens to their reinforcements.",
+        "text1": "For: All mechs lose their printed abilities except for SUSTAIN DAMAGE.",
+        "text2": "Against: Each player places 1 mech from their reinforcements on a planet they control in their home system.",
         "source": "byz_agendas"
     },
     {
@@ -43,31 +33,19 @@
         "category": "agenda",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: Players may no longer use BOMBARDMENT against planets in another player's home system.",
-        "text2": "Against: Starting with the Speaker and continuing clockwise, each player may use the PRODUCTION ability of 1 space dock they control.",
-        "mapText": "Players may no longer use BOMBARDMENT against planets in another player's home system.",
+        "text1": "For: Legendary planets and planets in home systems gain Planetary Shield.",
+        "text2": "Against: Each player may place 1 infantry from their reinforcements into coexistence on a planet controlled by the player to their right.",
+        "mapText": "Legendary planets and planets in home systems gain Planetary Shield.",
         "source": "byz_agendas"
     },
     {
-        "alias": "byz_enforced_travel_ban",
-        "name": "Enforced Travel Ban",
+        "alias": "byz_economic_equality",
+        "name": "Economic Equality",
         "category": "agenda",
-        "type": "Law",
+        "type": "Directive",
         "target": "For/Against",
-        "text1": "For: Alpha and beta wormholes have no effect during movement.",
-        "text2": "Against: The Speaker must place an ion storm token in the Mecatol Rex system.",
-        "mapText": "Alpha and beta wormholes have no effect during movement.",
-        "source": "byz_agendas"
-    },
-    {
-        "alias": "byz_homeland_defense_act",
-        "name": "Homeland Defense Act",
-        "category": "agenda",
-        "type": "Law",
-        "target": "For/Against",
-        "text1": "For: Each player may add one PDS from their reinforcements to a planet in their home system. Each player can have any number of PDS units on planets they control.",
-        "text2": "Against: All players must destroy all PDS units in their home system.",
-        "mapText": "Each player can have any number of PDS units on planets they control.",
+        "text1": "For: Each player returns all of their trade goods to the supply. Then, each player gains 5 trade goods.",
+        "text2": "Against: No effect.",
         "source": "byz_agendas"
     },
     {
@@ -75,9 +53,8 @@
         "name": "Judicial Abolishment",
         "category": "agenda",
         "type": "Directive",
-        "target": "For/Against",
-        "text1": "For: Discard the last public objective to be revealed from play. Draw a new public objective of the same stage and place it near the public objectives.",
-        "text2": "Against: Each player gives one other player of their choice a Political Secret from their hand.",
+        "target": "Elect Law (When this agenda is revealed, if there are 1 or fewer laws in play, discard this card and reveal another agenda from the top of the deck.)",
+        "text1": "Elect Law: Discard the elected law from play.",
         "source": "byz_agendas"
     },
     {
