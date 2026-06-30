@@ -38,11 +38,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -352,6 +349,7 @@ public class CombatRollService {
                 tileModel,
                 game,
                 rollType,
+                combatOnHolder,
                 Constants.COMBAT_MODIFIERS);
 
         List<NamedCombatModifierModel> extraRolls = CombatModHelper.getModifiers(
@@ -1071,37 +1069,13 @@ public class CombatRollService {
                     rollType,
                     activeSystem,
                     unitHolder);
-            if (rollType == CombatRollType.combatround && MobilizationEngineHandler.hasEngineAttached(game)) {
-                modifierToHit += MobilizationEngineHandler.getCombatMod(game, player, unitModel);
-            }
-            if (rollType == CombatRollType.combatround
-                    && player.hasTech("baconcg")
-                    && game.getPlayedSCs().containsAll(opponent.getSCs())) {
-                modifierToHit += 1;
-            }
-            if (rollType == CombatRollType.combatround
-                    && "onyxxa_mech".equalsIgnoreCase(unitModel.getId())
-                    && unitHolder != null) {
-                modifierToHit += OnyxxaUnitHandler.getObeliskCombatModifier(player, unitHolder);
-            }
-            if (rollType == CombatRollType.combatround
-                    && "xan_mech".equals(unitModel.getId())
-                    && unitHolder != null
-                    && XanUnitHandler.countSpaceDocksOnHolder(unitHolder, game) > 0) {
-                modifierToHit += 2;
-            }
-            // if (unitHolder != null) {
-            //     modifierToHit += VyserixUnitHandler.getTechnotemplarModifier(player, unitHolder, rollType);
-            // }
+
             int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player);
             if (rollType == CombatRollType.combatround) {
                 CombatStatsService.CombatRoundProfile combatRoundProfile = CombatStatsService.getCombatRoundProfile(
                         true, unitModel, player, activeSystem, opponent, false);
                 toHit = combatRoundProfile.hitsOn();
                 numRollsPerUnit = combatRoundProfile.diceCount();
-            }
-            if (rollType == CombatRollType.combatround && "xan_warsun2".equals(unitModel.getId())) {
-                numRollsPerUnit += XanUnitHandler.countSpaceDocksInTile(activeSystem, game);
             }
 
             boolean extraRollsCount = false;

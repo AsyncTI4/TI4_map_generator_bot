@@ -12,8 +12,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -201,8 +203,15 @@ public class CombatModHelper {
                             opponentUnitsByQuantity,
                             unitHolder,
                             game)) {
-                modifiers.add(new NamedCombatModifierModel(
-                        relevantMod.get(), unit.getUnitEmoji() + " " + unit.getName() + " " + unit.getAbility()));
+                String unitHeader = unit.getUnitEmoji() + " **__" + unit.getName() + "__**";
+                String unitModName = relevantMod.get().getRelated().stream()
+                        .filter(r -> Constants.UNIT.equals(r.getType())
+                                && unit.getAlias().equals(r.getAlias())
+                                && r.getMessage() != null)
+                        .map(r -> unitHeader + ": " + r.getMessage())
+                        .findFirst()
+                        .orElse(unitHeader + " " + unit.getAbility());
+                modifiers.add(new NamedCombatModifierModel(relevantMod.get(), unitModName));
             }
             if (unit.getUnitType() == UnitType.Flagship && player.hasUnlockedBreakthrough("nekrobt")) {
                 for (String fs : ValefarZService.getFlagshipAbilitys(game, player)) {
@@ -267,8 +276,14 @@ public class CombatModHelper {
         for (CombatModifierModel relevantMod : customAlwaysRelveantMods) {
             if (checkModPassesCondition(
                     relevantMod, tile, player, opponent, unitsByQuantity, opponentUnitsByQuantity, game)) {
-                modifiers.add(new NamedCombatModifierModel(
-                        relevantMod, relevantMod.getRelated().getFirst().getMessage()));
+                String displayName = relevantMod.getRelated().getFirst().getMessage();
+                if (relevantMod.getDisplayUnitAlias() != null) {
+                    UnitModel unitModel = Mapper.getUnit(relevantMod.getDisplayUnitAlias());
+                    if (unitModel != null) {
+                        displayName = unitModel.getUnitEmoji() + " **__" + unitModel.getName() + "__**: " + displayName;
+                    }
+                }
+                modifiers.add(new NamedCombatModifierModel(relevantMod, displayName));
             }
         }
         Set<NamedCombatModifierModel> set = new HashSet<>(modifiers);
@@ -609,6 +624,26 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "technotemplar" -> meetsCondition = player.hasUnit("vyserix_mech");
+            case "opponent_strat_cards_exhausted" ->
+                meetsCondition = opponent != null && game.getPlayedSCs().containsAll(opponent.getSCs());
+            case "space_dock_on_holder" -> {
+                if (unitHolder != null) {
+                    for (Player p : game.getRealPlayers()) {
+                        if (unitHolder.getUnitCount(UnitType.Spacedock, p.getColor()) > 0) {
+                            meetsCondition = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            case "arvaxi_engine" -> {
+                String stored = game.getStoredValue("arvaxiMobilizationEngine");
+                if (!stored.isEmpty()) {
+                    int firstSep = stored.indexOf('_');
+                    meetsCondition = firstSep > 0 && player.getFaction().equals(stored.substring(0, firstSep));
+                }
+            }
             case "bluetfMech" -> {
                 if (player.hasUnit("bluetf_mech")) {
                     for (UnitModel unitModel : unitsByQuantity.keySet()) {
@@ -783,6 +818,28 @@ public class CombatModHelper {
                         scalingCount = 0;
                     } else {
                         scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player);
+                    }
+                }
+                case "arvaxi_engine" -> {
+                    if (MobilizationEngineHandler.isAttachedToUnit(game, player, origUnit)) {
+                        scalingCount = MobilizationEngineHandler.isBoon(game) ? 1 : -1;
+                    }
+                }
+                case "mechs_on_planet" -> {
+                    if (!(unitHolder instanceof Planet)) {
+                        scalingCount = 0;
+                    } else {
+                        scalingCount = unitHolder.getUnitCount(UnitType.Mech, player.getColor());
+                    }
+                }
+                case "space_docks_in_tile" -> {
+                    for (UnitHolder holder : activeSystem.getPlanetUnitHolders())
+                        for (Player p : game.getRealPlayers())
+                            scalingCount += holder.getUnitCount(UnitType.Spacedock, p.getColor());
+                }
+                case "mechs_on_planet_minus_one" -> {
+                    if (unitHolder instanceof Planet) {
+                        scalingCount = Math.max(0, unitHolder.getUnitCount(UnitType.Mech, player.getColor()) - 1);
                     }
                 }
                 case "damaged_units_max_2" -> {

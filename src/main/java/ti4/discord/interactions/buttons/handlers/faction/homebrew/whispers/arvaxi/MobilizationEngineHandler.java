@@ -15,7 +15,7 @@ public class MobilizationEngineHandler {
         return !game.getStoredValue(STORED_KEY).isEmpty();
     }
 
-    private static boolean isAttachedToUnit(Game game, Player player, UnitModel unit) {
+    public static boolean isAttachedToUnit(Game game, Player player, UnitModel unit) {
         String stored = game.getStoredValue(STORED_KEY);
         if (stored.isEmpty()) return false;
         int firstSep = stored.indexOf('_');
@@ -27,7 +27,7 @@ public class MobilizationEngineHandler {
         return engineUnit != null && engineUnit.getAsyncId().equals(unit.getAsyncId());
     }
 
-    private static boolean isBoon(Game game) {
+    public static boolean isBoon(Game game) {
         return game.getStoredValue(STORED_KEY).endsWith("_boon");
     }
 
