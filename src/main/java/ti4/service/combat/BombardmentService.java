@@ -35,7 +35,8 @@ public class BombardmentService {
         if (tile == null) {
             return;
         }
-        Map<UnitModel, Integer> bombardUnits = CombatRollService.getUnitsInBombardment(tile, player, null);
+        Map<UnitModel, Integer> bombardUnits =
+                CombatRollService.flattenUnitMap(CombatRollService.getUnitsInBombardment(tile, player, null));
         String planet = getBestBombardablePlanet(player, game, tile);
         for (Map.Entry<UnitModel, Integer> entry : bombardUnits.entrySet()) {
             for (int x = 0; x < entry.getValue(); x++) {

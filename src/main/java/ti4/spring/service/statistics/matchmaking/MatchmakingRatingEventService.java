@@ -18,7 +18,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ti4.cache.CacheManager;
 import ti4.message.MessageHelper;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.PlayerEntity;
@@ -31,17 +30,15 @@ public class MatchmakingRatingEventService {
     private static final int MAX_LIST_SIZE = 50;
     private static final int INACTIVITY_MONTHS = 6;
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
-    private static final Duration RATINGS_CACHE_TTL = Duration.ofMinutes(30);
-    private static final String RATINGS_CACHE_NAME = "matchmakingDefaultRatingsCache";
-    private static final String CONSERVATIVE_RATINGS_CACHE_NAME = "matchmakingConservativeRatingsCache";
-    private static final String RATINGS_CACHE_KEY = "default";
+    private static final Duration RATINGS_CACHE_TTL = Duration.ofHours(8);
+    private static final Duration AVERAGE_RATING_CACHE_TTL = Duration.ofHours(8);
+    private static final String RATINGS_CACHE_KEY = "key";
 
-    private final Cache<String, List<MatchmakingRating>> defaultRatingsCache = createRatingsCache(RATINGS_CACHE_NAME);
-    private final Cache<String, List<MatchmakingRating>> conservativeRatingsCache =
-            createRatingsCache(CONSERVATIVE_RATINGS_CACHE_NAME);
+    private final Cache<String, List<MatchmakingRating>> unconservativeRatingsCache = createRatingsCache();
+    private final Cache<String, List<MatchmakingRating>> conservativeRatingsCache = createRatingsCache();
     private final Cache<String, BigDecimal> averageConservativeRatingCache = Caffeine.newBuilder()
             .maximumSize(1)
-            .expireAfterWrite(RATINGS_CACHE_TTL)
+            .expireAfterWrite(AVERAGE_RATING_CACHE_TTL)
             .build();
 
     private final PlayerEntityRepository playerEntityRepository;
@@ -91,21 +88,19 @@ public class MatchmakingRatingEventService {
     }
 
     private List<MatchmakingRating> getCachedDefaultPlayerRatings() {
-        return defaultRatingsCache.get(RATINGS_CACHE_KEY, _ -> getPlayerRatings(false, false));
+        return unconservativeRatingsCache.get(RATINGS_CACHE_KEY, _ -> getPlayerRatings(false, false));
     }
 
     private List<MatchmakingRating> getCachedConservativePlayerRatings() {
         return conservativeRatingsCache.get(RATINGS_CACHE_KEY, _ -> getPlayerRatings(false, true));
     }
 
-    private static Cache<String, List<MatchmakingRating>> createRatingsCache(String cacheName) {
-        Cache<String, List<MatchmakingRating>> cache = Caffeine.newBuilder()
+    private static Cache<String, List<MatchmakingRating>> createRatingsCache() {
+        return Caffeine.newBuilder()
                 .maximumSize(1)
                 .expireAfterWrite(RATINGS_CACHE_TTL)
                 .recordStats()
                 .build();
-        CacheManager.registerCache(cacheName, cache);
-        return cache;
     }
 
     private List<MatchmakingRating> getPlayerRatings(boolean onlyTiglGames, boolean useConservativeRating) {

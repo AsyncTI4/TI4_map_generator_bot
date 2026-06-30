@@ -543,7 +543,8 @@ public class AshenLeadersHandler {
     private static String buildHeroBombardmentAssignment(
             Player player, Game game, Tile sourceTile, String targetPlanet) {
         StringBuilder assignment = new StringBuilder();
-        Map<UnitModel, Integer> bombardUnits = CombatRollService.getUnitsInBombardment(sourceTile, player, null);
+        Map<UnitModel, Integer> bombardUnits =
+                CombatRollService.flattenUnitMap(CombatRollService.getUnitsInBombardment(sourceTile, player, null));
         for (Map.Entry<UnitModel, Integer> entry : bombardUnits.entrySet()) {
             for (int x = 0; x < entry.getValue(); x++) {
                 assignment

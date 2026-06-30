@@ -55,6 +55,7 @@ import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
@@ -6722,7 +6723,8 @@ public class ButtonHelper {
                 || (doesPlayerHaveFSHere("khrask_flagship", player, tile)
                         && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
                 || (player.hasRelic("metalivoidshielding")
-                        && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()));
+                        && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
+                || CrystellumBreakthroughHandler.canUseDefensiveArchitectureSustain(game, player, tile, unitModel);
     }
 
     @ButtonHandler("startThalnos_")

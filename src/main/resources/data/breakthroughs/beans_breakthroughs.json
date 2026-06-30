@@ -20,7 +20,7 @@
             "PROPULSION",
             "WARFARE"
         ],
-        "text": "After 1 or more hits are produced against your ships during the first round of a space combat: \n\nCancel 1 of those hits; Then, produce 1 hit and assign it to your opponent's ships.",
+        "text": "At the start of the first round of space combat: \n\nFor each unit in the active system that is at capacity, you may give one other non-fighter ship in the same system SUSTAIN DAMAGE until the end of that combat.",
         "source": "beans"
     },
     {
@@ -56,7 +56,7 @@
             "CYBERNETIC",
             "WARFARE"
         ],
-        "text": "At the end of your turn, you may exhaust this card or spend 1 token from your strategy pool to remove 1 design from a non-home planet and attach it to a different non-home planet in an adjacent system that does not have a design attached to it. Then, ready that planet.",
+        "text": "At the end of your turn, you may exhaust this card or spend 1 token from your strategy pool to remove 1 design from a non-home planet and attach it to a different non-home planet in an adjacent system that does not have a design attached to it. Then, place 2 infantry from your reinforcements on that planet and ready it.",
         "source": "beans"
     },
     {

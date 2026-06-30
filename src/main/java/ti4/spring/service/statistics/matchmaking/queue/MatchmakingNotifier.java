@@ -7,10 +7,14 @@ import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.discord.JdaService;
+import ti4.discord.utility.DiscordRoleUtility;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameLaunchPostService;
@@ -38,7 +42,7 @@ class MatchmakingNotifier {
 
         Map<String, ForumChannel> forumByNameCache = new HashMap<>();
         for (MatchedGame game : gamesToCreate) {
-            String forumName = game.tiglRank() != null
+            String forumName = !game.tiglRanks().isEmpty()
                     ? CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL
                     : CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL;
             ForumChannel forum = forumByNameCache.computeIfAbsent(forumName, name -> findForum(guild, name));
@@ -57,10 +61,28 @@ class MatchmakingNotifier {
             // Forum channels require an initial message payload, so the setup text becomes the post body.
             forum.createForumPost(threadTitle, MessageCreateData.fromContent(setupMessage))
                     .queue(
-                            forumPost -> CreateGameLaunchPostService.postLaunchButtons(
-                                    forumPost.getThreadChannel(), members, gameFunName),
+                            forumPost -> {
+                                ThreadChannel thread = forumPost.getThreadChannel();
+                                CreateGameLaunchPostService.postLaunchButtons(thread, members, gameFunName);
+                                postLfgPing(thread, game);
+                            },
                             BotLogger::catchRestError);
         }
+    }
+
+    private static void postLfgPing(ThreadChannel thread, MatchedGame game) {
+        if (!game.tiglRanks().isEmpty()) return;
+
+        int playersNeeded =
+                Integer.parseInt(game.playerCount()) - game.members().size();
+        if (playersNeeded <= 0) return;
+
+        Role lfgRole = DiscordRoleUtility.getRole("LFG", thread.getGuild());
+        String message = lfgRole == null
+                ? "Ping the `@LFG` role to find additional members, if the game doesn't fill soon."
+                : lfgRole.getAsMention() + " this game needs " + StringHelper.pluralize(playersNeeded, "player")
+                        + " to start.";
+        MessageHelper.sendMessageToChannel(thread, message);
     }
 
     private static ForumChannel findForum(Guild guild, String forumName) {
