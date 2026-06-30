@@ -3,7 +3,9 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
@@ -91,34 +93,33 @@ public class NatauAbilityHandler {
 
         List<AbilityModel> activeDoctrines = getActiveDoctrinesModels(player);
         List<AbilityModel> inactiveDoctrines = getInactiveDoctrinesModels(player);
+        List<MessageEmbed> embeds = new ArrayList<>();
+        embeds.add(buildDoctrineEmbed("Doctrines In Play Area", activeDoctrines));
+        embeds.add(buildDoctrineEmbed("Doctrines In Reinforcements", inactiveDoctrines));
 
-        StringBuilder sb = new StringBuilder();
+        List<Button> buttons = List.of(Buttons.red("deleteButtons", "Done Viewing"));
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                event.getMessageChannel(), player.getRepresentation() + "##Doctrines", embeds, buttons);
+    }
 
-        sb.append(player.getRepresentation()).append("## Doctrines\n\n");
-        sb.append("**In Play Area**");
-        sb.append("\n");
-        if (activeDoctrines.isEmpty()) {
-            sb.append("None");
-            sb.append("\n\n");
+    private static MessageEmbed buildDoctrineEmbed(String title, List<AbilityModel> doctrines) {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle(title);
+
+        StringBuilder description = new StringBuilder();
+        if (doctrines.isEmpty()) {
+            description.append("None");
         } else {
-            for (AbilityModel doctrine : activeDoctrines) {
-                sb.append(doctrine.getRepresentation());
-                sb.append("\n\n");
+            for (AbilityModel doctrine : doctrines) {
+                if (!description.isEmpty()) {
+                    description.append("\n\n");
+                }
+                description.append(doctrine.getRepresentation());
             }
         }
-        sb.append("**In Reinforcements**");
-        sb.append("\n");
-        if (inactiveDoctrines.isEmpty()) {
-            sb.append("None");
-            sb.append("\n\n");
-        } else {
-            for (AbilityModel doctrine : inactiveDoctrines) {
-                sb.append(doctrine.getRepresentation());
-                sb.append("\n\n");
-            }
-        }
-        Button button = Buttons.red("deleteButtons", "Done Viewing");
-        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), sb.toString(), button);
+
+        eb.setDescription(description.toString());
+        return eb.build();
     }
 
     public static void offerDoctrineSetupButtons(GenericInteractionCreateEvent event, Game game, Player player) {
