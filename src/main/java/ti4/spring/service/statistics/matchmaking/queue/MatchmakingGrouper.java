@@ -21,8 +21,8 @@ import ti4.settings.users.UserSettings;
 class MatchmakingGrouper {
 
     private static final Duration NEAR_QUEUE_EXPIRY_HOURS = Duration.ofHours(1);
-    private static final Duration LONG_QUEUE_DURATION = Duration.ofHours(8);
-    private static final int MIN_PLAYERS_FOR_NEAR_EXPIRY_MATCH = 4;
+    private static final Duration LONG_QUEUE_DURATION = Duration.ofHours(24);
+    private static final int MIN_PLAYERS_FOR_NEAR_MATCH = 3;
 
     static List<MatchedGame> formGames(List<QueuedParty> parties) {
         List<MatchedGame> gamesToCreate = new ArrayList<>();
@@ -79,7 +79,7 @@ class MatchmakingGrouper {
 
     private static boolean qualifiesAsNearMatch(List<QueuedParty> group, Instant now) {
         boolean longestQueuedWaitedLongEnough = group.stream().anyMatch(party -> hasLongQueueDuration(party, now));
-        boolean nearExpiryAndHasMinimumPlayerCount = totalPlayers(group) >= MIN_PLAYERS_FOR_NEAR_EXPIRY_MATCH
+        boolean nearExpiryAndHasMinimumPlayerCount = totalPlayers(group) >= MIN_PLAYERS_FOR_NEAR_MATCH
                 && group.stream().anyMatch(party -> isNearExpiry(party, now));
         return longestQueuedWaitedLongEnough || nearExpiryAndHasMinimumPlayerCount;
     }

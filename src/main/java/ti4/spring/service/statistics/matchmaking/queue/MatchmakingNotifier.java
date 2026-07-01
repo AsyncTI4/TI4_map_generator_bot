@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 import ti4.discord.utility.DiscordRoleUtility;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
@@ -71,17 +72,36 @@ class MatchmakingNotifier {
     }
 
     private static void postLfgPing(ThreadChannel thread, MatchedGame game) {
-        if (!game.tiglRanks().isEmpty()) return;
-
         int playersNeeded =
                 Integer.parseInt(game.playerCount()) - game.members().size();
         if (playersNeeded <= 0) return;
 
+        List<String> tiglRankMentions = game.tiglRanks().stream()
+                .filter(rank -> !MatchmakingOptions.UNRANKED_OPTION.equals(rank))
+                .map(rank -> DiscordRoleUtility.getRole("TIGL - " + rank, thread.getGuild()))
+                .filter(Objects::nonNull)
+                .map(Role::getAsMention)
+                .toList();
+
+        if (tiglRankMentions.isEmpty()) {
+            postLfgRolePing(thread, playersNeeded);
+        } else {
+            postTiglRankRolePing(thread, tiglRankMentions, playersNeeded);
+        }
+    }
+
+    private static void postLfgRolePing(ThreadChannel thread, int playersNeeded) {
         Role lfgRole = DiscordRoleUtility.getRole("LFG", thread.getGuild());
         String message = lfgRole == null
                 ? "Ping the `@LFG` role to find additional members, if the game doesn't fill soon."
                 : lfgRole.getAsMention() + " this game needs " + StringHelper.pluralize(playersNeeded, "player")
                         + " to start.";
+        MessageHelper.sendMessageToChannel(thread, message);
+    }
+
+    private static void postTiglRankRolePing(ThreadChannel thread, List<String> tiglRankMentions, int playersNeeded) {
+        String message = String.join(" ", tiglRankMentions) + " this game needs "
+                + StringHelper.pluralize(playersNeeded, "player") + " to start.";
         MessageHelper.sendMessageToChannel(thread, message);
     }
 
