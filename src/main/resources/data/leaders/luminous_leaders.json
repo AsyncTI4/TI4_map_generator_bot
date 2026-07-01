@@ -1,0 +1,35 @@
+[
+    {
+        "id": "arachneraagent",
+        "faction": "arachnera",
+        "type": "agent",
+        "name": "Shastena",
+        "title": "Hive Tender",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Exhaust this card to choose 1 player. That player may produce 2 ground forces on any planet that contains 1 of their space docks.",
+        "unlockCondition": "Always Unlocked",
+        "source": "luminous"
+    },
+    {
+        "id": "arachneracommander",
+        "faction": "arachnera",
+        "type": "commander",
+        "name": "Solikhera",
+        "title": "Nest Architect",
+        "abilityText": "Place Arachnera dock token in your reinforcements. This is an additional space dock unit. Your space dock component limit is increased by 1.",
+        "unlockCondition": "Have 6 captured units on your faction sheet.",
+        "source": "luminous"
+    },
+    {
+        "id": "arachnerahero",
+        "faction": "arachnera",
+        "type": "hero",
+        "name": "Arachnera",
+        "title": "Eternal Queen Mother",
+        "abilityName": "Feeding Frenzy - Consuming Swarm",
+        "abilityWindow": "ACTION:",
+        "abilityText": "For each system that contains 1 or more of your infantry, you may destroy any number of those infantry to capture 1 unit you do not control that has a cost value equal to or less than the number of infantry you destroy and is in or adjacent ot that system.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "luminous"
+    }
+]

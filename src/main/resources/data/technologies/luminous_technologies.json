@@ -1,0 +1,25 @@
+[
+    {
+        "alias": "luarachneray",
+        "name": "Arachnogenesis",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYY",
+        "faction": "arachnera",
+        "source": "luminous",
+        "text": "Once per combat, after 1 of your opponent’s non-fighter, non-structure units is destroyed, you may capture that unit. When 1 or more of your units use PRODUCTION, you may return any number of non-infantry units from your faction sheet to reduce the combined cost of the produced units by an amount equal to the returned units’ combined cost."
+    },
+    {
+        "alias": "luarachnerasd",
+        "name": "Lair II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "SD",
+        "faction": "arachnera",
+        "baseUpgrade": "sd2",
+        "source": "luminous",
+        "text": "This system is a Nebula, Nebulae in or adjacent to this unit's system do not affect your ships' movement. Place a Nebula token beneath this unit as a reminder."
+    }
+]

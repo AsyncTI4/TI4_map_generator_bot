@@ -1,0 +1,14 @@
+[
+    {
+        "alias": "arachnerabt",
+        "name": "Feed the Swarm",
+        "shortName": "Feed the\nSwarm",
+        "faction": "arachnera",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "When researching a technology you may treat this card as a planet with a green technology specialty symbol.\n\nYou may produce 1 additional infantry for their cost. These infantry do not count against your PRODUCTION limit.",
+        "source": "luminous"
+    }
+]

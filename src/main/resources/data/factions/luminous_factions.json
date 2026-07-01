@@ -1,0 +1,50 @@
+[
+    {
+        "alias": "arachnera",
+        "factionName": "Arachnera",
+        "homeSystem": "lu1",
+        "startingFleet": "1 cv, 2 dd, 2 ff, 2 inf b, 2 inf m, 1 mf w, 1 sd b",
+        "commodities": 3,
+        "factionTech": [
+            "luarachneray",
+            "luarachnerasd"
+        ],
+        "startingTech": [
+            "sdn",
+            "md"
+        ],
+        "homePlanets": [
+            "bruhd",
+            "muhmass",
+            "wheb"
+        ],
+        "abilities": [
+            "nesting_burrows",
+            "necrogenesis",
+            "feeding_frenzy",
+            "swarm"
+        ],
+        "leaders": [
+            "arachneraagent",
+            "arachneracommander",
+            "arachnerahero"
+        ],
+        "promissoryNotes": [
+            "lupnarachnera"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "crusier",
+            "carrier",
+            "dreadnought",
+            "arachnera_flagship",
+            "infantry",
+            "arachnera_mech",
+            "pds",
+            "arachnera_spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "luminous"
+    }
+]

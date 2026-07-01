@@ -1,0 +1,61 @@
+[
+  {
+    "id": "arachnera_flagship",
+    "baseType": "flagship",
+    "asyncId": "fs",
+    "name": "The Hive",
+    "source": "luminous",
+    "faction": "arachnera",
+    "moveValue": 1,
+    "capacityValue": 6,
+    "capacityUsed": 1,
+    "cost": 8,
+    "combatHitsOn": 7,
+    "combatDieCount": 2,
+    "sustainDamage": true,
+    "canBeDirectHit": true,
+    "isShip": true,
+    "ability": "After a non-fighter ship is destroyed during combat in this system, you may place 2 infantry in this system.\n\nAt the start of a ground combat in this system, you may place up to 2 infantry on that planet."
+  },
+  {
+    "id": "arachnera_mech",
+    "baseType": "mech",
+    "asyncId": "mf",
+    "name": "Broodmother",
+    "source": "luminous",
+    "faction": "arachnera",
+    "capacityUsed": 1,
+    "cost": 2,
+    "combatHitsOn": 6,
+    "combatDieCount": 1,
+    "sustainDamage": true,
+    "isGroundForce": true,
+    "ability": "When this unit becomes damaged during a ground combat, you may produce 1 infantry unit on this planet."
+  },
+  {
+    "id": "arachnera_spacedock",
+    "baseType": "spacedock",
+    "asyncId": "sd",
+    "name": "Lair I",
+    "source": "luminous",
+    "faction": "arachnera",
+    "productionValue": 4,
+    "capacityValue": 3,
+    "isStructure": true,
+    "ability": "This system is a Nebula, Nebulae in or adjacent to this unit's system do not affect your ships' movement. Place a Nebula token beneath this unit as a reminder."
+  },
+  {
+    "id": "arachnera_spacedock2",
+    "baseType": "spacedock",
+    "asyncId": "sd",
+    "name": "Lair II",
+    "upgradesFromUnitId": "arachnera_spacedock",
+    "requiredTechId": "luarachnerasd",
+    "source": "luminous",
+    "faction": "arachnera",
+    "productionValue": 6,
+    "capacityValue": 6,
+    "isStructure": true,
+    "ability": "This system is a Nebula, Nebulae in or adjacent to this unit's system do not affect your ships' movement. Place a Nebula token beneath this unit as a reminder."
+  }
+]
