@@ -82,7 +82,7 @@ class MatchmakingGrouper {
                 && group.stream().anyMatch(party -> isNearExpiry(party, now));
         return longestQueuedWaitedLongEnough || nearExpiryAndHasMinimumPlayerCount;
     }
-    
+
     private static int minPlayersForNearMatch(int fullPlayerCount) {
         return fullPlayerCount / 2 + 1;
     }
