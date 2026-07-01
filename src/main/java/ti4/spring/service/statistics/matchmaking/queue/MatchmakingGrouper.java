@@ -22,7 +22,6 @@ class MatchmakingGrouper {
 
     private static final Duration NEAR_QUEUE_EXPIRY_HOURS = Duration.ofHours(1);
     private static final Duration LONG_QUEUE_DURATION = Duration.ofHours(24);
-    private static final int MIN_PLAYERS_FOR_NEAR_MATCH = 3;
 
     static List<MatchedGame> formGames(List<QueuedParty> parties) {
         List<MatchedGame> gamesToCreate = new ArrayList<>();
@@ -61,7 +60,7 @@ class MatchmakingGrouper {
             if (targetSize < 1) continue;
             List<QueuedParty> available = ungrouped(partiesByConfig.get(config), partiesAddedToGames);
             for (List<QueuedParty> group : formGroupsOfSize(available, targetSize, playerMatchmakingData)) {
-                if (qualifiesAsNearMatch(group, now)) {
+                if (qualifiesAsNearMatch(group, config.playerCountValue(), now)) {
                     candidates.add(new NearMatchCandidate(config, group));
                 }
             }
@@ -77,11 +76,15 @@ class MatchmakingGrouper {
         }
     }
 
-    private static boolean qualifiesAsNearMatch(List<QueuedParty> group, Instant now) {
+    private static boolean qualifiesAsNearMatch(List<QueuedParty> group, int fullPlayerCount, Instant now) {
         boolean longestQueuedWaitedLongEnough = group.stream().anyMatch(party -> hasLongQueueDuration(party, now));
-        boolean nearExpiryAndHasMinimumPlayerCount = totalPlayers(group) >= MIN_PLAYERS_FOR_NEAR_MATCH
+        boolean nearExpiryAndHasMinimumPlayerCount = totalPlayers(group) >= minPlayersForNearMatch(fullPlayerCount)
                 && group.stream().anyMatch(party -> isNearExpiry(party, now));
         return longestQueuedWaitedLongEnough || nearExpiryAndHasMinimumPlayerCount;
+    }
+    
+    private static int minPlayersForNearMatch(int fullPlayerCount) {
+        return fullPlayerCount / 2 + 1;
     }
 
     private static boolean hasLongQueueDuration(QueuedParty queuedParty, Instant now) {
