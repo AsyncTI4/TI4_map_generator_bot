@@ -29,7 +29,7 @@ class MatchmakingGrouper {
         Set<QueuedParty> partiesAddedToGames = new HashSet<>();
 
         Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData =
-                PlayerMatchDataFactory.buildForParties(parties);
+                PlayerMatchmakingDataFactory.buildForParties(parties);
         Map<GameConfig, List<QueuedParty>> partiesByConfig = groupPartiesByConfig(parties);
         List<GameConfig> configsToTry = getRandomizedKeysThenSortByPlayerCount(partiesByConfig);
 
@@ -245,11 +245,11 @@ class MatchmakingGrouper {
     private static boolean isPartyCompatibleForMatch(
             QueuedParty party,
             List<MatchmakingQueueMember> group,
-            Map<MatchmakingQueueMember, PlayerMatchmakingData> matchData) {
+            Map<MatchmakingQueueMember, PlayerMatchmakingData> matchmakingData) {
         for (MatchmakingQueueMember newMember : party.members()) {
             for (MatchmakingQueueMember existing : group) {
-                PlayerMatchmakingData a = matchData.get(existing);
-                PlayerMatchmakingData b = matchData.get(newMember);
+                PlayerMatchmakingData a = matchmakingData.get(existing);
+                PlayerMatchmakingData b = matchmakingData.get(newMember);
                 if (MatchmakingCompatibilityService.areIncompatible(a, b)) {
                     return false;
                 }
@@ -258,8 +258,8 @@ class MatchmakingGrouper {
 
         List<MatchmakingQueueMember> combined = new ArrayList<>(group);
         combined.addAll(party.members());
-        return !isTiglGroup(combined, matchData)
-                || !getMatchingTiglRanks(combined, matchData).isEmpty();
+        return !isTiglGroup(combined, matchmakingData)
+                || !getMatchingTiglRanks(combined, matchmakingData).isEmpty();
     }
 
     private static int totalPlayers(List<QueuedParty> parties) {

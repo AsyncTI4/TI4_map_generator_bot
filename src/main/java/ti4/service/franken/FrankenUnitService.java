@@ -22,7 +22,7 @@ public class FrankenUnitService {
             String key = "veiledCards" + player.getFaction();
             String val = player.getGame().getStoredValue(key);
             val += "_" + String.join("_", unitIDs);
-            player.getGame().setStoredValue(key, val);
+            player.getGame().setStoredValue(key, val + "_");
             return;
         }
 

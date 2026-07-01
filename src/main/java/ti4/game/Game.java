@@ -294,6 +294,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     private Map<String, String> debtPoolIcons = new HashMap<>();
 
+    public Game getSelf() {
+        return this;
+    }
+
     public Game() {
         long currentTimeMillis = System.currentTimeMillis();
         setCreationDate(Helper.getDateRepresentation(currentTimeMillis));
@@ -2738,6 +2742,13 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (isTwilightsFallMode()) {
             techDeck.add("wavelength");
             techDeck.add("antimatter");
+        }
+        if (isTwilightDS()) {
+            for (TechnologyModel tech : Mapper.getTechs().values()) {
+                if (tech.getSource() == ComponentSource.twilight_ds) {
+                    techDeck.add(tech.getID());
+                }
+            }
         }
         return techDeck;
     }

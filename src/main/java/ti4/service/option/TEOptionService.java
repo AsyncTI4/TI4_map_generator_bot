@@ -1,6 +1,7 @@
 package ti4.service.option;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -10,6 +11,7 @@ import net.dv8tion.jda.api.components.section.Section;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.commands.franken.ban.BanService;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.draft.TwilightsFallFrankenDraft;
 import ti4.game.Game;
@@ -17,7 +19,9 @@ import ti4.helpers.ButtonHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
+import ti4.model.Source.ComponentSource;
 import ti4.model.SourceModel;
+import ti4.model.TechnologyModel;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.franken.FrankenDraftBagService;
 
@@ -26,7 +30,7 @@ public class TEOptionService {
 
     @ButtonHandler("startTFGame")
     public static void startTFGame(Game game, ButtonInteractionEvent event) {
-        ButtonHelper.deleteMessage(event);
+        // ButtonHelper.deleteMessage(event);
         String msg = """
             There are currently two draft options for Twilight's Fall.
 
@@ -69,7 +73,7 @@ public class TEOptionService {
         // MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, buttons);
     }
 
-    private static List<ContainerChildComponent> getTFHomebrewInfo(Game game) {
+    public static List<ContainerChildComponent> getTFHomebrewInfo(Game game) {
         String idPre = "toggleTFHomebrew_";
         List<ContainerChildComponent> sections = new ArrayList<>();
 
@@ -77,6 +81,12 @@ public class TEOptionService {
         String tkId = idPre + "twilightkart";
         Button button = Buttons.rgToggle(game.isTwilightKart(), tkId, "Twilight Kart", SourceEmojis.TwilightKart);
         sections.add(Section.of(button, tk.getRepresentationTextDisplays()));
+
+        SourceModel teds = Mapper.getSource("twilight_ds");
+        String tedsID = idPre + "twilightds";
+        Button button2 =
+                Buttons.rgToggle(game.isTwilightDS(), tedsID, "Discordant Stars", SourceEmojis.DiscordantStars);
+        sections.add(Section.of(button2, teds.getRepresentationTextDisplays()));
         // sections.add(Separator.create(true, Spacing.LARGE));
 
         return sections;
@@ -87,8 +97,54 @@ public class TEOptionService {
         String homebrew = buttonID.split("_")[1];
         switch (homebrew) {
             case "twilightkart" -> game.setTwilightKart(!game.isTwilightKart());
+            case "twilightds" -> {
+                game.setTwilightDS(!game.isTwilightDS());
+                if (game.isTwilightDS()) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("twilightDSSetup_justds", "Just DS Abilities"));
+                    buttons.add(Buttons.blue("twilightDSSetup_mixture", "Mixture of Normal and DS abilities"));
+                    MessageHelper.sendMessageToChannel(
+                            game.getMainGameChannel(),
+                            "Do you want to use just DS abilities or a mixture of Normal and DS abilities?",
+                            buttons);
+                }
+            }
         }
         postTwilightFallHomebrewOptions(event, game);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("twilightDSSetup_")
+    public static void twilightDSSetup(ButtonInteractionEvent event, Game game, String buttonID) {
+        String choice = buttonID.split("_")[1];
+        switch (choice.toLowerCase()) {
+            case "justds" -> {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Chose to just use DS abilities");
+                List<String> allCards = Mapper.getDeck("techs_tf").getNewShuffledDeck();
+                game.removeStoredValue("bannedTechs");
+                for (String tech : allCards) {
+                    BanService.appendStoredValue(game, "bannedTechs", tech);
+                }
+            }
+            case "mixture" -> {
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(), "Chose to just use a mixture of DS and normal abilities");
+                List<String> allCards = Mapper.getDeck("techs_tf").getNewShuffledDeck();
+                game.removeStoredValue("bannedTechs");
+                for (TechnologyModel tech : Mapper.getTechs().values()) {
+                    if (tech.getSource() == ComponentSource.twilight_ds) {
+                        allCards.add(tech.getID());
+                    }
+                }
+                Collections.shuffle(allCards);
+                String msg = "The following abilities have been banned:\n";
+                for (int x = 0; x < allCards.size() / 2; x++) {
+                    BanService.appendStoredValue(game, "bannedTechs", allCards.get(x));
+                    msg += Mapper.getTech(allCards.get(x)).getName() + "\n";
+                }
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+            }
+        }
         ButtonHelper.deleteMessage(event);
     }
 

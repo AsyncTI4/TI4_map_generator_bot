@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
@@ -49,7 +50,8 @@ import ti4.service.relic.SendRelicService;
 import ti4.service.transaction.SendPromissoryService;
 import ti4.settings.users.UserSettingsManager;
 
-public final class TransactionHelper {
+@UtilityClass
+public class TransactionHelper {
 
     private static final List<String> shadyOrganizations = List.of(
             "the Trade Adjustment Bureau",
@@ -1390,8 +1392,7 @@ public final class TransactionHelper {
     }
 
     @ButtonHandler("transact_")
-    public static void resolveSpecificTransButtonsOld(
-            Game game, Player p1, String buttonID, ButtonInteractionEvent event) {
+    static void resolveSpecificTransButtonsOld(Game game, Player p1, String buttonID, ButtonInteractionEvent event) {
         String factionChecker = "FFCC_" + p1.getFaction() + "_";
 
         List<Button> stuffToTransButtons = new ArrayList<>();

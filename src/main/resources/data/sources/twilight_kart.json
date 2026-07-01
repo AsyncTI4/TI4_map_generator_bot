@@ -9,5 +9,15 @@
             "[Google Sheet](https://docs.google.com/spreadsheets/d/1RMZd-Gu8SuArRtlS_9IxcksDjN8yuEaCEAbaP7ws3sk/edit?usp=sharing)",
             "[Assets Folder](https://drive.google.com/drive/folders/1OMrhOYkMDSBjUOk95fF6_nLegivHYNfh?usp=sharing)"
         ]
+    },
+    {
+        "source": "twilight_ds",
+        "name": "Twilight Discordant Stars",
+        "canal": "community",
+        "credits": "Tactic Blue",
+        "description": "73 abilities right now for use with Twilight's Fall",
+        "data": [
+            "[Google Sheet](https://docs.google.com/document/d/1214N4Py1NqvkQzFN5YULKiR7rmn1qpf4OdFqb8_vQUg/edit?tab=t.0#heading=h.edh8li2jdsvb)"
+        ]
     }
 ]

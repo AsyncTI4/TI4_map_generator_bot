@@ -473,9 +473,20 @@ public class ListPlayerInfoService {
     }
 
     public static int getPlayerProgressOnObjective(String objID, Game game, Player player) {
+        return getPlayerProgressOnObjective(objID, game, player, false);
+    }
+
+    public static int getPlayerProgressOnObjective(String objID, Game game, Player player, boolean plausibleD) {
         int comms = 0;
         if (player.hasUnexhaustedLeader("keleresagent")) {
             comms = player.getCommodities();
+        }
+        if (!plausibleD && player.hasTech("tf-plausibled") && Mapper.getSecretObjective(objID) != null) {
+            int max = 0;
+            for (Player p2 : game.getRealPlayers()) {
+                max = Math.max(max, getPlayerProgressOnObjective(objID, game, p2, true));
+                return max;
+            }
         }
         switch (objID) {
             case "push_boundaries", "push_boundaries_omegaphase" -> {

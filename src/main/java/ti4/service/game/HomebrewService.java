@@ -83,7 +83,7 @@ public class HomebrewService {
         buttons.add(Buttons.red("setupHomebrewNone", "Remove All Homebrews"));
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
 
-        ButtonHelper.deleteMessage(event);
+        // ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), sb.toString(), buttons);
     }
 

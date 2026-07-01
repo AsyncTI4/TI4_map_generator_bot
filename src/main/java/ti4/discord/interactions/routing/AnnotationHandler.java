@@ -188,7 +188,7 @@ public class AnnotationHandler {
                                 .reply(
                                         "The button failed. An exception has been logged for the developers. Please report this to "
                                                 + getBotBugsChannelLink()
-                                                + " if it doesn't resolve within an hour. Do not ping anyone until that time passes.")
+                                                + " if it doesn't resolve within an hour. Do not press this button again.")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                     if (arg instanceof StringSelectInteractionEvent selectInteractionEvent) {

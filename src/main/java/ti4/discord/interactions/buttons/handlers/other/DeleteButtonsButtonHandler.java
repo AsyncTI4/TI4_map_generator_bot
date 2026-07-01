@@ -351,6 +351,15 @@ class DeleteButtonsButtonHandler {
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
                 }
+                if (player.hasTech("tf-rallythehorde")) {
+                    String msg = player.getRepresentation()
+                            + " due to your **Rally the Horde** ability, if you just produced a ship,"
+                            + " you may place a neutral ship of that type in any system which does not possess any non-neutral ships. Press button to resolve";
+                    List<Button> buttons2 = new ArrayList<>();
+                    buttons2.add(Buttons.green("startRallyTheHorde", "Rally The Horde"));
+                    buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
+                }
             }
         }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {

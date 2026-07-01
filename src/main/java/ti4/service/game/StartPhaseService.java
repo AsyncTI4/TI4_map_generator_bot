@@ -1206,6 +1206,11 @@ public class StartPhaseService {
                     "All players have picked a strategy card.\n" + nextPlayer.getRepresentationNoPing()
                             + " is first in initiative order.");
             postSurveyResults(game);
+            if (game.isShowBanners()) {
+                BannerGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
+            }
+            ListTurnOrderService.turnOrder(event, game);
+            StartTurnService.turnStart(event, game, nextPlayer);
             for (Player p2 : game.getRealPlayers()) {
                 if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
                     List<Button> buttons = new ArrayList<>();
@@ -1229,11 +1234,6 @@ public class StartPhaseService {
                     hold.append((hold.isEmpty()) ? "" : " or ").append("_Imperial Arbiter_");
                 }
             }
-            if (game.isShowBanners()) {
-                BannerGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
-            }
-            ListTurnOrderService.turnOrder(event, game);
-            StartTurnService.turnStart(event, game, nextPlayer);
         }
         for (Player p2 : game.getRealPlayers()) {
             if (!game.isFowMode()) {

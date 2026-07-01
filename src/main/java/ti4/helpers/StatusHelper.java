@@ -520,7 +520,23 @@ public final class StatusHelper {
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
                                 + ", you may use the button to pay 3 trade goods and get a technology, using _Sentient Datapool_.",
-                        List.of(Buttons.GET_A_TECH));
+                        List.of(Buttons.GET_A_TECH, Buttons.DONE_DELETE_BUTTONS));
+            }
+
+            if (player.hasTech("dsaugug")) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + ", this is a reminder that you can score an additional public objective instead of a secret objective due to your Psychographics.");
+            }
+            if (player.hasTech("tf-sentientdatapool") && player.getTg() > 3) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + ", you may use the button to pay 4 trade goods and get an ability, using _Sentient Datapool_.",
+                        List.of(
+                                Buttons.green("drawSingularNewSpliceCard_ability_sentient", "Pay 4tg for Ability"),
+                                Buttons.DONE_DELETE_BUTTONS));
             }
             Leader playerLeader = player.getLeader("kyrohero").orElse(null);
             if (player.hasLeader("kyrohero")

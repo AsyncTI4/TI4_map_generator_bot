@@ -16,7 +16,7 @@ class MatchDescriberTest {
     }
 
     @Test
-    void threadTitleIncludesTiglRanksWhenPresent() {
+    void threadTitleLeadsWithTiglRanksWhenPresent() {
         MatchedGame game = game(
                 MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION,
                 "10",
@@ -24,7 +24,7 @@ class MatchDescriberTest {
                 List.of(),
                 List.of("Agent", "Commander"));
         assertThat(MatchDescriber.threadTitle(game))
-                .isEqualTo("6p, 10vp, PoK + TE, average (30 days) pace, TIGL (Agent/Commander)");
+                .isEqualTo("Agent/Commander: 6p, 10vp, PoK + TE, average (30 days) pace");
     }
 
     private static MatchedGame game(

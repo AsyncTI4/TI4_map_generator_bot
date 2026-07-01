@@ -73,7 +73,7 @@
         "id": "iron_resilience",
         "name": "Iron Resilience",
         "faction": "iron",
-        "permanentEffect": "Your ground forces cannot be removed or destroyed by any game effects outside of combat or when exceeding capacity.",
+        "permanentEffect": "Your ground forces cannot be removed or destroyed by any game effects except when in combat or when exceeding capacity.",
         "source": "beans"
     },
     {
@@ -162,7 +162,7 @@
         "name": "Revelation",
         "faction": "natau",
         "permanentEffect": "When you gain this card:\nChoose 2 non-objective common decks and place them on either side of this card. You may look at the top card of either of these decks at any time.",
-        "window": "When you would draw a card from either common deck placed near this card",
+        "window": "When you would draw a card from any common deck",
         "windowEffect": "You may exhaust this card to draw an additional card; choose 1 to keep or resolve and shuffle the rest back into that common deck.",
         "notes": "This does not allow you to draw an additional agenda during the primary ability of the Politics strategy card, as you are not drawing from the deck, only looking at the top 2. However, this does allow you to draw 2 agendas during the agenda phase if you are the speaker, and choose which one to vote on.",
         "source": "beans"
