@@ -29,7 +29,7 @@ class MatchmakingGrouper {
         Set<QueuedParty> partiesAddedToGames = new HashSet<>();
 
         Map<MatchmakingQueueMember, PlayerMatchmakingData> playerMatchmakingData =
-                PlayermatchmakingDataFactory.buildForParties(parties);
+                PlayerMatchmakingDataFactory.buildForParties(parties);
         Map<GameConfig, List<QueuedParty>> partiesByConfig = groupPartiesByConfig(parties);
         List<GameConfig> configsToTry = getRandomizedKeysThenSortByPlayerCount(partiesByConfig);
 
