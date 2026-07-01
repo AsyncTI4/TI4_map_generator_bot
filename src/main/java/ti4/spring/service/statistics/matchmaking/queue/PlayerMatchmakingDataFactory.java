@@ -24,7 +24,7 @@ import ti4.spring.service.statistics.UserGameInfoService;
 import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
 
 @UtilityClass
-class PlayermatchmakingDataFactory {
+class PlayerMatchmakingDataFactory {
 
     private static final List<String> ROLES_TO_TRACK =
             List.of(MatchmakingOptions.FLOATERS_ROLE_NAME, MatchmakingOptions.WARRIORS_ROLE_NAME);
