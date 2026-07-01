@@ -12,6 +12,7 @@ import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.service.webhook.GameWebhookNotifierFacade;
 
 class SCUnpick extends GameStateSubcommand {
 
@@ -34,8 +35,10 @@ class SCUnpick extends GameStateSubcommand {
         Player player = getPlayer();
         player.removeSC(scUnpicked);
         List<Button> scButtons = Helper.getRemainingSCButtons(game, player);
+        String previousPhaseOfGame = game.getPhaseOfGame();
         game.updateActivePlayer(player);
         game.setPhaseOfGame("strategy");
+        GameWebhookNotifierFacade.phaseChanged(game, previousPhaseOfGame, "strategy");
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), player.getRepresentation() + ", please pick a strategy card.", scButtons);
     }

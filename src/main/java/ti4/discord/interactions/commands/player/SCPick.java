@@ -20,6 +20,7 @@ import ti4.message.MessageHelper;
 import ti4.service.game.StartPhaseService;
 import ti4.service.player.PlayerStatsService;
 import ti4.service.strategycard.PickStrategyCardService;
+import ti4.service.webhook.GameWebhookNotifierFacade;
 
 class SCPick extends GameStateSubcommand {
 
@@ -92,6 +93,7 @@ class SCPick extends GameStateSubcommand {
         }
 
         boolean nextCorrectPing = false;
+        String previousPhaseOfGame = game.getPhaseOfGame();
         Queue<Player> players = new ArrayDeque<>(activePlayers);
         while (players.iterator().hasNext() && player.isRealPlayer()) {
             Player currentPlayer = players.poll();
@@ -121,6 +123,7 @@ class SCPick extends GameStateSubcommand {
             game.updateActivePlayer(privatePlayer);
             if (!allPicked) {
                 game.setPhaseOfGame("strategy");
+                GameWebhookNotifierFacade.phaseChanged(game, previousPhaseOfGame, "strategy");
                 MessageHelper.sendMessageToChannelWithButtons(
                         privatePlayer.getPrivateChannel(),
                         "Use buttons to pick your strategy card.",
@@ -130,6 +133,7 @@ class SCPick extends GameStateSubcommand {
             if (!allPicked) {
                 game.updateActivePlayer(privatePlayer);
                 game.setPhaseOfGame("strategy");
+                GameWebhookNotifierFacade.phaseChanged(game, previousPhaseOfGame, "strategy");
                 PickStrategyCardService.checkForForcePickLastStratCard(event, privatePlayer, game, msgExtra);
             }
         }

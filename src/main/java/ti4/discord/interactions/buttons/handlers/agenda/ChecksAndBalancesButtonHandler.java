@@ -15,6 +15,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.StartPhaseService;
 import ti4.service.player.PlayerStatsService;
+import ti4.service.webhook.GameWebhookNotifierFacade;
 
 @UtilityClass
 class ChecksAndBalancesButtonHandler {
@@ -65,8 +66,10 @@ class ChecksAndBalancesButtonHandler {
             if (privatePlayer == null) {
                 privatePlayer = game.getRealPlayers().getFirst();
             }
+            String previousPhaseOfGame = game.getPhaseOfGame();
             game.setPhaseOfGame("strategy");
             game.updateActivePlayer(privatePlayer);
+            GameWebhookNotifierFacade.phaseChanged(game, previousPhaseOfGame, "strategy");
             MessageHelper.sendMessageToChannelWithButtons(
                     privatePlayer.getCorrectChannel(),
                     privatePlayer.getRepresentationUnfogged()

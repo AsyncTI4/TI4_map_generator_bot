@@ -15,6 +15,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.DeckModel;
+import ti4.service.webhook.GameWebhookNotifierFacade;
 
 @UtilityClass
 public class EdictPhaseHandler {
@@ -30,7 +31,9 @@ public class EdictPhaseHandler {
 
     @ButtonHandler("edictPhase")
     public static void edictPhase(GenericInteractionCreateEvent event, Game game) {
+        String previousPhaseOfGame = game.getPhaseOfGame();
         game.setPhaseOfGame("agenda");
+        GameWebhookNotifierFacade.phaseChanged(game, previousPhaseOfGame, "agenda");
         List<String> edicts = getEdictDeck(game);
         List<Button> buttons = new ArrayList<>();
         List<MessageEmbed> embeds = new ArrayList<>();

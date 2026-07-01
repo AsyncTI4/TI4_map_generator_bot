@@ -41,6 +41,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
+import ti4.service.webhook.GameWebhookNotifierFacade;
 
 public final class TeHelperTechs {
 
@@ -584,7 +585,9 @@ public final class TeHelperTechs {
     @ButtonHandler("useExecutiveOrder_")
     private static void executiveOrder(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         game.setStoredValue("executiveOrder", player.getFaction());
+        String previousPhaseOfGame = game.getPhaseOfGame();
         game.setPhaseOfGame("agenda");
+        GameWebhookNotifierFacade.phaseChanged(game, previousPhaseOfGame, "agenda");
         boolean top = buttonID.contains("top");
 
         String msg = game.getPing() + " the " + buttonID.split("_")[1]

@@ -55,6 +55,7 @@ import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.strategycard.StrategyCardMessageService;
+import ti4.service.webhook.GameWebhookNotifierFacade;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -154,6 +155,7 @@ public class StartTurnService {
 
         game.updateActivePlayer(player);
         game.setPhaseOfGame("action");
+        GameWebhookNotifierFacade.turnChanged(game);
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
         if (NetrunnersPromissoryHandler.shouldOfferSharedNetworkAccessButtons(player, game)) {
             NetrunnersPromissoryHandler.offerSharedNetworkAccessButtons(player, game);
