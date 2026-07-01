@@ -420,7 +420,15 @@ public class MessageHelper {
                                 onSuccess.accept(msg);
                             }
                             String link = msg.getAttachments().getFirst().getUrl();
-                            realButtons.add(Button.link(link, "Open in browser"));
+                            Button fullResButton = Button.link(link, "Full Res");
+                            if (!buttons.isEmpty() && "Web View".equals(buttons.getFirst().getLabel())) {
+                                realButtons.add(buttons.getFirst());
+                                realButtons.add(fullResButton);
+                                realButtons.addAll(buttons.subList(1, buttons.size()));
+                                splitAndSent(message, channel, null, realButtons);
+                                return;
+                            }
+                            realButtons.add(fullResButton);
                             realButtons.addAll(buttons);
                             splitAndSent(message, channel, null, realButtons);
                         },
