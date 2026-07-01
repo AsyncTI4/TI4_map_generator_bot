@@ -1,0 +1,107 @@
+{
+    "id": "wheb",
+    "tileId": "lu1",
+    "name": "Wheb",
+    "aliases": [
+        "wheb"
+    ],
+    "positionInTile": {
+        "x": 241.0,
+        "y": 187.0
+    },
+    "resources": 1,
+    "influence": 1,
+    "factionHomeworld": "arachnera",
+    "planetType": "FACTION",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": null,
+    "legendaryAbilityText": null,
+    "unitPositions": {
+        "unitHolderName": "wheb",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 252.0,
+                    "y": 179.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 203.0,
+                    "y": 211.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 242.0,
+                    "y": 162.0
+                },
+                {
+                    "x": 257.0,
+                    "y": 164.0
+                },
+                {
+                    "x": 210.0,
+                    "y": 198.0
+                },
+                {
+                    "x": 220.0,
+                    "y": 208.0
+                },
+                {
+                    "x": 264.0,
+                    "y": 208.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 252.0,
+                    "y": 180.0
+                },
+                {
+                    "x": 266.0,
+                    "y": 180.0
+                },
+                {
+                    "x": 249.0,
+                    "y": 190.0
+                },
+                {
+                    "x": 260.0,
+                    "y": 190.0
+                },
+                {
+                    "x": 236.0,
+                    "y": 217.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 226.0,
+                    "y": 170.0
+                },
+                {
+                    "x": 240.0,
+                    "y": 191.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 279.0,
+                    "y": 176.0
+                },
+                {
+                    "x": 274.0,
+                    "y": 203.0
+                },
+                {
+                    "x": 196.0,
+                    "y": 182.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "source": "luminous"
+}

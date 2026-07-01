@@ -1,0 +1,33 @@
+[
+    {
+        "id": "nesting_burrows",
+        "name": "Nesting Burrows",
+        "faction": "arachnera",
+        "window": "After you produce 1 or more infantry:",
+        "windowEffect": "You may place up to 2 of those units on your faction sheet. Those units are captured.",
+        "source": "luminous"
+    },
+    {
+        "id": "necrogenesis",
+        "name": "Necrogenesis",
+        "faction": "arachnera",
+        "window": "Once per ground combat, after 1 of your opponent's units are destroyed:",
+        "windowEffect": "You may place 1 of your captured infantry from your faction sheet on that planet.",
+        "source": "luminous"
+    },
+    {
+        "id": "feeding_frenzy",
+        "name": "Feeding Frenzy",
+        "faction": "arachnera",
+        "permanentEffect": "Apply +1 to the result of each of your unit's combat rolls during ground combat on a planet that is in a nebula.",
+        "source": "luminous"
+    },
+    {
+        "id": "swarm",
+        "name": "Swarm",
+        "faction": "arachnera",
+        "window": "Once per action, during invasion on a planet that contains your units:",
+        "windowEffect": "You may resolve ground combat on that planet even if it does not contain another player's ground forces.",
+        "source": "luminous"
+    }
+]

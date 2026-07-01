@@ -1,0 +1,11 @@
+[
+    {
+        "alias": "lupnarachnera",
+        "name": "Arachnera PN",
+        "faction": "arachnera",
+        "color": "",
+        "playArea": "false",
+        "source": "luminous",
+        "text": "During ground combat, after one of your opponent's units is destroyed: You may place up to 2 infantry on that planet. Then, return this card to the Arachnera player."
+    }
+]
