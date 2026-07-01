@@ -58,6 +58,7 @@ public class PlayerTitleHelper {
                     Buttons.red("bestowTitleStep1_A Vuil'Raith In Xxcha Clothing", "A Vuil'Raith In Xxcha Clothing"));
             // buttons.add(Buttons.red("bestowTitleStep1_Space Risker", "Space Risker"));
             buttons.add(Buttons.red("bestowTitleStep1_A Warlord", "A Warlord"));
+            buttons.add(Buttons.red("bestowTitleStep1_Kingmaker", "Kingmaker"));
             buttons.add(Buttons.red("bestowTitleStep1_Word Breaker", "Word Breaker"));
             buttons.add(Buttons.red("bestowTitleStep1_One To Be Feared", "One To Be Feared"));
             // buttons.add(Buttons.red("bestowTitleStep1_Spice Bringer", "Spice Bringer"));
