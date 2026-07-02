@@ -21,6 +21,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.image.ImageHelper;
 import ti4.image.Mapper;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.image.FileUploadService;
@@ -30,6 +31,10 @@ import ti4.service.leader.UnlockLeaderService;
 public class RoundOneService {
 
     public static void roundOne(GenericInteractionCreateEvent event, Game game) {
+        if (game.isAcd2()) {
+            BotLogger.info(
+                    Constants.privateStaticVoidPing() + " Action Card Deck 2 game has begun: " + game.gameJumpLinks());
+        }
         if (!game.isFowMode()) {
             StringBuilder message =
                     new StringBuilder("Here are the quick reference cards for the factions in this game.");

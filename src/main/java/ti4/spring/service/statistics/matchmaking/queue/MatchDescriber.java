@@ -15,6 +15,9 @@ class MatchDescriber {
 
     static String threadTitle(MatchedGame game) {
         StringBuilder title = new StringBuilder();
+        if (!game.tiglRanks().isEmpty()) {
+            title.append(String.join("/", game.tiglRanks())).append(": ");
+        }
         title.append("%sp, %svp, %s, %s pace"
                 .formatted(
                         game.playerCount(),
@@ -57,9 +60,6 @@ class MatchDescriber {
         List<String> labels = new ArrayList<>();
         if (restrictions.contains(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION)) {
             labels.add("similar timezone");
-        }
-        if (!game.tiglRanks().isEmpty()) {
-            labels.add("TIGL (" + String.join("/", game.tiglRanks()) + ")");
         }
         return String.join(", ", labels);
     }

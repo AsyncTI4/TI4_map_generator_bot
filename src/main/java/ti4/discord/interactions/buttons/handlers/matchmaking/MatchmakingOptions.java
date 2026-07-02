@@ -75,7 +75,7 @@ public class MatchmakingOptions {
         MAX_QUEUE_TIME_OPTIONS_TO_HOURS.put("1 week", 168);
     }
 
-    private static final int DEFAULT_MAX_QUEUE_TIME_HOURS = 8;
+    private static final int DEFAULT_MAX_QUEUE_TIME_HOURS = 48;
 
     public static boolean wantsSimilarActiveHours(Collection<String> restrictions) {
         return restrictions.contains(SIMILAR_ACTIVE_HOURS_OPTION);
