@@ -16,6 +16,7 @@
         "type": "commander",
         "name": "Solikhera",
         "title": "Nest Architect",
+        "abilityWindow": "At any time",
         "abilityText": "Place Arachnera dock token in your reinforcements. This is an additional space dock unit. Your space dock component limit is increased by 1.",
         "unlockCondition": "Have 6 captured units on your faction sheet.",
         "source": "luminous"
