@@ -2,6 +2,55 @@
 
 This document describes how the TI4 Map Generator Bot integrates with the AsyncTI4 website UI.
 
+## Game Webhooks
+
+Trusted external integrations can subscribe to non-FoW game changes without polling. Server operators create `webhook_user` rows with the callback URL and SHA-256 API key hash.
+
+Supported events:
+
+- `TURN_CHANGED`
+- `PHASE_CHANGED`
+
+Endpoints:
+
+- `GET /api/public/game/webhook/eventTypes` returns supported event names, trigger descriptions, delivery settings, and payload fields.
+- `PUT /api/public/game/{gameName}/webhook` with `X-API-Key` and JSON body:
+
+```json
+{ "eventTypes": ["TURN_CHANGED", "PHASE_CHANGED"] }
+```
+
+- `DELETE /api/public/game/{gameName}/webhook` with `X-API-Key`
+
+Example `TURN_CHANGED` payload:
+
+```json
+{
+  "gameName": "pbd1234",
+  "eventType": "TURN_CHANGED",
+  "phaseOfGame": "action",
+  "round": 5,
+  "activePlayerId": "123456789012345678",
+  "activeFaction": "arborec",
+  "timestamp": "2026-06-02T14:30:00Z"
+}
+```
+
+Example `PHASE_CHANGED` payload:
+
+```json
+{
+  "gameName": "pbd1234",
+  "eventType": "PHASE_CHANGED",
+  "previousPhaseOfGame": "strategy",
+  "phaseOfGame": "agenda",
+  "round": 4,
+  "timestamp": "2026-06-02T14:30:00Z"
+}
+```
+
+Delivery is asynchronous. Webhook failures never block game flow; transient failures may be retried once, and permanent 4xx failures are not retried.
+
 ## Image Asset Pipeline
 
 Game assets (faction banners, planet images, system tiles, etc.) are automatically uploaded to a CloudFront-backed S3 bucket and served to the website.

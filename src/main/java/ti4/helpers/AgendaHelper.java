@@ -71,6 +71,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
+import ti4.service.webhook.GameWebhookNotifierFacade;
 
 @UtilityClass
 public final class AgendaHelper {
@@ -698,7 +699,9 @@ public final class AgendaHelper {
     }
 
     public static void startTheVoting(Game game) {
+        String previousPhaseOfGame = game.getPhaseOfGame();
         game.setPhaseOfGame("agendaVoting");
+        GameWebhookNotifierFacade.phaseChanged(game, previousPhaseOfGame, "agendaVoting");
         if (!game.getStoredValue("CommFormPreset").isEmpty()) {
             autoResolve(
                     null,
@@ -2540,7 +2543,9 @@ public final class AgendaHelper {
         Integer uniqueID = discardAgendas.get(agendaID);
         boolean action = false;
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
+            String previousPhaseOfGame = game.getPhaseOfGame();
             game.setPhaseOfGame("agendawaiting");
+            GameWebhookNotifierFacade.phaseChanged(game, previousPhaseOfGame, "agendawaiting");
             if (aCount == 1) {
                 GMService.logActivity(game, "**Agenda** Phase for Round " + game.getRound() + " started.", true);
                 FowCommunicationThreadService.checkAllCommThreads(game);

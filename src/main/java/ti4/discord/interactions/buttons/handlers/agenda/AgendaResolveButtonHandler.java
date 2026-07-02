@@ -71,6 +71,7 @@ import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.webhook.GameWebhookNotifierFacade;
 
 @UtilityClass
 class AgendaResolveButtonHandler {
@@ -469,10 +470,13 @@ class AgendaResolveButtonHandler {
                     + ", please use this buttons to proceed after fully resolving the agenda.";
             buttons = StartTurnService.getStartOfTurnButtons(executiveOrderPlayer, game, true, event);
             game.removeStoredValue("executiveOrder");
+            String previousPhaseOfGame = game.getPhaseOfGame();
             game.updateActivePlayer(executiveOrderPlayer);
             Player oldSpeaker = game.getPlayer(game.getStoredValue("oldSpeakerExecutiveOrder"));
             game.setSpeaker(oldSpeaker);
             game.setPhaseOfGame("action");
+            GameWebhookNotifierFacade.phaseChanged(game, previousPhaseOfGame, "action");
+            GameWebhookNotifierFacade.turnChanged(game);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, buttons);
         }
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {

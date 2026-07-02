@@ -50,6 +50,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.planet.EronousPlanetService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.webhook.GameWebhookNotifierFacade;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -154,7 +155,9 @@ public final class StatusHelper {
     }
 
     public static void beginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
+        String previousPhaseOfGame = game.getPhaseOfGame();
         game.setPhaseOfGame("statusScoring");
+        GameWebhookNotifierFacade.phaseChanged(game, previousPhaseOfGame, "statusScoring");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
         GMService.logActivity(game, "**StatusScoring** Phase for Round " + game.getRound() + " started.", true);
         for (Player player : game.getRealPlayers()) {
