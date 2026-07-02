@@ -370,9 +370,7 @@ class MatchmakingButtonHandler {
             return;
         }
         replyEphemeral(
-                event,
-                "Added " + added + " matching " + pluralize(added, "player")
-                        + " from the queue to this game.");
+                event, "Added " + added + " matching " + pluralize(added, "player") + " from the queue to this game.");
     }
 
     private static PlayerSearchCriteria buildSearchCriteria(ModalInteractionEvent event) {
