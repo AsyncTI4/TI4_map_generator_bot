@@ -120,6 +120,7 @@
     "asyncId": "pd",
     "name": "Orbital Defense Platform II",
     "upgradesFromUnitId": "psm_pds",
+    "requiredTechId": "lupsmpd",
     "source": "luminous",
     "faction": "psm",
     "productionValue": 2,
