@@ -29,5 +29,34 @@
         "window": "Once per action, during invasion on a planet that contains your units:",
         "windowEffect": "You may resolve ground combat on that planet even if it does not contain another player's ground forces.",
         "source": "luminous"
+    },
+    {
+        "id": "orbital_defense_grid",
+        "name": "Orbital Defense Grid",
+        "faction": "psm",
+        "permanentEffect": "PDS you control count as ships during space combat, but they cannot retreat.",
+        "source": "luminous"
+    },
+    {
+        "id": "galactic_industrial_complex",
+        "name": "Galactic Industrial Complex",
+        "faction": "psm",
+        "window": "ACTION:",
+        "windowEffect": "Return a promissory note to its owner. You may spend 3 resource or influence to place a PDS in a system you control.",
+        "source": "luminous"
+    },
+    {
+        "id": "psm_orbital_drops",
+        "name": "Orbital Drops",
+        "faction": "psm",
+        "permanentEffect": "When you would use Galactic Industrial Complex faction abiity you may plac ea mech from your reinforcements on a planet you control.",
+        "source": "luminous"
+    },
+    {
+        "id": "psm_mega_structures",
+        "name": "Mega Structures",
+        "faction": "psm",
+        "permanentEffect": "When scoring objectives you may treat each structure you control as if it is on its own separate planet for the purposes of scoring objectives.",
+        "source": "luminous"
     }
 ]

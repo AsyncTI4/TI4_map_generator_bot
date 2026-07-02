@@ -46,5 +46,52 @@
         ],
         "complexity": "Medium",
         "source": "luminous"
+    },
+    {
+        "alias": "psm",
+        "factionName": "Pax Solaris Martis",
+        "homeSystem": "lu2",
+        "startingFleet": "1 dn, 1 cv, 1 dd, 3 ff, 2 inf t, 1 inf n, 1 pds n, 1 sd t",
+        "commodities": 2,
+        "factionTech": [
+            "lupsmb",
+            "lupsmpd"
+        ],
+        "startingTech": [
+            "ps",
+            "aida"
+        ],
+        "homePlanets": [
+            "terra",
+            "nova"
+        ],
+        "abilities": [
+            "orbital_defense_grid",
+            "galactic_industrial_complex",
+            "psm_orbital_drops",
+            "psm_mega_structures"
+        ],
+        "leaders": [
+            "psmagent",
+            "psmcommander",
+            "psmhero"
+        ],
+        "promissoryNotes": [
+            "lupnpsm"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "psm_flagship",
+            "infantry",
+            "psm_mech",
+            "psm_pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "luminous"
     }
 ]

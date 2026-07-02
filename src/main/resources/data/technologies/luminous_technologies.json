@@ -16,10 +16,33 @@
         "types": [
             "UNITUPGRADE"
         ],
-        "requirements": "SD",
+        "requirements": "YY",
         "faction": "arachnera",
         "baseUpgrade": "sd2",
         "source": "luminous",
         "text": "This system is a Nebula, Nebulae in or adjacent to this unit's system do not affect your ships' movement. Place a Nebula token beneath this unit as a reminder."
+    },
+    {
+        "alias": "lupsmb",
+        "name": "Wave Transference",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBB",
+        "faction": "psm",
+        "text": "Whenever you would choose a player or planet with a non-Strategy Card effect, you may choose 1 additional target with that effect. You can choose a player or planet more than once with the same action.",
+        "source": "luminous"
+    },
+    {
+        "alias": "lupsmpd",
+        "name": "Orbital Defense Platform II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "RY",
+        "faction": "psm",
+        "baseUpgrade": "pd",
+        "text": "This unit is placed in the space area of a system. No more than 2 Orbital Defense Platform II may be placed in space per system. You may use this unit’s SPACE CANNON against ships that are adjacent to this unit’s system.",
+        "source": "luminous"
     }
 ]

@@ -10,5 +10,17 @@
         ],
         "text": "When researching a technology you may treat this card as a planet with a green technology specialty symbol.\n\nYou may produce 1 additional infantry for their cost. These infantry do not count against your PRODUCTION limit.",
         "source": "luminous"
+    },
+    {
+        "alias": "psmbt",
+        "name": "PSM Breakthrough",
+        "shortName": "PSM\nBreakthrough",
+        "faction": "psm",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "Each system or planet can contain a number of structures equal to +1 the number of structures that game effects or abilities would allow. You may exhaust this card at the start of your turn during the action phase; remove up to 2 of your structures from the game board and place them in a system you control.",
+        "source": "luminous"
     }
 ]
