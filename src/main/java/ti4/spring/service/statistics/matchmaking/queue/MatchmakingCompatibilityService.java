@@ -11,7 +11,7 @@ class MatchmakingCompatibilityService {
 
     private static final long ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT = 3;
 
-    private static final double SKILL_DIFFERENCE_STARTING_THRESHOLD = 4;
+    private static final double SKILL_DIFFERENCE_STARTING_THRESHOLD = 3;
     private static final double SKILL_DIFFERENCE_WIDENING_PER_WINDOW = 1;
     private static final Duration SIMILAR_SKILL_DECAY_INTERVAL = Duration.ofHours(2);
 
