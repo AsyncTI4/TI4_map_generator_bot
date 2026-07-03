@@ -86,6 +86,7 @@ public class GameProperties {
     // Aggregate Game Stats
     private @ExportableField int activationCount;
     private @ExportableField int buttonPressCount;
+    private @ExportableField long eventSequenceCounter;
     private @ExportableField int mapImageGenerationCount;
     private @ExportableField int numberOfPurgedFragments;
     private @ExportableField int pingSystemCounter;
