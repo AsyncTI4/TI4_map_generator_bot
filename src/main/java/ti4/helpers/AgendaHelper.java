@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
+import tools.jackson.core.type.TypeReference;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.acd2.PublicOutrageAcd2ButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.acd2.SettlementsAcd2ButtonHandler;
@@ -43,6 +44,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
+import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.GameMessageManager;
@@ -74,6 +76,7 @@ import ti4.service.unit.DestroyUnitService;
 
 @UtilityClass
 public final class AgendaHelper {
+    public static final String AGENDA_START_VOTE_COUNTS = "agendaStartVoteCounts";
 
     private static void pingAboutDebt(Game game) {
         if (game.isHiddenAgendaMode() || !game.getStoredValue("executiveOrder").isEmpty()) {
@@ -2565,6 +2568,7 @@ public final class AgendaHelper {
             revealAgenda(event, revealFromBottom, game, channel);
             return;
         }
+        snapshotAgendaStartVoteCounts(game);
         if ((agendaTarget.toLowerCase().contains("elect law") || "constitution".equalsIgnoreCase(agendaID))
                 && game.getLaws().isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -2822,6 +2826,50 @@ public final class AgendaHelper {
             itemNo++;
         }
         return sb.toString();
+    }
+
+    public static Map<String, Integer> getVoteCountByColor(Game game) {
+        Map<String, Integer> voteCounts = new LinkedHashMap<>();
+        for (Player player : getVotingOrder(game)) {
+            if (player.getColor() != null && !player.getColor().isBlank()) {
+                voteCounts.put(player.getColor(), getVoteTotal(player, game)[0]);
+            }
+        }
+        return voteCounts;
+    }
+
+    private static void snapshotAgendaStartVoteCounts(Game game) {
+        try {
+            game.setStoredValue(
+                    AGENDA_START_VOTE_COUNTS,
+                    JsonMapperManager.basic().writeValueAsString(getVoteCountByColor(game)));
+        } catch (Exception e) {
+            BotLogger.error(new LogOrigin(game), "Could not snapshot agenda start vote counts", e);
+        }
+    }
+
+    public static Map<String, Integer> getAgendaStartVoteCounts(Game game) {
+        String value = game.getStoredValue(AGENDA_START_VOTE_COUNTS);
+        if (value == null || value.isBlank()) {
+            return new LinkedHashMap<>();
+        }
+        try {
+            return JsonMapperManager.basic()
+                    .readValue(value, new TypeReference<LinkedHashMap<String, Integer>>() {});
+        } catch (Exception e) {
+            BotLogger.error(new LogOrigin(game), "Could not read agenda start vote counts", e);
+            return new LinkedHashMap<>();
+        }
+    }
+
+    public static String getCurrentAgendaId(Game game) {
+        String currentAgendaInfo = game.getCurrentAgendaInfo();
+        if (currentAgendaInfo == null || currentAgendaInfo.isBlank()) {
+            return null;
+        }
+
+        String candidate = currentAgendaInfo.substring(currentAgendaInfo.lastIndexOf('_') + 1);
+        return Mapper.isValidAgenda(candidate) ? candidate : null;
     }
 
     private static boolean isRepresentativeGovernmentInEffect(Game game) {
