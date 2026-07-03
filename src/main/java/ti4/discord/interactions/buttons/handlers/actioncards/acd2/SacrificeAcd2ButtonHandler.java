@@ -28,7 +28,7 @@ class SacrificeAcd2ButtonHandler {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             Planet uH = game.getUnitHolderFromPlanet(planet);
-            if (uH != null && uH.getUnitCount(player.getColor()) >= 2) {
+            if (uH != null && uH.getUnitCount(player.getColorID()) >= 2) {
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + "sacrificePlanet_" + planet,
                         Helper.getPlanetRepresentation(planet, game)));

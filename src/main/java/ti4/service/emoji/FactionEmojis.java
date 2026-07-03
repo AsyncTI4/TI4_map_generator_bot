@@ -123,6 +123,10 @@ public enum FactionEmojis implements TI4Emoji {
     ashen,
     natau,
 
+    // luminous
+    arachnera,
+    psm,
+
     // nomadfalcon
     erock,
     explanetary,
@@ -395,6 +399,9 @@ public enum FactionEmojis implements TI4Emoji {
             case "netrunners" -> netrunners;
             case "crystellum" -> crystellum;
             case "natau" -> natau;
+
+            case "arachnera" -> arachnera;
+            case "psm" -> psm;
 
             case "netharii" -> netharii;
             case "drahn" -> Drahn;
