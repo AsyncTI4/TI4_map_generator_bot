@@ -21,7 +21,7 @@ class RehashedDebatesAcd2ButtonHandler {
 
     @ButtonHandler("resolveRehashedDebates")
     public static void resolveRehashedDebates(Player player, Game game, ButtonInteractionEvent event) {
-        String currentAgendaId = getCurrentAgendaId(game);
+        String currentAgendaId = AgendaHelper.getCurrentAgendaId(game);
 
         List<Button> buttons = new ArrayList<>();
         for (String agendaId : game.getDiscardAgendas().keySet()) {
@@ -108,14 +108,5 @@ class RehashedDebatesAcd2ButtonHandler {
                 player.getRepresentationUnfogged() + " chose _" + agenda.getName()
                         + "_ for _Rehashed Debates_. Players will vote on it instead.");
         AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
-    }
-
-    private static String getCurrentAgendaId(Game game) {
-        String info = game.getCurrentAgendaInfo();
-        if (info == null || info.isEmpty()) {
-            return null;
-        }
-        String candidate = info.substring(info.lastIndexOf('_') + 1);
-        return Mapper.isValidAgenda(candidate) ? candidate : null;
     }
 }

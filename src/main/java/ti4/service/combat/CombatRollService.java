@@ -2395,7 +2395,7 @@ public class CombatRollService {
                 boolean spaceStation =
                         (player.hasUnlockedBreakthrough("gledgebt") || player.hasTech("tf-mantlecracking"))
                                 && planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG);
-                if ((planet.isSpaceStation() || spaceStation)
+                if ((planet.isSpaceStation(game) || spaceStation)
                         && player.getPlanets().contains(planet.getName())) {
                     if (player.hasUnlockedBreakthrough("gledgebt")) {
                         UnitModel planetFakeUnit = new UnitModel();

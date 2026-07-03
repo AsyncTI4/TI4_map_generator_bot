@@ -3,6 +3,7 @@ package ti4.service.planet;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -46,6 +47,8 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class AddPlanetService {
@@ -71,7 +74,7 @@ public class AddPlanetService {
                 return;
             }
         }
-        if (game.getRevealedPublicObjectives().size() < 3 || (unitHolder != null && unitHolder.isSpaceStation())) {
+        if (game.getRevealedPublicObjectives().size() < 3 || (unitHolder != null && unitHolder.isSpaceStation(game))) {
             setup = true;
         }
         if ("avernus".equalsIgnoreCase(planet)) {
@@ -144,6 +147,7 @@ public class AddPlanetService {
             if (unitHolder.getTokenList().contains(Constants.CUSTODIAN_TOKEN_PNG)) {
                 unitHolder.removeToken(Constants.CUSTODIAN_TOKEN_PNG);
                 game.scorePublicObjective(player.getUserID(), 0);
+                GameEventService.commit(game, GameEventType.OBJECTIVE_SCORED, player, Map.of("category", "CUSTODIAN"));
                 MessageChannel channel = game.getMainGameChannel();
                 if (game.isFowMode()) {
                     channel = player.getPrivateChannel();
@@ -274,7 +278,7 @@ public class AddPlanetService {
                 && player.hasTech("dxa")
                 && !doubleCheck
                 && !setup
-                && !unitHolder.isSpaceStation()) {
+                && !unitHolder.isSpaceStation(game)) {
             String msg10 = player.getRepresentationUnfogged()
                     + " you may have an opportunity to use _Dacxive Animators_ on "
                     + Helper.getPlanetRepresentation(planet, game)
@@ -590,7 +594,7 @@ public class AddPlanetService {
                         buttons);
             }
         }
-        if (!unitHolder.isSpaceStation()
+        if (!unitHolder.isSpaceStation(game)
                 && IsPlayerElectedService.isPlayerElected(game, player, "minister_exploration")) {
             String fac = player.getFactionEmoji();
             MessageHelper.sendMessageToChannel(

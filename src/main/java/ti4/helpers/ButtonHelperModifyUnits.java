@@ -754,7 +754,7 @@ public final class ButtonHelperModifyUnits {
                 if (isRemainingSustains) {
                     effectiveUnits -= damagedUnits;
                 }
-                int min = (player.hasTech("nes"))
+                int min = (player.hasTech("nes") && isRemainingSustains)
                         ? Math.min(effectiveUnits, (hits + 1) / 2)
                         : Math.min(effectiveUnits, hits);
                 if (isNraShenanigans
