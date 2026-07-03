@@ -17,6 +17,7 @@ import ti4.logging.BotLogger;
 import ti4.spring.context.SpringContext;
 import ti4.website.model.WebGameState;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
 
 /**
@@ -34,6 +35,8 @@ import tools.jackson.databind.node.ObjectNode;
 @RequiredArgsConstructor
 @Component
 public class WebSocketNotifier {
+    private static final JsonMapper MAPPER = JsonMapperManager.basic();
+
     private final SimpMessagingTemplate messagingTemplate;
 
     private final Cache<String, JsonNode> lastPublishedState = Caffeine.newBuilder()
@@ -41,6 +44,7 @@ public class WebSocketNotifier {
             .expireAfterAccess(Duration.ofHours(6))
             .build();
     private final Map<String, AtomicLong> stateSequences = new ConcurrentHashMap<>();
+    private final Map<String, Object> perGameLocks = new ConcurrentHashMap<>();
 
     public void notifyGameRefresh(String gameId) {
         String destination = "/topic/game/" + gameId;
@@ -61,22 +65,25 @@ public class WebSocketNotifier {
             if (game == null || game.isFowMode() || System.getenv("TESTING") != null) return;
 
             String gameId = game.getName();
-            JsonNode current = JsonMapperManager.basic().valueToTree(WebGameState.fromGame(game));
-            JsonNode previous = lastPublishedState.getIfPresent(gameId);
+            // Build the snapshot outside the lock (pure computation, no shared state).
+            JsonNode current = MAPPER.valueToTree(WebGameState.fromGame(game));
 
-            boolean full = previous == null;
-            JsonNode patch = full ? current : diff(previous, current);
-            if (patch == null) return; // nothing changed
+            synchronized (perGameLocks.computeIfAbsent(gameId, k -> new Object())) {
+                JsonNode previous = lastPublishedState.getIfPresent(gameId);
 
-            lastPublishedState.put(gameId, current);
-            long seq = stateSequences
-                    .computeIfAbsent(gameId, k -> new AtomicLong())
-                    .incrementAndGet();
+                boolean full = previous == null;
+                JsonNode patch = full ? current : diff(previous, current);
+                if (patch == null) return; // nothing changed
 
-            String json = JsonMapperManager.basic()
-                    .writeValueAsString(
-                            new GameStateMessage("gameState", seq, System.currentTimeMillis(), full, patch));
-            messagingTemplate.convertAndSend("/topic/game/" + gameId + "/state", json);
+                lastPublishedState.put(gameId, current);
+                long seq = stateSequences
+                        .computeIfAbsent(gameId, k -> new AtomicLong())
+                        .incrementAndGet();
+
+                String json = MAPPER.writeValueAsString(
+                        new GameStateMessage("gameState", seq, System.currentTimeMillis(), full, patch));
+                messagingTemplate.convertAndSend("/topic/game/" + gameId + "/state", json);
+            }
         } catch (Exception e) {
             // Never let websocket publishing break a game save.
             BotLogger.error("Failed to publish game state update", e);
@@ -92,7 +99,7 @@ public class WebSocketNotifier {
         if (before.equals(after)) return null;
         if (!before.isObject() || !after.isObject()) return after;
 
-        ObjectNode patch = JsonMapperManager.basic().createObjectNode();
+        ObjectNode patch = MAPPER.createObjectNode();
         Set<String> fieldNames = new HashSet<>();
         before.propertyNames().forEach(fieldNames::add);
         after.propertyNames().forEach(fieldNames::add);

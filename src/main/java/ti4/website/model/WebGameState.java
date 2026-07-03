@@ -1,6 +1,7 @@
 package ti4.website.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Date;
 import java.util.Map;
 import lombok.Data;
 import ti4.game.Game;
@@ -34,9 +35,8 @@ public class WebGameState {
         WebGameState state = new WebGameState();
         state.phase = inferPhase(game);
         state.activePlayer = colorForPlayer(game.getActivePlayer());
-        state.turnStartedAt = game.getLastActivePlayerChange().getTime() < 1_000_000
-                ? null
-                : game.getLastActivePlayerChange().getTime();
+        Date lastChange = game.getLastActivePlayerChange();
+        state.turnStartedAt = (lastChange == null || lastChange.getTime() < 1_000_000) ? null : lastChange.getTime();
         state.winner = game.getWinner().map(WebGameState::colorForPlayer).orElse(null);
         state.agenda = WebAgenda.fromGame(game);
         state.activeSystem = blankToNull(game.getCurrentActiveSystem());

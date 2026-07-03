@@ -201,7 +201,11 @@ class GameUndoService {
         File currentGameFile = Storage.getGameFile(gameName + Constants.TXT);
         try {
             replaceGameFileWithUndo(gameName, latestUndoIndex, currentGameFile.toPath());
-            return GameLoadService.load(gameName);
+            Game loadedGame = GameLoadService.load(gameName);
+            if (loadedGame != null) {
+                WebSocketNotifier.notifyGameStateChange(loadedGame);
+            }
+            return loadedGame;
         } catch (IOException e) {
             BotLogger.error("Error trying to undo for missing game: " + gameName, e);
         }
