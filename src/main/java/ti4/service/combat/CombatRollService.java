@@ -656,7 +656,7 @@ public class CombatRollService {
                         if (opponent.hasRelic("metalivoidshielding")) {
                             RelicModel relicModel = Mapper.getRelic("metalivoidshielding");
                             msg2 += "\nReminder: You have the _" + relicModel.getName()
-                                    + "_ relic, you may SUSTAIN DAMAGE on one of your none-fighter ships instead of taking a hit.";
+                                    + "_ relic, you may SUSTAIN DAMAGE on one of your non-fighter ships instead of taking a hit.";
                         }
                         if (opponent.hasUnlockedBreakthrough("crystellumbt") && round2 == 1) {
                             msg2 +=
@@ -874,7 +874,7 @@ public class CombatRollService {
         if (opponent.hasRelic("metalivoidshielding")) {
             RelicModel relicModel = Mapper.getRelic("metalivoidshielding");
             msg2 += "\nReminder: You have the _" + relicModel.getName() + "_ relic,";
-            msg2 += " you may SUSTAIN DAMAGE on one of your none-fighter ships instead of taking a hit.";
+            msg2 += " you may SUSTAIN DAMAGE on one of your non-fighter ships instead of taking a hit.";
         }
         String combatRoundKey = "combatRoundTracker" + opponent.getFaction() + tile.getPosition() + "space";
         String combatRoundValue = game.getStoredValue(combatRoundKey);

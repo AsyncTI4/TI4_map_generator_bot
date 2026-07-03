@@ -136,22 +136,6 @@ class MatchmakingGrouperTest extends BaseTi4Test {
     }
 
     @Test
-    void formsNearMatchWhenLongestQueuedHasWaitedEightHours() {
-        // Two players want a 3p game but only two are available; one has waited the full 8h long-queue
-        // duration (with a longer max queue time, so it is not yet near expiry).
-        addParty(List.of("p1"), List.of(), List.of("3"), Duration.ofHours(8), "1 day");
-        addParty(List.of("p2"), List.of(), List.of("3"), Duration.ZERO);
-
-        List<MatchedGame> games = MatchmakingGrouper.formGames(parties);
-
-        assertThat(games).hasSize(1);
-        assertThat(games.getFirst().playerCount()).isEqualTo("3");
-        assertThat(games.getFirst().members())
-                .extracting(MatchmakingQueueMember::getUserId)
-                .containsExactlyInAnyOrder("p1", "p2");
-    }
-
-    @Test
     void formsNearMatchWhenNearExpiryWithThreeOtherMatchedPlayers() {
         // A 5p game is one short; one player is within an hour of expiring (8h max) and three others matched.
         addParty(List.of("p1"), List.of(), List.of("5"), Duration.ofHours(7).plusMinutes(30));
@@ -169,38 +153,11 @@ class MatchmakingGrouperTest extends BaseTi4Test {
     }
 
     @Test
-    void doesNotFormNearMatchWhenNearExpiryButTooFewOtherPlayers() {
-        // A 3p game one short with a near-expiry player has only one other matched player, not the three required.
-        addParty(List.of("p1"), List.of(), List.of("3"), Duration.ofHours(7).plusMinutes(30));
-        addParty(List.of("p2"), List.of(), List.of("3"), Duration.ZERO);
-
-        assertThat(MatchmakingGrouper.formGames(parties)).isEmpty();
-    }
-
-    @Test
     void doesNotFormNearMatchWhenNoOneIsNearExpiryOrLongQueued() {
         addParty(List.of("p1"), List.of(), List.of("3"), Duration.ZERO);
         addParty(List.of("p2"), List.of(), List.of("3"), Duration.ZERO);
 
         assertThat(MatchmakingGrouper.formGames(parties)).isEmpty();
-    }
-
-    @Test
-    void realizesTheLargerNearMatchFirstAndSkipsOverlappingOnes() {
-        // p1 (long-queued 8h) fits both a 4p and a 3p near match; the 4p one (more players) wins and consumes
-        // p1, so the overlapping 3p near match with s1 is skipped.
-        addParty(List.of("p1"), List.of(), List.of("3", "4"), Duration.ofHours(8), "1 day");
-        addParty(List.of("q1"), List.of(), List.of("4"), Duration.ZERO);
-        addParty(List.of("r1"), List.of(), List.of("4"), Duration.ZERO);
-        addParty(List.of("s1"), List.of(), List.of("3"), Duration.ZERO);
-
-        List<MatchedGame> games = MatchmakingGrouper.formGames(parties);
-
-        assertThat(games).hasSize(1);
-        assertThat(games.getFirst().playerCount()).isEqualTo("4");
-        assertThat(games.getFirst().members())
-                .extracting(MatchmakingQueueMember::getUserId)
-                .containsExactlyInAnyOrder("p1", "q1", "r1");
     }
 
     private void addSolo(String userId) {

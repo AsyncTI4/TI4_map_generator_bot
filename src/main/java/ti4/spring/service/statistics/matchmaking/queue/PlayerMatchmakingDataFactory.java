@@ -60,12 +60,17 @@ class PlayerMatchmakingDataFactory {
     }
 
     static Map<String, PlayerMatchmakingData> buildForUsers(List<String> userIds, List<String> leaderRestrictions) {
+        return buildForUsers(userIds, leaderRestrictions, false, List.of());
+    }
+
+    static Map<String, PlayerMatchmakingData> buildForUsers(
+            List<String> userIds, List<String> leaderRestrictions, boolean tigl, List<String> tiglRanks) {
         Map<String, Rating> ratings = MatchmakingRatingEventService.get().getPlayerRatings(new HashSet<>(userIds));
         Guild guild = JdaService.guildPrimary;
 
         Map<String, PlayerMatchmakingData> dataById = new HashMap<>();
         for (String id : userIds) {
-            dataById.put(id, build(id, leaderRestrictions, ratings, guild, Duration.ZERO, false, List.of()));
+            dataById.put(id, build(id, leaderRestrictions, ratings, guild, Duration.ZERO, tigl, tiglRanks));
         }
         return dataById;
     }
