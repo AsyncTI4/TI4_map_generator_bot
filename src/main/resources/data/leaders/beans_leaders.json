@@ -179,6 +179,7 @@
     "title": "Production Specialist",
     "abilityWindow": "When a player produces units using the PRODUCTION ability of one of their space docks:",
     "abilityText": "You may exhaust this card to allow that player to produce 2 additional units. These units do not count against their PRODUCTION limit. Then, they may place those additional units with any of their other structures.",
+    "notes": "For best results, resolve the 2 additional units first, THEN finishing producing normally.",
     "unlockCondition": "Always Unlocked",
     "source": "beans"
   },
