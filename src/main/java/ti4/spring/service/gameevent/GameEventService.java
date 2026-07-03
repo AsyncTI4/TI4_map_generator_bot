@@ -51,6 +51,20 @@ public class GameEventService {
         game.setEventSequenceCounter(seq);
     }
 
+    public List<GameEventDto> getEvents(Game game) {
+        if (DatabasePersistenceGate.isDisabled()) return List.of();
+        return getEventsForGame(game).stream()
+                .map(event -> new GameEventDto(
+                        event.getSeq(),
+                        event.getArchetype(),
+                        event.getRound(),
+                        event.getPhase(),
+                        event.getFaction(),
+                        event.getTimestampEpochMillis(),
+                        JsonMapperManager.basic().readTree(event.getPayload())))
+                .toList();
+    }
+
     List<GameEventEntity> getEventsForGame(Game game) {
         return gameEventRepository.findByGameNameAndSeqLessThanEqualOrderBySeqAsc(
                 game.getName(), game.getEventSequenceCounter());

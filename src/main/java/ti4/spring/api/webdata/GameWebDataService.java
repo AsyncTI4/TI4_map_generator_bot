@@ -128,6 +128,7 @@ public class GameWebDataService {
         webData.put("ringCount", game.getRingCount());
         webData.put("vpsToWin", game.getVp());
         webData.put("gameRound", game.getRound());
+        webData.put("eventSequence", game.getEventSequenceCounter());
         webData.put("gameName", game.getName());
         webData.put("gameCustomName", game.getCustomName());
         webData.put("tableTalkJumpLink", game.getTabletalkJumpLink());
