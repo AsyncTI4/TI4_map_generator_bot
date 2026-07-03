@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
@@ -34,17 +35,13 @@ public class AgendaSummaryHelper {
             String outcome = entry.getKey();
             String outcomeName = AgendaHelper.getAgendaOutcomeName(game, outcome, capitalize);
             StringBuilder outcomeSummaryBuilder = new StringBuilder();
-            int totalVotes = 0;
+            int totalVotes = countNumericVotes(entry.getValue());
 
             StringTokenizer voteInfo = new StringTokenizer(entry.getValue(), ";");
             while (voteInfo.hasMoreTokens()) {
                 String specificVote = voteInfo.nextToken();
                 String faction = specificVote.substring(0, specificVote.indexOf('_'));
                 String vote = specificVote.substring(specificVote.indexOf('_') + 1);
-
-                if (NumberUtils.isDigits(vote)) {
-                    totalVotes += Integer.parseInt(vote);
-                }
 
                 if (capitalize) {
                     appendCapitalizedVote(game, overwriteFog, outcomeSummaryBuilder, faction, vote);
@@ -71,6 +68,32 @@ public class AgendaSummaryHelper {
             }
         }
         return summaryBuilder.toString();
+    }
+
+    public static Map<String, Integer> getCurrentOutcomeVoteCounts(Game game) {
+        Map<String, Integer> voteCounts = new LinkedHashMap<>();
+        for (Entry<String, String> entry : game.getCurrentAgendaVotes().entrySet()) {
+            voteCounts.put(entry.getKey(), countNumericVotes(entry.getValue()));
+        }
+        return voteCounts;
+    }
+
+    private static int countNumericVotes(String voteInfoValue) {
+        int totalVotes = 0;
+        StringTokenizer voteInfo = new StringTokenizer(voteInfoValue, ";");
+        while (voteInfo.hasMoreTokens()) {
+            String specificVote = voteInfo.nextToken();
+            int separator = specificVote.indexOf('_');
+            if (separator < 0) {
+                continue;
+            }
+
+            String vote = specificVote.substring(separator + 1);
+            if (NumberUtils.isDigits(vote)) {
+                totalVotes += Integer.parseInt(vote);
+            }
+        }
+        return totalVotes;
     }
 
     private static String resolveAgendaName(String agendaDetails) {

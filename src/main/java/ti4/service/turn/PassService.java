@@ -18,6 +18,8 @@ import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.message.MessageHelper;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class PassService {
@@ -32,6 +34,7 @@ public class PassService {
         }
 
         player.setPassed(true);
+        GameEventService.commit(game, GameEventType.TURN, player, Map.of("passed", true));
         if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
             ButtonHelperCommanders.olradinCommanderStep1(player, game);
         }

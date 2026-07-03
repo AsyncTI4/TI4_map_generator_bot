@@ -30,6 +30,8 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.DrawSecretService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.unit.AddUnitService;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class PromissoryNoteHelper {
@@ -214,6 +216,7 @@ public class PromissoryNoteHelper {
         }
         PromissoryNoteModel pn = Mapper.getPromissoryNote(id);
         String pnName = pn.getName();
+        GameEventService.commit(game, GameEventType.CARD_PLAY_PROMISSORY_NOTE, player, Map.of("cardId", id));
         // String pnOwner = Mapper.getPromissoryNoteOwner(id);
         Player owner = game.getPNOwner(id);
         if ("bepnta".equalsIgnoreCase(id)

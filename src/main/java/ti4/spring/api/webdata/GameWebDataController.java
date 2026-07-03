@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ti4.game.Game;
 import ti4.spring.context.RequestContext;
+import ti4.website.model.WebGameState;
 
 @RequiredArgsConstructor
 @RestController
@@ -27,5 +28,17 @@ public class GameWebDataController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(gameWebDataService.getOrCompute(gameName));
+    }
+
+    @GetMapping(value = "/game-state", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<WebGameState> getGameState() {
+        Game game = RequestContext.getGame();
+        if (game == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (game.isFowMode()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(WebGameState.fromGame(game));
     }
 }

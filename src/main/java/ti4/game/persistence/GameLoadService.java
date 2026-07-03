@@ -653,6 +653,11 @@ class GameLoadService {
                         game.setButtonPressCount(Integer.parseInt(info));
                     }
                 }
+                case Constants.EVENT_SEQUENCE_COUNTER -> {
+                    if (isNotBlank(info)) {
+                        game.setEventSequenceCounter(Long.parseLong(info));
+                    }
+                }
                 case Constants.STARTED_DATE -> {
                     if (isNotBlank(info)) {
                         game.setStartedDate(Long.parseLong(info));

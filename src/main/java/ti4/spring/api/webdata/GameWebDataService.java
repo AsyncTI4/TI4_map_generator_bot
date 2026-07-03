@@ -17,6 +17,7 @@ import ti4.json.JsonMapperManager;
 import ti4.website.model.WebBorderAnomalies;
 import ti4.website.model.WebCardPool;
 import ti4.website.model.WebExpeditions;
+import ti4.website.model.WebGameState;
 import ti4.website.model.WebLaw;
 import ti4.website.model.WebObjectives;
 import ti4.website.model.WebPlayerArea;
@@ -39,8 +40,12 @@ public class GameWebDataService {
         return webDataCache.get(gameName, this::computeForGameName);
     }
 
-    public void put(String gameName, Game game) {
-        webDataCache.put(gameName, serialize(game));
+    public String getIfCached(String gameName) {
+        return webDataCache.getIfPresent(gameName);
+    }
+
+    public void put(String gameName, String serializedWebData) {
+        webDataCache.put(gameName, serializedWebData);
     }
 
     private String computeForGameName(String gameName) {
@@ -69,7 +74,7 @@ public class GameWebDataService {
         }
     }
 
-    private static Map<String, Object> buildWebData(Game game) {
+    public static Map<String, Object> buildWebData(Game game) {
         List<WebPlayerArea> playerDataList = new ArrayList<>();
         for (Player player : game.getRealPlayersNNeutral()) {
             playerDataList.add(WebPlayerArea.fromPlayer(player, game));
@@ -109,6 +114,7 @@ public class GameWebDataService {
 
         Map<String, Object> webData = new LinkedHashMap<>();
         webData.put("versionSchema", 7);
+        webData.put("gameState", WebGameState.fromGame(game));
         webData.put("objectives", webObjectives);
         webData.put("playerData", playerDataList);
         webData.put("lawsInPlay", lawsInPlay);

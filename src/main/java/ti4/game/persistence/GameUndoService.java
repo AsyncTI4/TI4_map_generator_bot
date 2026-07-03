@@ -21,6 +21,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.game.GameUndoNameService;
 import ti4.service.info.CardsInfoService;
+import ti4.spring.websocket.WebSocketNotifier;
 
 @UtilityClass
 class GameUndoService {
@@ -99,6 +100,7 @@ class GameUndoService {
                 replaceGameFileWithUndo(gameName, latestUndoIndex, currentGameFile.toPath());
                 return null;
             }
+            WebSocketNotifier.notifyGameStateChange(loadedGame);
 
             generateSavedButtons(gameToUndo);
             sendAnyChangedCardsInfo(gameToUndo, loadedGame);
@@ -199,7 +201,11 @@ class GameUndoService {
         File currentGameFile = Storage.getGameFile(gameName + Constants.TXT);
         try {
             replaceGameFileWithUndo(gameName, latestUndoIndex, currentGameFile.toPath());
-            return GameLoadService.load(gameName);
+            Game loadedGame = GameLoadService.load(gameName);
+            if (loadedGame != null) {
+                WebSocketNotifier.notifyGameStateChange(loadedGame);
+            }
+            return loadedGame;
         } catch (IOException e) {
             BotLogger.error("Error trying to undo for missing game: " + gameName, e);
         }
