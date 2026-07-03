@@ -13,10 +13,10 @@ import ti4.message.MessageHelper;
 public class NetrunnersFactionTechsHandler {
 
     public static final String DATA_MINING_TECH = "benetrunnersdm";
-    public static final String SIPHON_II_TECH = "benetrunnerssd";
+    private static final String SIPHON_I_UNIT = "netrunners_spacedock";
     private static final String SIPHON_II_UNIT = "netrunners_spacedock2";
     private static final String DATA_MINING_RESOLVED = "dataMiningResolved";
-    private static final String SIPHON_II_DISCOUNT_APPLIED = "siphonIIDiscountApplied";
+    private static final String SIPHON_DISCOUNT_APPLIED = "siphonDiscountApplied";
 
     public static void resolveDataMining(Game game) {
         for (Player netrunner : game.getRealPlayers()) {
@@ -48,37 +48,49 @@ public class NetrunnersFactionTechsHandler {
                         + netrunner.gainTG(tgGain, true));
     }
 
-    public static int applySiphonIIDiscount(Game game, Player player, int cost) {
-        int discount = Math.min(cost, getSiphonIIDiscount(game, player));
+    public static int applySiphonDiscount(Game game, Player player, int cost) {
+        int discount = Math.min(cost, getSiphonDiscount(game, player));
         if (discount < 1) {
-            game.removeStoredValue(SIPHON_II_DISCOUNT_APPLIED + player.getFaction());
+            game.removeStoredValue(SIPHON_DISCOUNT_APPLIED + player.getFaction());
             return cost;
         }
-        game.setStoredValue(SIPHON_II_DISCOUNT_APPLIED + player.getFaction(), Integer.toString(discount));
+        game.setStoredValue(SIPHON_DISCOUNT_APPLIED + player.getFaction(), Integer.toString(discount));
         return Math.max(0, cost - discount);
     }
 
-    public static String getSiphonIIDiscountMessage(Game game, Player player) {
-        String appliedDiscount = game.getStoredValue(SIPHON_II_DISCOUNT_APPLIED + player.getFaction());
+    public static String getSiphonDiscountMessage(Game game, Player player) {
+        String appliedDiscount = game.getStoredValue(SIPHON_DISCOUNT_APPLIED + player.getFaction());
         int discount = appliedDiscount.isEmpty() ? 0 : Integer.parseInt(appliedDiscount);
         if (discount < 1) {
             return "";
         }
-        return "\n**Siphon II** discounted this build by " + StringHelper.pluralize(discount, "resource") + ".";
+        String siphonName = player.ownsUnit(SIPHON_II_UNIT) ? "Siphon II" : "Siphon I";
+        return "\n**" + siphonName + "** discounted this build by " + StringHelper.pluralize(discount, "resource")
+                + ".";
     }
 
-    private static int getSiphonIIDiscount(Game game, Player player) {
-        if (!isProducingWithSiphonII(game, player)) {
+    private static int getSiphonDiscount(Game game, Player player) {
+        int divisor = getSiphonDiscountDivisor(game, player);
+        if (divisor < 1) {
             return 0;
         }
-        return getHackermanTokenCount(game, player) / 2;
+        return getHackermanTokenCount(game, player) / divisor;
     }
 
-    private static boolean isProducingWithSiphonII(Game game, Player player) {
-        if (!player.ownsUnit(SIPHON_II_UNIT)) {
-            return false;
+    private static int getSiphonDiscountDivisor(Game game, Player player) {
+        if (!isProducingWithSiphon(game, player)) {
+            return 0;
         }
+        if (player.ownsUnit(SIPHON_II_UNIT)) {
+            return 2;
+        }
+        if (player.ownsUnit(SIPHON_I_UNIT)) {
+            return 4;
+        }
+        return 0;
+    }
 
+    private static boolean isProducingWithSiphon(Game game, Player player) {
         for (String producedUnit : player.getCurrentProducedUnits().keySet()) {
             String[] parts = producedUnit.split("_");
             if (parts.length < 2) {
