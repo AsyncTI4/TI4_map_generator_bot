@@ -21,6 +21,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.game.GameUndoNameService;
 import ti4.service.info.CardsInfoService;
+import ti4.spring.websocket.WebSocketNotifier;
 
 @UtilityClass
 class GameUndoService {
@@ -99,6 +100,7 @@ class GameUndoService {
                 replaceGameFileWithUndo(gameName, latestUndoIndex, currentGameFile.toPath());
                 return null;
             }
+            WebSocketNotifier.notifyGameStateChange(loadedGame);
 
             generateSavedButtons(gameToUndo);
             sendAnyChangedCardsInfo(gameToUndo, loadedGame);
