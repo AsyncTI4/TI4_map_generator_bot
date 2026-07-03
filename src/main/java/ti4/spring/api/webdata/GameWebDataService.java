@@ -40,8 +40,12 @@ public class GameWebDataService {
         return webDataCache.get(gameName, this::computeForGameName);
     }
 
-    public void put(String gameName, Game game) {
-        webDataCache.put(gameName, serialize(game));
+    public String getIfCached(String gameName) {
+        return webDataCache.getIfPresent(gameName);
+    }
+
+    public void put(String gameName, String serializedWebData) {
+        webDataCache.put(gameName, serializedWebData);
     }
 
     private String computeForGameName(String gameName) {

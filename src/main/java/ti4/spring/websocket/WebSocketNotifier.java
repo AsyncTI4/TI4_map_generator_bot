@@ -1,8 +1,5 @@
 package ti4.spring.websocket;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import java.time.Duration;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -30,9 +27,12 @@ import tools.jackson.databind.node.ObjectNode;
  * tiles, card pool, laws, strategy cards, ...), decides whether anything
  * actually changed against an in-memory baseline, and publishes only the
  * changed fields as an RFC 7386-style merge patch (client deep-merges;
- * {@code null} deletes a key; arrays replace wholesale). Nothing is persisted,
- * so undo needs no special handling: the post-undo snapshot diffs against the
- * last published one like any other change.</p>
+ * {@code null} deletes a key; arrays replace wholesale). The baseline is the
+ * serialized payload in {@link GameWebDataService}'s cache — the same cache
+ * that serves the REST endpoint — so the two views can never drift. Nothing is
+ * persisted, so undo needs no special handling: the post-undo snapshot diffs
+ * against the last published one like any other change; a cache eviction just
+ * costs one full snapshot resend.</p>
  */
 @RequiredArgsConstructor
 @Component
@@ -40,11 +40,8 @@ public class WebSocketNotifier {
     private static final JsonMapper MAPPER = JsonMapperManager.basic();
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final GameWebDataService gameWebDataService;
 
-    private final Cache<String, JsonNode> lastPublishedState = Caffeine.newBuilder()
-            .maximumSize(500)
-            .expireAfterAccess(Duration.ofHours(6))
-            .build();
     private final Map<String, AtomicLong> stateSequences = new ConcurrentHashMap<>();
     private final Map<String, Object> perGameLocks = new ConcurrentHashMap<>();
 
@@ -64,20 +61,27 @@ public class WebSocketNotifier {
 
     public void notifyGameStateChanged(Game game) {
         try {
-            if (game == null || game.isFowMode() || System.getenv("TESTING") != null) return;
+            if (game == null || System.getenv("TESTING") != null) return;
 
             String gameId = game.getName();
             // Build the snapshot outside the lock (pure computation, no shared state).
             JsonNode current = MAPPER.valueToTree(GameWebDataService.buildWebData(game));
 
             synchronized (perGameLocks.computeIfAbsent(gameId, k -> new Object())) {
-                JsonNode previous = lastPublishedState.getIfPresent(gameId);
+                // Sole writer of the web-data cache: if anything else wrote it, the diff
+                // baseline would drift from what clients last received.
+                if (game.isFowMode()) {
+                    gameWebDataService.put(gameId, MAPPER.writeValueAsString(current));
+                    return; // cache refreshed for REST, but FoW games never stream
+                }
+                String previousJson = gameWebDataService.getIfCached(gameId);
+                JsonNode previous = previousJson == null ? null : MAPPER.readTree(previousJson);
 
                 boolean full = previous == null;
                 JsonNode patch = full ? current : diff(previous, current);
                 if (patch == null) return; // nothing changed
 
-                lastPublishedState.put(gameId, current);
+                gameWebDataService.put(gameId, MAPPER.writeValueAsString(current));
                 long seq = stateSequences
                         .computeIfAbsent(gameId, k -> new AtomicLong())
                         .incrementAndGet();
