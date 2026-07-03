@@ -2,6 +2,7 @@ package ti4.website.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.Map;
 import lombok.Data;
 import ti4.game.Game;
@@ -23,6 +24,12 @@ import ti4.service.combat.StartCombatService.CurrentCombat;
  */
 @Data
 public class WebGameState {
+    private static final EnumSet<CanonicalPhase> AGENDA_PHASES = EnumSet.of(
+            CanonicalPhase.AGENDA_WHENS,
+            CanonicalPhase.AGENDA_AFTERS,
+            CanonicalPhase.AGENDA_VOTING,
+            CanonicalPhase.AGENDA_RESOLVING);
+
     private CanonicalPhase phase;
     private String activePlayer;
     private Long turnStartedAt;
@@ -38,7 +45,7 @@ public class WebGameState {
         Date lastChange = game.getLastActivePlayerChange();
         state.turnStartedAt = (lastChange == null || lastChange.getTime() < 1_000_000) ? null : lastChange.getTime();
         state.winner = game.getWinner().map(WebGameState::colorForPlayer).orElse(null);
-        state.agenda = WebAgenda.fromGame(game);
+        state.agenda = AGENDA_PHASES.contains(state.phase) ? WebAgenda.fromGame(game) : null;
         state.activeSystem = blankToNull(game.getCurrentActiveSystem());
         state.activeCombat = WebCombat.fromGame(game);
         return state;
