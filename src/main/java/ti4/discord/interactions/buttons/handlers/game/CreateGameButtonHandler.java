@@ -3,6 +3,7 @@ package ti4.discord.interactions.buttons.handlers.game;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
@@ -32,6 +33,8 @@ import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.statistics.AverageTurnTimeService;
 import ti4.spring.service.statistics.UserGameInfoService;
 import ti4.spring.service.statistics.matchmaking.queue.MatchmakerService;
+import ti4.spring.service.statistics.matchmaking.queue.PlayerSearchCriteria;
+import ti4.spring.service.statistics.matchmaking.queue.PlayerSearchService;
 
 @UtilityClass
 public class CreateGameButtonHandler {
@@ -277,6 +280,31 @@ public class CreateGameButtonHandler {
                     .sendMessage("Because you joined a game, you are no longer queued to find a game.")
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         }
+    }
+
+    public static int addPlayersFromQueueSearch(ModalInteractionEvent event, PlayerSearchCriteria criteria) {
+        List<Member> members = fetchMembersFromMessage(event);
+        List<String> existingIds = members.stream().map(Member::getId).toList();
+
+        List<String> addedIds = PlayerSearchService.get().searchAndAdd(criteria, existingIds);
+
+        List<Member> added = new ArrayList<>();
+        for (String id : addedIds) {
+            Member member = event.getGuild().getMemberById(id);
+            if (member == null || members.contains(member)) continue;
+            members.add(member);
+            added.add(member);
+        }
+        if (added.isEmpty()) return 0;
+
+        event.getMessage()
+                .editMessage(generateMemberListMessage(members, fetchSillyNameFromMessage(event)))
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+        String mentions = added.stream().map(Member::getAsMention).collect(Collectors.joining(" & "));
+        MessageHelper.sendMessageToEventChannel(
+                event,
+                mentions + (added.size() == 1 ? " was" : " were") + " added to the game from the matchmaking queue.");
+        return added.size();
     }
 
     @ButtonHandler(value = "leaveGameList", save = false)

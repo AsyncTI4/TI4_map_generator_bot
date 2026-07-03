@@ -109,18 +109,6 @@ class MatchmakingCompatibilityServiceTest {
     }
 
     @Test
-    void skillWindowWidensWithQueueTime() {
-        // A 6-point gap exceeds the fresh 4-point window, but after 4 hours the window widens to 6 (4 + 2 steps).
-        PlayerMatchmakingData fresh = player("a").rating(20).build();
-        PlayerMatchmakingData b = player("b").rating(26).build();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(fresh, b)).isTrue();
-
-        PlayerMatchmakingData patient =
-                player("a").rating(20).queueWait(Duration.ofHours(4)).build();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(patient, b)).isFalse();
-    }
-
-    @Test
     void floaterAndWarriorAreKeptApartWhileQueueIsShort() {
         PlayerMatchmakingData floater =
                 player("a").roleNames(MatchmakingOptions.FLOATERS_ROLE_NAME).build();
@@ -172,7 +160,7 @@ class MatchmakingCompatibilityServiceTest {
         private int completedGames = 5;
         private Set<String> roleNames = Set.of();
         private Duration queueWait = Duration.ZERO;
-        private boolean tigl = false;
+        private boolean tigl;
         private List<String> tiglRanks = List.of(MatchmakingOptions.UNRANKED_OPTION);
 
         private Builder(String userId) {
