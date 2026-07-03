@@ -82,7 +82,7 @@ public class StartCombatService {
 
     public static CurrentCombat getCurrentCombat(Game game) {
         String factionsInCombat = game.getStoredValue("factionsInCombat");
-        if (factionsInCombat == null || factionsInCombat.isBlank()) {
+        if (factionsInCombat.isBlank()) {
             return null;
         }
         List<String> factions = Arrays.stream(factionsInCombat.split("_"))

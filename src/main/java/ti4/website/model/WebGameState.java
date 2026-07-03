@@ -7,6 +7,8 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AgendaSummaryHelper;
+import ti4.service.combat.StartCombatService;
+import ti4.service.combat.StartCombatService.CurrentCombat;
 
 /**
  * Slim game-state payload for the web UI.
@@ -32,7 +34,7 @@ public class WebGameState {
         WebGameState state = new WebGameState();
         state.phase = inferPhase(game);
         state.activePlayer = colorForPlayer(game.getActivePlayer());
-        state.turnStartedAt = game.getLastActivePlayerChange() == null
+        state.turnStartedAt = game.getLastActivePlayerChange().getTime() < 1_000_000
                 ? null
                 : game.getLastActivePlayerChange().getTime();
         state.winner = game.getWinner().map(WebGameState::colorForPlayer).orElse(null);
@@ -158,8 +160,7 @@ public class WebGameState {
         private String[] participantColors;
 
         static WebCombat fromGame(Game game) {
-            ti4.service.combat.StartCombatService.CurrentCombat current =
-                    ti4.service.combat.StartCombatService.getCurrentCombat(game);
+            CurrentCombat current = StartCombatService.getCurrentCombat(game);
             if (current == null) return null;
             WebCombat combat = new WebCombat();
             combat.system = current.tilePosition();
