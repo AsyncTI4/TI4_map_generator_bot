@@ -105,7 +105,7 @@ public class PersistAllEntitiesService {
         return gameEntity;
     }
 
-    private Long getEndedDate(Game game) {
+    private static Long getEndedDate(Game game) {
         long endedDate = game.getEndedDate();
         return endedDate == 0 ? null : endedDate;
     }
@@ -142,7 +142,8 @@ public class PersistAllEntitiesService {
         return userEntityRepository.save(userEntity);
     }
 
-    private List<TitleEntity> toTitleEntities(Game game, GameEntity gameEntity, Map<String, UserEntity> userCache) {
+    private static List<TitleEntity> toTitleEntities(
+            Game game, GameEntity gameEntity, Map<String, UserEntity> userCache) {
         List<TitleEntity> titles = new ArrayList<>();
         for (String storedValue : game.getStoredValueMap().keySet()) {
             if (!storedValue.startsWith("TitlesFor")) {
