@@ -70,7 +70,7 @@ public class GameWebDataService {
         }
     }
 
-    private static Map<String, Object> buildWebData(Game game) {
+    public static Map<String, Object> buildWebData(Game game) {
         List<WebPlayerArea> playerDataList = new ArrayList<>();
         for (Player player : game.getRealPlayersNNeutral()) {
             playerDataList.add(WebPlayerArea.fromPlayer(player, game));

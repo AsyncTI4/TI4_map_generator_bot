@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 import ti4.game.Game;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
+import ti4.spring.api.webdata.GameWebDataService;
 import ti4.spring.context.SpringContext;
-import ti4.website.model.WebGameState;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
@@ -24,13 +24,15 @@ import tools.jackson.databind.node.ObjectNode;
  * Single contract for pushing game updates to web clients.
  *
  * <p>{@code notifyGameRefresh} signals that the heavy web-data payload changed
- * (map render pipeline). {@code notifyGameStateChanged} owns the lightweight
- * realtime channel: it rebuilds the small {@link WebGameState} snapshot,
- * decides whether anything actually changed against an in-memory baseline,
- * and publishes only the changed fields as an RFC 7386-style merge patch
- * (client deep-merges; {@code null} deletes a key; arrays replace wholesale).
- * Nothing is persisted, so undo needs no special handling: the post-undo
- * snapshot diffs against the last published one like any other change.</p>
+ * (map render pipeline). {@code notifyGameStateChanged} owns the realtime
+ * channel: it rebuilds the full web-exposed payload
+ * ({@link GameWebDataService#buildWebData} — gameState, objectives, playerData,
+ * tiles, card pool, laws, strategy cards, ...), decides whether anything
+ * actually changed against an in-memory baseline, and publishes only the
+ * changed fields as an RFC 7386-style merge patch (client deep-merges;
+ * {@code null} deletes a key; arrays replace wholesale). Nothing is persisted,
+ * so undo needs no special handling: the post-undo snapshot diffs against the
+ * last published one like any other change.</p>
  */
 @RequiredArgsConstructor
 @Component
@@ -66,7 +68,7 @@ public class WebSocketNotifier {
 
             String gameId = game.getName();
             // Build the snapshot outside the lock (pure computation, no shared state).
-            JsonNode current = MAPPER.valueToTree(WebGameState.fromGame(game));
+            JsonNode current = MAPPER.valueToTree(GameWebDataService.buildWebData(game));
 
             synchronized (perGameLocks.computeIfAbsent(gameId, k -> new Object())) {
                 JsonNode previous = lastPublishedState.getIfPresent(gameId);
