@@ -73,18 +73,10 @@ public class WebSocketNotifier {
                     .computeIfAbsent(gameId, k -> new AtomicLong())
                     .incrementAndGet();
 
-            try {
-                messagingTemplate.convertAndSend(
-                        "/topic/game/" + gameId + "/state",
-                        new GameStateMessage("gameState", seq, System.currentTimeMillis(), full, patch));
-            } catch (Exception serializationException) {
-                // Fallback: serialize the envelope ourselves in case the broker's
-                // default converter cannot handle JsonNode inside a record.
-                String json = JsonMapperManager.basic()
-                        .writeValueAsString(
-                                new GameStateMessage("gameState", seq, System.currentTimeMillis(), full, patch));
-                messagingTemplate.convertAndSend("/topic/game/" + gameId + "/state", json);
-            }
+            String json = JsonMapperManager.basic()
+                    .writeValueAsString(
+                            new GameStateMessage("gameState", seq, System.currentTimeMillis(), full, patch));
+            messagingTemplate.convertAndSend("/topic/game/" + gameId + "/state", json);
         } catch (Exception e) {
             // Never let websocket publishing break a game save.
             BotLogger.error("Failed to publish game state update", e);
