@@ -71,6 +71,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
+import ti4.service.webhook.GameEventNotifierFacade;
 
 @UtilityClass
 public final class AgendaHelper {
@@ -574,6 +575,7 @@ public final class AgendaHelper {
         if (winner == null) {
             winner = getWinner(game);
         }
+        GameEventNotifierFacade.notifyAgendaResolved(game, winner);
         if (!game.isHiddenAgendaMode()) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), AgendaSummaryHelper.getSummaryOfVotes(game, true) + "\n \n");
@@ -699,6 +701,7 @@ public final class AgendaHelper {
 
     public static void startTheVoting(Game game) {
         game.setPhaseOfGame("agendaVoting");
+        GameEventNotifierFacade.notifyAgendaVotingStarted(game);
         if (!game.getStoredValue("CommFormPreset").isEmpty()) {
             autoResolve(
                     null,

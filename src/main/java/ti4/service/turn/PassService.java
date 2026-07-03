@@ -18,6 +18,7 @@ import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.message.MessageHelper;
+import ti4.service.webhook.GameEventNotifierFacade;
 
 @UtilityClass
 public class PassService {
@@ -32,6 +33,7 @@ public class PassService {
         }
 
         player.setPassed(true);
+        GameEventNotifierFacade.notifyPlayerPassed(game, player, autoPass);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
             ButtonHelperCommanders.olradinCommanderStep1(player, game);
         }
