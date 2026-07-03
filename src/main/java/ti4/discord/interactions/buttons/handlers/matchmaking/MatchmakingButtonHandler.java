@@ -249,18 +249,22 @@ class MatchmakingButtonHandler {
                 userSettings.getMatchmakingTiglRanks(),
                 DEFAULT_TIGL_RANK_OPTIONS,
                 REQUIRE_SELECTION);
-        CheckboxGroup restrictions = buildCheckboxGroup(
-                RESTRICTIONS_ID,
-                RESTRICTION_OPTIONS,
-                userSettings.getMatchmakingRestrictions(),
-                userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
-                !REQUIRE_SELECTION);
-        return Modal.create(modalId, title)
+        Modal.Builder modal = Modal.create(modalId, title)
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
                 .addComponents(Label.of("Pace", paces))
-                .addComponents(Label.of("Rank", ranks))
-                .addComponents(Label.of("Restrictions", restrictions))
-                .build();
+                .addComponents(Label.of("Rank", ranks));
+
+        List<String> restrictionOptions = groupRestrictionOptions(List.of(userId));
+        if (!restrictionOptions.isEmpty()) {
+            CheckboxGroup restrictions = buildCheckboxGroup(
+                    RESTRICTIONS_ID,
+                    restrictionOptions,
+                    userSettings.getMatchmakingRestrictions(),
+                    userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
+                    !REQUIRE_SELECTION);
+            modal.addComponents(Label.of("Restrictions", restrictions));
+        }
+        return modal.build();
     }
 
     @ButtonHandler(value = ADDITIONAL_SETTINGS_BUTTON_ID, save = false)

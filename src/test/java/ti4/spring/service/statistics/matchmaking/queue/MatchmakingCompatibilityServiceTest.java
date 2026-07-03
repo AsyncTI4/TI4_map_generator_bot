@@ -92,6 +92,21 @@ class MatchmakingCompatibilityServiceTest {
     }
 
     @Test
+    void playerWithTooFewActiveHourBucketsCanNeverMatch() {
+        // Fewer than the three shared buckets a match requires means the shared count can never be reached.
+        assertThat(MatchmakingCompatibilityService.hasEnoughActiveHourDataToMatch(
+                        player("a").activeHourBuckets(0, 1).build()))
+                .isFalse();
+    }
+
+    @Test
+    void playerWithEnoughActiveHourBucketsCanMatch() {
+        assertThat(MatchmakingCompatibilityService.hasEnoughActiveHourDataToMatch(
+                        player("a").activeHourBuckets(0, 1, 2).build()))
+                .isTrue();
+    }
+
+    @Test
     void largeSkillGapBlocksFreshlyQueuedPlayers() {
         // Fresh queue: the window is the 4-point starting threshold, so a 20-point gap is too large.
         PlayerMatchmakingData a = player("a").rating(20).build();
