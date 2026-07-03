@@ -1,5 +1,6 @@
 package ti4.discord.interactions.commands;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import ti4.game.Game;
@@ -8,6 +9,8 @@ import ti4.game.persistence.GameManager;
 import ti4.logging.RollbarManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 record CommandGameState(boolean saveGame, boolean playerCommand) {
 
@@ -39,6 +42,16 @@ record CommandGameState(boolean saveGame, boolean playerCommand) {
     void postExecute(SlashCommandInteractionEvent event) {
         if (saveGame) {
             Game game = CommandGameState.game.get();
+            // Log the raw command before the save so the bumped event-sequence counter is persisted with the game.
+            GameEventService.commit(
+                    game,
+                    GameEventType.COMMAND,
+                    player.get(),
+                    Map.of(
+                            "command",
+                            event.getCommandString(),
+                            "user",
+                            event.getUser().getName()));
             GameManager.save(game, EventAuditService.getReason(event));
         }
         clear();

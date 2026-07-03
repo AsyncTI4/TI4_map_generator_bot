@@ -21,4 +21,7 @@ public class GameEventType {
     public static final String AGENDA_RESOLVED = "AGENDA_RESOLVED";
     public static final String TRANSACTION = "TRANSACTION";
     public static final String GAME_ENDED = "GAME_ENDED";
+    // Raw record of a state-modifying slash command; carries the unparsed command string. Not deduped against
+    // the typed events above, and prunes on undo like any other event.
+    public static final String COMMAND = "COMMAND";
 }
