@@ -452,7 +452,7 @@ public class PlayerTechService {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
-            case "dslaneb" -> {
+            case "dslaneb", "tf-dslaneb" -> {
                 deleteIfButtonEvent(event);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),

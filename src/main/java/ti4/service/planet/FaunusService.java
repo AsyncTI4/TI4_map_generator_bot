@@ -44,7 +44,7 @@ public class FaunusService {
             if (game.isFowMode() && !tiles.contains(t.getPosition())) continue;
 
             // skip space stations
-            if (p.isSpaceStation()) continue;
+            if (p.isSpaceStation(game)) continue;
 
             String id = player.factionButtonChecker() + "faunusTake_" + p.getName();
             String label = Helper.getPlanetRepresentation(p.getName(), game);

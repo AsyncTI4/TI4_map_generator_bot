@@ -969,7 +969,7 @@ public final class Helper {
 
             boolean containsDMZ = uh.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
 
-            if (containsDMZ || uh.isSpaceStation()) {
+            if (containsDMZ || uh.isSpaceStation(game)) {
                 continue;
             }
             if ("spacedock".equalsIgnoreCase(unit)) {
@@ -1001,7 +1001,7 @@ public final class Helper {
                 continue;
             }
             if (game.getUnitHolderFromPlanet(planet) == null
-                    || game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
+                    || game.getUnitHolderFromPlanet(planet).isSpaceStation(game)) {
                 continue;
             }
             String id = player.factionButtonChecker() + prefix + "_" + unit + "_" + planet;

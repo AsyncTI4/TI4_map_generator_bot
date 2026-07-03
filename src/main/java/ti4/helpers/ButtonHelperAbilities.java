@@ -50,6 +50,7 @@ import ti4.service.tactical.TacticalActionService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.MoveUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
@@ -1960,6 +1961,9 @@ public final class ButtonHelperAbilities {
                         + "->"
                         + player.getTg() + ").\n-# This is technically an optional gain.");
         pillageCheck(player, game);
+        if (game.isTwilightDS()) {
+            DestroyUnitService.destroyAllUnits(event, game.getTileFromPlanet(planetName), game, planet, false);
+        }
         ButtonHelperAgents.resolveArtunoCheck(player, 4);
         List<Button> buttons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         String message = "Use buttons to end turn or do another action";
