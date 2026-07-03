@@ -2,6 +2,8 @@ package ti4.service.combat;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -18,6 +20,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import ti4.ResourceHelper;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
@@ -72,6 +75,40 @@ import ti4.spring.context.SpringContext;
 
 @UtilityClass
 public class StartCombatService {
+
+    private static final String COMBAT_ROUND_TRACKER = "combatRoundTracker";
+
+    public record CurrentCombat(String tilePosition, String unitHolderName, int round, List<String> factions) {}
+
+    public static CurrentCombat getCurrentCombat(Game game) {
+        String factionsInCombat = game.getStoredValue("factionsInCombat");
+        if (factionsInCombat == null || factionsInCombat.isBlank()) {
+            return null;
+        }
+        List<String> factions = Arrays.stream(factionsInCombat.split("_"))
+                .filter(f -> !f.isBlank())
+                .toList();
+
+        for (var entry : game.getStoredValueMap().entrySet()) {
+            if (!entry.getKey().startsWith(COMBAT_ROUND_TRACKER)) continue;
+            String suffix = entry.getKey().substring(COMBAT_ROUND_TRACKER.length());
+            for (String faction : factions) {
+                if (!suffix.startsWith(faction)) continue;
+                String location = suffix.substring(faction.length());
+                // Longest matching tile position wins so "30" doesn't shadow "305".
+                String tilePosition = game.getTileMap().keySet().stream()
+                        .filter(location::startsWith)
+                        .max(Comparator.comparingInt(String::length))
+                        .orElse(null);
+                if (tilePosition == null) continue;
+                String unitHolder = location.substring(tilePosition.length());
+                int round = NumberUtils.toInt(entry.getValue(), 1);
+                return new CurrentCombat(tilePosition, unitHolder.isBlank() ? null : unitHolder, round, factions);
+            }
+        }
+        // Combat flagged but no tracker key yet (combat just declared).
+        return new CurrentCombat(null, null, 1, factions);
+    }
 
     public static void combatCheck(Game game, GenericInteractionCreateEvent event, Tile tile) {
         spaceCombatCheck(game, tile, event);
@@ -276,9 +313,9 @@ public class StartCombatService {
         game.setStoredValue("factionsInCombat", player1.getFaction() + "_" + player2.getFaction());
 
         sendStartOfCombatSecretMessages(game, player1, player2, tile, spaceOrGround, unitHolderName);
-        String combatName2 = "combatRoundTracker" + player1.getFaction() + tile.getPosition() + unitHolderName;
+        String combatName2 = COMBAT_ROUND_TRACKER + player1.getFaction() + tile.getPosition() + unitHolderName;
         game.setStoredValue(combatName2, "");
-        combatName2 = "combatRoundTracker" + player2.getFaction() + tile.getPosition() + unitHolderName;
+        combatName2 = COMBAT_ROUND_TRACKER + player2.getFaction() + tile.getPosition() + unitHolderName;
         game.setStoredValue(combatName2, "");
         if (player1.hasAbility("refraction") || player2.hasAbility("refraction")) {
             CrystellumAbilityHandler.resetRefractionForCombat(game, player1, tile);
