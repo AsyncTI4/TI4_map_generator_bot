@@ -39,6 +39,7 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
+import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -366,7 +367,31 @@ public class PlayerTechService {
                             .queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }
-            case "pi", "absol_pi" -> { // Predictive Intelligence
+            case "tf-singularitypoint" -> {
+                deleteTheOneButtonIfButtonEvent(event);
+                List<Button> buttons = new ArrayList<>();
+                for (Tile tile : game.getTileMap().values()) {
+                    boolean adjToUnits = false;
+                    for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                        Tile tile2 = game.getTileByPosition(pos2);
+                        if (tile2.containsPlayersUnits(player)) {
+                            adjToUnits = true;
+                            break;
+                        }
+                    }
+                    if (adjToUnits) {
+                        buttons.add(Buttons.green(
+                                "nivynMechStep2_" + tile.getPosition(),
+                                tile.getRepresentationForButtons(game, player)));
+                    }
+                }
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + ", please choose the system where you wish to place the **Wound** token.",
+                        buttons);
+            }
+            case "pi", "absol_pi", "tf-predictivecommand" -> { // Predictive Intelligence
                 deleteTheOneButtonIfButtonEvent(event);
                 Button deleteButton =
                         Buttons.red("FFCC_" + player.getFaction() + "_deleteButtons", "Delete These Buttons");
@@ -376,6 +401,36 @@ public class PlayerTechService {
             }
             case "dsvadeb" -> ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, event);
             case "bazephy" -> ZephyrionBountyHandler.offerBountyButtons(game, player);
+            case "tf-mercenarycaptains" -> {
+                TeHelperActionCards.beginPirates(game, player, "resolveNokarBt", 0, false);
+            }
+            case "tf-radiantsigils" -> {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + " unfortunately at this time I am too lazy to offer an elegant solution to this tech. Use ./add_token token:sigil tile_name: to add the sigil, and /remove_token if you're moving it from somewhere.");
+            }
+            case "tf-oracularalgorithms" -> {
+                List<Button> buttons = new ArrayList<>();
+                for (int loc = 1; loc <= game.getPublicObjectives1Peekable().size(); loc++) {
+                    String id = player.factionButtonChecker() + "foretellPeak_1_" + loc + "_oracular";
+                    String label = "Stage 1, Position " + loc;
+                    buttons.add(Buttons.green(id, label, CardEmojis.Public1alt));
+                }
+                for (int loc = 1; loc <= game.getPublicObjectives2Peekable().size(); loc++) {
+                    String id = player.factionButtonChecker() + "foretellPeak_2_" + loc + "_oracular";
+                    String label = "Stage 2, Position " + loc;
+                    buttons.add(Buttons.blue(id, label, CardEmojis.Public2alt));
+                }
+                buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Done Peeking"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationNoPing() + " use buttons to resolve.",
+                        buttons);
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        "## A rules note: the speaker can choose which objective to reveal during status phase. Normally this doesnt matter, but if certain objectives have been peeked at, the speaker can purposely choose to reveal or not reveal those particular objectives (provided there are other valid options to choose from).");
+            }
             case "mi" -> { // Mageon
                 deleteIfButtonEvent(event);
                 List<Button> buttons = getMageonImplantsButtons(game, player);
@@ -397,7 +452,7 @@ public class PlayerTechService {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
-            case "dslaneb" -> {
+            case "dslaneb", "tf-dslaneb" -> {
                 deleteIfButtonEvent(event);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),

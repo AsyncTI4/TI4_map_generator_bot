@@ -1,0 +1,107 @@
+{
+    "id": "muhmass",
+    "tileId": "lu1",
+    "name": "Muhmass",
+    "aliases": [
+        "muhmass"
+    ],
+    "positionInTile": {
+        "x": 117.0,
+        "y": 134.0
+    },
+    "resources": 0,
+    "influence": 2,
+    "factionHomeworld": "arachnera",
+    "planetType": "FACTION",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": null,
+    "legendaryAbilityText": null,
+    "unitPositions": {
+        "unitHolderName": "muhmass",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 121.0,
+                    "y": 121.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 62.0,
+                    "y": 119.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 125.0,
+                    "y": 172.0
+                },
+                {
+                    "x": 135.0,
+                    "y": 167.0
+                },
+                {
+                    "x": 86.0,
+                    "y": 120.0
+                },
+                {
+                    "x": 97.0,
+                    "y": 111.0
+                },
+                {
+                    "x": 142.0,
+                    "y": 103.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 124.0,
+                    "y": 87.0
+                },
+                {
+                    "x": 138.0,
+                    "y": 87.0
+                },
+                {
+                    "x": 117.0,
+                    "y": 108.0
+                },
+                {
+                    "x": 131.0,
+                    "y": 108.0
+                },
+                {
+                    "x": 151.0,
+                    "y": 113.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 131.0,
+                    "y": 122.0
+                },
+                {
+                    "x": 95.0,
+                    "y": 140.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 89.0,
+                    "y": 84.0
+                },
+                {
+                    "x": 71.0,
+                    "y": 100.0
+                },
+                {
+                    "x": 65.0,
+                    "y": 114.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "source": "luminous"
+}

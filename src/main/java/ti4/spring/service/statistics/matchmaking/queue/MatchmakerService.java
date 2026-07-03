@@ -2,6 +2,7 @@ package ti4.spring.service.statistics.matchmaking.queue;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -62,7 +63,7 @@ public class MatchmakerService {
     }
 
     @Transactional
-    public Optional<String> queue(String queuerId) {
+    public Optional<String> queue(String queuerId, boolean tigl) {
         if (DatabasePersistenceGate.isDisabled()) return Optional.of("Queueing is currently disabled.");
 
         Optional<MatchmakingQueueMember> optionalMember = queueStore.findMember(queuerId);
@@ -72,8 +73,9 @@ public class MatchmakerService {
                     queueStore.findParty(member.getPartyId()).orElse(null);
             if (party != null) {
                 if (party.isQueued()) return Optional.of("You are already queued for a game.");
+                if (tigl) return Optional.of("You cannot queue for TIGL as a group. Leave your group first.");
 
-                queueStore.markQueued(party, queuerId);
+                queueStore.markQueued(party, queuerId, tigl);
                 return Optional.empty();
             }
             // This is defensive, in case we have an orphaned member
@@ -84,7 +86,7 @@ public class MatchmakerService {
         Optional<String> error = PartyValidator.validateGameLimits(List.of(queuerId));
         if (error.isPresent()) return error;
 
-        queueStore.createSoloQueuedParty(queuerId);
+        queueStore.createSoloQueuedParty(queuerId, tigl);
         return Optional.empty();
     }
 
@@ -104,6 +106,40 @@ public class MatchmakerService {
     public long clearQueue() {
         if (DatabasePersistenceGate.isDisabled()) return 0;
         return queueStore.clearAll();
+    }
+
+    @Transactional
+    public List<String> removePlayer(String userId) {
+        if (DatabasePersistenceGate.isDisabled()) return List.of();
+
+        Optional<MatchmakingQueueMember> memberOpt = queueStore.findMember(userId);
+        if (memberOpt.isEmpty()) return List.of();
+
+        long partyId = memberOpt.get().getPartyId();
+        List<String> removedMemberIds = queueStore.partyMemberIds(userId);
+        queueStore.deleteParties(List.of(partyId));
+        return removedMemberIds;
+    }
+
+    @Transactional(readOnly = true)
+    public List<GroupVerificationResult> verifyGroups() {
+        if (DatabasePersistenceGate.isDisabled()) return List.of();
+
+        List<GroupVerificationResult> results = new ArrayList<>();
+        for (QueuedParty party : queueStore.loadQueuedParties()) {
+            List<String> memberIds = party.members().stream()
+                    .map(MatchmakingQueueMember::getUserId)
+                    .toList();
+            List<String> selected = party.leaderSettings().getMatchmakingRestrictions().stream()
+                    .filter(MatchmakingOptions.RESTRICTION_OPTIONS::contains)
+                    .toList();
+            List<String> valid = PartyValidator.getValidRestrictions(memberIds, selected);
+            List<String> invalid =
+                    selected.stream().filter(r -> !valid.contains(r)).toList();
+            results.add(new GroupVerificationResult(
+                    party.party().getId(), memberIds, party.party().isTigl(), invalid));
+        }
+        return results;
     }
 
     @Transactional

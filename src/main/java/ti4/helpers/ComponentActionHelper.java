@@ -76,6 +76,7 @@ public class ComponentActionHelper {
                 }
                 if ("tf-fabrication".equalsIgnoreCase(tech)
                         || "tf-orbitaldrop".equalsIgnoreCase(tech)
+                        || "tf-mantlecracking".equalsIgnoreCase(tech)
                         || "tf-stalltactics".equalsIgnoreCase(tech)) {
                     continue;
                 }

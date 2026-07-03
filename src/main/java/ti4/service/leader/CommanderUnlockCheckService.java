@@ -292,6 +292,16 @@ public class CommanderUnlockCheckService {
             case "crystellum" ->
                 shouldBeUnlocked =
                         (CrystellumLeadersHandler.getCrystellumCommanderCapacitySystemCount(game, player) >= 3);
+            case "natau" -> {
+                int qualifyingSystems = 0;
+                for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player)) {
+                    if (tile.isAnomaly(game, player)
+                            || FoWHelper.isTileAdjacentToAnAnomaly(game, tile.getPosition(), player)) {
+                        qualifyingSystems++;
+                    }
+                }
+                shouldBeUnlocked = (qualifyingSystems >= 3);
+            }
         }
         if (shouldBeUnlocked) {
             UnlockLeaderService.unlockLeader(leaderId, game, player);

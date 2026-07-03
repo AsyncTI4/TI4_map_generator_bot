@@ -310,7 +310,7 @@ public class ExploreService {
                 }
             }
         }
-        if (player.hasAbility("deep_mining") && tile != null) {
+        if ((player.hasAbility("deep_mining") || player.hasTech("tf-deepinstallations")) && tile != null) {
             UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
             if (unitHolder.getUnitCount(Units.UnitType.Mech, player.getColor()) > 0
                     || unitHolder.getUnitCount(Units.UnitType.Spacedock, player.getColor()) > 0

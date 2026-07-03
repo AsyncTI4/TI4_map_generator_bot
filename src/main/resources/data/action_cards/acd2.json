@@ -1251,7 +1251,7 @@
         "name": "Refugees",
         "phase": "Action",
         "window": "After another player gains control of a planet you control",
-        "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets outside of that player's home system.",
+        "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets outside of that player's home system that contain their units.",
         "notes": "You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.",
         "automationID": "refugees",
         "flavorText": "\"Our survival hinged on the line they drew between slaughter and genocide,\" S'ula reminded her crew. \"Spit that mercy in their face.\"",
@@ -1262,7 +1262,7 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
+        "text": "Destroy each unit on a planet that contains 2 of your units to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
         "automationID": "sacrifice",
         "flavorText": "Sharsiss exulted. Each puppet had done his bidding without notice. Their minds shattered at the merest glimpse of power—of what was to come, of what they would become.",
         "source": "action_deck_2"
@@ -1272,7 +1272,7 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
+        "text": "Destroy each unit on a planet that contains 2 of your units to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
         "automationID": "sacrifice",
         "flavorText": "Mot was disturbed by the sight of the ivory monolith looming over the capitol. He was told that it was his idea to bring it here, but had no recollection of it.",
         "source": "action_deck_2"
@@ -1282,7 +1282,7 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
+        "text": "Destroy each unit on a planet that contains 2 of your units to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
         "automationID": "sacrifice",
         "flavorText": "The insignificant device let off no energy, no known signals. It lay inert for untold ages. Yet, upon touch, innumerable, unspeakable truths were relayed in an instant. Then, there was only darkness.",
         "source": "action_deck_2"
@@ -1292,7 +1292,7 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
+        "text": "Destroy each unit on a planet that contains 2 of your units to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
         "automationID": "sacrifice",
         "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "action_deck_2"

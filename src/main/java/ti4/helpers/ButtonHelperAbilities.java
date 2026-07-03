@@ -50,6 +50,7 @@ import ti4.service.tactical.TacticalActionService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.MoveUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
@@ -200,6 +201,15 @@ public final class ButtonHelperAbilities {
                 getTilesToRallyToTheCause(game, player));
     }
 
+    @ButtonHandler("startRallyTheHorde")
+    public static void startRallyTheHorde(Game game, Player player, ButtonInteractionEvent event) {
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                "Please choose the system to produce up to 2 ships in.",
+                getTilesToRallyToTheCause(game, player));
+    }
+
     @ButtonHandler("startBestow")
     public static void startBestow(Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -292,6 +302,19 @@ public final class ButtonHelperAbilities {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
+    @ButtonHandler("rallyTheHordeStep2_")
+    public static void rallyTheHordeStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        String type = "sling";
+        List<Button> buttons = Helper.getPlaceUnitButtons(
+                event, game.getNeutral(), game, game.getTileByPosition(pos), type, "placeOneNDone_skipbuild");
+        String message =
+                player.getRepresentation() + " Use the buttons to place a neutral ship of a type you just produced.";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
     public static List<Button> getTilesToRallyToTheCause(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
@@ -304,6 +327,24 @@ public final class ButtonHelperAbilities {
             }
             buttons.add(Buttons.green(
                     "rallyToTheCauseStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+        }
+        return buttons;
+    }
+
+    public static List<Button> getTilesToRallyTheHorde(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            boolean empty = true;
+            for (Player p : game.getRealPlayers()) {
+                if (FoWHelper.playerHasActualShipsInSystem(p, tile)) {
+                    empty = false;
+                    break;
+                }
+            }
+            if (empty) {
+                buttons.add(Buttons.green(
+                        "rallyTheHordeStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+            }
         }
         return buttons;
     }
@@ -1920,6 +1961,9 @@ public final class ButtonHelperAbilities {
                         + "->"
                         + player.getTg() + ").\n-# This is technically an optional gain.");
         pillageCheck(player, game);
+        if (game.isTwilightDS()) {
+            DestroyUnitService.destroyAllUnits(event, game.getTileFromPlanet(planetName), game, planet, false);
+        }
         ButtonHelperAgents.resolveArtunoCheck(player, 4);
         List<Button> buttons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         String message = "Use buttons to end turn or do another action";
@@ -2029,7 +2073,7 @@ public final class ButtonHelperAbilities {
 
     public static void oceanBoundCheck(Game game) {
         for (Player player : game.getRealPlayers()) {
-            if (player.hasUnlockedBreakthrough("kjalengardbt")) {
+            if (player.hasUnlockedBreakthrough("kjalengardbt") || player.hasTech("tf-glorioushalls")) {
                 int bannerHalls =
                         3 - ButtonHelperAgents.getGloryTokensLeft(game).size();
                 for (int x = 1; x <= bannerHalls; x++) {
@@ -2648,9 +2692,13 @@ public final class ButtonHelperAbilities {
             ExploreService.explorePlanet(
                     event, game.getTileFromPlanet(info[1]), info[1], info[2], player, true, game, 1, false);
         } else {
-            message = player.getFactionEmoji() + " used their **Deep Mining** ability to gain 1 trade good "
-                    + player.gainTG(1) + ".";
-            ButtonHelperAgents.resolveArtunoCheck(player, 1);
+            int deep = 1;
+            if (game.isTwilightsFallMode()) {
+                deep = 2;
+            }
+            message = player.getFactionEmoji() + " used their **Deep Mining** ability to gain " + deep + " trade good "
+                    + player.gainTG(deep) + ".";
+            ButtonHelperAgents.resolveArtunoCheck(player, deep);
             pillageCheck(player, game);
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         }

@@ -123,7 +123,7 @@ class VoteButtonHandler {
         List<String> planets = new ArrayList<>(player.getPlanets());
         for (String planet : planets) {
             Planet p = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-            if (p != null && p.isSpaceStation()) continue;
+            if (p != null && p.isSpaceStation(game)) continue;
             String agendaDetails = game.getCurrentAgendaInfo().split("_")[1].toLowerCase();
             if (agendaDetails.contains("non-home")) {
                 if (game.getTileFromPlanet(planet) != null

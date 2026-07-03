@@ -61,9 +61,9 @@ public class MoveUnitService {
             UnitType oldType,
             UnitType newType,
             int amt) {
-        RemoveUnitService.removeUnit(event, tile, game, player, uh, oldType, amt);
         String unitList = amt + " " + newType.getValue();
         if (uh instanceof Planet) unitList += " " + uh.getName();
         AddUnitService.addUnits(event, tile, game, player.getColor(), unitList);
+        RemoveUnitService.removeUnit(event, tile, game, player, uh, oldType, amt);
     }
 }

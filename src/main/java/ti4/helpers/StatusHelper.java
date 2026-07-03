@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
 import ti4.game.Game;
@@ -171,6 +172,9 @@ public final class StatusHelper {
             if (player.getTotalVictoryPoints() > maxVP) {
                 maxVP = player.getTotalVictoryPoints();
             }
+            if (player.hasAbility("paradigm")) {
+                NatauAbilityHandler.resolveParadigmStartOfStrategy(event, game, player);
+            }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "vadencommander")) {
                 int numScoredSOs = player.getSoScored();
                 int numScoredPos = player.getPublicVictoryPoints(false);
@@ -265,7 +269,7 @@ public final class StatusHelper {
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
                     game.getPing()
-                            + ", players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.",
+                            + ", players will be forced to score in order. Any preemptive scores will be queued. In the event of a bug, you may turn this off at any time by pressing this button, but that will not resolve the queue, it will just abandon it.",
                     buttons);
             for (Player player : getPlayersInScoringOrder(game)) {
                 game.setStoredValue(key3, game.getStoredValue(key3) + player.getFaction() + "*");
@@ -516,7 +520,23 @@ public final class StatusHelper {
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
                                 + ", you may use the button to pay 3 trade goods and get a technology, using _Sentient Datapool_.",
-                        List.of(Buttons.GET_A_TECH));
+                        List.of(Buttons.GET_A_TECH, Buttons.DONE_DELETE_BUTTONS));
+            }
+
+            if (player.hasTech("dsaugug")) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + ", this is a reminder that you can score an additional public objective instead of a secret objective due to your Psychographics.");
+            }
+            if (player.hasTech("tf-sentientdatapool") && player.getTg() > 3) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + ", you may use the button to pay 4 trade goods and get an ability, using _Sentient Datapool_.",
+                        List.of(
+                                Buttons.green("drawSingularNewSpliceCard_ability_sentient", "Pay 4tg for Ability"),
+                                Buttons.DONE_DELETE_BUTTONS));
             }
             Leader playerLeader = player.getLeader("kyrohero").orElse(null);
             if (player.hasLeader("kyrohero")

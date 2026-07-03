@@ -38,7 +38,7 @@ public class CardsInfoPinCleanupService {
                 TimeUnit.MILLISECONDS);
     }
 
-    public static void queueStalePinnedMessageCleanup(ThreadChannel threadChannel, Set<String> protectedMessageIds) {
+    private static void queueStalePinnedMessageCleanup(ThreadChannel threadChannel, Set<String> protectedMessageIds) {
         if (threadChannel == null) {
             return;
         }

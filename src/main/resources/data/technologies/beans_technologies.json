@@ -5,7 +5,7 @@
         "types": [
             "UNITUPGRADE"
         ],
-        "requirements": "DD",
+        "requirements": "RR",
         "faction": "dream",
         "baseUpgrade": "dd2",
         "source": "beans",

@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -501,11 +502,14 @@ public class PlayerSetupService {
                     "Set mech unit maximum to 6 for " + player.getRepresentation()
                             + ", due to their **Mechanized Military** ability.");
         }
+        if (player.hasAbility("doctrine") && player.hasAbility("paradigm") && player.hasAbility("natau_decree")) {
+            NatauAbilityHandler.offerDoctrineSetupButtons(event, game, player);
+        }
         CardsInfoService.sendVariousAdditionalButtons(game, player);
 
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Player: " + player.getRepresentation() + " has been set up");
+                    game.getMainGameChannel(), "Player: " + player.getRepresentationNoPing() + " has been set up");
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player was set up.");
         }

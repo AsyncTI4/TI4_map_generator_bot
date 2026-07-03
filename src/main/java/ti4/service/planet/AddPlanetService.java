@@ -71,7 +71,7 @@ public class AddPlanetService {
                 return;
             }
         }
-        if (game.getRevealedPublicObjectives().size() < 3 || (unitHolder != null && unitHolder.isSpaceStation())) {
+        if (game.getRevealedPublicObjectives().size() < 3 || (unitHolder != null && unitHolder.isSpaceStation(game))) {
             setup = true;
         }
         if ("avernus".equalsIgnoreCase(planet)) {
@@ -274,7 +274,7 @@ public class AddPlanetService {
                 && player.hasTech("dxa")
                 && !doubleCheck
                 && !setup
-                && !unitHolder.isSpaceStation()) {
+                && !unitHolder.isSpaceStation(game)) {
             String msg10 = player.getRepresentationUnfogged()
                     + " you may have an opportunity to use _Dacxive Animators_ on "
                     + Helper.getPlanetRepresentation(planet, game)
@@ -590,7 +590,7 @@ public class AddPlanetService {
                         buttons);
             }
         }
-        if (!unitHolder.isSpaceStation()
+        if (!unitHolder.isSpaceStation(game)
                 && IsPlayerElectedService.isPlayerElected(game, player, "minister_exploration")) {
             String fac = player.getFactionEmoji();
             MessageHelper.sendMessageToChannel(

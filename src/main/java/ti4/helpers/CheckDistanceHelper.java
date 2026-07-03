@@ -22,7 +22,7 @@ public class CheckDistanceHelper {
         if (distances.get(tilePosition2) != null) {
             return distances.get(tilePosition2);
         }
-        return countsRiftsAsNormal || !game.getTileByPosition(tilePosition1).isGravityRift(game) ? 100 : 99;
+        return countsRiftsAsNormal || !game.getTileByPosition(tilePosition1).isGravityRift(game, player) ? 100 : 99;
     }
 
     private static boolean tileUnlockedForMoving(Game game, Player player, Tile tile) {
@@ -127,7 +127,7 @@ public class CheckDistanceHelper {
                 }
                 if (!forMap) {
                     if (tile != null
-                            && tile.isGravityRift(game)
+                            && tile.isGravityRift(game, player)
                             && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)) {
                         num = -1;
                         if (game.isCosmicPhenomenaeMode()) {

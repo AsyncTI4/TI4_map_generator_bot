@@ -177,8 +177,9 @@
     "type": "agent",
     "name": "Overclock",
     "title": "Production Specialist",
-    "abilityWindow": "When any player's unit uses PRODUCTION:",
-    "abilityText": "You may exhaust this card to allow that player to choose 1 planet controlled by another player in a system adjacent to that unit. Reduce the combined cost of the produced units by that planet's resource value.",
+    "abilityWindow": "When a player produces units using the PRODUCTION ability of one of their space docks:",
+    "abilityText": "You may exhaust this card to allow that player to produce 2 additional units. These units do not count against their PRODUCTION limit. Then, they may place those additional units with any of their other structures.",
+    "notes": "For best results, resolve the 2 additional units first, THEN finishing producing normally.",
     "unlockCondition": "Always Unlocked",
     "source": "beans"
   },
@@ -222,9 +223,9 @@
     "type": "commander",
     "name": "Kaethos",
     "title": "The Unyielding",
-    "abilityWindow": "When any player scores a secret objective:",
-    "abilityText": "You may draw 1 secret objective, or gain 1 command token.",
-    "unlockCondition": "Have all of your doctrines in your play area exhausted.",
+    "abilityWindow": "During the status phase:",
+    "abilityText": "You may score an additional secret objective.",
+    "unlockCondition": "Have units in or adjacent to 3 different systems that contain anomalies.",
     "source": "beans"
   },
   {

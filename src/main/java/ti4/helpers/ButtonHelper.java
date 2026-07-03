@@ -55,6 +55,7 @@ import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
@@ -629,7 +630,7 @@ public class ButtonHelper {
         }
         int middleVal = (int) Math.round(Math.sqrt(infCount));
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            if (unitHolder instanceof Planet && !((Planet) unitHolder).isSpaceStation()) {
+            if (unitHolder instanceof Planet && !((Planet) unitHolder).isSpaceStation(game)) {
                 if (player.getPlanets().contains(unitHolder.getName())) {
                     String prefixID = player.factionButtonChecker() + "statusInfRevival_" + unitHolder.getName() + "_";
                     String msgSuffix = " Infantry on " + Helper.getPlanetRepresentation(unitHolder.getName(), game);
@@ -1591,6 +1592,8 @@ public class ButtonHelper {
         if (!game.isFowMode()
                 && activeSystem.isScar(game)
                 && !player.getRelics().contains("circletofthevoid")
+                && !player.hasUnlockedBreakthrough("nivynbt")
+                && !player.hasTech("tf-singularitypoint")
                 && !player.hasAbility("celestial_being")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -2440,6 +2443,7 @@ public class ButtonHelper {
         if (game.isDominusOrb()
                 || game.isL1Hero()
                 || player.hasTech("tf-desperados")
+                || player.hasTech("tf-fraactalspikedrives")
                 || !game.getStoredValue("phantomEnergy").isEmpty()) {
             return true;
         }
@@ -2508,7 +2512,7 @@ public class ButtonHelper {
         int totalNumber = 0;
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.playerHasUnitsInSystem(player, tile) && tile.isAnomaly() && !tile.isHomeSystem(game)) {
-                if (tile.isGravityRift(game) && grav < 1) {
+                if (tile.isGravityRift(game, player) && grav < 1) {
                     grav = 1;
                 }
                 if (tile.isNebula(game) && nebula < 1) {
@@ -2517,7 +2521,7 @@ public class ButtonHelper {
                 if (tile.isAsteroidField() && asteroids < 1) {
                     asteroids = 1;
                 }
-                if (!tile.isGravityRift(game) && !tile.isNebula(game) && !tile.isAsteroidField()) {
+                if (!tile.isGravityRift(game, player) && !tile.isNebula(game) && !tile.isAsteroidField()) {
                     count = 1;
                 }
 
@@ -4665,12 +4669,14 @@ public class ButtonHelper {
         List<String> endOfTurnTechs = List.of(
                 "pi",
                 "absol_pi",
+                "tf-singularitypoint",
                 "bs",
                 "absol_bs",
                 "dsceldr",
                 "dsbelky",
                 "miltymod_hm",
                 "absol_hm",
+                "tf-industrialjuggernaut",
                 "absol_nm",
                 "absol_pa",
                 "betaro");
@@ -4686,8 +4692,11 @@ public class ButtonHelper {
             // Add the button
             TechnologyModel model = Mapper.getTech(tech);
             endButtons.add(Buttons.red(
-                    player.factionButtonChecker() + ("absol_pa".equals(tech) ? "use" : "exhaust") + "Tech_" + tech,
-                    ("absol_pa".equals(tech) ? "Use" : "Exhaust") + " " + model.getName()));
+                    player.factionButtonChecker()
+                            + (("absol_pa".equals(tech) || "tf-industrialjuggernaut".equals(tech)) ? "use" : "exhaust")
+                            + "Tech_" + tech,
+                    (("absol_pa".equals(tech) || "tf-industrialjuggernaut".equals(tech)) ? "Use" : "Exhaust") + " "
+                            + model.getName()));
         }
 
         // Agents
@@ -4756,7 +4765,7 @@ public class ButtonHelper {
             endButtons.add(Buttons.green(
                     player.factionButtonChecker() + "useAxisBT", "Use Arms Brokerage", FactionEmojis.axis));
         }
-        if (player.hasReadyBreakthrough("cheiranbt") || player.hasTech("tf-cheiranbt")) {
+        if (player.hasReadyBreakthrough("cheiranbt") || player.hasTech("tf-matriphagy")) {
             endButtons.add(Buttons.green(
                     player.factionButtonChecker() + "exhaustBT_cheiranbt",
                     "Exhaust Cheiran Breakthrough",
@@ -6147,7 +6156,7 @@ public class ButtonHelper {
         }
         Tile tile = game.getTileByPosition(pos);
 
-        if (tile.isScar()) {
+        if (tile.isScar(game) && !player.hasUnlockedBreakthrough("nivynbt") && !player.hasTech("tf-singularitypoint")) {
             String message = "";
             switch (rollTypeString) {
                 case "afb" ->
@@ -6714,7 +6723,8 @@ public class ButtonHelper {
                 || (doesPlayerHaveFSHere("khrask_flagship", player, tile)
                         && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
                 || (player.hasRelic("metalivoidshielding")
-                        && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()));
+                        && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
+                || CrystellumBreakthroughHandler.canUseDefensiveArchitectureSustain(game, player, tile, unitModel);
     }
 
     @ButtonHandler("startThalnos_")
@@ -7133,7 +7143,6 @@ public class ButtonHelper {
                         new LogOrigin(game), "Failing to set up player #cards-info thread in " + game.getName(), e);
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
     }
 
     public static void offerRedTapeButtons(Game game, Player player) {
@@ -7527,7 +7536,7 @@ public class ButtonHelper {
             Tile tile = game.getTileByPosition(pos);
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder instanceof Planet planet) {
-                    if (planet.isSpaceStation()) {
+                    if (planet.isSpaceStation(game)) {
                         continue;
                     }
                     if ((!player.getPlanetsAllianceMode().contains(planet.getName())
@@ -7564,7 +7573,7 @@ public class ButtonHelper {
 
     public static int getNumberOfGravRiftsPlayerIsIn(Player player, Game game) {
         return (int) game.getTileMap().values().stream()
-                .filter(tile -> tile.isGravityRift(game) && tile.containsPlayersUnits(player))
+                .filter(tile -> tile.isGravityRift(game, player) && tile.containsPlayersUnits(player))
                 .count();
     }
 
@@ -7611,6 +7620,12 @@ public class ButtonHelper {
         }
         if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos), game)
                 && player.hasAbility("starfall_gunnery")
+                && checkNumberNonFighterShipsWithoutSpaceCannon(player, game.getTileByPosition(tilePos)) > 0) {
+            playersWithPds2.add(player);
+        }
+
+        if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos), game)
+                && player.hasTech("tf-kinematicstarfall")
                 && checkNumberNonFighterShipsWithoutSpaceCannon(player, game.getTileByPosition(tilePos)) > 0) {
             playersWithPds2.add(player);
         }

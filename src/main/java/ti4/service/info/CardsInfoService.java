@@ -13,6 +13,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
@@ -106,6 +107,9 @@ public class CardsInfoService {
         }
         if (player.hasTech("becrystmb") && player.isActivePlayer()) {
             buttons.add(CrystellumFactionTechHandler.getMolecularBindingButton(player));
+        }
+        if (player.hasAbility("doctrine") && player.hasAbility("paradigm") && player.hasAbility("natau_decree")) {
+            buttons.add(NatauAbilityHandler.getShowDoctrinesButton(player));
         }
         if (player.hasAbility("intrigue")) {
             buttons.add(Buttons.blue("startIntrigueCard", "Pay For Intrigue Card", FactionEmojis.xin));
@@ -261,6 +265,14 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("hyperagent")) {
             buttons.add(Buttons.gray(
                     "getAgentSelection_hyperagent", "Use Hyper Agent on Someone Else", FactionEmojis.Mentak));
+        }
+        if (player.hasTech("tf-predictivecommand")
+                && !player.getExhaustedTechs().contains("tf-predictivecommand")) {
+            buttons.add(Buttons.gray(
+                    "exhaustTech_tf-predictivecommand", "Exhaust Predictive Command", FactionEmojis.mykomentori));
+        }
+        if (player.hasTech("tf-radiantsigils") && !player.getExhaustedTechs().contains("tf-radiantsigils")) {
+            buttons.add(Buttons.gray("exhaustTech_tf-radiantsigils", "Exhaust Radiant Sigils", FactionEmojis.edyn));
         }
         if (player.hasUnexhaustedLeader("firmamentagent")) {
             buttons.add(

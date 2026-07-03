@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static ti4.discord.utility.DiscordErrorUtility.isIgnorableError;
+import static ti4.discord.utility.DiscordErrorUtility.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -97,7 +97,8 @@ public final class ButtonHelperModifyUnits {
         if (game.getActiveSystem() != null
                 && game.getTileByPosition(game.getActiveSystem()) != null
                 && game.getTileByPosition(game.getActiveSystem()).isScar(game)
-                && !player.hasUnlockedBreakthrough("nivynbt")) {
+                && !player.hasUnlockedBreakthrough("nivynbt")
+                && !player.hasTech("tf-singularitypoint")) {
             return 0;
         }
         mentakFS = Helper.getPlayerFromUnit(game, "sigma_mentak_flagship_2");
@@ -753,7 +754,7 @@ public final class ButtonHelperModifyUnits {
                 if (isRemainingSustains) {
                     effectiveUnits -= damagedUnits;
                 }
-                int min = (player.hasTech("nes"))
+                int min = (player.hasTech("nes") && isRemainingSustains)
                         ? Math.min(effectiveUnits, (hits + 1) / 2)
                         : Math.min(effectiveUnits, hits);
                 if (isNraShenanigans
@@ -1536,6 +1537,18 @@ public final class ButtonHelperModifyUnits {
                 getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet, "ruthless"));
     }
 
+    @ButtonHandler("stealthcorpsHit_")
+    public static void stealthcorpsHit(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        String planet = buttonID.split("_")[1];
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), player.getRepresentationNoPing() + " is resolving **Stealth Corps**.");
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentation() + ", please choose the opposing unit to destroy.",
+                getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet, "stealthcorps"));
+    }
+
     private static List<Button> getOpposingUnitsToHitOnGround(
             Player player, Game game, Tile tile, String planet, String source) {
         List<Button> buttons = new ArrayList<>();
@@ -1596,7 +1609,13 @@ public final class ButtonHelperModifyUnits {
                 + ("magen".equals(source) ? " with _Magen Defense Grid_" : "")
                 + ("ruthless".equals(source) ? " by **Ruthless**" : "")
                 + ". Please either cancel the hit somehow, or accept the loss of the unit.";
+        if ("stealthcorps".equals(source)) {
+            msg = player.getRepresentationUnfogged()
+                    + ", one of your " + unit + " units has been destroyed via Stealth Corps"
+                    + ". Please either play divinity, or accept the loss of the unit.";
+        }
         List<Button> buttons = new ArrayList<>();
+        game.setStoredValue(player.getFaction() + "latestAssignHits", "combat");
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
         UnitModel unitModel = player.getUnitFromUnitKey(key);
 
@@ -2307,6 +2326,15 @@ public final class ButtonHelperModifyUnits {
                                 + " but does not contain a legendary planet or another player's units. Press button to resolve";
                         List<Button> buttons2 = new ArrayList<>();
                         buttons2.add(Buttons.green("startRallyToTheCause", "Rally To The Cause"));
+                        buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
+                    }
+                    if (!willSkipBuild && player.hasTech("tf-rallythehorde")) {
+                        String msg = player.getRepresentation()
+                                + " due to your **Rally the Horde** ability, if you just produced a ship,"
+                                + " you may place a neutral ship of that type in any system which does not possess any non-neutral ships. Press button to resolve";
+                        List<Button> buttons2 = new ArrayList<>();
+                        buttons2.add(Buttons.green("startRallyTheHorde", "Rally The Horde"));
                         buttons2.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
                     }

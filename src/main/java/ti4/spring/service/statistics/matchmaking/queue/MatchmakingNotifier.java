@@ -1,14 +1,21 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
+import ti4.discord.utility.DiscordRoleUtility;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameLaunchPostService;
@@ -34,16 +41,14 @@ class MatchmakingNotifier {
         Guild guild = JdaService.guildPrimary;
         if (gamesToCreate.isEmpty() || guild == null) return;
 
-        List<ForumChannel> forums =
-                guild.getForumChannelsByName(CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL, true);
-        if (forums.isEmpty()) {
-            BotLogger.error("MatchmakerService could not find a thread container named #"
-                    + CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL + ".");
-            return;
-        }
-        ForumChannel forum = forums.getFirst();
-
+        Map<String, ForumChannel> forumByNameCache = new HashMap<>();
         for (MatchedGame game : gamesToCreate) {
+            String forumName = !game.tiglRanks().isEmpty()
+                    ? CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL
+                    : CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL;
+            ForumChannel forum = forumByNameCache.computeIfAbsent(forumName, name -> findForum(guild, name));
+            if (forum == null) continue;
+
             List<MatchmakingQueueMember> queueMembers = game.members();
             List<Member> members = queueMembers.stream()
                     .map(member -> guild.getMemberById(member.getUserId()))
@@ -52,24 +57,60 @@ class MatchmakingNotifier {
             if (members.size() != queueMembers.size()) continue;
 
             String gameFunName = CreateGameService.autoGenerateGameName();
-            String threadTitle = "Matchmaker Game: " + gameFunName.replace(":", "");
-            String setupMessage = describeSetup(game);
+            String threadTitle = MatchDescriber.threadTitle(game);
+            String setupMessage = MatchDescriber.setupBody(game);
             // Forum channels require an initial message payload, so the setup text becomes the post body.
             forum.createForumPost(threadTitle, MessageCreateData.fromContent(setupMessage))
                     .queue(
-                            forumPost -> CreateGameLaunchPostService.postLaunchButtons(
-                                    forumPost.getThreadChannel(), members, gameFunName),
+                            forumPost -> {
+                                ThreadChannel thread = forumPost.getThreadChannel();
+                                CreateGameLaunchPostService.postLaunchButtons(thread, members, gameFunName);
+                                postLfgPing(thread, game);
+                            },
                             BotLogger::catchRestError);
         }
     }
 
-    private static String describeSetup(MatchedGame game) {
-        String restrictionsText = game.restrictions().isEmpty() ? "None" : String.join(", ", game.restrictions());
-        return "The players were matched on the following game setup:\n"
-                + "- **Player count:** " + game.playerCount() + "\n"
-                + "- **Victory point goal:** " + game.victoryPointGoal() + "\n"
-                + "- **Expansion:** " + game.expansion() + "\n"
-                + "- **Pace:** " + game.pace() + "\n"
-                + "- **Restrictions:** " + restrictionsText;
+    private static void postLfgPing(ThreadChannel thread, MatchedGame game) {
+        int playersNeeded =
+                Integer.parseInt(game.playerCount()) - game.members().size();
+        if (playersNeeded <= 0) return;
+
+        List<String> tiglRankMentions = game.tiglRanks().stream()
+                .filter(rank -> !MatchmakingOptions.UNRANKED_OPTION.equals(rank))
+                .map(rank -> DiscordRoleUtility.getRole("TIGL - " + rank, thread.getGuild()))
+                .filter(Objects::nonNull)
+                .map(Role::getAsMention)
+                .toList();
+
+        if (tiglRankMentions.isEmpty()) {
+            postLfgRolePing(thread, playersNeeded);
+        } else {
+            postTiglRankRolePing(thread, tiglRankMentions, playersNeeded);
+        }
+    }
+
+    private static void postLfgRolePing(ThreadChannel thread, int playersNeeded) {
+        Role lfgRole = DiscordRoleUtility.getRole("LFG", thread.getGuild());
+        String message = lfgRole == null
+                ? "Ping the `@LFG` role to find additional members, if the game doesn't fill soon."
+                : lfgRole.getAsMention() + " this game needs " + StringHelper.pluralize(playersNeeded, "player")
+                        + " to start.";
+        MessageHelper.sendMessageToChannel(thread, message);
+    }
+
+    private static void postTiglRankRolePing(ThreadChannel thread, List<String> tiglRankMentions, int playersNeeded) {
+        String message = String.join(" ", tiglRankMentions) + " this game needs "
+                + StringHelper.pluralize(playersNeeded, "player") + " to start.";
+        MessageHelper.sendMessageToChannel(thread, message);
+    }
+
+    private static ForumChannel findForum(Guild guild, String forumName) {
+        List<ForumChannel> forums = guild.getForumChannelsByName(forumName, true);
+        if (forums.isEmpty()) {
+            BotLogger.error("MatchmakerService could not find a thread container named #" + forumName + ".");
+            return null;
+        }
+        return forums.getFirst();
     }
 }

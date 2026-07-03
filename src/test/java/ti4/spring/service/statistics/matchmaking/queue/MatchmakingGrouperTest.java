@@ -101,9 +101,9 @@ class MatchmakingGrouperTest extends BaseTi4Test {
     }
 
     @Test
-    void formsNoGameWhenAPairIsIncompatible() {
+    void formsNoGameWhenTiglPlayerMixedWithNonTigl() {
         // p1 wants a TIGL game while the others do not, so no compatible trio can be assembled.
-        addParty(List.of("p1"), List.of(MatchmakingOptions.TIGL_OPTION), List.of("3"), Duration.ZERO);
+        addTiglParty(List.of("p1"), List.of("3"), Duration.ZERO, List.of("Hero"));
         addSolo("p2");
         addSolo("p3");
 
@@ -111,25 +111,53 @@ class MatchmakingGrouperTest extends BaseTi4Test {
     }
 
     @Test
-    void queueTimeDecaysSkillMatching() {
-        List<String> skill = List.of(MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION);
+    void formsTiglGameWhenAllPlayersShareARank() {
+        addTiglParty(List.of("p1"), List.of("3"), Duration.ZERO, List.of("Hero", "Commander"));
+        addTiglParty(List.of("p2"), List.of("3"), Duration.ZERO, List.of("Commander", "Agent"));
+        addTiglParty(List.of("p3"), List.of("3"), Duration.ZERO, List.of("Commander"));
 
-        // Ratings 20/26/26: the 20-vs-26 skill gap gives a 1v1 match quality (~0.59) that fails the starting
-        // 0.70 threshold but clears the 0.40 floor, so the trio only forms once the threshold has decayed.
-        rate("a", 20);
-        rate("b", 26);
-        rate("c", 26);
-        addParty(List.of("a"), skill, List.of("3"), Duration.ZERO);
-        addParty(List.of("b"), skill, List.of("3"), Duration.ZERO);
-        addParty(List.of("c"), skill, List.of("3"), Duration.ZERO);
+        List<MatchedGame> games = MatchmakingGrouper.formGames(parties);
+
+        assertThat(games).hasSize(1);
+        assertThat(games.getFirst().tiglRanks()).containsExactly("Commander");
+        assertThat(games.getFirst().members())
+                .extracting(MatchmakingQueueMember::getUserId)
+                .containsExactlyInAnyOrder("p1", "p2", "p3");
+    }
+
+    @Test
+    void formsNoTiglGameWhenNoRankIsCommonToAllDespitePairwiseOverlap() {
+        // Every pair shares a rank, but no single rank is accepted by all three, so the game cannot form.
+        addTiglParty(List.of("p1"), List.of("3"), Duration.ZERO, List.of("Hero", "Commander"));
+        addTiglParty(List.of("p2"), List.of("3"), Duration.ZERO, List.of("Commander", "Agent"));
+        addTiglParty(List.of("p3"), List.of("3"), Duration.ZERO, List.of("Agent", "Hero"));
+
         assertThat(MatchmakingGrouper.formGames(parties)).isEmpty();
+    }
 
-        parties.clear();
-        // After 90 minutes the threshold has decayed three steps (0.70 -> 0.40), low enough to accept the gap.
-        addParty(List.of("a"), skill, List.of("3"), Duration.ofMinutes(90));
-        addParty(List.of("b"), skill, List.of("3"), Duration.ofMinutes(90));
-        addParty(List.of("c"), skill, List.of("3"), Duration.ofMinutes(90));
-        assertThat(MatchmakingGrouper.formGames(parties)).hasSize(1);
+    @Test
+    void formsNearMatchWhenNearExpiryWithThreeOtherMatchedPlayers() {
+        // A 5p game is one short; one player is within an hour of expiring (8h max) and three others matched.
+        addParty(List.of("p1"), List.of(), List.of("5"), Duration.ofHours(7).plusMinutes(30));
+        addParty(List.of("p2"), List.of(), List.of("5"), Duration.ZERO);
+        addParty(List.of("p3"), List.of(), List.of("5"), Duration.ZERO);
+        addParty(List.of("p4"), List.of(), List.of("5"), Duration.ZERO);
+
+        List<MatchedGame> games = MatchmakingGrouper.formGames(parties);
+
+        assertThat(games).hasSize(1);
+        assertThat(games.getFirst().playerCount()).isEqualTo("5");
+        assertThat(games.getFirst().members())
+                .extracting(MatchmakingQueueMember::getUserId)
+                .containsExactlyInAnyOrder("p1", "p2", "p3", "p4");
+    }
+
+    @Test
+    void doesNotFormNearMatchWhenNoOneIsNearExpiryOrLongQueued() {
+        addParty(List.of("p1"), List.of(), List.of("3"), Duration.ZERO);
+        addParty(List.of("p2"), List.of(), List.of("3"), Duration.ZERO);
+
+        assertThat(MatchmakingGrouper.formGames(parties)).isEmpty();
     }
 
     private void addSolo(String userId) {
@@ -146,6 +174,26 @@ class MatchmakingGrouperTest extends BaseTi4Test {
 
     private void addParty(
             List<String> userIds, List<String> restrictions, List<String> playerCounts, Duration queueWait) {
+        addParty(userIds, restrictions, playerCounts, queueWait, "8 hours");
+    }
+
+    private void addParty(
+            List<String> userIds,
+            List<String> restrictions,
+            List<String> playerCounts,
+            Duration queueWait,
+            String maxQueueTime) {
+        addPartyWithSettings(userIds, queueWait, settings(playerCounts, restrictions, maxQueueTime), false);
+    }
+
+    private void addTiglParty(
+            List<String> userIds, List<String> playerCounts, Duration queueWait, List<String> tiglRanks) {
+        UserSettings settings = settings(playerCounts, List.of(), "8 hours");
+        settings.setMatchmakingTiglRanks(tiglRanks);
+        addPartyWithSettings(userIds, queueWait, settings, true);
+    }
+
+    private void addPartyWithSettings(List<String> userIds, Duration queueWait, UserSettings settings, boolean tigl) {
         long partyId = nextPartyId;
         nextPartyId++;
         List<MatchmakingQueueMember> members = new ArrayList<>();
@@ -158,23 +206,24 @@ class MatchmakingGrouperTest extends BaseTi4Test {
         MatchmakingQueueParty party = new MatchmakingQueueParty();
         party.setId(partyId);
         party.setQueued(true);
+        party.setTigl(tigl);
         party.setQueuedAt(Instant.now().minus(queueWait));
         party.setLeaderId(userIds.getFirst());
-        parties.add(new QueuedParty(party, members, settings(playerCounts, restrictions)));
+        parties.add(new QueuedParty(party, members, settings));
     }
 
     private void rate(String userId, double mean) {
         ratingsByUser.put(userId, new Rating(mean, CONFIDENT_SIGMA));
     }
 
-    private static UserSettings settings(List<String> playerCounts, List<String> restrictions) {
+    private static UserSettings settings(List<String> playerCounts, List<String> restrictions, String maxQueueTime) {
         UserSettings settings = new UserSettings();
         settings.setMatchmakingPlayerCounts(playerCounts);
         settings.setMatchmakingVictoryPointGoals(List.of(VICTORY_POINTS));
         settings.setMatchmakingExpansions(List.of(EXPANSION));
         settings.setMatchmakingPaces(List.of(PACE));
         settings.setMatchmakingRestrictions(restrictions);
-        settings.setMatchmakingMaxQueueTime("8 hours");
+        settings.setMatchmakingMaxQueueTime(maxQueueTime);
         return settings;
     }
 }

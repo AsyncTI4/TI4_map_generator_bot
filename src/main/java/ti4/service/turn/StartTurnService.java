@@ -478,10 +478,7 @@ public class StartTurnService {
             if (game.isFowMode()) {
                 numOfComponentActions += acButtons.size();
             }
-            if (IsPlayerElectedService.isPlayerElected(player.getGame(), player, "censure")
-                    || IsPlayerElectedService.isPlayerElected(player.getGame(), player, "absol_censure")) {
-                numOfComponentActions += 1;
-            }
+
             Button componentAction = Buttons.green(
                     factionChecker + "componentAction", "Component Action (" + numOfComponentActions + ")");
 
@@ -725,6 +722,17 @@ public class StartTurnService {
                 && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
             startButtons.add(
                     Buttons.green(factionChecker + "getPsychoButtons", "Use Psychoarcheology", TechEmojis.BioticTech));
+        }
+        if (player.hasTech("tf-predictivecommand")
+                && !player.getExhaustedTechs().contains("tf-predictivecommand")) {
+            startButtons.add(Buttons.gray(
+                    factionChecker + "exhaustTech_tf-predictivecommand",
+                    "Exhaust Predictive Command",
+                    FactionEmojis.mykomentori));
+        }
+        if (player.hasTech("tf-radiantsigils") && !player.getExhaustedTechs().contains("tf-radiantsigils")) {
+            startButtons.add(
+                    Buttons.gray("exhaustTech_tf-radiantsigils", "Exhaust Radiant Sigils", FactionEmojis.edyn));
         }
         if (player.hasTechReady("dsuydag")) {
             startButtons.add(Buttons.green(

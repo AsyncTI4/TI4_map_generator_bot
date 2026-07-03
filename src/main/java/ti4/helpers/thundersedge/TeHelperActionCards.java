@@ -355,7 +355,7 @@ public class TeHelperActionCards {
                         && !player.getPlanetsAllianceMode().contains(p.getName()))
                 .filter(p -> game.getTileFromPlanet(p.getName()) != null)
                 .filter(p -> game.getUnitHolderFromPlanet(p.getName()) != null
-                        && !game.getUnitHolderFromPlanet(p.getName()).isSpaceStation()
+                        && !game.getUnitHolderFromPlanet(p.getName()).isSpaceStation(game)
                         && !p.getTokenList().contains("dmz")
                         && !p.getTokenList().contains("dmz_large"))
                 .map(p -> {

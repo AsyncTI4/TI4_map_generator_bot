@@ -701,7 +701,7 @@ public class ButtonHelperCommanders {
                 }
             }
         }
-        if (player.hasUnlockedBreakthrough("freesystemsbt")) {
+        if (player.hasUnlockedBreakthrough("freesystemsbt") || player.hasTech("tf-rallyingmarshalls")) {
             List<Button> buttons = new ArrayList<>();
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 buttons.add(Buttons.green(

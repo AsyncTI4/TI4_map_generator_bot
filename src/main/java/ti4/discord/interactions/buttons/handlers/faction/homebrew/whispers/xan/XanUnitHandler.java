@@ -9,7 +9,6 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
@@ -19,19 +18,6 @@ import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
 public class XanUnitHandler {
-
-    public static int countSpaceDocksInTile(Tile tile, Game game) {
-        int count = 0;
-        for (var unitHolder : tile.getPlanetUnitHolders()) count += countSpaceDocksOnHolder(unitHolder, game);
-        return count;
-    }
-
-    public static int countSpaceDocksOnHolder(UnitHolder unitHolder, Game game) {
-        int count = 0;
-        for (var player : game.getRealPlayers())
-            count += unitHolder.getUnitCount(UnitType.Spacedock, player.getColor());
-        return count;
-    }
 
     public static void offerFlagshipReplace(GenericInteractionCreateEvent event, Game game, Player player) {
         List<Tile> flagshipTiles =

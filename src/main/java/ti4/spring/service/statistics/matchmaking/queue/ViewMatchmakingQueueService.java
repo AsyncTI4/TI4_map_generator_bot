@@ -41,7 +41,7 @@ public class ViewMatchmakingQueueService {
         List<String> partyLines = new ArrayList<>();
         for (MatchmakingQueueParty party : parties) {
             List<MatchmakingQueueMember> members = membersByParty.getOrDefault(party.getId(), List.of());
-            partyLines.add(describeQueuedParty(members, UserSettingsManager.get(party.getLeaderId())));
+            partyLines.add(describeQueuedParty(members, UserSettingsManager.get(party.getLeaderId()), party.isTigl()));
         }
 
         return paginateIntoEmbeds(partyLines);
@@ -81,7 +81,8 @@ public class ViewMatchmakingQueueService {
                 .build();
     }
 
-    private static String describeQueuedParty(List<MatchmakingQueueMember> members, UserSettings settings) {
+    private static String describeQueuedParty(
+            List<MatchmakingQueueMember> members, UserSettings settings, boolean tigl) {
         String mentions =
                 members.stream().map(member -> "<@" + member.getUserId() + ">").collect(Collectors.joining(", "));
         StringBuilder line = new StringBuilder("\n• ").append(mentions).append(" — ");
@@ -91,24 +92,49 @@ public class ViewMatchmakingQueueService {
                 .append(joinInOrder(
                         settings.getMatchmakingVictoryPointGoals(), MatchmakingOptions.VICTORY_POINT_OPTIONS, "/"))
                 .append("vp");
-        line.append(" · ")
-                .append(joinInOrder(settings.getMatchmakingExpansions(), MatchmakingOptions.EXPANSION_OPTIONS, "/"));
-        line.append(" · ")
-                .append(joinInOrder(settings.getMatchmakingPaces(), MatchmakingOptions.PACE_RESTRICTION_OPTIONS, "/"));
+        String expansions = settings.getMatchmakingExpansions().stream()
+                .sorted(byCanonicalOrder(MatchmakingOptions.EXPANSION_OPTIONS))
+                .map(MatchmakingOptions::shortExpansionName)
+                .collect(Collectors.joining("/"));
+        line.append(" · ").append(expansions);
+        String paces = settings.getMatchmakingPaces().stream()
+                .sorted(byCanonicalOrder(MatchmakingOptions.PACE_RESTRICTION_OPTIONS))
+                .map(MatchmakingOptions::shortPaceName)
+                .map(String::toLowerCase)
+                .collect(Collectors.joining("/"));
+        line.append(" · ").append(paces).append(" pace");
         List<String> restrictions = settings.getMatchmakingRestrictions();
         if (!restrictions.isEmpty()) {
-            line.append(" · ").append(joinInOrder(restrictions, MatchmakingOptions.RESTRICTION_OPTIONS, ", "));
+            String restrictionsText = restrictions.stream()
+                    .sorted(byCanonicalOrder(MatchmakingOptions.RESTRICTION_OPTIONS))
+                    .map(ViewMatchmakingQueueService::labelRestriction)
+                    .collect(Collectors.joining(", "));
+            line.append(" · ").append(restrictionsText);
+        }
+        if (tigl) {
+            line.append(" · TIGL (")
+                    .append(String.join("/", settings.getMatchmakingTiglRanks()))
+                    .append(")");
         }
         return line.toString();
     }
 
+    private static String labelRestriction(String restriction) {
+        if (MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION.equals(restriction)) {
+            return "similar hours";
+        }
+        return restriction;
+    }
+
+    private static Comparator<String> byCanonicalOrder(List<String> canonicalOrder) {
+        return Comparator.comparingInt(value -> {
+            int index = canonicalOrder.indexOf(value);
+            return index < 0 ? Integer.MAX_VALUE : index;
+        });
+    }
+
     private static String joinInOrder(List<String> values, List<String> canonicalOrder, String separator) {
-        return values.stream()
-                .sorted(Comparator.comparingInt(value -> {
-                    int index = canonicalOrder.indexOf(value);
-                    return index < 0 ? Integer.MAX_VALUE : index;
-                }))
-                .collect(Collectors.joining(separator));
+        return values.stream().sorted(byCanonicalOrder(canonicalOrder)).collect(Collectors.joining(separator));
     }
 
     public static ViewMatchmakingQueueService get() {

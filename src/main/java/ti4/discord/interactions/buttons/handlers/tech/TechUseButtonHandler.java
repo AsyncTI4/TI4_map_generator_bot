@@ -15,9 +15,13 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -25,6 +29,8 @@ import ti4.model.FactionModel;
 import ti4.model.TechnologyModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.unit.AddUnitService;
+import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -107,6 +113,32 @@ class TechUseButtonHandler {
 
                 event.getMessage().editMessage(exhaustedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
             }
+            case "tf-industrialjuggernaut" -> {
+                List<Button> buttons = new ArrayList<>();
+                for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
+                    if (FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                        continue;
+                    }
+                    for (UnitHolder uH : tile.getUnitHolders().values()) {
+                        if (uH.getUnitCount(UnitType.Spacedock, player) > 0) {
+                            String uHName = "in space";
+                            if (!"space".equalsIgnoreCase(uH.getName())) {
+                                uHName = "on " + Helper.getPlanetRepresentation(uH.getName(), game);
+                            }
+                            buttons.add(Buttons.green(
+                                    "industrialJugReplace_" + tile.getPosition() + "_" + uH.getName(),
+                                    tile.getRepresentationForButtons() + " " + uHName));
+                        }
+                    }
+                }
+
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationNoPing()
+                                + " choose a spacedock of yours to replace with a warsun (and spend 6r)",
+                        buttons);
+                ButtonHelper.deleteTheOneButton(event);
+            }
             case "absol_st" -> { // Absol's Sarween Tools
                 player.addSpentThing("absol_sarween");
                 String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
@@ -131,6 +163,28 @@ class TechUseButtonHandler {
                         absolPAButtons);
             }
         }
+    }
+
+    @ButtonHandler("industrialJugReplace")
+    public static void industrialJugReplace(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        String uHName = buttonID.split("_")[2];
+        Tile tile = game.getTileByPosition(pos);
+        UnitHolder uH = tile.getUnitHolders().get(uHName);
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "ws");
+        ButtonHelper.deleteMessage(event);
+        RemoveUnitService.removeUnit(event, tile, game, player, uH, UnitType.Spacedock, 1);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing()
+                        + " used their industrial juggernaut ability to replace a spacedock in tile "
+                        + tile.getRepresentationForButtons() + " with a warsun for the cost of 6r.");
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
+        buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", use these buttons to pay the 6 resources.",
+                buttons);
     }
 
     @ButtonHandler("acquireAFreeTech") // Buttons.GET_A_FREE_TECH

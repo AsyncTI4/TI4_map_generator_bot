@@ -19,6 +19,7 @@ import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -260,15 +261,16 @@ class CombatRollPayloadRendererParityTest extends BaseTi4Test {
     private RenderedRoll assertRollBodyParity(
             Harness harness, Player player, Player opponent, Tile tile, CombatRollType rollType) {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
-        Map<UnitModel, Integer> playerUnits =
-                CombatRollService.getUnitsInCombat(tile, space, player, null, rollType, harness.game);
+        Map<Pair<UnitModel, UnitHolder>, Integer> playerUnits =
+                CombatRollService.getUnitsInCombatByHolder(tile, space, player, null, rollType, harness.game);
+        Map<UnitModel, Integer> playerUnitsFlat = CombatRollService.flattenUnitMap(playerUnits);
         Map<UnitModel, Integer> opponentUnits =
                 CombatRollService.getUnitsInCombat(tile, space, opponent, null, rollType, harness.game);
         TileModel tileModel = tile.getTileModel();
         List<NamedCombatModifierModel> modifiers = CombatModHelper.getModifiers(
                 player,
                 opponent,
-                playerUnits,
+                playerUnitsFlat,
                 opponentUnits,
                 tileModel,
                 harness.game,
@@ -277,7 +279,7 @@ class CombatRollPayloadRendererParityTest extends BaseTi4Test {
         List<NamedCombatModifierModel> extraRolls = CombatModHelper.getModifiers(
                 player,
                 opponent,
-                playerUnits,
+                playerUnitsFlat,
                 opponentUnits,
                 tileModel,
                 harness.game,

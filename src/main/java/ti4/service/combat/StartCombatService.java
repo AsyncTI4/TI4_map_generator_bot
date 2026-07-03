@@ -851,7 +851,7 @@ public class StartCombatService {
                         msg + ", a reminder that if you win the combat, you could score _Spark a Rebellion_.",
                         buttons2);
             }
-            if (player.getSecretsUnscored().containsKey("btv") && tile.isAnomaly(game)) {
+            if (player.getSecretsUnscored().containsKey("btv") && tile.isAnomaly(game, player)) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         msg + ", a reminder that if you win the combat, you could score _Brave the Void_.",
@@ -1190,6 +1190,28 @@ public class StartCombatService {
                             player.getRepresentationUnfogged()
                                     + " Reminder that you have the Metal Void Armaments relic to use AFB 3x6.");
                 }
+                if (player.hasTech("tf-projectionofpow")) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player.getRepresentationUnfogged()
+                                    + " Reminder that you have the Projection of Power to use AFB 2x6.");
+                }
+                if (player.hasAbility("projection_of_power")) {
+                    boolean adj = false;
+                    for (Tile tile2 : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
+                        if (FoWHelper.getAdjacentTiles(game, tile2.getPosition(), player, false, true)
+                                .contains(tile.getPosition())) {
+                            adj = true;
+                            break;
+                        }
+                    }
+                    if (adj) {
+                        MessageHelper.sendMessageToChannel(
+                                threadChannel,
+                                player.getRepresentationUnfogged()
+                                        + " Reminder that you have the Projection of Power to use AFB 1x6.");
+                    }
+                }
                 if ((ButtonHelper.doesPlayerHaveMechHere("naalu_mech_omega", player, tile)
                                 && !ButtonHelper.isLawInPlay(game, "articles_war"))
                         || ButtonHelper.doesPlayerHaveFSHere("sigma_naalu_flagship_1", player, tile)
@@ -1445,6 +1467,12 @@ public class StartCombatService {
                         "Use Titans " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                                 + "Agent",
                         FactionEmojis.Titans));
+            }
+            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasRelicReady("heartofixth")) {
+                buttons.add(Buttons.blue(
+                        factionChecker + "exhaustRelic_heartofixth",
+                        "Exhaust Heart of Ixth",
+                        agentHolder.getFactionEmoji()));
             }
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("gheminaagent")) {
                 buttons.add(Buttons.gray(
@@ -2259,6 +2287,11 @@ public class StartCombatService {
                         String id = p.factionButtonChecker() + "magenHit_" + unitH.getName();
                         String label = "Use Magen Defense Grid on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, TechEmojis.WarfareTech));
+                    }
+                    if (p.hasTech("tf-stealthcorps") && game.getActivePlayer() == p && isGroundCombat) {
+                        String id = p.factionButtonChecker() + "stealthcorpsHit_" + unitH.getName();
+                        String label = "Use Stealth Corps on " + nameOfHolder;
+                        buttons.add(Buttons.gray(id, label, FactionEmojis.tnelis));
                     }
                     if (p.hasUnit("tk-blacktrenchbulwark")
                             && unitH.getUnitCount(Units.UnitType.Pds, p.getColor()) > 0) {

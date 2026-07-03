@@ -1,0 +1,70 @@
+[
+    {
+        "id": "arachneraagent",
+        "faction": "arachnera",
+        "type": "agent",
+        "name": "Shastena",
+        "title": "Hive Tender",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Exhaust this card to choose 1 player. That player may produce 2 ground forces on any planet that contains 1 of their space docks.",
+        "unlockCondition": "Always Unlocked",
+        "source": "luminous"
+    },
+    {
+        "id": "arachneracommander",
+        "faction": "arachnera",
+        "type": "commander",
+        "name": "Solikhera",
+        "title": "Nest Architect",
+        "abilityWindow": "At any time",
+        "abilityText": "Place Arachnera dock token in your reinforcements. This is an additional space dock unit. Your space dock component limit is increased by 1.",
+        "unlockCondition": "Have 6 captured units on your faction sheet.",
+        "source": "luminous"
+    },
+    {
+        "id": "arachnerahero",
+        "faction": "arachnera",
+        "type": "hero",
+        "name": "Arachnera",
+        "title": "Eternal Queen Mother",
+        "abilityName": "Feeding Frenzy - Consuming Swarm",
+        "abilityWindow": "ACTION:",
+        "abilityText": "For each system that contains 1 or more of your infantry, you may destroy any number of those infantry to capture 1 unit you do not control that has a cost value equal to or less than the number of infantry you destroy and is in or adjacent ot that system.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "luminous"
+    },
+    {
+        "id": "psmagent",
+        "faction": "psm",
+        "type": "agent",
+        "name": "The Adjudicator",
+        "title": "Descriptor",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Exhaust this Card to choose 1 player who is your neighbor, that player must give 1 promissory note that is from their hand or face up in their play area, that player then gains 2 trade goods.",
+        "unlockCondition": "Always Unlocked",
+        "source": "luminous"
+    },
+    {
+        "id": "psmcommander",
+        "faction": "psm",
+        "type": "commander",
+        "name": "Jury of the Council",
+        "title": "Descriptor",
+        "abilityWindow": "At any time",
+        "abilityText": "You are considered neighbors with all players. When you gain a Promissory Note from another player for the first time this round, you gain 1 trade good.",
+        "unlockCondition": "Have 1 or more promissory notes, that are from 2 or more players, in your hand or faceup in your play area.",
+        "source": "luminous"
+    },
+    {
+        "id": "psmhero",
+        "faction": "psm",
+        "type": "hero",
+        "name": "The Executioner",
+        "title": "Descriptor",
+        "abilityName": "Thing - Descriptor",
+        "abilityWindow": "After you resolve the effect of a promissory note or action card:",
+        "abilityText": "Return the promissory note or component action card you used to your hand instead of returning it to its assigned player or discard pile, then purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "luminous"
+    }
+]

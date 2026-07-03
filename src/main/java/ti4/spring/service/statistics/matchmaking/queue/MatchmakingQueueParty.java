@@ -25,6 +25,9 @@ public class MatchmakingQueueParty {
     @Column(name = "queued", nullable = false)
     private boolean queued;
 
+    @Column(name = "tigl", nullable = false, columnDefinition = "boolean default false")
+    private boolean tigl;
+
     @Column(name = "queued_at")
     private Instant queuedAt;
 

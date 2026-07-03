@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -244,10 +243,6 @@ class DeleteButtonsButtonHandler {
                 if (player.hasTechReady("absol_st")) {
                     buttons.add(Buttons.red("useTech_absol_st", "Use Sarween Tools"));
                 }
-                if (game.getRealPlayers().stream()
-                        .anyMatch(player_ -> player_.hasUnexhaustedLeader("netrunnersagent"))) {
-                    buttons.addAll(NetrunnersLeadersHandler.getOverclockButtons(game, player, tile));
-                }
                 if (player.hasUnexhaustedLeader("winnuagent")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"solBtBuild".equalsIgnoreCase(buttonID)
@@ -348,6 +343,15 @@ class DeleteButtonsButtonHandler {
                             + " but does not contain a legendary planet or another player's units. Please use the button to resolve.";
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green("startRallyToTheCause", "Rally To The Cause"));
+                    buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
+                }
+                if (player.hasTech("tf-rallythehorde")) {
+                    String msg = player.getRepresentation()
+                            + " due to your **Rally the Horde** ability, if you just produced a ship,"
+                            + " you may place a neutral ship of that type in any system which does not possess any non-neutral ships. Press button to resolve";
+                    List<Button> buttons2 = new ArrayList<>();
+                    buttons2.add(Buttons.green("startRallyTheHorde", "Rally The Horde"));
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
                 }

@@ -73,7 +73,7 @@
         "id": "iron_resilience",
         "name": "Iron Resilience",
         "faction": "iron",
-        "permanentEffect": "Your ground forces cannot be removed or destroyed by any game effects outside of combat or when exceeding capacity.",
+        "permanentEffect": "Your ground forces cannot be removed or destroyed by any game effects except when in combat or when exceeding capacity.",
         "source": "beans"
     },
     {
@@ -137,6 +137,61 @@
         "name": "Decree",
         "faction": "natau",
         "permanentEffect": "You gain the text abilities of a doctrine while it is in your play area.",
+        "source": "beans"
+    },
+    {
+        "id": "doctrine_wrath",
+        "name": "Wrath",
+        "faction": "natau",
+        "permanentEffect": "During combat:\nYour units with SUSTAIN DAMAGE roll an additional combat die while not damaged.",
+        "window": "You may exhaust this card at the start of a combat to choose 2 other player's ships",
+        "windowEffect": "Those ships apply -1 to their combat rolls until the end of that combat.",
+        "source": "beans"
+    },
+    {
+        "id": "doctrine_strength",
+        "name": "Strength",
+        "faction": "natau",
+        "permanentEffect": "At the start of combat:\nChoose 1 of your participating units to gain SUSTAIN DAMAGE until the end of combat.",
+        "window": "When another player uses a unit ability against your units",
+        "windowEffect": "You may exhaust thsi card to cancel up to 2 of those hits.",
+        "source": "beans"
+    },
+    {
+        "id": "doctrine_revelation",
+        "name": "Revelation",
+        "faction": "natau",
+        "permanentEffect": "When you gain this card:\nChoose 2 non-objective common decks and place them on either side of this card. You may look at the top card of either of these decks at any time.",
+        "window": "When you would draw a card from any common deck",
+        "windowEffect": "You may exhaust this card to draw an additional card; choose 1 to keep or resolve and shuffle the rest back into that common deck.",
+        "notes": "This does not allow you to draw an additional agenda during the primary ability of the Politics strategy card, as you are not drawing from the deck, only looking at the top 2. However, this does allow you to draw 2 agendas during the agenda phase if you are the speaker, and choose which one to vote on.",
+        "source": "beans"
+    },
+    {
+        "id": "doctrine_knowledge",
+        "name": "Knowledge",
+        "faction": "natau",
+        "permanentEffect": "When you research a technology owned by one of your neighbors:\nYou may ignore 1 prerequisite on that technology.",
+        "window": "After you research a technology",
+        "windowEffect": "You may exhaust this card and 1 planet you control that has a technology specialty to research a technology of that color.",
+        "source": "beans"
+    },
+    {
+        "id": "doctrine_discovery",
+        "name": "Discovery",
+        "faction": "natau",
+        "permanentEffect": "When you would resolve the effects of an exploration card:\nYou may choose to discard that card without resolving its effects to gian 1 trade good.",
+        "window": "At the end of a tactical action",
+        "windowEffect": "You may exhaust this card to explore the frontier deck in a system that contains 1 or more of your ships and no planets.",
+        "source": "beans"
+    },
+    {
+        "id": "doctrine_stability",
+        "name": "Stability",
+        "faction": "natau",
+        "permanentEffect": "When 1 or more of your units use PRODUCTION, if you produce 3 or more non-fighter ships:\nYou may produce an additional 2 fighters or infantry at no cost. These units do not count against your PRODUCTION limit.",
+        "window": "When you use the PRODUCTION ability of 1 of your units",
+        "windowEffect": "You may exhaust this card to use the PRODUCTION ability of 1 of your space docks in a different system that does not contain your command tokens or another player's ships. If you do, place a command token from your reinforcements into that system.",
         "source": "beans"
     }
 ]

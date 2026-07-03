@@ -1,6 +1,6 @@
 [
     {
-        "alias": "tf-axisbt",
+        "alias": "tf-armsbrokerage",
         "name": "Arms Brokerage",
         "types": [
             "BIOTIC"
@@ -20,12 +20,12 @@
         "faction": "axis"
     },
     {
-        "alias": "tf-projectionofpower",
+        "alias": "tf-projectionofpow",
         "name": "Projection of Power",
         "types": [
             "WARFARE"
         ],
-        "text": "At the start of space combat, you may use ANTI-FIGHTER BARRAGE 6(x2) against a player’s fighters in the active system (even if you are not participating in that combat).",
+        "text": "At the start of space combat, you may use ANTI-FIGHTER BARRAGE 6(x2) against a player’s fighters in the active system.",
         "source": "twilight_ds",
         "faction": "celdauri"
     },
@@ -50,7 +50,7 @@
         "faction": "cheiran"
     },
     {
-        "alias": "tf-cheiranbt",
+        "alias": "tf-matriphagy",
         "name": "Matriphagy",
         "types": [
             "BIOTIC"
@@ -197,7 +197,7 @@
         ],
         "text": "ACTION: Place 1 \"Core\" token on a non-home planet you control other than Mecatol Rex to destroy all units on that planet and gain 4 trade goods. Planets that contain Core tokens are stations with a resource value of 2 and influence value of 0. Core tokens cannot be removed from the planet that contains them.",
         "source": "twilight_ds",
-        "faction": "ghoti"
+        "faction": "gledge"
     },
     {
         "alias": "tf-deepinstallations",
@@ -207,7 +207,7 @@
         ],
         "text": "When you would explore a planet that contains 1 of your mechs or structures, you may instead gain 2 trade goods. Stations you control have SPACE CANNON 5(x2)",
         "source": "twilight_ds",
-        "faction": "ghoti"
+        "faction": "gledge"
     },
     {
         "alias": "tf-oracularalgorithms",
@@ -220,7 +220,7 @@
         "faction": "augers"
     },
     {
-        "alias": "tf-psychographics",
+        "alias": "tf-dsaugug",
         "name": "Psychographics",
         "types": [
             "BIOTIC"
@@ -250,7 +250,7 @@
         "faction": "kjalengard"
     },
     {
-        "alias": "tf-valor",
+        "alias": "tf-valortf",
         "name": "Valor",
         "types": [
             "BIOTIC"
@@ -260,7 +260,7 @@
         "faction": "kjalengard"
     },
     {
-        "alias": "tf-shroudedfleets",
+        "alias": "tf-shroudoflith",
         "name": "Shrouded Fleets",
         "types": [
             "PROPULSION"
@@ -411,13 +411,13 @@
     },
     {
         "alias": "tf-zealousds",
-        "name": "Zealous DS",
+        "name": "Zealous (DS)",
         "types": [
             "WARFARE"
         ],
         "text": "When you spend a command token to resolve the secondary ability of the \"Calamatis\" strategy card, you may resolve the primary ability of Warfare instead. (the token lift one)",
         "source": "twilight_ds",
-        "faction": "khrask"
+        "faction": "kortali"
     },
     {
         "alias": "tf-dronehosts",
@@ -450,7 +450,7 @@
         "faction": "mortheus"
     },
     {
-        "alias": "tf-fabricationgrid",
+        "alias": "tf-dsmorty",
         "name": "Fabrication Grid",
         "types": [
             "CYBERNETIC"
@@ -470,7 +470,7 @@
         "faction": "mortheus"
     },
     {
-        "alias": "tf-prescientdivination",
+        "alias": "tf-divination",
         "name": "Prescient Divination",
         "types": [
             "CYBERNETIC"

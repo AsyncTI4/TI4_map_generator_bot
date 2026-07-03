@@ -18,44 +18,30 @@ public class PartyValidator {
 
     public static List<String> getValidRestrictions(List<String> userIds, List<String> restrictions) {
         List<String> members = userIds.stream().distinct().toList();
-        List<String> candidateRestrictions = restrictionsAllowedForMembers(members, restrictions);
-        if (members.size() < 2) return candidateRestrictions;
 
         List<String> available = new ArrayList<>();
-        for (String restriction : candidateRestrictions) {
+        for (String restriction : restrictions) {
             Map<String, PlayerMatchmakingData> dataById =
-                    PlayerMatchDataFactory.buildForUsers(members, List.of(restriction));
-            if (groupInternallyCompatible(members, dataById)) {
-                available.add(restriction);
+                    PlayerMatchmakingDataFactory.buildForUsers(members, List.of(restriction));
+            if (!everyMemberCanUseRestriction(restriction, members, dataById)) {
+                continue;
             }
+            if (members.size() >= 2 && !groupInternallyCompatible(members, dataById)) {
+                continue;
+            }
+            available.add(restriction);
         }
         return available;
     }
 
-    private static List<String> restrictionsAllowedForMembers(List<String> members, List<String> restrictions) {
-        List<String> allowed = restrictions;
-        if (members.stream().anyMatch(PartyValidator::isNewPlayer)) {
-            allowed = allowed.stream()
-                    .filter(restriction -> !MatchmakingOptions.SIMILAR_PLAYER_SKILL_OPTION.equals(restriction))
-                    .toList();
+    private static boolean everyMemberCanUseRestriction(
+            String restriction, List<String> members, Map<String, PlayerMatchmakingData> dataById) {
+        if (!MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION.equals(restriction)) {
+            return true;
         }
-        if (!members.stream().allMatch(PartyValidator::hasSetTiglRank)) {
-            allowed = allowed.stream()
-                    .filter(restriction -> !MatchmakingOptions.TIGL_OPTION.equals(restriction))
-                    .toList();
-        }
-        return allowed;
-    }
-
-    private static boolean hasSetTiglRank(String userId) {
-        return UserSettingsManager.get(userId).hasSetTiglRank();
-    }
-
-    private static boolean isNewPlayer(String userId) {
-        ManagedPlayer managedPlayer = GameManager.getManagedPlayer(userId);
-        int completedGames =
-                managedPlayer == null ? 0 : UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer);
-        return completedGames < MatchmakingCompatibilityService.NEW_PLAYER_GAME_THRESHOLD;
+        return members.stream()
+                .map(dataById::get)
+                .allMatch(MatchmakingCompatibilityService::hasEnoughActiveHourDataToMatch);
     }
 
     private static boolean groupInternallyCompatible(

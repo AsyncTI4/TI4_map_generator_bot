@@ -239,7 +239,7 @@ public class FactionDraftItem extends DraftItem {
         };
     }
 
-    private static boolean storedListContains(Game game, String key, String value) {
+    public static boolean storedListContains(Game game, String key, String value) {
         return Arrays.asList(PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue(key)))
                 .contains(value);
     }

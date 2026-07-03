@@ -17,6 +17,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
@@ -383,6 +384,9 @@ public class DestroyUnitService {
                                 + " available to you  (on the game board or in your reinforcements)."
                                 + "\n-# If this was a mistake, readjust the limit with `/game set_unit_cap`.");
             }
+        }
+        if (player != null && CrystellumPromissoryHandler.canUseFracture(game, player, unit, combat, killers)) {
+            CrystellumPromissoryHandler.sendFractureButtons(event, game, player, unit);
         }
         if (player != null) {
             String unitTypeString =

@@ -358,6 +358,12 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
+    public boolean isSpaceStation(Game game) {
+        if (game.isTwilightDS() && tokenList.contains(Constants.GLEDGE_CORE_PNG)) return true;
+        return getPlanetModel().isSpaceStation();
+    }
+
+    @JsonIgnore
     public boolean isFake() {
         return getPlanetModel().isFake();
     }

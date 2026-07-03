@@ -967,12 +967,17 @@ public final class ButtonHelperTwilightsFall {
                     sendPlayerSpliceOptions(game, participants.getFirst());
                 }
             } else {
-                List<String> cards = getSpliceCards(game);
-                List<MessageEmbed> embeds = getSpliceEmbeds(game, type, cards, null);
-                MessageHelper.sendMessageToChannelWithEmbeds(
-                        game.getMainGameChannel(),
-                        game.getPing() + ", the splice is complete. The remaining splice cards were as follows",
-                        embeds);
+                if (game.isVeiledHeartMode()) {
+                    MessageHelper.sendMessageToChannel(
+                            game.getMainGameChannel(), game.getPing() + ", the splice is complete.");
+                } else {
+                    List<String> cards = ButtonHelperTwilightsFall.getSpliceCards(game);
+                    List<MessageEmbed> embeds = ButtonHelperTwilightsFall.getSpliceEmbeds(game, type, cards, null);
+                    MessageHelper.sendMessageToChannelWithEmbeds(
+                            game.getMainGameChannel(),
+                            game.getPing() + ", the splice is complete. The remaining splice cards were as follows",
+                            embeds);
+                }
                 if (!game.getStoredValue("endTurnWhenSpliceEnds").isEmpty()) {
                     Player p2 = game.getActivePlayer();
                     if (game.getStoredValue("endTurnWhenSpliceEnds").contains(p2.getFaction())) {
@@ -1510,6 +1515,13 @@ public final class ButtonHelperTwilightsFall {
         String type = buttonID;
         if (buttonID.contains("_")) {
             type = buttonID.split("_")[1];
+        }
+        if (buttonID.contains("sentient")) {
+            player.setTg(player.getTg() - 4);
+            ButtonHelper.deleteMessage(event);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + " paid 4tg to resolve sentient datapool.");
         }
         List<String> cardsToDraw = getDeckForSplicing(game, type, 1);
         if (cardsToDraw.isEmpty()) {
