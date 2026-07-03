@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
-import tools.jackson.core.type.TypeReference;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.acd2.PublicOutrageAcd2ButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.acd2.SettlementsAcd2ButtonHandler;
@@ -73,6 +72,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
+import tools.jackson.core.type.TypeReference;
 
 @UtilityClass
 public final class AgendaHelper {
@@ -590,6 +590,7 @@ public final class AgendaHelper {
         }
         GMService.logActivity(game, AgendaSummaryHelper.getSummaryOfVotes(game, true, true, false), false);
         game.setPhaseOfGame("agendaEnd");
+        game.removeStoredValue(AGENDA_START_VOTE_COUNTS);
         game.setActivePlayerID(null);
         StringBuilder message = new StringBuilder();
         String formattedWinner = getAgendaOutcomeName(game, winner, true);
@@ -2841,8 +2842,7 @@ public final class AgendaHelper {
     private static void snapshotAgendaStartVoteCounts(Game game) {
         try {
             game.setStoredValue(
-                    AGENDA_START_VOTE_COUNTS,
-                    JsonMapperManager.basic().writeValueAsString(getVoteCountByColor(game)));
+                    AGENDA_START_VOTE_COUNTS, JsonMapperManager.basic().writeValueAsString(getVoteCountByColor(game)));
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Could not snapshot agenda start vote counts", e);
         }
@@ -2854,8 +2854,7 @@ public final class AgendaHelper {
             return new LinkedHashMap<>();
         }
         try {
-            return JsonMapperManager.basic()
-                    .readValue(value, new TypeReference<LinkedHashMap<String, Integer>>() {});
+            return JsonMapperManager.basic().readValue(value, new TypeReference<LinkedHashMap<String, Integer>>() {});
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Could not read agenda start vote counts", e);
             return new LinkedHashMap<>();
