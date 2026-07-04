@@ -1006,8 +1006,17 @@ public class CombatRollService {
         }
         StringBuilder resultBuilder = new StringBuilder(result);
         boolean metaliVoidCounted = false;
-        boolean unitUndecided = game.getStoredValue("highestValueSingleUnit" + player.getFaction())
-                .isEmpty();
+        String highestValueSingleUnitKey = "highestValueSingleUnit" + player.getFaction();
+        String storedHighestValueUnit = game.getStoredValue(highestValueSingleUnitKey);
+        boolean unitUndecided = storedHighestValueUnit.isEmpty()
+                || playerUnits.keySet().stream()
+                        .noneMatch(k -> k.getLeft().getAsyncId().equalsIgnoreCase(storedHighestValueUnit));
+        if (!storedHighestValueUnit.isEmpty() && unitUndecided) {
+            // A manual Gravleash/Supercharge choice (chooseGravleash_) that isn't part of this combat
+            // round - wrong tile, or the chosen unit has since died/retreated - would otherwise block
+            // auto-pick forever, since this flag never becomes true again once set.
+            game.removeStoredValue(highestValueSingleUnitKey);
+        }
         if (rollType == CombatRollType.combatround
                 && (player.hasTech("tf-supercharge")
                         || (player.hasUnlockedBreakthrough("letnevbt")
