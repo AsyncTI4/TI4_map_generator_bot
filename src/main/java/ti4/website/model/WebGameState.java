@@ -143,6 +143,7 @@ public class WebGameState {
     public static class WebAgenda {
         private String id;
         private Map<String, Integer> startVoteCounts;
+        private Map<String, Integer> castVoteCounts;
         private Map<String, Integer> outcomeVoteCounts;
 
         static WebAgenda fromGame(Game game) {
@@ -154,6 +155,7 @@ public class WebGameState {
             WebAgenda agenda = new WebAgenda();
             agenda.id = agendaId;
             agenda.startVoteCounts = AgendaHelper.getAgendaStartVoteCounts(game);
+            agenda.castVoteCounts = AgendaSummaryHelper.getCurrentPlayerVoteCountsByColor(game);
             agenda.outcomeVoteCounts = AgendaSummaryHelper.getCurrentOutcomeVoteCounts(game);
             return agenda;
         }

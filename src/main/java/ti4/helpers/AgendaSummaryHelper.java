@@ -78,6 +78,35 @@ public class AgendaSummaryHelper {
         return voteCounts;
     }
 
+    public static Map<String, Integer> getCurrentPlayerVoteCountsByColor(Game game) {
+        Map<String, Integer> voteCounts = new LinkedHashMap<>();
+        for (String voteInfoValue : game.getCurrentAgendaVotes().values()) {
+            StringTokenizer voteInfo = new StringTokenizer(voteInfoValue, ";");
+            while (voteInfo.hasMoreTokens()) {
+                String specificVote = voteInfo.nextToken();
+                int separator = specificVote.indexOf('_');
+                if (separator < 0) {
+                    continue;
+                }
+
+                String faction = specificVote.substring(0, separator);
+                String vote = specificVote.substring(separator + 1);
+                if (!NumberUtils.isDigits(vote)) {
+                    continue;
+                }
+
+                Player player = game.getPlayerFromColorOrFaction(faction);
+                if (player == null
+                        || player.getColor() == null
+                        || player.getColor().isBlank()) {
+                    continue;
+                }
+                voteCounts.merge(player.getColor(), Integer.parseInt(vote), Integer::sum);
+            }
+        }
+        return voteCounts;
+    }
+
     private static int countNumericVotes(String voteInfoValue) {
         int totalVotes = 0;
         StringTokenizer voteInfo = new StringTokenizer(voteInfoValue, ";");
