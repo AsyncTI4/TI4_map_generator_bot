@@ -1,5 +1,7 @@
 package ti4.discord.interactions.buttons.handlers.game;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -289,7 +291,9 @@ public class CreateGameButtonHandler {
         List<Member> members = fetchMembersFromMessage(content, guild);
         List<String> existingIds = members.stream().map(Member::getId).toList();
 
-        List<String> addedIds = PlayerSearchService.get().searchAndAdd(criteria, existingIds);
+        Duration hostWait = Duration.between(message.getTimeCreated().toInstant(), Instant.now());
+        if (hostWait.isNegative()) hostWait = Duration.ZERO;
+        List<String> addedIds = PlayerSearchService.get().searchAndAdd(criteria, existingIds, hostWait);
 
         List<Member> added = new ArrayList<>();
         for (String id : addedIds) {

@@ -1,5 +1,6 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,7 +26,7 @@ public class PlayerSearchService {
     }
 
     @Transactional
-    public List<String> searchAndAdd(PlayerSearchCriteria criteria, List<String> existingMemberIds) {
+    public List<String> searchAndAdd(PlayerSearchCriteria criteria, List<String> existingMemberIds, Duration hostWait) {
         if (DatabasePersistenceGate.isDisabled()) return List.of();
 
         int targetSize = maxPlayerCount(criteria.playerCounts());
@@ -38,7 +39,7 @@ public class PlayerSearchService {
         Map<MatchmakingQueueMember, PlayerMatchmakingData> partyData =
                 PlayerMatchmakingDataFactory.buildForParties(queued);
         Map<String, PlayerMatchmakingData> hostData = PlayerMatchmakingDataFactory.buildForUsers(
-                existingMemberIds, criteria.restrictions(), criteria.tigl(), criteria.tiglRanks());
+                existingMemberIds, criteria.restrictions(), criteria.tigl(), criteria.tiglRanks(), hostWait);
 
         Set<String> takenUserIds = new HashSet<>(existingMemberIds);
         List<PlayerMatchmakingData> selectedGroup = new ArrayList<>(hostData.values());
