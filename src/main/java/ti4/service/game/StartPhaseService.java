@@ -66,6 +66,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
+import ti4.service.fow.LoreService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.ListTurnOrderService;
 import ti4.service.leader.PlayHeroService;
@@ -84,6 +85,7 @@ public class StartPhaseService {
             case "voting", "agendaVoting" -> AgendaHelper.startTheVoting(game);
             case "shuffleDecks" -> game.shuffleDecks();
             case "agenda" -> {
+                LoreService.showPhaseLore(game, "agenda"); // before setPhaseOfGame: END lore reads the old phase
                 game.setPhaseOfGame("agenda");
                 Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
                 List<Button> buttons = List.of(flipAgenda);
@@ -211,6 +213,9 @@ public class StartPhaseService {
     }
 
     public static void startStrategyPhase(GenericInteractionCreateEvent event, Game game) {
+        // Phase-end lore must fire before the round number increments below, so "end of round N"
+        // round gates see the round they close; the matching phase-START fires after setPhaseOfGame.
+        LoreService.showPhaseEndLore(game, "strategy");
         for (Player player2 : game.getRealPlayers()) {
             if (game.getStoredValue("SpecialSession") != null
                     && game.getStoredValue("SpecialSession").contains(player2.getFaction())
@@ -547,6 +552,7 @@ public class StartPhaseService {
         game.updateActivePlayer(firstSCPicker);
         game.setPhaseOfGame("strategy");
         GMService.logActivity(game, "**Strategy** Phase for Round " + game.getRound() + " started.", true);
+        LoreService.showPhaseStartLore(game, "strategy");
         FowCommunicationThreadService.checkAllCommThreads(game);
         SpinService.executeSpinsForTrigger(game, SpinService.AutoTrigger.STRATEGY);
         String pickSCMsg = " Please use the buttons to pick a strategy card.";
@@ -1126,6 +1132,7 @@ public class StartPhaseService {
     public static void startActionPhase(GenericInteractionCreateEvent event, Game game, boolean incrementTgs) {
         boolean isFowPrivateGame = game.isFowMode();
         game.setStoredValue("willRevolution", "");
+        LoreService.showPhaseLore(game, "action"); // before setPhaseOfGame: END lore reads the old phase
         game.setPhaseOfGame("action");
         GMService.logActivity(game, "**Action** Phase for Round " + game.getRound() + " started.", true);
         for (Player p2 : game.getRealPlayers()) {

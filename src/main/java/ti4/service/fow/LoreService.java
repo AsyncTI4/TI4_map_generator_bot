@@ -13,6 +13,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -71,7 +74,7 @@ public final class LoreService {
     // TODO: export file is written to the JVM working directory and never deleted after sending.
     private static final String LORE_EXPORT_FILENAME = "_lore_export.txt";
     private static final int LORE_TEXT_MAX_LENGTH = 1000;
-    private static final int FOOTER_TEXT_MAX_LENGTH = 200;
+    private static final int FOOTER_TEXT_MAX_LENGTH = 300;
     // TODO: editing existing lore does not re-validate RECEIVER against current game mode; an entry saved in FoW
     //       mode with ADJACENT/GM receiver remains editable without correction in non-FoW mode.
     // TODO: LORECACHE is a plain HashMap — not thread-safe under concurrent event handlers.
@@ -96,7 +99,11 @@ public final class LoreService {
         MOVED("Units are moved in"),
         CONTROLLED("Target is in control"),
         SPACE_BATTLE("A space battle was fought here"),
-        GROUND_BATTLE("A ground battle was fought here");
+        GROUND_BATTLE("A ground battle was fought here"),
+        // Phase triggers pair only with the phase pseudo-targets (strategy/action/status/agenda) —
+        // see showPhaseStartLore/showPhaseEndLore; validateLore rejects any other pairing.
+        PHASE_START("Phase begins"),
+        PHASE_END("Phase ends");
         public final String name;
 
         TRIGGER(String name) {
@@ -134,6 +141,11 @@ public final class LoreService {
         public PING ping = PING.NO;
         public PERSISTANCE persistance = PERSISTANCE.ONCE;
 
+        /** 0 means unbounded on that side — the entry can fire from game start / has no end round. */
+        public int fromRound = 0;
+
+        public int tillRound = 0;
+
         public LoreEntry(String loreText) {
             this.loreText = loreText;
         }
@@ -148,16 +160,24 @@ public final class LoreService {
                 entry.trigger = TRIGGER.valueOf(splitLore[4]);
                 entry.ping = PING.valueOf(splitLore[5]);
                 entry.persistance = PERSISTANCE.valueOf(splitLore[6]);
+                entry.fromRound = Integer.parseInt(splitLore[7]);
+                entry.tillRound = Integer.parseInt(splitLore[8]);
             } catch (Exception e) {
-                // Ignore invalid entries and use defaults
+                // Ignore invalid/missing fields — also covers exports written before round-gating existed,
+                // which simply won't have splitLore[7]/[8] — and use defaults for whatever wasn't parsed yet.
             }
             return entry;
+        }
+
+        /** True if {@code round} falls inside this entry's from/till bounds (0 on a side = unbounded there). */
+        public boolean isInRoundRange(int round) {
+            return (fromRound <= 0 || round >= fromRound) && (tillRound <= 0 || round <= tillRound);
         }
 
         @Override
         public String toString() {
             return target + ";" + loreText + ";" + footerText + ";" + receiver + ";" + trigger + ";" + ping + ";"
-                    + persistance;
+                    + persistance + ";" + fromRound + ";" + tillRound;
         }
 
         /** A field-for-field clone. Used when saving one set of lore settings to several targets at once so each
@@ -170,10 +190,19 @@ public final class LoreService {
             clone.trigger = trigger;
             clone.ping = ping;
             clone.persistance = persistance;
+            clone.fromRound = fromRound;
+            clone.tillRound = tillRound;
             return clone;
         }
 
         private static final String CHOICE_MARKER = "!choice";
+
+        /** {@code !roll <count>d<sides>}, e.g. {@code !roll 2d10}. Case-insensitive, whole line. */
+        private static final Pattern ROLL_MARKER = Pattern.compile("(?i)^!roll\\s+(\\d+)d(\\d+)$");
+
+        /** A footer line whose whole body is a bare numeric range/value, e.g. {@code 2-10:} or {@code 5:} —
+         *  a roll-bin tag rather than the fixed {@code accept:}/{@code reject:} choice tags. */
+        private static final Pattern BIN_TAG = Pattern.compile("^(\\d+(?:-\\d+)?):\\s*(.*)$", Pattern.DOTALL);
 
         /**
          * A footer line that is just {@code !choice} gates the whole entry behind an Accept/Reject
@@ -186,48 +215,75 @@ public final class LoreService {
             return false;
         }
 
-        /** Strips a leading "accept:"/"reject:" tag (case-insensitive) from a footer line, if present. */
-        private static String stripBranchTag(String line) {
-            String lower = line.toLowerCase();
-            if (lower.startsWith("accept:") || lower.startsWith("reject:")) {
-                return line.substring(7).strip();
+        /**
+         * A footer line matching {@code !roll <count>d<sides>} gates the whole entry behind a single "Roll"
+         * button sent individually to each recipient — see {@code LoreService#requestRollConfirmation}. Which
+         * effect lines fire is decided by which {@code N-M:}-tagged bin the rolled total lands in.
+         */
+        public boolean isRollGated() {
+            return getRollSpec() != null;
+        }
+
+        /** {@code {count, sides}} of this entry's {@code !roll} marker, or null if it isn't roll-gated. */
+        public int[] getRollSpec() {
+            for (String line : footerText.split("\n")) {
+                Matcher m = ROLL_MARKER.matcher(line.strip());
+                if (m.matches()) {
+                    return new int[] {Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2))};
+                }
             }
-            return line;
+            return null;
+        }
+
+        /** Splits a footer line into an optional tag ("accept", "reject", or a numeric roll-bin range like
+         *  "2-10"/"5") and the remainder of the line after the tag; tag is null if untagged. */
+        private static String[] splitTag(String line) {
+            String lower = line.toLowerCase();
+            if (lower.startsWith("accept:"))
+                return new String[] {"accept", line.substring(7).strip()};
+            if (lower.startsWith("reject:"))
+                return new String[] {"reject", line.substring(7).strip()};
+            Matcher m = BIN_TAG.matcher(line.strip());
+            if (m.matches()) return new String[] {m.group(1), m.group(2)};
+            return new String[] {null, line};
         }
 
         /**
-         * Footer lines beginning with '!' are machine-readable effects, not shown in the embed.
-         * A line prefixed with "accept:"/"reject:" only fires when a {@code !choice} gate is resolved
-         * that way; the tag is preserved on the returned line for {@link LoreEffects} to parse.
+         * Footer lines beginning with '!' are machine-readable effects, not shown in the embed. A line
+         * prefixed with "accept:"/"reject:" only fires when a {@code !choice} gate is resolved that way; a
+         * line prefixed with a numeric range like "2-10:" only fires when a {@code !roll} gate's total lands
+         * in that range. The tag is preserved on the returned line for {@link LoreEffects} to parse.
          */
         public List<String> getEffectLines() {
             List<String> out = new ArrayList<>();
             for (String line : footerText.split("\n")) {
                 String stripped = line.strip();
-                if (CHOICE_MARKER.equalsIgnoreCase(stripped)) continue;
+                if (CHOICE_MARKER.equalsIgnoreCase(stripped)
+                        || ROLL_MARKER.matcher(stripped).matches()) continue;
 
-                String lower = stripped.toLowerCase();
-                String tag = lower.startsWith("accept:") ? "accept:" : lower.startsWith("reject:") ? "reject:" : "";
-                String rest = tag.isEmpty() ? stripped : stripBranchTag(stripped);
+                String[] tagged = splitTag(stripped);
+                String tagPrefix = tagged[0] == null ? "" : tagged[0] + ":";
+                String rest = tagged[1];
 
                 // Support multiple effects on one line: "!tg +2 !fleet +1"
                 for (String segment : rest.split("(?<=\\s)(?=!)")) {
                     String trimmed = segment.strip();
                     if (trimmed.startsWith("!")) {
-                        out.add(tag + trimmed.substring(1).strip());
+                        out.add(tagPrefix + trimmed.substring(1).strip());
                     }
                 }
             }
             return out;
         }
 
-        /** Footer text with the !choice marker and effect lines removed, for display. */
+        /** Footer text with the !choice/!roll markers and effect lines removed, for display. */
         public String getDisplayFooter() {
             StringBuilder sb = new StringBuilder();
             for (String line : footerText.split("\n")) {
                 String stripped = line.strip();
-                if (CHOICE_MARKER.equalsIgnoreCase(stripped)) continue;
-                stripped = stripBranchTag(stripped);
+                if (CHOICE_MARKER.equalsIgnoreCase(stripped)
+                        || ROLL_MARKER.matcher(stripped).matches()) continue;
+                stripped = splitTag(stripped)[1];
 
                 // Strip effect segments from the line (same split as getEffectLines)
                 StringBuilder lineOut = new StringBuilder();
@@ -354,11 +410,17 @@ public final class LoreService {
                 continue;
             }
 
+            String badRoundRange = findBadRoundRange(fields);
+            if (badRoundRange != null) {
+                errors.add(label + " (`" + fields[0].trim() + "`): " + badRoundRange);
+                continue;
+            }
+
             LoreEntry entry = LoreEntry.fromString(raw);
             String rawTarget = fields[0].trim();
             label += " (`" + rawTarget + "`)";
 
-            String validatedTarget = validateLore(rawTarget, entry, validEntries, game);
+            String validatedTarget = validateLore(rawTarget, "", entry, validEntries, game);
             if (validatedTarget == null) {
                 errors.add(label + ": target is not a valid system/planet on this map, or lore/footer text exceeds"
                         + " the length limit");
@@ -404,6 +466,28 @@ public final class LoreService {
         }
     }
 
+    /**
+     * {@code LoreEntry.fromString} silently defaults to unrestricted on a non-numeric or backwards
+     * from/till round field, which would otherwise import the entry with the wrong round gating instead
+     * of flagging the problem. Fields are only present in exports written after round-gating shipped, so
+     * older exports (fields.length <= 8) are untouched — those simply import as unrestricted.
+     */
+    private static String findBadRoundRange(String[] fields) {
+        if (fields.length <= 8) return null;
+        int from;
+        int till;
+        try {
+            from = fields[7].isBlank() ? 0 : Integer.parseInt(fields[7].trim());
+            till = fields[8].isBlank() ? 0 : Integer.parseInt(fields[8].trim());
+        } catch (NumberFormatException e) {
+            return "invalid round range `" + fields[7] + "-" + fields[8] + "`";
+        }
+        if (from > 0 && till > 0 && from > till) {
+            return "round range `" + from + "-" + till + "` has a from-round after its till-round";
+        }
+        return null;
+    }
+
     @ButtonHandler(value = "gmLore", save = false)
     public static void showLoreButtons(GenericInteractionCreateEvent event, String buttonID, Game game) {
         String page = StringUtils.substringAfter(buttonID, "page");
@@ -426,13 +510,15 @@ public final class LoreService {
     private static List<Button> getLoreButtons(Game game) {
         List<Button> loreButtons = new ArrayList<>();
         for (String target : getGameLore(game).keySet()) {
+            TargetKey key = splitTargetKey(target);
             String buttonLabel;
             String emoji;
             boolean isValidLore = true;
 
-            if (PositionMapper.isTilePositionValid(target)) {
-                // System Lore
-                Tile tile = game.getTileByPosition(target);
+            if (PositionMapper.isTilePositionValid(key.base())) {
+                // System Lore — the full stored key (base + tag, e.g. "522#MovedR4to6") is already
+                // self-descriptive, so it's used as-is for the label.
+                Tile tile = game.getTileByPosition(key.base());
                 if (tile == null) isValidLore = false;
 
                 buttonLabel = target;
@@ -441,14 +527,19 @@ public final class LoreService {
                                 && tile.getTileModel().getEmoji() != null
                         ? tile.getTileModel().getEmoji().toString()
                         : null;
+            } else if (isPhaseTarget(key.base())) {
+                // Phase Lore — the stored key ("strategy", "agenda#PhaseEndR3") is self-descriptive.
+                buttonLabel = target;
+                emoji = null;
             } else {
                 // Planet Lore — targets are stored as canonical planet IDs, but resolve aliases defensively
                 // so a button still renders as valid if an entry was ever stored under an alias.
-                String planetId = AliasHandler.resolvePlanet(target);
+                String planetId = AliasHandler.resolvePlanet(key.base());
                 PlanetModel planet = Mapper.getPlanet(planetId);
                 if (!game.getPlanets().contains(planetId)) isValidLore = false;
 
-                buttonLabel = planet == null ? target : planet.getName();
+                String label = planet == null ? key.base() : planet.getName();
+                buttonLabel = key.tag() == null ? label : label + " #" + key.tag();
                 emoji = planet != null && planet.getEmoji() != null
                         ? planet.getEmoji().toString()
                         : null;
@@ -462,6 +553,27 @@ public final class LoreService {
         }
         SortHelper.sortButtonsByTitle(loreButtons);
         return loreButtons;
+    }
+
+    static final char TAG_DELIMITER = '#';
+
+    /** A stored/typed target split into its system-or-planet base and an optional "#tag" disambiguator.
+     *  Package-private: {@link LoreEffects} needs the same split to resolve a tagged entry's tile. */
+    record TargetKey(String base, String tag) {}
+
+    static TargetKey splitTargetKey(String storedOrTyped) {
+        if (storedOrTyped == null) return new TargetKey(null, null);
+        int idx = storedOrTyped.indexOf(TAG_DELIMITER);
+        if (idx < 0) return new TargetKey(storedOrTyped, null);
+        return new TargetKey(storedOrTyped.substring(0, idx), storedOrTyped.substring(idx + 1));
+    }
+
+    /** Resolves the board position for a (possibly "#tag"-suffixed) lore target: itself for system lore,
+     *  or the position of the system containing the underlying planet for planet lore. */
+    private static String resolvePosition(Game game, String target, boolean isSystemLore) {
+        if (isSystemLore) return target;
+        Tile tile = game.getTileFromPlanet(splitTargetKey(target).base());
+        return tile != null ? tile.getPosition() : target;
     }
 
     public static Map<String, LoreEntry> getGameLore(Game game) {
@@ -619,8 +731,12 @@ public final class LoreService {
                 .setRequired(false)
                 .setPlaceholder("!tg +2\n!comms +3\n!ac 2\n!fleet +1\n!plastic red 2 infantry mr\n!token gravityrift")
                 .setMaxLength(FOOTER_TEXT_MAX_LENGTH);
+        TextInput.Builder rounds = TextInput.create("rounds", TextInputStyle.SHORT)
+                .setRequired(false)
+                .setPlaceholder("e.g. 3-6, 4, or blank for any round");
 
         String selections = target.replace("NEW_", "");
+        String originalTarget = "";
         if (!target.startsWith("NEW")) {
             LoreEntry entry = getGameLore(game).get(target);
             position.setValue(entry.target);
@@ -628,22 +744,75 @@ public final class LoreService {
             if (!StringUtils.isBlank(entry.footerText)) {
                 footer.setValue(entry.footerText);
             }
+            String roundRange = formatRoundRange(entry);
+            if (!roundRange.isEmpty()) {
+                rounds.setValue(roundRange);
+            }
+            originalTarget = entry.target;
             selections = entry.receiver + ":" + entry.trigger + ":" + entry.ping + ":" + entry.persistance;
         }
 
-        Modal editLoreModal = Modal.create("gmLoreSave_" + selections, "Add Lore")
+        // originalTarget (may be blank for a brand-new entry) rides along as the modal ID's first field so
+        // saveLoreFromModal can tell "typing the same target back" (an in-place edit) apart from "typing a
+        // target that collides with someone else's entry" (which should auto-tag instead of clobbering it).
+        Modal editLoreModal = Modal.create("gmLoreSave_" + originalTarget + ":" + selections, "Add Lore")
                 .addComponents(
                         Label.of("Target", position.build()),
                         Label.of("Lore (clear to delete)", lore.build()),
-                        Label.of("Other info", footer.build()))
+                        Label.of("Other info", footer.build()),
+                        Label.of("Rounds (optional)", rounds.build()))
                 .build();
         event.replyModal(editLoreModal).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    /** Renders an entry's round bounds back into the "N-M" / "N" / "N-" / "-M" shorthand the modal accepts. */
+    private static String formatRoundRange(LoreEntry entry) {
+        if (entry.fromRound <= 0 && entry.tillRound <= 0) return "";
+        if (entry.fromRound == entry.tillRound) return String.valueOf(entry.fromRound);
+        return (entry.fromRound > 0 ? entry.fromRound : "") + "-" + (entry.tillRound > 0 ? entry.tillRound : "");
+    }
+
+    /**
+     * Parses the "Rounds" modal field ("N", "N-M", "N-", "-M", or blank) onto {@code entry}. Blank means
+     * unrestricted. On anything unparseable, or a from-round after its till-round, leaves the entry
+     * unrestricted and returns a warning describing the problem; returns null when the input was valid.
+     */
+    private static String applyRoundRange(LoreEntry entry, String rawRounds) {
+        entry.fromRound = 0;
+        entry.tillRound = 0;
+        String s = rawRounds == null ? "" : rawRounds.strip();
+        if (s.isEmpty()) return null;
+
+        try {
+            if (s.contains("-")) {
+                String[] parts = s.split("-", 2);
+                entry.fromRound = parts[0].isBlank() ? 0 : Integer.parseInt(parts[0].strip());
+                entry.tillRound = parts[1].isBlank() ? 0 : Integer.parseInt(parts[1].strip());
+            } else {
+                int round = Integer.parseInt(s);
+                entry.fromRound = round;
+                entry.tillRound = round;
+            }
+        } catch (NumberFormatException e) {
+            entry.fromRound = 0;
+            entry.tillRound = 0;
+            return "rounds `" + rawRounds
+                    + "` isn't a valid round or range (e.g. `3-6`, `4`, or blank) — ignored, entry is unrestricted";
+        }
+        if (entry.fromRound > 0 && entry.tillRound > 0 && entry.fromRound > entry.tillRound) {
+            entry.fromRound = 0;
+            entry.tillRound = 0;
+            return "rounds `" + rawRounds + "` has a from-round after its till-round — ignored, entry is unrestricted";
+        }
+        return null;
     }
 
     @ModalHandler("gmLoreSave_")
     public static void saveLoreFromModal(ModalInteractionEvent event, Game game) {
         String[] targets = event.getValue(Constants.POSITION).getAsString().split(",");
-        String[] selectedOptions = event.getModalId().replace("gmLoreSave_", "").split(":");
+        String[] modalIdParts = event.getModalId().replace("gmLoreSave_", "").split(":", 5);
+        String originalTarget = modalIdParts[0];
+        String[] selectedOptions = Arrays.copyOfRange(modalIdParts, 1, modalIdParts.length);
         Map<String, LoreEntry> loreMap = getGameLore(game);
 
         LoreEntry newEntry =
@@ -653,11 +822,13 @@ public final class LoreService {
         newEntry.trigger = TRIGGER.valueOf(selectedOptions[1]);
         newEntry.ping = PING.valueOf(selectedOptions[2]);
         newEntry.persistance = PERSISTANCE.valueOf(selectedOptions[3]);
+        String roundRangeProblem =
+                applyRoundRange(newEntry, event.getValue("rounds").getAsString());
 
         // Validate
         List<String> validTargets = new ArrayList<>();
         for (String s : targets) {
-            String validatedTarget = validateLore(s, newEntry, loreMap, game);
+            String validatedTarget = validateLore(s, originalTarget, newEntry, loreMap, game);
             if (validatedTarget == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), s + " is invalid to save lore");
                 continue;
@@ -678,6 +849,15 @@ public final class LoreService {
             saveLore(game);
         }
 
+        if (roundRangeProblem != null && !validTargets.isEmpty()) {
+            sb.append("\n⚠️ ").append(roundRangeProblem);
+        }
+
+        // validateEffects needs a target on the entry for target-dependent checks (phase-entry warnings);
+        // newEntry itself never got one — only its stored copies did — so borrow the first valid target.
+        if (!validTargets.isEmpty()) {
+            newEntry.target = validTargets.getFirst();
+        }
         List<String> effectProblems = LoreEffects.validateEffects(newEntry, game);
         if (!effectProblems.isEmpty()) {
             sb.append("\n⚠️ Effect warnings (lore still saved; these lines are skipped until fixed):");
@@ -689,11 +869,22 @@ public final class LoreService {
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
 
-    private static String validateLore(
-            String target, LoreEntry loreEntry, Map<String, LoreEntry> savedLoreMap, Game game) {
-        target = target.trim();
+    /**
+     * Package-private for tests.
+     *
+     * @param originalTarget the exact key this save was opened for ("" for a brand-new entry). Typing that
+     *                        same key back is always an in-place edit; typing anything else that collides
+     *                        with a different, already-existing entry auto-tags instead of clobbering it.
+     */
+    static String validateLore(
+            String rawTarget,
+            String originalTarget,
+            LoreEntry loreEntry,
+            Map<String, LoreEntry> savedLoreMap,
+            Game game) {
+        String target = rawTarget.trim();
         if (savedLoreMap.containsKey(target) && StringUtils.isBlank(loreEntry.loreText)) {
-            return target; // Deleting existing lore is always valid
+            return target; // Deleting existing lore (by its exact stored key) is always valid, even if stale
         }
 
         if (loreEntry.loreText.length() > LORE_TEXT_MAX_LENGTH
@@ -701,20 +892,82 @@ public final class LoreService {
             return null; // Too long
         }
 
-        if (PositionMapper.isTilePositionValid(target)) {
-            if (game.getTileByPosition(target) == null) {
+        TargetKey typed = splitTargetKey(target);
+        if (typed.tag() != null
+                && (typed.tag().isEmpty() || !typed.tag().chars().allMatch(Character::isLetterOrDigit))) {
+            return null; // tag must be non-empty and letters/digits only
+        }
+
+        String canonicalBase;
+        if (PositionMapper.isTilePositionValid(typed.base())) {
+            if (game.getTileByPosition(typed.base()) == null) {
                 return null;
             }
-
-            return target;
+            canonicalBase = typed.base();
+        } else if (isPhaseTarget(typed.base())) {
+            // Phase pseudo-target — checked before planet resolution so no planet alias can shadow it.
+            canonicalBase = typed.base().toLowerCase();
         } else {
-            PlanetModel planet = Mapper.getPlanet(AliasHandler.resolvePlanet(target.replace(" ", "")));
+            PlanetModel planet =
+                    Mapper.getPlanet(AliasHandler.resolvePlanet(typed.base().replace(" ", "")));
             if (planet == null || !game.getPlanets().contains(planet.getID())) {
                 return null;
             }
-
-            return planet.getID();
+            canonicalBase = planet.getID();
         }
+
+        // Phase targets pair only with phase triggers and vice versa — a mismatched entry could never
+        // fire (trigger scans match on base AND trigger), so refuse to save the junk state.
+        boolean phaseTrigger = loreEntry.trigger == TRIGGER.PHASE_START || loreEntry.trigger == TRIGGER.PHASE_END;
+        if (isPhaseTarget(canonicalBase) != phaseTrigger) {
+            return null;
+        }
+
+        if (typed.tag() != null) {
+            return canonicalBase + TAG_DELIMITER + typed.tag(); // an explicit tag is respected even if it collides
+        }
+
+        if (canonicalBase.equals(originalTarget) || !savedLoreMap.containsKey(canonicalBase)) {
+            return canonicalBase; // in-place edit of the same entry, or the bare key is free
+        }
+
+        // A bare target collided with a different, already-existing entry — auto-tag instead of clobbering it.
+        return autoTag(canonicalBase, loreEntry, savedLoreMap);
+    }
+
+    /**
+     * Builds a free {@code base#TriggerRoundinfo[N]} key for a bare target that collided with someone
+     * else's entry, so the new entry doesn't silently overwrite it. The tag is derived from the new
+     * entry's trigger and round range so the resulting button reads as self-descriptive without opening it.
+     * Package-private for tests.
+     */
+    static String autoTag(String base, LoreEntry loreEntry, Map<String, LoreEntry> savedLoreMap) {
+        String descriptor = pascalCase(loreEntry.trigger.name()) + roundSuffix(loreEntry);
+        String candidate = base + TAG_DELIMITER + descriptor;
+        for (int n = 2; savedLoreMap.containsKey(candidate); n++) {
+            candidate = base + TAG_DELIMITER + descriptor + n;
+        }
+        return candidate;
+    }
+
+    /** "SPACE_BATTLE" -> "SpaceBattle". Used to build a readable, letters-only auto-tag segment. */
+    private static String pascalCase(String enumName) {
+        StringBuilder sb = new StringBuilder();
+        for (String part : enumName.split("_")) {
+            if (part.isEmpty()) continue;
+            sb.append(Character.toUpperCase(part.charAt(0)))
+                    .append(part.substring(1).toLowerCase());
+        }
+        return sb.toString();
+    }
+
+    /** Renders an entry's round bounds as a short letters+digits tag segment, e.g. "R4to6", "R4plus", "". */
+    private static String roundSuffix(LoreEntry entry) {
+        if (entry.fromRound <= 0 && entry.tillRound <= 0) return "";
+        if (entry.fromRound > 0 && entry.fromRound == entry.tillRound) return "R" + entry.fromRound;
+        if (entry.fromRound > 0 && entry.tillRound > 0) return "R" + entry.fromRound + "to" + entry.tillRound;
+        if (entry.fromRound > 0) return "R" + entry.fromRound + "plus";
+        return "Rupto" + entry.tillRound;
     }
 
     public static void addLoreFromString(String loreString, Game game) {
@@ -775,13 +1028,20 @@ public final class LoreService {
             "of No Known Origin");
 
     private static MessageEmbed buildLoreEmbed(Game game, String target, LoreEntry lore, boolean isSystemLore) {
-        Tile tile = isSystemLore ? game.getTileByPosition(target) : game.getTileFromPlanet(target);
-        PlanetModel planet = isSystemLore ? null : Mapper.getPlanet(target);
+        // Player-facing content always uses the base system/planet — a GM's "#tag" disambiguator is
+        // storage/bookkeeping only and should never leak into what a player actually sees.
+        String base = splitTargetKey(target).base();
+        Tile tile = isSystemLore ? game.getTileByPosition(base) : game.getTileFromPlanet(base);
+        PlanetModel planet = isSystemLore ? null : Mapper.getPlanet(base);
         String titleTile = "of ";
-        if (lore.receiver == RECEIVER.ALL) {
+        if (isPhaseTarget(base)) {
+            // Phases are public knowledge, so the title names the phase even for RECEIVER.ALL —
+            // the anonymous random title exists to hide *where* lore was found, which doesn't apply.
+            titleTile = "of the " + StringUtils.capitalize(base) + " Phase";
+        } else if (lore.receiver == RECEIVER.ALL) {
             titleTile = RandomHelper.pickRandomFromList(UNKNOWN_LORE_TARGETS);
         } else if (isSystemLore && tile != null && tile.getTileModel() != null) {
-            titleTile += target + " - " + tile.getTileModel().getNameNullSafe() + " "
+            titleTile += base + " - " + tile.getTileModel().getNameNullSafe() + " "
                     + tile.getTileModel().getEmoji();
         } else if (planet != null) {
             titleTile += planet.getName() + " " + planet.getEmoji();
@@ -817,9 +1077,192 @@ public final class LoreService {
         return game.isFowMode() || game.isLoreMode();
     }
 
-    private static boolean hasLoreToShow(Game game, String target, TRIGGER trigger) {
-        if (!isLoreEnabled(game)) return false;
-        return getGameLore(game).containsKey(target) && getGameLore(game).get(target).trigger == trigger;
+    /**
+     * Every stored entry whose target shares this base (ignoring any "#tag" disambiguator), matches the
+     * trigger, and is inside its round window. A bare position/planet can now have more than one entry
+     * tagged onto it, so trigger call sites — which only ever know the bare base, never a tag — look up
+     * "everything live here" instead of a single exact key, and {@link #showSystemLore}/{@link
+     * #showPlanetLore} delivers each match independently.
+     */
+    private static List<LoreEntry> matchingEntries(Game game, String base, TRIGGER trigger) {
+        if (!isLoreEnabled(game)) return List.of();
+        int round = game.getRound();
+        List<LoreEntry> matches = new ArrayList<>();
+        for (LoreEntry entry : getGameLore(game).values()) {
+            if (entry.trigger == trigger
+                    && entry.isInRoundRange(round)
+                    && splitTargetKey(entry.target).base().equals(base)) {
+                matches.add(entry);
+            }
+        }
+        return matches;
+    }
+
+    // -------------------------------------------------------------------------------------------------
+    // Phase-triggered lore: entries whose target is a phase pseudo-target (strategy/action/status/agenda)
+    // and whose trigger is PHASE_START/PHASE_END fire on phase transitions, not player actions.
+    // -------------------------------------------------------------------------------------------------
+
+    /** The four phase pseudo-targets. Checked in validateLore BEFORE planet resolution, so no planet
+     *  alias can ever shadow them (verified none collides today). */
+    private static final Set<String> PHASE_TARGETS = Set.of("strategy", "action", "status", "agenda");
+
+    static boolean isPhaseTarget(String base) {
+        return base != null && PHASE_TARGETS.contains(base.toLowerCase());
+    }
+
+    /**
+     * Maps the free-form {@code game.getPhaseOfGame()} strings onto the four phase pseudo-targets:
+     * sub-states collapse ("statusScoring"/"statusHomework" → status, "agendaVoting"/"agendawaiting"/
+     * "agendaEnd" → agenda); setup/draft states ("miltydraft", "playerSetup", blank) return null so no
+     * phase lore ever fires for them.
+     */
+    private static String normalizePhase(String rawPhase) {
+        if (rawPhase == null) return null;
+        String lower = rawPhase.toLowerCase();
+        if (lower.startsWith("status")) return "status";
+        if (lower.startsWith("agenda")) return "agenda";
+        if ("strategy".equals(lower) || "action".equals(lower)) return lower;
+        return null;
+    }
+
+    /**
+     * Fires PHASE_END lore for the phase the game is currently in, then PHASE_START lore for
+     * {@code newPhase}. Call from a phase-start hook BEFORE {@code setPhaseOfGame} overwrites the
+     * previous phase. A re-assertion (the game is already in {@code newPhase}, e.g. a double-clicked
+     * phase button re-entering the start method) fires nothing.
+     *
+     * Not used by the strategy-phase hook: the round number increments during strategy start, so its
+     * ends and start must fire on opposite sides of the increment — it calls {@link #showPhaseEndLore}
+     * and {@link #showPhaseStartLore} separately instead.
+     */
+    public static void showPhaseLore(Game game, String newPhase) {
+        String prev = normalizePhase(game.getPhaseOfGame());
+        String next = normalizePhase(newPhase);
+        if (next != null && next.equals(prev)) return; // re-assertion, not a transition — fire nothing
+        showPhaseEndLore(game, newPhase);
+        showPhaseStartLore(game, newPhase);
+    }
+
+    /**
+     * Fires PHASE_END lore for the game's current phase. {@code phaseAboutToStart} guards re-entry: if
+     * the current phase already normalizes to it, this is a re-assertion, not a transition, and nothing
+     * fires. Call before any round-number mutation so "end of round N" round gates see the round they close.
+     */
+    public static void showPhaseEndLore(Game game, String phaseAboutToStart) {
+        if (!isLoreEnabled(game)) return;
+        String prev = normalizePhase(game.getPhaseOfGame());
+        if (prev == null || prev.equals(normalizePhase(phaseAboutToStart))) return;
+        for (LoreEntry entry : matchingEntries(game, prev, TRIGGER.PHASE_END)) {
+            showPhaseLoreEntry(game, entry);
+        }
+    }
+
+    /** Fires PHASE_START lore for {@code phase}, at most once per phase per round (see below). */
+    public static void showPhaseStartLore(Game game, String phase) {
+        if (!isLoreEnabled(game)) return;
+        String next = normalizePhase(phase);
+        if (next == null) return;
+        List<LoreEntry> matches = matchingEntries(game, next, TRIGGER.PHASE_START);
+        if (matches.isEmpty() || phaseStartAlreadyFiredThisRound(game, next)) return;
+        for (LoreEntry entry : matches) {
+            showPhaseLoreEntry(game, entry);
+        }
+    }
+
+    /**
+     * Round-scoped dedup for PHASE_START: the strategy-start hook can't use the re-assertion guard
+     * (by the time its START fires, {@code phaseOfGame} is already "strategy" on both a first and a
+     * repeated call), so a stored value records which round each phase's start lore last fired in.
+     * Only written when entries actually matched, to avoid bookkeeping in games not using phase lore.
+     */
+    private static boolean phaseStartAlreadyFiredThisRound(Game game, String phase) {
+        String key = "lorePhaseStartFired_" + phase;
+        String round = String.valueOf(game.getRound());
+        if (round.equals(game.getStoredValue(key))) return true;
+        game.setStoredValue(key, round);
+        return false;
+    }
+
+    /**
+     * Routes one matched phase entry: {@code !choice}/{@code !roll} gates get their per-player buttons
+     * (audience only meaningful for RECEIVER.ALL — the placeholder "triggering player" argument is
+     * ignored for that receiver); everything else delivers immediately.
+     */
+    private static void showPhaseLoreEntry(Game game, LoreEntry loreEntry) {
+        if ((loreEntry.isChoiceGated() || loreEntry.isRollGated()) && loreEntry.receiver == RECEIVER.ALL) {
+            List<Player> audience =
+                    game.getRealPlayers().stream().filter(p -> !p.isNpc()).toList();
+            if (!audience.isEmpty()) {
+                if (loreEntry.isChoiceGated()) {
+                    requestChoiceConfirmation(
+                            audience.getFirst(), game, loreEntry.target, true, loreEntry, loreEntry.target);
+                } else {
+                    requestRollConfirmation(
+                            audience.getFirst(), game, loreEntry.target, true, loreEntry, loreEntry.target);
+                }
+                return;
+            }
+        }
+        deliverPhaseLore(game, loreEntry);
+    }
+
+    /**
+     * Playerless delivery for phase lore. Receiver ALL (and everything that isn't GM — validation warns)
+     * announces in the main game channel; GM announces in the GM channel. Map-mutating effect lines fire
+     * exactly once; player-stat lines fan out to every real player so per-player {@code ?conditions} gate
+     * individually. GM receiver grants no player rewards, matching deliverLore's rule.
+     */
+    static void deliverPhaseLore(Game game, LoreEntry loreEntry) {
+        String target = loreEntry.target;
+
+        MessageChannel channel;
+        String ping;
+        if (loreEntry.receiver == RECEIVER.GM) {
+            // getGMChannel searches the guild's channels by name — guard for guildless (test) games.
+            channel = game.getGuild() != null ? GMService.getGMChannel(game) : null;
+            ping = GMService.gmPing(game);
+        } else {
+            channel = game.getMainGameChannel();
+            ping = game.getPing();
+        }
+
+        MessageEmbed embed = buildLoreEmbed(game, target, loreEntry, true);
+        if (channel != null) {
+            MessageHelper.sendMessageToChannelWithEmbed(channel, ping + ", Lore was discovered.", embed);
+        }
+
+        // Map effects need *a* player as context, but validation requires phase entries to spell out
+        // colors and @targets explicitly, so which player carries the context never matters. Prefer the
+        // neutral (Dicecord) player so a forgotten explicit color mutates neutral units, not a random
+        // player's.
+        Player contextPlayer = game.getPlayer(Constants.dicecordId);
+        if (contextPlayer == null && !game.getRealPlayers().isEmpty()) {
+            contextPlayer = game.getRealPlayers().getFirst();
+        }
+        Set<MessageChannel> channels = channel != null ? Set.of(channel) : Set.of();
+        if (contextPlayer != null) {
+            LoreEffects.EffectResults mapResults =
+                    LoreEffects.applyLoreEffectsMapOnly(contextPlayer, game, loreEntry, true, null);
+            reportEffectResults(contextPlayer, game, mapResults, target, channels);
+        }
+
+        if (loreEntry.receiver != RECEIVER.GM) {
+            for (Player p : game.getRealPlayers()) {
+                LoreEffects.EffectResults results =
+                        LoreEffects.applyLoreEffectsPlayerOnly(p, game, loreEntry, true, null);
+                MessageChannel playerChannel = p.getCorrectChannel();
+                reportEffectResults(p, game, results, target, playerChannel != null ? Set.of(playerChannel) : Set.of());
+            }
+        }
+
+        GMService.logActivity(game, "Phase lore fired for " + target, loreEntry.ping == PING.YES);
+
+        // ONCE_PER_PLAYER has no meaning without a triggering player (validation warns) — treat as ONCE.
+        if (loreEntry.persistance != PERSISTANCE.ALWAYS) {
+            getGameLore(game).remove(target);
+            saveLore(game);
+        }
     }
 
     public static void showSpaceBattleLore(Player activePlayer, Game game, String position) {
@@ -834,7 +1277,8 @@ public final class LoreService {
     }
 
     public static void showSystemLore(Player player, Game game, String position, TRIGGER trigger) {
-        if (!hasLoreToShow(game, position, trigger)) return;
+        List<LoreEntry> matches = matchingEntries(game, position, trigger);
+        if (matches.isEmpty()) return;
 
         if (trigger == TRIGGER.SPACE_BATTLE) {
             // Only fire when combat rounds were actually rolled in this system
@@ -847,11 +1291,14 @@ public final class LoreService {
             return;
         }
 
-        showLore(player, game, position, true);
+        for (LoreEntry entry : matches) {
+            showLore(player, game, entry.target, true);
+        }
     }
 
     public static void showPlanetLore(Player player, Game game, String planet, TRIGGER trigger) {
-        if (!hasLoreToShow(game, planet, trigger)) return;
+        List<LoreEntry> matches = matchingEntries(game, planet, trigger);
+        if (matches.isEmpty()) return;
 
         // CONTROLLED requires planet control; MOVED requires units on planet; GROUND_BATTLE has no extra guard
         if (trigger == TRIGGER.CONTROLLED && !player.getPlanets().contains(planet)
@@ -860,7 +1307,9 @@ public final class LoreService {
             return;
         }
 
-        showLore(player, game, planet, false);
+        for (LoreEntry entry : matches) {
+            showLore(player, game, entry.target, false);
+        }
     }
 
     static void showLore(Player player, Game game, String target, boolean isSystemLore) {
@@ -877,13 +1326,7 @@ public final class LoreService {
             return;
         }
 
-        String position = target;
-        if (!isSystemLore) {
-            Tile tile = game.getTileFromPlanet(target);
-            if (tile != null) {
-                position = tile.getPosition();
-            }
-        }
+        String position = resolvePosition(game, target, isSystemLore);
 
         // WINNER/LOSER: ask the player to self-report the outcome rather than inferring it from unit
         // presence (mutual annihilation / early retreat make presence sadly an unreliable proxy). NPCs
@@ -898,6 +1341,11 @@ public final class LoreService {
 
         if (loreEntry.isChoiceGated()) {
             requestChoiceConfirmation(player, game, target, isSystemLore, loreEntry, position);
+            return;
+        }
+
+        if (loreEntry.isRollGated()) {
+            requestRollConfirmation(player, game, target, isSystemLore, loreEntry, position);
             return;
         }
 
@@ -1041,13 +1489,7 @@ public final class LoreService {
 
         addStoredId(game, choiceResolvedKey(target), player.getUserID());
 
-        String position = target;
-        if (!isSystemLore) {
-            Tile tile = game.getTileFromPlanet(target);
-            if (tile != null) {
-                position = tile.getPosition();
-            }
-        }
+        String position = resolvePosition(game, target, isSystemLore);
         deliverChoiceLore(player, game, target, isSystemLore, loreEntry, position, branch);
     }
 
@@ -1130,6 +1572,126 @@ public final class LoreService {
         }
     }
 
+    /** Sends each not-yet-offered recipient their own "Roll NdM" button in their own channel. Reuses the
+     *  same offered/delivered bookkeeping as the choice flow — an entry is only ever choice-gated or
+     *  roll-gated, never both, so there's no risk of the two flows colliding on the same keys. */
+    static void requestRollConfirmation(
+            Player triggeringPlayer,
+            Game game,
+            String target,
+            boolean isSystemLore,
+            LoreEntry loreEntry,
+            String position) {
+        List<Player> audience = computeChoiceAudience(game, loreEntry, triggeringPlayer, position);
+        if (audience.isEmpty()) {
+            // No player audience to offer the roll to (e.g. RECEIVER.GM) — fall back to unconditional delivery.
+            deliverLore(triggeringPlayer, game, target, isSystemLore, loreEntry, position);
+            return;
+        }
+
+        int[] spec = loreEntry.getRollSpec();
+        String scope = isSystemLore ? "sys" : "planet";
+        MessageEmbed embed = buildLoreEmbed(game, target, loreEntry, isSystemLore);
+        Set<String> alreadyOffered = getStoredIdSet(game, choiceOfferedKey(target));
+        Set<String> alreadyDelivered = loreEntry.persistance == PERSISTANCE.ONCE_PER_PLAYER
+                ? getStoredIdSet(game, loreDeliveredKey(target))
+                : Set.of();
+        for (Player p : audience) {
+            if (!p.isRealPlayer() || alreadyOffered.contains(p.getUserID()) || alreadyDelivered.contains(p.getUserID()))
+                continue;
+            String rollId = "loreRoll_" + scope + "_" + p.getUserID() + "_" + target;
+            List<Button> buttons = List.of(Buttons.blue(rollId, "🎲 Roll " + spec[0] + "d" + spec[1]));
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    p.getCorrectChannel(), p.getRepresentationUnfogged() + ", Lore was discovered.", embed);
+            MessageHelper.sendMessageToChannel(
+                    p.getCorrectChannel(), p.getRepresentation() + ", roll the dice to see your reward!", buttons);
+            addStoredId(game, choiceOfferedKey(target), p.getUserID());
+        }
+    }
+
+    @ButtonHandler("loreRoll_")
+    private static void handleRollButton(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        ButtonHelper.deleteMessage(event);
+
+        String[] parts = buttonID.split("_", 4);
+        boolean isSystemLore = "sys".equals(parts[1]);
+        String resolverUserID = parts[2];
+        String target = parts[3];
+
+        if (player == null || !resolverUserID.equals(player.getUserID())) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "This roll isn't yours to make.");
+            return;
+        }
+
+        LoreEntry loreEntry = getGameLore(game).get(target);
+        if (loreEntry == null) return;
+
+        addStoredId(game, choiceResolvedKey(target), player.getUserID());
+
+        int[] spec = loreEntry.getRollSpec();
+        int total = rollDice(spec[0], spec[1]);
+        String branch = LoreEffects.resolveRollBranch(loreEntry.getEffectLines(), total);
+
+        String position = resolvePosition(game, target, isSystemLore);
+        deliverRollLore(player, game, target, isSystemLore, loreEntry, position, total, branch);
+    }
+
+    private static int rollDice(int count, int sides) {
+        int total = 0;
+        for (int i = 0; i < count; i++) {
+            total += ThreadLocalRandom.current().nextInt(1, sides + 1);
+        }
+        return total;
+    }
+
+    /** Delivers (or withholds) lore + its tagged effects to a single resolver based on which bin their roll
+     *  total landed in ({@code branch}, or null if it landed in none of the entry's bins — no reward). */
+    static void deliverRollLore(
+            Player resolver,
+            Game game,
+            String target,
+            boolean isSystemLore,
+            LoreEntry loreEntry,
+            String position,
+            int total,
+            String branch) {
+        MessageChannel channel = resolver.getCorrectChannel();
+        if (branch == null) {
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    resolver.getRepresentationUnfoggedNoPing() + " rolled a " + total + " — no reward this time.");
+        } else {
+            MessageEmbed embed = buildLoreEmbed(game, target, loreEntry, isSystemLore);
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    channel, resolver.getRepresentationUnfogged() + " rolled a " + total + " and struck lore!", embed);
+        }
+
+        // Each audience member resolves independently, but a map-mutating effect line must still apply
+        // exactly once for the whole entry — whichever resolver gets there first triggers it; everyone
+        // after only gets their own copy of the player-stat effects.
+        boolean mapEffectsAlreadyApplied =
+                !game.getStoredValue(choiceMapAppliedKey(target)).isEmpty();
+        LoreEffects.EffectResults results = mapEffectsAlreadyApplied
+                ? LoreEffects.applyLoreEffectsPlayerOnly(resolver, game, loreEntry, isSystemLore, branch)
+                : LoreEffects.applyLoreEffects(resolver, game, loreEntry, isSystemLore, branch);
+        if (!mapEffectsAlreadyApplied) {
+            game.setStoredValue(choiceMapAppliedKey(target), "true");
+        }
+        reportEffectResults(resolver, game, results, position, channel != null ? Set.of(channel) : Set.of());
+
+        GMService.logPlayerActivity(
+                game,
+                resolver,
+                resolver.getRepresentationUnfoggedNoPing() + " rolled " + total + " for a lore roll at " + target,
+                null,
+                loreEntry.ping == PING.YES);
+
+        if (loreEntry.persistance == PERSISTANCE.ONCE_PER_PLAYER) {
+            addStoredId(game, loreDeliveredKey(target), resolver.getUserID());
+        }
+        maybeCompleteChoiceRound(resolver, game, loreEntry, target, position);
+    }
+
     /** Sends the "did you win or lose" buttons; delivery resumes in {@link #handleBattleResultConfirmation}. */
     private static void requestBattleResultConfirmation(Player player, String target, boolean isSystemLore) {
         String scope = isSystemLore ? "sys" : "planet";
@@ -1165,13 +1727,7 @@ public final class LoreService {
             return;
         }
 
-        String position = target;
-        if (!isSystemLore) {
-            Tile tile = game.getTileFromPlanet(target);
-            if (tile != null) {
-                position = tile.getPosition();
-            }
-        }
+        String position = resolvePosition(game, target, isSystemLore);
         deliverLore(player, game, target, isSystemLore, loreEntry, position);
     }
 
@@ -1261,13 +1817,21 @@ public final class LoreService {
         if (!results.mapChanges().isEmpty()) {
             if (game.isFowMode()) {
                 // Each map change pings the system it affected so all players with visibility are notified.
-                // The triggering player is sent directly (pingSystem skips their color in the message).
+                // The triggering player is sent directly too, but only for changes to their own color's
+                // units (or effects with no color, like token/swap) — pingSystem already covers them for
+                // everything else, and only if they actually have visibility on the system. Otherwise a
+                // foreign-color unit change (e.g. neutral units spawned somewhere unseen) would leak straight
+                // to the triggering player regardless of fog of war.
                 MessageChannel privateChannel = player.getPrivateChannel();
                 for (LoreEffects.EffectDescription desc : results.mapChanges()) {
                     String changeMsg = "**Map change from lore:** " + desc.text();
                     String pingPosition = desc.tilePosition() != null ? desc.tilePosition() : position;
                     FoWHelper.pingSystem(game, pingPosition, changeMsg, false);
-                    if (privateChannel != null) MessageHelper.sendMessageToChannel(privateChannel, changeMsg);
+                    boolean tellTriggeringPlayer =
+                            desc.unitColor() == null || desc.unitColor().equalsIgnoreCase(player.getColor());
+                    if (tellTriggeringPlayer && privateChannel != null) {
+                        MessageHelper.sendMessageToChannel(privateChannel, changeMsg);
+                    }
                     GMService.postToActivityThread(game, changeMsg);
                 }
                 // Board changed — drop a fresh GM-view map into the activity thread.
