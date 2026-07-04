@@ -66,5 +66,39 @@
         "abilityText": "Return the promissory note or component action card you used to your hand instead of returning it to its assigned player or discard pile, then purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "luminous"
+    },
+    {
+        "id": "opaagent",
+        "faction": "opa",
+        "type": "agent",
+        "name": "Anderson Dawes",
+        "title": "Demang",
+        "abilityWindow": "When you activate a system:",
+        "abilityText": "You may exhaust this card to explore 1 planet in that system that contains 1 or more of your units.",
+        "unlockCondition": "Always Unlocked",
+        "source": "luminous"
+    },
+    {
+        "id": "opacommander",
+        "faction": "opa",
+        "type": "commander",
+        "name": "Camina Drummer",
+        "title": "Zakomang",
+        "abilityWindow": "At any time",
+        "abilityText": "All borken planet cards you control gain the Space Cannon 5 ability.",
+        "unlockCondition": "Control 2 borken planet cards.",
+        "source": "luminous"
+    },
+    {
+        "id": "opahero",
+        "faction": "opa",
+        "type": "hero",
+        "name": "Frederick Johnson",
+        "title": "Bosmang Kapawu of Tyco Station",
+        "abilityName": "Thing - Descriptor",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Choose 1 non-home planet other than Mecatol Rex in a system that is adjacent to or in a system that contains your flagship; destroy all units on that planet and purge it's attachments and it's planet card. Then, place the destroyed planet token on that planet and purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "luminous"
     }
 ]

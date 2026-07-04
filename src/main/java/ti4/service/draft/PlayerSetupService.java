@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.luminous.opa.OpaAbilitiesHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -410,6 +411,10 @@ public class PlayerSetupService {
                     player.getCorrectChannel(),
                     "Set mech unit maximum to 6 for " + player.getRepresentation()
                             + ", due to their **Machine Cult** ability.");
+        }
+        if (player.hasAbility("occupational_hazard")) {
+            game.setStoredValue("opaBelterWayResolved", "");
+            OpaAbilitiesHandler.offerOccupationalHazardButtons(game, player);
         }
         if (game.isAgeOfFightersMode()) {
             String tech = "ff2";

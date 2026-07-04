@@ -58,5 +58,28 @@
         "faction": "psm",
         "permanentEffect": "When scoring objectives you may treat each structure you control as if it is on its own separate planet for the purposes of scoring objectives.",
         "source": "luminous"
+    },
+    {
+        "id": "occupational_hazard",
+        "name": "Occupational Hazard",
+        "faction": "opa",
+        "window": "At the start of the game:",
+        "windowEffect": "You may replace 1 anomaly system tile, that does not contain a planet, with an asteroid field anomaly system tile.",
+        "source": "luminous"
+    },
+    {
+        "id": "the_belter_way",
+        "name": "The Belter Way",
+        "faction": "opa",
+        "window": "At the start of the game:",
+        "windowEffect": "Place a broken planet token in each system that is an asteroid field anomaly.",
+        "source": "luminous"
+    },
+    {
+        "id": "opa_one_people",
+        "name": "One People",
+        "faction": "opa",
+        "permanentEffect": "Whenever another player gains control of a broken planet, you and that player each gain 1 tg.",
+        "source": "luminous"
     }
 ]
