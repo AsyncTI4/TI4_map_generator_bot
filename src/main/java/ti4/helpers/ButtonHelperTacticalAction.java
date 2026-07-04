@@ -29,6 +29,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperPromissories;
 import ti4.image.Mapper;
+import ti4.json.JsonMapperManager;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -48,8 +49,10 @@ import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameSubEvent;
 
 public final class ButtonHelperTacticalAction {
 
@@ -420,6 +423,7 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
         DreamButtonHandler.clearDreamAgentAnomaly(game);
+        GameEventDraft.clear(game);
 
         game.getTacticalActionDisplacement().clear();
     }
@@ -430,6 +434,12 @@ public final class ButtonHelperTacticalAction {
         addIfNotEmpty(payload, "planetsTaken", game.getStoredValue("planetsTakenThisRound"));
         addIfNotEmpty(payload, "combat", game.getStoredValue("factionsInCombat"));
         addIfNotEmpty(payload, "summary", game.getStoredValue("currentActionSummary" + player.getFaction()));
+        List<GameSubEvent> subEvents = GameEventDraft.drain(game);
+        if (!subEvents.isEmpty()) {
+            // Embed as a pre-typed JsonNode: serializing the list inside the Object-valued payload map would otherwise
+            // drop the polymorphic "type" discriminator that the frontend relies on.
+            payload.put("subEvents", JsonMapperManager.basic().readTree(GameEventDraft.serialize(subEvents)));
+        }
         GameEventService.commit(game, GameEventType.TACTICAL_ACTION, player, payload);
     }
 
@@ -587,6 +597,7 @@ public final class ButtonHelperTacticalAction {
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Activated "
                         + tile.getRepresentationForButtons(game, player) + ".");
+        GameEventDraft.open(game);
         if ((game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander") || player.hasTech("tf-starbasewebway"))
                 && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
                         .contains(tile)) {

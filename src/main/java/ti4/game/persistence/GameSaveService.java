@@ -424,6 +424,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.EVENT_SEQUENCE_COUNTER + " " + game.getEventSequenceCounter());
         writer.write(System.lineSeparator());
+        writer.write(Constants.PENDING_SUB_EVENTS_JSON + " " + game.getPendingSubEventsJson());
+        writer.write(System.lineSeparator());
         writer.write(Constants.GAME_CUSTOM_NAME + " " + game.getCustomName());
         writer.write(System.lineSeparator());
 

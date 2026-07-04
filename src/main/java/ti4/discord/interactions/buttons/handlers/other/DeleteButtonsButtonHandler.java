@@ -1,6 +1,7 @@
 package ti4.discord.interactions.buttons.handlers.other;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
@@ -40,6 +41,10 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.LoreService;
 import ti4.service.turn.StartTurnService;
+import ti4.spring.service.gameevent.GameEventDraft;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameSubEvent;
 
 @UtilityClass
 class DeleteButtonsButtonHandler {
@@ -180,6 +185,28 @@ class DeleteButtonsButtonHandler {
                 TheIconService.checkAndSendIconButton(event, game, player, buttonID);
                 EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
                 int cost = Helper.calculateCostOfProducedUnits(player, game, true);
+                Map<String, Integer> unitsMap = new HashMap<>();
+                for (Map.Entry<String, Integer> entry :
+                        player.getCurrentProducedUnits().entrySet()) {
+                    String unitId = entry.getKey().split("_")[0];
+                    unitsMap.merge(unitId, entry.getValue(), Integer::sum);
+                }
+                // Only tactical-action builds belong to the tactical draft; the draft is game-global, so an
+                // unscoped stage would swallow other players' warfare/construction builds into the active
+                // player's tactical action.
+                if (buttonID.contains("tacticalAction")) {
+                    GameSubEvent.Production produced =
+                            new GameSubEvent.Production(tile == null ? null : tile.getPosition(), unitsMap, cost);
+                    if (!GameEventDraft.stage(game, produced)) {
+                        Map<String, Object> payload = new HashMap<>();
+                        if (produced.tile() != null) {
+                            payload.put("tile", produced.tile());
+                        }
+                        payload.put("units", produced.units());
+                        payload.put("cost", produced.cost());
+                        GameEventService.commit(game, GameEventType.PRODUCTION, player, payload);
+                    }
+                }
                 game.setStoredValue("producedUnitCostFor" + player.getFaction(), "" + cost);
                 player.setTotalExpenses(
                         player.getTotalExpenses() + Helper.calculateCostOfProducedUnits(player, game, true));

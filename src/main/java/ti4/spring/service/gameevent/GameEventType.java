@@ -21,4 +21,8 @@ public class GameEventType {
     public static final String AGENDA_RESOLVED = "AGENDA_RESOLVED";
     public static final String TRANSACTION = "TRANSACTION";
     public static final String GAME_ENDED = "GAME_ENDED";
+    public static final String PRODUCTION = "PRODUCTION";
+    public static final String MANUAL_COMMAND = "MANUAL_COMMAND";
+    public static final String PHASE_STARTED = "PHASE_STARTED";
+    public static final String ROUND_STARTED = "ROUND_STARTED";
 }
