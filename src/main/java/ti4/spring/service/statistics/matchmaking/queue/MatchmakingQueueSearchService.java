@@ -28,9 +28,7 @@ public class MatchmakingQueueSearchService {
     @Transactional
     public void register(String threadId, String messageId, PlayerSearchCriteria criteria) {
         if (DatabasePersistenceGate.isDisabled()) return;
-        // Upsert: re-pressing the button replaces the previous criteria for this thread rather than duplicating.
-        repository.deleteByThreadId(threadId);
-        MatchmakingQueueSearch search = new MatchmakingQueueSearch();
+        MatchmakingQueueSearch search = repository.findByThreadId(threadId).orElseGet(MatchmakingQueueSearch::new);
         search.setThreadId(threadId);
         search.setMessageId(messageId);
         search.setPlayerCounts(join(criteria.playerCounts()));
