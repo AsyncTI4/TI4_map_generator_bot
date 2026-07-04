@@ -10,6 +10,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -17,12 +18,10 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.Source.ComponentSource;
-import ti4.model.SpaceTokenModel;
 import ti4.model.TileModel;
 import ti4.service.map.AddTileService;
 import ti4.service.planet.AddPlanetService;
@@ -197,19 +196,7 @@ public class OpaAbilitiesHandler {
         if (tile == null || tile.getUnitHolderFromPlanet(planetName) != null) {
             return;
         }
-
-        SpaceTokenModel tokenModel = Mapper.getSpaceToken(planetName);
-        if (tokenModel == null) {
-            MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Could not find space token model for " + planetName + ".");
-            return;
-        }
-
-        String tokenFileName = tokenModel.getFileName();
-        if (!tile.getSpaceUnitHolder().getTokenList().contains(tokenFileName)) {
-            tile.addToken(tokenFileName, Constants.SPACE);
-        }
-        Helper.addTokenPlanetToTile(game, tile, planetName);
+        AddTokenCommand.addToken(null, tile, planetName, game);
     }
 
     private static boolean tileHasAnyBrokenPlanet(Tile tile) {
