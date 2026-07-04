@@ -36,9 +36,9 @@ public class CreateGameLaunchPostService {
         buttons.add(Buttons.red("leaveGameList", "Leave Game"));
         buttons.add(Buttons.gray("editPlayers~MDL", "Add Players"));
         buttons.add(Buttons.gray("removePlayers~MDL", "Remove Players"));
-        buttons.add(Buttons.gray("addSillyName~MDL", "Add Fun Game Name"));
         buttons.add(Buttons.gray("searchForPlayers~MDL", "Search for Players"));
         buttons.add(Buttons.blue("launchGame", "Launch Game"));
+        buttons.add(Buttons.gray("addSillyName~MDL", "Add Fun Game Name"));
 
         String message =
                 CREATE_GAME_FLOW_MESSAGE + CreateGameButtonHandler.generateMemberListMessage(members, gameFunName);
