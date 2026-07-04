@@ -66,7 +66,7 @@ public class WebCardPool {
                     .filter(so -> !scoredSecrets.contains(so))
                     .collect(Collectors.toList());
         }
-        cardPool.secretObjectiveDeck = shuffledCopy(unscoredSecrets);
+        cardPool.secretObjectiveDeck = sortedCopy(unscoredSecrets);
         cardPool.secretObjectiveFullDeckSize = game.getSecretObjectiveFullDeckSize();
 
         // Action Cards
@@ -76,37 +76,39 @@ public class WebCardPool {
         cardPool.actionCardFullDeckSize = game.getActionCardFullDeckSize();
 
         // Exploration Cards
-        cardPool.culturalExploreDeck = shuffledCopy(game.getExploreDeck(Constants.CULTURAL));
+        cardPool.culturalExploreDeck = sortedCopy(game.getExploreDeck(Constants.CULTURAL));
         cardPool.culturalExploreDiscard = new ArrayList<>(game.getExploreDiscard(Constants.CULTURAL));
         cardPool.culturalExploreFullDeckSize = game.getCulturalExploreFullDeckSize();
 
-        cardPool.industrialExploreDeck = shuffledCopy(game.getExploreDeck(Constants.INDUSTRIAL));
+        cardPool.industrialExploreDeck = sortedCopy(game.getExploreDeck(Constants.INDUSTRIAL));
         cardPool.industrialExploreDiscard = new ArrayList<>(game.getExploreDiscard(Constants.INDUSTRIAL));
         cardPool.industrialExploreFullDeckSize = game.getIndustrialExploreFullDeckSize();
 
-        cardPool.hazardousExploreDeck = shuffledCopy(game.getExploreDeck(Constants.HAZARDOUS));
+        cardPool.hazardousExploreDeck = sortedCopy(game.getExploreDeck(Constants.HAZARDOUS));
         cardPool.hazardousExploreDiscard = new ArrayList<>(game.getExploreDiscard(Constants.HAZARDOUS));
         cardPool.hazardousExploreFullDeckSize = game.getHazardousExploreFullDeckSize();
 
-        cardPool.frontierExploreDeck = shuffledCopy(game.getExploreDeck(Constants.FRONTIER));
+        cardPool.frontierExploreDeck = sortedCopy(game.getExploreDeck(Constants.FRONTIER));
         cardPool.frontierExploreDiscard = new ArrayList<>(game.getExploreDiscard(Constants.FRONTIER));
         cardPool.frontierExploreFullDeckSize = game.getFrontierExploreFullDeckSize();
 
         // Relics
-        cardPool.relicDeck = shuffledCopy(game.getAllRelics());
+        cardPool.relicDeck = sortedCopy(game.getAllRelics());
         cardPool.relicFullDeckSize = game.getRelicFullDeckSize();
 
         // Agendas
-        cardPool.agendaDeck = shuffledCopy(game.getAgendas());
+        cardPool.agendaDeck = sortedCopy(game.getAgendas());
         cardPool.agendaDiscard = new ArrayList<>(game.getDiscardAgendas().keySet());
         cardPool.agendaFullDeckSize = game.getAgendaFullDeckSize();
 
         return cardPool;
     }
 
-    private static List<String> shuffledCopy(List<String> cards) {
-        List<String> shuffled = new ArrayList<>(cards);
-        Collections.shuffle(shuffled);
-        return shuffled;
+    // Sorted to conceal true deck order while keeping the payload deterministic,
+    // so state diffs only fire when the pool contents actually change.
+    private static List<String> sortedCopy(List<String> cards) {
+        List<String> sorted = new ArrayList<>(cards);
+        Collections.sort(sorted);
+        return sorted;
     }
 }

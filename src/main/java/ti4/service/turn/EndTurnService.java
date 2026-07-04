@@ -3,6 +3,7 @@ package ti4.service.turn;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
@@ -10,9 +11,10 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.PhantomEnergyHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -20,6 +22,7 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.thundersedge.TeHelperGeneral;
@@ -32,6 +35,8 @@ import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.PlayHeroService;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class EndTurnService {
@@ -53,6 +58,13 @@ public class EndTurnService {
     }
 
     public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (StringUtils.isNotEmpty(game.getCurrentActiveSystem())
+                && game.getStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED)
+                        .isEmpty()) {
+            ButtonHelperTacticalAction.logTacticalAction(game, player);
+        }
+        game.removeStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED);
+        GameEventService.commit(game, GameEventType.TURN, player, Map.of("passed", false));
         pingNextPlayer(event, game, player);
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
         if (!game.isFowMode()) {
@@ -70,7 +82,7 @@ public class EndTurnService {
 
     private static void resetStoredValuesEndOfTurn(Game game, Player player) {
         if (player.hasAbility("phantom_energy")) {
-            PhantomEnergyHandler.cleanupEndOfTurn(game, player);
+            TyrisAbilityHandler.cleanupPhantomEnergy(game, player);
         }
         game.removeStoredValue("fortuneSeekers");
         game.setStoredValue("lawsDisabled", "no");

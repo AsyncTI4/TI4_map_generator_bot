@@ -2,6 +2,7 @@ package ti4.helpers.thundersedge;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -18,11 +19,14 @@ import ti4.service.breakthrough.ResonanceGeneratorService;
 import ti4.service.breakthrough.TheIconService;
 import ti4.service.breakthrough.VaultsOfTheHeirService;
 import ti4.service.breakthrough.VisionariaSelectService;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class TeHelperBreakthroughs {
     public static boolean handleBreakthroughExhaust(
             GenericInteractionCreateEvent event, Game game, Player player, String breakthroughID) {
+        GameEventService.commit(game, GameEventType.CARD_PLAY_BREAKTHROUGH, player, Map.of("cardId", breakthroughID));
         switch (breakthroughID) {
             case "arvaxibt" -> ArvaxiBreakthroughHandler.postInitialButtons(event, game, player);
             case "arborecbt" -> PsychosporeService.postInitialButtons(event, game, player);

@@ -41,7 +41,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
@@ -1006,8 +1006,17 @@ public class CombatRollService {
         }
         StringBuilder resultBuilder = new StringBuilder(result);
         boolean metaliVoidCounted = false;
-        boolean unitUndecided = game.getStoredValue("highestValueSingleUnit" + player.getFaction())
-                .isEmpty();
+        String highestValueSingleUnitKey = "highestValueSingleUnit" + player.getFaction();
+        String storedHighestValueUnit = game.getStoredValue(highestValueSingleUnitKey);
+        boolean unitUndecided = storedHighestValueUnit.isEmpty()
+                || playerUnits.keySet().stream()
+                        .noneMatch(k -> k.getLeft().getAsyncId().equalsIgnoreCase(storedHighestValueUnit));
+        if (!storedHighestValueUnit.isEmpty() && unitUndecided) {
+            // A manual Gravleash/Supercharge choice (chooseGravleash_) that isn't part of this combat
+            // round - wrong tile, or the chosen unit has since died/retreated - would otherwise block
+            // auto-pick forever, since this flag never becomes true again once set.
+            game.removeStoredValue(highestValueSingleUnitKey);
+        }
         if (rollType == CombatRollType.combatround
                 && (player.hasTech("tf-supercharge")
                         || (player.hasUnlockedBreakthrough("letnevbt")
@@ -2267,7 +2276,7 @@ public class CombatRollService {
         output.forEach((k, v) -> flatOutput.merge(k.getLeft(), v, Integer::sum));
         checkBadUnits(player, event, unitsByAsyncId, flatOutput);
         if (player.getGame() != null && player.getGame().playerHasLeaderUnlockedOrAlliance(player, "kaloracommander")) {
-            KaloraCommanderHandler.addCommanderBombardmentUnits(player, tile, output);
+            KaloraLeaderHandler.addCommanderBombardmentUnits(player, tile, output);
         }
         return output;
     }
@@ -2395,7 +2404,7 @@ public class CombatRollService {
                 boolean spaceStation =
                         (player.hasUnlockedBreakthrough("gledgebt") || player.hasTech("tf-mantlecracking"))
                                 && planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG);
-                if ((planet.isSpaceStation() || spaceStation)
+                if ((planet.isSpaceStation(game) || spaceStation)
                         && player.getPlanets().contains(planet.getName())) {
                     if (player.hasUnlockedBreakthrough("gledgebt")) {
                         UnitModel planetFakeUnit = new UnitModel();

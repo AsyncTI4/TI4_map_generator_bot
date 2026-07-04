@@ -106,6 +106,12 @@ public final class Constants {
     public static final String ALLIANCE_MODE = "alliance_mode";
     public static final String FOW_MODE = "fow_mode";
     public static final String AVERNUS = "avernus";
+    public static final String BROKENPLANET1 = "brokenplanet1";
+    public static final String BROKENPLANET2 = "brokenplanet2";
+    public static final String BROKENPLANET3 = "brokenplanet3";
+    public static final String BROKENPLANET4 = "brokenplanet4";
+    public static final String BROKENPLANET5 = "brokenplanet5";
+    public static final String BROKENPLANET6 = "brokenplanet6";
     public static final String FOW_OPTIONS = "fow_options";
     public static final String BASE_GAME_MODE = "base_game_mode";
     public static final String THUNDERS_EDGE_MODE = "thunders_edge_mode";
@@ -116,6 +122,8 @@ public final class Constants {
     public static final String HOMEBREW_SC_MODE = "homebrew_sc_mode";
     public static final String SPIN_MODE = "spin_mode";
     public static final String BUTTON_PRESS_COUNT = "button_press_count";
+    public static final String EVENT_SEQUENCE_COUNTER = "event_sequence_counter";
+    public static final String PENDING_SUB_EVENTS_JSON = "pending_sub_events_json";
     public static final String ABSOL_MODE = "absol_mode";
     public static final String PROMISES_PROMISES = "promises_promises";
     public static final String FLAGSHIPPING = "flagshipping";
@@ -419,8 +427,20 @@ public final class Constants {
     private static final String CRADLE = "cradle";
     private static final String ILLUSION = "illusion";
     private static final String PHANTASM = "phantasm";
-    public static final List<String> TOKEN_PLANETS =
-            List.of(MIRAGE, OASIS, CRADLE, ILLUSION, PHANTASM, AVERNUS, THUNDERSEDGE);
+    public static final List<String> TOKEN_PLANETS = List.of(
+            MIRAGE,
+            OASIS,
+            CRADLE,
+            ILLUSION,
+            PHANTASM,
+            AVERNUS,
+            THUNDERSEDGE,
+            BROKENPLANET1,
+            BROKENPLANET2,
+            BROKENPLANET3,
+            BROKENPLANET4,
+            BROKENPLANET5,
+            BROKENPLANET6);
 
     public static final String FRONTIER = "frontier";
 

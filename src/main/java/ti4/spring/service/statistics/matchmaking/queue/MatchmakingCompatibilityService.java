@@ -17,6 +17,10 @@ class MatchmakingCompatibilityService {
 
     private static final int HOURS_TO_AVOID_FLOATERS_WARRIORS = 8;
 
+    static boolean hasEnoughActiveHourDataToMatch(PlayerMatchmakingData data) {
+        return data.activeHourBuckets().size() >= ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT;
+    }
+
     static boolean areIncompatible(PlayerMatchmakingData a, PlayerMatchmakingData b) {
         if (a.avoidList().contains(b.userId()) || b.avoidList().contains(a.userId())) {
             return true;

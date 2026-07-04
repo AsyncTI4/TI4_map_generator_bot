@@ -62,7 +62,7 @@ class YinHeroButtonHandler {
             for (Tile tile : game.getTileMap().values()) {
                 for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                     if (unitHolder instanceof Planet planet) {
-                        if (planet.isSpaceStation()) {
+                        if (planet.isSpaceStation(game)) {
                             continue;
                         }
                         boolean owned = false;

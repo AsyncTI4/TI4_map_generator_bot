@@ -93,5 +93,50 @@
         ],
         "complexity": "Medium",
         "source": "luminous"
+    },
+    {
+        "alias": "opa",
+        "factionName": "The Outer Planets Alliance",
+        "homeSystem": "lu3",
+        "startingFleet": "1 cv, 1 cr, 1 ff, 3 inf e, 1 sd e, 1 pds e",
+        "commodities": 2,
+        "factionTech": [
+            "luopar",
+            "luopacv"
+        ],
+        "startingTech": [
+            "amd",
+            "sar"
+        ],
+        "homePlanets": [
+            "eros"
+        ],
+        "abilities": [
+            "occupational_hazard",
+            "the_belter_way",
+            "opa_one_people"
+        ],
+        "leaders": [
+            "opaagent",
+            "opacommander",
+            "opahero"
+        ],
+        "promissoryNotes": [
+            "lupnopa"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "opa_carrier",
+            "dreadnought",
+            "opa_flagship",
+            "infantry",
+            "opa_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "luminous"
     }
 ]
