@@ -16,7 +16,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
 
 @UtilityClass
-public class TyrisCommanderHandler {
+public class TyrisLeaderHandler {
 
     public static void resolveMechAction(Player player, Game game, ButtonInteractionEvent event) {
         String successMessage = player.getFactionEmoji()
@@ -56,6 +56,25 @@ public class TyrisCommanderHandler {
                 player.getRepresentationUnfogged()
                         + " you may use Chrono-Tactician Xelthar to place 1 "
                         + UnitEmojis.infantry + " infantry on a planet you control.",
+                buttons);
+    }
+
+    public static boolean isHeroActiveThisRound(Game game, Player player) {
+        return !game.getStoredValue("tyrisHeroRound" + game.getRound() + "_" + player.getFaction())
+                .isEmpty();
+    }
+
+    public static void offerHeroAtStartOfTurn(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green(
+                player.factionButtonChecker() + "leader_tyrishero",
+                "Use Fatebreaker Azhurak (Unlimited Actions)",
+                FactionEmojis.tyris));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged()
+                        + ", you may use Fatebreaker Azhurak at the start of this turn for unlimited actions.",
                 buttons);
     }
 }

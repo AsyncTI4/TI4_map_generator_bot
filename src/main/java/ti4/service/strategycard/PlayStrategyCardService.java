@@ -17,7 +17,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -467,7 +467,7 @@ public class PlayStrategyCardService {
                 OnyxxaBreakthroughHandler.offerSCRollButton(game, p);
             }
             if (p != player && !p.hasLeaderUnlocked("onyxxacommander") && p.hasLeader("onyxxacommander")) {
-                OnyxxaCommanderHandler.offerCommanderUnlockButton(p);
+                OnyxxaLeaderHandler.offerCommanderUnlockButton(p);
             }
         }
         if (scModel.usesAutomationForSCID("anarchy8")) {

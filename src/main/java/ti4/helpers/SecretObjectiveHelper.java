@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumLeaderHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -246,7 +246,7 @@ public class SecretObjectiveHelper {
         }
         CommanderUnlockCheckService.checkPlayer(player, "nomad");
         if (game.playerHasLeaderUnlockedOrAlliance(player, "lunariumcommander")) {
-            LunariumCommanderHandler.drawSO(event, game, player);
+            LunariumLeaderHandler.drawSO(event, game, player);
         }
         return Helper.checkEndGame(game, player);
     }

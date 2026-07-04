@@ -679,7 +679,10 @@ public class PromissoryNoteHelper {
         if ("bepnta".equalsIgnoreCase(id)) {
             TaPromissoryHandler.offerAdvancedStructuralEngineeringButtons(event, player, game);
         }
-        if (pn.getText().toLowerCase().contains("action:") && !"acq".equalsIgnoreCase(id)) {
+
+        // These PNs' text contains "action:" but describe a trigger on another player's action
+        List<String> actionTextPNsNotOwnAction = List.of("acq", "bapnconc");
+        if (pn.getText().toLowerCase().contains("action:") && !actionTextPNsNotOwnAction.contains(id)) {
             ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
             game.setStoredValue(
                     "currentActionSummary" + player.getFaction(),

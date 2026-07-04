@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
+import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -16,18 +17,20 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.CommandCounterHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.leader.PlayHeroService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 
 @UtilityClass
-public class ZephyrionAgentHandler {
+public class ZephyrionLeaderHandler {
 
-    public static void postInitialButtons(Game game, Player player) {
+    public static void postAgentTargetButtons(Game game, Player player) {
         List<String> bounties = ZephyrionBountyHandler.getBountiesForPlayer(game);
         List<Button> buttons = new ArrayList<>();
         for (Player otherPlayer : game.getRealPlayersExcludingThis(player)) {
@@ -219,5 +222,45 @@ public class ZephyrionAgentHandler {
             buttons.add(Buttons.gray("deleteButtons", "Done"));
             MessageHelper.editMessageButtons(event, buttons);
         }
+    }
+
+    @ButtonHandler("zephHeroRes_")
+    public static void resolveZephyrionHero(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        buttonID = buttonID.replace("zephHeroRes_", "");
+        String unitTypeString = buttonID.split("_")[1].toLowerCase();
+
+        Leader hero = player.getLeader("zephyrionhero").orElse(null);
+        if (hero == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " could not find Monturak Homotol, the Zephyrion hero. Please resolve manually.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        PlayHeroService.removeLeader(game, player, hero);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + " resolved Monturak Homotol, the Zephyrion hero. Monturak Homotol has been purged.");
+
+        if ("flagship".equalsIgnoreCase(unitTypeString) || "warsun".equalsIgnoreCase(unitTypeString)) {
+            Integer poIndex = game.addCustomPO("Zephyrion Hero", 1);
+            game.scorePublicObjective(player.getUserID(), poIndex);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " destroyed a " + StringUtils.capitalize(unitTypeString)
+                            + " with a bounty token and gained 1 victory point.");
+        } else {
+            List<Button> buttons = Helper.getTileWithShipsPlaceUnitButtons(player, game, unitTypeString, "place");
+            buttons.add(Buttons.red("deleteButtons", "Done"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", use the buttons to place " + StringUtils.capitalize(unitTypeString)
+                            + "s in systems that contain your ships.",
+                    buttons);
+        }
+
+        ButtonHelper.deleteMessage(event);
     }
 }
