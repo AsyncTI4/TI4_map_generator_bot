@@ -54,8 +54,10 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameSubEvent;
 
 @UtilityClass
 public class ActionCardHelper {
@@ -753,8 +755,14 @@ public class ActionCardHelper {
             }
         }
         recordTrackedActionCardPlay(game, player, actionCardTitle);
-        GameEventService.commit(
-                game, GameEventType.CARD_PLAY_ACTION_CARD, player, Map.of("cardId", acID, "cardName", actionCardTitle));
+        if (!GameEventDraft.stage(
+                game, new GameSubEvent.ActionCardPlayed(player.getFaction(), acID, actionCardTitle))) {
+            GameEventService.commit(
+                    game,
+                    GameEventType.CARD_PLAY_ACTION_CARD,
+                    player,
+                    Map.of("cardId", acID, "cardName", actionCardTitle));
+        }
 
         boolean hasUnyieldingWill = player.hasTech("baarvag");
         boolean actionCardIsCancelable = isActionCardCancelable(actionCard) && !twinned && !hasUnyieldingWill;

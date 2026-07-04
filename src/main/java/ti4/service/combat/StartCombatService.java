@@ -72,6 +72,8 @@ import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.gameevent.GameEventDraft;
+import ti4.spring.service.gameevent.GameSubEvent;
 
 @UtilityClass
 public class StartCombatService {
@@ -183,7 +185,10 @@ public class StartCombatService {
             game.setStoredValue(
                     "currentActionSummary" + player.getFaction(),
                     game.getStoredValue("currentActionSummary" + player.getFaction()) + " Had a space combat in "
-                            + tile.getRepresentationForButtons() + " against " + player2.getFactionEmoji() + ".");
+                            + tile.getRepresentationForButtons() + " against " + player2.getFactionNameOrColor()
+                            + ".");
+            GameEventDraft.stage(
+                    game, new GameSubEvent.Combat("space", tile.getPosition(), null, player2.getFaction()));
             return;
         }
         findOrCreateCombatThread(
@@ -224,7 +229,10 @@ public class StartCombatService {
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Had a ground combat on "
                         + Helper.getPlanetRepresentation(unitHolder.getName(), game) + " against "
-                        + player2.getFactionEmoji() + ".");
+                        + player2.getFactionNameOrColor() + ".");
+        GameEventDraft.stage(
+                game,
+                new GameSubEvent.Combat("ground", tile.getPosition(), unitHolder.getName(), player2.getFaction()));
         if (!game.isFowMode()) {
             findOrCreateCombatThread(
                     game,
