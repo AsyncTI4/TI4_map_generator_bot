@@ -51,6 +51,8 @@ import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.planet.EronousPlanetService;
 import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public final class StatusHelper {
@@ -155,6 +157,7 @@ public final class StatusHelper {
 
     public static void beginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
         game.setPhaseOfGame("statusScoring");
+        GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "status"));
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
         GMService.logActivity(game, "**StatusScoring** Phase for Round " + game.getRound() + " started.", true);
         for (Player player : game.getRealPlayers()) {

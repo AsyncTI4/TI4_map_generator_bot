@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -74,6 +75,8 @@ import ti4.service.planet.PlanetService;
 import ti4.service.strategycard.PickStrategyCardService;
 import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class StartPhaseService {
@@ -85,6 +88,7 @@ public class StartPhaseService {
             case "shuffleDecks" -> game.shuffleDecks();
             case "agenda" -> {
                 game.setPhaseOfGame("agenda");
+                GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "agenda"));
                 Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
                 List<Button> buttons = List.of(flipAgenda);
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -243,6 +247,7 @@ public class StartPhaseService {
         if (game.isHasHadAStatusPhase()) {
             round++;
             game.setRound(round);
+            GameEventService.commit(game, GameEventType.ROUND_STARTED, null, Map.of("round", round));
         }
         if (game.getRound() == 1 && !game.isFowMode()) {
             Helper.setOrder(game);
@@ -546,6 +551,7 @@ public class StartPhaseService {
         String message = firstSCPicker.getRepresentationUnfogged() + " is up to pick a strategy card.";
         game.updateActivePlayer(firstSCPicker);
         game.setPhaseOfGame("strategy");
+        GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "strategy"));
         GMService.logActivity(game, "**Strategy** Phase for Round " + game.getRound() + " started.", true);
         FowCommunicationThreadService.checkAllCommThreads(game);
         SpinService.executeSpinsForTrigger(game, SpinService.AutoTrigger.STRATEGY);
@@ -1127,6 +1133,7 @@ public class StartPhaseService {
         boolean isFowPrivateGame = game.isFowMode();
         game.setStoredValue("willRevolution", "");
         game.setPhaseOfGame("action");
+        GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "action"));
         GMService.logActivity(game, "**Action** Phase for Round " + game.getRound() + " started.", true);
         for (Player p2 : game.getRealPlayers()) {
             ButtonHelperActionCards.checkForAssigningExtremeDuress(game, p2);
