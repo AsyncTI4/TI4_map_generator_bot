@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
-import ti4.helpers.Constants;
 import ti4.logging.RollbarManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
@@ -56,8 +55,6 @@ record CommandGameState(boolean saveGame, boolean playerCommand) {
 
     private static void logManualCommand(SlashCommandInteractionEvent event, Game game) {
         if (game == null) return;
-        // Undo events would be invalidated immediately; skip them.
-        if (Constants.UNDO.equals(event.getSubcommandName())) return;
 
         String commandString = event.getCommandString();
         Member member = event.getMember();

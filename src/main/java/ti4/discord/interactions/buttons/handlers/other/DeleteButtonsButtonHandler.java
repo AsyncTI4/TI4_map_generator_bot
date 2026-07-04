@@ -188,12 +188,7 @@ class DeleteButtonsButtonHandler {
                 Map<String, Integer> unitsMap = new HashMap<>();
                 for (Map.Entry<String, Integer> entry :
                         player.getCurrentProducedUnits().entrySet()) {
-                    String producedUnit = entry.getKey();
-                    int lastSeparator = producedUnit.lastIndexOf('_');
-                    int middleSeparator = lastSeparator < 0 ? -1 : producedUnit.lastIndexOf('_', lastSeparator - 1);
-                    String unitId = middleSeparator < 0
-                            ? producedUnit.split("_")[0]
-                            : producedUnit.substring(0, middleSeparator);
+                    String unitId = entry.getKey().split("_")[0];
                     unitsMap.merge(unitId, entry.getValue(), Integer::sum);
                 }
                 GameSubEvent.Production produced =
