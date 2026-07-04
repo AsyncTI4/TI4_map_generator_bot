@@ -1,0 +1,16 @@
+{
+    "id": "brokenplanet1",
+    "name": "Ceres Station",
+    "aliases": [
+        "brokenplanet1",
+        "ceresstation"
+    ],
+    "resources": 2,
+    "influence": 1,
+    "planetTypes": [
+        "FAKE",
+        "HAZARDOUS"
+    ],
+    "flavourText": "Flavor text is the bane of all time-pressed devs.",
+    "source": "luminous"
+}

@@ -1,0 +1,16 @@
+{
+    "id": "brokenplanet3",
+    "name": "Eros Station",
+    "aliases": [
+        "brokenplanet3",
+        "erosstation"
+    ],
+    "resources": 2,
+    "influence": 1,
+    "planetTypes": [
+        "FAKE",
+        "HAZARDOUS"
+    ],
+    "flavourText": "Flavor text is the bane of all time-pressed devs.",
+    "source": "luminous"
+}

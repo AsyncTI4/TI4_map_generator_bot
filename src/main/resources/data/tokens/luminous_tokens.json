@@ -1,0 +1,8 @@
+[
+    {
+        "id": "broken_planet",
+        "imagePath": "token_luminous_brokenplanet.png",
+        "spaceOrPlanet": "space",
+        "source": "luminous"
+    }
+]
