@@ -658,6 +658,11 @@ class GameLoadService {
                         game.setEventSequenceCounter(Long.parseLong(info));
                     }
                 }
+                case Constants.PENDING_SUB_EVENTS_JSON -> {
+                    if (isNotBlank(info)) {
+                        game.setPendingSubEventsJson(info);
+                    }
+                }
                 case Constants.STARTED_DATE -> {
                     if (isNotBlank(info)) {
                         game.setStartedDate(Long.parseLong(info));

@@ -68,6 +68,8 @@ public class GameProperties {
     private String activeSystem;
     private String currentAgendaInfo = "";
     private String currentACDrawStatusInfo = "";
+    // Undo-safe draft of tactical sub-events, persisted as one JSON line; "" means closed.
+    private String pendingSubEventsJson = "";
     private String latestCommand = "";
     private String latestOutcomeVotedFor = "";
     private String playersWhoHitPersistentNoAfter = "";
