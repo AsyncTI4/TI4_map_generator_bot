@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.PhantomEnergyHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -82,7 +82,7 @@ public class EndTurnService {
 
     private static void resetStoredValuesEndOfTurn(Game game, Player player) {
         if (player.hasAbility("phantom_energy")) {
-            PhantomEnergyHandler.cleanupEndOfTurn(game, player);
+            TyrisAbilityHandler.cleanupPhantomEnergy(game, player);
         }
         game.removeStoredValue("fortuneSeekers");
         game.setStoredValue("lawsDisabled", "no");
