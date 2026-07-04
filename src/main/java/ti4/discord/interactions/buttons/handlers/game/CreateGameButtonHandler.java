@@ -1,5 +1,7 @@
 package ti4.discord.interactions.buttons.handlers.game;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +12,9 @@ import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu.SelectTarget;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -33,6 +37,7 @@ import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.statistics.AverageTurnTimeService;
 import ti4.spring.service.statistics.UserGameInfoService;
 import ti4.spring.service.statistics.matchmaking.queue.MatchmakerService;
+import ti4.spring.service.statistics.matchmaking.queue.MatchmakingQueueSearchService;
 import ti4.spring.service.statistics.matchmaking.queue.PlayerSearchCriteria;
 import ti4.spring.service.statistics.matchmaking.queue.PlayerSearchService;
 
@@ -150,42 +155,37 @@ public class CreateGameButtonHandler {
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    private static List<Member> fetchMembersFromMessage(ButtonInteractionEvent event) {
-        String buttonMsg = event.getMessage().getContentRaw();
+    private static List<Member> fetchMembersFromMessage(String buttonMsg, Guild guild) {
         List<Member> members = new ArrayList<>();
         for (int i = 0; i < StringUtils.countMatches(buttonMsg, "<@"); i++) {
             String user = buttonMsg.split("@")[i + 1];
             user = StringUtils.substringBefore(user, ">");
-            Member member = event.getGuild().getMemberById(user);
+            Member member = guild.getMemberById(user);
             if (member != null) {
                 members.add(member);
             }
         }
         return members;
+    }
+
+    private static List<Member> fetchMembersFromMessage(ButtonInteractionEvent event) {
+        return fetchMembersFromMessage(event.getMessage().getContentRaw(), event.getGuild());
     }
 
     private static List<Member> fetchMembersFromMessage(ModalInteractionEvent event) {
-        String buttonMsg = event.getMessage().getContentRaw();
-        List<Member> members = new ArrayList<>();
-        for (int i = 0; i < StringUtils.countMatches(buttonMsg, "<@"); i++) {
-            String user = buttonMsg.split("@")[i + 1];
-            user = StringUtils.substringBefore(user, ">");
-            Member member = event.getGuild().getMemberById(user);
-            if (member != null) {
-                members.add(member);
-            }
-        }
-        return members;
+        return fetchMembersFromMessage(event.getMessage().getContentRaw(), event.getGuild());
+    }
+
+    private static String fetchSillyNameFromMessage(String buttonMsg) {
+        return StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
     }
 
     private static String fetchSillyNameFromMessage(ModalInteractionEvent event) {
-        String buttonMsg = event.getMessage().getContentRaw();
-        return StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
+        return fetchSillyNameFromMessage(event.getMessage().getContentRaw());
     }
 
     private static String fetchSillyNameFromMessage(ButtonInteractionEvent event) {
-        String buttonMsg = event.getMessage().getContentRaw();
-        return StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
+        return fetchSillyNameFromMessage(event.getMessage().getContentRaw());
     }
 
     public static String generateMemberListMessage(List<Member> members, String gameFunName) {
@@ -283,26 +283,32 @@ public class CreateGameButtonHandler {
     }
 
     public static int addPlayersFromQueueSearch(ModalInteractionEvent event, PlayerSearchCriteria criteria) {
-        List<Member> members = fetchMembersFromMessage(event);
+        return addPlayersFromQueueSearch(event.getGuild(), event.getMessage(), criteria);
+    }
+
+    public static int addPlayersFromQueueSearch(Guild guild, Message message, PlayerSearchCriteria criteria) {
+        String content = message.getContentRaw();
+        List<Member> members = fetchMembersFromMessage(content, guild);
         List<String> existingIds = members.stream().map(Member::getId).toList();
 
-        List<String> addedIds = PlayerSearchService.get().searchAndAdd(criteria, existingIds);
+        Duration hostWait = Duration.between(message.getTimeCreated().toInstant(), Instant.now());
+        if (hostWait.isNegative()) hostWait = Duration.ZERO;
+        List<String> addedIds = PlayerSearchService.get().searchAndAdd(criteria, existingIds, hostWait);
 
         List<Member> added = new ArrayList<>();
         for (String id : addedIds) {
-            Member member = event.getGuild().getMemberById(id);
+            Member member = guild.getMemberById(id);
             if (member == null || members.contains(member)) continue;
             members.add(member);
             added.add(member);
         }
         if (added.isEmpty()) return 0;
 
-        event.getMessage()
-                .editMessage(generateMemberListMessage(members, fetchSillyNameFromMessage(event)))
+        message.editMessage(generateMemberListMessage(members, fetchSillyNameFromMessage(content)))
                 .queue(Consumers.nop(), BotLogger::catchRestError);
         String mentions = added.stream().map(Member::getAsMention).collect(Collectors.joining(" & "));
-        MessageHelper.sendMessageToEventChannel(
-                event,
+        MessageHelper.sendMessageToChannel(
+                message.getChannel(),
                 mentions + (added.size() == 1 ? " was" : " were") + " added to the game from the matchmaking queue.");
         return added.size();
     }
@@ -366,6 +372,7 @@ public class CreateGameButtonHandler {
         }
 
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        MatchmakingQueueSearchService.get().remove(event.getChannelId());
 
         String gameSillyName = parseOrGenerateSillyName(buttonMessage);
 
