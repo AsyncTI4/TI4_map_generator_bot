@@ -54,7 +54,15 @@ public class GameEventDraft {
 
     /** Returns the staged sub-events (empty when closed/empty) and clears the draft. */
     public static List<GameSubEvent> drain(Game game) {
-        List<GameSubEvent> subEvents = isOpen(game) ? parse(game.getPendingSubEventsJson()) : new ArrayList<>();
+        List<GameSubEvent> subEvents;
+        try {
+            subEvents = isOpen(game) ? parse(game.getPendingSubEventsJson()) : new ArrayList<>();
+        } catch (Exception e) {
+            // An unparseable draft (e.g. staged by a newer bot version, then rolled back) must not break
+            // the tactical action's end buttons; the text summary still carries the information.
+            BotLogger.error(new LogOrigin(game), "Failed to drain tactical sub-event draft.", e);
+            subEvents = new ArrayList<>();
+        }
         clear(game);
         return subEvents;
     }

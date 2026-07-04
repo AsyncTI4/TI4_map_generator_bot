@@ -2,6 +2,8 @@ package ti4.spring.service.gameevent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +60,7 @@ class GameEventDraftTest {
         Game game = new Game();
         GameEventDraft.open(game);
         GameEventDraft.stage(game, new GameSubEvent.ControlEstablished("18"));
-        GameEventDraft.stage(game, new GameSubEvent.LeaderPlayed("hacan", "agent", "hacanagent"));
+        GameEventDraft.stage(game, new GameSubEvent.LeaderPlayed("hacan", "AGENT", "hacanagent"));
 
         String json = game.getPendingSubEventsJson();
 
@@ -84,5 +86,19 @@ class GameEventDraftTest {
         Map<String, Object> payload = new HashMap<>();
         payload.put("subEvents", JsonMapperManager.basic().readTree(payloadJson));
         assertThat(JsonMapperManager.basic().writeValueAsString(payload)).contains("\"type\":\"ACTION_CARD_PLAYED\"");
+    }
+
+    @Test
+    void subEventTypeEnumMatchesJsonDiscriminators() {
+        // GameSubEventType documents the wire contract; keep it structurally tied to the @JsonSubTypes names.
+        List<String> discriminators = Arrays.stream(
+                        GameSubEvent.class.getAnnotation(JsonSubTypes.class).value())
+                .map(JsonSubTypes.Type::name)
+                .toList();
+        List<String> enumNames =
+                Arrays.stream(GameSubEventType.values()).map(Enum::name).toList();
+
+        assertThat(discriminators).containsExactlyInAnyOrderElementsOf(enumNames);
+        assertThat(GameSubEvent.class.getPermittedSubclasses()).hasSameSizeAs(discriminators);
     }
 }
