@@ -80,6 +80,8 @@ public class CreateGameButtonHandler {
         for (Member member : members) {
             if (membersOG.contains(member)) continue;
             membersOG.add(member);
+            // Pulled into a game, so they should no longer be searchable in the matchmaking queue.
+            MatchmakerService.get().leaveQueue(member.getId());
             MessageHelper.sendMessageToEventChannel(event, member.getAsMention() + " joined the game.");
         }
         event.getMessage()
