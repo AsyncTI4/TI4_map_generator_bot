@@ -23,6 +23,12 @@ public final class TokenPlanetService {
         thundersedge,
         illusion,
         phantasm,
+        brokenplanet1,
+        brokenplanet2,
+        brokenplanet3,
+        brokenplanet4,
+        brokenplanet5,
+        brokenplanet6,
     }
 
     public static String adsf() {

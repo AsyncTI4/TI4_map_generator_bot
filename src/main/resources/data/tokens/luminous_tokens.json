@@ -1,8 +1,74 @@
 [
     {
-        "id": "broken_planet",
-        "imagePath": "token_luminous_brokenplanet.png",
+        "id": "brokenplanet1",
+        "imagePath": "token_brokenplanet1.png",
         "spaceOrPlanet": "space",
+        "aliasList": [
+            "brokenplanet1",
+            "ceres"
+        ],
+        "tokenPlanetName": "brokenplanet1",
+        "isPlanet": true,
+        "source": "luminous"
+    },
+    {
+        "id": "brokenplanet2",
+        "imagePath": "token_brokenplanet2.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "brokenplanet2",
+            "tycho"
+        ],
+        "tokenPlanetName": "brokenplanet2",
+        "isPlanet": true,
+        "source": "luminous"
+    },
+    {
+        "id": "brokenplanet3",
+        "imagePath": "token_brokenplanet3.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "brokenplanet3",
+            "eros"
+        ],
+        "tokenPlanetName": "brokenplanet3",
+        "isPlanet": true,
+        "source": "luminous"
+    },
+    {
+        "id": "brokenplanet4",
+        "imagePath": "token_brokenplanet4.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "brokenplanet4",
+            "ganymede"
+        ],
+        "tokenPlanetName": "brokenplanet4",
+        "isPlanet": true,
+        "source": "luminous"
+    },
+    {
+        "id": "brokenplanet5",
+        "imagePath": "token_brokenplanet5.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "brokenplanet5",
+            "medina"
+        ],
+        "tokenPlanetName": "brokenplanet5",
+        "isPlanet": true,
+        "source": "luminous"
+    },
+    {
+        "id": "brokenplanet6",
+        "imagePath": "token_brokenplanet6.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "brokenplanet6",
+            "anderson"
+        ],
+        "tokenPlanetName": "brokenplanet6",
+        "isPlanet": true,
         "source": "luminous"
     }
 ]

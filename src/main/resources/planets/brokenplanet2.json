@@ -8,9 +8,18 @@
     "resources": 2,
     "influence": 1,
     "planetTypes": [
-        "FAKE",
         "HAZARDOUS"
     ],
+    "planetLayout": {
+        "unitHolderName": "brokenplanet2",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 92,
+            "y": 66
+        },
+        "planetRadius": 60,
+        "extraIcons": 1
+    },
     "flavourText": "Flavor text is the bane of all time-pressed devs.",
     "source": "luminous"
 }

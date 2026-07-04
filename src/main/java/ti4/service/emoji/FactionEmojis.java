@@ -126,6 +126,7 @@ public enum FactionEmojis implements TI4Emoji {
     // luminous
     arachnera,
     psm,
+    opa,
 
     // nomadfalcon
     erock,
@@ -402,6 +403,7 @@ public enum FactionEmojis implements TI4Emoji {
 
             case "arachnera" -> arachnera;
             case "psm" -> psm;
+            case "opa" -> opa;
 
             case "netharii" -> netharii;
             case "drahn" -> Drahn;

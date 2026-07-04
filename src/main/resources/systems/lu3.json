@@ -1,0 +1,18 @@
+{
+    "tileBack": "green",
+    "id": "lu3",
+    "name": "Eros - Outer Planets Alliance",
+    "aliases": [
+        "lu3",
+        "opa",
+        "eros"
+    ],
+    "imagePath": "lu3_opahs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "isAsteroidField": true,
+    "planets": [
+        "eros"
+    ],
+    "source": "beans"
+}
