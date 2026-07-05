@@ -41,6 +41,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixBreakthroughHandler;
@@ -836,6 +837,9 @@ public class CombatRollService {
                             + (h == 1 ? "the BOMBARDMENT hit" : "some BOMBARDMENT hits")
                             + " to place infantry instead. Use these buttons to do so, and press done when done. The bot did not track how many hits you got. ";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
+                }
+                if (player.hasUnlockedBreakthrough("kalorabt")) {
+                    KaloraBreakthroughHandler.offerCommitInfantryButton(event, game, player, tile, bombardPlanet);
                 }
             }
             if (player.hasTech("x89c4")) {
