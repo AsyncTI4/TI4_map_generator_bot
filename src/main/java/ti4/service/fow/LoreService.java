@@ -74,7 +74,7 @@ public final class LoreService {
     // TODO: export file is written to the JVM working directory and never deleted after sending.
     private static final String LORE_EXPORT_FILENAME = "_lore_export.txt";
     private static final int LORE_TEXT_MAX_LENGTH = 1000;
-    private static final int FOOTER_TEXT_MAX_LENGTH = 300;
+    private static final int FOOTER_TEXT_MAX_LENGTH = 400;
     // TODO: editing existing lore does not re-validate RECEIVER against current game mode; an entry saved in FoW
     //       mode with ADJACENT/GM receiver remains editable without correction in non-FoW mode.
     // TODO: LORECACHE is a plain HashMap — not thread-safe under concurrent event handlers.
