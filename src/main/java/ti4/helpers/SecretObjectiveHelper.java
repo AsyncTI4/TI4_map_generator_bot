@@ -50,11 +50,13 @@ public class SecretObjectiveHelper {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
             }
-            GameEventService.commit(
-                    game,
-                    GameEventType.OBJECTIVE_SCORED,
-                    player,
-                    Map.of("objectiveId", entry.getKey(), "category", "SECRET"));
+            if (!StatusHelper.stageObjectiveScoredEvent(game, player, entry.getKey(), "SECRET")) {
+                GameEventService.commit(
+                        game,
+                        GameEventType.OBJECTIVE_SCORED,
+                        player,
+                        Map.of("objectiveId", entry.getKey(), "category", "SECRET"));
+            }
             if (ListPlayerInfoService.getObjectiveThreshold(entry.getKey(), game) > 0) {
                 message.append(SecretObjectiveInfoService.getSecretObjectiveRepresentationNoNewLine(entry.getKey()));
                 message.append(" (")

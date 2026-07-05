@@ -18,6 +18,7 @@ public class GameEventType {
     public static final String SC_PLAYED = "SC_PLAYED";
     public static final String SC_PICKED = "SC_PICKED";
     public static final String OBJECTIVE_SCORED = "OBJECTIVE_SCORED";
+    public static final String STATUS_SCORING = "STATUS_SCORING";
     public static final String AGENDA_RESOLVED = "AGENDA_RESOLVED";
     public static final String TRANSACTION = "TRANSACTION";
     public static final String GAME_ENDED = "GAME_ENDED";

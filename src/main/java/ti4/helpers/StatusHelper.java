@@ -30,6 +30,7 @@ import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
+import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.GameMessageType;
@@ -51,8 +52,10 @@ import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.planet.EronousPlanetService;
 import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameSubEvent;
 
 @UtilityClass
 public final class StatusHelper {
@@ -158,6 +161,7 @@ public final class StatusHelper {
     public static void beginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
         game.setPhaseOfGame("statusScoring");
         GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "status"));
+        GameEventDraft.open(game);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
         GMService.logActivity(game, "**StatusScoring** Phase for Round " + game.getRound() + " started.", true);
         for (Player player : game.getRealPlayers()) {
@@ -1081,5 +1085,26 @@ public final class StatusHelper {
         }
         ButtonHelper.deleteMessage(event);
         ReactionCheckService.checkForAllReactions(event, game);
+    }
+
+    public static boolean isStatusScoring(Game game) {
+        return game != null && "statusScoring".equalsIgnoreCase(game.getPhaseOfGame());
+    }
+
+    public static boolean stageObjectiveScoredEvent(Game game, Player player, String objectiveId, String category) {
+        if (!isStatusScoring(game)) {
+            return false;
+        }
+        return GameEventDraft.stage(game, new GameSubEvent.ObjectiveScored(player.getFaction(), objectiveId, category));
+    }
+
+    public static void commitStatusScoringEvent(Game game) {
+        List<GameSubEvent> subEvents = GameEventDraft.drain(game);
+        if (subEvents.isEmpty()) {
+            return;
+        }
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("subEvents", JsonMapperManager.basic().readTree(GameEventDraft.serialize(subEvents)));
+        GameEventService.commit(game, GameEventType.STATUS_SCORING, null, payload);
     }
 }

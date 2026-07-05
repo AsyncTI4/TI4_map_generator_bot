@@ -850,6 +850,7 @@ public class StartPhaseService {
     }
 
     public static void startStatusHomework(GenericInteractionCreateEvent event, Game game) {
+        StatusHelper.commitStatusScoringEvent(game);
         game.setPhaseOfGame("statusHomework");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusHomework", System.currentTimeMillis() + "");
         GMService.logActivity(game, "**StatusHomework** Phase for Round " + game.getRound() + " started.", true);

@@ -6,6 +6,7 @@ public enum GameSubEventType {
     ACTION_CARD_PLAYED,
     LEADER_PLAYED,
     TECH_EXHAUSTED,
+    OBJECTIVE_SCORED,
     PRODUCTION,
     MANUAL_COMMAND
 }

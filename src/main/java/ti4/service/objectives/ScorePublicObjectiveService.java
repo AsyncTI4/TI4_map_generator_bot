@@ -22,6 +22,7 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StatusHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
@@ -76,7 +77,9 @@ public class ScorePublicObjectiveService {
                 payload.put("objectiveId", id);
             }
             payload.put("category", "PUBLIC");
-            GameEventService.commit(game, GameEventType.OBJECTIVE_SCORED, player, payload);
+            if (!StatusHelper.stageObjectiveScoredEvent(game, player, id, "PUBLIC")) {
+                GameEventService.commit(game, GameEventType.OBJECTIVE_SCORED, player, payload);
+            }
             informAboutScoring(event, channel, game, player, poID);
             if (player.hasAbility("primordial")) {
                 KaloraAbilityHandler.primordial(player, game);

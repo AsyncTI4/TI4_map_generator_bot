@@ -103,6 +103,7 @@ class StatusPhaseButtonHandler {
         if (!game.isOmegaPhaseMode()) {
             StartPhaseService.startStatusHomework(event, game);
         } else {
+            StatusHelper.commitStatusScoringEvent(game);
             if (Constants.IMPERIUM_REX_ID.equalsIgnoreCase(revealedObjective)) {
                 EndGameService.secondHalfOfGameEnd(event, game, true, true, false);
             } else {
