@@ -138,6 +138,8 @@ class AgendaResolveButtonHandler {
         String agID = getAgendaId(game, aID);
         AgendaModel agendaDetails = Mapper.getAgenda(agID);
         String agendaName = agendaDetails == null ? "" : agendaDetails.getName();
+        game.setStoredValue("resolvedAgendaId", agID);
+        game.setStoredValue("resolvedAgendaOutcome", winner);
         GameEventService.commit(
                 game,
                 GameEventType.AGENDA_RESOLVED,

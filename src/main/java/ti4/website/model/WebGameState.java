@@ -45,7 +45,7 @@ public class WebGameState {
         Date lastChange = game.getLastActivePlayerChange();
         state.turnStartedAt = (lastChange == null || lastChange.getTime() < 1_000_000) ? null : lastChange.getTime();
         state.winner = game.getWinner().map(WebGameState::colorForPlayer).orElse(null);
-        state.agenda = AGENDA_PHASES.contains(state.phase) ? WebAgenda.fromGame(game) : null;
+        state.agenda = AGENDA_PHASES.contains(state.phase) ? WebAgenda.fromGame(game, state.phase) : null;
         state.activeSystem = blankToNull(game.getCurrentActiveSystem());
         state.activeCombat = WebCombat.fromGame(game);
         return state;
@@ -145,8 +145,9 @@ public class WebGameState {
         private Map<String, Integer> startVoteCounts;
         private Map<String, Integer> castVoteCounts;
         private Map<String, Integer> outcomeVoteCounts;
+        private String resolvedOutcome;
 
-        static WebAgenda fromGame(Game game) {
+        static WebAgenda fromGame(Game game, CanonicalPhase phase) {
             String agendaId = AgendaHelper.getCurrentAgendaId(game);
             if (agendaId == null || agendaId.isBlank()) {
                 return null;
@@ -157,6 +158,10 @@ public class WebGameState {
             agenda.startVoteCounts = AgendaHelper.getAgendaStartVoteCounts(game);
             agenda.castVoteCounts = AgendaSummaryHelper.getCurrentPlayerVoteCountsByColor(game);
             agenda.outcomeVoteCounts = AgendaSummaryHelper.getCurrentOutcomeVoteCounts(game);
+            agenda.resolvedOutcome =
+                    phase == CanonicalPhase.AGENDA_RESOLVING && agendaId.equals(game.getStoredValue("resolvedAgendaId"))
+                            ? blankToNull(game.getStoredValue("resolvedAgendaOutcome"))
+                            : null;
             return agenda;
         }
     }
