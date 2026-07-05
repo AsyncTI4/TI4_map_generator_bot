@@ -626,7 +626,30 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
-            case "technotemplar" -> meetsCondition = player.hasUnit("vyserix_mech");
+            case "technotemplar" -> {
+                if (tile != null && player.hasUnit("vyserix_mech")) {
+                    List<Tile> tilesToCheck = new ArrayList<>();
+                    tilesToCheck.add(tile);
+                    if (unitsByQuantity.keySet().stream().anyMatch(UnitModel::getDeepSpaceCannon)) {
+                        for (String adjPos :
+                                FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                            Tile adjTile = game.getTileByPosition(adjPos);
+                            if (adjTile != null) {
+                                tilesToCheck.add(adjTile);
+                            }
+                        }
+                    }
+                    checkTiles:
+                    for (Tile t : tilesToCheck) {
+                        for (UnitHolder uh : t.getPlanetUnitHolders()) {
+                            if (uh.getUnitCount(UnitType.Mech, player.getColor()) > 0) {
+                                meetsCondition = true;
+                                break checkTiles;
+                            }
+                        }
+                    }
+                }
+            }
             case "opponent_strat_cards_exhausted" ->
                 meetsCondition = opponent != null && game.getPlayedSCs().containsAll(opponent.getSCs());
             case "space_dock_on_holder" -> {

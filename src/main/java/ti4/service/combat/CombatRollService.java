@@ -41,8 +41,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixBreakthroughHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -51,6 +53,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.BombardmentAssignment;
+import ti4.helpers.BombardmentAssignmentType;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -271,18 +274,23 @@ public class CombatRollService {
             }
             List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
                     game.getStoredValue("assignedBombardment" + player.getFaction()),
-                    new TypeReference<List<BombardmentAssignment>>() {});
-            int count;
+                    new TypeReference<List<BombardmentAssignment>>() {});            
+            Map<String, Integer> remainingAssignedByAsyncId = new HashMap<>();
+            for (BombardmentAssignment assignedUnit : assignedUnits) {
+                if (assignedUnit.planet().equals(bombardPlanet) && assignedUnit.sourceId() != null) {
+                    String asyncId = assignedUnit.sourceId();
+                    remainingAssignedByAsyncId.merge(asyncId, 1, Integer::sum);
+                }
+            }
             List<Pair<UnitModel, UnitHolder>> unitMods = new ArrayList<>(playerUnitsByQuantity.keySet());
             for (Pair<UnitModel, UnitHolder> mod : unitMods) {
-                count = 0;
-                for (BombardmentAssignment assignedUnit : assignedUnits) {
-                    if (assignedUnit.planet().equals(bombardPlanet)
-                            && assignedUnit.sourceId().equals(mod.getLeft().getAsyncId())) {
-                        count++;
-                    }
-                }
+                // The same asyncId can span multiple holders here, so split the assigned total across them
+                // instead of giving every holder the full matched count.
+                String asyncId = mod.getLeft().getAsyncId();
+                int available = remainingAssignedByAsyncId.getOrDefault(asyncId, 0);
+                int count = Math.min(available, playerUnitsByQuantity.get(mod));
                 if (count > 0) {
+                    remainingAssignedByAsyncId.put(asyncId, available - count);
                     playerUnitsByQuantity.put(mod, count);
                 } else {
                     playerUnitsByQuantity.remove(mod);
@@ -810,6 +818,10 @@ public class CombatRollService {
             MessageHelper.sendMessageToChannelWithButtons(channel, msg2, buttons);
         }
 
+        if (rollType == CombatRollType.AFB && player.hasUnlockedBreakthrough("vyserixbt")) {
+            VyserixBreakthroughHandler.offerMoraySystemButtons(event, game, player, tile, h);
+        }
+
         if (rollType == CombatRollType.bombardment) {
             AshenLeadersHandler.offerCommanderBombardmentButtons(event, game, player, h);
             if (h > 0) {
@@ -861,6 +873,9 @@ public class CombatRollService {
                             + (h == 1 ? "the BOMBARDMENT hit" : "some BOMBARDMENT hits")
                             + " to place infantry instead. Use these buttons to do so, and press done when done. The bot did not track how many hits you got. ";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
+                }
+                if (player.hasUnlockedBreakthrough("kalorabt")) {
+                    KaloraBreakthroughHandler.offerCommitInfantryButton(event, game, player, tile, bombardPlanet);
                 }
             }
             if (player.hasTech("x89c4")) {
