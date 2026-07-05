@@ -1,7 +1,6 @@
 package ti4.service.objectives;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,8 +28,6 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.game.EndedGameScoringGuardService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.leader.HeroUnlockCheckService;
-import ti4.spring.service.gameevent.GameEventService;
-import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class ScorePublicObjectiveService {
@@ -72,14 +69,7 @@ public class ScorePublicObjectiveService {
                     channel,
                     player.getFactionEmoji() + ", no such public objective ID found, or already scored, please retry.");
         } else {
-            Map<String, Object> payload = new HashMap<>();
-            if (!id.isEmpty()) {
-                payload.put("objectiveId", id);
-            }
-            payload.put("category", "PUBLIC");
-            if (!StatusHelper.stageObjectiveScoredEvent(game, player, id, "PUBLIC")) {
-                GameEventService.commit(game, GameEventType.OBJECTIVE_SCORED, player, payload);
-            }
+            StatusHelper.recordObjectiveScored(game, player, id, "PUBLIC");
             informAboutScoring(event, channel, game, player, poID);
             if (player.hasAbility("primordial")) {
                 KaloraAbilityHandler.primordial(player, game);

@@ -35,7 +35,7 @@ class StatusPhaseButtonHandler {
     public static void revealPOStage(ButtonInteractionEvent event, String buttonID, Game game) {
         String stage = buttonID.replace("reveal_stage_", "");
         if ("true".equalsIgnoreCase(game.getStoredValue("forcedScoringOrder"))) {
-            if ("statusScoring".equalsIgnoreCase(game.getPhaseOfGame())) {
+            if (StatusHelper.isStatusScoring(game)) {
                 StringBuilder missingPeople = new StringBuilder();
                 for (Player player : game.getRealPlayers()) {
                     String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");

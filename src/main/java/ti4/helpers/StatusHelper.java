@@ -30,7 +30,6 @@ import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
-import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.GameMessageType;
@@ -159,6 +158,8 @@ public final class StatusHelper {
     }
 
     public static void beginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
+        // On a re-entered scoring phase, commit the previously staged scores instead of letting open() wipe them.
+        commitStatusScoringEvent(game);
         game.setPhaseOfGame("statusScoring");
         GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "status"));
         GameEventDraft.open(game);
@@ -1088,23 +1089,34 @@ public final class StatusHelper {
     }
 
     public static boolean isStatusScoring(Game game) {
-        return game != null && "statusScoring".equalsIgnoreCase(game.getPhaseOfGame());
+        return "statusScoring".equalsIgnoreCase(game.getPhaseOfGame());
     }
 
-    public static boolean stageObjectiveScoredEvent(Game game, Player player, String objectiveId, String category) {
-        if (!isStatusScoring(game)) {
-            return false;
+    /** Stages the score into the status-scoring draft when one is open, else commits a top-level event. */
+    public static void recordObjectiveScored(Game game, Player player, String objectiveId, String category) {
+        if (isStatusScoring(game)
+                && GameEventDraft.stage(
+                        game, new GameSubEvent.ObjectiveScored(player.getFaction(), objectiveId, category))) {
+            return;
         }
-        return GameEventDraft.stage(game, new GameSubEvent.ObjectiveScored(player.getFaction(), objectiveId, category));
+        GameEventService.commit(
+                game, GameEventType.OBJECTIVE_SCORED, player, Map.of("objectiveId", objectiveId, "category", category));
     }
 
+    /**
+     * Commits the staged scoring sub-events as one STATUS_SCORING event. Safe to call from any status-scoring exit
+     * path: no-op outside the statusScoring phase (so it never drains an unrelated tactical draft) or when nothing
+     * was staged.
+     */
     public static void commitStatusScoringEvent(Game game) {
+        if (!isStatusScoring(game)) {
+            return;
+        }
         List<GameSubEvent> subEvents = GameEventDraft.drain(game);
         if (subEvents.isEmpty()) {
             return;
         }
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("subEvents", JsonMapperManager.basic().readTree(GameEventDraft.serialize(subEvents)));
-        GameEventService.commit(game, GameEventType.STATUS_SCORING, null, payload);
+        GameEventService.commit(
+                game, GameEventType.STATUS_SCORING, null, Map.of("subEvents", GameEventDraft.toJsonNode(subEvents)));
     }
 }

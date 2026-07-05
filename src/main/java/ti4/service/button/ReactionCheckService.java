@@ -18,7 +18,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.helpers.StatusHelper;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
@@ -244,7 +243,6 @@ public class ReactionCheckService {
                                 event.getChannel(), "Please flip agenda now.", buttons);
                     }
                 } else {
-                    StatusHelper.commitStatusScoringEvent(game);
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
                             game.getPing()

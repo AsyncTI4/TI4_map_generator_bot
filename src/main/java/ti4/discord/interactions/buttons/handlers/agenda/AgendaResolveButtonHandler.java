@@ -136,9 +136,9 @@ class AgendaResolveButtonHandler {
         if (guardDoublePress(game, winner, agendaId)) return;
         int aID = computeAgendaNumericId(game, agendaId);
         String agID = getAgendaId(game, aID);
-        AgendaModel agendaDetails = Mapper.getAgenda(agID);
-        String agendaName = agendaDetails == null ? "" : agendaDetails.getName();
-        game.setStoredValue("resolvedAgendaId", agID);
+        String agendaName = StringUtils.defaultString(Mapper.getAgendaTitleNoCap(agID));
+        // Keyed by the id the web state reads back (for Covert Legislation that is "covert", not the hidden agenda).
+        game.setStoredValue("resolvedAgendaId", StringUtils.defaultString(AgendaHelper.getCurrentAgendaId(game)));
         game.setStoredValue("resolvedAgendaOutcome", winner);
         GameEventService.commit(
                 game,

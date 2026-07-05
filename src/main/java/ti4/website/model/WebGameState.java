@@ -45,7 +45,7 @@ public class WebGameState {
         Date lastChange = game.getLastActivePlayerChange();
         state.turnStartedAt = (lastChange == null || lastChange.getTime() < 1_000_000) ? null : lastChange.getTime();
         state.winner = game.getWinner().map(WebGameState::colorForPlayer).orElse(null);
-        state.agenda = AGENDA_PHASES.contains(state.phase) ? WebAgenda.fromGame(game, state.phase) : null;
+        state.agenda = AGENDA_PHASES.contains(state.phase) ? WebAgenda.fromGame(game) : null;
         state.activeSystem = blankToNull(game.getCurrentActiveSystem());
         state.activeCombat = WebCombat.fromGame(game);
         return state;
@@ -147,7 +147,7 @@ public class WebGameState {
         private Map<String, Integer> outcomeVoteCounts;
         private String resolvedOutcome;
 
-        static WebAgenda fromGame(Game game, CanonicalPhase phase) {
+        static WebAgenda fromGame(Game game) {
             String agendaId = AgendaHelper.getCurrentAgendaId(game);
             if (agendaId == null || agendaId.isBlank()) {
                 return null;
@@ -156,12 +156,14 @@ public class WebGameState {
             WebAgenda agenda = new WebAgenda();
             agenda.id = agendaId;
             agenda.startVoteCounts = AgendaHelper.getAgendaStartVoteCounts(game);
-            agenda.castVoteCounts = AgendaSummaryHelper.getCurrentPlayerVoteCountsByColor(game);
+            // Hidden agenda mode keeps per-player vote attribution secret on Discord; don't leak it here.
+            agenda.castVoteCounts =
+                    game.isHiddenAgendaMode() ? null : AgendaSummaryHelper.getCurrentPlayerVoteCountsByColor(game);
             agenda.outcomeVoteCounts = AgendaSummaryHelper.getCurrentOutcomeVoteCounts(game);
-            agenda.resolvedOutcome =
-                    phase == CanonicalPhase.AGENDA_RESOLVING && agendaId.equals(game.getStoredValue("resolvedAgendaId"))
-                            ? blankToNull(game.getStoredValue("resolvedAgendaOutcome"))
-                            : null;
+            // resolvedAgendaId is cleared on every agenda reveal, so a match means this agenda was resolved.
+            agenda.resolvedOutcome = agendaId.equals(game.getStoredValue("resolvedAgendaId"))
+                    ? blankToNull(game.getStoredValue("resolvedAgendaOutcome"))
+                    : null;
             return agenda;
         }
     }

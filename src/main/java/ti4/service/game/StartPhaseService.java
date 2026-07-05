@@ -87,6 +87,7 @@ public class StartPhaseService {
             case "voting", "agendaVoting" -> AgendaHelper.startTheVoting(game);
             case "shuffleDecks" -> game.shuffleDecks();
             case "agenda" -> {
+                StatusHelper.commitStatusScoringEvent(game);
                 game.setPhaseOfGame("agenda");
                 GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "agenda"));
                 Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
@@ -215,6 +216,7 @@ public class StartPhaseService {
     }
 
     public static void startStrategyPhase(GenericInteractionCreateEvent event, Game game) {
+        StatusHelper.commitStatusScoringEvent(game);
         for (Player player2 : game.getRealPlayers()) {
             if (game.getStoredValue("SpecialSession") != null
                     && game.getStoredValue("SpecialSession").contains(player2.getFaction())

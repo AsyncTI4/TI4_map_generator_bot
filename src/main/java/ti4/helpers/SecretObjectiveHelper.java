@@ -27,8 +27,6 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.HeroUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
-import ti4.spring.service.gameevent.GameEventService;
-import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class SecretObjectiveHelper {
@@ -50,13 +48,7 @@ public class SecretObjectiveHelper {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
             }
-            if (!StatusHelper.stageObjectiveScoredEvent(game, player, entry.getKey(), "SECRET")) {
-                GameEventService.commit(
-                        game,
-                        GameEventType.OBJECTIVE_SCORED,
-                        player,
-                        Map.of("objectiveId", entry.getKey(), "category", "SECRET"));
-            }
+            StatusHelper.recordObjectiveScored(game, player, entry.getKey(), "SECRET");
             if (ListPlayerInfoService.getObjectiveThreshold(entry.getKey(), game) > 0) {
                 message.append(SecretObjectiveInfoService.getSecretObjectiveRepresentationNoNewLine(entry.getKey()));
                 message.append(" (")
