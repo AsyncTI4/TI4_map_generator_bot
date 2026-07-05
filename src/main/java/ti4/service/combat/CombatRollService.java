@@ -393,21 +393,22 @@ public class CombatRollService {
         List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
                     game.getStoredValue("assignedBombardment" + player.getFaction()),
                     new TypeReference<List<BombardmentAssignment>>() {});
+        String bombardPlanet2 = bombardPlanet;
         for (NamedCombatModifierModel mod : extraRollsDup) {
             if ("plus1_roll_plasmascoring".equalsIgnoreCase(mod.getModifier().getAlias())) {
-                if (assignedUnits.stream().anyMatch(a -> a.sourceId().equals("plasmascoring"))) {
+                if (assignedUnits.stream().filter(a -> a.planet().equals(bombardPlanet2)).noneMatch(a -> a.sourceId().equals("plasmascoring"))) {
                     extraRolls.remove(mod);
                 }
             }
             if ("plus1_roll_argent_commander_bombard"
                     .equalsIgnoreCase(mod.getModifier().getAlias())) {
-                if (assignedUnits.stream().anyMatch(a -> a.sourceId().equals("argentcommander"))) {
+                if (assignedUnits.stream().filter(a -> a.planet().equals(bombardPlanet2)).noneMatch(a -> a.sourceId().equals("argentcommander"))) {
                     extraRolls.remove(mod);
                 }
             }
-            if("roll_1_for_galvanize_bombard_scaling".equalsIgnoreCase(mod.getModifier().getAlias())) 
+            if("roll_1_for_galvanize_bombard".equalsIgnoreCase(mod.getModifier().getAlias())) 
             {
-                if (assignedUnits.stream().anyMatch(a -> a.galvanized())) {
+                if (assignedUnits.stream().filter(a -> a.planet().equals(bombardPlanet2)).noneMatch(a -> a.galvanized())) {
                     extraRolls.remove(mod);
                 }
             }
