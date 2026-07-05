@@ -3,12 +3,15 @@ package ti4.service.fow;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -32,6 +35,7 @@ import ti4.service.fow.LoreService.RECEIVER;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.map.AddTileService;
 import ti4.service.map.CustomHyperlaneService;
+import ti4.service.tech.ListTechService;
 
 /**
  * Effect-processing engine for lore entries.
@@ -910,11 +914,21 @@ final class LoreEffects {
         };
     }
 
-    // tech <techID|random> [blue|green|yellow|red|unit]  -> grants a technology (random draws from the
-    // game's own technology deck, so homebrew deck settings are respected automatically)
+    /** The five tech-type filter names, used to build the "any color" choose pool. */
+    private static final List<String> ALL_TECH_TYPES =
+            List.of("propulsion", "biotic", "cybernetic", "warfare", "unitupgrade");
+
+    // tech <techID|random|choose> [blue|green|yellow|red|unit]  -> grants or offers a technology. A specific
+    // id grants it directly; `random` draws from the game's own deck (so homebrew deck settings are respected);
+    // `choose` sends the receiving player free-research buttons to pick their own (no prereqs/cost), limited to
+    // the optional color/type. Each recipient of the lore is offered their own independent choice.
     private static EffectDescription effectTech(EffectContext ctx) {
         if (ctx.args.length == 0) return null;
-        String techID = AliasHandler.resolveTech(ctx.arg(0).toLowerCase());
+        String first = ctx.arg(0).toLowerCase();
+        if ("choose".equals(first) || "pick".equals(first)) {
+            return offerTechChoice(ctx);
+        }
+        String techID = AliasHandler.resolveTech(first);
         if ("random".equalsIgnoreCase(techID)) {
             String typeFilter = techTypeFilter(ctx.arg(1));
             List<String> pool = ctx.game.getTechnologyDeck().stream()
@@ -939,6 +953,41 @@ final class LoreEffects {
         ctx.player.addTech(techID);
         return new EffectDescription(
                 who(ctx) + " gained the technology _" + Mapper.getTech(techID).getName() + "_.", false);
+    }
+
+    /**
+     * Sends the receiving player free-research buttons to pick their own technology, reusing the same
+     * `getTech_..._free` button flow relics use ("research a tech with no prerequisites") — the existing
+     * {@code getTech_} handler resolves the click, adds the tech, and handles all faction/upgrade follow-ups.
+     * The pool is restricted to the optional color/type and already excludes owned, purged, off-deck, and
+     * other factions' faction techs (via {@link ListTechService#getAllTechOfAType}). No-op if the pool is
+     * empty or the player has no channel.
+     */
+    private static EffectDescription offerTechChoice(EffectContext ctx) {
+        String typeWord = ctx.arg(1);
+        String typeFilter = techTypeFilter(typeWord);
+        List<String> types = typeFilter == null ? ALL_TECH_TYPES : List.of(typeFilter);
+
+        List<TechnologyModel> pool = new ArrayList<>();
+        Set<String> seen = new HashSet<>();
+        for (String type : types) {
+            for (TechnologyModel model : ListTechService.getAllTechOfAType(ctx.game, type, ctx.player, false, false)) {
+                if (seen.add(model.getAlias())) pool.add(model);
+            }
+        }
+        if (pool.isEmpty()) return null;
+
+        MessageChannel channel = ctx.player.getCorrectChannel();
+        if (channel == null) return null;
+
+        List<Button> buttons = ListTechService.getTechButtons(pool, ctx.player, "free");
+        String scope = typeFilter == null ? "" : " (" + typeWord.toLowerCase() + ")";
+        MessageHelper.sendMessageToChannelWithButtons(
+                channel,
+                ctx.player.getRepresentationUnfogged() + ", lore lets you research a technology of your choice" + scope
+                        + ":",
+                buttons);
+        return new EffectDescription(who(ctx) + " may choose a technology to research" + scope + ".", false);
     }
 
     // removetech <techID>  -> removes a technology the player has researched; no-op if they don't have it
@@ -1145,8 +1194,12 @@ final class LoreEffects {
             }
             case "tech" -> {
                 if (a.isEmpty()) {
-                    problems.add("`tech` needs a tech id or `random`, e.g. `!tech gd` or `!tech random blue`" + where);
-                } else if ("random".equalsIgnoreCase(a.get(0))) {
+                    problems.add(
+                            "`tech` needs a tech id, `random`, or `choose`, e.g. `!tech gd`, `!tech random blue`, or `!tech choose blue`"
+                                    + where);
+                } else if ("random".equalsIgnoreCase(a.get(0))
+                        || "choose".equalsIgnoreCase(a.get(0))
+                        || "pick".equalsIgnoreCase(a.get(0))) {
                     if (a.size() > 1 && !isKnownTechType(a.get(1))) {
                         problems.add("unknown tech type `" + a.get(1) + "` — use blue/green/yellow/red/unit" + where);
                     }

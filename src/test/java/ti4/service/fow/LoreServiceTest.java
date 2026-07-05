@@ -2416,6 +2416,30 @@ class LoreServiceTest extends BaseTi4Test {
             String granted = player.getTechs().get(0);
             assertTrue(Mapper.getTech(granted).isType("propulsion"), "expected a propulsion tech, got: " + granted);
         }
+
+        @Test
+        void chooseModeOffersButtonsRatherThanGrantingDirectly() {
+            // "choose" sends the player free-research buttons; the tech is only added when they click one
+            // (handled by the existing getTech_ handler), so no tech is granted synchronously here.
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!tech choose blue"), systemTile, Constants.SPACE, true);
+            assertTrue(player.getTechs().isEmpty(), "choose must not grant a tech directly");
+        }
+
+        @Test
+        void chooseAndPickValidateCleanlyWithAndWithoutAType() {
+            assertTrue(LoreEffects.validateEffects(entry("!tech choose"), game).isEmpty());
+            assertTrue(LoreEffects.validateEffects(entry("!tech choose blue"), game)
+                    .isEmpty());
+            assertTrue(
+                    LoreEffects.validateEffects(entry("!tech pick green"), game).isEmpty());
+        }
+
+        @Test
+        void chooseWithUnknownTypeIsFlagged() {
+            assertFalse(LoreEffects.validateEffects(entry("!tech choose purple"), game)
+                    .isEmpty());
+        }
     }
 
     // -----------------------------------------------------------------------
