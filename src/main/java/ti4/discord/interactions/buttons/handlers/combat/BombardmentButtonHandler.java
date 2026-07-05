@@ -9,11 +9,15 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import org.apache.commons.lang3.tuple.Pair;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
+import ti4.helpers.BombardmentAssignment;
+import ti4.helpers.BombardmentAssignmentType;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.FoWHelper;
@@ -26,18 +30,29 @@ import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.emoji.UnitEmojis;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 class BombardmentButtonHandler {
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @ButtonHandler("unassignBombardUnit_")
     public static void unassignBombardUnit(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String assignedUnit = buttonID.replace("unassignBombardUnit_", "");
-        game.setStoredValue(
-                "assignedBombardment" + player.getFaction(),
-                game.getStoredValue("assignedBombardment" + player.getFaction())
-                        .replace(assignedUnit, "")
-                        .replace(";;", ";"));
+        BombardmentAssignment buttonAssignment =
+                BombardmentAssignment.decode(buttonID.replace("unassignBombardUnit_", ""));
+
+        List<BombardmentAssignment> assignments = getAssignments(player, game);
+        assignments.stream()
+            .filter(a -> a.sourceId().equals(buttonAssignment.sourceId())
+                    && a.planet().equals(buttonAssignment.planet())
+                    && a.galvanized() == buttonAssignment.galvanized()
+                    && a.type() == buttonAssignment.type())
+            .findFirst()
+            .ifPresent(assignments::remove);
+        saveAssignments(player, game, assignments);
+
         List<Button> buttons = getBombardmentAssignmentButtons(player, game);
         event.getMessage()
                 .editMessage(getBombardmentSummary(player, game))
@@ -47,10 +62,12 @@ class BombardmentButtonHandler {
 
     @ButtonHandler("assignBombardUnit_")
     public static void assignBombardUnit(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String assignedUnit = buttonID.replace("assignBombardUnit_", "");
-        game.setStoredValue(
-                "assignedBombardment" + player.getFaction(),
-                game.getStoredValue("assignedBombardment" + player.getFaction()) + assignedUnit + ";");
+        BombardmentAssignment buttonAssignment =
+                BombardmentAssignment.decode(buttonID.replace("assignBombardUnit_", ""));
+        List<BombardmentAssignment> assignments = getAssignments(player, game);
+        assignments.add(buttonAssignment);
+        saveAssignments(player, game, assignments);
+
         List<Button> buttons = getBombardmentAssignmentButtons(player, game);
         event.getMessage()
                 .editMessage(getBombardmentSummary(player, game))
@@ -98,48 +115,109 @@ class BombardmentButtonHandler {
         if (tile == null) {
             return buttons;
         }
-        Map<UnitModel, Integer> bombardUnits =
-                CombatRollService.flattenUnitMap(CombatRollService.getUnitsInBombardment(tile, player, null));
-        String assignedUnits = game.getStoredValue("assignedBombardment" + player.getFaction());
-        List<String> usedLabels = new ArrayList<>();
-        for (Map.Entry<UnitModel, Integer> entry : bombardUnits.entrySet()) {
-            UnitModel mod = entry.getKey();
-            for (int x = 0; x < entry.getValue(); x++) {
-                String name = mod.getAsyncId() + "_" + x;
-                if (assignedUnits.contains(name)) {
-                    for (String assignedUnit : assignedUnits.split(";")) {
+        Map<Pair<UnitModel, UnitHolder>, Integer> bombardUnits =
+                CombatRollService.getUnitsInBombardment(tile, player, null);
 
-                        if (assignedUnit.contains(name)) {
-                            String planet = assignedUnit.split("_")[2];
-                            String label = "Unassign " + capitalize(mod.getBaseType()) + " From "
-                                    + Helper.getPlanetRepresentationNoResInf(planet, game);
-                            if (!usedLabels.contains(label)) {
-                                buttons.add(
-                                        Buttons.red("unassignBombardUnit_" + assignedUnit, label, mod.getUnitEmoji()));
-                                usedLabels.add(label);
-                            }
-                        }
-                    }
+        List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
+                game.getStoredValue("assignedBombardment" + player.getFaction()),
+                new TypeReference<List<BombardmentAssignment>>() {});
+        List<String> usedLabels = new ArrayList<>();
+        for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : bombardUnits.entrySet()) {
+
+            UnitModel mod = entry.getKey().getKey();
+            String sourceId = mod.getAsyncId();
+
+            int totalUnits = entry.getValue();
+            int totalGalvanized =
+                    entry.getKey().getValue().getGalvanizedUnitCount(mod.getUnitType(), player.getColorID());
+
+            int totalNormal = totalUnits - totalGalvanized;
+
+            // All assignments for this unit model
+            List<BombardmentAssignment> assignments = assignedUnits.stream()
+                    .filter(a -> a.sourceId().contains(sourceId))
+                    .toList();
+
+            int assignedNormal = 0;
+            int assignedGalvanized = 0;
+
+            //
+            // RED BUTTONS
+            //
+            for (BombardmentAssignment assignment : assignments) {
+
+                if (assignment.galvanized()) {
+                    assignedGalvanized++;
                 } else {
-                    for (String planet : BombardmentService.getBombardablePlanets(player, game, tile)) {
-                        String label = "Assign " + capitalize(mod.getBaseType()) + " To "
-                                + Helper.getPlanetRepresentationNoResInf(planet, game);
-                        if (!usedLabels.contains(label)) {
-                            buttons.add(Buttons.green(
-                                    "assignBombardUnit_" + name + "_" + planet, label, mod.getUnitEmoji()));
-                            usedLabels.add(label);
-                        }
+                    assignedNormal++;
+                }
+
+                String label = "Unassign "
+                        + (assignment.galvanized() ? "Galvanized " : "")
+                        + capitalize(mod.getBaseType())
+                        + " From "
+                        + Helper.getPlanetRepresentationNoResInf(assignment.planet(), game);
+
+                if (!usedLabels.contains(label)) {
+                    buttons.add(Buttons.red("unassignBombardUnit_" + assignment.encode(), label, mod.getUnitEmoji()));
+                    usedLabels.add(label);
+                }
+            }
+
+            int remainingNormal = totalNormal - assignedNormal;
+            int remainingGalvanized = totalGalvanized - assignedGalvanized;
+
+            //
+            // GREEN BUTTONS (NORMAL)
+            //
+            for (int i = 0; i < remainingNormal; i++) {
+                for (String planet : BombardmentService.getBombardablePlanets(player, game, tile)) {
+
+                    BombardmentAssignment assignment =
+                            new BombardmentAssignment(sourceId, planet, false, BombardmentAssignmentType.UNIT);
+
+                    String label = "Assign "
+                            + capitalize(mod.getBaseType())
+                            + " To "
+                            + Helper.getPlanetRepresentationNoResInf(planet, game);
+
+                    if (!usedLabels.contains(label)) {
+                        buttons.add(
+                                Buttons.green("assignBombardUnit_" + assignment.encode(), label, mod.getUnitEmoji()));
+                        usedLabels.add(label);
+                    }
+                }
+            }
+
+            //
+            // GREEN BUTTONS (GALVANIZED)
+            //
+            for (int i = 0; i < remainingGalvanized; i++) {
+                for (String planet : BombardmentService.getBombardablePlanets(player, game, tile)) {
+
+                    BombardmentAssignment assignment =
+                            new BombardmentAssignment(sourceId, planet, true, BombardmentAssignmentType.UNIT);
+
+                    String label = "Assign Galvanized "
+                            + capitalize(mod.getBaseType())
+                            + " To "
+                            + Helper.getPlanetRepresentationNoResInf(planet, game);
+
+                    if (!usedLabels.contains(label)) {
+                        buttons.add(
+                                Buttons.green("assignBombardUnit_" + assignment.encode(), label, mod.getUnitEmoji()));
+                        usedLabels.add(label);
                     }
                 }
             }
         }
         if (player.hasTech("ps") || player.hasTech("absol_ps")) {
-            if (assignedUnits.contains("plasma")) {
-                for (String assignedUnit : assignedUnits.split(";")) {
-                    if (assignedUnit.contains("plasma")) {
-                        String planet = assignedUnit.split("_")[2];
+            if (assignedUnits.stream().anyMatch(u -> u.sourceId().contains("plasmascoring"))) {
+                for (BombardmentAssignment assignedUnit : assignedUnits) {
+                    if (assignedUnit.sourceId().contains("plasmascoring")) {
+                        String planet = assignedUnit.planet();
                         buttons.add(Buttons.red(
-                                "unassignBombardUnit_" + assignedUnit,
+                                "unassignBombardUnit_" + assignedUnit.encode(),
                                 "Unassign Plasma Scoring Die From "
                                         + Helper.getPlanetRepresentationNoResInf(planet, game),
                                 TechEmojis.WarfareTech));
@@ -147,20 +225,22 @@ class BombardmentButtonHandler {
                 }
             } else {
                 for (String planet : BombardmentService.getBombardablePlanets(player, game, tile)) {
+                    BombardmentAssignment assignedUnit =
+                            new BombardmentAssignment("plasmascoring", planet, false, BombardmentAssignmentType.TECH);
                     buttons.add(Buttons.green(
-                            "assignBombardUnit_plasma_99_" + planet,
+                            "assignBombardUnit_" + assignedUnit.encode(),
                             "Assign Plasma Scoring Die To " + Helper.getPlanetRepresentationNoResInf(planet, game),
                             TechEmojis.WarfareTech));
                 }
             }
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander") || player.hasTech("tf-zealous")) {
-            if (assignedUnits.contains("argent")) {
-                for (String assignedUnit : assignedUnits.split(";")) {
-                    if (assignedUnit.contains("argent")) {
-                        String planet = assignedUnit.split("_")[2];
+            if (assignedUnits.stream().anyMatch(u -> u.sourceId().contains("argentcommander"))) {
+                for (BombardmentAssignment assignedUnit : assignedUnits) {
+                    if (assignedUnit.sourceId().contains("argentcommander")) {
+                        String planet = assignedUnit.planet();
                         buttons.add(Buttons.red(
-                                "unassignBombardUnit_" + assignedUnit,
+                                "unassignBombardUnit_" + assignedUnit.encode(),
                                 "Unassign Argent Commander Die from "
                                         + Helper.getPlanetRepresentationNoResInf(planet, game),
                                 FactionEmojis.Argent));
@@ -169,7 +249,10 @@ class BombardmentButtonHandler {
             } else {
                 for (String planet : BombardmentService.getBombardablePlanets(player, game, tile)) {
                     buttons.add(Buttons.green(
-                            "assignBombardUnit_argentcommander_99_" + planet,
+                            "assignBombardUnit_"
+                                    + new BombardmentAssignment(
+                                                    "argentcommander", planet, false, BombardmentAssignmentType.LEADER)
+                                            .encode(),
                             "Assign Argent Commander Die to " + Helper.getPlanetRepresentationNoResInf(planet, game),
                             FactionEmojis.Argent));
                 }
@@ -183,7 +266,7 @@ class BombardmentButtonHandler {
 
     private static String getBombardmentSummary(Player player, Game game) {
         StringBuilder summary = new StringBuilder();
-        String assignedUnits = game.getStoredValue("assignedBombardment" + player.getFaction());
+        List<BombardmentAssignment> assignedUnits = getAssignments(player, game);
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         if (tile == null) {
             return summary.toString();
@@ -209,22 +292,44 @@ class BombardmentButtonHandler {
                 }
             }
 
-            for (String assignedUnit : assignedUnits.split(";")) {
-                if (assignedUnit.endsWith(planet)) {
-                    if (assignedUnit.contains("99")) {
-                        if (assignedUnit.contains("argent")) {
-                            summary.append("- Trrakan Aun Zulok die\n");
-                        } else {
-                            summary.append("- _Plasma Scoring_ die\n");
+            for (BombardmentAssignment assignedUnit : assignedUnits) {
+                if (assignedUnit.planet().equals(planet)) {
+                    switch (assignedUnit.type()) {
+                        case UNIT -> {
+                            String asyncID = assignedUnit.sourceId();
+                            UnitModel mod = player.getUnitFromAsyncID(asyncID);
+                            summary.append("- ").append(mod.getUnitEmoji());
+                            if (assignedUnit.galvanized()) {
+                                summary.append(" " + UnitEmojis.Galvanized);
+                            }
+                            summary.append('\n');
                         }
-                    } else {
-                        String asyncID = assignedUnit.split("_")[0];
-                        UnitModel mod = player.getUnitFromAsyncID(asyncID);
-                        summary.append("- ").append(mod.getUnitEmoji()).append('\n');
+                        case TECH -> {
+                            if (assignedUnit.sourceId().contains("plasmascoring")) {
+                                summary.append("- _Plasma Scoring_ die\n");
+                            }
+                        }
+                        case LEADER -> {
+                            if (assignedUnit.sourceId().contains("argentcommander")) {
+                                summary.append("- Trrakan Aun Zulok die\n");
+                            }
+                        }
                     }
                 }
             }
         }
         return summary.toString();
+    }
+
+    private static List<BombardmentAssignment> getAssignments(Player player, Game game) {
+        String json = game.getStoredValue("assignedBombardment" + player.getFaction());
+        if (json == null || json.isBlank()) {
+            return new ArrayList<>();
+        }
+        return MAPPER.readValue(json, new TypeReference<List<BombardmentAssignment>>() {});
+    }
+
+    private static void saveAssignments(Player player, Game game, List<BombardmentAssignment> assignments) {
+        game.setStoredValue("assignedBombardment" + player.getFaction(), MAPPER.writeValueAsString(assignments));
     }
 }

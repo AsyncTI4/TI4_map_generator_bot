@@ -1,6 +1,7 @@
 package ti4.service.combat;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +92,33 @@ class CombatStatsServiceTest extends BaseTi4Test {
         Assertions.assertEquals(3, displayProfile.diceCount());
         Assertions.assertEquals(0, rollProfile.diceCount());
         Assertions.assertEquals(3, extraRollCount);
+    }
+
+    @Test
+    void bombardmentCombatContextCountsOnlyAssignedGalvanizedUnits() {
+        UnitModel unit = new UnitModel();
+        unit.setAsyncId("dn");
+        unit.setBaseType("dn");
+        Map<UnitModel, Integer> unitsByQuantity = new HashMap<>();
+        unitsByQuantity.put(unit, 2);
+
+        CombatRollService.BombardmentCombatContext context = CombatRollService.buildBombardmentCombatContext(
+                unitsByQuantity, "dn_0_mecatol_true;dn_1_mecatol_false;", "mecatol");
+
+        Assertions.assertEquals(2, context.participatingUnitsByQuantity().get(unit));
+        Assertions.assertEquals(1, context.getParticipatingGalvanizedCount(unit));
+    }
+
+    @Test
+    void bombardmentAssignmentLookupFindsGalvanizedMatches() {
+        String assignedUnits = "dn_0_mecatol_false;dn_1_mecatol_true;";
+
+        Assertions.assertEquals(
+                "dn_1_mecatol_true",
+                BombardmentService.findMatchingBombardmentAssignment(assignedUnits, "dn", "mecatol", true));
+        Assertions.assertEquals(
+                "dn_0_mecatol_false",
+                BombardmentService.findMatchingBombardmentAssignment(assignedUnits, "dn", "mecatol", false));
     }
 
     @Test
