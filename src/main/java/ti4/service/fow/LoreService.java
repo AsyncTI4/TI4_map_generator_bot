@@ -987,6 +987,31 @@ public final class LoreService {
         saveLore(game);
     }
 
+    /** Outcome of {@link #importValidatedLore}: {@code target} is the canonical stored key on
+     *  success (null if the entry was rejected outright), {@code warnings} lists non-fatal
+     *  effect-line problems — still saved, but those lines won't fire until fixed. */
+    public record LoreImportResult(String target, List<String> warnings) {}
+
+    /**
+     * Validates and saves one lore entry from an external source (e.g. the JSON map importer),
+     * using the exact same rules a GM typing it into the modal gets: target resolution
+     * (system/planet/phase), phase/trigger pairing, {@code #tag} collision auto-tagging, length
+     * limits, and effect-line syntax warnings. Unlike {@link #addLoreFromString}, a rejected entry
+     * is reported back rather than silently dropped or defaulted — callers should treat a null
+     * {@code target} as "not saved" and surface a reason to whoever's importing.
+     */
+    public static LoreImportResult importValidatedLore(String rawTarget, LoreEntry entry, Game game) {
+        Map<String, LoreEntry> loreMap = getGameLore(game);
+        String validTarget = validateLore(rawTarget, "", entry, loreMap, game);
+        if (validTarget == null) {
+            return new LoreImportResult(null, List.of());
+        }
+        entry.target = validTarget;
+        setLore(entry, game, new StringBuilder());
+        saveLore(game);
+        return new LoreImportResult(validTarget, LoreEffects.validateEffects(entry, game));
+    }
+
     private static void setLore(LoreEntry entry, Game game, StringBuilder sb) {
         Map<String, LoreEntry> gameLoreMap = getGameLore(game);
         if (StringUtils.isBlank(entry.loreText)) {
@@ -1109,6 +1134,22 @@ public final class LoreService {
         return matches;
     }
 
+    /**
+     * Every stored entry whose target shares this base (ignoring any "#tag" disambiguator),
+     * regardless of trigger or round window — unlike {@link #matchingEntries}, which is
+     * trigger/round-scoped for firing. Used by external exporters (the JSON map exporter) that
+     * need "every entry attached to this system/planet/phase," not "what should fire right now."
+     */
+    public static List<LoreEntry> getEntriesForBase(Game game, String base) {
+        List<LoreEntry> matches = new ArrayList<>();
+        for (LoreEntry entry : getGameLore(game).values()) {
+            if (splitTargetKey(entry.target).base().equals(base)) {
+                matches.add(entry);
+            }
+        }
+        return matches;
+    }
+
     // -------------------------------------------------------------------------------------------------
     // Phase-triggered lore: entries whose target is a phase pseudo-target (strategy/action/status/agenda)
     // and whose trigger is PHASE_START/PHASE_END fire on phase transitions, not player actions.
@@ -1120,6 +1161,12 @@ public final class LoreService {
 
     static boolean isPhaseTarget(String base) {
         return base != null && PHASE_TARGETS.contains(base.toLowerCase());
+    }
+
+    /** The four phase pseudo-target names, for external exporters (the JSON map exporter) that
+     *  need to enumerate them without duplicating the list themselves. */
+    public static Set<String> getPhaseTargetNames() {
+        return Set.copyOf(PHASE_TARGETS);
     }
 
     /**
