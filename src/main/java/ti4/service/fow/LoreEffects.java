@@ -240,6 +240,19 @@ final class LoreEffects {
             if (spec[0] <= 0 || spec[1] <= 1) {
                 problems.add("`!roll` needs a positive dice count and at least 2 sides, e.g. `!roll 2d10`");
             }
+        } else {
+            // A line like "2-10: !tg +2" with no !roll marker looks like a forgotten roll bin: without the
+            // marker the "2-10:" is treated as flavor and the effect fires unconditionally. Pure flavor
+            // ("3: the gate opens", no effect) is intentionally left alone — only warn when there's an effect.
+            for (String line : lore.footerText.split("\n")) {
+                String stripped = line.strip();
+                Matcher m = BIN_BRANCH.matcher(stripped);
+                if (m.matches() && m.group(2).contains("!")) {
+                    problems.add(
+                            "`" + stripped
+                                    + "` looks like a roll bin but the footer has no `!roll NdM` marker — its effect will fire every time");
+                }
+            }
         }
         if (LoreService.isPhaseTarget(LoreService.splitTargetKey(lore.target).base())) {
             problems.addAll(validatePhaseEntry(lore));

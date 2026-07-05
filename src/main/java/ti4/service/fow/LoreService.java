@@ -235,16 +235,25 @@ public final class LoreService {
             return null;
         }
 
-        /** Splits a footer line into an optional tag ("accept", "reject", or a numeric roll-bin range like
-         *  "2-10"/"5") and the remainder of the line after the tag; tag is null if untagged. */
-        private static String[] splitTag(String line) {
+        /**
+         * Splits a footer line into an optional tag ("accept", "reject", or a numeric roll-bin range like
+         * "2-10"/"5") and the remainder of the line after the tag; tag is null if untagged.
+         *
+         * The numeric bin tag is only recognized when {@code rollGated} — otherwise a plain flavor line that
+         * happens to start with "N:" (e.g. "3: the gate opens") would have its prefix stripped, a regression
+         * for lore written before roll gating existed. accept:/reject: are always recognized (they were
+         * stripped regardless of choice-gating before roll gating shipped, so that behavior is preserved).
+         */
+        private static String[] splitTag(String line, boolean rollGated) {
             String lower = line.toLowerCase();
             if (lower.startsWith("accept:"))
                 return new String[] {"accept", line.substring(7).strip()};
             if (lower.startsWith("reject:"))
                 return new String[] {"reject", line.substring(7).strip()};
-            Matcher m = BIN_TAG.matcher(line.strip());
-            if (m.matches()) return new String[] {m.group(1), m.group(2)};
+            if (rollGated) {
+                Matcher m = BIN_TAG.matcher(line.strip());
+                if (m.matches()) return new String[] {m.group(1), m.group(2)};
+            }
             return new String[] {null, line};
         }
 
@@ -256,12 +265,13 @@ public final class LoreService {
          */
         public List<String> getEffectLines() {
             List<String> out = new ArrayList<>();
+            boolean rollGated = isRollGated();
             for (String line : footerText.split("\n")) {
                 String stripped = line.strip();
                 if (CHOICE_MARKER.equalsIgnoreCase(stripped)
                         || ROLL_MARKER.matcher(stripped).matches()) continue;
 
-                String[] tagged = splitTag(stripped);
+                String[] tagged = splitTag(stripped, rollGated);
                 String tagPrefix = tagged[0] == null ? "" : tagged[0] + ":";
                 String rest = tagged[1];
 
@@ -279,11 +289,12 @@ public final class LoreService {
         /** Footer text with the !choice/!roll markers and effect lines removed, for display. */
         public String getDisplayFooter() {
             StringBuilder sb = new StringBuilder();
+            boolean rollGated = isRollGated();
             for (String line : footerText.split("\n")) {
                 String stripped = line.strip();
                 if (CHOICE_MARKER.equalsIgnoreCase(stripped)
                         || ROLL_MARKER.matcher(stripped).matches()) continue;
-                stripped = splitTag(stripped)[1];
+                stripped = splitTag(stripped, rollGated)[1];
 
                 // Strip effect segments from the line (same split as getEffectLines)
                 StringBuilder lineOut = new StringBuilder();

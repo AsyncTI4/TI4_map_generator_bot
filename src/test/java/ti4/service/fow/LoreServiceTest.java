@@ -141,6 +141,21 @@ class LoreServiceTest extends BaseTi4Test {
             assertEquals(List.of("tg +2"), e.getEffectLines());
             assertEquals("Flavor here", e.getDisplayFooter());
         }
+
+        @Test
+        void numericColonPrefixIsPlainTextWithoutARollMarker() {
+            // Backward compat: roll gating added N-M:/N: bin tags, but a pre-roll entry with flavor text
+            // that happens to start with "N:" must keep its prefix and its effect must still fire.
+            LoreEntry e = entry("3: The ancient gate opens !tg +2");
+            assertEquals("3: The ancient gate opens", e.getDisplayFooter());
+            assertEquals(List.of("tg +2"), e.getEffectLines(), "effect is untagged, fires unconditionally");
+        }
+
+        @Test
+        void numericColonPrefixBecomesABinTagOnlyWhenRollGated() {
+            LoreEntry e = entry("!roll 2d10", "3: !tg +2");
+            assertEquals(List.of("3:tg +2"), e.getEffectLines());
+        }
     }
 
     // -----------------------------------------------------------------------
