@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
+import java.util.function.ObjIntConsumer;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -78,8 +79,29 @@ public class AgendaSummaryHelper {
         return voteCounts;
     }
 
+    public static Map<String, Integer> getCurrentPlayerVoteCountsByColor(Game game) {
+        Map<String, Integer> voteCounts = new LinkedHashMap<>();
+        for (String voteInfoValue : game.getCurrentAgendaVotes().values()) {
+            forEachNumericVote(voteInfoValue, (faction, votes) -> {
+                Player player = game.getPlayerFromColorOrFaction(faction);
+                if (player != null
+                        && player.getColor() != null
+                        && !player.getColor().isBlank()) {
+                    voteCounts.merge(player.getColor(), votes, Integer::sum);
+                }
+            });
+        }
+        return voteCounts;
+    }
+
     private static int countNumericVotes(String voteInfoValue) {
-        int totalVotes = 0;
+        int[] totalVotes = {0};
+        forEachNumericVote(voteInfoValue, (faction, votes) -> totalVotes[0] += votes);
+        return totalVotes[0];
+    }
+
+    /** Parses a "faction_votes;faction_votes" vote-info value, skipping riders and other non-numeric entries. */
+    private static void forEachNumericVote(String voteInfoValue, ObjIntConsumer<String> consumer) {
         StringTokenizer voteInfo = new StringTokenizer(voteInfoValue, ";");
         while (voteInfo.hasMoreTokens()) {
             String specificVote = voteInfo.nextToken();
@@ -90,10 +112,9 @@ public class AgendaSummaryHelper {
 
             String vote = specificVote.substring(separator + 1);
             if (NumberUtils.isDigits(vote)) {
-                totalVotes += Integer.parseInt(vote);
+                consumer.accept(specificVote.substring(0, separator), Integer.parseInt(vote));
             }
         }
-        return totalVotes;
     }
 
     private static String resolveAgendaName(String agendaDetails) {

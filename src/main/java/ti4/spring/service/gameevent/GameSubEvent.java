@@ -17,6 +17,7 @@ import java.util.Map;
     @JsonSubTypes.Type(value = GameSubEvent.ActionCardPlayed.class, name = "ACTION_CARD_PLAYED"),
     @JsonSubTypes.Type(value = GameSubEvent.LeaderPlayed.class, name = "LEADER_PLAYED"),
     @JsonSubTypes.Type(value = GameSubEvent.TechExhausted.class, name = "TECH_EXHAUSTED"),
+    @JsonSubTypes.Type(value = GameSubEvent.ObjectiveScored.class, name = "OBJECTIVE_SCORED"),
     @JsonSubTypes.Type(value = GameSubEvent.Production.class, name = "PRODUCTION"),
     @JsonSubTypes.Type(value = GameSubEvent.ManualCommand.class, name = "MANUAL_COMMAND")
 })
@@ -30,6 +31,8 @@ public sealed interface GameSubEvent {
     record LeaderPlayed(String faction, String leaderType, String leaderId) implements GameSubEvent {}
 
     record TechExhausted(String faction, String techId) implements GameSubEvent {}
+
+    record ObjectiveScored(String faction, String objectiveId, String category) implements GameSubEvent {}
 
     record Production(String tile, Map<String, Integer> units, Integer cost) implements GameSubEvent {}
 

@@ -29,7 +29,6 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperPromissories;
 import ti4.image.Mapper;
-import ti4.json.JsonMapperManager;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -436,9 +435,7 @@ public final class ButtonHelperTacticalAction {
         addIfNotEmpty(payload, "summary", game.getStoredValue("currentActionSummary" + player.getFaction()));
         List<GameSubEvent> subEvents = GameEventDraft.drain(game);
         if (!subEvents.isEmpty()) {
-            // Embed as a pre-typed JsonNode: serializing the list inside the Object-valued payload map would otherwise
-            // drop the polymorphic "type" discriminator that the frontend relies on.
-            payload.put("subEvents", JsonMapperManager.basic().readTree(GameEventDraft.serialize(subEvents)));
+            payload.put("subEvents", GameEventDraft.toJsonNode(subEvents));
         }
         GameEventService.commit(game, GameEventType.TACTICAL_ACTION, player, payload);
     }
