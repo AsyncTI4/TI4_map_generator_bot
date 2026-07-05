@@ -88,6 +88,7 @@ public class StartPhaseService {
             case "voting", "agendaVoting" -> AgendaHelper.startTheVoting(game);
             case "shuffleDecks" -> game.shuffleDecks();
             case "agenda" -> {
+                StatusHelper.commitStatusScoringEvent(game);
                 LoreService.showPhaseLore(game, "agenda"); // before setPhaseOfGame: END lore reads the old phase
                 game.setPhaseOfGame("agenda");
                 GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "agenda"));
@@ -217,6 +218,7 @@ public class StartPhaseService {
     }
 
     public static void startStrategyPhase(GenericInteractionCreateEvent event, Game game) {
+        StatusHelper.commitStatusScoringEvent(game);
         // Phase-end lore must fire before the round number increments below, so "end of round N"
         // round gates see the round they close; the matching phase-START fires after setPhaseOfGame.
         LoreService.showPhaseEndLore(game, "strategy");
@@ -856,6 +858,7 @@ public class StartPhaseService {
     }
 
     public static void startStatusHomework(GenericInteractionCreateEvent event, Game game) {
+        StatusHelper.commitStatusScoringEvent(game);
         game.setPhaseOfGame("statusHomework");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusHomework", System.currentTimeMillis() + "");
         GMService.logActivity(game, "**StatusHomework** Phase for Round " + game.getRound() + " started.", true);

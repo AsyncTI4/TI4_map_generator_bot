@@ -143,7 +143,9 @@ public class WebGameState {
     public static class WebAgenda {
         private String id;
         private Map<String, Integer> startVoteCounts;
+        private Map<String, Integer> castVoteCounts;
         private Map<String, Integer> outcomeVoteCounts;
+        private String resolvedOutcome;
 
         static WebAgenda fromGame(Game game) {
             String agendaId = AgendaHelper.getCurrentAgendaId(game);
@@ -154,7 +156,14 @@ public class WebGameState {
             WebAgenda agenda = new WebAgenda();
             agenda.id = agendaId;
             agenda.startVoteCounts = AgendaHelper.getAgendaStartVoteCounts(game);
+            // Hidden agenda mode keeps per-player vote attribution secret on Discord; don't leak it here.
+            agenda.castVoteCounts =
+                    game.isHiddenAgendaMode() ? null : AgendaSummaryHelper.getCurrentPlayerVoteCountsByColor(game);
             agenda.outcomeVoteCounts = AgendaSummaryHelper.getCurrentOutcomeVoteCounts(game);
+            // resolvedAgendaId is cleared on every agenda reveal, so a match means this agenda was resolved.
+            agenda.resolvedOutcome = agendaId.equals(game.getStoredValue("resolvedAgendaId"))
+                    ? blankToNull(game.getStoredValue("resolvedAgendaOutcome"))
+                    : null;
             return agenda;
         }
     }

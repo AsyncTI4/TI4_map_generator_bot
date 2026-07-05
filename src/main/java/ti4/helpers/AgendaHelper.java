@@ -2539,6 +2539,8 @@ public final class AgendaHelper {
         game.setStoredValue("AssassinatedReps", "");
         game.setStoredValue("riskedPredictive", "");
         game.setStoredValue("conspiratorsFaction", "");
+        game.setStoredValue("resolvedAgendaId", "");
+        game.setStoredValue("resolvedAgendaOutcome", "");
         String agendaID = game.revealAgenda(revealFromBottom);
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(agendaID);
@@ -2867,8 +2869,12 @@ public final class AgendaHelper {
             return null;
         }
 
-        String candidate = currentAgendaInfo.substring(currentAgendaInfo.lastIndexOf('_') + 1);
-        return Mapper.isValidAgenda(candidate) ? candidate : null;
+        // Format: type_target_uniqueID_agendaID; the agenda ID itself may contain underscores.
+        String[] parts = currentAgendaInfo.split("_", 4);
+        if (parts.length < 4) {
+            return null;
+        }
+        return Mapper.isValidAgenda(parts[3]) ? parts[3] : null;
     }
 
     private static boolean isRepresentativeGovernmentInEffect(Game game) {

@@ -9,6 +9,7 @@ import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Undo-safe, strictly ordered draft of tactical sub-events. The draft lives as ONE JSON line in the game save file via
@@ -70,6 +71,14 @@ public class GameEventDraft {
     /** Compact JSON (one line, {@code type} discriminators intact) for a list of sub-events. */
     public static String serialize(List<GameSubEvent> subEvents) {
         return JsonMapperManager.basic().writerFor(LIST_TYPE).writeValueAsString(subEvents);
+    }
+
+    /**
+     * Sub-events as a pre-typed JsonNode for embedding in an Object-valued event payload; serializing the raw list
+     * there would drop the polymorphic {@code type} discriminator that the frontend relies on.
+     */
+    public static JsonNode toJsonNode(List<GameSubEvent> subEvents) {
+        return JsonMapperManager.basic().readTree(serialize(subEvents));
     }
 
     private static List<GameSubEvent> parse(String json) {

@@ -32,7 +32,7 @@
             "CYBERNETIC",
             "WARFARE"
         ],
-        "text": "At the start of a space combat round in a non-home system, your ships in the active system may use their BOMBARDMENT abilities. If they do, you must announce retreat during this combat round. When you retreat during your tactical action, remove 1 of your command tokens from the active system and return it to your reinforcements. After you destroy all the ground forces on a planet, gain control of that planet.",
+        "text": "At the start of a space combat round in a non-home system, your ships in the active system may use their BOMBARDMENT abilities. If they do, you must announce retreat during this combat round. When you retreat during your tactical action, remove 1 of your command tokens from the active system and return it to your reinforcements. After you destroy the last of the controlling player's ground forces on a planet, you may commit 1 infantry from that planet's space area onto that planet.",
         "source": "balacasi"
     },
     {

@@ -4045,6 +4045,7 @@ public class ButtonHelper {
         int numInfNFightersNMechs = 0;
         int numOfCapitalShips = 0;
         int fightersIgnored = 0;
+        int totalPdsInSystem = 0;
         int numFighter2s = 0;
         int numFighter2sFleet = 0;
         int numRiptide2s = 0;
@@ -4117,6 +4118,7 @@ public class ButtonHelper {
                 }
                 if ("pds".equalsIgnoreCase(unit.getBaseType()) && !"space".equalsIgnoreCase(capChecker.getName())) {
                     numPDS += entry.getValue();
+                    totalPdsInSystem += entry.getValue();
                 }
             }
             if (player.getPlanets().contains(capChecker.getName())) {
@@ -4161,6 +4163,9 @@ public class ButtonHelper {
             if ((capChecker instanceof Planet p) && numPDS > 2 && !isLawInPlay(game, "defense_act")) {
                 tooManyPDS = p.getRepresentation(game);
             }
+        }
+        if (player.hasUnlockedBreakthrough("vyserixbt")) {
+            fightersIgnored += 3 * totalPdsInSystem;
         }
         int ignoredFs = 0;
 
