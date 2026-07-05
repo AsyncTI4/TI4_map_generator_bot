@@ -348,7 +348,7 @@
     "basicProduction": "res",
     "capacityValue": 3,
     "isStructure": true,
-    "ability": "This unit's PRODUCTION value is equal to 2 more than this planet's resource value. \n\nUp to 3 fighters in this system do not count against capacity."
+    "ability": "This unit's PRODUCTION value is equal to 2 more than this planet's resource value. \n\nWhen using this unit's PRODUCTION ability, discount the combined cost of the units produced by 1 for every 4 other player's control tokens on your faction sheet. \n\nUp to 3 fighters in this system do not count against capacity."
   },
   {
     "id": "netrunners_spacedock2",

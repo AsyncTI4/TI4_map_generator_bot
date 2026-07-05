@@ -47,10 +47,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -970,7 +969,7 @@ public final class Helper {
 
             boolean containsDMZ = uh.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
 
-            if (containsDMZ || uh.isSpaceStation()) {
+            if (containsDMZ || uh.isSpaceStation(game)) {
                 continue;
             }
             if ("spacedock".equalsIgnoreCase(unit)) {
@@ -1002,7 +1001,7 @@ public final class Helper {
                 continue;
             }
             if (game.getUnitHolderFromPlanet(planet) == null
-                    || game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
+                    || game.getUnitHolderFromPlanet(planet).isSpaceStation(game)) {
                 continue;
             }
             String id = player.factionButtonChecker() + prefix + "_" + unit + "_" + planet;
@@ -1324,7 +1323,6 @@ public final class Helper {
                     && !thing.contains("ghostbt")
                     && !thing.contains("tyrisbt")
                     && !thing.contains("dwsDiscount")
-                    && !NetrunnersLeadersHandler.isOverclockSpentThing(thing)
                     && !thing.contains("aida")
                     && !thing.contains("commander")
                     && !thing.contains("agent")
@@ -1437,10 +1435,6 @@ public final class Helper {
                             .append(MiscEmojis.Resources_1)
                             .append('\n');
                     res += 1;
-                }
-                if (NetrunnersLeadersHandler.isOverclockSpentThing(thing)) {
-                    msg.append(NetrunnersLeadersHandler.getOverclockSpentMessage(game, thing));
-                    res += NetrunnersLeadersHandler.getOverclockSpentResources(thing);
                 }
                 if (thing.contains("boon")) {
                     msg.append("> Used Boon Relic ").append(ExploreEmojis.Relic).append('\n');
@@ -1640,9 +1634,9 @@ public final class Helper {
         }
         int cost = calculateCostOfProducedUnits(player, game, true);
         int unitCount = calculateCostOfProducedUnits(player, game, false);
-        String siphonIIDiscountMessage = "";
-        if (player.hasTech("benetrunnerssd")) {
-            siphonIIDiscountMessage = NetrunnersFactionTechsHandler.getSiphonIIDiscountMessage(game, player);
+        String siphonDiscountMessage = "";
+        if (player.ownsUnit("netrunners_spacedock") || player.ownsUnit("netrunners_spacedock2")) {
+            siphonDiscountMessage = NetrunnersFactionTechsHandler.getSiphonDiscountMessage(game, player);
         }
         if (player.hasAbility("control_network")) {
             String controlNetworkMessage =
@@ -1735,7 +1729,7 @@ public final class Helper {
                         .append(".");
             }
         }
-        msg.append(siphonIIDiscountMessage);
+        msg.append(siphonDiscountMessage);
         return msg.toString();
     }
 
@@ -2164,8 +2158,8 @@ public final class Helper {
                         || (!game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")
                                 && !player.hasTech("tf-quantumdrive"))) {
                     cost += (int) removedUnit.getCost() * entry.getValue();
-                    if (MobilizationEngineHandler.hasEngineAttached(game)) {
-                        cost += MobilizationEngineHandler.getCostMod(game, player, removedUnit) * entry.getValue();
+                    if (ArvaxiBreakthroughHandler.hasEngineAttached(game)) {
+                        cost += ArvaxiBreakthroughHandler.getCostMod(game, player, removedUnit) * entry.getValue();
                     }
                 }
                 totalUnits += entry.getValue();
@@ -2186,8 +2180,8 @@ public final class Helper {
         }
         totalUnits += numInf + numFF;
         if (wantCost) {
-            if (player.hasTech("benetrunnerssd")) {
-                cost = NetrunnersFactionTechsHandler.applySiphonIIDiscount(game, player, cost);
+            if (player.ownsUnit("netrunners_spacedock") || player.ownsUnit("netrunners_spacedock2")) {
+                cost = NetrunnersFactionTechsHandler.applySiphonDiscount(game, player, cost);
             }
             return cost;
         } else {

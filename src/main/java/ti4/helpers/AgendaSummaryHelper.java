@@ -1,8 +1,10 @@
 package ti4.helpers;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
+import java.util.function.ObjIntConsumer;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -34,17 +36,13 @@ public class AgendaSummaryHelper {
             String outcome = entry.getKey();
             String outcomeName = AgendaHelper.getAgendaOutcomeName(game, outcome, capitalize);
             StringBuilder outcomeSummaryBuilder = new StringBuilder();
-            int totalVotes = 0;
+            int totalVotes = countNumericVotes(entry.getValue());
 
             StringTokenizer voteInfo = new StringTokenizer(entry.getValue(), ";");
             while (voteInfo.hasMoreTokens()) {
                 String specificVote = voteInfo.nextToken();
                 String faction = specificVote.substring(0, specificVote.indexOf('_'));
                 String vote = specificVote.substring(specificVote.indexOf('_') + 1);
-
-                if (NumberUtils.isDigits(vote)) {
-                    totalVotes += Integer.parseInt(vote);
-                }
 
                 if (capitalize) {
                     appendCapitalizedVote(game, overwriteFog, outcomeSummaryBuilder, faction, vote);
@@ -71,6 +69,52 @@ public class AgendaSummaryHelper {
             }
         }
         return summaryBuilder.toString();
+    }
+
+    public static Map<String, Integer> getCurrentOutcomeVoteCounts(Game game) {
+        Map<String, Integer> voteCounts = new LinkedHashMap<>();
+        for (Entry<String, String> entry : game.getCurrentAgendaVotes().entrySet()) {
+            voteCounts.put(entry.getKey(), countNumericVotes(entry.getValue()));
+        }
+        return voteCounts;
+    }
+
+    public static Map<String, Integer> getCurrentPlayerVoteCountsByColor(Game game) {
+        Map<String, Integer> voteCounts = new LinkedHashMap<>();
+        for (String voteInfoValue : game.getCurrentAgendaVotes().values()) {
+            forEachNumericVote(voteInfoValue, (faction, votes) -> {
+                Player player = game.getPlayerFromColorOrFaction(faction);
+                if (player != null
+                        && player.getColor() != null
+                        && !player.getColor().isBlank()) {
+                    voteCounts.merge(player.getColor(), votes, Integer::sum);
+                }
+            });
+        }
+        return voteCounts;
+    }
+
+    private static int countNumericVotes(String voteInfoValue) {
+        int[] totalVotes = {0};
+        forEachNumericVote(voteInfoValue, (faction, votes) -> totalVotes[0] += votes);
+        return totalVotes[0];
+    }
+
+    /** Parses a "faction_votes;faction_votes" vote-info value, skipping riders and other non-numeric entries. */
+    private static void forEachNumericVote(String voteInfoValue, ObjIntConsumer<String> consumer) {
+        StringTokenizer voteInfo = new StringTokenizer(voteInfoValue, ";");
+        while (voteInfo.hasMoreTokens()) {
+            String specificVote = voteInfo.nextToken();
+            int separator = specificVote.indexOf('_');
+            if (separator < 0) {
+                continue;
+            }
+
+            String vote = specificVote.substring(separator + 1);
+            if (NumberUtils.isDigits(vote)) {
+                consumer.accept(specificVote.substring(0, separator), Integer.parseInt(vote));
+            }
+        }
     }
 
     private static String resolveAgendaName(String agendaDetails) {

@@ -1,18 +1,15 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -22,14 +19,13 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperUnits;
-import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
@@ -44,275 +40,293 @@ import ti4.service.unit.DestroyUnitService;
 public class NetrunnersLeadersHandler {
 
     private static final String AGENT_ID = "netrunnersagent";
-    private static final String AGENT_SPENT_PREFIX = "netrunnersagent";
-    private static final String AGENT_BUTTON_PREFIX = "netrunnersAgent_";
-    private static final String CHOOSE_TARGET_BUTTON_ID = "netrunnersAgentChooseTarget";
-    private static final String TARGET_PICKER_MESSAGE = "choose a player to use **Overclock** on.";
+    private static final String AGENT_CHOOSE_TARGET = "netrunnersAgentChooseTarget";
+    private static final String AGENT_TARGET = "netrunnersAgentTarget_";
+    private static final String OVERCLOCK_TILE_PREFIX = "netrunnersAgentTile_";
+    private static final String OVERCLOCK_UNIT_PREFIX = "netrunnersAgentUnit_";
+    private static final String OVERCLOCK_DONE_PREFIX = "netrunnersAgentDone_";
+    private static final String OVERCLOCK_REMAINING_PREFIX = "netrunnersAgentRemaining_";
     private static final String COMMANDER_ID = "netrunnerscommander";
     private static final String COMMANDER_FAKE_UNIT_ID = "netrunnerscommanderpds";
     private static final String HERO_CHOOSE_STRUCTURE_PREFIX = "netrunnersHeroChooseStructure_";
     private static final String HERO_DESTROY_STRUCTURE_PREFIX = "netrunnersHeroDestroyStructure_";
 
-    public static List<Button> getOverclockButtons(Game game, Player producingPlayer, Tile productionTile) {
-        if (producingPlayer == null
-                || productionTile == null
-                || getHighestResourceOverclockPlanet(game, producingPlayer, productionTile) == null) {
-            return List.of();
-        }
-        return game.getRealPlayers().stream()
-                .filter(netrunner -> netrunner.hasUnexhaustedLeader(AGENT_ID))
-                .map(netrunner -> Buttons.gray(
-                        getOverclockButtonID(netrunner, producingPlayer, productionTile),
-                        "Use Overclock",
-                        FactionEmojis.netrunners))
-                .toList();
-    }
-
-    public static Button getOverclockCardsInfoButton(Player netrunner) {
+    public static Button getOverclockCardsInfoButton(Player player) {
         return Buttons.gray(
-                netrunner.factionButtonChecker() + CHOOSE_TARGET_BUTTON_ID,
-                "Use Overclock on someone else",
-                FactionEmojis.netrunners);
+                player.factionButtonChecker() + AGENT_CHOOSE_TARGET, "Use Overclock", FactionEmojis.netrunners);
     }
 
-    @ButtonHandler(CHOOSE_TARGET_BUTTON_ID)
-    public static void offerOverclockTargetButtons(Game game, Player netrunner, ButtonInteractionEvent event) {
-        List<Button> buttons = getOverclockTargetButtons(game, netrunner);
-        if (buttons.isEmpty()) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "No eligible players were found for **Overclock**.");
+    @ButtonHandler(AGENT_CHOOSE_TARGET)
+    public static void chooseOverclockTarget(ButtonInteractionEvent event, Player player, Game game) {
+        if (!player.hasUnexhaustedLeader(AGENT_ID)) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Overclock is no longer available.");
+            ButtonHelper.deleteMessage(event);
             return;
         }
 
-        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
-                event, netrunner.getRepresentationUnfogged() + ", choose a player to use **Overclock** on.", buttons);
+        List<Button> buttons = new ArrayList<>();
+        for (Player target : game.getRealPlayers()) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + AGENT_TARGET + target.getFaction(), target.getColorDisplayName()));
+        }
+
+        MessageChannel channel =
+                player.getCardsInfoThread() == null ? player.getCorrectChannel() : player.getCardsInfoThread();
+        MessageHelper.sendMessageToChannelWithButtons(
+                channel, player.getRepresentation() + ", please choose a player to use _Overclock_ on:", buttons);
     }
 
-    @ButtonHandler(AGENT_BUTTON_PREFIX)
-    public static void resolveOverclock(Game game, Player netrunner, ButtonInteractionEvent event, String buttonID) {
-        String[] parts = buttonID.replace(AGENT_BUTTON_PREFIX, "").split("_", 2);
+    public static void startOverclockSession(Game game, Player netrunner, Player affectedPlayer) {
+        game.setStoredValue(OVERCLOCK_REMAINING_PREFIX + affectedPlayer.getFaction(), "2");
+    }
+
+    public static int getOverclockRemaining(Game game, Player affectedPlayer) {
+        String stored = game.getStoredValue(OVERCLOCK_REMAINING_PREFIX + affectedPlayer.getFaction());
+        return stored.isEmpty() ? 0 : Integer.parseInt(stored);
+    }
+
+    private static void setOverclockRemaining(Game game, Player affectedPlayer, int remaining) {
+        if (remaining <= 0) {
+            clearOverclockSession(game, affectedPlayer);
+            return;
+        }
+        game.setStoredValue(OVERCLOCK_REMAINING_PREFIX + affectedPlayer.getFaction(), Integer.toString(remaining));
+    }
+
+    private static void clearOverclockSession(Game game, Player affectedPlayer) {
+        game.removeStoredValue(OVERCLOCK_REMAINING_PREFIX + affectedPlayer.getFaction());
+    }
+
+    private static List<Tile> getOverclockStructureTiles(Game game, Player affectedPlayer) {
+        if (game == null || affectedPlayer == null) {
+            return List.of();
+        }
+
+        return game.getTileMap().values().stream()
+                .filter(Objects::nonNull)
+                .filter(tile -> tile.containsPlayersUnitsWithModelCondition(affectedPlayer, UnitModel::getIsStructure))
+                .toList();
+    }
+
+    private static List<Button> getOverclockStructureTileButtons(Game game, Player affectedPlayer) {
+        List<Button> buttons = getOverclockStructureTiles(game, affectedPlayer).stream()
+                .limit(24)
+                .map(tile -> Buttons.green(
+                        affectedPlayer.factionButtonChecker()
+                                + OVERCLOCK_TILE_PREFIX
+                                + affectedPlayer.getFaction()
+                                + "_"
+                                + tile.getPosition(),
+                        tile.getRepresentationForButtons(game, affectedPlayer)))
+                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        buttons.add(Buttons.red(
+                affectedPlayer.factionButtonChecker() + OVERCLOCK_DONE_PREFIX + affectedPlayer.getFaction(),
+                "Done With Overclock"));
+        return buttons;
+    }
+
+    @ButtonHandler(AGENT_TARGET)
+    public static void resolveOverclockTarget(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!player.hasUnexhaustedLeader(AGENT_ID)) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "_Overclock_ is no longer available.");
+            return;
+        }
+
+        String faction = getOverclockPayload(buttonID, AGENT_TARGET);
+        Player affectedPlayer = game.getPlayerFromColorOrFaction(faction);
+        if (affectedPlayer == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not find that player.");
+            return;
+        }
+
+        startOverclockSession(game, player, affectedPlayer);
+
+        Leader agent = player.getLeader(AGENT_ID).orElse(null);
+        if (agent != null) {
+            ExhaustLeaderService.exhaustLeader(game, player, agent);
+        }
+
+        List<Button> buttons = getOverclockStructureTileButtons(game, affectedPlayer);
+        if (buttons.isEmpty()) {
+            clearOverclockSession(game, affectedPlayer);
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Player has no eligibl tiles with structures.");
+            return;
+        }
+
+        MessageHelper.sendMessageToChannel(
+                game.getActionsChannel(),
+                player.getRepresentation() + " exhausted **Overclock** to allow "
+                        + affectedPlayer.getRepresentation()
+                        + " to produce up to 2 units with tiles containing their structures.");
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                game.getActionsChannel(),
+                affectedPlayer.getRepresentationUnfogged()
+                        + ", choose a tile containing one of your structures for _Overclock_. "
+                        + "You have " + getOverclockRemaining(game, affectedPlayer) + " use(s) remaining.",
+                buttons);
+
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static String getOverclockPayload(String buttonID, String prefix) {
+        int prefixIndex = buttonID.indexOf(prefix);
+        if (prefixIndex < 0) {
+            return "";
+        }
+        return buttonID.substring(prefixIndex + prefix.length());
+    }
+
+    @ButtonHandler(OVERCLOCK_TILE_PREFIX)
+    public static void resolveOverclockTile(
+            Game game, Player affectedPlayer, ButtonInteractionEvent event, String buttonID) {
+        String payload = getOverclockPayload(buttonID, OVERCLOCK_TILE_PREFIX);
+        String[] parts = payload.split("_", 2);
         if (parts.length < 2) {
             return;
         }
-        if (!netrunner.hasUnexhaustedLeader(AGENT_ID)) {
-            rejectOverclock(event, "**Overclock** is no longer available.");
+
+        Player target = game.getPlayerFromColorOrFaction(parts[0]);
+        Tile tile = game.getTileByPosition(parts[1]);
+
+        if (target == null || tile == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "That Overclock option is no longer valid.");
             return;
         }
 
-        OverclockTarget target = getOverclockTarget(game, parts[0], parts[1]);
-        if (target == null) {
-            rejectOverclock(event, "No eligible adjacent planets were found for **Overclock**.");
+        if (!affectedPlayer.equals(target)) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "That Overclock option is not for you.");
             return;
         }
 
-        if (isTargetPickerMessage(event.getMessage())) {
-            resolveTargetPickerOverclock(game, netrunner, target, event);
-            return;
-        }
-
-        String exhaustedMessage = applyOverclock(game, netrunner, target.producingPlayer(), target.planet());
-        if (exhaustedMessage == null) {
-            return;
-        }
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
-        event.getMessage().editMessage(exhaustedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
-    private static String applyOverclock(Game game, Player netrunner, Player producingPlayer, Planet planet) {
-        Leader agent = netrunner.getLeader(AGENT_ID).orElse(null);
-        if (agent == null || !netrunner.hasUnexhaustedLeader(AGENT_ID)) {
-            return null;
-        }
-        ExhaustLeaderService.exhaustLeader(game, netrunner, agent);
-        producingPlayer.addSpentThing(AGENT_SPENT_PREFIX + "_" + planet.getResources() + "_" + netrunner.getFaction());
-        MessageHelper.sendMessageToChannel(
-                game.getActionsChannel(),
-                netrunner.getRepresentation() + " exhausted **Overclock** to reduce "
-                        + producingPlayer.getRepresentation()
-                        + "'s production cost by " + planet.getResources()
-                        + ". The highest-resource eligible planet was "
-                        + Helper.getPlanetRepresentation(planet.getName(), game) + ".");
-        return Helper.buildSpentThingsMessage(producingPlayer, game, "res");
-    }
-
-    private static List<Button> getOverclockTargetButtons(Game game, Player netrunner) {
-        if (!netrunner.hasUnexhaustedLeader(AGENT_ID)) {
-            return List.of();
-        }
-
-        return game.getRealPlayers().stream()
-                .filter(producingPlayer -> producingPlayer != netrunner)
-                .map(producingPlayer -> getBestOverclockTarget(game, producingPlayer))
-                .filter(Objects::nonNull)
-                .map(target -> Buttons.gray(
-                        getOverclockButtonID(netrunner, target.producingPlayer(), target.productionTile()),
-                        target.producingPlayer().getColorDisplayName() + ": "
-                                + Helper.getPlanetRepresentation(target.planet().getName(), game),
-                        target.producingPlayer().fogSafeEmoji()))
-                .toList();
-    }
-
-    private static OverclockTarget getOverclockTarget(Game game, String faction, String position) {
-        return getOverclockTarget(game, game.getPlayerFromColorOrFaction(faction), game.getTileByPosition(position));
-    }
-
-    private static OverclockTarget getBestOverclockTarget(Game game, Player producingPlayer) {
-        return producingPlayer.getCurrentProducedUnits().keySet().stream()
-                .map(producedUnit -> getProductionTile(game, producedUnit))
-                .filter(Objects::nonNull)
-                .map(productionTile -> getOverclockTarget(game, producingPlayer, productionTile))
-                .filter(Objects::nonNull)
-                .max(Comparator.comparingInt(target -> target.planet().getResources()))
-                .orElse(null);
-    }
-
-    private static OverclockTarget getOverclockTarget(Game game, Player producingPlayer, Tile productionTile) {
-        Planet planet = getHighestResourceOverclockPlanet(game, producingPlayer, productionTile);
-        return planet == null ? null : new OverclockTarget(producingPlayer, productionTile, planet);
-    }
-
-    private static Tile getProductionTile(Game game, String producedUnit) {
-        String[] parts = producedUnit.split("_");
-        return parts.length < 2 ? null : game.getTileByPosition(parts[1]);
-    }
-
-    public static boolean isOverclockSpentThing(String thing) {
-        return thing.startsWith(AGENT_SPENT_PREFIX + "_");
-    }
-
-    public static int getOverclockSpentResources(String thing) {
-        return Integer.parseInt(thing.split("_")[1]);
-    }
-
-    public static String getOverclockSpentMessage(Game game, String thing) {
-        String[] parts = thing.split("_");
-        int discount = Integer.parseInt(parts[1]);
-        String faction = game.isFowMode() ? "someone" : parts[2];
-        Player netrunner = game.getPlayerFromColorOrFaction(faction);
-        String source = "someone".equals(faction) || netrunner == null
-                ? ""
-                : " (from " + netrunner.getRepresentationNoPing() + ")";
-        return "> Used **Overclock**" + source + " for " + StringHelper.pluralize(discount, "resource") + "\n";
-    }
-
-    private static boolean isTargetPickerMessage(Message message) {
-        return message.getContentRaw().contains(TARGET_PICKER_MESSAGE);
-    }
-
-    private static void resolveTargetPickerOverclock(
-            Game game, Player netrunner, OverclockTarget target, ButtonInteractionEvent event) {
-        String overclockButtonID = getOverclockButtonID(netrunner, target.producingPlayer(), target.productionTile());
-        target.producingPlayer()
-                .getCorrectChannel()
-                .getHistory()
-                .retrievePast(25)
-                .queue(
-                        messages -> {
-                            Message message = messages.stream()
-                                    .filter(message_ -> hasButton(message_, overclockButtonID))
-                                    .findFirst()
-                                    .orElse(null);
-                            if (message != null) {
-                                applyOverclockToPaymentMessage(
-                                        game, netrunner, target, event, message, overclockButtonID);
-                                return;
-                            }
-                            deleteWithEphemeral(
-                                    event, "Could not find the active production payment message for **Overclock**.");
-                            BotLogger.warning("Could not find Overclock production payment message for "
-                                    + target.producingPlayer().getFaction() + ".");
-                        },
-                        BotLogger::catchRestError);
-    }
-
-    private static void applyOverclockToPaymentMessage(
-            Game game,
-            Player netrunner,
-            OverclockTarget target,
-            ButtonInteractionEvent event,
-            Message message,
-            String overclockButtonID) {
-        String exhaustedMessage = applyOverclock(game, netrunner, target.producingPlayer(), target.planet());
-        if (exhaustedMessage == null) {
-            deleteWithEphemeral(event, "**Overclock** is no longer available.");
-            return;
-        }
-        ButtonHelper.deleteMessage(event);
-        editSpentSummary(message, overclockButtonID, exhaustedMessage);
-    }
-
-    private static void rejectOverclock(ButtonInteractionEvent event, String message) {
-        MessageHelper.sendEphemeralMessageToEventChannel(event, message);
-        removeOverclockButton(event);
-    }
-
-    private static void deleteWithEphemeral(ButtonInteractionEvent event, String message) {
-        MessageHelper.sendEphemeralMessageToEventChannel(event, message);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    private static void removeOverclockButton(ButtonInteractionEvent event) {
-        if (isTargetPickerMessage(event.getMessage())) {
+        if (getOverclockRemaining(game, affectedPlayer) < 1) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "**Overclock** is no longer available.");
             ButtonHelper.deleteMessage(event);
-        } else {
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
-        }
-    }
-
-    private static String getOverclockButtonID(Player netrunner, Player producingPlayer, Tile productionTile) {
-        return netrunner.factionButtonChecker() + AGENT_BUTTON_PREFIX + producingPlayer.getFaction() + "_"
-                + productionTile.getPosition();
-    }
-
-    private static boolean hasButton(Message message, String buttonID) {
-        return message.getComponentTree().findAll(Button.class).stream()
-                .map(Button::getCustomId)
-                .anyMatch(buttonID::equals);
-    }
-
-    private static void editSpentSummary(Message message, String buttonID, String exhaustedMessage) {
-        List<Button> buttons = message.getComponentTree().findAll(Button.class).stream()
-                .filter(button -> !buttonID.equals(button.getCustomId()))
-                .toList();
-        message.editMessage(exhaustedMessage)
-                .setComponents(ActionRow.partitionOf(buttons))
-                .queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
-    private static Planet getHighestResourceOverclockPlanet(Game game, Player producingPlayer, Tile productionTile) {
-        if (producingPlayer == null || productionTile == null) {
-            return null;
+            return;
         }
 
-        Set<String> adjacentTilePositions =
-                FoWHelper.getAdjacentTiles(game, productionTile.getPosition(), producingPlayer, false, true);
-        return adjacentTilePositions.stream()
-                .map(game::getTileByPosition)
-                .filter(Objects::nonNull)
-                .flatMap(tile -> tile.getUnitHolders().values().stream())
-                .filter(Planet.class::isInstance)
-                .map(Planet.class::cast)
-                .filter(planet -> isEligibleOverclockPlanet(game, producingPlayer, adjacentTilePositions, planet))
-                .max(Comparator.comparingInt(Planet::getResources))
-                .orElse(null);
+        if (!getOverclockStructureTiles(game, affectedPlayer).contains(tile)) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "That tile no longer contains one of your structures.");
+            return;
+        }
+
+        List<Button> buttons = getOverclockUnitButtons(event, game, affectedPlayer, tile);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "No valid Overclock production options were found for that tile.");
+            return;
+        }
+
+        String message = affectedPlayer.getRepresentationUnfogged()
+                + ", use these buttons to produce in "
+                + tile.getRepresentationForButtons(game, affectedPlayer)
+                + " for **Overclock**. "
+                + getOverclockRemaining(game, affectedPlayer)
+                + " Overclock use(s) remaining.";
+
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
 
-    private static boolean isEligibleOverclockPlanet(
-            Game game, Player producingPlayer, Set<String> adjacentTilePositions, Planet planet) {
-        Tile planetTile = game.getTileFromPlanet(planet.getName());
-        Player planetOwner = game.getPlanetOwner(planet.getName());
-        return planet.getResources() >= 1
-                && planetTile != null
-                && planetOwner != null
-                && planetOwner != producingPlayer
-                && adjacentTilePositions.contains(planetTile.getPosition());
+    @ButtonHandler(OVERCLOCK_UNIT_PREFIX)
+    public static void resolveOverclockUnit(
+            Game game, Player affectedPlayer, ButtonInteractionEvent event, String buttonID) {
+        String payload = getOverclockPayload(buttonID, OVERCLOCK_UNIT_PREFIX);
+        String[] parts = payload.split("\\|", 2);
+        if (parts.length < 2) {
+            return;
+        }
+
+        Player target = game.getPlayerFromColorOrFaction(parts[0]);
+        String placeButtonId = parts[1];
+        if (target == null || !affectedPlayer.equals(target) || getOverclockRemaining(game, affectedPlayer) < 1) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "**Overclock** is no longer available.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        ButtonHelperModifyUnits.placeUnitAndDeleteButton(placeButtonId, event, game, affectedPlayer);
+        sendOverclockPaymentPrompt(game, affectedPlayer, event);
+        int remaining = getOverclockRemaining(game, affectedPlayer) - 1;
+        setOverclockRemaining(game, affectedPlayer, remaining);
+        if (remaining < 1) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    affectedPlayer.getRepresentationUnfogged() + " has finished resolving **Overclock**.");
+            return;
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getChannel(),
+                affectedPlayer.getRepresentationUnfogged()
+                        + ", choose another tile containing one of your structures for _Overclock_. "
+                        + "You have " + remaining + " use(s) remaining.",
+                getOverclockStructureTileButtons(game, affectedPlayer));
+    }
+
+    @ButtonHandler(OVERCLOCK_DONE_PREFIX)
+    public static void resolveOverclockDone(
+            Game game, Player affectedPlayer, ButtonInteractionEvent event, String buttonID) {
+        String faction = getOverclockPayload(buttonID, OVERCLOCK_DONE_PREFIX);
+        Player target = game.getPlayerFromColorOrFaction(faction);
+        if (target != null && affectedPlayer.equals(target)) {
+            clearOverclockSession(game, affectedPlayer);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static List<Button> getOverclockUnitButtons(
+            ButtonInteractionEvent event, Game game, Player affectedPlayer, Tile tile) {
+        Map<String, Integer> producedUnitsSnapshot = new LinkedHashMap<>(affectedPlayer.getCurrentProducedUnits());
+        List<Button> generatedButtons = Helper.getPlaceUnitButtons(
+                event, affectedPlayer, game, tile, "netrunnersagent", "placeOneNDone_skipbuild");
+        restoreProducedUnits(affectedPlayer, producedUnitsSnapshot);
+
+        List<Button> wrappedButtons = generatedButtons.stream()
+                .filter(button -> button.getCustomId() != null)
+                .filter(button -> button.getCustomId().contains("placeOneNDone_"))
+                .map(button -> wrapOverclockUnitButton(affectedPlayer, button))
+                .limit(24)
+                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        wrappedButtons.add(Buttons.red(
+                affectedPlayer.factionButtonChecker() + OVERCLOCK_DONE_PREFIX + affectedPlayer.getFaction(),
+                "Done With Overclock"));
+        return wrappedButtons;
+    }
+
+    private static void sendOverclockPaymentPrompt(Game game, Player affectedPlayer, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, affectedPlayer, "res"));
+        buttons.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getChannel(),
+                affectedPlayer.getRepresentationUnfogged() + ", Pay for the additional unit.",
+                buttons);
+    }
+
+    private static void restoreProducedUnits(Player affectedPlayer, Map<String, Integer> producedUnitsSnapshot) {
+        affectedPlayer.resetProducedUnits();
+        producedUnitsSnapshot.forEach(affectedPlayer::setProducedUnit);
+    }
+
+    private static Button wrapOverclockUnitButton(Player affectedPlayer, Button button) {
+        String innerId = button.getCustomId();
+        String checker = affectedPlayer.factionButtonChecker();
+        if (innerId.startsWith(checker)) {
+            innerId = innerId.substring(checker.length());
+        }
+        String wrappedId = checker + OVERCLOCK_UNIT_PREFIX + affectedPlayer.getFaction() + "|" + innerId;
+        String emoji = button.getEmoji() == null ? null : button.getEmoji().toString();
+
+        return switch (button.getStyle()) {
+            case PRIMARY -> Buttons.blue(wrappedId, button.getLabel(), emoji);
+            case SECONDARY -> Buttons.gray(wrappedId, button.getLabel(), emoji);
+            case DANGER -> Buttons.red(wrappedId, button.getLabel(), emoji);
+            default -> Buttons.green(wrappedId, button.getLabel(), emoji);
+        };
     }
 
     public static void startRevolution(Game game, Player netrunner) {
-        if (!isNetrunnersPlayer(netrunner)) {
-            return;
-        }
-
         List<Player> targets = getRevolutionTargets(game, netrunner);
         if (targets.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -500,14 +514,9 @@ public class NetrunnersLeadersHandler {
     }
 
     private static boolean isRevolutionTarget(Game game, Player netrunner, Player target) {
-        return isNetrunnersPlayer(netrunner)
-                && target != null
+        return target != null
                 && netrunner.getDebtTokenCount(target.getColor(), NetrunnersAbilitiesHandler.SYSTEM_BREACH_POOL) > 0
                 && !getRevolutionStructures(game, target).isEmpty();
-    }
-
-    private static boolean isNetrunnersPlayer(Player player) {
-        return player != null && "netrunners".equals(player.getFaction());
     }
 
     private static List<Button> getRevolutionStructureButtons(Game game, Player netrunner, Player target) {
@@ -526,13 +535,13 @@ public class NetrunnersLeadersHandler {
     }
 
     private static List<RevolutionStructure> getRevolutionStructures(Game game, Player target) {
-        if (game == null) {
+        if (game == null || target == null) {
             return List.of();
         }
-        return game.getTileMap().values().stream()
-                .filter(tile -> !tile.isHomeSystem(game))
+        return ButtonHelper.getTilesOfPlayersSpecificUnits(game, target, UnitType.Pds, UnitType.Spacedock).stream()
                 .flatMap(tile -> tile.getPlanetUnitHolders().stream()
-                        .flatMap(unitHolder -> getRevolutionStructures(target, tile, unitHolder).stream()))
+                        .filter(planet -> !planet.isHomePlanet(game))
+                        .flatMap(planet -> getRevolutionStructures(target, tile, planet).stream()))
                 .toList();
     }
 
@@ -606,8 +615,6 @@ public class NetrunnersLeadersHandler {
         model.setDeepSpaceCannon(pds.model().getDeepSpaceCannon(owner));
         return model;
     }
-
-    private record OverclockTarget(Player producingPlayer, Tile productionTile, Planet planet) {}
 
     private record BorrowedPds(Tile tile, UnitModel model) {}
 

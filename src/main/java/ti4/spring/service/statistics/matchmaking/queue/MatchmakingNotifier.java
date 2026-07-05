@@ -4,15 +4,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 import ti4.discord.utility.DiscordRoleUtility;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
@@ -63,25 +66,66 @@ class MatchmakingNotifier {
                     .queue(
                             forumPost -> {
                                 ThreadChannel thread = forumPost.getThreadChannel();
-                                CreateGameLaunchPostService.postLaunchButtons(thread, members, gameFunName);
+                                if (getPlayersNeeded(game) > 0) {
+                                    PlayerSearchCriteria criteria = toSearchCriteria(game);
+                                    Consumer<Message> postLaunch = message -> MatchmakingQueueSearchService.get()
+                                            .register(thread.getId(), message.getId(), criteria);
+                                    CreateGameLaunchPostService.postLaunchButtons(
+                                            thread, members, gameFunName, postLaunch);
+                                } else {
+                                    CreateGameLaunchPostService.postLaunchButtons(thread, members, gameFunName);
+                                }
                                 postLfgPing(thread, game);
                             },
                             BotLogger::catchRestError);
         }
     }
 
-    private static void postLfgPing(ThreadChannel thread, MatchedGame game) {
-        if (!game.tiglRanks().isEmpty()) return;
+    private static int getPlayersNeeded(MatchedGame game) {
+        return Integer.parseInt(game.playerCount()) - game.members().size();
+    }
 
-        int playersNeeded =
-                Integer.parseInt(game.playerCount()) - game.members().size();
+    private static PlayerSearchCriteria toSearchCriteria(MatchedGame game) {
+        return new PlayerSearchCriteria(
+                List.of(game.playerCount()),
+                List.of(game.victoryPointGoal()),
+                List.of(game.expansion()),
+                List.of(game.pace()),
+                game.restrictions(),
+                !game.tiglRanks().isEmpty(),
+                game.tiglRanks());
+    }
+
+    private static void postLfgPing(ThreadChannel thread, MatchedGame game) {
+        int playersNeeded = getPlayersNeeded(game);
         if (playersNeeded <= 0) return;
 
+        List<String> tiglRankMentions = game.tiglRanks().stream()
+                .filter(rank -> !MatchmakingOptions.UNRANKED_OPTION.equals(rank))
+                .map(rank -> DiscordRoleUtility.getRole("TIGL - " + rank, thread.getGuild()))
+                .filter(Objects::nonNull)
+                .map(Role::getAsMention)
+                .toList();
+
+        if (tiglRankMentions.isEmpty()) {
+            postLfgRolePing(thread, playersNeeded);
+        } else {
+            postTiglRankRolePing(thread, tiglRankMentions, playersNeeded);
+        }
+    }
+
+    private static void postLfgRolePing(ThreadChannel thread, int playersNeeded) {
         Role lfgRole = DiscordRoleUtility.getRole("LFG", thread.getGuild());
         String message = lfgRole == null
                 ? "Ping the `@LFG` role to find additional members, if the game doesn't fill soon."
                 : lfgRole.getAsMention() + " this game needs " + StringHelper.pluralize(playersNeeded, "player")
                         + " to start.";
+        MessageHelper.sendMessageToChannel(thread, message);
+    }
+
+    private static void postTiglRankRolePing(ThreadChannel thread, List<String> tiglRankMentions, int playersNeeded) {
+        String message = String.join(" ", tiglRankMentions) + " this game needs "
+                + StringHelper.pluralize(playersNeeded, "player") + " to start.";
         MessageHelper.sendMessageToChannel(thread, message);
     }
 

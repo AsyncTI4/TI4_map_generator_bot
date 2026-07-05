@@ -197,7 +197,8 @@ public class SilverFlameService {
             for (Player p : game.getRealPlayers()) {
                 if (p.hasPlanet(planet.getName())) p.removePlanet(buttonID);
             }
-            if (!planet.isSpaceStation() && player.getPlanetsForScoring(false).contains(planet)) {
+            if (!planet.isSpaceStation(game)
+                    && player.getPlanetsForScoring(false).contains(planet)) {
                 controlsAPlanet = true;
             }
         }

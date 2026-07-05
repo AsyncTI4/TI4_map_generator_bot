@@ -6,6 +6,7 @@ import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingO
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.RESTRICTION_OPTIONS;
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.SLOWER_PACE_OPTION;
 import static ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions.VICTORY_POINT_OPTIONS;
+import static ti4.helpers.StringHelper.pluralize;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,24 +21,28 @@ import net.dv8tion.jda.api.components.selections.SelectOption;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.modals.ModalInteraction;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.handlers.game.CreateGameButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedPlayer;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.game.CreateGameLaunchPostService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
-import ti4.spring.context.SpringContext;
 import ti4.spring.service.statistics.UserGameInfoService;
 import ti4.spring.service.statistics.matchmaking.queue.MatchmakerService;
+import ti4.spring.service.statistics.matchmaking.queue.MatchmakingQueueSearchService;
 import ti4.spring.service.statistics.matchmaking.queue.PartyValidator;
+import ti4.spring.service.statistics.matchmaking.queue.PlayerSearchCriteria;
 import ti4.spring.service.statistics.matchmaking.queue.ViewMatchmakingQueueService;
 
 @UtilityClass
@@ -45,12 +50,15 @@ class MatchmakingButtonHandler {
 
     private static final String QUEUE_FOR_GAME_BUTTON_ID = "queueForGame~MDL";
     private static final String QUEUE_FOR_TIGL_BUTTON_ID = "queueForTigl~MDL";
+    private static final String SEARCH_FOR_PLAYERS_BUTTON_ID = "searchForPlayers~MDL";
     private static final String FORM_GROUP_BUTTON_ID = "formGroup~MDL";
     private static final String LEAVE_QUEUE_BUTTON_ID = "leaveQueueForGame";
     private static final String VIEW_QUEUE_BUTTON_ID = "viewMatchmakingQueue";
     private static final String ADDITIONAL_SETTINGS_BUTTON_ID = "queueForGameAdditionalSettings~MDL";
     private static final String QUEUE_FOR_GAME_MODAL_ID = "queueForGameModal";
     private static final String QUEUE_FOR_TIGL_MODAL_ID = "queueForTiglModal";
+    private static final String SEARCH_FOR_PLAYERS_MODAL_ID = "searchForPlayersModal";
+    private static final String SEARCH_FOR_PLAYERS_TIGL_MODAL_ID = "searchForPlayersTiglModal";
     private static final String FORM_GROUP_MODAL_ID = "formGroupModal";
     private static final String ADDITIONAL_SETTINGS_MODAL_ID = "queueForGameAdditionalSettingsModal";
 
@@ -80,21 +88,44 @@ class MatchmakingButtonHandler {
     @ButtonHandler(value = QUEUE_FOR_GAME_BUTTON_ID, save = false)
     public static void offerQueueForGameModal(ButtonInteractionEvent event) {
         if (cannotQueue(event)) return;
-        event.replyModal(buildQueueModal(event)).queue(Consumers.nop(), BotLogger::catchRestError);
+        event.replyModal(buildQueueModal(event, QUEUE_FOR_GAME_MODAL_ID, "Queue for Game"))
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler(value = QUEUE_FOR_TIGL_BUTTON_ID, save = false)
     public static void offerQueueForTiglModal(ButtonInteractionEvent event) {
         if (cannotQueue(event)) return;
-        if (SpringContext.getBean(MatchmakerService.class)
-                .isUserInParty(event.getUser().getId())) {
+        if (MatchmakerService.get().isUserInParty(event.getUser().getId())) {
             event.reply(
                             "You cannot queue for TIGL as part of a group. Use the Leave Queue button to leave your group first.")
                     .setEphemeral(true)
                     .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
-        event.replyModal(buildTiglQueueModal(event)).queue(Consumers.nop(), BotLogger::catchRestError);
+        event.replyModal(buildTiglQueueModal(event, QUEUE_FOR_TIGL_MODAL_ID, "Queue for TIGL"))
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler(value = SEARCH_FOR_PLAYERS_BUTTON_ID, save = false)
+    public static void offerSearchForPlayersModal(ButtonInteractionEvent event) {
+        if (MatchmakerService.isQueueingDisabled()) {
+            event.reply("Queueing is currently disabled.")
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+        Modal modal = isTiglThread(event)
+                ? buildTiglQueueModal(event, SEARCH_FOR_PLAYERS_TIGL_MODAL_ID, "Search for Players")
+                : buildQueueModal(event, SEARCH_FOR_PLAYERS_MODAL_ID, "Search for Players");
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static boolean isTiglThread(ButtonInteractionEvent event) {
+        if (!(event.getChannel() instanceof ThreadChannel thread)) {
+            return false;
+        }
+        return CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL.equalsIgnoreCase(
+                thread.getParentChannel().getName());
     }
 
     @ButtonHandler(value = FORM_GROUP_BUTTON_ID, save = false)
@@ -111,7 +142,7 @@ class MatchmakingButtonHandler {
     }
 
     private static boolean cannotQueue(ButtonInteractionEvent event) {
-        MatchmakerService matchmakerService = SpringContext.getBean(MatchmakerService.class);
+        MatchmakerService matchmakerService = MatchmakerService.get();
         if (MatchmakerService.isQueueingDisabled()) {
             event.reply("Queueing is currently disabled.")
                     .setEphemeral(true)
@@ -129,7 +160,7 @@ class MatchmakingButtonHandler {
     }
 
     private static boolean cannotForm(ButtonInteractionEvent event) {
-        MatchmakerService matchmakerService = SpringContext.getBean(MatchmakerService.class);
+        MatchmakerService matchmakerService = MatchmakerService.get();
         if (MatchmakerService.isQueueingDisabled()) {
             event.reply("Queueing is currently disabled.")
                     .setEphemeral(true)
@@ -145,11 +176,10 @@ class MatchmakingButtonHandler {
         return false;
     }
 
-    private static Modal buildQueueModal(ButtonInteractionEvent event) {
+    private static Modal buildQueueModal(ButtonInteractionEvent event, String modalId, String title) {
         String userId = event.getUser().getId();
         UserSettings userSettings = UserSettingsManager.get(userId);
-        List<String> groupMemberIds =
-                SpringContext.getBean(MatchmakerService.class).partyMemberIds(userId);
+        List<String> groupMemberIds = MatchmakerService.get().partyMemberIds(userId);
 
         final boolean REQUIRE_SELECTION = true;
         CheckboxGroup expansions = buildCheckboxGroup(
@@ -176,7 +206,7 @@ class MatchmakingButtonHandler {
                 userSettings.getMatchmakingPaces(),
                 DEFAULT_PACE_OPTIONS,
                 REQUIRE_SELECTION);
-        Modal.Builder modal = Modal.create(QUEUE_FOR_GAME_MODAL_ID, "Queue for Game")
+        Modal.Builder modal = Modal.create(modalId, title)
                 .addComponents(Label.of("Expansions", expansions))
                 .addComponents(Label.of("Player Count", playerCounts))
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
@@ -195,7 +225,7 @@ class MatchmakingButtonHandler {
         return modal.build();
     }
 
-    private static Modal buildTiglQueueModal(ButtonInteractionEvent event) {
+    private static Modal buildTiglQueueModal(ButtonInteractionEvent event, String modalId, String title) {
         String userId = event.getUser().getId();
         UserSettings userSettings = UserSettingsManager.get(userId);
 
@@ -218,18 +248,22 @@ class MatchmakingButtonHandler {
                 userSettings.getMatchmakingTiglRanks(),
                 DEFAULT_TIGL_RANK_OPTIONS,
                 REQUIRE_SELECTION);
-        CheckboxGroup restrictions = buildCheckboxGroup(
-                RESTRICTIONS_ID,
-                RESTRICTION_OPTIONS,
-                userSettings.getMatchmakingRestrictions(),
-                userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
-                !REQUIRE_SELECTION);
-        return Modal.create(QUEUE_FOR_TIGL_MODAL_ID, "Queue for TIGL")
+        Modal.Builder modal = Modal.create(modalId, title)
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
                 .addComponents(Label.of("Pace", paces))
-                .addComponents(Label.of("Rank", ranks))
-                .addComponents(Label.of("Restrictions", restrictions))
-                .build();
+                .addComponents(Label.of("Rank", ranks));
+
+        List<String> restrictionOptions = groupRestrictionOptions(List.of(userId));
+        if (!restrictionOptions.isEmpty()) {
+            CheckboxGroup restrictions = buildCheckboxGroup(
+                    RESTRICTIONS_ID,
+                    restrictionOptions,
+                    userSettings.getMatchmakingRestrictions(),
+                    userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
+                    !REQUIRE_SELECTION);
+            modal.addComponents(Label.of("Restrictions", restrictions));
+        }
+        return modal.build();
     }
 
     @ButtonHandler(value = ADDITIONAL_SETTINGS_BUTTON_ID, save = false)
@@ -259,7 +293,7 @@ class MatchmakingButtonHandler {
 
     @ButtonHandler(value = LEAVE_QUEUE_BUTTON_ID, save = false)
     public static void leaveQueue(ButtonInteractionEvent event) {
-        MatchmakerService matchmakerService = SpringContext.getBean(MatchmakerService.class);
+        MatchmakerService matchmakerService = MatchmakerService.get();
         if (MatchmakerService.isQueueingDisabled()) {
             MessageHelper.sendEphemeralMessageToEventChannel(
                     event, "Leaving queue is currently disabled. Try again later.");
@@ -271,9 +305,7 @@ class MatchmakingButtonHandler {
 
     @ButtonHandler(value = VIEW_QUEUE_BUTTON_ID, save = false)
     public static void viewQueue(ButtonInteractionEvent event) {
-        ViewMatchmakingQueueService viewMatchmakingQueueService =
-                SpringContext.getBean(ViewMatchmakingQueueService.class);
-        List<MessageEmbed> embeds = viewMatchmakingQueueService.getMessageEmbeds();
+        List<MessageEmbed> embeds = ViewMatchmakingQueueService.get().getMessageEmbeds();
         for (MessageEmbed embed : embeds) {
             event.getHook()
                     .setEphemeral(true)
@@ -291,7 +323,7 @@ class MatchmakingButtonHandler {
 
         saveMatchmakingPreferences(event, userSettings);
 
-        Optional<String> error = SpringContext.getBean(MatchmakerService.class).queue(userId, false);
+        Optional<String> error = MatchmakerService.get().queue(userId, false);
         if (error.isPresent()) {
             replyEphemeral(event, error.get());
             return;
@@ -309,13 +341,84 @@ class MatchmakingButtonHandler {
 
         saveTiglMatchmakingPreferences(event, userSettings);
 
-        Optional<String> error = SpringContext.getBean(MatchmakerService.class).queue(userId, true);
+        Optional<String> error = MatchmakerService.get().queue(userId, true);
         if (error.isPresent()) {
             replyEphemeral(event, error.get());
             return;
         }
 
         replyEphemeral(event, "You have been added to the TIGL matchmaking queue.");
+    }
+
+    @ModalHandler(SEARCH_FOR_PLAYERS_MODAL_ID)
+    public static void submitSearchForPlayersModal(ModalInteractionEvent event) {
+        handleSearchSubmit(event, buildSearchCriteria(event));
+    }
+
+    @ModalHandler(SEARCH_FOR_PLAYERS_TIGL_MODAL_ID)
+    public static void submitSearchForPlayersTiglModal(ModalInteractionEvent event) {
+        handleSearchSubmit(event, buildTiglSearchCriteria(event));
+    }
+
+    private static void handleSearchSubmit(ModalInteractionEvent event, PlayerSearchCriteria criteria) {
+        if (MatchmakerService.isQueueingDisabled()) {
+            replyEphemeral(event, "Queueing is currently disabled.");
+            return;
+        }
+        boolean isMakingNewGamesOrTiglGamesThread = isMakingNewGamesOrTiglGamesThread(event);
+        if (isMakingNewGamesOrTiglGamesThread) {
+            MatchmakingQueueSearchService.get()
+                    .register(event.getChannelId(), event.getMessage().getId(), criteria);
+        }
+        int added = CreateGameButtonHandler.addPlayersFromQueueSearch(event, criteria);
+        String continuation = isMakingNewGamesOrTiglGamesThread
+                ? " I'll keep searching each time the matchmaker runs until the game is launched."
+                : "";
+        if (added == 0) {
+            replyEphemeral(event, "No matching players were found in the queue right now." + continuation);
+            return;
+        }
+        replyEphemeral(
+                event,
+                "Added " + added + " matching " + pluralize(added, "player") + " from the queue to this game."
+                        + continuation);
+    }
+
+    private static boolean isMakingNewGamesOrTiglGamesThread(ModalInteractionEvent event) {
+        if (!(event.getChannel() instanceof ThreadChannel thread)) {
+            return false;
+        }
+        String parentName = thread.getParentChannel().getName();
+        return CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL.equalsIgnoreCase(parentName)
+                || CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL.equalsIgnoreCase(parentName);
+    }
+
+    private static PlayerSearchCriteria buildSearchCriteria(ModalInteractionEvent event) {
+        return new PlayerSearchCriteria(
+                getSelectedValues(event, PLAYER_COUNTS_ID),
+                getSelectedValues(event, VICTORY_POINTS_ID),
+                getSelectedValues(event, EXPANSIONS_ID),
+                getSelectedValues(event, PACE_RESTRICTIONS_ID),
+                searchRestrictions(event),
+                false,
+                List.of());
+    }
+
+    private static PlayerSearchCriteria buildTiglSearchCriteria(ModalInteractionEvent event) {
+        return new PlayerSearchCriteria(
+                List.of("6"),
+                getSelectedValues(event, VICTORY_POINTS_ID),
+                List.of(MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION),
+                getSelectedValues(event, PACE_RESTRICTIONS_ID),
+                searchRestrictions(event),
+                true,
+                getSelectedValues(event, TIGL_RANKS_ID));
+    }
+
+    private static List<String> searchRestrictions(ModalInteractionEvent event) {
+        return getSelectedValues(event, RESTRICTIONS_ID).stream()
+                .filter(restriction -> !PACE_RESTRICTION_OPTIONS.contains(restriction))
+                .toList();
     }
 
     @ModalHandler(FORM_GROUP_MODAL_ID)
@@ -330,7 +433,7 @@ class MatchmakingButtonHandler {
             return;
         }
 
-        Optional<String> error = SpringContext.getBean(MatchmakerService.class).formGroup(creatorId, memberIds);
+        Optional<String> error = MatchmakerService.get().formGroup(creatorId, memberIds);
         if (error.isPresent()) {
             replyEphemeral(event, "Couldn't form the group: " + error.get());
             return;

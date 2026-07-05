@@ -16,7 +16,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamBut
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisHeroHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -200,7 +200,7 @@ public class StartTurnService {
         ButtonHelperFactionSpecific.resolveMykoMechCheck(player, game);
         ButtonHelperFactionSpecific.resolveKolleccAbilities(player, game);
         if (player.hasLeaderUnlocked("tyrishero")) {
-            TyrisHeroHandler.offerHeroAtStartOfTurn(game, player);
+            TyrisLeaderHandler.offerHeroAtStartOfTurn(game, player);
         }
         if (!game.getStoredValue("futureMessageFor" + player.getFaction()).isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -464,7 +464,7 @@ public class StartTurnService {
         List<Button> startButtons = new ArrayList<>();
         boolean hadAnyUnplayedSCs = false;
 
-        if (doneActionThisTurn && (player.hasTech("fl") || TyrisHeroHandler.isHeroActiveThisRound(game, player))) {
+        if (doneActionThisTurn && (player.hasTech("fl") || TyrisLeaderHandler.isHeroActiveThisRound(game, player))) {
             confirmed2ndAction = true;
         }
         if (!doneActionThisTurn || confirmed2ndAction) {
@@ -478,10 +478,7 @@ public class StartTurnService {
             if (game.isFowMode()) {
                 numOfComponentActions += acButtons.size();
             }
-            if (IsPlayerElectedService.isPlayerElected(player.getGame(), player, "censure")
-                    || IsPlayerElectedService.isPlayerElected(player.getGame(), player, "absol_censure")) {
-                numOfComponentActions += 1;
-            }
+
             Button componentAction = Buttons.green(
                     factionChecker + "componentAction", "Component Action (" + numOfComponentActions + ")");
 

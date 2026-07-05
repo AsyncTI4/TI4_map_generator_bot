@@ -2,6 +2,7 @@ package ti4.spring.service.statistics.matchmaking.queue;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -105,6 +106,40 @@ public class MatchmakerService {
     public long clearQueue() {
         if (DatabasePersistenceGate.isDisabled()) return 0;
         return queueStore.clearAll();
+    }
+
+    @Transactional
+    public List<String> removePlayer(String userId) {
+        if (DatabasePersistenceGate.isDisabled()) return List.of();
+
+        Optional<MatchmakingQueueMember> memberOpt = queueStore.findMember(userId);
+        if (memberOpt.isEmpty()) return List.of();
+
+        long partyId = memberOpt.get().getPartyId();
+        List<String> removedMemberIds = queueStore.partyMemberIds(userId);
+        queueStore.deleteParties(List.of(partyId));
+        return removedMemberIds;
+    }
+
+    @Transactional(readOnly = true)
+    public List<GroupVerificationResult> verifyGroups() {
+        if (DatabasePersistenceGate.isDisabled()) return List.of();
+
+        List<GroupVerificationResult> results = new ArrayList<>();
+        for (QueuedParty party : queueStore.loadQueuedParties()) {
+            List<String> memberIds = party.members().stream()
+                    .map(MatchmakingQueueMember::getUserId)
+                    .toList();
+            List<String> selected = party.leaderSettings().getMatchmakingRestrictions().stream()
+                    .filter(MatchmakingOptions.RESTRICTION_OPTIONS::contains)
+                    .toList();
+            List<String> valid = PartyValidator.getValidRestrictions(memberIds, selected);
+            List<String> invalid =
+                    selected.stream().filter(r -> !valid.contains(r)).toList();
+            results.add(new GroupVerificationResult(
+                    party.party().getId(), memberIds, party.party().isTigl(), invalid));
+        }
+        return results;
     }
 
     @Transactional

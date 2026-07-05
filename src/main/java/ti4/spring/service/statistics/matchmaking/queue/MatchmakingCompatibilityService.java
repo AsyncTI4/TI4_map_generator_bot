@@ -11,11 +11,15 @@ class MatchmakingCompatibilityService {
 
     private static final long ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT = 3;
 
-    private static final double SKILL_DIFFERENCE_STARTING_THRESHOLD = 4;
+    private static final double SKILL_DIFFERENCE_STARTING_THRESHOLD = 3;
     private static final double SKILL_DIFFERENCE_WIDENING_PER_WINDOW = 1;
     private static final Duration SIMILAR_SKILL_DECAY_INTERVAL = Duration.ofHours(2);
 
     private static final int HOURS_TO_AVOID_FLOATERS_WARRIORS = 8;
+
+    static boolean hasEnoughActiveHourDataToMatch(PlayerMatchmakingData data) {
+        return data.activeHourBuckets().size() >= ACTIVE_HOUR_SHARED_BUCKET_REQUIREMENT;
+    }
 
     static boolean areIncompatible(PlayerMatchmakingData a, PlayerMatchmakingData b) {
         if (a.avoidList().contains(b.userId()) || b.avoidList().contains(a.userId())) {

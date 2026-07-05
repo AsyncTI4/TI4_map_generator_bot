@@ -49,6 +49,8 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.relic.SendRelicService;
 import ti4.service.transaction.SendPromissoryService;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class TransactionHelper {
@@ -88,6 +90,11 @@ public class TransactionHelper {
 
     private static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
+        GameEventService.commit(
+                game,
+                GameEventType.TRANSACTION,
+                p1,
+                Map.of("from", p1.getFaction(), "to", p2.getFaction(), "items", transactionItems));
         List<Player> players = new ArrayList<>();
         players.add(p1);
         players.add(p2);

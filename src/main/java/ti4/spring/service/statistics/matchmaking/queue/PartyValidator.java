@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedPlayer;
 import ti4.settings.users.UserSettings;
@@ -17,17 +18,30 @@ public class PartyValidator {
 
     public static List<String> getValidRestrictions(List<String> userIds, List<String> restrictions) {
         List<String> members = userIds.stream().distinct().toList();
-        if (members.size() < 2) return restrictions;
 
         List<String> available = new ArrayList<>();
         for (String restriction : restrictions) {
             Map<String, PlayerMatchmakingData> dataById =
-                    PlayermatchmakingDataFactory.buildForUsers(members, List.of(restriction));
-            if (groupInternallyCompatible(members, dataById)) {
-                available.add(restriction);
+                    PlayerMatchmakingDataFactory.buildForUsers(members, List.of(restriction));
+            if (!everyMemberCanUseRestriction(restriction, members, dataById)) {
+                continue;
             }
+            if (members.size() >= 2 && !groupInternallyCompatible(members, dataById)) {
+                continue;
+            }
+            available.add(restriction);
         }
         return available;
+    }
+
+    private static boolean everyMemberCanUseRestriction(
+            String restriction, List<String> members, Map<String, PlayerMatchmakingData> dataById) {
+        if (!MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION.equals(restriction)) {
+            return true;
+        }
+        return members.stream()
+                .map(dataById::get)
+                .allMatch(MatchmakingCompatibilityService::hasEnoughActiveHourDataToMatch);
     }
 
     private static boolean groupInternallyCompatible(

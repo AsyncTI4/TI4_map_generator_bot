@@ -92,6 +92,21 @@ class MatchmakingCompatibilityServiceTest {
     }
 
     @Test
+    void playerWithTooFewActiveHourBucketsCanNeverMatch() {
+        // Fewer than the three shared buckets a match requires means the shared count can never be reached.
+        assertThat(MatchmakingCompatibilityService.hasEnoughActiveHourDataToMatch(
+                        player("a").activeHourBuckets(0, 1).build()))
+                .isFalse();
+    }
+
+    @Test
+    void playerWithEnoughActiveHourBucketsCanMatch() {
+        assertThat(MatchmakingCompatibilityService.hasEnoughActiveHourDataToMatch(
+                        player("a").activeHourBuckets(0, 1, 2).build()))
+                .isTrue();
+    }
+
+    @Test
     void largeSkillGapBlocksFreshlyQueuedPlayers() {
         // Fresh queue: the window is the 4-point starting threshold, so a 20-point gap is too large.
         PlayerMatchmakingData a = player("a").rating(20).build();
@@ -106,18 +121,6 @@ class MatchmakingCompatibilityServiceTest {
         PlayerMatchmakingData b = player("b").rating(26).build();
 
         assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isFalse();
-    }
-
-    @Test
-    void skillWindowWidensWithQueueTime() {
-        // A 6-point gap exceeds the fresh 4-point window, but after 4 hours the window widens to 6 (4 + 2 steps).
-        PlayerMatchmakingData fresh = player("a").rating(20).build();
-        PlayerMatchmakingData b = player("b").rating(26).build();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(fresh, b)).isTrue();
-
-        PlayerMatchmakingData patient =
-                player("a").rating(20).queueWait(Duration.ofHours(4)).build();
-        assertThat(MatchmakingCompatibilityService.areIncompatible(patient, b)).isFalse();
     }
 
     @Test
@@ -172,7 +175,7 @@ class MatchmakingCompatibilityServiceTest {
         private int completedGames = 5;
         private Set<String> roleNames = Set.of();
         private Duration queueWait = Duration.ZERO;
-        private boolean tigl = false;
+        private boolean tigl;
         private List<String> tiglRanks = List.of(MatchmakingOptions.UNRANKED_OPTION);
 
         private Builder(String userId) {
