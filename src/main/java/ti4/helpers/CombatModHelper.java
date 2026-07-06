@@ -34,6 +34,8 @@ import ti4.model.UnitModel;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.CardEmojis;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class CombatModHelper {
@@ -896,7 +898,8 @@ public class CombatModHelper {
                 case "opponent_sftt" -> scalingCount = getOpponentSfttCount(opponent);
                 case "nonhome_system_with_planet" -> scalingCount = getSystemsWithControlledPlanets(game, player);
                 case "galvanized_unit_count" -> {
-                    scalingCount = getGalvanizedUnitCount(game, unitHolder, origUnit, player);
+                    scalingCount = getGalvanizedUnitCount(
+                            game, unitHolder, origUnit, player, rollType == CombatRollType.bombardment);
                     if (rollType == CombatRollType.SpaceCannonOffence && origUnit.getDeepSpaceCannon()) {
                         for (String adjPos :
                                 FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
@@ -974,7 +977,27 @@ public class CombatModHelper {
     }
 
     private static int getGalvanizedUnitCount(Game game, UnitHolder uH, UnitModel origUnit, Player player) {
+        return getGalvanizedUnitCount(game, uH, origUnit, player, false);
+    }
+
+    private static int getGalvanizedUnitCount(
+            Game game, UnitHolder uH, UnitModel origUnit, Player player, boolean isBombardment) {
         UnitKey uk = Units.getUnitKey(origUnit.getUnitType(), player.getColorID());
+
+        if (isBombardment) {
+            String bombardmentTarget = game.getStoredValue("bombardmentTarget" + player.getFaction());
+            List<BombardmentAssignment> bombardmentAssignments = new ObjectMapper()
+                    .readValue(
+                            game.getStoredValue("assignedBombardment" + player.getFaction()),
+                            new TypeReference<List<BombardmentAssignment>>() {});
+            return bombardmentAssignments.stream()
+                    .filter(a -> a.planet().equals(bombardmentTarget)
+                            && a.galvanized()
+                            && a.sourceId().equals(uk.asyncID()))
+                    .mapToInt(a -> 1)
+                    .sum();
+        }
+
         return uH.getGalvanizedUnitCount(uk);
     }
 }

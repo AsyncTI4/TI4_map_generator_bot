@@ -1026,6 +1026,8 @@ class GameLoadService {
                 case Constants.DRAFT_QUEUE -> player.loadItemsToDraft(getCardList(tokenizer.nextToken()));
                 case Constants.DRAFT_HAND -> player.loadDraftHand(getCardList(tokenizer.nextToken()));
                 case Constants.ABILITIES -> player.setAbilities(new HashSet<>(getCardList(tokenizer.nextToken())));
+                case Constants.EXHAUSTED_ABILITIES ->
+                    player.setExhaustedAbilities(new HashSet<>(getCardList(tokenizer.nextToken())));
                 case Constants.TECH_EXHAUSTED -> player.setExhaustedTechs(getCardList(tokenizer.nextToken()));
                 case Constants.TECH_PURGED -> player.setPurgedTechs(getCardList(tokenizer.nextToken()));
                 case Constants.RELICS -> player.setRelics(getCardList(tokenizer.nextToken()));
