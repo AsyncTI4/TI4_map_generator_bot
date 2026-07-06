@@ -53,7 +53,6 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.BombardmentAssignment;
-import ti4.helpers.BombardmentAssignmentType;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -119,9 +118,9 @@ public class CombatRollService {
             CombatRollType rollType) {
         if (rollType == CombatRollType.bombardment) {
             AshenUnitHandler.clearFlagshipBombardmentContexts(game);
-                    List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
-                game.getStoredValue("assignedBombardment" + player.getFaction()),
-                new TypeReference<List<BombardmentAssignment>>() {});
+            List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
+                    game.getStoredValue("assignedBombardment" + player.getFaction()),
+                    new TypeReference<List<BombardmentAssignment>>() {});
             if (assignedUnits.isEmpty()) {
                 BombardmentService.autoAssignAllBombardmentToAPlanet(player, game);
             }
@@ -274,7 +273,7 @@ public class CombatRollService {
             }
             List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
                     game.getStoredValue("assignedBombardment" + player.getFaction()),
-                    new TypeReference<List<BombardmentAssignment>>() {});            
+                    new TypeReference<List<BombardmentAssignment>>() {});
             Map<String, Integer> remainingAssignedByAsyncId = new HashMap<>();
             for (BombardmentAssignment assignedUnit : assignedUnits) {
                 if (assignedUnit.planet().equals(bombardPlanet) && assignedUnit.sourceId() != null) {
@@ -399,46 +398,33 @@ public class CombatRollService {
 
         List<NamedCombatModifierModel> extraRollsDup = new ArrayList<>(extraRolls);
         List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
-                    game.getStoredValue("assignedBombardment" + player.getFaction()),
-                    new TypeReference<List<BombardmentAssignment>>() {});
+                game.getStoredValue("assignedBombardment" + player.getFaction()),
+                new TypeReference<List<BombardmentAssignment>>() {});
         String bombardPlanet2 = bombardPlanet;
         for (NamedCombatModifierModel mod : extraRollsDup) {
             if ("plus1_roll_plasmascoring".equalsIgnoreCase(mod.getModifier().getAlias())) {
-                if (assignedUnits.stream().filter(a -> a.planet().equals(bombardPlanet2)).noneMatch(a -> a.sourceId().equals("plasmascoring"))) {
+                if (assignedUnits.stream()
+                        .filter(a -> a.planet().equals(bombardPlanet2))
+                        .noneMatch(a -> "plasmascoring".equals(a.sourceId()))) {
                     extraRolls.remove(mod);
                 }
             }
             if ("plus1_roll_argent_commander_bombard"
                     .equalsIgnoreCase(mod.getModifier().getAlias())) {
-                if (assignedUnits.stream().filter(a -> a.planet().equals(bombardPlanet2)).noneMatch(a -> a.sourceId().equals("argentcommander"))) {
+                if (assignedUnits.stream()
+                        .filter(a -> a.planet().equals(bombardPlanet2))
+                        .noneMatch(a -> "argentcommander".equals(a.sourceId()))) {
                     extraRolls.remove(mod);
                 }
             }
-            if("roll_1_for_galvanize_bombard".equalsIgnoreCase(mod.getModifier().getAlias())) 
-            {
-                if (assignedUnits.stream().filter(a -> a.planet().equals(bombardPlanet2)).noneMatch(a -> a.galvanized())) {
+            if ("roll_1_for_galvanize_bombard"
+                    .equalsIgnoreCase(mod.getModifier().getAlias())) {
+                if (assignedUnits.stream()
+                        .filter(a -> a.planet().equals(bombardPlanet2))
+                        .noneMatch(a -> a.galvanized())) {
                     extraRolls.remove(mod);
                 }
             }
-
-            // Map<String, List<NamedCombatModifierModel>> galvanizeModsByUnit =
-            //     extraRolls.stream()
-            //         .filter(mod -> "roll_1_for_galvanize_bombard"
-            //             .equalsIgnoreCase(mod.getModifier().getAlias()))
-            //         .collect(Collectors.groupingBy(mod -> mod.getModifier().getDisplayUnitAlias()));
-
-            // for (Map.Entry<String, List<NamedCombatModifierModel>> entry : galvanizeModsByUnit.entrySet()) {
-            //     String unitAlias = entry.getKey();
-
-            //     long available = assignedUnits.stream()
-            //         .filter(BombardmentAssignment::galvanized)
-            //         .filter(a -> a.sourceId().equals(unitAlias))
-            //         .count();
-
-            //     entry.getValue().stream()
-            //         .skip(available)
-            //         .forEach(extraRolls::remove);
-            // }
         }
 
         // Check for temp mods

@@ -3,6 +3,7 @@ package ti4.discord.interactions.buttons.handlers.combat;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
@@ -44,13 +45,7 @@ class BombardmentButtonHandler {
                 BombardmentAssignment.decode(buttonID.replace("unassignBombardUnit_", ""));
 
         List<BombardmentAssignment> assignments = getAssignments(player, game);
-        assignments.stream()
-            .filter(a -> a.sourceId().equals(buttonAssignment.sourceId())
-                    && a.planet().equals(buttonAssignment.planet())
-                    && a.galvanized() == buttonAssignment.galvanized()
-                    && a.type() == buttonAssignment.type())
-            .findFirst()
-            .ifPresent(assignments::remove);
+        assignments.stream().filter(buttonAssignment::equals).findFirst().ifPresent(assignments::remove);
         saveAssignments(player, game, assignments);
 
         List<Button> buttons = getBombardmentAssignmentButtons(player, game);
@@ -126,24 +121,17 @@ class BombardmentButtonHandler {
 
             UnitModel mod = entry.getKey().getKey();
             String sourceId = mod.getAsyncId();
-
             int totalUnits = entry.getValue();
             int totalGalvanized =
                     entry.getKey().getValue().getGalvanizedUnitCount(mod.getUnitType(), player.getColorID());
-
             int totalNormal = totalUnits - totalGalvanized;
 
-            // All assignments for this unit model
             List<BombardmentAssignment> assignments = assignedUnits.stream()
                     .filter(a -> a.sourceId().contains(sourceId))
                     .toList();
-
             int assignedNormal = 0;
             int assignedGalvanized = 0;
 
-            //
-            // RED BUTTONS
-            //
             for (BombardmentAssignment assignment : assignments) {
 
                 if (assignment.galvanized()) {
@@ -167,12 +155,8 @@ class BombardmentButtonHandler {
             int remainingNormal = totalNormal - assignedNormal;
             int remainingGalvanized = totalGalvanized - assignedGalvanized;
 
-            //
-            // GREEN BUTTONS (NORMAL)
-            //
-            for (int i = 0; i < remainingNormal; i++) {
+            if (remainingNormal > 0) {
                 for (String planet : BombardmentService.getBombardablePlanets(player, game, tile)) {
-
                     BombardmentAssignment assignment =
                             new BombardmentAssignment(sourceId, planet, false, BombardmentAssignmentType.UNIT);
 
@@ -189,12 +173,8 @@ class BombardmentButtonHandler {
                 }
             }
 
-            //
-            // GREEN BUTTONS (GALVANIZED)
-            //
-            for (int i = 0; i < remainingGalvanized; i++) {
+            if (remainingGalvanized > 0) {
                 for (String planet : BombardmentService.getBombardablePlanets(player, game, tile)) {
-
                     BombardmentAssignment assignment =
                             new BombardmentAssignment(sourceId, planet, true, BombardmentAssignmentType.UNIT);
 
@@ -324,7 +304,7 @@ class BombardmentButtonHandler {
     private static List<BombardmentAssignment> getAssignments(Player player, Game game) {
         String json = game.getStoredValue("assignedBombardment" + player.getFaction());
         if (json == null || json.isBlank()) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
         return MAPPER.readValue(json, new TypeReference<List<BombardmentAssignment>>() {});
     }
