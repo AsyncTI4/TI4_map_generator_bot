@@ -1074,6 +1074,10 @@ public final class Constants {
     public static final String PING = "ping";
     public static final String PING_ACTIVE_PLAYER = "ping_active_player";
     public static final String WHISPER = "whisper";
+    public static final String W = "w";
+    public static final String TO = "to";
+    public static final String FUTURE = "future";
+    public static final String REMIND_ME = "remind_me";
     public static final String MSG = "msg";
     public static final String OVERRIDE_FOW = "override_fow";
     public static final String OVERRIDE_EXPLORE_OWNERSHIP_REQ = "override_explore_ownership_req";

@@ -59,9 +59,12 @@ import ti4.discord.interactions.commands.tokens.RemoveTokenCommand;
 import ti4.discord.interactions.commands.transaction.TransactionCommand;
 import ti4.discord.interactions.commands.uncategorized.AllInfoCommand;
 import ti4.discord.interactions.commands.uncategorized.CardsInfoCommand;
+import ti4.discord.interactions.commands.uncategorized.RemindMeCommand;
 import ti4.discord.interactions.commands.uncategorized.SelectionBoxDemoCommand;
 import ti4.discord.interactions.commands.uncategorized.ShowDistancesCommand;
 import ti4.discord.interactions.commands.uncategorized.ShowGameCommand;
+import ti4.discord.interactions.commands.uncategorized.WCommand;
+import ti4.discord.interactions.commands.uncategorized.WhisperCommand;
 import ti4.discord.interactions.commands.units.AddUnitDamage;
 import ti4.discord.interactions.commands.units.AddUnits;
 import ti4.discord.interactions.commands.units.CaptureCommand;
@@ -84,6 +87,9 @@ public class SlashCommandManager {
                     new RemoveAllUnits(),
                     new AllInfoCommand(),
                     new CardsInfoCommand(),
+                    new WhisperCommand(),
+                    new WCommand(),
+                    new RemindMeCommand(),
                     new ShowGameCommand(),
                     new ShowDistancesCommand(),
                     new AddCCCommand(),
