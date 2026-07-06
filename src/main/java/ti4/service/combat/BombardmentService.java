@@ -34,8 +34,7 @@ public class BombardmentService {
         return planets;
     }
 
-    public static void autoAssignAllBombardmentToAPlanet(Player player, Game game) {
-        Tile tile = game.getTileByPosition(game.getActiveSystem());
+    public static void autoAssignAllBombardmentToAPlanet(Player player, Game game, Tile tile) {
         game.removeStoredValue("assignedBombardment" + player.getFaction());
         if (tile == null) {
             return;

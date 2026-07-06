@@ -1,6 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.combat;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,21 +71,17 @@ class BombardmentButtonHandler {
     }
 
     @ButtonHandler("bombardConfirm_")
-    public static void bombardConfirm(ButtonInteractionEvent event, Player player, Game game) {
-        if (game.getActiveSystem() == null) {
-            return;
-        }
-        if (game.getTileByPosition(game.getActiveSystem()).isScar(game)
-                && !player.hasUnlockedBreakthrough("nivynbt")
-                && !player.hasTech("tf-singularitypoint")) {
+    public static void bombardConfirm(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        String pos = buttonID.split("_")[2];
+        Tile tile = game.getTileByPosition(pos);
+        if (tile.isScar(game) && !player.hasUnlockedBreakthrough("nivynbt") && !player.hasTech("tf-singularitypoint")) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     player.getRepresentation()
                             + ", you cannot use BOMBARDMENT (or any other unit abilities) in an entropic scar.");
             return;
         }
-        if (BombardmentService.getBombardablePlanets(player, game, game.getTileByPosition(game.getActiveSystem()))
-                .isEmpty()) {
+        if (BombardmentService.getBombardablePlanets(player, game, tile).isEmpty()) {
             String message = player.getRepresentation()
                     + ", there are no planets in this system that you can legally use BOMBARDMENT against. "
                     + "You cannot use BOMBARDMENT against planets you own";
@@ -96,7 +92,7 @@ class BombardmentButtonHandler {
             return;
         }
 
-        BombardmentService.autoAssignAllBombardmentToAPlanet(player, game);
+        BombardmentService.autoAssignAllBombardmentToAPlanet(player, game, tile);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(),
                 player.getRepresentation() + " is assigning units to bombard as follows:\n"
