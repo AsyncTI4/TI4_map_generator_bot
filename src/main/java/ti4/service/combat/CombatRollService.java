@@ -400,12 +400,12 @@ public class CombatRollService {
 
         String gameAssignedBombardment = game.getStoredValue("assignedBombardment" + player.getFaction());
         if (!gameAssignedBombardment.isEmpty()) {
-            List<BombardmentAssignment> assignedBombardment = MAPPER.readValue(
-                    gameAssignedBombardment,
-                    new TypeReference<List<BombardmentAssignment>>() {});
+            List<BombardmentAssignment> assignedBombardment =
+                    MAPPER.readValue(gameAssignedBombardment, new TypeReference<List<BombardmentAssignment>>() {});
             String tempBombardPlanet = bombardPlanet;
             for (NamedCombatModifierModel mod : extraRollsDup) {
-                if ("plus1_roll_plasmascoring".equalsIgnoreCase(mod.getModifier().getAlias())) {
+                if ("plus1_roll_plasmascoring"
+                        .equalsIgnoreCase(mod.getModifier().getAlias())) {
                     if (assignedBombardment.stream()
                             .filter(a -> a.planet().equals(tempBombardPlanet))
                             .noneMatch(a -> "plasmascoring".equals(a.sourceId()))) {
