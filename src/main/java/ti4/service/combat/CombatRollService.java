@@ -399,7 +399,7 @@ public class CombatRollService {
         List<NamedCombatModifierModel> extraRollsDup = new ArrayList<>(extraRolls);
 
         String gameAssignedBombardment = game.getStoredValue("assignedBombardment" + player.getFaction());
-        if (!gameAssignedBombardment.isEmpty()) {
+        if (!gameAssignedBombardment.isEmpty() && rollType == CombatRollType.bombardment) {
             List<BombardmentAssignment> assignedBombardment =
                     MAPPER.readValue(gameAssignedBombardment, new TypeReference<List<BombardmentAssignment>>() {});
             String tempBombardPlanet = bombardPlanet;
