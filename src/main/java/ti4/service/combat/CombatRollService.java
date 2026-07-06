@@ -118,12 +118,13 @@ public class CombatRollService {
             CombatRollType rollType) {
         if (rollType == CombatRollType.bombardment) {
             AshenUnitHandler.clearFlagshipBombardmentContexts(game);
+            if (game.getStoredValue("assignedBombardment" + player.getFaction()).isEmpty()) {
+                BombardmentService.autoAssignAllBombardmentToAPlanet(player, game);
+            }
             List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
                     game.getStoredValue("assignedBombardment" + player.getFaction()),
                     new TypeReference<List<BombardmentAssignment>>() {});
-            if (assignedUnits.isEmpty()) {
-                BombardmentService.autoAssignAllBombardmentToAPlanet(player, game);
-            }
+
             boolean hasValidBombardment = false;
             List<String> bombardedPlanets = new ArrayList<>();
             for (String planet : BombardmentService.getBombardablePlanets(player, game, tile)) {
