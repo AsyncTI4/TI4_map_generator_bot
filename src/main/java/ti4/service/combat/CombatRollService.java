@@ -397,32 +397,36 @@ public class CombatRollService {
                 Constants.COMBAT_EXTRA_ROLLS);
 
         List<NamedCombatModifierModel> extraRollsDup = new ArrayList<>(extraRolls);
-        List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
-                game.getStoredValue("assignedBombardment" + player.getFaction()),
-                new TypeReference<List<BombardmentAssignment>>() {});
-        String bombardPlanet2 = bombardPlanet;
-        for (NamedCombatModifierModel mod : extraRollsDup) {
-            if ("plus1_roll_plasmascoring".equalsIgnoreCase(mod.getModifier().getAlias())) {
-                if (assignedUnits.stream()
-                        .filter(a -> a.planet().equals(bombardPlanet2))
-                        .noneMatch(a -> "plasmascoring".equals(a.sourceId()))) {
-                    extraRolls.remove(mod);
+
+        String gameAssignedBombardment = game.getStoredValue("assignedBombardment" + player.getFaction());
+        if (!gameAssignedBombardment.isEmpty()) {
+            List<BombardmentAssignment> assignedBombardment = MAPPER.readValue(
+                    gameAssignedBombardment,
+                    new TypeReference<List<BombardmentAssignment>>() {});
+            String tempBombardPlanet = bombardPlanet;
+            for (NamedCombatModifierModel mod : extraRollsDup) {
+                if ("plus1_roll_plasmascoring".equalsIgnoreCase(mod.getModifier().getAlias())) {
+                    if (assignedBombardment.stream()
+                            .filter(a -> a.planet().equals(tempBombardPlanet))
+                            .noneMatch(a -> "plasmascoring".equals(a.sourceId()))) {
+                        extraRolls.remove(mod);
+                    }
                 }
-            }
-            if ("plus1_roll_argent_commander_bombard"
-                    .equalsIgnoreCase(mod.getModifier().getAlias())) {
-                if (assignedUnits.stream()
-                        .filter(a -> a.planet().equals(bombardPlanet2))
-                        .noneMatch(a -> "argentcommander".equals(a.sourceId()))) {
-                    extraRolls.remove(mod);
+                if ("plus1_roll_argent_commander_bombard"
+                        .equalsIgnoreCase(mod.getModifier().getAlias())) {
+                    if (assignedBombardment.stream()
+                            .filter(a -> a.planet().equals(tempBombardPlanet))
+                            .noneMatch(a -> "argentcommander".equals(a.sourceId()))) {
+                        extraRolls.remove(mod);
+                    }
                 }
-            }
-            if ("roll_1_for_galvanize_bombard"
-                    .equalsIgnoreCase(mod.getModifier().getAlias())) {
-                if (assignedUnits.stream()
-                        .filter(a -> a.planet().equals(bombardPlanet2))
-                        .noneMatch(a -> a.galvanized())) {
-                    extraRolls.remove(mod);
+                if ("roll_1_for_galvanize_bombard"
+                        .equalsIgnoreCase(mod.getModifier().getAlias())) {
+                    if (assignedBombardment.stream()
+                            .filter(a -> a.planet().equals(tempBombardPlanet))
+                            .noneMatch(a -> a.galvanized())) {
+                        extraRolls.remove(mod);
+                    }
                 }
             }
         }
