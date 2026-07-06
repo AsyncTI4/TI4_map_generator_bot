@@ -2003,7 +2003,18 @@ public final class ButtonHelperAbilities {
                                 && ("wavelength".equalsIgnoreCase(tech) || "antimatter".equalsIgnoreCase(tech))) {
                             continue;
                         }
-                        techToGain.add(tech);
+                        boolean someoneElseHasIt = false;
+                        if (game.isTwilightsFallMode()) {
+                            for (Player p : game.getRealPlayersExcludingThis(victim)) {
+                                if (p.getTechs().contains(tech)) {
+                                    someoneElseHasIt = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!someoneElseHasIt) {
+                            techToGain.add(tech);
+                        }
                     }
                 }
             }

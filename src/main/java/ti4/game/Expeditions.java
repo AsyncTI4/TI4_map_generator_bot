@@ -182,6 +182,22 @@ public class Expeditions {
     public static void setExpedition(Game game, String expedition, String faction) {
         Expeditions exp = game.getExpeditions();
         exp.expeditionFactions.put(expedition, faction);
+        Player player = game.getPlayerFromColorOrFaction(faction);
+        if (player != null && player.isRealPlayer()) {
+            if (exp.getRemainingExpeditionCount() == 0) {
+                String message = !game.isFowMode() ? "# ATTENTION " + game.getPing() + "\n" : "";
+                message += player.getRepresentation()
+                        + " has completed the last expedition! They can now place the Thunder's Edge planet on the board:";
+                message +=
+                        "\n-# Thunder's Edge must be placed on a tile that does not have any planets or printed wormholes, and cannot be placed in a supernova or The Fracture.";
+                Button button =
+                        Buttons.green(player.factionButtonChecker() + "placeThundersEdge", "Place Thunder's Edge");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                MessageHelper.sendMessageToChannelWithButton(
+                        player.getCorrectChannel(), "Use the button to begin placing Thunder's Edge:", button);
+            }
+            BreakthroughCommandHelper.unlockAllBreakthroughs(game, player);
+        }
     }
 
     @ButtonHandler("TEexpedition_")

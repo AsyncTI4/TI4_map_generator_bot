@@ -25,7 +25,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "At the start of space combat, you may use ANTI-FIGHTER BARRAGE 6(x2) against a player’s fighters in the active system.",
+        "text": "During the Anti-Fighter Barrage step of space combat, you may use ANTI-FIGHTER BARRAGE 6(x2) against your opponent's units.",
         "source": "twilight_ds",
         "faction": "celdauri"
     },
