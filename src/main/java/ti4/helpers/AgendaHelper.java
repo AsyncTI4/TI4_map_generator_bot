@@ -828,7 +828,7 @@ public final class AgendaHelper {
                 Player keleres = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                 if (keleres != null && specificVote.contains("Keleres Xxcha Hero")) {
                     int size = getLosingVoters(outcome, game).size()
-                            + getAbainingVoters(winner, game).size();
+                            + getAbstainingVoters(winner, game).size();
                     String message = keleres.getRepresentation()
                             + " You have Odlynn Myrr, the Keleres (Xxcha) Hero, to resolve. There were " + size
                             + " players who abstained or voted for a different outcome, so you get that many trade goods and command tokens. ";
@@ -1272,6 +1272,7 @@ public final class AgendaHelper {
                                 && !specificVote.contains("Sanction")
                                 && !specificVote.contains("Radiance")
                                 && !specificVote.contains("Unity")
+                                && !specificVote.contains("Hero")
                                 && !specificVote.contains("Ability")) {
                             losers.add(loser);
                         }
@@ -1282,7 +1283,7 @@ public final class AgendaHelper {
         return losers;
     }
 
-    private static List<Player> getAbainingVoters(String winner, Game game) {
+    private static List<Player> getAbstainingVoters(String winner, Game game) {
         List<Player> abstainers = new ArrayList<>();
         List<Player> losers = getLosingVoters(winner, game);
         List<Player> winners = getWinningVoters(winner, game);

@@ -11,7 +11,7 @@
         "alias": "lightrailordnance",
         "name": "Lightrail Ordnance",
         "text": "Your space docks gain SPACE CANNON 5 (x2). You may use your space dock's SPACE CANNON against ships that are adjacent to their systems.",
-        "flavourText": "A single sparkle was the only warning the Yin fleet had before a massive hole had been punched through the hull of the Van Hague.\nThen, searing light.",
+        "flavourText": "A single sparkle was the only warning the Yin fleet had before a massive hole had been punched through the hull of the Van Hauge.\nThen, searing light.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/te/lightrailordnance.png?raw=true",
         "source": "thunders_edge"
     },
