@@ -1223,6 +1223,7 @@ public final class Constants {
     public static final String ABILITY_4 = "ability_4";
     public static final String ABILITY_5 = "ability_5";
     public static final String ABILITIES = "abilities";
+    public static final String EXHAUSTED_ABILITIES = "exhausted_abilities";
     public static final String ABILITY_INFO = "ability_info";
     public static final String ABILITY_ADD = "ability_add";
     public static final String ABILITY_REMOVE = "ability_remove";

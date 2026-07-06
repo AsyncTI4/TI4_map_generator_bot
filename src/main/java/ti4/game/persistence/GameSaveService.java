@@ -956,6 +956,8 @@ class GameSaveService {
 
             writer.write(Constants.ABILITIES + " " + String.join(",", player.getAbilities()));
             writer.write(System.lineSeparator());
+            writer.write(Constants.EXHAUSTED_ABILITIES + " " + String.join(",", player.getExhaustedAbilities()));
+            writer.write(System.lineSeparator());
 
             writer.write(Constants.TG + " " + player.getTg());
             writer.write(System.lineSeparator());
