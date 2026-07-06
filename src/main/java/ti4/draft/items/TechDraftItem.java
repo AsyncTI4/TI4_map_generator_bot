@@ -77,7 +77,7 @@ public class TechDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.TECH);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.TECH, game.isTwilightsFallMode());
         return allItems;
     }
 

@@ -418,6 +418,29 @@ public class ExploreService {
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
             return;
         }
+        if (player.hasAbility("doctrine_discovery")) {
+            ExploreModel exploreModel = Mapper.getExplore(cardID);
+            String name1 = exploreModel.getName();
+            Button resolveExplore1 = Buttons.green(
+                    "natauDiscovery_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Resolve " + name1);
+            Button resolveExplore2 =
+                    Buttons.green("natauDiscovery_Accept" + drawColor + "_" + planetName, "Gain 1 Trade Good");
+            List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
+            String message = player.getRepresentationUnfogged()
+                    + " You have _Discovery_, and thus may decline this exploration to gain 1 trade good.";
+            if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
+                String pF = player.getFactionEmoji();
+                MessageHelper.sendMessageToChannel(
+                        game.getActionsChannel(), pF + " found a " + name1 + " on " + planetName + ".");
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(), "Found a " + name1 + " on " + planetName + ".");
+            }
+            ExploreModel exploreModel1 = Mapper.getExplore(cardID);
+            List<MessageEmbed> embeds = List.of(exploreModel1.getRepresentationEmbed());
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
+            return;
+        }
         resolveExplore(event, cardID, tile, planetName, messageText, player, game);
         if (player.hasTech("pfa")) { // Pre-Fab Arcologies
             PlanetService.refreshPlanet(player, planetName);

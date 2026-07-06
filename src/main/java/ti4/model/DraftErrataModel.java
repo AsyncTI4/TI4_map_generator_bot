@@ -72,10 +72,16 @@ public class DraftErrataModel implements ModelInterface {
     }
 
     public static void filterUndraftablesAndShuffle(List<DraftItem> items, DraftCategory listCategory) {
+        filterUndraftablesAndShuffle(items, listCategory, false);
+    }
+
+    public static void filterUndraftablesAndShuffle(List<DraftItem> items, DraftCategory listCategory, boolean tf) {
         Map<String, DraftErrataModel> frankenErrata = Mapper.getFrankenErrata();
         items.removeIf((DraftItem item) -> frankenErrata.containsKey(item.getAlias())
                 && frankenErrata.get(item.getAlias()).isUndraftable());
-        items.addAll(DraftItem.getAlwaysIncludeItems(listCategory));
+        if (!tf) {
+            items.addAll(DraftItem.getAlwaysIncludeItems(listCategory));
+        }
         Set<DraftItem> itemsSet = Set.copyOf(items); // Remove duplicates
         items.clear();
         items.addAll(itemsSet);

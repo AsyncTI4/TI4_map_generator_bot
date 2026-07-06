@@ -17,6 +17,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -915,6 +916,14 @@ public class PlayerTechService {
             List<Button> buttons2 =
                     new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2, buttons2);
+        }
+        if (NatauDoctrineHandler.canUseKnowledgeExhaust(player)
+                && !NatauDoctrineHandler.eligibleKnowledgePlanets(player).isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButton(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", after researching a technology, you may exhaust _Knowledge_ and 1 planet you control that has a technology specialty to research a technology of that color.",
+                    NatauDoctrineHandler.getUseKnowledgeButton(player));
         }
 
         ButtonHelper.deleteMessage(event);

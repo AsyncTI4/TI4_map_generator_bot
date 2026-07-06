@@ -331,8 +331,12 @@ public class TeHelperActionCards {
         String msg2 = player.getRepresentation()
                 + ", A strategy token was auto deducted (if possible) due to so many people forgetting to do so. If you end up resolving leadership, please gain it back (the bot wont make you pay for it).";
         if (player.getStrategicCC() > 0) {
+
             player.setStrategicCC(player.getStrategicCC() - 1);
             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
+        } else {
+            msg2 = player.getRepresentation()
+                    + ", you have no strategy tokens to deduct, so the bot did not deduct one. You should probably only resolve leadership.";
         }
         buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);

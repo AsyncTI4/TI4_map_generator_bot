@@ -180,7 +180,7 @@
         "id": "doctrine_discovery",
         "name": "Discovery",
         "faction": "natau",
-        "permanentEffect": "When you would resolve the effects of an exploration card:\nYou may choose to discard that card without resolving its effects to gian 1 trade good.",
+        "permanentEffect": "When you would resolve the effects of an exploration card:\nYou may choose to discard that card without resolving its effects to gain 1 trade good.",
         "window": "At the end of a tactical action",
         "windowEffect": "You may exhaust this card to explore the frontier deck in a system that contains 1 or more of your ships and no planets.",
         "source": "beans"

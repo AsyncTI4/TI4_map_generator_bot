@@ -2791,8 +2791,7 @@ public final class ButtonHelperFactionSpecific {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String id = "naaluHeroSend_" + p2.getFaction() + "_"
                 + player.getPromissoryNotes().get("malevolency");
-        ButtonHelperHeroes.resolveNaaluHeroSend(player, game, id, null);
-        ButtonHelper.deleteMessage(event);
+        ButtonHelperHeroes.resolveNaaluHeroSend(player, game, id, event);
     }
 
     @ButtonHandler("redCreussWashFull")
