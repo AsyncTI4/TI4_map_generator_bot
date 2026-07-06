@@ -12,7 +12,6 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.settings.GlobalSettings;
 import ti4.spring.api.image.GameImageService;
-import ti4.spring.api.webdata.GameWebDataService;
 import ti4.spring.context.SpringContext;
 import ti4.spring.websocket.WebSocketNotifier;
 import ti4.website.model.WebsiteOverlay;
@@ -30,8 +29,8 @@ public class AsyncTi4WebsiteHelper {
         boolean isDevMode = !uploadsEnabled() || bucket == null || bucket.isEmpty();
 
         try {
-            SpringContext.getBean(GameWebDataService.class).put(gameId, game);
-
+            // WebSocketNotifier is the sole writer of the web-data cache (writing it here
+            // would desync the websocket diff baseline from what clients last received).
             if (!isDevMode) {
                 // Upload latest image name if available for legacy consumers.
                 try {

@@ -89,10 +89,13 @@ class RetreatButtonHandler {
 
     @ButtonHandler("retreatUnitsFrom_")
     public static void retreatUnitsFrom(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        ButtonHelperModifyUnits.retreatSpaceUnits(buttonID, event, game, player);
         String both = buttonID.replace("retreatUnitsFrom_", "");
         String pos1 = both.split("_")[0];
         String pos2 = both.split("_")[1];
+        if (player.hasUnlockedBreakthrough("kalorabt")) {
+            KaloraBreakthroughHandler.bypassOperationsRetreat(player, game, game.getTileByPosition(pos1), event);
+        }
+        ButtonHelperModifyUnits.retreatSpaceUnits(buttonID, event, game, player);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " retreated all units in space to "
@@ -107,9 +110,6 @@ class RetreatButtonHandler {
         CommanderUnlockCheckService.checkPlayer(player, "kalora");
         if (player.hasAbility("carapace_regeneration")) {
             KaloraAbilityHandler.carapaceRegeneration(player, game.getTileByPosition(pos2), event);
-        }
-        if (player.hasUnlockedBreakthrough("kalorabt")) {
-            KaloraBreakthroughHandler.bypassOperationsRetreat(player, game, game.getTileByPosition(pos1), event);
         }
         FOWCombatThreadMirroring.mirrorMessage(
                 event, game, player.getRepresentationNoPing() + " retreated all units in space.");

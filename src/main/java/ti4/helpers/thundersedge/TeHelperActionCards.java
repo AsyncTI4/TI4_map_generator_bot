@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -341,7 +341,7 @@ public class TeHelperActionCards {
             OnyxxaBreakthroughHandler.offerSCRollButton(game, player);
         }
         if (!player.hasLeaderUnlocked("onyxxacommander") && "onyxxa".equals(player.getFaction())) {
-            OnyxxaCommanderHandler.offerCommanderUnlockButton(player);
+            OnyxxaLeaderHandler.offerCommanderUnlockButton(player);
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -355,7 +355,7 @@ public class TeHelperActionCards {
                         && !player.getPlanetsAllianceMode().contains(p.getName()))
                 .filter(p -> game.getTileFromPlanet(p.getName()) != null)
                 .filter(p -> game.getUnitHolderFromPlanet(p.getName()) != null
-                        && !game.getUnitHolderFromPlanet(p.getName()).isSpaceStation()
+                        && !game.getUnitHolderFromPlanet(p.getName()).isSpaceStation(game)
                         && !p.getTokenList().contains("dmz")
                         && !p.getTokenList().contains("dmz_large"))
                 .map(p -> {

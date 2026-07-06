@@ -209,7 +209,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                                 + " seems to have planets that don't exist. Try removing them with `/planet remove`. The planet ID is `"
                                 + planet + "`.");
             } else {
-                if (game.getPlanetsInfo().get(planet).isSpaceStation()) {
+                if (game.getPlanetsInfo().get(planet).isSpaceStation(game)) {
                     return true;
                 }
             }
@@ -1448,10 +1448,13 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             bonus += 2;
         }
         for (String planet : getPlanets()) {
-            if (Mapper.getPlanet(planet) != null && Mapper.getPlanet(planet).isSpaceStation()) {
+            if (Mapper.getPlanet(planet) != null
+                    && (Mapper.getPlanet(planet).isSpaceStation()
+                            || (game.getUnitHolderFromPlanet(planet) != null
+                                    && game.getUnitHolderFromPlanet(planet).isSpaceStation(game)))) {
                 bonus++;
             }
-            if (hasUnlockedBreakthrough("gledgebt") || hasTech("tf-mantlecracking")) {
+            if (hasUnlockedBreakthrough("gledgebt")) {
                 Planet planetObj = game.getUnitHolderFromPlanet(planet);
                 if (planetObj != null && planetObj.getTokenList().contains(Constants.GLEDGE_CORE_PNG)) {
                     bonus++;
@@ -2350,7 +2353,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 .map(planet -> game.getPlanetsInfo().get(planet))
                 .filter(Objects::nonNull)
                 .filter(planet -> !planet.getPlanetModel().getPlanetTypes().contains(PlanetType.FAKE))
-                .filter(planet -> !planet.isSpaceStation())
+                .filter(planet -> !planet.isSpaceStation(game))
                 .count();
     }
 
@@ -2362,7 +2365,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 .map(planet -> game.getPlanetsInfo().get(planet))
                 .filter(Objects::nonNull)
                 .filter(p -> !p.getPlanetModel().getPlanetTypes().contains(PlanetType.FAKE))
-                .filter(p -> !p.isSpaceStation())
+                .filter(p -> !p.isSpaceStation(game))
                 .collect(Collectors.toSet());
 
         // Current coexisting framework is really very dumb
@@ -2382,7 +2385,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                         Tile t = game.getTileFromPlanet(planet.getName());
                         return t != null
                                 && t.containsPlayersUnitsWithModelCondition(this, UnitModel::getIsShip)
-                                && !planet.isSpaceStation();
+                                && !planet.isSpaceStation(game);
                     })
                     .collect(Collectors.toSet());
             playerPlanets.addAll(planetsUnderShips);

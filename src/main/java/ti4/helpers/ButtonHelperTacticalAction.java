@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -48,10 +49,17 @@ import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.service.gameevent.GameEventDraft;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameSubEvent;
 
 public final class ButtonHelperTacticalAction {
 
+    public static final String TACTICAL_ACTION_LOGGED = "gameEventTacticalLogged";
+
     public static void endOfTacticalActionThings(Player player, Game game, ButtonInteractionEvent event) {
+        logTacticalAction(game, player);
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
             RiftSetModeService.concludeTacticalAction(player, game, event);
             ButtonHelper.exploreDET(player, game, event);
@@ -146,6 +154,7 @@ public final class ButtonHelperTacticalAction {
             CrystellumLeadersHandler.clearFacetBypass(game, player);
             resetStoredValuesForTacticalAction(game);
         }
+        game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
     }
 
     @ButtonHandler("doneWithTacticalAction")
@@ -407,6 +416,7 @@ public final class ButtonHelperTacticalAction {
         game.setNaaluAgent(false);
         game.setWarfareAction(false);
         game.setL1Hero(false);
+        game.removeStoredValue(TACTICAL_ACTION_LOGGED);
         game.removeStoredValue("violatedSystems");
         game.removeStoredValue("mercenarycaptaintrigged");
         game.removeStoredValue("vaylerianHeroActive");
@@ -421,8 +431,28 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
         DreamButtonHandler.clearDreamAgentAnomaly(game);
+        GameEventDraft.clear(game);
 
         game.getTacticalActionDisplacement().clear();
+    }
+
+    public static void logTacticalAction(Game game, Player player) {
+        Map<String, Object> payload = new HashMap<>();
+        addIfNotEmpty(payload, "activeSystem", game.getActiveSystem());
+        addIfNotEmpty(payload, "planetsTaken", game.getStoredValue("planetsTakenThisRound"));
+        addIfNotEmpty(payload, "combat", game.getStoredValue("factionsInCombat"));
+        addIfNotEmpty(payload, "summary", game.getStoredValue("currentActionSummary" + player.getFaction()));
+        List<GameSubEvent> subEvents = GameEventDraft.drain(game);
+        if (!subEvents.isEmpty()) {
+            payload.put("subEvents", GameEventDraft.toJsonNode(subEvents));
+        }
+        GameEventService.commit(game, GameEventType.TACTICAL_ACTION, player, payload);
+    }
+
+    private static void addIfNotEmpty(Map<String, Object> payload, String key, String value) {
+        if (value != null && !value.isEmpty()) {
+            payload.put(key, value);
+        }
     }
 
     public static void beginTacticalAction(Game game, Player player) {
@@ -573,6 +603,7 @@ public final class ButtonHelperTacticalAction {
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Activated "
                         + tile.getRepresentationForButtons(game, player) + ".");
+        GameEventDraft.open(game);
         if ((game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander") || player.hasTech("tf-starbasewebway"))
                 && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
                         .contains(tile)) {

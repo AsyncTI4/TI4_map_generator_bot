@@ -22,7 +22,7 @@ class TradeStationButtonHandler {
         String onlyPlanet = null;
         for (String planet : player.getReadiedPlanets()) {
             if (game.getUnitHolderFromPlanet(planet) == null
-                    || !game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
+                    || !game.getUnitHolderFromPlanet(planet).isSpaceStation(game)) {
                 continue;
             }
             onlyPlanet = planet;

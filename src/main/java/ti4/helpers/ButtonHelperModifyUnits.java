@@ -754,7 +754,7 @@ public final class ButtonHelperModifyUnits {
                 if (isRemainingSustains) {
                     effectiveUnits -= damagedUnits;
                 }
-                int min = (player.hasTech("nes"))
+                int min = (player.hasTech("nes") && isRemainingSustains)
                         ? Math.min(effectiveUnits, (hits + 1) / 2)
                         : Math.min(effectiveUnits, hits);
                 if (isNraShenanigans
@@ -2489,6 +2489,7 @@ public final class ButtonHelperModifyUnits {
         UnitHolder uh = tile.getUnitHolders().get("space");
         for (UnitKey unit : uh.getUnitsByStateForPlayer(player).keySet()) {
             UnitModel um = player.getUnitFromUnitKey(unit);
+            if (um == null || !um.getIsShip()) continue;
             buttons.add(Buttons.gray("chooseGravleash_" + um.getAsyncId(), um.getName(), unit.unitEmoji()));
         }
         String msg = player.getRepresentation() + ", please choose which of your ships in "

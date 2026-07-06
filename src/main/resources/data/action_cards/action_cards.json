@@ -1329,7 +1329,7 @@
         "name": "Archaeological Expedition",
         "phase": "Action",
         "window": "Action",
-        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control. gain any relic fragments that you reveal and discard the rest.",
+        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control; gain any relic fragments that you reveal and discard the rest.",
         "automationID": "arch_expedition",
         "flavorText": "Hiari pressed the activation glyphs, and the ancient door hissed open. As she stepped into the pitch-black interior of the Mahact tomb, she felt a shiver of anticipation. Perhaps, finally, she would find the Codex.",
         "source": "pok"
@@ -1339,7 +1339,7 @@
         "name": "Archaeological Expedition",
         "phase": "Action",
         "window": "Action",
-        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control. gain any relic fragments that you reveal and discard the rest.",
+        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control; gain any relic fragments that you reveal and discard the rest.",
         "automationID": "arch_expedition",
         "flavorText": "Hiari pressed the activation glyphs, and the ancient door hissed open. As she stepped into the pitch-black interior of the Mahact tomb, she felt a shiver of anticipation. Perhaps, finally, she would find the Codex.",
         "source": "asteroid"
@@ -1349,7 +1349,7 @@
         "name": "Archaeological Expedition",
         "phase": "Action",
         "window": "Action",
-        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control. gain any relic fragments that you reveal and discard the rest.",
+        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control; gain any relic fragments that you reveal and discard the rest.",
         "automationID": "arch_expedition",
         "flavorText": "Hiari pressed the activation glyphs, and the ancient door hissed open. As she stepped into the pitch-black interior of the Mahact tomb, she felt a shiver of anticipation. Perhaps, finally, she would find the Codex.",
         "source": "asteroid"
@@ -1359,7 +1359,7 @@
         "name": "Archaeological Expedition",
         "phase": "Action",
         "window": "Action",
-        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control. gain any relic fragments that you reveal and discard the rest.",
+        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control; gain any relic fragments that you reveal and discard the rest.",
         "automationID": "arch_expedition",
         "flavorText": "Hiari pressed the activation glyphs, and the ancient door hissed open. As she stepped into the pitch-black interior of the Mahact tomb, she felt a shiver of anticipation. Perhaps, finally, she would find the Codex.",
         "source": "asteroid"

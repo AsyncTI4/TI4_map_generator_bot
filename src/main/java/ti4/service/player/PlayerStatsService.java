@@ -23,6 +23,8 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class PlayerStatsService {
@@ -165,6 +167,7 @@ public class PlayerStatsService {
         }
 
         player.addSC(scNumber);
+        GameEventService.commit(game, GameEventType.SC_PICKED, player, Map.of("scNumber", scNumber));
         if (game.isFowMode()) {
             String messageToSend =
                     ColorEmojis.getColorEmojiWithName(player.getColor()) + " picked " + game.getSCName(scNumber) + ".";

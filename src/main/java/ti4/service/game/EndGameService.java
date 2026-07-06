@@ -3,6 +3,7 @@ package ti4.service.game;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
@@ -23,6 +24,7 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.RepositoryDispatchEvent;
+import ti4.helpers.StatusHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.MapRenderPipeline;
@@ -38,6 +40,8 @@ import ti4.service.statistics.game.WinningPathPersistenceService;
 import ti4.service.tigl.TiglReportService;
 import ti4.spring.api.image.GameImageService;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class EndGameService {
@@ -57,6 +61,14 @@ public class EndGameService {
             MessageHelper.replyToMessage(
                     event, "No roles match the game name (" + gameName + ") - no role will be deleted.");
             deleteRole = false;
+        }
+        if (!game.isHasEnded()) {
+            // The game-winning objective may have just been staged into the status-scoring draft.
+            StatusHelper.commitStatusScoringEvent(game);
+            List<String> winners =
+                    game.getWinners().stream().map(Player::getFaction).toList();
+            GameEventService.commit(
+                    game, GameEventType.GAME_ENDED, null, winners.isEmpty() ? Map.of() : Map.of("winner", winners));
         }
 
         // Do not publish games that never really took off

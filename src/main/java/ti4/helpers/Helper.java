@@ -49,7 +49,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -969,7 +969,7 @@ public final class Helper {
 
             boolean containsDMZ = uh.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
 
-            if (containsDMZ || uh.isSpaceStation()) {
+            if (containsDMZ || uh.isSpaceStation(game)) {
                 continue;
             }
             if ("spacedock".equalsIgnoreCase(unit)) {
@@ -1001,7 +1001,7 @@ public final class Helper {
                 continue;
             }
             if (game.getUnitHolderFromPlanet(planet) == null
-                    || game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
+                    || game.getUnitHolderFromPlanet(planet).isSpaceStation(game)) {
                 continue;
             }
             String id = player.factionButtonChecker() + prefix + "_" + unit + "_" + planet;
@@ -2158,8 +2158,8 @@ public final class Helper {
                         || (!game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")
                                 && !player.hasTech("tf-quantumdrive"))) {
                     cost += (int) removedUnit.getCost() * entry.getValue();
-                    if (MobilizationEngineHandler.hasEngineAttached(game)) {
-                        cost += MobilizationEngineHandler.getCostMod(game, player, removedUnit) * entry.getValue();
+                    if (ArvaxiBreakthroughHandler.hasEngineAttached(game)) {
+                        cost += ArvaxiBreakthroughHandler.getCostMod(game, player, removedUnit) * entry.getValue();
                     }
                 }
                 totalUnits += entry.getValue();

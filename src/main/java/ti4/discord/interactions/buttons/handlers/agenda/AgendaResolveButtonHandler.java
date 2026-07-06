@@ -71,6 +71,8 @@ import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 class AgendaResolveButtonHandler {
@@ -132,9 +134,21 @@ class AgendaResolveButtonHandler {
         String winner = buttonID.substring(buttonID.indexOf('_') + 1);
         String agendaId = game.getCurrentAgendaInfo().split("_")[2];
         if (guardDoublePress(game, winner, agendaId)) return;
-
         int aID = computeAgendaNumericId(game, agendaId);
         String agID = getAgendaId(game, aID);
+        String agendaName = StringUtils.defaultString(Mapper.getAgendaTitleNoCap(agID));
+        // Keyed by the id the web state reads back (for Covert Legislation that is "covert", not the hidden agenda).
+        game.setStoredValue("resolvedAgendaId", StringUtils.defaultString(AgendaHelper.getCurrentAgendaId(game)));
+        game.setStoredValue("resolvedAgendaOutcome", winner);
+        GameEventService.commit(
+                game,
+                GameEventType.AGENDA_RESOLVED,
+                null,
+                Map.of(
+                        "agendaId", agID,
+                        "agendaName", agendaName,
+                        "outcome", winner,
+                        "votes", game.getCurrentAgendaVotes()));
 
         // Pre-resolution
         handlePredictiveIntelligence(game, winner);

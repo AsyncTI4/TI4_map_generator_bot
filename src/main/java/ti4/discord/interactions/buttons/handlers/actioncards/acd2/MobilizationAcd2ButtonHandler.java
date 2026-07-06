@@ -69,7 +69,7 @@ class MobilizationAcd2ButtonHandler {
             return;
         }
 
-        List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "warfare", "place");
+        List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "mobilization", "place");
         String message = player.getRepresentation() + ", use the buttons to produce up to 4 units in "
                 + tile.getRepresentationForButtons(game, player) + " for _Mobilization_."
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, game, true);

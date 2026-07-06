@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.PhantomEnergyHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -50,6 +50,7 @@ import ti4.service.tactical.TacticalActionService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.MoveUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
@@ -1960,6 +1961,9 @@ public final class ButtonHelperAbilities {
                         + "->"
                         + player.getTg() + ").\n-# This is technically an optional gain.");
         pillageCheck(player, game);
+        if (game.isTwilightDS()) {
+            DestroyUnitService.destroyAllUnits(event, game.getTileFromPlanet(planetName), game, planet, false);
+        }
         ButtonHelperAgents.resolveArtunoCheck(player, 4);
         List<Button> buttons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         String message = "Use buttons to end turn or do another action";
@@ -2281,7 +2285,7 @@ public final class ButtonHelperAbilities {
             if (player.hasAbility("marked_prey")) {
                 ZephyrionBountyHandler.offerBountyButtons(game, player, false);
             }
-            PhantomEnergyHandler.checkFlagshipPhantomEnergy(game, player);
+            TyrisAbilityHandler.checkFlagshipPhantomEnergy(game, player);
             if (player.hasAbility("protocols")) {
                 List<Button> buttons = getAvailableProtocols(player);
                 String sb = player.getRepresentationUnfogged() + ", your **Protocols** ability was triggered."

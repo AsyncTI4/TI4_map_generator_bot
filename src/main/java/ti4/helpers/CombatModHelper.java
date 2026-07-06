@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -624,7 +624,30 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
-            case "technotemplar" -> meetsCondition = player.hasUnit("vyserix_mech");
+            case "technotemplar" -> {
+                if (tile != null && player.hasUnit("vyserix_mech")) {
+                    List<Tile> tilesToCheck = new ArrayList<>();
+                    tilesToCheck.add(tile);
+                    if (unitsByQuantity.keySet().stream().anyMatch(UnitModel::getDeepSpaceCannon)) {
+                        for (String adjPos :
+                                FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                            Tile adjTile = game.getTileByPosition(adjPos);
+                            if (adjTile != null) {
+                                tilesToCheck.add(adjTile);
+                            }
+                        }
+                    }
+                    checkTiles:
+                    for (Tile t : tilesToCheck) {
+                        for (UnitHolder uh : t.getPlanetUnitHolders()) {
+                            if (uh.getUnitCount(UnitType.Mech, player.getColor()) > 0) {
+                                meetsCondition = true;
+                                break checkTiles;
+                            }
+                        }
+                    }
+                }
+            }
             case "opponent_strat_cards_exhausted" ->
                 meetsCondition = opponent != null && game.getPlayedSCs().containsAll(opponent.getSCs());
             case "space_dock_on_holder" -> {
@@ -821,8 +844,8 @@ public class CombatModHelper {
                     }
                 }
                 case "arvaxi_engine" -> {
-                    if (MobilizationEngineHandler.isAttachedToUnit(game, player, origUnit)) {
-                        scalingCount = MobilizationEngineHandler.isBoon(game) ? 1 : -1;
+                    if (ArvaxiBreakthroughHandler.isAttachedToUnit(game, player, origUnit)) {
+                        scalingCount = ArvaxiBreakthroughHandler.isBoon(game) ? 1 : -1;
                     }
                 }
                 case "mechs_on_planet" -> {

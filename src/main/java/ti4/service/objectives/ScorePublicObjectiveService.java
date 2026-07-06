@@ -21,6 +21,7 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StatusHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
@@ -68,6 +69,7 @@ public class ScorePublicObjectiveService {
                     channel,
                     player.getFactionEmoji() + ", no such public objective ID found, or already scored, please retry.");
         } else {
+            StatusHelper.recordObjectiveScored(game, player, id, "PUBLIC");
             informAboutScoring(event, channel, game, player, poID);
             if (player.hasAbility("primordial")) {
                 KaloraAbilityHandler.primordial(player, game);
