@@ -193,18 +193,31 @@ public class MapJsonIOService {
             LoreService.clearLore(game);
 
             for (TileIO tileIO : mapData.getMapInfo()) {
-                if (handleTile(tileIO, game, errorSb)) {
-                    handleTokens(tileIO, game, errorSb);
-                    handleCustomHyperlane(tileIO, game, errorSb);
-                    handleBorderAnomalies(tileIO, game, errorSb);
-                    handleSystemLore(tileIO, game, errorSb);
-                    handlePlanetAttachments(tileIO, game, errorSb);
-                    handlePlanetLore(tileIO, game, errorSb);
-                    handleAdjacencyOverrides(tileIO, game, errorSb);
-                    handleCustomAdjacencies(tileIO, game, errorSb);
+                // Isolated per tile: an unexpected failure processing one tile must not abort the
+                // rest of the map (or phase lore, handled after this loop) — it's reported and
+                // skipped instead, same as every other per-item failure in this importer.
+                try {
+                    if (handleTile(tileIO, game, errorSb)) {
+                        handleTokens(tileIO, game, errorSb);
+                        handleCustomHyperlane(tileIO, game, errorSb);
+                        handleBorderAnomalies(tileIO, game, errorSb);
+                        handleSystemLore(tileIO, game, errorSb);
+                        handlePlanetAttachments(tileIO, game, errorSb);
+                        handlePlanetLore(tileIO, game, errorSb);
+                        handleAdjacencyOverrides(tileIO, game, errorSb);
+                        handleCustomAdjacencies(tileIO, game, errorSb);
+                    }
+                } catch (Exception e) {
+                    appendError(errorSb, tileIO, "unexpected error, tile skipped: " + e.getMessage());
                 }
             }
-            handlePhaseLore(mapData, game, errorSb);
+            try {
+                handlePhaseLore(mapData, game, errorSb);
+            } catch (Exception e) {
+                errorSb.append("- phase lore: unexpected error, skipped: ")
+                        .append(e.getMessage())
+                        .append('\n');
+            }
 
             MessageHelper.sendMessageToChannel(feedbackChannel, "Map imported from JSON.");
             MessageHelper.sendMessageToChannelWithButtons(
@@ -372,14 +385,19 @@ public class MapJsonIOService {
      */
     private static void importLoreList(
             String rawTarget, List<LoreIO> entries, Game game, StringBuilder sb, String label) {
-        if (entries == null) return;
+        if (entries == null || entries.isEmpty()) return;
+        if (rawTarget == null) {
+            appendLoreError(sb, label, "(missing)", "missing position/planetID — all its lore entries were skipped");
+            return;
+        }
 
         for (LoreIO io : entries) {
             if (io == null || StringUtils.isBlank(io.getLoreText())) continue;
 
-            LoreEntry candidate;
+            // One entry's failure — expected (bad enum) or not (any other exception) — must not
+            // stop the rest of this target's entries, or the target after it, from importing.
             try {
-                candidate = new LoreEntry(LoreService.clean(io.getLoreText()));
+                LoreEntry candidate = new LoreEntry(LoreService.clean(io.getLoreText()));
                 candidate.footerText = LoreService.clean(io.getFooterText());
                 candidate.receiver = LoreService.RECEIVER.valueOf(io.getReceiver());
                 candidate.trigger = LoreService.TRIGGER.valueOf(io.getTrigger());
@@ -387,18 +405,22 @@ public class MapJsonIOService {
                 candidate.persistance = LoreService.PERSISTANCE.valueOf(io.getPersistance());
                 candidate.fromRound = io.getFromRound() == null ? 0 : io.getFromRound();
                 candidate.tillRound = io.getTillRound() == null ? 0 : io.getTillRound();
-            } catch (Exception e) {
-                appendLoreError(sb, label, rawTarget, "unrecognized receiver/trigger/ping/persistance value");
-                continue;
-            }
 
-            LoreService.LoreImportResult result = LoreService.importValidatedLore(rawTarget, candidate, game);
-            if (result.target() == null) {
-                appendLoreError(sb, label, rawTarget, "invalid target, phase/trigger mismatch, or text too long");
-            } else {
-                for (String warning : result.warnings()) {
-                    appendLoreError(sb, label, result.target(), "warning: " + warning);
+                LoreService.LoreImportResult result = LoreService.importValidatedLore(rawTarget, candidate, game);
+                if (result.target() == null) {
+                    appendLoreError(sb, label, rawTarget, "invalid target, phase/trigger mismatch, or text too long");
+                } else {
+                    for (String warning : result.warnings()) {
+                        appendLoreError(sb, label, result.target(), "warning: " + warning);
+                    }
                 }
+            } catch (IllegalArgumentException | NullPointerException e) {
+                // NullPointerException: Enum.valueOf(null) when a receiver/trigger/ping/persistance
+                // field is missing entirely, not just misspelled.
+                appendLoreError(
+                        sb, label, rawTarget, "unrecognized or missing receiver/trigger/ping/persistance value");
+            } catch (Exception e) {
+                appendLoreError(sb, label, rawTarget, "unexpected error, entry skipped: " + e.getMessage());
             }
         }
     }

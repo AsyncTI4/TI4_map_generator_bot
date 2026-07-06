@@ -187,6 +187,71 @@ class MapJsonIOServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void oneBadTileIsSkippedInsteadOfAbortingTheRestOfTheImport() {
+        // A null position throws inside handleTile itself (PositionMapper/Properties reject a null
+        // key) before any lore code runs — listed first, on purpose, so a pre-fix importer would
+        // have aborted before ever reaching the second (valid) tile or the phaseLore below it.
+        String json = """
+                {
+                  "mapInfo": [
+                    {"position": null, "tileID": "18"},
+                    {
+                      "position": "101",
+                      "tileID": "19",
+                      "systemLore": {"loreText":"Still here","footerText":"","receiver":"CURRENT","trigger":"CONTROLLED","ping":"NO","persistance":"ONCE"}
+                    }
+                  ],
+                  "phaseLore": {
+                    "action": [
+                      {"loreText":"Also still here","footerText":"","receiver":"ALL","trigger":"PHASE_START","ping":"NO","persistance":"ONCE"}
+                    ]
+                  }
+                }
+                """;
+
+        MapJsonIOService.importMapFromJson(game, json, null);
+
+        assertNotNull(game.getTileByPosition("101"), "the second, valid tile must still be added");
+        assertEquals("Still here", LoreService.getGameLore(game).get("101").loreText, "its lore must still import");
+        assertTrue(
+                LoreService.getGameLore(game).containsKey("action"),
+                "phase lore (handled after the tile loop) must still run despite the earlier tile's failure");
+    }
+
+    @Test
+    void planetLoreWithAMissingPlanetIdIsSkippedNotThrown() {
+        String json = """
+                {
+                  "mapInfo": [
+                    {
+                      "position": "000",
+                      "tileID": "18",
+                      "planets": [
+                        {
+                          "planetID": null,
+                          "planetLoreEntries": [
+                            {"loreText":"Orphaned entry","footerText":"","receiver":"CURRENT","trigger":"CONTROLLED","ping":"NO","persistance":"ONCE"}
+                          ]
+                        },
+                        {
+                          "planetID": "mr",
+                          "planetLoreEntries": [
+                            {"loreText":"Real entry","footerText":"","receiver":"CURRENT","trigger":"CONTROLLED","ping":"NO","persistance":"ONCE"}
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+                """;
+
+        MapJsonIOService.importMapFromJson(game, json, null);
+
+        assertEquals(1, LoreService.getGameLore(game).size(), "only the entry with a real planetID must land");
+        assertEquals("Real entry", LoreService.getGameLore(game).get("mr").loreText);
+    }
+
+    @Test
     void exportThenReimportRoundTripsTaggedAndPhaseLore() {
         LoreEntry bare = new LoreEntry("Bare system lore");
         bare.target = "000";
