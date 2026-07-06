@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
@@ -113,6 +114,14 @@ public final class ButtonHelperTacticalAction {
                 if (buttons.size() > 2) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                 }
+            }
+            if (player.hasAbility("doctrine_discovery")
+                    && !player.getExhaustedAbilities().contains("doctrine_discovery")) {
+                MessageHelper.sendMessageToChannelWithButton(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + ", you may exhaust _Discovery_ to explore a frontier token in a planetless system containing your ships.",
+                        NatauDoctrineHandler.getUseDiscoveryButton(player));
             }
             if (!game.isAbsolMode()
                     && player.getRelics().contains("emphidia")

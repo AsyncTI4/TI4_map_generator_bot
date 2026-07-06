@@ -173,7 +173,7 @@ public final class StatusHelper {
                 maxVP = player.getTotalVictoryPoints();
             }
             if (player.hasAbility("paradigm")) {
-                NatauAbilityHandler.resolveParadigmStartOfStrategy(event, game, player);
+                NatauAbilityHandler.resolveParadigmStartOfStatus(event, game, player);
             }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "vadencommander")) {
                 int numScoredSOs = player.getSoScored();
