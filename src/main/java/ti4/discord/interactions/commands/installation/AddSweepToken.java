@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 
 class AddSweepToken extends GameStateSubcommand {
 
-    public AddSweepToken() {
+    AddSweepToken() {
         super(Constants.ADD_SWEEP_TOKEN, "Add a sweep token to the selected system", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System to add a sweep token to")
                 .setAutoComplete(true)
