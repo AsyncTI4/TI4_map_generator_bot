@@ -612,9 +612,14 @@ public class JdaService {
 
     public static void leaveGuildIfNotWhitelisted(Guild guild) {
         if (isWhitelistedGuild(guild)) return;
+        boolean leave = LEAVE_ENABLED && isProduction();
         BotLogger.warning("Would leave guild '" + guild.getName() + "' (" + guild.getId()
-                + ") because it isn't whitelisted!" + (LEAVE_ENABLED ? " LEAVING." : " (dry run)"));
-        if (LEAVE_ENABLED) guild.leave().queue(Consumers.nop(), BotLogger::catchRestError);
+                + ") because it isn't whitelisted!" + (leave ? " LEAVING." : " (dry run)"));
+        if (leave) guild.leave().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    public static boolean isProduction() {
+        return Constants.ASYNCTI4_HUB_SERVER_ID.equals(guildPrimaryID);
     }
 
     private static boolean isWhitelistedGuild(Guild guild) {
