@@ -96,6 +96,7 @@ import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.DeepgloomService;
 import ti4.service.breakthrough.ValefarZService;
+import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -1686,11 +1687,17 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
 
         Emoji parsedEmoji = Emoji.fromFormatted(emoji);
-        if (parsedEmoji instanceof CustomEmoji) {
-            TI4Emoji replacement = TI4Emoji.findEmojiFromJustName(parsedEmoji.getName());
+        if (parsedEmoji instanceof CustomEmoji customEmoji) {
+            TI4Emoji replacement = TI4Emoji.findEmojiFromJustName(customEmoji.getName());
             if (replacement != null) {
                 emoji = replacement.emojiString();
                 setFactionEmoji(emoji);
+                return emoji;
+            }
+            if (isInaccessibleCustomEmoji(customEmoji)) {
+                setFactionEmoji(null);
+                notifyCustomFactionEmojiWasReset(customEmoji);
+                return null;
             }
             return emoji;
         }
@@ -1701,6 +1708,20 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
         setFactionEmoji(null);
         return null;
+    }
+
+    private static boolean isInaccessibleCustomEmoji(CustomEmoji emoji) {
+        if (JdaService.testingMode || JdaService.jda == null) return false;
+        return !ApplicationEmojiService.isValidAppEmoji(emoji) && JdaService.jda.getEmojiById(emoji.getId()) == null;
+    }
+
+    private void notifyCustomFactionEmojiWasReset(CustomEmoji oldEmoji) {
+        if (game == null) return;
+        MessageHelper.sendMessageToChannel(
+                getCorrectChannel(),
+                getRepresentationUnfogged() + " your custom faction icon `:" + oldEmoji.getName()
+                        + ":` is from a server the bot no longer has access to, so it has been reset to the default."
+                        + " You may pick a new one with `/franken set_faction_icon`.");
     }
 
     public String fogSafeEmoji() {
