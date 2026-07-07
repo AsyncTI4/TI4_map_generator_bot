@@ -613,6 +613,7 @@ public class JdaService {
         if (!isProduction() || isWhitelistedGuild(guild)) return;
         BotLogger.warning(
                 "Leaving guild '" + guild.getName() + "' (" + guild.getId() + ") because it isn't whitelisted!");
+        guild.leave().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static boolean isProduction() {
