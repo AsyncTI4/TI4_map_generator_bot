@@ -82,6 +82,7 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 @UtilityClass
 public class JdaService {
 
+    private static final boolean LEAVE_ENABLED = false;
     private static final String JDA_EVENT_POOL_NAME = "JDA Event Pool";
     private static final int EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS = 5;
     private static final int JDA_SHUTDOWN_TIMEOUT_SECONDS = 20;
@@ -282,6 +283,8 @@ public class JdaService {
                 + serversToCreateNewGamesOn.size() + " Overflow servers for new games\n> "
                 + fowServers.size() + " Fog of War servers"
                 + "\n> Guilds: " + jda.getGuilds().stream().map(Guild::getName).collect(Collectors.toSet()));
+
+        if (isProduction()) leaveNonWhitelistedGuilds();
 
         // Attempt to start a "Search Only" version of the bot on eligible servers
         for (Guild searchGuild : jda.getGuilds()) {
@@ -601,6 +604,28 @@ public class JdaService {
         User user = jda.getUserById(userId);
         if (user != null) return user.getEffectiveName();
         return null;
+    }
+
+    private static void leaveNonWhitelistedGuilds() {
+        jda.getGuilds().forEach(JdaService::leaveGuildIfNotWhitelisted);
+    }
+
+    public static void leaveGuildIfNotWhitelisted(Guild guild) {
+        if (isWhitelistedGuild(guild)) return;
+        boolean leave = LEAVE_ENABLED && isProduction();
+        String action = leave ? "Leaving" : "Would leave";
+        BotLogger.warning(action + " guild '" + guild.getName() + "' (" + guild.getId()
+                + ") because it isn't whitelisted!" + (leave ? "" : " (dry run)"));
+        if (leave) guild.leave().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    public static boolean isProduction() {
+        return Constants.ASYNCTI4_HUB_SERVER_ID.equals(guildPrimaryID);
+    }
+
+    private static boolean isWhitelistedGuild(Guild guild) {
+        return guilds.stream().anyMatch(whitelistGuild -> whitelistGuild.getId().equals(guild.getId()))
+                || Constants.EMOJI_FARM_SERVERS.containsKey(guild.getId());
     }
 
     public static void shutdown() {

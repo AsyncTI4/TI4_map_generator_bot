@@ -28,7 +28,6 @@ import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.Constants;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -469,7 +468,7 @@ class MessageListener extends ListenerAdapter {
         return hasFowServers()
                 && isNotInFowServers(event)
                 && isDifferentCommunityPlayGuild(event)
-                && isPrimaryHubServer();
+                && JdaService.isProduction();
     }
 
     private static boolean hasFowServers() {
@@ -485,9 +484,5 @@ class MessageListener extends ListenerAdapter {
                 && !JdaService.guildCommunityPlays
                         .getId()
                         .equals(event.getGuild().getId());
-    }
-
-    private static boolean isPrimaryHubServer() {
-        return Constants.ASYNCTI4_HUB_SERVER_ID.equals(JdaService.guildPrimaryID);
     }
 }
