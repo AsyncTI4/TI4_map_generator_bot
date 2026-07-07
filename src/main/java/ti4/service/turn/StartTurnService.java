@@ -38,6 +38,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.model.PromissoryNoteModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -477,6 +478,26 @@ public class StartTurnService {
                     - acButtons.size();
             if (game.isFowMode()) {
                 numOfComponentActions += acButtons.size();
+            } else {
+                for (String pn : player.getPromissoryNotes().keySet()) {
+                    PromissoryNoteModel prom = Mapper.getPromissoryNote(pn);
+                    if (pn != null
+                            && prom != null
+                            && prom.getOwner() != null
+                            && game.getPNOwner(pn) != player
+                            && !prom.getOwner().equalsIgnoreCase(player.getFaction())
+                            && !prom.getOwner().equalsIgnoreCase(player.getColor())
+                            && !player.getPromissoryNotesInPlayArea().contains(pn)
+                            && prom.getText() != null) {
+                        String pnText = prom.getText();
+                        if (pnText.toLowerCase().contains("action:")
+                                && !"bmf".equalsIgnoreCase(pn)
+                                && !"acq".equalsIgnoreCase(pn)
+                                && !"bapnconc".equalsIgnoreCase(pn)) {
+                            numOfComponentActions--;
+                        }
+                    }
+                }
             }
 
             Button componentAction = Buttons.green(
