@@ -610,7 +610,7 @@ public class JdaService {
     }
 
     public static void leaveGuildIfNotWhitelisted(Guild guild) {
-        if (isWhitelistedGuild(guild)) return;
+        if (!isProduction() || isWhitelistedGuild(guild)) return;
         BotLogger.warning(
                 "Leaving guild '" + guild.getName() + "' (" + guild.getId() + ") because it isn't whitelisted!");
     }
