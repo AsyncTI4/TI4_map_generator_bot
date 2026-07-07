@@ -2971,13 +2971,13 @@ public final class ButtonHelperFactionSpecific {
         String traitNameWithEmoji = ExploreEmojis.getTraitEmoji(deckType) + deckType;
         if (deck.isEmpty() && game.getExploreDiscard(deckType).isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
+                    player.getCorrectChannel(),
                     "The" + traitNameWithEmoji + " exploration deck & discard is empty - nothing to look at.");
             return;
         }
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
+                    player.getCorrectChannel(),
                     "The top card of the " + traitNameWithEmoji + " exploration deck has been sent to "
                             + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
         } else {
@@ -2989,7 +2989,9 @@ public final class ButtonHelperFactionSpecific {
 
         // Cards Info Message
         String topCard = deck.getFirst();
-        game.setStoredValue("lastExpLookedAt" + player.getFaction() + deckType, topCard);
+        if (!game.isTwilightsFallMode()) {
+            game.setStoredValue("lastExpLookedAt" + player.getFaction() + deckType, topCard);
+        }
         ExploreModel explore = Mapper.getExplore(topCard);
         String message = "You looked at the top of the " + traitNameWithEmoji + " exploration deck and saw _"
                 + explore.getName() + "_.";
@@ -3010,7 +3012,12 @@ public final class ButtonHelperFactionSpecific {
     }
 
     public static void resolveKolleccAbilities(Player player, Game game) {
-        if (player.hasAbility("treasure_hunters")) {
+        if (player.hasAbility("treasure_hunters") && game.isTwilightDS()) {
+            ButtonHelperFactionSpecific.resolveExpLook(player, game, null, "industrial");
+            ButtonHelperFactionSpecific.resolveExpLook(player, game, null, "hazardous");
+            ButtonHelperFactionSpecific.resolveExpLook(player, game, null, "cultural");
+        }
+        if (player.hasAbility("treasure_hunters") && !game.isTwilightDS()) {
             // resolve treasure hunters
             String msg =
                     player.getRepresentation() + ", please choose which exploration deck to look at the top card of.";
