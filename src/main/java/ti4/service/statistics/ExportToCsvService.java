@@ -54,7 +54,7 @@ public class ExportToCsvService {
             MessageHelper.sendFileToChannel(event.getChannel(), outputCSV);
             return;
         }
-        
+
         try {
             File outputZip = zipCsv(outputCSV);
             if (outputZip.length() <= maxFileSize) {
