@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
 import ti4.game.persistence.GameManager;
@@ -46,6 +47,14 @@ public class BanCleanupService {
         } else {
             return "user `unknownUser` with ID `" + id.getId() + "`";
         }
+    }
+
+    public boolean banSpamAccount(MessageReceivedEvent event, UserSnowflake target) {
+        String reason = "Banned by the bot for pinging LFG with attachments while having no ongoing games.";
+        BotLogger.info("Banning " + getIdent(target) + " for reason: " + reason);
+        int errors = removeUserFromAllGuilds(target, reason);
+        auditPostBanAction(target, event.getGuild(), reason, errors);
+        return errors == 0;
     }
 
     public boolean banSpamAccount(UserContextInteractionEvent event, UserSnowflake target, UserSnowflake admin) {
@@ -106,7 +115,7 @@ public class BanCleanupService {
         return true;
     }
 
-    private int removeUserFromAllGuilds(UserSnowflake user, String reason) {
+    public int removeUserFromAllGuilds(UserSnowflake user, String reason) {
         int errors = 0;
         Collection<UserSnowflake> banList = Collections.singleton(user);
         for (Guild guild : JdaService.guilds) {
