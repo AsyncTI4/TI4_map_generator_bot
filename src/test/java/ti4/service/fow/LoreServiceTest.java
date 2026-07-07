@@ -1,12 +1,17 @@
 package ti4.service.fow;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import net.dv8tion.jda.api.JDA;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -20,9 +25,20 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
+import ti4.model.TileModel;
 import ti4.service.fow.LoreService.LoreEntry;
+import ti4.service.map.CustomHyperlaneService;
 import ti4.testUtils.BaseTi4Test;
 
+/**
+ * Comprehensive lore effect testing: 150+ tests covering trigger paths, round-gating, tag resolution,
+ * conditional effects (?color/?faction/?round), and all five new automation verbs (tech, fogtile, settile,
+ * hyperlane). Organized into nested classes by concern (TriggerScan, RoundGating, TaggedTargets, etc.).
+ * <p>
+ * These tests validate cross-system impact: settile/rotatehyperlane call into map services and rebuild
+ * autocomplete; fogtile effects are FoW-only; tech grants are idempotent. Tests run ~8ms each; full suite
+ * adds ~4 seconds to the 451-test pipeline (negligible for dev loops, acceptable for CI).
+ */
 class LoreServiceTest extends BaseTi4Test {
 
     private Game game;
@@ -37,6 +53,10 @@ class LoreServiceTest extends BaseTi4Test {
         // here so these tests don't depend on suite-wide ordering.
         JdaService.testingMode = true;
         JdaService.jda = mock(JDA.class);
+
+        // LORECACHE is keyed by game name and every test game is named "test-game" — without this,
+        // entries seeded via getGameLore(game).put(...) in one test silently leak into the next.
+        LoreService.evictGameLore("test-game");
 
         game = new Game();
         game.setName("test-game");
@@ -120,6 +140,21 @@ class LoreServiceTest extends BaseTi4Test {
             LoreEntry e = entry("Flavor here !tg +2");
             assertEquals(List.of("tg +2"), e.getEffectLines());
             assertEquals("Flavor here", e.getDisplayFooter());
+        }
+
+        @Test
+        void numericColonPrefixIsPlainTextWithoutARollMarker() {
+            // Backward compat: roll gating added N-M:/N: bin tags, but a pre-roll entry with flavor text
+            // that happens to start with "N:" must keep its prefix and its effect must still fire.
+            LoreEntry e = entry("3: The ancient gate opens !tg +2");
+            assertEquals("3: The ancient gate opens", e.getDisplayFooter());
+            assertEquals(List.of("tg +2"), e.getEffectLines(), "effect is untagged, fires unconditionally");
+        }
+
+        @Test
+        void numericColonPrefixBecomesABinTagOnlyWhenRollGated() {
+            LoreEntry e = entry("!roll 2d10", "3: !tg +2");
+            assertEquals(List.of("3:tg +2"), e.getEffectLines());
         }
     }
 
@@ -828,6 +863,150 @@ class LoreServiceTest extends BaseTi4Test {
     }
 
     // -----------------------------------------------------------------------
+    // 12b. Roll gating: !roll NdM gates an entry behind a single "Roll" button;
+    //      N-M:/N:-tagged lines only fire when the rolled total lands in that bin.
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class RollGating {
+
+        @Test
+        void rollMarkerIsDetectedAndSpecParsed() {
+            LoreEntry e = entry("!roll 2d10", "!tg +2");
+            assertTrue(e.isRollGated());
+            assertArrayEquals(new int[] {2, 10}, e.getRollSpec());
+        }
+
+        @Test
+        void noMarkerMeansNotRollGated() {
+            LoreEntry e = entry("!tg +2");
+            assertFalse(e.isRollGated());
+            assertNull(e.getRollSpec());
+        }
+
+        @Test
+        void markerIsCaseInsensitiveAndHiddenFromDisplay() {
+            LoreEntry e = entry("!ROLL 1d20", "Visible footer.");
+            assertTrue(e.isRollGated());
+            assertEquals("Visible footer.", e.getDisplayFooter());
+        }
+
+        @Test
+        void binTaggedLinesKeepTagInEffectLinesAndAreHiddenFromDisplay() {
+            LoreEntry e = entry("!roll 2d10", "2-10: !tg 1", "11-16: !ac 1", "17-20: !tg 1 !ac 1", "Visible footer.");
+            assertEquals(List.of("2-10:tg 1", "11-16:ac 1", "17-20:tg 1", "17-20:ac 1"), e.getEffectLines());
+            assertEquals("Visible footer.", e.getDisplayFooter());
+        }
+
+        @Test
+        void singleValueBinTagWorks() {
+            LoreEntry e = entry("!roll 1d6", "6: !tg 1");
+            assertEquals(List.of("6:tg 1"), e.getEffectLines());
+        }
+
+        @Test
+        void tagWithoutSpaceAfterColonAlsoWorks() {
+            LoreEntry e = entry("!roll 2d10", "2-10:!tg 1");
+            assertEquals(List.of("2-10:tg 1"), e.getEffectLines());
+        }
+
+        @Test
+        void resolveRollBranchFindsTheBinContainingTheTotal() {
+            List<String> lines = List.of("2-10:tg 1", "11-16:ac 1", "17-20:tg 1", "17-20:ac 1");
+            assertEquals("2-10", LoreEffects.resolveRollBranch(lines, 7));
+            assertEquals("11-16", LoreEffects.resolveRollBranch(lines, 11));
+            assertEquals("11-16", LoreEffects.resolveRollBranch(lines, 16));
+            assertEquals("17-20", LoreEffects.resolveRollBranch(lines, 20));
+        }
+
+        @Test
+        void resolveRollBranchReturnsNullWhenNoBinCoversTheTotal() {
+            List<String> lines = List.of("2-10:tg 1");
+            assertNull(LoreEffects.resolveRollBranch(lines, 15));
+        }
+
+        @Test
+        void resolveRollBranchIgnoresAcceptRejectTags() {
+            List<String> lines = List.of("accept:tg 1", "reject:tg -1", "2-10:ac 1");
+            assertEquals("2-10", LoreEffects.resolveRollBranch(lines, 5));
+            assertNull(LoreEffects.resolveRollBranch(lines, 99));
+        }
+
+        @Test
+        void firstMatchingBinWinsOnOverlap() {
+            List<String> lines = List.of("1-10:tg 1", "5-15:ac 1");
+            assertEquals("1-10", LoreEffects.resolveRollBranch(lines, 7));
+        }
+
+        @Test
+        void matchingBranchAppliesItsLinesPlusAlwaysLines() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player,
+                    game,
+                    entry("!roll 2d10", "2-10: !tg 1", "11-16: !ac 1", "17-20: !tg 1 !ac 1", "!fleet +1"),
+                    systemTile,
+                    Constants.SPACE,
+                    true,
+                    "17-20");
+            assertEquals(6, player.getTg());
+            assertEquals(4, player.getFleetCC());
+        }
+
+        @Test
+        void nonMatchingBranchAppliesOnlyAlwaysLines() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!roll 2d10", "2-10: !tg 1", "!fleet +1"), systemTile, Constants.SPACE, true);
+            assertEquals(5, player.getTg());
+            assertEquals(4, player.getFleetCC());
+        }
+
+        @Test
+        void binTagWithoutRollMarkerIsFlagged() {
+            assertFalse(LoreEffects.validateEffects(entry("2-10: !tg +2"), game).isEmpty());
+        }
+
+        @Test
+        void backwardsBinRangeIsFlagged() {
+            assertFalse(LoreEffects.validateEffects(entry("!roll 2d10", "10-2: !tg +2"), game)
+                    .isEmpty());
+        }
+
+        @Test
+        void rollWithChoiceMarkerTooIsFlagged() {
+            assertFalse(LoreEffects.validateEffects(entry("!choice", "!roll 2d10"), game)
+                    .isEmpty());
+        }
+
+        @Test
+        void rollWithWinnerReceiverIsFlagged() {
+            LoreEntry e = entry("!roll 2d10", "2-10: !tg +2");
+            e.receiver = LoreService.RECEIVER.WINNER;
+            assertFalse(LoreEffects.validateEffects(e, game).isEmpty());
+        }
+
+        @Test
+        void rollWithGmReceiverIsFlagged() {
+            LoreEntry e = entry("!roll 2d10", "2-10: !tg +2");
+            e.receiver = LoreService.RECEIVER.GM;
+            assertFalse(LoreEffects.validateEffects(e, game).isEmpty());
+        }
+
+        @Test
+        void zeroDiceOrOneSidedDieIsFlagged() {
+            assertFalse(LoreEffects.validateEffects(entry("!roll 0d10", "2-10: !tg +2"), game)
+                    .isEmpty());
+            assertFalse(LoreEffects.validateEffects(entry("!roll 2d1", "1: !tg +2"), game)
+                    .isEmpty());
+        }
+
+        @Test
+        void rollWithCurrentReceiverAndValidBinsIsClean() {
+            LoreEntry e = entry("!roll 2d10", "2-10: !tg 1", "11-16: !ac 1", "17-20: !tg 1 !ac 1");
+            assertTrue(LoreEffects.validateEffects(e, game).isEmpty());
+        }
+    }
+
+    // -----------------------------------------------------------------------
     // 13. Export/import round-trip (LoreEntry#toString / #fromString, the format
     //     written verbatim to the export file and parsed back on import)
     // -----------------------------------------------------------------------
@@ -1204,6 +1383,91 @@ class LoreServiceTest extends BaseTi4Test {
     }
 
     // -----------------------------------------------------------------------
+    // 16b. Roll-gated delivery: mirrors ChoiceGatedMultiResolverDelivery, but the
+    //      "branch" each resolver lands on comes from their own dice roll instead
+    //      of an accept/reject pick.
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class RollGatedDelivery {
+
+        private Player otherPlayer;
+        private LoreEntry rollEntry;
+
+        @BeforeEach
+        void setUpRollEntry() {
+            otherPlayer = addRealPlayer("other-user-id", "jolnar", "blue");
+            otherPlayer.setTg(0);
+            rollEntry = entry("!roll 2d10", "!plastic 1 infantry", "2-10: !tg +2", "11-20: !tg +5");
+            rollEntry.target = "001";
+            rollEntry.receiver = LoreService.RECEIVER.ALL;
+        }
+
+        /** Mirrors what the (button-driven) {@code handleRollButton} does before delivering. */
+        private void resolve(Player resolver, int total) {
+            LoreService.addStoredId(game, LoreService.choiceResolvedKey("001"), resolver.getUserID());
+            String branch = LoreEffects.resolveRollBranch(rollEntry.getEffectLines(), total);
+            LoreService.deliverRollLore(resolver, game, "001", true, rollEntry, "001", total, branch);
+        }
+
+        @Test
+        void mapEffectAppliesOnceAcrossResolvers() {
+            rollEntry.persistance = LoreService.PERSISTANCE.ONCE;
+            LoreService.getGameLore(game).put("001", rollEntry);
+
+            resolve(player, 5);
+            resolve(otherPlayer, 15);
+
+            assertEquals(
+                    1,
+                    systemTile
+                            .getUnitHolders()
+                            .get(Constants.SPACE)
+                            .getUnitCount(Units.getUnitKey(UnitType.Infantry, "red")));
+            assertEquals(7, player.getTg());
+            assertEquals(5, otherPlayer.getTg());
+        }
+
+        @Test
+        void onceEntryRemovedOnlyAfterWholeAudienceResolves() {
+            rollEntry.persistance = LoreService.PERSISTANCE.ONCE;
+            LoreService.getGameLore(game).put("001", rollEntry);
+
+            resolve(player, 5);
+            assertTrue(LoreService.getGameLore(game).containsKey("001"), "must wait for the rest of the audience");
+
+            resolve(otherPlayer, 15);
+            assertFalse(LoreService.getGameLore(game).containsKey("001"));
+        }
+
+        @Test
+        void rollOutsideEveryBinGrantsNoBinRewardButStillCompletesTheRound() {
+            rollEntry.persistance = LoreService.PERSISTANCE.ONCE;
+            rollEntry.receiver = LoreService.RECEIVER.CURRENT; // single-person audience for this test
+            rollEntry.footerText = "!roll 2d10\n!fleet +1\n2-5: !tg +2";
+            LoreService.getGameLore(game).put("001", rollEntry);
+
+            resolve(player, 10); // outside the only bin (2-5)
+
+            assertEquals(5, player.getTg(), "no bin matched, so no tg change");
+            assertEquals(4, player.getFleetCC(), "the always-fire line still applies");
+            assertFalse(LoreService.getGameLore(game).containsKey("001"), "round still completes and clears ONCE");
+        }
+
+        @Test
+        void requestRollConfirmationOffersEveryAudienceMemberExactlyOnce() {
+            rollEntry.persistance = LoreService.PERSISTANCE.ONCE;
+            LoreService.getGameLore(game).put("001", rollEntry);
+
+            LoreService.requestRollConfirmation(player, game, "001", true, rollEntry, "001");
+
+            Set<String> offered = LoreService.getStoredIdSet(game, LoreService.choiceOfferedKey("001"));
+            assertTrue(offered.contains(player.getUserID()));
+            assertTrue(offered.contains(otherPlayer.getUserID()));
+        }
+    }
+
+    // -----------------------------------------------------------------------
     // 17. NPC-controlled players never get interactive buttons: they're excluded
     //     from choice audiences, and the WINNER/LOSER self-report prompt is skipped.
     // -----------------------------------------------------------------------
@@ -1456,6 +1720,919 @@ class LoreServiceTest extends BaseTi4Test {
             game.setStoredValue("fowSystemLore", "001;Some lore;;ALL;ACTIVATED;NO;ONCE");
             assertFalse(game.isLoreMode());
             assertFalse(LoreService.isLoreEnabled(game));
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 22. Trigger entry point: showSystemLore is what production actually calls
+    //     when a system is activated / moved into — it must scan for matching
+    //     entries (including tagged ones), respect the trigger guards, and honor
+    //     round windows. Everything above tests showLore/deliverLore directly.
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class TriggerScan {
+
+        @BeforeEach
+        void enableLore() {
+            game.setLoreMode(true);
+        }
+
+        private LoreEntry seed(String target, LoreService.TRIGGER trigger, String... footerLines) {
+            LoreEntry e = entry(footerLines);
+            e.target = target;
+            e.trigger = trigger;
+            e.persistance = LoreService.PERSISTANCE.ALWAYS; // survive repeat fires within a test
+            LoreService.getGameLore(game).put(target, e);
+            return e;
+        }
+
+        @Test
+        void activatedEntryFiresThroughTheRealTriggerPath() {
+            seed("001", LoreService.TRIGGER.ACTIVATED, "!tg +1");
+            LoreService.showSystemLore(player, game, "001", LoreService.TRIGGER.ACTIVATED);
+            assertEquals(6, player.getTg());
+        }
+
+        @Test
+        void triggerMismatchDoesNotFire() {
+            seed("001", LoreService.TRIGGER.ACTIVATED, "!tg +1");
+            LoreService.showSystemLore(player, game, "001", LoreService.TRIGGER.MOVED);
+            assertEquals(5, player.getTg());
+        }
+
+        @Test
+        void movedTriggerRequiresUnitsInSystem() {
+            seed("001", LoreService.TRIGGER.MOVED, "!tg +1");
+
+            LoreService.showSystemLore(player, game, "001", LoreService.TRIGGER.MOVED);
+            assertEquals(5, player.getTg(), "no units in system yet — must not fire");
+
+            systemTile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Fighter, "red"), 1);
+            LoreService.showSystemLore(player, game, "001", LoreService.TRIGGER.MOVED);
+            assertEquals(6, player.getTg());
+        }
+
+        @Test
+        void roundWindowGatesTheTrigger() {
+            LoreEntry e = seed("001", LoreService.TRIGGER.ACTIVATED, "!tg +1");
+            e.fromRound = 4;
+
+            game.setRound(2);
+            LoreService.showSystemLore(player, game, "001", LoreService.TRIGGER.ACTIVATED);
+            assertEquals(5, player.getTg(), "round 2 is before the entry's window");
+
+            game.setRound(4);
+            LoreService.showSystemLore(player, game, "001", LoreService.TRIGGER.ACTIVATED);
+            assertEquals(6, player.getTg());
+        }
+
+        @Test
+        void disabledLoreNeverFires() {
+            seed("001", LoreService.TRIGGER.ACTIVATED, "!tg +1");
+            game.setLoreMode(false);
+            LoreService.showSystemLore(player, game, "001", LoreService.TRIGGER.ACTIVATED);
+            assertEquals(5, player.getTg());
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 23. Round gating: range semantics and — crucially — that pre-round-gating
+    //     exports (7 fields, no round columns) still parse as unbounded.
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class RoundGating {
+
+        @Test
+        void rangeBoundsAreInclusiveAndZeroMeansUnbounded() {
+            LoreEntry e = entry();
+            e.fromRound = 3;
+            e.tillRound = 6;
+            assertFalse(e.isInRoundRange(2));
+            assertTrue(e.isInRoundRange(3));
+            assertTrue(e.isInRoundRange(6));
+            assertFalse(e.isInRoundRange(7));
+
+            e.fromRound = 4;
+            e.tillRound = 0;
+            assertFalse(e.isInRoundRange(3));
+            assertTrue(e.isInRoundRange(99));
+
+            e.fromRound = 0;
+            e.tillRound = 2;
+            assertTrue(e.isInRoundRange(1));
+            assertFalse(e.isInRoundRange(3));
+
+            e.fromRound = 0;
+            e.tillRound = 0;
+            assertTrue(e.isInRoundRange(1));
+            assertTrue(e.isInRoundRange(99));
+        }
+
+        @Test
+        void roundFieldsSurviveSerializationRoundTrip() {
+            LoreEntry e = entry("!tg +1");
+            e.target = "001";
+            e.fromRound = 3;
+            e.tillRound = 6;
+
+            LoreEntry parsed = LoreEntry.fromString(e.toString());
+            assertEquals(3, parsed.fromRound);
+            assertEquals(6, parsed.tillRound);
+        }
+
+        @Test
+        void legacySevenFieldExportParsesAsUnbounded() {
+            // Serialized before round-gating existed: no fromRound/tillRound columns.
+            LoreEntry parsed = LoreEntry.fromString("001;Some lore;;ALL;ACTIVATED;NO;ONCE");
+            assertEquals("001", parsed.target);
+            assertEquals(LoreService.PERSISTANCE.ONCE, parsed.persistance);
+            assertEquals(0, parsed.fromRound);
+            assertEquals(0, parsed.tillRound);
+            assertTrue(parsed.isInRoundRange(1));
+        }
+
+        @Test
+        void copyPreservesRoundBounds() {
+            LoreEntry e = entry();
+            e.fromRound = 2;
+            e.tillRound = 5;
+            LoreEntry clone = e.copy();
+            assertEquals(2, clone.fromRound);
+            assertEquals(5, clone.tillRound);
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 23b. Phase triggers: strategy/action/status/agenda pseudo-targets with
+    //      PHASE_START/PHASE_END fire on phase transitions with no triggering
+    //      player — map effects once, player effects fanned to all real players.
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class PhaseTriggers {
+
+        private Player otherPlayer;
+
+        @BeforeEach
+        void enableLoreAndAddSecondPlayer() {
+            game.setLoreMode(true); // non-FoW games only get lore via this explicit toggle
+            otherPlayer = addRealPlayer("other-user-id", "jolnar", "blue");
+            otherPlayer.setTg(0);
+        }
+
+        private LoreEntry seed(String target, LoreService.TRIGGER trigger, String... footerLines) {
+            LoreEntry e = entry(footerLines);
+            e.target = target;
+            e.trigger = trigger;
+            e.receiver = LoreService.RECEIVER.ALL;
+            e.persistance = LoreService.PERSISTANCE.ALWAYS;
+            LoreService.getGameLore(game).put(target, e);
+            return e;
+        }
+
+        @Test
+        void validateLoreAcceptsPhaseTargetsAndCanonicalizesCase() {
+            LoreEntry e = entry("!tg +1");
+            e.trigger = LoreService.TRIGGER.PHASE_START;
+            assertEquals("strategy", LoreService.validateLore("Strategy", "", e, new HashMap<>(), game));
+            assertEquals("agenda#Omen", LoreService.validateLore("agenda#Omen", "", e, new HashMap<>(), game));
+        }
+
+        @Test
+        void validateLoreRejectsMismatchedTargetTriggerPairings() {
+            LoreEntry controlled = entry("!tg +1"); // default trigger CONTROLLED
+            assertNull(LoreService.validateLore("strategy", "", controlled, new HashMap<>(), game));
+
+            LoreEntry phaseTrigger = entry("!tg +1");
+            phaseTrigger.trigger = LoreService.TRIGGER.PHASE_END;
+            assertNull(LoreService.validateLore("001", "", phaseTrigger, new HashMap<>(), game));
+            assertNull(LoreService.validateLore("mecatolrex", "", phaseTrigger, new HashMap<>(), game));
+        }
+
+        @Test
+        void phaseStartFansPlayerEffectsToAllRealPlayersAndAppliesMapEffectOnce() {
+            seed("strategy", LoreService.TRIGGER.PHASE_START, "!tg +1", "!unit red 1 infantry @001");
+
+            LoreService.showPhaseStartLore(game, "strategy");
+
+            assertEquals(6, player.getTg());
+            assertEquals(1, otherPlayer.getTg());
+            assertEquals(
+                    1,
+                    systemTile
+                            .getUnitHolders()
+                            .get(Constants.SPACE)
+                            .getUnitCount(Units.getUnitKey(UnitType.Infantry, "red")));
+        }
+
+        @Test
+        void loreModeToggleGatesPhaseLoreInNormalGames() {
+            seed("strategy", LoreService.TRIGGER.PHASE_START, "!tg +1");
+            game.setLoreMode(false);
+
+            LoreService.showPhaseStartLore(game, "strategy");
+
+            assertEquals(5, player.getTg(), "phase lore must not fire in a normal game without the lore toggle");
+        }
+
+        @Test
+        void phaseEndDerivesFromTheCurrentPhaseAndNormalizesSubStates() {
+            seed("status", LoreService.TRIGGER.PHASE_END, "!tg +1");
+            game.setPhaseOfGame("statusHomework"); // sub-state must normalize to "status"
+
+            LoreService.showPhaseEndLore(game, "strategy");
+
+            assertEquals(6, player.getTg());
+        }
+
+        @Test
+        void reassertingTheSamePhaseFiresNothing() {
+            seed("status", LoreService.TRIGGER.PHASE_END, "!tg +1");
+            seed("status#start", LoreService.TRIGGER.PHASE_START, "!fleet +1");
+            game.setPhaseOfGame("statusScoring");
+
+            // e.g. a double-clicked "end action phase" button re-entering while already in status
+            LoreService.showPhaseLore(game, "status");
+
+            assertEquals(5, player.getTg());
+            assertEquals(3, player.getFleetCC());
+        }
+
+        @Test
+        void phaseStartFiresOncePerRoundButAgainNextRound() {
+            seed("action", LoreService.TRIGGER.PHASE_START, "!tg +1");
+
+            LoreService.showPhaseStartLore(game, "action");
+            LoreService.showPhaseStartLore(game, "action");
+            assertEquals(6, player.getTg(), "second call in the same round must be deduplicated");
+
+            game.setRound(game.getRound() + 1);
+            LoreService.showPhaseStartLore(game, "action");
+            assertEquals(7, player.getTg(), "an ALWAYS entry fires again next round");
+        }
+
+        @Test
+        void oncePersistanceRemovesTheEntryAfterFiring() {
+            LoreEntry e = seed("agenda", LoreService.TRIGGER.PHASE_START, "!tg +1");
+            e.persistance = LoreService.PERSISTANCE.ONCE;
+
+            LoreService.showPhaseStartLore(game, "agenda");
+
+            assertEquals(6, player.getTg());
+            assertFalse(LoreService.getGameLore(game).containsKey("agenda"));
+        }
+
+        @Test
+        void roundWindowGatesPhaseLore() {
+            LoreEntry e = seed("strategy", LoreService.TRIGGER.PHASE_START, "!tg +1");
+            e.fromRound = 3;
+
+            LoreService.showPhaseStartLore(game, "strategy");
+            assertEquals(5, player.getTg(), "round 1 is outside the 3+ window");
+
+            game.setRound(3);
+            LoreService.showPhaseStartLore(game, "strategy");
+            assertEquals(6, player.getTg());
+        }
+
+        @Test
+        void gmReceiverAppliesMapEffectsButNoPlayerRewards() {
+            LoreEntry e = seed("action", LoreService.TRIGGER.PHASE_START, "!tg +1", "!unit red 1 infantry @001");
+            e.receiver = LoreService.RECEIVER.GM;
+
+            LoreService.showPhaseStartLore(game, "action");
+
+            assertEquals(5, player.getTg());
+            assertEquals(0, otherPlayer.getTg());
+            assertEquals(
+                    1,
+                    systemTile
+                            .getUnitHolders()
+                            .get(Constants.SPACE)
+                            .getUnitCount(Units.getUnitKey(UnitType.Infantry, "red")));
+        }
+
+        @Test
+        void setupAndDraftPhasesNeverFirePhaseLore() {
+            seed("strategy", LoreService.TRIGGER.PHASE_START, "!tg +1");
+            game.setPhaseOfGame("miltydraft");
+
+            LoreService.showPhaseStartLore(game, "miltydraft");
+            LoreService.showPhaseEndLore(game, "strategy");
+
+            assertEquals(5, player.getTg());
+        }
+
+        @Test
+        void choiceGatedPhaseEntryOffersEveryRealPlayerTheirOwnButtons() {
+            seed("strategy", LoreService.TRIGGER.PHASE_START, "!choice", "accept: !tg +2");
+
+            LoreService.showPhaseStartLore(game, "strategy");
+
+            Set<String> offered = LoreService.getStoredIdSet(game, LoreService.choiceOfferedKey("strategy"));
+            assertTrue(offered.contains(player.getUserID()));
+            assertTrue(offered.contains(otherPlayer.getUserID()));
+            assertEquals(5, player.getTg(), "no reward until the choice is resolved");
+        }
+
+        @Test
+        void phaseEntryFootgunsAreWarnedAtSaveTime() {
+            LoreEntry e = entry("!unit 1 infantry", "!token gravityrift @001", "!tg +1");
+            e.target = "strategy";
+            e.trigger = LoreService.TRIGGER.PHASE_START;
+            e.receiver = LoreService.RECEIVER.CURRENT;
+            e.persistance = LoreService.PERSISTANCE.ONCE_PER_PLAYER;
+
+            List<String> problems = LoreEffects.validateEffects(e, game);
+
+            assertTrue(problems.stream().anyMatch(p -> p.contains("no single receiving player")), problems.toString());
+            assertTrue(problems.stream().anyMatch(p -> p.contains("behaves like `Once`")), problems.toString());
+            assertTrue(problems.stream().anyMatch(p -> p.contains("explicit color")), problems.toString());
+            assertTrue(problems.stream().anyMatch(p -> p.contains("`unit` needs an `@target`")), problems.toString());
+        }
+
+        @Test
+        void cleanPhaseEntryValidatesWithoutWarnings() {
+            LoreEntry e = entry("!unit red 1 infantry @001", "!tg +1", "!settile 305 41");
+            e.target = "strategy";
+            e.trigger = LoreService.TRIGGER.PHASE_START;
+            e.receiver = LoreService.RECEIVER.ALL;
+
+            assertTrue(LoreEffects.validateEffects(e, game).isEmpty());
+        }
+
+        @Test
+        void gmReceiverPhaseEntryWarnsAboutPlayerRewardLines() {
+            LoreEntry e = entry("!tg +1", "!unit red 1 infantry @001");
+            e.target = "action";
+            e.trigger = LoreService.TRIGGER.PHASE_END;
+            e.receiver = LoreService.RECEIVER.GM;
+
+            List<String> problems = LoreEffects.validateEffects(e, game);
+
+            assertTrue(problems.stream().anyMatch(p -> p.contains("player rewards are skipped")), problems.toString());
+            assertFalse(
+                    problems.stream().anyMatch(p -> p.contains("explicit color")),
+                    "the unit line names its color explicitly");
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 24. Tagged targets: several entries can share one system via "base#tag"
+    //     keys. Pins the splitTargetKey null-crash found by the first real
+    //     build, and the auto-tag naming scheme.
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class TaggedTargets {
+
+        @Test
+        void splitHandlesBareTaggedAndNullKeys() {
+            assertEquals("001", LoreService.splitTargetKey("001").base());
+            assertNull(LoreService.splitTargetKey("001").tag());
+
+            assertEquals("001", LoreService.splitTargetKey("001#ambush").base());
+            assertEquals("ambush", LoreService.splitTargetKey("001#ambush").tag());
+
+            // Regression: entries seeded without a target used to NPE deep in effect application.
+            assertNull(LoreService.splitTargetKey(null).base());
+        }
+
+        @Test
+        void bareAndTaggedEntriesAtTheSameBaseBothFire() {
+            game.setLoreMode(true);
+
+            LoreEntry bare = entry("!tg +1");
+            bare.target = "001";
+            bare.trigger = LoreService.TRIGGER.ACTIVATED;
+            LoreService.getGameLore(game).put("001", bare);
+
+            LoreEntry tagged = entry("!fleet +1");
+            tagged.target = "001#ambush";
+            tagged.trigger = LoreService.TRIGGER.ACTIVATED;
+            LoreService.getGameLore(game).put("001#ambush", tagged);
+
+            LoreService.showSystemLore(player, game, "001", LoreService.TRIGGER.ACTIVATED);
+
+            assertEquals(6, player.getTg(), "bare entry must fire");
+            assertEquals(4, player.getFleetCC(), "tagged entry at the same base must fire too");
+        }
+
+        @Test
+        void taggedEntryMapEffectsResolveTheBaseTile() {
+            game.setLoreMode(true);
+
+            LoreEntry tagged = entry("!plastic 1 infantry");
+            tagged.target = "001#drop";
+            tagged.trigger = LoreService.TRIGGER.ACTIVATED;
+            LoreService.getGameLore(game).put("001#drop", tagged);
+
+            LoreService.showSystemLore(player, game, "001", LoreService.TRIGGER.ACTIVATED);
+
+            assertEquals(
+                    1,
+                    systemTile
+                            .getUnitHolders()
+                            .get(Constants.SPACE)
+                            .getUnitCount(Units.getUnitKey(UnitType.Infantry, "red")),
+                    "the '#drop' tag must be stripped when resolving the board tile");
+        }
+
+        @Test
+        void autoTagBuildsTriggerAndRoundDescriptorsAndDodgesCollisions() {
+            Map<String, LoreEntry> saved = new HashMap<>();
+
+            LoreEntry e = entry();
+            e.trigger = LoreService.TRIGGER.MOVED;
+            e.fromRound = 4;
+            e.tillRound = 6;
+            assertEquals("522#MovedR4to6", LoreService.autoTag("522", e, saved));
+
+            saved.put("522#MovedR4to6", entry());
+            assertEquals("522#MovedR4to62", LoreService.autoTag("522", e, saved));
+
+            LoreEntry battle = entry();
+            battle.trigger = LoreService.TRIGGER.SPACE_BATTLE;
+            assertEquals("522#SpaceBattle", LoreService.autoTag("522", battle, saved));
+
+            LoreEntry open = entry();
+            open.trigger = LoreService.TRIGGER.MOVED;
+            open.fromRound = 4;
+            assertEquals("522#MovedR4plus", LoreService.autoTag("522", open, saved));
+
+            LoreEntry upTo = entry();
+            upTo.trigger = LoreService.TRIGGER.MOVED;
+            upTo.tillRound = 6;
+            assertEquals("522#MovedRupto6", LoreService.autoTag("522", upTo, saved));
+
+            LoreEntry single = entry();
+            single.trigger = LoreService.TRIGGER.MOVED;
+            single.fromRound = 4;
+            single.tillRound = 4;
+            assertEquals("522#MovedR4", LoreService.autoTag("522", single, saved));
+        }
+
+        @Test
+        void validateLoreRespectsExplicitTagsAndAutoTagsCollisions() {
+            // validateLore needs a PositionMapper-recognized position with a tile on the board.
+            game.setTile(new Tile("18", "000"));
+            Map<String, LoreEntry> saved = new HashMap<>();
+            LoreEntry e = entry("!tg +1");
+
+            // Bare key, no collision -> stays bare.
+            assertEquals("000", LoreService.validateLore("000", "", e, saved, game));
+
+            // Explicit tag -> always respected.
+            assertEquals("000#mytag", LoreService.validateLore("000#mytag", "", e, saved, game));
+
+            // Tag with characters outside letters/digits -> rejected.
+            assertNull(LoreService.validateLore("000#bad tag", "", e, saved, game));
+
+            // Bare key colliding with a different entry -> auto-tag (default trigger is CONTROLLED).
+            saved.put("000", entry());
+            assertEquals("000#Controlled", LoreService.validateLore("000", "", e, saved, game));
+
+            // Same bare key but it's the entry being edited -> in-place edit, no tag.
+            assertEquals("000", LoreService.validateLore("000", "000", e, saved, game));
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 25. Conditional per-line gates: trailing ?color / ?faction: / ?round:
+    //     tokens, ANDed, evaluated against the player RECEIVING the effect.
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class ConditionalEffects {
+
+        @Test
+        void colorConditionsGateTheLine() {
+            // player is red
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!tg +2 ?red"), systemTile, Constants.SPACE, true);
+            assertEquals(7, player.getTg());
+
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!tg +2 ?blue"), systemTile, Constants.SPACE, true);
+            assertEquals(7, player.getTg(), "?blue must skip for a red player");
+
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!tg +2 ?!red"), systemTile, Constants.SPACE, true);
+            assertEquals(7, player.getTg(), "?!red must skip for a red player");
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!tg +2 ?!blue"), systemTile, Constants.SPACE, true);
+            assertEquals(9, player.getTg(), "?!blue must fire for a red player");
+        }
+
+        @Test
+        void factionConditionMatchesTheReceivingPlayersFaction() {
+            // player is winnu
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!tg +2 ?faction:winnu"), systemTile, Constants.SPACE, true);
+            assertEquals(7, player.getTg());
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!tg +2 ?faction:sol"), systemTile, Constants.SPACE, true);
+            assertEquals(7, player.getTg());
+        }
+
+        @Test
+        void roundConditionUsesTheCurrentGameRound() {
+            game.setRound(3);
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!tg +2 ?round:3-6"), systemTile, Constants.SPACE, true);
+            assertEquals(7, player.getTg());
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!tg +2 ?round:4-6"), systemTile, Constants.SPACE, true);
+            assertEquals(7, player.getTg());
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!tg +2 ?round:-2"), systemTile, Constants.SPACE, true);
+            assertEquals(7, player.getTg());
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!tg +2 ?round:3"), systemTile, Constants.SPACE, true);
+            assertEquals(9, player.getTg());
+        }
+
+        @Test
+        void multipleConditionsAndTogether() {
+            game.setRound(3);
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!tg +2 ?red ?round:5-"), systemTile, Constants.SPACE, true);
+            assertEquals(5, player.getTg(), "round 3 fails ?round:5- even though ?red holds");
+
+            game.setRound(5);
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!tg +2 ?red ?round:5-"), systemTile, Constants.SPACE, true);
+            assertEquals(7, player.getTg());
+        }
+
+        @Test
+        void allReceiverEvaluatesConditionsPerRecipient() {
+            Player bluePlayer = addRealPlayer("other-user-id", "jolnar", "blue");
+            bluePlayer.setTg(0);
+
+            LoreEntry redOnly = entry("!tg +2 ?red");
+            redOnly.target = "001";
+            redOnly.receiver = LoreService.RECEIVER.ALL;
+            LoreService.deliverLore(player, game, "001", true, redOnly, "001");
+            assertEquals(7, player.getTg(), "red triggering player matches ?red");
+            assertEquals(0, bluePlayer.getTg(), "blue recipient must not match ?red");
+
+            LoreEntry blueOnly = entry("!tg +2 ?blue");
+            blueOnly.target = "001";
+            blueOnly.receiver = LoreService.RECEIVER.ALL;
+            LoreService.deliverLore(player, game, "001", true, blueOnly, "001");
+            assertEquals(7, player.getTg(), "red triggering player must not match ?blue");
+            assertEquals(2, bluePlayer.getTg(), "blue recipient matches ?blue via the fan-out");
+        }
+
+        @Test
+        void conditionSyntaxIsValidatedAtSaveTime() {
+            assertTrue(LoreEffects.validateEffects(entry("!tg +2 ?red"), game).isEmpty());
+            assertTrue(LoreEffects.validateEffects(entry("!tg +2 ?!blue"), game).isEmpty());
+            assertTrue(LoreEffects.validateEffects(entry("!tg +2 ?faction:winnu"), game)
+                    .isEmpty());
+            assertTrue(LoreEffects.validateEffects(entry("!tg +2 ?round:3-6"), game)
+                    .isEmpty());
+            assertTrue(LoreEffects.validateEffects(entry("!choice", "accept: !tg +2 ?red"), game)
+                    .isEmpty());
+
+            assertFalse(
+                    LoreEffects.validateEffects(entry("!tg +2 ?xyzzy"), game).isEmpty());
+            assertFalse(LoreEffects.validateEffects(entry("!tg +2 ?faction:zzznotafaction"), game)
+                    .isEmpty());
+            assertFalse(LoreEffects.validateEffects(entry("!tg +2 ?round:6-3"), game)
+                    .isEmpty());
+            assertFalse(LoreEffects.validateEffects(entry("!tg +2 ?round:abc"), game)
+                    .isEmpty());
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 26. Validation matrix for the new verbs — written via their short aliases
+    //     so alias resolution is covered by the same assertions.
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class NewVerbValidation {
+
+        private static final String SYMMETRIC_MATRIX =
+                "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0";
+
+        @Test
+        void newVerbsValidateCleanViaAliases() {
+            game.setFowMode(true); // fog verbs warn outside FoW
+            assertTrue(LoreEffects.validateEffects(entry("!tech gd"), game).isEmpty());
+            assertTrue(LoreEffects.validateEffects(entry("!tech random blue"), game)
+                    .isEmpty());
+            assertTrue(LoreEffects.validateEffects(entry("!rtec gd"), game).isEmpty());
+            assertTrue(
+                    LoreEffects.validateEffects(entry("!afog 19 Decoy"), game).isEmpty());
+            assertTrue(LoreEffects.validateEffects(entry("!rfog"), game).isEmpty());
+            assertTrue(LoreEffects.validateEffects(entry("!stl 000 19"), game).isEmpty());
+            assertTrue(LoreEffects.validateEffects(entry("!stl 000 random red wormhole"), game)
+                    .isEmpty());
+            assertTrue(LoreEffects.validateEffects(entry("!rhl 000 2"), game).isEmpty());
+            assertTrue(LoreEffects.validateEffects(entry("!rhl 000 -1"), game).isEmpty());
+            assertTrue(LoreEffects.validateEffects(
+                            entry("!shl 000 " + CustomHyperlaneService.encodeMatrix(SYMMETRIC_MATRIX)), game)
+                    .isEmpty());
+            assertTrue(LoreEffects.validateEffects(entry("!rcc red"), game).isEmpty());
+            assertTrue(LoreEffects.validateEffects(entry("!clru neutral"), game).isEmpty());
+        }
+
+        @Test
+        void newVerbBadArgsAreFlagged() {
+            assertFalse(LoreEffects.validateEffects(entry("!tech"), game).isEmpty());
+            assertFalse(LoreEffects.validateEffects(entry("!tech zzznotatech"), game)
+                    .isEmpty());
+            assertFalse(LoreEffects.validateEffects(entry("!tech random pink"), game)
+                    .isEmpty());
+            assertFalse(LoreEffects.validateEffects(entry("!removetech zzznotatech"), game)
+                    .isEmpty());
+            assertFalse(LoreEffects.validateEffects(entry("!settile 000"), game).isEmpty());
+            assertFalse(
+                    LoreEffects.validateEffects(entry("!settile zzz9 19"), game).isEmpty());
+            assertFalse(LoreEffects.validateEffects(entry("!settile 000 zzznotatile"), game)
+                    .isEmpty());
+            assertFalse(LoreEffects.validateEffects(entry("!settile 000 random purple"), game)
+                    .isEmpty());
+            assertFalse(
+                    LoreEffects.validateEffects(entry("!rotatehyperlane"), game).isEmpty());
+            assertFalse(LoreEffects.validateEffects(entry("!rotatehyperlane zzz9"), game)
+                    .isEmpty());
+            assertFalse(LoreEffects.validateEffects(entry("!rotatehyperlane 000 fast"), game)
+                    .isEmpty());
+            assertFalse(LoreEffects.validateEffects(entry("!sethyperlane 000 nothex9!"), game)
+                    .isEmpty());
+        }
+
+        @Test
+        void fogVerbsWarnOutsideFowGames() {
+            assertFalse(game.isFowMode());
+            assertFalse(
+                    LoreEffects.validateEffects(entry("!addfogtile 19"), game).isEmpty());
+            assertFalse(
+                    LoreEffects.validateEffects(entry("!removefogtile"), game).isEmpty());
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 27. Tech effects
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class TechEffects {
+
+        @Test
+        void grantIsUnexhaustedAndIdempotent() {
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!tech gd"), systemTile, Constants.SPACE, true);
+            assertTrue(player.getTechs().contains("gd"));
+            assertFalse(player.getExhaustedTechs().contains("gd"), "a granted tech must arrive readied");
+
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!tech gd"), systemTile, Constants.SPACE, true);
+            assertEquals(
+                    1L,
+                    player.getTechs().stream().filter("gd"::equals).count(),
+                    "re-granting an owned tech must not duplicate it");
+        }
+
+        @Test
+        void removeTechViaAliasRemovesAnOwnedTech() {
+            player.addTech("gd");
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!rtec gd"), systemTile, Constants.SPACE, true);
+            assertFalse(player.getTechs().contains("gd"));
+        }
+
+        @Test
+        void randomBlueGrantsAnUnownedPropulsionTech() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!tech random blue"), systemTile, Constants.SPACE, true);
+            assertEquals(1, player.getTechs().size());
+            String granted = player.getTechs().get(0);
+            assertTrue(Mapper.getTech(granted).isType("propulsion"), "expected a propulsion tech, got: " + granted);
+        }
+
+        @Test
+        void chooseModeOffersButtonsRatherThanGrantingDirectly() {
+            // "choose" sends the player free-research buttons; the tech is only added when they click one
+            // (handled by the existing getTech_ handler), so no tech is granted synchronously here.
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!tech choose blue"), systemTile, Constants.SPACE, true);
+            assertTrue(player.getTechs().isEmpty(), "choose must not grant a tech directly");
+        }
+
+        @Test
+        void chooseAndPickValidateCleanlyWithAndWithoutAType() {
+            assertTrue(LoreEffects.validateEffects(entry("!tech choose"), game).isEmpty());
+            assertTrue(LoreEffects.validateEffects(entry("!tech choose blue"), game)
+                    .isEmpty());
+            assertTrue(
+                    LoreEffects.validateEffects(entry("!tech pick green"), game).isEmpty());
+        }
+
+        @Test
+        void chooseWithUnknownTypeIsFlagged() {
+            assertFalse(LoreEffects.validateEffects(entry("!tech choose purple"), game)
+                    .isEmpty());
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 28. Fog tile effects: per-player fowSeenTiles disguise/wipe, FoW only
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class FogTileEffects {
+
+        @Test
+        void addAndRemoveMutateThePlayersFogMap() {
+            game.setFowMode(true);
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!addfogtile 19 Spooky Ruins"), systemTile, Constants.SPACE, true);
+            assertEquals("19", player.getFogTiles().get("001"));
+            assertEquals("Spooky Ruins", player.getFogLabels().get("001"));
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!removefogtile"), systemTile, Constants.SPACE, true);
+            assertFalse(player.getFogTiles().containsKey("001"));
+            assertFalse(player.getFogLabels().containsKey("001"));
+        }
+
+        @Test
+        void fogEffectsAreNoOpsOutsideFow() {
+            assertFalse(game.isFowMode());
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!addfogtile 19"), systemTile, Constants.SPACE, true);
+            assertTrue(player.getFogTiles().isEmpty());
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 29. Command token + clearunits effects
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class CommandTokenAndClearUnitsEffects {
+
+        @Test
+        void ccDefaultsToTheTriggeringPlayersColor() {
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!cc"), systemTile, Constants.SPACE, true);
+            assertTrue(systemTile.hasCC(Mapper.getCCID("red")));
+        }
+
+        @Test
+        void ccNeutralResolvesToTheNeutralPlayersColor() {
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!cc neutral"), systemTile, Constants.SPACE, true);
+            assertTrue(systemTile.hasCC(Mapper.getCCID("gray")));
+        }
+
+        @Test
+        void removeccRemovesTheToken() {
+            systemTile.addCC(Mapper.getCCID("red"));
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!removecc"), systemTile, Constants.SPACE, true);
+            assertFalse(systemTile.hasCC(Mapper.getCCID("red")));
+        }
+
+        @Test
+        void clearunitsRemovesOnlyTheGivenColorAndKeepsTheHolder() {
+            UnitKey redFighter = Units.getUnitKey(UnitType.Fighter, "red");
+            UnitKey grayFighter = Units.getUnitKey(UnitType.Fighter, "gray");
+            systemTile.addUnit(Constants.SPACE, redFighter, 2);
+            systemTile.addUnit(Constants.SPACE, grayFighter, 3);
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!clearunits neutral"), systemTile, Constants.SPACE, true);
+
+            assertNotNull(systemTile.getUnitHolders().get(Constants.SPACE));
+            assertEquals(0, systemTile.getUnitHolders().get(Constants.SPACE).getUnitCount(grayFighter));
+            assertEquals(
+                    2,
+                    systemTile.getUnitHolders().get(Constants.SPACE).getUnitCount(redFighter),
+                    "other colors must be untouched");
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 30. settile: specific + random placement, and the replace-cleanup path
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class SetTileEffects {
+
+        @Test
+        void placesASpecificTileAtAValidPosition() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!settile 000 19"), systemTile, Constants.SPACE, true);
+            assertNotNull(game.getTileByPosition("000"));
+            assertEquals("19", game.getTileByPosition("000").getTileID());
+        }
+
+        @Test
+        void replacingAHyperlanePositionClearsItsCustomData() {
+            game.setTile(new Tile("hl", "000"));
+            CustomHyperlaneService.insertData(
+                    game, "000", "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!settile 000 19"), systemTile, Constants.SPACE, true);
+
+            assertFalse(
+                    game.getCustomHyperlaneData().containsKey("000"),
+                    "stale hyperlane data must not survive the tile being replaced");
+        }
+
+        @Test
+        void randomRedPlacesAnUnusedRedBackTile() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!settile 000 random red"), systemTile, Constants.SPACE, true);
+            Tile placed = game.getTileByPosition("000");
+            assertNotNull(placed);
+            assertEquals(TileModel.TileBack.RED, placed.getTileModel().getTileBack());
+        }
+
+        @Test
+        void invalidPositionIsANoOp() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!settile zzz9 19"), systemTile, Constants.SPACE, true);
+            assertNull(game.getTileByPosition("zzz9"));
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // 31. Hyperlane effects: rotation direction/identity and the encoded-matrix
+    //     form of sethyperlane (raw ';' matrices can't survive footer cleaning)
+    // -----------------------------------------------------------------------
+
+    @Nested
+    class HyperlaneEffects {
+
+        // Symmetric (0<->3) so insertData's both-ways normalization can't alter it.
+        private static final String SIDES_0_3 =
+                "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0";
+        // SIDES_0_3 rotated once: connections move to 1<->4.
+        private static final String SIDES_1_4 =
+                "0,0,0,0,0,0;0,0,0,0,1,0;0,0,0,0,0,0;0,0,0,0,0,0;0,1,0,0,0,0;0,0,0,0,0,0";
+        // A different symmetric matrix (2<->5) for the sethyperlane test.
+        private static final String SIDES_2_5 =
+                "0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,1;0,0,0,0,0,0;0,0,0,0,0,0;0,0,1,0,0,0";
+
+        @BeforeEach
+        void placeCustomHyperlane() {
+            game.setTile(new Tile("hl", "000"));
+            CustomHyperlaneService.insertData(game, "000", SIDES_0_3);
+        }
+
+        private String storedEncoded() {
+            return CustomHyperlaneService.encodeMatrix(
+                    game.getCustomHyperlaneData().get("000"));
+        }
+
+        @Test
+        void rotateOnceMovesConnectionsOneSideClockwise() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!rotatehyperlane 000"), systemTile, Constants.SPACE, true);
+            assertEquals(CustomHyperlaneService.encodeMatrix(SIDES_1_4), storedEncoded());
+        }
+
+        @Test
+        void sixStepsIsAFullTurnNoOp() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!rotatehyperlane 000 6"), systemTile, Constants.SPACE, true);
+            assertEquals(CustomHyperlaneService.encodeMatrix(SIDES_0_3), storedEncoded());
+        }
+
+        @Test
+        void negativeStepsRotateBackwards() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!rotatehyperlane 000 -1"), systemTile, Constants.SPACE, true);
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!rotatehyperlane 000 1"), systemTile, Constants.SPACE, true);
+            assertEquals(CustomHyperlaneService.encodeMatrix(SIDES_0_3), storedEncoded(), "-1 then +1 must cancel out");
+        }
+
+        @Test
+        void sethyperlaneAppliesAnEncodedMatrix() {
+            String encoded = CustomHyperlaneService.encodeMatrix(SIDES_2_5);
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!sethyperlane 000 " + encoded), systemTile, Constants.SPACE, true);
+            assertEquals(encoded, storedEncoded());
+        }
+
+        @Test
+        void refusesToTouchANonHyperlaneTile() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!rotatehyperlane 001 1"), systemTile, Constants.SPACE, true);
+            assertFalse(game.getCustomHyperlaneData().containsKey("001"));
+            assertEquals(
+                    CustomHyperlaneService.encodeMatrix(SIDES_0_3),
+                    storedEncoded(),
+                    "the real hyperlane at 000 must be untouched");
         }
     }
 }
