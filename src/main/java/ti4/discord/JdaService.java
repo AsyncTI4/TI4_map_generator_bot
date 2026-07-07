@@ -282,11 +282,7 @@ public class JdaService {
                 + guilds.size() + " total servers connected\n> "
                 + serversToCreateNewGamesOn.size() + " Overflow servers for new games\n> "
                 + fowServers.size() + " Fog of War servers"
-                + "\n> Guilds: " + jda.getGuilds().stream().map(Guild::getName).collect(Collectors.toSet()));
-
-        leaveNonWhitelistedGuilds();
-
-        // Attempt to start a "Search Only" version of the bot on eligible servers
+        if (isProduction()) leaveNonWhitelistedGuilds();
         for (Guild searchGuild : jda.getGuilds()) {
             if (guilds.stream().anyMatch(g -> g.getId().equals(searchGuild.getId()))) continue;
             startBotSearchOnly(searchGuild);
