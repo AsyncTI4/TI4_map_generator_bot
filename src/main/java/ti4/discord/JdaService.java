@@ -82,7 +82,6 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 @UtilityClass
 public class JdaService {
 
-    private static final boolean LEAVE_ENABLED = false;
     private static final String JDA_EVENT_POOL_NAME = "JDA Event Pool";
     private static final int EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS = 5;
     private static final int JDA_SHUTDOWN_TIMEOUT_SECONDS = 20;
@@ -611,12 +610,10 @@ public class JdaService {
     }
 
     public static void leaveGuildIfNotWhitelisted(Guild guild) {
-        if (isWhitelistedGuild(guild)) return;
-        boolean leave = LEAVE_ENABLED && isProduction();
-        String action = leave ? "Leaving" : "Would leave";
-        BotLogger.warning(action + " guild '" + guild.getName() + "' (" + guild.getId()
-                + ") because it isn't whitelisted!" + (leave ? "" : " (dry run)"));
-        if (leave) guild.leave().queue(Consumers.nop(), BotLogger::catchRestError);
+        if (!isProduction() || isWhitelistedGuild(guild)) return;
+        BotLogger.warning(
+                "Leaving guild '" + guild.getName() + "' (" + guild.getId() + ") because it isn't whitelisted!");
+        guild.leave().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static boolean isProduction() {
