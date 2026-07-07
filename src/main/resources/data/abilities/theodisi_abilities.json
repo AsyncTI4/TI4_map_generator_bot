@@ -85,5 +85,188 @@
         "window": "At the end of a tactical action that you explored a planet:",
         "windowEffect": "You may spend 1 command token to reveal cards from that planet's exploration deck until you reveal an attachment. Resolve that exploration and shuffle the revealed cards back into the deck.",
         "source": "theodisi"
+    },
+    {
+        "id": "battle_tested_designs",
+        "name": "Battle-Tested Designs",
+        "faction": "kryxos",
+        "window": "When you research a unit upgrade technology:",
+        "windowEffect": "You may exhaust 1 planet you control to ignore 1 prerequisite of that technology.\n\nThen, you may produce 1 unit of that type in a system that contains your units and no other player's ships, reducing its cost by 1.",
+        "source": "theodisi"
+    },
+    {
+        "id": "evolved_warforms",
+        "name": "Evolved Warforms",
+        "faction": "kryxos",
+        "permanentEffect": "Your mechs are treated as both ships and ground forces and gain Move 1. Mechs not being transported count against fleet capacity.",
+        "source": "theodisi"
+    },
+    {
+        "id": "testing_yard",
+        "name": "Testing Yard",
+        "faction": "kryxos",
+        "permanentEffect": "One ship of each type in your home system does not count against capacity.",
+        "source": "theodisi"
+    },
+    {
+        "id": "ritual_of_ascension",
+        "name": "Ritual of Ascension",
+        "faction": "arcanum",
+        "window": "ACTION:",
+        "windowEffect": "Purge 2 relic fragments to research 1 technology.",
+        "source": "theodisi"
+    },
+    {
+        "id": "primordial_secrets",
+        "name": "Primordial Secrets",
+        "faction": "arcanum",
+        "window": "During setup:",
+        "windowEffect": "Select 1 primordial technology to play with. You have 1 additional faction technology.",
+        "source": "theodisi"
+    },
+    {
+        "id": "forbidden_knowledge",
+        "name": "Forbidden Knowledge",
+        "faction": "arcanum",
+        "permanentEffect": "Primordial technologies have no ability text unless the player using their effect has 4 other technologies of that color.",
+        "source": "theodisi"
+    },
+    {
+        "id": "sting_of_the_hive",
+        "name": "Sting of the Hive",
+        "faction": "xytheris",
+        "permanentEffect": "When you produce a hit with a unit ability, you may place 1 mine token in the active system instead.\n\nAfter movement, if the active system contains 1 or more mine tokens, remove any number of those tokens to either gain 1 commodity or produce hits on the active player's units up to the number of tokens removed.",
+        "source": "theodisi"
+    },
+    {
+        "id": "hive_echo",
+        "name": "Hive Echo",
+        "faction": "xytheris",
+        "permanentEffect": "During SPACE CANNON OFFENSE, a unit with SPACE CANNON up to 2 systems away may use it against units in the active system. During BOMBARDMENT and ANTI-FIGHTER BARRAGE steps, if the active system contains 1 of your ships, a unit with that unit ability up to 2 systems away may use it against units in the active system.",
+        "source": "theodisi"
+    },
+    {
+        "id": "ignorant_discoveries",
+        "name": "Ignorant Discoveries",
+        "faction": "oblivion",
+        "window": "At the end of the action phase:",
+        "windowEffect": "You may purge 1 technology and spend 1 command token from your strategy pool to research 2 technologies.",
+        "source": "theodisi"
+    },
+    {
+        "id": "reflections_of_the_void",
+        "name": "Reflections of the Void",
+        "faction": "oblivion",
+        "permanentEffect": "When you move units into a system with no planets, you may place 1 reflection token in a system that contains 1 or more planets you control.\n\nAt the end of a tactical action in a system that contains 1 or more reflection tokens, you may purge 1 of those tokens to explore the frontier deck in that system.",
+        "source": "theodisi"
+    },
+    {
+        "id": "commanding_presence",
+        "name": "Commanding Presence",
+        "faction": "revenant",
+        "window": "When you unlock or purge a leader for its effect:",
+        "windowEffect": "Gain 1 command token.",
+        "source": "theodisi"
+    },
+    {
+        "id": "call_of_the_haunted",
+        "name": "Call of the Haunted",
+        "faction": "revenant",
+        "window": "During setup:",
+        "windowEffect": "Select 1 Revenant leader set to play with. Purge the unchosen leaders. You have 1 additional leader of each type.",
+        "source": "theodisi"
+    },
+    {
+        "id": "allure_of_darkness",
+        "name": "Allure of Darkness",
+        "faction": "revenant",
+        "window": "At the start of the strategy phase:",
+        "windowEffect": "Choose 1 other player's commander that does not have the lich token on it and place the lich token on it.",
+        "source": "theodisi"
+    },
+    {
+        "id": "thrones_of_ruin",
+        "name": "Thrones of Ruin",
+        "faction": "thrones",
+        "window": "During setup:",
+        "windowEffect": "Select 1 throne legendary planet and place it in your home system.",
+        "source": "theodisi"
+    },
+    {
+        "id": "traces_of_ruin",
+        "name": "Traces of Ruin",
+        "faction": "thrones",
+        "permanentEffect": "Systems that contain throne planets are anomalies. Players may score even if they do not control the throne planets in their home system.",
+        "source": "theodisi"
+    },
+    {
+        "id": "cycle_of_reclamation",
+        "name": "Cycle of Reclamation",
+        "faction": "aeterna",
+        "window": "During setup:",
+        "windowEffect": "Place the moon phase cards in your play area.\n\nUp to 3 times per action when 1 or more units are destroyed in a system containing or adjacent to your units you may place 1 neutral destroyer on a moon phase card in your play area.",
+        "source": "theodisi"
+    },
+    {
+        "id": "new_moon_phase",
+        "name": "New Moon",
+        "faction": "aeterna",
+        "window": "ACTION:",
+        "windowEffect": "Exhaust this card to do 1 of the following:\n\nPlace 1 neutral unit from this card into a system that contains no other player's ships.\n\nPlace 1 neutral cruiser on a moon phase card.",
+        "source": "theodisi"
+    },
+    {
+        "id": "waning_moon_phase",
+        "name": "Waning Moon",
+        "faction": "aeterna",
+        "window": "When you pass:",
+        "windowEffect": "You may exhaus this card. Return neutral units on this card with a combined cost of 4 or more to research 1 technology.",
+        "source": "theodisi"
+    },
+    {
+        "id": "full_moon_phase",
+        "name": "Full Moon",
+        "faction": "aeterna",
+        "window": "At the end of your turn:",
+        "windowEffect": "You may exhaust this card. Return neutral units on this card with a combined cost of 3 or more to place 1 structure on a planet you control.",
+        "source": "theodisi"
+    },
+    {
+        "id": "waxing_moon_phase",
+        "name": "Waxing Moon",
+        "faction": "aeterna",
+        "window": "At the start of your turn:",
+        "windowEffect": "You may exhaust this card. Return neutral units on this card with a combined cost of 2 to draw 2 action cards, then discard 1.",
+        "source": "theodisi"
+    },
+    {
+        "id": "lunar_eclipse_phase",
+        "name": "Lunar Eclipse",
+        "faction": "aeterna",
+        "window": "When you perform a strategic action:",
+        "windowEffect": "You may exhaust this card. Return 2 neutral units on this card to gain 1 command token.",
+        "source": "theodisi"
+    },
+    {
+        "id": "survivalists",
+        "name": "Survivalists",
+        "faction": "ponthous",
+        "permanentEffect": "You may treat your damaged ships as Galvanized during combat.",
+        "source": "theodisi"
+    },
+    {
+        "id": "last_stand",
+        "name": "Last Stand",
+        "faction": "ponthous",
+        "window": "During combat, when your last unit would be destroyed during the Assign Hits step:",
+        "windowEffect": "You may roll that unit's combat dice. For each result equal to or greater than that unit's combat value, produce 1 hit.\n\nIf the last of your opponent's participating units are destroyed by this roll, that unit is not destroyed.",
+        "source": "theodisi"
+    },
+    {
+        "id": "rallying_cry",
+        "name": "Rallying Cry",
+        "faction": "ponthous",
+        "permanentEffect": "Systems that contain exactly 1 of your ships gain PRODUCTION 2 as if they were units.",
+        "source": "theodisi"
     }
 ]
