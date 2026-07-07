@@ -82,6 +82,7 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 @UtilityClass
 public class JdaService {
 
+    private static final boolean LEAVE_ENABLED = false;
     private static final String JDA_EVENT_POOL_NAME = "JDA Event Pool";
     private static final int EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS = 5;
     private static final int JDA_SHUTDOWN_TIMEOUT_SECONDS = 20;
@@ -282,6 +283,8 @@ public class JdaService {
                 + serversToCreateNewGamesOn.size() + " Overflow servers for new games\n> "
                 + fowServers.size() + " Fog of War servers"
                 + "\n> Guilds: " + jda.getGuilds().stream().map(Guild::getName).collect(Collectors.toSet()));
+
+        leaveNonWhitelistedGuilds();
 
         // Attempt to start a "Search Only" version of the bot on eligible servers
         for (Guild searchGuild : jda.getGuilds()) {
@@ -601,6 +604,22 @@ public class JdaService {
         User user = jda.getUserById(userId);
         if (user != null) return user.getEffectiveName();
         return null;
+    }
+
+    private static void leaveNonWhitelistedGuilds() {
+        jda.getGuilds().forEach(JdaService::leaveGuildIfNotWhitelisted);
+    }
+
+    public static void leaveGuildIfNotWhitelisted(Guild guild) {
+        if (isWhitelistedGuild(guild)) return;
+        BotLogger.warning("Would leave guild '" + guild.getName() + "' (" + guild.getId()
+                + ") because it isn't whitelisted!" + (LEAVE_ENABLED ? " LEAVING." : " (dry run)"));
+        if (LEAVE_ENABLED) guild.leave().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static boolean isWhitelistedGuild(Guild guild) {
+        return guilds.stream().anyMatch(whitelistGuild -> whitelistGuild.getId().equals(guild.getId()))
+                || Constants.EMOJI_FARM_SERVERS.containsKey(guild.getId());
     }
 
     public static void shutdown() {
