@@ -107,6 +107,7 @@ import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.map.FractureService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.transaction.TransactionItem;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -373,8 +374,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return 0;
     }
 
-    public List<String> getTransactionItemsWithPlayer(Player player) {
-        List<String> transactionItemsWithPlayer = new ArrayList<>();
+    public List<TransactionItem> getTransactionItemsWithPlayer(Player player) {
+        List<TransactionItem> transactionItemsWithPlayer = new ArrayList<>();
         List<Player> players = new ArrayList<>();
         players.add(this);
         players.add(player);
@@ -383,9 +384,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             if (sender == player) {
                 receiver = this;
             }
-            for (String item : getTransactionItems()) {
-                if (item.contains("sending" + sender.getFaction())
-                        && item.contains("receiving" + receiver.getFaction())) {
+            for (TransactionItem item : getTransactionItems()) {
+                if (item.isSentFromTo(sender.getFaction(), receiver.getFaction())) {
                     transactionItemsWithPlayer.add(item);
                 }
             }
@@ -395,9 +395,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public void clearTransactionItemsWithPlayer(Player player) {
         List<String> newTransactionItems = new ArrayList<>();
-        for (String item : getTransactionItems()) {
-            if (!item.contains("ing" + player.getFaction())) {
-                newTransactionItems.add(item);
+        for (TransactionItem item : getTransactionItems()) {
+            if (!item.involves(player.getFaction())) {
+                newTransactionItems.add(item.serialize());
             }
         }
         game.setStoredValue(player.getFaction() + "NothingMessage", "");
@@ -406,7 +406,14 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public void addTransactionItem(String thing) {
-        getTransactionItems().add(thing);
+        TransactionItem transactionItem = TransactionItem.parse(thing);
+        if (transactionItem != null) {
+            addTransactionItem(transactionItem);
+        }
+    }
+
+    public void addTransactionItem(TransactionItem item) {
+        getSerializedTransactionItems().add(item.serialize());
     }
 
     public void addBreakthrough(String bt) {
