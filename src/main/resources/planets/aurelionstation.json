@@ -1,0 +1,31 @@
+{
+    "id": "aurelionstation",
+    "tileId": null,
+    "name": "Aurelion",
+    "aliases": [
+        "aurelionstation",
+        "aurelion"
+    ],
+    "positionInTile": null,
+    "resources": 1,
+    "influence": 1,
+    "planetTypes" : [
+        "STATION"
+    ],
+    "factionHomeworld": null,
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": "Thone of Pride",
+    "legendaryAbilityText": "The system containing the Aurelion Station is treated as an entrpic scar. This anomaly does not prevent player's from using unit abilities in it's system.",
+    "planetLayout": {
+        "unitHolderName": "aurelionstation",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 72,
+            "y": 58
+        },
+        "planetRadius": 52
+    },
+    "contrastColor": "orange",
+    "source": "theodisi"
+}

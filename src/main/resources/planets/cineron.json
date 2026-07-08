@@ -1,0 +1,27 @@
+{
+    "id": "cineron",
+    "tileId": null,
+    "name": "Cineron",
+    "aliases": [
+        "cineron"
+    ],
+    "positionInTile": null,
+    "resources": 2,
+    "influence": 2,
+    "factionHomeworld": null,
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": "Thone of Wrath",
+    "legendaryAbilityText": "During the action phase you may exhaust this card to destroy 1 unit you control. Then, place 1 unit of the same type from your reinforcements in that system and galvanize that unit.",
+    "planetLayout": {
+        "unitHolderName": "cineron",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 72,
+            "y": 58
+        },
+        "planetRadius": 52
+    },
+    "contrastColor": "orange",
+    "source": "theodisi"
+}

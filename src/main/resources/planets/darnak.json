@@ -9,7 +9,10 @@
     "resources": 1,
     "influence": 1,
     "factionHomeworld": "kairn",
-    "planetType": "FACTION",
+    "planetTypes": [
+        "FACTION",
+        "INDUSTRIAL"
+    ],
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": null,

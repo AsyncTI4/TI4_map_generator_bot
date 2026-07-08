@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "th8",
+    "name": "Hiveworld - Xytheris",
+    "aliases": [
+        "th8",
+        "hiveworld",
+        "xytheris"
+    ],
+    "imagePath": "th8_xytherishs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "hiveworld"
+    ],
+    "source": "theodisi"
+}

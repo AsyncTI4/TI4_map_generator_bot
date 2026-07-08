@@ -12,7 +12,10 @@
     "resources": 2,
     "influence": 0,
     "factionHomeworld": "kairn",
-    "planetType": "FACTION",
+    "planetTypes": [
+        "FACTION",
+        "HAZARDOUS"
+    ],
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": null,
