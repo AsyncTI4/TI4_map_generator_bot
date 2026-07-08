@@ -166,8 +166,9 @@ public class NetrunnersAbilitiesHandler {
                     continue;
                 }
 
-                String message = payer.getRepresentationUnfogged() + ", you may pay 1 trade good to remove 1 of your control tokens from their **"
-        + SYSTEM_BREACH_POOL + "** pool via **Ransomware**.";
+                String message = payer.getRepresentationUnfogged() 
+                    + ", you may pay 1 trade good to remove 1 of your control tokens from their "
+                    + SYSTEM_BREACH_POOL + " pool via **Ransomware**.";
                 List<Button> buttons = List.of(
                         Buttons.green(
                                 payer.factionButtonChecker() + "ransomwarePay_" + netrunner.getFaction(),
@@ -193,8 +194,9 @@ public class NetrunnersAbilitiesHandler {
         netrunner.gainTG(1, true);
         netrunner.clearDebt(payer, 1, SYSTEM_BREACH_POOL);
 
-        String message = payer.getFactionEmojiOrColor() + " paid 1 trade good to remove 1 of their control tokens from the **"
-        + SYSTEM_BREACH_POOL + "** pool via **Ransomware**.";
+        String message = 
+            payer.getFactionEmojiOrColor() + " paid 1 trade good to remove 1 of their control tokens from the "
+                + SYSTEM_BREACH_POOL + " pool via **Ransomware**.";
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(payer.getCorrectChannel(), message);
         if (game.isFowMode()) {
