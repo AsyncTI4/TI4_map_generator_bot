@@ -167,9 +167,7 @@ public class NetrunnersAbilitiesHandler {
                 }
 
                 String message = payer.getRepresentationUnfogged()
-                        + ", you may pay 1 trade good to "
-                        + netrunner.getRepresentation(false, true)
-                        + " to remove 1 of your control tokens from their **" + SYSTEM_BREACH_POOL
+                        + ", you may pay 1 trade good to remove 1 of your control tokens from their **" + SYSTEM_BREACH_POOL
                         + "** pool via **Ransomware**.";
                 List<Button> buttons = List.of(
                         Buttons.green(
