@@ -3,7 +3,7 @@
         "alias": "ardentia",
         "factionName": "The Slavers of Ardentia",
         "homeSystem": "th1",
-        "startingFleet": "1 cv, 1 cr, 1 dd, 2 ff, 2 inf s, 2 inf a, 1 sd s, 1 pds a",
+        "startingFleet": "1 cv, 1 cr, 1 dd, 2 ff, 2 inf w, 2 inf a, 1 sd w, 1 pds a",
         "commodities": 3,
         "factionTech": [
             "thardentiar",
@@ -15,7 +15,7 @@
         ],
         "startingTechAmount": 1,
         "homePlanets": [
-            "spireofweyr",
+            "weyr",
             "ardentia"
         ],
         "abilities": [
@@ -198,7 +198,7 @@
         ],
         "homePlanets": [
             "kairn",
-            "darnakshold",
+            "darnak",
             "plotyz"
         ],
         "abilities": [
@@ -233,7 +233,7 @@
         "alias": "kryxos",
         "factionName": "The Dominion of Kryxos",
         "homeSystem": "th6",
-        "startingFleet": "1 dn, 1 cv, 1 cr, 1 dd, 1 ff, 1 mf s, 1 inf ch, 1 sd s, 1 pds cu",
+        "startingFleet": "1 dn, 1 cv, 1 cr, 1 dd, 1 ff, 1 mf b, 1 inf ch, 1 sd b, 1 pds cu",
         "commodities": 2,
         "factionTech": [
             "thkryxosfs",
@@ -243,8 +243,8 @@
             "aida"
         ],
         "homePlanets": [
-            "spawningfields",
-            "chrysalisyard",
+            "bruud",
+            "chrysali",
             "cullspire"
         ],
         "abilities": [
@@ -388,8 +388,8 @@
             "nm"
         ],
         "homePlanets": [
-            "nihilusprime",
-            "veydrasfall"
+            "nihlus",
+            "veydra"
         ],
         "abilities": [
             "ignorant_discoveries",

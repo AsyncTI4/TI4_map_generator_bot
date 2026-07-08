@@ -72,7 +72,7 @@ public class Units {
             if (unitType == UnitType.Destroyer && eyes) {
                 return String.format("%s_dd_eyes.png", colorID);
             }
-            if (unitType == UnitType.Celagrom || unitType == UnitType.Lady || unitType == UnitType.Cavalry) {
+            if (unitType == UnitType.Celagrom || unitType == UnitType.Lady || unitType == UnitType.Cavalry || unitType == UnitType.Aurelion) {
                 return String.format("%s_%s.png", colorID, "fs");
             }
             if (unitType == UnitType.TyrantsLament) {
@@ -120,6 +120,7 @@ public class Units {
         TyrantsLament("tyrantslament"),
         Lady("lady"),
         Celagrom("celagrom"),
+        Aurelion("aurelion"),
         Cavalry("cavalry"), // relics
         StarfallPds("starfallpds"),
         MetaliVoidArmaments("metalivoidarmaments"),
@@ -150,6 +151,7 @@ public class Units {
                 case Cavalry -> "The Cavalry";
                 case Lady -> "The Lady";
                 case Celagrom -> "The Celagrom";
+                case Aurelion -> "The Aurelion Station";
                 case Monument -> "Monument";
                 case MetaliVoidArmaments -> "Metali Void Armaments";
                 case ProjectionOfPower -> "Projection of Power";
@@ -175,6 +177,7 @@ public class Units {
                 case Cavalry -> "cavalry";
                 case Lady -> "lady";
                 case Celagrom -> "celagrom";
+                case Aurelion -> "aurelion";
                 case Monument -> "monument";
                 case MetaliVoidArmaments -> "metalivoidarmaments";
                 case ProjectionOfPower -> "projectionofpower";
@@ -194,7 +197,7 @@ public class Units {
                 case Cruiser -> UnitEmojis.cruiser;
                 case Carrier -> UnitEmojis.carrier;
                 case Dreadnought -> UnitEmojis.dreadnought;
-                case Flagship, Cavalry, Lady, Celagrom -> UnitEmojis.flagship;
+                case Flagship, Cavalry, Lady, Celagrom, Aurelion -> UnitEmojis.flagship;
                 case TyrantsLament -> UnitEmojis.TyrantsLament;
                 case Warsun -> UnitEmojis.warsun;
                 case Monument -> UnitEmojis.Monument;
@@ -337,6 +340,7 @@ public class Units {
             case "tyrantslament" -> UnitType.TyrantsLament;
             case "lady" -> UnitType.Lady;
             case "celagrom" -> UnitType.Celagrom;
+            case "aurelion" -> UnitType.Aurelion;
             case "cavalry" -> UnitType.Cavalry;
             case "starfallpds" -> UnitType.StarfallPds;
             case "metaliafb" -> UnitType.MetaliVoidArmaments;
