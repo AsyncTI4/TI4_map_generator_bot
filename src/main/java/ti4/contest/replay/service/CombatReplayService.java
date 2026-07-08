@@ -62,7 +62,6 @@ public class CombatReplayService {
     private final CombatReplayEventAppender eventAppender;
     private final CombatReplaySideBetTriggerService sideBetTriggerService;
     private final CombatSideBetAvailabilityService availabilityService;
-    // Games that MAY have open candidates; a stale entry costs one query and self-heals in getOpenCandidates.
     private final Set<String> gamesWithOpenCandidates = ConcurrentHashMap.newKeySet();
     private CombatReplaySelection selection;
 
@@ -73,10 +72,6 @@ public class CombatReplayService {
         refreshOpenCandidateGames();
     }
 
-    /**
-     * Add-only on purpose: a replace-style refresh could race with concurrent candidate creation and drop a
-     * just-created game. Removal happens only in getOpenCandidates, once the database proves a game has none open.
-     */
     public void refreshOpenCandidateGames() {
         gamesWithOpenCandidates.addAll(candidateRepository.findDistinctGameNamesByStatusIn(OPEN_CANDIDATE_STATUSES));
     }
