@@ -1654,10 +1654,10 @@ public class TransactionHelper {
                     p1.setTg(p1.getTg() - (Integer.parseInt(amountToTrans) - tgAmount));
                     p2.setTg(p2.getTg() + (Integer.parseInt(amountToTrans) - tgAmount));
                     MessageHelper.sendMessageToChannel(
-                            event.getChannel(),
+                            p1.getCorrectChannel(),
                             ident + " sent " + (Integer.parseInt(amountToTrans) - tgAmount) + " trade good"
                                     + ((Integer.parseInt(amountToTrans) - tgAmount) == 1 ? "" : "s") + " to " + ident2
-                                    + ".");
+                                    + " because they didn't have enough commodities to cover the full amount.");
                 }
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, tgAmount);
                 message2 = ident + " sent " + tgAmount + " commodit" + (tgAmount == 1 ? "y" : "ies") + " to " + ident2
