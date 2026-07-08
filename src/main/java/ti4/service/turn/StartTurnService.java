@@ -734,6 +734,12 @@ public class StartTurnService {
                 startButtons.add(Buttons.gray(
                         factionChecker + "exhaustTech_td", "Exhaust Transit Diodes", TechEmojis.CyberneticTech));
             }
+            if (player.hasTech("batyriy") && !player.getExhaustedTechs().contains("batyriy")) {
+                startButtons.add(Buttons.gray(
+                        factionChecker + "exhaustTech_batyriy",
+                        "Exhaust Temporal Displacement",
+                        TechEmojis.CyberneticTech));
+            }
             if (player.hasUnexhaustedLeader("kolleccagent")) {
                 startButtons.add(Buttons.gray(
                         factionChecker + "exhaustAgent_kolleccagent", "Use Kollecc Agent", FactionEmojis.kollecc));

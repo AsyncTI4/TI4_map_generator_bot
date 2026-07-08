@@ -12,10 +12,14 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.objectives.RevealPublicObjectiveService;
+import ti4.service.unit.AddUnitService;
+import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
 public class TyrisAbilityHandler {
@@ -115,5 +119,64 @@ public class TyrisAbilityHandler {
             RevealPublicObjectiveService.revealS2(game, event, true);
         }
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static void resolveTemporalDisplacementStep1(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (FoWHelper.playerHasShipsInSystem(player, tile)) {
+                buttons.add(Buttons.green(
+                        "temporalDisplacement_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+            }
+        }
+        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", use buttons to choose the system you wish to move fighters to.",
+                buttons);
+    }
+
+    @ButtonHandler("temporalDisplacement_")
+    public static void resolveTemporalDisplacementStep2(
+            Player player, String buttonID, Game game, ButtonInteractionEvent event) {
+        String destPos = buttonID.replace("temporalDisplacement_", "");
+        Tile destTile = game.getTileByPosition(destPos);
+        if (destTile == null) return;
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.getPosition().equals(destPos)) continue;
+            if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
+                buttons.add(Buttons.green(
+                        "temporalDisplacementMove_" + destPos + "_" + tile.getPosition(),
+                        "Move Fighter from " + tile.getRepresentationForButtons(game, player)));
+            }
+        }
+        buttons.add(Buttons.red("deleteButtons", "Done Moving to This System"));
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation() + ", use buttons to choose the fighters you wish to move to "
+                        + destTile.getRepresentationForButtons(game, player) + ".",
+                buttons);
+    }
+
+    @ButtonHandler("temporalDisplacementMove_")
+    public static void resolveTemporalDisplacementMove(
+            Player player, String buttonID, Game game, ButtonInteractionEvent event) {
+        String[] parts = buttonID.replace("temporalDisplacementMove_", "").split("_");
+        Tile destTile = game.getTileByPosition(parts[0]);
+        Tile srcTile = game.getTileByPosition(parts[1]);
+        if (destTile == null || srcTile == null) return;
+        List<RemoveUnitService.RemovedUnit> removedUnits =
+                RemoveUnitService.removeUnits(event, srcTile, game, player.getColor(), "ff");
+        AddUnitService.addUnits(event, destTile, game, player.getColor(), "ff", removedUnits);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getFactionEmojiOrColor() + " moved 1 fighter from "
+                        + srcTile.getRepresentationForButtons(game, player) + " to "
+                        + destTile.getRepresentationForButtons(game, player) + " using _Temporal Displacement_.");
+        if (srcTile.getSpaceUnitHolder().getUnitCount(UnitType.Fighter, player.getColor()) < 1) {
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        }
     }
 }
