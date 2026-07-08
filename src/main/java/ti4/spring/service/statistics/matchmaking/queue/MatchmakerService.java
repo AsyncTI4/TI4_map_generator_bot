@@ -142,31 +142,39 @@ public class MatchmakerService {
         return results;
     }
 
-    @Transactional
     public void processQueue() {
         if (DatabasePersistenceGate.isDisabled()) return;
 
-        Map<Boolean, List<QueuedParty>> queuedPartyByExpired = queueStore.loadQueuedParties().stream()
-                .collect(Collectors.partitioningBy(MatchmakerService::isExpired));
-        List<QueuedParty> expiredParties = queuedPartyByExpired.get(true);
+        List<QueuedParty> expiredParties;
+        List<MatchedGame> gamesToCreate;
+        MatchmakingQueueLock.LOCK.lock();
+        try {
+            Map<Boolean, List<QueuedParty>> queuedPartyByExpired = queueStore.loadQueuedParties().stream()
+                    .collect(Collectors.partitioningBy(MatchmakerService::isExpired));
+            expiredParties = queuedPartyByExpired.get(true);
+
+            if (!expiredParties.isEmpty()) {
+                queueStore.deleteParties(expiredParties.stream()
+                        .map(queuedParty -> queuedParty.party().getId())
+                        .toList());
+            }
+
+            List<QueuedParty> activeParties = queuedPartyByExpired.get(false);
+            gamesToCreate = MatchmakingGrouper.formGames(activeParties);
+
+            if (!gamesToCreate.isEmpty()) {
+                queueStore.deleteParties(gamesToCreate.stream()
+                        .flatMap(game -> game.parties().stream())
+                        .map(MatchmakingQueueParty::getId)
+                        .toList());
+            }
+        } finally {
+            MatchmakingQueueLock.LOCK.unlock();
+        }
 
         if (!expiredParties.isEmpty()) {
-            queueStore.deleteParties(expiredParties.stream()
-                    .map(queuedParty -> queuedParty.party().getId())
-                    .toList());
             MatchmakingNotifier.notifyExpired(expiredParties);
         }
-
-        List<QueuedParty> activeParties = queuedPartyByExpired.get(false);
-        List<MatchedGame> gamesToCreate = MatchmakingGrouper.formGames(activeParties);
-
-        if (!gamesToCreate.isEmpty()) {
-            queueStore.deleteParties(gamesToCreate.stream()
-                    .flatMap(game -> game.parties().stream())
-                    .map(MatchmakingQueueParty::getId)
-                    .toList());
-        }
-
         MatchmakingNotifier.postMatchedGames(gamesToCreate);
     }
 
