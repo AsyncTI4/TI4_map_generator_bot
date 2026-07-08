@@ -18,6 +18,9 @@ public interface CombatCandidateRepository extends JpaRepository<CombatCandidate
 
     List<CombatCandidateEntity> findByGameNameAndStatusIn(String gameName, Collection<CombatCandidateStatus> statuses);
 
+    @Query("select distinct c.gameName from CombatCandidateEntity c where c.status in :statuses")
+    List<String> findDistinctGameNamesByStatusIn(@Param("statuses") Collection<CombatCandidateStatus> statuses);
+
     CombatCandidateEntity findFirstByGameNameAndTilePositionAndStatusIn(
             String gameName, String tilePosition, Collection<CombatCandidateStatus> statuses);
 

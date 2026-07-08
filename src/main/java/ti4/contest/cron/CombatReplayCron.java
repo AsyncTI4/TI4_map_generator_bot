@@ -26,7 +26,9 @@ public class CombatReplayCron {
         CombatContestSettings settings = SpringContext.getBean(CombatContestSettings.class);
         if (!shouldRun(settings.getReplayExecution().getReplayIntervalSeconds())) return;
         try {
-            SpringContext.getBean(CombatReplayService.class).finalizeExpiredPendingResolutionCandidates();
+            CombatReplayService replayService = SpringContext.getBean(CombatReplayService.class);
+            replayService.finalizeExpiredPendingResolutionCandidates();
+            replayService.refreshOpenCandidateGames();
             SpringContext.getBean(CombatReplayContestLifecycleService.class).runReplayTick();
         } catch (Exception e) {
             BotLogger.error("**CombatReplayCron failed.**", e);

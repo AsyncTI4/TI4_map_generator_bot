@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -61,17 +62,29 @@ public class CombatReplayService {
     private final CombatReplayEventAppender eventAppender;
     private final CombatReplaySideBetTriggerService sideBetTriggerService;
     private final CombatSideBetAvailabilityService availabilityService;
+    // Games that MAY have open candidates; a stale entry costs one query and self-heals in getOpenCandidates.
+    private final Set<String> gamesWithOpenCandidates = ConcurrentHashMap.newKeySet();
     private CombatReplaySelection selection;
 
     @PostConstruct
     void initializeSelectionSnapshot() {
         selection = new CombatReplaySelection(settings);
         refreshSelectionSnapshot();
+        refreshOpenCandidateGames();
+    }
+
+    /**
+     * Add-only on purpose: a replace-style refresh could race with concurrent candidate creation and drop a
+     * just-created game. Removal happens only in getOpenCandidates, once the database proves a game has none open.
+     */
+    public void refreshOpenCandidateGames() {
+        gamesWithOpenCandidates.addAll(candidateRepository.findDistinctGameNamesByStatusIn(OPEN_CANDIDATE_STATUSES));
     }
 
     public PreInteractionSnapshot capturePreInteractionSnapshot(Game game) {
         if (!settings.isEnabled()) return PreInteractionSnapshot.empty();
         if (game == null) return PreInteractionSnapshot.empty();
+        if (!mayHaveOpenCandidates(game)) return PreInteractionSnapshot.empty();
 
         Map<Long, CandidateInitialSnapshot> snapshots = new HashMap<>();
         for (CombatCandidateEntity candidate : getOpenCandidates(game)) {
@@ -116,10 +129,12 @@ public class CombatReplayService {
 
         CombatCandidateEntity candidate = buildCandidate(observation, attacker, defender, tile);
         candidateRepository.save(candidate);
+        gamesWithOpenCandidates.add(candidate.getGameName());
     }
 
     public void onButtonInteractionSettled(Game game, Player player, ButtonInteractionEvent event) {
         if (!settings.isEnabled()) return;
+        if (!mayHaveOpenCandidates(game)) return;
         for (CombatCandidateEntity candidate : getOpenCandidates(game)) {
             if (candidate.getStatus() == CombatCandidateStatus.PENDING_RESOLUTION
                     && !candidate
@@ -892,8 +907,17 @@ public class CombatReplayService {
         return player != null && player.hasTech("asc");
     }
 
+    private boolean mayHaveOpenCandidates(Game game) {
+        return gamesWithOpenCandidates.contains(game.getName());
+    }
+
     private List<CombatCandidateEntity> getOpenCandidates(Game game) {
-        return candidateRepository.findByGameNameAndStatusIn(game.getName(), OPEN_CANDIDATE_STATUSES);
+        List<CombatCandidateEntity> openCandidates =
+                candidateRepository.findByGameNameAndStatusIn(game.getName(), OPEN_CANDIDATE_STATUSES);
+        if (openCandidates.isEmpty()) {
+            gamesWithOpenCandidates.remove(game.getName());
+        }
+        return openCandidates;
     }
 
     private CombatCandidateEntity getTrackingCandidate(Game game, String tilePosition) {
