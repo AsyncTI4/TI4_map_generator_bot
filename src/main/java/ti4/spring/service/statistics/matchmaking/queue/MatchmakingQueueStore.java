@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ti4.settings.users.UserSettingsManager;
 
 @Service
@@ -89,6 +90,7 @@ public class MatchmakingQueueStore {
         memberRepository.saveAll(members);
     }
 
+    @Transactional
     void deleteParties(Collection<Long> partyIds) {
         if (partyIds.isEmpty()) return;
         memberRepository.deleteAllByPartyIdIn(partyIds);
