@@ -1,0 +1,22 @@
+[
+    {
+        "id": "kairnexpedition",
+        "imagePath": "token_theodisi_kairnexpedition.png",
+        "spaceOrPlanet": "planet",
+        "aliasList": [
+            "kairnexpedition",
+            "expedition"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "id": "xythrismine",
+        "imagePath": "token_theodisi_mine.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "xytherismine",
+            "mine"
+        ],
+        "source": "theodisi"
+    }
+]

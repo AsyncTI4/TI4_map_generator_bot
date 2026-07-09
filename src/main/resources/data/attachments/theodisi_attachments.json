@@ -1,0 +1,26 @@
+[
+    {
+        "id": "factoryleaseh",
+        "name": "Factory Lease: Hazardous",
+        "imagePath": "attachment_factoryleaseh.png",
+        "source": "theodisi"
+    },
+    {
+        "id": "factoryleasec",
+        "name": "Factory Lease: Cultural",
+        "imagePath": "attachment_factoryleasec.png",
+        "source": "theodisi"
+    },
+    {
+        "id": "factoryleasei",
+        "name": "Factory Lease: Industrial",
+        "imagePath": "attachment_factoryleasei.png",
+        "source": "theodisi"
+    },
+    {
+        "id": "kairnoutpost",
+        "name": "Archaeological Outpost",
+        "imagePath": "attachment_kairnoutpost.png",
+        "source": "theodisi"
+    }
+]
