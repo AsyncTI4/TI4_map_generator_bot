@@ -45,8 +45,7 @@ public class KairnPromissoryHandler {
         if (legalPlanets.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + ", there are no legal planets to attach _Archaeological Outpost_ to.");
+                    player.getRepresentation() + ", there are no legal planets to attach _Archaeological Outpost_ to.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -65,14 +64,12 @@ public class KairnPromissoryHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation()
-                        + ", please choose a non-home planet to attach _Archaeological Outpost_ to.",
+                player.getRepresentation() + ", please choose a non-home planet to attach _Archaeological Outpost_ to.",
                 buttons);
     }
 
     @ButtonHandler(KAIRN_PN_ATTACH)
-    public static void resolveKairnPnAttach(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void resolveKairnPnAttach(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (event == null || game == null || player == null) {
             return;
         }

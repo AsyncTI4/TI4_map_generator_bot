@@ -178,6 +178,11 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = player.getFactionEmoji() + ", please choose a technology to return.";
                 buttons.addAll(getNewPrismLoseTechOptions(player));
             }
+            case "ponthous" -> {
+                player.refreshPlanet(planet);
+                output = player.getRepresentation()
+                        + " readied Ponthous with _Fractured Souls_. In async, readying the 3/3 planet is identical in effect.";
+            }
             case "echo" -> {
                 output =
                         "Use buttons to place a frontier token in a system with no planets.\n-# Cannot yet place a double frontier token in a system, sorry.";

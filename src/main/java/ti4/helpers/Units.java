@@ -72,7 +72,10 @@ public class Units {
             if (unitType == UnitType.Destroyer && eyes) {
                 return String.format("%s_dd_eyes.png", colorID);
             }
-            if (unitType == UnitType.Celagrom || unitType == UnitType.Lady || unitType == UnitType.Cavalry || unitType == UnitType.Aurelion) {
+            if (unitType == UnitType.Celagrom
+                    || unitType == UnitType.Lady
+                    || unitType == UnitType.Cavalry
+                    || unitType == UnitType.Aurelion) {
                 return String.format("%s_%s.png", colorID, "fs");
             }
             if (unitType == UnitType.TyrantsLament) {

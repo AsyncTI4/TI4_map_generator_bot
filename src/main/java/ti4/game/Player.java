@@ -50,6 +50,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.discord.utility.DiscordErrorUtility;
@@ -2610,6 +2612,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             addOwnedUnitByID("death_commandos3");
             removeOwnedUnitByID("infantry2");
         }
+        if (hasUnlockedBreakthrough("arcanumbt") || hasUnlockedBreakthrough("arcanumbtback")) {
+            ArcanumBreakthroughHandler.handlePowerWordWishTechGain(this, techID);
+        }
+        if (ownsUnit("kryxos_flagship") || ownsUnit("kryxos_mech")) {
+            KryxosUnitHandler.offerEvolutionButtons(this, game, techID);
+        }
     }
 
     // Provided because people make mistakes, also nekro exists, also weird homebrew exists
@@ -2723,6 +2731,17 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                     getCorrectChannel(),
                     getRepresentation()
                             + ", you may choose to exhaust the _Nano-Forge_ legendary ability to ready the planet it's attached to.",
+                    buttons);
+        }
+        if ("ponthous".equalsIgnoreCase(planet)
+                && !getExhaustedPlanetsAbilities().contains(planet)) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("planetAbilityExhaust_" + planet, "Use Ponthous Ability"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    getCorrectChannel(),
+                    getRepresentation()
+                            + ", you may exhaust the Ponthous ability and \"exhaust\" the Ponthous + or - card to ready Ponthous.",
                     buttons);
         }
     }

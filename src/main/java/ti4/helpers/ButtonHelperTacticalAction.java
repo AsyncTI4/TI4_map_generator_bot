@@ -883,8 +883,8 @@ public final class ButtonHelperTacticalAction {
             }
         }
         if (!tile.getPlanetUnitHolders().isEmpty()
-                && tile.getPlanetUnitHolders().stream().anyMatch(planet ->
-                        player.getPlanetsAllianceMode().contains(planet.getName())
+                && tile.getPlanetUnitHolders().stream()
+                        .anyMatch(planet -> player.getPlanetsAllianceMode().contains(planet.getName())
                                 && planet.getAttachments().contains("attachment_kairnoutpost.png"))) {
             KairnPromissoryHandler.offerArchaeologicalOutpostExplore(player, game, tile);
         }

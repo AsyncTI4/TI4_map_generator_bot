@@ -4050,6 +4050,8 @@ public class ButtonHelper {
         int numFighter2sFleet = 0;
         int numRiptide2s = 0;
         int numRiptide2sFleet = 0;
+        int evolvedWarformsMechsInSpace = 0;
+        Set<String> testingYardShipTypes = new HashSet<>();
         boolean capacityViolated = false;
         boolean fleetSupplyViolated = false;
         String tooManyDocks = "";
@@ -4195,6 +4197,9 @@ public class ButtonHelper {
                     if ("naaz_voltron".equalsIgnoreCase(unit.getId())) {
                         numFighter2s++;
                     }
+                    if ("mech".equalsIgnoreCase(unit.getBaseType()) && player.hasAbility("evolved_warforms")) {
+                        evolvedWarformsMechsInSpace += entry.getValue();
+                    }
                     if ("fighter".equalsIgnoreCase(unit.getBaseType())) {
                         ignoredFs = Math.min(fightersIgnored, entry.getValue());
                         int numCountedFighters = unit.getCapacityUsed() * entry.getValue() - fightersIgnored;
@@ -4223,9 +4228,15 @@ public class ButtonHelper {
                     } else {
                         numOfCapitalShips += entry.getValue() * 2;
                     }
+                    if (player.hasAbility("testing_yard") && tile == player.getHomeSystemTile()) {
+                        testingYardShipTypes.add(unit.getBaseType());
+                    }
                     unitTypesCounted.add(unit.getBaseType());
                 }
             }
+        }
+        if (!testingYardShipTypes.isEmpty()) {
+            numOfCapitalShips = Math.max(0, numOfCapitalShips - (2 * testingYardShipTypes.size()));
         }
         if (numOfCapitalShips > fleetCap) {
             fleetSupplyViolated = true;
@@ -4262,6 +4273,14 @@ public class ButtonHelper {
             if (riptide2Overflow > 0) {
                 numRiptide2sFleet += riptide2Overflow * 2;
                 overflow -= riptide2Overflow;
+            }
+
+            if (overflow > 0 && player.hasAbility("evolved_warforms")) {
+                int mechOverflow = Math.min(overflow, evolvedWarformsMechsInSpace);
+                if (mechOverflow > 0) {
+                    numOfCapitalShips += mechOverflow * 2;
+                    overflow -= mechOverflow;
+                }
             }
 
             if (overflow > 0) {

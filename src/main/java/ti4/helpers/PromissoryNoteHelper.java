@@ -681,9 +681,7 @@ public class PromissoryNoteHelper {
         if ("bepnta".equalsIgnoreCase(id)) {
             TaPromissoryHandler.offerAdvancedStructuralEngineeringButtons(event, player, game);
         }
-        if ("thpnmyrri".equalsIgnoreCase(id)
-                || "thpnmyrrh".equalsIgnoreCase(id)
-                || "thpnmyrrc".equalsIgnoreCase(id)) {
+        if ("thpnmyrri".equalsIgnoreCase(id) || "thpnmyrrh".equalsIgnoreCase(id) || "thpnmyrrc".equalsIgnoreCase(id)) {
             MyrrPromissoryHandler.offerFactoryLeaseButtons(event, player, game, id);
         }
         if ("thpnkairn".equalsIgnoreCase(id)) {

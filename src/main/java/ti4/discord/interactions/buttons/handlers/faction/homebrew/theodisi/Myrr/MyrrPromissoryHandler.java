@@ -34,7 +34,8 @@ public class MyrrPromissoryHandler {
         }
 
         String attachmentId = pnModel.getAttachment().get();
-        if (!player.getPromissoryNotesInPlayArea().contains(promissoryNoteId) || attachmentAlreadyPlaced(game, attachmentId)) {
+        if (!player.getPromissoryNotesInPlayArea().contains(promissoryNoteId)
+                || attachmentAlreadyPlaced(game, attachmentId)) {
             return;
         }
 
@@ -42,8 +43,8 @@ public class MyrrPromissoryHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + ", there are no legal planets to attach _" + pnModel.getName() + "_ to.");
+                    player.getRepresentation() + ", there are no legal planets to attach _" + pnModel.getName()
+                            + "_ to.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -80,7 +81,8 @@ public class MyrrPromissoryHandler {
         }
 
         String attachmentId = pnModel.getAttachment().get();
-        if (!player.getPromissoryNotesInPlayArea().contains(promissoryNoteId) || attachmentAlreadyPlaced(game, attachmentId)) {
+        if (!player.getPromissoryNotesInPlayArea().contains(promissoryNoteId)
+                || attachmentAlreadyPlaced(game, attachmentId)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -143,6 +145,7 @@ public class MyrrPromissoryHandler {
 
     private static boolean attachmentAlreadyPlaced(Game game, String attachmentId) {
         String tokenName = "attachment_" + attachmentId + ".png";
-        return game.getPlanetsInfo().values().stream().anyMatch(planet -> planet.getAttachments().contains(tokenName));
+        return game.getPlanetsInfo().values().stream()
+                .anyMatch(planet -> planet.getAttachments().contains(tokenName));
     }
 }

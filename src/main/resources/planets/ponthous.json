@@ -9,8 +9,8 @@
         "x": 170.0,
         "y": 128.0
     },
-    "resources": 0,
-    "influence": 0,
+    "resources": 3,
+    "influence": 3,
     "factionHomeworld": "ponthous",
     "planetType": "FACTION",
     "cardImagePath": null,
