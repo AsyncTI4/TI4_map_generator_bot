@@ -17,10 +17,10 @@
         "unitHolderName": "lethara",
         "resourcesLocation": "BottomLeft",
         "centerPosition": {
-            "x": 72,
-            "y": 58
+            "x": 50,
+            "y": 45
         },
-        "planetRadius": 52
+        "planetRadius": 33
     },
     "contrastColor": "orange",
     "source": "theodisi"

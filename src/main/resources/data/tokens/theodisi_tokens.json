@@ -18,5 +18,70 @@
             "mine"
         ],
         "source": "theodisi"
+    },
+    {
+        "id": "oblivionreflection",
+        "imagePath": "token_theodisi_oblivionreflection.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "oblivionreflection",
+            "reflection",
+            "oblivion"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "id": "revenantlich",
+        "imagePath": "token_theodisi_revenantlich.png",
+        "aliasList": [
+            "revenantlich",
+            "revenant",
+            "lich"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "id": "cineron",
+        "imagePath": "token_theodisi_cineron.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "cineron"
+        ],
+        "tokenPlanetName": "cineron",
+        "isPlanet": true,
+        "source": "theodisi"
+    },
+    {
+        "id": "gyraxis",
+        "imagePath": "token_theodisi_gyraxis.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "gyraxis"
+        ],
+        "tokenPlanetName": "gyraxis",
+        "isPlanet": true,
+        "source": "theodisi"
+    },
+    {
+        "id": "lethara",
+        "imagePath": "token_theodisi_lethara.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "lethara"
+        ],
+        "tokenPlanetName": "lethara",
+        "isPlanet": true,
+        "source": "theodisi"
+    },
+    {
+        "id": "skarnath",
+        "imagePath": "token_theodisi_skarnath.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "skarnath"
+        ],
+        "tokenPlanetName": "skarnath",
+        "isPlanet": true,
+        "source": "theodisi"
     }
 ]

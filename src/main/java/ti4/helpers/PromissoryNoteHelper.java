@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrPromissoryHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -678,6 +680,14 @@ public class PromissoryNoteHelper {
         }
         if ("bepnta".equalsIgnoreCase(id)) {
             TaPromissoryHandler.offerAdvancedStructuralEngineeringButtons(event, player, game);
+        }
+        if ("thpnmyrri".equalsIgnoreCase(id)
+                || "thpnmyrrh".equalsIgnoreCase(id)
+                || "thpnmyrrc".equalsIgnoreCase(id)) {
+            MyrrPromissoryHandler.offerFactoryLeaseButtons(event, player, game, id);
+        }
+        if ("thpnkairn".equalsIgnoreCase(id)) {
+            KairnPromissoryHandler.offerArchaeologicalOutpostButtons(event, player, game);
         }
 
         // These PNs' text contains "action:" but describe a trigger on another player's action
