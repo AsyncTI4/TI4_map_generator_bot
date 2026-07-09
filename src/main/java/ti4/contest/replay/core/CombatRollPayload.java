@@ -3,6 +3,7 @@ package ti4.contest.replay.core;
 import java.util.List;
 import java.util.Map;
 import ti4.service.combat.CombatRollType;
+import ti4.service.combat.CombatV2DiceData.RollSource;
 
 /**
  * Structured combat roll snapshot used to replay roll messages without depending on live Discord text.
@@ -41,19 +42,6 @@ public record CombatRollPayload(
         BEFORE_UNIT_ROLLS,
         AFTER_UNIT_ROLLS,
         AFTER_TOTAL
-    }
-
-    public enum RollSegmentType {
-        PRIMARY,
-        SUPERCHARGE_SELECTED_UNIT,
-        SUPERCHARGE_REST,
-        GRAVLEASH_SELECTED_UNIT,
-        GRAVLEASH_REST,
-        JOL_NAR_COMMANDER_REROLL_MISSES,
-        JOL_NAR_COMMANDER_REROLL_HITS,
-        IRON_COMMANDER_REROLL_MISSES,
-        KALTRIM_COMMANDER_REROLL_ONES,
-        MUNITIONS_RESERVES_REROLL
     }
 
     public enum DieRollSource {
@@ -119,7 +107,7 @@ public record CombatRollPayload(
             int printedHitsOn,
             int modifier,
             int effectiveThreshold,
-            RollSegmentType segmentType,
+            RollSource segmentType,
             List<DieRoll> dice,
             int hits) {
         public UnitRoll {

@@ -15,7 +15,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RelicHelper;
 import ti4.message.MessageHelper;
-import ti4.service.combat.StartCombatService;
+import ti4.service.combat.CombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.UnlockLeaderService;
 
@@ -94,7 +94,7 @@ public class OnyxxaLeaderHandler {
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.playerHasActualShipsInSystem(player, tile)
                     && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
-                StartCombatService.combatCheck(game, event, tile);
+                CombatService.combatCheck(game, event, tile);
             }
         }
     }

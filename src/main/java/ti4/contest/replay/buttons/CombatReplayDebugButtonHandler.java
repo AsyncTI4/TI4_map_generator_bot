@@ -13,7 +13,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.message.MessageHelper;
-import ti4.service.combat.StartCombatService;
+import ti4.service.combat.CombatService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.unit.AddUnitService;
 import ti4.spring.context.SpringContext;
@@ -174,7 +174,7 @@ public class CombatReplayDebugButtonHandler {
                 event,
                 "Added combat replay debug fleets to Mecatol Rex: " + player.getRepresentation() + " `" + DEBUG_FLEET
                         + "` vs " + opponent.getRepresentation() + " `" + DEBUG_FLEET + "`.");
-        StartCombatService.combatCheck(game, event, mecatolRex);
+        CombatService.combatCheck(game, event, mecatolRex);
     }
 
     private static void wipeMecatolRexSpace(ButtonInteractionEvent event, Game game) {

@@ -16,7 +16,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
-import ti4.service.combat.StartCombatService;
+import ti4.service.combat.CombatService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.unit.AddUnitService;
 
@@ -102,7 +102,7 @@ public class AddUnits extends GameStateCommand {
                         buttons);
             }
         }
-        if (!coexist) StartCombatService.combatCheck(game, event, tile);
+        if (!coexist) CombatService.combatCheck(game, event, tile);
         handleSlingRelayOption(event);
         UnitCommandHelper.handleCcUseOption(event, tile, color, game);
         UnitCommandHelper.handleGenerateMapOption(event, game);

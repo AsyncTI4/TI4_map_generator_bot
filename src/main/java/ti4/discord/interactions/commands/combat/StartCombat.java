@@ -10,7 +10,7 @@ import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
-import ti4.service.combat.StartCombatService;
+import ti4.service.combat.CombatService;
 
 class StartCombat extends GameStateSubcommand {
 
@@ -32,6 +32,6 @@ class StartCombat extends GameStateSubcommand {
             return;
         }
 
-        StartCombatService.combatCheck(game, event, tile);
+        CombatService.combatCheck(game, event, tile);
     }
 }

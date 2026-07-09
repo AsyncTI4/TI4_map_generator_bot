@@ -19,7 +19,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.service.combat.StartCombatService;
+import ti4.service.combat.CombatService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
@@ -125,7 +125,7 @@ public class MoveUnits extends GameStateCommand {
                         buttons);
             }
         }
-        if (!coexist) StartCombatService.combatCheck(game, event, tileTo);
+        if (!coexist) CombatService.combatCheck(game, event, tileTo);
         UnitCommandHelper.handleCcUseOption(event, tileTo, color, game);
         UnitCommandHelper.handleGenerateMapOption(event, game);
     }

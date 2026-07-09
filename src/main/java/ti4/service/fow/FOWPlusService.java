@@ -38,7 +38,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
-import ti4.service.combat.StartCombatService;
+import ti4.service.combat.CombatService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -394,7 +394,7 @@ public final class FOWPlusService {
         List<RemovedUnit> removed =
                 RemoveUnitService.removeUnits(event, currentTile, game, player.getColor(), unitList, false);
         AddUnitService.addUnits(event, targetTile, game, player.getColor(), unitList, removed);
-        StartCombatService.combatCheck(game, event, targetTile);
+        CombatService.combatCheck(game, event, targetTile);
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),

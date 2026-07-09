@@ -11,8 +11,8 @@ import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
-import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
+import ti4.service.combat.CombatService;
 
 class CombatRoll extends GameStateSubcommand {
 
@@ -76,6 +76,6 @@ class CombatRoll extends GameStateSubcommand {
             }
         }
 
-        CombatRollService.secondHalfOfCombatRoll(player, game, event, tile, unitHolderName, rollType);
+        CombatService.roll(player, game, event, tile, unitHolderName, rollType);
     }
 }

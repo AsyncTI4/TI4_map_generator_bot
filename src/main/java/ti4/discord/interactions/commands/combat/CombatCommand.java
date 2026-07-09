@@ -15,7 +15,7 @@ public class CombatCommand implements ParentCommand {
     private final Map<String, Subcommand> subcommands = buildSubcommands();
 
     private Map<String, Subcommand> buildSubcommands() {
-        List<Subcommand> commands = new ArrayList<>(List.of(new CombatRoll(), new StartCombat()));
+        List<Subcommand> commands = new ArrayList<>(List.of(new CombatRoll(), new StartCombat(), new CombatV2()));
         if (isReplayDebugEnabled()) {
             commands.add(new CombatReplayDebugPanel());
         }

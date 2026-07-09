@@ -26,7 +26,6 @@ import ti4.contest.replay.core.CombatRollPayload;
 import ti4.contest.replay.core.CombatRollPayload.CombatRollNotePlacement;
 import ti4.contest.replay.core.CombatRollPayload.CombatRollNoteType;
 import ti4.contest.replay.core.CombatRollPayload.DieRollSource;
-import ti4.contest.replay.core.CombatRollPayload.RollSegmentType;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
@@ -82,6 +81,7 @@ import ti4.model.RelicModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.service.breakthrough.ValefarZService;
+import ti4.service.combat.CombatV2DiceData.RollSource;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
@@ -1226,17 +1226,17 @@ public class CombatRollService {
                 if (numRolls == 0) {
                     continue;
                 }
-                RollSegmentType segmentType =
+                RollSource segmentType =
                         switch (singleUnit) {
                             case "singleUnit" ->
                                 player.hasTech("tf-supercharge")
-                                        ? RollSegmentType.SUPERCHARGE_SELECTED_UNIT
-                                        : RollSegmentType.GRAVLEASH_SELECTED_UNIT;
+                                        ? RollSource.SUPERCHARGE_SELECTED_UNIT
+                                        : RollSource.GRAVLEASH_SELECTED_UNIT;
                             case "RestOfUnits" ->
                                 player.hasTech("tf-supercharge")
-                                        ? RollSegmentType.SUPERCHARGE_REST
-                                        : RollSegmentType.GRAVLEASH_REST;
-                            default -> RollSegmentType.PRIMARY;
+                                        ? RollSource.SUPERCHARGE_REST
+                                        : RollSource.GRAVLEASH_REST;
+                            default -> RollSource.PRIMARY;
                         };
                 List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
                 int mult = 1;
@@ -1521,7 +1521,7 @@ public class CombatRollService {
                                     numOfUnit,
                                     numRollsPerUnit,
                                     extraRollsForUnit,
-                                    RollSegmentType.JOL_NAR_COMMANDER_REROLL_HITS,
+                                    RollSource.JOL_NAR_COMMANDER_HITS,
                                     resultRolls2,
                                     hitRolls2,
                                     DieRollSource.REROLL_HIT);
@@ -1561,7 +1561,7 @@ public class CombatRollService {
                                     numOfUnit,
                                     numRollsPerUnit,
                                     0,
-                                    RollSegmentType.JOL_NAR_COMMANDER_REROLL_MISSES,
+                                    RollSource.JOL_NAR_COMMANDER_MISSES,
                                     resultRolls2,
                                     hitRolls2,
                                     DieRollSource.REROLL_MISS);
@@ -1596,7 +1596,7 @@ public class CombatRollService {
                             numOfUnit,
                             numRollsPerUnit,
                             0,
-                            RollSegmentType.IRON_COMMANDER_REROLL_MISSES,
+                            RollSource.IRON_COMMANDER_MISSES,
                             resultRolls2,
                             hitRolls2,
                             DieRollSource.REROLL_MISS);
@@ -1696,7 +1696,7 @@ public class CombatRollService {
                                 numOfUnit,
                                 numRollsPerUnit,
                                 0,
-                                RollSegmentType.KALTRIM_COMMANDER_REROLL_ONES,
+                                RollSource.KALTRIM_COMMANDER_ONES,
                                 resultRolls2,
                                 hitRolls2,
                                 DieRollSource.REROLL_ONE);
@@ -1746,7 +1746,7 @@ public class CombatRollService {
                             numOfUnit,
                             numRollsPerUnit,
                             0,
-                            RollSegmentType.MUNITIONS_RESERVES_REROLL,
+                            RollSource.MUNITIONS_RESERVES,
                             resultRolls2,
                             hitRolls2,
                             DieRollSource.MUNITIONS_RESERVES);
@@ -2057,7 +2057,7 @@ public class CombatRollService {
                 int unitQuantity,
                 int numRollsPerUnit,
                 int extraRolls,
-                RollSegmentType segmentType,
+                RollSource segmentType,
                 List<DiceHelper.Die> resultRolls,
                 int hits,
                 DieRollSource source) {

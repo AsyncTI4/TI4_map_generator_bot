@@ -19,6 +19,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollType;
+import ti4.service.combat.CombatV2RollData.Request;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.AddUnitService;
 
@@ -132,6 +133,22 @@ public class NetrunnersUnitsHandler {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        return true;
+    }
+
+    public static boolean resolveEmpSpaceCannonOffenseBlock(Request request) {
+        return resolveEmpSpaceCannonBlock(request, CombatRollType.SpaceCannonOffence);
+    }
+
+    public static boolean resolveEmpSpaceCannonDefenseBlock(Request request) {
+        return resolveEmpSpaceCannonBlock(request, CombatRollType.SpaceCannonDefence);
+    }
+
+    private static boolean resolveEmpSpaceCannonBlock(Request request, CombatRollType rollType) {
+        String message = getEmpSpaceCannonBlockMessage(request.game(), request.player(), request.tile(), rollType);
+        if (message.isEmpty()) return false;
+
+        MessageHelper.sendMessageToChannel(request.messageChannel(), message);
         return true;
     }
 

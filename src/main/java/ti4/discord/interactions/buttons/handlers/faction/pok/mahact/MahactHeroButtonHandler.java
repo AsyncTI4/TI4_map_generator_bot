@@ -19,7 +19,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Units;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
-import ti4.service.combat.StartCombatService;
+import ti4.service.combat.CombatService;
 import ti4.service.fow.BlindSelectionService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
@@ -113,7 +113,7 @@ class MahactHeroButtonHandler {
             }
         }
         if (player != player2) {
-            StartCombatService.startSpaceCombat(game, player, player2, tile2, event, "-benediction");
+            CombatService.startSpaceCombat(game, player, player2, tile2, event, "-benediction");
         }
         game.setActiveSystem(pos2);
     }

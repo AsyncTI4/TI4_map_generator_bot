@@ -44,8 +44,8 @@ import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
-import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
+import ti4.service.combat.CombatService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
@@ -225,10 +225,8 @@ public final class ButtonHelperModifyUnits {
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         int count = 0;
         while (haveGroundForces) {
-            int hitP1 = CombatRollService.secondHalfOfCombatRoll(
-                    p1, game, event, tile, planet, CombatRollType.combatround, true);
-            int hitP2 = CombatRollService.secondHalfOfCombatRoll(
-                    p2, game, event, tile, planet, CombatRollType.combatround, true);
+            int hitP1 = CombatService.roll(p1, game, event, tile, planet, CombatRollType.combatround, true);
+            int hitP2 = CombatService.roll(p2, game, event, tile, planet, CombatRollType.combatround, true);
 
             if (p1.hasTech("vpw") && hitP2 > 0) {
                 hitP1++;
@@ -1359,7 +1357,7 @@ public final class ButtonHelperModifyUnits {
 
                 } else {
                     if (game.getStoredValue("coexistFlag").isEmpty()) {
-                        StartCombatService.startGroundCombat(player, player2, game, event, unitHolder, tile);
+                        CombatService.startGroundCombat(player, player2, game, event, unitHolder, tile);
                     }
                 }
                 int mechCount = unitHolder.getUnitCount(UnitType.Mech, player2.getColor());

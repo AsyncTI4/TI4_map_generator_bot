@@ -72,31 +72,31 @@ public class CombatRollPayloadRenderer {
     private void appendRollPrefix(StringBuilder message, UnitRoll unitRoll) {
         int count = Math.max(0, unitRoll.dice().size());
         switch (unitRoll.segmentType()) {
-            case JOL_NAR_COMMANDER_REROLL_HITS ->
+            case JOL_NAR_COMMANDER_HITS ->
                 message.append("Rerolling ")
                         .append(count)
                         .append(" hit")
                         .append(count == 1 ? "" : "s")
                         .append(" due to Ta Zern, the Jol-Nar Commander:\n");
-            case JOL_NAR_COMMANDER_REROLL_MISSES ->
+            case JOL_NAR_COMMANDER_MISSES ->
                 message.append("Rerolling ")
                         .append(count)
                         .append(" miss")
                         .append(count == 1 ? "" : "es")
                         .append(" due to Ta Zern, the Jol-Nar Commander:\n");
-            case IRON_COMMANDER_REROLL_MISSES ->
+            case IRON_COMMANDER_MISSES ->
                 message.append("Rerolling ")
                         .append(count)
                         .append(" miss")
                         .append(count == 1 ? "" : "es")
                         .append(" due to Captain Vakros, the Iron Tide Commander:\n");
-            case KALTRIM_COMMANDER_REROLL_ONES ->
+            case KALTRIM_COMMANDER_ONES ->
                 message.append("Rerolling ")
                         .append(count)
                         .append(" roll")
                         .append(count == 1 ? "" : "s")
                         .append(" of 1 due to the Kaltrim Commander:\n ");
-            case MUNITIONS_RESERVES_REROLL ->
+            case MUNITIONS_RESERVES ->
                 message.append("**Munitions Reserve** rerolling ")
                         .append(count)
                         .append(" miss")

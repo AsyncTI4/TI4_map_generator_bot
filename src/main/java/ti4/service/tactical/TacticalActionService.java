@@ -27,7 +27,7 @@ import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.message.MessageHelper;
-import ti4.service.combat.StartCombatService;
+import ti4.service.combat.CombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWPlusService;
@@ -191,7 +191,7 @@ public class TacticalActionService {
             ButtonHelperTacticalAction.tacticalActionSpaceCannonOffenceStep(
                     game, player, ctx.playersWithPds2, ctx.tile);
         }
-        StartCombatService.combatCheck(game, event, ctx.tile);
+        CombatService.combatCheck(game, event, ctx.tile);
         ButtonHelper.deleteAllButtons(event);
     }
 

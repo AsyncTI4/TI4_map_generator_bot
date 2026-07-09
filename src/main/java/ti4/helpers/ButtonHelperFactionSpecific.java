@@ -59,7 +59,7 @@ import ti4.service.abilities.MahactTokenService;
 import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
-import ti4.service.combat.StartCombatService;
+import ti4.service.combat.CombatService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -1647,7 +1647,7 @@ public final class ButtonHelperFactionSpecific {
                         + Helper.getPlanetRepresentation(planet, game) + ".");
         List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, game.getTileFromPlanet(planet), planet);
         if (players.size() > 1) {
-            StartCombatService.startGroundCombat(
+            CombatService.startGroundCombat(
                     players.get(0),
                     players.get(1),
                     game,

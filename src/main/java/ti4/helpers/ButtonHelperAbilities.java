@@ -35,7 +35,7 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.UnitModel;
-import ti4.service.combat.StartCombatService;
+import ti4.service.combat.CombatService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -2169,7 +2169,7 @@ public final class ButtonHelperAbilities {
                     event.getMessageChannel(), "No eligible opponent found for combat on " + planetName + ".");
             return;
         }
-        StartCombatService.startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
+        CombatService.startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
     }
 
     @ButtonHandler("replaceSleeperWith_")
@@ -2537,7 +2537,7 @@ public final class ButtonHelperAbilities {
         UnitHolder unitHolder = tile.getUnitHolders().get(planet);
         List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
         if (players.size() > 1) {
-            StartCombatService.startGroundCombat(players.get(0), players.get(1), game, event, unitHolder, tile);
+            CombatService.startGroundCombat(players.get(0), players.get(1), game, event, unitHolder, tile);
         }
 
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);

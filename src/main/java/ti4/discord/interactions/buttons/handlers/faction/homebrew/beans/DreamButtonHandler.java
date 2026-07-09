@@ -23,7 +23,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.combat.CombatRollService;
-import ti4.service.combat.StartCombatService;
+import ti4.service.combat.CombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
@@ -620,7 +620,7 @@ public class DreamButtonHandler {
                         + tile.getRepresentationForButtons(game, player) + ".");
         game.removeStoredValue(HERO_NEXUS_USES_KEY + player.getFaction());
         if (FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
-            StartCombatService.combatCheck(game, event, tile);
+            CombatService.combatCheck(game, event, tile);
         }
     }
 

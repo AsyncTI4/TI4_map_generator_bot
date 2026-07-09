@@ -28,6 +28,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
+import ti4.service.combat.CombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.unit.AddUnitService;
@@ -116,8 +117,7 @@ public class AshenLeadersHandler {
             game.setStoredValue(
                     "assignedBombardment" + player.getFaction(),
                     buildHeroBombardmentAssignment(player, game, sourceTile, planet));
-            CombatRollService.secondHalfOfCombatRoll(
-                    player, game, event, sourceTile, "space", CombatRollType.bombardment, false);
+            CombatService.roll(player, game, event, sourceTile, "space", CombatRollType.bombardment, false);
         }
 
         game.removeStoredValue("assignedBombardment" + player.getFaction());

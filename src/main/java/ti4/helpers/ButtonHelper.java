@@ -112,6 +112,7 @@ import ti4.service.breakthrough.ValefarZService;
 import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
+import ti4.service.combat.CombatService;
 import ti4.service.combat.CombatStatsService;
 import ti4.service.combat.CombatUnitSelectionHelper;
 import ti4.service.decks.ShowActionCardsService;
@@ -6237,8 +6238,7 @@ public class ButtonHelper {
         } else {
             game.removeStoredValue("assignedBombardment" + player.getFaction());
         }
-        CombatRollService.secondHalfOfCombatRoll(
-                player, game, event, game.getTileByPosition(pos), unitHolderName, rollType);
+        CombatService.roll(player, game, event, game.getTileByPosition(pos), unitHolderName, rollType);
         if (buttonID.contains("bombardment") && isLawInPlay(game, "conventions")) {
             boolean relevant = false;
             for (UnitHolder unitHolder : game.getTileByPosition(pos).getPlanetUnitHolders()) {
