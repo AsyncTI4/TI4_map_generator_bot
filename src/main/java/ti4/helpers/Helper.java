@@ -1834,10 +1834,11 @@ public final class Helper {
                 productionValueTotal += productionValue * uH.getUnits().get(unit);
             }
         }
-        if (uH instanceof Planet planet
-                && TaPromissoryHandler.planetHasAdvancedStructuralEngineering(planet)
-                && player.getPlanets().contains(planet.getName())) {
-            productionValueTotal += Math.max(0, planet.getResources());
+        if (uH instanceof Planet planet) {
+            if (TaPromissoryHandler.planetHasAdvancedStructuralEngineering(planet)
+                    && player.getPlanets().contains(planet.getName())) {
+                productionValueTotal += Math.max(0, planet.getResources());
+            }
         }
         String planet = uH.getName();
         int planetUnitVal = 0;
@@ -1884,6 +1885,43 @@ public final class Helper {
                     productionValueTotal++;
                 }
                 planetUnitVal = 2;
+            }
+
+            if (token.contains("factoryleaseh") && uH instanceof Planet p) {
+                productionValueTotal += p.getResources();
+                if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+                if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
+                if (cosmicSuper) {
+                    productionValueTotal++;
+                }
+            }
+            if (token.contains("factoryleasec") && uH instanceof Planet p) {
+                productionValueTotal += p.getInfluence();
+                if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+                if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
+                if (cosmicSuper) {
+                    productionValueTotal++;
+                }
+            }
+            if (token.contains("factoryleasei")) {
+                productionValueTotal += tile.getPlanetUnitHolders().size();
+                if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+                if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
+                if (cosmicSuper) {
+                    productionValueTotal++;
+                }
             }
 
             if (token.contains("automatons") && planetUnitVal < 3) {

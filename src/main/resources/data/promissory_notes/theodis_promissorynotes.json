@@ -1,0 +1,148 @@
+[
+    {
+        "alias": "thpnardentia",
+        "name": "The Usurper's Lease",
+        "faction": "ardentia",
+        "color": "",
+        "playArea": false,
+        "source": "theodisi",
+        "text": "When you would spend influence to gain 1 or more command tokens: Increase the amount of influence spent by the number of neighbors you have. Then, return this card to the Ardentia player."
+    },
+    {
+        "alias": "thpnverydith",
+        "name": "Pact Renewed",
+        "faction": "verydith",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "source": "theodisi",
+        "text": "When you perform the primary effect of a strategy card, you may place this card face up in your play area: Perform the secondary effect of that strategy card without spending a command token. At the start of the status phase, return this card to the Verydith player."
+    },
+    {
+        "alias": "thpnveylor",
+        "name": "Hand of the Synod",
+        "faction": "veylor",
+        "color": "",
+        "playArea": false,
+        "source": "theodisi",
+        "text": "ACTION: Discard up to 1 action card and draw that many action cards + 1. At the start of the status phase, return this card to the Veylor player."
+    },
+    {
+        "alias": "thpnmyrri",
+        "name": "Factory Lease: Industrial",
+        "faction": "myrr",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "attachment": "factoryleasei",
+        "source": "theodisi",
+        "text": "At the end of your turn, attach this card to an industrial planet you conrol: That planet gains PRODUCTION equal to the number of planets in that system."
+    },
+    {
+        "alias": "thpnmyrrh",
+        "name": "Factory Lease: Hazardous",
+        "faction": "myrr",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "attachment": "factoryleaseh",
+        "source": "theodisi",
+        "text": "At the end of your turn, attach this card to a hazardous planet you control: That planet gains PRODUCTION equal to its resource value."
+    },
+    {
+        "alias": "thpnmyrrc",
+        "name": "Factory Lease: Cultural",
+        "faction": "myrr",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "attachment": "factoryleasec",
+        "source": "theodisi",
+        "text": "At the end of your turn, attach this card to a cultural planet you control: That planet gains PRODUCTION equal to its influence value."
+    },
+    {
+        "alias": "thpnkairn",
+        "name": "Archaeological Outpost",
+        "faction": "kairn",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "attachment": "kairnoutpost",
+        "source": "theodisi",
+        "text": "ACTION: Attach this card to 1 non-home planet. When you activate this planet's system, explore it."
+    },
+    {
+        "alias": "thpnkryxos",
+        "name": "Evolutionary Edict",
+        "faction": "kryxos",
+        "color": "",
+        "playArea": false,
+        "source": "theodisi",
+        "text": "When you research a unit upgrade: Produce 1 of those units in your home system. Reduce its cost by the number of its prerequisites. Then, return this card to the Kryxos player."
+    },
+    {
+        "alias": "thpnarcanum",
+        "name": "Scroll of Ascension",
+        "faction": "arcanum",
+        "color": "",
+        "playArea": false,
+        "source": "theodisi",
+        "text": "At the start of the strategy phase: Research 1 non-unit upgrade, non-faction technology the Arcanum player does not own. If you do, the Arcanum player may spend 1 command otken from their strategy pool to gain that technology. Then, return this card to the Arcanum player."
+    },
+    {
+        "alias": "thpnxytheris",
+        "name": "Swarm Spawn",
+        "faction": "xytheris",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "source": "theodisi",
+        "text": "When you produce hits with a unit ability against your opponent's units, place this card face up in your play area. You may place fighters in a system contianing 1 of your ships equal to the number of hits produced. Then, return this card to the Xytheris player."
+    },
+    {
+        "alias": "thpnoblivion",
+        "name": "Shard of Nothingness",
+        "faction": "oblivion",
+        "color": "",
+        "playArea": false,
+        "source": "theodisi",
+        "text": "ACTION: Draw 3 unused red-backed tiles. Choose 1 and place it adjacent to 2 systems. If it contains no planets, place a frontier token in that system. Then, purge this card and the unchosen tiles."
+    },
+    {
+        "alias": "thpnrevenant",
+        "name": "Revenant Alliance",
+        "faction": "revenant",
+        "color": "",
+        "playArea": true,
+        "source": "theodisi",
+        "text": "When you receive this card and you are not the Revenant Glory player, place it face up in your play area: While this is in your play area, you can use the Revenant Glory player's Pantheon commander ability if it is unlocked. If you activate a system that contains 1 or more of the Revenant player's units, return this card to the Revenant player."
+    },
+    {
+        "alias": "thpnthrones",
+        "name": "Thronebound Covenant",
+        "faction": "thrones",
+        "color": "",
+        "playArea": false,
+        "source": "theodisi",
+        "text": "ACTION: Place an unused throne planet into your home system and gain control of it. Then, purge this promissory note."
+    },
+    {
+        "alias": "thpnaeterna",
+        "name": "Funeral Services",
+        "faction": "aeterna",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "source": "theodisi",
+        "text": "At the start of a round of combat, place this card face up in your play area: Each time a fighter is destroyed during this combat roll a dice, for each result greater than 5 place that fighter on this card. At the start of your next turn place each fighter in systems that contain your ships. Then, return this card to the Aeterna player."
+    },
+    {
+        "alias": "thpnponthous",
+        "name": "Thunderbird Prototype",
+        "faction": "ponthous",
+        "color": "",
+        "playArea": false,
+        "source": "theodisi",
+        "text": "At the start of space combat select 1 of your ground forces in that system: That unit participates in combat as if it were a ship and you may treat them as Galvanized until the end of the combat. Return this card to the Ponthous player at the end of that combat."
+    }
+]
