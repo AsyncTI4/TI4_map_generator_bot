@@ -543,6 +543,13 @@
     "ability": "When 1 or more dice are rolled, you may destroy this unit to increase the value of 1 die by 3."
   },
   {
+    "id": "aurelion",
+    "baseType": "aurelion",
+    "asyncId": "aurelion",
+    "name": "Fake Aurelion Flagship Basetype",
+    "source": "theodisi"
+  },
+  {
     "id": "thrones_aurelion",
     "baseType": "aurelion",
     "asyncId": "aurelion",
@@ -595,7 +602,7 @@
     "ability": "At the end of a round of ground combat, you may destroy 1 mech on that planet to destroy 2 of your opponent's infantry on that planet."
   },
   {
-    "id": "aetenra_spacedock",
+    "id": "aeterna_spacedock",
     "baseType": "spacedock",
     "asyncId": "sd",
     "name": "Graveyard I",
@@ -607,7 +614,7 @@
     "ability": "Once per action, if a unit in a system containing or adjacent to this unit is destroyed, gain 1 commodity, or produce 1 unit of the same type in this system if able. Up to 4 fighters in this unit's system do not count against capacity."
   },
   {
-    "id": "aetenra_spacedock2",
+    "id": "aeterna_spacedock2",
     "baseType": "spacedock",
     "asyncId": "sd",
     "name": "Graveyard II",
