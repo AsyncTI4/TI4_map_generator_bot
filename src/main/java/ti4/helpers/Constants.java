@@ -1,8 +1,11 @@
 package ti4.helpers;
 
+import static java.util.Map.entry;
+
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public final class Constants {
     // Staff Pings
@@ -23,6 +26,27 @@ public final class Constants {
 
     // Server IDs
     public static final String ASYNCTI4_HUB_SERVER_ID = "943410040369479690";
+
+    public static final Map<String, String> EMOJI_FARM_SERVERS = Map.ofEntries(
+            entry("1155639926675746886", "Emoji Farm 1"),
+            entry("1156671516784730314", "Emoji Farm 2"),
+            entry("1156686770436591637", "Emoji Farm 3"),
+            entry("1158956227829706762", "Emoji Farm 4"),
+            entry("1158956387376828507", "Emoji Farm 5"),
+            entry("1158956545019760750", "Emoji Farm 6"),
+            entry("1158956865875615836", "Emoji Farm 7"),
+            entry("1158956969290383360", "Emoji Farm 8"),
+            entry("1164297443379249302", "Emoji Farm 9"),
+            entry("1164298025603190864", "Emoji Farm 10"),
+            entry("1171620536833560676", "Emoji Farm 11"),
+            entry("1180152020582289478", "Emoji Farm 12"),
+            entry("1180160763353124864", "Emoji Farm 13"),
+            entry("1197344983531913267", "Emoji Farm 14"),
+            entry("1220415501608681512", "Emoji Farm 15"),
+            entry("1220415609725124660", "Emoji Farm 16"),
+            entry("1220415693837832212", "Emoji Farm 17"),
+            entry("1243245147551170582", "Emoji Farm 18"),
+            entry("1303437221361352715", "Emoji Farm 19"));
 
     public static String jazzPing() {
         return "<@" + jazzId + ">";

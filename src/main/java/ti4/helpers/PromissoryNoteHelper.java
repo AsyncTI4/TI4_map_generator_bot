@@ -262,10 +262,12 @@ public class PromissoryNoteHelper {
         }
         // And refresh cards info
         sendPromissoryNoteInfo(game, player, false);
-        sendPromissoryNoteInfo(game, owner, false);
-        MessageHelper.sendMessageToChannel(
-                owner.getCardsInfoThread(),
-                owner.getRepresentationUnfogged() + ", someone just played _" + pnName + "_.");
+        if (!"malevolency".equalsIgnoreCase(id)) {
+            sendPromissoryNoteInfo(game, owner, false);
+            MessageHelper.sendMessageToChannel(
+                    owner.getCardsInfoThread(),
+                    owner.getRepresentationUnfogged() + ", someone just played _" + pnName + "_.");
+        }
 
         if (id.contains("dspnveld")) {
             ButtonHelperFactionSpecific.offerVeldyrButtons(player, game, id);

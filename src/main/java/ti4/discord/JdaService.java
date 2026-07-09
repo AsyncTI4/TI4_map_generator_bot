@@ -283,6 +283,8 @@ public class JdaService {
                 + fowServers.size() + " Fog of War servers"
                 + "\n> Guilds: " + jda.getGuilds().stream().map(Guild::getName).collect(Collectors.toSet()));
 
+        if (isProduction()) leaveNonWhitelistedGuilds();
+
         // Attempt to start a "Search Only" version of the bot on eligible servers
         for (Guild searchGuild : jda.getGuilds()) {
             if (guilds.stream().anyMatch(g -> g.getId().equals(searchGuild.getId()))) continue;
@@ -601,6 +603,26 @@ public class JdaService {
         User user = jda.getUserById(userId);
         if (user != null) return user.getEffectiveName();
         return null;
+    }
+
+    private static void leaveNonWhitelistedGuilds() {
+        jda.getGuilds().forEach(JdaService::leaveGuildIfNotWhitelisted);
+    }
+
+    public static void leaveGuildIfNotWhitelisted(Guild guild) {
+        if (!isProduction() || isWhitelistedGuild(guild)) return;
+        BotLogger.warning(
+                "Leaving guild '" + guild.getName() + "' (" + guild.getId() + ") because it isn't whitelisted!");
+        guild.leave().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    public static boolean isProduction() {
+        return Constants.ASYNCTI4_HUB_SERVER_ID.equals(guildPrimaryID);
+    }
+
+    private static boolean isWhitelistedGuild(Guild guild) {
+        return guilds.stream().anyMatch(whitelistGuild -> whitelistGuild.getId().equals(guild.getId()))
+                || Constants.EMOJI_FARM_SERVERS.containsKey(guild.getId());
     }
 
     public static void shutdown() {

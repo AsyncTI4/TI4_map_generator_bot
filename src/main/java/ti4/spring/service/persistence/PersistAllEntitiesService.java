@@ -94,6 +94,7 @@ public class PersistAllEntitiesService {
                         : game.getMinimumTIGLRankAtGameStart().toString());
         gameEntity.setProphecyOfKings(game.isProphecyOfKings());
         gameEntity.setThundersEdge(game.isThundersEdge());
+        gameEntity.setTwilightsFall(game.isTwilightsFallMode());
         gameEntity.setPlayerCount(game.getRealAndEliminatedPlayers().size());
 
         var players = gameEntity.getPlayers();

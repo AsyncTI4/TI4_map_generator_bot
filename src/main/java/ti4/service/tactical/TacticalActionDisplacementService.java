@@ -80,6 +80,7 @@ public class TacticalActionDisplacementService {
         }
         if (player.hasTech("dsmirvpds")
                 || player.hasUnlockedBreakthrough("mirvedabt")
+                || player.hasUnit("tk-keshnu")
                 || player.hasUnit("mirveda_pds")) {
             movableFromPlanets.add(UnitType.Pds);
         }

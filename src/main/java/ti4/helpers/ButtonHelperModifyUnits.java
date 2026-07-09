@@ -1253,6 +1253,30 @@ public final class ButtonHelperModifyUnits {
                             + Helper.getPlanetRepresentation(unitHolder.getName(), game);
                     buttons.add(Buttons.green(id, label, UnitEmojis.mech));
                 }
+                if (player.hasAbility("miniaturization")) {
+                    limit = unitHolder.getUnitCount(UnitType.Pds, player.getColor());
+                    for (int x = 1; x < limit + 1; x++) {
+                        if (x > 2) {
+                            break;
+                        }
+                        String id = factionChecker + "retreatGroundUnits_" + pos1 + "_" + pos2 + "_" + x + "_pds_"
+                                + unitHolder.getName();
+                        String label = "Retreat " + StringHelper.pluralize(x, "PDS") + " on "
+                                + Helper.getPlanetRepresentation(unitHolder.getName(), game);
+                        buttons.add(Buttons.green(id, label, UnitEmojis.pds));
+                    }
+                    limit = unitHolder.getUnitCount(UnitType.Spacedock, player.getColor());
+                    for (int x = 1; x < limit + 1; x++) {
+                        if (x > 2) {
+                            break;
+                        }
+                        String id = factionChecker + "retreatGroundUnits_" + pos1 + "_" + pos2 + "_" + x + "_spacedock_"
+                                + unitHolder.getName();
+                        String label = "Retreat " + StringHelper.pluralize(x, "Spacedock") + " on "
+                                + Helper.getPlanetRepresentation(unitHolder.getName(), game);
+                        buttons.add(Buttons.green(id, label, UnitEmojis.spacedock));
+                    }
+                }
             }
         }
         Button concludeMove = Buttons.gray(factionChecker + "deleteButtons", "Done Retreating troops");

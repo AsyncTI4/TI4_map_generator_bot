@@ -122,7 +122,9 @@ public final class ButtonHelperAbilities {
     @ButtonHandler("autoneticMemoryStep3a")
     public static void autoneticMemoryStep3a(ButtonInteractionEvent event, Game game, Player player) {
         ActionCardHelper.pickACardFromDiscardStep1(game, player);
-        ActionCardHelper.sendACDiscardButtons(player);
+        if (!game.isTwilightsFallMode()) {
+            ActionCardHelper.sendACDiscardButtons(player);
+        }
         ButtonHelper.deleteMessage(event);
     }
 
@@ -207,7 +209,7 @@ public final class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 "Please choose the system to produce up to 2 ships in.",
-                getTilesToRallyToTheCause(game, player));
+                getTilesToRallyTheHorde(game, player));
     }
 
     @ButtonHandler("startBestow")
@@ -2003,7 +2005,18 @@ public final class ButtonHelperAbilities {
                                 && ("wavelength".equalsIgnoreCase(tech) || "antimatter".equalsIgnoreCase(tech))) {
                             continue;
                         }
-                        techToGain.add(tech);
+                        boolean someoneElseHasIt = false;
+                        if (game.isTwilightsFallMode()) {
+                            for (Player p : game.getRealPlayersExcludingThis(victim)) {
+                                if (p.getTechs().contains(tech)) {
+                                    someoneElseHasIt = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!someoneElseHasIt) {
+                            techToGain.add(tech);
+                        }
                     }
                 }
             }

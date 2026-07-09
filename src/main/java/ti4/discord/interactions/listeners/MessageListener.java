@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -25,12 +26,13 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
+import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.Constants;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.async.BanCleanupService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
@@ -38,6 +40,7 @@ import ti4.service.fow.WhisperService;
 import ti4.service.game.GameNameService;
 import ti4.spring.service.deploy.ActiveLeaseService;
 import ti4.spring.service.messagecache.SavedBotMessagesService;
+import ti4.spring.service.statistics.UserGameInfoService;
 
 class MessageListener extends ListenerAdapter {
 
@@ -207,11 +210,22 @@ class MessageListener extends ListenerAdapter {
     }
 
     private static boolean copyLFGPingsToLFGPingsChannel(MessageReceivedEvent event, Message message) {
-        if (!(event.getChannel() instanceof ThreadChannel)) {
-            return false;
-        }
+
         Role lfgRole = DiscordRoleUtility.getRole("LFG", event.getGuild()); // 947310962485108816
         if (lfgRole == null || !message.getContentRaw().contains(lfgRole.getAsMention())) {
+            return false;
+        }
+        if (message.getAttachments().size() > 0 && !(event.getChannel() instanceof ThreadChannel)) {
+            Member member = event.getMember();
+            ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
+            int ongoingAmount = UserGameInfoService.countOngoingGamesThatAffectJoinLimit(managedPlayer);
+            int completedGames = UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer);
+            if (ongoingAmount + completedGames < 1) {
+                BanCleanupService.banSpamAccount(event, event.getAuthor());
+                return true;
+            }
+        }
+        if (!(event.getChannel() instanceof ThreadChannel)) {
             return false;
         }
         String msg2 = lfgRole.getAsMention()
@@ -454,7 +468,7 @@ class MessageListener extends ListenerAdapter {
         return hasFowServers()
                 && isNotInFowServers(event)
                 && isDifferentCommunityPlayGuild(event)
-                && isPrimaryHubServer();
+                && JdaService.isProduction();
     }
 
     private static boolean hasFowServers() {
@@ -470,9 +484,5 @@ class MessageListener extends ListenerAdapter {
                 && !JdaService.guildCommunityPlays
                         .getId()
                         .equals(event.getGuild().getId());
-    }
-
-    private static boolean isPrimaryHubServer() {
-        return Constants.ASYNCTI4_HUB_SERVER_ID.equals(JdaService.guildPrimaryID);
     }
 }
