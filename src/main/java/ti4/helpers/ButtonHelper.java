@@ -4228,7 +4228,9 @@ public class ButtonHelper {
                     } else {
                         numOfCapitalShips += entry.getValue() * 2;
                     }
-                    if (player.hasAbility("testing_yard") && tile == player.getHomeSystemTile()) {
+                    if (player.hasAbility("testing_yard")
+                            && tile.getPosition()
+                                    .equals(player.getHomeSystemTile().getPosition())) {
                         testingYardShipTypes.add(unit.getBaseType());
                     }
                     unitTypesCounted.add(unit.getBaseType());
