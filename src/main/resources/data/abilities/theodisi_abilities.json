@@ -39,8 +39,8 @@
         "source": "theodisi"
     },
     {
-        "id": "tight_deadlines",
-        "name": "Tight Deadlines",
+        "id": "tight_scheduling",
+        "name": "Tight Scheduling",
         "faction": "veylor",
         "window": "After the first agenda is revealed",
         "windowEffect": "Draw 3 agendas and place them in your hand. When an agenda would be revealed, you may reveal 1 agenda from your hand instead. At the end of the agenda phase, place the remaining agendas on the bottom of the deck in any order.",

@@ -220,7 +220,8 @@
         "requirements": "RR",
         "faction": "xytheris",
         "baseUpgrade": "dd2",
-        "source": "theodisi"
+        "source": "theodisi",
+        "text": ""
     },
     {
         "alias": "thoblivionr",
