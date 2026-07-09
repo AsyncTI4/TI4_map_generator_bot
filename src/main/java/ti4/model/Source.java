@@ -51,6 +51,7 @@ public class Source {
         viability_patch,
         beans,
         endlesst,
+        theodisi,
 
         // async homebrew
         draft,
