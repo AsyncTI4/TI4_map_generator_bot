@@ -882,8 +882,9 @@ public final class ButtonHelperTacticalAction {
                 DreamButtonHandler.offerDreamAgentButtons(game, player, player);
             }
         }
-        if (!tile.getPlanetUnitHolders().isEmpty()
-                && tile.getPlanetUnitHolders().stream()
+        List<Planet> planetUnitHolders = tile.getPlanetUnitHolders();
+        if (!planetUnitHolders.isEmpty()
+                && planetUnitHolders.stream()
                         .anyMatch(planet -> player.getPlanetsAllianceMode().contains(planet.getName())
                                 && planet.getAttachments().contains("attachment_kairnoutpost.png"))) {
             KairnPromissoryHandler.offerArchaeologicalOutpostExplore(player, game, tile);
