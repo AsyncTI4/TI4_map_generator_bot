@@ -13,6 +13,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.spring.context.SpringContext;
+import ti4.website.model.CompactMapState;
 
 @AllArgsConstructor
 @Service
@@ -37,6 +38,14 @@ public class GameEventService {
         long seq = counter + 1;
         String faction = player == null ? null : player.getFaction();
         String serializedPayload = JsonMapperManager.basic().writeValueAsString(payload);
+        String serializedMapState = CompactMapState.serialize(game);
+        String previousMapState = gameEventRepository
+                .findFirstByGameNameAndSeqLessThanEqualAndMapStateIsNotNullOrderBySeqDesc(game.getName(), counter)
+                .map(GameEventEntity::getMapState)
+                .orElse(null);
+        if (serializedMapState.equals(previousMapState)) {
+            serializedMapState = null;
+        }
         var record = new GameEventEntity(
                 null,
                 game.getName(),
@@ -46,7 +55,8 @@ public class GameEventService {
                 game.getPhaseOfGame(),
                 faction,
                 System.currentTimeMillis(),
-                serializedPayload);
+                serializedPayload,
+                serializedMapState);
         gameEventRepository.save(record);
         game.setEventSequenceCounter(seq);
     }
@@ -61,7 +71,8 @@ public class GameEventService {
                         event.getPhase(),
                         event.getFaction(),
                         event.getTimestampEpochMillis(),
-                        JsonMapperManager.basic().readTree(event.getPayload())))
+                        JsonMapperManager.basic().readTree(event.getPayload()),
+                        event.getMapState()))
                 .toList();
     }
 
