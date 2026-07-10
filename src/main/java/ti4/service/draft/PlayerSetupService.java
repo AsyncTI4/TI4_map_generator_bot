@@ -15,6 +15,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.luminous.opa.OpaAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesStartingTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
@@ -314,7 +315,9 @@ public class PlayerSetupService {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false, event);
 
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
-            if (player.getFaction().contains("keleres")) {
+            if (LostLegaciesStartingTechsHandler.offerStartingTechButtons(game, player, null)) {
+                // Lost Legacies starting-tech restrictions are handled by their faction handler.
+            } else if (player.getFaction().contains("keleres")) {
                 Button getTech = Buttons.green(
                         player.factionButtonChecker() + "getKeleresTechOptions", "Get Keleres Technology Options");
                 String msg = player.getRepresentationUnfogged()

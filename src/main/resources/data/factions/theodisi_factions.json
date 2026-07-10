@@ -285,17 +285,7 @@
             "tharcanumry",
             "tharcanumbg"
         ],
-        "startingTechOptions": [
-            "aida",
-            "ps",
-            "nm",
-            "pa",
-            "amd",
-            "det",
-            "st",
-            "sdn"
-        ],
-        "startingTechAmount": 2,
+        "startingTech": [],
         "homePlanets": [
             "thearcanum",
             "crythisis",
@@ -428,25 +418,7 @@
             "threvenanty",
             "threvenantr"
         ],
-        "startingTechOptions": [
-            "aida",
-            "ps",
-            "nm",
-            "pa",
-            "amd",
-            "det",
-            "st",
-            "sdn",
-            "sar",
-            "md",
-            "bs",
-            "dxa",
-            "gd",
-            "sr",
-            "pi",
-            "gls"
-        ],
-        "startingTechAmount": 2,
+        "startingTech": [],
         "homePlanets": [
             "heroh",
             "thecrypt"
