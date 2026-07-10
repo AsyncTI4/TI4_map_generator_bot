@@ -93,7 +93,11 @@ public class CompactMapState {
                 };
 
         if (!"u".equals(type)) {
-            return List.of(type, entity.getEntityId(), entity.getCount());
+            List<Object> data = new ArrayList<>(3);
+            data.add(type);
+            data.add(entity.getEntityId());
+            data.add(entity.getCount());
+            return data;
         }
 
         List<Integer> states = entity.getUnitStates();
