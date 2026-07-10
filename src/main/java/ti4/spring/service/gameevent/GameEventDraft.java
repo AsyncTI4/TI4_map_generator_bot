@@ -1,12 +1,17 @@
 package ti4.spring.service.gameevent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitState;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -100,6 +105,53 @@ public class GameEventDraft {
                         .filter(states -> states != null)
                         .flatMap(List::stream)
                         .anyMatch(count -> count != null && count > 0);
+    }
+
+    /** Snapshot used to calculate exactly which of a player's units a retreat operation removed from its source. */
+    public static Map<UnitKey, List<Integer>> snapshotRetreatUnits(Player player, UnitHolder source) {
+        if (source == null) return Map.of();
+        Map<UnitKey, List<Integer>> snapshot = new HashMap<>();
+        for (UnitKey unitKey : source.getUnitKeys()) {
+            if (player.unitBelongsToPlayer(unitKey)) {
+                snapshot.put(unitKey, new ArrayList<>(source.getUnitStates(unitKey)));
+            }
+        }
+        return snapshot;
+    }
+
+    /** Stages the exact state-count delta removed from a retreat source. */
+    public static boolean stageRetreat(
+            Game game,
+            Player player,
+            String fromTile,
+            String fromHolder,
+            String toTile,
+            String toHolder,
+            Map<UnitKey, List<Integer>> before,
+            UnitHolder sourceAfterRetreat) {
+        Map<String, List<Integer>> units = new TreeMap<>();
+        for (Map.Entry<UnitKey, List<Integer>> entry : before.entrySet()) {
+            List<Integer> after = sourceAfterRetreat == null
+                    ? UnitState.emptyList()
+                    : sourceAfterRetreat.getUnitStates(entry.getKey());
+            List<Integer> moved = new ArrayList<>(UnitState.values().length);
+            int total = 0;
+            for (int i = 0; i < UnitState.values().length; i++) {
+                int beforeCount = stateCount(entry.getValue(), i);
+                int movedCount = Math.max(0, beforeCount - stateCount(after, i));
+                moved.add(movedCount);
+                total += movedCount;
+            }
+            if (total > 0) units.put(entry.getKey().asyncID(), moved);
+        }
+        if (units.isEmpty()) return false;
+        return stage(
+                game, new GameSubEvent.Retreat(player.getFaction(), fromTile, fromHolder, toTile, toHolder, units));
+    }
+
+    private static int stateCount(List<Integer> states, int index) {
+        if (states == null || index >= states.size() || states.get(index) == null) return 0;
+        return states.get(index);
     }
 
     /** Compact JSON (one line, {@code type} discriminators intact) for a list of sub-events. */

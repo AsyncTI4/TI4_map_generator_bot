@@ -8,5 +8,6 @@ public enum GameSubEventType {
     TECH_EXHAUSTED,
     OBJECTIVE_SCORED,
     PRODUCTION,
+    RETREAT,
     MANUAL_COMMAND
 }
