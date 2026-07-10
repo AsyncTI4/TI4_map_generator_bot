@@ -388,6 +388,7 @@ public final class WebTileUnitData {
             case TyrantsLament -> "tyrantslament";
             case Lady -> "lady";
             case Celagrom -> "celagrom";
+            case Aurelion -> "aurelion";
             case Cavalry -> "cavalry";
             case StarfallPds -> "starfallpds";
             default -> null;

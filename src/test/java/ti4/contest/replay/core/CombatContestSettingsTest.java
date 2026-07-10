@@ -23,7 +23,7 @@ class CombatContestSettingsTest {
         CombatContestSettings settings = new CombatContestSettings(false);
 
         assertTrue(settings.isProd());
-        assertTrue(settings.isEnabled());
+        assertFalse(settings.isEnabled());
         assertFalse(settings.getPromotion().isEnabled());
         assertFalse(settings.getRuntime().isDevMode());
         assertEquals(8, settings.getCandidateSelection().getTargetCandidatesPerHour());

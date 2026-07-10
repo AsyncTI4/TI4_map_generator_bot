@@ -34,6 +34,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
+import ti4.spring.service.gameevent.GameEventDraft;
 
 @UtilityClass
 public class TeHelperCommanders {
@@ -152,6 +153,9 @@ public class TeHelperCommanders {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             HashMap<String, List<String>> ojzMap = TeHelperAbilities.readMoveMap(game.getStoredValue("OjzRetreatMap"));
             for (Map.Entry<String, List<String>> entry : ojzMap.entrySet()) {
+                Tile sourceTile = game.getTileByPosition(entry.getKey());
+                UnitHolder sourceSpace = sourceTile.getSpaceUnitHolder();
+                Map<UnitKey, List<Integer>> beforeRetreat = GameEventDraft.snapshotRetreatUnits(player, sourceSpace);
                 if (entry.getValue().contains("fs space")) movedFlagship = true;
                 List<String> units =
                         entry.getValue().stream().collect(Collectors.groupingBy(s -> s)).entrySet().stream()
@@ -166,9 +170,17 @@ public class TeHelperCommanders {
                         .toList();
                 String unitStrFrom = String.join(", ", units);
                 String unitStrTo = String.join(", ", unitsTo);
-                RemoveUnitService.removeUnits(
-                        event, game.getTileByPosition(entry.getKey()), game, player.getColor(), unitStrFrom);
+                RemoveUnitService.removeUnits(event, sourceTile, game, player.getColor(), unitStrFrom);
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitStrTo);
+                GameEventDraft.stageRetreat(
+                        game,
+                        player,
+                        entry.getKey(),
+                        Constants.SPACE,
+                        tile.getPosition(),
+                        Constants.SPACE,
+                        beforeRetreat,
+                        sourceSpace);
             }
             if (!player.hasUnit("ralnel_flagship")) movedFlagship = false;
             game.removeStoredValue("OjzRetreatMap");

@@ -1,0 +1,17 @@
+{
+    "id":"fabricatestation",
+    "name":"Fabricate Station",
+    "aliases":[
+        "fabricatestation",
+        "fabricate"
+    ],
+    "resources":3,
+    "influence":3,
+    "planetTypes":[
+        "SPACESTATION",
+        "FAKE"
+    ],
+    "legendaryAbilityName": "Mass Production",
+    "legendaryAbilityText": "Your flagship gains PRODUCTION 3. During the action phase you may exhaust this card to use the PRODUCTION effect of one of your units. Units produced by this effect may be placed in any system that contains your ships and no other player's units.",
+    "source":"theodisi"
+}

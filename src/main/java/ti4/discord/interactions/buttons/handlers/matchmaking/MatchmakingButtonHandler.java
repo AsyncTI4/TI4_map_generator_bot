@@ -121,11 +121,14 @@ class MatchmakingButtonHandler {
     }
 
     private static boolean isTiglThread(ButtonInteractionEvent event) {
+        return CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL.equalsIgnoreCase(getParentForumName(event));
+    }
+
+    private static String getParentForumName(ButtonInteractionEvent event) {
         if (!(event.getChannel() instanceof ThreadChannel thread)) {
-            return false;
+            return null;
         }
-        return CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL.equalsIgnoreCase(
-                thread.getParentChannel().getName());
+        return thread.getParentChannel().getName();
     }
 
     @ButtonHandler(value = FORM_GROUP_BUTTON_ID, save = false)
@@ -305,7 +308,14 @@ class MatchmakingButtonHandler {
 
     @ButtonHandler(value = VIEW_QUEUE_BUTTON_ID, save = false)
     public static void viewQueue(ButtonInteractionEvent event) {
-        List<MessageEmbed> embeds = ViewMatchmakingQueueService.get().getMessageEmbeds();
+        Boolean tiglFilter = null;
+        String parentName = getParentForumName(event);
+        if (CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL.equalsIgnoreCase(parentName)) {
+            tiglFilter = true;
+        } else if (CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL.equalsIgnoreCase(parentName)) {
+            tiglFilter = false;
+        }
+        List<MessageEmbed> embeds = ViewMatchmakingQueueService.get().getMessageEmbeds(tiglFilter);
         for (MessageEmbed embed : embeds) {
             event.getHook()
                     .setEphemeral(true)

@@ -148,6 +148,7 @@ public final class Constants {
     public static final String BUTTON_PRESS_COUNT = "button_press_count";
     public static final String EVENT_SEQUENCE_COUNTER = "event_sequence_counter";
     public static final String PENDING_SUB_EVENTS_JSON = "pending_sub_events_json";
+    public static final String PENDING_MOVEMENT_STATE = "pending_movement_state";
     public static final String ABSOL_MODE = "absol_mode";
     public static final String PROMISES_PROMISES = "promises_promises";
     public static final String FLAGSHIPPING = "flagshipping";
@@ -653,6 +654,7 @@ public final class Constants {
     public static final String SC_FOLLOW = "sc_follow";
     public static final String SC_PLAY = "sc_play";
     public static final String SC_UNPLAY = "sc_unplay";
+    public static final String UNPASS = "unpass";
     public static final String SC_PICK = "sc_pick";
     public static final String SC_UNPICK = "sc_unpick";
     public static final String PASS = "pass";

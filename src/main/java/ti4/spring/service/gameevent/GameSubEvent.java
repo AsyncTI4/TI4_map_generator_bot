@@ -2,6 +2,7 @@ package ti4.spring.service.gameevent;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,6 +20,7 @@ import java.util.Map;
     @JsonSubTypes.Type(value = GameSubEvent.TechExhausted.class, name = "TECH_EXHAUSTED"),
     @JsonSubTypes.Type(value = GameSubEvent.ObjectiveScored.class, name = "OBJECTIVE_SCORED"),
     @JsonSubTypes.Type(value = GameSubEvent.Production.class, name = "PRODUCTION"),
+    @JsonSubTypes.Type(value = GameSubEvent.Retreat.class, name = "RETREAT"),
     @JsonSubTypes.Type(value = GameSubEvent.ManualCommand.class, name = "MANUAL_COMMAND")
 })
 public sealed interface GameSubEvent {
@@ -35,6 +37,15 @@ public sealed interface GameSubEvent {
     record ObjectiveScored(String faction, String objectiveId, String category) implements GameSubEvent {}
 
     record Production(String tile, Map<String, Integer> units, Integer cost) implements GameSubEvent {}
+
+    record Retreat(
+            String faction,
+            String fromTile,
+            String fromHolder,
+            String toTile,
+            String toHolder,
+            Map<String, List<Integer>> units)
+            implements GameSubEvent {}
 
     record ManualCommand(String user, String command) implements GameSubEvent {}
 }

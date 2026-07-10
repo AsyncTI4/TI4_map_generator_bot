@@ -3190,6 +3190,19 @@ public class ButtonHelper {
                 msg += " agent";
             }
         }
+
+        if (whatIsItFor.contains("unexpectedOtherPerson")) {
+            String faction = buttonID.split("_")[2];
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            player = game.getPlayerFromColorOrFaction(faction);
+            if (game.isFowMode()) {
+                msg = player.getRepresentationUnfogged()
+                        + ", this is a notice that someone removed your command token from " + tileRep;
+            } else {
+                msg = player.getRepresentationUnfogged() + ", this is a notice that " + msg
+                        + " owned by you by using Flux";
+            }
+        }
         msg += ".";
 
         RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
@@ -3610,29 +3623,35 @@ public class ButtonHelper {
 
     public static List<Button> getButtonsToRemoveYourCC(
             Player player, Game game, GenericInteractionCreateEvent event, String whatIsItFor) {
+        return getButtonsToRemoveYourCC(player, game, event, whatIsItFor, player);
+    }
+
+    public static List<Button> getButtonsToRemoveYourCC(
+            Player player, Game game, GenericInteractionCreateEvent event, String whatIsItFor, Player p2) {
         List<Button> buttonsToRemoveCC = new ArrayList<>();
         String factionChecker = player.factionButtonChecker();
-        for (Tile tile : getTilesWithYourCC(player, game, event)) {
+        for (Tile tile : getTilesWithYourCC(p2, game, event)) {
             if (whatIsItFor.contains("heartOfDominion")) {
-                if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, player) == 0) {
+                if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, p2) == 0) {
                     continue;
                 }
             }
             if (whatIsItFor.contains("kjal")) {
                 String pos = whatIsItFor.split("_")[1];
                 if (!pos.equalsIgnoreCase(tile.getPosition())
-                        && !FoWHelper.getAdjacentTiles(game, pos, player, false).contains(tile.getPosition())) {
+                        && !FoWHelper.getAdjacentTiles(game, pos, p2, false).contains(tile.getPosition())) {
                     continue;
                 }
             }
-            if (whatIsItFor.contains("intervention") && FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
+            if (whatIsItFor.contains("intervention") && FoWHelper.otherPlayersHaveUnitsInSystem(p2, tile, game)) {
                 continue;
             }
-            if (FOWPlusService.preventRemovingCCFromTile(game, player, tile)) {
+            if (FOWPlusService.preventRemovingCCFromTile(game, p2, tile)) {
                 continue;
             }
-            String id = factionChecker + "removeCCFromBoard_" + whatIsItFor.replace("_", "") + "_" + tile.getPosition();
-            String label = "Remove Token From " + tile.getRepresentationForButtons(game, player);
+            String id = factionChecker + "removeCCFromBoard_" + whatIsItFor.replace("_", "") + "_" + tile.getPosition()
+                    + "_" + p2.getFaction();
+            String label = "Remove Token From " + tile.getRepresentationForButtons(game, p2);
             buttonsToRemoveCC.add(Buttons.green(id, label));
         }
         return buttonsToRemoveCC;
@@ -4050,6 +4069,8 @@ public class ButtonHelper {
         int numFighter2sFleet = 0;
         int numRiptide2s = 0;
         int numRiptide2sFleet = 0;
+        int evolvedWarformsMechsInSpace = 0;
+        Set<String> testingYardShipTypes = new HashSet<>();
         boolean capacityViolated = false;
         boolean fleetSupplyViolated = false;
         String tooManyDocks = "";
@@ -4114,6 +4135,10 @@ public class ButtonHelper {
                         fleetCap += 6;
                     } else if (!player.hasUnit("mykomentori_spacedock") && !player.hasUnit("mykomentori_spacedock2")) {
                         fightersIgnored += 3;
+                    } else if (player.ownsUnit("aeterna_spacedock")) {
+                        fightersIgnored += 4;
+                    } else if (player.ownsUnit("aeterna_spacedock2")) {
+                        fightersIgnored += 8;
                     }
                 }
                 if ("pds".equalsIgnoreCase(unit.getBaseType()) && !"space".equalsIgnoreCase(capChecker.getName())) {
@@ -4191,6 +4216,9 @@ public class ButtonHelper {
                     if ("naaz_voltron".equalsIgnoreCase(unit.getId())) {
                         numFighter2s++;
                     }
+                    if ("mech".equalsIgnoreCase(unit.getBaseType()) && player.hasAbility("evolved_warforms")) {
+                        evolvedWarformsMechsInSpace += entry.getValue();
+                    }
                     if ("fighter".equalsIgnoreCase(unit.getBaseType())) {
                         ignoredFs = Math.min(fightersIgnored, entry.getValue());
                         int numCountedFighters = unit.getCapacityUsed() * entry.getValue() - fightersIgnored;
@@ -4219,9 +4247,17 @@ public class ButtonHelper {
                     } else {
                         numOfCapitalShips += entry.getValue() * 2;
                     }
+                    if (player.hasAbility("testing_yard")
+                            && tile.getPosition()
+                                    .equals(player.getHomeSystemTile().getPosition())) {
+                        testingYardShipTypes.add(unit.getBaseType());
+                    }
                     unitTypesCounted.add(unit.getBaseType());
                 }
             }
+        }
+        if (!testingYardShipTypes.isEmpty()) {
+            numOfCapitalShips = Math.max(0, numOfCapitalShips - (2 * testingYardShipTypes.size()));
         }
         if (numOfCapitalShips > fleetCap) {
             fleetSupplyViolated = true;
@@ -4258,6 +4294,14 @@ public class ButtonHelper {
             if (riptide2Overflow > 0) {
                 numRiptide2sFleet += riptide2Overflow * 2;
                 overflow -= riptide2Overflow;
+            }
+
+            if (overflow > 0 && player.hasAbility("evolved_warforms")) {
+                int mechOverflow = Math.min(overflow, evolvedWarformsMechsInSpace);
+                if (mechOverflow > 0) {
+                    numOfCapitalShips += mechOverflow * 2;
+                    overflow -= mechOverflow;
+                }
             }
 
             if (overflow > 0) {

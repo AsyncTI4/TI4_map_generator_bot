@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -253,6 +256,44 @@ class CombatReplayServiceTest {
         service.onSpaceCombatStarted(game, player(game, "rohdhna"), player(game, "khrask"), new Tile("d31", "317"));
 
         verifyNoInteractions(observationRepository, candidateRepository);
+    }
+
+    @Test
+    void capturePreInteractionSnapshotSkipsDatabaseForGameWithoutOpenCandidates() {
+        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+        CombatReplayService service = service(candidateRepository);
+        Game game = game("pbd-unregistered");
+
+        CombatReplayService.PreInteractionSnapshot snapshot = service.capturePreInteractionSnapshot(game);
+
+        assertEquals(CombatReplayService.PreInteractionSnapshot.empty(), snapshot);
+        verify(candidateRepository, never()).findByGameNameAndStatusIn(any(), any());
+    }
+
+    @Test
+    void onButtonInteractionSettledSkipsDatabaseForGameWithoutOpenCandidates() {
+        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+        CombatReplayService service = service(candidateRepository);
+        Game game = game("pbd-unregistered");
+
+        service.onButtonInteractionSettled(game, player(game, "sol"), null);
+
+        verifyNoInteractions(candidateRepository);
+    }
+
+    @Test
+    void refreshRegistersOpenCandidateGameAndEmptyQuerySelfHeals() {
+        CombatCandidateRepository candidateRepository = mock(CombatCandidateRepository.class);
+        CombatReplayService service = service(candidateRepository);
+        Game game = game("pbd1");
+        when(candidateRepository.findDistinctGameNamesByStatusIn(any())).thenReturn(List.of("pbd1"));
+        when(candidateRepository.findByGameNameAndStatusIn(any(), any())).thenReturn(List.of());
+
+        service.refreshOpenCandidateGames();
+        service.onButtonInteractionSettled(game, player(game, "sol"), null);
+        service.onButtonInteractionSettled(game, player(game, "sol"), null);
+
+        verify(candidateRepository, times(1)).findByGameNameAndStatusIn(any(), any());
     }
 
     private CombatReplayService service(CombatCandidateRepository candidateRepository) {

@@ -13,6 +13,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.spring.context.SpringContext;
+import ti4.website.model.CompactMapState;
 
 @AllArgsConstructor
 @Service
@@ -21,22 +22,44 @@ public class GameEventService {
     private final GameEventRepository gameEventRepository;
 
     public static void commit(Game game, String archetype, @Nullable Player player, Map<String, Object> payload) {
+        commit(game, archetype, player, payload, null);
+    }
+
+    public static void commit(
+            Game game,
+            String archetype,
+            @Nullable Player player,
+            Map<String, Object> payload,
+            @Nullable String movementState) {
         try {
             if (DatabasePersistenceGate.isDisabled()) return;
-            SpringContext.getBean(GameEventService.class).commitEvent(game, archetype, player, payload);
+            SpringContext.getBean(GameEventService.class).commitEvent(game, archetype, player, payload, movementState);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to commit game event.", e);
         }
     }
 
     @Transactional
-    void commitEvent(Game game, String archetype, @Nullable Player player, Map<String, Object> payload) {
+    void commitEvent(
+            Game game,
+            String archetype,
+            @Nullable Player player,
+            Map<String, Object> payload,
+            @Nullable String movementState) {
         long counter = game.getEventSequenceCounter();
         // Undo restores an older counter; rows above it are future events and must not survive the next append.
         gameEventRepository.deleteByGameNameAndSeqGreaterThan(game.getName(), counter);
         long seq = counter + 1;
         String faction = player == null ? null : player.getFaction();
         String serializedPayload = JsonMapperManager.basic().writeValueAsString(payload);
+        String serializedMapState = CompactMapState.serialize(game);
+        String previousMapState = gameEventRepository
+                .findFirstByGameNameAndSeqLessThanEqualAndMapStateIsNotNullOrderBySeqDesc(game.getName(), counter)
+                .map(GameEventEntity::getMapState)
+                .orElse(null);
+        if (serializedMapState.equals(previousMapState)) {
+            serializedMapState = null;
+        }
         var record = new GameEventEntity(
                 null,
                 game.getName(),
@@ -46,7 +69,9 @@ public class GameEventService {
                 game.getPhaseOfGame(),
                 faction,
                 System.currentTimeMillis(),
-                serializedPayload);
+                serializedPayload,
+                serializedMapState,
+                movementState);
         gameEventRepository.save(record);
         game.setEventSequenceCounter(seq);
     }
@@ -61,7 +86,9 @@ public class GameEventService {
                         event.getPhase(),
                         event.getFaction(),
                         event.getTimestampEpochMillis(),
-                        JsonMapperManager.basic().readTree(event.getPayload())))
+                        JsonMapperManager.basic().readTree(event.getPayload()),
+                        event.getMapState(),
+                        event.getMovementState()))
                 .toList();
     }
 

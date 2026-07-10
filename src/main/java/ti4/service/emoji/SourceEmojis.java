@@ -25,7 +25,8 @@ public enum SourceEmojis implements TI4Emoji {
     IgnisAurora,
     MiltyMod,
     StrategicAlliance,
-    DeepReaches;
+    DeepReaches,
+    Theodisi;
 
     @Override
     public String toString() {

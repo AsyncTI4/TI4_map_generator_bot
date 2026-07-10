@@ -138,6 +138,10 @@ public class FrankenDraft extends BagDraft {
             if ((game == null || game.isBlueReverieMode()) && model.getSource().isBr()) {
                 return false;
             }
+            if ((game == null || game.initializeFrankenSettings().isLostLegaciesEnabled())
+                    && model.getSource() == ComponentSource.theodisi) {
+                return false;
+            }
             return !model.getSource().isPok();
         });
         return factionSet;

@@ -26,7 +26,8 @@ public class FactionSourceSettings extends SettingsMenu {
             ComponentSource.eronous,
             ComponentSource.ignis_aurora,
             ComponentSource.balacasi,
-            ComponentSource.beans);
+            ComponentSource.beans,
+            ComponentSource.theodisi);
 
     private final IntegerRangeSetting base;
     private final IntegerRangeSetting pok;
@@ -37,6 +38,7 @@ public class FactionSourceSettings extends SettingsMenu {
     private final IntegerRangeSetting ignisAurora;
     private final IntegerRangeSetting whispers;
     private final IntegerRangeSetting deepreaches;
+    private final IntegerRangeSetting lostLegacies;
 
     FactionSourceSettings(JsonNode json, SettingsMenu parent) {
         super(
@@ -59,6 +61,7 @@ public class FactionSourceSettings extends SettingsMenu {
         int ignisCount = countFactions(ComponentSource.ignis_aurora);
         int balacasiCount = countFactions(ComponentSource.balacasi);
         int beansCount = countFactions(ComponentSource.beans);
+        int lostLegaciesCount = countFactions(ComponentSource.theodisi);
 
         base = new IntegerRangeSetting(
                 "FactionBase", "Base Game factions", 0, 0, baseCount, baseCount, 0, baseCount, 1);
@@ -84,6 +87,16 @@ public class FactionSourceSettings extends SettingsMenu {
                 1);
         deepreaches = new IntegerRangeSetting(
                 "FactionDeepReaches", "Deep Reaches factions", 0, 0, beansCount, beansCount, 0, beansCount, 1);
+        lostLegacies = new IntegerRangeSetting(
+                "FactionLostLegacies",
+                "Lost Legacies factions",
+                0,
+                0,
+                lostLegaciesCount,
+                lostLegaciesCount,
+                0,
+                lostLegaciesCount,
+                1);
 
         if (json != null && json.has("factionSourceSettings")) json = json.get("factionSourceSettings");
         if (json != null
@@ -98,6 +111,7 @@ public class FactionSourceSettings extends SettingsMenu {
             ignisAurora.initialize(json.get("ignisAurora"));
             whispers.initialize(json.get("whispers"));
             deepreaches.initialize(json.get("deepreaches"));
+            lostLegacies.initialize(json.get("lostLegacies"));
         }
     }
 
@@ -149,6 +163,7 @@ public class FactionSourceSettings extends SettingsMenu {
             case ignis_aurora -> ignisAurora;
             case balacasi -> whispers;
             case beans -> deepreaches;
+            case theodisi -> lostLegacies;
             default -> null;
         };
     }

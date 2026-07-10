@@ -70,6 +70,8 @@ public class GameProperties {
     private String currentACDrawStatusInfo = "";
     // Undo-safe draft of tactical sub-events, persisted as one JSON line; "" means closed.
     private String pendingSubEventsJson = "";
+    // Undo-safe compact movement captured when tactical displacement is committed.
+    private String pendingMovementState = "";
     private String latestCommand = "";
     private String latestOutcomeVotedFor = "";
     private String playersWhoHitPersistentNoAfter = "";
