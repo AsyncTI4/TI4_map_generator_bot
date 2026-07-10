@@ -366,6 +366,10 @@ public final class Constants {
     public static final String SEARCH_WARRANT = "search_warrant";
     public static final String ADD_CUSTOM_ADJACENT_TILES = "add_custom_adjacent_tiles";
     public static final String ADD_FOG_TILE = "add_fog_tile";
+    public static final String ADD_VISION_TOKEN = "add_vision_token";
+    public static final String REMOVE_VISION_TOKEN = "remove_vision_token";
+    public static final String TOKEN_FOWVISION_PNG = "token_fowvision.png";
+    public static final String FOW_VISION_GRANT_PREFIX = "fowVisionGrant";
     public static final String ADD_ADJACENCY_OVERRIDE = "add_adjacency_override";
     public static final String REMOVE_ADJACENCY_OVERRIDE = "remove_adjacency_override";
     public static final String REMOVE_ALL_ADJACENCY_OVERRIDES = "remove_all_adjacency_overrides";

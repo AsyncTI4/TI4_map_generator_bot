@@ -151,6 +151,8 @@ public final class FoWHelper {
             tilePositionsToShow.addAll(adjacentTiles);
         }
 
+        addFowVisionTiles(game, player, tilePositionsToShow);
+
         String playerSweep = Mapper.getSweepID(player.getColor());
         for (Tile tile : game.getTileMap().values()) {
             if (tile.hasCC(playerSweep)) {
@@ -184,7 +186,31 @@ public final class FoWHelper {
                 tilePositionsToShow.add(tile.getPosition());
             }
         }
+
+        addFowVisionTiles(game, player, tilePositionsToShow);
         return tilePositionsToShow;
+    }
+
+    /**
+     * Fog-vision tokens/tiles reveal a system independent of unit presence. A tile is added to the
+     * player's visible set if it is an intrinsic fog-vision tile (revealed to everyone) or carries a
+     * fog-vision token whose recipient list (stored per position; blank = everyone) includes the
+     * player. Only the tile's own position is added — this grants no adjacency or movement.
+     */
+    private static void addFowVisionTiles(Game game, @NotNull Player player, Set<String> tilePositionsToShow) {
+        for (Tile tile : game.getTileMap().values()) {
+            String pos = tile.getPosition();
+            if (tile.getTileModel().isFowVision()) {
+                tilePositionsToShow.add(pos); // intrinsic vision tile: everyone sees it
+                continue;
+            }
+            if (!tile.hasFowVisionToken()) continue; // token presence is the master gate
+            String grant = game.getStoredValue(Constants.FOW_VISION_GRANT_PREFIX + pos);
+            boolean all = grant == null || grant.isBlank();
+            if (all || List.of(grant.split(",")).contains(player.getColor())) {
+                tilePositionsToShow.add(pos);
+            }
+        }
     }
 
     public static void updateFog(Game game, Player player) {

@@ -39,6 +39,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
+import ti4.model.TokenModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.emoji.TI4Emoji;
@@ -671,6 +672,24 @@ public class Tile {
                             return true;
                         }
                     }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * True if this tile carries a fog-vision token (a token whose {@link TokenModel} has
+     * {@code isFowVision}). Deliberately independent of {@link #isAnomaly()} — a fog-vision
+     * marker is not an anomaly and must not gain anomaly movement/combat/ability behaviour.
+     */
+    @JsonIgnore
+    public boolean hasFowVisionToken() {
+        for (UnitHolder uh : unitHolders.values()) {
+            for (String token : uh.getTokenList()) {
+                TokenModel model = Mapper.getToken(token);
+                if (model != null && Boolean.TRUE.equals(model.getIsFowVision())) {
+                    return true;
                 }
             }
         }
