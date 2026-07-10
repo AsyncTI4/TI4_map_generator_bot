@@ -94,7 +94,7 @@
     "cost": 2,
     "combatHitsOn": 5,
     "combatDieCount": 1,
-    "sustainDamage": false,
+    "sustainDamage": true,
     "isGroundForce": true,
     "ability": "When you exhaust this unit's planet to vote, cast 2 additional votes."
   },
@@ -127,7 +127,7 @@
     "cost": 2,
     "combatHitsOn": 7,
     "combatDieCount": 2,
-    "sustainDamage": false,
+    "sustainDamage": true,
     "isGroundForce": true,
     "ability": "DEPLOY: After movement, you may remove 2 of your fighters or infantry from the space area of the active system to place 1 mech from your reinforcements with your units in the active system."
   },
@@ -358,7 +358,7 @@
     "cost": 2,
     "combatHitsOn": 6,
     "combatDieCount": 1,
-    "sustainDamage": false,
+    "sustainDamage": true,
     "isGroundForce": true,
     "ability": "When you gain a technology, you may place 1 infantry on a planet containing 1 or more of your mechs for each prerequisite on that technology + 1."
   },

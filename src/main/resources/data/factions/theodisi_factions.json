@@ -279,7 +279,7 @@
         "alias": "arcanum",
         "factionName": "The Arcanum Ascension",
         "homeSystem": "th7",
-        "startingFleet": "1 cv, 2 dd, 3 ff, 2 inf t, 1 inf c, 1 inf s, 1 sd s, t, 1 pds s",
+        "startingFleet": "1 cv, 2 dd, 3 ff, 2 inf t, 1 inf c, 1 inf s, 1 sd t, 1 pds s",
         "commodities": 3,
         "factionTech": [
             "tharcanumry",
