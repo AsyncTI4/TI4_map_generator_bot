@@ -38,7 +38,8 @@ public class LostLegaciesStartingTechsHandler {
         MessageHelper.sendMessageToChannelWithButton(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " press this button to choose your starting technology.",
-                Buttons.green(player.factionButtonChecker() + "getLostLegaciesStartingTechOptions", "Get Starting Tech"));
+                Buttons.green(
+                        player.factionButtonChecker() + "getLostLegaciesStartingTechOptions", "Get Starting Tech"));
         return true;
     }
 

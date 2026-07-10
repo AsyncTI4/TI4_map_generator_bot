@@ -207,33 +207,10 @@ public enum TileEmojis implements TI4Emoji {
     d120,
     d121,
     d122,
-    d123,
+    d123
 
-    // other
-
-    // theodisi
-    th1_ardentiahs,
-    th2_verydithhs,
-    th3_veylorhs,
-    th4_myrrhs,
-    th5_kairnhs,
-    th6_kryxoshs,
-    th7_arcanumhs,
-    th8_xytherishs,
-    th9_oblivionhs,
-    th10_revenanths,
-    th11_throneshs,
-    th12_aeternahs,
-    th13_ponthoushs,
-
-    // beans
-    be1_dreamhs,
-    be2_crystellumhs,
-    be3_ashenhs,
-    be4_ironhs,
-    be5_tahs,
-    be6_netrunnershs,
-    be7_natauhs;
+// other
+;
 
     @Override
     public String toString() {
@@ -435,32 +412,6 @@ public enum TileEmojis implements TI4Emoji {
             case "d121" -> d121;
             case "d122" -> d122;
             case "d123" -> d123;
-
-            // other
-
-            // theodisi
-            case "th1" -> th1_ardentiahs;
-            case "th2" -> th2_verydithhs;
-            case "th3" -> th3_veylorhs;
-            case "th4" -> th4_myrrhs;
-            case "th5" -> th5_kairnhs;
-            case "th6" -> th6_kryxoshs;
-            case "th7" -> th7_arcanumhs;
-            case "th8" -> th8_xytherishs;
-            case "th9" -> th9_oblivionhs;
-            case "th10" -> th10_revenanths;
-            case "th11" -> th11_throneshs;
-            case "th12" -> th12_aeternahs;
-            case "th13" -> th13_ponthoushs;
-
-            // beans
-            case "be1" -> be1_dreamhs;
-            case "be2" -> be2_crystellumhs;
-            case "be3" -> be3_ashenhs;
-            case "be4" -> be4_ironhs;
-            case "be5" -> be5_tahs;
-            case "be6" -> be6_netrunnershs;
-            case "be7" -> be7_natauhs;
             default -> getTileBackEmojiFromTileID(tileID);
         };
     }
