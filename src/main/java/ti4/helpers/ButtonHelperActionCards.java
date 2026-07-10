@@ -930,9 +930,41 @@ public final class ButtonHelperActionCards {
     @ButtonHandler("resolveUnexpected")
     public static void resolveUnexpectedAction(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "unexpected");
+        if (game.isTwilightsFallMode()) {
+            buttons.add(Buttons.red(
+                    player.getFactionCheckerPrefix() + "unexpectedSomeoneElse", "Lift Someone Else's Command Token"));
+        }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 "Please choose which system you wish to remove your command token from.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("unexpectedSomeoneElse")
+    public static void unexpectedSomeoneElse(Player player, Game game, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "unexpectedSomeoneElseStep2_" + p2.getFaction(),
+                    p2.getFactionEmojiOrColor()));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), "Please choose which player's command token you wish to remove.", buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("unexpectedSomeoneElseStep2_")
+    public static void unexpectedSomeoneElseStep2(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "unexpectedOtherPerson", p2);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                "Please choose which system you wish to remove the command token from.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
