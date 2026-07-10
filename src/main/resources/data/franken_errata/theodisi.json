@@ -201,4 +201,18 @@
         "alternateText": "Choose 2 technologies in different colors with 1 total prerequisite.",
         "source": "theodisi"
     }
+				{
+        "itemCategory": "COMMANDER",
+        "itemId": "revenantcommander",
+        "additionalComponents": [
+            "ABILITY:allure_of_darkness"
+        ],
+        "source": "theodisi"
+    },
+				{
+								"itemCategory": "ABILITY",
+								"itemId": "allure_of_darkness",
+								"undraftable": true,
+								"source": "theodisi"
+				}
 ]
