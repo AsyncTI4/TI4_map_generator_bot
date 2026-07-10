@@ -1,4 +1,4 @@
-package ti4.service.combat;
+package ti4.service.combat.v2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,8 +6,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Player;
-import ti4.service.combat.CombatV2RollData.Context;
-import ti4.service.combat.CombatV2RollData.Round;
+import ti4.service.combat.v2.CombatV2RollData.Context;
+import ti4.service.combat.v2.CombatV2RollData.Round;
 import ti4.service.emoji.ExploreEmojis;
 
 /** Builds combat button groups while preserving the established Discord custom IDs and labels. */
@@ -155,5 +155,20 @@ class CombatV2Buttons {
                         context.factionButtonChecker() + "meteorSlings_" + planet,
                         CombatV2Messages.infantryOnPlanet(planet, context.game())),
                 Buttons.red("deleteButtons", CombatV2Messages.doneLabel()));
+    }
+
+    static List<Button> dragonBombardment(String tilePosition, int hits) {
+        return List.of(
+                Buttons.red("getDamageButtons_" + tilePosition + "_bombardment", CombatV2Messages.assignLabel(hits)));
+    }
+
+    static List<Button> dragonBombardmentForDummy(Player target, String planet, int hits) {
+        return dummyBombardmentAssignment(target, planet, hits);
+    }
+
+    static List<Button> exploration(List<Button> planetButtons) {
+        List<Button> buttons = new ArrayList<>(planetButtons);
+        buttons.add(Buttons.red("deleteButtons", "No Valid Exploration"));
+        return buttons;
     }
 }

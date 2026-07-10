@@ -33,7 +33,6 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperRelics;
 import ti4.helpers.ButtonHelperTwilightsFallActionCards;
-import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -52,8 +51,8 @@ import ti4.model.AgendaModel;
 import ti4.model.LeaderModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
-import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.RemoveCommandCounterService;
+import ti4.service.combat.CombatService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -726,10 +725,7 @@ public class PlayHeroService {
             }
             case "keleresheroharka" -> resolveKeleresHeroMentak(game, player, event);
         }
-        TemporaryCombatModifierModel posssibleCombatMod = CombatTempModHelper.getPossibleTempModifier(
-                Constants.LEADER, playerLeader.getId(), player.getNumberOfTurns());
-        if (posssibleCombatMod != null) {
-            player.addNewTempCombatMod(posssibleCombatMod);
+        if (CombatService.activateModifier(game, player, Constants.LEADER, playerLeader.getId())) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Combat modifier will be applied next time you push the combat roll button.");

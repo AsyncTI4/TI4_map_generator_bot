@@ -1,13 +1,14 @@
-package ti4.service.combat;
+package ti4.service.combat.v2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 import ti4.game.Player;
-import ti4.service.combat.CombatV2RollData.Context;
-import ti4.service.combat.CombatV2RollData.Round;
+import ti4.service.combat.v2.CombatV2RollData.Context;
+import ti4.service.combat.v2.CombatV2RollData.Round;
 
 class CombatV2ButtonsTest {
 
@@ -36,5 +37,23 @@ class CombatV2ButtonsTest {
         assertEquals(
                 "getDamageButtons_101_bombardment",
                 CombatV2Buttons.bombardmentAssignment(context, 3).getFirst().getCustomId());
+        assertEquals(
+                "FFCC_hacan_autoAssignGroundHits_mecatolrex_2",
+                CombatV2Buttons.groundAssignment(context, opponent, 2, new ArrayList<>())
+                        .getFirst()
+                        .getCustomId());
+        assertEquals(
+                "FFCC_hacan_autoAssignSpaceHits_101_2",
+                CombatV2Buttons.spaceAssignment(context, opponent, 2, new ArrayList<>())
+                        .getFirst()
+                        .getCustomId());
+        assertEquals(
+                "FFCC_hacan_autoAssignSpaceCannonOffenceHits_101_2",
+                CombatV2Buttons.spaceCannonOffense(context, opponent, 2)
+                        .getFirst()
+                        .getCustomId());
+        assertEquals(
+                "getDamageButtons_102_bombardment",
+                CombatV2Buttons.dragonBombardment("102", 2).getFirst().getCustomId());
     }
 }

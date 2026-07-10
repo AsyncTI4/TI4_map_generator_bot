@@ -23,8 +23,8 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
-import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.abilities.MahactTokenService;
+import ti4.service.combat.CombatService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.game.StartPhaseService;
@@ -699,10 +699,7 @@ public class PromissoryNoteHelper {
                     game.getStoredValue("currentActionSummary" + player.getFaction()) + " played the _"
                             + Mapper.getPromissoryNote(id).getName() + "_ promissory note.");
         }
-        TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(
-                Constants.PROMISSORY_NOTES, pn.getAlias(), player.getNumberOfTurns());
-        if (possibleCombatMod != null) {
-            player.addNewTempCombatMod(possibleCombatMod);
+        if (CombatService.activateModifier(game, player, Constants.PROMISSORY_NOTES, pn.getAlias())) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Combat modifier will be applied next time you push the combat roll button.");

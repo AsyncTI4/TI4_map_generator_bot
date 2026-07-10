@@ -81,7 +81,7 @@ import ti4.model.RelicModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.service.breakthrough.ValefarZService;
-import ti4.service.combat.CombatV2DiceData.RollSource;
+import ti4.service.combat.v2.CombatV2DiceData.RollSource;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;

@@ -27,7 +27,6 @@ import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
-import ti4.service.combat.CombatRollType;
 import ti4.service.combat.CombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.ExhaustLeaderService;
@@ -117,7 +116,7 @@ public class AshenLeadersHandler {
             game.setStoredValue(
                     "assignedBombardment" + player.getFaction(),
                     buildHeroBombardmentAssignment(player, game, sourceTile, planet));
-            CombatService.roll(player, game, event, sourceTile, "space", CombatRollType.bombardment, false);
+            CombatService.bombardmentTarget(player, game, event, sourceTile, "space");
         }
 
         game.removeStoredValue("assignedBombardment" + player.getFaction());

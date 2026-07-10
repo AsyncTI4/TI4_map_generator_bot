@@ -2426,7 +2426,7 @@ public class StartCombatService {
                                         "Roll Ground Combat For " + nameOfHolder + " For Dummy")
                                 .withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
                     }
-                    if (CombatRollService.checkIfUnitsOfType(
+                    if (CombatService.checkIfUnitsOfType(
                             nonActive, game, null, tile, unitH.getName(), CombatRollType.SpaceCannonDefence)) {
                         Player target = nonActive == p1 ? p2 : p1;
                         if (game.getRealPlayers().stream().anyMatch(player -> player.hasUnit("netrunners_flagship"))

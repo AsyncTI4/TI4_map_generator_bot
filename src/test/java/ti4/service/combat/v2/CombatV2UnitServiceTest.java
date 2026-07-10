@@ -1,4 +1,4 @@
-package ti4.service.combat;
+package ti4.service.combat.v2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -26,7 +26,7 @@ import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.model.FactionModel;
 import ti4.model.UnitModel;
-import ti4.service.combat.CombatV2RollData.Request;
+import ti4.service.combat.v2.CombatV2RollData.Request;
 import ti4.service.player.PlayerColorService;
 import ti4.testUtils.BaseTi4Test;
 
@@ -40,8 +40,8 @@ class CombatV2UnitServiceTest extends BaseTi4Test {
         harness.add(tile, Constants.SPACE, sol, UnitType.Destroyer, 1);
         harness.add(tile, Constants.SPACE, sol, UnitType.Cruiser, 1);
 
-        Map<Pair<UnitModel, UnitHolder>, Integer> units = CombatV2UnitService.select(
-                        harness.request(sol, tile, Constants.SPACE), tile.getSpaceUnitHolder(), CombatRollType.AFB)
+        Map<Pair<UnitModel, UnitHolder>, Integer> units = CombatV2UnitService.selectAntiFighterBarrage(
+                        harness.request(sol, tile, Constants.SPACE), tile.getSpaceUnitHolder())
                 .units();
 
         assertEquals(1, units.size());
@@ -78,15 +78,12 @@ class CombatV2UnitServiceTest extends BaseTi4Test {
         harness.add(tile, planet, sol, UnitType.Infantry, 2);
         harness.add(tile, planet, sol, UnitType.Pds, 1);
 
-        Map<Pair<UnitModel, UnitHolder>, Integer> space = CombatV2UnitService.select(
-                        harness.request(sol, tile, Constants.SPACE),
-                        tile.getSpaceUnitHolder(),
-                        CombatRollType.combatround)
+        Map<Pair<UnitModel, UnitHolder>, Integer> space = CombatV2UnitService.selectCombatRound(
+                        harness.request(sol, tile, Constants.SPACE), tile.getSpaceUnitHolder())
                 .units();
-        Map<Pair<UnitModel, UnitHolder>, Integer> ground = CombatV2UnitService.select(
+        Map<Pair<UnitModel, UnitHolder>, Integer> ground = CombatV2UnitService.selectCombatRound(
                         harness.request(sol, tile, planet),
-                        tile.getUnitHolders().get(planet),
-                        CombatRollType.combatround)
+                        tile.getUnitHolders().get(planet))
                 .units();
 
         assertTrue(hasUnit(space, UnitType.Cruiser));
@@ -119,10 +116,8 @@ class CombatV2UnitServiceTest extends BaseTi4Test {
         String planet = tile.getPlanetUnitHolders().getFirst().getName();
         harness.add(tile, planet, sol, UnitType.Pds, 1);
 
-        CombatV2UnitService.UnitSelection selection = CombatV2UnitService.select(
-                harness.request(sol, tile, Constants.SPACE),
-                tile.getSpaceUnitHolder(),
-                CombatRollType.SpaceCannonOffence);
+        CombatV2UnitService.UnitSelection selection =
+                CombatV2UnitService.selectSpaceCannonOffense(harness.request(sol, tile, Constants.SPACE));
 
         assertTrue(hasUnit(selection.units(), UnitType.Pds));
         assertTrue(selection.notices().isEmpty());
@@ -138,10 +133,8 @@ class CombatV2UnitServiceTest extends BaseTi4Test {
         String planet = tile.getPlanetUnitHolders().getFirst().getName();
         harness.add(tile, planet, sol, UnitType.Pds, 1);
 
-        CombatV2UnitService.UnitSelection selection = CombatV2UnitService.select(
-                harness.request(sol, tile, Constants.SPACE),
-                tile.getSpaceUnitHolder(),
-                CombatRollType.SpaceCannonOffence);
+        CombatV2UnitService.UnitSelection selection =
+                CombatV2UnitService.selectSpaceCannonOffense(harness.request(sol, tile, Constants.SPACE));
 
         assertFalse(hasUnit(selection.units(), UnitType.Pds));
         assertEquals(1, selection.notices().size());
@@ -166,10 +159,8 @@ class CombatV2UnitServiceTest extends BaseTi4Test {
         harness.add(first, firstPlanet, mirveda, UnitType.Pds, 1);
         harness.add(second, secondPlanet, mirveda, UnitType.Pds, 1);
 
-        CombatV2UnitService.UnitSelection selection = CombatV2UnitService.select(
-                harness.request(mirveda, target, Constants.SPACE),
-                target.getSpaceUnitHolder(),
-                CombatRollType.SpaceCannonOffence);
+        CombatV2UnitService.UnitSelection selection =
+                CombatV2UnitService.selectSpaceCannonOffense(harness.request(mirveda, target, Constants.SPACE));
 
         assertEquals(1, selection.units().size());
         String selectedHolder =
@@ -186,8 +177,8 @@ class CombatV2UnitServiceTest extends BaseTi4Test {
         harness.add(tile, Constants.SPACE, nekro, UnitType.Flagship, 1);
         harness.add(tile, planet, nekro, UnitType.Infantry, 2);
 
-        CombatV2UnitService.UnitSelection selection = CombatV2UnitService.select(
-                harness.request(nekro, tile, Constants.SPACE), tile.getSpaceUnitHolder(), CombatRollType.combatround);
+        CombatV2UnitService.UnitSelection selection = CombatV2UnitService.selectCombatRound(
+                harness.request(nekro, tile, Constants.SPACE), tile.getSpaceUnitHolder());
 
         assertTrue(hasUnit(selection.units(), UnitType.Flagship));
         assertTrue(hasUnit(selection.units(), UnitType.Infantry));
@@ -202,8 +193,8 @@ class CombatV2UnitServiceTest extends BaseTi4Test {
         harness.add(tile, Constants.SPACE, purple, UnitType.Cruiser, 1);
         harness.add(tile, planet, purple, UnitType.Mech, 1);
 
-        CombatV2UnitService.UnitSelection selection = CombatV2UnitService.select(
-                harness.request(purple, tile, Constants.SPACE), tile.getSpaceUnitHolder(), CombatRollType.combatround);
+        CombatV2UnitService.UnitSelection selection = CombatV2UnitService.selectCombatRound(
+                harness.request(purple, tile, Constants.SPACE), tile.getSpaceUnitHolder());
 
         assertTrue(hasUnit(selection.units(), UnitType.Cruiser));
         assertTrue(hasUnit(selection.units(), UnitType.Mech));
@@ -217,10 +208,8 @@ class CombatV2UnitServiceTest extends BaseTi4Test {
         harness.game.setActivePlayerID(kolume.getUserID());
         harness.add(tile, Constants.SPACE, kolume, UnitType.Cruiser, 4);
 
-        CombatV2UnitService.UnitSelection selection = CombatV2UnitService.select(
-                harness.request(kolume, tile, Constants.SPACE),
-                tile.getSpaceUnitHolder(),
-                CombatRollType.SpaceCannonOffence);
+        CombatV2UnitService.UnitSelection selection =
+                CombatV2UnitService.selectSpaceCannonOffense(harness.request(kolume, tile, Constants.SPACE));
 
         Map.Entry<Pair<UnitModel, UnitHolder>, Integer> starfall = selection.units().entrySet().stream()
                 .filter(entry -> "starfallpds".equals(entry.getKey().getLeft().getId()))

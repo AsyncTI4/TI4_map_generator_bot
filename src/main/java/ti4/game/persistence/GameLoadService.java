@@ -57,6 +57,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.combat.v2.CombatModifierActivation;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import tools.jackson.core.type.TypeReference;
@@ -1159,6 +1160,13 @@ class GameLoadService {
                     StringTokenizer mods = new StringTokenizer(tokenizer.nextToken(), "|");
                     while (mods.hasMoreTokens()) {
                         player.addTempCombatMod(new TemporaryCombatModifierModel(mods.nextToken()));
+                    }
+                }
+                case Constants.PLAYER_COMBAT_MODIFIER_ACTIVATIONS -> {
+                    StringTokenizer activations = new StringTokenizer(tokenizer.nextToken(), "|");
+                    while (activations.hasMoreTokens()) {
+                        player.getCombatModifierActivations()
+                                .add(CombatModifierActivation.fromSaveString(activations.nextToken()));
                     }
                 }
                 case Constants.ELIMINATED -> player.setEliminated(Boolean.parseBoolean(tokenizer.nextToken()));

@@ -63,6 +63,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.combat.v2.CombatModifierActivation;
 import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftSaveService;
 import ti4.service.map.CustomHyperlaneService;
@@ -1100,6 +1101,12 @@ class GameSaveService {
                 tempCombatMods.add(mod.getSaveString());
             }
             writer.write(Constants.PLAYER_TEMP_MODS + " " + String.join("|", tempCombatMods));
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.PLAYER_COMBAT_MODIFIER_ACTIVATIONS + " "
+                    + player.getCombatModifierActivations().stream()
+                            .map(CombatModifierActivation::getSaveString)
+                            .collect(Collectors.joining("|")));
             writer.write(System.lineSeparator());
 
             if (player.getPlayerTIGLRankAtGameStart() != null) {

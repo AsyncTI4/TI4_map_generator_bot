@@ -60,6 +60,10 @@ import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.CombatService;
+import ti4.service.combat.v2.CombatV2Config;
+import ti4.service.combat.v2.CombatV2RollData.Request;
+import ti4.service.combat.v2.CombatV2RollData.Resolution;
+import ti4.service.combat.v2.CombatV2RollService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -2664,41 +2668,52 @@ public final class ButtonHelperFactionSpecific {
         var units = Map.of(p1.getUnitByType(UnitType.Mech), 1);
         String planetN = planet.getName();
 
-        var rollMods = CombatModHelper.getModifiers(
-                p1,
-                p2,
-                units,
-                units,
-                tile.getTileModel(),
-                game,
-                CombatRollType.bombardment,
-                CombatModType.extra_rolls.toString());
-        var flatMods = CombatModHelper.getModifiers(
-                p1,
-                p2,
-                units,
-                units,
-                tile.getTileModel(),
-                game,
-                CombatRollType.bombardment,
-                CombatModType.result_modifier.toString());
+        String message;
+        int h;
+        if (CombatV2Config.isEnabled(game)) {
+            Resolution rolled =
+                    CombatV2RollService.rollCombatRoundUnits(new Request(p1, game, event, tile, planetN), units, p2);
+            if (rolled == null) return;
+            message = rolled.message();
+            h = rolled.hits();
+        } else {
 
-        // Temp modifiers (bunker)
+            var rollMods = CombatModHelper.getModifiers(
+                    p1,
+                    p2,
+                    units,
+                    units,
+                    tile.getTileModel(),
+                    game,
+                    CombatRollType.bombardment,
+                    CombatModType.extra_rolls.toString());
+            var flatMods = CombatModHelper.getModifiers(
+                    p1,
+                    p2,
+                    units,
+                    units,
+                    tile.getTileModel(),
+                    game,
+                    CombatRollType.bombardment,
+                    CombatModType.result_modifier.toString());
 
-        CombatTempModHelper.ensureValidTempMods(p1, tile.getTileModel(), planet);
-        CombatTempModHelper.initializeNewTempMods(p1, tile.getTileModel(), planet);
-        List<NamedCombatModifierModel> tempMods =
-                new ArrayList<>(CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
-                        p1, tile.getTileModel(), planet, false, CombatRollType.combatround));
+            // Temp modifiers (bunker)
 
-        String message = CombatMessageHelper.displayCombatSummary(p1, tile, planet, CombatRollType.combatround);
-        message += CombatRollService.rollForUnits(
-                units, rollMods, flatMods, tempMods, p1, p2, game, CombatRollType.combatround, event, tile, planet);
-        String hits = substringAfter(message, "Total hits ");
-        hits = hits.split(" ")[0].replace("*", "");
-        int h = Integer.parseInt(hits);
-        if (message.endsWith(";\n")) {
-            message = message.substring(0, message.length() - 2);
+            CombatTempModHelper.ensureValidTempMods(p1, tile.getTileModel(), planet);
+            CombatTempModHelper.initializeNewTempMods(p1, tile.getTileModel(), planet);
+            List<NamedCombatModifierModel> tempMods =
+                    new ArrayList<>(CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
+                            p1, tile.getTileModel(), planet, false, CombatRollType.combatround));
+
+            message = CombatMessageHelper.displayCombatSummary(p1, tile, planet, CombatRollType.combatround);
+            message += CombatRollService.rollForUnits(
+                    units, rollMods, flatMods, tempMods, p1, p2, game, CombatRollType.combatround, event, tile, planet);
+            String hits = substringAfter(message, "Total hits ");
+            hits = hits.split(" ")[0].replace("*", "");
+            h = Integer.parseInt(hits);
+            if (message.endsWith(";\n")) {
+                message = message.substring(0, message.length() - 2);
+            }
         }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), message + "\nRolled against " + p2.getRepresentationNoPing() + ".");

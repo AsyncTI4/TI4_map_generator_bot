@@ -4,11 +4,10 @@ import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
-import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
-import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.combat.CombatService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.franken.FrankenAlternateTextService;
 
@@ -56,10 +55,7 @@ public class ExhaustLeaderService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         }
 
-        TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(
-                Constants.LEADER, leader.getId(), player.getNumberOfTurns());
-        if (possibleCombatMod != null) {
-            player.addNewTempCombatMod(possibleCombatMod);
+        if (CombatService.activateModifier(game, player, Constants.LEADER, leader.getId())) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "Combat modifier will be applied next time you push the combat roll button.");

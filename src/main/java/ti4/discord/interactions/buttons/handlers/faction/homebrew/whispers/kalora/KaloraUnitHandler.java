@@ -14,7 +14,6 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
-import ti4.service.combat.CombatRollType;
 import ti4.service.combat.CombatService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.explore.ExploreService;
@@ -44,8 +43,7 @@ public class KaloraUnitHandler {
         String tilePos = parts[0];
         String planet = parts[1];
         game.setStoredValue("bombardmentTarget" + player.getFaction(), planet);
-        CombatService.roll(
-                player, game, event, game.getTileByPosition(tilePos), "space", CombatRollType.bombardment, false);
+        CombatService.bombardmentTarget(player, game, event, game.getTileByPosition(tilePos), "space");
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 

@@ -37,12 +37,12 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.GenericCardModel;
 import ti4.model.PlanetModel;
-import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.DeepgloomService;
+import ti4.service.combat.CombatService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -1970,9 +1970,7 @@ public class ActionCardHelper {
             TeHelperActionCards.resolveTeActionCard(actionCard, player, introMsg);
             TkHelperActionCards.resolveTkActionCard(actionCard, player, introMsg);
 
-            TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(
-                    Constants.AC, actionCard.getAlias(), player.getNumberOfTurns());
-            if (combatModAC != null) {
+            if (CombatService.canActivateModifier(game, Constants.AC, actionCard.getAlias())) {
                 codedButtons.add(Buttons.green(
                         player.factionButtonChecker() + "applytempcombatmod__" + Constants.AC + "__"
                                 + actionCard.getAlias(),

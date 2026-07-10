@@ -1,4 +1,4 @@
-package ti4.service.combat;
+package ti4.service.combat.v2;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -33,7 +32,8 @@ import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
-import ti4.service.combat.CombatV2RollData.Request;
+import ti4.service.combat.CombatRollType;
+import ti4.service.combat.v2.CombatV2RollData.Request;
 import tools.jackson.core.type.TypeReference;
 
 /** Selects the units that participate in each kind of combat roll. */
@@ -41,51 +41,50 @@ import tools.jackson.core.type.TypeReference;
 public class CombatV2UnitService {
 
     public boolean checkIfUnitsOfType(Request request, CombatRollType rollType) {
-        UnitHolder holder = request.unitHolder();
-        return holder != null && !select(request, holder, rollType).units().isEmpty();
+        UnitHolder holder = request.tile().getUnitHolders().get(request.unitHolderName());
+        if (holder == null) return false;
+        UnitSelection selected =
+                switch (rollType) {
+                    case combatround -> selectCombatRound(request, holder);
+                    case AFB -> selectAntiFighterBarrage(request, holder);
+                    case bombardment -> selectBombardment(request);
+                    case SpaceCannonOffence -> selectSpaceCannonOffense(request);
+                    case SpaceCannonDefence -> selectSpaceCannonDefense(request, holder);
+                };
+        return !selected.units().isEmpty();
     }
 
-    static UnitSelection select(Request request, UnitHolder holder, CombatRollType rollType) {
-        return switch (rollType) {
-            case combatround -> selectCombatRound(request, holder);
-            case AFB -> selectAntiFighterBarrage(request, holder);
-            case bombardment -> selectBombardment(request);
-            case SpaceCannonOffence -> selectSpaceCannonOffense(request);
-            case SpaceCannonDefence -> selectSpaceCannonDefense(request, holder);
-        };
-    }
-
-    private static UnitSelection selectCombatRound(Request request, UnitHolder holder) {
+    static UnitSelection selectCombatRound(Request request, UnitHolder holder) {
         UnitSelection selected = selectCombatRoundUnits(request, holder, request.player());
         Map<Pair<UnitModel, UnitHolder>, Integer> units = new LinkedHashMap<>(selected.units());
         List<String> notices = new ArrayList<>(selected.notices());
         addCombatRoundVirtualUnits(request, holder, units);
-        removeUnitsDisabledByArticlesOfWar(request, CombatRollType.combatround, units, notices);
+        removeArticleOfWarUnit(request, units, notices, "naaz_mech_space", CombatV2Messages.articlesOfWarNaazRokha());
         return new UnitSelection(units, notices);
     }
 
-    private static UnitSelection selectAntiFighterBarrage(Request request, UnitHolder holder) {
+    static UnitSelection selectAntiFighterBarrage(Request request, UnitHolder holder) {
         UnitSelection selected = selectAfbUnits(request, request.player());
         Map<Pair<UnitModel, UnitHolder>, Integer> units = new LinkedHashMap<>(selected.units());
         addAbilityUnits(request, holder, units);
         return new UnitSelection(units, selected.notices());
     }
 
-    private static UnitSelection selectBombardment(Request request) {
+    static UnitSelection selectBombardment(Request request) {
         UnitSelection selected = selectBombardmentUnits(request, request.player());
         Map<Pair<UnitModel, UnitHolder>, Integer> units = new LinkedHashMap<>(selected.units());
         List<String> notices = new ArrayList<>(selected.notices());
         filterAssignedBombardmentUnits(request, units);
-        removeUnitsDisabledByArticlesOfWar(request, CombatRollType.bombardment, units, notices);
+        removeArticleOfWarUnit(request, units, notices, "l1z1x_mech", CombatV2Messages.articlesOfWarL1z1x());
         return new UnitSelection(units, notices);
     }
 
-    private static UnitSelection selectSpaceCannonOffense(Request request) {
+    static UnitSelection selectSpaceCannonOffense(Request request) {
         UnitSelection selected = selectSpaceCannonOffenseUnits(request, request.player());
         return removeSpaceCannonUnitsDisabledByArticlesOfWar(request, selected);
     }
 
-    private static UnitSelection selectSpaceCannonDefense(Request request, UnitHolder holder) {
+    static UnitSelection selectSpaceCannonDefense(Request request, UnitHolder holder) {
         UnitSelection selected = selectSpaceCannonDefenseUnits(request, holder, request.player());
         return removeSpaceCannonUnitsDisabledByArticlesOfWar(request, selected);
     }
@@ -94,34 +93,38 @@ public class CombatV2UnitService {
             Request request, UnitSelection selected) {
         Map<Pair<UnitModel, UnitHolder>, Integer> units = new LinkedHashMap<>(selected.units());
         List<String> notices = new ArrayList<>(selected.notices());
-        removeUnitsDisabledByArticlesOfWar(request, CombatRollType.SpaceCannonOffence, units, notices);
+        removeArticleOfWarUnit(request, units, notices, "xxcha_mech", CombatV2Messages.articlesOfWarXxcha());
         return new UnitSelection(units, notices);
     }
 
-    static Map<UnitModel, Integer> getUnitsInCombat(
-            Request request, UnitHolder holder, Player player, CombatRollType rollType) {
-        return selectBase(request, holder, player, rollType).flatUnits();
+    static Map<UnitModel, Integer> combatRoundUnits(Request request, UnitHolder holder, Player player) {
+        return selectCombatRoundUnits(request, holder, player).flatUnits();
+    }
+
+    static Map<UnitModel, Integer> antiFighterBarrageUnits(Request request, Player player) {
+        return selectAfbUnits(request, player).flatUnits();
+    }
+
+    static Map<UnitModel, Integer> bombardmentUnits(Request request, Player player) {
+        return selectBombardmentUnits(request, player).flatUnits();
+    }
+
+    static Map<UnitModel, Integer> spaceCannonOffenseUnits(Request request, Player player) {
+        return selectSpaceCannonOffenseUnits(request, player).flatUnits();
+    }
+
+    static Map<UnitModel, Integer> spaceCannonDefenseUnits(Request request, UnitHolder holder, Player player) {
+        return selectSpaceCannonDefenseUnits(request, holder, player).flatUnits();
     }
 
     static Map<Pair<UnitModel, UnitHolder>, Integer> getUnitsInBombardment(Request request) {
         return selectBombardmentUnits(request, request.player()).units();
     }
 
-    private static UnitSelection selectBase(
-            Request request, UnitHolder holder, Player player, CombatRollType rollType) {
-        return switch (rollType) {
-            case combatround -> selectCombatRoundUnits(request, holder, player);
-            case AFB -> selectAfbUnits(request, player);
-            case bombardment -> selectBombardmentUnits(request, player);
-            case SpaceCannonOffence -> selectSpaceCannonOffenseUnits(request, player);
-            case SpaceCannonDefence -> selectSpaceCannonDefenseUnits(request, holder, player);
-        };
-    }
-
     static Player getOpponent(Request request, List<UnitHolder> holders) {
         Player player = request.player();
         Game game = request.game();
-        String playerColorId = request.getColorId();
+        String playerColorId = request.player().getColorID();
         List<Player> opponents = holders.stream()
                 .flatMap(holder -> holder.getUnitColorsOnHolder().stream())
                 .filter(color -> !color.equals(playerColorId))
@@ -456,12 +459,15 @@ public class CombatV2UnitService {
 
     private static void filterAssignedBombardmentUnits(
             Request request, Map<Pair<UnitModel, UnitHolder>, Integer> rollingUnits) {
-        String target = request.storedValue("bombardmentTarget" + request.getFaction());
+        String target = request.game()
+                .getStoredValue("bombardmentTarget" + request.player().getFaction());
         if (target.isBlank()) return;
 
         List<BombardmentAssignment> assignments = JsonMapperManager.basic()
                 .readValue(
-                        request.storedValue("assignedBombardment" + request.getFaction()),
+                        request.game()
+                                .getStoredValue(
+                                        "assignedBombardment" + request.player().getFaction()),
                         new TypeReference<List<BombardmentAssignment>>() {});
         Map<String, Integer> remainingByAsyncId = new HashMap<>();
         assignments.stream()
@@ -496,7 +502,7 @@ public class CombatV2UnitService {
                     ButtonHelper.getTilesOfPlayersSpecificUnits(request.game(), player, UnitType.Spacedock).stream()
                             .anyMatch(dockTile -> FoWHelper.getAdjacentTiles(
                                             request.game(), dockTile.getPosition(), player, false, true)
-                                    .contains(request.getTilePosition()));
+                                    .contains(request.tile().getPosition()));
             if (adjacentDock) {
                 rollingUnits.put(new ImmutablePair<>(projectionOfPower(player, 1), holder), 1);
             }
@@ -506,9 +512,9 @@ public class CombatV2UnitService {
     private static void addCombatRoundVirtualUnits(
             Request request, UnitHolder holder, Map<Pair<UnitModel, UnitHolder>, Integer> rollingUnits) {
         Player player = request.player();
-        if (request.playerHasActiveBreakthrough("zelianbt")) {
-            for (UnitHolder planet : request.planetHolders()) {
-                if (request.playerControlsPlanet(planet.getName())
+        if (request.player().hasActiveBreakthrough("zelianbt")) {
+            for (UnitHolder planet : request.tile().getPlanetUnitHolders()) {
+                if (request.player().getPlanetsAllianceMode().contains(planet.getName())
                         && (Constants.SPACE.equalsIgnoreCase(request.unitHolderName())
                                 || planet.getName().equalsIgnoreCase(request.unitHolderName()))) {
                     addPlanetUnit(request, holder, rollingUnits, planet);
@@ -516,8 +522,8 @@ public class CombatV2UnitService {
             }
         }
         if (player.hasTech("tf-hostileplanetoids") && Constants.SPACE.equalsIgnoreCase(request.unitHolderName())) {
-            for (UnitHolder planet : request.planetHolders()) {
-                if (request.playerControlsPlanet(planet.getName())) {
+            for (UnitHolder planet : request.tile().getPlanetUnitHolders()) {
+                if (request.player().getPlanetsAllianceMode().contains(planet.getName())) {
                     addPlanetUnit(request, holder, rollingUnits, planet);
                 }
             }
@@ -565,39 +571,17 @@ public class CombatV2UnitService {
         return unit;
     }
 
-    private static void removeUnitsDisabledByArticlesOfWar(
+    private static void removeArticleOfWarUnit(
             Request request,
-            CombatRollType rollType,
             Map<Pair<UnitModel, UnitHolder>, Integer> rollingUnits,
-            List<String> notices) {
+            List<String> notices,
+            String disabledAlias,
+            String notice) {
         if (!ButtonHelper.isLawInPlay(request.game(), "articles_war")) return;
-        boolean removedNaazMech = rollingUnits.keySet().stream()
-                .anyMatch(pair -> "naaz_mech_space".equals(pair.getLeft().getAlias()));
-        boolean removedXxchaMech = rollingUnits.keySet().stream()
-                .anyMatch(pair -> "xxcha_mech".equals(pair.getLeft().getAlias()));
-        Map<Pair<UnitModel, UnitHolder>, Integer> allowed = rollingUnits.entrySet().stream()
-                .filter(entry ->
-                        !disabledByArticlesOfWar(rollType, entry.getKey().getLeft()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        rollingUnits.clear();
-        rollingUnits.putAll(allowed);
-        if (removedNaazMech) {
-            notices.add(CombatV2Messages.articlesOfWarNaazRokha());
-        }
-        if ((rollType == CombatRollType.SpaceCannonDefence || rollType == CombatRollType.SpaceCannonOffence)
-                && removedXxchaMech) {
-            notices.add(CombatV2Messages.articlesOfWarXxcha());
-        }
-    }
-
-    private static boolean disabledByArticlesOfWar(CombatRollType rollType, UnitModel unit) {
-        if (rollType == CombatRollType.combatround) {
-            return "naaz_mech_space".equals(unit.getAlias());
-        }
-        if (rollType == CombatRollType.SpaceCannonDefence || rollType == CombatRollType.SpaceCannonOffence) {
-            return "xxcha_mech".equals(unit.getAlias());
-        }
-        return rollType == CombatRollType.bombardment && "l1z1x_mech".equals(unit.getAlias());
+        boolean removed = rollingUnits
+                .keySet()
+                .removeIf(pair -> disabledAlias.equals(pair.getLeft().getAlias()));
+        if (removed) notices.add(notice);
     }
 
     private static Map<Pair<UnitModel, UnitHolder>, Integer> filter(

@@ -19,7 +19,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollType;
-import ti4.service.combat.CombatV2RollData.Request;
+import ti4.service.combat.v2.CombatV2RollData.Request;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.AddUnitService;
 
@@ -148,7 +148,7 @@ public class NetrunnersUnitsHandler {
         String message = getEmpSpaceCannonBlockMessage(request.game(), request.player(), request.tile(), rollType);
         if (message.isEmpty()) return false;
 
-        MessageHelper.sendMessageToChannel(request.messageChannel(), message);
+        MessageHelper.sendMessageToChannel(request.event().getMessageChannel(), message);
         return true;
     }
 

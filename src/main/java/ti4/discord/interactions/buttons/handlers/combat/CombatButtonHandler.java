@@ -14,13 +14,12 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
-import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.combat.CombatService;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.spring.context.SpringContext;
 
@@ -80,12 +79,9 @@ class CombatButtonHandler {
     }
 
     @ButtonHandler("applytempcombatmod__" + Constants.AC + "__")
-    static void applyTemporaryCombatMod(ButtonInteractionEvent event, Player player, String buttonID) {
+    static void applyTemporaryCombatMod(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String acAlias = buttonID.substring(buttonID.lastIndexOf("__") + 2);
-        TemporaryCombatModifierModel combatModAC =
-                CombatTempModHelper.getPossibleTempModifier(Constants.AC, acAlias, player.getNumberOfTurns());
-        if (combatModAC != null) {
-            player.addNewTempCombatMod(combatModAC);
+        if (CombatService.activateModifier(game, player, Constants.AC, acAlias)) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(), "Combat modifier will be applied next time you push the combat roll button.");
         }
@@ -93,12 +89,9 @@ class CombatButtonHandler {
     }
 
     @ButtonHandler("applytempcombatmod__tech__")
-    public static void applyTempCombatModTech(ButtonInteractionEvent event, Player player) {
+    public static void applyTempCombatModTech(ButtonInteractionEvent event, Game game, Player player) {
         String acAlias = "sc";
-        TemporaryCombatModifierModel combatModAC =
-                CombatTempModHelper.getPossibleTempModifier("tech", acAlias, player.getNumberOfTurns());
-        if (combatModAC != null) {
-            player.addNewTempCombatMod(combatModAC);
+        if (CombatService.activateModifier(game, player, Constants.TECH, acAlias)) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     player.getFactionEmoji()

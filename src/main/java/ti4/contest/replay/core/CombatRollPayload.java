@@ -3,7 +3,7 @@ package ti4.contest.replay.core;
 import java.util.List;
 import java.util.Map;
 import ti4.service.combat.CombatRollType;
-import ti4.service.combat.CombatV2DiceData.RollSource;
+import ti4.service.combat.v2.CombatV2DiceData.RollSource;
 
 /**
  * Structured combat roll snapshot used to replay roll messages without depending on live Discord text.

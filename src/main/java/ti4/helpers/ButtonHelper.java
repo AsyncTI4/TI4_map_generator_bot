@@ -115,6 +115,9 @@ import ti4.service.combat.CombatRollType;
 import ti4.service.combat.CombatService;
 import ti4.service.combat.CombatStatsService;
 import ti4.service.combat.CombatUnitSelectionHelper;
+import ti4.service.combat.v2.CombatV2Config;
+import ti4.service.combat.v2.CombatV2RollData.Request;
+import ti4.service.combat.v2.CombatV2RollService;
 import ti4.service.decks.ShowActionCardsService;
 import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
@@ -6841,6 +6844,11 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Cannot find the planet " + unitHolderName + " on tile " + tile.getPosition() + ".");
+            return;
+        }
+        if (CombatV2Config.isEnabled(game)) {
+            game.setStoredValue("thalnosPlusOne", "true");
+            CombatV2RollService.thalnosCombatRound(new Request(player, game, event, tile, unitHolderName));
             return;
         }
         CombatRollType rollType = CombatRollType.combatround;

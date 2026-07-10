@@ -44,7 +44,6 @@ import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
-import ti4.service.combat.CombatRollType;
 import ti4.service.combat.CombatService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
@@ -225,8 +224,8 @@ public final class ButtonHelperModifyUnits {
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         int count = 0;
         while (haveGroundForces) {
-            int hitP1 = CombatService.roll(p1, game, event, tile, planet, CombatRollType.combatround, true);
-            int hitP2 = CombatService.roll(p2, game, event, tile, planet, CombatRollType.combatround, true);
+            int hitP1 = CombatService.automatedCombatRound(p1, game, event, tile, planet);
+            int hitP2 = CombatService.automatedCombatRound(p2, game, event, tile, planet);
 
             if (p1.hasTech("vpw") && hitP2 > 0) {
                 hitP1++;

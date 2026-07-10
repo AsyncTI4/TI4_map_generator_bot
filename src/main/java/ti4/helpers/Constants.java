@@ -1559,6 +1559,7 @@ public final class Constants {
     public static final String MOD_TEMP_ONE_COMBAT = "ONE_COMBAT";
     public static final String PLAYER_TEMP_MODS = "PLAYER_TEMP_MODS";
     public static final String PLAYER_NEW_TEMP_MODS = "PLAYER_NEW_TEMP_MODS";
+    public static final String PLAYER_COMBAT_MODIFIER_ACTIVATIONS = "PLAYER_COMBAT_MODIFIER_ACTIVATIONS";
     public static final String ARCHIVE_CHANNELS = "archive_channels";
     public static final String GET_CHANNEL_HTML = "get_channel_html";
     public static final String CHANNEL = "channel";

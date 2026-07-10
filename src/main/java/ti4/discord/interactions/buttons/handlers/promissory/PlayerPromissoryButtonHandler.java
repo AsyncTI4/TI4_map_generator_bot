@@ -8,13 +8,13 @@ import ti4.game.Player;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
-import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 import ti4.model.metadata.TechSummariesMetadataManager;
+import ti4.service.combat.CombatService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
@@ -41,10 +41,7 @@ class PlayerPromissoryButtonHandler {
             ButtonHelper.deleteMessage(event);
         }
 
-        var possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(
-                Constants.PROMISSORY_NOTES, pnID, player.getNumberOfTurns());
-        if (possibleCombatMod != null) {
-            player.addNewTempCombatMod(possibleCombatMod);
+        if (CombatService.activateModifier(game, player, Constants.PROMISSORY_NOTES, pnID)) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     "Combat modifier will be applied next time you push the \"Combat Roll\" button.");

@@ -1,4 +1,4 @@
-package ti4.service.combat;
+package ti4.service.combat.v2;
 
 import java.util.List;
 import lombok.experimental.UtilityClass;
@@ -9,7 +9,8 @@ import ti4.game.Player;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
-import ti4.service.combat.CombatV2RollData.Context;
+import ti4.service.combat.CombatRollType;
+import ti4.service.combat.v2.CombatV2RollData.Context;
 
 /** Builds combat messages and button labels without sending messages or mutating game state. */
 @UtilityClass
@@ -61,6 +62,10 @@ public class CombatV2Messages {
 
     public static String articlesOfWarXxcha() {
         return "Skipping Indomitus (Xxcha mech) SPACE CANNON rolls due to _Articles of War_.";
+    }
+
+    public static String articlesOfWarL1z1x() {
+        return "Skipping Annihilator (L1Z1X mech) BOMBARDMENT rolls due to _Articles of War_.";
     }
 
     public static String noBombardmentTarget() {
@@ -206,6 +211,60 @@ public class CombatV2Messages {
         return target.getRepresentation() + ", your planet " + Helper.getPlanetRepresentation(planet, game)
                 + " was exhausted when " + (game.isFowMode() ? "another player" : roller.getRepresentationNoPing())
                 + " bombarded it with _X-89 Bacterial Weapon ΩΩ_.";
+    }
+
+    public static String x89AdditionalHits(Player player, int hits) {
+        return "\n" + player.getFactionEmoji() + " produced " + StringHelper.pluralize(hits, "additional hit")
+                + " using " + Mapper.getTech("x89c4").getNameRepresentation() + ".";
+    }
+
+    public static String shardVolley(Player player) {
+        return "\n" + player.getFactionEmoji()
+                + " You have _Shard Volley_ and thus produced an additional hit to the ones rolled above.";
+    }
+
+    public static String shardSaturation(Player player) {
+        return "\n" + player.getFactionEmoji()
+                + " You have _Shard Saturation_ and thus produced an additional hit to the ones rolled above.";
+    }
+
+    public static String gloryValor(Player player, boolean twilightFall) {
+        return player.getRepresentation() + " got an extra hit due to the **"
+                + (twilightFall ? "Glorious Halls" : "Valor")
+                + "** ability (it has been accounted for in the hit count).";
+    }
+
+    public static String vadenBombardmentTradeGood(Player player) {
+        return player.getRepresentation()
+                + " gained 1 trade good due to hitting on a BOMBARDMENT roll with the Aurum Vadra (the Vaden flagship).";
+    }
+
+    public static String belkoseaCommodities(Player player, int hits) {
+        return player.getRepresentation() + " please gain or convert 1 commodity a total of "
+                + StringHelper.pluralize(hits, "time") + " due to your Uzean Wardog mech ability.";
+    }
+
+    public static String mercenaryCaptains(Player player) {
+        return player.getRepresentation() + " you gained 1 commodity due to the mercenary captains ability.";
+    }
+
+    public static String dragonBombardment(Player target, int hits, String planet, Game game) {
+        return target.getRepresentation() + ", please assign the Dragon BOMBARDMENT hit" + pluralSuffix(hits) + " on "
+                + Helper.getPlanetRepresentation(planet, game) + ".";
+    }
+
+    public static String dragonBombardmentForDummy(Player roller, int hits, String planet, Game game) {
+        return roller.getRepresentation() + ", please assign the Dragon BOMBARDMENT hit" + pluralSuffix(hits)
+                + " for the dummy player on " + Helper.getPlanetRepresentation(planet, game) + ".";
+    }
+
+    public static String gledgePds2Explore(Player player) {
+        return player.getRepresentation()
+                + ", use the buttons to explore a planet with the PDS that got the hit. It should be noted that the bot has no idea which PDS rolled which dice, but default practice would be to go from lowest tile position to highest, with _Plasma Scoring_ applying to the last die. You can specify any order before rolling though.";
+    }
+
+    public static String gledgePdsExplore(Player player) {
+        return player.getRepresentation() + " use the buttons to explore a planet with the PDS that got the hit.";
     }
 
     public static String autoAssignLabel(int hits, boolean dummy) {

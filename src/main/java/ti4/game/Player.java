@@ -98,6 +98,7 @@ import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.DeepgloomService;
 import ti4.service.breakthrough.ValefarZService;
+import ti4.service.combat.v2.CombatModifierActivation;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -141,6 +142,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     @Getter
     private List<TemporaryCombatModifierModel> tempCombatModifiers = new ArrayList<>();
+
+    @Getter
+    private final List<CombatModifierActivation> combatModifierActivations = new ArrayList<>();
 
     // TIGL
     private @Getter @Setter TIGLRank playerTIGLRankAtGameStart;

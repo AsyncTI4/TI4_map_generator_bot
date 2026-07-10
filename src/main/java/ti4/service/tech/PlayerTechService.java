@@ -31,7 +31,6 @@ import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
-import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -50,11 +49,11 @@ import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
-import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.metadata.TechSummariesMetadataManager;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.VisionariaSelectService;
+import ti4.service.combat.CombatService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -637,10 +636,7 @@ public class PlayerTechService {
     }
 
     public static void checkAndApplyCombatMods(GenericInteractionCreateEvent event, Player player, String techID) {
-        TemporaryCombatModifierModel possibleCombatMod =
-                CombatTempModHelper.getPossibleTempModifier(Constants.TECH, techID, player.getNumberOfTurns());
-        if (possibleCombatMod != null) {
-            player.addNewTempCombatMod(possibleCombatMod);
+        if (CombatService.activateModifier(player.getGame(), player, Constants.TECH, techID)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Combat modifier will be applied next time you push the combat roll button.");
