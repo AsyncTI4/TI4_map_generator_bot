@@ -83,7 +83,7 @@ public class GameEventDraft {
             Game game, String targetPosition, Map<String, Map<UnitKey, List<Integer>>> displacement) {
         if (!isOpen(game) || !hasMovedUnits(displacement)) return false;
         try {
-            game.setPendingMovementState(CompactMovementState.serialize(targetPosition, displacement));
+            game.setPendingMovementState(CompactMovementState.serialize(game, targetPosition, displacement));
             return true;
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to stage tactical movement state.", e);
