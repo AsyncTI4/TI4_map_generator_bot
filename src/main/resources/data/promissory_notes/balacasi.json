@@ -36,7 +36,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "balacasi",
-        "text": "When the Onyxxa player performs a strategic action: Spend a command token from your strategy pool and place this card face up in your play area. During their strategic action, you resolve the primary ability of their strategy card instead of the secondary, and you resolve abilities before the Onyxxa player. At the start of the status phase, return this card to the Onyxxa player."
+        "text": "When the Onyxxa player performs a strategic action: Spend a command token from your strategy pool and place this card face up in your play area. During this action, you resolve the primary ability of that strategy card instead of the secondary, and you resolve abilities before the Onyxxa player. At the start of the status phase, return this card to the Onyxxa player."
     },
     {
         "alias": "bapnluna",
