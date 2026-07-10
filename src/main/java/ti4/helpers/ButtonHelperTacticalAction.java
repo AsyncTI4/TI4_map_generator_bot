@@ -447,7 +447,8 @@ public final class ButtonHelperTacticalAction {
         if (!subEvents.isEmpty()) {
             payload.put("subEvents", GameEventDraft.toJsonNode(subEvents));
         }
-        GameEventService.commit(game, GameEventType.TACTICAL_ACTION, player, payload);
+        String movementState = GameEventDraft.drainMovement(game);
+        GameEventService.commit(game, GameEventType.TACTICAL_ACTION, player, payload, movementState);
     }
 
     private static void addIfNotEmpty(Map<String, Object> payload, String key, String value) {
