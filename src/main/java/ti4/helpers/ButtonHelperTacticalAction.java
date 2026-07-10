@@ -314,7 +314,8 @@ public final class ButtonHelperTacticalAction {
                     "lunarium",
                     "zephyrion",
                     "vyserix",
-                    "crystellum");
+                    "crystellum",
+                    "ardentia");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "cabal");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "naalu");
@@ -447,7 +448,8 @@ public final class ButtonHelperTacticalAction {
         if (!subEvents.isEmpty()) {
             payload.put("subEvents", GameEventDraft.toJsonNode(subEvents));
         }
-        GameEventService.commit(game, GameEventType.TACTICAL_ACTION, player, payload);
+        String movementState = GameEventDraft.drainMovement(game);
+        GameEventService.commit(game, GameEventType.TACTICAL_ACTION, player, payload, movementState);
     }
 
     private static void addIfNotEmpty(Map<String, Object> payload, String key, String value) {

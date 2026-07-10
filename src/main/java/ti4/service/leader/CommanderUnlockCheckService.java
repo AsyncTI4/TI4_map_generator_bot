@@ -302,6 +302,17 @@ public class CommanderUnlockCheckService {
                 }
                 shouldBeUnlocked = (qualifyingSystems >= 3);
             }
+
+            // theodisi
+            case "ardentia" -> {
+                int qualifyingSystems = 0;
+                for (Tile tile : game.getTileMap().values()) {
+                    if (tile.hasPlayerCC(player)) {
+                        qualifyingSystems++;
+                    }
+                }
+                shouldBeUnlocked = (qualifyingSystems >= 4);
+            }
         }
         if (shouldBeUnlocked) {
             UnlockLeaderService.unlockLeader(leaderId, game, player);
