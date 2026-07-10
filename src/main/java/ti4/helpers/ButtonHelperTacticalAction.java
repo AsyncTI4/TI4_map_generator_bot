@@ -314,7 +314,8 @@ public final class ButtonHelperTacticalAction {
                     "lunarium",
                     "zephyrion",
                     "vyserix",
-                    "crystellum");
+                    "crystellum",
+                    "ardentia");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "cabal");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "naalu");
