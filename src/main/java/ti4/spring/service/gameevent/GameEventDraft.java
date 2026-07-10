@@ -2,12 +2,15 @@ package ti4.spring.service.gameevent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
+import ti4.helpers.Units.UnitKey;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.website.model.CompactMovementState;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.JsonNode;
 
@@ -26,10 +29,12 @@ public class GameEventDraft {
 
     public static void open(Game game) {
         game.setPendingSubEventsJson("[]");
+        game.setPendingMovementState("");
     }
 
     public static void clear(Game game) {
         game.setPendingSubEventsJson("");
+        game.setPendingMovementState("");
     }
 
     public static boolean isOpen(Game game) {
@@ -64,8 +69,37 @@ public class GameEventDraft {
             BotLogger.error(new LogOrigin(game), "Failed to drain tactical sub-event draft.", e);
             subEvents = new ArrayList<>();
         }
-        clear(game);
+        game.setPendingSubEventsJson("");
         return subEvents;
+    }
+
+    /** Captures committed displacement while the enclosing tactical-event draft remains undo-safe. */
+    public static boolean stageMovement(
+            Game game, String targetPosition, Map<String, Map<UnitKey, List<Integer>>> displacement) {
+        if (!isOpen(game) || !hasMovedUnits(displacement)) return false;
+        try {
+            game.setPendingMovementState(CompactMovementState.serialize(targetPosition, displacement));
+            return true;
+        } catch (Exception e) {
+            BotLogger.error(new LogOrigin(game), "Failed to stage tactical movement state.", e);
+            return false;
+        }
+    }
+
+    /** Returns the committed movement payload, if any, and clears only that portion of the draft. */
+    public static String drainMovement(Game game) {
+        String movementState = StringUtils.trimToNull(game.getPendingMovementState());
+        game.setPendingMovementState("");
+        return movementState;
+    }
+
+    private static boolean hasMovedUnits(Map<String, Map<UnitKey, List<Integer>>> displacement) {
+        return displacement != null
+                && displacement.values().stream()
+                        .flatMap(units -> units.values().stream())
+                        .filter(states -> states != null)
+                        .flatMap(List::stream)
+                        .anyMatch(count -> count != null && count > 0);
     }
 
     /** Compact JSON (one line, {@code type} discriminators intact) for a list of sub-events. */

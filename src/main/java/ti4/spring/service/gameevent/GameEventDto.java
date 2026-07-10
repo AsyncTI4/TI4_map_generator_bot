@@ -11,4 +11,5 @@ public record GameEventDto(
         String faction,
         long timestamp,
         JsonNode payload,
-        @JsonInclude(JsonInclude.Include.NON_NULL) String mapState) {}
+        @JsonInclude(JsonInclude.Include.NON_NULL) String mapState,
+        @JsonInclude(JsonInclude.Include.NON_NULL) String movementState) {}
