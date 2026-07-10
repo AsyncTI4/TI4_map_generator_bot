@@ -263,20 +263,23 @@ class TacticalActionButtonHandlers {
                     List<RemovedUnit> toAdd = removed.stream()
                             .map(r -> r.onUnitHolder(addToHolder))
                             .toList();
-                    AddUnitService.addUnits(event, game, toAdd);
-
-                    List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
 
                     String planetName = Mapper.getPlanet(planet).getNameNullSafe();
                     String landingMsg = player.fogSafeEmoji() + " landed " + amount + colorMsg + " "
                             + type.humanReadableName() + " on " + planetName + ".";
                     if (!removed.isEmpty()) {
+                        // Announce the landing before adding the units: addUnits can trigger CONTROLLED
+                        // lore (e.g. a troop-removing effect) that posts its own follow-up messages, and
+                        // we want "landed X" to read before those, not after.
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), landingMsg);
+                        AddUnitService.addUnits(event, game, toAdd);
                     } else {
                         MessageHelper.sendMessageToChannel(
                                 event.getMessageChannel(),
                                 "Landing failed for an unknown reason. Regenerated buttons, please ping bothelper if the problem persists.");
                     }
+
+                    List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
                     event.getMessage()
                             .editMessage(event.getMessage().getContentRaw())
                             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))

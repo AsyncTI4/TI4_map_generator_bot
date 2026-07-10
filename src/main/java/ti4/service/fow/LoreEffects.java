@@ -752,10 +752,17 @@ final class LoreEffects {
             }
         }
 
-        ctx.tile.removeUnit(holder, key, count);
+        // removeUnit removes whatever is present up to count (silent partial removal), so report the
+        // number actually removed rather than the number requested. If nothing matched, there's no
+        // board change to announce.
+        int removedCount = ctx.tile.removeUnit(holder, key, count).stream()
+                .mapToInt(Integer::intValue)
+                .sum();
+        if (removedCount <= 0) return null;
+
         String location = ctx.tile.getPosition() + (Constants.SPACE.equals(holder) ? "" : " (" + holder + ")");
         return new EffectDescription(
-                "Removed " + count + " " + color + " " + ctx.arg(idx + 1) + " from " + location + ".",
+                "Removed " + removedCount + " " + color + " " + ctx.arg(idx + 1) + " from " + location + ".",
                 true,
                 ctx.tile.getPosition(),
                 color);
