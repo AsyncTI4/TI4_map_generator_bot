@@ -211,7 +211,7 @@ public enum TileEmojis implements TI4Emoji {
 
     // other
 
-    //theodisi
+    // theodisi
     th1_ardentiahs,
     th2_verydithhs,
     th3_veylorhs,
@@ -226,16 +226,14 @@ public enum TileEmojis implements TI4Emoji {
     th12_aeternahs,
     th13_ponthoushs,
 
-    //beans
+    // beans
     be1_dreamhs,
     be2_crystellumhs,
     be3_ashenhs,
     be4_ironhs,
     be5_tahs,
     be6_netrunnershs,
-    be7_natauhs
-
-;
+    be7_natauhs;
 
     @Override
     public String toString() {
@@ -438,9 +436,9 @@ public enum TileEmojis implements TI4Emoji {
             case "d122" -> d122;
             case "d123" -> d123;
 
-            //other
+            // other
 
-            //theodisi
+            // theodisi
             case "th1" -> th1_ardentiahs;
             case "th2" -> th2_verydithhs;
             case "th3" -> th3_veylorhs;
@@ -455,7 +453,7 @@ public enum TileEmojis implements TI4Emoji {
             case "th12" -> th12_aeternahs;
             case "th13" -> th13_ponthoushs;
 
-            //beans
+            // beans
             case "be1" -> be1_dreamhs;
             case "be2" -> be2_crystellumhs;
             case "be3" -> be3_ashenhs;

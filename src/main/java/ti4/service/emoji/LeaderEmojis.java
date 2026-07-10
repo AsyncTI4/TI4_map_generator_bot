@@ -265,7 +265,7 @@ public enum LeaderEmojis implements TI4Emoji {
     NatauCommander,
     NatauHero,
 
-    //Lost Legacies (Theodisi)
+    // Lost Legacies (Theodisi)
     ArdentiaAgent,
     ArdentiaCommander,
     ArdentiaHero,
