@@ -221,6 +221,7 @@ public class ScorePublicObjectiveService {
             List<Integer> unfollowedSCs = player.getUnfollowedSCs();
             if (unfollowedSCs != null
                     && !unfollowedSCs.contains(1)
+                    && !game.getPhaseOfGame().contains("action")
                     && !unfollowedSCs.contains(6)
                     && !unfollowedSCs.contains(7)) {
                 message2 = player.getRepresentationUnfogged()

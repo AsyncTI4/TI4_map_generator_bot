@@ -207,7 +207,7 @@ public enum TileEmojis implements TI4Emoji {
     d120,
     d121,
     d122,
-    d123,
+    d123
 
 // other
 ;

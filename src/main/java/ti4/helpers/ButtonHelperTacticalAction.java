@@ -17,6 +17,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.Na
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnPromissoryHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -313,7 +314,8 @@ public final class ButtonHelperTacticalAction {
                     "lunarium",
                     "zephyrion",
                     "vyserix",
-                    "crystellum");
+                    "crystellum",
+                    "myrr");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "cabal");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "naalu");
@@ -446,7 +448,8 @@ public final class ButtonHelperTacticalAction {
         if (!subEvents.isEmpty()) {
             payload.put("subEvents", GameEventDraft.toJsonNode(subEvents));
         }
-        GameEventService.commit(game, GameEventType.TACTICAL_ACTION, player, payload);
+        String movementState = GameEventDraft.drainMovement(game);
+        GameEventService.commit(game, GameEventType.TACTICAL_ACTION, player, payload, movementState);
     }
 
     private static void addIfNotEmpty(Map<String, Object> payload, String key, String value) {
@@ -880,6 +883,13 @@ public final class ButtonHelperTacticalAction {
             if (player.hasUnexhaustedLeader("dreamagent")) {
                 DreamButtonHandler.offerDreamAgentButtons(game, player, player);
             }
+        }
+        List<Planet> planetUnitHolders = tile.getPlanetUnitHolders();
+        if (!planetUnitHolders.isEmpty()
+                && planetUnitHolders.stream()
+                        .anyMatch(planet -> player.getPlanetsAllianceMode().contains(planet.getName())
+                                && planet.getAttachments().contains("attachment_kairnoutpost.png"))) {
+            KairnPromissoryHandler.offerArchaeologicalOutpostExplore(player, game, tile);
         }
 
         // Send buttons to move

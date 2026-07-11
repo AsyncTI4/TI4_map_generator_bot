@@ -41,6 +41,7 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting teDemo;
     private final BooleanSetting whispers;
     private final BooleanSetting deepreaches;
+    private final BooleanSetting lostLegacies;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -69,6 +70,7 @@ public class SourceSettings extends SettingsMenu {
         eronous = new BooleanSetting("Eronous", "Eronous Tiles", false);
         whispers = new BooleanSetting("WhispersVoid", "Whispers from the Void", false);
         deepreaches = new BooleanSetting("DeepReaches", "Deep Reaches", false);
+        lostLegacies = new BooleanSetting("LostLegacies", "Lost Legacies", false);
         actionCardDeck2 = new BooleanSetting("ActionCardDeck2", "Action Card Deck 2", game.isAcd2());
         // Emojis
         base.setEmoji(SourceEmojis.TI4BaseGame);
@@ -80,11 +82,13 @@ public class SourceSettings extends SettingsMenu {
         eronous.setEmoji(SourceEmojis.Eronous);
         actionCardDeck2.setEmoji(SourceEmojis.ActionDeck2);
         deepreaches.setEmoji(SourceEmojis.DeepReaches);
+        lostLegacies.setEmoji(SourceEmojis.Theodisi);
 
         // Other Initialization
         discoStars.setExtraInfo("Adds Discordant Stars factions only.");
         blueReverie.setExtraInfo("Adds Blue Reverie factions only.");
         unchartedSpace.setExtraInfo("Adds Uncharted Space content.");
+        lostLegacies.setExtraInfo("Adds Lost Legacies factions only.");
         // miltymod.setExtraInfo("NOTE: this is NOT \"milty draft\", this is a homebrew mod that replaces components in
         // the game");
 
@@ -109,6 +113,7 @@ public class SourceSettings extends SettingsMenu {
             eronous.initialize(json.get("eronous"));
             whispers.initialize(json.get("whispers"));
             deepreaches.initialize(json.get("deepreaches"));
+            lostLegacies.initialize(json.get("lostLegacies"));
             actionCardDeck2.initialize(json.get("actionCardDeck2"));
         }
         base.setEditable(false);
@@ -133,6 +138,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(eronous);
         ls.add(whispers);
         ls.add(deepreaches);
+        ls.add(lostLegacies);
         ls.add(actionCardDeck2);
         return ls;
     }
@@ -181,6 +187,7 @@ public class SourceSettings extends SettingsMenu {
         if (ignis.isVal()) sources.add(ComponentSource.ignis_aurora);
         if (whispers.isVal()) sources.add(ComponentSource.balacasi);
         if (deepreaches.isVal()) sources.add(ComponentSource.beans);
+        if (lostLegacies.isVal()) sources.add(ComponentSource.theodisi);
         return sources;
     }
 

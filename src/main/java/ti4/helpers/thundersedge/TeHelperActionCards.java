@@ -291,7 +291,7 @@ public class TeHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static List<Button> getReadiedStrategyCardSecondaryButtons(Game game) {
+    public static List<Button> getReadiedStrategyCardSecondaryButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
 
         if (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1)) {
@@ -314,7 +314,11 @@ public class TeHelperActionCards {
             buttons.add(Buttons.green("warfareBuild", "Build At Home", CardEmojis.SC6));
         }
         if (game.getScPlayed().get(7) == null || !game.getScPlayed().get(7)) {
-            buttons.add(Buttons.GET_A_TECH.withEmoji(CardEmojis.SC7.asEmoji()));
+            if (player.hasAbility("propagation")) {
+                buttons.add(Buttons.green("leadershipGenerateCCButtons_", "Gain 3 Command Tokens (for Nekro)"));
+            } else {
+                buttons.add(Buttons.GET_A_TECH.withEmoji(CardEmojis.SC7.asEmoji()));
+            }
         }
         if (game.getScPlayed().get(8) == null || !game.getScPlayed().get(8)) {
             buttons.add(Buttons.green("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
@@ -325,7 +329,7 @@ public class TeHelperActionCards {
 
     @ButtonHandler("strategize")
     private static void resolveStrategize(Game game, Player player, ButtonInteractionEvent event) {
-        List<Button> buttons = getReadiedStrategyCardSecondaryButtons(game);
+        List<Button> buttons = getReadiedStrategyCardSecondaryButtons(game, player);
 
         String message = player.getRepresentationUnfogged() + ", please resolve _Strategize_ using these buttons.";
         String msg2 = player.getRepresentation()

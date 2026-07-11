@@ -65,6 +65,7 @@ import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.gameevent.GameEventDraft;
 
 public final class ButtonHelperModifyUnits {
 
@@ -1723,9 +1724,12 @@ public final class ButtonHelperModifyUnits {
 
         Tile src = game.getTileByPosition(pos1);
         Tile dest = game.getTileByPosition(pos2);
+        UnitHolder sourceHolder = src.getUnitHolderFromPlanet(planet);
+        Map<UnitKey, List<Integer>> beforeRetreat = GameEventDraft.snapshotRetreatUnits(player, sourceHolder);
         boolean damaged = buttonLabel.toLowerCase().contains("damaged");
         MoveUnitService.moveUnits(
                 event, src, game, player.getColor(), amount + " " + unitType + " " + planet, dest, "space", damaged);
+        GameEventDraft.stageRetreat(game, player, pos1, planet, pos2, Constants.SPACE, beforeRetreat, sourceHolder);
 
         List<Button> systemButtons = getRetreatingGroundTroopsButtons(player, game, pos1, pos2);
         String retreatMessage = player.getFactionEmojiOrColor() + " retreated " + amount + " " + unitType + " on "
@@ -1749,6 +1753,8 @@ public final class ButtonHelperModifyUnits {
         Tile tile1 = game.getTileByPosition(pos1);
         Tile tile2 = game.getTileByPosition(pos2);
         tile2 = FlipTileService.flipTileIfNeeded(event, tile2, game);
+        UnitHolder sourceSpace = tile1.getSpaceUnitHolder();
+        Map<UnitKey, List<Integer>> beforeRetreat = GameEventDraft.snapshotRetreatUnits(player, sourceSpace);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "kollecccommander")
                 && !buttonID.contains("skilled")
                 && !CommandCounterHelper.hasCC(event, player.getColor(), tile1)) {
@@ -1809,6 +1815,8 @@ public final class ButtonHelperModifyUnits {
                         event, tile1, game, player.getColor(), totalUnits + " " + unitName, tile2, "space");
             }
         }
+        GameEventDraft.stageRetreat(
+                game, player, pos1, Constants.SPACE, pos2, Constants.SPACE, beforeRetreat, sourceSpace);
 
         if (tile2 != null && tile2.getPosition().startsWith("frac")) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");

@@ -45,6 +45,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
+import ti4.spring.service.gameevent.GameEventDraft;
 
 /*
  To activate FoW+ mode use /game weird_game_setup fow_plus:True
@@ -229,6 +230,7 @@ public final class FOWPlusService {
         String message = player.getRepresentationUnfoggedNoPing() + " lost " + valueOfUnitsLost + " resources ";
         message += unitEmojis + " to The Void round " + game.getRound() + " turn " + player.getInRoundTurnCount() + ".";
         GMService.logPlayerActivity(game, player, message, null, true);
+        GameEventDraft.stageMovement(game, game.getActiveSystem(), unitsGoingToVoid);
         game.getTacticalActionDisplacement().clear();
     }
 

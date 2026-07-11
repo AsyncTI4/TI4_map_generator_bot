@@ -1,0 +1,18 @@
+{
+    "id": "innersanctum",
+    "name": "Inner Sanctum",
+    "aliases": [
+        "innersanctum",
+        "inner",
+        "sanctum"
+    ],
+    "resources": 0,
+    "influence": 4,
+    "planetTypes": [
+        "FAKE"
+    ],
+    "legendaryAbilityName": "Sabotaged Legislation",
+    "legendaryAbilityText": "After an agenda is revealed, you may exhaust this card and predict the outcome of this agenda. If your prediction is correct, each player who voted for the resolved outcome draws 1 action card.",
+    "flavourText": "Flavor text is the bane of all time-pressed devs.",
+    "source": "theodisi"
+}

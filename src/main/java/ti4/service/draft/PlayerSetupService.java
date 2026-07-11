@@ -14,6 +14,9 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.luminous.opa.OpaAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesStartingTechsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -312,7 +315,9 @@ public class PlayerSetupService {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false, event);
 
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
-            if (player.getFaction().contains("keleres")) {
+            if (LostLegaciesStartingTechsHandler.offerStartingTechButtons(game, player, null)) {
+                // Lost Legacies starting-tech restrictions are handled by their faction handler.
+            } else if (player.getFaction().contains("keleres")) {
                 Button getTech = Buttons.green(
                         player.factionButtonChecker() + "getKeleresTechOptions", "Get Keleres Technology Options");
                 String msg = player.getRepresentationUnfogged()
@@ -509,6 +514,23 @@ public class PlayerSetupService {
         }
         if (player.hasAbility("doctrine") && player.hasAbility("paradigm") && player.hasAbility("natau_decree")) {
             NatauAbilityHandler.offerDoctrineSetupButtons(event, game, player);
+        }
+        if (player.hasAbility("primordial_secrets")) {
+            ArcanumAbilityHandler.offerPrimordialSecretsButtons(game, player);
+        }
+        if (player.hasAbility("call_of_the_haunted")) {
+            RevenantAbilityHandler.offerCallOfTheHauntedButtons(game, player);
+        }
+        if (player.hasAbility("factory_lease")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " added the three \"Factory Lease\" promissory notes to their reinforcements.");
+        }
+        if (player.hasAbility("cycle_of_reclamation")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " added the 5 _Moon Phase_ cards to their play area.");
         }
         CardsInfoService.sendVariousAdditionalButtons(game, player);
 

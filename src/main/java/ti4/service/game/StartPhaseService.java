@@ -405,7 +405,7 @@ public class StartPhaseService {
                             ", please choose up to 3 planets you wish to ready because of _Checks and Balances_ resolving \"Against\".";
                     buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Readying Planets")); // spitItOut
                 }
-                MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player2.getCorrectChannel(), message, buttons);
             }
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "Sent buttons to ready 3 planets due to _Checks and Balances_.");
