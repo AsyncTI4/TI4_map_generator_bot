@@ -15,6 +15,7 @@ public class PlayerCommand implements ParentCommand {
                     new SCPlay(),
                     new SCUnplay(),
                     new Pass(),
+                    new Unpass(),
                     new AbilityInfo(),
                     new TurnEnd(),
                     new TurnStart(),

@@ -799,7 +799,8 @@ public final class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getExhaustedPlanets());
         for (String planet : planets) {
-            Button button = Buttons.green("refresh_" + planet, getPlanetRepresentation(planet, game));
+            Button button = Buttons.green(
+                    player.getFactionCheckerPrefix() + "refresh_" + planet, getPlanetRepresentation(planet, game));
             planetButtons.add(button);
         }
         return planetButtons;

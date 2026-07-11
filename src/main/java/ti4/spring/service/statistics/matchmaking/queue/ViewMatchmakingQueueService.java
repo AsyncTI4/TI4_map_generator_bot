@@ -24,12 +24,17 @@ public class ViewMatchmakingQueueService {
     private final MatchmakingQueuePartyRepository partyRepository;
     private final MatchmakingQueueMemberRepository memberRepository;
 
-    public List<MessageEmbed> getMessageEmbeds() {
+    public List<MessageEmbed> getMessageEmbeds(Boolean tiglFilter) {
         if (DatabasePersistenceGate.isDisabled()) {
             return List.of(messageEmbed("Queueing is currently disabled."));
         }
 
         List<MatchmakingQueueParty> parties = partyRepository.findAllByQueuedTrueOrderByQueuedAtAsc();
+        if (tiglFilter != null) {
+            parties = parties.stream()
+                    .filter(party -> party.isTigl() == tiglFilter)
+                    .toList();
+        }
         if (parties.isEmpty()) {
             return List.of(messageEmbed("There are no players in the queue right now."));
         }

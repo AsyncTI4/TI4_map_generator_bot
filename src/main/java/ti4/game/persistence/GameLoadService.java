@@ -663,6 +663,11 @@ class GameLoadService {
                         game.setPendingSubEventsJson(info);
                     }
                 }
+                case Constants.PENDING_MOVEMENT_STATE -> {
+                    if (isNotBlank(info)) {
+                        game.setPendingMovementState(info);
+                    }
+                }
                 case Constants.STARTED_DATE -> {
                     if (isNotBlank(info)) {
                         game.setStartedDate(Long.parseLong(info));

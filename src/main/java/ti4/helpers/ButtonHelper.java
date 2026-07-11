@@ -3190,6 +3190,19 @@ public class ButtonHelper {
                 msg += " agent";
             }
         }
+
+        if (whatIsItFor.contains("unexpectedOtherPerson")) {
+            String faction = buttonID.split("_")[2];
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            player = game.getPlayerFromColorOrFaction(faction);
+            if (game.isFowMode()) {
+                msg = player.getRepresentationUnfogged()
+                        + ", this is a notice that someone removed your command token from " + tileRep;
+            } else {
+                msg = player.getRepresentationUnfogged() + ", this is a notice that " + msg
+                        + " owned by you by using Flux";
+            }
+        }
         msg += ".";
 
         RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
@@ -3610,29 +3623,35 @@ public class ButtonHelper {
 
     public static List<Button> getButtonsToRemoveYourCC(
             Player player, Game game, GenericInteractionCreateEvent event, String whatIsItFor) {
+        return getButtonsToRemoveYourCC(player, game, event, whatIsItFor, player);
+    }
+
+    public static List<Button> getButtonsToRemoveYourCC(
+            Player player, Game game, GenericInteractionCreateEvent event, String whatIsItFor, Player p2) {
         List<Button> buttonsToRemoveCC = new ArrayList<>();
         String factionChecker = player.factionButtonChecker();
-        for (Tile tile : getTilesWithYourCC(player, game, event)) {
+        for (Tile tile : getTilesWithYourCC(p2, game, event)) {
             if (whatIsItFor.contains("heartOfDominion")) {
-                if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, player) == 0) {
+                if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, p2) == 0) {
                     continue;
                 }
             }
             if (whatIsItFor.contains("kjal")) {
                 String pos = whatIsItFor.split("_")[1];
                 if (!pos.equalsIgnoreCase(tile.getPosition())
-                        && !FoWHelper.getAdjacentTiles(game, pos, player, false).contains(tile.getPosition())) {
+                        && !FoWHelper.getAdjacentTiles(game, pos, p2, false).contains(tile.getPosition())) {
                     continue;
                 }
             }
-            if (whatIsItFor.contains("intervention") && FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
+            if (whatIsItFor.contains("intervention") && FoWHelper.otherPlayersHaveUnitsInSystem(p2, tile, game)) {
                 continue;
             }
-            if (FOWPlusService.preventRemovingCCFromTile(game, player, tile)) {
+            if (FOWPlusService.preventRemovingCCFromTile(game, p2, tile)) {
                 continue;
             }
-            String id = factionChecker + "removeCCFromBoard_" + whatIsItFor.replace("_", "") + "_" + tile.getPosition();
-            String label = "Remove Token From " + tile.getRepresentationForButtons(game, player);
+            String id = factionChecker + "removeCCFromBoard_" + whatIsItFor.replace("_", "") + "_" + tile.getPosition()
+                    + "_" + p2.getFaction();
+            String label = "Remove Token From " + tile.getRepresentationForButtons(game, p2);
             buttonsToRemoveCC.add(Buttons.green(id, label));
         }
         return buttonsToRemoveCC;
