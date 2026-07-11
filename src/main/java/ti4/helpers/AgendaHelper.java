@@ -31,6 +31,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.acd2.PublicOutrageA
 import ti4.discord.interactions.buttons.handlers.actioncards.acd2.SettlementsAcd2ButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanAbilityHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -2743,6 +2744,17 @@ public final class AgendaHelper {
                             + game.getStoredValue(key).replace("_", ", ") + ".";
                 }
                 MessageHelper.sendMessageToChannel(channel, message);
+            }
+        }
+        if (!action) {
+            for (Player player : game.getRealPlayers()) {
+                if (player.hasLeader("veylorcommander") && !player.hasLeaderUnlocked("veylorcommander")) {
+                    MessageHelper.sendMessageToChannelWithButton(
+                            player.getCardsInfoThread(),
+                            player.getRepresentationUnfogged()
+                                    + ", you may press the button below to start the process of unlocking the Veylor commander",
+                            VeylorLeadersHandler.offerVeylorCommanderUnlock(player));
+                }
             }
         }
         for (Player player : game.getRealPlayers()) {
