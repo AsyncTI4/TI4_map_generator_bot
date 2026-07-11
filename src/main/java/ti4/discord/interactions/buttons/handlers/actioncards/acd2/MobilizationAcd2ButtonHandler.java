@@ -22,7 +22,7 @@ class MobilizationAcd2ButtonHandler {
     @ButtonHandler("resolveMobilization")
     public static void resolveMobilization(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tile == null) {
                 continue;
             }
@@ -70,7 +70,7 @@ class MobilizationAcd2ButtonHandler {
         }
 
         List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "mobilization", "place");
-        String message = player.getRepresentation() + ", use the buttons to produce up to 4 units in "
+        String message = player.toString() + ", use the buttons to produce up to 4 units in "
                 + tile.getRepresentationForButtons(game, player) + " for _Mobilization_."
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, game, true);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);

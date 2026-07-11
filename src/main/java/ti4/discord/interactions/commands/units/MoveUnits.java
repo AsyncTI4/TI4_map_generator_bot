@@ -100,11 +100,11 @@ public class MoveUnits extends GameStateCommand {
         List<RemovedUnit> removed =
                 RemoveUnitService.removeUnits(event, tileFrom, game, color, fromUnitList, prioritizeDamaged);
         String toUnitList = event.getOption(Constants.UNIT_NAMES_TO).getAsString();
-        UnitHolder space = tileTo.getUnitHolders().get("space");
+        UnitHolder space = tileTo.getSpaceUnitHolder();
         boolean doesTileHaveFloatingGF = false;
         if (space != null && getPlayer().getColor() != null) {
-            doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0
-                    || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
+            doesTileHaveFloatingGF =
+                    space.hasUnit(UnitType.Mech, getPlayer()) || space.hasUnit(UnitType.Infantry, getPlayer());
         }
         AddUnitService.addUnits(event, tileTo, game, color, toUnitList, removed);
         if (space != null
@@ -112,8 +112,8 @@ public class MoveUnits extends GameStateCommand {
                 && !doesTileHaveFloatingGF
                 && ButtonHelper.getOtherPlayersWithShipsInTheSystem(getPlayer(), game, tileTo)
                         .isEmpty()) {
-            doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0
-                    || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
+            doesTileHaveFloatingGF =
+                    space.hasUnit(UnitType.Mech, getPlayer()) || space.hasUnit(UnitType.Infantry, getPlayer());
             if (doesTileHaveFloatingGF) {
                 List<Button> buttons = TacticalActionService.getLandingUnitsButtons(game, getPlayer(), tileTo);
                 Button concludeMove =
@@ -121,7 +121,7 @@ public class MoveUnits extends GameStateCommand {
                 buttons.add(concludeMove);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getChannel(),
-                        getPlayer().getRepresentation() + " you can use these buttons to land troops if necessary",
+                        getPlayer().toString() + " you can use these buttons to land troops if necessary",
                         buttons);
             }
         }

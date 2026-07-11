@@ -28,15 +28,14 @@ class ArbitrationAcd2ButtonHandler {
         List<Button> buttons = getArbitrationOwnerButtons(game, player);
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " has no eligible planets for _Arbitration_.");
+                    player.getCorrectChannel(), player.toString() + " has no eligible planets for _Arbitration_.");
             ButtonHelper.deleteMessage(event);
             return;
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", choose which player's planets to inspect for _Arbitration_.",
+                player.toString() + ", choose which player's planets to inspect for _Arbitration_.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -49,14 +48,14 @@ class ArbitrationAcd2ButtonHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has no eligible planets for _Arbitration_ in that category.");
+                    player.toString() + " has no eligible planets for _Arbitration_ in that category.");
             ButtonHelper.deleteMessage(event);
             return;
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", choose a non-home planet with ground forces for _Arbitration_.",
+                player.toString() + ", choose a non-home planet with ground forces for _Arbitration_.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -73,7 +72,7 @@ class ArbitrationAcd2ButtonHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has no eligible target players for _Arbitration_ on "
+                    player.toString() + " has no eligible target players for _Arbitration_ on "
                             + Helper.getPlanetRepresentation(planet, game) + ".");
             ButtonHelper.deleteMessage(event);
             return;
@@ -81,7 +80,7 @@ class ArbitrationAcd2ButtonHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", choose who will place 1 infantry into coexistence on "
+                player.toString() + ", choose who will place 1 infantry into coexistence on "
                         + Helper.getPlanetRepresentation(planet, game) + ".",
                 buttons);
         ButtonHelper.deleteMessage(event);
@@ -99,7 +98,7 @@ class ArbitrationAcd2ButtonHandler {
         String planet = arbitrationTarget.substring(0, lastSeparator);
         String faction = arbitrationTarget.substring(lastSeparator + 1);
         Player target = game.getPlayerFromColorOrFaction(faction);
-        Tile tile = game.getTileFromPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
         if (target == null || tile == null || target == player || target.hasPlanet(planet)) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Arbitration_.");
             ButtonHelper.deleteMessage(event);
@@ -112,7 +111,7 @@ class ArbitrationAcd2ButtonHandler {
         ButtonHelperAbilities.oceanBoundCheck(game);
 
         String planetRepresentation = Helper.getPlanetRepresentation(planet, game);
-        String message = player.getRepresentation() + " chose " + target.getRepresentationNoPing()
+        String message = player.toString() + " chose " + target.getRepresentationNoPing()
                 + " to place 1 infantry into coexistence on " + planetRepresentation + " using _Arbitration_.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         if (!Objects.equals(player.getCorrectChannel(), target.getCorrectChannel())) {
@@ -148,7 +147,7 @@ class ArbitrationAcd2ButtonHandler {
 
     private static List<Button> getArbitrationPlanetButtons(Game game, Player player, String owner) {
         List<String> planets = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tile.isHomeSystem(game)) {
                 continue;
             }

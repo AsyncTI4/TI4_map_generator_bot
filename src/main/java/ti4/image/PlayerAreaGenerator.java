@@ -740,14 +740,14 @@ public class PlayerAreaGenerator {
             int maxBreachTokens = 7;
             List<Point> points = new ArrayList<>();
             IntStream.range(0, maxBreachTokens).forEach(i -> points.add(new Point(i * 35, 25 * ((i + 1) % 2))));
-            int totalBreaches = (int) game.getTileMap().values().stream()
-                    .flatMap(t -> t.getUnitHolders().values().stream())
+            int totalBreaches = (int) game.getTiles().stream()
+                    .flatMap(t -> t.getUnitHolderValues().stream())
                     .flatMap(uh -> uh.getTokenList().stream())
                     .filter(tok ->
                             Constants.TOKEN_BREACH_ACTIVE.equals(tok) || Constants.TOKEN_BREACH_INACTIVE.equals(tok))
                     .count();
             if (totalBreaches > maxBreachTokens) {
-                String msg = player.getRepresentation()
+                String msg = player.toString()
                         + ", there are too many Breach tokens on the board. Please review and resolve manually.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
@@ -761,13 +761,13 @@ public class PlayerAreaGenerator {
             int maxSeverTokens = 1;
             List<Point> points = new ArrayList<>();
             IntStream.range(0, maxSeverTokens).forEach(i -> points.add(new Point(i * 20, 0)));
-            int severtokens = (int) game.getTileMap().values().stream()
-                    .flatMap(t -> t.getUnitHolders().values().stream())
-                    .filter(uh -> uh.getTokenList().contains(Constants.TOKEN_SEVERED))
+            int severtokens = (int) game.getTiles().stream()
+                    .flatMap(t -> t.getUnitHolderValues().stream())
+                    .filter(uh -> uh.containsToken(Constants.TOKEN_SEVERED))
                     .count();
 
             if (severtokens > maxSeverTokens) {
-                String msg = player.getRepresentation()
+                String msg = player.toString()
                         + ", there are too many Sever tokens on the board. Please review and resolve manually.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
@@ -784,12 +784,12 @@ public class PlayerAreaGenerator {
             int maxGalvanizeTokens = 7;
             List<Point> points = new ArrayList<>();
             IntStream.range(0, maxGalvanizeTokens).forEach(i -> points.add(new Point(i * 20, 20 * ((i + 1) % 2))));
-            int totGalvanized = game.getTileMap().values().stream()
-                    .flatMap(t -> t.getUnitHolders().values().stream())
+            int totGalvanized = game.getTiles().stream()
+                    .flatMap(t -> t.getUnitHolderValues().stream())
                     .mapToInt(UnitHolder::getTotalGalvanizedCount)
                     .sum();
             if (totGalvanized > maxGalvanizeTokens) {
-                String msg = player.getRepresentation()
+                String msg = player.toString()
                         + ", there are too many Galvanized units on the board. Please review and resolve manually.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
@@ -864,8 +864,8 @@ public class PlayerAreaGenerator {
         String alphaID = Mapper.getTokenID("creussalpha");
         String betaID = Mapper.getTokenID("creussbeta");
         String gammaID = Mapper.getTokenID("creussgamma");
-        for (Tile tile : game.getTileMap().values()) {
-            Set<String> tileTokens = tile.getUnitHolders().get("space").getTokenList();
+        for (Tile tile : game.getTiles()) {
+            Set<String> tileTokens = tile.getSpaceUnitHolder().getTokenList();
             alphaOnMap |= tileTokens.contains(alphaID);
             betaOnMap |= tileTokens.contains(betaID);
             gammaOnMap |= tileTokens.contains(gammaID);
@@ -1096,8 +1096,8 @@ public class PlayerAreaGenerator {
         if (model.getAttachment().isEmpty() || model.getAttachment().get().isBlank()) return null;
 
         String tokenID = model.getAttachment().get();
-        for (Tile tile : game.getTileMap().values()) {
-            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+        for (Tile tile : game.getTiles()) {
+            for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
                 if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains(tokenID))) {
                     return Mapper.getPlanet(unitHolder.getName());
                 }
@@ -1663,7 +1663,7 @@ public class PlayerAreaGenerator {
         drawPAImage(x, y, "pa_reinforcements.png");
         if (unitMapCount.isEmpty()) {
             for (Tile tile : tileMap.values()) {
-                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
                     fillUnits(unitMapCount, unitHolder, false);
                 }
             }
@@ -1710,9 +1710,9 @@ public class PlayerAreaGenerator {
                         && model != null
                         && model.getUnitType() == UnitType.Infantry) {
                     for (String planet : player.getPlanetsAllianceMode()) {
-                        UnitHolder planetUh = game.getUnitHolderFromPlanet(planet);
+                        UnitHolder planetUh = game.getPlanet(planet);
                         if (planetUh != null) {
-                            if (planetUh.getUnitCount(UnitType.Infantry, player) > 0) {
+                            if (planetUh.hasUnit(UnitType.Infantry, player)) {
                                 numInReinforcements += 1;
                                 numInReinforcements = Math.min(numInReinforcements, unitCap);
                             }
@@ -1740,7 +1740,7 @@ public class PlayerAreaGenerator {
 
                 String unitName = unitKey.unitType().humanReadableName();
                 if (!game.isHasEnded() && numInReinforcements < 0 && game.isCcNPlasticLimit()) {
-                    String warningMessage = player.getRepresentation()
+                    String warningMessage = player.toString()
                             + " is exceeding unit plastic or cardboard limits for " + unitName
                             + ". Use buttons to remove (note that you cannot remove plastic pieces from systems with your command token in them).";
                     List<Button> removeButtons =
@@ -2209,7 +2209,7 @@ public class PlayerAreaGenerator {
 
             if (types.contains(PlanetType.FAKE)) {
                 fakePlanets.add(planet);
-            } else if (game.getTileFromPlanet(planet) == null) {
+            } else if (game.getTileContainingPlanet(planet) == null) {
                 nonTile.add(planet);
             } else {
                 realPlanets.add(planet);
@@ -2235,7 +2235,7 @@ public class PlayerAreaGenerator {
             Comparator<String> planetComparator = (planet1, planet2) -> {
                 if (homePosition == null) return 0;
 
-                Tile tile1 = game.getTileFromPlanet(planet1);
+                Tile tile1 = game.getTileContainingPlanet(planet1);
                 if (tile1 != null && "51".equals(tile1.getTileID())) {
                     Tile creussGate = game.getTile("17");
                     if (creussGate != null) tile1 = creussGate;
@@ -2244,7 +2244,7 @@ public class PlayerAreaGenerator {
                     if (creussGate != null) tile1 = creussGate;
                 }
 
-                Tile tile2 = game.getTileFromPlanet(planet2);
+                Tile tile2 = game.getTileContainingPlanet(planet2);
                 if (tile2 != null && "51".equals(tile2.getTileID())) {
                     Tile creussGate = game.getTile("17");
                     if (creussGate != null) tile2 = creussGate;
@@ -2343,7 +2343,7 @@ public class PlayerAreaGenerator {
             String coexistFaction = "";
             boolean isExhausted = exhaustedPlanets.contains(planetName);
             for (Player p2 : player.getGame().getRealPlayers()) {
-                if (p2 != player && p2.getPlanets().contains(planetName)) {
+                if (p2 != player && p2.containsPlanet(planetName)) {
                     isExhausted = true;
                     coexistFaction = p2.getFaction();
                     coexist = true;
@@ -2413,7 +2413,7 @@ public class PlayerAreaGenerator {
             }
 
             // GLEDGE CORE
-            if (planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG)) {
+            if (planet.containsToken(Constants.GLEDGE_CORE_PNG)) {
                 String tokenPath = ResourceHelper.getInstance().getTokenFile(Constants.GLEDGE_CORE_PNG);
                 BufferedImage image = ImageHelper.readScaled(tokenPath, 0.25f);
                 graphics.drawImage(image, x + deltaX + 15, y + 112, null);
@@ -2422,7 +2422,7 @@ public class PlayerAreaGenerator {
             boolean hasAttachment = planet.hasAttachment();
             if (hasAttachment) {
                 String planetChevrons = "pc_upgrade.png";
-                if (planet.getTokenList().contains("attachment_tombofemphidia.png")) {
+                if (planet.containsToken("attachment_tombofemphidia.png")) {
                     planetChevrons = "pc_upgrade_tomb.png";
                     ExploreModel tomb = Mapper.getExplore("toe");
                     addWebsiteOverlay(tomb, x + deltaX + 26, y + 40, 20, 20);
@@ -2487,7 +2487,7 @@ public class PlayerAreaGenerator {
             String infFileName = "pc_inf" + statusOfPlanet + ".png";
             int resources = planet.getResources();
             int influence = planet.getInfluence();
-            if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
+            if (planet.containsToken(Constants.GARDEN_WORLDS_PNG)) {
                 resFileName = "pc_res_khrask" + statusOfPlanet + ".png";
                 addWebsiteOverlay("Garden World", null, x + deltaX, y, 20, 20);
             }
@@ -2497,7 +2497,7 @@ public class PlayerAreaGenerator {
 
             graphics.setFont(Storage.getFont16());
             int offset = 11 - graphics.getFontMetrics().stringWidth("" + resources) / 2;
-            if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
+            if (planet.containsToken(Constants.GARDEN_WORLDS_PNG)) {
                 graphics.setColor(Color.BLACK);
                 for (int i = -1; i <= 1; i++) {
                     for (int j = -1; j <= 1; j++) {

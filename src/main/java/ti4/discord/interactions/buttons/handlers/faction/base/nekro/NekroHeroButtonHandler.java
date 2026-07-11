@@ -26,7 +26,7 @@ class NekroHeroButtonHandler {
     @ButtonHandler("nekroHeroStep2_")
     public static void resolveNekroHeroStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        Planet unitHolder = game.getPlanetsInfo().get(planet);
+        Planet unitHolder = game.getPlanet(planet);
         List<String> techTypes = unitHolder.getTechSpecialities();
         if (techTypes.isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "No technology specialties found.");
@@ -47,7 +47,7 @@ class NekroHeroButtonHandler {
                 emoji.repeat(Objects.requireNonNull(key.unitEmoji().emojiString()), amt);
             }
             if (!emoji.isEmpty()) {
-                message.append(p2.getRepresentation())
+                message.append(p2.toString())
                         .append(", your ")
                         .append(emoji)
                         .append(" on ")
@@ -87,8 +87,7 @@ class NekroHeroButtonHandler {
             List<TechnologyModel> techs = new ArrayList<>();
             for (String type : techTypes) techs.addAll(ListTechService.getAllTechOfAType(game, type, player));
             List<Button> buttons = ListTechService.getTechButtons(techs, player, "nekro");
-            message =
-                    new StringBuilder(player.getRepresentation() + ", please choose which technology you wish to get.");
+            message = new StringBuilder(player.toString() + ", please choose which technology you wish to get.");
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message.toString(), buttons);
         } else {
             List<Button> buttons = new ArrayList<>();

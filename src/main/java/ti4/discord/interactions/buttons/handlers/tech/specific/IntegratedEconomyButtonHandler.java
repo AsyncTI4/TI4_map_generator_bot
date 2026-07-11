@@ -20,14 +20,14 @@ class IntegratedEconomyButtonHandler {
     @ButtonHandler("integratedBuild_")
     public static void integratedBuild(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String planet = buttonID.split("_")[1];
-        Tile tile = game.getTileFromPlanet(planet);
-        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        Tile tile = game.getTileContainingPlanet(planet);
+        UnitHolder uH = game.getPlanet(planet);
         int resources = 0;
         if (uH instanceof Planet plan) {
             resources = plan.getResources();
         }
         List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "integrated" + planet, "place");
-        String message = player.getRepresentation()
+        String message = player.toString()
                 + " is using _Integrated Economy_ on " + Helper.getPlanetRepresentation(planet, game)
                 + ". Use the buttons to produce units with a combined cost up to the planet (" + resources
                 + ") resources.\n"

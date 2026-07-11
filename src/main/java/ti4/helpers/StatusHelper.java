@@ -97,7 +97,7 @@ public final class StatusHelper {
             }
             if (!buttons.isEmpty() && Helper.canPlayerScorePOs(game, player)) {
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
-                String msg = player.getRepresentation()
+                String msg = player.toString()
                         + ", you may use these buttons to queue a public objective to score, to speed up the status phase.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
             }
@@ -118,7 +118,7 @@ public final class StatusHelper {
             }
             if (!buttons.isEmpty()) {
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
-                String msg = player.getRepresentation()
+                String msg = player.toString()
                         + ", you may use these buttons to queue a secret objective to score, to speed up the status phase.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
             } else {
@@ -325,16 +325,16 @@ public final class StatusHelper {
                 poScoring(null, player, game.getStoredValue(keyV), game, player.getCorrectChannel());
             } else {
                 if (scorables.isEmpty()) {
-                    messageText = player.getRepresentation()
-                            + ", the bot does not believe that you can score any public objectives.";
+                    messageText =
+                            player.toString() + ", the bot does not believe that you can score any public objectives.";
                 } else {
                     if (Helper.canPlayerScorePOs(game, player)) {
-                        messageText = player.getRepresentation()
+                        messageText = player.toString()
                                 + ", as a reminder, the bot believes you are capable of scoring the following public objective"
                                 + (scorables.size() == 1 ? "" : "s") + ":\n";
                         messageText += String.join("\n", scorables);
                     } else {
-                        messageText = player.getRepresentation()
+                        messageText = player.toString()
                                 + ", you cannot score public objectives because you do not control your home system.";
                     }
                 }
@@ -342,7 +342,7 @@ public final class StatusHelper {
             }
 
             if (scorables.isEmpty() || !Helper.canPlayerScorePOs(game, player)) {
-                String message = player.getRepresentation()
+                String message = player.toString()
                         + " cannot score any public objectives according to the bot, and has been marked as not scoring a public objective.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 game.setStoredValue(player.getFaction() + "round" + game.getRound() + "PO", "None");
@@ -389,15 +389,15 @@ public final class StatusHelper {
                 if (count > 0 && player.isRealPlayer() && !player.isNpc()) {
                     message3a.insert(
                             0,
-                            player.getRepresentation()
+                            player.toString()
                                     + ", as a reminder, the bot believes you are capable of scoring the following secret objective"
                                     + (count == 1 ? "" : "s") + ":");
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message3a.toString());
                 } else if (player.getSo() == 0
                         || player.isNpc()
                         || userSettings.getSandbagPref().contains("bot")) {
-                    String message = player.getRepresentation()
-                            + " has opted not to score a secret objective at this point in time.";
+                    String message =
+                            player.toString() + " has opted not to score a secret objective at this point in time.";
                     game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "None");
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     key2 = "queueToScoreSOs";
@@ -411,7 +411,7 @@ public final class StatusHelper {
                 } else if (player.isRealPlayer()) {
                     MessageHelper.sendMessageToChannel(
                             player.getCardsInfoThread(),
-                            player.getRepresentation()
+                            player.toString()
                                     + ", the bot does not believe that you can score any of your secret objectives.");
                 }
             }
@@ -474,7 +474,7 @@ public final class StatusHelper {
             return PriorityTrackHelper.getPriorityTrack(game).stream()
                     .filter(Objects::nonNull)
                     .toList();
-        } else if (game.getPlanets().contains(EronousPlanetService.CANTRIS_ID)) {
+        } else if (game.containsPlanet(EronousPlanetService.CANTRIS_ID)) {
             return EronousPlanetService.resolveCantrisScoringOrder(game);
         }
         return game.getActionPhaseTurnOrder();
@@ -556,7 +556,7 @@ public final class StatusHelper {
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
-                        player.getRepresentation()
+                        player.toString()
                                 + ", a reminder this is the window to play Speygh, the Kyro hero. You may use the buttons to start the process.",
                         buttons);
             }
@@ -567,24 +567,24 @@ public final class StatusHelper {
                     if (tile == null) {
                         continue;
                     }
-                    UnitHolder unitHolder = tile.getUnitHolders().get(pl);
+                    UnitHolder unitHolder = tile.getPlanet(pl);
                     if (unitHolder != null
                             && unitHolder.getTokenList() != null
-                            && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
+                            && unitHolder.containsToken("attachment_tombofemphidia.png")) {
                         if (player.hasRelic("emphidia")) {
                             MessageHelper.sendMessageToChannel(
                                     player.getCardsInfoThread(),
-                                    player.getRepresentation()
+                                    player.toString()
                                             + ", a reminder this is __not__ the window to use _The Crown of Emphidia_."
                                             + " You may purge _The Crown of Emphidia_ in the status homework phase, which is when buttons will appear.");
                         } else {
                             MessageHelper.sendMessageToChannel(
                                     player.getCardsInfoThread(),
-                                    player.getRepresentation()
+                                    player.toString()
                                             + ", a reminder this is the window to use _The Crown of Emphidia_.");
                             MessageHelper.sendMessageToChannelWithButtons(
                                     player.getCardsInfoThread(),
-                                    player.getRepresentation()
+                                    player.toString()
                                             + ", you may use these buttons to resolve _The Crown of Emphidia_.",
                                     ButtonHelper.getCrownButtons());
                         }
@@ -600,7 +600,7 @@ public final class StatusHelper {
             }
 
             Button editSummary = RoundSummaryHelper.editSummaryButton(game, p2, game.getRound());
-            String endOfRoundMessage = p2.getRepresentation();
+            String endOfRoundMessage = p2.toString();
             endOfRoundMessage +=
                     ", you may write down your end of round thoughts, to be shared at the end of the game.";
             endOfRoundMessage +=
@@ -610,8 +610,8 @@ public final class StatusHelper {
             Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
             if (obsidian != null
                     && obsidian.getPuppetedFactionsForPlot("seethe").contains(p2.getFaction())) {
-                String seetheMsg = obsidian.getRepresentation() + ", please destroy one infantry belonging to "
-                        + p2.getRepresentation() + ", using _Seethe_.";
+                String seetheMsg = obsidian.toString() + ", please destroy one infantry belonging to " + p2.toString()
+                        + ", using _Seethe_.";
                 List<Button> removeButtons = ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(p2, game, "gf");
                 MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), seetheMsg, removeButtons);
             }
@@ -633,15 +633,14 @@ public final class StatusHelper {
     }
 
     private static void sendRemoveBreachButtons(Game game) {
-        Predicate<Tile> hasBreach = t -> t.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
+        Predicate<Tile> hasBreach = t -> t.getSpaceUnitHolder().containsToken(Constants.TOKEN_BREACH_ACTIVE);
         Function<Player, Predicate<Tile>> hasPlayerShips = p -> (t -> FoWHelper.playerHasActualShipsInSystem(p, t));
         for (Player p : game.getRealPlayers()) {
             List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(
                     p, game, "statusRemoveBreach", hasBreach.and(hasPlayerShips.apply(p)), false);
             if (!buttons.isEmpty()) {
                 buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Done removing"));
-                String msg = p.getRepresentation()
-                        + ", you may remove active Breaches from systems that contain your ships.";
+                String msg = p.toString() + ", you may remove active Breaches from systems that contain your ships.";
                 MessageHelper.sendMessageToChannelWithButtons(p.getCorrectChannel(), msg, buttons);
             }
         }
@@ -699,11 +698,11 @@ public final class StatusHelper {
             if (player.getStasisInfantry() > 0 && player.hasUnit("tf-yinclone")) {
                 if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
                     List<Button> buttons = ButtonHelper.getPlaceStatusInfButtons(game, player);
-                    String msg = player.getRepresentation() + ", please use these buttons to revive infantry. You have "
+                    String msg = player.toString() + ", please use these buttons to revive infantry. You have "
                             + player.getStasisInfantry() + " infantry left to revive.";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                 } else {
-                    String msg = player.getRepresentation() + ", you had infantry II to be revived, but";
+                    String msg = player.toString() + ", you had infantry II to be revived, but";
                     msg += " the bot couldn't find any planets you control in your home system to place them on";
                     msg += ", so per the rules they now disappear into the ether.";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -718,9 +717,9 @@ public final class StatusHelper {
             return;
         }
         Player neutral = game.getNeutral();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             for (Planet planet : tile.getPlanetUnitHolders()) {
-                if (planet.getUnitCount(UnitType.Spacedock, neutral) > 0) {
+                if (planet.hasUnit(UnitType.Spacedock, neutral)) {
 
                     int remaining = game.changeCommsOnPlanet(1, planet.getName());
 
@@ -739,7 +738,7 @@ public final class StatusHelper {
                         }
                         Player p1 = neutral;
                         for (Player p : game.getRealPlayers()) {
-                            if (p.getPlanets().contains(planet.getName())) {
+                            if (p.containsPlanet(planet.getName())) {
                                 p1 = p;
                                 break;
                             }
@@ -755,7 +754,7 @@ public final class StatusHelper {
 
     private static void sendEntropicScarButtons(Game game) {
         Map<Player, Integer> scars = new HashMap<>();
-        for (Tile t : game.getTileMap().values()) {
+        for (Tile t : game.getTiles()) {
             if (t.isScar()) {
                 for (Player p : game.getRealPlayers()) {
                     if (Tile.tileHasPlayerShips(p).test(t)) {
@@ -835,10 +834,10 @@ public final class StatusHelper {
 
             String colorID = Mapper.getColorID(player.getColor());
             UnitKey infKey = Mapper.getUnitKey("gf", colorID);
-            for (Tile tile : game.getTileMap().values()) {
-                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            for (Tile tile : game.getTiles()) {
+                for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
                     if (!unitHolder.hasUnits()) continue;
-                    if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
+                    if (unitHolder.hasUnit(UnitType.Flagship, colorID)) {
                         unitHolder.addUnit(infKey, 1);
                         String genesisMessage = player.getRepresentationUnfogged()
                                 + ", 1 infantry was added to the space area of the Genesis (the Sol flagship) automatically.";
@@ -1050,7 +1049,7 @@ public final class StatusHelper {
                     }
                     if (game.getStoredValue(key3).contains(player2.getFaction() + "*")
                             || game.getStoredValue(key3b).contains(player2.getFaction() + "*")) {
-                        message = player.getRepresentation() + " has been queued to score a secret objective. ";
+                        message = player.toString() + " has been queued to score a secret objective. ";
                         if (!game.isFowMode()) {
                             message += player2.getRepresentationUnfogged()
                                     + " is the one the game is currently waiting on.";

@@ -42,10 +42,10 @@ public class AddAllianceMember extends GameStateSubcommand {
     public static void makeAlliancePartners(
             Player player, Player otherPlayer, GenericInteractionCreateEvent event, Game game) {
         String currentMembers = otherPlayer.getAllianceMembers();
-        if (!otherPlayer.getAllianceMembers().contains(player.getFaction())) {
+        if (!otherPlayer.hasAllianceMember(player.getFaction())) {
             otherPlayer.addAllianceMember(player.getFaction() + player.getAllianceMembers());
         }
-        if (!player.getAllianceMembers().contains(otherPlayer.getFaction())) {
+        if (!player.hasAllianceMember(otherPlayer.getFaction())) {
             player.addAllianceMember(otherPlayer.getFaction() + currentMembers);
         }
         player.removeOwnedPromissoryNoteByID(player.getColor() + "_an");
@@ -83,7 +83,7 @@ public class AddAllianceMember extends GameStateSubcommand {
             player.addMahactCC(otherPlayer.getColor());
             MessageHelper.sendMessageToChannel(
                     otherPlayer.getCorrectChannel(),
-                    "Heads up, " + otherPlayer.getRepresentation()
+                    "Heads up, " + otherPlayer.toString()
                             + ", in an alliance game with Mahact as an alliance partner, you do not get Mahact's alliance. "
                             + " They instead grab a command token from your reinforcements and put it in their fleet pool."
                             + " This is because Dane thought Mahact's commander was too powerful to share.");
@@ -92,7 +92,7 @@ public class AddAllianceMember extends GameStateSubcommand {
             otherPlayer.addMahactCC(player.getColor());
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "Heads up, " + player.getRepresentation()
+                    "Heads up, " + player.toString()
                             + ", in an alliance game with Mahact as an alliance partner, you do not get Mahact's alliance. "
                             + " They instead grab a command token from your reinforcements and put it in their fleet pool."
                             + " This is because Dane thought Mahact's commander was too powerful to share.");

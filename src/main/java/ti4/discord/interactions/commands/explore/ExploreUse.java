@@ -56,8 +56,8 @@ class ExploreUse extends GameStateSubcommand {
             planetName = AliasHandler.resolvePlanet(planetName);
         }
         Tile tile = null;
-        if (game.getPlanets().contains(planetName)) {
-            for (Tile tile_ : game.getTileMap().values()) {
+        if (game.containsPlanet(planetName)) {
+            for (Tile tile_ : game.getTiles()) {
                 if (tile != null) {
                     break;
                 }
@@ -76,7 +76,7 @@ class ExploreUse extends GameStateSubcommand {
             }
         }
         Player player = getPlayer();
-        String messageText = player.getRepresentation() + " is resolving the `" + id + "` exploration card.";
+        String messageText = player.toString() + " is resolving the `" + id + "` exploration card.";
         if (force)
             messageText +=
                     "\nThis card was drawn __forcefully__ (if the card wasn't in the deck, it was created from thin air).";

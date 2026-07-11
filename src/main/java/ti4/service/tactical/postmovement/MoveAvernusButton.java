@@ -7,12 +7,12 @@ import ti4.helpers.Units.UnitType;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.tactical.PostMovementAbilityButton;
 import ti4.service.tactical.PostMovementButtonContext;
-import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitQueryService;
 
 public final class MoveAvernusButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
         return ctx.player().hasUnlockedBreakthrough("muaatbt")
-                && CheckUnitContainmentService.getTilesContainingPlayersUnits(ctx.game(), ctx.player(), UnitType.Warsun)
+                && UnitQueryService.getTilesContainingPlayersUnits(ctx.game(), ctx.player(), UnitType.Warsun)
                         .contains(ctx.tile())
                 && !ctx.tile().isHomeSystem(ctx.game());
     }

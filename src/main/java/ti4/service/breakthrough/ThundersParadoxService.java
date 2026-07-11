@@ -54,7 +54,7 @@ public class ThundersParadoxService {
                     player.getCorrectChannel(),
                     null,
                     player.getBreakthroughModel("nomadbt").getRepresentationEmbed());
-            String message = player.getRepresentation() + " is using " + paradoxRep()
+            String message = player.toString() + " is using " + paradoxRep()
                     + ". Use the buttons to choose one of your agents to exhaust.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -62,7 +62,7 @@ public class ThundersParadoxService {
         } else {
             Player nomad = Helper.getPlayerFromUnlockedBreakthrough(game, "nomadbt");
             if (nomad != null) {
-                String msg = "Attention " + nomad.getRepresentation() + " - " + player.getRepresentation(false, false)
+                String msg = "Attention " + nomad.toString() + " - " + player.getRepresentation(false, false)
                         + " is requesting that you use " + paradoxRep() + ".";
                 MessageHelper.sendMessageToChannel(nomad.getCorrectChannel(), msg);
             }
@@ -87,7 +87,7 @@ public class ThundersParadoxService {
             }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
 
-            String msg2 = player.getRepresentation() + ". please choose a player to ready one of their agents.";
+            String msg2 = player.toString() + ". please choose a player to ready one of their agents.";
             List<Button> buttons = new ArrayList<>();
             String buttonPrefix = player.factionButtonChecker() + "useThundersParadox_step3_";
             for (Player p : game.getRealPlayers()) {
@@ -114,7 +114,7 @@ public class ThundersParadoxService {
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Player p2 = game.getPlayerFromColorOrFaction(matcher.group("faction"));
             if (p2 != null) {
-                String message = player.getRepresentation() + ", please choose an agent to refresh for "
+                String message = player.toString() + ", please choose an agent to refresh for "
                         + p2.getRepresentation(false, false) + ".";
 
                 List<Button> buttons = new ArrayList<>();
@@ -152,7 +152,7 @@ public class ThundersParadoxService {
             String leaderID = matcher.group("agent");
 
             if (p2 != null) {
-                String message = p2.getRepresentation() + ", your agent, ";
+                String message = p2.toString() + ", your agent, ";
                 if (p2.hasLeader(leaderID)
                         && p2.getLeader(leaderID).map(Leader::isExhausted).orElse(true)) {
                     Optional<Leader> leader = p2.getLeaderByID(leaderID);

@@ -174,8 +174,8 @@ public class TileImageTest extends BaseTi4Test {
         thibah.getSpaceUnitHolder().addUnitsWithStates(dn, List.of(1, 1, 1, 1));
         thibah.getSpaceUnitHolder().addUnitsWithStates(ff, List.of(5, 0, 1, 0));
         TileImageTestHelper.addUnitsAndControlToPlanet(testPlayer3, thibah, "thibah", UnitType.Spacedock);
-        thibah.getUnitHolderFromPlanet("thibah").addUnitsWithStates(inf, List.of(1, 0, 3, 0));
-        thibah.getUnitHolderFromPlanet("thibah").addUnitsWithStates(mf, List.of(1, 0, 1, 1));
+        thibah.getPlanet("thibah").addUnitsWithStates(inf, List.of(1, 0, 3, 0));
+        thibah.getPlanet("thibah").addUnitsWithStates(mf, List.of(1, 0, 1, 1));
 
         TileImageTestHelper.runTest(thibah, "Thibah.png");
     }

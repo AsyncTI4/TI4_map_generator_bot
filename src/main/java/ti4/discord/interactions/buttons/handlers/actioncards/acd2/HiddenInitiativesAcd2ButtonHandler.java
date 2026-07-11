@@ -28,7 +28,7 @@ class HiddenInitiativesAcd2ButtonHandler {
         if (peekedSecrets.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + ", the secret objective deck is empty; _Hidden Initiatives_ cannot be resolved.");
             event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             return;

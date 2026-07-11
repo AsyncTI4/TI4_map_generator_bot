@@ -40,7 +40,7 @@ public class ArcanumAbilityHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", choose 1 primordial technology to add with **Primordial Secrets**.",
+                player.toString() + ", choose 1 primordial technology to add with **Primordial Secrets**.",
                 buttons);
     }
 
@@ -70,7 +70,7 @@ public class ArcanumAbilityHandler {
         player.addTech(techId);
         MessageHelper.sendMessageToChannelWithEmbed(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " added " + Mapper.getTech(techId).getNameRepresentation()
+                player.toString() + " added " + Mapper.getTech(techId).getNameRepresentation()
                         + " using **Primordial Secrets**.",
                 Mapper.getTech(techId).getRepresentationEmbed());
         if (player.getCardsInfoThread() != null) {

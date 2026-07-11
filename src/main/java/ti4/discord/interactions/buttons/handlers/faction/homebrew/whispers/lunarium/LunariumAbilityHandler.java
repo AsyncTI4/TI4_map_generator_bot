@@ -50,7 +50,7 @@ public class LunariumAbilityHandler {
     public static void moveCCToSheet(ButtonInteractionEvent event, Game game, Player player) {
         if (player.getFleetCC() <= 0) {
             MessageHelper.sendMessageToEventChannel(
-                    event, player.getRepresentation() + " has no fleet tokens to move to the faction sheet.");
+                    event, player.toString() + " has no fleet tokens to move to the faction sheet.");
             return;
         }
         player.setFleetCC(player.getFleetCC() - 1);
@@ -58,7 +58,7 @@ public class LunariumAbilityHandler {
         setFactionSheetCCs(game, player, newSheet);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " moved 1 token from fleet pool to faction sheet (**Multitasking**). Fleet: "
                         + player.getFleetCC() + ". Faction sheet: " + newSheet + ".");
         event.getMessage()
@@ -71,14 +71,14 @@ public class LunariumAbilityHandler {
         int sheetCCs = getFactionSheetCCs(game, player);
         if (sheetCCs <= 0) {
             MessageHelper.sendMessageToEventChannel(
-                    event, player.getRepresentation() + " has no faction sheet tokens to move back to the fleet pool.");
+                    event, player.toString() + " has no faction sheet tokens to move back to the fleet pool.");
             return;
         }
         setFactionSheetCCs(game, player, sheetCCs - 1);
         player.setFleetCC(player.getFleetCC() + 1);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " moved 1 token from faction sheet to fleet pool (**Multitasking**). Fleet: "
                         + player.getFleetCC() + ". Faction sheet: " + (sheetCCs - 1) + ".");
         event.getMessage()

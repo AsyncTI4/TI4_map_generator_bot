@@ -44,12 +44,12 @@ class MoveCoatl extends GameStateSubcommand {
         }
         tokenName = AliasHandler.resolveToken(tokenName);
 
-        StringBuilder sb = new StringBuilder(player.getRepresentation());
+        StringBuilder sb = new StringBuilder(player.toString());
         tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
-        sb.append(" moved the Coatl to ").append(tile.getRepresentation());
-        for (Tile tile_ : game.getTileMap().values()) {
+        sb.append(" moved the Coatl to ").append(tile.toString());
+        for (Tile tile_ : game.getTiles()) {
             if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
-                sb.append(" (from ").append(tile_.getRepresentation()).append(")");
+                sb.append(" (from ").append(tile_.toString()).append(")");
                 break;
             }
         }

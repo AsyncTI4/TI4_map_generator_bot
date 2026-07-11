@@ -13,15 +13,14 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.service.unit.AddUnitService;
-import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class XanUnitHandler {
 
     public static void offerFlagshipReplace(GenericInteractionCreateEvent event, Game game, Player player) {
-        List<Tile> flagshipTiles =
-                CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Flagship);
+        List<Tile> flagshipTiles = UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Flagship);
         if (flagshipTiles.isEmpty()) return;
         Tile flagshipTile = flagshipTiles.getFirst();
         MessageHelper.sendMessageToChannelWithButtons(

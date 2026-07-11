@@ -6,7 +6,6 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.StringHelper;
@@ -23,10 +22,10 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
     @Override
     public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         for (Player player : game.getRealPlayers()) {
-            if (player.getPlanets().contains(winner.toLowerCase())) {
+            if (player.containsPlanet(winner.toLowerCase())) {
                 StringBuilder units = new StringBuilder();
-                Tile tile = game.getTileFromPlanet(winner);
-                Planet uH = ButtonHelper.getUnitHolderFromPlanetName(winner, game);
+                Tile tile = game.getTileContainingPlanet(winner);
+                Planet uH = game.getPlanet(winner);
                 int count = 0;
                 if (uH != null) { // kill coexisters first
                     for (Player p2 : game.getRealPlayersExcludingThis(player)) {
@@ -58,7 +57,7 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
                     MessageHelper.sendMessageToChannel(
                             player.getPrivateChannel(),
                             "Destroyed all ground forces (" + units + ") on " + winner + ", and gave "
-                                    + player.getRepresentation() + " " + StringHelper.pluralize(count, "trade good")
+                                    + player.toString() + " " + StringHelper.pluralize(count, "trade good")
                                     + ".");
                     MessageHelper.sendMessageToChannel(
                             game.getMainGameChannel(),
@@ -67,7 +66,7 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
                     MessageHelper.sendMessageToChannel(
                             game.getMainGameChannel(),
                             "Destroyed all ground forces (" + units + ") on " + winner + ", and gave "
-                                    + player.getRepresentation() + " " + StringHelper.pluralize(count, "trade good")
+                                    + player.toString() + " " + StringHelper.pluralize(count, "trade good")
                                     + " in compensation.");
                 }
             }

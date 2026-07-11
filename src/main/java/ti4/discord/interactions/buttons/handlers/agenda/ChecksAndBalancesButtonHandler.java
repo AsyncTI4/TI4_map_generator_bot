@@ -51,7 +51,7 @@ class ChecksAndBalancesButtonHandler {
                 Collections.reverse(players);
             }
             for (Player p3 : players) {
-                if (p3.getFaction().equalsIgnoreCase(game.getStoredValue("politicalStabilityFaction"))) {
+                if (p3.isFaction(game.getStoredValue("politicalStabilityFaction"))) {
                     continue;
                 }
                 if (foundPlayer) {

@@ -62,8 +62,7 @@ public class SilverFlameService {
 
     private void silverFlameDrumroll(Game game, Player flamePlayer, int target) {
         String gameName = game.getName();
-        String watchPartyMsg =
-                flamePlayer.getRepresentation() + " is rolling for _The Silver Flame_ in " + gameName + "!";
+        String watchPartyMsg = flamePlayer.toString() + " is rolling for _The Silver Flame_ in " + gameName + "!";
         watchPartyMsg += " They are currently at " + flamePlayer.getTotalVictoryPoints() + "/" + game.getVp()
                 + " victory points";
         watchPartyMsg +=
@@ -79,7 +78,7 @@ public class SilverFlameService {
             Game silverFlameGame = GameManager.getManagedGame(gameName).getGame();
             resolveSilverFlameRoll(silverFlameGame, silverFlameGame.getPlayer(flamePlayer.getUserID()), target);
         };
-        String drumrollMessage = flamePlayer.getRepresentation() + " is rolling for " + rep() + "!";
+        String drumrollMessage = flamePlayer.toString() + " is rolling for " + rep() + "!";
         DrumrollService.doDrumroll(flamePlayer.getCorrectChannel(), drumrollMessage, 5, onCompletion);
     }
 
@@ -100,7 +99,7 @@ public class SilverFlameService {
             definitePoint = result.getResult() == 10;
         }
 
-        String resultMsg = "## " + flamePlayer.getRepresentation() + " rolled " + dice + " for _The Silver Flame_! ";
+        String resultMsg = "## " + flamePlayer.toString() + " rolled " + dice + " for _The Silver Flame_! ";
         if (definitePoint && (flamePlayer.getTotalVictoryPoints() + 1 == game.getVp())) {
             resultMsg += "\nEnjoy all the marbles.";
         }
@@ -127,12 +126,12 @@ public class SilverFlameService {
         String message;
         if (id != null) {
             game.scorePublicObjective(player.getUserID(), id);
-            message = player.getRepresentation() + " scored \"" + flame + "\".";
+            message = player.toString() + " scored \"" + flame + "\".";
         } else {
             id = game.addCustomPO(flame, 1);
             game.scorePublicObjective(player.getUserID(), id);
             message = "Custom PO \"" + flame + "\" has been added.";
-            message += "\n" + player.getRepresentation() + " scored \"" + flame + "\".";
+            message += "\n" + player.toString() + " scored \"" + flame + "\".";
         }
         Helper.checkEndGame(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
@@ -156,7 +155,7 @@ public class SilverFlameService {
         // count units
         Map<UnitKey, Integer> allUnitsCount = new HashMap<>();
         List<UnitType> singles = List.of(UnitType.Infantry, UnitType.Fighter);
-        for (UnitHolder uh : homeSystem.getUnitHolders().values()) {
+        for (UnitHolder uh : homeSystem.getUnitHolderValues()) {
             for (UnitKey key : uh.getUnitsByState().keySet()) {
                 int uhAmt = singles.contains(key.unitType()) ? 1 : uh.getUnitCount(key);
                 allUnitsCount.put(key, allUnitsCount.getOrDefault(key, 0) + uhAmt);
@@ -249,12 +248,12 @@ public class SilverFlameService {
         if (!game.isFowMode() && (player.getTotalVictoryPoints() == game.getVp())) {
             DisasterWatchHelper.sendMessageInFlameWatch(
                     game,
-                    "### Just According to _Keikaku_ - " + player.getRepresentation() + " has won " + game.getName()
+                    "### Just According to _Keikaku_ - " + player.toString() + " has won " + game.getName()
                             + " by scoring _Become A Martyr_.");
         } else if (!game.isFowMode()) {
             DisasterWatchHelper.sendMessageInFlameWatch(
                     game,
-                    "### Every _Silver Flame_ has a silver lining; " + player.getRepresentation()
+                    "### Every _Silver Flame_ has a silver lining; " + player.toString()
                             + " has scored _Become A Martyr_ in " + game.getName() + ".");
         }
     }

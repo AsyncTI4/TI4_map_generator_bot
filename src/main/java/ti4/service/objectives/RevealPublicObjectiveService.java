@@ -99,9 +99,7 @@ public class RevealPublicObjectiveService {
         // first do cleanup if necessary
         int playersWithSCs = 0;
         for (Player player : game.getRealPlayers()) {
-            if (player.getSCs() != null
-                    && !player.getSCs().isEmpty()
-                    && !player.getSCs().contains(0)) {
+            if (player.getSCs() != null && !player.getSCs().isEmpty() && !player.hasStrategyCard(0)) {
                 playersWithSCs++;
             }
         }
@@ -219,9 +217,7 @@ public class RevealPublicObjectiveService {
         // first do cleanup if necessary
         int playersWithSCs = 0;
         for (Player player : game.getRealPlayers()) {
-            if (player.getSCs() != null
-                    && !player.getSCs().isEmpty()
-                    && !player.getSCs().contains(0)) {
+            if (player.getSCs() != null && !player.getSCs().isEmpty() && !player.hasStrategyCard(0)) {
                 playersWithSCs++;
             }
         }

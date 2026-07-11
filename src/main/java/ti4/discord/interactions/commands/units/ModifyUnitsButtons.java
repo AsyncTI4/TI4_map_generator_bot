@@ -32,7 +32,7 @@ public class ModifyUnitsButtons extends GameStateCommand {
         Player player = getPlayer();
 
         List<Button> buttons = ButtonHelper.getTilesToModify(player, game);
-        String message = player.getRepresentation() + ", please choose the system in which you wish to modify units. ";
+        String message = player.toString() + ", please choose the system in which you wish to modify units. ";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 

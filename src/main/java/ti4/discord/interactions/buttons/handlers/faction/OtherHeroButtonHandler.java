@@ -65,7 +65,7 @@ class OtherHeroButtonHandler {
         buttons.add(
                 Buttons.red(player.factionButtonChecker() + "pharadnHeroDestroy_" + planet, "Destroy All Infantry"));
         for (int x = 1;
-                x < player.getNomboxTile().getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player) + 1;
+                x < player.getNomboxTile().getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) + 1;
                 x++) {
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + "pharadnHeroCommit_" + planet + "_" + x,
@@ -82,8 +82,8 @@ class OtherHeroButtonHandler {
     @ButtonHandler("pharadnHeroDestroy_")
     public static void pharadnHeroDestroy(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
-        Planet unitHolder = game.getUnitHolderFromPlanet(planet);
-        Tile tile = game.getTileFromPlanet(planet);
+        Planet unitHolder = game.getPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
         if (unitHolder == null || tile == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not locate planet");
             return;
@@ -112,7 +112,7 @@ class OtherHeroButtonHandler {
                 player.getFactionEmoji() + " you chose to use the Pharad'n the Immortal on "
                         + Mapper.getPlanet(planet).getAutoCompleteName() + " to commit " + amount + " infantry.");
         ButtonHelper.deleteMessage(event);
-        Tile tile = game.getTileFromPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
         AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " inf " + planet);
         RemoveUnitService.removeUnits(event, player.getNomboxTile(), game, player.getColor(), amount + " inf");
     }

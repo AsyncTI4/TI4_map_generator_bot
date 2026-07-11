@@ -13,8 +13,7 @@ public final class BreakthroughHelper {
         if (leaderID == null || leaderID.isBlank()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + " cannot gain a new commander, as all commanders are already in play.");
+                    player.toString() + " cannot gain a new commander, as all commanders are already in play.");
             return;
         }
         player.addLeader(leaderID);
@@ -23,7 +22,7 @@ public final class BreakthroughHelper {
                 leaderID,
                 game,
                 player,
-                player.getRepresentation() + " has used _Yin Ascendant_ to acquire a new commander, "
+                player.toString() + " has used _Yin Ascendant_ to acquire a new commander, "
                         + Mapper.getLeader(leaderID).getName() + "!");
     }
 }

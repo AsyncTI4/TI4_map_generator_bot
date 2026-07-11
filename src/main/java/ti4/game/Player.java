@@ -111,12 +111,21 @@ import ti4.service.map.FractureService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
-import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitQueryService;
 import ti4.service.user.AFKService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 
 public class Player extends PlayerProperties implements StoredValueHelper {
+
+    public boolean containsPlanet(String planet) {
+        return getPlanets().contains(planet);
+    }
+
+    @Override
+    public String toString() {
+        return getRepresentation();
+    }
 
     private static final int EMBED_FIELD_VALUE_LIMIT = 1024;
 
@@ -212,7 +221,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                                 + " seems to have planets that don't exist. Try removing them with `/planet remove`. The planet ID is `"
                                 + planet + "`.");
             } else {
-                if (game.getPlanetsInfo().get(planet).isSpaceStation(game)) {
+                if (game.getPlanet(planet).isSpaceStation(game)) {
                     return true;
                 }
             }
@@ -1396,10 +1405,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             if (firstTime > 0) {
                 CommanderUnlockCheckService.checkPlayer(this, "bentor");
                 if (hasUnit("bentor_mech")) {
-                    int mechsRemain = 4 - ButtonHelper.getNumberOfUnitsOnTheBoard(game, this, "mech", true);
+                    int mechsRemain = 4 - UnitQueryService.countUnits(game, this, "mech", true);
                     List<Button> buttons = new ArrayList<>(
                             Helper.getPlanetPlaceUnitButtons(this, game, "mech", "placeOneNDone_skipbuild"));
-                    String message = getRepresentation()
+                    String message = toString()
                             + " due to your mech deploy ability, you may now place a mech on a planet you control.";
                     for (int i = 0; i < firstTime && i < mechsRemain; i++) {
                         MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(), message, buttons);
@@ -1448,7 +1457,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
 
         if (hasAbility("necrophage")) {
-            bonus += ButtonHelper.getNumberOfUnitsOnTheBoard(
+            bonus += UnitQueryService.countUnits(
                     game, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), getColor()));
         }
         if (getRelics().contains("dynamiscore") || getRelics().contains("absol_dynamiscore")) {
@@ -1457,23 +1466,23 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         for (String planet : getPlanets()) {
             if (Mapper.getPlanet(planet) != null
                     && (Mapper.getPlanet(planet).isSpaceStation()
-                            || (game.getUnitHolderFromPlanet(planet) != null
-                                    && game.getUnitHolderFromPlanet(planet).isSpaceStation(game)))) {
+                            || (game.getPlanet(planet) != null
+                                    && game.getPlanet(planet).isSpaceStation(game)))) {
                 bonus++;
             }
             if (hasUnlockedBreakthrough("gledgebt")) {
-                Planet planetObj = game.getUnitHolderFromPlanet(planet);
-                if (planetObj != null && planetObj.getTokenList().contains(Constants.GLEDGE_CORE_PNG)) {
+                Planet planetObj = game.getPlanet(planet);
+                if (planetObj != null && planetObj.containsToken(Constants.GLEDGE_CORE_PNG)) {
                     bonus++;
                 }
             }
         }
         if (ownsUnit("rohdhna_warsun3")) {
-            bonus += ButtonHelper.getNumberOfUnitsOnTheBoard(game, this, "warsun", false);
+            bonus += UnitQueryService.countUnits(game, this, "warsun", false);
         }
         if (game.isFacilitiesMode()) {
             for (String planet : getPlanets()) {
-                UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
+                UnitHolder unitHolder = game.getPlanet(planet);
                 if (unitHolder != null) {
                     for (String token : unitHolder.getTokenList()) {
                         if (token.contains("facility")) {
@@ -2170,13 +2179,13 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                     if (!p2.hasFollowedSC(sc)) {
                         return;
                     }
-                    if (p2.getSCs().contains(sc)) {
+                    if (p2.hasStrategyCard(sc)) {
                         holder = p2;
                     }
                 }
                 MessageHelper.sendMessageToChannel(
                         holder.getCorrectChannel(),
-                        holder.getRepresentation() + ", everyone has reacted to the **" + Helper.getSCName(sc, game)
+                        holder.toString() + ", everyone has reacted to the **" + Helper.getSCName(sc, game)
                                 + "** splice.");
                 if (holder.isNpc()) {
                     ButtonHelperTwilightsFall.startSplice(game, holder, "startSplice_" + sc, null);
@@ -2202,7 +2211,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 }
                 game.setStoredValue("fleetLogWhenSCFinished", "");
                 Player p2 = game.getActivePlayer();
-                String message = p2.getRepresentation() + ", please end turn or do another action.";
+                String message = p2.toString() + ", please end turn or do another action.";
                 List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(p2, game, true, event);
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, systemButtons);
             }
@@ -2215,6 +2224,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public boolean hasFollowedSC(int sc) {
         return getFollowedSCs().contains(sc);
+    }
+
+    public boolean hasStrategyCard(int sc) {
+        return getSCs().contains(sc);
     }
 
     public void clearFollowedSCs() {
@@ -2344,23 +2357,51 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return getTechs().contains(techID);
     }
 
+    public boolean hasExactTech(String techID) {
+        return getTechs().contains(techID);
+    }
+
     public boolean hasTechReady(String techID) {
         return hasTech(techID)
                 && !getExhaustedTechs().contains(techID)
                 && !getExhaustedTechs().contains("tf-" + techID);
     }
 
+    public boolean isTechExhausted(String techID) {
+        return getExhaustedTechs().contains(techID);
+    }
+
     public boolean controlsMecatol(boolean includeAlliance) {
         if (game.isOrdinianC1Mode()) {
             Player p2 = ButtonHelper.getPlayerWhoControlsCoatl(game);
-            return p2 != null && p2.getFaction().equalsIgnoreCase(getFaction());
+            return p2 != null && p2.isFaction(getFaction());
         }
         if (includeAlliance) return CollectionUtils.containsAny(getPlanetsAllianceMode(), game.mecatols());
         return CollectionUtils.containsAny(getPlanets(), game.mecatols());
     }
 
     public boolean isPlayerMemberOfAlliance(Player player2) {
-        return getAllianceMembers().contains(player2.getFaction());
+        return hasAllianceMember(player2.getFaction());
+    }
+
+    public boolean hasAllianceMember(String faction) {
+        return getAllianceMembers().contains(faction);
+    }
+
+    public boolean isFaction(String faction) {
+        return getFaction().equalsIgnoreCase(faction);
+    }
+
+    public boolean isFactionExact(String faction) {
+        return getFaction().equals(faction);
+    }
+
+    public boolean isSameFaction(Player player) {
+        return isFaction(player.getFaction());
+    }
+
+    public boolean isAlliedWith(Player player) {
+        return this == player || hasAllianceMember(player.getFaction());
     }
 
     public List<String> getPlanetsAllianceMode() {
@@ -2377,9 +2418,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public int getNumberOfRealPlanetsAllianceMode() {
         return (int) getPlanetsAllianceMode().stream()
-                .map(planet -> game.getPlanetsInfo().get(planet))
+                .map(planet -> game.getPlanet(planet))
                 .filter(Objects::nonNull)
-                .filter(planet -> !planet.getPlanetModel().getPlanetTypes().contains(PlanetType.FAKE))
+                .filter(planet -> !planet.getPlanetModel().hasType(PlanetType.FAKE))
                 .filter(planet -> !planet.isSpaceStation(game))
                 .count();
     }
@@ -2389,9 +2430,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
         // All planets the player owns count for scoring, except oceans. Oceans are fake
         Set<Planet> playerPlanets = getPlanets().stream()
-                .map(planet -> game.getPlanetsInfo().get(planet))
+                .map(planet -> game.getPlanet(planet))
                 .filter(Objects::nonNull)
-                .filter(p -> !p.getPlanetModel().getPlanetTypes().contains(PlanetType.FAKE))
+                .filter(p -> !p.getPlanetModel().hasType(PlanetType.FAKE))
                 .filter(p -> !p.isSpaceStation(game))
                 .collect(Collectors.toSet());
 
@@ -2409,7 +2450,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                         || hasTech("tf-theburningeye"))) {
             Set<Planet> planetsUnderShips = game.getPlanetsInfo().values().stream()
                     .filter(planet -> {
-                        Tile t = game.getTileFromPlanet(planet.getName());
+                        Tile t = game.getTileContainingPlanet(planet.getName());
                         return t != null
                                 && t.containsPlayersUnitsWithModelCondition(this, UnitModel::getIsShip)
                                 && !planet.isSpaceStation(game);
@@ -2535,7 +2576,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         exhaustPlanet("custodiavigilia");
 
         if (getPlanets().contains(Constants.MR)) {
-            Planet mecatolRex = game.getPlanetsInfo().get(Constants.MR);
+            Planet mecatolRex = game.getPlanet(Constants.MR);
             if (mecatolRex != null) {
                 PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
                 mecatolRex.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
@@ -2547,7 +2588,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     private void removeCustodiaVigilia() {
         removePlanet("custodiavigilia");
         if (getPlanets().contains(Constants.MR)) {
-            Planet mecatolRex = game.getPlanetsInfo().get(Constants.MR);
+            Planet mecatolRex = game.getPlanet(Constants.MR);
             if (mecatolRex != null) {
                 mecatolRex.setSpaceCannonDieCount(0);
                 mecatolRex.setSpaceCannonHitsOn(0);
@@ -2721,7 +2762,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public void addPlanet(String planet) {
         if (!getPlanets().contains(planet)) {
             getPlanets().add(planet);
-            Tile tile = game.getTileFromPlanet(planet);
+            Tile tile = game.getTileContainingPlanet(planet);
             if (tile != null
                     && !game.getStoredValue("combatRoundTracker" + getFaction() + tile.getPosition() + planet)
                             .isEmpty()) {
@@ -2743,18 +2784,16 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             getExhaustedPlanets().add(planet);
         }
         Game game = this.game;
-        if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null
+        if (game.getPlanet(planet) != null
                 && game.isAbsolMode()
-                && ButtonHelper.getUnitHolderFromPlanetName(planet, game)
-                        .getTokenList()
-                        .contains("attachment_nanoforge.png")
+                && game.getPlanet(planet).getTokenList().contains("attachment_nanoforge.png")
                 && !getExhaustedPlanetsAbilities().contains(planet)) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("planetAbilityExhaust_" + planet, "Use Nano-Forge Ability"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(
                     getCorrectChannel(),
-                    getRepresentation()
+                    toString()
                             + ", you may choose to exhaust the _Nano-Forge_ legendary ability to ready the planet it's attached to.",
                     buttons);
         }
@@ -2765,7 +2804,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(
                     getCorrectChannel(),
-                    getRepresentation()
+                    toString()
                             + ", you may exhaust the Ponthous ability and \"exhaust\" the Ponthous + or - card to ready Ponthous.",
                     buttons);
         }
@@ -3002,6 +3041,14 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return getPlanets().contains(planetID);
     }
 
+    public boolean canUsePlanet(String planetID) {
+        return getPlanetsAllianceMode().contains(planetID);
+    }
+
+    public boolean isPlanetExhausted(String planetID) {
+        return getExhaustedPlanets().contains(planetID);
+    }
+
     public boolean hasPlanetReady(String planetID) {
         return hasPlanet(planetID) && !getExhaustedPlanets().contains(planetID);
     }
@@ -3013,7 +3060,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public boolean hasMechInSystem(Tile tile) {
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
         for (UnitHolder unitHolder : unitHolders.values()) {
-            if (unitHolder.getUnitCount(UnitType.Mech, getColorID()) > 0) {
+            if (unitHolder.hasUnit(UnitType.Mech, getColorID())) {
                 return true;
             }
         }
@@ -3027,7 +3074,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 game.getPlayers().values().stream().filter(Player::isRealPlayer).toList());
 
         Set<Tile> playersTiles = new HashSet<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (FoWHelper.playerIsInSystem(game, tile, this, true)) {
                 playersTiles.add(tile);
             }
@@ -3097,7 +3144,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public float getTotalResourceValueOfUnits(String type) {
         float count = 0;
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             count += ButtonHelper.checkValuesOfUnits(this, tile, type);
         }
         return count;
@@ -3105,7 +3152,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public int getTotalHPValueOfUnits(String type) {
         int count = 0;
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             count += ButtonHelper.checkHPOfUnits(this, tile, type);
         }
         return count;
@@ -3113,7 +3160,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public float getTotalCombatValueOfUnits(String type) {
         float count = 0;
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             count += ButtonHelper.checkCombatValuesOfUnits(this, tile, type);
         }
         return Math.round(count * 10) / 10.0f;
@@ -3121,7 +3168,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public float getTotalUnitAbilityValueOfUnits() {
         float count = 0;
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             count += ButtonHelper.checkUnitAbilityValuesOfUnits(this, game, tile);
         }
         return Math.round(count * 10) / 10.0f;
@@ -3351,24 +3398,24 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
 
         if (hasAbility("mobile_command")) {
-            if (CheckUnitContainmentService.getTilesContainingPlayersUnits(game, this, UnitType.Flagship)
+            if (UnitQueryService.getTilesContainingPlayersUnits(game, this, UnitType.Flagship)
                     .isEmpty()) {
                 return null;
             }
-            return CheckUnitContainmentService.getTilesContainingPlayersUnits(game, this, UnitType.Flagship)
+            return UnitQueryService.getTilesContainingPlayersUnits(game, this, UnitType.Flagship)
                     .getFirst();
         }
         if (!getFaction().contains("franken") && game.getTile(AliasHandler.resolveTile(getFaction())) != null) {
             return game.getTile(AliasHandler.resolveTile(getFaction()));
         }
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tile.getPosition().equalsIgnoreCase(getPlayerStatsAnchorPosition()) && tile.isHomeSystem()) {
                 return tile;
             }
-            if (getPlanets().contains("creuss") && tile.getUnitHolders().get("creuss") != null) {
+            if (getPlanets().contains("creuss") && tile.getPlanet("creuss") != null) {
                 return tile;
             }
-            if (tile.getUnitHolders().get("ahkcreuss") != null && getAbilities().contains("sorrow")) {
+            if (tile.getPlanet("ahkcreuss") != null && getAbilities().contains("sorrow")) {
                 return tile;
             }
         }

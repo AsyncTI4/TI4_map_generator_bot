@@ -35,7 +35,7 @@ public class WhisperService {
             feedbackChannel = player.getCardsInfoThread();
             MessageHelper.sendMessageToChannel(
                     feedbackChannel,
-                    player.getRepresentation()
+                    player.toString()
                             + " Reminder you should start all whispers from your `#cards-info` thread, and do not need to use the `/fow whisper` command,"
                             + " you can just start a message with `toblue message...` or something.");
         }

@@ -25,7 +25,7 @@ class GlimmerButtonHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation()
+                player.toString()
                         + ", please choose the system adjacent to your destroyed unit that you wish to place the unit."
                         + "\n-# Note that not all options displayed are legal options. The bot did not check where the unit was destroyed.",
                 Helper.getTileWithShipsPlaceUnitButtons(player, game, unit, "placeOneNDone_skipbuild"));

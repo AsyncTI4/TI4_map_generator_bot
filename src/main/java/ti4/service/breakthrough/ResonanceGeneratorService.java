@@ -73,11 +73,11 @@ public class ResonanceGeneratorService {
         String active = Constants.TOKEN_BREACH_ACTIVE, inactive = Constants.TOKEN_BREACH_INACTIVE;
         String pos = buttonID.replace("flipBreach_", "");
         Tile tile = game.getTileByPosition(pos);
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
 
         // TODO: JAZZ - idk if you can have multiple, but just prefer flipping inactive for now
         String oldState, newState;
-        if (space.getTokenList().contains(inactive)) {
+        if (space.containsToken(inactive)) {
             space.removeToken(inactive);
             space.addToken(active);
             oldState = "inactive";
@@ -97,15 +97,15 @@ public class ResonanceGeneratorService {
     }
 
     public static void checkBreachLimit(Player player, Game game) {
-        int totalBreaches = (int) game.getTileMap().values().stream()
-                .flatMap(t -> t.getUnitHolders().values().stream())
+        int totalBreaches = (int) game.getTiles().stream()
+                .flatMap(t -> t.getUnitHolderValues().stream())
                 .flatMap(uh -> uh.getTokenList().stream())
                 .filter(tok -> Constants.TOKEN_BREACH_ACTIVE.equals(tok) || Constants.TOKEN_BREACH_INACTIVE.equals(tok))
                 .count();
         if (totalBreaches > 7) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + " There are more than 7 breaches on the board. You will need to remove an inactive one or the one you just placed.");
             sendRemoveBreachButtons(player, game);
         }
@@ -113,8 +113,8 @@ public class ResonanceGeneratorService {
 
     public static void sendRemoveBreachButtons(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_INACTIVE)) {
+        for (Tile tile : game.getTiles()) {
+            if (tile.getSpaceUnitHolder().containsToken(Constants.TOKEN_BREACH_INACTIVE)) {
                 String pos = tile.getPosition();
                 buttons.add(Buttons.red(
                         player.factionButtonChecker() + "removeBreach_" + pos,
@@ -135,10 +135,10 @@ public class ResonanceGeneratorService {
             pos = pos.split("_")[0];
         }
         Tile tile = game.getTileByPosition(pos);
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
 
         // TODO: JAZZ - idk if you can have multiple, so don't double add for now
-        if (!space.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE)) {
+        if (!space.containsToken(Constants.TOKEN_BREACH_ACTIVE)) {
             space.addToken(Constants.TOKEN_BREACH_ACTIVE);
         }
 
@@ -155,14 +155,14 @@ public class ResonanceGeneratorService {
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("placeInactiveBreach_", "");
         Tile tile = game.getTileByPosition(pos);
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
 
         // TODO: JAZZ - idk if you can have multiple, so don't double add for now
-        if (!space.getTokenList().contains(Constants.TOKEN_BREACH_INACTIVE)) {
+        if (!space.containsToken(Constants.TOKEN_BREACH_INACTIVE)) {
             space.addToken(Constants.TOKEN_BREACH_INACTIVE);
         }
 
-        String msg = "Placed inactive breach in the " + tile.getRepresentation();
+        String msg = "Placed inactive breach in the " + tile.toString();
         msg += " system using an Exile destroyer.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         checkCrimsonCommanderUnlock(game, player, tile);

@@ -99,7 +99,7 @@ public class ReactionService {
         } else if (message.contains("following")) {
             text = player.getRepresentation(false, false) + " " + message;
         } else {
-            text = player.getRepresentation() + " " + message;
+            text = player.toString() + " " + message;
         }
 
         if (isNotBlank(additionalMessage)) {
@@ -159,7 +159,7 @@ public class ReactionService {
             return;
         }
 
-        String text = player.getRepresentation() + " " + message;
+        String text = player.toString() + " " + message;
         if (game.isFowMode() && sendPublic) {
             text = message;
         } else if (game.isFowMode()) {

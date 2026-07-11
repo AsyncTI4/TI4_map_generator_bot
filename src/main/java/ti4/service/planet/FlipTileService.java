@@ -76,8 +76,7 @@ public class FlipTileService {
                 && List.of("528", "529", "530", "501", "502", "503", "504").contains(tile.getPosition())) {
             boolean anything = false;
             for (String pos : List.of("528", "529", "530", "501", "502", "503", "504")) {
-                for (UnitHolder uh :
-                        game.getTileByPosition(pos).getUnitHolders().values()) {
+                for (UnitHolder uh : game.getTileByPosition(pos).getUnitHolderValues()) {
                     if (uh.hasUnits()) {
                         anything = true;
                         break;
@@ -88,11 +87,11 @@ public class FlipTileService {
             if (anything) {
                 Tile left = game.getTileByPosition("529");
                 Tile right = game.getTileByPosition("503");
-                if (!left.getSpaceUnitHolder().getTokenList().contains("token_whalpha.png")) {
+                if (!left.getSpaceUnitHolder().containsToken("token_whalpha.png")) {
                     left.addToken("token_whalpha.png", "space");
                     left.addToken("token_whbeta.png", "space");
                 }
-                if (!right.getSpaceUnitHolder().getTokenList().contains("token_whalpha.png")) {
+                if (!right.getSpaceUnitHolder().containsToken("token_whalpha.png")) {
                     right.addToken("token_whalpha.png", "space");
                     right.addToken("token_whbeta.png", "space");
                 }

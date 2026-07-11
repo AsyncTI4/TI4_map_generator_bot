@@ -30,7 +30,7 @@ class AgendaDocketButtonHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentation() + ", please "
+                player.toString() + ", please "
                         + "choose how much influence you wish to spend bidding on being one of the two people who propose agendas. You will be"
                         + " prompted to exhaust planets later. Please ensure the value you submit is one that your planets can add up to.",
                 buttons);
@@ -52,7 +52,7 @@ class AgendaDocketButtonHandler {
         for (Player player2 : game.getRealPlayers()) {
             if (game.getStoredValue("docketSpace1").equalsIgnoreCase(player2.getFaction())
                     || player2.hasAbility("galactic_threat")
-                    || player2.getFaction().equalsIgnoreCase(game.getStoredValue("docketspace2"))) {
+                    || player2.isFaction(game.getStoredValue("docketspace2"))) {
                 amount++;
                 continue;
             }
@@ -64,7 +64,7 @@ class AgendaDocketButtonHandler {
         buttons.add(Buttons.gray("reviseBid", "Revise Bid"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentation() + ", you successfully " + "bid " + influence
+                player.toString() + ", you successfully " + "bid " + influence
                         + " influence. Use this button to revise your bid if necessary.",
                 buttons);
 
@@ -124,7 +124,7 @@ class AgendaDocketButtonHandler {
         MessageHelper.sendMessageToChannel(
                 game.getMainGameChannel(),
                 "The Speaker broke the tie for place #" + pos + " in favor of "
-                        + game.getPlayerFromColorOrFaction(faction).getRepresentation() + ".");
+                        + game.getPlayerFromColorOrFaction(faction).toString() + ".");
 
         if (!game.getStoredValue("docketSpace1").isEmpty()
                 && !game.getStoredValue("docketSpace2").isEmpty()) {

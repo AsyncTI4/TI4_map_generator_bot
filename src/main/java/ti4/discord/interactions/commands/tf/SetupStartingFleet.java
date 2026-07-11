@@ -50,7 +50,7 @@ class SetupStartingFleet extends GameStateSubcommand {
         Player player = getPlayer();
 
         if (!player.isRealPlayer() && !"neutral".equals(player.getFaction())) {
-            MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " is not a real player.");
+            MessageHelper.sendMessageToEventChannel(event, player.toString() + " is not a real player.");
             return;
         }
 

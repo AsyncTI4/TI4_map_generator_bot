@@ -7,7 +7,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.tactical.PostMovementAbilityButton;
 import ti4.service.tactical.PostMovementButtonContext;
-import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitQueryService;
 
 public final class MuaatHeroButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
@@ -15,7 +15,7 @@ public final class MuaatHeroButton implements PostMovementAbilityButton {
                 && ((!ctx.tile().isMecatol(ctx.game()) && !ctx.tile().isHomeSystem(ctx.game()))
                         || ctx.game().isWildWildGalaxyMode())
                 && !ctx.tile().getPosition().contains("frac")
-                && CheckUnitContainmentService.getTilesContainingPlayersUnits(ctx.game(), ctx.player(), UnitType.Warsun)
+                && UnitQueryService.getTilesContainingPlayersUnits(ctx.game(), ctx.player(), UnitType.Warsun)
                         .contains(ctx.tile());
     }
 

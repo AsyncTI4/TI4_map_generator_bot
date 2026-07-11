@@ -62,7 +62,7 @@ public class PuppetSoftHeBladeService {
         StringBuilder plotInfo = new StringBuilder("## __" + factionName + " plots are now revealed:__");
         for (String plotID : player.getPlotCards().keySet()) {
             GenericCardModel plot = Mapper.getPlot(plotID);
-            plotInfo.append('\n').append(plot.getRepresentation());
+            plotInfo.append('\n').append(plot.toString());
 
             List<String> puppetedFactions = player.getPuppetedFactionsForPlot(plotID);
             if (puppetedFactions != null && !puppetedFactions.isEmpty()) {
@@ -105,7 +105,7 @@ public class PuppetSoftHeBladeService {
             String label = p.getFactionNameOrColor();
             seetheButtons.add(Buttons.red(prefix + p.getFaction(), label, p.fogSafeEmoji()));
         }
-        String message = obsidian.getRepresentation() + " Resolve the Seethe plot:";
+        String message = obsidian.toString() + " Resolve the Seethe plot:";
         MessageHelper.sendMessageToChannelWithButtons(obsidian.getCorrectChannel(), message, seetheButtons);
     }
 
@@ -117,7 +117,7 @@ public class PuppetSoftHeBladeService {
             String label = p.getFactionNameOrColor();
             extractButtons.add(Buttons.red(prefix + p.getFaction(), label, p.fogSafeEmoji()));
         }
-        String message = obsidian.getRepresentation() + " Resolve the Extract plot:";
+        String message = obsidian.toString() + " Resolve the Extract plot:";
         MessageHelper.sendMessageToChannelWithButtons(obsidian.getCorrectChannel(), message, extractButtons);
     }
 
@@ -160,13 +160,13 @@ public class PuppetSoftHeBladeService {
         newHome.inheritFogData(oldHome);
 
         // Move stuff on cronos to cronos hollow
-        Planet cronos = oldHome.getUnitHolderFromPlanet("cronos");
-        Planet cronosH = newHome.getUnitHolderFromPlanet("cronoshollow");
+        Planet cronos = oldHome.getPlanet("cronos");
+        Planet cronosH = newHome.getPlanet("cronoshollow");
         cronosH.inheritEverythingFrom(cronos);
 
         // Move stuff on tallin to tallin hollow
-        Planet tallin = oldHome.getUnitHolderFromPlanet("tallin");
-        Planet tallinH = newHome.getUnitHolderFromPlanet("tallinhollow");
+        Planet tallin = oldHome.getPlanet("tallin");
+        Planet tallinH = newHome.getPlanet("tallinhollow");
         tallinH.inheritEverythingFrom(tallin);
 
         player.removePlanet("cronos");
@@ -340,8 +340,8 @@ public class PuppetSoftHeBladeService {
         StringBuilder output = new StringBuilder("### " + player.getRepresentationUnfogged());
         output.append(", the following planet has been taken control of by your Viper Hollow:");
         for (String planet : game.getPlanetsPlayerIsCoexistingOn(player)) {
-            UnitHolder uH = game.getUnitHolderFromPlanet(planet);
-            if (uH != null && uH.getUnitCount(UnitType.Mech, player) > 0) {
+            UnitHolder uH = game.getPlanet(planet);
+            if (uH != null && uH.hasUnit(UnitType.Mech, player)) {
                 count++;
                 output.append("\n> ").append(Helper.getPlanetRepresentation(planet, game));
                 AddPlanetService.addPlanet(player, planet, game);

@@ -20,7 +20,7 @@ class HostileWorldAcd2ButtonHandler {
     public static void resolveHostileWorld(Player player, Game game, ButtonInteractionEvent event) {
         List<DiceHelper.Die> rolls = DiceHelper.rollDice(6, 3);
         int hits = DiceHelper.countSuccesses(rolls);
-        StringBuilder message = new StringBuilder(player.getRepresentation())
+        StringBuilder message = new StringBuilder(player.toString())
                 .append(" rolled for _Hostile World_.\n")
                 .append(DiceHelper.formatDiceOutput(rolls));
         String loreQuip = getHostileWorldLoreQuip(hits);

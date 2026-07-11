@@ -141,6 +141,10 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return types;
     }
 
+    public boolean hasType(PlanetTypeModel.PlanetType type) {
+        return getPlanetTypes().contains(type);
+    }
+
     @JsonIgnore
     public String getNameNullSafe() {
         return Optional.ofNullable(name).orElse("");

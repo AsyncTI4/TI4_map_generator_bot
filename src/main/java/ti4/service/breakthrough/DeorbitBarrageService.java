@@ -35,8 +35,7 @@ public class DeorbitBarrageService {
 
     private List<Planet> getAllPlanetsInRange(Game game, Player player) {
         Predicate<Tile> asteroidWithUnit = Tile.tileHasPlayerShips(player).and(Tile::isAsteroidField);
-        List<Tile> asteroids =
-                game.getTileMap().values().stream().filter(asteroidWithUnit).toList();
+        List<Tile> asteroids = game.getTiles().stream().filter(asteroidWithUnit).toList();
 
         return asteroids.stream()
                 .map(Tile::getPosition)
@@ -61,7 +60,7 @@ public class DeorbitBarrageService {
 
             buttons.add(Buttons.red("deorbitBarrageTarget_" + p2.getFaction(), null, p2.fogSafeEmoji()));
         }
-        String msg = player.getRepresentation() + ", please choose the player whose planet you want to target with "
+        String msg = player.toString() + ", please choose the player whose planet you want to target with "
                 + deorbitRep(true) + ".";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
@@ -134,11 +133,12 @@ public class DeorbitBarrageService {
                     ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
                 }
                 buttons.add(Buttons.red(
-                        "getDamageButtons_" + game.getTileFromPlanet(planet).getPosition() + "_bombardment",
+                        "getDamageButtons_"
+                                + game.getTileContainingPlanet(planet).getPosition() + "_bombardment",
                         "Assign Hit" + (hits == 1 ? "" : "s")));
                 MessageHelper.sendMessageToChannelWithButtons(
                         game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
-                        p2.getRepresentation() + ", please assign the hits" + (hits == 1 ? "" : "s")
+                        p2.toString() + ", please assign the hits" + (hits == 1 ? "" : "s")
                                 + ". Reminder that the player who did the barrage officially assigns the hits, but that you can sustain if they assign a hit to mechs. Ask them how they would like you to assign hits.",
                         buttons);
             }

@@ -9,7 +9,7 @@ import ti4.service.tactical.MoveContext;
 
 public final class LightningDrivesButton implements MoveAbilityButton {
     public boolean enabled(MoveContext ctx) {
-        return ctx.player.getTechs().contains("dsgledb");
+        return ctx.player.hasExactTech("dsgledb");
     }
 
     public List<Button> build(MoveContext ctx) {

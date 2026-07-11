@@ -527,10 +527,9 @@ public class NucleusSliceGeneratorService {
     }
 
     private boolean isRemoveCandidate(MiltyDraftTile draftTile, PlanetType maxTrait, boolean isOnBoard) {
-        if (draftTile.getTile().getPlanetUnitHolders().isEmpty()) return false;
+        if (!draftTile.getTile().hasPlanets()) return false;
         List<Planet> planets = draftTile.getTile().getPlanetUnitHolders();
-        boolean hasMax = planets.stream()
-                .anyMatch(p -> p.getPlanetModel().getPlanetTypes().contains(maxTrait));
+        boolean hasMax = planets.stream().anyMatch(p -> p.getPlanetModel().hasType(maxTrait));
         boolean hasBoardWormholes = isOnBoard && draftTile.hasAnyWormhole();
         return hasMax && !hasBoardWormholes;
     }

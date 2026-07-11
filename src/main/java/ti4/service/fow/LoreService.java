@@ -547,7 +547,7 @@ public final class LoreService {
                 // so a button still renders as valid if an entry was ever stored under an alias.
                 String planetId = AliasHandler.resolvePlanet(key.base());
                 PlanetModel planet = Mapper.getPlanet(planetId);
-                if (!game.getPlanets().contains(planetId)) isValidLore = false;
+                if (!game.containsPlanet(planetId)) isValidLore = false;
 
                 String label = planet == null ? key.base() : planet.getName();
                 buttonLabel = key.tag() == null ? label : label + " #" + key.tag();
@@ -583,7 +583,7 @@ public final class LoreService {
      *  or the position of the system containing the underlying planet for planet lore. */
     private static String resolvePosition(Game game, String target, boolean isSystemLore) {
         if (isSystemLore) return target;
-        Tile tile = game.getTileFromPlanet(splitTargetKey(target).base());
+        Tile tile = game.getTileContainingPlanet(splitTargetKey(target).base());
         return tile != null ? tile.getPosition() : target;
     }
 
@@ -921,7 +921,7 @@ public final class LoreService {
         } else {
             PlanetModel planet =
                     Mapper.getPlanet(AliasHandler.resolvePlanet(typed.base().replace(" ", "")));
-            if (planet == null || !game.getPlanets().contains(planet.getID())) {
+            if (planet == null || !game.containsPlanet(planet.getID())) {
                 return null;
             }
             canonicalBase = planet.getID();
@@ -1067,7 +1067,7 @@ public final class LoreService {
         // Player-facing content always uses the base system/planet — a GM's "#tag" disambiguator is
         // storage/bookkeeping only and should never leak into what a player actually sees.
         String base = splitTargetKey(target).base();
-        Tile tile = isSystemLore ? game.getTileByPosition(base) : game.getTileFromPlanet(base);
+        Tile tile = isSystemLore ? game.getTileByPosition(base) : game.getTileContainingPlanet(base);
         PlanetModel planet = isSystemLore ? null : Mapper.getPlanet(base);
         String titleTile = "of ";
         if (isPhaseTarget(base)) {
@@ -1359,9 +1359,9 @@ public final class LoreService {
         if (matches.isEmpty()) return;
 
         // CONTROLLED requires planet control; MOVED requires units on planet; GROUND_BATTLE has no extra guard
-        if (trigger == TRIGGER.CONTROLLED && !player.getPlanets().contains(planet)
+        if (trigger == TRIGGER.CONTROLLED && !player.containsPlanet(planet)
                 || trigger == TRIGGER.MOVED
-                        && !FoWHelper.playerHasUnitsOnPlanet(player, game.getTileFromPlanet(planet), planet)) {
+                        && !FoWHelper.playerHasUnitsOnPlanet(player, game.getTileContainingPlanet(planet), planet)) {
             return;
         }
 
@@ -1520,8 +1520,7 @@ public final class LoreService {
             List<Button> buttons = Arrays.asList(Buttons.green(acceptId, "Accept"), Buttons.red(rejectId, "Reject"));
             MessageHelper.sendMessageToChannelWithEmbed(
                     p.getCorrectChannel(), p.getRepresentationUnfogged() + ", Lore was discovered.", embed);
-            MessageHelper.sendMessageToChannel(
-                    p.getCorrectChannel(), p.getRepresentation() + ", Accept or reject?", buttons);
+            MessageHelper.sendMessageToChannel(p.getCorrectChannel(), p.toString() + ", Accept or reject?", buttons);
             addStoredId(game, choiceOfferedKey(target), p.getUserID());
         }
     }
@@ -1662,7 +1661,7 @@ public final class LoreService {
             MessageHelper.sendMessageToChannelWithEmbed(
                     p.getCorrectChannel(), p.getRepresentationUnfogged() + ", Lore was discovered.", embed);
             MessageHelper.sendMessageToChannel(
-                    p.getCorrectChannel(), p.getRepresentation() + ", roll the dice to see your reward!", buttons);
+                    p.getCorrectChannel(), p.toString() + ", roll the dice to see your reward!", buttons);
             addStoredId(game, choiceOfferedKey(target), p.getUserID());
         }
     }
@@ -1759,7 +1758,7 @@ public final class LoreService {
                 Buttons.green(wonButtonId, "I won this battle"), Buttons.red(lostButtonId, "I lost this battle"));
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", did you win or lose this battle? Lore awaits your answer.",
+                player.toString() + ", did you win or lose this battle? Lore awaits your answer.",
                 buttons);
     }
 
@@ -1793,7 +1792,7 @@ public final class LoreService {
             Player player, Game game, String target, boolean isSystemLore, LoreEntry loreEntry, String position) {
         Map<String, LoreEntry> gameLore = getGameLore(game);
         Map<MessageChannel, String> channels = new HashMap<>();
-        String who = player.getRepresentation() + " ";
+        String who = player.toString() + " ";
         switch (loreEntry.receiver) {
             case CURRENT, WINNER, LOSER:
                 channels.put(player.getCorrectChannel(), player.getRepresentationUnfogged());

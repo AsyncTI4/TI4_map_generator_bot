@@ -22,7 +22,7 @@ class BoardingPartyAcd2ButtonHandler {
         String pos = game.getActiveSystem();
         List<Button> buttons = Helper.getPlaceUnitButtons(
                 event, player, game, game.getTileByPosition(pos), type, "placeOneNDone_skipbuild");
-        String message = player.getRepresentation() + ", use the buttons to place the 1 ship you killed under 5 cost. ";
+        String message = player.toString() + ", use the buttons to place the 1 ship you killed under 5 cost. ";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
 }

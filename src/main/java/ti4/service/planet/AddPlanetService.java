@@ -46,7 +46,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.unit.AddUnitService;
-import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitQueryService;
 import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
@@ -68,8 +68,8 @@ public class AddPlanetService {
         if ("mirage".equals(planet) || "avernus".equals(planet) || "thundersedge".equals(planet)) {
             game.clearPlanetsCache();
         }
-        Tile tile = game.getTileFromPlanet(planet);
-        Planet unitHolder = game.getPlanetsInfo().get(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
+        Planet unitHolder = game.getPlanet(planet);
 
         if (!"custodiavigilia".equalsIgnoreCase(planet) && !"ghoti".equalsIgnoreCase(planet)) {
             if (unitHolder == null || tile == null) {
@@ -86,24 +86,23 @@ public class AddPlanetService {
             BotLogger.error(
                     event != null ? new LogOrigin(event) : null,
                     "Unitholder found null in addPlanet for planet " + planet);
-            unitHolder = game.getUnitHolderFromPlanet(planet);
+            unitHolder = game.getPlanet(planet);
         }
-        if (player.isRealPlayer() && unitHolder.getTokenList().contains("token_freepeople.png")) {
+        if (player.isRealPlayer() && unitHolder.containsToken("token_freepeople.png")) {
             unitHolder.removeToken("token_freepeople.png");
         }
-        if (unitHolder.getTokenList().contains("token_tomb.png") && player.hasAbility("ancient_empire")) {
+        if (unitHolder.containsToken("token_tomb.png") && player.hasAbility("ancient_empire")) {
             unitHolder.removeToken("token_tomb.png");
             AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), "2 inf");
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + ", you captured 2 infantry from a Tomb token.");
+                    player.getCorrectChannel(), player.toString() + ", you captured 2 infantry from a Tomb token.");
         }
 
         int shrineCount = 0;
-        shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine1.png") ? 1 : 0);
-        shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine2.png") ? 1 : 0);
-        shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine3.png") ? 1 : 0);
-        shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine4.png") ? 1 : 0);
+        shrineCount += (unitHolder.containsToken("token_kaltrimshrine1.png") ? 1 : 0);
+        shrineCount += (unitHolder.containsToken("token_kaltrimshrine2.png") ? 1 : 0);
+        shrineCount += (unitHolder.containsToken("token_kaltrimshrine3.png") ? 1 : 0);
+        shrineCount += (unitHolder.containsToken("token_kaltrimshrine4.png") ? 1 : 0);
         if ((shrineCount >= 1) && player.hasAbility("questing_prince")) {
             unitHolder.removeToken("token_kaltrimshrine1.png");
             unitHolder.removeToken("token_kaltrimshrine2.png");
@@ -112,21 +111,21 @@ public class AddPlanetService {
             if (game.getStoredValue("kaltrimcrownplanet").equalsIgnoreCase(planet)) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation()
+                        player.toString()
                                 + ", you reclaimed your Crown Shrine from "
                                 + Helper.getPlanetRepresentation(planet, game)
                                 + " with your **The Questing Prince** ability. Congratz!");
                 String kalt = "Kaltrim Crown Token";
                 Integer id = game.addCustomPO(kalt, 1);
                 game.scorePublicObjective(player.getUserID(), id);
-                String message2 = "Custom public objective \"_" + kalt + "_\" has been added.\n"
-                        + player.getRepresentation() + " scored \"_" + kalt + "_\".";
+                String message2 = "Custom public objective \"_" + kalt + "_\" has been added.\n" + player.toString()
+                        + " scored \"_" + kalt + "_\".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2);
                 CommanderUnlockCheckService.checkPlayer(player, "kaltrim");
             } else {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation()
+                        player.toString()
                                 + ", you reclaimed " + (shrineCount == 1 ? "a Shrine" : shrineCount + " Shrines")
                                 + " from "
                                 + Helper.getPlanetRepresentation(planet, game)
@@ -146,7 +145,7 @@ public class AddPlanetService {
             if (ccPath != null) {
                 unitHolder.addControl(ccID);
             }
-            if (unitHolder.getTokenList().contains(Constants.CUSTODIAN_TOKEN_PNG)) {
+            if (unitHolder.containsToken(Constants.CUSTODIAN_TOKEN_PNG)) {
                 unitHolder.removeToken(Constants.CUSTODIAN_TOKEN_PNG);
                 game.scorePublicObjective(player.getUserID(), 0);
                 GameEventService.commit(game, GameEventType.OBJECTIVE_SCORED, player, Map.of("category", "CUSTODIAN"));
@@ -154,7 +153,7 @@ public class AddPlanetService {
                 if (game.isFowMode()) {
                     channel = player.getPrivateChannel();
                 }
-                MessageHelper.sendMessageToChannel(channel, "# " + player.getRepresentation() + " scored Custodians!");
+                MessageHelper.sendMessageToChannel(channel, "# " + player.toString() + " scored Custodians!");
                 String message2 = player.getRepresentationUnfogged()
                         + ", choose the planets you wish to exhaust to spend " + MiscEmojis.Influence_6 + ".";
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
@@ -190,8 +189,8 @@ public class AddPlanetService {
                             int shardID = game.getRevealedPublicObjectives().get(customPOName);
                             game.unscorePublicObjective(player_.getUserID(), shardID);
                             game.scorePublicObjective(player.getUserID(), shardID);
-                            String msg2 = player_.getRepresentation() + " lost Mecatol Rex and lost a victory point. "
-                                    + player.getRepresentation()
+                            String msg2 = player_.toString() + " lost Mecatol Rex and lost a victory point. "
+                                    + player.toString()
                                     + " gained Mecatol Rex and a victory point.";
                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
                             Helper.checkEndGame(game, player);
@@ -202,9 +201,9 @@ public class AddPlanetService {
                                 && player.isRealPlayer()
                                 && ButtonHelper.isPlanetLegendaryOrHome(planet, game, true, player_)
                                 && !doubleCheck) {
-                            String msg2 = player_.getRepresentation()
+                            String msg2 = player_.toString()
                                     + " lost _Shard of the Throne_ and lost a victory point. "
-                                    + player.getRepresentation()
+                                    + player.toString()
                                     + " gained _Shard of the Throne_ and a victory point.";
                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
                             player_.removeRelic(relic);
@@ -247,7 +246,7 @@ public class AddPlanetService {
                         }
                     }
                     if (Mapper.getPlanet(planet) != null) {
-                        String msg = player_.getRepresentation()
+                        String msg = player_.toString()
                                 + " lost control of "
                                 + Mapper.getPlanet(planet).getName()
                                 + (player_.isNeutral() ? "" : " (and could perhaps resolve some applicable ability)")
@@ -261,14 +260,14 @@ public class AddPlanetService {
                         }
                         if (player_.isRealPlayer()
                                 && player_.getNumberOfRealPlanetsAllianceMode() == 0
-                                && CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                                && UnitQueryService.getTilesContainingPlayersUnits(
                                                 game, player_, UnitType.Infantry, UnitType.Mech, UnitType.Spacedock)
                                         .isEmpty()) {
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Buttons.red(
                                     "eliminatePlayer_" + player_.getFaction(),
                                     "Eliminate " + player_.getFlexibleDisplayName()));
-                            msg = player_.getRepresentation()
+                            msg = player_.toString()
                                     + ", the game believes that you ought to be eliminated. Press the button if this is accurate (anyone can press the button).";
                             MessageHelper.sendMessageToChannel(player_.getCorrectChannel(), msg, buttons);
                         }
@@ -304,7 +303,7 @@ public class AddPlanetService {
                 && player.isRealPlayer()
                 && tile != null
                 && !tile.isHomeSystem(game)
-                && (unitHolder.getPlanetModel().getPlanetTypes().contains(PlanetType.FACTION))) {
+                && (unitHolder.getPlanetModel().hasType(PlanetType.FACTION))) {
             PlanetModel p = Mapper.getPlanet(unitHolder.getName());
             if (!p.getFactionHomeworld().equalsIgnoreCase(player.getFaction())) {
                 unitHolder.addToken("attachment_threetraits.png");
@@ -324,7 +323,7 @@ public class AddPlanetService {
                         List.of(Buttons.GET_A_TECH));
             } else {
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                String message2 = player.getRepresentation()
+                String message2 = player.toString()
                         + ", you would research a technology, but because of **Propagation**, you instead gain 3 command tokens."
                         + " Your current command tokens are " + player.getCCRepresentation()
                         + ". Use buttons to gain command tokens.";
@@ -335,11 +334,11 @@ public class AddPlanetService {
 
         if (game.isMinorFactionsMode()
                 && tile != null
-                && unitHolder.getTokenList().contains("attachment_threetraits.png")
+                && unitHolder.containsToken("attachment_threetraits.png")
                 && player.isRealPlayer()) {
             boolean ownsThemAll = true;
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
-                if (!player.getPlanets().contains(uH.getName())) {
+                if (!player.containsPlanet(uH.getName())) {
                     ownsThemAll = false;
                     break;
                 }
@@ -380,11 +379,11 @@ public class AddPlanetService {
                             + " to the planet of " + Helper.getPlanetRepresentation(planet2, game) + ".");
         }
 
-        if (unitHolder.getTokenList().contains("token_relictoken.png") && player.isRealPlayer()) {
+        if (unitHolder.containsToken("token_relictoken.png") && player.isRealPlayer()) {
             unitHolder.removeToken("token_relictoken.png");
             if (!alreadyOwned) {
                 Button draw = Buttons.green(player.factionButtonChecker() + "drawRelic", "Draw A Relic");
-                String message = player.getRepresentation()
+                String message = player.toString()
                         + " has gained control of a planet which allows them to draw a relic!\nUse the button __after__ you have resolved __all__ ground combats.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, draw);
             }
@@ -447,11 +446,11 @@ public class AddPlanetService {
 
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + " is resolving _Rhodun's Reliquary_ to either research a technology or remove the command token from the system.");
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + ", please choose whether you want to __research__ a technology or remove the command token from the system (or neither).",
                     buttons);
         }
@@ -471,8 +470,7 @@ public class AddPlanetService {
                 && !setup) {
             String message;
             if (tile != null && planet != null) {
-                Set<String> tokenList =
-                        ButtonHelper.getUnitHolderFromPlanetName(planet, game).getTokenList();
+                Set<String> tokenList = game.getPlanet(planet).getTokenList();
                 boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
                 if (!containsDMZ) {
                     AddUnitService.addUnits(event, tile, game, player.getColor(), "inf " + planet);
@@ -529,7 +527,7 @@ public class AddPlanetService {
                 && !setup
                 && tile != null) {
             UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
-            tile.getUnitHolders().get(planet).addUnit(infKey, 1);
+            tile.getPlanet(planet).addUnit(infKey, 1);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), "Added 1 infantry to " + planet + " due to **Enslave**.");
         }
@@ -587,7 +585,7 @@ public class AddPlanetService {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("deployMykoSD_" + planet, "Deploy Space Dock " + planet));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
-            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd") < 3) {
+            if (UnitQueryService.countUnits(game, player, "sd") < 3) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
@@ -625,7 +623,7 @@ public class AddPlanetService {
         }
 
         if (!setup && tile != null && FealtyUplinkService.canUseFealty(game, player, tile)) {
-            Planet p = tile.getUnitHolderFromPlanet(planet);
+            Planet p = tile.getPlanet(planet);
             if (p != null && !alreadyOwned) {
                 FealtyUplinkService.postInitialButtons(game, player, planet);
             } else {
@@ -638,7 +636,7 @@ public class AddPlanetService {
                 && player.hasUnit("saar_mech")
                 && !setup
                 && !ButtonHelper.isLawInPlay(game, "articles_war")
-                && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
+                && UnitQueryService.countUnits(game, player, "mech") < 4) {
             List<Button> saarButton = new ArrayList<>();
             saarButton.add(Buttons.green(
                     "saarMechRes_" + planet,
@@ -651,7 +649,7 @@ public class AddPlanetService {
                     saarButton);
         }
         if (player.hasTech("ie") && unitHolder.getResources() > 0 && !setup) {
-            String message = player.getRepresentation()
+            String message = player.toString()
                     + " Click the button to resolve an _Integrated Economy_ build on "
                     + Helper.getPlanetRepresentation(planet, game) + ".";
             List<Button> buttons = new ArrayList<>();
@@ -674,11 +672,11 @@ public class AddPlanetService {
             String message;
             if (id != null) {
                 game.scorePublicObjective(player.getUserID(), id);
-                message = player.getRepresentation() + " scored '" + marrow + "'";
+                message = player.toString() + " scored '" + marrow + "'";
             } else {
                 id = game.addCustomPO(marrow, 1);
                 game.scorePublicObjective(player.getUserID(), id);
-                message = "Custom public objective \"_" + marrow + "_\" has been added.\n" + player.getRepresentation()
+                message = "Custom public objective \"_" + marrow + "_\" has been added.\n" + player.toString()
                         + " scored \"_" + marrow + "_\".";
             }
             for (Player p : game.getRealPlayers()) {

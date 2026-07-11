@@ -60,7 +60,7 @@ class PersonalCleanup extends GameStateSubcommand {
         }
         Map<Integer, Boolean> scPlayed = game.getScPlayed();
         for (Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
-            if (player.getSCs().contains(sc.getKey())) sc.setValue(false);
+            if (player.hasStrategyCard(sc.getKey())) sc.setValue(false);
         }
 
         player.setPassed(false);

@@ -37,15 +37,15 @@ class IonFlip extends GameStateSubcommand {
                     event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
-        UnitHolder spaceUnitHolder = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder spaceUnitHolder = tile.getSpaceUnitHolder();
         if (spaceUnitHolder == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No valid Space found");
             return;
         }
-        if (spaceUnitHolder.getTokenList().contains(Constants.TOKEN_ION_ALPHA_PNG)) {
+        if (spaceUnitHolder.containsToken(Constants.TOKEN_ION_ALPHA_PNG)) {
             tile.removeToken(Constants.TOKEN_ION_ALPHA_PNG, spaceUnitHolder.getName());
             tile.addToken(Constants.TOKEN_ION_BETA_PNG, spaceUnitHolder.getName());
-        } else if (spaceUnitHolder.getTokenList().contains(Constants.TOKEN_ION_BETA_PNG)) {
+        } else if (spaceUnitHolder.containsToken(Constants.TOKEN_ION_BETA_PNG)) {
             tile.removeToken(Constants.TOKEN_ION_BETA_PNG, spaceUnitHolder.getName());
             tile.addToken(Constants.TOKEN_ION_ALPHA_PNG, spaceUnitHolder.getName());
         }

@@ -62,7 +62,7 @@ class AddTileRandom extends GameStateSubcommand {
         StringBuilder msg = new StringBuilder();
         for (String position : positions) {
             Set<TileModel> existingTileModels =
-                    game.getTileMap().values().stream().map(Tile::getTileModel).collect(Collectors.toSet());
+                    game.getTiles().stream().map(Tile::getTileModel).collect(Collectors.toSet());
 
             List<TileModel> availableTiles =
                     AddTileService.availableTiles(sources, randomOption, existingTileModels, drawnTiles);

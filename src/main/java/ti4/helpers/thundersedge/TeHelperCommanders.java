@@ -99,7 +99,7 @@ public class TeHelperCommanders {
             game.setStoredValue("OjzRetreatMap", TeHelperAbilities.storeMovementMap(ojzMap));
 
             List<Button> buttons = getWatchfulOjzUnitButtons(game, player, source, ojzMap.get(pos));
-            String message = player.getRepresentation()
+            String message = player.toString()
                     + ", choose up to 2 ships to retreat as well as anything they may transport using Watchful Ojz, the Ral Nel commander.";
             message += TeHelperAbilities.unitSummary(game, player, ojzMap);
             MessageHelper.editMessageWithButtons(event, message, buttons);
@@ -135,8 +135,8 @@ public class TeHelperCommanders {
                         "Retreat To " + t.getRepresentationForButtons(game, player)));
             }
 
-            String message = player.getRepresentation()
-                    + ", please choose a destination system to send your retreating units to.";
+            String message =
+                    player.toString() + ", please choose a destination system to send your retreating units to.";
             message += TeHelperAbilities.unitSummary(game, player, ojzMap);
             MessageHelper.editMessageWithButtons(event, message, buttons);
         } else {
@@ -185,7 +185,7 @@ public class TeHelperCommanders {
             if (!player.hasUnit("ralnel_flagship")) movedFlagship = false;
             game.removeStoredValue("OjzRetreatMap");
 
-            String msg = player.getRepresentation() + " retreated the following units to "
+            String msg = player.toString() + " retreated the following units to "
                     + tile.getRepresentationForButtons(game, player);
             msg += " using Watchful Ojz, the Ral Nel commander:";
             msg += TeHelperAbilities.unitSummary(game, player, ojzMap);
@@ -204,7 +204,7 @@ public class TeHelperCommanders {
             Game game, Player player, Tile source, List<String> movedUnits) {
         // Get buttons to move units from this system
         List<Button> buttons = new ArrayList<>();
-        for (UnitHolder uh : source.getUnitHolders().values()) {
+        for (UnitHolder uh : source.getUnitHolderValues()) {
             String uhName = "space".equals(uh.getName()) ? "Space" : Helper.getPlanetRepresentation(uh.getName(), game);
             for (UnitKey uk : uh.getUnitsByState().keySet()) {
                 // franken compat

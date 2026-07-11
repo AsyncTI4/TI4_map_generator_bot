@@ -19,12 +19,10 @@ class DataArchiveAcd2ButtonHandler {
     public static void resolveDataArchive(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game, true);
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentation() + ", use buttons to explore planet #1.",
-                buttons);
+                player.getCorrectChannel(), player.toString() + ", use buttons to explore planet #1.", buttons);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", use buttons to explore planet #2 (different planet from #1).",
+                player.toString() + ", use buttons to explore planet #2 (different planet from #1).",
                 buttons);
         if (game.getPhaseOfGame().toLowerCase().contains("agenda")) {
             for (String planet : player.getPlanets()) {

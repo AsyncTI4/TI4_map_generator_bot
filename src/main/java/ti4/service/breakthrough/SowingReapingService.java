@@ -46,8 +46,7 @@ public class SowingReapingService {
         }
         buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
 
-        String message =
-                firmament.getRepresentation() + " you may place up to 3 of your trade goods on " + sowingRep() + ".";
+        String message = firmament.toString() + " you may place up to 3 of your trade goods on " + sowingRep() + ".";
         int btTG = firmament.getBreakthroughTGs("firmamentbt");
         int tg = firmament.getTg();
         message += "\n-# There are " + StringHelper.pluralize(btTG, "trade good")
@@ -89,8 +88,8 @@ public class SowingReapingService {
         int tgs = obsidian.getBreakthroughTGs("obsidianbt");
         obsidian.setBreakthroughTGs("obsidianbt", 0);
 
-        String message = obsidian.getRepresentation() + " gained the " + StringHelper.pluralize(tgs, "trade good")
-                + " on " + reapingRep() + " as well as " + tgs + " more from the supply.";
+        String message = obsidian.toString() + " gained the " + StringHelper.pluralize(tgs, "trade good") + " on "
+                + reapingRep() + " as well as " + tgs + " more from the supply.";
         message += "\n-# " + MiscEmojis.getTGorNomadCoinEmoji(game) + " trade goods went from "
                 + obsidian.gainTG(tgs * 2) + ".";
         MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), message);

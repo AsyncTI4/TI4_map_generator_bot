@@ -15,6 +15,42 @@ import ti4.testUtils.BaseTi4Test;
 class GameTest extends BaseTi4Test {
 
     @Test
+    void resolvesPlanetLocationOwnershipAndBoardTraversal() {
+        var game = new Game();
+        var owner = createPlayer("owner", Set.of(), game);
+        owner.setFaction("sol");
+        owner.setColor("red");
+        owner.addPlanet("mr");
+        game.setPlayers(new LinkedHashMap<>(Map.of(owner.getUserID(), owner)));
+        var tile = new Tile("18", "000");
+        game.setTile(tile);
+
+        assertThat(game.getPlanet("mr")).isSameAs(tile.getPlanet("mr"));
+        assertThat(game.getTileContainingPlanet("mr")).isSameAs(tile);
+        assertThat(game.getPlanetOwner("mr")).isSameAs(owner);
+        assertThat(game.findPlanet("mr")).hasValueSatisfying(location -> {
+            assertThat(location.planet()).isSameAs(tile.getPlanet("mr"));
+            assertThat(location.tile()).isSameAs(tile);
+            assertThat(location.owner()).isSameAs(owner);
+        });
+        assertThat(game.streamPlanets()).containsExactly(tile.getPlanet("mr"));
+        assertThat(game.streamPlanetLocations()).singleElement().satisfies(location -> {
+            assertThat(location.tile()).isSameAs(tile);
+            assertThat(location.owner()).isSameAs(owner);
+        });
+        assertThat(game.streamUnitHolders()).containsExactlyElementsOf(tile.getUnitHolderValues());
+        assertThat(game.streamUnitHolderLocations())
+                .allSatisfy(location -> assertThat(location.tile()).isSameAs(tile));
+    }
+
+    @Test
+    void returnsEmptyPlanetLocationForUnknownOrOffMapPlanet() {
+        var game = new Game();
+
+        assertThat(game.findPlanet("missing")).isEmpty();
+    }
+
+    @Test
     void getActionPhaseTurnOrder() {
         var game = createThreePlayerGame();
         assertThat(game.getActionPhaseTurnOrder("hasThe2")).isEqualTo(2);

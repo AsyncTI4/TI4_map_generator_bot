@@ -26,7 +26,7 @@ public class ArcanumBreakthroughHandler {
                 && player.changeBreakthrough(POWER_WORD_WISH_FRONT, POWER_WORD_WISH_BACK)) {
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " flipped _Power Word: Wish_ to its biotic/cybernetic side.",
+                    player.toString() + " flipped _Power Word: Wish_ to its biotic/cybernetic side.",
                     Mapper.getBreakthrough(POWER_WORD_WISH_BACK).getRepresentationEmbed());
             return;
         }
@@ -36,7 +36,7 @@ public class ArcanumBreakthroughHandler {
                 && player.changeBreakthrough(POWER_WORD_WISH_BACK, POWER_WORD_WISH_FRONT)) {
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " flipped _Power Word: Wish_ to its propulsion/warfare side.",
+                    player.toString() + " flipped _Power Word: Wish_ to its propulsion/warfare side.",
                     Mapper.getBreakthrough(POWER_WORD_WISH_FRONT).getRepresentationEmbed());
         }
     }

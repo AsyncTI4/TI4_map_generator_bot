@@ -95,7 +95,7 @@ public class AshenUnitHandler {
         game.setStoredValue(getAshenMechPendingKey(player), Integer.toString(pending));
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " had "
+                player.toString() + " had "
                         + StringHelper.pluralize(unit.getTotalRemoved(), unitModel.getName())
                         + " destroyed. It will be placed on a planet you control in your home system at the start of"
                         + " your next turn.");
@@ -115,7 +115,7 @@ public class AshenUnitHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", you had "
+                    player.toString() + ", you had "
                             + StringHelper.pluralize(pending, "Balefire Sentinel")
                             + " to revive, but the bot couldn't find any planets you control in your home system to"
                             + " place them on.");
@@ -135,7 +135,7 @@ public class AshenUnitHandler {
         if (game == null) {
             return;
         }
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             for (Planet planet : tile.getPlanetUnitHolders()) {
                 game.removeStoredValue(getAshenFlagshipBombardmentKey(planet.getName()));
             }
@@ -210,7 +210,7 @@ public class AshenUnitHandler {
                 unit.getTotalRemoved() + " infantry " + planetHolder.getName());
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                attacker.getRepresentation() + " committed "
+                attacker.toString() + " committed "
                         + StringHelper.pluralize(unit.getTotalRemoved(), "infantry") + " to "
                         + Helper.getPlanetRepresentation(planetHolder.getName(), game) + " with _The Pyre_.");
     }
@@ -338,7 +338,7 @@ public class AshenUnitHandler {
                 : " A total of " + triggerCount + " Ashfall Engines were destroyed.";
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation()
+                player.toString()
                         + ", your _Ashfall Engine_ "
                         + timing
                         + ". You may use its BOMBARDMENT ability against a planet in this system."
@@ -405,9 +405,9 @@ public class AshenUnitHandler {
         }
 
         String planet = buttonID.substring(ASHEN_MECH_REVIVE_PREFIX.length());
-        Tile tile = game.getTileFromPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
         Tile homeTile = player.getHomeSystemTile();
-        if (homeTile == null || !homeTile.equals(tile) || !player.getPlanets().contains(planet)) {
+        if (homeTile == null || !homeTile.equals(tile) || !player.containsPlanet(planet)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -423,8 +423,8 @@ public class AshenUnitHandler {
         }
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " placed 1 Balefire Sentinel on "
-                        + Helper.getPlanetRepresentation(planet, game) + ". You have " + pending + " left to place.");
+                player.toString() + " placed 1 Balefire Sentinel on " + Helper.getPlanetRepresentation(planet, game)
+                        + ". You have " + pending + " left to place.");
     }
 
     @ButtonHandler(ASHFALL_ENGINE_PREFIX)
@@ -460,7 +460,7 @@ public class AshenUnitHandler {
         if (tile.isScar()) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + ", you cannot use BOMBARDMENT (or any other unit abilities) in an entropic scar.");
             ButtonHelper.deleteMessage(event);
             return;
@@ -561,7 +561,7 @@ public class AshenUnitHandler {
                 if (p2 == player) {
                     continue;
                 }
-                if (FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(planet))) {
+                if (FoWHelper.playerHasUnitsOnPlanet(p2, game.getPlanet(planet))) {
                     if (p2.isRealPlayer()) {
                         List<Button> buttons = new ArrayList<>();
                         buttons.add(Buttons.red(
@@ -569,19 +569,18 @@ public class AshenUnitHandler {
                                 "Assign Hit" + (hits == 1 ? "" : "s")));
                         MessageHelper.sendMessageToChannelWithButtons(
                                 game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
-                                p2.getRepresentation() + ", please assign the BOMBARDMENT hit" + (hits == 1 ? "" : "s")
-                                        + ".",
+                                p2.toString() + ", please assign the BOMBARDMENT hit" + (hits == 1 ? "" : "s") + ".",
                                 buttons);
                     } else {
                         List<Button> buttons2 = new ArrayList<>();
                         buttons2.add(Buttons.green(
                                 p2.dummyPlayerSpoof() + "autoAssignGroundHits_"
-                                        + game.getUnitHolderFromPlanet(planet).getName() + "_" + hits,
+                                        + game.getPlanet(planet).getName() + "_" + hits,
                                 "Auto-assign Hit" + (hits == 1 ? "" : "s") + " For Dummy"));
                         MessageHelper.sendMessageToChannelWithButtons(
                                 game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
-                                player.getRepresentation() + ", please assign the BOMBARDMENT hit"
-                                        + (hits == 1 ? "" : "s") + " for the dummy player.",
+                                player.toString() + ", please assign the BOMBARDMENT hit" + (hits == 1 ? "" : "s")
+                                        + " for the dummy player.",
                                 buttons2);
                     }
                 }
@@ -596,9 +595,9 @@ public class AshenUnitHandler {
             return buttons;
         }
 
-        for (UnitHolder unitHolder : home.getUnitHolders().values()) {
+        for (UnitHolder unitHolder : home.getUnitHolderValues()) {
             if (unitHolder instanceof Planet planet
-                    && player.getPlanets().contains(planet.getName())
+                    && player.containsPlanet(planet.getName())
                     && !planet.isSpaceStation()) {
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + ASHEN_MECH_REVIVE_PREFIX + planet.getName(),

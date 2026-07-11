@@ -73,7 +73,7 @@ public abstract class FixedNumberDraftable extends Draftable {
             int pickCount = draftManager.getPlayerPicks(playerUserId, getType()).size();
             if (pickCount < getNumPicksPerPlayer()) {
                 Player player = draftManager.getGame().getPlayer(playerUserId);
-                return "Player " + (player != null ? player.getRepresentation() : playerUserId) + " needs to make "
+                return "Player " + (player != null ? player.toString() : playerUserId) + " needs to make "
                         + (getNumPicksPerPlayer() - pickCount) + " more pick(s) for " + getDisplayName() + "!";
             }
         }

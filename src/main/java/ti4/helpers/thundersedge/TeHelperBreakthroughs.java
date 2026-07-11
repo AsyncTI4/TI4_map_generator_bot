@@ -32,7 +32,7 @@ public class TeHelperBreakthroughs {
             case "arborecbt" -> PsychosporeService.postInitialButtons(event, game, player);
             case "zooidbt" -> {
                 ThreadChannel channel = player.getCardsInfoThread();
-                String output = player.getRepresentation()
+                String output = player.toString()
                         + ", please choose a secret objective to discard - the bot will automatically draw a replacement:";
                 List<Button> buttons =
                         new ArrayList<>(SecretObjectiveHelper.getSODiscardButtonsWithSuffix(player, "redraw"));

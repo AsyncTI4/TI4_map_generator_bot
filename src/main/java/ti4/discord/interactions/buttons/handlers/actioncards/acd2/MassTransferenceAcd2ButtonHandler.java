@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -15,6 +16,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
+import ti4.service.planet.PlanetButtonService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
@@ -50,12 +52,8 @@ class MassTransferenceAcd2ButtonHandler {
         }
         game.setStoredValue(stateKey(player), parts[0] + "_" + parts[1] + "_" + parts[2]);
 
-        List<Button> buttons = new ArrayList<>();
-        for (String planet : player.getPlanets()) {
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + "massTransDest_" + planet,
-                    Helper.getPlanetRepresentation(planet, game)));
-        }
+        List<Button> buttons = new ArrayList<>(PlanetButtonService.buttonsForOwnedPlanets(
+                player, game, location -> true, ButtonStyle.SUCCESS, player.factionButtonChecker() + "massTransDest_"));
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -88,9 +86,9 @@ class MassTransferenceAcd2ButtonHandler {
         }
         UnitType type = unitTypeFromName(state[1]);
         String sourcePlanet = state[2];
-        Tile sourceTile = game.getTileFromPlanet(sourcePlanet);
-        Planet sourceUH = game.getUnitHolderFromPlanet(sourcePlanet);
-        Tile destTile = game.getTileFromPlanet(destPlanet);
+        Tile sourceTile = game.getTileContainingPlanet(sourcePlanet);
+        Planet sourceUH = game.getPlanet(sourcePlanet);
+        Tile destTile = game.getTileContainingPlanet(destPlanet);
         if (type == null || sourceTile == null || sourceUH == null || destTile == null) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Mass Transference_.");
             return;

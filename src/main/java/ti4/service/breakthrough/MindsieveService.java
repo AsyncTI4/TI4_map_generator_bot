@@ -48,7 +48,7 @@ public class MindsieveService {
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
         if (!canUseMindsieve(naalu, primary, scModel)) return;
 
-        StringBuilder msg = new StringBuilder(naalu.getRepresentation())
+        StringBuilder msg = new StringBuilder(naalu.toString())
                 .append(" since you have ")
                 .append(mindsieve())
                 .append(" you may send a promissory note to ")
@@ -91,7 +91,7 @@ public class MindsieveService {
                             game.getStrategyCardModelByInitiative(sc).orElse(null);
                     SendPromissoryService.sendPromissoryToPlayer(event, game, naalu, primary, pn);
 
-                    if (!naalu.getFollowedSCs().contains(sc))
+                    if (!naalu.hasFollowedSC(sc))
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(naalu, sc, game, event);
                     naalu.addFollowedSC(sc, event);
 

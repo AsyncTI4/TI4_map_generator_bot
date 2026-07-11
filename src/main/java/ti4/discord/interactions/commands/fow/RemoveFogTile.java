@@ -53,7 +53,7 @@ class RemoveFogTile extends GameStateSubcommand {
                 targetPlayer.removeFogTile(position);
                 sb2.append(' ').append(position);
             }
-            sb.append(targetPlayer.getRepresentation())
+            sb.append(targetPlayer.toString())
                     .append(" removed fog tiles:")
                     .append(sb2)
                     .append('\n');

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -20,6 +21,7 @@ import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.planet.FlipTileService;
+import ti4.service.planet.PlanetButtonService;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -43,31 +45,29 @@ class YinHeroButtonHandler {
         List<Button> buttons = new ArrayList<>();
         Player target = game.getPlayerFromColorOrFaction(faction);
         if (target != null && !"unowned".equalsIgnoreCase(faction)) {
-            for (String planet : target.getPlanets()) {
-                if (game.getTileFromPlanet(planet) == null
-                        || game.getTileFromPlanet(planet).isHomeSystem(game)
-                        || Helper.getPlanetRepresentation(planet, game)
-                                .toLowerCase()
-                                .contains("dmz")) {
-                    continue;
-                }
-                buttons.add(Buttons.green(
-                        player.factionButtonChecker() + "yinHeroPlanet_" + planet,
-                        Helper.getPlanetRepresentation(planet, game)));
-            }
+            buttons = PlanetButtonService.buttonsForOwnedPlanets(
+                    target,
+                    game,
+                    location -> !location.tile().isHomeSystem(game)
+                            && !location.planet()
+                                    .getRepresentation(game)
+                                    .toLowerCase()
+                                    .contains("dmz"),
+                    ButtonStyle.SUCCESS,
+                    player.factionButtonChecker() + "yinHeroPlanet_");
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getChannel(), "Please choose which planet to invade.", buttons);
             ButtonHelper.deleteMessage(event);
         } else {
-            for (Tile tile : game.getTileMap().values()) {
-                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            for (Tile tile : game.getTiles()) {
+                for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
                     if (unitHolder instanceof Planet planet) {
                         if (planet.isSpaceStation(game)) {
                             continue;
                         }
                         boolean owned = false;
                         for (Player p2 : game.getRealPlayersNNeutral()) {
-                            if (p2.getPlanets().contains(planet.getName())) {
+                            if (p2.containsPlanet(planet.getName())) {
                                 owned = true;
                                 break;
                             }
@@ -90,10 +90,10 @@ class YinHeroButtonHandler {
         String planet = buttonID.replace("yinHeroPlanet_", "");
         if ("lockedmallice".equalsIgnoreCase(planet)) {
             planet = "mallice";
-            FlipTileService.flipTileIfNeeded(event, game.getTileFromPlanet("lockedmallice"), game);
+            FlipTileService.flipTileIfNeeded(event, game.getTileContainingPlanet("lockedmallice"), game);
         } else if ("hexlockedmallice".equalsIgnoreCase(planet)) {
             planet = "hexmallice";
-            FlipTileService.flipTileIfNeeded(event, game.getTileFromPlanet("hexlockedmallice"), game);
+            FlipTileService.flipTileIfNeeded(event, game.getTileContainingPlanet("hexlockedmallice"), game);
         }
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
@@ -122,12 +122,12 @@ class YinHeroButtonHandler {
                 event.getChannel(),
                 player.getFactionEmojiOrColor() + " Chose to land " + amount + " infantry on "
                         + Helper.getPlanetRepresentation(planet, game));
-        UnitHolder unitHolder = tile.getUnitHolders().get(planet);
+        UnitHolder unitHolder = tile.getPlanet(planet);
         boolean groundCombatStarted = StartCombatService.groundCombatCheck(game, unitHolder, tile, event);
         if (groundCombatStarted) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + ", reminder that Dannel of the Tenth, the Yin hero, skips the space cannon defense step.");
         }
         ButtonHelper.deleteMessage(event);

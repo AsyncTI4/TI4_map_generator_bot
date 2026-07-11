@@ -33,7 +33,7 @@ public class TravelBanAgendaResolver implements AgendaResolver {
                 Tile t = game.getTileByPosition(pos);
                 for (Player p : game.getRealPlayersNNeutral()) {
                     UnitKey pds = Units.getUnitKey(UnitType.Pds, p.getColorID());
-                    for (UnitHolder uh : t.getUnitHolders().values()) {
+                    for (UnitHolder uh : t.getUnitHolderValues()) {
                         int num = uh.getUnitCount(pds);
                         if (num > 0) DestroyUnitService.destroyUnit(event, t, game, pds, num, uh, false);
                     }

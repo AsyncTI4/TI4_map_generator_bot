@@ -13,7 +13,7 @@ public final class ExploreHelper {
 
     public static boolean checkForMech(String planetName, Game game, Player player) {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
-        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        UnitHolder unitHolder = tile.getPlanet(planetName);
         UnitKey mechKey = Units.getUnitKey(UnitType.Mech, player.getColorID());
         if (player.hasUnlockedBreakthrough("ironbt")) {
             return true;
@@ -23,7 +23,7 @@ public final class ExploreHelper {
 
     public static boolean checkForInf(String planetName, Game game, Player player) {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
-        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        UnitHolder unitHolder = tile.getPlanet(planetName);
         UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());
         return unitHolder.getUnitCount(infKey) > 0;
     }
@@ -31,7 +31,7 @@ public final class ExploreHelper {
     public static String getUnitListEmojisOnPlanetForHazardousExplorePurposes(
             Game game, Player player, String planetID) {
         String message = "";
-        Planet planet = game.getUnitHolderFromPlanet(planetID);
+        Planet planet = game.getPlanet(planetID);
         if (planet != null) {
             String planetName = Mapper.getPlanet(planetID) == null
                     ? "`error?`"

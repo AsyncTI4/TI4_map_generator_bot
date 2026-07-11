@@ -23,10 +23,10 @@ class FreedomFightersAcd2ButtonHandler {
     @ButtonHandler("resolveFreedomFighters")
     public static void resolveFreedomFighters(Player player, Game game, ButtonInteractionEvent event) {
         Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
-        if (activeSystem == null || activeSystem.getPlanetUnitHolders().isEmpty()) {
+        if (activeSystem == null || !activeSystem.hasPlanets()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", _Freedom Fighters_ requires an active system with planets.");
+                    player.toString() + ", _Freedom Fighters_ requires an active system with planets.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -41,7 +41,7 @@ class FreedomFightersAcd2ButtonHandler {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation()
+                player.toString()
                         + ", use the buttons to place up to 1 infantry from reinforcements on each planet in the active system.",
                 buttons);
     }
@@ -50,7 +50,7 @@ class FreedomFightersAcd2ButtonHandler {
     public static void resolveFreedomFightersStep2(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.replace("resolveFreedomFightersStep2_", "");
-        Tile tile = game.getTileFromPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), "Could not resolve _Freedom Fighters_ for that planet.");

@@ -29,7 +29,7 @@ class SettlersAcd2ButtonHandler {
     @ButtonHandler("resolveSettlers")
     public static void resolveSettlers(Player player, Game game, ButtonInteractionEvent event) {
         Set<String> planets = new LinkedHashSet<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tile == null) continue;
             for (Planet uH : tile.getPlanetUnitHolders()) {
                 if (uH.isHomePlanet(game)) continue;
@@ -99,7 +99,7 @@ class SettlersAcd2ButtonHandler {
         String choice = parts[0];
         Player acting = game.getPlayerFromColorOrFaction(parts[1]);
         String planet = parts[2];
-        Tile tile = game.getTileFromPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
         ButtonHelper.deleteMessage(event);
         if (acting == null || tile == null) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Settlers_.");
@@ -145,8 +145,8 @@ class SettlersAcd2ButtonHandler {
         Player target = game.getPlayerFromColorOrFaction(parts[1]);
         UnitType type = UnitType.valueOf(parts[2]);
         String planet = parts[3];
-        Tile tile = game.getTileFromPlanet(planet);
-        Planet uH = game.getUnitHolderFromPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
+        Planet uH = game.getPlanet(planet);
         ButtonHelper.deleteMessage(event);
         if (target == null || tile == null || uH == null) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Settlers_.");
@@ -167,7 +167,7 @@ class SettlersAcd2ButtonHandler {
 
     private static void sendSettlersDestroyButtons(
             Player acting, Game game, Player target, String planet, int remaining) {
-        Planet uH = game.getUnitHolderFromPlanet(planet);
+        Planet uH = game.getPlanet(planet);
         if (uH == null) {
             return;
         }
@@ -199,7 +199,7 @@ class SettlersAcd2ButtonHandler {
     }
 
     private static Player settlersTargetFor(Game game, Player acting, String planet) {
-        Planet uH = game.getUnitHolderFromPlanet(planet);
+        Planet uH = game.getPlanet(planet);
         if (uH == null) {
             return null;
         }

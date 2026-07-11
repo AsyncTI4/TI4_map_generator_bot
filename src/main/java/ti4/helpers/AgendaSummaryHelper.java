@@ -13,6 +13,7 @@ import ti4.game.Player;
 import ti4.image.Mapper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class AgendaSummaryHelper {
@@ -150,10 +151,10 @@ public class AgendaSummaryHelper {
                     && game.getStoredValue("executiveOrder").isEmpty()) {
                 builder.append(" (**Future Sight**)");
             }
-            if (p2.hasTech("dsatokcr") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, "cruiser", true) < 8) {
+            if (p2.hasTech("dsatokcr") && UnitQueryService.countUnits(game, p2, "cruiser", true) < 8) {
                 builder.append(" (Mirrorshard DEPLOY)");
             }
-            if (p2.hasUnit("kaltrim_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, "mech", true) < 4) {
+            if (p2.hasUnit("kaltrim_mech") && UnitQueryService.countUnits(game, p2, "mech", true) < 4) {
                 builder.append(" (Mech DEPLOY)");
             }
         }

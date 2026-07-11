@@ -19,7 +19,7 @@ import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.fow.GMService;
-import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class SabotageService {
@@ -70,13 +70,13 @@ public class SabotageService {
 
     public static boolean couldUseWatcherMech(Player player, Game game) {
         return player.hasUnit("empyrean_mech")
-                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Mech)
+                && !UnitQueryService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Mech)
                         .isEmpty();
     }
 
     private static boolean couldUseTriune(Player player, Game game) {
         return player.hasUnit("tf-triune")
-                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Fighter)
+                && !UnitQueryService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Fighter)
                         .isEmpty();
     }
 

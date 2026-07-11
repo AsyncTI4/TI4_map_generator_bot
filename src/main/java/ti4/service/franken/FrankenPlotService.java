@@ -13,7 +13,7 @@ public class FrankenPlotService {
     public static void addPlot(GenericInteractionCreateEvent event, Player player, String itemID) {
         player.setPlotCard(itemID);
         GenericCardModel model = Mapper.getPlot(itemID);
-        String msg = player.getRepresentation() + " added Plot Card: " + model.getNameRepresentation();
+        String msg = player.toString() + " added Plot Card: " + model.getNameRepresentation();
         MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
     }
 
@@ -21,7 +21,7 @@ public class FrankenPlotService {
         player.getPlotCardsRaw().remove(itemID);
         player.removePlotCardFaction(itemID);
         GenericCardModel model = Mapper.getPlot(itemID);
-        String msg = player.getRepresentation() + " removed Plot Card: " + model.getNameRepresentation();
+        String msg = player.toString() + " removed Plot Card: " + model.getNameRepresentation();
         MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
     }
 }

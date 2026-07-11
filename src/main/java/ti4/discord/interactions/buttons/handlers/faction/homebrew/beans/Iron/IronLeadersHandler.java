@@ -50,7 +50,7 @@ public class IronLeadersHandler {
 
         MessageHelper.sendMessageToChannel(
                 game.getActionsChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " exhausted **Shipwright Kastel**, the Iron Tide agent, to allow 1 unit to not be destroyed or removed.");
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
@@ -89,7 +89,7 @@ public class IronLeadersHandler {
         Player winner = remainingPlayers.getFirst();
         if (winner.hasLeader(COMMANDER_ID)
                 && !winner.hasLeaderUnlocked(COMMANDER_ID)
-                && tile.getSpaceUnitHolder().getUnitCount(UnitType.Mech, winner) > 0) {
+                && tile.hasUnitInSpace(UnitType.Mech, winner)) {
             UnlockLeaderService.unlockLeader(COMMANDER_ID, game, winner);
         }
     }
@@ -144,7 +144,7 @@ public class IronLeadersHandler {
                 && player != null
                 && activeSystem != null
                 && player.hasLeaderUnlocked(HERO_ID)
-                && activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player) > 0
+                && activeSystem.hasUnitInSpace(UnitType.Mech, player)
                 && activeSystem.getPosition().equals(game.getStoredValue(getIronHeroEligibilityKey(player)));
     }
 
@@ -177,7 +177,7 @@ public class IronLeadersHandler {
         Player winner = remainingPlayers.getFirst();
         if (winner.hasLeader(COMMANDER_ID)
                 && !winner.hasLeaderUnlocked(COMMANDER_ID)
-                && holder.getUnitCount(UnitType.Mech, winner) > 0) {
+                && holder.hasUnit(UnitType.Mech, winner)) {
             UnlockLeaderService.unlockLeader(COMMANDER_ID, game, winner);
         }
     }

@@ -993,7 +993,7 @@ class GameSaveService {
             writer.write(Constants.AUTO_SABO_PASS_MEDIAN + " " + player.getAutoSaboPassMedian());
             writer.write(System.lineSeparator());
 
-            UnitHolder unitHolder = player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
+            UnitHolder unitHolder = player.getNomboxTile().getSpaceUnitHolder();
             StringBuilder units = new StringBuilder();
             if (unitHolder != null) {
                 for (UnitKey unit : unitHolder.getUnitKeys()) {

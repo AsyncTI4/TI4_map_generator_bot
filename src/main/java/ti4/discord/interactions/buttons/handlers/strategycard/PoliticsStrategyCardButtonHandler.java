@@ -24,7 +24,7 @@ class PoliticsStrategyCardButtonHandler {
     public static void assignTyrant(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String faction = buttonID.replace("assignTyrant_", "");
         for (Player player_ : game.getPlayers().values()) {
-            if (player_.getFaction().equals(faction)) {
+            if (player_.isFactionExact(faction)) {
                 game.setTyrantUserID(player_.getUserID());
                 String message = MiscEmojis.BenedictionToken + " Tyrant has been assigned to "
                         + player_.getRepresentation(false, true) + ".";

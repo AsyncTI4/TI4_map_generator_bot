@@ -24,7 +24,7 @@ public class MuaatHeroService {
         DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 1, message1);
 
         // Destroy all other players units from the tile in question
-        for (UnitHolder uh : tile.getUnitHolders().values()) {
+        for (UnitHolder uh : tile.getUnitHolderValues()) {
             for (Player player_ : game.getPlayers().values()) {
                 if (player_ == muaat) continue; // skip muaat
                 DestroyUnitService.destroyAllPlayerUnits(event, game, player_, tile, uh, false);
@@ -32,11 +32,11 @@ public class MuaatHeroService {
         }
 
         // Add the muaat supernova to the map and copy over the space unitholder
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
-        boolean frontier = space.getTokenList().contains(frontierFilename);
+        boolean frontier = space.containsToken(frontierFilename);
         Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
-        if (muaat.getPlanets().contains("avernus") && tile.getUnitHolders().containsKey("avernus")) {
+        if (muaat.containsPlanet("avernus") && tile.hasUnitHolder("avernus")) {
             TokenPlanetService.moveTokenPlanet(game, muaat, novaTile, "avernus");
         }
         game.removeTile(tile.getPosition());
@@ -45,12 +45,12 @@ public class MuaatHeroService {
             novaTile.getSpaceUnitHolder().addToken(frontierFilename);
         }
 
-        String message2 = tile.getRepresentation() + " has been _Nova Seed_'d by " + muaat.getRepresentation() + ".";
+        String message2 = tile.toString() + " has been _Nova Seed_'d by " + muaat.toString() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, novaTile, 1, message2);
 
         if (muaat.hasLeaderUnlocked("muaathero")) {
             Leader playerLeader = muaat.getLeader("muaathero").orElse(null);
-            StringBuilder message = new StringBuilder(muaat.getRepresentation())
+            StringBuilder message = new StringBuilder(muaat.toString())
                     .append(" played ")
                     .append(Helper.getLeaderFullRepresentation(playerLeader));
             boolean purged = muaat.removeLeader(playerLeader);

@@ -37,7 +37,7 @@ public class ArvaxiBreakthroughHandler {
         int firstSep = stored.indexOf('_');
         int lastSep = stored.lastIndexOf('_');
         if (firstSep < 0 || firstSep == lastSep) return false;
-        if (!player.getFaction().equals(stored.substring(0, firstSep))) return false;
+        if (!player.isFactionExact(stored.substring(0, firstSep))) return false;
         String techID = stored.substring(firstSep + 1, lastSep);
         UnitModel engineUnit = Mapper.getUnitModelByTechUpgrade(techID);
         return engineUnit != null && engineUnit.getAsyncId().equals(unit.getAsyncId());
@@ -75,7 +75,7 @@ public class ArvaxiBreakthroughHandler {
         }
         buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Delete these buttons"));
 
-        String msg = player.getRepresentation() + " use " + btRep()
+        String msg = player.toString() + " use " + btRep()
                 + " to choose which player's unit upgrade to attach the Mobilization Engine to.";
         String existing = game.getStoredValue(STORED_KEY);
         if (!existing.isEmpty()) {
@@ -171,7 +171,7 @@ public class ArvaxiBreakthroughHandler {
         game.setStoredValue(STORED_KEY, targetFaction + "_" + techID + "_" + side);
         ButtonHelper.deleteMessage(event);
 
-        String targetRep = target != null ? target.getRepresentation() : targetName;
+        String targetRep = target != null ? target.toString() : targetName;
         String effectText = "boon".equals(side) ? BOON_TEXT : CURSE_TEXT;
         String msg = player.getRepresentationNoPing() + " attached the Arvaxi Mobilization Engine ("
                 + side + " side) to " + targetRep + " " + techName + " using " + btRep() + "."

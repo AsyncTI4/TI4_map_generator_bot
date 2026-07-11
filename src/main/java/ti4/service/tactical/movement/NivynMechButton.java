@@ -7,13 +7,12 @@ import ti4.helpers.Units.UnitType;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.tactical.MoveAbilityButton;
 import ti4.service.tactical.MoveContext;
-import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitQueryService;
 
 public final class NivynMechButton implements MoveAbilityButton {
     public boolean enabled(MoveContext ctx) {
         return (ctx.player.ownsUnit("nivyn_mech")
-                        && CheckUnitContainmentService.getTilesContainingPlayersUnits(
-                                        ctx.game, ctx.player, UnitType.Mech)
+                        && UnitQueryService.getTilesContainingPlayersUnits(ctx.game, ctx.player, UnitType.Mech)
                                 .contains(ctx.active))
                 || ctx.player.ownsUnit("nivyn_mech2");
     }

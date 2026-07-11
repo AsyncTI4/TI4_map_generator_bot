@@ -39,7 +39,7 @@ public class TfBlessResolver implements EdictResolver {
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg2, blessButtons);
             }
         } else {
-            String addl = "-# " + player.getRepresentation() + " gets to resolve all 3 boons, ";
+            String addl = "-# " + player.toString() + " gets to resolve all 3 boons, ";
             addl += "other players must choose only 1.";
             MessageHelper.sendMessageToChannelWithButtons(
                     game.getMainGameChannel(), gamePing(game, addl), blessButtons);
@@ -75,7 +75,7 @@ public class TfBlessResolver implements EdictResolver {
         }
         player.setStoredValue(buttonID, "y");
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " gained 3 trade goods.");
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.toString() + " gained 3 trade goods.");
         player.setTg(player.getTg() + 3);
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 3);

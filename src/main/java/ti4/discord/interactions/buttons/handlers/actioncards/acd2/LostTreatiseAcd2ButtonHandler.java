@@ -45,7 +45,7 @@ class LostTreatiseAcd2ButtonHandler {
                 player.getFactionEmoji() + " gained a command token in their fleet pool (" + oldFleetCC + "->"
                         + player.getFleetCC() + ") using _Lost Treatise_.");
         if (ButtonHelper.isLawInPlay(game, "regulations") && player.getEffectiveFleetCC() > 4) {
-            String msg = player.getRepresentation() + ", reminder that _Fleet Regulations_ is a";
+            String msg = player.toString() + ", reminder that _Fleet Regulations_ is a";
             msg += " law in play, which is limiting fleet pool to 4 tokens.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         }

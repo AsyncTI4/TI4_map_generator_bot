@@ -15,7 +15,6 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -36,8 +35,7 @@ class ReconstructionAcd2ButtonHandler {
         if (activeSystem == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + " could not resolve _Reconstruction_ because there is no active system.");
+                    player.toString() + " could not resolve _Reconstruction_ because there is no active system.");
             return;
         }
 
@@ -45,14 +43,13 @@ class ReconstructionAcd2ButtonHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + " has no planets they control in the active system for _Reconstruction_.");
+                    player.toString() + " has no planets they control in the active system for _Reconstruction_.");
             return;
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", choose a planet you control in "
+                player.toString() + ", choose a planet you control in "
                         + activeSystem.getRepresentationForButtons(game, player) + " for _Reconstruction_.",
                 buttons);
     }
@@ -61,12 +58,12 @@ class ReconstructionAcd2ButtonHandler {
     public static void resolveReconstructionStep2(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.replace("reconstructionStep2_", "");
-        Planet planetHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        Planet planetHolder = game.getPlanet(planet);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         if (planetHolder == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " could not find that planet for _Reconstruction_.");
+                    player.toString() + " could not find that planet for _Reconstruction_.");
             return;
         }
 
@@ -75,7 +72,7 @@ class ReconstructionAcd2ButtonHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " readied "
+                    player.toString() + " readied "
                             + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game)
                             + " with _Reconstruction_. It has no planet trait, so the exploration deck portion cannot occur.");
             return;
@@ -83,7 +80,7 @@ class ReconstructionAcd2ButtonHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " readied "
+                player.toString() + " readied "
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game)
                         + " with _Reconstruction_. Choose the matching exploration deck to reveal from.",
                 buttons);
@@ -96,21 +93,21 @@ class ReconstructionAcd2ButtonHandler {
         int splitIndex = info.lastIndexOf('_');
         if (splitIndex < 0) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), player.getRepresentation() + " could not resolve _Reconstruction_.");
+                    player.getCorrectChannel(), player.toString() + " could not resolve _Reconstruction_.");
             return;
         }
         String planet = info.substring(0, splitIndex);
         String trait = info.substring(splitIndex + 1);
-        Tile tile = game.getTileFromPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " could not find that planet's system for _Reconstruction_.");
+                    player.toString() + " could not find that planet's system for _Reconstruction_.");
             return;
         }
 
-        StringBuilder sb = new StringBuilder(player.getRepresentation())
+        StringBuilder sb = new StringBuilder(player.toString())
                 .append(" revealed the top 3 cards of the ")
                 .append(StringUtils.capitalize(trait))
                 .append(" exploration deck for _Reconstruction_ on ")
@@ -132,7 +129,7 @@ class ReconstructionAcd2ButtonHandler {
             sb.append("\n> Revealed ").append(explore.getNameRepresentation());
             if (Constants.ATTACH.equalsIgnoreCase(explore.getResolution())) {
                 sb.append(" and resolved the attachment.");
-                String messageText = player.getRepresentation() + " resolved an attachment with _Reconstruction_ on "
+                String messageText = player.toString() + " resolved an attachment with _Reconstruction_ on "
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game) + ":";
                 ExploreService.resolveExplore(event, cardId, tile, planet, messageText, player, game);
             } else {
@@ -146,7 +143,7 @@ class ReconstructionAcd2ButtonHandler {
     private static List<Button> getReconstructionPlanetButtons(Game game, Player player, Tile activeSystem) {
         List<Button> buttons = new ArrayList<>();
         for (Planet planet : activeSystem.getPlanetUnitHolders()) {
-            if (player.getPlanets().contains(planet.getName())) {
+            if (player.containsPlanet(planet.getName())) {
                 buttons.add(Buttons.gray(
                         "reconstructionStep2_" + planet.getName(),
                         Helper.getPlanetRepresentation(planet.getName(), game)));

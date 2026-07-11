@@ -77,7 +77,7 @@ public class AddUnitService {
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
             List<Integer> states = pickStatesForAddedUnit(parsedUnit, removed);
-            tile.getUnitHolders().get(parsedUnit.location()).addUnitsWithStates(parsedUnit.unitKey(), states);
+            tile.getUnitHolder(parsedUnit.location()).addUnitsWithStates(parsedUnit.unitKey(), states);
             tile = FlipTileService.flipTileIfNeeded(tile, game);
             AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.location(), game);
             if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("system_breach"))) {

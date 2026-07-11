@@ -46,7 +46,7 @@ public class FrankenHomeService {
         String ringPos = getPlayerHsRingPosition(player);
         if (ringPos == null) {
             String msg = " Could not determine your home system location. Please resolve manually.";
-            MessageHelper.sendEphemeralMessageToEventChannel(event, player.getRepresentation() + msg);
+            MessageHelper.sendEphemeralMessageToEventChannel(event, player.toString() + msg);
             return;
         }
         BotLogger.warning("Replacing home system for player " + player.getUserName() + " at location " + ringPos);

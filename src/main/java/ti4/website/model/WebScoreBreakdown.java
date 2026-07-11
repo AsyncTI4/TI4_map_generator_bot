@@ -588,24 +588,24 @@ public class WebScoreBreakdown {
     private static boolean isTombInPlay(Game game) {
         if (game == null || game.getTileMap() == null) return false;
 
-        return game.getTileMap().values().stream()
+        return game.getTiles().stream()
                 .filter(Objects::nonNull)
-                .flatMap(tile -> tile.getUnitHolders().values().stream())
+                .flatMap(tile -> tile.getUnitHolderValues().stream())
                 .filter(Objects::nonNull)
-                .anyMatch(uh -> uh.getTokenList().contains("attachment_tombofemphidia.png"));
+                .anyMatch(uh -> uh.containsToken("attachment_tombofemphidia.png"));
     }
 
     private static boolean controlsTombOfEmphidia(Player player, Game game) {
         if (player == null || game == null || game.getTileMap() == null) return false;
 
-        return game.getTileMap().values().stream()
+        return game.getTiles().stream()
                 .filter(Objects::nonNull)
-                .flatMap(tile -> tile.getUnitHolders().values().stream())
+                .flatMap(tile -> tile.getUnitHolderValues().stream())
                 .filter(Objects::nonNull)
-                .filter(uh -> uh.getTokenList().contains("attachment_tombofemphidia.png"))
+                .filter(uh -> uh.containsToken("attachment_tombofemphidia.png"))
                 .filter(uh -> uh instanceof Planet)
                 .map(uh -> (Planet) uh)
-                .anyMatch(planet -> player.getPlanets().contains(planet.getName()));
+                .anyMatch(planet -> player.containsPlanet(planet.getName()));
     }
 
     private static int countUniqueTechSkips(Player player, Game game) {
@@ -613,7 +613,7 @@ public class WebScoreBreakdown {
 
         Set<String> skips = new HashSet<>();
         for (String planetName : player.getPlanetsAllianceMode()) {
-            Planet planet = game.getUnitHolderFromPlanet(planetName);
+            Planet planet = game.getPlanet(planetName);
             if (planet != null) {
                 skips.addAll(planet.getTechSpecialities());
             }
@@ -623,7 +623,7 @@ public class WebScoreBreakdown {
 
     private static boolean hasImperialUntapped(Player player) {
         if (player == null) return false;
-        return player.getSCs().contains(IMPERIAL_STRATEGY_CARD)
+        return player.hasStrategyCard(IMPERIAL_STRATEGY_CARD)
                 && !player.getExhaustedSCs().contains(IMPERIAL_STRATEGY_CARD);
     }
 
@@ -639,14 +639,14 @@ public class WebScoreBreakdown {
 
     private static boolean hasControlOfMecatol(Player player) {
         if (player == null) return false;
-        return player.getPlanets().contains(MECATOL_REX_PLANET);
+        return player.containsPlanet(MECATOL_REX_PLANET);
     }
 
     private static boolean canImperialHolderDrawSecret(Player player, Game game) {
         if (player == null || game == null) return false;
 
         // Check if player is the Imperial holder
-        if (!player.getSCs().contains(IMPERIAL_STRATEGY_CARD)) {
+        if (!player.hasStrategyCard(IMPERIAL_STRATEGY_CARD)) {
             return false;
         }
 
@@ -673,7 +673,7 @@ public class WebScoreBreakdown {
         // Find who has Imperial (if anyone picked it)
         Player imperialHolder = null;
         for (Player p : game.getRealPlayers()) {
-            if (p.getSCs().contains(IMPERIAL_STRATEGY_CARD)) {
+            if (p.hasStrategyCard(IMPERIAL_STRATEGY_CARD)) {
                 imperialHolder = p;
                 break;
             }
@@ -691,7 +691,7 @@ public class WebScoreBreakdown {
 
         // If this player is the Imperial holder, they can't draw a secret via Imperial
         // because the primary is either score an Imperial point OR draw a secret (not both)
-        boolean isImperialHolder = player.getSCs().contains(IMPERIAL_STRATEGY_CARD);
+        boolean isImperialHolder = player.hasStrategyCard(IMPERIAL_STRATEGY_CARD);
         if (isImperialHolder) {
             return false;
         }

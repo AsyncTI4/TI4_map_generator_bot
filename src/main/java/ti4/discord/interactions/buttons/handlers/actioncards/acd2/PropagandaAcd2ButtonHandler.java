@@ -1,6 +1,5 @@
 package ti4.discord.interactions.buttons.handlers.actioncards.acd2;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -15,6 +14,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.service.planet.PlanetButtonService;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -43,8 +43,8 @@ class PropagandaAcd2ButtonHandler {
             return;
         }
         String planet = payload.substring(separator + 1);
-        Planet uH = game.getUnitHolderFromPlanet(planet);
-        Tile tile = game.getTileFromPlanet(planet);
+        Planet uH = game.getPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
         ButtonHelper.deleteMessage(event);
         if (uH == null || tile == null) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Propaganda_.");
@@ -67,22 +67,18 @@ class PropagandaAcd2ButtonHandler {
     }
 
     private static void sendPropagandaButtons(Player player, Game game, int remaining) {
-        List<Button> buttons = new ArrayList<>();
-        for (String planet : player.getPlanets()) {
-            if (player.getExhaustedPlanets().contains(planet)) {
-                continue;
-            }
-            Planet uH = game.getUnitHolderFromPlanet(planet);
-            if (uH == null
-                    || uH.isHomePlanet(game)
-                    || uH.isLegendary()
-                    || !FoWHelper.playerHasUnitsOnPlanet(player, uH)) {
-                continue;
-            }
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + "propagandaTeChoose_" + remaining + "_" + planet,
-                    Helper.getPlanetRepresentation(planet, game) + " (" + uH.getInfluence() + " influence)"));
-        }
+        List<Button> buttons = PlanetButtonService.buttonsForOwnedPlanets(
+                player,
+                game,
+                location -> !player.isPlanetExhausted(location.planet().getName())
+                        && !location.planet().isHomePlanet(game)
+                        && !location.planet().isLegendary()
+                        && FoWHelper.playerHasUnitsOnPlanet(player, location.planet()),
+                location -> Buttons.green(
+                        player.factionButtonChecker() + "propagandaTeChoose_" + remaining + "_"
+                                + location.planet().getName(),
+                        location.planet().getRepresentation(game) + " ("
+                                + location.planet().getInfluence() + " influence)"));
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

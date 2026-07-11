@@ -551,7 +551,7 @@ class PlayerAggregatesService {
     }
 
     private static boolean allTilesOfficial(Game game) {
-        return game.getTileMap().values().stream().allMatch(tile -> {
+        return game.getTiles().stream().allMatch(tile -> {
             if (tile == null || tile.getTileModel() == null) {
                 return true;
             }

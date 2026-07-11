@@ -59,7 +59,7 @@ public class AshenAbilityHandler {
                 tile,
                 planet,
                 channel,
-                player.getRepresentation() + ", you rolled a " + die.getResult()
+                player.toString() + ", you rolled a " + die.getResult()
                         + " for _Cinderborn_, so you may use _Phoenix Rising_ to place that infantry on "
                         + Helper.getPlanetRepresentation(planet, game)
                         + ". If you decline, resolve _Cinderborn_ normally.");
@@ -83,7 +83,7 @@ public class AshenAbilityHandler {
                 tile,
                 planet,
                 channel,
-                player.getRepresentation()
+                player.toString()
                         + " exhausted _From Fire, Resolve_ to treat an infantry revive roll as a 10, so you may use _Phoenix Rising_ to place that infantry on "
                         + Helper.getPlanetRepresentation(planet, game)
                         + ". If you decline, resolve _Cinderborn_ normally.");
@@ -115,7 +115,7 @@ public class AshenAbilityHandler {
         if (tile == null || planet == null) {
             MessageHelper.sendMessageToChannel(
                     channel,
-                    player.getRepresentation()
+                    player.toString()
                             + " placed 1 infantry in stasis from _Cinderborn_, but there was no valid planet to assign its produced hit.");
             return;
         }
@@ -123,7 +123,7 @@ public class AshenAbilityHandler {
         if (opponent == null) {
             MessageHelper.sendMessageToChannel(
                     channel,
-                    player.getRepresentation()
+                    player.toString()
                             + " placed 1 infantry in stasis from _Cinderborn_, but there was no opposing ground unit to assign its produced hit to.");
             return;
         }
@@ -134,7 +134,7 @@ public class AshenAbilityHandler {
         hitButtons.addAll(getManualGroundHitButtons(opponent, game, tile, planet));
         MessageHelper.sendMessageToChannelWithButtons(
                 channel,
-                player.getRepresentation() + ", _Cinderborn_ produced 1 hit on "
+                player.toString() + ", _Cinderborn_ produced 1 hit on "
                         + Helper.getPlanetRepresentation(planet, game) + ". "
                         + opponent.getRepresentationUnfogged() + ", please assign it.",
                 hitButtons);
@@ -157,7 +157,7 @@ public class AshenAbilityHandler {
                         UnitEmojis.infantry));
         MessageHelper.sendMessageToChannelWithButtons(
                 channel,
-                player.getRepresentation() + ", _Cinderborn_ succeeded on "
+                player.toString() + ", _Cinderborn_ succeeded on "
                         + Helper.getPlanetRepresentation(planet, game)
                         + ". Choose whether to revive that infantry and produce 1 hit, or revive it with no hit.",
                 buttons);
@@ -171,14 +171,13 @@ public class AshenAbilityHandler {
         player.setStasisInfantry(player.getStasisInfantry() + 1);
         if (planet == null) {
             MessageHelper.sendMessageToChannel(
-                    channel,
-                    player.getRepresentation() + " revived 1 infantry from _Cinderborn_ with no produced hit.");
+                    channel, player.toString() + " revived 1 infantry from _Cinderborn_ with no produced hit.");
             return;
         }
 
         MessageHelper.sendMessageToChannel(
                 channel,
-                player.getRepresentation() + " revived 1 infantry from _Cinderborn_ with no produced hit on "
+                player.toString() + " revived 1 infantry from _Cinderborn_ with no produced hit on "
                         + Helper.getPlanetRepresentation(planet, game) + ".");
     }
 
@@ -207,7 +206,7 @@ public class AshenAbilityHandler {
                 Buttons.red("deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", one of your "
+                player.toString() + ", one of your "
                         + (unitModel == null ? unit.unitKey().unitType().humanReadableName() : unitModel.getName())
                         + " units was destroyed during combat. You may spend 1 token from your strategy pool to gain _"
                         + techName + "_. REMINDER: You may only use this ability once per action.",
@@ -225,7 +224,7 @@ public class AshenAbilityHandler {
         AddUnitService.addUnits(event, tile, game, player.getColor(), "inf " + planet);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation() + " used _Phoenix Rising_ to place 1 infantry on "
+                player.toString() + " used _Phoenix Rising_ to place 1 infantry on "
                         + Helper.getPlanetRepresentation(planet, game) + ".");
         ButtonHelper.deleteMessage(event);
     }
@@ -307,7 +306,7 @@ public class AshenAbilityHandler {
     }
 
     private static Player getGroundCombatOpponent(Player player, Game game, String planet) {
-        UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
+        UnitHolder unitHolder = game.getPlanet(planet);
         if (unitHolder == null) {
             return null;
         }
@@ -326,7 +325,7 @@ public class AshenAbilityHandler {
 
     private static List<Button> getManualGroundHitButtons(Player player, Game game, Tile tile, String planet) {
         List<Button> buttons = new ArrayList<>();
-        UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
+        UnitHolder unitHolder = game.getPlanet(planet);
         if (unitHolder == null) {
             return buttons;
         }

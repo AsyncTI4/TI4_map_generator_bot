@@ -46,10 +46,10 @@ public final class TeHelperAbilities {
         String regex = "liberate_" + RegexHelper.unitHolderRegex(game, "planet");
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String planet = matcher.group("planet");
-            String msg = player.getRepresentation() + " used **Liberate** to ";
+            String msg = player.toString() + " used **Liberate** to ";
 
-            Tile tile = game.getTileFromPlanet(planet);
-            Planet p = tile != null ? tile.getUnitHolderFromPlanet(planet) : null;
+            Tile tile = game.getTileContainingPlanet(planet);
+            Planet p = tile != null ? tile.getPlanet(planet) : null;
             PlanetModel model = Mapper.getPlanet(planet);
             String planetName = model != null ? model.getName() : planet;
 
@@ -176,7 +176,7 @@ public final class TeHelperAbilities {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
 
             UnitHolder space = tile.getSpaceUnitHolder();
-            Planet p = tile.getUnitHolderFromPlanet(planet);
+            Planet p = tile.getPlanet(planet);
             if (p != null) {
                 List<Integer> states = space.removeUnit(uk, count);
                 p.addUnitsWithStates(uk, states);
@@ -197,7 +197,7 @@ public final class TeHelperAbilities {
     public static List<Button> miniLandingButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         // Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
-        for (Tile activeSystem : game.getTileMap().values()) {
+        for (Tile activeSystem : game.getTiles()) {
             if (activeSystem != null) {
                 // TODO: galvanize
                 int dmgDocks =
@@ -207,7 +207,7 @@ public final class TeHelperAbilities {
                 int pds = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Pds, player) - dmgPds;
 
                 for (Planet planet : activeSystem.getPlanetUnitHolders()) {
-                    if (!player.getPlanetsAllianceMode().contains(planet.getName())) {
+                    if (!player.canUsePlanet(planet.getName())) {
                         continue;
                     }
                     for (int x = 1; x <= Math.min(2, pds); x++) {
@@ -257,7 +257,7 @@ public final class TeHelperAbilities {
         if ((matcher = Pattern.compile(regex1).matcher(buttonID)).matches()) {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             List<Button> buttons = getSurvivalInstinctSystemButtons(game, player, tile, survivalMap);
-            String message = player.getRepresentation()
+            String message = player.toString()
                     + ", please choose a system to source **Survival Instinct** from, or click \"Done Moving\".";
             message += unitSummary(game, player, survivalMap);
             MessageHelper.editMessageWithButtons(event, message, buttons);
@@ -267,7 +267,7 @@ public final class TeHelperAbilities {
             Tile source = game.getTileByPosition(matcher.group("source"));
             List<Button> buttons = getSurvivalInstinctUnitButtonsForSystem(
                     game, player, tile, source, survivalMap.get(matcher.group("source")));
-            String message = player.getRepresentation()
+            String message = player.toString()
                     + ", please choose which units you wish to move from the system using **Survival Instinct**, or click \"Done With This System\" to move from a different system.";
             message += unitSummary(game, player, survivalMap);
             MessageHelper.editMessageWithButtons(event, message, buttons);
@@ -302,7 +302,7 @@ public final class TeHelperAbilities {
 
             List<Button> buttons =
                     getSurvivalInstinctUnitButtonsForSystem(game, player, destination, source, survivalMap.get(pos));
-            String message = player.getRepresentation()
+            String message = player.toString()
                     + ", please choose which units you wish to move from the system using **Survival Instinct**, or click \"Done With This System\" to move from a different system.";
             message += unitSummary(game, player, survivalMap);
             MessageHelper.editMessageWithButtons(event, message, buttons);
@@ -335,7 +335,7 @@ public final class TeHelperAbilities {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitStrTo);
             }
             game.removeStoredValue("survivalInstinctMap");
-            String msg = player.getRepresentation()
+            String msg = player.toString()
                     + " moved the following units into the active system with **Survival Instinct**:"
                     + unitSummary(game, player, survivalMap);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -369,7 +369,7 @@ public final class TeHelperAbilities {
             Game game, Player player, Tile destination, Tile source, List<String> movedUnits) {
         // Get buttons to move units from this system
         List<Button> buttons = new ArrayList<>();
-        for (UnitHolder uh : source.getUnitHolders().values()) {
+        for (UnitHolder uh : source.getUnitHolderValues()) {
             String uhName = "space".equals(uh.getName()) ? "Space" : Helper.getPlanetRepresentation(uh.getName(), game);
             for (UnitKey uk : uh.getUnits().keySet()) {
                 if (!player.unitBelongsToPlayer(uk)) continue;

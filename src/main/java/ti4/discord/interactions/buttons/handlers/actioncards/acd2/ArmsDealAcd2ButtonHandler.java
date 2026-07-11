@@ -53,14 +53,14 @@ class ArmsDealAcd2ButtonHandler {
         buttons.add(Buttons.red("deleteButtons", "Don't Place"));
         MessageHelper.sendMessageToChannelWithButtons(
                 p2.getCorrectChannel(),
-                p2.getRepresentation() + ", please choose where you wish to place the _Arms Deal_ cruiser.",
+                p2.toString() + ", please choose where you wish to place the _Arms Deal_ cruiser.",
                 buttons);
         buttons = new ArrayList<>(
                 Helper.getTileWithShipsPlaceUnitButtons(p2, game, "destroyer", "placeOneNDone_skipbuild"));
         buttons.add(Buttons.red("deleteButtons", "Don't Place"));
         MessageHelper.sendMessageToChannelWithButtons(
                 p2.getCorrectChannel(),
-                p2.getRepresentation() + ", please choose where you wish to place the _Arms Deal_ destroyer.",
+                p2.toString() + ", please choose where you wish to place the _Arms Deal_ destroyer.",
                 buttons);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }

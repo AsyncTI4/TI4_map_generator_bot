@@ -30,8 +30,8 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.unit.AddUnitService;
-import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 class CabalButtonHandler {
@@ -77,8 +77,8 @@ class CabalButtonHandler {
             }
             if (FoWHelper.playerHasShipsInSystem(p2, tile)
                     && ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, game, player)) {
-                String msg = player.getRepresentationUnfogged() + " has failed to eat units owned by "
-                        + p2.getRepresentation() + " because they were blockaded. Womp Womp.";
+                String msg = player.getRepresentationUnfogged() + " has failed to eat units owned by " + p2.toString()
+                        + " because they were blockaded. Womp Womp.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
@@ -104,8 +104,7 @@ class CabalButtonHandler {
                     || p2.hasTech("absol_dt2")
                     || p2.getUnitsOwned().contains("absol_cabal_spacedock")
                     || p2.getUnitsOwned().contains("absol_cabal_spacedock2")) {
-                tiles.addAll(
-                        CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, Units.UnitType.Spacedock));
+                tiles.addAll(UnitQueryService.getTilesContainingPlayersUnits(game, p2, Units.UnitType.Spacedock));
             }
         }
 
@@ -144,7 +143,7 @@ class CabalButtonHandler {
                         && ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, game, player)) {
                     message.append(player.getRepresentationUnfogged())
                             .append(" has failed to eat units owned by ")
-                            .append(p2.getRepresentation())
+                            .append(p2.toString())
                             .append(" because they were blockaded. Womp Womp.\n");
                     content = true;
                     continue;
@@ -512,21 +511,19 @@ class CabalButtonHandler {
                                 "removeNCaptureThisTypeOfUnit_"
                                         + key.unitType().humanReadableName() + "_" + tile.getPosition() + "_"
                                         + unitHolder.getName() + "_" + player.getColor(),
-                                key.unitType().humanReadableName() + " from " + tile.getRepresentation()
-                                        + " in Space"));
+                                key.unitType().humanReadableName() + " from " + tile.toString() + " in Space"));
                     } else {
                         buttons.add(Buttons.blue(
                                 "removeThisTypeOfUnit_" + key.unitType().humanReadableName() + "_" + tile.getPosition()
                                         + "_" + unitHolder.getName(),
-                                key.unitType().humanReadableName() + " from " + tile.getRepresentation()
-                                        + " in Space"));
+                                key.unitType().humanReadableName() + " from " + tile.toString() + " in Space"));
                     }
                 }
             }
             buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
             MessageHelper.sendMessageToChannelWithButtons(
                     p2.getCorrectChannel(),
-                    p2.getRepresentation() + ", you are exceeding your fleet pool "
+                    p2.toString() + ", you are exceeding your fleet pool "
                             + (resolveMixedCapacity.getOrDefault(tile, null) == p2 ? "and capacity limits" : "limit")
                             + " in tile " + tile.getRepresentationForButtons()
                             + ". Please remove some units.",
@@ -564,15 +561,13 @@ class CabalButtonHandler {
                             buttons.add(Buttons.blue(
                                     "removeThisTypeOfUnit_" + key.unitType().humanReadableName() + "_"
                                             + tile.getPosition() + "_" + unitHolder.getName(),
-                                    key.unitType().humanReadableName() + " from " + tile.getRepresentation()
-                                            + " in Space"));
+                                    key.unitType().humanReadableName() + " from " + tile.toString() + " in Space"));
                         } else {
                             buttons.add(Buttons.red(
                                     "removeNCaptureThisTypeOfUnit_"
                                             + key.unitType().humanReadableName() + "_" + tile.getPosition() + "_"
                                             + unitHolder.getName() + "_" + player.getColor(),
-                                    key.unitType().humanReadableName() + " from " + tile.getRepresentation()
-                                            + " in Space"));
+                                    key.unitType().humanReadableName() + " from " + tile.toString() + " in Space"));
                         }
                     }
                 }
@@ -580,7 +575,7 @@ class CabalButtonHandler {
             buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
             MessageHelper.sendMessageToChannelWithButtons(
                     p2.getCorrectChannel(),
-                    p2.getRepresentation() + ", you are exceeding your capacity limit in tile "
+                    p2.toString() + ", you are exceeding your capacity limit in tile "
                             + tile.getRepresentationForButtons() + ". Please remove some units.",
                     buttons);
         }

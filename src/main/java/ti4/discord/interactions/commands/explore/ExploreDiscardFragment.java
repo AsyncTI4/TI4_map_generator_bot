@@ -60,7 +60,7 @@ class ExploreDiscardFragment extends GameStateSubcommand {
         }
 
         ExploreModel fragmentModel = Mapper.getExplore(fragmentsToDiscard.getFirst());
-        String message = player.getRepresentation() + " discarded " + count + " " + fragmentModel.getName() + ".";
+        String message = player.toString() + " discarded " + count + " " + fragmentModel.getName() + ".";
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 }

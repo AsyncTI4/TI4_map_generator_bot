@@ -25,7 +25,7 @@ public class WarrantAgendaResolver implements AgendaResolver {
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player2, event);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                (game.isFowMode() ? "The elected player" : player2.getRepresentation())
+                (game.isFowMode() ? "The elected player" : player2.toString())
                         + " has drawn 2 secret objectives, and their secret objective info is now public.");
     }
 }

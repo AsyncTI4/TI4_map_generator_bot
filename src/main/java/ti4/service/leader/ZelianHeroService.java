@@ -29,7 +29,7 @@ public class ZelianHeroService {
         // Remove all other players ground force units from the tile in question
         for (Player player_ : game.getPlayers().values()) {
             if (player_ != player) {
-                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
                     if (!Constants.SPACE.equals(unitHolder.getName())) {
                         unitHolder.removeAllUnits(player_.getColor());
                     }
@@ -51,22 +51,21 @@ public class ZelianHeroService {
         ButtonHelperAgents.resolveArtunoCheck(player, resourcesSum);
 
         // Add the zelian asteroid field to the map and copy over the space unitholder
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
         game.removeTile(tile.getPosition());
         Tile asteroidTile = new Tile(AliasHandler.resolveTile("D36"), tile.getPosition(), space);
         game.setTile(asteroidTile);
 
         // After shot to disaster channel
-        String message2 =
-                tile.getRepresentation() + " has been _Celestial Impact_'d by " + player.getRepresentation() + ".";
+        String message2 = tile.toString() + " has been _Celestial Impact_'d by " + player.toString() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, asteroidTile, 1, message2);
 
         if (player.hasLeaderUnlocked("zelianhero")) {
             Leader playerLeader = player.getLeader("zelianhero").orElse(null);
-            StringBuilder message = new StringBuilder(player.getRepresentation())
+            StringBuilder message = new StringBuilder(player.toString())
                     .append(" played ")
                     .append(Helper.getLeaderFullRepresentation(playerLeader));
-            boolean purged = player.removeLeader(playerLeader);
+            boolean purged = PlayHeroService.removeLeader(game, player, playerLeader);
             if (purged) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(), message + " - Zelian R, the Zelian heRo, has been purged.");

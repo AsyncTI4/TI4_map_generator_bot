@@ -60,8 +60,8 @@ class SendTG extends GameStateSubcommand {
         targetPlayer.setTg(targetTG);
         ButtonHelperAbilities.pillageCheck(targetPlayer, game);
 
-        String p1 = player.getRepresentation();
-        String p2 = targetPlayer.getRepresentation();
+        String p1 = player.toString();
+        String p2 = targetPlayer.toString();
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         String tgString = sendTG + " " + MiscEmojis.getTGorNomadCoinEmoji(game) + " trade goods";
         String message = p1 + " sent " + tgString + " to " + p2;
@@ -71,8 +71,8 @@ class SendTG extends GameStateSubcommand {
             targetPlayer.clearDebt(player, sendTG);
             MessageHelper.sendMessageToEventChannel(
                     event,
-                    targetPlayer.getRepresentation() + " cleared " + StringHelper.pluralize(sendTG, "debt token")
-                            + " owned by " + player.getRepresentation() + ", from their \"Debt Account\" pool.");
+                    targetPlayer.toString() + " cleared " + StringHelper.pluralize(sendTG, "debt token") + " owned by "
+                            + player.toString() + ", from their \"Debt Account\" pool.");
         }
 
         if (game.isFowMode()) {

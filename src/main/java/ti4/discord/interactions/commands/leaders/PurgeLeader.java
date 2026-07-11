@@ -35,8 +35,7 @@ class PurgeLeader extends GameStateSubcommand {
         if (purged) {
             MessageHelper.sendMessageToEventChannel(
                     event, LeaderEmojis.getLeaderEmoji(playerLeader).toString());
-            String message =
-                    player.getRepresentation() + " purged " + Helper.getLeaderShortRepresentation(playerLeader);
+            String message = player.toString() + " purged " + Helper.getLeaderShortRepresentation(playerLeader);
             MessageHelper.sendMessageToEventChannel(event, message);
         } else {
             MessageHelper.sendMessageToEventChannel(event, "Leader not found");

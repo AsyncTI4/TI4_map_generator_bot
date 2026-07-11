@@ -46,7 +46,7 @@ public class TfArtificeResolver implements EdictResolver {
                     mod.getRepresentationEmbed());
 
             String plural = (vpDifference == 1 ? "" : "s");
-            String msg = player.getRepresentation() + ", you are " + vpDifference + " point" + plural
+            String msg = player.toString() + ", you are " + vpDifference + " point" + plural
                     + " behind the player with the most victory points, so they may draw "
                     + vpDifference + " additional card" + plural + " from either deck.";
             List<Button> buttons = new ArrayList<>();
@@ -92,7 +92,7 @@ public class TfArtificeResolver implements EdictResolver {
             }
             MessageHelper.sendMessageToChannel(
                     game.isVeiledHeartMode() ? player.getCardsInfoThread() : player.getCorrectChannel(),
-                    player.getRepresentation() + ", please choose the paradigm you wish to keep.",
+                    player.toString() + ", please choose the paradigm you wish to keep.",
                     buttons);
             if (game.isVeiledHeartMode()) {
                 MessageHelper.sendMessageToChannel(
@@ -127,8 +127,7 @@ public class TfArtificeResolver implements EdictResolver {
 
         MessageHelper.sendMessageToChannel(
                 game.isVeiledHeartMode() ? player.getCardsInfoThread() : player.getCorrectChannel(),
-                player.getRepresentation() + " kept the _"
-                        + Mapper.getLeader(paradigm).getName() + "_ paradigm.");
+                player.toString() + " kept the _" + Mapper.getLeader(paradigm).getName() + "_ paradigm.");
         if (game.isVeiledHeartMode()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

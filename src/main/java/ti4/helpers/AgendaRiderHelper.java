@@ -122,7 +122,7 @@ public class AgendaRiderHelper {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation()
+                player.toString()
                         + ", don't forget you now have to decide on whether you will play any more \"after\"s.");
     }
 

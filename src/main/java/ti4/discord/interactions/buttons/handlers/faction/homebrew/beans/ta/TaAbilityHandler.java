@@ -81,7 +81,7 @@ public class TaAbilityHandler {
 
         int count = 0;
         for (String planetName : player.getPlanets()) {
-            Tile tile = game.getTileFromPlanet(planetName);
+            Tile tile = game.getTileContainingPlanet(planetName);
             if (tile != null && planetHasAnyDesignAttached(tile, planetName)) {
                 count++;
             }
@@ -96,7 +96,7 @@ public class TaAbilityHandler {
                 || planetName == null
                 || planetName.isBlank()
                 || !player.hasAbility(PLANETARY_RECONFIGURATION)
-                || !player.getPlanetsAllianceMode().contains(planetName)
+                || !player.canUsePlanet(planetName)
                 || planetHasAnyDesignAttached(tile, planetName)) {
             return;
         }
@@ -126,7 +126,7 @@ public class TaAbilityHandler {
             return;
         }
 
-        Tile tile = game.getTileFromPlanet(planet.getName());
+        Tile tile = game.getTileContainingPlanet(planet.getName());
         if (tile == null) {
             return;
         }
@@ -164,7 +164,7 @@ public class TaAbilityHandler {
         if (tile == null
                 || tokenPath == null
                 || !ATTACHABLE_DESIGNS.contains(design)
-                || !player.getPlanetsAllianceMode().contains(planetName)
+                || !player.canUsePlanet(planetName)
                 || planetHasAnyDesignAttached(tile, planetName)
                 || !getAvailableDesigns(game).contains(design)) {
             ButtonHelper.deleteMessage(event);
@@ -176,14 +176,14 @@ public class TaAbilityHandler {
         CommanderUnlockCheckService.checkPlayer(player, "ta");
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation() + " attached _" + getDesignName(design) + "_ to "
+                player.toString() + " attached _" + getDesignName(design) + "_ to "
                         + Helper.getPlanetRepresentation(planetName, game) + ".");
         ButtonHelper.deleteMessage(event);
     }
 
     private static Map<String, String> getAttachedDesigns(Game game) {
         Map<String, String> attachedDesigns = new LinkedHashMap<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             for (Planet planet : tile.getPlanetUnitHolders()) {
                 for (String token : planet.getTokenList()) {
                     AttachmentModel attachment = Mapper.getAttachmentInfo(token);
@@ -208,7 +208,7 @@ public class TaAbilityHandler {
     }
 
     public static boolean planetHasAnyDesignAttached(Tile tile, String planetName) {
-        Planet planet = tile.getUnitHolderFromPlanet(planetName);
+        Planet planet = tile.getPlanet(planetName);
         if (planet == null) {
             return false;
         }
@@ -223,7 +223,7 @@ public class TaAbilityHandler {
     }
 
     private static boolean planetHasGrandDesignAttached(Tile tile, String planetName) {
-        Planet planet = tile.getUnitHolderFromPlanet(planetName);
+        Planet planet = tile.getPlanet(planetName);
         if (planet == null) {
             return false;
         }
@@ -260,7 +260,7 @@ public class TaAbilityHandler {
             if (buttons != null) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        player.getRepresentation()
+                        player.toString()
                                 + " You may ready up to 2 planets due to your _Efficient Governance_ ability.",
                         buttons);
             }
@@ -268,8 +268,8 @@ public class TaAbilityHandler {
     }
 
     public static void resolveGrandDesign(Player player, Game game, String planetName) {
-        Tile tile = game.getTileFromPlanet(planetName);
-        Planet planet = game.getPlanetsInfo().get(planetName);
+        Tile tile = game.getTileContainingPlanet(planetName);
+        Planet planet = game.getPlanet(planetName);
         if (game == null
                 || planet == null
                 || tile == null
@@ -283,8 +283,7 @@ public class TaAbilityHandler {
 
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", you may explore " + Helper.getPlanetRepresentation(planetName, game)
-                            + ".",
+                    player.toString() + ", you may explore " + Helper.getPlanetRepresentation(planetName, game) + ".",
                     buttons);
         }
     }

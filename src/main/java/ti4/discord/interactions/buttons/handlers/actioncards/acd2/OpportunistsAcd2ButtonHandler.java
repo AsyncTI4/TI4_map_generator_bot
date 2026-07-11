@@ -28,7 +28,7 @@ class OpportunistsAcd2ButtonHandler {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " added 1 neutral cruiser and 2 neutral destroyers to "
+                player.toString() + " added 1 neutral cruiser and 2 neutral destroyers to "
                         + tile.getRepresentationForButtons(game, player) + ".");
     }
 }

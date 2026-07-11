@@ -32,14 +32,14 @@ class MahactAgentButtonHandler {
         }
         Player constructionPlayer = player;
         for (Player p2 : game.getRealPlayers()) {
-            if (p2.getSCs().contains(4)) {
+            if (p2.hasStrategyCard(4)) {
                 constructionPlayer = p2;
             }
         }
         CommandCounterHelper.addCC(event, constructionPlayer, tile);
 
         String colorName = Mapper.getColor(constructionPlayer.getColor()).getDisplayName();
-        String message = player.getRepresentation() + " placed 1 " + colorName + " command token in the "
+        String message = player.toString() + " placed 1 " + colorName + " command token in the "
                 + Helper.getPlanetRepresentation(planet, game)
                 + " system due to use of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")

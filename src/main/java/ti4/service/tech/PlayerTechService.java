@@ -65,7 +65,7 @@ import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
-import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitQueryService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.gameevent.GameEventDraft;
@@ -80,7 +80,7 @@ public class PlayerTechService {
         player.addTech(techID);
         AshenLeadersHandler.offerCommanderPlacementButtons(event, game, player, Mapper.getTech(techID));
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
-        String message = player.getRepresentation() + " added technology: "
+        String message = player.toString() + " added technology: "
                 + Mapper.getTech(techID).getRepresentation(false) + ".";
         if ("iihq".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             message += "\nAutomatically added the Custodia Vigilia planet.";
@@ -112,7 +112,7 @@ public class PlayerTechService {
             exhaustNewest = true;
         }
 
-        exhaustNewest &= player.getExhaustedTechs().contains(componentID);
+        exhaustNewest &= player.isTechExhausted(componentID);
         player.removeTech(componentID);
 
         if (Mapper.getTech(componentID) != null) {
@@ -204,7 +204,7 @@ public class PlayerTechService {
             inf = "inf";
         }
         TechnologyModel techModel = Mapper.getTech(tech);
-        if (!player.getTechs().contains(tech)) {
+        if (!player.hasExactTech(tech)) {
             boolean hasSub = false;
             for (String tech2 : player.getTechs()) {
                 if (tech2.contains(tech)) {
@@ -215,8 +215,8 @@ public class PlayerTechService {
             if (!hasSub) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " does not own the _" + techModel.getName() + "_ (`"
-                                + techModel.getAlias() + "`) technology.");
+                        player.toString() + " does not own the _" + techModel.getName() + "_ (`" + techModel.getAlias()
+                                + "`) technology.");
                 return;
             }
         }
@@ -256,7 +256,7 @@ public class PlayerTechService {
             case "gls" -> { // Graviton
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        player.getRepresentation()
+                        player.toString()
                                 + " exhausted _Graviton Laser System_. The auto-assign hits button for SPACE CANNON OFFENSE fire will now kill fighters last.");
                 if (event instanceof ButtonInteractionEvent buttonEvent) {
                     SpringContext.getBean(CombatReplayService.class)
@@ -270,7 +270,7 @@ public class PlayerTechService {
             case "dsbenty" -> {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation()
+                        player.toString()
                                 + " exhausted _Merged Replicators_ to increase the PRODUCTION value of one of their units by 2, or to match the largest PRODUCTION value on the game board.");
                 deleteTheOneButtonIfButtonEvent(event);
             }
@@ -285,7 +285,7 @@ public class PlayerTechService {
 
             case "dscymiy" -> {
                 List<Tile> tiles = new ArrayList<>();
-                for (Tile tile : game.getTileMap().values()) {
+                for (Tile tile : game.getTiles()) {
                     if (FoWHelper.playerHasUnitsInSystem(player, tile)
                             && !tile.isHomeSystem(game)
                             && !tile.isMecatol(game)) {
@@ -382,7 +382,7 @@ public class PlayerTechService {
             case "tf-singularitypoint" -> {
                 deleteTheOneButtonIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();
-                for (Tile tile : game.getTileMap().values()) {
+                for (Tile tile : game.getTiles()) {
                     boolean adjToUnits = false;
                     for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
                         Tile tile2 = game.getTileByPosition(pos2);
@@ -419,7 +419,7 @@ public class PlayerTechService {
             case "tf-radiantsigils" -> {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation()
+                        player.toString()
                                 + " unfortunately at this time I am too lazy to offer an elegant solution to this tech. Use ./add_token token:sigil tile_name: to add the sigil, and /remove_token if you're moving it from somewhere.");
             }
             case "tf-oracularalgorithms" -> {
@@ -474,7 +474,7 @@ public class PlayerTechService {
             case "executiveorder" -> TeHelperTechs.postExecutiveOrderButtons(event, game, player);
             case "nekroc4r", "nanomachines", "tf-nanomachines" -> {
                 List<Button> buttons = ButtonHelperFactionSpecific.getc4RedTechButtons(player);
-                String message = player.getRepresentation() + ", please choose one of the options for this technology:";
+                String message = player.toString() + ", please choose one of the options for this technology:";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -557,7 +557,7 @@ public class PlayerTechService {
                     sendNextActionButtonsIfButtonEvent(event, game, player);
                 } else {
                     MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(), player.getRepresentation() + " You do not control Mecatol Rex");
+                            player.getCorrectChannel(), player.toString() + " You do not control Mecatol Rex");
                     player.refreshTech("lgf");
                 }
             }
@@ -601,10 +601,10 @@ public class PlayerTechService {
     }
 
     public static List<Button> getSlingRelayButtons(Game game, Player player) {
-        Set<Tile> tiles = new HashSet<>(
-                ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock, UnitType.PlenaryOrbital));
+        Set<Tile> tiles = new HashSet<>(UnitQueryService.getTilesContainingPlayersUnits(
+                game, player, UnitType.Spacedock, UnitType.PlenaryOrbital));
         if (player.hasUnit("ghoti_flagship")) {
-            tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship));
+            tiles.addAll(UnitQueryService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Flagship));
         }
 
         List<Button> buttons = new ArrayList<>();
@@ -740,7 +740,7 @@ public class PlayerTechService {
             if (player.hasAbility("obsessive_designs")
                     && paymentRequired
                     && "action".equalsIgnoreCase(game.getPhaseOfGame())) {
-                String msg = player.getRepresentation()
+                String msg = player.toString()
                         + " due to your **Obsessive Designs** ability, you may use the PRODUCTION ability of a space dock in your home system"
                         + " to build units of the type you just upgraded, reducing the total cost by 2.";
                 String generalMsg = player.getFactionEmojiOrColor()
@@ -749,11 +749,9 @@ public class PlayerTechService {
                 List<Button> buttons;
                 Tile tile = game.getTile(AliasHandler.resolveTile(player.getFaction()));
                 if (player.hasAbility("mobile_command")
-                        && !CheckUnitContainmentService.getTilesContainingPlayersUnits(
-                                        game, player, Units.UnitType.Flagship)
+                        && !UnitQueryService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Flagship)
                                 .isEmpty()) {
-                    tile = CheckUnitContainmentService.getTilesContainingPlayersUnits(
-                                    game, player, Units.UnitType.Flagship)
+                    tile = UnitQueryService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Flagship)
                             .getFirst();
                 }
                 if (tile == null) {
@@ -811,7 +809,7 @@ public class PlayerTechService {
         if ("cm".equalsIgnoreCase(techID)
                 && game.getActivePlayer() != null
                 && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())
-                && !player.getSCs().contains(7)) {
+                && !player.hasStrategyCard(7)) {
             if (!game.isFowMode()) {
                 GameMessageManager.remove(game.getName(), GameMessageType.TURN)
                         .ifPresent(messageId -> game.getMainGameChannel()
@@ -894,7 +892,7 @@ public class PlayerTechService {
                 }
                 game.setStoredValue(player.getFaction() + "singularityTechs", prev + techID);
                 if (player.getSingularityTechs().size() > player.getSingularities()) {
-                    String msg = player.getRepresentation()
+                    String msg = player.toString()
                             + " you have more copied abilities than you have Singularities. Please remove a copied ability with these buttons.";
                     List<Button> buttons = new ArrayList<>();
                     for (String tech : player.getSingularityTechs()) {
@@ -909,7 +907,7 @@ public class PlayerTechService {
         if (dwsBreakthrough) {
             VisionariaSelectService.resolveTechResearch(game, player, techID);
         }
-        if (player.hasUnit("augers_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
+        if (player.hasUnit("augers_mech") && UnitQueryService.countUnits(game, player, "mech") < 4) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getFactionEmoji()
@@ -1023,7 +1021,7 @@ public class PlayerTechService {
         if (ButtonHelper.isLawInPlay(game, "revolution")) {
             MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + ", due to the _Anti-Intellectual Revolution_ law, you now have to destroy a non-fighter ship (if you __researched__ the technology you just acquired).",
                     Buttons.gray("getModifyTiles", "Modify Units"));
         }
@@ -1046,7 +1044,7 @@ public class PlayerTechService {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation()
+                player.toString()
                         + ", please choose the unit that was destroyed, and that you will be placing via _Fractal Plating_.",
                 buttons);
     }

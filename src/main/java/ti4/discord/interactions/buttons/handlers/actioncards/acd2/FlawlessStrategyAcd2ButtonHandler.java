@@ -22,30 +22,30 @@ class FlawlessStrategyAcd2ButtonHandler {
     public static void resolveFlawlessStrategy(Player player, ButtonInteractionEvent event) {
         List<Button> scButtons = new ArrayList<>();
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        if (player.getSCs().contains(2)) {
+        if (player.hasStrategyCard(2)) {
             scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
         }
-        if (player.getSCs().contains(3)) {
+        if (player.hasStrategyCard(3)) {
             scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
         }
-        if (player.getSCs().contains(4)) {
+        if (player.hasStrategyCard(4)) {
             scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
             scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
         }
-        if (player.getSCs().contains(5)) {
+        if (player.hasStrategyCard(5)) {
             scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
         }
-        if (player.getSCs().contains(6)) {
+        if (player.hasStrategyCard(6)) {
             scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
         }
-        if (player.getSCs().contains(7)) {
+        if (player.hasStrategyCard(7)) {
             scButtons.add(Buttons.GET_A_TECH);
         }
-        if (player.getSCs().contains(8)) {
+        if (player.hasStrategyCard(8)) {
             scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
         scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), player.getRepresentation() + ", use the buttons to resolve.", scButtons);
+                event.getMessageChannel(), player.toString() + ", use the buttons to resolve.", scButtons);
     }
 }

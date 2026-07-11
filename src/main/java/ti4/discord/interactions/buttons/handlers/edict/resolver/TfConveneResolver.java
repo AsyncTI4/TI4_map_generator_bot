@@ -37,8 +37,8 @@ public class TfConveneResolver implements EdictResolver {
                 player.getCorrectChannel(), "_Convene_ has revealed these abilities.", embeds);
 
         Player speaker = game.getSpeaker();
-        String addl = "You need to assign the first ability to " + player.getRepresentation()
-                + ", then that player assigns the rest.";
+        String addl =
+                "You need to assign the first ability to " + player.toString() + ", then that player assigns the rest.";
         MessageHelper.sendMessageToChannelWithButtons(speaker.getCorrectChannel(), playerPing(speaker, addl), buttons);
     }
 
@@ -53,7 +53,7 @@ public class TfConveneResolver implements EdictResolver {
             tyrant.addTech(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.getActionsChannel(),
-                    tyrant.getRepresentation() + " has acquired the ability: "
+                    tyrant.toString() + " has acquired the ability: "
                             + Mapper.getTech(cardID).getName(),
                     Mapper.getTech(cardID).getRepresentationEmbed());
         } else {
@@ -69,7 +69,7 @@ public class TfConveneResolver implements EdictResolver {
             }
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", please choose the player you wish to give _"
+                    player.toString() + ", please choose the player you wish to give _"
                             + Mapper.getTech(cardID).getName() + "_ to.",
                     buttons);
         }
@@ -106,7 +106,7 @@ public class TfConveneResolver implements EdictResolver {
 
         MessageHelper.sendMessageToChannelWithEmbed(
                 game.getActionsChannel(),
-                p2.getRepresentation() + " has acquired the ability: "
+                p2.toString() + " has acquired the ability: "
                         + Mapper.getTech(cardID).getName(),
                 Mapper.getTech(cardID).getRepresentationEmbed());
         ButtonHelper.deleteMessage(event);

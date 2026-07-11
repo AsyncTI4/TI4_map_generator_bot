@@ -57,7 +57,7 @@ public class EventHelper {
             sb.append('\n')
                     .append(TileEmojis.TileBlueBack)
                     .append(' ')
-                    .append(tile.getRepresentation())
+                    .append(tile.toString())
                     .append(" (`")
                     .append(tile.getTileID())
                     .append("`)");
@@ -67,7 +67,7 @@ public class EventHelper {
             sb.append('\n')
                     .append(TileEmojis.TileRedBack)
                     .append(' ')
-                    .append(tile.getRepresentation())
+                    .append(tile.toString())
                     .append(" (`")
                     .append(tile.getTileID())
                     .append("`)");

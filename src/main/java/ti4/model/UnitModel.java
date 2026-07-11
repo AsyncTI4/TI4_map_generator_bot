@@ -244,7 +244,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     private boolean shouldUseShrapnelTurrets(Player player) {
         return capacityValue > 0
-                && player.getFaction().equalsIgnoreCase(player.getGame().getStoredValue("ShrapnelTurretsFaction"))
+                && player.isFaction(player.getGame().getStoredValue("ShrapnelTurretsFaction"))
                 && getExpectedAfbHits(player, false) < 0.6;
     }
 

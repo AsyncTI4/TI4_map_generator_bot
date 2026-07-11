@@ -139,7 +139,7 @@ public class FrankenDraftBagService {
                 embeds.add(Mapper.getTech("wavelength").getRepresentationEmbed());
                 embeds.add(Mapper.getTech("antimatter").getRepresentationEmbed());
 
-                String msg = player.getRepresentation()
+                String msg = player.toString()
                         + ", you should only keep 2 abilities, 1 genome, and 1 unit out of those you drafted."
                         + " Instead of keeping one (or two) of those, you may use these buttons to take one (or two) of these generic technologies.";
                 MessageHelper.sendMessageToChannelWithEmbeds(cardsInfoThread, msg, embeds);

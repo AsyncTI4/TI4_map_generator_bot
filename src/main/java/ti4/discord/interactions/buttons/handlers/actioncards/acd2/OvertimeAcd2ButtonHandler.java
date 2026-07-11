@@ -34,7 +34,7 @@ class OvertimeAcd2ButtonHandler {
         if (player.getTg() < 3) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " needs at least 3 trade goods to resolve _Overtime_.");
+                    player.toString() + " needs at least 3 trade goods to resolve _Overtime_.");
             event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
@@ -43,13 +43,13 @@ class OvertimeAcd2ButtonHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has no exhausted components to ready with _Overtime_.");
+                    player.toString() + " has no exhausted components to ready with _Overtime_.");
             event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
         String spendMessage =
-                player.getRepresentation() + " spent 3 trade goods " + player.gainTG(-3) + " to resolve _Overtime_.";
+                player.toString() + " spent 3 trade goods " + player.gainTG(-3) + " to resolve _Overtime_.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), spendMessage);
         sendOvertimeButtons(player, game, 2);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -77,8 +77,7 @@ class OvertimeAcd2ButtonHandler {
         String readyItem = readyOvertimeComponent(player, game, parts[0], parts[2]);
         if (readyItem == null) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " could not ready that component with _Overtime_.");
+                    player.getCorrectChannel(), player.toString() + " could not ready that component with _Overtime_.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -195,7 +194,7 @@ class OvertimeAcd2ButtonHandler {
                 yield relicModel == null ? componentId : relicModel.getNameRepresentation();
             }
             case "tech" -> {
-                if (!player.getExhaustedTechs().contains(componentId)) {
+                if (!player.isTechExhausted(componentId)) {
                     yield null;
                 }
                 player.refreshTech(componentId);

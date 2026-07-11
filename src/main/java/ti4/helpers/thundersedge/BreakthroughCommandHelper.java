@@ -130,7 +130,7 @@ public final class BreakthroughCommandHelper {
         withAllBreakthroughs(target, bts -> {
             List<MessageEmbed> embeds =
                     bts.stream().map(BreakthroughModel::getRepresentationEmbed).toList();
-            String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
+            String headerText = player.toString() + CommandHelper.getHeaderText(event);
             MessageHelper.sendMessageEmbedsToCardsInfoThread(player, headerText, embeds);
         });
     }
@@ -138,7 +138,7 @@ public final class BreakthroughCommandHelper {
     public static void exhaustBreakthroughs(Player player, List<String> btIDs) {
         withEachBreakthrough(player, btIDs, bt -> {
             player.getBreakthroughExhausted().put(bt.getAlias(), true);
-            String message = player.getRepresentation() + " exhausted their _" + bt.getName() + "_ breakthrough.";
+            String message = player.toString() + " exhausted their _" + bt.getName() + "_ breakthrough.";
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(), message, bt.getRepresentationEmbed());
         });
@@ -151,7 +151,7 @@ public final class BreakthroughCommandHelper {
     public static void readyBreakthroughs(Player player, List<String> btIDs) {
         withEachBreakthrough(player, btIDs, bt -> {
             player.getBreakthroughExhausted().put(bt.getAlias(), false);
-            String message = player.getRepresentation() + " readied their _" + bt.getName() + "_ breakthrough.";
+            String message = player.toString() + " readied their _" + bt.getName() + "_ breakthrough.";
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(), message, bt.getRepresentationEmbed());
         });
@@ -178,7 +178,7 @@ public final class BreakthroughCommandHelper {
 
             player.setBreakthroughUnlocked(btID, true);
             player.setBreakthroughExhausted(btID, false);
-            String message = player.getRepresentation() + " unlocked their _" + bt.getName() + "_ breakthrough.";
+            String message = player.toString() + " unlocked their _" + bt.getName() + "_ breakthrough.";
             if ("naazbt".equalsIgnoreCase(bt.getID())) {
                 message +=
                         "\n-# You may choose a style of Eidolon Maximum with the `/user set_preferred_settings voltron_style:` command.";
@@ -190,7 +190,7 @@ public final class BreakthroughCommandHelper {
             }
             if ("khraskbt".equalsIgnoreCase(bt.getID())) {
                 player.addPlanet("grove");
-                Planet grove = game.getPlanetsInfo().get("grove");
+                Planet grove = game.getPlanet("grove");
                 if (grove != null) grove.updateGroveStats(player);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(), "Added the Grove \"planet\" card to your play area.");
@@ -203,8 +203,8 @@ public final class BreakthroughCommandHelper {
             }
             if ("celdauribt".equalsIgnoreCase(bt.getID())) {
                 player.addOwnedUnitByID("celdauri_celagrom");
-                String output = player.getRepresentation()
-                        + ", please choose the system in which you wish to place the _Celagrom_.";
+                String output =
+                        player.toString() + ", please choose the system in which you wish to place the _Celagrom_.";
                 List<Button> buttons =
                         Helper.getTileWithShipsPlaceUnitButtons(player, game, "celagrom", "placeOneNDone_skipbuild");
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), output, buttons);
@@ -233,8 +233,7 @@ public final class BreakthroughCommandHelper {
                     tile.addToken("token_nebula_async.png", "space");
                 }
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation() + " Made your home system into a nebula.");
+                        player.getCorrectChannel(), player.toString() + " Made your home system into a nebula.");
             }
 
             if ("cabalbt".equalsIgnoreCase(bt.getID())) {
@@ -286,7 +285,7 @@ public final class BreakthroughCommandHelper {
             if (!player.isBreakthroughUnlocked(btID)) return;
 
             player.setBreakthroughUnlocked(btID, false);
-            String message = player.getRepresentation() + " locked their _" + bt.getName() + "_ breakthrough.";
+            String message = player.toString() + " locked their _" + bt.getName() + "_ breakthrough.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         });
     }
@@ -302,8 +301,7 @@ public final class BreakthroughCommandHelper {
             if (activatable.contains(btID)) {
                 if (!player.isBreakthroughActive(btID)) {
                     player.setBreakthroughActive(btID, true);
-                    String message =
-                            player.getRepresentation() + " activated their _" + bt.getName() + "_ breakthrough.";
+                    String message = player.toString() + " activated their _" + bt.getName() + "_ breakthrough.";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     if ("naazbt".equalsIgnoreCase(bt.getAlias())) {
                         player.addOwnedUnitByID("naaz_voltron");
@@ -312,8 +310,7 @@ public final class BreakthroughCommandHelper {
                     }
                 } else {
                     player.setBreakthroughActive(btID, false);
-                    String message =
-                            player.getRepresentation() + " deactivated their _" + bt.getName() + "_ breakthrough.";
+                    String message = player.toString() + " deactivated their _" + bt.getName() + "_ breakthrough.";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     if ("naazbt".equalsIgnoreCase(bt.getAlias())) {
                         player.removeOwnedUnitByID("naaz_voltron");
@@ -332,8 +329,8 @@ public final class BreakthroughCommandHelper {
                                 player.getCorrectChannel(), "Use these buttons to fix the breakthrough", buttons);
                     }
                     default -> {
-                        String msg = player.getRepresentation() + " could not activate their _" + bt.getName()
-                                + "_ breakthrough.";
+                        String msg =
+                                player.toString() + " could not activate their _" + bt.getName() + "_ breakthrough.";
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                     }
                 }
@@ -395,8 +392,7 @@ public final class BreakthroughCommandHelper {
             String btID = bt.getID();
             if (player.isBreakthroughActive(btID)) {
                 player.setBreakthroughActive(btID, false);
-                String message =
-                        player.getRepresentation() + " de-activated their _" + bt.getName() + "_ breakthrough.";
+                String message = player.toString() + " de-activated their _" + bt.getName() + "_ breakthrough.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if ("naazbt".equalsIgnoreCase(bt.getAlias())) {
                     player.removeOwnedUnitByID("naaz_voltron");
@@ -422,8 +418,8 @@ public final class BreakthroughCommandHelper {
         } else {
             int initial = player.getBreakthroughTGs(btID);
             player.getBreakthroughTGs().put(btID, newTgs);
-            String msg = player.getRepresentation() + " set the trade goods on their breakthrough to " + newTgs + " ("
-                    + initial + "->" + newTgs + ").";
+            String msg = player.toString() + " set the trade goods on their breakthrough to " + newTgs + " (" + initial
+                    + "->" + newTgs + ").";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         }
     }

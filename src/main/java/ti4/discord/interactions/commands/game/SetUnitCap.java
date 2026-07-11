@@ -45,8 +45,7 @@ class SetUnitCap extends GameStateSubcommand {
             Player player = getPlayer();
             player.setUnitCap(unitID, unitCap);
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "Set " + unit + " max to " + unitCap + " for " + player.getRepresentation() + ".");
+                    event.getChannel(), "Set " + unit + " max to " + unitCap + " for " + player.toString() + ".");
         }
     }
 }

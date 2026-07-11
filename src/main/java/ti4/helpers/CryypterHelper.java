@@ -37,7 +37,7 @@ import ti4.service.emoji.TechEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.UnlockLeaderService;
-import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitQueryService;
 
 public final class CryypterHelper {
     // Revised Politics SC
@@ -94,7 +94,7 @@ public final class CryypterHelper {
         for (Player player : game.getRealPlayers()) {
             game.setStoredValue("Mentak Envoy " + player.getFaction(), "");
             if (player.hasUnexhaustedLeader("mentakenvoy")) {
-                String msg = player.getRepresentation()
+                String msg = player.toString()
                         + " you have the option to pre-assign the declaration of using your Envoy on someone."
                         + " When they are up to vote, it will ping them saying that you wish to use your Envoy, and then it will be your job to clarify."
                         + " Feel free to not preassign if you don't wish to use it on this agenda.";
@@ -166,14 +166,14 @@ public final class CryypterHelper {
         if ("accept".equals(choice)) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + " has chosen to vote for the outcome indicated by "
-                            + mentakPlayer.getRepresentation()
+                            + mentakPlayer.toString()
                             + ".");
         } else if ("PNdecline".equals(choice)) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + " has chosen to send a promissory note and may vote in any manner that they wish.");
             List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, mentakPlayer, player);
             String message = player.getRepresentationUnfogged()
@@ -184,7 +184,7 @@ public final class CryypterHelper {
             mentakPlayer.setTg(mentakPlayer.getTg() + 2);
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
-                    player.getRepresentation() + " has given 2 trade goods and may vote in any manner that they wish.");
+                    player.toString() + " has given 2 trade goods and may vote in any manner that they wish.");
         }
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -194,7 +194,7 @@ public final class CryypterHelper {
         if (player.hasUnexhaustedLeader("yssarilenvoy")
                 && game.getPhaseOfGame() != null
                 && game.getPhaseOfGame().startsWith("agenda")) {
-            String msg = player.getRepresentation()
+            String msg = player.toString()
                     + " you have the option to user your Envoy on someone."
                     + " It will ping them saying that they may copy the effect of the action card you just played.";
             List<Button> buttons2 = new ArrayList<>();
@@ -248,11 +248,10 @@ public final class CryypterHelper {
         if ("decline".equals(choice)) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
-                    player.getRepresentation() + " has chosen not to resolve the effect of the Yssaril Envoy.");
+                    player.toString() + " has chosen not to resolve the effect of the Yssaril Envoy.");
         } else {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    player.getRepresentation() + " has chosen to resolve the effect of the Yssaril Envoy.");
+                    event.getChannel(), player.toString() + " has chosen to resolve the effect of the Yssaril Envoy.");
             ActionCardHelper.resolveActionCard(
                     event, game, player, buttonID.replace("resolveYssarilEnvoy_" + choice + "_", ""), -1, null);
         }
@@ -352,7 +351,7 @@ public final class CryypterHelper {
                 if (key.contains("arborecenvoy") && committedWinner.contains(envoyPlayer)) {
                     String message = envoyPlayer.getRepresentationUnfogged()
                             + ", you have the Arborec Envoy to resolve. Choose the planet you wish to place an infantry on.";
-                    List<Tile> arboTiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                    List<Tile> arboTiles = UnitQueryService.getTilesContainingPlayersUnits(
                             game, envoyPlayer, UnitType.Mech, UnitType.Infantry);
                     Map<Planet, Integer> eligiblePlanets = new HashMap<>();
 
@@ -411,7 +410,7 @@ public final class CryypterHelper {
                     for (Player counterPlayer : counterWinners) {
                         List<String> planets = counterPlayer.getPlanets();
                         for (String planetID : planets) {
-                            Planet p = game.getUnitHolderFromPlanet(planetID);
+                            Planet p = game.getPlanet(planetID);
                             if (!p.isHomePlanet()) {
                                 PlanetModel tempPlanet = Mapper.getPlanet(planetID);
                                 String tilePos =
@@ -545,7 +544,7 @@ public final class CryypterHelper {
                 if (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() == 2) {
                     List<String> playerFragments = player.getFragments();
                     List<String> fragmentsToPurge = new ArrayList<>(playerFragments);
-                    StringBuilder message2 = new StringBuilder(player.getRepresentation() + " purged");
+                    StringBuilder message2 = new StringBuilder(player.toString() + " purged");
                     for (String fragid : fragmentsToPurge) {
                         player.removeFragment(fragid);
                         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
@@ -639,9 +638,9 @@ public final class CryypterHelper {
         String tokenName = "creuss" + type;
         Tile tile = game.getTileByPosition(tilePos);
         tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
-        String msg = player.getRepresentation() + " moved " + MiscEmojis.getCreussWormhole(tokenName) + " " + type
+        String msg = player.toString() + " moved " + MiscEmojis.getCreussWormhole(tokenName) + " " + type
                 + " wormhole to " + tile.getRepresentationForButtons(game, player);
-        for (Tile tile_ : game.getTileMap().values()) {
+        for (Tile tile_ : game.getTiles()) {
             if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
                 msg += " (from " + tile_.getRepresentationForButtons(game, player) + ")";
                 break;
@@ -667,9 +666,9 @@ public final class CryypterHelper {
         }
         // Nekro envoy
         if (player.getLeader("winnuenvoy").orElse(null) != null) {
-            if (player.getExhaustedPlanets().contains("mr")) {
+            if (player.isPlanetExhausted("mr")) {
                 additionalVotesAndSources.put(FactionEmojis.Winnu + " envoy with Mecatol Rex", 6);
-            } else if (player.getExhaustedPlanets().contains("winnu")) {
+            } else if (player.isPlanetExhausted("winnu")) {
                 additionalVotesAndSources.put(FactionEmojis.Winnu + " envoy with Winnu", 4);
             }
         }
@@ -683,7 +682,7 @@ public final class CryypterHelper {
             if (!prevoting) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " please remove 1 infantry to pay for the Yin Envoy.",
+                        player.toString() + " please remove 1 infantry to pay for the Yin Envoy.",
                         ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "infantry"));
             }
         }

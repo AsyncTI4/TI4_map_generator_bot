@@ -262,7 +262,7 @@ public class AutoPingCron {
                                 player.getRepresentationUnfogged()
                                         + ", please indicate if you are scoring a public objective.");
                     }
-                    poMsg.append(player.getRepresentation()).append(", ");
+                    poMsg.append(player.toString()).append(", ");
                 }
                 if (so.isEmpty()) {
                     if (game.isFowMode()) {
@@ -271,7 +271,7 @@ public class AutoPingCron {
                                 player.getRepresentationUnfogged()
                                         + ", please indicate if you are scoring a secret objective.");
                     }
-                    soMsg.append(player.getRepresentation()).append(", ");
+                    soMsg.append(player.toString()).append(", ");
                 }
             }
             if (!game.isFowMode() && !poMsg.isEmpty()) {
@@ -293,7 +293,7 @@ public class AutoPingCron {
             for (Player player : game.getRealPlayers()) {
                 if (game.getStoredValue("statusHomeworkReactionFor" + player.getFaction() + "Round" + game.getRound())
                         .isEmpty()) {
-                    msg.append(player.getRepresentation()).append(", ");
+                    msg.append(player.toString()).append(", ");
                 } else if (game.isFowMode()
                         && game.getStoredValue("fowStatusDone") != null
                         && !game.getStoredValue("fowStatusDone").contains(player.getFaction())) {

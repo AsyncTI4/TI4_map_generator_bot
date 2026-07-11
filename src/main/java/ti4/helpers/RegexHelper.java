@@ -203,7 +203,7 @@ public class RegexHelper {
     public static String unitHolderRegex(Game game, String group) {
         Set<String> unitholders = new HashSet<>(game.getPlanets());
         game.getPlanetsInfo().values().stream()
-                .filter(p -> game.getTileFromPlanet(p.getName()) != null)
+                .filter(p -> game.getTileContainingPlanet(p.getName()) != null)
                 .forEach(p -> unitholders.add(p.getName()));
         unitholders.add("space");
         return regexBuilder(group, unitholders);

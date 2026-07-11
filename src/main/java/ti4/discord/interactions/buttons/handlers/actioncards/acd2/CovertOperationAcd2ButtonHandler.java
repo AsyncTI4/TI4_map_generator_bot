@@ -129,7 +129,7 @@ class CovertOperationAcd2ButtonHandler {
 
     private static List<Button> getCovertOperationTileButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tileHasPlayerMovableUnit(player, tile)) {
                 buttons.add(Buttons.gray(
                         "covertOpTile_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
@@ -139,7 +139,7 @@ class CovertOperationAcd2ButtonHandler {
     }
 
     private static boolean tileHasPlayerMovableUnit(Player player, Tile tile) {
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+        for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
             for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
                 UnitModel model = player.getUnitFromUnitKey(unitKey);

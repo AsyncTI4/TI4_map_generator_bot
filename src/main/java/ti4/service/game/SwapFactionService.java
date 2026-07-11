@@ -66,17 +66,17 @@ public class SwapFactionService {
 
         if (game.isFowMode()) {
             // Fog data is saved by userID so need to swap it too
-            game.getTileMap().values().forEach(tile -> tile.swapFogData(player, addedPlayer));
+            game.getTiles().forEach(tile -> tile.swapFogData(player, addedPlayer));
         }
 
-        String before = "> **Before:** " + addedPlayer.getRepresentation() + " & " + player.getRepresentation() + "\n";
+        String before = "> **Before:** " + addedPlayer.toString() + " & " + player.toString() + "\n";
         addedPlayer.setUserName(removedPlayer.getUserName());
         addedPlayer.setUserID(removedPlayer.getUserID());
         addedPlayer.removeTeamMateID(removedPlayer.getUserID());
         player.setUserName(addedUser.getName());
         player.setUserID(addedUser.getId());
         player.removeTeamMateID(addedUser.getId());
-        String after = "> **After:** " + addedPlayer.getRepresentation() + " & " + player.getRepresentation() + "\n";
+        String after = "> **After:** " + addedPlayer.toString() + " & " + player.toString() + "\n";
 
         String message = "Users have swapped factions:\n" + before + after;
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);

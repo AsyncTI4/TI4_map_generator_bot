@@ -14,7 +14,7 @@ class L1Z1XButtonHandler {
 
     @ButtonHandler("assimilate_")
     public static void assimilate(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(buttonID.split("_")[1], game);
+        UnitHolder uH = game.getPlanet(buttonID.split("_")[1]);
         ButtonHelperModifyUnits.infiltratePlanet(player, game, uH, event);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }

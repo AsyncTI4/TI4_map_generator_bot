@@ -76,7 +76,7 @@ public class OnyxxaBreakthroughHandler {
                 "Removed ingress token from " + fromTile.getRepresentationForButtons(game, player) + ".");
 
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + "onyxxaMoveIngressTo_" + tile.getPosition(),
@@ -105,9 +105,9 @@ public class OnyxxaBreakthroughHandler {
 
     private static void offerMoveIngressFromButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             UnitHolder space = tile.getSpaceUnitHolder();
-            if (space.getTokenList().contains(Constants.TOKEN_INGRESS)) {
+            if (space.containsToken(Constants.TOKEN_INGRESS)) {
                 buttons.add(Buttons.red(
                         player.factionButtonChecker() + "onyxxaMoveIngressFrom_" + tile.getPosition(),
                         tile.getRepresentationForButtons(game, player)));
@@ -153,7 +153,7 @@ public class OnyxxaBreakthroughHandler {
         String pos = parts[0];
         String planetName = parts[1];
         Tile tile = game.getTileByPosition(pos);
-        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        UnitHolder unitHolder = tile.getPlanet(planetName);
 
         MoveUnitService.replaceUnit(event, game, player, tile, unitHolder, UnitType.Infantry, UnitType.Mech);
         MessageHelper.sendMessageToChannel(

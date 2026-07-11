@@ -316,7 +316,7 @@ public class Mapper {
             }
             case Constants.AC -> {
                 ActionCardModel actionCard = getActionCard(relatedID);
-                displayName = actionCard.getRepresentation();
+                displayName = actionCard.toString();
             }
             case Constants.PROMISSORY_NOTES -> {
                 PromissoryNoteModel pn = getPromissoryNote(relatedID);
@@ -324,7 +324,7 @@ public class Mapper {
             }
             case Constants.TECH -> displayName = getTech(relatedID).getRepresentation(true);
             case Constants.RELIC -> displayName = getRelic(relatedID).getSimpleRepresentation();
-            case Constants.ABILITY -> displayName = getAbility(relatedID).getRepresentation();
+            case Constants.ABILITY -> displayName = getAbility(relatedID).toString();
             case Constants.UNIT -> {
                 UnitModel unit = getUnit(relatedID);
                 displayName = unit.getUnitEmoji() + " " + unit.getName();

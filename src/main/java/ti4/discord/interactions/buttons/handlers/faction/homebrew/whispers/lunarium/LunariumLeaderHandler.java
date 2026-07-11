@@ -24,7 +24,7 @@ public class LunariumLeaderHandler {
         Leader playerLeader = player.getLeader("lunariumagent").orElse(null);
         if (playerLeader == null) return;
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), player.getRepresentation() + " has exhausted Gu'la Ma, the Lunarium agent.");
+                event.getMessageChannel(), player.toString() + " has exhausted Gu'la Ma, the Lunarium agent.");
         ExhaustLeaderService.exhaustLeader(game, player, playerLeader);
         player.addSpentThing("lunariumagent");
         event.getMessage()
@@ -36,7 +36,7 @@ public class LunariumLeaderHandler {
     public static void drawSO(GenericInteractionCreateEvent event, Game game, Player player) {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " draws 1 secret objective due to " + FactionEmojis.lunarium
+                player.toString() + " draws 1 secret objective due to " + FactionEmojis.lunarium
                         + " **Lunarium Commander**.");
         DrawSecretService.drawSO(event, game, player);
     }

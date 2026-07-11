@@ -6,10 +6,10 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.StringHelper;
 import ti4.message.MessageHelper;
+import ti4.service.unit.UnitQueryService;
 
 public class ArmsReductionAgendaResolver implements ForAgainstAgendaResolver {
     @Override
@@ -23,23 +23,23 @@ public class ArmsReductionAgendaResolver implements ForAgainstAgendaResolver {
             List<Button> removeButtons = new ArrayList<>();
             String message = "";
 
-            int excessCruisers = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser", false) - 4;
+            int excessCruisers = UnitQueryService.countUnits(game, player, "cruiser", false) - 4;
             if (excessCruisers > 0) {
                 removeButtons.addAll(
                         ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "cruiser", true));
-                message = player.getRepresentation() + ", please remove "
+                message = player.toString() + ", please remove "
                         + StringHelper.pluralize(excessCruisers, "excess cruiser");
             }
 
-            int excessDreadnoughts = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false) - 2;
+            int excessDreadnoughts = UnitQueryService.countUnits(game, player, "dreadnought", false) - 2;
             if (excessDreadnoughts > 0) {
                 removeButtons.addAll(
                         ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "dreadnought", true));
                 if (message.isEmpty()) {
-                    message = player.getRepresentation() + ", please remove "
+                    message = player.toString() + ", please remove "
                             + StringHelper.pluralize(excessDreadnoughts, "excess dreadnought");
                 } else {
-                    message += player.getRepresentation() + " and "
+                    message += player.toString() + " and "
                             + StringHelper.pluralize(excessDreadnoughts, "excess dreadnought");
                 }
             }

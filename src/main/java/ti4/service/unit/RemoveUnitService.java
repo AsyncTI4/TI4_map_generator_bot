@@ -39,7 +39,7 @@ public class RemoveUnitService {
         }
 
         public RemovedUnit onUnitHolder(Tile t2, String uh2) {
-            return new RemovedUnit(unitKey, t2, t2.getUnitHolders().get(uh2), states);
+            return new RemovedUnit(unitKey, t2, t2.getUnitHolder(uh2), states);
         }
 
         public RemovedUnit withColorID(String colorID) {
@@ -209,11 +209,11 @@ public class RemoveUnitService {
 
     private static List<UnitHolder> getUnitHoldersToRemoveFrom(Tile tile, ParsedUnit parsedUnit) {
         if (!Constants.SPACE.equals(parsedUnit.location())) { // We are removing from a specific planet.
-            var planet = tile.getUnitHolders().get(parsedUnit.location());
+            var planet = tile.getUnitHolder(parsedUnit.location());
             return planet == null ? Collections.emptyList() : List.of(planet);
         }
         // Otherwise, the location was not specified, so we check everywhere
-        return tile.getUnitHolders().values().stream()
+        return tile.getUnitHolderValues().stream()
                 .filter(unitHolderTemp -> countUnitsInHolder(unitHolderTemp, parsedUnit.unitKey()) > 0)
                 .toList();
     }
@@ -226,8 +226,8 @@ public class RemoveUnitService {
         if (event instanceof ButtonInteractionEvent) {
             BotLogger.warning(
                     new LogOrigin(event),
-                    event.getId() + " found a null UnitHolder with the following info: " + tile.getRepresentation()
-                            + " " + parsedUnit.location());
+                    event.getId() + " found a null UnitHolder with the following info: " + tile.toString() + " "
+                            + parsedUnit.location());
         } else if (event != null) {
             MessageHelper.replyToMessage(event, "Unable to determine where the units are being removed from.");
         }

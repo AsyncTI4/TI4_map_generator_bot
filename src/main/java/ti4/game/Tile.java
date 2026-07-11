@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -53,6 +54,12 @@ public class Tile {
 
     @Getter
     private final Map<String, UnitHolder> unitHolders = new LinkedHashMap<>();
+
+    /** All unit holders in this system without exposing the backing map at the call site. */
+    @JsonIgnore
+    public Collection<UnitHolder> getUnitHolderValues() {
+        return Collections.unmodifiableCollection(unitHolders.values());
+    }
 
     @JsonIgnore
     private final HashMap<String, Boolean> fog = new LinkedHashMap<>();
@@ -130,7 +137,7 @@ public class Tile {
     public static Predicate<Tile> tileMayHaveThundersEdge() {
         return tile -> {
             if (tile.getTilePath().toLowerCase().contains("hyperlane")) return false;
-            if (!tile.getPlanetUnitHolders().isEmpty()) return false;
+            if (tile.hasPlanets()) return false;
             if (tile.isSupernova()) return false;
             if (tile.getPosition().contains("frac")) return false;
             return !tile.getTileModel().hasWormhole();
@@ -449,6 +456,19 @@ public class Tile {
         return planets;
     }
 
+    public boolean hasPlanets() {
+        return !getPlanetUnitHolders().isEmpty();
+    }
+
+    public boolean hasUnitHolder(String unitHolderName) {
+        return unitHolders.containsKey(unitHolderName);
+    }
+
+    @Nullable
+    public UnitHolder getUnitHolder(String unitHolderName) {
+        return unitHolders.get(unitHolderName);
+    }
+
     public boolean hasSpaceStation() {
         for (UnitHolder uh : unitHolders.values()) if (uh instanceof Planet p && p.isSpaceStation()) return true;
         return false;
@@ -456,7 +476,7 @@ public class Tile {
 
     @JsonIgnore
     @Nullable
-    public Planet getUnitHolderFromPlanet(String planetName) {
+    public Planet getPlanet(String planetName) {
         for (Map.Entry<String, UnitHolder> unitHolderEntry : unitHolders.entrySet()) {
             if (unitHolderEntry.getValue() instanceof Planet p
                     && unitHolderEntry.getKey().equals(planetName)) {
@@ -466,11 +486,30 @@ public class Tile {
         return null;
     }
 
+    /** @deprecated Use {@link #getPlanet(String)}. */
+    @Deprecated
+    @Nullable
+    public Planet getUnitHolderFromPlanet(String planetName) {
+        return getPlanet(planetName);
+    }
+
     @JsonIgnore
     public Space getSpaceUnitHolder() {
         UnitHolder space = unitHolders.get("space");
         if (space instanceof Space s) return s;
         return null;
+    }
+
+    public boolean hasUnitInSpace(UnitType unitType, Player player) {
+        return getSpaceUnitHolder().hasUnit(unitType, player);
+    }
+
+    public boolean hasUnitInSpace(UnitType unitType, String color) {
+        return getSpaceUnitHolder().hasUnit(unitType, color);
+    }
+
+    public boolean hasAnyUnitInSpace(Player player, UnitType... unitTypes) {
+        return getSpaceUnitHolder().hasAnyUnit(player, unitTypes);
     }
 
     @JsonIgnore
@@ -486,6 +525,11 @@ public class Tile {
         return null;
     }
 
+    @Override
+    public String toString() {
+        return getRepresentation();
+    }
+
     @JsonIgnore
     public String getRepresentationForButtons() {
         return getRepresentationForButtons(null, null);
@@ -498,13 +542,13 @@ public class Tile {
                 if (player == null) return getPosition();
 
                 Set<String> tilesToShow = FoWHelper.getTilePositionsToShow(game, player);
-                if (tilesToShow.contains(getPosition()) && !StringUtils.isEmpty(getRepresentation())) {
-                    return getPosition() + " (" + getRepresentation() + ")";
+                if (tilesToShow.contains(getPosition()) && !StringUtils.isEmpty(toString())) {
+                    return getPosition() + " (" + toString() + ")";
                 } else {
                     return getPosition();
                 }
             } else {
-                return getPosition() + " (" + getRepresentation() + ")";
+                return getPosition() + " (" + toString() + ")";
             }
 
         } catch (Exception e) {
@@ -515,7 +559,7 @@ public class Tile {
     @JsonIgnore
     public String getAutoCompleteName() {
         try {
-            return getPosition() + " (" + getRepresentation() + ")";
+            return getPosition() + " (" + toString() + ")";
         } catch (Exception e) {
             return tileID;
         }
@@ -526,7 +570,7 @@ public class Tile {
         List<String> planetsWithSleepers = new ArrayList<>();
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planet) {
-                if (planet.getTokenList().contains(Constants.TOKEN_SLEEPER_PNG)) {
+                if (planet.containsToken(Constants.TOKEN_SLEEPER_PNG)) {
                     planetsWithSleepers.add(planet.getName());
                 }
             }
@@ -643,7 +687,7 @@ public class Tile {
                     || p.ownsUnit("sigma_creuss_flagship_1")
                     || p.ownsUnit("sigma_creuss_flagship_2")) {
                 ghostFlagshipColor = p.getColor();
-                if (getSpaceUnitHolder().getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
+                if (getSpaceUnitHolder().hasUnit(UnitType.Flagship, ghostFlagshipColor)) {
                     whs2.add(WormholeModel.Wormhole.DELTA);
                 }
             }
@@ -804,11 +848,11 @@ public class Tile {
                 if (planetHolder.isSpaceStation()) {
                     continue;
                 }
-                boolean oneOfThree = (unitHolder.getTokenList() != null
-                                && unitHolder.getTokenList().contains("attachment_threetraits.png"))
-                        || ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
-                                || "cultural".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
-                                || "hazardous".equalsIgnoreCase(planetHolder.getOriginalPlanetType()));
+                boolean oneOfThree =
+                        (unitHolder.getTokenList() != null && unitHolder.containsToken("attachment_threetraits.png"))
+                                || ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
+                                        || "cultural".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
+                                        || "hazardous".equalsIgnoreCase(planetHolder.getOriginalPlanetType()));
 
                 if (!Constants.MECATOLS.contains(planetHolder.getName()) && !oneOfThree) {
                     return true;

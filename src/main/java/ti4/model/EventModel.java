@@ -88,6 +88,11 @@ public class EventModel implements ModelInterface, EmbeddableModel {
         return getRepresentation(null);
     }
 
+    @Override
+    public String toString() {
+        return getRepresentation();
+    }
+
     public String getRepresentation(@Nullable Integer uniqueID) {
         StringBuilder sb = new StringBuilder();
 

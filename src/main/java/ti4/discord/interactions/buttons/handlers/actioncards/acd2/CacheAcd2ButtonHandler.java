@@ -24,7 +24,7 @@ class CacheAcd2ButtonHandler {
     @ButtonHandler("resolveCache")
     public static void resolveCache(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = player.getReadiedPlanets().stream()
-                .map(planet -> game.getPlanetsInfo().get(planet))
+                .map(planet -> game.getPlanet(planet))
                 .filter(Objects::nonNull)
                 .filter(planet -> !planet.isHomePlanet(game))
                 .map(planet -> Buttons.green(
@@ -36,14 +36,14 @@ class CacheAcd2ButtonHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has no ready non-home planets to exhaust for _Cache_.");
+                    player.toString() + " has no ready non-home planets to exhaust for _Cache_.");
             event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", choose a non-home planet to exhaust for _Cache_.",
+                player.toString() + ", choose a non-home planet to exhaust for _Cache_.",
                 buttons);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -51,7 +51,7 @@ class CacheAcd2ButtonHandler {
     @ButtonHandler("resolveCacheStep2_")
     public static void resolveCacheStep2(Player player, Game game, String buttonID) {
         String planetName = buttonID.split("_")[1];
-        Planet planet = game.getPlanetsInfo().get(planetName);
+        Planet planet = game.getPlanet(planetName);
         if (planet == null || !player.hasPlanet(planetName) || planet.isHomePlanet(game)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), "Could not resolve _Cache_ for that planet.");
@@ -72,7 +72,7 @@ class CacheAcd2ButtonHandler {
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " exhausted "
+                player.toString() + " exhausted "
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game)
                         + " and gained " + StringHelper.pluralize(tgGain, "trade good") + " from _Cache_.");
     }

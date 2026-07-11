@@ -24,7 +24,7 @@ public class HacanFlagshipService {
     public static void startHacanFlagshipNormal(
             GenericInteractionCreateEvent event, Game game, Player player, Tile tile, int amount) {
         if (player.getTg() == 0 && amount > 0) {
-            String message = player.getRepresentation() + ", you would have been able to score up to ";
+            String message = player.toString() + ", you would have been able to score up to ";
             message += amount + " extra hits, but you don't have any trade goods :(";
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -74,7 +74,7 @@ public class HacanFlagshipService {
         String label = hitsSoFar > 0 ? "Cancel" : "Decline";
         buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel(label));
 
-        String message = player.getRepresentation() + ", there are " + tot + " dice eligible to produce an";
+        String message = player.toString() + ", there are " + tot + " dice eligible to produce an";
         message += " additional hit using the _Wrath of Kenara_ flagship ability.";
         if (!game.isFowMode()) {
             message += "\n-# You currently have " + player.getTg() + " trade goods.";

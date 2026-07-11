@@ -14,7 +14,7 @@ public class FrankenBreakthroughService {
     public static void addBreakthrough(GenericInteractionCreateEvent event, Player player, String itemID) {
         player.addBreakthrough(itemID);
         BreakthroughModel model = Mapper.getBreakthrough(itemID);
-        String msg = player.getRepresentation() + " added Breakthrough: "
+        String msg = player.toString() + " added Breakthrough: "
                 + FrankenAlternateTextService.getRepresentationWithAlternateText(
                         player.getGame(),
                         DraftCategory.BREAKTHROUGH,
@@ -27,7 +27,7 @@ public class FrankenBreakthroughService {
     public static void removeBreakthrough(GenericInteractionCreateEvent event, Player player, String itemID) {
         player.removeBreakthrough(itemID);
         BreakthroughModel model = Mapper.getBreakthrough(itemID);
-        String msg = player.getRepresentation() + " removed Breakthrough: "
+        String msg = player.toString() + " removed Breakthrough: "
                 + FrankenAlternateTextService.getRepresentationWithAlternateText(
                         player.getGame(),
                         DraftCategory.BREAKTHROUGH,

@@ -24,19 +24,19 @@ public final class AlRaithService {
     @ButtonHandler("beginCabalBreakthroughMove")
     public static void serveCabalMoveIngressButtons(ButtonInteractionEvent event, Game game, Player player) {
         // List<Tile> tilesWithIngress = new ArrayList<>();
-        // for (Tile t : game.getTileMap().values()) {
-        //     if (t.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS)) {
+        // for (Tile t : game.getTiles()) {
+        //     if (t.getSpaceUnitHolder().containsToken(Constants.TOKEN_INGRESS)) {
         //         tilesWithIngress.add(t);
         //     }
         // }
         // int totalIngress = tilesWithIngress.size();
 
         // // Send notice
-        // String notice = player.getRepresentation()
+        // String notice = player.toString()
         //         + " you can move up to 2 ingress tokens into systems that contain gravity rifts. For now, please use
         // the command /remove_token and /add_token to accomplish this.";
         // if (totalIngress < 2) {
-        //     notice = player.getRepresentation() + " Only " + totalIngress
+        //     notice = player.toString() + " Only " + totalIngress
         //             + " ingress tokens spawned. You can move any of those ingress tokens into systems that contain
         // gravity rifts.";
         // }

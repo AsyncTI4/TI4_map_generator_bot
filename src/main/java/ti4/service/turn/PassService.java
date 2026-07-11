@@ -46,14 +46,14 @@ public class PassService {
         String text = player.getRepresentation(true, false) + " has passed" + (autoPass ? " (preset)." : ".");
 
         if (autoPass
-                && player.getPlanets().contains("ordinian")
+                && player.containsPlanet("ordinian")
                 && !player.getExhaustedPlanetsAbilities().contains("ordinian")) {
             text += "\n# They did not use the Ordinian ability. If this was a mistake, let them do so now.";
         }
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);
         if (player.hasTech("absol_aida")) {
-            String msg = player.getRepresentation()
+            String msg = player.toString()
                     + " since you have _AI Development Algorithm_, you may research 1 unit upgrade now for 6 influence.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             if (!player.hasAbility("propagation")) {
@@ -64,7 +64,7 @@ public class PassService {
                         Collections.singletonList(Buttons.GET_A_UNIT_TECH_WITH_INF));
             } else {
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                String message2 = player.getRepresentation()
+                String message2 = player.toString()
                         + ", you would research a unit upgrade technology, but because of **Propagation**, you instead gain 3 command tokens."
                         + " Your current command tokens are " + player.getCCRepresentation()
                         + ". Use buttons to gain command tokens.";
@@ -74,7 +74,7 @@ public class PassService {
         }
         if (player.hasAbility("deliberate_action")
                 && (player.getTacticalCC() == 0 || player.getStrategicCC() == 0 || player.getFleetCC() == 0)) {
-            String msg = player.getRepresentation() + ", since you have the **Deliberate Action** ability,"
+            String msg = player.toString() + ", since you have the **Deliberate Action** ability,"
                     + " and passed while one of your command pools contained no tokens, you may gain 1 command token to that pool.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
@@ -83,7 +83,7 @@ public class PassService {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
         // if (player.hasAbility("bestow")) {
-        //     String msg = player.getRepresentation() + ", since you have the _Bestow_ Honor card,"
+        //     String msg = player.toString() + ", since you have the _Bestow_ Honor card,"
         //             + " you can allow your neighbors to each gain 2 commodities with the below button. If you do, for
         // each one that does you will gain 1 commodity.";
         //     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -104,7 +104,7 @@ public class PassService {
                 }
             }
             if (player.getCommodities() > oldComm) {
-                String msg = player.getRepresentation()
+                String msg = player.toString()
                         + " since you have _Applied Biothermics_, you gained 1 commodity for each passed player"
                         + " (commodities went from " + oldComm + " -> " + player.getCommodities() + ").";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);

@@ -47,25 +47,23 @@ public class BastionTechService {
     }
 
     public static void checkHeliosAttachment(Game game) {
-        for (Tile tile : game.getTileMap().values()) {
-            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+        for (Tile tile : game.getTiles()) {
+            for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
                 if (unitHolder instanceof Planet planet) {
-                    if (planet.getTokenList().contains(Constants.HELIOS_ATTACHMENT_1))
+                    if (planet.containsToken(Constants.HELIOS_ATTACHMENT_1))
                         planet.removeToken(Constants.HELIOS_ATTACHMENT_1);
-                    if (planet.getTokenList().contains(Constants.HELIOS_ATTACHMENT_2))
+                    if (planet.containsToken(Constants.HELIOS_ATTACHMENT_2))
                         planet.removeToken(Constants.HELIOS_ATTACHMENT_2);
                     for (Player player : game.getRealPlayers()) {
 
-                        boolean hasSD = planet.getUnitCount(UnitType.Spacedock, player.getColorID()) > 0;
+                        boolean hasSD = planet.hasUnit(UnitType.Spacedock, player.getColorID());
                         boolean hasHelios = player.hasUnit("bastion_spacedock");
                         boolean hasHeliosUpgrade =
                                 player.hasUnit("bastion_spacedock2") || player.hasUnit("tf-heliosentity");
 
-                        if (hasSD && hasHelios && !planet.getTokenList().contains(Constants.HELIOS_ATTACHMENT_1)) {
+                        if (hasSD && hasHelios && !planet.containsToken(Constants.HELIOS_ATTACHMENT_1)) {
                             planet.addToken(Constants.HELIOS_ATTACHMENT_1);
-                        } else if (hasSD
-                                && hasHeliosUpgrade
-                                && !planet.getTokenList().contains(Constants.HELIOS_ATTACHMENT_2)) {
+                        } else if (hasSD && hasHeliosUpgrade && !planet.containsToken(Constants.HELIOS_ATTACHMENT_2)) {
                             planet.addToken(Constants.HELIOS_ATTACHMENT_2);
                         }
                     }
@@ -93,13 +91,13 @@ public class BastionTechService {
                 return;
             }
 
-            Planet planet = tile.getUnitHolderFromPlanet(matcher.group("planet"));
+            Planet planet = tile.getPlanet(matcher.group("planet"));
             if (planet == null) {
                 RegexService.throwFailure("Planet `" + matcher.group("planet")
                         + "` cannot be resolved for tile at position `" + matcher.group("pos") + "`");
                 return;
             }
-            if (planet.getPlanetTypes().contains(PlanetType.CULTURAL.toString())
+            if (planet.hasType(PlanetType.CULTURAL.toString())
                     && ButtonHelper.anyLawInPlay(game, "conventions", "absol_conventionswar")) {
                 MessageHelper.sendMessageToEventChannel(
                         event,

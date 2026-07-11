@@ -108,7 +108,7 @@ public class PickStrategyCardButtonHandler {
 
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),
-                                player.getRepresentation()
+                                player.toString()
                                         + " you have been _Public Disgrace_'d because someone preset it to occur when "
                                         + game.getSCEmojiWordRepresentation(scpick)
                                         + " was chosen. If this is a mistake or the _Public Disgrace_ is Sabo'd, feel free to pick the strategy card again. Otherwise, pick a different strategy card.");
@@ -120,7 +120,7 @@ public class PickStrategyCardButtonHandler {
         if (!applyDeflectionCostIfNeeded(game, player, scpick, event)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + ", you can't pick this strategy card because it has been targeted by _Deflection_, and you don't have a command token in your strategy pool to spend.");
             return false;
         }
@@ -194,7 +194,7 @@ public class PickStrategyCardButtonHandler {
                 Collections.reverse(players);
             }
             for (Player p3 : players) {
-                if (p3.getFaction().equalsIgnoreCase(game.getStoredValue("politicalStabilityFaction"))) {
+                if (p3.isFaction(game.getStoredValue("politicalStabilityFaction"))) {
                     continue;
                 }
                 if (foundPlayer) {
@@ -266,7 +266,7 @@ public class PickStrategyCardButtonHandler {
         Map<Integer, Integer> strategyCardToTradeGoodCount = game.getScTradeGoods();
 
         for (Player playerStats : game.getRealPlayers()) {
-            if (playerStats.getSCs().contains(scPicked)) {
+            if (playerStats.hasStrategyCard(scPicked)) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(), Helper.getSCName(scPicked, game) + " is already picked.");
                 return;
@@ -282,8 +282,8 @@ public class PickStrategyCardButtonHandler {
             tg += tgCount;
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " gained " + StringHelper.pluralize(tgCount, "trade good")
-                            + " from picking **" + Helper.getSCName(scPicked, game) + "**.");
+                    player.toString() + " gained " + StringHelper.pluralize(tgCount, "trade good") + " from picking **"
+                            + Helper.getSCName(scPicked, game) + "**.");
             if (game.isFowMode()) {
                 String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained "
                         + StringHelper.pluralize(tgCount, "trade good") + " from picking **"

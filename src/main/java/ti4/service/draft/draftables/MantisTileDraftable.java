@@ -461,16 +461,16 @@ public class MantisTileDraftable extends Draftable {
                 } else if (category == DraftCategory.REDTILE) {
                     redPicked++;
                 } else {
-                    return "Player " + player.getRepresentation() + " has an invalid tile choice: "
-                            + choice.unformattedName() + " (" + choice.choiceKey() + ").";
+                    return "Player " + player.toString() + " has an invalid tile choice: " + choice.unformattedName()
+                            + " (" + choice.choiceKey() + ").";
                 }
             }
             if (bluePicked > bpp) {
-                return "Player " + player.getRepresentation() + " has picked too many blue tiles (" + bluePicked
+                return "Player " + player.toString() + " has picked too many blue tiles (" + bluePicked
                         + " picked, max is " + bpp + ").";
             }
             if (redPicked > rpp) {
-                return "Player " + player.getRepresentation() + " has picked too many red tiles (" + redPicked
+                return "Player " + player.toString() + " has picked too many red tiles (" + redPicked
                         + " picked, max is " + rpp + ").";
             }
         }
@@ -579,7 +579,7 @@ public class MantisTileDraftable extends Draftable {
             PlayerDraftState pState = entry.getValue();
             List<DraftChoice> mantisPicks = pState.getPicks(TYPE);
             if (mantisPicks == null) {
-                return "Player " + player.getRepresentation() + " has not picked any tiles.";
+                return "Player " + player.toString() + " has not picked any tiles.";
             }
             int bluePicked = 0;
             int redPicked = 0;
@@ -590,16 +590,16 @@ public class MantisTileDraftable extends Draftable {
                 } else if (category == DraftCategory.REDTILE) {
                     redPicked++;
                 } else {
-                    return "Player " + player.getRepresentation() + " has an invalid tile choice: "
-                            + choice.unformattedName() + " (" + choice.choiceKey() + ").";
+                    return "Player " + player.toString() + " has an invalid tile choice: " + choice.unformattedName()
+                            + " (" + choice.choiceKey() + ").";
                 }
             }
             if (bluePicked < bpp) {
-                return "Player " + player.getRepresentation() + " needs to pick more blue tiles (" + bluePicked
+                return "Player " + player.toString() + " needs to pick more blue tiles (" + bluePicked
                         + " picked, out of " + bpp + ").";
             }
             if (redPicked < rpp) {
-                return "Player " + player.getRepresentation() + " needs to pick more red tiles (" + redPicked
+                return "Player " + player.toString() + " needs to pick more red tiles (" + redPicked
                         + " picked, out of " + rpp + ").";
             }
         }

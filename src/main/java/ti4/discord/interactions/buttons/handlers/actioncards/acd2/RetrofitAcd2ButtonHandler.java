@@ -64,7 +64,7 @@ class RetrofitAcd2ButtonHandler {
         String where = tile == null ? "the active system" : tile.getRepresentationForButtons(game, player);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + "'s " + type.humanReadableName() + " in " + where
+                player.toString() + "'s " + type.humanReadableName() + " in " + where
                         + " gains **SPACE CANNON 5**, **BOMBARDMENT 5**, and **SUSTAIN DAMAGE** during this tactical"
                         + " action (_Retrofit_). Apply these manually when rolling dice and assigning hits.");
     }

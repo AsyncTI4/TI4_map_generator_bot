@@ -63,8 +63,8 @@ public class NatauDoctrineHandler {
         }
 
         List<Tile> eligibleTiles = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (!tile.getPlanetUnitHolders().isEmpty()) {
+        for (Tile tile : game.getTiles()) {
+            if (tile.hasPlanets()) {
                 continue;
             }
             if (!FoWHelper.playerHasShipsInSystem(player, tile)) {
@@ -90,7 +90,7 @@ public class NatauDoctrineHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation()
+                player.toString()
                         + ", please choose which planetless system containing your ships to explore using _Discovery_:",
                 buttons);
 
@@ -107,7 +107,7 @@ public class NatauDoctrineHandler {
         String pos = buttonID.replace(CHOOSE_DISCOVERY_TILE, "");
         Tile tile = game.getTileByPosition(pos);
 
-        if (tile == null || !tile.getPlanetUnitHolders().isEmpty() || !FoWHelper.playerHasShipsInSystem(player, tile)) {
+        if (tile == null || tile.hasPlanets() || !FoWHelper.playerHasShipsInSystem(player, tile)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "That system is no longer eligible for _Discovery_.");
             return;
@@ -124,9 +124,9 @@ public class NatauDoctrineHandler {
             String drawColor = buttonID.split("_")[2];
             String cardID = buttonID.split("_")[3];
             String planetName = buttonID.split("_")[4];
-            Tile tile = game.getTileFromPlanet(planetName);
+            Tile tile = game.getTileContainingPlanet(planetName);
             if (tile == null) return;
-            String messageText = player.getRepresentation() + " explored the planet "
+            String messageText = player.toString() + " explored the planet "
                     + ExploreEmojis.getTraitEmoji(drawColor)
                     + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " in tile "
                     + tile.getPosition() + ":";
@@ -141,7 +141,7 @@ public class NatauDoctrineHandler {
             }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                 UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
-                tile.getUnitHolders().get(planetName).addUnit(infKey, 1);
+                tile.getPlanet(planetName).addUnit(infKey, 1);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         "Added 1 infantry to planet because of Master Halbert, the Lanefir Commander.");
@@ -149,7 +149,7 @@ public class NatauDoctrineHandler {
             if (player.hasTech("dslaner")) {
                 player.setAtsCount(player.getAtsCount() + 1);
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                        event.getMessageChannel(), player.toString() + " put 1 commodity on _ATS Armaments_.");
             }
         } else {
             int oldTg = player.getTg();
@@ -158,13 +158,13 @@ public class NatauDoctrineHandler {
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + " used _Discovery_ to decline exploration and gained 1 trade good (trade goods went from "
                             + oldTg + "->" + player.getTg() + ").");
             String planetID = buttonID.split("_")[2];
             if (player.hasAbility("awaken")
                     && !game.getAllPlanetsWithSleeperTokens().contains(planetID)
-                    && player.getPlanets().contains(planetID)
+                    && player.containsPlanet(planetID)
                     && !game.isTwilightsFallMode()) {
                 Button placeSleeper = Buttons.green(
                         "putSleeperOnPlanet_" + planetID,
@@ -233,7 +233,7 @@ public class NatauDoctrineHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", please choose a tech specialty planet to exhaust for _Knowledge_:",
+                player.toString() + ", please choose a tech specialty planet to exhaust for _Knowledge_:",
                 buttons);
 
         ButtonHelper.deleteMessage(event);
@@ -248,10 +248,10 @@ public class NatauDoctrineHandler {
 
         String planetId = buttonID.replace(SELECT_KNOWLEDGE_PLANET, "");
 
-        if (!player.getPlanets().contains(planetId)) {
+        if (!player.containsPlanet(planetId)) {
             return;
         }
-        if (player.getExhaustedPlanets().contains(planetId)) {
+        if (player.isPlanetExhausted(planetId)) {
             return;
         }
         PlanetModel planetModel = Mapper.getPlanet(planetId);
@@ -291,8 +291,7 @@ public class NatauDoctrineHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation()
-                        + ", you can research a tech of the same color as the exhausted planet's specialty:",
+                player.toString() + ", you can research a tech of the same color as the exhausted planet's specialty:",
                 buttons);
 
         ButtonHelper.deleteMessage(event);

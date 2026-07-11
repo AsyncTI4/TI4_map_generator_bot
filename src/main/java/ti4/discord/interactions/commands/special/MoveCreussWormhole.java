@@ -59,15 +59,15 @@ class MoveCreussWormhole extends GameStateSubcommand {
             return;
         }
 
-        StringBuilder sb = new StringBuilder(player.getRepresentation());
+        StringBuilder sb = new StringBuilder(player.toString());
         tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
         sb.append(" moved ")
                 .append(MiscEmojis.getCreussWormhole(tokenName))
                 .append(" to ")
-                .append(tile.getRepresentation());
-        for (Tile tile_ : game.getTileMap().values()) {
+                .append(tile.toString());
+        for (Tile tile_ : game.getTiles()) {
             if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
-                sb.append(" (from ").append(tile_.getRepresentation()).append(")");
+                sb.append(" (from ").append(tile_.toString()).append(")");
                 break;
             }
         }

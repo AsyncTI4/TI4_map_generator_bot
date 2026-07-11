@@ -28,7 +28,7 @@ public class SpeakerService {
         }
         game.setStoredValue("hasntSetSpeaker", "");
         for (Player player_ : game.getPlayers().values()) {
-            if (player_.getFaction().equals(faction)) {
+            if (player_.isFactionExact(faction)) {
                 game.setSpeakerUserID(player_.getUserID());
                 String message = MiscEmojis.SpeakerToken + " Speaker has been assigned to "
                         + player_.getRepresentation(false, true) + ".";
@@ -45,7 +45,7 @@ public class SpeakerService {
 
         if (game.isTwilightsFallMode()) {
             String assignSpeakerMessage =
-                    player.getRepresentation() + ", please choose a faction below to receive the Tyrant token.";
+                    player.toString() + ", please choose a faction below to receive the Tyrant token.";
             List<Button> assignSpeakerActionRow = getTyrannusAssignTyrantButtons(game, player);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), assignSpeakerMessage, assignSpeakerActionRow);
@@ -55,7 +55,7 @@ public class SpeakerService {
     private static List<Button> getTyrannusAssignTyrantButtons(Game game, Player politicsHolder) {
         List<Button> assignSpeakerButtons = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
-            if ((!player.isSpeaker() || !politicsHolder.getSCs().contains(3)) && !player.isTyrant()) {
+            if ((!player.isSpeaker() || !politicsHolder.hasStrategyCard(3)) && !player.isTyrant()) {
                 String faction = player.getFaction();
                 if (Mapper.isValidFaction(faction)) {
                     Button button;

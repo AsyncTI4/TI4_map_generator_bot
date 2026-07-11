@@ -78,8 +78,8 @@ public class HeartOfIxthService {
                         ExploreEmojis.Relic));
 
                 if (game.getStoredValue("heartWarnedThisTurn").isBlank()) {
-                    String warning = "### ATTENTION " + rollingPlayer.getRepresentation() + ":\n";
-                    warning += heart.getRepresentation()
+                    String warning = "### ATTENTION " + rollingPlayer.toString() + ":\n";
+                    warning += heart.toString()
                             + " has access to _Heart of Ixth_ and is able to change the outcome of your die roll. ";
                     warning +=
                             "Check with this player before resolving to make sure you choose the appropriate result.";
@@ -100,7 +100,7 @@ public class HeartOfIxthService {
 
         Player heart = getHeartOfIxthPlayer(game, false);
         if (wait && heart != null && !player.is(heart)) {
-            String msg = heart.getRepresentation() + " still needs to decide on " + rep() + ".";
+            String msg = heart.toString() + " still needs to decide on " + rep() + ".";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             return true;
         }
@@ -134,7 +134,7 @@ public class HeartOfIxthService {
     }
 
     public void exhaustHeartOfIxth(Game game, Player player, Boolean plus) {
-        String msg = player.getRepresentation() + " exhausted " + rep();
+        String msg = player.toString() + " exhausted " + rep();
         if (plus == null) {
             msg += ".";
         } else {
@@ -146,7 +146,7 @@ public class HeartOfIxthService {
 
     @ButtonHandler("declineHeartOfIxth")
     private void declineHeartOfIxth(ButtonInteractionEvent event, Game game, Player player) {
-        String msg = player.getRepresentation() + " declined to use " + rep() + " at this time.";
+        String msg = player.toString() + " declined to use " + rep() + " at this time.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         MessageHelper.editMessageButtons(event, getButtonsAfterUsingHeart(event, false));
     }

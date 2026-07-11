@@ -18,8 +18,8 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.objectives.RevealPublicObjectiveService;
-import ti4.service.unit.AddUnitService;
-import ti4.service.unit.RemoveUnitService;
+import ti4.service.unit.MoveUnitService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class TyrisAbilityHandler {
@@ -35,7 +35,7 @@ public class TyrisAbilityHandler {
         }
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " choose the ship type to use **Phantom Energy** on.",
+                player.toString() + " choose the ship type to use **Phantom Energy** on.",
                 buttons);
     }
 
@@ -45,8 +45,8 @@ public class TyrisAbilityHandler {
         game.setStoredValue("phantomEnergy", game.getStoredValue("phantomEnergy") + asyncID);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " has used **Phantom Energy** on the "
-                        + Mapper.getUnitBaseTypeFromAsyncID(asyncID) + " ship type.");
+                player.toString() + " has used **Phantom Energy** on the " + Mapper.getUnitBaseTypeFromAsyncID(asyncID)
+                        + " ship type.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -54,7 +54,7 @@ public class TyrisAbilityHandler {
         if (game.getStoredValue("phantomEnergy").isEmpty()) {
             return;
         }
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tile.hasPlayerCC(player)) {
                 for (String asyncID : tile.getSpaceUnitHolder()
                         .getUnitAsyncIdsOnHolder(player.getColorID())
@@ -68,8 +68,7 @@ public class TyrisAbilityHandler {
     }
 
     public static void checkFlagshipPhantomEnergy(Game game, Player player) {
-        if (player.hasUnit("tyris_flagship")
-                && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", false) > 0) {
+        if (player.hasUnit("tyris_flagship") && UnitQueryService.countUnits(game, player, "flagship", false) > 0) {
             game.setStoredValue("phantomEnergy", game.getStoredValue("phantomEnergy") + "fs");
         }
     }
@@ -99,7 +98,7 @@ public class TyrisAbilityHandler {
         if (idNumber == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " the objective was not found — it may have already been discarded.");
+                    player.toString() + " the objective was not found — it may have already been discarded.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -109,7 +108,7 @@ public class TyrisAbilityHandler {
                 ? Mapper.getPublicObjective(poID).getName()
                 : poID;
         game.shuffleObjectiveBackIntoDeck(idNumber);
-        String msg = "## " + game.getPing() + " " + player.getRepresentation()
+        String msg = "## " + game.getPing() + " " + player.toString()
                 + " is using **Rewrite Destiny**, spending 1 strategy token, to discard _" + poName
                 + "_ and have the speaker reveal a new stage " + stage + " public objective.";
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
@@ -123,7 +122,7 @@ public class TyrisAbilityHandler {
 
     public static void resolveTemporalDisplacementStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (FoWHelper.playerHasShipsInSystem(player, tile)) {
                 buttons.add(Buttons.green(
                         "temporalDisplacement_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
@@ -132,7 +131,7 @@ public class TyrisAbilityHandler {
         buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", use buttons to choose the system you wish to move fighters to.",
+                player.toString() + ", use buttons to choose the system you wish to move fighters to.",
                 buttons);
     }
 
@@ -143,9 +142,9 @@ public class TyrisAbilityHandler {
         Tile destTile = game.getTileByPosition(destPos);
         if (destTile == null) return;
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tile.getPosition().equals(destPos)) continue;
-            if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
+            if (tile.hasUnitInSpace(UnitType.Fighter, player.getColor())) {
                 buttons.add(Buttons.green(
                         "temporalDisplacementMove_" + destPos + "_" + tile.getPosition(),
                         "Move Fighter from " + tile.getRepresentationForButtons(game, player)));
@@ -155,7 +154,7 @@ public class TyrisAbilityHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", use buttons to choose the fighters you wish to move to "
+                player.toString() + ", use buttons to choose the fighters you wish to move to "
                         + destTile.getRepresentationForButtons(game, player) + ".",
                 buttons);
     }
@@ -167,15 +166,13 @@ public class TyrisAbilityHandler {
         Tile destTile = game.getTileByPosition(parts[0]);
         Tile srcTile = game.getTileByPosition(parts[1]);
         if (destTile == null || srcTile == null) return;
-        List<RemoveUnitService.RemovedUnit> removedUnits =
-                RemoveUnitService.removeUnits(event, srcTile, game, player.getColor(), "ff");
-        AddUnitService.addUnits(event, destTile, game, player.getColor(), "ff", removedUnits);
+        MoveUnitService.moveUnits(event, srcTile, game, player.getColor(), "ff", destTile, "space");
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getFactionEmojiOrColor() + " moved 1 fighter from "
                         + srcTile.getRepresentationForButtons(game, player) + " to "
                         + destTile.getRepresentationForButtons(game, player) + " using _Temporal Displacement_.");
-        if (srcTile.getSpaceUnitHolder().getUnitCount(UnitType.Fighter, player.getColor()) < 1) {
+        if (!srcTile.hasUnitInSpace(UnitType.Fighter, player.getColor())) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         }
     }

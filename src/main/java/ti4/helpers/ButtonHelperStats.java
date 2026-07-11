@@ -45,7 +45,7 @@ public final class ButtonHelperStats {
 
     public static void convertComms(
             ButtonInteractionEvent event, Game game, Player player, int amt, boolean deleteMsg) {
-        String message, ident = player.getRepresentation();
+        String message, ident = player.toString();
         if (player.getCommodities() >= amt) {
             player.setCommodities(player.getCommodities() - amt);
             player.setTg(player.getTg() + amt);
@@ -130,7 +130,7 @@ public final class ButtonHelperStats {
         if (amt == 0) return;
         String message = "has gained " + amt + " trade goods " + player.gainTG(amt);
         if (!skipOutput)
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " " + message);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.toString() + " " + message);
         if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
 
         // After gain tg checks
@@ -150,11 +150,11 @@ public final class ButtonHelperStats {
         if (obsidian != null && obsidian.getPuppetedFactionsForPlot("siphon").contains(player.getFaction())) {
             String siphonMsg;
             if (game.isFowMode()) {
-                siphonMsg = obsidian.getRepresentation()
+                siphonMsg = obsidian.toString()
                         + ", the puppeted player for _Siphon_ has gained commodities, so you gain " + realGain
                         + " trade goods. ";
             } else {
-                siphonMsg = obsidian.getRepresentation()
+                siphonMsg = obsidian.toString()
                         + ", your puppet, " + player.getRepresentationNoPing()
                         + ", has gained commodities, and so you have _Siphon_'d " + realGain
                         + " trade goods. ";
@@ -173,8 +173,7 @@ public final class ButtonHelperStats {
         if (!redistribute) buttons = ButtonHelper.getGainCCButtons(player);
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation()); // redundant
 
-        String message =
-                player.getRepresentation() + ", your current command tokens are " + player.getCCRepresentation() + ". ";
+        String message = player.toString() + ", your current command tokens are " + player.getCCRepresentation() + ". ";
         message += "Use the buttons to gain" + (redistribute ? " and redistribute" : "") + " command tokens.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }

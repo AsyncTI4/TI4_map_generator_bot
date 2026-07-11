@@ -21,9 +21,7 @@ public class DiploSystemHelper {
         }
 
         for (Player player_ : game.getPlayers().values()) {
-            if (player_ != player
-                    && player_.isRealPlayer()
-                    && !player.getAllianceMembers().contains(player_.getFaction())) {
+            if (player_ != player && player_.isRealPlayer() && !player.hasAllianceMember(player_.getFaction())) {
                 CommandCounterHelper.addCC(event, player_, tile);
                 Helper.isCCCountCorrect(player_);
             }

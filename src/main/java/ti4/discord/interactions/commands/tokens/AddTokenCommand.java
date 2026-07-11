@@ -126,7 +126,7 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                 String facility = tokenID;
                 Player player = game.getActivePlayer();
                 for (Player p2 : game.getRealPlayers()) {
-                    if (p2.getPlanets().contains(planet)) {
+                    if (p2.containsPlanet(planet)) {
                         player = p2;
                     }
                 }

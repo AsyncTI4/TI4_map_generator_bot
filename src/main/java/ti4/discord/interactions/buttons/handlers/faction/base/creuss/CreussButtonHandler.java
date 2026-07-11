@@ -49,7 +49,7 @@ class CreussButtonHandler {
         String pos1 = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();
         Tile tile1 = game.getTileByPosition(pos1);
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tile.getPosition().contains("t")
                     || tile.getPosition().contains("b")
                     || tile == tile1

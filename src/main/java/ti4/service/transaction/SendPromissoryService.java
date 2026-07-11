@@ -51,7 +51,7 @@ public class SendPromissoryService {
                     && sender.getPromissoryNotesInPlayArea().contains(receiver.getColor() + "_sftt")) {
                 MessageHelper.sendMessageToChannel(
                         sender.getCardsInfoThread(),
-                        sender.getRepresentation()
+                        sender.toString()
                                 + ", you cannot swap _Supports For The Thrones_ in this game (it has banned _Support For The Throne_ swaps).");
                 return false;
             }
@@ -83,18 +83,18 @@ public class SendPromissoryService {
         Player owner = game.getPNOwner(id);
         if (model.isPlayedDirectlyToPlayArea() && receiver != owner && !receiver.isPlayerMemberOfAlliance(owner)) {
             receiver.addPromissoryNoteToPlayArea(id);
-            if (id.startsWith("dspnveld") && !receiver.getAllianceMembers().contains(owner.getFaction())) {
+            if (id.startsWith("dspnveld") && !receiver.hasAllianceMember(owner.getFaction())) {
                 PromissoryNoteHelper.resolvePNPlay(id, receiver, game, event);
             }
         }
-        if (id.contains("blackops") && !receiver.getAllianceMembers().contains(sender.getFaction())) {
+        if (id.contains("blackops") && !receiver.hasAllianceMember(sender.getFaction())) {
             PromissoryNoteHelper.resolvePNPlay(id, receiver, game, event);
         }
     }
 
     private static void reportSentProm(
             Game game, Player sender, Player receiver, PromissoryNoteModel model, boolean reportLost) {
-        String reportMsgFmt = sender.getRepresentation() + " sent %s of " + receiver.getRepresentation() + ".";
+        String reportMsgFmt = sender.toString() + " sent %s of " + receiver.toString() + ".";
         String reportMsg;
         if (model.isPlayedDirectlyToPlayArea() && !sender.isPlayerMemberOfAlliance(receiver)) {
             reportMsg = String.format(reportMsgFmt, model.getNameRepresentation() + " directly to the play area");
@@ -105,7 +105,7 @@ public class SendPromissoryService {
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
                     sender.getCorrectChannel(),
-                    reportMsg.replace(receiver.getRepresentation(), receiver.getColorIfCanSeeStats(sender)));
+                    reportMsg.replace(receiver.toString(), receiver.getColorIfCanSeeStats(sender)));
             String extra = null;
             if (model.getAlias().endsWith("_sftt")) extra = "Scores changed.";
             String whatSent = model.isPlayedDirectlyToPlayArea() ? model.getName() : "face down promissory note";
@@ -114,10 +114,10 @@ public class SendPromissoryService {
         if (reportLost) {
             MessageHelper.sendMessageToChannel(
                     sender.getCardsInfoThread(),
-                    "# " + sender.getRepresentation() + " you lost the promissory note _" + model.getName() + "_.");
+                    "# " + sender.toString() + " you lost the promissory note _" + model.getName() + "_.");
             MessageHelper.sendMessageToChannel(
                     receiver.getCardsInfoThread(),
-                    "# " + receiver.getRepresentation() + " you gained the promissory note _" + model.getName() + "_.");
+                    "# " + receiver.toString() + " you gained the promissory note _" + model.getName() + "_.");
         }
     }
 
@@ -140,8 +140,8 @@ public class SendPromissoryService {
     }
 
     private static void reportReturnedProm(Game game, Player sender, Player receiver, PromissoryNoteModel model) {
-        String reportMsg = sender.getRepresentation() + " returned " + model.getNameRepresentation() + " to "
-                + receiver.getRepresentation() + ".";
+        String reportMsg =
+                sender.toString() + " returned " + model.getNameRepresentation() + " to " + receiver.toString() + ".";
         MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), reportMsg);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(sender.getCorrectChannel(), reportMsg);

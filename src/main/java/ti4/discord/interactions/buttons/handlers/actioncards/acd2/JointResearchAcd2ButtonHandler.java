@@ -58,7 +58,7 @@ class JointResearchAcd2ButtonHandler {
 
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
-            if (p2 == player || p2.getTechs().contains(techID)) {
+            if (p2 == player || p2.hasExactTech(techID)) {
                 continue;
             }
             String id = player.factionButtonChecker() + "jointResearchGive_" + p2.getFaction() + "_" + techID;
@@ -99,7 +99,7 @@ class JointResearchAcd2ButtonHandler {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Joint Research_.");
             return;
         }
-        if (target.getTechs().contains(techID)) {
+        if (target.hasExactTech(techID)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     target.getRepresentationNoPing() + " already has _" + tech.getName() + "_.");

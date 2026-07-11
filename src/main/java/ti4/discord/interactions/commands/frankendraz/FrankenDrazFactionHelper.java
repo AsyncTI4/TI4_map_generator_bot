@@ -44,7 +44,7 @@ final class FrankenDrazFactionHelper {
             return false;
         }
         if (player.getDraftHand() == null) {
-            MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " does not have a draft hand.");
+            MessageHelper.sendMessageToEventChannel(event, player.toString() + " does not have a draft hand.");
             return false;
         }
         if (player.getDraftHand().getCategoryCount(DraftCategory.FACTION) > 0) {
@@ -87,13 +87,13 @@ final class FrankenDrazFactionHelper {
     }
 
     static String buildAddMessage(Player player, String faction, List<DraftItem> added) {
-        return player.getRepresentation() + " added " + added.size() + " post-draft components from "
-                + factionName(faction) + "." + summarizeItems(added, "Added");
+        return player.toString() + " added " + added.size() + " post-draft components from " + factionName(faction)
+                + "." + summarizeItems(added, "Added");
     }
 
     static String buildRemoveMessage(Player player, String faction, List<DraftItem> removed) {
-        return player.getRepresentation() + " removed " + removed.size() + " post-draft components from "
-                + factionName(faction) + "." + summarizeItems(removed, "Removed");
+        return player.toString() + " removed " + removed.size() + " post-draft components from " + factionName(faction)
+                + "." + summarizeItems(removed, "Removed");
     }
 
     static String buildSwapMessage(
@@ -102,7 +102,7 @@ final class FrankenDrazFactionHelper {
             String addFaction,
             ComponentChange removeChange,
             ComponentChange addChange) {
-        return player.getRepresentation() + " swapped post-draft components from " + factionName(removeFaction)
+        return player.toString() + " swapped post-draft components from " + factionName(removeFaction)
                 + " to " + factionName(addFaction) + ".\n"
                 + "Removed " + removeChange.removed().size() + " components."
                 + summarizeItems(removeChange.removed(), "Removed")

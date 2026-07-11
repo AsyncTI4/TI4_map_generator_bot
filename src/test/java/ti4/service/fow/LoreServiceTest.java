@@ -334,7 +334,7 @@ class LoreServiceTest extends BaseTi4Test {
             LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!plastic 2 infantry"), systemTile, Constants.SPACE, true);
             UnitKey key = Units.getUnitKey(UnitType.Infantry, "red");
-            assertEquals(2, systemTile.getUnitHolders().get(Constants.SPACE).getUnitCount(key));
+            assertEquals(2, systemTile.getSpaceUnitHolder().getUnitCount(key));
         }
 
         @Test
@@ -342,7 +342,7 @@ class LoreServiceTest extends BaseTi4Test {
             LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!plastic neutral 1 spacedock"), systemTile, Constants.SPACE, true);
             UnitKey key = Units.getUnitKey(UnitType.Spacedock, "gray");
-            assertEquals(1, systemTile.getUnitHolders().get(Constants.SPACE).getUnitCount(key));
+            assertEquals(1, systemTile.getSpaceUnitHolder().getUnitCount(key));
         }
 
         @Test
@@ -369,15 +369,15 @@ class LoreServiceTest extends BaseTi4Test {
             LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!plastic 2 infantry mr"), systemTile, Constants.SPACE, true);
             UnitKey key = Units.getUnitKey(UnitType.Infantry, "red");
-            assertEquals(2, systemTile.getUnitHolders().get("mr").getUnitCount(key));
-            assertEquals(0, systemTile.getUnitHolders().get(Constants.SPACE).getUnitCount(key));
+            assertEquals(2, systemTile.getPlanet("mr").getUnitCount(key));
+            assertEquals(0, systemTile.getSpaceUnitHolder().getUnitCount(key));
         }
 
         @Test
         void planetHolderWithColorSpecifier() {
             LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!plastic gray 1 pds mr"), systemTile, Constants.SPACE, true);
-            assertEquals(1, systemTile.getUnitHolders().get("mr").getUnitCount(Units.getUnitKey(UnitType.Pds, "gray")));
+            assertEquals(1, systemTile.getPlanet("mr").getUnitCount(Units.getUnitKey(UnitType.Pds, "gray")));
         }
 
         @Test
@@ -385,7 +385,7 @@ class LoreServiceTest extends BaseTi4Test {
             LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!plastic 2 infantry notaplanet"), systemTile, Constants.SPACE, true);
             UnitKey key = Units.getUnitKey(UnitType.Infantry, "red");
-            assertEquals(2, systemTile.getUnitHolders().get(Constants.SPACE).getUnitCount(key));
+            assertEquals(2, systemTile.getSpaceUnitHolder().getUnitCount(key));
         }
 
         @Test
@@ -393,8 +393,8 @@ class LoreServiceTest extends BaseTi4Test {
             LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!plastic 3 fighter @002"), systemTile, Constants.SPACE, true);
             UnitKey key = Units.getUnitKey(UnitType.Fighter, "red");
-            assertEquals(3, remoteTile.getUnitHolders().get(Constants.SPACE).getUnitCount(key));
-            assertEquals(0, systemTile.getUnitHolders().get(Constants.SPACE).getUnitCount(key));
+            assertEquals(3, remoteTile.getSpaceUnitHolder().getUnitCount(key));
+            assertEquals(0, systemTile.getSpaceUnitHolder().getUnitCount(key));
         }
 
         @Test
@@ -422,7 +422,7 @@ class LoreServiceTest extends BaseTi4Test {
             // Exercises Mapper.getTokenID — breaks if the token naming convention changes
             LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!token gravityrift"), systemTile, Constants.SPACE, true);
-            var tokens = systemTile.getUnitHolders().get(Constants.SPACE).getTokenList();
+            var tokens = systemTile.getSpaceUnitHolder().getTokenList();
             assertTrue(tokens.contains("token_gravityrift.png"), "resolved filename must be present");
             assertFalse(tokens.contains("gravityrift"), "raw short name must not be stored");
         }
@@ -544,7 +544,7 @@ class LoreServiceTest extends BaseTi4Test {
         void removesRequestedCount() {
             LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!removeunit 2 infantry"), systemTile, Constants.SPACE, true);
-            assertEquals(1, systemTile.getUnitHolders().get(Constants.SPACE).getUnitCount(redInfantry));
+            assertEquals(1, systemTile.getSpaceUnitHolder().getUnitCount(redInfantry));
         }
 
         @Test
@@ -552,7 +552,7 @@ class LoreServiceTest extends BaseTi4Test {
             // documented behavior: removes whatever exists if fewer are present — silent partial removal
             LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!removeunit 5 infantry"), systemTile, Constants.SPACE, true);
-            assertEquals(0, systemTile.getUnitHolders().get(Constants.SPACE).getUnitCount(redInfantry));
+            assertEquals(0, systemTile.getSpaceUnitHolder().getUnitCount(redInfantry));
         }
 
         @Test
@@ -561,7 +561,7 @@ class LoreServiceTest extends BaseTi4Test {
             systemTile.addUnit(Constants.SPACE, grayFighter, 2);
             LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!removeunit neutral 1 fighter"), systemTile, Constants.SPACE, true);
-            assertEquals(1, systemTile.getUnitHolders().get(Constants.SPACE).getUnitCount(grayFighter));
+            assertEquals(1, systemTile.getSpaceUnitHolder().getUnitCount(grayFighter));
         }
 
         @Test
@@ -569,9 +569,9 @@ class LoreServiceTest extends BaseTi4Test {
             systemTile.addUnit("mr", redInfantry, 2);
             LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!removeunit 1 infantry mr"), systemTile, Constants.SPACE, true);
-            assertEquals(1, systemTile.getUnitHolders().get("mr").getUnitCount(redInfantry));
+            assertEquals(1, systemTile.getPlanet("mr").getUnitCount(redInfantry));
             // space holder is untouched
-            assertEquals(3, systemTile.getUnitHolders().get(Constants.SPACE).getUnitCount(redInfantry));
+            assertEquals(3, systemTile.getSpaceUnitHolder().getUnitCount(redInfantry));
         }
 
         @Test
@@ -2391,8 +2391,8 @@ class LoreServiceTest extends BaseTi4Test {
         @Test
         void grantIsUnexhaustedAndIdempotent() {
             LoreEffects.applyLoreEffectsForTest(player, game, entry("!tech gd"), systemTile, Constants.SPACE, true);
-            assertTrue(player.getTechs().contains("gd"));
-            assertFalse(player.getExhaustedTechs().contains("gd"), "a granted tech must arrive readied");
+            assertTrue(player.hasExactTech("gd"));
+            assertFalse(player.isTechExhausted("gd"), "a granted tech must arrive readied");
 
             LoreEffects.applyLoreEffectsForTest(player, game, entry("!tech gd"), systemTile, Constants.SPACE, true);
             assertEquals(
@@ -2405,7 +2405,7 @@ class LoreServiceTest extends BaseTi4Test {
         void removeTechViaAliasRemovesAnOwnedTech() {
             player.addTech("gd");
             LoreEffects.applyLoreEffectsForTest(player, game, entry("!rtec gd"), systemTile, Constants.SPACE, true);
-            assertFalse(player.getTechs().contains("gd"));
+            assertFalse(player.hasExactTech("gd"));
         }
 
         @Test
@@ -2509,12 +2509,9 @@ class LoreServiceTest extends BaseTi4Test {
             LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!clearunits neutral"), systemTile, Constants.SPACE, true);
 
-            assertNotNull(systemTile.getUnitHolders().get(Constants.SPACE));
-            assertEquals(0, systemTile.getUnitHolders().get(Constants.SPACE).getUnitCount(grayFighter));
-            assertEquals(
-                    2,
-                    systemTile.getUnitHolders().get(Constants.SPACE).getUnitCount(redFighter),
-                    "other colors must be untouched");
+            assertNotNull(systemTile.getSpaceUnitHolder());
+            assertEquals(0, systemTile.getSpaceUnitHolder().getUnitCount(grayFighter));
+            assertEquals(2, systemTile.getSpaceUnitHolder().getUnitCount(redFighter), "other colors must be untouched");
         }
     }
 

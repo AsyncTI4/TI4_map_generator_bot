@@ -113,7 +113,7 @@ public class EndTurnService {
         var userSettings = UserSettingsManager.get(mainPlayer.getUserID());
 
         if ("No Preference".equalsIgnoreCase(userSettings.getSandbagPref())) {
-            String msg = mainPlayer.getRepresentation() + " the bot could auto pass on scoring secrets for you in the "
+            String msg = mainPlayer.toString() + " the bot could auto pass on scoring secrets for you in the "
                     + "status phase if you cannot score any secrets. This might speed up the game as people won't be waiting on you in the cases "
                     + "where you can score nothing. Do you want to enable this feature? Once you answer, you will not be asked again. ";
             List<Button> buttons = new ArrayList<>();
@@ -145,7 +145,7 @@ public class EndTurnService {
             MessageHelper.sendMessageToChannel(
                     mainPlayer.getPrivateChannel(),
                     "# End of Turn " + mainPlayer.getInRoundTurnCount() + ", Round " + game.getRound() + " for "
-                            + mainPlayer.getRepresentation());
+                            + mainPlayer.toString());
         } else {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), mainPlayer.getRepresentation(true, false) + " ended turn.");

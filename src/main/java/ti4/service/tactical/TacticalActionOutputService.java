@@ -1,7 +1,6 @@
 package ti4.service.tactical;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +23,7 @@ import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
@@ -171,7 +171,7 @@ public class TacticalActionOutputService {
         }
 
         List<String> lines = new ArrayList<>();
-        for (UnitHolder uh : tile.getUnitHolders().values()) {
+        for (UnitHolder uh : tile.getUnitHolderValues()) {
             String uhKey = tile.getPosition() + "-" + uh.getName();
             if (!displaced.containsKey(uhKey)) continue;
 
@@ -189,10 +189,7 @@ public class TacticalActionOutputService {
 
                 List<Integer> states = unitMap.get(key);
                 if (condensed) {
-                    int amt = states.stream().mapToInt(Integer::intValue).sum();
-                    String unitStr = key.unitEmoji().emojiString().repeat(amt);
-                    if (amt > 2) unitStr = amt + "x " + key.unitEmoji();
-                    lines.add(unitStr);
+                    lines.add(key.emojiString(Units.getTotalCount(states)));
                     continue;
                 }
                 String color = "";
@@ -229,24 +226,9 @@ public class TacticalActionOutputService {
 
     private String buildShortSummary(Game game, Set<String> excludeTiles) {
         StringBuilder sb = new StringBuilder("-# Units from elsewhere: ");
-        Map<UnitKey, Integer> quantities = new HashMap<>();
-        for (var entry : game.getTacticalActionDisplacement().entrySet()) {
-            String pos = entry.getKey().split("-")[0];
-            if (excludeTiles.contains(pos)) continue;
-            for (var unitEntry : entry.getValue().entrySet()) {
-                int amt = unitEntry.getValue().stream().mapToInt(a -> a).sum();
-                UnitKey key = unitEntry.getKey();
-                quantities.put(key, quantities.getOrDefault(key, 0) + amt);
-            }
-        }
-        List<String> units = new ArrayList<>();
-        for (Entry<UnitKey, Integer> entry : quantities.entrySet()) {
-            UnitKey key = entry.getKey();
-            int amt = entry.getValue();
-            String unitStr = key.unitEmoji().emojiString().repeat(amt);
-            if (amt > 2) unitStr = amt + "x " + key.unitEmoji();
-            units.add(unitStr);
-        }
+        List<String> units = game.getTacticalActionDisplacementUnitCounts(excludeTiles).entrySet().stream()
+                .map(entry -> entry.getKey().emojiString(entry.getValue()))
+                .toList();
         if (units.isEmpty()) return null;
         sb.append(String.join(", ", units));
         return sb.toString();
@@ -299,7 +281,7 @@ public class TacticalActionOutputService {
                 output.append(
                         " (has _Imperator_ for +1 movement for one ship when moving into a legendary planet's system)");
             }
-            if (player.getTechs().contains("dsgledb")) {
+            if (player.hasExactTech("dsgledb")) {
                 maxBonus++;
                 output.append(" (has _Lightning Drives_ for +1 movement if not transporting)");
             }
@@ -357,7 +339,7 @@ public class TacticalActionOutputService {
                 && !player.hasAbility("voidborn")
                 && !player.hasAbility("celestial_being")
                 && !player.hasTech("absol_amd")
-                && !player.getRelics().contains("circletofthevoid")) {
+                && !player.hasRelic("circletofthevoid")) {
             baseMoveValue = 1;
         }
         if (skipBonus) return baseMoveValue;
@@ -372,7 +354,7 @@ public class TacticalActionOutputService {
             bonusMoveValue = maxBase - baseMoveValue;
         }
 
-        boolean tileHasBreach = tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
+        boolean tileHasBreach = tile.getSpaceUnitHolder().containsToken(Constants.TOKEN_BREACH_ACTIVE);
 
         if (player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
             bonusMoveValue++;
@@ -425,7 +407,7 @@ public class TacticalActionOutputService {
         }
 
         for (UnitHolder uhPlanet : activeSystem.getPlanetUnitHolders()) {
-            if (player.getPlanets().contains(uhPlanet.getName())) {
+            if (player.containsPlanet(uhPlanet.getName())) {
                 continue;
             }
             for (String attachment : uhPlanet.getTokenList()) {

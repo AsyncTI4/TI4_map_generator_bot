@@ -35,7 +35,7 @@ public class TkHelperUnits {
         MessageHelper.sendMessageToChannel(event.getChannel(), ident + " is using _Moyin's Chosen_.");
 
         List<Button> buttons = Helper.getTileWithShipsPlaceUnitButtons(player, game, "ff", "placeOneNDone_skipbuild");
-        String message = player.getRepresentation() + " use the buttons to deploy 1 fighter with your ships using the ";
+        String message = player.toString() + " use the buttons to deploy 1 fighter with your ships using the ";
         message += UnitEmojis.destroyer + " " + FactionEmojis.Yin + " _Moyin's Chosen_ ability.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
@@ -47,7 +47,7 @@ public class TkHelperUnits {
         buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
         buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
 
-        String msg = player.getRepresentation() + ", use these buttons to resolve the ";
+        String msg = player.toString() + ", use these buttons to resolve the ";
         msg += UnitEmojis.fighter + " " + FactionEmojis.Nekro + " _Maleagant_ ability.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
@@ -70,8 +70,8 @@ public class TkHelperUnits {
         ButtonHelperTwilightsFall.drawAbilityFromDeck(game, player);
 
         if (player != archive) {
-            String msg2 = archive.getRepresentation() + "!!!!\n";
-            msg2 += player.getRepresentation() + " spent 3 trade goods to draw an ability, so you get one as well.";
+            String msg2 = archive.toString() + "!!!!\n";
+            msg2 += player.toString() + " spent 3 trade goods to draw an ability, so you get one as well.";
             MessageHelper.sendMessageToChannel(archive.getCorrectChannel(), msg2);
             ButtonHelperTwilightsFall.drawAbilityFromDeck(game, archive);
         }

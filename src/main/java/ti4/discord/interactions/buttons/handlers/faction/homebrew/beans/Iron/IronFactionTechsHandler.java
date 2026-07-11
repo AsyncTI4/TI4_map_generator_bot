@@ -64,7 +64,7 @@ public class IronFactionTechsHandler {
         armAdvancedTargetingSystems(game, player, opponent, tile);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " exhausted _Advanced Targeting Systems_. Their mechs will roll 1 additional combat die in whichever ground combat roll in this system happens first.");
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
@@ -147,7 +147,7 @@ public class IronFactionTechsHandler {
 
     private static boolean hasParticipatingMech(Tile tile, Game game, Player player, Player opponent) {
         return getContestedPlanetUnitHolders(tile, game, player, opponent).stream()
-                .anyMatch(unitHolder -> unitHolder.getUnitCount(UnitType.Mech, player) > 0);
+                .anyMatch(unitHolder -> unitHolder.hasUnit(UnitType.Mech, player));
     }
 
     private static boolean isBeforeFirstGroundCombatRoll(Game game, Player player, Player opponent, Tile tile) {

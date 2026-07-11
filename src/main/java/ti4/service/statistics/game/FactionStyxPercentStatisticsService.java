@@ -61,7 +61,7 @@ class FactionStyxPercentStatisticsService {
             Game game, Map<String, Integer> factionStyxCount, Map<String, Integer> factionGameCount) {
         Player styxTaker = null;
         for (Player player : game.getRealPlayers()) {
-            if (player.getPlanets().contains("styx")) {
+            if (player.containsPlanet("styx")) {
                 styxTaker = player;
                 break;
             }

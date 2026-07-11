@@ -87,10 +87,10 @@ public class RoundOneService {
             Tile mr = game.getMecatolTile();
             if (mr != null) {
                 String pos = mr.getPosition();
-                boolean ingress = mr.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS);
+                boolean ingress = mr.getSpaceUnitHolder().containsToken(Constants.TOKEN_INGRESS);
                 game.removeTile(pos);
                 Tile tile = new Tile("112", pos);
-                Planet rex = tile.getUnitHolderFromPlanet("mrte");
+                Planet rex = tile.getPlanet("mrte");
                 rex.addToken(Constants.CUSTODIAN_TOKEN_PNG);
                 game.setTile(tile);
                 if (ingress) {
@@ -112,7 +112,7 @@ public class RoundOneService {
                 }
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation()
+                        player.toString()
                                 + ", due to _Cultural Exchange Program_, you have received the leaders of "
                                 + Mapper.getFaction(faction).getFactionName() + " this game.");
             }
@@ -185,7 +185,7 @@ public class RoundOneService {
                     if (!buttons.isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(
                                 target.getCorrectChannel(),
-                                target.getRepresentation() + ", please choose a planet on which to place a Shrine.",
+                                target.toString() + ", please choose a planet on which to place a Shrine.",
                                 buttons);
                     }
                 }

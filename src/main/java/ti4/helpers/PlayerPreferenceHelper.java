@@ -35,7 +35,7 @@ public final class PlayerPreferenceHelper {
         else buttons.add(Buttons.gray("playerPref_showTransactables", "Show player areas start of transaction"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentation() + ", please choose the thing you wish to change.",
+                player.toString() + ", please choose the thing you wish to change.",
                 buttons);
     }
 
@@ -47,7 +47,7 @@ public final class PlayerPreferenceHelper {
             case "afkTimes" -> offerAFKTimeOptions(player);
             case "tacticalAction" -> {
                 List<Button> buttons = new ArrayList<>();
-                String msg = player.getRepresentation()
+                String msg = player.toString()
                         + ", please choose whether you wish to selected the active system for your tactical action"
                         + " by distance (offer you 0 tiles away initially, then 1, 2, 3 tiles away upon more button presses)"
                         + " or by ring (choose what ring the active system is in). Default is by ring. This will apply to all your games.";
@@ -57,7 +57,7 @@ public final class PlayerPreferenceHelper {
             }
             case "autoNoWhensAfters" -> {
                 List<Button> buttons = new ArrayList<>();
-                String msg = player.getRepresentation()
+                String msg = player.toString()
                         + ", please choose whether you wish for the bot to auto react \"no whens\"/\"no afters\" after a random amount of time for you when you have no \"when\"s and no \"after\"s."
                         + " Default is off. This will only apply to this game. If you have any \"when\"s or \"afters\", or related \"when\"/\"after\" abilities, the bot will do nothing. ";
                 buttons.add(Buttons.green("playerPrefDecision_true_agenda", "Turn on"));

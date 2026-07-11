@@ -44,10 +44,10 @@ public final class TokenPlanetService {
     }
 
     public static void moveTokenPlanet(Game game, Player player, Tile destination, String planetName) {
-        Tile oldTile = game.getTileFromPlanet(planetName);
+        Tile oldTile = game.getTileContainingPlanet(planetName);
         if (oldTile == null) return;
 
-        Planet oldPlanet = oldTile.getUnitHolderFromPlanet(planetName);
+        Planet oldPlanet = oldTile.getPlanet(planetName);
         if (oldPlanet == null) return;
         PlanetModel model = oldPlanet.getPlanetModel();
 
@@ -64,7 +64,7 @@ public final class TokenPlanetService {
 
         // Inform the player
         if (player != null) {
-            String message = player.getRepresentation() + " moved " + model.getName() + " from "
+            String message = player.toString() + " moved " + model.getName() + " from "
                     + oldTile.getRepresentationForButtons(game, player) + " to "
                     + destination.getRepresentationForButtons(game, player) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -72,7 +72,7 @@ public final class TokenPlanetService {
     }
 
     public static void addTokenPlanetToTile(Game game, Tile tile, String planetName) {
-        if (!isTokenPlanet(planetName) || tile.getUnitHolderFromPlanet(planetName) != null) return;
+        if (!isTokenPlanet(planetName) || tile.getPlanet(planetName) != null) return;
 
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
         Point tokenPlanetPosition = Constants.TOKEN_PLANET_POSITION;
@@ -98,7 +98,7 @@ public final class TokenPlanetService {
     }
 
     public static void removeTokenPlanetFromTile(Game game, String planetName) {
-        Tile tile = game.getTileFromPlanet(planetName);
+        Tile tile = game.getTileContainingPlanet(planetName);
         if (!isTokenPlanet(planetName) || tile == null) return;
 
         String tokenPath = Mapper.getTokenPath(planetName);

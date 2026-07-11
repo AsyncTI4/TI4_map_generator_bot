@@ -29,8 +29,7 @@ class ProjectRiderAcd2ButtonHandler {
         if (getProjectRiderSelectableCards(game).isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + " has no action cards in the discard pile to choose for _Project Rider_.");
+                    player.toString() + " has no action cards in the discard pile to choose for _Project Rider_.");
             return;
         }
 
@@ -58,7 +57,7 @@ class ProjectRiderAcd2ButtonHandler {
         if (selectedCards.contains(acId)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " already selected _"
+                    player.toString() + " already selected _"
                             + Mapper.getActionCard(acId).getName() + "_ for _Project Rider_.");
             sendProjectRiderSelectionButtons(player, game, selectedCards);
             return;
@@ -66,15 +65,14 @@ class ProjectRiderAcd2ButtonHandler {
         if (!isProjectRiderCardSelectable(game, acId)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + " cannot select that action card because it is no longer in the discard pile.");
+                    player.toString() + " cannot select that action card because it is no longer in the discard pile.");
             sendProjectRiderSelectionButtons(player, game, selectedCards);
             return;
         }
         if (selectedCards.size() >= PROJECT_RIDER_MAX_SELECTIONS) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " already selected the maximum number of cards for _Project Rider_.");
+                    player.toString() + " already selected the maximum number of cards for _Project Rider_.");
             sendProjectRiderSelectionButtons(player, game, selectedCards);
             return;
         }
@@ -98,7 +96,7 @@ class ProjectRiderAcd2ButtonHandler {
         if (selectedCards.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " had no action cards selected for _Project Rider_.");
+                    player.toString() + " had no action cards selected for _Project Rider_.");
             return;
         }
 

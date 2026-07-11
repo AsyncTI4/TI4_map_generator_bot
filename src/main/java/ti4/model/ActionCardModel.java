@@ -62,6 +62,11 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
         return getRepresentation(null);
     }
 
+    @Override
+    public String toString() {
+        return getRepresentation();
+    }
+
     public String getRepresentationJustText(Game game) {
         boolean useWildText = hasWildText(game);
         String cardText = useWildText ? wildWildText : text;

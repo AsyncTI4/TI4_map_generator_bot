@@ -18,8 +18,8 @@ class MigrationHelper {
 
     static boolean replaceTokens(Game game, Map<String, String> replacements) {
         boolean found = false;
-        for (Tile t : game.getTileMap().values()) {
-            for (UnitHolder uh : t.getUnitHolders().values()) {
+        for (Tile t : game.getTiles()) {
+            for (UnitHolder uh : t.getUnitHolderValues()) {
                 Set<String> oldList = new HashSet<>(uh.getTokenList());
                 for (Map.Entry<String, String> entry : replacements.entrySet()) {
                     if (oldList.contains(entry.getKey())) {

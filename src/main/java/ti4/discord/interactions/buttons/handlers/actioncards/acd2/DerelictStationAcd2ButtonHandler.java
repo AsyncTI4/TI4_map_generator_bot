@@ -43,11 +43,11 @@ class DerelictStationAcd2ButtonHandler {
     public static void resolveDerelictStationFrontier(Player player, Game game, ButtonInteractionEvent event) {
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (tile == null || !tile.getPlanetUnitHolders().isEmpty()) {
+        for (Tile tile : game.getTiles()) {
+            if (tile == null || tile.hasPlanets()) {
                 continue;
             }
-            if (tile.getSpaceUnitHolder().getTokenList().contains(frontierFilename)) {
+            if (tile.getSpaceUnitHolder().containsToken(frontierFilename)) {
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + "derelictStationExplore_" + tile.getPosition(),
                         tile.getRepresentationForButtons(game, player)));
@@ -83,7 +83,7 @@ class DerelictStationAcd2ButtonHandler {
         ButtonHelper.resolveFullFrontierExplore(game, player, tile, event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getFactionEmoji() + " explored the frontier token in " + tile.getRepresentation()
+                player.getFactionEmoji() + " explored the frontier token in " + tile.toString()
                         + " via _Derelict Station_.");
     }
 }

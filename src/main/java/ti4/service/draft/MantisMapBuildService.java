@@ -105,8 +105,7 @@ public class MantisMapBuildService {
         // Post the pick
         MessageHelper.sendMessageToChannel(
                 mapBuildContext.game().getMainGameChannel(),
-                player.getRepresentation() + " placed " + placedTile.getShortDescription() + " at Position " + position
-                        + ".");
+                player.toString() + " placed " + placedTile.getShortDescription() + " at Position " + position + ".");
 
         updateMapBuild(event, mapBuildContext);
         return DraftButtonService.DELETE_MESSAGE;
@@ -133,7 +132,7 @@ public class MantisMapBuildService {
         DraftItem oldTileItem = DraftItem.generate(tileCategory, tileId);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation() + " mulliganed tile " + oldTileItem.getLongDescription() + ".");
+                player.toString() + " mulliganed tile " + oldTileItem.getLongDescription() + ".");
         updateMapBuild(event, updatedContext);
         return DraftButtonService.DELETE_MESSAGE;
     }
@@ -354,15 +353,14 @@ public class MantisMapBuildService {
         if (playerRemainingTiles == null) {
             MessageHelper.sendMessageToChannel(
                     responseChannel,
-                    "Error: Could not find remaining tiles for player " + player.getRepresentation()
-                            + " to place next tile.");
+                    "Error: Could not find remaining tiles for player " + player.toString() + " to place next tile.");
             return;
         }
 
         DraftItem nextTile = drawTile(event, mapBuildContext, player, playerRemainingTiles);
         if (nextTile == null) {
             MessageHelper.sendMessageToChannel(
-                    responseChannel, "Error: Could not draw next tile for player " + player.getRepresentation() + ".");
+                    responseChannel, "Error: Could not draw next tile for player " + player.toString() + ".");
             return;
         }
 
@@ -384,7 +382,7 @@ public class MantisMapBuildService {
 
             MessageHelper.sendMessageToChannel(
                     mapBuildContext.game().getMainGameChannel(),
-                    player.getRepresentation() + " placed "
+                    player.toString() + " placed "
                             + nextTile.getShortDescription() + " at Position " + nextGroup.getFirst()
                             + " (automatically; no alternatives).");
 
@@ -423,7 +421,7 @@ public class MantisMapBuildService {
         if (nextTile == null) {
             MessageHelper.sendMessageToChannel(
                     responseChannel,
-                    "Error: Could not find any available tiles for player " + player.getRepresentation()
+                    "Error: Could not find any available tiles for player " + player.toString()
                             + " to place next tile.");
             return;
         }
@@ -444,7 +442,7 @@ public class MantisMapBuildService {
         // Build next message text
         MessageHelper.sendMessageToChannel(
                 responseChannel,
-                player.getRepresentation() + " can pick a position to place " + nextTile.getLongDescription() + "."
+                player.toString() + " can pick a position to place " + nextTile.getLongDescription() + "."
                         + mulliganString,
                 buttons);
     }
@@ -525,7 +523,7 @@ public class MantisMapBuildService {
                 MessageHelper.sendMessageToChannel(
                         responseChannel,
                         "Error: Previously drawn tile " + drawnTileId
-                                + " is no longer available for player " + player.getRepresentation()
+                                + " is no longer available for player " + player.toString()
                                 + " to place next tile.");
                 return null;
             }
@@ -542,7 +540,7 @@ public class MantisMapBuildService {
         if (availableTileIDs.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     responseChannel,
-                    "Error: Could not find any available tiles for player " + player.getRepresentation()
+                    "Error: Could not find any available tiles for player " + player.toString()
                             + " to place next tile.");
             return null;
         }
@@ -758,7 +756,7 @@ public class MantisMapBuildService {
         }
         MessageHelper.sendMessageToChannel(
                 playerChannel,
-                player.getRepresentation() + " You need to discard down to " + desiredAmount + " of these tiles",
+                player.toString() + " You need to discard down to " + desiredAmount + " of these tiles",
                 discardButtons);
     }
 

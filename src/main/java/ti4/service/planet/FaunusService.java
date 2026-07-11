@@ -32,14 +32,14 @@ public class FaunusService {
         List<Button> buttons = new ArrayList<>();
         Set<String> tiles = FoWHelper.getTilePositionsToShow(game, player);
         for (Planet p : game.getPlanetsInfo().values()) {
-            Tile t = game.getTileFromPlanet(p.getName());
+            Tile t = game.getTileContainingPlanet(p.getName());
             if (t == null || player.hasPlanet(p.getName())) continue;
             if (p.getUnitCount() > 0) continue;
             if (p.isLegendary()) continue;
             if (p.isHomePlanet(game)) continue;
             if (!p.getAttachments().isEmpty()
-                    && !p.getTokenList().contains("token_relictoken.png")
-                    && !p.getTokenList().contains("token_freepeople.png")) continue;
+                    && !p.containsToken("token_relictoken.png")
+                    && !p.containsToken("token_freepeople.png")) continue;
 
             // in fow, skip planets you can't see
             if (game.isFowMode() && !tiles.contains(t.getPosition())) continue;
@@ -50,7 +50,7 @@ public class FaunusService {
             String id = player.factionButtonChecker() + "faunusTake_" + p.getName();
             String label = Helper.getPlanetRepresentation(p.getName(), game);
 
-            Player owner = game.getPlayerThatControlsPlanet(p.getName());
+            Player owner = game.getPlanetOwner(p.getName());
             if (owner != null) {
                 buttons.add(Buttons.red(id, label, owner.fogSafeEmoji()));
             } else {

@@ -58,7 +58,7 @@ public class ArvaxiLeaderHandler {
         String acName = Mapper.getActionCard(acID).getName();
         List<Button> buttons = new ArrayList<>();
         for (Player target : game.getRealPlayers()) {
-            if (target.getFaction().equals(discarderFaction)) continue;
+            if (target.isFactionExact(discarderFaction)) continue;
             buttons.add(Buttons.green(
                     "FFCC_" + player.getFaction() + "_arvaxiAgentPickTarget_" + acIndex + "_" + target.getFaction(),
                     target.getFactionNameOrColor(),
@@ -165,13 +165,13 @@ public class ArvaxiLeaderHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
-                    player.getRepresentation() + " has no action cards to discard for the " + FactionEmojis.arvaxi
+                    player.toString() + " has no action cards to discard for the " + FactionEmojis.arvaxi
                             + " **Arvaxi Commander** unlock.");
             return;
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentation() + ", discard 1 action card to unlock the " + FactionEmojis.arvaxi
+                player.toString() + ", discard 1 action card to unlock the " + FactionEmojis.arvaxi
                         + " **Arvaxi Commander**.",
                 buttons);
     }

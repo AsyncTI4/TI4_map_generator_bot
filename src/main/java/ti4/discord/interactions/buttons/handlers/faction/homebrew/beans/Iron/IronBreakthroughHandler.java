@@ -15,7 +15,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class IronBreakthroughHandler {
@@ -25,8 +25,7 @@ public class IronBreakthroughHandler {
     public static void sendIronBtMessage(Player player, Game game) {
         MessageHelper.sendMessageToChannel(
                 game.getActionsChannel(),
-                player.getRepresentation()
-                        + " **REMINDER**: You do not need a mech on the planet due to _Foundry Network_.");
+                player.toString() + " **REMINDER**: You do not need a mech on the planet due to _Foundry Network_.");
     }
 
     public static List<Button> getPlaceUnitButtonsForIronBt(
@@ -34,18 +33,17 @@ public class IronBreakthroughHandler {
         List<Button> unitButtons = new ArrayList<>();
 
         if (player.hasUnlockedBreakthrough(IRON_BT)) {
-            for (Tile tile :
-                    CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)) {
+            for (Tile tile : UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)) {
                 if (tile.getPosition().equalsIgnoreCase(origTile.getPosition())
                         || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                     continue;
                 }
-                for (UnitHolder uH : tile.getUnitHolders().values()) {
+                for (UnitHolder uH : tile.getUnitHolderValues()) {
                     if (player.getUnitsOwned().contains("spacedock")
                             || player.getUnitsOwned().contains("spacedock2")
-                            || uH.getUnitCount(UnitType.Spacedock, player) > 0) {
+                            || uH.hasUnit(UnitType.Spacedock, player)) {
                         if (uH instanceof Planet planet) {
-                            if (player.getPlanetsAllianceMode().contains(uH.getName())) {
+                            if (player.canUsePlanet(uH.getName())) {
                                 String pp = planet.getName();
                                 Button inf1Button = Buttons.green(
                                         player.factionButtonChecker() + placePrefix + "_mech_" + pp,

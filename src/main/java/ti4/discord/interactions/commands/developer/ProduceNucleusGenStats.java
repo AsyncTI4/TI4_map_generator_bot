@@ -102,7 +102,7 @@ class ProduceNucleusGenStats extends GameStateSubcommand {
                                         + 1);
                     }
                 }
-                for (Tile placedTile : game.getTileMap().values()) {
+                for (Tile placedTile : game.getTiles()) {
 
                     if (tileManager
                             .filterAll(t -> t.getTile().getTileID().equals(placedTile.getTileID()))
@@ -175,7 +175,7 @@ class ProduceNucleusGenStats extends GameStateSubcommand {
             result.append("- (")
                     .append(draftTile.getTile().getTileID())
                     .append(") ")
-                    .append(draftTile.getTile().getRepresentation());
+                    .append(draftTile.getTile().toString());
             float inSlicesPercent = (inSlices * 100.0f) / Math.max(1, successAfterAttempts.size());
             float inMapsPercent = (inMaps * 100.0f) / Math.max(1, successAfterAttempts.size());
             float inTotalPercent = (inTotal * 100.0f) / Math.max(1, successAfterAttempts.size());

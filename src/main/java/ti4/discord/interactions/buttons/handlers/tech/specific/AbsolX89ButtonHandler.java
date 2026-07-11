@@ -26,8 +26,8 @@ class AbsolX89ButtonHandler {
                 event.getChannel(),
                 player.getFaction() + " used _X-89 Bacterial Weapon_ to remove all ground forces on " + planet + ".");
 
-        Tile tile = game.getTileFromPlanet(planet);
-        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        Tile tile = game.getTileContainingPlanet(planet);
+        UnitHolder uH = game.getPlanet(planet);
         Set<UnitKey> units = new HashSet<>(uH.getUnitsByState().keySet());
         for (UnitKey unit : units) {
             if (game.getPlayerByUnitKey(unit)

@@ -28,7 +28,7 @@ class UbiquityAcd2ButtonHandler {
         if (techs.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has no eligible technologies to gain with _Ubiquity_.");
+                    player.toString() + " has no eligible technologies to gain with _Ubiquity_.");
             event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }

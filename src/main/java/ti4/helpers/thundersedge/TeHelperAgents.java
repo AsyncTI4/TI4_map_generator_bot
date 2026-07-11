@@ -108,12 +108,11 @@ public final class TeHelperAgents {
                 ActionCardHelper.sendActionCard(event, game, player, game.getPlayerFromColorOrFaction(faction), acID);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation(true, true) + " sent an action card to " + p2.getRepresentation()
-                                + ".");
+                        player.getRepresentation(true, true) + " sent an action card to " + p2.toString() + ".");
                 if (game.isFowMode())
                     MessageHelper.sendMessageToChannel(
                             p2.getCorrectChannel(),
-                            (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.getRepresentation())
+                            (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.toString())
                                     + " sent an action card to " + p2.getRepresentation(true, true) + ".");
             } else {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Error, player2 is null");
@@ -124,8 +123,7 @@ public final class TeHelperAgents {
 
     private static void postCrimsonAgentStep1(Game game, Player player) {
         Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip);
-        String message =
-                player.getRepresentation() + ", please choose the first system from which you wish to swap a ship.";
+        String message = player.toString() + ", please choose the first system from which you wish to swap a ship.";
         List<Button> buttons =
                 ButtonHelper.getTilesWithPredicateForAction(player, game, "handleCrimsonAgent", pred, false);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
@@ -147,8 +145,8 @@ public final class TeHelperAgents {
         List<Button> newButtons = new ArrayList<>();
         if ((matcher = Pattern.compile(part2).matcher(buttonID)).matches()) {
             Tile from = game.getTileByPosition(matcher.group("tileA"));
-            newMessage = player.getRepresentation() + ", you are swapping from "
-                    + from.getRepresentationForButtons(game, player) + ". Please choose the ship you wish to swap.";
+            newMessage = player.toString() + ", you are swapping from " + from.getRepresentationForButtons(game, player)
+                    + ". Please choose the ship you wish to swap.";
 
             UnitHolder space = from.getSpaceUnitHolder();
             Set<UnitKey> keys = space.getUnitsByState().keySet().stream()
@@ -164,7 +162,7 @@ public final class TeHelperAgents {
             Tile from = game.getTileByPosition(matcher.group("tileA"));
             UnitType unitType = Units.findUnitType(matcher.group("unitA"));
 
-            newMessage = player.getRepresentation() + ", you are swapping a " + unitType.humanReadableName() + " from "
+            newMessage = player.toString() + ", you are swapping a " + unitType.humanReadableName() + " from "
                     + from.getRepresentationForButtons(game, player) + ".";
             newMessage += "\nPlease choose the other system from which you wish to swap a ship.";
             newButtons = ButtonHelper.getTilesWithPredicateForAction(player, game, buttonID, pred, false);
@@ -174,7 +172,7 @@ public final class TeHelperAgents {
             UnitType unitType = Units.findUnitType(matcher.group("unitA"));
             Tile to = game.getTileByPosition(matcher.group("tileB"));
 
-            newMessage = player.getRepresentation() + " you are swapping a " + unitType.humanReadableName() + " from "
+            newMessage = player.toString() + " you are swapping a " + unitType.humanReadableName() + " from "
                     + from.getRepresentationForButtons(game, player) + ".";
             newMessage += "\nYou are swapping to " + to.getRepresentationForButtons(game, player)
                     + ". Please choose the ship you wish to swap.";
@@ -205,7 +203,7 @@ public final class TeHelperAgents {
             AddUnitService.addUnits(event, tileB, game, player.getColor(), unitA);
             AddUnitService.addUnits(event, tileA, game, player.getColor(), unitB);
 
-            String message = player.getRepresentation() + " swapped two ships using Ahk Ravin.";
+            String message = player.toString() + " swapped two ships using Ahk Ravin.";
             message +=
                     "\n> " + unitTypeA.humanReadableName() + " at " + tileA.getRepresentationForButtons(game, player);
             message +=
@@ -239,7 +237,7 @@ public final class TeHelperAgents {
         msg += " to remove a " + p2.getColor() + " command token from " + tile.getRepresentationForButtons(game, player)
                 + ".";
         if (p2 == player) {
-            msg = player.getRepresentation() + msg;
+            msg = player.toString() + msg;
         } else {
             msg = player.getRepresentationNoPing() + msg;
         }
@@ -266,7 +264,7 @@ public final class TeHelperAgents {
                 RemoveCommandCounterService.fromTile(event, p3, tile);
             });
             for (Player p2 : game.getRealPlayers()) {
-                if (p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")) {
+                if (p2.hasTech("tcs") && !p2.isTechExhausted("tcs")) {
                     List<Button> buttons2 = new ArrayList<>();
                     String msg;
                     if (game.isTwilightsFallMode()) {

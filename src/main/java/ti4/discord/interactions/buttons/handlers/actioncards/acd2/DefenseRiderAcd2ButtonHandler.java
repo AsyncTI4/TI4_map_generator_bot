@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -12,6 +13,7 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.service.planet.PlanetButtonService;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -44,7 +46,7 @@ class DefenseRiderAcd2ButtonHandler {
         }
 
         String planet = parts[1];
-        AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "pds " + planet);
+        AddUnitService.addUnits(event, game.getTileContainingPlanet(planet), game, player.getColor(), "pds " + planet);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " put 1 PDS on " + Helper.getPlanetRepresentation(planet, game)
@@ -56,16 +58,11 @@ class DefenseRiderAcd2ButtonHandler {
     }
 
     private static void sendDefenseRiderButtons(Player player, Game game, int remainingPds) {
-        List<Button> buttons = new ArrayList<>();
-        for (String planet : player.getPlanets()) {
-            buttons.add(Buttons.green(
-                    "resolveDefenseRiderStep2_" + remainingPds + "_" + planet,
-                    Helper.getPlanetRepresentation(planet, game)));
-        }
+        List<Button> buttons = new ArrayList<>(PlanetButtonService.buttonsForOwnedPlanets(
+                player, game, location -> true, ButtonStyle.SUCCESS, "resolveDefenseRiderStep2_" + remainingPds + "_"));
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " has no planets available for _Defense Rider_.");
+                    player.getCorrectChannel(), player.toString() + " has no planets available for _Defense Rider_.");
             return;
         }
         buttons.add(Buttons.red("deleteButtons", "Done"));

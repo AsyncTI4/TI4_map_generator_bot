@@ -25,7 +25,7 @@ public class VyserixBreakthroughHandler {
                 player.factionButtonChecker() + "vyserixMoraySystem_" + tile.getPosition(),
                 "Place 1 Fighter in " + tile.getRepresentationForButtons(game, player)));
         buttons.add(Buttons.red("deleteButtons", "Done"));
-        String msg = player.getRepresentation() + " you could potentially cancel "
+        String msg = player.toString() + " you could potentially cancel "
                 + (hits == 1 ? "the ANTI-FIGHTER BARRAGE hit" : "some ANTI-FIGHTER BARRAGE hits")
                 + " to place fighters instead due to _M.O.R.A.Y. System_. Use these buttons to do so, and press done when done. The bot did not track how many hits you got.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
@@ -37,7 +37,7 @@ public class VyserixBreakthroughHandler {
         String pos = buttonID.replace("vyserixMoraySystem_", "");
         Tile tile = game.getTileByPosition(pos);
         if (tile == null) return;
-        String msg = player.getRepresentation()
+        String msg = player.toString()
                 + " canceled one ANTI-FIGHTER BARRAGE hit to place one fighter in "
                 + tile.getRepresentationForButtons(game, player) + " due to _M.O.R.A.Y. System_.";
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 ff");

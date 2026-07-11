@@ -43,7 +43,7 @@ class RefugeesAcd2ButtonHandler {
         }
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), player.getRepresentation() + " has no valid _Refugees_ targets.");
+                    player.getCorrectChannel(), player.toString() + " has no valid _Refugees_ targets.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -82,7 +82,7 @@ class RefugeesAcd2ButtonHandler {
         Player target = game.getPlayerFromColorOrFaction(payload[0]);
         int infantryRemaining = Integer.parseInt(payload[1]);
         String planet = payload[2];
-        Tile tile = game.getTileFromPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
         if (target == null || tile == null) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Refugees_.");
             ButtonHelper.deleteMessage(event);
@@ -133,7 +133,7 @@ class RefugeesAcd2ButtonHandler {
     private static List<String> getRefugeesPlanets(Game game, Player target) {
         Set<String> planets = new HashSet<>();
         Tile homeSystem = target.getHomeSystemTile();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tile == null || tile == homeSystem) {
                 continue;
             }

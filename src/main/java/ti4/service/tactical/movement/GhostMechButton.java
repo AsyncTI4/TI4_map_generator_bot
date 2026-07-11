@@ -3,15 +3,14 @@ package ti4.service.tactical.movement;
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.helpers.ButtonHelper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.tactical.MoveAbilityButton;
 import ti4.service.tactical.MoveContext;
+import ti4.service.unit.UnitQueryService;
 
 public final class GhostMechButton implements MoveAbilityButton {
     public boolean enabled(MoveContext ctx) {
-        return ctx.player.ownsUnit("ghost_mech")
-                && ButtonHelper.getNumberOfUnitsOnTheBoard(ctx.game, ctx.player, "mech") > 0;
+        return ctx.player.ownsUnit("ghost_mech") && UnitQueryService.countUnits(ctx.game, ctx.player, "mech") > 0;
     }
 
     public List<Button> build(MoveContext ctx) {

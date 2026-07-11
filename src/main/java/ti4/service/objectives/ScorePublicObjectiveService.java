@@ -131,7 +131,7 @@ public class ScorePublicObjectiveService {
         String poName = both.split("_")[0];
         String emojiName = both.split("_")[1];
 
-        String message = player.getRepresentation() + " scored " + emojiName + " _" + poName + "_.";
+        String message = player.toString() + " scored " + emojiName + " _" + poName + "_.";
         MessageHelper.sendMessageToChannel(channel, message);
         if (game.isFowMode()) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
@@ -139,8 +139,7 @@ public class ScorePublicObjectiveService {
         HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
         if (player.hasAbility("dark_purpose") && !poName.toLowerCase().contains("custodian")) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " gains 1 command token from **Dark Purpose**.");
+                    player.getCorrectChannel(), player.toString() + " gains 1 command token from **Dark Purpose**.");
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
                     + player.getCCRepresentation() + ". Use buttons to gain 1 command token.";
@@ -148,7 +147,7 @@ public class ScorePublicObjectiveService {
         }
         if (player.hasTech("tf-yinascendant") && !poName.toLowerCase().contains("custodian")) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), player.getRepresentation() + " gains 1 card due to _Yin Ascendant_.");
+                    player.getCorrectChannel(), player.toString() + " gains 1 card due to _Yin Ascendant_.");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
             buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
@@ -182,7 +181,7 @@ public class ScorePublicObjectiveService {
                 Player p2 = game.getPlayerFromColorOrFaction(game.getStoredValue("toldarHeroPlayer"));
                 MessageHelper.sendMessageToChannel(
                         p2.getCorrectChannel(),
-                        p2.getRepresentation() + " draws 1 secret objective due to their Toldar hero ability.");
+                        p2.toString() + " draws 1 secret objective due to their Toldar hero ability.");
                 DrawSecretService.drawSO(event, game, p2);
             }
         }
@@ -193,7 +192,7 @@ public class ScorePublicObjectiveService {
             if (scoredPlayerList.size() > 1 && Mapper.getPublicObjective(idC) != null) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation()
+                        player.toString()
                                 + " is drawing 1 action card due to scoring an objective someone else already scored while having the _Reflect_ Honor card.");
                 ActionCardHelper.drawActionCardsSilent(player, 1);
             }
@@ -228,7 +227,7 @@ public class ScorePublicObjectiveService {
                         + ", please choose the planets you wish to exhaust to score the objective.";
                 game.setStoredValue("resetSpend", "sup");
                 for (String planet : player.getPlanets()) {
-                    if (!player.getExhaustedPlanets().contains(planet)) {
+                    if (!player.isPlanetExhausted(planet)) {
                         player.exhaustPlanet(planet);
                         player.addSpentThing(planet);
                     }
@@ -246,8 +245,8 @@ public class ScorePublicObjectiveService {
                 player.setTg(oldtg - 5);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + ", automatically deducted 5 trade goods (" + oldtg + "->"
-                                + player.getTg() + ").");
+                        player.toString() + ", automatically deducted 5 trade goods (" + oldtg + "->" + player.getTg()
+                                + ").");
             } else {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
@@ -260,8 +259,8 @@ public class ScorePublicObjectiveService {
                 player.setTg(oldtg - 10);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + ", automatically deducted 10 trade goods (" + oldtg + "->"
-                                + player.getTg() + ").");
+                        player.toString() + ", automatically deducted 10 trade goods (" + oldtg + "->" + player.getTg()
+                                + ").");
             } else {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
@@ -287,7 +286,7 @@ public class ScorePublicObjectiveService {
                     player.setStrategicCC(currentStrat - requiredSpend);
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getRepresentation()
+                            player.toString()
                                     + ", 6 command tokens have automatically been deducted from your strategy pool ("
                                     + currentStrat + "->" + player.getStrategicCC() + ")");
                 } else {
@@ -302,13 +301,13 @@ public class ScorePublicObjectiveService {
                     if (currentStrat == 0) {
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),
-                                player.getRepresentation()
+                                player.toString()
                                         + ", 6 command tokens have automatically been deducted from your tactic pool ("
                                         + currentCC + "->" + player.getCCRepresentation() + ")");
                     } else {
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),
-                                player.getRepresentation()
+                                player.toString()
                                         + ", " + subtract + " and " + currentStrat
                                         + " command tokens (6 total) have automatically been deducted from your tactic and/or strategy pools respectively ("
                                         + currentCC + "->" + player.getCCRepresentation() + ")");
@@ -317,7 +316,7 @@ public class ScorePublicObjectiveService {
             } else {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation()
+                        player.toString()
                                 + ", you do not have 6 command tokens in your tactic and/or strategy pools. No command tokens have been removed.");
             }
         }
@@ -335,7 +334,7 @@ public class ScorePublicObjectiveService {
                     player.getCorrectChannel(),
                     String.format(
                             "%s, you do not have %d command tokens in your tactic and/or strategy pools. No command tokens have been removed.",
-                            player.getRepresentation(), requiredSpend));
+                            player.toString(), requiredSpend));
             return;
         }
 
@@ -350,7 +349,7 @@ public class ScorePublicObjectiveService {
         player.setTacticalCC(currentTact - spentFromTactics);
 
         StringBuilder commandTokenMessage = new StringBuilder();
-        commandTokenMessage.append(player.getRepresentation());
+        commandTokenMessage.append(player.toString());
 
         if (spentFromStrat > 0) {
             commandTokenMessage.append(String.format(

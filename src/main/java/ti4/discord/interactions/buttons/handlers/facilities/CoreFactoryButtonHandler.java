@@ -25,7 +25,7 @@ class CoreFactoryButtonHandler {
         ButtonHelper.deleteMessage(event);
         String tPlanet = "";
         for (String planet : player.getPlanets()) {
-            Planet uH = game.getUnitHolderFromPlanet(planet);
+            Planet uH = game.getPlanet(planet);
             if (uH == null) {
                 continue;
             }
@@ -37,7 +37,7 @@ class CoreFactoryButtonHandler {
                 }
             }
         }
-        Planet uH = game.getUnitHolderFromPlanet(tPlanet);
+        Planet uH = game.getPlanet(tPlanet);
         List<Button> facilities = new ArrayList<>();
         List<String> usedFacilities = ButtonHelperSCs.findUsedFacilities(game, player);
 
@@ -93,7 +93,7 @@ class CoreFactoryButtonHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", please choose the facility you wish to replace the Core Factory.",
+                player.toString() + ", please choose the facility you wish to replace the Core Factory.",
                 facilities);
 
         String message = "Use buttons to end turn or do another action.";

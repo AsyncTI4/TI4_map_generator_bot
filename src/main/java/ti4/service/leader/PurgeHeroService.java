@@ -26,13 +26,13 @@ public class PurgeHeroService {
         if (leaderModel != null) {
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " is playing " + heroTitle + ".",
+                    player.toString() + " is playing " + heroTitle + ".",
                     FrankenAlternateTextService.getLeaderEmbed(
                             game, leaderModel, false, true, true, showFlavourText, game.isTwilightsFallMode()));
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " is playing " + heroTitle + ".\n"
+                    player.toString() + " is playing " + heroTitle + ".\n"
                             + Helper.getLeaderFullRepresentation(playerLeader));
         }
         boolean purged = PlayHeroService.removeLeader(game, player, playerLeader);

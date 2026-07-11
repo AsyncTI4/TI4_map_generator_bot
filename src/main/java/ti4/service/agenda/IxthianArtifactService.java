@@ -148,7 +148,7 @@ public class IxthianArtifactService {
 
             List<Button> buttons = HeartOfIxthService.makeHeartOfIxthButtons(game, heartPlayer, good, bad, result);
             String msg = resultMessage(game, result, false).replaceFirst("## ", "");
-            msg += "\nHOWEVER, " + heartPlayer.getRepresentation() + " you can use the _Heart of Ixth_";
+            msg += "\nHOWEVER, " + heartPlayer.toString() + " you can use the _Heart of Ixth_";
             msg += " to modify the outcome of _Ixthian Artifact_.";
             MessageHelper.sendMessageToChannelWithButtons(heartPlayer.getCorrectChannel(), msg, buttons);
 
@@ -186,7 +186,7 @@ public class IxthianArtifactService {
             for (Player p : game.getRealPlayers()) {
                 if (p.hasAbility("propagation")) {
                     List<Button> buttons = ButtonHelper.getGainCCButtons(p);
-                    String propMsg = p.getRepresentation();
+                    String propMsg = p.toString();
                     propMsg += ", you would research a technology, but because of **Propagation**";
                     propMsg += ", you instead gain 6 command tokens. Your current command tokens are ";
                     propMsg += p.getCCRepresentation() + ". Use buttons to gain command tokens.";
@@ -202,7 +202,7 @@ public class IxthianArtifactService {
         if (Helper.getPlayerFromAbility(game, "propagation") != null) {
             Player player = Helper.getPlayerFromAbility(game, "propagation");
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-            String propMsg = player.getRepresentation();
+            String propMsg = player.toString();
             propMsg += ", you would research a technology, but because of **Propagation**";
             propMsg += ", you instead gain 6 command tokens. Your current command tokens are ";
             propMsg += player.getCCRepresentation() + ". Use buttons to gain command tokens.";

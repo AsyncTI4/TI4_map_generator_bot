@@ -22,7 +22,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamBut
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
-import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -72,6 +71,7 @@ import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.ListTurnOrderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.map.SpinService;
+import ti4.service.planet.PlanetEffectService;
 import ti4.service.planet.PlanetService;
 import ti4.service.strategycard.PickStrategyCardService;
 import ti4.service.turn.StartTurnService;
@@ -194,8 +194,8 @@ public class StartPhaseService {
                 + " pick in this Strategy Phase and so can queue " + number + " strategy cards."
                 + " So far you have queued " + numQueued + " cards. ");
         if (game.isFowMode()) {
-            msg = new StringBuilder(player.getRepresentation() + " you can queue up to 8 cards."
-                    + " So far you have queued " + numQueued + " cards. ");
+            msg = new StringBuilder(player.toString() + " you can queue up to 8 cards." + " So far you have queued "
+                    + numQueued + " cards. ");
         }
         if (numQueued > 0) {
             msg.append(
@@ -357,34 +357,18 @@ public class StartPhaseService {
         if (!game.getStoredValue("agendaConstitution").isEmpty()) {
             game.setStoredValue("agendaConstitution", "");
             for (Player player2 : game.getRealPlayers()) {
-                var exhausted = new ArrayList<String>();
-                for (String planet : player2.getPlanets()) {
-                    if (planet.contains("custodia") || planet.contains("ghoti")) {
-                        continue;
-                    }
-                    if (game.getTileFromPlanet(planet) == player2.getHomeSystemTile()) {
-                        player2.exhaustPlanet(planet);
-                        exhausted.add(Helper.getPlanetRepresentation(planet, game));
-                    }
-                }
-                if (exhausted.size() >= 2) {
-                    MessageHelper.sendMessageToChannel(
-                            player2.getCardsInfoThread(),
-                            player2.getRepresentationUnfogged() + ", because _New Constitution_ resolved \"For\", "
-                                    + String.join(", ", exhausted.subList(0, exhausted.size() - 1))
-                                    + " and "
-                                    + exhausted.getLast() + " have been exhausted.");
-                } else if (exhausted.size() == 1) {
-                    MessageHelper.sendMessageToChannel(
-                            player2.getCardsInfoThread(),
-                            player2.getRepresentationUnfogged() + ", because _New Constitution_ resolved \"For\", "
-                                    + exhausted.getFirst() + " has been exhausted.");
-                } else {
-                    MessageHelper.sendMessageToChannel(
-                            player2.getCardsInfoThread(),
-                            player2.getRepresentationUnfogged() + ", though _New Constitution_ resolved \"For\","
-                                    + " you control no planets in your home system to exhaust.");
-                }
+                var exhausted = PlanetEffectService.exhaustControlledPlanets(
+                        player2,
+                        game,
+                        location -> !location.planet().getName().contains("custodia")
+                                && !location.planet().getName().contains("ghoti")
+                                && location.tile() == player2.getHomeSystemTile());
+                PlanetEffectService.sendExhaustionSummary(
+                        player2,
+                        game,
+                        exhausted,
+                        ", because _New Constitution_ resolved \"For\", ",
+                        ", though _New Constitution_ resolved \"For\", you control no planets in your home system to exhaust.");
             }
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
@@ -413,29 +397,15 @@ public class StartPhaseService {
         if (!game.getStoredValue("agendaArmsReduction").isEmpty()) {
             game.setStoredValue("agendaArmsReduction", "");
             for (Player player2 : game.getRealPlayers()) {
-                var exhausted = new ArrayList<String>();
-                for (String planet : player2.getPlanets()) {
-                    if (planet.contains("custodia") || planet.contains("ghoti")) {
-                        continue;
-                    }
-                    if (ButtonHelper.isPlanetTechSkip(planet, game)) {
-                        player2.exhaustPlanet(planet);
-                        exhausted.add(Helper.getPlanetRepresentation(planet, game));
-                    }
-                }
-                if (exhausted.size() >= 2) {
-                    MessageHelper.sendMessageToChannel(
-                            player2.getCardsInfoThread(),
-                            player2.getRepresentationUnfogged() + ", because _Arms Reduction_ resolved \"Against\", "
-                                    + String.join(", ", exhausted.subList(0, exhausted.size() - 1))
-                                    + " and "
-                                    + exhausted.getLast() + " have been exhausted.");
-                } else if (exhausted.size() == 1) {
-                    MessageHelper.sendMessageToChannel(
-                            player2.getCardsInfoThread(),
-                            player2.getRepresentationUnfogged() + ", because _Arms Reduction_ resolved \"Against\", "
-                                    + exhausted.getFirst() + " has been exhausted.");
-                }
+                var exhausted = PlanetEffectService.exhaustControlledPlanets(
+                        player2,
+                        game,
+                        location -> !location.planet().getName().contains("custodia")
+                                && !location.planet().getName().contains("ghoti")
+                                && ButtonHelper.isPlanetTechSkip(
+                                        location.planet().getName(), game));
+                PlanetEffectService.sendExhaustionSummary(
+                        player2, game, exhausted, ", because _Arms Reduction_ resolved \"Against\", ", null);
             }
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
@@ -463,35 +433,14 @@ public class StartPhaseService {
         if (!game.getStoredValue("agendaRepGov").isEmpty()) {
             for (Player player2 : game.getRealPlayers()) {
                 if (game.getStoredValue("agendaRepGov").contains(player2.getFaction())) {
-                    var exhausted = new ArrayList<String>();
-                    for (String planet : player2.getPlanets()) {
-                        Planet p = game.getPlanetsInfo().get(planet);
-                        if (p != null && p.getPlanetTypes().contains("cultural")) {
-                            player2.exhaustPlanet(planet);
-                            exhausted.add(Helper.getPlanetRepresentation(planet, game));
-                        }
-                    }
-                    if (exhausted.size() >= 2) {
-                        MessageHelper.sendMessageToChannel(
-                                player2.getCardsInfoThread(),
-                                player2.getRepresentationUnfogged()
-                                        + ", because you voted \"Against\" on _Representative Government_, "
-                                        + String.join(", ", exhausted.subList(0, exhausted.size() - 1))
-                                        + " and "
-                                        + exhausted.getLast() + " have been exhausted.");
-                    } else if (exhausted.size() == 1) {
-                        MessageHelper.sendMessageToChannel(
-                                player2.getCardsInfoThread(),
-                                player2.getRepresentationUnfogged()
-                                        + ", because you voted \"Against\" on _Representative Government_, "
-                                        + exhausted.getFirst() + " has been exhausted.");
-                    } else {
-                        MessageHelper.sendMessageToChannel(
-                                player2.getCardsInfoThread(),
-                                player2.getRepresentationUnfogged()
-                                        + ", though you voted \"Against\" on  _Representative Government_,"
-                                        + " you have no cultural planets to exhaust.");
-                    }
+                    var exhausted = PlanetEffectService.exhaustControlledPlanets(
+                            player2, game, location -> location.planet().hasType("cultural"));
+                    PlanetEffectService.sendExhaustionSummary(
+                            player2,
+                            game,
+                            exhausted,
+                            ", because you voted \"Against\" on _Representative Government_, ",
+                            ", though you voted \"Against\" on  _Representative Government_, you have no cultural planets to exhaust.");
                 }
             }
             game.setStoredValue("agendaRepGov", "");
@@ -524,7 +473,7 @@ public class StartPhaseService {
                 if (speaker != null) {
                     sb.append(MiscEmojis.SpeakerToken)
                             .append(' ')
-                            .append(speaker.getRepresentation())
+                            .append(speaker.toString())
                             .append('\n');
                 }
                 for (var i = 0; i < priorityTrack.size(); i++) {
@@ -536,7 +485,7 @@ public class StartPhaseService {
                         sb.append(String.format("%d. ~~%s~~\n", priority, player.getRepresentationNoPing()));
                     } else {
                         Player player = priorityTrack.get(i);
-                        sb.append(String.format("%d. %s\n", priority, player.getRepresentation()));
+                        sb.append(String.format("%d. %s\n", priority, player.toString()));
                     }
                 }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
@@ -634,7 +583,7 @@ public class StartPhaseService {
         }
 
         // Pulsar destruction logic
-        game.getTileMap().values().stream()
+        game.getTiles().stream()
                 .filter(tile -> "sig02".equals(tile.getTileID()))
                 .forEach(pulsar -> pulsar.getSpaceUnitHolder()
                         .getUnitColorsOnHolder()
@@ -790,10 +739,10 @@ public class StartPhaseService {
                 if (tile == null) {
                     continue;
                 }
-                UnitHolder unitHolder = tile.getUnitHolders().get(pl);
+                UnitHolder unitHolder = tile.getPlanet(pl);
                 if (unitHolder != null
                         && unitHolder.getTokenList() != null
-                        && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
+                        && unitHolder.containsToken("attachment_tombofemphidia.png")) {
                     MessageHelper.sendMessageToChannel(
                             player.getCardsInfoThread(),
                             player.getRepresentationUnfogged()
@@ -865,9 +814,7 @@ public class StartPhaseService {
         // first do cleanup if necessary
         int playersWithSCs = 0;
         for (Player player : game.getRealPlayers()) {
-            if (player.getSCs() != null
-                    && !player.getSCs().isEmpty()
-                    && !player.getSCs().contains(0)) {
+            if (player.getSCs() != null && !player.getSCs().isEmpty() && !player.hasStrategyCard(0)) {
                 playersWithSCs++;
             }
         }
@@ -910,7 +857,7 @@ public class StartPhaseService {
                         "Resolve Absol Minister Of Policy"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " please resolve Absol Minister Of Policy",
+                        player.toString() + " please resolve Absol Minister Of Policy",
                         absButtons);
             }
         }
@@ -1264,7 +1211,7 @@ public class StartPhaseService {
                         + " Feel free to not do this. **Trade** is never available for this feature due to **Trade** sometimes being mandatory.";
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), preDeclineMsg);
                 for (Integer sc : game.getSCList()) {
-                    if (p2.getSCs().contains(sc)
+                    if (p2.hasStrategyCard(sc)
                             || game.getStrategyCardModelByInitiative(sc).get().usesAutomationForSCID("pok5trade")
                             || !scPickedList.contains(sc)) {
                         continue;

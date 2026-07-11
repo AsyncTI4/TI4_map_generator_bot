@@ -107,7 +107,7 @@ public class PickStrategyCardService {
                 == 1) { // if there is only one strategy card left to pick (4p/8p games), force pick last strategy card
             MessageHelper.sendMessageToChannel(
                     privatePlayer.getCorrectChannel(),
-                    privatePlayer.getRepresentation()
+                    privatePlayer.toString()
                             + ", you have only one available strategy card to pick. Bot will force pick for you.");
             int unpickedStrategyCard = 0;
             for (Integer sc : game.getSCList()) {
@@ -117,7 +117,7 @@ public class PickStrategyCardService {
                     if (p == null || p.getFaction() == null) {
                         continue;
                     }
-                    if (p.getSCs() != null && p.getSCs().contains(sc)) {
+                    if (p.getSCs() != null && p.hasStrategyCard(sc)) {
                         held = true;
                         break;
                     }
@@ -164,7 +164,7 @@ public class PickStrategyCardService {
                 int sc = Integer.parseInt(scNum);
                 boolean held = false;
                 for (Player p : game.getRealPlayers()) {
-                    if (p.getSCs() != null && p.getSCs().contains(sc)) {
+                    if (p.getSCs() != null && p.hasStrategyCard(sc)) {
                         held = true;
                         break;
                     }
@@ -216,7 +216,7 @@ public class PickStrategyCardService {
             if (p == null || p.getFaction() == null) {
                 continue;
             }
-            if (p.getFaction().equals(player.getFaction())) {
+            if (p.isFactionExact(player.getFaction())) {
                 break;
             }
             scPickOrder++;

@@ -26,8 +26,7 @@ public class TfArbitrateResolver implements EdictResolver {
 
     public void handle(ButtonInteractionEvent event, Game game, Player player) {
         String msg = gamePing(
-                game,
-                "-# You must get permission from " + player.getRepresentation() + " in order to resolve this edict.");
+                game, "-# You must get permission from " + player.toString() + " in order to resolve this edict.");
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, buttons);
     }
 }

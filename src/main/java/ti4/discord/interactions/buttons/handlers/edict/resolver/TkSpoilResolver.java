@@ -120,7 +120,7 @@ public class TkSpoilResolver implements EdictResolver {
             int amt = Math.round(model.getCost());
             String msg = player.getRepresentationUnfogged() + " has removed 1 " + unitName;
             msg += " from tile " + tile.getRepresentationForButtons(game, player) + ",";
-            msg += " giving " + (game.isFowMode() ? "the tyrant" : tyrant.getRepresentation());
+            msg += " giving " + (game.isFowMode() ? "the tyrant" : tyrant.toString());
             msg += " " + amt + " trade goods " + MiscEmojis.tg(amt);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 

@@ -58,7 +58,7 @@ public class TacticalActionDisplacementService {
 
     public Map<String, Map<UnitKey, List<Integer>>> reverseTileUnitMovement(Game game, Player player, Tile tile) {
         Map<String, Map<UnitKey, List<Integer>>> displaced = game.getTacticalActionDisplacement();
-        for (UnitHolder uh : tile.getUnitHolders().values()) {
+        for (UnitHolder uh : tile.getUnitHolderValues()) {
             String key = unitHolderKey(tile, uh);
             if (!displaced.containsKey(key)) continue;
 
@@ -87,7 +87,7 @@ public class TacticalActionDisplacementService {
         }
 
         Set<Player> allowedAllies = resolveAllowedAllies(game, player, tile);
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+        for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
             processUnitHolderMovement(game, player, allowedAllies, tile, unitHolder, displaced, movableFromPlanets);
         }
         return displaced;
@@ -119,7 +119,7 @@ public class TacticalActionDisplacementService {
             int amt,
             UnitState state,
             String color) {
-        UnitHolder uh = planetName == null ? tile.getSpaceUnitHolder() : tile.getUnitHolderFromPlanet(planetName);
+        UnitHolder uh = planetName == null ? tile.getSpaceUnitHolder() : tile.getPlanet(planetName);
         if (uh == null) return game.getTacticalActionDisplacement();
         String uhKey = unitHolderKey(tile, uh);
 
@@ -146,7 +146,7 @@ public class TacticalActionDisplacementService {
             int amt,
             UnitState state,
             String color) {
-        UnitHolder uh = planetName == null ? tile.getSpaceUnitHolder() : tile.getUnitHolderFromPlanet(planetName);
+        UnitHolder uh = planetName == null ? tile.getSpaceUnitHolder() : tile.getPlanet(planetName);
         if (uh == null) return game.getTacticalActionDisplacement();
         String uhKey = unitHolderKey(tile, uh);
 
@@ -212,9 +212,8 @@ public class TacticalActionDisplacementService {
             Tile srcTile = game.getTileByPosition(pos);
             if (srcTile == null) continue;
 
-            UnitHolder srcHolder = "space".equalsIgnoreCase(uhName)
-                    ? srcTile.getSpaceUnitHolder()
-                    : srcTile.getUnitHolderFromPlanet(uhName);
+            UnitHolder srcHolder =
+                    "space".equalsIgnoreCase(uhName) ? srcTile.getSpaceUnitHolder() : srcTile.getPlanet(uhName);
             if (srcHolder == null) continue;
 
             for (Entry<UnitKey, List<Integer>> unitEntry : e.getValue().entrySet()) {
@@ -275,7 +274,7 @@ public class TacticalActionDisplacementService {
         Set<Player> allowed = new HashSet<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) continue;
-            if (!player.getAllianceMembers().contains(p2.getFaction())) continue;
+            if (!player.hasAllianceMember(p2.getFaction())) continue;
             if (tile.hasPlayerCC(p2)) continue;
             allowed.add(p2);
         }

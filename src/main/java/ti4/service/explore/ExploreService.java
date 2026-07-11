@@ -26,7 +26,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvax
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
 import ti4.game.Leader;
-import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -68,6 +67,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.PlanetService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class ExploreService {
@@ -82,7 +82,7 @@ public class ExploreService {
             Game game,
             int numExplores,
             boolean ownerShipOverride) {
-        if (!player.getPlanetsAllianceMode().contains(planetName) && !ownerShipOverride) {
+        if (!player.canUsePlanet(planetName) && !ownerShipOverride) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "You do not control this planet, thus cannot explore it.");
             return;
@@ -190,7 +190,7 @@ public class ExploreService {
                     exploreModelC.getRepresentationEmbed(),
                     exploreModelH.getRepresentationEmbed(),
                     exploreModelI.getRepresentationEmbed());
-            String message = player.getRepresentation() + " please choose 1 exploration card to resolve.";
+            String message = player.toString() + " please choose 1 exploration card to resolve.";
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
             return;
         }
@@ -228,13 +228,13 @@ public class ExploreService {
                     }
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                         Units.UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
-                        Tile tileWithPlanet = game.getTileFromPlanet(planetName);
+                        Tile tileWithPlanet = game.getTileContainingPlanet(planetName);
                         if (tileWithPlanet == null) {
                             MessageHelper.sendMessageToEventChannel(
                                     event, "An error occurred while placing 1 infantry. Resolve manually.");
                             return;
                         }
-                        tileWithPlanet.getUnitHolders().get(planetName).addUnit(infKey, 1);
+                        tileWithPlanet.getPlanet(planetName).addUnit(infKey, 1);
                         MessageHelper.sendMessageToChannel(
                                 (MessageChannel) event.getChannel(),
                                 "Added infantry to " + planetName
@@ -303,7 +303,7 @@ public class ExploreService {
                     List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
                     List<MessageEmbed> embeds =
                             List.of(exploreModel1.getRepresentationEmbed(), exploreModel2.getRepresentationEmbed());
-                    String message = player.getRepresentation() + " please choose 1 exploration card to resolve.";
+                    String message = player.toString() + " please choose 1 exploration card to resolve.";
                     MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                             event.getMessageChannel(), message, embeds, buttons);
                     return;
@@ -311,7 +311,7 @@ public class ExploreService {
             }
         }
         if ((player.hasAbility("deep_mining") || player.hasTech("tf-deepinstallations")) && tile != null) {
-            UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+            UnitHolder unitHolder = tile.getPlanet(planetName);
             if (unitHolder.getUnitCount(Units.UnitType.Mech, player.getColor()) > 0
                     || unitHolder.getUnitCount(Units.UnitType.Spacedock, player.getColor()) > 0
                     || unitHolder.getUnitCount(Units.UnitType.Pds, player.getColor()) > 0) {
@@ -332,7 +332,7 @@ public class ExploreService {
             player.setBreakthroughExhausted("kolleccbt", true);
             MessageHelper.sendMessageToChannel(
                     (MessageChannel) event.getChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + " has exhausted _The Collector's Museum_ to explore from the discard pile of "
                             + drawColor + " on " + planetName
                             + ". Not yet implemented fully. Please use `/explore shuffle_back_into_deck` and then `/explore use` to resolve (and then maybe `/explore shuffle_back_into_deck` back into deck again).");
@@ -344,10 +344,9 @@ public class ExploreService {
             return;
         }
         String position_ = tile == null ? "none" : tile.getPosition();
-        String messageText =
-                player.getRepresentation() + " explored " + ExploreEmojis.getTraitEmoji(drawColor) + "Planet "
-                        + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " in tile "
-                        + position_ + ":";
+        String messageText = player.toString() + " explored " + ExploreEmojis.getTraitEmoji(drawColor) + "Planet "
+                + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " in tile "
+                + position_ + ":";
         if (player.hasUnexhaustedLeader("lanefiragent")) {
             ExploreModel exploreModel = Mapper.getExplore(cardID);
             String name1 = exploreModel.getName();
@@ -468,13 +467,13 @@ public class ExploreService {
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
             Units.UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
-            Tile tileWithPlanet = game.getTileFromPlanet(planetName);
+            Tile tileWithPlanet = game.getTileContainingPlanet(planetName);
             if (tileWithPlanet == null) {
                 MessageHelper.sendMessageToEventChannel(
                         event, "An error occurred while placing 1 infantry. Resolve manually.");
                 return;
             }
-            tileWithPlanet.getUnitHolders().get(planetName).addUnit(infKey, 1);
+            tileWithPlanet.getPlanet(planetName).addUnit(infKey, 1);
             MessageHelper.sendMessageToChannel(
                     (MessageChannel) event.getChannel(),
                     "Added infantry to " + planetName + " because of Master Halbert, the Lanefir Commander.");
@@ -482,7 +481,7 @@ public class ExploreService {
         if (player.hasTech("dslaner")) {
             player.setAtsCount(player.getAtsCount() + numExplores);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                    event.getMessageChannel(), player.toString() + " put 1 commodity on _ATS Armaments_.");
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "tacommander")) {
             TaLeadersHandler.resolveTaCommander(player, tile, game, planetName);
@@ -512,9 +511,9 @@ public class ExploreService {
         String[] info = bID.split("_");
         String cardID = info[0];
         String planetName = info[1];
-        Tile tile = game.getTileFromPlanet(planetName);
+        Tile tile = game.getTileContainingPlanet(planetName);
         String tileName = tile == null ? "no tile" : tile.getPosition();
-        String messageText = player.getRepresentation() + " explored the planet "
+        String messageText = player.toString() + " explored the planet "
                 + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " in tile "
                 + tileName + ":";
         if (buttonID.contains("_distantSuns")) {
@@ -527,7 +526,7 @@ public class ExploreService {
 
     private static void resolveExploreAuto(
             GenericInteractionCreateEvent event, Player player, String cardID, String planetName, Game game) {
-        Tile tile = game.getTileFromPlanet(planetName);
+        Tile tile = game.getTileContainingPlanet(planetName);
         String messageText = player.getRepresentationNoPing() + " \"chose\" to resolve _"
                 + Mapper.getExplore(cardID).getName() + "_.";
         resolveExplore(event, cardID, tile, planetName, messageText, player, game);
@@ -592,7 +591,7 @@ public class ExploreService {
                         + StringUtils.capitalize(message.toString()));
 
         if (tile == null) {
-            tile = game.getTileFromPlanet(planetID);
+            tile = game.getTileContainingPlanet(planetID);
         }
 
         // Generic Resolution Handling
@@ -685,7 +684,7 @@ public class ExploreService {
                                             game,
                                             "\\> \"" + String.join("", structures) + "⁉️" + UnitEmojis.Blank
                                                     + "🇾​🇪​🇪​🇹‼️\"\n\\- _Demilitarized Zone_, to "
-                                                    + p2.getRepresentation() + ", in " + game.getName() + ".");
+                                                    + p2.toString() + ", in " + game.getName() + ".");
                                 }
                             }
                         }
@@ -708,7 +707,7 @@ public class ExploreService {
                                         + " because it is an entropic scar and cannot have wormholes.");
                     } else {
                         if ("ionalpha".equalsIgnoreCase(token)) {
-                            message = new StringBuilder(player.getRepresentation()
+                            message = new StringBuilder(player.toString()
                                     + ", please choose if the _Ion Storm_ is placed on its alpha or beta side.");
                             List<Button> buttonIon = new ArrayList<>();
                             buttonIon.add(Buttons.gray(
@@ -726,7 +725,7 @@ public class ExploreService {
                             if ("gamma".equalsIgnoreCase(token) && "mallice".equals(planetID) && !game.isFowMode()) {
                                 DisasterWatchHelper.sendMessageInDisasterWatch(
                                         game,
-                                        player.getRepresentation() + " has explored Mallice in " + game.getName()
+                                        player.toString() + " has explored Mallice in " + game.getName()
                                                 + ", and discovered the _Gamma Wormhole_.");
                             }
                             DSHelperBreakthroughs.doLanefirBtCheck(game, player);
@@ -745,13 +744,13 @@ public class ExploreService {
                                     && !game.didPlayerScoreThisAlready(player.getUserID(), "deep_space")) {
                                 DisasterWatchHelper.sendMessageInDisasterWatch(
                                         game,
-                                        player.getRepresentation() + " is attempting to _Explore Deep Space_ in "
+                                        player.toString() + " is attempting to _Explore Deep Space_ in "
                                                 + game.getName() + ". Alas, alack, they have discovered Mirage!");
                             } else if (game.getRevealedPublicObjectives().containsKey("vast_territories")
                                     && !game.didPlayerScoreThisAlready(player.getUserID(), "vast_territories")) {
                                 DisasterWatchHelper.sendMessageInDisasterWatch(
                                         game,
-                                        player.getRepresentation() + " is attempting to _Patrol Vast Territories_ in "
+                                        player.toString() + " is attempting to _Patrol Vast Territories_ in "
                                                 + game.getName() + ". Alas, alack, they have discovered Mirage!");
                             }
                         }
@@ -853,7 +852,7 @@ public class ExploreService {
                                 || game.getPhaseOfGame().contains("agenda"))
                         && player.hasUnit("saar_mech")
                         && !ButtonHelper.isLawInPlay(game, "articles_war")
-                        && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
+                        && UnitQueryService.countUnits(game, player, "mech") < 4) {
                     List<Button> saarButton = new ArrayList<>();
                     saarButton.add(Buttons.green(
                             "saarMechRes_" + "mirage",
@@ -867,7 +866,7 @@ public class ExploreService {
                             saarButton);
                 }
 
-                String exploredMessage = player.getRepresentation() + " explored the planet " + ExploreEmojis.Cultural
+                String exploredMessage = player.toString() + " explored the planet " + ExploreEmojis.Cultural
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(mirageID, game)
                         + (tile == null ? "" : " in tile " + tile.getPosition() + ":");
                 // MessageHelper.sendMessageToEventChannel(event, message);
@@ -892,7 +891,7 @@ public class ExploreService {
                 game.setComponentAction(true);
                 MessageHelper.sendMessageToChannelWithButton(
                         event.getMessageChannel(),
-                        player.getRepresentation() + ", please use the button to research a technology.",
+                        player.toString() + ", please use the button to research a technology.",
                         Buttons.GET_A_FREE_TECH);
             }
             case "aw1", "aw2", "aw3", "aw4" -> {
@@ -920,8 +919,7 @@ public class ExploreService {
             }
             case "mo1", "mo2", "mo3" -> {
                 if (tile != null && planetID != null) {
-                    Set<String> tokenList = ButtonHelper.getUnitHolderFromPlanetName(planetID, game)
-                            .getTokenList();
+                    Set<String> tokenList = game.getPlanet(planetID).getTokenList();
                     boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
                     if (!containsDMZ) {
                         AddUnitService.addUnits(event, tile, game, player.getColor(), "inf " + planetID);
@@ -958,22 +956,14 @@ public class ExploreService {
                 discardButtons.add(
                         Buttons.gray("discardExploreTop_frontier", "Discard Top Frontier", ExploreEmojis.Frontier));
                 discardButtons.add(Buttons.red("deleteButtons", "Done Resolving"));
-                message = new StringBuilder(player.getRepresentation()
+                message = new StringBuilder(player.toString()
                         + " you may use the buttons to discard the top of the exploration decks if you choose.");
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(), message.toString(), discardButtons);
-                List<Button> explorePlanets = new ArrayList<>();
-                for (String planet : player.getPlanetsAllianceMode()) {
-                    Planet unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-                    if (unitHolder == null) {
-                        continue;
-                    }
-                    Planet planetReal = unitHolder;
-                    List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
-                    if (buttons != null && !buttons.isEmpty()) {
-                        explorePlanets.addAll(buttons);
-                    }
-                }
+                List<Button> explorePlanets = game.streamUsablePlanetLocations(player)
+                        .flatMap(location ->
+                                ButtonHelper.getPlanetExplorationButtons(game, location.planet(), player).stream())
+                        .toList();
                 message = new StringBuilder("Click button to explore a planet after resolving any discards");
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(), message.toString(), explorePlanets);
@@ -986,7 +976,7 @@ public class ExploreService {
             }
             case "lf1", "lf2", "lf3", "lf4" -> {
                 message = new StringBuilder(
-                        player.getRepresentation() + " please resolve _Local Fabricators_:\n-# You currently have "
+                        player.toString() + " please resolve _Local Fabricators_:\n-# You currently have "
                                 + StringHelper.pluralize(player.getTg(), "trade good") + " and "
                                 + player.getCommoditiesRepresentation() + " commodit"
                                 + (player.getCommodities() == 1 ? "y" : "ies") + ".");
@@ -1045,8 +1035,7 @@ public class ExploreService {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
             }
             case "exp1", "exp2", "exp3" -> {
-                message =
-                        new StringBuilder(player.getRepresentation() + ", please resolve _Expedition_:\n-# You have ");
+                message = new StringBuilder(player.toString() + ", please resolve _Expedition_:\n-# You have ");
                 message.append(
                         ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID));
                 List<Button> buttons = new ArrayList<>();
@@ -1070,14 +1059,14 @@ public class ExploreService {
                 }
             }
             case "frln1", "frln2", "frln3" -> {
-                message = new StringBuilder(player.getRepresentation() + ", please resolve _Freelancers_:\n-# "
+                message = new StringBuilder(player.toString() + ", please resolve _Freelancers_:\n-# "
                         + ButtonHelper.getListOfStuffAvailableToSpend(player, game, false));
                 Button gainTG = Buttons.green("freelancersBuild_" + planetID, "Produce 1 Unit");
                 List<Button> buttons = List.of(gainTG, decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
             }
             case "cm1", "cm2", "cm3" -> {
-                message = new StringBuilder(player.getRepresentation() + ", please resolve _Core Mine_:\n-# You have ");
+                message = new StringBuilder(player.toString() + ", please resolve _Core Mine_:\n-# You have ");
                 message.append(
                         ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID));
                 List<Button> buttons = new ArrayList<>();
@@ -1099,7 +1088,7 @@ public class ExploreService {
                 }
             }
             case "vfs1", "vfs2", "vfs3" -> {
-                message = new StringBuilder(player.getRepresentation()
+                message = new StringBuilder(player.toString()
                         + ", please resolve _Volatile Fuel Source_:\n-# Your current command tokens are "
                         + player.getCCRepresentation() + ".");
                 message.append(" and you have ")
@@ -1125,8 +1114,7 @@ public class ExploreService {
                 }
             }
             case "warforgeruins" -> {
-                message = new StringBuilder(
-                        player.getRepresentation() + ", please resolve _War Forge Ruins_:\n-# You have ");
+                message = new StringBuilder(player.toString() + ", please resolve _War Forge Ruins_:\n-# You have ");
                 message.append(
                         ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID));
                 List<Button> buttons = new ArrayList<>();
@@ -1157,7 +1145,7 @@ public class ExploreService {
                 }
             }
             case "seedyspaceport" -> {
-                message = new StringBuilder(player.getRepresentation()
+                message = new StringBuilder(player.toString()
                         + ", please resolve _Seedy Spaceport_:\n-# You have "
                         + ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID));
                 List<Button> buttons = new ArrayList<>();
@@ -1208,7 +1196,7 @@ public class ExploreService {
             case "ancientshipyard" -> {
                 List<String> colors = tile == null
                         ? Collections.emptyList()
-                        : tile.getUnitHolders().get("space").getUnitColorsOnHolder();
+                        : tile.getSpaceUnitHolder().getUnitColorsOnHolder();
                 if (colors.isEmpty() || colors.contains(player.getColorID())) {
                     AddUnitService.addUnits(event, tile, game, player.getColor(), "cruiser");
                     MessageHelper.sendMessageToEventChannel(event, "Cruiser added to the system automatically.");
@@ -1260,17 +1248,17 @@ public class ExploreService {
         }
 
         CommanderUnlockCheckService.checkPlayer(player, "kollecc", "bentor", "ghost");
-        if (player.getPlanets().contains(planetID)) {
+        if (player.containsPlanet(planetID)) {
             ButtonHelperAbilities.offerOrladinPlunderButtons(player, game, planetID);
         }
 
-        if (player.getPlanets().contains(planetID) && player.hasAbility("planetary_reconfiguration")) {
+        if (player.containsPlanet(planetID) && player.hasAbility("planetary_reconfiguration")) {
             TaAbilityHandler.offerPlanetaryReconfigurationButtons(player, game, tile, planetID);
         }
 
         if (player.hasAbility("awaken")
                 && !game.getAllPlanetsWithSleeperTokens().contains(planetID)
-                && player.getPlanetsAllianceMode().contains(planetID)
+                && player.canUsePlanet(planetID)
                 && !game.isTwilightsFallMode()) {
             Button placeSleeper = Buttons.green(
                     "putSleeperOnPlanet_" + planetID,
@@ -1293,23 +1281,22 @@ public class ExploreService {
 
     public static void expFront(
             GenericInteractionCreateEvent event, Tile tile, Game game, Player player, boolean force, String cardID) {
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
-        if (space.getTokenList().contains(frontierFilename) || force) {
-            if (space.getTokenList().contains(frontierFilename) && !force) {
+        if (space.containsToken(frontierFilename) || force) {
+            if (space.containsToken(frontierFilename) && !force) {
                 space.removeToken(frontierFilename);
             }
             cardID = cardID == null ? game.drawExplore(Constants.FRONTIER) : cardID;
             boolean isSlashForce = force && event instanceof SlashCommandInteractionEvent;
-            String messageText = player.getRepresentation() + (isSlashForce ? " force" : "") + " explored the "
+            String messageText = player.toString() + (isSlashForce ? " force" : "") + " explored the "
                     + ExploreEmojis.Frontier + "frontier token in tile " + tile.getPosition() + ":";
             resolveExplore(event, cardID, tile, null, messageText, player, game);
 
             if (player.hasTech("dslaner")) {
                 player.setAtsCount(player.getAtsCount() + 1);
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                        player.getCorrectChannel(), player.toString() + " put 1 commodity on _ATS Armaments_.");
             }
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "No frontier token in given system.");
@@ -1318,18 +1305,18 @@ public class ExploreService {
 
     public static void expFrontAlreadyDone(
             GenericInteractionCreateEvent event, Tile tile, Game game, Player player, String cardID) {
-        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder space = tile.getSpaceUnitHolder();
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
-        if (space.getTokenList().contains(frontierFilename)) {
+        if (space.containsToken(frontierFilename)) {
             space.removeToken(frontierFilename);
-            String messageText = player.getRepresentation() + " explored the " + ExploreEmojis.Frontier
+            String messageText = player.toString() + " explored the " + ExploreEmojis.Frontier
                     + "frontier token in tile " + tile.getPosition() + ":";
             resolveExplore(event, cardID, tile, null, messageText, player, game);
 
             if (player.hasTech("dslaner")) {
                 player.setAtsCount(player.getAtsCount() + 1);
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                        event.getMessageChannel(), player.toString() + " put 1 commodity on _ATS Armaments_.");
             }
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No frontier token in given system.");

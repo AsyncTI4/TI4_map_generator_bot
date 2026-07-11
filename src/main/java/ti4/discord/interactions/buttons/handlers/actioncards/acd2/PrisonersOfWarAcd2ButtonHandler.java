@@ -118,11 +118,10 @@ class PrisonersOfWarAcd2ButtonHandler {
         String pnName = Mapper.getPromissoryNote(pnId).getName();
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
-                "# " + player.getRepresentation() + " you gave the promissory note _" + pnName
-                        + "_ for _Prisoners of War_.");
+                "# " + player.toString() + " you gave the promissory note _" + pnName + "_ for _Prisoners of War_.");
         MessageHelper.sendMessageToChannel(
                 receiver.getCardsInfoThread(),
-                "# " + receiver.getRepresentation() + " you gained the promissory note _" + pnName
+                "# " + receiver.toString() + " you gained the promissory note _" + pnName
                         + "_ from _Prisoners of War_.");
 
         sendCommandTokenButtons(receiver, game, player);
@@ -153,7 +152,7 @@ class PrisonersOfWarAcd2ButtonHandler {
 
     private static void sendCommandTokenButtons(Player player, Game game, Player target) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tile != null && !tile.isHomeSystem(game) && FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + "prisonersOfWarPlaceCC_" + target.getFaction() + "_"

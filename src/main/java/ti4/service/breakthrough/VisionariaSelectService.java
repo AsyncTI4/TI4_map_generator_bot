@@ -124,7 +124,7 @@ public class VisionariaSelectService {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
             if (player.getTg() > 2) {
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(), player.getRepresentation() + " automatically spent 3 trade goods.");
+                        player.getCorrectChannel(), player.toString() + " automatically spent 3 trade goods.");
                 player.setTg(player.getTg() - 3);
             }
             Player deepwrought = Helper.getPlayerFromUnlockedBreakthrough(game, "deepwroughtbt");
@@ -132,7 +132,7 @@ public class VisionariaSelectService {
 
                 // Send PN to DWS
                 List<Button> sendPNbuttons = ButtonHelper.getForcedPNSendButtons(game, deepwrought, player);
-                String dwsPromMsg = player.getRepresentation() + ", please choose a promissory note to send to "
+                String dwsPromMsg = player.toString() + ", please choose a promissory note to send to "
                         + deepwrought.getRepresentation(false, false) + " as part of _" + visionariaName() + "_.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), dwsPromMsg, sendPNbuttons);
             }
@@ -179,8 +179,7 @@ public class VisionariaSelectService {
             EndTurnService.endTurnAndUpdateMap(null, game, activePlayer);
 
         } else if (game.getStoredValue("fleetLogAfterVisionaria").equals(activePlayer.getFaction())) {
-            String message =
-                    activePlayer.getRepresentation() + ", please use these buttons to end turn or do another action.";
+            String message = activePlayer.toString() + ", please use these buttons to end turn or do another action.";
             List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(activePlayer, game, true, event);
             MessageHelper.sendMessageToChannelWithButtons(activePlayer.getCorrectChannel(), message, systemButtons);
         }
@@ -205,7 +204,7 @@ public class VisionariaSelectService {
 
             // Send PN to DWS
             List<Button> sendPNbuttons = ButtonHelper.getForcedPNSendButtons(game, deepwrought, player);
-            String dwsPromMsg = player.getRepresentation() + ", please choose a promissory note to send to "
+            String dwsPromMsg = player.toString() + ", please choose a promissory note to send to "
                     + deepwrought.getColorIfCanSeeStats(player) + " as part of _" + visionariaName() + "_.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), dwsPromMsg, sendPNbuttons);
         }

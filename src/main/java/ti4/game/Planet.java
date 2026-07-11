@@ -379,6 +379,10 @@ public class Planet extends UnitHolder {
         return types;
     }
 
+    public boolean hasType(String type) {
+        return getPlanetTypes().contains(type);
+    }
+
     @JsonIgnore
     public boolean hasTechSpecialty(TechnologyType type) {
         return techSpeciality.contains(type.toString().toLowerCase())
@@ -420,7 +424,7 @@ public class Planet extends UnitHolder {
 
     @JsonIgnore
     public boolean isHomePlanet(Game game) {
-        Tile t = game.getTileFromPlanet(getName());
+        Tile t = game.getTileContainingPlanet(getName());
         if (t != null) return t.isHomeSystem(game);
         return false;
     }

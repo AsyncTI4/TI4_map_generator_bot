@@ -34,7 +34,7 @@ class DefenseInstallationAcd2ButtonHandler {
     public static void resolveDefenseInstallationStep2(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "pds " + planet);
+        AddUnitService.addUnits(event, game.getTileContainingPlanet(planet), game, player.getColor(), "pds " + planet);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),

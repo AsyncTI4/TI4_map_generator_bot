@@ -72,9 +72,7 @@ class ShowPN extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, "Promissory note has been shown.");
         } else {
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    player.getRepresentation() + " has shown a promissory note to " + targetPlayer.getRepresentation()
-                            + ".");
+                    event, player.toString() + " has shown a promissory note to " + targetPlayer.toString() + ".");
         }
         String message = player.getRepresentation(false, false) + " has shown you a promissory note:";
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, longPNDisplay);

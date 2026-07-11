@@ -22,8 +22,8 @@ class ContingencyAcd2ButtonHandler {
         String pos = game.getActiveSystem();
         List<Button> buttons = Helper.getPlaceUnitButtons(
                 event, player, game, game.getTileByPosition(pos), type, "placeOneNDone_dontskipcontingency");
-        String message = player.getRepresentation()
-                + ", use the buttons to place up to 2 ships that have a combined cost of 3 or less.";
+        String message =
+                player.toString() + ", use the buttons to place up to 2 ships that have a combined cost of 3 or less.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }

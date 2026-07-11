@@ -48,7 +48,7 @@ public class TheIconService {
 
     public List<String> getEligibleIconDestinations(Game game, Player player) {
         List<String> destinations = new ArrayList<>();
-        for (Tile t : game.getTileMap().values()) {
+        for (Tile t : game.getTiles()) {
             if (!CommandCounterHelper.hasCC(player, t)) continue;
             if (!t.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsGroundForce)) continue;
             // don't bother including a button for the active system production
@@ -140,7 +140,7 @@ public class TheIconService {
                     Tile src = game.getTileByPosition(pos);
                     int amt = entry.getValue();
                     UnitKey key = Units.getUnitKey(type, player.getColor());
-                    var states = src.getUnitHolders().get(uhName).removeUnit(key, amt, UnitState.none);
+                    var states = src.getUnitHolder(uhName).removeUnit(key, amt, UnitState.none);
                     dest.getSpaceUnitHolder().addUnitsWithStates(key, states);
                     movedSummary
                             .append("\n> ")
@@ -148,7 +148,7 @@ public class TheIconService {
                 }
             }
 
-            String msg = player.getRepresentation() + " produced the following units in "
+            String msg = player.toString() + " produced the following units in "
                     + dest.getRepresentationForButtons(game, player) + " using " + theIcon() + ":";
             msg += movedSummary;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);

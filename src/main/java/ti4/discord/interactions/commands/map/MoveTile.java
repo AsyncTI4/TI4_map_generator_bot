@@ -52,8 +52,7 @@ public class MoveTile extends GameStateSubcommand {
         CustomHyperlaneService.moveCustomHyperlaneData(tileFromPosition, tileToPosition, game);
 
         MessageHelper.sendMessageToEventChannel(
-                event,
-                "Moved tile " + movingTile.getRepresentation() + " from " + tileFromPosition + " to " + tileToPosition);
+                event, "Moved tile " + movingTile.toString() + " from " + tileFromPosition + " to " + tileToPosition);
 
         game.rebuildTilePositionAutoCompleteList();
     }

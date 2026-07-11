@@ -90,7 +90,7 @@ public class SettlementsAcd2ButtonHandler {
             return;
         }
         String planet = payload.substring(separator + 1);
-        Tile tile = game.getTileFromPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
         ButtonHelper.deleteMessage(event);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Settlements_.");
@@ -118,7 +118,7 @@ public class SettlementsAcd2ButtonHandler {
         Set<String> planets = new LinkedHashSet<>();
         for (Player voter : votersFor(game, outcome)) {
             for (String planet : voter.getPlanets()) {
-                Planet uH = game.getUnitHolderFromPlanet(planet);
+                Planet uH = game.getPlanet(planet);
                 if (uH != null && !uH.isHomePlanet(game)) {
                     planets.add(planet);
                 }

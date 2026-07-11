@@ -20,7 +20,7 @@ class SpatialCollapseAcd2ButtonHandler {
 
     private static List<Button> getSpatialCollapseTilesStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tile.getPosition().contains("t")
                     || tile.getPosition().contains("b")
                     || tile.isHomeSystem(game)

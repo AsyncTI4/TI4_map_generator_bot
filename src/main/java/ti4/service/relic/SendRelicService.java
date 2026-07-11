@@ -17,7 +17,7 @@ public class SendRelicService {
             GenericInteractionCreateEvent event, Game game, Player player1, Player player2, String relicID) {
         boolean exhausted = player1.getExhaustedRelics().contains(relicID);
         if ("thetriad".equals(relicID)) {
-            exhausted = player1.getExhaustedPlanets().contains("triad");
+            exhausted = player1.isPlanetExhausted("triad");
         }
 
         // Transfer the relic
@@ -42,8 +42,8 @@ public class SendRelicService {
         }
 
         RelicModel relicModel = Mapper.getRelic(relicID);
-        String sb = player1.getRepresentation() + " sent a relic to "
-                + player2.getRepresentation() + "\n"
+        String sb = player1.toString() + " sent a relic to "
+                + player2.toString() + "\n"
                 + relicModel.getSimpleRepresentation();
         MessageHelper.sendMessageToChannel(player1.getCorrectChannel(), sb);
         if (game.isFowMode()) MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), sb);

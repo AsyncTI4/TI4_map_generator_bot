@@ -117,11 +117,11 @@ class ExploreButtonHandler {
         }
 
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
-        Planet planet = tile.getUnitHolderFromPlanet(planetID);
+        Planet planet = tile.getPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
         ButtonHelper.resolveInfantryRemoval(player, 1, tile);
 
-        String message = player.getRepresentation() + " is removing an infantry to resolve _Volatile Fuel Source_.";
+        String message = player.toString() + " is removing an infantry to resolve _Volatile Fuel Source_.";
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         message = " Please gain 1 command token. Your current command tokens are " + player.getCCRepresentation() + ".";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
@@ -164,12 +164,12 @@ class ExploreButtonHandler {
         }
 
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
-        Planet planet = tile.getUnitHolderFromPlanet(planetID);
+        Planet planet = tile.getPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
         ButtonHelper.resolveInfantryRemoval(player, 1, tile);
 
         PlanetService.refreshPlanet(player, planetID);
-        String message = player.getRepresentation() + " is removing an infantry to resolve _Expedition_. ";
+        String message = player.toString() + " is removing an infantry to resolve _Expedition_. ";
         message += Helper.getPlanetRepresentation(planetID, game) + " has been readied.";
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelper.deleteMessage(event);
@@ -205,11 +205,11 @@ class ExploreButtonHandler {
         }
 
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
-        Planet planet = tile.getUnitHolderFromPlanet(planetID);
+        Planet planet = tile.getPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
         ButtonHelper.resolveInfantryRemoval(player, 1, tile);
 
-        String message = player.getRepresentation() + " is removing an infantry to resolve _Core Mine_. ";
+        String message = player.toString() + " is removing an infantry to resolve _Core Mine_. ";
         message += " Gained 1 trade good " + player.gainTG(1, true) + ".";
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
@@ -232,7 +232,7 @@ class ExploreButtonHandler {
         }
 
         AddUnitService.addUnits(
-                event, game.getTileFromPlanet(planetID), game, player.getColor(), placedUnit + " " + planetID);
+                event, game.getTileContainingPlanet(planetID), game, player.getColor(), placedUnit + " " + planetID);
         String message = player.getRepresentationNoPing() + " is using a mech to resolve _War Forge Ruins_.";
         message += " Placing " + placedUnit + " on " + Helper.getPlanetRepresentation(planetID, game) + ".";
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
@@ -251,13 +251,13 @@ class ExploreButtonHandler {
         }
 
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
-        Planet planet = tile.getUnitHolderFromPlanet(planetID);
+        Planet planet = tile.getPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
         ButtonHelper.resolveInfantryRemoval(player, 1, tile);
 
         AddUnitService.addUnits(
-                event, game.getTileFromPlanet(planetID), game, player.getColor(), placedUnit + " " + planetID);
-        String message = player.getRepresentation() + " is removing an infantry to resolve _War Forge Ruins_.";
+                event, game.getTileContainingPlanet(planetID), game, player.getColor(), placedUnit + " " + planetID);
+        String message = player.toString() + " is removing an infantry to resolve _War Forge Ruins_.";
         message += " Placing " + placedUnit + " on " + Helper.getPlanetRepresentation(planetID, game) + ".";
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelper.deleteMessage(event);
@@ -299,10 +299,10 @@ class ExploreButtonHandler {
         }
 
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
-        Planet planet = tile.getUnitHolderFromPlanet(planetID);
+        Planet planet = tile.getPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
 
-        String message = player.getRepresentation() + " is removing an infantry to resolve _Seedy Space Port_.";
+        String message = player.toString() + " is removing an infantry to resolve _Seedy Space Port_.";
         if ("ac".equalsIgnoreCase(agent)) {
             ActionCardHelper.drawActionCards(player, 1);
         } else {
@@ -401,21 +401,21 @@ class ExploreButtonHandler {
         boolean dsdihmy = bID.startsWith("dsdihmy_");
         boolean scanlink = bID.startsWith("scanlink_");
         String[] info = bID.split("_");
-        Tile tile = game.getTileFromPlanet(info[1]);
+        Tile tile = game.getTileContainingPlanet(info[1]);
         ExploreService.explorePlanet(
-                event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game, 1, scanlink);
+                event, game.getTileContainingPlanet(info[1]), info[1], info[2], player, false, game, 1, scanlink);
         if (dsdihmy) {
             player.exhaustPlanet(info[1]);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), info[1] + " was exhausted by _Impressment Programs_.");
         }
-        if (tile != null && player.getTechs().contains("dsdihmy")) {
+        if (tile != null && player.hasExactTech("dsdihmy")) {
             var produce = new ArrayList<Button>();
             String pos = tile.getPosition();
             produce.add(Buttons.blue("dsdihmy_" + pos, "Produce (1) Units"));
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + ", you explored a planet, and due to _Impressment Programs_ you may now produce 1 ship in the system.",
                     produce);
         }
@@ -426,9 +426,7 @@ class ExploreButtonHandler {
     static void exploreAPlanet(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                player.getRepresentation() + ", please use these buttons to explore.",
-                buttons);
+                event.getMessageChannel(), player.toString() + ", please use these buttons to explore.", buttons);
     }
 
     @ButtonHandler("shuffleExplores")

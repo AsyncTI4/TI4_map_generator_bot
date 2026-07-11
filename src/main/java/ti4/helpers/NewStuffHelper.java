@@ -143,7 +143,7 @@ public final class NewStuffHelper {
             ActionCardModel acModel = Mapper.getActionCard(acNum);
             game.getDiscardACStatus().put(acNum, ACStatus.garbozia);
 
-            String msg = player.getRepresentation() + " picked up " + acModel.getName()
+            String msg = player.toString() + " picked up " + acModel.getName()
                     + " from the discard and placed it on _Doc 'N Pic's Salvage Yard_.";
             msg +=
                     " You can check the cards on _Doc 'N Pic's Salvage Yard_ at any time by looking at the action card discard pile in the bot map thread.";

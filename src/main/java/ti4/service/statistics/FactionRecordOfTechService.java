@@ -84,7 +84,7 @@ public class FactionRecordOfTechService {
             String faction,
             FactionModel factionModel) {
         for (Player player : game.getRealPlayers()) {
-            if (!player.getFaction().equalsIgnoreCase(faction)) {
+            if (!player.isFaction(faction)) {
                 continue;
             }
             gamesThatHadThem.getAndIncrement();

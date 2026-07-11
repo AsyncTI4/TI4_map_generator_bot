@@ -40,7 +40,7 @@ class AmendmentAcd2ButtonHandler {
         ActionCardModel actionCard = Mapper.getActionCard("amendment");
         String actionCardPlayMessage = game.isFowMode()
                 ? "Someone played the action card _Amendment_."
-                : player.getRepresentation() + " played the action card _Amendment_.";
+                : player.toString() + " played the action card _Amendment_.";
         MessageHelper.sendMessageToChannelWithEmbed(
                 game.getMainGameChannel(), actionCardPlayMessage, actionCard.getRepresentationEmbed(false, true, game));
 

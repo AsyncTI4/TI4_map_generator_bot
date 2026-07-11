@@ -419,7 +419,7 @@ public class CreateGameService {
                             try {
                                 StringBuilder msg = new StringBuilder();
                                 for (Player p : newPlayers) {
-                                    msg.append(p.getRepresentation());
+                                    msg.append(p.toString());
                                 }
                                 msg.append(getNewPlayerInfoText());
                                 String message = msg.toString();

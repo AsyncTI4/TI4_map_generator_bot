@@ -56,6 +56,7 @@ import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.strategycard.StrategyCardMessageService;
+import ti4.service.unit.UnitQueryService;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -118,7 +119,7 @@ public class StartTurnService {
                     buttons.add(Buttons.red("autoProveEndurance_no", "Decline Prove Endurance", "🙅"));
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCardsInfoThread(),
-                            player.getRepresentation()
+                            player.toString()
                                     + " All other players have passed. As such, when you pass, you could score _Prove Endurance_."
                                     + " You may use these buttons to queue scoring this when you pass (or not).",
                             buttons);
@@ -228,7 +229,7 @@ public class StartTurnService {
                 && player.getCommodities() > 0) {
             for (Player p2 : game.getRealPlayers()) {
                 if (!p2.equals(player)
-                        && !p2.getAllianceMembers().contains(player.getFaction())
+                        && !p2.hasAllianceMember(player.getFaction())
                         && (game.playerHasLeaderUnlockedOrAlliance(p2, "redcreusscommander")
                                 || game.playerHasLeaderUnlockedOrAlliance(p2, "crimsoncommander"))
                         && p2.getCommodities() > 0
@@ -267,7 +268,7 @@ public class StartTurnService {
                             Buttons.green("deleteButtons", "Give In And Play Strategy Card (or Sabo Extreme Duress)"));
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getRepresentation() + ", please resolve _Extreme Duress_.",
+                            player.toString() + ", please resolve _Extreme Duress_.",
                             buttons2);
                 }
             }
@@ -281,9 +282,7 @@ public class StartTurnService {
                     buttons2.add(Buttons.red(player.factionButtonChecker() + "turnEnd", "End Turn"));
                     buttons2.add(Buttons.green("deleteButtons", "Delete These (If Crisis Was Sabo'd)"));
                     MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentation() + ", please resolve _Crisis_.",
-                            buttons2);
+                            player.getCorrectChannel(), player.toString() + ", please resolve _Crisis_.", buttons2);
                 }
             }
         }
@@ -296,9 +295,7 @@ public class StartTurnService {
                     buttons2.add(ButtonHelper.getEndTurnButton(game, player));
                     buttons2.add(Buttons.green("deleteButtons", "Delete These (If Stasis Was Sabo'd)"));
                     MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentation() + ", please resolve _Stasis_.",
-                            buttons2);
+                            player.getCorrectChannel(), player.toString() + ", please resolve _Stasis_.", buttons2);
                 }
             }
         }
@@ -327,7 +324,7 @@ public class StartTurnService {
                         + " infantry left to revive.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             } else {
-                String msg = player.getRepresentation() + ", you had infantry II to be revived, but";
+                String msg = player.toString() + ", you had infantry II to be revived, but";
                 msg += " the bot couldn't find any planets you control in your home system to place them on";
                 msg += ", so per the rules they now disappear into the ether.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -336,10 +333,10 @@ public class StartTurnService {
         }
 
         if (!game.getStoredValue("pathOf" + player.getFaction()).isEmpty()) {
-            String msg1 = player.getRepresentation() + "The Starlit path points you towards a "
+            String msg1 = player.toString() + "The Starlit path points you towards a "
                     + game.getStoredValue("pathOf" + player.getFaction()) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg1);
-            String msg = player.getRepresentation() + " use buttons to either accept or refuse the path";
+            String msg = player.toString() + " use buttons to either accept or refuse the path";
             List<Button> buttons = new ArrayList<>();
             game.removeStoredValue("pathOf" + player.getFaction());
             buttons.add(Buttons.green(player.factionButtonChecker() + "acceptPath", "Accept Path"));
@@ -677,13 +674,11 @@ public class StartTurnService {
                         Buttons.gray(factionChecker + "startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));
             }
 
-            if (player.ownsUnit("tf-ahksylfier")
-                    && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser", false) > 0) {
+            if (player.ownsUnit("tf-ahksylfier") && UnitQueryService.countUnits(game, player, "cruiser", false) > 0) {
                 startButtons.add(
                         Buttons.gray("creussTFCruiserStep1_", "Use Ahk Syl Fier Ability", CardEmojis.MixedWormhole));
             }
-            if (player.hasUnit("redtf_flagship")
-                    && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", true) < 1) {
+            if (player.hasUnit("redtf_flagship") && UnitQueryService.countUnits(game, player, "flagship", true) < 1) {
                 startButtons.add(
                         Buttons.gray(factionChecker + "startRedTFDeploy", "Deploy Flagship", FactionEmojis.redtf));
             }
@@ -707,7 +702,7 @@ public class StartTurnService {
                         "Release Vortexer Infantry/Fighters",
                         FactionEmojis.Cabal));
             }
-            if (player.hasTech("dscymiy") && !player.getExhaustedTechs().contains("dscymiy")) {
+            if (player.hasTech("dscymiy") && !player.isTechExhausted("dscymiy")) {
                 startButtons.add(Buttons.gray(
                         factionChecker + "exhaustTech_dscymiy", "Exhaust Recursive Worm", FactionEmojis.cymiae));
             }
@@ -728,13 +723,12 @@ public class StartTurnService {
                 startButtons.add(Buttons.gray(
                         player.factionButtonChecker() + "useLawsOrder", "Pay To Ignore Laws", FactionEmojis.Keleres));
             }
-            if ((player.hasTech("td") && !player.getExhaustedTechs().contains("td"))
-                    || (player.hasTech("absol_td")
-                            && !player.getExhaustedTechs().contains("absol_td"))) {
+            if ((player.hasTech("td") && !player.isTechExhausted("td"))
+                    || (player.hasTech("absol_td") && !player.isTechExhausted("absol_td"))) {
                 startButtons.add(Buttons.gray(
                         factionChecker + "exhaustTech_td", "Exhaust Transit Diodes", TechEmojis.CyberneticTech));
             }
-            if (player.hasTech("batyriy") && !player.getExhaustedTechs().contains("batyriy")) {
+            if (player.hasTech("batyriy") && !player.isTechExhausted("batyriy")) {
                 startButtons.add(Buttons.gray(
                         factionChecker + "exhaustTech_batyriy",
                         "Exhaust Temporal Displacement",
@@ -750,14 +744,13 @@ public class StartTurnService {
             startButtons.add(
                     Buttons.green(factionChecker + "getPsychoButtons", "Use Psychoarcheology", TechEmojis.BioticTech));
         }
-        if (player.hasTech("tf-predictivecommand")
-                && !player.getExhaustedTechs().contains("tf-predictivecommand")) {
+        if (player.hasTech("tf-predictivecommand") && !player.isTechExhausted("tf-predictivecommand")) {
             startButtons.add(Buttons.gray(
                     factionChecker + "exhaustTech_tf-predictivecommand",
                     "Exhaust Predictive Command",
                     FactionEmojis.mykomentori));
         }
-        if (player.hasTech("tf-radiantsigils") && !player.getExhaustedTechs().contains("tf-radiantsigils")) {
+        if (player.hasTech("tf-radiantsigils") && !player.isTechExhausted("tf-radiantsigils")) {
             startButtons.add(
                     Buttons.gray("exhaustTech_tf-radiantsigils", "Exhaust Radiant Sigils", FactionEmojis.edyn));
         }

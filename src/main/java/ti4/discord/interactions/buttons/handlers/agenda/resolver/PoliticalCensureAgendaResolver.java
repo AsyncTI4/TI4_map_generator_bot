@@ -19,7 +19,7 @@ public record PoliticalCensureAgendaResolver(String agendaId) implements AgendaR
         message.append("Custom objective _Political Censure_ has been added.\n");
         game.scorePublicObjective(player2.getUserID(), poIndex);
         if (!game.isFowMode()) {
-            message.append(player2.getRepresentation()).append(" scored _Political Censure_.\n");
+            message.append(player2.toString()).append(" scored _Political Censure_.\n");
         }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message.toString());
         Helper.checkEndGame(game, player2);

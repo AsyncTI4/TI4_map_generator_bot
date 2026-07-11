@@ -132,8 +132,7 @@ public class GameStatisticsFilterer {
         if (winningFactionFilter == null) {
             return true;
         }
-        return game.getWinners().stream()
-                .anyMatch(winner -> winner.getFaction().equalsIgnoreCase(winningFactionFilter));
+        return game.getWinners().stream().anyMatch(winner -> winner.isFaction(winningFactionFilter));
     }
 
     private static boolean filterOnFaction(String factionFilter, Game game) {

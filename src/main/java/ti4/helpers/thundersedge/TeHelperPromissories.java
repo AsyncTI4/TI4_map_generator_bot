@@ -63,7 +63,7 @@ public final class TeHelperPromissories {
             List<Button> buttons = getCourierTransportButtons(game, player, destination);
             buttons.add(Buttons.DONE_DELETE_BUTTONS);
 
-            String msg = player.getRepresentation() + ", please choose which structures you wish to move.";
+            String msg = player.toString() + ", please choose which structures you wish to move.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
     }
@@ -102,7 +102,7 @@ public final class TeHelperPromissories {
             }
             String msg = String.format(
                     "%s moved %s from %s to %s using %s.",
-                    player.getRepresentation(), unit.humanReadableName(), srcStr, destStr, name);
+                    player.toString(), unit.humanReadableName(), srcStr, destStr, name);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         });
@@ -118,7 +118,7 @@ public final class TeHelperPromissories {
             Tile tile = game.getTileByPosition(adj);
             if (tile == null || tile.hasPlayerCC(player)) continue;
 
-            for (UnitHolder uh : tile.getUnitHolders().values()) {
+            for (UnitHolder uh : tile.getUnitHolderValues()) {
                 String uhName = "space";
                 if (!"space".equals(uh.getName())) {
                     uhName = Helper.getPlanetRepresentation(uh.getName(), game);

@@ -35,7 +35,7 @@ public class TfCensureResolver implements EdictResolver {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         game.discardSpecificAgenda("tf-censure");
         game.addLaw("tf-censure", p2.getFaction());
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), p2.getRepresentation() + " has been _Censure_'d.");
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), p2.toString() + " has been _Censure_'d.");
 
         ButtonHelper.deleteMessage(event);
     }

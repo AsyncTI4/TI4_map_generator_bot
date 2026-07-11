@@ -52,7 +52,7 @@ public class ZephyrionBreakthroughHandler {
             if (agentModel != null) {
                 MessageHelper.sendMessageToChannelWithEmbed(
                         player.getCardsInfoThread(),
-                        player.getRepresentation() + " drew this agent via _Subdue Chancellor_:",
+                        player.toString() + " drew this agent via _Subdue Chancellor_:",
                         agentModel.getRepresentationEmbed());
             }
             buttons.add(Buttons.green(
@@ -64,7 +64,7 @@ public class ZephyrionBreakthroughHandler {
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
-                    player.getRepresentation() + " has no unused agents available to draw via _Subdue Chancellor_.");
+                    player.toString() + " has no unused agents available to draw via _Subdue Chancellor_.");
             buttons.add(Buttons.red(
                     player.factionButtonChecker() + "zephyrionbtExhaustOp_" + opponentFaction,
                     "Exhaust Opponent's Agent"));
@@ -72,7 +72,7 @@ public class ZephyrionBreakthroughHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentation() + ", please choose how to resolve _Subdue Chancellor_.",
+                player.toString() + ", please choose how to resolve _Subdue Chancellor_.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -91,7 +91,7 @@ public class ZephyrionBreakthroughHandler {
                 attachedModel != null ? ", the " + capitalize(attachedModel.getFaction()) + " agent," : "";
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " attached _" + agentName + "_" + factionLabel
+                player.toString() + " attached _" + agentName + "_" + factionLabel
                         + " to _Subdue Chancellor_ and may now treat it as their own agent.");
         ButtonHelper.deleteMessage(event);
     }
@@ -108,7 +108,7 @@ public class ZephyrionBreakthroughHandler {
         String factionLabel = purgedModel != null ? ", the " + capitalize(purgedModel.getFaction()) + " agent," : "";
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " purged _" + agentName + "_" + factionLabel
+                player.toString() + " purged _" + agentName + "_" + factionLabel
                         + " while resolving _Subdue Chancellor_.");
 
         resolveExhaustOpponent(event, game, player, opponentFaction);
@@ -137,7 +137,7 @@ public class ZephyrionBreakthroughHandler {
         if (unexhaustedAgents.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " all of " + opponent.getRepresentationNoPing()
+                    player.toString() + " all of " + opponent.getRepresentationNoPing()
                             + "'s agents are already exhausted. Please resolve manually if needed.");
             ButtonHelper.deleteMessage(event);
             return;
@@ -147,7 +147,7 @@ public class ZephyrionBreakthroughHandler {
             ExhaustLeaderService.exhaustLeader(game, opponent, unexhaustedAgents.getFirst());
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " exhausted " + opponent.getRepresentationNoPing()
+                    player.toString() + " exhausted " + opponent.getRepresentationNoPing()
                             + "'s agent via _Subdue Chancellor_.");
             ButtonHelper.deleteMessage(event);
             return;
@@ -164,7 +164,7 @@ public class ZephyrionBreakthroughHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", " + opponent.getRepresentationNoPing()
+                player.toString() + ", " + opponent.getRepresentationNoPing()
                         + " has multiple unexhausted agents. Choose which to exhaust.",
                 buttons);
         ButtonHelper.deleteMessage(event);
@@ -195,7 +195,7 @@ public class ZephyrionBreakthroughHandler {
         ExhaustLeaderService.exhaustLeader(game, opponent, agent);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " exhausted " + opponent.getRepresentationNoPing()
+                player.toString() + " exhausted " + opponent.getRepresentationNoPing()
                         + "'s agent via _Subdue Chancellor_.");
         ButtonHelper.deleteMessage(event);
     }

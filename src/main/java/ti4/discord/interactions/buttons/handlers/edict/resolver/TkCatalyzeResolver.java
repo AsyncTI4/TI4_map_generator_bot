@@ -48,7 +48,7 @@ public class TkCatalyzeResolver implements EdictResolver {
         if (result == 1 || result == 10) { // success
             if (FractureService.isFractureInPlay(game)) {
                 // Destroy Styx
-                Tile styx = game.getTileFromPlanet("styx");
+                Tile styx = game.getTileContainingPlanet("styx");
                 DestroyUnitService.destroyAllUnitsInSystem(event, styx, game, false);
                 AddUnitService.addUnits(event, styx, game, game.getNeutralColor(), "2 dn, 1 dd, 3 inf s");
             } else {

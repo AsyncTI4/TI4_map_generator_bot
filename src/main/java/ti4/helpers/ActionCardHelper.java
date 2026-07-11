@@ -224,7 +224,7 @@ public class ActionCardHelper {
         GenericCardModel trap = Mapper.getTrap(trapID);
         String planet = trapCardsPlanets.get(trapID);
 
-        sb.append(trap.getRepresentation());
+        sb.append(trap.toString());
         if (planet != null) {
             Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
             String representation = planetRepresentations.get(planet);
@@ -312,7 +312,7 @@ public class ActionCardHelper {
     }
 
     private static String getPlotCardRepresentation(Game game, GenericCardModel plot, List<String> factions) {
-        StringBuilder sb = new StringBuilder(plot.getRepresentation()).append('\n');
+        StringBuilder sb = new StringBuilder(plot.toString()).append('\n');
         if (factions != null) {
             List<String> factionEmojis = factions.stream()
                     .map(game::getPlayerFromColorOrFaction)
@@ -579,7 +579,7 @@ public class ActionCardHelper {
 
     @ButtonHandler(value = "refreshACInfo", save = false)
     public static void sendActionCardInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
+        String headerText = player.toString() + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendActionCardInfo(game, player);
     }
@@ -657,10 +657,10 @@ public class ActionCardHelper {
             return;
         }
 
-        String message = player.getRepresentation() + " drew " + StringHelper.pluralize(count, "action card") + ".";
+        String message = player.toString() + " drew " + StringHelper.pluralize(count, "action card") + ".";
         if (scheming && player.hasAbility("scheming")) {
             count++;
-            message = player.getRepresentation() + " drew " + StringHelper.pluralize(count, "action card")
+            message = player.toString() + " drew " + StringHelper.pluralize(count, "action card")
                     + " (including one extra because of **Scheming**).";
         }
         game.drawActionCard(player.getUserID(), count);
@@ -865,7 +865,7 @@ public class ActionCardHelper {
                 Button codex1 = Buttons.green("codexCardPick_1", "Card #1");
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        player.getRepresentation()
+                        player.toString()
                                 + ", please pick up the Sabo'd card from the discard, per the _Wild, Wild Galaxy_ galactic event.",
                         List.of(codex1));
             }
@@ -936,8 +936,7 @@ public class ActionCardHelper {
                 }
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2,
-                        player.getRepresentation()
-                                + " Use buttons to choose which strategy card will be the target of your AC.",
+                        player.toString() + " Use buttons to choose which strategy card will be the target of your AC.",
                         scButtons);
             }
 
@@ -945,24 +944,23 @@ public class ActionCardHelper {
                 List<Button> scButtons = ButtonHelperActionCards.getArcExpButtons(game, player);
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2,
-                        player.getRepresentation()
+                        player.toString()
                                 + ", after checking for Sabos, please use buttons to explore a planet type thrice and gain any fragments.",
                         scButtons);
             }
 
             if ("planetary_rigs".equals(automationID)) {
                 List<Button> acbuttons = ButtonHelperHeroes.getAttachmentSearchButtons(game, player);
-                String msg = player.getRepresentation()
+                String msg = player.toString()
                         + ", after checking for Sabos, first declare what planet you mean to put an attachment on, then hit the button to resolve.";
                 if (acbuttons.isEmpty()) {
-                    msg = player.getRepresentation()
-                            + ", there were no attachments found in the applicable exploration decks.";
+                    msg = player.toString() + ", there were no attachments found in the applicable exploration decks.";
                 }
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, acbuttons);
             }
             String cancelReminder = actionCardIsCancelable ? ", after checking for Sabos" : "";
-            String introMsg = player.getRepresentation() + cancelReminder + ", please use buttons to resolve _"
-                    + actionCardTitle + "_.";
+            String introMsg =
+                    player.toString() + cancelReminder + ", please use buttons to resolve _" + actionCardTitle + "_.";
             String targetMsg =
                     " A reminder that you should declare which %s you are targeting now, before other players choose whether they will Sabo.";
 
@@ -1927,7 +1925,7 @@ public class ActionCardHelper {
             if ("bribery".equals(automationID)) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2,
-                        player.getRepresentation()
+                        player.toString()
                                 + ", a reminder that you should declare how many trade goods you are spending now, before other players choose whether they will Sabo.",
                         codedButtons);
             }
@@ -1935,7 +1933,7 @@ public class ActionCardHelper {
             if ("investments".equals(automationID)) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2,
-                        player.getRepresentation()
+                        player.toString()
                                 + ", a reminder that you should declare how you are distributing the trade goods now, before other players choose whether they will Sabo.",
                         codedButtons);
             }
@@ -1946,7 +1944,7 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
 
-            targetMsg = player.getRepresentation()
+            targetMsg = player.toString()
                     + ", a reminder that you should declare which %s you are targeting now, before other players choose whether they will Sabo.";
 
             if ("silence_space".equals(automationID)) {
@@ -2069,8 +2067,8 @@ public class ActionCardHelper {
 
         // Fog of war ping
         if (game.isFowMode()) {
-            String fowMessage = player.getRepresentation() + " played an action card " + CardEmojis.getACEmoji(game)
-                    + ": _" + actionCardTitle + "_.";
+            String fowMessage = player.toString() + " played an action card " + CardEmojis.getACEmoji(game) + ": _"
+                    + actionCardTitle + "_.";
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, fowMessage);
             MessageHelper.sendPrivateMessageToPlayer(
                     player, game, "Played action card " + CardEmojis.getACEmoji(game) + ": _" + actionCardTitle + "_.");
@@ -2116,7 +2114,7 @@ public class ActionCardHelper {
         }
         scButtons.add(Buttons.red("deleteButtons", "Done Adding Trade Goods"));
 
-        String msg = player.getRepresentation() + ", please use buttons to increase trade goods";
+        String msg = player.toString() + ", please use buttons to increase trade goods";
         msg += " on strategy cards. Each button press adds 1 trade good.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, scButtons);
     }
@@ -2225,7 +2223,7 @@ public class ActionCardHelper {
     private static String removeRepresentationIfFOW(String message, Player player, Game game) {
         return game.isFowMode()
                 ? StringUtils.capitalize(
-                        message.replace(player.getRepresentation() + ",", "").trim())
+                        message.replace(player.toString() + ",", "").trim())
                 : message;
     }
 
@@ -2337,11 +2335,11 @@ public class ActionCardHelper {
         sendActionCardInfo(game, player);
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
-                "# " + player.getRepresentation() + " you lost the action card _"
+                "# " + player.toString() + " you lost the action card _"
                         + Mapper.getActionCard(acID).getName() + "_.");
         MessageHelper.sendMessageToChannel(
                 player2.getCardsInfoThread(),
-                "# " + player2.getRepresentation() + " you gained the action card _"
+                "# " + player2.toString() + " you gained the action card _"
                         + Mapper.getActionCard(acID).getName() + "_.");
     }
 
@@ -2517,7 +2515,7 @@ public class ActionCardHelper {
                 .append(UnitEmojis.infantry)
                 .append(" to each of: ");
         int count = 0;
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             for (UnitHolder unitHolder : tile.getPlanetUnitHolders()) {
                 if (planets.contains(unitHolder.getName())) {
                     Set<String> tokenList = unitHolder.getTokenList();
@@ -2562,11 +2560,11 @@ public class ActionCardHelper {
         String colorID = Mapper.getColorID(player.getColor());
 
         List<Tile> tilesAffected = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             boolean hasSD = false;
             boolean hasCap = false;
             boolean blockaded = false;
-            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
                 // player has a space dock in the system
                 int numSd = unitHolder.getUnitCount(Units.UnitType.Spacedock, colorID);
                 numSd += unitHolder.getUnitCount(Units.UnitType.PlenaryOrbital, colorID);

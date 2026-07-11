@@ -35,7 +35,7 @@ public class TkEndorseResolver implements EdictResolver {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         game.discardSpecificAgenda("tk-endorse");
         game.addLaw("tk-endorse", p2.getFaction());
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), p2.getRepresentation() + " has been _Endorse_d.");
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), p2.toString() + " has been _Endorse_d.");
 
         ButtonHelper.deleteMessage(event);
     }

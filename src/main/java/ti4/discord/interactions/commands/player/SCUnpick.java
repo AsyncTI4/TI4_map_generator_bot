@@ -37,6 +37,6 @@ class SCUnpick extends GameStateSubcommand {
         game.updateActivePlayer(player);
         game.setPhaseOfGame("strategy");
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(), player.getRepresentation() + ", please pick a strategy card.", scButtons);
+                player.getCorrectChannel(), player.toString() + ", please pick a strategy card.", scButtons);
     }
 }

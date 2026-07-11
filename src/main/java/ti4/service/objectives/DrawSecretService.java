@@ -41,7 +41,7 @@ public class DrawSecretService {
             idsDrawn.add(game.drawSecretObjective(player.getUserID()));
         }
         if (event != null) {
-            MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + output);
+            MessageHelper.sendMessageToEventChannel(event, player.toString() + output);
         }
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         if (player.hasAbility("multitasking")) {
@@ -75,7 +75,7 @@ public class DrawSecretService {
                     game.drawSecretObjective(player.getUserID());
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getRepresentation()
+                            player.toString()
                                     + " due to **Plausible Deniability**, you were dealt an extra secret objective. Thus, you must also discard an extra secret objective.");
                 }
                 SecretObjectiveInfoService.sendSecretObjectiveInfoWithHeaderText(

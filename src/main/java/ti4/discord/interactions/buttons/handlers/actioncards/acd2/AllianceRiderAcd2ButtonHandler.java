@@ -29,7 +29,7 @@ class AllianceRiderAcd2ButtonHandler {
         if (allyCommander == null || allyCommander.isBlank()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " cannot reveal a new ally because none are available.");
+                    player.toString() + " cannot reveal a new ally because none are available.");
             return;
         }
 
@@ -41,11 +41,11 @@ class AllianceRiderAcd2ButtonHandler {
         buttons.add(Buttons.red(player.factionButtonChecker() + "allianceRiderPurgeAlly", "Purge Ally"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", choose whether to gain or purge this ally.",
+                player.toString() + ", choose whether to gain or purge this ally.",
                 buttons);
         MessageHelper.sendMessageToChannelWithEmbed(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " revealed this ally for _Alliance Rider_.",
+                player.toString() + " revealed this ally for _Alliance Rider_.",
                 Mapper.getLeader(allyCommander).getRepresentationEmbed());
     }
 
@@ -55,13 +55,13 @@ class AllianceRiderAcd2ButtonHandler {
         if (allyCommander.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has no revealed ally to gain. Use _Random Ally_ first.");
+                    player.toString() + " has no revealed ally to gain. Use _Random Ally_ first.");
             return;
         }
 
         if (player.hasLeader(allyCommander)) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), player.getRepresentation() + " already has this ally ability in play.");
+                    player.getCorrectChannel(), player.toString() + " already has this ally ability in play.");
             game.setStoredValue(ALLIANCE_RIDER_CURRENT_ALLY, "");
             return;
         }
@@ -74,7 +74,7 @@ class AllianceRiderAcd2ButtonHandler {
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " gained the _Alliance Rider_ ally ability: "
+                player.toString() + " gained the _Alliance Rider_ ally ability: "
                         + Mapper.getLeader(allyCommander).getName() + ".");
     }
 
@@ -84,7 +84,7 @@ class AllianceRiderAcd2ButtonHandler {
         if (allyCommander.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has no revealed ally to purge. Use _Random Ally_ first.");
+                    player.toString() + " has no revealed ally to purge. Use _Random Ally_ first.");
             return;
         }
 
@@ -96,7 +96,7 @@ class AllianceRiderAcd2ButtonHandler {
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " purged the _Alliance Rider_ ally: "
+                player.toString() + " purged the _Alliance Rider_ ally: "
                         + Mapper.getLeader(allyCommander).getName() + ".");
     }
 

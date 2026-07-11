@@ -20,7 +20,7 @@ public final class PriorityTrackHelper {
             int priority = i + 1;
             if (priorityTrack.get(i) != null) {
                 var player = priorityTrack.get(i);
-                sb.append(String.format("%d. %s\n", priority, player.getRepresentation()));
+                sb.append(String.format("%d. %s\n", priority, player.toString()));
             } else {
                 sb.append(String.format("%d.\n", priority));
             }
@@ -68,14 +68,14 @@ public final class PriorityTrackHelper {
                 if (existingIndex.isPresent()) {
                     var existingPlayer = existingIndex.get();
                     existingPlayer.setPriorityPosition(-1); // Clear the existing player's priority
-                    messageOutput += existingPlayer.getRepresentation() + " has been removed from position " + priority
+                    messageOutput += existingPlayer.toString() + " has been removed from position " + priority
                             + " on the priority track.\n";
                 }
             }
         } else {
             if (player.hasPriorityPosition()) {
                 // If the player already has a priority position, we don't need to assign them again
-                messageOutput += player.getRepresentation() + " is already on the priority track at position "
+                messageOutput += player.toString() + " is already on the priority track at position "
                         + player.getPriorityPosition() + ".\n";
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), messageOutput);
                 return;
@@ -92,7 +92,7 @@ public final class PriorityTrackHelper {
             if (priority == null) {
                 // If no empty spot was found, return early with message
                 player.setPriorityPosition(-1); // Ensure data model matches inferred state
-                messageOutput += player.getRepresentation()
+                messageOutput += player.toString()
                         + " could not be placed on the priority track because no empty spot was availble.\n";
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), messageOutput);
                 return;
@@ -107,10 +107,10 @@ public final class PriorityTrackHelper {
         } else if (player.hasPriorityPosition()) {
             // If priority is -1, remove the player from the priority track
             player.setPriorityPosition(-1);
-            messageOutput += player.getRepresentation() + " has been removed from the priority track.";
+            messageOutput += player.toString() + " has been removed from the priority track.";
         } else {
             // The player was to be removed, but was already off the track
-            messageOutput = player.getRepresentation() + " is not on the priority track.";
+            messageOutput = player.toString() + " is not on the priority track.";
         }
 
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), messageOutput);

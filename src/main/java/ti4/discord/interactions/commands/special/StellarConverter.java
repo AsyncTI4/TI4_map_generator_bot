@@ -22,7 +22,7 @@ class StellarConverter extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         String planetName = event.getOption(Constants.PLANET).getAsString();
-        if (!game.getPlanets().contains(planetName)) {
+        if (!game.containsPlanet(planetName)) {
             MessageHelper.replyToMessage(event, "Planet not found in map.");
             return;
         }

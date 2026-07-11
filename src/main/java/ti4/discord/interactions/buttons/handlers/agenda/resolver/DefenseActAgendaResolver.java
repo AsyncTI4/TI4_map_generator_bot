@@ -6,7 +6,7 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
-import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitQueryService;
 
 public class DefenseActAgendaResolver implements AgendaResolver {
     @Override
@@ -18,11 +18,11 @@ public class DefenseActAgendaResolver implements AgendaResolver {
     public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         if (!"for".equalsIgnoreCase(winner)) {
             for (Player player : game.getRealPlayers()) {
-                if (!CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Pds)
+                if (!UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Pds)
                         .isEmpty()) {
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCorrectChannel(),
-                            player.getRepresentation() + ", please destroy 1 of your PDS.",
+                            player.toString() + ", please destroy 1 of your PDS.",
                             ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "pds", true));
                 }
             }

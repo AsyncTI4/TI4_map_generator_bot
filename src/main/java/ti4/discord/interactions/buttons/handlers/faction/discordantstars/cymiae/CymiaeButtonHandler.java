@@ -33,8 +33,7 @@ class CymiaeButtonHandler {
         buttons.add(Buttons.green("cymiaeHeroStep1_" + (game.getRealPlayers().size()), "Resolve Cymiae Hero"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation()
-                        + ", please resuming resolving your hero after doing **Autonetic Memory** steps.",
+                player.toString() + ", please resuming resolving your hero after doing **Autonetic Memory** steps.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -56,9 +55,7 @@ class CymiaeButtonHandler {
                     "cymiaeHeroStep2_" + acID, Mapper.getActionCard(acID).getName()));
         }
         MessageHelper.sendMessageToChannelWithButtons(
-                channel,
-                player.getRepresentation() + ", please use the buttons to give out action cards to players.",
-                buttons);
+                channel, player.toString() + ", please use the buttons to give out action cards to players.", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -104,12 +101,12 @@ class CymiaeButtonHandler {
         if ("action".equalsIgnoreCase(game.getPhaseOfGame())) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has given "
-                            + Mapper.getActionCard(acID).getName() + " to " + p2.getRepresentation() + ".");
+                    player.toString() + " has given "
+                            + Mapper.getActionCard(acID).getName() + " to " + p2.toString() + ".");
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has given an action card to " + p2.getRepresentation() + ".");
+                    player.toString() + " has given an action card to " + p2.toString() + ".");
         }
         ButtonHelper.deleteMessage(event);
         if (p2 != player && "action".equalsIgnoreCase(game.getPhaseOfGame())) {

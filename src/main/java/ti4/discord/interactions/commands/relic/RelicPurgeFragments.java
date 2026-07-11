@@ -72,7 +72,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
 
         Game game = getGame();
         StringBuilder message =
-                new StringBuilder().append(activePlayer.getRepresentation()).append(" purged ");
+                new StringBuilder().append(activePlayer.toString()).append(" purged ");
         if (fragmentsToPurge.size() == 1) {
             String fragid = fragmentsToPurge.getFirst();
             activePlayer.removeFragment(fragid);
@@ -110,7 +110,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
         if (activePlayer.hasTech("dslaner")) {
             activePlayer.setAtsCount(activePlayer.getAtsCount() + 1);
             MessageHelper.sendMessageToEventChannel(
-                    event, activePlayer.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                    event, activePlayer.toString() + " put 1 commodity on _ATS Armaments_.");
         }
 
         boolean drawRelic = event.getOption(Constants.ALSO_DRAW_RELIC, Boolean.FALSE, OptionMapping::getAsBoolean);
