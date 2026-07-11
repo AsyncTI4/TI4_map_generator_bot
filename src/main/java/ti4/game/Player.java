@@ -602,6 +602,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
     }
 
+    public String getFactionCheckerPrefix() {
+        return factionButtonChecker();
+    }
+
     public String factionButtonChecker() {
         if (isNpc() || isDummy()) {
             return dummyPlayerSpoof();
