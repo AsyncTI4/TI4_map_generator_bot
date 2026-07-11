@@ -65,7 +65,7 @@ public class MapJsonIOService {
             MapDataIO mapData = new MapDataIO();
             List<TileIO> tiles = new ArrayList<>();
 
-            for (Tile tile : game.getTileMap().values()) {
+            for (Tile tile : game.getTiles()) {
                 TileIO t = new TileIO();
                 t.setPosition(tile.getPosition());
                 t.setTileID(tile.getTileID());
@@ -340,7 +340,7 @@ public class MapJsonIOService {
                         continue;
                     }
                 }
-                UnitHolder planetHolder = tile.getUnitHolderFromPlanet(planetIO.getPlanetID());
+                UnitHolder planetHolder = tile.getPlanet(planetIO.getPlanetID());
                 if (planetHolder == null) {
                     appendError(sb, tileIO, "Planet unitHolder not found: " + planetIO.getPlanetID());
                     continue;

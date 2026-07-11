@@ -63,7 +63,7 @@ public class NetrunnersAbilitiesHandler {
 
                 MessageHelper.sendMessageToChannel(
                         netrunner.getCorrectChannel(),
-                        netrunner.getRepresentation() + " used **System Breach** to place " + count + " of "
+                        netrunner.toString() + " used **System Breach** to place " + count + " of "
                                 + placingPlayer.getRepresentation(false, true)
                                 + "'s control token" + (count == 1 ? "" : "s") + " in their **" + SYSTEM_BREACH_POOL
                                 + "** pool."
@@ -127,7 +127,7 @@ public class NetrunnersAbilitiesHandler {
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                netrunner.getRepresentation() + " used **Control Network** to remove 1 of "
+                netrunner.toString() + " used **Control Network** to remove 1 of "
                         + rollingPlayer.getRepresentation(false, true)
                         + "'s control tokens from their **" + SYSTEM_BREACH_POOL
                         + "** pool and apply -1 to their next SPACE CANNON roll.");
@@ -221,14 +221,14 @@ public class NetrunnersAbilitiesHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    netrunner.getRepresentation()
+                    netrunner.toString()
                             + " has no players with eligible blockaded space docks for **Control Network**.");
             return;
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                netrunner.getRepresentation()
+                netrunner.toString()
                         + ", please choose the player whose blockaded space dock you wish to use. Note that this can only be done during the production window of a tactical action.",
                 buttons);
     }
@@ -246,7 +246,7 @@ public class NetrunnersAbilitiesHandler {
         if (!canUseControlNetworkProduction(game, netrunner, target, tile)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    netrunner.getRepresentation() + " cannot use **Control Network** with that space dock.");
+                    netrunner.toString() + " cannot use **Control Network** with that space dock.");
             return;
         }
 
@@ -311,7 +311,7 @@ public class NetrunnersAbilitiesHandler {
             if (netrunner.getDebtTokenCount(target.getColor(), SYSTEM_BREACH_POOL) < 1) {
                 continue;
             }
-            for (Tile tile : game.getTileMap().values()) {
+            for (Tile tile : game.getTiles()) {
                 if (canUseControlNetworkProduction(game, netrunner, target, tile)) {
                     buttons.add(Buttons.green(
                             netrunner.factionButtonChecker() + "controlNetworkProduce_" + target.getColor() + "_"
@@ -346,8 +346,8 @@ public class NetrunnersAbilitiesHandler {
     }
 
     private static boolean tileHasSpaceDockControlledByPlayer(Player player, Tile tile) {
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0) {
+        for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
+            if (unitHolder.hasUnit(UnitType.Spacedock, player.getColor())) {
                 return true;
             }
         }
@@ -364,7 +364,7 @@ public class NetrunnersAbilitiesHandler {
 
         int highestProductionValue = 0;
         boolean cosmicSuper = isAdjacentToCosmicSupernova(game, target, tile);
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+        for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
             for (UnitKey unit : unitHolder.getUnits().keySet()) {
                 if (!target.unitBelongsToPlayer(unit)) {
                     continue;
@@ -388,7 +388,7 @@ public class NetrunnersAbilitiesHandler {
                     }
                     if (target.hasUnit("axis_mech")
                             && !ButtonHelper.isLawInPlay(game, "articles_war")
-                            && unitHolder.getUnitCount(UnitType.Mech, target) > 0) {
+                            && unitHolder.hasUnit(UnitType.Mech, target)) {
                         productionValue = Math.max(5, productionValue);
                     }
                 }

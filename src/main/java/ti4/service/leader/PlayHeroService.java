@@ -65,7 +65,7 @@ import ti4.service.planet.PlanetService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
-import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitQueryService;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
@@ -115,7 +115,7 @@ public class PlayHeroService {
                             player,
                             leaderModel.getAlias(),
                             event.getChannel().getName());
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " played:");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.toString() + " played:");
             player.getCorrectChannel()
                     .sendMessageEmbeds(FrankenAlternateTextService.getLeaderEmbed(
                             game, leaderModel, false, true, false, showFlavourText, game.isTwilightsFallMode()))
@@ -124,9 +124,7 @@ public class PlayHeroService {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     LeaderEmojis.getLeaderEmoji(playerLeader).toString());
-            sb.append(player.getRepresentation())
-                    .append(" played ")
-                    .append(Helper.getLeaderFullRepresentation(playerLeader));
+            sb.append(player.toString()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
             BotLogger.warning(new LogOrigin(event), "Missing LeaderModel: " + playerLeader.getId());
         }
 
@@ -139,15 +137,15 @@ public class PlayHeroService {
             if ("zealotshero".equals(playerLeader.getId())) {
                 MessageHelper.sendMessageToChannelWithButton(
                         event.getMessageChannel(),
-                        player.getRepresentation() + ", please choose your first non-faction technology.",
+                        player.toString() + ", please choose your first non-faction technology.",
                         Buttons.GET_A_FREE_TECH);
                 MessageHelper.sendMessageToChannelWithButton(
                         event.getMessageChannel(),
-                        player.getRepresentation() + ", please choose your second non-faction technology.",
+                        player.toString() + ", please choose your second non-faction technology.",
                         Buttons.GET_A_FREE_TECH);
                 MessageHelper.sendMessageToChannelWithButton(
                         event.getMessageChannel(),
-                        player.getRepresentation() + ", please choose your third non-faction technology.",
+                        player.toString() + ", please choose your third non-faction technology.",
                         Buttons.GET_A_FREE_TECH);
             }
         } else {
@@ -256,9 +254,9 @@ public class PlayHeroService {
                         "You will unfortunately need to use dicecord's `/roll` command for the SPACE CANNON and BOMBARDMENT of all your units against one system and planet respectively.");
             }
             case "florzenhero" -> {
-                for (Tile tile : game.getTileMap().values()) {
+                for (Tile tile : game.getTiles()) {
                     for (UnitHolder uH : tile.getPlanetUnitHolders()) {
-                        if (player.getPlanetsAllianceMode().contains(uH.getName())
+                        if (player.canUsePlanet(uH.getName())
                                 && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                             AddUnitService.addUnits(event, tile, game, player.getColor(), "2 ff");
                             break;
@@ -312,7 +310,7 @@ public class PlayHeroService {
 
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + ", please choose whether to resolve **Autonetic Memory** or not.",
+                        player.toString() + ", please choose whether to resolve **Autonetic Memory** or not.",
                         buttons);
             }
             case "lizhohero" ->
@@ -325,7 +323,7 @@ public class PlayHeroService {
                         event.getMessageChannel(),
                         player.getRepresentationUnfogged()
                                 + ", all of your command tokens on the game have been returned to your reinforcements.");
-                for (Tile t : game.getTileMap().values()) {
+                for (Tile t : game.getTiles()) {
                     if (CommandCounterHelper.hasCC(event, player.getColor(), t)) {
                         RemoveCommandCounterService.fromTile(player.getColor(), t, game);
                     }
@@ -341,7 +339,7 @@ public class PlayHeroService {
             }
             case "argenthero" -> ButtonHelperHeroes.argentHeroStep1(game, player, event);
             case "l1z1xhero" -> {
-                String message = player.getRepresentation()
+                String message = player.toString()
                         + " is resolving The Helmsman, the L1Z1X Hero. At the moment, this is implemented as a sort of tactical action, relying on the player to follow the rules."
                         + " The game will know not to take a command token from your tactic pool, and will allow you to move out of locked systems."
                         + " Reminder that you may carry ground forces and fighters with your dreadnoughts/flagship, and that they can't move into supernovae (or asteroid fields if you don't have _Antimass Deflectors_).";
@@ -392,7 +390,7 @@ public class PlayHeroService {
                         buttons);
             }
             case "edynhero" -> {
-                int size = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Mech)
+                int size = UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Mech)
                         .size();
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
@@ -500,7 +498,7 @@ public class PlayHeroService {
                         buttons);
             }
             case "witchinghero" -> {
-                String assignSpeakerMessage = player.getRepresentation()
+                String assignSpeakerMessage = player.toString()
                         + ", please choose a faction below to receive the Speaker token."
                         + MiscEmojis.SpeakerToken;
 
@@ -524,7 +522,7 @@ public class PlayHeroService {
                 List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "warfare", "place");
                 int productionValue = Helper.getProductionValue(player, game, tile, singleDock);
 
-                String message = player.getRepresentation() + ", please use these buttons to produce.\nYou have "
+                String message = player.toString() + ", please use these buttons to produce.\nYou have "
                         + productionValue + " PRODUCTION value in this system.";
                 if (productionValue > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
                     message +=
@@ -535,9 +533,9 @@ public class PlayHeroService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Produce Units", buttons);
 
                 if (player.hasUnit("tf-productionbiomes")
-                        && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                        && UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
                                 .contains(tile)) {
-                    String msg = player.getRepresentation()
+                    String msg = player.toString()
                             + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
                             + " If you do, you will also choose another player, who will gain 2 trade goods.";
                     List<Button> buttons2 = new ArrayList<>();
@@ -556,8 +554,7 @@ public class PlayHeroService {
                             tyrant.factionButtonChecker() + "resolveEdict_" + edicts.get(x), edict.getName()));
                     embeds.add(edict.getRepresentationEmbed());
                 }
-                String msg = tyrant.getRepresentation()
-                        + " you should now choose which of the 3 edicts you wish to resolve.";
+                String msg = tyrant.toString() + " you should now choose which of the 3 edicts you wish to resolve.";
                 MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                         tyrant.getCorrectChannel(), msg, embeds, buttons);
             }
@@ -591,8 +588,8 @@ public class PlayHeroService {
             }
             case "kaltrimhero" -> {
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                String propMsg = player.getRepresentation() + ", your current command tokens are "
-                        + player.getCCRepresentation() + ". Use these buttons to gain command tokens.";
+                String propMsg = player.toString() + ", your current command tokens are " + player.getCCRepresentation()
+                        + ". Use these buttons to gain command tokens.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), propMsg, buttons);
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
                 MessageHelper.sendMessageToChannel(
@@ -605,7 +602,7 @@ public class PlayHeroService {
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
                                 player.getRepresentationUnfogged() + " you have scored more secret objectives than "
-                                        + p2.getRepresentation()
+                                        + p2.toString()
                                         + ", and so here are buttons to look at one of their shrines. You can decline to gain 2 CC instead, using the CC buttons above.",
                                 shrineButtons);
                     }
@@ -737,7 +734,7 @@ public class PlayHeroService {
     }
 
     private static boolean isElysium(Game game, Tile tile) {
-        Tile elysiumTile = game.getTileFromPlanet("elysium");
+        Tile elysiumTile = game.getTileContainingPlanet("elysium");
         return elysiumTile != null && elysiumTile == tile;
     }
 
@@ -856,7 +853,7 @@ public class PlayHeroService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), LeaderEmojis.KeleresHeroHarka.toString());
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation() + " uses Harka Leeds, the Keleres (Mentak) hero, to reveal "
+                player.toString() + " uses Harka Leeds, the Keleres (Mentak) hero, to reveal "
                         + CardEmojis.getACEmoji(game) + "action cards, until drawing 3 component action cards.\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), acRevealMessage.toString());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), acDrawMessage.toString());

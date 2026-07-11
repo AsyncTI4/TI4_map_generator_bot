@@ -35,7 +35,6 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
@@ -61,6 +60,7 @@ import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
 import ti4.service.map.FractureService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.unit.UnitQueryService;
 import ti4.settings.GlobalSettings;
 import ti4.website.AsyncTi4WebsiteHelper;
 import ti4.website.model.WebsiteOverlay;
@@ -901,7 +901,7 @@ public class MapGenerator implements AutoCloseable {
 
     private void drawExpeditionTracker(int x, int y) {
         Expeditions exp = game.getExpeditions();
-        boolean thundersEdgeOnBoard = game.getTileFromPlanet("thundersedge") != null;
+        boolean thundersEdgeOnBoard = game.getTileContainingPlanet("thundersedge") != null;
         if (!game.isThundersEdge()
                 || exp.getRemainingExpeditionCount() == 0
                 || thundersEdgeOnBoard
@@ -1366,10 +1366,10 @@ public class MapGenerator implements AutoCloseable {
             boolean hasNanoForge = player.hasRelic("nanoforge") || player.hasRelic("absol_nanoforge");
             for (String planet : player.getPlanets()) {
                 PlanetModel custodiaVigilia = Mapper.getPlanet(planet);
-                offBoardHighlighting +=
-                        (custodiaVigilia.getLegendaryAbilityName() != null && game.getTileFromPlanet(planet) == null)
-                                ? 1
-                                : 0;
+                offBoardHighlighting += (custodiaVigilia.getLegendaryAbilityName() != null
+                                && game.getTileContainingPlanet(planet) == null)
+                        ? 1
+                        : 0;
             }
             if (offBoardHighlighting >= 1) {
                 String legendaryFile = ResourceHelper.getInstance().getGeneralFile("Legendary_complete.png");
@@ -1437,8 +1437,8 @@ public class MapGenerator implements AutoCloseable {
             String alphaID = Mapper.getTokenID("creussalpha");
             String betaID = Mapper.getTokenID("creussbeta");
             String gammaID = Mapper.getTokenID("creussgamma");
-            for (Tile tile2 : game.getTileMap().values()) {
-                Set<String> tileTokens = tile2.getUnitHolders().get("space").getTokenList();
+            for (Tile tile2 : game.getTiles()) {
+                Set<String> tileTokens = tile2.getSpaceUnitHolder().getTokenList();
                 alphaOnMap |= tileTokens.contains(alphaID);
                 betaOnMap |= tileTokens.contains(betaID);
                 gammaOnMap |= tileTokens.contains(gammaID);
@@ -1498,11 +1498,7 @@ public class MapGenerator implements AutoCloseable {
             unitNum = (unitNum == 0
                     ? PositionMapper.getReinforcementsPosition("sd").getPositionCount("sd")
                     : unitNum);
-            for (Tile tile2 : game.getTileMap().values()) {
-                for (UnitHolder unitHolder : tile2.getUnitHolders().values()) {
-                    unitNum -= unitHolder.getUnitCount(unitKey);
-                }
-            }
+            unitNum -= UnitQueryService.countUnitsOnBoard(game, unitKey);
             if (unitNum > 0) {
                 int x = miscTile.x + (TILE_WIDTH - 95) / 2;
                 x += (unitNum == 3 ? 40 : 0) + (unitNum == 2 ? 30 : 0);
@@ -1519,8 +1515,8 @@ public class MapGenerator implements AutoCloseable {
             List<String> traitFiles = new ArrayList<>();
             for (String planet : player.getPlanets()) {
                 PlanetModel custodiaVigilia = Mapper.getPlanet(planet);
-                if (game.getTileFromPlanet(planet) == null) {
-                    Planet planetReal = game.getPlanetsInfo().get(planet);
+                if (game.getTileContainingPlanet(planet) == null) {
+                    Planet planetReal = game.getPlanet(planet);
                     String traitFile = "";
                     List<String> traits = planetReal.getPlanetType();
 
@@ -1592,8 +1588,8 @@ public class MapGenerator implements AutoCloseable {
         } else if (displayType == DisplayType.techskips) {
             List<String> techFiles = new ArrayList<>();
             for (String planet : player.getPlanets()) {
-                if (game.getTileFromPlanet(planet) == null) {
-                    Planet planetReal = game.getPlanetsInfo().get(planet);
+                if (game.getTileContainingPlanet(planet) == null) {
+                    Planet planetReal = game.getPlanet(planet);
                     List<String> skips = planetReal.getTechSpeciality();
                     skips.removeAll(Collections.singleton(null));
                     skips.removeAll(Collections.singleton(""));
@@ -1655,8 +1651,8 @@ public class MapGenerator implements AutoCloseable {
             Map<String, String> attachFiles = new HashMap<>();
             Map<String, Integer> attachCount = new HashMap<>();
             for (String planet : player.getPlanets()) {
-                if (game.getTileFromPlanet(planet) == null) {
-                    Planet planetReal = game.getPlanetsInfo().get(planet);
+                if (game.getTileContainingPlanet(planet) == null) {
+                    Planet planetReal = game.getPlanet(planet);
                     List<String> attach = new ArrayList<>(planetReal.getAttachments());
                     attach.removeAll(Collections.singleton(null));
                     attach.removeAll(Collections.singleton(""));

@@ -26,6 +26,7 @@ import ti4.service.button.ReactionService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 class ActionCardHandButtonHandler {
@@ -130,7 +131,7 @@ class ActionCardHandButtonHandler {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
                 return;
             }
-            String sb = player.getRepresentation() + " discarded the action card _"
+            String sb = player.toString() + " discarded the action card _"
                     + Mapper.getActionCard(acID).getName() + "_.\n"
                     + Mapper.getActionCard(acID).getRepresentation(game);
             MessageChannel channel2 = game.isFowMode() ? player.getPrivateChannel() : game.getMainGameChannel();
@@ -143,7 +144,7 @@ class ActionCardHandButtonHandler {
             if (stalling) {
                 if (player.hasUnit("yssaril_mech")
                         && !ButtonHelper.isLawInPlay(game, "articles_war")
-                        && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
+                        && UnitQueryService.countUnits(game, player, "mech", true) < 4) {
                     String message3 = "Use buttons to drop 1 mech on a planet or decline";
                     List<Button> buttons = new ArrayList<>(
                             Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
@@ -198,7 +199,7 @@ class ActionCardHandButtonHandler {
         if (ActionCardHelper.isSabotageOrShatter(acID)) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
-                    player.getRepresentation() + ", to cancel an action card, use the button in the actions channel.");
+                    player.toString() + ", to cancel an action card, use the button in the actions channel.");
             return;
         }
 
@@ -209,8 +210,7 @@ class ActionCardHandButtonHandler {
                     "resolveReverse_" + actionCardTitle, "Pick Up " + actionCardTitle + " From The Discard");
             MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + ", after checking for Sabos, use the button to resolve _Reverse Engineer_.",
+                    player.toString() + ", after checking for Sabos, use the button to resolve _Reverse Engineer_.",
                     button);
         }
         if (acID.contains("twinning_")) {
@@ -219,7 +219,7 @@ class ActionCardHandButtonHandler {
             Button button = Buttons.green("resolveTwin_" + actionCardTitle, "Play " + actionCardTitle + " Immediately");
             MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", after checking for Sabos, use the button to resolve _Twinning_.",
+                    player.toString() + ", after checking for Sabos, use the button to resolve _Twinning_.",
                     button);
         }
         if (acID.contains("counterstroke_")) {
@@ -228,8 +228,7 @@ class ActionCardHandButtonHandler {
             Button button = Buttons.green("resolveCounterStroke_" + tilePos, "Counterstroke in " + tilePos);
             MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + ", after checking for Sabos, use the button to resolve _Counterstroke_.",
+                    player.toString() + ", after checking for Sabos, use the button to resolve _Counterstroke_.",
                     button);
         }
         if (acID.contains("riposte_")) {
@@ -238,7 +237,7 @@ class ActionCardHandButtonHandler {
             Button button = Buttons.green("resolveRiposte_" + tilePos, "Riposte in " + tilePos);
             MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", after checking for Sabos, use the button to resolve _Riposte_.",
+                    player.toString() + ", after checking for Sabos, use the button to resolve _Riposte_.",
                     button);
         }
         if (acID.contains("incubate_")) {
@@ -247,7 +246,7 @@ class ActionCardHandButtonHandler {
             Button button = Buttons.green("resolveIncubate_" + tilePos, "Incubate in " + tilePos);
             MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", after checking for Sabos, use the button to resolve _Incubate_.",
+                    player.toString() + ", after checking for Sabos, use the button to resolve _Incubate_.",
                     button);
         }
         if (channel == null) {

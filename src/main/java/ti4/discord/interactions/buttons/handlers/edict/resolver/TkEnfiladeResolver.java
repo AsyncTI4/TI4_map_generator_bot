@@ -92,10 +92,10 @@ public class TkEnfiladeResolver implements EdictResolver {
 
     private static List<Button> getTargetButtonsForEnfiladeDestroy(Game game, Player player) {
         Map<String, Integer> visibleTargets = new HashMap<>();
-        for (Tile t : game.getTileMap().values()) {
+        for (Tile t : game.getTiles()) {
             if (t.hasFog(player) || t.isHomeSystem(game)) continue;
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-                int amt = t.getUnitHolders().values().stream()
+                int amt = t.getUnitHolderValues().stream()
                         .map(uh -> uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure))
                         .mapToInt(Integer::intValue)
                         .sum();
@@ -121,10 +121,10 @@ public class TkEnfiladeResolver implements EdictResolver {
         Player victim = game.getPlayerFromColorOrFaction(victimFaction);
 
         List<Button> buttons = new ArrayList<>();
-        for (Tile t : game.getTileMap().values()) {
+        for (Tile t : game.getTiles()) {
             if (t.hasFog(player) || t.isHomeSystem(game)) continue;
 
-            for (UnitHolder uh : t.getUnitHolders().values()) {
+            for (UnitHolder uh : t.getUnitHolderValues()) {
                 String partialID = player.factionButtonChecker() + "enfiladeDestroy_" + victim.getFaction();
                 partialID += "_" + t.getPosition() + "_" + uh.getName() + "_";
 
@@ -164,7 +164,7 @@ public class TkEnfiladeResolver implements EdictResolver {
             UnitType type = Units.findUnitType(matcher.group("unittype"));
             UnitState state = Units.findUnitState(matcher.group("state"));
             Tile tile = game.getTileByPosition(matcher.group("pos"));
-            UnitHolder uh = tile.getUnitHolders().get(matcher.group("uh"));
+            UnitHolder uh = tile.getUnitHolder(matcher.group("uh"));
 
             var unit = ParseUnitService.simpleParsedUnit(target, type, uh, 1);
             DestroyUnitService.destroyUnit(event, tile, game, unit, false, state);
@@ -177,7 +177,7 @@ public class TkEnfiladeResolver implements EdictResolver {
             }
 
             if (game.isFowMode()) {
-                String msg = String.format(msgFormat, player.getRepresentationUnfogged(), target.getRepresentation());
+                String msg = String.format(msgFormat, player.getRepresentationUnfogged(), target.toString());
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
             String msg = String.format(msgFormat, player.getRepresentationNoPing(), target.getRepresentationUnfogged());

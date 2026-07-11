@@ -159,9 +159,8 @@ final class LoreEffects {
         // than one entry is tagged onto the same system/planet — strip it before resolving the tile, or
         // the lookup below would silently fail to find anything and every effect line would be a no-op.
         String base = LoreService.splitTargetKey(lore.target).base();
-        Tile tile = isSystemLore ? game.getTileByPosition(base) : game.getTileFromPlanet(base);
-        String holder =
-                (!isSystemLore && tile != null && tile.getUnitHolders().containsKey(base)) ? base : Constants.SPACE;
+        Tile tile = isSystemLore ? game.getTileByPosition(base) : game.getTileContainingPlanet(base);
+        String holder = (!isSystemLore && tile != null && tile.hasUnitHolder(base)) ? base : Constants.SPACE;
 
         return applyEffectLines(player, game, tile, holder, lines, branch);
     }
@@ -520,9 +519,9 @@ final class LoreEffects {
 
     /** Resolves an "@" target to a tile + unit-holder; tries planet name first, then board position. */
     private static TargetRef resolveTarget(Game game, String ref) {
-        Tile byPlanet = game.getTileFromPlanet(ref);
+        Tile byPlanet = game.getTileContainingPlanet(ref);
         if (byPlanet != null) {
-            String holder = byPlanet.getUnitHolders().containsKey(ref) ? ref : Constants.SPACE;
+            String holder = byPlanet.hasUnitHolder(ref) ? ref : Constants.SPACE;
             return new TargetRef(byPlanet, holder);
         }
         Tile byPosition = game.getTileByPosition(ref);
@@ -665,7 +664,7 @@ final class LoreEffects {
         String holder = ctx.holder;
         if (ctx.args.length >= idx + 3) {
             String planetArg = AliasHandler.resolvePlanet(ctx.arg(idx + 2));
-            if (ctx.tile.getUnitHolders().containsKey(planetArg)) {
+            if (ctx.tile.hasUnitHolder(planetArg)) {
                 holder = planetArg;
             }
         }
@@ -713,7 +712,7 @@ final class LoreEffects {
         String holder = ctx.holder;
         if (ctx.args.length >= 2) {
             String planetArg = AliasHandler.resolvePlanet(ctx.arg(1));
-            if (ctx.tile.getUnitHolders().containsKey(planetArg)) {
+            if (ctx.tile.hasUnitHolder(planetArg)) {
                 holder = planetArg;
             }
         }
@@ -747,7 +746,7 @@ final class LoreEffects {
         String holder = ctx.holder;
         if (ctx.args.length >= idx + 3) {
             String planetArg = AliasHandler.resolvePlanet(ctx.arg(idx + 2));
-            if (ctx.tile.getUnitHolders().containsKey(planetArg)) {
+            if (ctx.tile.hasUnitHolder(planetArg)) {
                 holder = planetArg;
             }
         }
@@ -798,12 +797,12 @@ final class LoreEffects {
         String holder = ctx.holder;
         if (ctx.args.length >= 2) {
             String planetArg = AliasHandler.resolvePlanet(ctx.arg(1));
-            if (ctx.tile.getUnitHolders().containsKey(planetArg)) {
+            if (ctx.tile.hasUnitHolder(planetArg)) {
                 holder = planetArg;
             }
         }
 
-        UnitHolder unitHolder = ctx.tile.getUnitHolders().get(holder);
+        UnitHolder unitHolder = ctx.tile.getUnitHolder(holder);
         if (unitHolder == null) return null;
         unitHolder.removeAllUnits(color);
 
@@ -932,7 +931,7 @@ final class LoreEffects {
         if ("random".equalsIgnoreCase(techID)) {
             String typeFilter = techTypeFilter(ctx.arg(1));
             List<String> pool = ctx.game.getTechnologyDeck().stream()
-                    .filter(id -> !ctx.player.getTechs().contains(id))
+                    .filter(id -> !ctx.player.hasExactTech(id))
                     .filter(id -> {
                         TechnologyModel model = Mapper.getTech(id);
                         if (model == null) return false;
@@ -946,7 +945,7 @@ final class LoreEffects {
                     .toList();
             if (pool.isEmpty()) return null;
             techID = RandomHelper.pickRandomFromList(pool);
-        } else if (Mapper.getTech(techID) == null || ctx.player.getTechs().contains(techID)) {
+        } else if (Mapper.getTech(techID) == null || ctx.player.hasExactTech(techID)) {
             return null;
         }
 
@@ -994,7 +993,7 @@ final class LoreEffects {
     private static EffectDescription effectRemoveTech(EffectContext ctx) {
         if (ctx.args.length == 0) return null;
         String techID = AliasHandler.resolveTech(ctx.arg(0).toLowerCase());
-        if (Mapper.getTech(techID) == null || !ctx.player.getTechs().contains(techID)) return null;
+        if (Mapper.getTech(techID) == null || !ctx.player.hasExactTech(techID)) return null;
 
         ctx.player.removeTech(techID);
         return new EffectDescription(
@@ -1056,7 +1055,7 @@ final class LoreEffects {
 
     private static String pickRandomTileId(Game game, List<String> filters) {
         Set<ComponentSource> sources = AddTileService.getSources(game, false);
-        Set<TileModel> onBoard = game.getTileMap().values().stream()
+        Set<TileModel> onBoard = game.getTiles().stream()
                 .map(Tile::getTileModel)
                 .filter(model -> model != null)
                 .collect(Collectors.toSet());

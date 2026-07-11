@@ -156,7 +156,7 @@ public class PlayerStatsService {
 
         Map<String, Player> players = game.getPlayers();
         for (Player playerStats : players.values()) {
-            if (playerStats.getSCs().contains(scNumber)) {
+            if (playerStats.hasStrategyCard(scNumber)) {
                 MessageHelper.sendMessageToChannel(
                         (MessageChannel) event.getChannel(), game.getSCName(scNumber) + " is already picked.");
                 return false;
@@ -197,8 +197,8 @@ public class PlayerStatsService {
             tg += tgCount;
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " gained " + StringHelper.pluralize(tgCount, "trade good")
-                            + " from picking **" + game.getSCName(scNumber) + "**.");
+                    player.toString() + " gained " + StringHelper.pluralize(tgCount, "trade good") + " from picking **"
+                            + game.getSCName(scNumber) + "**.");
             if (game.isFowMode()) {
                 String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained "
                         + StringHelper.pluralize(tgCount, "trade good") + " from picking **" + game.getSCName(scNumber)

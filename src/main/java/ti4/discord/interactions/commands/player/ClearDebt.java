@@ -55,9 +55,9 @@ class ClearDebt extends GameStateSubcommand {
         clearingPlayer.clearDebt(clearedPlayer, debtCountToClear, pool);
         MessageHelper.sendMessageToChannel(
                 clearingPlayer.getCorrectChannel(),
-                clearingPlayer.getRepresentation() + " cleared "
+                clearingPlayer.toString() + " cleared "
                         + StringHelper.pluralize(debtCountToClear, "debt token") + " owned by "
-                        + clearedPlayer.getRepresentation() + ", from their \"" + pool + "\" pool.");
+                        + clearedPlayer.toString() + ", from their \"" + pool + "\" pool.");
     }
 
     @Override

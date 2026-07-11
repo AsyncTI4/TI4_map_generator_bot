@@ -22,8 +22,7 @@ public class StandardizationAgendaResolver implements AgendaResolver {
         p2.gainFleetCC(amountToGain);
 
         if (p2.getEffectiveFleetCC() > 3 && !p2.getMahactCC().isEmpty()) {
-            String msg = p2.getRepresentation()
-                    + ", please lose command tokens from your fleet pool until you are at 3 total.";
+            String msg = p2.toString() + ", please lose command tokens from your fleet pool until you are at 3 total.";
             var buttons = ButtonHelper.getLoseFleetCCButtons(p2);
             MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons);
         } else {

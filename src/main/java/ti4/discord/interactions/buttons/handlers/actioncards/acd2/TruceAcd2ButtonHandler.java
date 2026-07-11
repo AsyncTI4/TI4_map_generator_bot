@@ -16,7 +16,7 @@ class TruceAcd2ButtonHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " played _Truce_: the ground combat ends in a draw and "
+                player.toString() + " played _Truce_: the ground combat ends in a draw and "
                         + player.getRepresentationNoPing()
                         + "'s participating units remain in coexistence on the contested planet. The attacking player"
                         + " cannot engage these coexisting units in combat after this draw.");

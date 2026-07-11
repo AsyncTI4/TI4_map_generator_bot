@@ -101,7 +101,7 @@ public class DataSkimmerService {
 
         if (game.pickActionCard(ralnel.getUserID(), acNum)) {
             ActionCardModel acModel = Mapper.getActionCard(acID);
-            String msg = ralnel.getRepresentation() + " picked up _" + acModel.getName()
+            String msg = ralnel.toString() + " picked up _" + acModel.getName()
                     + "_ from _Data Skimmer_ and added it to their hand.";
             MessageHelper.sendMessageToChannel(ralnel.getCorrectChannel(), msg);
         } else {

@@ -93,12 +93,12 @@ public class ColorChangeHelper {
         player.setPromissoryNotesOwned(ownedPromissoryNotesChanged);
 
         // Convert all unitholders
-        game.getTileMap().values().stream()
-                .flatMap(t -> t.getUnitHolders().values().stream())
+        game.getTiles().stream()
+                .flatMap(t -> t.getUnitHolderValues().stream())
                 .forEach(uh -> replaceIDsOnUnitHolder(uh, oldColorID, newColorID));
         game.getPlayers().values().stream()
                 .map(Player::getNomboxTile)
-                .flatMap(t -> t.getUnitHolders().values().stream())
+                .flatMap(t -> t.getUnitHolderValues().stream())
                 .forEach(uh -> replaceIDsOnUnitHolder(uh, oldColorID, newColorID));
     }
 

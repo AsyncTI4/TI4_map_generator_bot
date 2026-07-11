@@ -40,8 +40,7 @@ class StrandedShipAcd2ButtonHandler {
         AddUnitService.addUnits(event, tile, game, player.getColor(), "cruiser");
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getFactionEmoji() + " put 1 cruiser in " + tile.getRepresentation() + ".");
+                player.getCorrectChannel(), player.getFactionEmoji() + " put 1 cruiser in " + tile.toString() + ".");
 
         // If Empyrean Commander is in game check if unlock condition exists
         Player p2 = game.getPlayerFromLeader("empyreancommander");
@@ -50,8 +49,8 @@ class StrandedShipAcd2ButtonHandler {
 
     private static List<Button> getStrandedShipButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (tile.getPlanetUnitHolders().isEmpty() && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
+        for (Tile tile : game.getTiles()) {
+            if (!tile.hasPlanets() && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
                 buttons.add(Buttons.green(
                         "strandedShipStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
             }

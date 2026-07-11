@@ -55,8 +55,8 @@ class MoveAllUnits extends GameStateSubcommand {
         }
 
         Player player = getPlayer();
-        UnitHolder space = tileTo.getUnitHolders().get("space");
-        for (UnitHolder uH : tileFrom.getUnitHolders().values()) {
+        UnitHolder space = tileTo.getSpaceUnitHolder();
+        for (UnitHolder uH : tileFrom.getUnitHolderValues()) {
             for (UnitKey key : uH.getUnits().keySet()) {
                 if (!player.unitBelongsToPlayer(key)) continue;
                 space.addUnit(key, uH.getUnits().get(key));

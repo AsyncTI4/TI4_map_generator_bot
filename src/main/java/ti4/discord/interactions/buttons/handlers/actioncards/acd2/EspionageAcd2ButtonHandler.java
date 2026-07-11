@@ -168,11 +168,11 @@ class EspionageAcd2ButtonHandler {
 
         MessageHelper.sendMessageToChannel(
                 initiator.getCardsInfoThread(),
-                "# " + initiator.getRepresentation() + " you took the action card _"
+                "# " + initiator.toString() + " you took the action card _"
                         + Mapper.getActionCard(actionCardId).getName() + "_ for _Espionage_.");
         MessageHelper.sendMessageToChannel(
                 target.getCardsInfoThread(),
-                "# " + target.getRepresentation() + " your action card _"
+                "# " + target.toString() + " your action card _"
                         + Mapper.getActionCard(actionCardId).getName() + "_ was taken with _Espionage_.");
         ButtonHelper.deleteMessage(event);
     }

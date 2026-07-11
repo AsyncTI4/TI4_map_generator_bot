@@ -37,7 +37,7 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.game.GameNameService;
 import ti4.service.option.FOWOptionService.FOWOption;
-import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitQueryService;
 
 public final class FoWHelper {
     public static boolean isPrivateGame(GenericInteractionCreateEvent event) {
@@ -99,7 +99,7 @@ public final class FoWHelper {
         if (player == viewingPlayer) {
             return true;
         }
-        if (viewingPlayer.getAllianceMembers().contains(player.getFaction())) {
+        if (viewingPlayer.hasAllianceMember(player.getFaction())) {
             return true;
         }
         if ((hasPlayersPromInPlayArea(player, viewingPlayer) || hasMahactCCInFleet(player, viewingPlayer))
@@ -152,7 +152,7 @@ public final class FoWHelper {
         }
 
         String playerSweep = Mapper.getSweepID(player.getColor());
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tile.hasCC(playerSweep)) {
                 tilePositionsToShow.add(tile.getPosition());
             }
@@ -179,7 +179,7 @@ public final class FoWHelper {
         }
 
         String playerSweep = Mapper.getSweepID(player.getColor());
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tile.hasCC(playerSweep)) {
                 tilePositionsToShow.add(tile.getPosition());
             }
@@ -192,7 +192,7 @@ public final class FoWHelper {
     }
 
     private static void updatePlayerFogTiles(Game game, Player player) {
-        for (Tile tileToUpdate : game.getTileMap().values()) {
+        for (Tile tileToUpdate : game.getTiles()) {
             if (!tileToUpdate.isValid()) {
                 BotLogger.warning(
                         String.format("Tile %s is not valid in game %s", tileToUpdate.getTileID(), game.getName()));
@@ -288,10 +288,10 @@ public final class FoWHelper {
                 && player == game.getActivePlayer()
                 && forDistance
                 && !game.getCurrentActiveSystem().isEmpty()
-                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                && UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
                         .contains(game.getTileByPosition(position))) {
 
-            for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
+            for (Tile tile : UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)) {
                 if (tile.getPosition().equalsIgnoreCase(position)) {
                     continue;
                 }
@@ -308,7 +308,7 @@ public final class FoWHelper {
             playersToCheck.add(player);
             if (game.isAllianceMode()) {
                 playersToCheck.addAll(game.getRealPlayers().stream()
-                        .filter(alliancePlayer -> player.getAllianceMembers().contains(alliancePlayer.getFaction()))
+                        .filter(alliancePlayer -> player.hasAllianceMember(alliancePlayer.getFaction()))
                         .collect(Collectors.toSet()));
             }
 
@@ -317,8 +317,7 @@ public final class FoWHelper {
             Set<Tile> emptyTiles = getEmptyTiles(game);
             boolean containsUnits =
                     emptyTiles.stream().anyMatch(tile -> playersToCheck.stream().anyMatch(tile::containsPlayersUnits));
-            if (containsUnits
-                    && game.getTileByPosition(position).getPlanetUnitHolders().isEmpty()) {
+            if (containsUnits && !game.getTileByPosition(position).hasPlanets()) {
                 adjacentPositions.addAll(
                         emptyTiles.stream().map(Tile::getPosition).collect(Collectors.toSet()));
             }
@@ -334,7 +333,7 @@ public final class FoWHelper {
 
     private static Set<String> getNonWormholeAdjacencies(Game game, String position) {
         Set<String> adjacentPositions = new HashSet<>();
-        Set<Tile> allTiles = new HashSet<>(game.getTileMap().values());
+        Set<Tile> allTiles = new HashSet<>(game.getTiles());
         Tile tile = game.getTileByPosition(position);
         if (tile == null) {
             return adjacentPositions;
@@ -363,7 +362,7 @@ public final class FoWHelper {
             adjToFeatures.add(Feature.egress);
         }
 
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+        for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
             for (String token : unitHolder.getTokenList()) {
                 switch (token) {
                     case Constants.TOKEN_BREACH_ACTIVE -> adjToFeatures.add(Feature.breach);
@@ -385,7 +384,7 @@ public final class FoWHelper {
                     continue;
                 }
             }
-            for (UnitHolder unitHolder : t.getUnitHolders().values()) {
+            for (UnitHolder unitHolder : t.getUnitHolderValues()) {
                 for (String token : unitHolder.getTokenList()) {
                     if (adjToFeatures.contains(Feature.breach) && Constants.TOKEN_BREACH_ACTIVE.equals(token)) {
                         adjacentPositions.add(t.getPosition());
@@ -407,10 +406,10 @@ public final class FoWHelper {
 
     public static Set<Tile> getEmptyTiles(Game game) {
         Set<Tile> emptyTiles = new HashSet<>();
-        Collection<Tile> tileList = game.getTileMap().values();
+        Collection<Tile> tileList = game.getTiles();
         List<String> frontierTileList = Mapper.getFrontierTileIds();
         for (Tile tile : tileList) {
-            if (tile.getPlanetUnitHolders().isEmpty()
+            if (!tile.hasPlanets()
                     && (tile.getUnitHolders().size() == 2 || frontierTileList.contains(tile.getTileID()))) {
                 emptyTiles.add(tile);
             }
@@ -514,7 +513,7 @@ public final class FoWHelper {
 
     public static boolean isTileInExileRange(Game game, Tile tile, Player player) {
         if (player.hasUnit("crimson_destroyer")) {
-            List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
+            List<Tile> destroyers = UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Destroyer);
             for (Tile tile2 : destroyers) {
                 if (getAdjacentTiles(game, tile.getPosition(), player, false, true)
                         .contains(tile2.getPosition())) {
@@ -527,7 +526,7 @@ public final class FoWHelper {
 
     public static boolean isTileInUpgradedExileRange(Game game, Tile tile, Player player) {
         if (player.hasUnit("crimson_destroyer2")) {
-            List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
+            List<Tile> destroyers = UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Destroyer);
             for (String adjPos : getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
                 for (Tile tile2 : destroyers) {
                     if (getAdjacentTiles(game, adjPos, player, false, true).contains(tile2.getPosition())) {
@@ -566,7 +565,7 @@ public final class FoWHelper {
         }
 
         Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+        for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
             Set<String> tokenList = unitHolder.getTokenList();
             for (String token : tokenList) {
                 String tokenName =
@@ -586,7 +585,7 @@ public final class FoWHelper {
                     wormholeIDs.add(Constants.BETA);
                 }
             }
-            if (unitHolder.getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
+            if (unitHolder.hasUnit(UnitType.Flagship, ghostFlagshipColor)) {
                 wormholeIDs.add(Constants.DELTA);
             }
         }
@@ -598,7 +597,7 @@ public final class FoWHelper {
         Tile tile = game.getTileByPosition(position);
 
         Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+        for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
             Set<String> tokenList = unitHolder.getTokenList();
             for (String token : tokenList) {
                 String tokenName =
@@ -629,7 +628,7 @@ public final class FoWHelper {
         Tile tile = game.getTileByPosition(position);
 
         Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+        for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
             Set<String> tokenList = unitHolder.getTokenList();
             for (String token : tokenList) {
                 String tokenName =
@@ -660,7 +659,7 @@ public final class FoWHelper {
         Tile tile = game.getTileByPosition(position);
 
         Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+        for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
             Set<String> tokenList = unitHolder.getTokenList();
             for (String token : tokenList) {
                 String tokenName =
@@ -697,7 +696,7 @@ public final class FoWHelper {
     private static Set<String> getWormholeAdjacencies(
             Game game, String position, Player player, boolean neighbors, boolean forDistance) {
         Set<String> adjacentPositions = new HashSet<>();
-        Set<Tile> allTiles = new HashSet<>(game.getTileMap().values());
+        Set<Tile> allTiles = new HashSet<>(game.getTiles());
         Tile tile = game.getTileByPosition(position);
 
         String ghostFlagshipColor = null;
@@ -716,7 +715,7 @@ public final class FoWHelper {
             return adjacentPositions;
         }
         Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+        for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
             Set<String> tokenList = unitHolder.getTokenList();
             for (String token : tokenList) {
                 String tokenName =
@@ -735,7 +734,7 @@ public final class FoWHelper {
                     wormholeIDs.add(Constants.BETA);
                 }
             }
-            if (unitHolder.getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
+            if (unitHolder.hasUnit(UnitType.Flagship, ghostFlagshipColor)) {
                 wormholeIDs.add(Constants.DELTA);
             }
         }
@@ -754,7 +753,7 @@ public final class FoWHelper {
             wormholeIDs.removeIf(wh -> !keepers.contains(wh.toLowerCase()));
         }
 
-        if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)) {
+        if (tile.getSpaceUnitHolder().containsToken(Constants.TOKEN_SEVERED)) {
             Set<String> keepers = new HashSet<>();
             if (hasQuantumEntanglement || wh_recon || absol_recon) {
                 keepers.addAll(Set.of("alpha", "beta"));
@@ -780,10 +779,9 @@ public final class FoWHelper {
                 && player == game.getActivePlayer()
                 && !game.getCurrentActiveSystem().isEmpty()
                 && player.hasTech("lgf")
-                && !player.getPlanets().contains("mrte")
-                && !player.getPlanets().contains("mr")
-                && (tile.getUnitHolders().containsKey("mrte")
-                        || tile.getUnitHolders().containsKey("mr"))) {
+                && !player.containsPlanet("mrte")
+                && !player.containsPlanet("mr")
+                && (tile.hasUnitHolder("mrte") || tile.hasUnitHolder("mr"))) {
             wormholeIDs.add(Constants.BETA);
             wormholeIDs.add(Constants.ALPHA);
         }
@@ -794,7 +792,7 @@ public final class FoWHelper {
                 && player.hasTech("tf-lazaxgatefolding")) {
             boolean hasUncontrolledLeg = false;
             for (Planet planet : tile.getPlanetUnitHolders()) {
-                if (planet.isLegendary() && !player.getPlanets().contains(planet.getName())) {
+                if (planet.isLegendary() && !player.containsPlanet(planet.getName())) {
                     hasUncontrolledLeg = true;
                 }
             }
@@ -833,7 +831,7 @@ public final class FoWHelper {
                 adjacentPositions.add(position_);
                 continue;
             }
-            for (UnitHolder unitHolder : tile_.getUnitHolders().values()) {
+            for (UnitHolder unitHolder : tile_.getUnitHolderValues()) {
                 Set<String> tokenList = unitHolder.getTokenList();
                 for (String token : tokenList) {
                     for (String wormholeID : wormholeIDs) {
@@ -851,7 +849,7 @@ public final class FoWHelper {
                     }
                 }
                 if (wormholeIDs.contains(Constants.DELTA)
-                        && unitHolder.getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
+                        && unitHolder.hasUnit(UnitType.Flagship, ghostFlagshipColor)) {
                     adjacentPositions.add(position_);
                 }
             }
@@ -921,7 +919,7 @@ public final class FoWHelper {
         if (game.isAllianceMode() && !forNeighbors) {
             boolean allianceHasUnits = game.getRealPlayers().stream()
                     .filter(alliancePlayer -> alliancePlayer != player)
-                    .filter(alliancePlayer -> player.getAllianceMembers().contains(alliancePlayer.getFaction()))
+                    .filter(alliancePlayer -> player.hasAllianceMember(alliancePlayer.getFaction()))
                     .anyMatch(alliancePlayer -> playerHasUnitsInSystem(alliancePlayer, tile));
 
             if (allianceHasUnits) {
@@ -940,7 +938,7 @@ public final class FoWHelper {
         if (tile == null || player == null) return false;
 
         for (UnitHolder uH : tile.getPlanetUnitHolders()) {
-            if (player.getPlanetsAllianceMode().contains(uH.getName())) {
+            if (player.canUsePlanet(uH.getName())) {
                 return true;
             }
         }
@@ -951,7 +949,7 @@ public final class FoWHelper {
         String colorID = Mapper.getColorID(player.getColor());
         if (tile == null || colorID == null) return false;
 
-        UnitHolder unitHolder = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder unitHolder = tile.getSpaceUnitHolder();
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
@@ -966,7 +964,7 @@ public final class FoWHelper {
         String colorID = Mapper.getColorID(player.getColor());
         if (tile == null || colorID == null) return false;
 
-        UnitHolder unitHolder = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder unitHolder = tile.getSpaceUnitHolder();
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
@@ -982,7 +980,7 @@ public final class FoWHelper {
 
     public static boolean otherPlayersHaveShipsInSystem(Player player, Tile tile, Game game) {
         for (Player p2 : game.getRealPlayersNDummies()) {
-            if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
+            if (p2 == player || player.hasAllianceMember(p2.getFaction())) {
                 continue;
             }
             if (playerHasActualShipsInSystem(p2, tile)) {
@@ -997,7 +995,7 @@ public final class FoWHelper {
             return false;
         }
         for (Player p2 : game.getRealPlayersNDummies()) {
-            if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
+            if (p2 == player || player.hasAllianceMember(p2.getFaction())) {
                 continue;
             }
             if (p2.hasTech("ah") && ButtonHelperAgents.doesTileHaveAStructureInIt(p2, tile)) {
@@ -1005,8 +1003,8 @@ public final class FoWHelper {
             }
             if ((p2.hasAbility("decree") || p2.hasTech("tf-radiantsigils")) && tile.isAnomaly(game, p2)) {
                 List<Tile> tiles = new ArrayList<>();
-                tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Infantry));
-                tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Mech));
+                tiles.addAll(UnitQueryService.getTilesContainingPlayersUnits(game, p2, UnitType.Infantry));
+                tiles.addAll(UnitQueryService.getTilesContainingPlayersUnits(game, p2, UnitType.Mech));
                 if (tiles.contains(tile)) {
                     return true;
                 }
@@ -1017,7 +1015,7 @@ public final class FoWHelper {
 
     public static boolean otherPlayersHaveUnitsInSystem(Player player, Tile tile, Game game) {
         for (Player p2 : game.getRealPlayersNDummies()) {
-            if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
+            if (p2 == player || player.hasAllianceMember(p2.getFaction())) {
                 continue;
             }
             if (playerHasUnitsInSystem(p2, tile)) {
@@ -1031,7 +1029,7 @@ public final class FoWHelper {
         String colorID = Mapper.getColorID(player.getColor());
         if (tile == null || colorID == null) return false;
 
-        UnitHolder unitHolder = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder unitHolder = tile.getSpaceUnitHolder();
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
@@ -1048,8 +1046,8 @@ public final class FoWHelper {
 
         for (String pos : getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
             Tile tile2 = game.getTileByPosition(pos);
-            UnitHolder unitHolder = tile2.getUnitHolders().get(Constants.SPACE);
-            if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
+            UnitHolder unitHolder = tile2.getSpaceUnitHolder();
+            if (unitHolder.hasUnit(UnitType.Fighter, player.getColor())) {
                 return true;
             }
         }
@@ -1070,7 +1068,7 @@ public final class FoWHelper {
     }
 
     public static boolean playerHasUnitsOnPlanet(Player player, Tile tile, String planet) {
-        return playerHasUnitsOnPlanet(player, tile.getUnitHolders().get(planet));
+        return playerHasUnitsOnPlanet(player, tile.getPlanet(planet));
     }
 
     public static boolean playerHasUnitsOnPlanet(Player player, UnitHolder unitHolder) {
@@ -1108,7 +1106,7 @@ public final class FoWHelper {
         String colorID = Mapper.getColorID(player.getColor());
         if (tile == null || colorID == null) return false;
 
-        UnitHolder unitHolder = tile.getUnitHolders().get(planet);
+        UnitHolder unitHolder = tile.getPlanet(planet);
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
@@ -1155,7 +1153,7 @@ public final class FoWHelper {
                 .filter(viewer -> initializeAndCheckStatVisibility(game, playerWithChange, viewer))
                 .collect(Collectors.toSet());
 
-        String playerMessage = playerWithChange.getRepresentation() + " stats changed: " + message;
+        String playerMessage = playerWithChange.toString() + " stats changed: " + message;
         for (Player player_ : playersToPing) {
             MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
         }
@@ -1204,13 +1202,13 @@ public final class FoWHelper {
             StringBuilder sb = new StringBuilder();
             // first off let's give full info for someone that can see both sides
             if (senderVisible) {
-                sb.append(sendingPlayer.getRepresentation());
+                sb.append(sendingPlayer.toString());
             } else {
                 sb.append("Someone");
             }
             sb.append(" sent ").append(transactedObject).append(" to ");
             if (receiverVisible) {
-                sb.append(receivingPlayer.getRepresentation());
+                sb.append(receivingPlayer.toString());
             } else {
                 sb.append("someone");
             }

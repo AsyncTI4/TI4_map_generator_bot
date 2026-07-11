@@ -218,7 +218,7 @@ public class MiltyService {
                     if (p != draftManager.getCurrentDraftPlayer(game) && p.getCardsInfoThread() != null) {
                         MessageHelper.sendMessageToChannel(
                                 p.getCardsInfoThread(),
-                                p.getRepresentation() + " You can queue your choices with these buttons",
+                                p.toString() + " You can queue your choices with these buttons",
                                 draftManager.getQueueButtons(p, game));
                     }
                 }

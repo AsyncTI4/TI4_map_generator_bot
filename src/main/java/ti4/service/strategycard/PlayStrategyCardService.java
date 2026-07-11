@@ -52,7 +52,7 @@ import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.SpeakerService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
-import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitQueryService;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
 
@@ -100,7 +100,7 @@ public class PlayStrategyCardService {
                     game.setStoredValue("Coup", "");
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getRepresentation()
+                            player.toString()
                                     + " you have been Coup'd due to attempting to play **" + stratCardName
                                     + "**. If this is a mistake or the _Coup D'etat_ is Sabo'd, feel free to play **"
                                     + stratCardName
@@ -118,7 +118,7 @@ public class PlayStrategyCardService {
         StringBuilder message = new StringBuilder();
         message.append(game.getSCEmojiWordRepresentation(scToPlay)).append(isOverrule ? " overruled" : " played");
         if (!game.isFowMode()) {
-            message.append(" by ").append(player.getRepresentation());
+            message.append(" by ").append(player.toString());
         }
         message.append(".\n\n");
 
@@ -140,7 +140,7 @@ public class PlayStrategyCardService {
                         String num2 = sc + "";
                         num2 = num2.substring(num2.length() - 1);
                         if (num2.equalsIgnoreCase(num) || "0".equalsIgnoreCase(num) || "0".equalsIgnoreCase(num2)) {
-                            gamePing.append(gamePing.isEmpty() ? "" : ", ").append(p2.getRepresentation());
+                            gamePing.append(gamePing.isEmpty() ? "" : ", ").append(p2.toString());
                             playersToFollow.add(p2);
                         }
                     }
@@ -241,7 +241,7 @@ public class PlayStrategyCardService {
         // Politics Assign Speaker Buttons
         if (scModel.usesAutomationForSCID("pok3politics") || scModel.usesAutomationForSCID("cryypter_3")) {
             game.setStoredValue("hasntSetSpeaker", "waiting");
-            String assignSpeakerMessage = player.getRepresentation()
+            String assignSpeakerMessage = player.toString()
                     + ", please, __before__ you draw your action cards or look at agendas, choose a faction below to receive the Speaker token."
                     + MiscEmojis.SpeakerToken;
 
@@ -267,17 +267,16 @@ public class PlayStrategyCardService {
         }
 
         // Handle Kyro Hero
-        if (scToPlay == ButtonHelper.getKyroHeroSC(game)
-                && !player.getFaction().equalsIgnoreCase(game.getStoredValue("kyroHeroPlayer"))) {
+        if (scToPlay == ButtonHelper.getKyroHeroSC(game) && !player.isFaction(game.getStoredValue("kyroHeroPlayer"))) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + " this is a reminder that this strategy card is Kyro Cursed and therefore you should only do 1 of its clauses. ");
         }
 
         // Politics Agenda Draw Buttons
         if (scModel.usesAutomationForSCID("pok3politics") || scModel.usesAutomationForSCID("cryypter_3")) {
-            String drawAgendasMessage = player.getRepresentation()
+            String drawAgendasMessage = player.toString()
                     + " __after__ assigning speaker, use this button to look at the top agendas, which will be shown to you in your `#cards-info` thread.";
             Button draw2Agenda =
                     Buttons.green(player.factionButtonChecker() + "drawAgenda_2", "Draw 2 Agendas", CardEmojis.Agenda);
@@ -289,7 +288,7 @@ public class PlayStrategyCardService {
 
         // Cryypter's Additional Look at Top Agenda Buttons
         if (scModel.usesAutomationForSCID("cryypter_3")) {
-            String lookAtTopMessage = player.getRepresentation()
+            String lookAtTopMessage = player.toString()
                     + " after placing the drawn agendas on top/bottom, you must look a the top two cards of the agenda deck.";
             Button draw2Agenda = Buttons.green(
                     player.factionButtonChecker() + "agendaLookAt[count:2][lookAtBottom:false]",
@@ -311,7 +310,7 @@ public class PlayStrategyCardService {
         }
 
         if (!isOverrule && scModel.usesAutomationForSCID("pok5trade")) {
-            String assignSpeakerMessage2 = player.getRepresentation()
+            String assignSpeakerMessage2 = player.toString()
                     + " you may force players to replenish commodities. This is normally done in order to trigger a _Trade Agreement_ or because of a pre-existing deal."
                     + " This is not required, and not advised if you are offering them a conditional replenishment. If you're offering them a conditional replenishment, it is advised to let them press replenish (or replenish and wash) themselves, since them pressing that can act as their acceptance of the deal. The bot will not auto-deduct a strategy command token.";
             List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(game, player, playersToFollow);
@@ -355,11 +354,11 @@ public class PlayStrategyCardService {
         Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
         if (obsidian != null && obsidian.getPuppetedFactionsForPlot("enervate").contains(player.getFaction())) {
             if (scModel.usesAutomationForSCID("pok1leadership")) {
-                String enervateMsg = obsidian.getRepresentation()
+                String enervateMsg = obsidian.toString()
                         + ", your _Enervate_ puppet has played **Leadership**, so you can resolve the primary instead of the secondary. ";
                 MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), enervateMsg);
             } else {
-                String enervateMsg = obsidian.getRepresentation()
+                String enervateMsg = obsidian.toString()
                         + ", your _Enervate_ puppet has played a strategy card, so you have been marked as following for free. ";
                 MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), enervateMsg);
                 obsidian.addFollowedSC(scToPlay, event);
@@ -370,7 +369,7 @@ public class PlayStrategyCardService {
                 if (IsPlayerElectedService.isPlayerElected(game, player3, "minister_sciences")) {
                     MessageHelper.sendMessageToChannel(
                             player3.getCardsInfoThread(),
-                            player3.getRepresentation()
+                            player3.toString()
                                     + ", you have been elected as Minister of Sciences, so you do not need to pay resources to research off of technology. ");
                 }
             }
@@ -473,7 +472,7 @@ public class PlayStrategyCardService {
         if (scModel.usesAutomationForSCID("anarchy8")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + " to resolve the 3rd primary effect, "
                             + "a tactical action, we advise you just click the \"Do Another Action\" button, and when you do the primary of **Warfare**, gain an extra command token "
                             + "into your tactic pool, to account for the tactical action spending from reinforcements.");
@@ -518,9 +517,9 @@ public class PlayStrategyCardService {
             scHolder = game.getRealPlayers().get(0);
         }
         for (Player p : Helper.getSpeakerOrFullPriorityOrderFromPlayer(scHolder, game)) {
-            String representation = ping ? p.getRepresentation() : p.getRepresentationNoPing();
+            String representation = ping ? p.toString() : p.getRepresentationNoPing();
             if (p.hasFollowedSC(scID)) {
-                if (p.getSCs().contains(scID)) {
+                if (p.hasStrategyCard(scID)) {
                     followSummary.append(representation).append(" played the SC");
                 } else {
                     if (game.getStoredValue("followedSC" + scID + "_" + game.getRound())
@@ -570,7 +569,7 @@ public class PlayStrategyCardService {
                 if (!primaryHasAcq
                         && p2.getStrategicCC() == 0
                         && !unfollowedSCs.contains(1)
-                        && (!p2.getTechs().contains("iihq") || !unfollowedSCs.contains(8))
+                        && (!p2.hasExactTech("iihq") || !unfollowedSCs.contains(8))
                         && !p2.hasRelicReady("absol_emelpar")
                         && !p2.hasRelicReady("emelpar")
                         && !p2.hasUnexhaustedLeader("mahactagent")
@@ -587,8 +586,7 @@ public class PlayStrategyCardService {
                     if (scToPlay == 6
                             && !p2.hasUnit("ghoti_flagship")
                             && !game.isTwilightsFallMode()
-                            && !CheckUnitContainmentService.getTilesContainingPlayersUnits(
-                                            game, p2, Units.UnitType.Spacedock)
+                            && !UnitQueryService.getTilesContainingPlayersUnits(game, p2, Units.UnitType.Spacedock)
                                     .contains(p2.getHomeSystemTile())) {
                         markPlayerAsAutoFollowing(playersToReact, game, p2, 6, event);
                         MessageHelper.sendMessageToChannel(
@@ -665,7 +663,7 @@ public class PlayStrategyCardService {
         threadChannel.queue(m5 -> {
             if (Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity())
                     && scModel.hasImageFile()
-                    && player.getSCs().contains(scToPlay)) {
+                    && player.hasStrategyCard(scToPlay)) {
                 MessageHelper.sendMessageToChannel(m5, scModel.getImageFileUrl());
                 if (ShouldPrintFollowOrder(game, scModel)) {
                     List<Player> playersInOrder = getPlayersInFollowOrder(game, player);

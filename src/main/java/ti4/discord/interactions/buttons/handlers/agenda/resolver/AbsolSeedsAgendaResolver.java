@@ -25,12 +25,12 @@ public class AbsolSeedsAgendaResolver implements ForAgainstAgendaResolver {
             Integer poIndex = game.addCustomPO("Seed of an Empire", 1);
             game.scorePublicObjective(playerWL.getUserID(), poIndex);
             MessageHelper.sendMessageToChannel(
-                    playerWL.getCorrectChannel(), playerWL.getRepresentation() + " scored _Seed of an Empire_.");
+                    playerWL.getCorrectChannel(), playerWL.toString() + " scored _Seed of an Empire_.");
             Helper.checkEndGame(game, playerWL);
             game.setSpeakerUserID(playerWL.getUserID());
             MessageHelper.sendMessageToChannel(
                     playerWL.getCorrectChannel(),
-                    playerWL.getRepresentation()
+                    playerWL.toString()
                             + " was made speaker and so must give each other player that voted \"for\" a promissory note.");
             for (Player p2 : AgendaHelper.getWinningVoters("for", game)) {
                 if (p2 != playerWL) {
@@ -53,7 +53,7 @@ public class AbsolSeedsAgendaResolver implements ForAgainstAgendaResolver {
             Integer poIndex = game.addCustomPO("Seed of an Empire", 1);
             game.scorePublicObjective(playerWL.getUserID(), poIndex);
             MessageHelper.sendMessageToChannel(
-                    playerWL.getCorrectChannel(), playerWL.getRepresentation() + " scored _Seed of an Empire_.");
+                    playerWL.getCorrectChannel(), playerWL.toString() + " scored _Seed of an Empire_.");
             Helper.checkEndGame(game, playerWL);
             ActionCardHelper.drawActionCards(playerWL, 3);
             playerWL.setFleetCC(playerWL.getFleetCC() + 1);
@@ -61,7 +61,7 @@ public class AbsolSeedsAgendaResolver implements ForAgainstAgendaResolver {
             playerWL.setStrategicCC(playerWL.getStrategicCC() + 1);
             MessageHelper.sendMessageToChannel(
                     playerWL.getCorrectChannel(),
-                    playerWL.getRepresentation()
+                    playerWL.toString()
                             + " drew some action cards and has had a command token placed in each command pool.");
         }
     }

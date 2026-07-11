@@ -28,7 +28,7 @@ public class TaPromissoryHandler {
         }
 
         for (String planetName : player.getPlanets()) {
-            Planet planet = game.getUnitHolderFromPlanet(planetName);
+            Planet planet = game.getPlanet(planetName);
             if (planet == null
                     || planet.isHomePlanet()
                     || planet.getAttachments().contains(ASE_ATTACHMENT_TOKEN)) {
@@ -50,7 +50,7 @@ public class TaPromissoryHandler {
 
         List<String> legalPlanets = new ArrayList<>();
         for (String planetName : player.getPlanets()) {
-            Planet planet = game.getUnitHolderFromPlanet(planetName);
+            Planet planet = game.getPlanet(planetName);
             if (planet == null
                     || planet.isHomePlanet()
                     || planet.getAttachments().contains(ASE_ATTACHMENT_TOKEN)) {
@@ -63,15 +63,14 @@ public class TaPromissoryHandler {
         if (legalPlanets.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + ", there are no legal planets to play _Advanced Structural Engineering_ on.");
+                    player.toString() + ", there are no legal planets to play _Advanced Structural Engineering_ on.");
             ButtonHelper.deleteMessage(event);
             return;
         }
 
         List<Button> buttons = new ArrayList<>();
         for (String planetName : legalPlanets) {
-            Tile tilePos = game.getTileFromPlanet(planetName);
+            Tile tilePos = game.getTileContainingPlanet(planetName);
             if (tilePos == null) {
                 continue;
             }
@@ -83,8 +82,7 @@ public class TaPromissoryHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation()
-                        + ", please select a non-home planet to attach _Advanced Structural Engineering_ to.",
+                player.toString() + ", please select a non-home planet to attach _Advanced Structural Engineering_ to.",
                 buttons);
     }
 
@@ -116,13 +114,13 @@ public class TaPromissoryHandler {
             return;
         }
 
-        Planet planet = tile.getUnitHolderFromPlanet(planetName);
+        Planet planet = tile.getPlanet(planetName);
         if (planet == null) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
-        if (!player.getPlanets().contains(planetName)
+        if (!player.containsPlanet(planetName)
                 || planet.isHomePlanet()
                 || planet.getAttachments().contains(ASE_ATTACHMENT_TOKEN)) {
             ButtonHelper.deleteMessage(event);

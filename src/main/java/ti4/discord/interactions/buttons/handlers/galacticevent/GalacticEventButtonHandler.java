@@ -147,7 +147,7 @@ class GalacticEventButtonHandler {
                     player.addTech(tech);
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getRepresentation() + " gained the "
+                            player.toString() + " gained the "
                                     + Mapper.getTech(tech).getNameRepresentation()
                                     + " technology due to the _Age of Fighters_ galactic event.");
                 }

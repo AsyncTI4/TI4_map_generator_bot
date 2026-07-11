@@ -37,7 +37,7 @@ class BlackMarketRaidAcd2ButtonHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + " cannot resolve _Black Market Raid_: not enough command tokens or relic fragments.");
             return;
         }

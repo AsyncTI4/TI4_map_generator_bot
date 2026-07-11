@@ -29,7 +29,7 @@ class BrutalOccupationAcd2ButtonHandler {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", please choose the target of _Brutal Occupation_.",
+                player.toString() + ", please choose the target of _Brutal Occupation_.",
                 buttons);
     }
 
@@ -37,13 +37,12 @@ class BrutalOccupationAcd2ButtonHandler {
     public static void resolveBrutalOccupationStep2(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        Tile tile = game.getTileFromPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "2 inf " + planet);
 
         player.refreshPlanet(planet);
 
-        List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(
-                game, ButtonHelper.getUnitHolderFromPlanetName(planet, game), player);
+        List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, game.getPlanet(planet), player);
         if (!buttons.isEmpty()) {
             String message = player.getFactionEmoji() + ", please press the button to explore "
                     + Helper.getPlanetRepresentation(planet, game) + ".";
@@ -53,7 +52,7 @@ class BrutalOccupationAcd2ButtonHandler {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " readied and explored "
+                player.toString() + " readied and explored "
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game) + ".");
     }
 }

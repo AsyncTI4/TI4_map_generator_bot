@@ -31,6 +31,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
+import ti4.service.unit.UnitQueryService;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -41,8 +42,7 @@ class TechUseButtonHandler {
         String tech = buttonID.replace("useTech_", "");
         TechnologyModel techModel = Mapper.getTech(tech);
         if (!"st".equalsIgnoreCase(tech)) {
-            String useMessage =
-                    player.getRepresentation() + " used the " + techModel.getRepresentation(false) + " technology.";
+            String useMessage = player.toString() + " used the " + techModel.getRepresentation(false) + " technology.";
             if (game.isShowFullComponentTextEmbeds()) {
                 MessageHelper.sendMessageToChannelWithEmbed(
                         event.getMessageChannel(), useMessage, techModel.getRepresentationEmbed());
@@ -115,12 +115,12 @@ class TechUseButtonHandler {
             }
             case "tf-industrialjuggernaut" -> {
                 List<Button> buttons = new ArrayList<>();
-                for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
+                for (Tile tile : UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)) {
                     if (FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                         continue;
                     }
-                    for (UnitHolder uH : tile.getUnitHolders().values()) {
-                        if (uH.getUnitCount(UnitType.Spacedock, player) > 0) {
+                    for (UnitHolder uH : tile.getUnitHolderValues()) {
+                        if (uH.hasUnit(UnitType.Spacedock, player)) {
                             String uHName = "in space";
                             if (!"space".equalsIgnoreCase(uH.getName())) {
                                 uHName = "on " + Helper.getPlanetRepresentation(uH.getName(), game);
@@ -149,7 +149,7 @@ class TechUseButtonHandler {
                 List<Button> absolPAButtons = new ArrayList<>();
                 absolPAButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard", CardEmojis.getACEmoji(game)));
                 for (String planetID : player.getReadiedPlanets()) {
-                    Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetID, game);
+                    Planet planet = game.getPlanet(planetID);
                     if (planet != null && isNotBlank(planet.getOriginalPlanetType())) {
                         List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(game, planet, player);
                         absolPAButtons.addAll(planetButtons);
@@ -170,7 +170,7 @@ class TechUseButtonHandler {
         String pos = buttonID.split("_")[1];
         String uHName = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(pos);
-        UnitHolder uH = tile.getUnitHolders().get(uHName);
+        UnitHolder uH = tile.getUnitHolder(uHName);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "ws");
         ButtonHelper.deleteMessage(event);
         RemoveUnitService.removeUnit(event, tile, game, player, uH, UnitType.Spacedock, 1);
@@ -212,7 +212,7 @@ class TechUseButtonHandler {
                 finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade_noPay",
                 "Get A Unit Upgrade Technology",
                 TechEmojis.UnitUpgradeTech));
-        String message = player.getRepresentation() + ", please choose what type of technology you wish to get?";
+        String message = player.toString() + ", please choose what type of technology you wish to get?";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }

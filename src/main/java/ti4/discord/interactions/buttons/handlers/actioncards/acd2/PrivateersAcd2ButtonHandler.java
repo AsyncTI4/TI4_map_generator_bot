@@ -127,7 +127,7 @@ class PrivateersAcd2ButtonHandler {
         player.setTg(player.getTg() + cost);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationNoPing() + " replaced their ships in " + tile.getRepresentation()
+                player.getRepresentationNoPing() + " replaced their ships in " + tile.toString()
                         + " with neutral ships and gained " + cost + " trade goods for _Privateers_ (cost of 1 "
                         + chosen.humanReadableName() + ").");
     }

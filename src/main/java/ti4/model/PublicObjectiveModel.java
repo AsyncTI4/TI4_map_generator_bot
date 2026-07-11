@@ -41,6 +41,11 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
         return getRepresentation(true);
     }
 
+    @Override
+    public String toString() {
+        return getRepresentation();
+    }
+
     @JsonIgnore
     public String getRepresentation(boolean vps) {
         return getObjectiveEmoji() + "_" + name + "_ - " + text + (vps ? " (" + points + " VP)" : "");

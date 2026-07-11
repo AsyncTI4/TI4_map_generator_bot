@@ -38,7 +38,7 @@ public class TaLeadersHandler {
             return;
         }
 
-        Planet planet = tile.getUnitHolderFromPlanet(planetName);
+        Planet planet = tile.getPlanet(planetName);
         player.gainCommodities(1);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
@@ -86,7 +86,7 @@ public class TaLeadersHandler {
         String tilePosition = parts[0];
         String planetName = parts[1];
         Tile tile = game.getTileByPosition(tilePosition);
-        Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
+        Planet planet = tile == null ? null : tile.getPlanet(planetName);
 
         if (tile == null
                 || planet == null
@@ -101,7 +101,7 @@ public class TaLeadersHandler {
         player.gainTG(1);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " converted 1 "
                         + MiscEmojis.comm
                         + " to 1 "
@@ -173,7 +173,7 @@ public class TaLeadersHandler {
 
         List<Button> buttons = new ArrayList<>();
         for (String planet : eligiblePlanets) {
-            Planet planetModel = game.getPlanetsInfo().get(planet);
+            Planet planetModel = game.getPlanet(planet);
             int influence = planetModel == null ? 0 : planetModel.getInfluence();
             String planetName =
                     Mapper.getPlanet(planet) != null && Mapper.getPlanet(planet).getName() != null
@@ -228,7 +228,7 @@ public class TaLeadersHandler {
         game.setStoredValue(
                 getLenPredeclareKey(player), game.getCurrentAgendaInfo() + ";" + target.getFaction() + ";" + planet);
 
-        Planet planetModel = game.getPlanetsInfo().get(planet);
+        Planet planetModel = game.getPlanet(planet);
         int influence = planetModel == null ? 0 : planetModel.getInfluence();
         String planetRepresentation = Helper.getPlanetRepresentationPlusEmoji(planet);
         String ownerMessage = player.getRepresentationNoPing() + " exhausted _Len_ to give "
@@ -259,7 +259,7 @@ public class TaLeadersHandler {
                 continue;
             }
 
-            Planet planetModel = game.getPlanetsInfo().get(planet);
+            Planet planetModel = game.getPlanet(planet);
             if (planetModel != null) {
                 bonus += planetModel.getInfluence();
             }
@@ -353,7 +353,7 @@ public class TaLeadersHandler {
         List<Button> buttons = new ArrayList<>();
         for (Planet planet : hs.getPlanetUnitHolders()) {
             String planetName = planet.getName();
-            if (!player.getPlanetsAllianceMode().contains(planetName)) {
+            if (!player.canUsePlanet(planetName)) {
                 continue;
             }
             if (TaAbilityHandler.planetHasAnyDesignAttached(hs, planetName)) {
@@ -399,18 +399,17 @@ public class TaLeadersHandler {
             return;
         }
 
-        Planet planet = tile.getUnitHolderFromPlanet(planetName);
+        Planet planet = tile.getPlanet(planetName);
         if (planet == null) {
             return;
         }
 
-        if (!player.getPlanetsAllianceMode().contains(planetName)
+        if (!player.canUsePlanet(planetName)
                 || player.getHomeSystemTile() == null
                 || !tile.getPosition().equals(player.getHomeSystemTile().getPosition())
                 || TaAbilityHandler.planetHasAnyDesignAttached(tile, planetName)) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    player.getRepresentation() + ", that planet is no longer eligible for _Zat_.");
+                    event.getMessageChannel(), player.toString() + ", that planet is no longer eligible for _Zat_.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -423,7 +422,7 @@ public class TaLeadersHandler {
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " used _Zat_ to attach _Grand Design (Pinnacle)_ to "
                         + planet.getRepresentation(game));
         ButtonHelper.deleteMessage(event);
@@ -438,7 +437,7 @@ public class TaLeadersHandler {
 
         List<String> designPlanets = new ArrayList<>();
         for (String planetName : player.getPlanets()) {
-            Tile tile = game.getTileFromPlanet(planetName);
+            Tile tile = game.getTileContainingPlanet(planetName);
             if (tile == null) {
                 continue;
             }
@@ -454,7 +453,7 @@ public class TaLeadersHandler {
 
         List<String> readiedPlanets = new ArrayList<>();
         for (String planetName : designPlanets) {
-            if (!player.getExhaustedPlanets().contains(planetName)) {
+            if (!player.isPlanetExhausted(planetName)) {
                 continue;
             }
 
@@ -480,8 +479,8 @@ public class TaLeadersHandler {
         }
 
         for (String planetName : designPlanets) {
-            Tile tile = game.getTileFromPlanet(planetName);
-            Planet planet = game.getPlanetsInfo().get(planetName);
+            Tile tile = game.getTileContainingPlanet(planetName);
+            Planet planet = game.getPlanet(planetName);
             if (tile == null || planet == null) {
                 continue;
             }

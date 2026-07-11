@@ -38,7 +38,7 @@ public class AutoFactoriesService {
 
         // Check if Fleet Regulations is in play and player already has 4+ effective fleet CC
         if (ButtonHelper.isLawInPlay(game, "regulations") && player.getEffectiveFleetCC() >= 4) {
-            String msg = player.getRepresentation() + ", you cannot gain a command token from " + autoFactories();
+            String msg = player.toString() + ", you cannot gain a command token from " + autoFactories();
             msg += " because _Fleet Regulations_ is a law in play, which is limiting fleet pool to 4 tokens.";
             ButtonHelper.sendMessageToRightStratThread(player, game, msg, buttonID);
             return;

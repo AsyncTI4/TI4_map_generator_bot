@@ -39,12 +39,12 @@ class DihmohnButtonHandler {
     public static void resolveDihmohnFlagship(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " is using the Maximus (the Dih-Mohn flagship) to produce units. They may produce up to 2 units with a combined cost of 4.");
         String pos = buttonID.replace("dihmohnfs_", "");
         List<Button> buttons =
                 Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "muaatagent", "place");
-        String message = player.getRepresentation() + ", please use the buttons to produce units. ";
+        String message = player.toString() + ", please use the buttons to produce units. ";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }

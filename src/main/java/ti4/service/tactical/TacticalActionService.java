@@ -210,10 +210,10 @@ public class TacticalActionService {
         spendAndPlaceTokenIfNecessary(event, game, player, updatedTile);
 
         boolean hasGfsInRange = game.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")
-                || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0
-                || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player) > 0
+                || updatedTile.hasUnitInSpace(UnitType.Infantry, player)
+                || updatedTile.hasUnitInSpace(UnitType.Mech, player)
                 || (player.hasUnit("crimson_mech")
-                        && tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE));
+                        && tile.getSpaceUnitHolder().containsToken(Constants.TOKEN_BREACH_ACTIVE));
 
         if (unitsWereMoved) {
             ButtonHelperTacticalAction.resolveAfterMovementEffects(event, game, player, updatedTile, true);
@@ -409,7 +409,7 @@ public class TacticalActionService {
             Player player, Game game, GenericInteractionCreateEvent event, Tile tile) {
         boolean hasUnits = FoWHelper.playerHasUnitsInSystem(player, tile);
         for (Player p2 : game.getRealPlayers()) {
-            if (player.getAllianceMembers().contains(p2.getFaction()) && !game.isFowMode()) {
+            if (player.hasAllianceMember(p2.getFaction()) && !game.isFowMode()) {
                 if (FoWHelper.playerHasUnitsInSystem(p2, tile)
                         && (!CommandCounterHelper.hasCC(event, p2.getColor(), tile))) {
                     hasUnits = true;
@@ -422,11 +422,11 @@ public class TacticalActionService {
     private List<UnitType> getCommittableGroundUnitTypes(Player player, UnitHolder space) {
         List<UnitType> committable = new ArrayList<>(List.of(UnitType.Mech, UnitType.Infantry));
         boolean naaluFS = (player.hasUnit("naalu_flagship") || player.hasUnit("sigma_naalu_flagship_2"))
-                && space.getUnitCount(UnitType.Flagship, player) > 0;
+                && space.hasUnit(UnitType.Flagship, player);
         boolean belkoFF = player.hasUnit("belkosea_fighter")
                 || player.hasUnit("belkosea_fighter2")
                 || player.hasUnit("tf-morphwing");
-        boolean hierarch = player.hasUnit("tk-hierarch") && space.getUnitCount(UnitType.Cruiser, player) > 0;
+        boolean hierarch = player.hasUnit("tk-hierarch") && space.hasUnit(UnitType.Cruiser, player);
         if (naaluFS || belkoFF || hierarch) committable.add(UnitType.Fighter);
         return committable;
     }

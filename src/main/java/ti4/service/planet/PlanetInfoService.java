@@ -28,9 +28,9 @@ public class PlanetInfoService {
 
     private static MessageEmbed getPlanetEmbed(Player player, String planetID) {
         Game game = player.getGame();
-        Planet planet = game.getPlanetsInfo().get(planetID);
+        Planet planet = game.getPlanet(planetID);
         PlanetModel planetModel = Mapper.getPlanet(planetID);
-        Tile tile = game.getTileFromPlanet(planetID);
+        Tile tile = game.getTileContainingPlanet(planetID);
 
         EmbedBuilder eb = new EmbedBuilder();
 
@@ -43,7 +43,7 @@ public class PlanetInfoService {
         eb.setTitle(sb.toString());
 
         sb = new StringBuilder();
-        if (player.getReadiedPlanets().contains(planetID)) {
+        if (player.hasPlanetReady(planetID)) {
             sb.append("Ready: ");
         } else {
             sb.append("Exhausted: ");

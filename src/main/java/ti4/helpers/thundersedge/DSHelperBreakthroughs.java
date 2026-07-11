@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
@@ -32,8 +33,10 @@ import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.UnitModel;
+import ti4.service.planet.PlanetButtonService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
+import ti4.service.unit.UnitQueryService;
 
 public final class DSHelperBreakthroughs {
     // @ButtonHandler("componentActionRes_")
@@ -46,7 +49,7 @@ public final class DSHelperBreakthroughs {
     }
 
     public static void cheiranBTExhaust(Game game, Player p1) {
-        String message = p1.getRepresentation() + ", please choose which system the ship you wish to replace is in.";
+        String message = p1.toString() + ", please choose which system the ship you wish to replace is in.";
         String factionChecker = "FFCC_" + p1.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
@@ -66,7 +69,7 @@ public final class DSHelperBreakthroughs {
     public static void useVaylerianBT(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " is discarding an action card to move 1 ship (possibly transporting) to an adjacent system containing no other players' ships.");
         ButtonHelperAgents.moveShipToAdjacentSystemStep2(game, player, event, buttonID + "_hero");
         MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
@@ -153,7 +156,7 @@ public final class DSHelperBreakthroughs {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         List<Button> buttons =
                 Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "solBtBuild", "place");
-        String message = player.getRepresentation() + ", use these buttons to place units. ";
+        String message = player.toString() + ", use these buttons to place units. ";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
 
         ButtonHelper.deleteMessage(event);
@@ -164,12 +167,12 @@ public final class DSHelperBreakthroughs {
         ButtonHelper.deleteMessage(event);
         List<Button> buttons = new ArrayList<>();
         String planetName = buttonID.split("_")[1];
-        for (Tile tile : game.getTileMap().values()) {
-            for (UnitHolder uH : tile.getUnitHolders().values()) {
+        for (Tile tile : game.getTiles()) {
+            for (UnitHolder uH : tile.getUnitHolderValues()) {
                 if (uH.getName().equalsIgnoreCase(planetName)) {
                     continue;
                 }
-                if (uH.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
+                if (uH.hasUnit(UnitType.Infantry, player.getColor())) {
                     if (uH instanceof Planet) {
                         buttons.add(Buttons.green(
                                 "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
@@ -197,14 +200,14 @@ public final class DSHelperBreakthroughs {
         String btID = buttonID.split("_")[1];
         BreakthroughModel btModel = Mapper.getBreakthrough(btID);
         p1.getBreakthroughExhausted().put(btID, false);
-        String message = p1.getRepresentation() + " readied _" + btModel.getName() + "_.";
+        String message = p1.toString() + " readied _" + btModel.getName() + "_.";
         MessageHelper.sendMessageToChannelWithEmbed(p1.getCorrectChannel(), message, btModel.getRepresentationEmbed());
         if ("dihmohnbt".equalsIgnoreCase(btID)) {
             Tile tile = game.getTileByPosition(game.getActiveSystem());
             if (tile != null) {
                 List<Button> buttons =
                         Helper.getPlaceUnitButtons(event, p1, game, tile, "sling", "placeOneNDone_dontskip");
-                String message2 = p1.getRepresentation()
+                String message2 = p1.toString()
                         + ", please use these buttons to produce 1 non-fighter ship\n> "
                         + ButtonHelper.getListOfStuffAvailableToSpend(p1, game);
                 MessageHelper.sendMessageToChannel(
@@ -222,7 +225,7 @@ public final class DSHelperBreakthroughs {
         String btID = buttonID.split("_")[1];
         BreakthroughModel btModel = Mapper.getBreakthrough(btID);
         p1.getBreakthroughExhausted().put(btID, true);
-        String message = p1.getRepresentation() + " exhausted _" + btModel.getName() + "_.";
+        String message = p1.toString() + " exhausted _" + btModel.getName() + "_.";
         MessageHelper.sendMessageToChannelWithEmbed(p1.getCorrectChannel(), message, btModel.getRepresentationEmbed());
         boolean implemented = TeHelperBreakthroughs.handleBreakthroughExhaust(event, game, p1, buttonID);
 
@@ -251,11 +254,11 @@ public final class DSHelperBreakthroughs {
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " is resolving _Synchronicity VI_, either to research 1 technology (that's the same colour as one of their exhausted technologies), or to or gain 1 command token.");
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation()
+                player.toString()
                         + ", please choose whether you are researching a technology or gaining a command token.",
                 buttons);
     }
@@ -280,7 +283,7 @@ public final class DSHelperBreakthroughs {
         if (p2 != p1) {
             MessageHelper.sendMessageToChannel(
                     p2.getCorrectChannel(),
-                    p2.getRepresentation() + ", your _Historian Conclave_ offer to " + p1.getFactionNameOrColor()
+                    p2.toString() + ", your _Historian Conclave_ offer to " + p1.getFactionNameOrColor()
                             + " has been accepted. "
                             + (p2.getCommodities() >= p2.getCommoditiesTotal()
                                     ? "You would gain 1 commodity, but you are already at maximum commodities."
@@ -301,12 +304,12 @@ public final class DSHelperBreakthroughs {
         }
         MessageHelper.sendMessageToChannel(
                 p1.getCorrectChannel(),
-                p1.getRepresentation()
+                p1.toString()
                         + " has used _Arms Brokerage_ to move any number of ships between two systems with their space docks.");
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         String message = ", please choose the first system that you wish to swap ships between (and transport).";
         List<Button> buttons = new ArrayList<>();
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Spacedock);
+        List<Tile> tiles = UnitQueryService.getTilesContainingPlayersUnits(game, p1, UnitType.Spacedock);
         for (Tile tile : tiles) {
             if (FoWHelper.otherPlayersHaveShipsInSystem(p1, tile, game)) {
                 continue;
@@ -324,7 +327,7 @@ public final class DSHelperBreakthroughs {
         p1.setBreakthroughExhausted("florzenbt", true);
         MessageHelper.sendMessageToChannel(
                 p1.getCorrectChannel(),
-                p1.getRepresentation()
+                p1.toString()
                         + " has used _Arms Brokerage_."
                         + " They will choose another player, and both players will secretly choose to spend 0, 1, or 2 trade goods."
                         + " If the players spend different amounts, the chosen player must give "
@@ -346,8 +349,7 @@ public final class DSHelperBreakthroughs {
     @ButtonHandler("florzenBTStep2")
     public static void florzenBTStep2(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        MessageHelper.sendMessageToChannel(
-                p1.getCorrectChannel(), p1.getRepresentation() + " has targeted " + p2.getRepresentation());
+        MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), p1.toString() + " has targeted " + p2.toString());
         ButtonHelper.deleteMessage(event);
         String message = ", please choose the amount of trade goods you wish to spend.";
         List<Button> buttons = new ArrayList<>();
@@ -365,8 +367,8 @@ public final class DSHelperBreakthroughs {
         String originalBid = buttonID.split("_")[2];
         MessageHelper.sendMessageToChannel(
                 p1.getCorrectChannel(),
-                p1.getRepresentation() + " has locked in their trade goods, and buttons have been sent to "
-                        + p2.getRepresentation() + " for them to choose an amount of trade goods.");
+                p1.toString() + " has locked in their trade goods, and buttons have been sent to " + p2.toString()
+                        + " for them to choose an amount of trade goods.");
         ButtonHelper.deleteMessage(event);
         String message = ", please choose the amount of tg you want to spend.";
         List<Button> buttons = new ArrayList<>();
@@ -386,14 +388,14 @@ public final class DSHelperBreakthroughs {
         String originalBidFlorz = buttonID.split("_")[3];
         MessageHelper.sendMessageToChannel(
                 p1.getCorrectChannel(),
-                p1.getRepresentation() + " has chosen to spend " + originalBidFlorz + " trade good"
-                        + ("1".equals(originalBidFlorz) ? "" : "s") + " and " + p2.getRepresentation()
+                p1.toString() + " has chosen to spend " + originalBidFlorz + " trade good"
+                        + ("1".equals(originalBidFlorz) ? "" : "s") + " and " + p2.toString()
                         + " has chosen to spend " + originalBid + " trade good" + ("1".equals(originalBid) ? "" : "s")
                         + ". These trade goods have been returned to the supply."
                         + (!originalBid.equalsIgnoreCase(originalBidFlorz)
                                 ? "\nAs the two players did not spend the same number of trade goods, "
-                                        + p1.getRepresentation() + " has sent a random promissory note to "
-                                        + p2.getRepresentation() + "."
+                                        + p1.toString() + " has sent a random promissory note to "
+                                        + p2.toString() + "."
                                 : ""));
         ButtonHelper.deleteMessage(event);
         if (StringUtils.isNumeric(originalBidFlorz) && Integer.parseInt(originalBidFlorz) > 0) {
@@ -411,8 +413,7 @@ public final class DSHelperBreakthroughs {
     public static void useLanefirBt(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
         p1.setBreakthroughExhausted("lanefirbt", true);
         MessageHelper.sendMessageToChannel(
-                p1.getCorrectChannel(),
-                p1.getRepresentation() + " has used _Erasure Corps_ to explore 1 planet they control.");
+                p1.getCorrectChannel(), p1.toString() + " has used _Erasure Corps_ to explore 1 planet they control.");
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(p1, game);
         MessageHelper.sendMessageToChannelWithButtons(
@@ -421,7 +422,7 @@ public final class DSHelperBreakthroughs {
 
     @ButtonHandler("resolveMirvedaBT")
     public static void resolveMirvedaBT(Game game, Player player, ButtonInteractionEvent event) {
-        String msg = player.getRepresentation() + ", you may use _Stabilization Arrays_ to land 1 PDS.";
+        String msg = player.toString() + ", you may use _Stabilization Arrays_ to land 1 PDS.";
         List<Button> buttons = TeHelperAbilities.miniLandingButtons(game, player);
         if (!buttons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
@@ -431,7 +432,7 @@ public final class DSHelperBreakthroughs {
 
     @ButtonHandler("readyLanefirBt")
     public static void readyLanefirBt(Game game, Player player, ButtonInteractionEvent event) {
-        String msg = player.getRepresentation() + " readied their breakthrough.";
+        String msg = player.toString() + " readied their breakthrough.";
         player.setBreakthroughExhausted("lanefirbt", false);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
@@ -449,11 +450,11 @@ public final class DSHelperBreakthroughs {
                 MessageHelper.sendMessageToChannel(
                         p2.getCorrectChannel(),
                         "Another player has purged a component (that isn't an action card). As such, "
-                                + p2.getRepresentation()
+                                + p2.toString()
                                 + " is resolving _Erasure Corps_, either to ready the breakthrough, or to gain 1 command token.");
                 MessageHelper.sendMessageToChannel(
                         p2.getCorrectChannel(),
-                        p2.getRepresentation()
+                        p2.toString()
                                 + ", pleas choose whether you wish to ready _Erasure Corps_ or gain 1 command token.",
                         buttons);
             }
@@ -467,7 +468,7 @@ public final class DSHelperBreakthroughs {
                 ", please choose the second system that you wish to swap ships between (and transport). The first system is position "
                         + pos + ".";
         List<Button> buttons = new ArrayList<>();
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock);
+        List<Tile> tiles = UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock);
         for (Tile tile : tiles) {
             if (tile.getPosition().equalsIgnoreCase(pos)) {
                 continue;
@@ -529,8 +530,8 @@ public final class DSHelperBreakthroughs {
                 "edynbtFinal_noShowSecret_" + p1.getFaction(), "Allow Coexistence to " + p1.getFactionNameOrColor()));
         MessageHelper.sendMessageToChannel(
                 p2.getCorrectChannel(),
-                p2.getRepresentation() + " , please choose whether to show a secret objective to "
-                        + p1.getFactionNameOrColor() + " or to allow coexistence.",
+                p2.toString() + " , please choose whether to show a secret objective to " + p1.getFactionNameOrColor()
+                        + " or to allow coexistence.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -547,8 +548,8 @@ public final class DSHelperBreakthroughs {
             if (so != null) {
                 MessageHelper.sendMessageToChannelWithEmbed(
                         p2.getCardsInfoThread(),
-                        p2.getRepresentation() + " " + p1.getFactionNameOrColor()
-                                + " has shown you the secret objective: " + so.getName() + ".",
+                        p2.toString() + " " + p1.getFactionNameOrColor() + " has shown you the secret objective: "
+                                + so.getName() + ".",
                         so.getRepresentationEmbed());
                 MessageHelper.sendMessageToChannel(
                         p1.getCorrectChannel(), p2.getFactionNameOrColor() + " was shown a random secret objective.");
@@ -559,19 +560,16 @@ public final class DSHelperBreakthroughs {
         } else {
             MessageHelper.sendMessageToChannel(
                     p1.getCorrectChannel(),
-                    p2.getRepresentation() + " " + p1.getFactionNameOrColor()
+                    p2.toString() + " " + p1.getFactionNameOrColor()
                             + " has chosen to allow you to coexist on one of their planets.");
-            List<Button> buttons = new ArrayList<>();
             Player target = p1;
             Player player = p2;
-            for (String planet : target.getPlanetsAllianceMode()) {
-                if (game.getUnitHolderFromPlanet(planet) != null
-                        && game.getUnitHolderFromPlanet(planet).hasGroundForces(target)) {
-                    buttons.add(Buttons.gray(
-                            player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
-                            Helper.getPlanetRepresentation(planet, game)));
-                }
-            }
+            List<Button> buttons = new ArrayList<>(PlanetButtonService.buttonsForUsablePlanets(
+                    target,
+                    game,
+                    location -> location.planet().hasGroundForces(target),
+                    ButtonStyle.SECONDARY,
+                    player.factionButtonChecker() + "exchangeProgramPart3_"));
             buttons.add(Buttons.red("deleteButtons", "Cancel"));
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),

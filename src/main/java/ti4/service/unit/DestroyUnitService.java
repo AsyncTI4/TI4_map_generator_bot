@@ -51,7 +51,7 @@ public class DestroyUnitService {
     public static void destroyAllUnitsInSystem(
             GenericInteractionCreateEvent event, Tile tile, Game game, boolean combat) {
         List<RemovedUnit> units = new ArrayList<>();
-        for (UnitHolder uh : tile.getUnitHolders().values())
+        for (UnitHolder uh : tile.getUnitHolderValues())
             units.addAll(RemoveUnitService.removeAllUnits(event, tile, game, uh));
         handleDestroyedUnits(event, game, units, combat);
     }
@@ -65,7 +65,7 @@ public class DestroyUnitService {
     public static void destroyAllPlayerUnitsInSystem(
             GenericInteractionCreateEvent event, Game game, Player player, Tile tile, boolean combat) {
         List<RemovedUnit> units = new ArrayList<>();
-        for (UnitHolder uh : tile.getUnitHolders().values())
+        for (UnitHolder uh : tile.getUnitHolderValues())
             units.addAll(RemoveUnitService.removeAllPlayerUnits(event, game, player, tile, uh));
         handleDestroyedUnits(event, game, units, combat);
     }
@@ -208,7 +208,7 @@ public class DestroyUnitService {
                 if (p2.ownsUnit("tf-vortexer")) {
                     for (String pos :
                             FoWHelper.getAdjacentTiles(game, unit.tile().getPosition(), p2, false, true)) {
-                        if (game.getTileByPosition(pos).getSpaceUnitHolder().getUnitCount(UnitType.Carrier, p2) > 0) {
+                        if (game.getTileByPosition(pos).hasUnitInSpace(UnitType.Carrier, p2)) {
                             capturing.add(p2);
                             break;
                         }
@@ -280,7 +280,7 @@ public class DestroyUnitService {
                         MessageHelper.sendFileToChannel(event.getMessageChannel(), audioFile);
                     }
                     DisasterWatchHelper.postTileInDisasterWatch(
-                            game, event, unit.tile(), 0, player.getRepresentation() + " has detonated the bomb.");
+                            game, event, unit.tile(), 0, player.toString() + " has detonated the bomb.");
                 }
                 if (player != null && player.hasUnit("crystellum_flagship")) {
                     CrystellumUnitHandler.resolveCrystFlagDestroy(event, player, game, unit);
@@ -315,7 +315,7 @@ public class DestroyUnitService {
             UnitModel uni = player.getUnitFromUnitKey(unit.unitKey());
             if (uni != null && uni.getIsShip()) {
                 if (player.hasUnit("ghoti_flagship")
-                        || CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
+                        || UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)
                                 .contains(player.getHomeSystemTile())) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green(
@@ -325,7 +325,7 @@ public class DestroyUnitService {
                     buttons.add(Buttons.red("deleteButtons", "Decline", FactionEmojis.Nekro));
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCorrectChannel(),
-                            player.getRepresentation()
+                            player.toString()
                                     + ", you may produce one of your recently destroyed ships in your home system.",
                             buttons);
                 }
@@ -342,9 +342,8 @@ public class DestroyUnitService {
                             "totalWarCommGain_" + winnings + "_" + p2.getFaction(), p2.getFactionNameOrColor()));
                 }
                 buttons.add(Buttons.red("deleteButtons", "No one"));
-                String msg =
-                        player.getRepresentation() + ", please tell the bot who killed your " + unit.getTotalRemoved()
-                                + " " + unit.unitKey().unitType().getUnitTypeEmoji() + ".";
+                String msg = player.toString() + ", please tell the bot who killed your " + unit.getTotalRemoved() + " "
+                        + unit.unitKey().unitType().getUnitTypeEmoji() + ".";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             } else {
 
@@ -410,7 +409,7 @@ public class DestroyUnitService {
         if (player.hasTech("sar")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + " you gained " + StringHelper.pluralize(min, "trade good") + " (" + player.getTg()
                             + "->" + (player.getTg() + min)
                             + ") from _Self-Assembly Routines_ because of " + min + " of your mechs dying."

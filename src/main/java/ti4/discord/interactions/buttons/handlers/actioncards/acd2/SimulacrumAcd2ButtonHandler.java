@@ -72,13 +72,11 @@ class SimulacrumAcd2ButtonHandler {
         if (agent.isExhausted()) {
             RefreshLeaderService.refreshLeader(agentOwner, agent, game);
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " readied " + ownerName + " using _Simulacrum_.");
+                    player.getCorrectChannel(), player.toString() + " readied " + ownerName + " using _Simulacrum_.");
         } else {
             ExhaustLeaderService.exhaustLeader(game, agentOwner, agent);
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " exhausted " + ownerName + " using _Simulacrum_.");
+                    player.getCorrectChannel(), player.toString() + " exhausted " + ownerName + " using _Simulacrum_.");
         }
 
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);

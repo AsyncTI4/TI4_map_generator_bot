@@ -66,7 +66,7 @@ class SwapTwoSystems extends GameStateSubcommand {
 
     private Tile getRandomTile() {
         Set<String> EXCLUDED_POSITIONS = Set.of("tl", "tr", "bl", "br");
-        List<Tile> availableTiles = getGame().getTileMap().values().stream()
+        List<Tile> availableTiles = getGame().getTiles().stream()
                 .filter(tile -> !EXCLUDED_POSITIONS.contains(tile.getPosition()))
                 .filter(tile -> !tile.getTileModel().isHyperlane())
                 .toList();

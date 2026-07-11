@@ -18,7 +18,7 @@ class ColonialButtonHandler {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p2 == null) return;
         String planet = buttonID.split("_")[2];
-        Tile tile = game.getTileFromPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
         if (tile != null) {
             AddUnitService.addUnits(event, tile, game, p2.getColor(), "1 inf " + planet);
         }

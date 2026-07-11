@@ -40,8 +40,7 @@ class CorruptionAcd2ButtonHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + ", there are no revealed public objectives to resolve _Corruption_ on.");
+                    player.toString() + ", there are no revealed public objectives to resolve _Corruption_ on.");
             ButtonHelper.deleteMessage(event);
             return;
         }

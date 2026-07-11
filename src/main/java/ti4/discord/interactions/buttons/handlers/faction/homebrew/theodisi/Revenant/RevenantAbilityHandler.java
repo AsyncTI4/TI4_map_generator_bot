@@ -48,7 +48,7 @@ public class RevenantAbilityHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", choose 1 Revenant leader set for **Call of the Haunted**.",
+                player.toString() + ", choose 1 Revenant leader set for **Call of the Haunted**.",
                 buttons);
     }
 
@@ -97,7 +97,7 @@ public class RevenantAbilityHandler {
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " chose a Revenant leader set with **Call of the Haunted** and gained 1 additional leader of each type.");
         if (!embeds.isEmpty() && player.getCardsInfoThread() != null) {
             MessageHelper.sendMessageToChannelWithEmbeds(

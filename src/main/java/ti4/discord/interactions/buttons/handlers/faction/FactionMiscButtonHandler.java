@@ -71,7 +71,7 @@ class FactionMiscButtonHandler {
     @ButtonHandler("nightbloomBuild")
     public static void nightbloomBuild(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> flagButtons = new ArrayList<>();
-        for (Tile tile1 : game.getTileMap().values()) {
+        for (Tile tile1 : game.getTiles()) {
             if (Helper.getProductionValue(player, game, tile1, false) > 0) {
                 String pos1 = tile1.getPosition();
                 flagButtons.add(

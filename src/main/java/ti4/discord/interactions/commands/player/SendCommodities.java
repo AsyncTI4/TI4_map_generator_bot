@@ -69,8 +69,8 @@ class SendCommodities extends GameStateSubcommand {
             targetPlayer.setCommodities(targetTG);
         }
 
-        String p1 = player.getRepresentation();
-        String p2 = targetPlayer.getRepresentation();
+        String p1 = player.toString();
+        String p2 = targetPlayer.toString();
         String commString = sendCommodities + " commodit" + (sendCommodities == 1 ? "y" : "ies");
         String message = p1 + " sent " + commString + " to " + p2 + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -82,9 +82,9 @@ class SendCommodities extends GameStateSubcommand {
             targetPlayer.clearDebt(player, sendCommodities);
             MessageHelper.sendMessageToEventChannel(
                     event,
-                    targetPlayer.getRepresentation() + " cleared "
+                    targetPlayer.toString() + " cleared "
                             + StringHelper.pluralize(sendCommodities, "debt token") + " owned by "
-                            + player.getRepresentation() + ", from their \"Debt Account\" pool.");
+                            + player.toString() + ", from their \"Debt Account\" pool.");
         }
 
         if (game.isFowMode()) {

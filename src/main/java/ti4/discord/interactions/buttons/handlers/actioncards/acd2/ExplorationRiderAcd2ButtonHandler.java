@@ -48,7 +48,7 @@ class ExplorationRiderAcd2ButtonHandler {
                 payload.substring(firstSeparator + 1, secondSeparator));
         String planet = payload.substring(secondSeparator + 1, lastSeparator);
         String trait = payload.substring(lastSeparator + 1);
-        Tile tile = game.getTileFromPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
         if (tile == null
                 || !ButtonHelperActionCards.isExplorationRiderEligiblePlanet(player, game, planet, selectedPlanets)) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Exploration Rider_.");

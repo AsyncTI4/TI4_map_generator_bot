@@ -47,6 +47,7 @@ import ti4.service.info.CardsInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.relic.SendRelicService;
+import ti4.service.rules.PlanetRules;
 import ti4.service.transaction.SendPromissoryService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventService;
@@ -701,11 +702,11 @@ public class TransactionHelper {
         }
 
         List<Button> buttons = getPlayersToTransact(game, player);
-        String message = player.getRepresentation() + ", please choose which player you wish to transact with.";
+        String message = player.toString() + ", please choose which player you wish to transact with.";
         if (game.isHiddenAgendaMode()
                 && game.getPhaseOfGame().toLowerCase().contains("agenda")
                 && game.getStoredValue("executiveOrder").isEmpty()) {
-            message = player.getRepresentation()
+            message = player.toString()
                     + ", this game is in Hidden Agenda mode, which does not allow transactions in the Agenda Phase.";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
             return;
@@ -790,13 +791,11 @@ public class TransactionHelper {
             case "Planets" -> {
                 message += " Please choose the planet you wish to " + requestOrOffer + ".";
                 for (String planet : p1.getPlanetsAllianceMode()) {
-                    if (planet.contains("custodia")
-                            || planet.contains("ghoti")
-                            || ButtonHelper.getUnitHolderFromPlanetName(planet, game) == null) {
+                    if (planet.contains("custodia") || planet.contains("ghoti") || game.getPlanet(planet) == null) {
                         continue;
                     }
-                    UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-                    if (unitHolder != null && unitHolder.getUnitCount(UnitType.Mech, p1.getColor()) > 0) {
+                    UnitHolder unitHolder = game.getPlanet(planet);
+                    if (unitHolder != null && unitHolder.hasUnit(UnitType.Mech, p1.getColor())) {
                         stuffToTransButtons.add(Buttons.gray(
                                 "offerToTransact_Planets_" + p1.getFaction() + "_" + p2.getFaction() + "_" + planet,
                                 Helper.getPlanetRepresentation(planet, game)));
@@ -816,13 +815,13 @@ public class TransactionHelper {
             case "AlliancePlanets" -> {
                 message += " Please choose the planet you wish to " + requestOrOffer + ".";
                 for (String planet : p1.getPlanets()) {
-                    if (planet.contains("custodia") || planet.contains("ghoti")) {
+                    if (PlanetRules.isCustodiaVigiliaOrGhoti(planet)) {
                         continue;
                     }
-                    UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+                    UnitHolder unitHolder = game.getPlanet(planet);
                     if (unitHolder != null && unitHolder.getUnitColorsOnHolder().contains(p2.getColorID())) {
                         String refreshed = "refreshed";
-                        if (p1.getExhaustedPlanets().contains(planet)) {
+                        if (p1.isPlanetExhausted(planet)) {
                             refreshed = "exhausted";
                         }
                         stuffToTransButtons.add(Buttons.gray(
@@ -926,7 +925,7 @@ public class TransactionHelper {
                         } else {
                             MessageHelper.sendMessageToChannel(
                                     player.getCorrectChannel(),
-                                    player.getRepresentation()
+                                    player.toString()
                                             + ", you have a promissory note with a null owner. Its number ID is `"
                                             + p1.getPromissoryNotes().get(pnShortHand) + "` and its letter ID is "
                                             + pnShortHand + "`.");
@@ -1080,7 +1079,7 @@ public class TransactionHelper {
                 .isEmpty()) {
             return false;
         }
-        if (receiver.getTechs().contains(tech)) {
+        if (receiver.hasExactTech(tech)) {
             return false;
         }
         return !receiver.getNotResearchedFactionTechs().contains(tech);
@@ -1302,7 +1301,7 @@ public class TransactionHelper {
         buttons.add(Buttons.green("acceptOffer_" + player.getFaction() + "_" + offerNumber, "Accept"));
         buttons.add(Buttons.red("rejectOffer_" + player.getFaction() + bmdSuffix, "Reject"));
         buttons.add(Buttons.red("resetOffer_" + player.getFaction() + bmdSuffix, "Reject and CounterOffer"));
-        String p2OfferMsg = p2.getRepresentation() + " you have received a transaction offer from "
+        String p2OfferMsg = p2.toString() + " you have received a transaction offer from "
                 + player.getRepresentationNoPing() + ":\n" + privateOfferText;
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), p2OfferMsg, buttons);
         checkTransactionLegality(game, p2, player);
@@ -1481,7 +1480,7 @@ public class TransactionHelper {
                         ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game));
             }
             case "ACs" -> {
-                String message = p1.getRepresentation()
+                String message = p1.toString()
                         + ", please choose the __green__ button that indicates the action card you wish to send.";
                 for (String acShortHand : p1.getActionCards().keySet()) {
                     Button transact = Buttons.green(
@@ -1533,7 +1532,7 @@ public class TransactionHelper {
                 }
             }
             case "SOs" -> {
-                String message = p1.getRepresentation();
+                String message = p1.toString();
                 message += " Click the __green__ button that indicates the unscored secret objective you wish to send.";
 
                 String prefix = factionChecker + "send_SOs_" + p2.getFaction() + "_";
@@ -1620,8 +1619,8 @@ public class TransactionHelper {
         if (p2 == null) return;
 
         String message2 = "";
-        String ident = p1.getRepresentation();
-        String ident2 = p2.getRepresentation();
+        String ident = p1.toString();
+        String ident2 = p2.toString();
         switch (thingToTrans) {
             case "TGs" -> {
                 int tgAmount = Integer.parseInt(amountToTrans);
@@ -1770,7 +1769,7 @@ public class TransactionHelper {
                 } catch (NumberFormatException e) {
                     MessageHelper.sendMessageToChannel(
                             p1.getCorrectChannel(),
-                            "# " + p1.getRepresentation()
+                            "# " + p1.toString()
                                     + " heads up, a promissory note failed to send. This is likely due to you not having the promissory note to send."
                                     + " Maybe you already gave it to someone else and forgot?");
                     return;
@@ -1826,9 +1825,9 @@ public class TransactionHelper {
                     SecretObjectiveInfoService.sendSecretObjectiveInfo(game, p2, event);
                 }
 
-                String msg = p1.getRepresentation() + " sent "
+                String msg = p1.toString() + " sent "
                         + (RandomHelper.isOneInX(20) ? "||a secret objective||" : "a secret objective") + " to "
-                        + p2.getRepresentation() + ".";
+                        + p2.toString() + ".";
                 MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), msg);
                 if (game.isFowMode()) MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
             }
@@ -1850,7 +1849,7 @@ public class TransactionHelper {
                 p2.addTech(amountToTrans);
                 MessageHelper.sendMessageToChannel(
                         p2.getCorrectChannel(),
-                        p2.getRepresentation() + ", you have received the technology _" + Mapper.getTech(amountToTrans)
+                        p2.toString() + ", you have received the technology _" + Mapper.getTech(amountToTrans)
                                 + "_ from a transaction.");
             }
             case "Relics" -> SendRelicService.handleSendRelic(event, game, p1, p2, amountToTrans);
@@ -1936,7 +1935,7 @@ public class TransactionHelper {
         String factionChecker = "FFCC_" + p.getFaction() + "_";
         for (Player player : game.getPlayers().values()) {
             if (player.isRealPlayer()) {
-                if (player.getFaction().equalsIgnoreCase(p.getFaction())) {
+                if (player.isFaction(p.getFaction())) {
                     continue;
                 }
                 String faction = player.getFaction();
@@ -1993,7 +1992,7 @@ public class TransactionHelper {
                 && !game.isFowMode()
                 && (p1.getCommodities() > 0 || p2.getCommodities() > 0)
                 && !p1.hasAbility("military_industrial_complex")
-                && !p1.getAllianceMembers().contains(p2.getFaction())) {
+                && !p1.hasAllianceMember(p2.getFaction())) {
             stuffToTransButtons.add(Buttons.gray(
                     "offerToTransact_washComms_" + player.getFaction() + "_" + p2.getFaction() + "_0",
                     "Wash Both Players' Commodities"));
@@ -2127,8 +2126,8 @@ public class TransactionHelper {
             p2.setPromissoryNote(id);
             PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
             PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
-            String message2 = p1.getRepresentation() + " returned _"
-                    + Mapper.getPromissoryNote(id).getName() + "_ from their play area to " + p2.getRepresentation()
+            String message2 = p1.toString() + " returned _"
+                    + Mapper.getPromissoryNote(id).getName() + "_ from their play area to " + p2.toString()
                     + ".";
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2);
             if (game.isFowMode()) {
@@ -2156,7 +2155,7 @@ public class TransactionHelper {
         if (!game.isFowMode()
                 && (p1.getCommodities() > 0 || p2.getCommodities() > 0)
                 && !p1.hasAbility("military_industrial_complex")
-                && !p1.getAllianceMembers().contains(p2.getFaction())) {
+                && !p1.hasAllianceMember(p2.getFaction())) {
             stuffToTransButtons.add(Buttons.gray(
                     factionChecker + "send_WashComms_" + p2.getFaction() + "_0", "Wash Both Players' Commodities"));
         }
@@ -2232,12 +2231,11 @@ public class TransactionHelper {
         if (p2 != null) {
             MessageHelper.sendMessageToChannel(
                     p2.getCardsInfoThread(),
-                    p2.getRepresentation() + " the latest offer from " + player.getRepresentation(false, false)
+                    p2.toString() + " the latest offer from " + player.getRepresentation(false, false)
                             + " has been rescinded.");
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
-                    player.getRepresentation() + "you rescinded the latest offer to "
-                            + p2.getRepresentation(false, false));
+                    player.toString() + "you rescinded the latest offer to " + p2.getRepresentation(false, false));
             player.clearTransactionItemsWithPlayer(p2);
             ButtonHelper.deleteMessage(event);
         }
@@ -2250,8 +2248,7 @@ public class TransactionHelper {
         if (p1 != null) {
             MessageHelper.sendMessageToChannel(
                     p1.getCardsInfoThread(),
-                    p1.getRepresentation() + " your offer to " + player.getRepresentation(false, false)
-                            + " has been rejected.");
+                    p1.toString() + " your offer to " + player.getRepresentation(false, false) + " has been rejected.");
             ButtonHelper.deleteMessage(event);
         }
     }

@@ -80,11 +80,11 @@ public class BlindSelectionService {
             } else {
                 // planet selection: planet must be on visible tile
                 // or its owner must be visible to the requesting player
-                Tile planetTile = game.getTileFromPlanet(target);
+                Tile planetTile = game.getTileContainingPlanet(target);
                 if (planetTile == null) {
                     keep = false;
                 } else {
-                    Player owner = game.getPlayerThatControlsPlanet(target);
+                    Player owner = game.getPlanetOwner(target);
                     if (owner == null) {
                         keep = visibleTilePositions.contains(planetTile.getPosition());
                     } else {
@@ -159,9 +159,7 @@ public class BlindSelectionService {
         chooseTargetButtons.add(
                 Buttons.red("blindSelection~MDL_" + encodedButtonPrefix + "_" + type, "Change Selection"));
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                player.getRepresentation() + ", please choose the target.",
-                chooseTargetButtons);
+                event.getMessageChannel(), player.toString() + ", please choose the target.", chooseTargetButtons);
 
         event.getMessageChannel().deleteMessageById(origMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -196,7 +194,7 @@ public class BlindSelectionService {
         if (POSITION.equals(type)) {
             owner = game.getPlayerThatControlsTile(game.getTileByPosition(target));
         } else {
-            owner = game.getPlayerThatControlsPlanet(target);
+            owner = game.getPlanetOwner(target);
         }
 
         if (owner != null) {

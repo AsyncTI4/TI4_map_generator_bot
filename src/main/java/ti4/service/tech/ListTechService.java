@@ -69,14 +69,14 @@ public class ListTechService {
             String error = null;
             boolean scepter = player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar");
             if (player.getStrategicCC() < 1 && !scepter) {
-                error = player.getRepresentation()
+                error = player.toString()
                         + ", you seem to have misplaced your strategy tokens, and cannot use the Entropic Scar anomaly.";
             } else if (model == null) {
                 error = "Could not find tech: " + tech;
             } else if (player.hasTech(tech)) {
-                error = player.getRepresentation() + ", you already have " + model.getName();
+                error = player.toString() + ", you already have " + model.getName();
             } else {
-                String msg = player.getRepresentation() + ", you gained " + model.getNameRepresentation()
+                String msg = player.toString() + ", you gained " + model.getNameRepresentation()
                         + " using the Entropic Scar anomaly.";
                 if (scepter) {
                     msg += " Exhausted the _" + RelicHelper.sillySpelling() + "_.";
@@ -119,7 +119,7 @@ public class ListTechService {
             if (!used
                     && scModel != null
                     && scModel.usesAutomationForSCID("pok7technology")
-                    && !player.getFollowedSCs().contains(scModel.getInitiative())) {
+                    && !player.hasFollowedSC(scModel.getInitiative())) {
                 int scNum = scModel.getInitiative();
                 player.addFollowedSC(scNum, event);
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
@@ -158,7 +158,7 @@ public class ListTechService {
 
         ButtonHelperCommanders.yinCommanderSummary(player, game);
         ButtonHelperCommanders.veldyrCommanderSummary(player, game);
-        String message = player.getRepresentation() + ", what type of technology do you wish to get?";
+        String message = player.toString() + ", what type of technology do you wish to get?";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
 
@@ -200,7 +200,7 @@ public class ListTechService {
             buttons.add(Buttons.gray("acquireATechWithSC_second", "Get Other Technology"));
         }
 
-        String message = player.getRepresentation() + ", please choose which technology you wish to get.";
+        String message = player.toString() + ", please choose which technology you wish to get.";
 
         if (!techType.contains("allTechResearchable")) {
             ButtonHelper.deleteMessage(event);
@@ -253,12 +253,11 @@ public class ListTechService {
         }
 
         for (String planet : player.getPlanets()) {
-            if (player.getExhaustedPlanets().contains(planet)
-                    && !(player.hasTech("pa") || player.hasTech("absol_pa"))) {
+            if (player.isPlanetExhausted(planet) && !(player.hasTech("pa") || player.hasTech("absol_pa"))) {
                 continue;
             }
             if (ButtonHelper.checkForTechSkips(game, planet)) {
-                Planet unitHolder = game.getPlanetsInfo().get(planet);
+                Planet unitHolder = game.getPlanet(planet);
                 List<String> techTypes = unitHolder.getTechSpecialities();
                 for (String type : techTypes) {
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "zealotscommander")) {

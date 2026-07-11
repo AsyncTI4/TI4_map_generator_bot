@@ -480,22 +480,22 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             Player player = draftManager.getGame().getPlayer(playerUserId);
             List<DraftChoice> playerChoices = draftManager.getPlayerPicks(playerUserId, TYPE);
             if (playerChoices == null || playerChoices.isEmpty()) {
-                return "Player " + player.getRepresentation() + " has not picked a reference card package.";
+                return "Player " + player.toString() + " has not picked a reference card package.";
             }
 
             DraftChoice pick = playerChoices.getFirst();
             ReferenceCardPackage refPackage = getPackageByChoiceKey(pick.choiceKey());
             if (refPackage.homeSystemFaction() == null) {
-                return "Player " + player.getRepresentation() + " has not assigned a home system faction.";
+                return "Player " + player.toString() + " has not assigned a home system faction.";
             }
             if (refPackage.startingUnitsFaction() == null) {
-                return "Player " + player.getRepresentation() + " has not assigned a starting units faction.";
+                return "Player " + player.toString() + " has not assigned a starting units faction.";
             }
             if (refPackage.speakerOrderFaction() == null) {
-                return "Player " + player.getRepresentation() + " has not assigned a speaker order priority faction.";
+                return "Player " + player.toString() + " has not assigned a speaker order priority faction.";
             }
             if (refPackage.choicesFinal() == null || !refPackage.choicesFinal()) {
-                return "Player " + player.getRepresentation() + " has not finalized their reference card assignments.";
+                return "Player " + player.toString() + " has not finalized their reference card assignments.";
             }
         }
         return null;
@@ -530,7 +530,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
 
             FactionModel newKeleresFaction = getKeleresHomeSystemFaction(draftManager);
             if (newKeleresFaction != null) {
-                String sb = game.getPlayer(playerUserId).getRepresentation()
+                String sb = game.getPlayer(playerUserId).toString()
                         + " had Keleres as their home system faction, and drew a random unused home system tile."
                         + System.lineSeparator()
                         + TwilightsFallInfoHelper.getFactionSetupInfo(newKeleresFaction, false, true, false);

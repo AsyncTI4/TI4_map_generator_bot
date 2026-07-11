@@ -27,7 +27,7 @@ class ChainReactionAcd2ButtonHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(),
-                player.getRepresentation() + " choose the destroyed ship's combat value for _Chain Reaction_.",
+                player.toString() + " choose the destroyed ship's combat value for _Chain Reaction_.",
                 combatValueButtons);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -66,7 +66,7 @@ class ChainReactionAcd2ButtonHandler {
             }
         }
 
-        StringBuilder message = new StringBuilder(player.getRepresentation())
+        StringBuilder message = new StringBuilder(player.toString())
                 .append(" rolled for _Chain Reaction_ (combat value ")
                 .append(combatValue)
                 .append(").\n")

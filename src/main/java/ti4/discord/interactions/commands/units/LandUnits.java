@@ -67,17 +67,17 @@ public class LandUnits extends GameStateCommand {
         String planetID = event.getOption(Constants.PLANET).getAsString();
         planetID = AliasHandler.resolvePlanet(
                 StringUtils.substringBefore(planetID, " (").replace(" ", ""));
-        Tile tile = game.getTileFromPlanet(planetID);
+        Tile tile = game.getTileContainingPlanet(planetID);
         if (tile == null) return;
 
         String color = getPlayer().getColor();
         boolean coexist = event.getOption(Constants.COEXIST, Boolean.FALSE, OptionMapping::getAsBoolean);
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString();
         boolean doesTileHaveFloatingGF = false;
-        UnitHolder space = tile.getUnitHolders().get("space");
+        UnitHolder space = tile.getSpaceUnitHolder();
         if (space != null && getPlayer().getColor() != null) {
-            doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0
-                    || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
+            doesTileHaveFloatingGF =
+                    space.hasUnit(UnitType.Mech, getPlayer()) || space.hasUnit(UnitType.Infantry, getPlayer());
         }
         for (String unitString : unitList.split(",")) {
             if (doesTileHaveFloatingGF) {
@@ -87,10 +87,10 @@ public class LandUnits extends GameStateCommand {
         }
 
         doesTileHaveFloatingGF = false;
-        space = tile.getUnitHolders().get("space");
+        space = tile.getSpaceUnitHolder();
         if (space != null && getPlayer().getColor() != null) {
-            doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0
-                    || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
+            doesTileHaveFloatingGF =
+                    space.hasUnit(UnitType.Mech, getPlayer()) || space.hasUnit(UnitType.Infantry, getPlayer());
         }
 
         if (space != null
@@ -98,8 +98,8 @@ public class LandUnits extends GameStateCommand {
                 && !doesTileHaveFloatingGF
                 && ButtonHelper.getOtherPlayersWithShipsInTheSystem(getPlayer(), game, tile)
                         .isEmpty()) {
-            doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0
-                    || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
+            doesTileHaveFloatingGF =
+                    space.hasUnit(UnitType.Mech, getPlayer()) || space.hasUnit(UnitType.Infantry, getPlayer());
             if (doesTileHaveFloatingGF) {
                 List<Button> buttons = TacticalActionService.getLandingTroopsButtons(game, getPlayer(), tile);
                 Button concludeMove =
@@ -107,7 +107,7 @@ public class LandUnits extends GameStateCommand {
                 buttons.add(concludeMove);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getChannel(),
-                        getPlayer().getRepresentation() + " you can use these buttons to land troops if necessary",
+                        getPlayer().toString() + " you can use these buttons to land troops if necessary",
                         buttons);
             }
         }

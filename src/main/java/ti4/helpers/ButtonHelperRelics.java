@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
@@ -16,6 +17,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.planet.PlanetButtonService;
 
 @UtilityClass
 public class ButtonHelperRelics {
@@ -52,7 +54,7 @@ public class ButtonHelperRelics {
             if (!exhaustedMessage.contains("Please choose the")) {
                 exhaustedMessage += ", " + msg;
             } else {
-                exhaustedMessage = player.getRepresentation() + msg;
+                exhaustedMessage = player.toString() + msg;
             }
             event.getMessage().editMessage(exhaustedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -60,33 +62,22 @@ public class ButtonHelperRelics {
     }
 
     public static void offerNanoforgeButtons(Player player, Game game, GenericInteractionCreateEvent event) {
-        List<Button> buttons = new ArrayList<>();
-        for (String planetName : player.getPlanetsAllianceMode()) {
-            Planet planet = game.getPlanetsInfo().get(planetName);
-            if (planet == null || planet.isFake() || planet.isSpaceStation(game)) {
-                continue;
-            }
-            if (ButtonHelper.isPlanetLegendaryOrHome(planetName, game, false, null)) {
-                continue;
-            }
-            String buttonID = "nanoforgePlanet_" + planetName;
-            String buttonLabel = Helper.getPlanetRepresentation(planetName, game);
-            buttons.add(Buttons.green(buttonID, buttonLabel));
-        }
+        List<Button> buttons = PlanetButtonService.buttonsForUsablePlanets(
+                player,
+                game,
+                location -> !location.planet().isFake()
+                        && !location.planet().isSpaceStation(game)
+                        && !ButtonHelper.isPlanetLegendaryOrHome(
+                                location.planet().getName(), game, false, null),
+                ButtonStyle.SUCCESS,
+                "nanoforgePlanet_");
         String message = "Please choose which planet you wish to attach _Nano-Forge_ to.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
 
     public static void offerTitansHeroButtons(Player player, Game game, GenericInteractionCreateEvent event) {
-        List<Button> buttons = new ArrayList<>();
-        for (String planetName : player.getPlanetsAllianceMode()) {
-            Planet planet = game.getPlanetsInfo().get(planetName);
-            if (planet == null || planet.isFake()) continue;
-
-            String buttonID = "titansHeroPlanet_" + planetName;
-            String buttonLabel = Helper.getPlanetRepresentation(planetName, game);
-            buttons.add(Buttons.green(buttonID, buttonLabel));
-        }
+        List<Button> buttons = PlanetButtonService.buttonsForUsablePlanets(
+                player, game, location -> !location.planet().isFake(), ButtonStyle.SUCCESS, "titansHeroPlanet_");
         String message = "Please choose which planet you wish to attach _Geoform_ to.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
@@ -94,7 +85,7 @@ public class ButtonHelperRelics {
     @ButtonHandler("nanoforgePlanet_")
     public static void nanoforgePlanet(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String planet = buttonID.replace("nanoforgePlanet_", "");
-        Planet planetReal = game.getPlanetsInfo().get(planet);
+        Planet planetReal = game.getPlanet(planet);
         planetReal.addToken("attachment_nanoforge.png");
         MessageHelper.sendMessageToChannel(
                 event.getChannel(), "Attached _Nano-Forge_ to " + Helper.getPlanetRepresentation(planet, game) + ".");
@@ -105,7 +96,7 @@ public class ButtonHelperRelics {
     @ButtonHandler("titansHeroPlanet_")
     public static void titansHeroPlanet(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String planet = buttonID.replace("titansHeroPlanet_", "");
-        Planet planetReal = game.getPlanetsInfo().get(planet);
+        Planet planetReal = game.getPlanet(planet);
         planetReal.addToken("attachment_titanshero.png");
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),

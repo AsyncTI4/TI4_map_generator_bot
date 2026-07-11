@@ -49,7 +49,7 @@ public class CrystellumFactionTechHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentation()
+                player.toString()
                         + ", choose what you want to convert. Eligible tiles will be shown afterwards."
                         + "\n"
                         + "**REMINDER**: This can only be used once per turn at the start of your turn.",
@@ -71,7 +71,7 @@ public class CrystellumFactionTechHandler {
         }
 
         List<Tile> fighterTiles = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             UnitHolder space = tile.getSpaceUnitHolder();
             if (space == null) {
                 continue;
@@ -93,7 +93,7 @@ public class CrystellumFactionTechHandler {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : fighterTiles) {
             String tilePos = tile.getPosition();
-            String label = tile.getRepresentation();
+            String label = tile.toString();
             String buttonId = "crystellumFFDDTile_" + tilePos;
 
             buttons.add(Buttons.green(player.factionButtonChecker() + buttonId, label));
@@ -101,7 +101,7 @@ public class CrystellumFactionTechHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),
-                player.getRepresentation() + ", please choose the system in which to convert 1 fighter to a destroyer.",
+                player.toString() + ", please choose the system in which to convert 1 fighter to a destroyer.",
                 buttons);
 
         ButtonHelper.deleteMessage(event);
@@ -137,8 +137,7 @@ public class CrystellumFactionTechHandler {
         if (removedFighters < 1) {
             MessageHelper.sendMessageToChannel(
                     game.getActionsChannel(),
-                    player.getRepresentation() + " no longer has an eligible fighter in " + tile.getRepresentation()
-                            + ".");
+                    player.toString() + " no longer has an eligible fighter in " + tile.toString() + ".");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -146,9 +145,9 @@ public class CrystellumFactionTechHandler {
 
         MessageHelper.sendMessageToChannel(
                 game.getActionsChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " replaced 1 fighter in "
-                        + tile.getRepresentation()
+                        + tile.toString()
                         + " with 1 destroyer form their reinforcements using _Molecular Binding_.");
 
         ButtonHelper.deleteMessage(event);
@@ -170,12 +169,12 @@ public class CrystellumFactionTechHandler {
 
         List<String> eligiblePlanets = new ArrayList<>();
         for (String planetName : player.getPlanets()) {
-            Tile tile = game.getTileFromPlanet(planetName);
+            Tile tile = game.getTileContainingPlanet(planetName);
             if (tile == null) {
                 continue;
             }
 
-            UnitHolder holder = tile.getUnitHolderFromPlanet(planetName);
+            UnitHolder holder = tile.getPlanet(planetName);
             if (holder == null) {
                 continue;
             }
@@ -202,8 +201,7 @@ public class CrystellumFactionTechHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),
-                player.getRepresentation()
-                        + ", please choose the planet on which you will replace 2 infantry with a mech.",
+                player.toString() + ", please choose the planet on which you will replace 2 infantry with a mech.",
                 buttons);
 
         ButtonHelper.deleteMessage(event);
@@ -224,7 +222,7 @@ public class CrystellumFactionTechHandler {
         }
 
         String planet = buttonID.replace("crystellumINFMFPlanet_", "");
-        Tile tile = game.getTileFromPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
         if (planet == null || tile == null) {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Unable to locate chosen planet.");
             ButtonHelper.deleteMessage(event);
@@ -238,7 +236,7 @@ public class CrystellumFactionTechHandler {
         if (removedInfantry < 2) {
             MessageHelper.sendMessageToChannel(
                     game.getActionsChannel(),
-                    player.getRepresentation() + " no longer has 2 eligible infantry on "
+                    player.toString() + " no longer has 2 eligible infantry on "
                             + Mapper.getPlanet(planet).getNameRepresentation() + ".");
             ButtonHelper.deleteMessage(event);
             return;
@@ -247,7 +245,7 @@ public class CrystellumFactionTechHandler {
 
         MessageHelper.sendMessageToChannel(
                 game.getActionsChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " replaced 2 infantry on "
                         + Mapper.getPlanet(planet).getNameRepresentation()
                         + " with 1 mech from their reinforcements using _Molecular Binding_.");

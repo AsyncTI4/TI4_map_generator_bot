@@ -47,8 +47,6 @@ class CustomCommand extends Subcommand {
         List<Button> buttons =
                 List.of(Buttons.green(player.factionButtonChecker() + "resolveOracle", "Resolve Oracle"));
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                player.getRepresentation() + " may use this button to resolve _Oracle_.",
-                buttons);
+                event.getMessageChannel(), player.toString() + " may use this button to resolve _Oracle_.", buttons);
     }
 }

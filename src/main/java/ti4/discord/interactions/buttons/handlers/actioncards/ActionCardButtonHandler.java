@@ -120,7 +120,7 @@ class ActionCardButtonHandler {
                 sendReact = false;
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
-                        player.getRepresentation()
+                        player.toString()
                                 + ", you clicked the _Sabotage_ action card button but did not have a _Sabotage_ in hand.");
             }
         }

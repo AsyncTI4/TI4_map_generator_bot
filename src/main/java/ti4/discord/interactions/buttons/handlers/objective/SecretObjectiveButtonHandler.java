@@ -77,8 +77,7 @@ class SecretObjectiveButtonHandler {
                             .queue(Consumers.nop(), BotLogger::catchRestError);
                 }
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation() + " drew a replacement secret objective.");
+                        player.getCorrectChannel(), player.toString() + " drew a replacement secret objective.");
             }
             if (game.getRound() == 1 && !game.isFowMode() && !game.isCommunityMode()) {
                 var userSettings = UserSettingsManager.get(player.getUserID());
@@ -86,7 +85,7 @@ class SecretObjectiveButtonHandler {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("answerSurvey_yes_1", "Yes"));
                     buttons.add(Buttons.red("deleteButtons", "No"));
-                    String msg2 = player.getRepresentation()
+                    String msg2 = player.toString()
                             + " Hullo there! Welcome to async! As part of the ground rules setup process here, we request each player complete a 1 time survey of 5 questions. Would you like to complete it now?";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg2, buttons);
                 }
@@ -152,7 +151,7 @@ class SecretObjectiveButtonHandler {
                 "🛑 Cannot deal secret objectives yet as some players still need to pick their starting technologies. If you wish to proceed anyways, just press the button again.");
         for (Player p : game.getRealPlayers()) {
             if (p.getTechs().size() < p.getFactionModel().finalStartingTechAmount()) {
-                message.append("\n> ").append(p.getRepresentation());
+                message.append("\n> ").append(p.toString());
                 allPlayersSetup = false;
             }
         }

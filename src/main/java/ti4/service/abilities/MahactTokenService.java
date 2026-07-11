@@ -17,7 +17,7 @@ import ti4.service.emoji.ColorEmojis;
 public class MahactTokenService {
 
     public void removeFleetCC(Game game, Player player, String reason) {
-        String message = player.getRepresentation();
+        String message = player.toString();
         if (!(player.hasAbility("primacy"))
                 && (player.hasAbility("edict") || player.hasAbility("imperia"))
                 && !player.getMahactCC().isEmpty()) {

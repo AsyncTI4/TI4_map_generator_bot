@@ -55,6 +55,11 @@ public class GenericCardModel implements ModelInterface, EmbeddableModel {
         return sb.toString();
     }
 
+    @Override
+    public String toString() {
+        return getRepresentation();
+    }
+
     private String cardTypeEmoji() {
         return switch (cardType) {
             case trap -> FactionEmojis.lizho.toString();

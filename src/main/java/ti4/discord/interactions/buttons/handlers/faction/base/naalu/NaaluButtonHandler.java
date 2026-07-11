@@ -21,7 +21,7 @@ class NaaluButtonHandler {
     @ButtonHandler("naaluHeroInitiation")
     public static void resolveNaaluHeroInitiation(Player player, Game game, ButtonInteractionEvent event) {
         Leader playerLeader = player.unsafeGetLeader("naaluhero");
-        StringBuilder message2 = new StringBuilder(player.getRepresentation())
+        StringBuilder message2 = new StringBuilder(player.toString())
                 .append(" played ")
                 .append(Helper.getLeaderFullRepresentation(playerLeader));
         boolean purged = PlayHeroService.removeLeader(game, player, playerLeader);

@@ -71,7 +71,7 @@ public final class WebTileUnitData {
         tileData.isAnomaly = tile.isAnomaly(game, null);
 
         // Extract command tokens from space
-        UnitHolder spaceHolder = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder spaceHolder = tile.getSpaceUnitHolder();
         if (spaceHolder != null) {
             for (String ccID : spaceHolder.getCcList()) {
                 Player player =
@@ -186,7 +186,7 @@ public final class WebTileUnitData {
     private static String getSpaceStationController(Game game, Planet station) {
         String holderName = station.getName();
         for (Player player : game.getRealPlayers()) {
-            if (player.getPlanets().contains(holderName)) {
+            if (player.containsPlanet(holderName)) {
                 return player.getFaction();
             }
         }
@@ -338,7 +338,7 @@ public final class WebTileUnitData {
             String controllingFaction = null;
             Player controllingPlayer = null;
             for (Player player : game.getRealPlayers()) {
-                if (player.getPlanets().contains(planetId)) {
+                if (player.containsPlanet(planetId)) {
                     controllingFaction = player.getFaction();
                     controllingPlayer = player;
                     break;
@@ -349,7 +349,7 @@ public final class WebTileUnitData {
             // Set exhausted status based on controlling player's exhausted planets
             boolean isExhausted = false;
             if (controllingPlayer != null) {
-                isExhausted = controllingPlayer.getExhaustedPlanets().contains(planetId);
+                isExhausted = controllingPlayer.isPlanetExhausted(planetId);
             }
             planetData.setExhausted(isExhausted);
 

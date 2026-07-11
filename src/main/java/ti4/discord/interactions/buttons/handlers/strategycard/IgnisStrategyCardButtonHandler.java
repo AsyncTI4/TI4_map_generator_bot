@@ -17,7 +17,7 @@ class IgnisStrategyCardButtonHandler {
 
     @ButtonHandler("ignisAuroraSC8Primary")
     public static void resolveIgnisAuroraSC8Primary(ButtonInteractionEvent event, Game game, Player player) {
-        if (!player.getSCs().contains(2)) {
+        if (!player.hasStrategyCard(2)) {
             MessageHelper.sendMessageToEventChannel(event, "You don't have the Antiquities strategy card.");
             return;
         }
@@ -31,6 +31,6 @@ class IgnisStrategyCardButtonHandler {
         player.addFragment("urf1");
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " gained an " + ExploreEmojis.UFrag + " Unknown Relic Fragment");
+                player.toString() + " gained an " + ExploreEmojis.UFrag + " Unknown Relic Fragment");
     }
 }

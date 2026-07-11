@@ -62,7 +62,7 @@ public final class LandingContext {
     private static List<Player> computeAllies(Player player, Game game) {
         List<Player> allies = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
-            if (p2 != player && player.getAllianceMembers().contains(p2.getFaction())) {
+            if (p2 != player && player.hasAllianceMember(p2.getFaction())) {
                 allies.add(p2);
             }
         }

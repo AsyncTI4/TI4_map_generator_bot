@@ -32,6 +32,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.service.breakthrough.ValefarZService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class EdictResolveButtonHandler {
@@ -95,12 +96,12 @@ public class EdictResolveButtonHandler {
             if (!buttonID.contains("orangetf")) {
                 List<Player> airoShirRexPlayers = ValefarZService.getAllPlayersWithFlagships(game, "orangetf_flagship");
                 for (Player aur : airoShirRexPlayers) {
-                    if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, aur, "flagship", false) < 1) {
+                    if (UnitQueryService.countUnits(game, aur, "flagship", false) < 1) {
                         continue;
                     }
 
                     orangeResolving = true;
-                    String msg = aur.getRepresentation()
+                    String msg = aur.toString()
                             + ", after resolving the edict, use this button to resolve an additional edict from your flagship.";
 
                     List<String> edicts = EdictPhaseHandler.getEdictDeck(game);
@@ -118,7 +119,7 @@ public class EdictResolveButtonHandler {
                 }
             }
             if (!orangeResolving) {
-                String msg2 = player.getRepresentation()
+                String msg2 = player.toString()
                         + ", after resolving the edict, use this button to proceed to the strategy phase. This button will ready all cards, and ping the speaker.";
                 Button proceed = Buttons.green("proceed_to_strategy", "Proceed to Strategy Phase");
                 MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg2, proceed);

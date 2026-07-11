@@ -72,7 +72,7 @@ public class CrystellumPromissoryHandler {
 
         String message = player.getRepresentationUnfogged()
                 + ", you may use _Fracture_ to place 1 fighter in "
-                + unit.tile().getRepresentation() + ".";
+                + unit.tile().toString() + ".";
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         } else {
@@ -110,7 +110,7 @@ public class CrystellumPromissoryHandler {
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation() + " used _Fracture_ to place 1 fighter in " + tile.getRepresentation()
+                player.toString() + " used _Fracture_ to place 1 fighter in " + tile.toString()
                         + " and returned the promissory note to " + receiver.getRepresentationNoPing() + ".");
         ButtonHelper.deleteMessage(event);
     }

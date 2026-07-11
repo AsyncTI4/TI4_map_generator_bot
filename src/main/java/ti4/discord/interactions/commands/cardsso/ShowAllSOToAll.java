@@ -33,7 +33,7 @@ class ShowAllSOToAll extends GameStateSubcommand {
             scoredSecretObjective.remove(id);
         }
 
-        sb.append(player.getRepresentation());
+        sb.append(player.toString());
         sb.append('\n');
         sb.append("**Secret Objectives:**").append('\n');
         int index = 1;

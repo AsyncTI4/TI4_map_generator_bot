@@ -41,7 +41,7 @@ public class KaloraBreakthroughHandler {
                 player.factionButtonChecker() + "kaloraCommitInfantry_" + bombardPlanet,
                 "Commit 1 Infantry to " + Helper.getPlanetRepresentation(bombardPlanet, game)));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
-        String msg = player.getRepresentation()
+        String msg = player.toString()
                 + ", if you just destroyed the last of the controlling player's ground forces on "
                 + Helper.getPlanetRepresentation(bombardPlanet, game)
                 + ", you may commit 1 infantry from the space area onto that planet using **Bypass Operations**.";
@@ -52,12 +52,12 @@ public class KaloraBreakthroughHandler {
     public static void commitInfantryFromSpace(
             Player player, String buttonID, Game game, ButtonInteractionEvent event) {
         String planet = buttonID.replace("kaloraCommitInfantry_", "");
-        Tile tile = game.getTileFromPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
         if (tile == null) return;
         MoveUnitService.moveUnits(event, tile, game, player.getColor(), "inf", tile, planet);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation() + " committed 1 infantry from the space area onto "
+                player.toString() + " committed 1 infantry from the space area onto "
                         + Helper.getPlanetRepresentation(planet, game) + " using **Bypass Operations**.");
         ButtonHelper.deleteMessage(event);
     }

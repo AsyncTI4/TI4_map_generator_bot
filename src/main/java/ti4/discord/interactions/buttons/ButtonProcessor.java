@@ -353,8 +353,7 @@ public class ButtonProcessor {
     @Deprecated
     private static void gain1tgFromCommander(
             ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
-        String message =
-                player.getRepresentation() + " gained 1 trade good " + player.gainTG(1) + " from their commander.";
+        String message = player.toString() + " gained 1 trade good " + player.gainTG(1) + " from their commander.";
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
         MessageHelper.sendMessageToChannel(mainGameChannel, message);
@@ -363,8 +362,8 @@ public class ButtonProcessor {
 
     private static void gain1tgFromMuaatCommander(
             ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
-        String message = player.getRepresentation() + " gained 1 trade good " + player.gainTG(1)
-                + " from Magmus, the Muaat commander.";
+        String message =
+                player.toString() + " gained 1 trade good " + player.gainTG(1) + " from Magmus, the Muaat commander.";
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
         MessageHelper.sendMessageToChannel(mainGameChannel, message);
@@ -373,7 +372,7 @@ public class ButtonProcessor {
 
     private static void gain1tgFromLetnevCommander(
             ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
-        String message = player.getRepresentation() + " gained 1 trade good " + player.gainTG(1)
+        String message = player.toString() + " gained 1 trade good " + player.gainTG(1)
                 + " from Rear Admiral Farran, the Letnev commander.";
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);

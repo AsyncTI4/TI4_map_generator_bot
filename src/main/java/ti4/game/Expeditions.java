@@ -186,7 +186,7 @@ public class Expeditions {
         if (player != null && player.isRealPlayer()) {
             if (exp.getRemainingExpeditionCount() == 0) {
                 String message = !game.isFowMode() ? "# ATTENTION " + game.getPing() + "\n" : "";
-                message += player.getRepresentation()
+                message += player.toString()
                         + " has completed the last expedition! They can now place the Thunder's Edge planet on the board:";
                 message +=
                         "\n-# Thunder's Edge must be placed on a tile that does not have any planets or printed wormholes, and cannot be placed in a supernova or The Fracture.";
@@ -208,7 +208,7 @@ public class Expeditions {
         MessageChannel channel = player.getCorrectChannel();
         String output;
         boolean success = false;
-        String whichExp = "### " + player.getRepresentation() + " completed the **%s** expedition!";
+        String whichExp = "### " + player.toString() + " completed the **%s** expedition!";
         switch (expeditionType) {
             case "techSkip" -> {
                 success = true;
@@ -233,7 +233,7 @@ public class Expeditions {
                     buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Spending Trade Goods"));
                 } else {
                     player.setTg(player.getTg() - 3);
-                    output = player.getRepresentation() + " Automatically deducted 3 trade goods (" + oldTg + "->"
+                    output = player.toString() + " Automatically deducted 3 trade goods (" + oldTg + "->"
                             + player.getTg() + ")";
                 }
                 MessageHelper.sendMessageToChannelWithButtons(channel, output, buttons);
@@ -278,7 +278,7 @@ public class Expeditions {
                     MessageHelper.sendMessageToChannel(channel, output);
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCardsInfoThread(),
-                            player.getRepresentation() + ", please discard 2 action cards.",
+                            player.toString() + ", please discard 2 action cards.",
                             acButtons);
                 } else {
                     output += "\n-# you may not have enough action cards... use `/game undo` if this was a mistake.";
@@ -292,7 +292,7 @@ public class Expeditions {
             exp.expeditionFactions.put(expeditionType, player.getFaction());
             if (exp.getRemainingExpeditionCount() == 0) {
                 String message = !game.isFowMode() ? "# ATTENTION " + game.getPing() + "\n" : "";
-                message += player.getRepresentation()
+                message += player.toString()
                         + " has completed the last expedition! They can now place the Thunder's Edge planet on the board:";
                 message +=
                         "\n-# Thunder's Edge must be placed on a tile that does not have any planets or printed wormholes, and cannot be placed in a supernova or The Fracture.";

@@ -47,7 +47,7 @@ public class PlotCardsService {
                 player.setPlotCardFaction(plotID, faction);
                 Player p2 = game.getPlayerFromColorOrFaction(faction);
                 String player2 = p2 == null ? faction : p2.getRepresentation(false, true);
-                String msg = player.getRepresentation() + " added a " + player2 + " token to plot "
+                String msg = player.toString() + " added a " + player2 + " token to plot "
                         + player.getPlotCards().get(plotID);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -75,7 +75,7 @@ public class PlotCardsService {
                 player.removePlotCardFaction(plotID);
                 Player p2 = game.getPlayerFromColorOrFaction(faction);
                 String player2 = p2 == null ? faction : p2.getRepresentation(false, true);
-                String msg = player.getRepresentation() + " removed a " + player2 + " token from plot "
+                String msg = player.toString() + " removed a " + player2 + " token from plot "
                         + player.getPlotCards().get(plotID);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -93,11 +93,11 @@ public class PlotCardsService {
 
             List<Button> buttons = new ArrayList<>();
             for (String planet : puppet.getPlanets()) {
-                Tile tile = game.getTileFromPlanet(planet);
+                Tile tile = game.getTileContainingPlanet(planet);
                 if (tile == null) continue;
                 if (tile.isHomeSystem(game)) continue;
 
-                Planet p = tile.getUnitHolderFromPlanet(planet);
+                Planet p = tile.getPlanet(planet);
                 if (p == null) continue;
 
                 String id = player.factionButtonChecker() + "resolveSeethe_" + planet;
@@ -105,7 +105,7 @@ public class PlotCardsService {
                 buttons.add(Buttons.red(id, label));
             }
 
-            String message = player.getRepresentation() + ", please choose a non-home planet controlled by "
+            String message = player.toString() + ", please choose a non-home planet controlled by "
                     + puppet.getRepresentation(false, false) + " to eradicate.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -129,7 +129,7 @@ public class PlotCardsService {
             }
             List<Button> buttons = ListTechService.getTechButtons(techs, player, "free");
 
-            String message = player.getRepresentation() + ", please choose a technology to gain from "
+            String message = player.toString() + ", please choose a technology to gain from "
                     + puppet.getRepresentation(false, false) + ".";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -140,10 +140,10 @@ public class PlotCardsService {
     private static void resolveSeethe(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String regex = "resolveSeethe_" + RegexHelper.unitHolderRegex(game, "planet");
         RegexService.runMatcher(regex, buttonID, matcher -> {
-            Tile t = game.getTileFromPlanet(matcher.group("planet"));
+            Tile t = game.getTileContainingPlanet(matcher.group("planet"));
             if (t == null) return;
 
-            Planet planet = t.getUnitHolderFromPlanet(matcher.group("planet"));
+            Planet planet = t.getPlanet(matcher.group("planet"));
             if (planet == null) return;
 
             boolean disaster = planet.getUnitCount() >= 15;

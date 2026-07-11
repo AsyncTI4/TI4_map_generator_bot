@@ -19,10 +19,7 @@ public class KryxosUnitHandler {
     private static final String FLIP_UNIT = "kryxosFlipUnit_";
 
     public static void offerEvolutionButtons(Player player, Game game, String techID) {
-        if (player == null
-                || game == null
-                || techID == null
-                || !player.getTechs().contains(techID)) {
+        if (player == null || game == null || techID == null || !player.hasExactTech(techID)) {
             return;
         }
 
@@ -66,7 +63,7 @@ public class KryxosUnitHandler {
         String techID = parts[0];
         String currentUnit = parts[1];
         String flippedUnit = parts[2];
-        if (!player.getTechs().contains(techID) || !player.ownsUnit(currentUnit) || player.ownsUnit(flippedUnit)) {
+        if (!player.hasExactTech(techID) || !player.ownsUnit(currentUnit) || player.ownsUnit(flippedUnit)) {
             ButtonHelper.deleteMessage(event);
             return;
         }

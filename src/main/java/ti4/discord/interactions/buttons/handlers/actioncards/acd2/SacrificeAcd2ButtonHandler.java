@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -18,6 +19,7 @@ import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.objectives.DrawSecretService;
+import ti4.service.planet.PlanetButtonService;
 import ti4.service.unit.DestroyUnitService;
 
 @UtilityClass
@@ -25,15 +27,12 @@ class SacrificeAcd2ButtonHandler {
 
     @ButtonHandler("resolveSacrifice")
     public static void resolveSacrifice(Player player, Game game, ButtonInteractionEvent event) {
-        List<Button> buttons = new ArrayList<>();
-        for (String planet : player.getPlanets()) {
-            Planet uH = game.getUnitHolderFromPlanet(planet);
-            if (uH != null && uH.getUnitCount(player.getColorID()) >= 2) {
-                buttons.add(Buttons.green(
-                        player.factionButtonChecker() + "sacrificePlanet_" + planet,
-                        Helper.getPlanetRepresentation(planet, game)));
-            }
-        }
+        List<Button> buttons = PlanetButtonService.buttonsForOwnedPlanets(
+                player,
+                game,
+                location -> location.planet().getUnitCount(player.getColorID()) >= 2,
+                ButtonStyle.SUCCESS,
+                player.factionButtonChecker() + "sacrificePlanet_");
         ButtonHelper.deleteMessage(event);
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -81,8 +80,8 @@ class SacrificeAcd2ButtonHandler {
         }
         String reward = payload.substring(0, separator);
         String planet = payload.substring(separator + 1);
-        Planet unitHolder = game.getUnitHolderFromPlanet(planet);
-        Tile tile = game.getTileFromPlanet(planet);
+        Planet unitHolder = game.getPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
         if (unitHolder == null || tile == null) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Sacrifice_.");
             ButtonHelper.deleteMessage(event);
@@ -145,8 +144,8 @@ class SacrificeAcd2ButtonHandler {
 
     private static void sendIngressFromButtons(Player player, Game game, String targetPos) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (tile != null && tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS)) {
+        for (Tile tile : game.getTiles()) {
+            if (tile != null && tile.getSpaceUnitHolder().containsToken(Constants.TOKEN_INGRESS)) {
                 buttons.add(Buttons.gray(
                         player.factionButtonChecker() + "sacrificeIngressFrom_" + targetPos + "_" + tile.getPosition(),
                         tile.getRepresentationForButtons(game, player)));

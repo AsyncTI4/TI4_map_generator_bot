@@ -63,10 +63,10 @@ public final class PdsCoverageHelper {
                 }
                 boolean sameTile = tilePos.equalsIgnoreCase(adjTilePos);
 
-                for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
+                for (UnitHolder unitHolder : adjTile.getUnitHolderValues()) {
                     // Check for Imperial II HQ on Mecatol Rex
                     if (sameTile && game.mecatols().contains(unitHolder.getName())) {
-                        if (player.controlsMecatol(false) && player.getPlanets().contains("custodiavigilia")) {
+                        if (player.controlsMecatol(false) && player.containsPlanet("custodiavigilia")) {
                             diceCount.add(5 - mod);
                         }
                     }
@@ -90,7 +90,7 @@ public final class PdsCoverageHelper {
                             continue;
                         }
                         if (("ralnel_destroyer2".equalsIgnoreCase(model.getId())
-                                && unitHolder.getUnitCount(UnitType.Pds, player) < 1)) {
+                                && !unitHolder.hasUnit(UnitType.Pds, player))) {
                             continue;
                         }
                         if ((model.getUnitType() == UnitType.Pds
@@ -115,8 +115,8 @@ public final class PdsCoverageHelper {
                     }
 
                     // Check planets for space cannon abilities
-                    if (sameTile && player.getPlanets().contains(unitHolder.getName())) {
-                        Planet planet = game.getPlanetsInfo().get(unitHolder.getName());
+                    if (sameTile && player.containsPlanet(unitHolder.getName())) {
+                        Planet planet = game.getPlanet(unitHolder.getName());
                         for (int i = planet.getSpaceCannonDieCount(); i > 0; i--) {
                             diceCount.add(planet.getSpaceCannonHitsOn() - mod);
                         }
@@ -184,7 +184,7 @@ public final class PdsCoverageHelper {
 
     private static int checkNumberNonFighterShipsWithoutSpaceCannon(Player player, Tile tile) {
         int count = 0;
-        UnitHolder space = tile.getUnitHolders().get("space");
+        UnitHolder space = tile.getSpaceUnitHolder();
         for (Units.UnitKey unit : space.getUnitKeys()) {
             if (!player.unitBelongsToPlayer(unit)) continue;
 

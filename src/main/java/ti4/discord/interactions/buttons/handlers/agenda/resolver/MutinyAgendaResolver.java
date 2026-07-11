@@ -34,7 +34,7 @@ public class MutinyAgendaResolver implements AgendaResolver {
             }
             game.scorePublicObjective(winningOrLosingPlayer.getUserID(), poIndex);
             if (!game.isFowMode()) {
-                message.append(winningOrLosingPlayer.getRepresentation()).append(" scored _Mutiny_.\n");
+                message.append(winningOrLosingPlayer.toString()).append(" scored _Mutiny_.\n");
             }
             Helper.checkEndGame(game, winningOrLosingPlayer);
             if (winningOrLosingPlayer.getTotalVictoryPoints() >= game.getVp()) {

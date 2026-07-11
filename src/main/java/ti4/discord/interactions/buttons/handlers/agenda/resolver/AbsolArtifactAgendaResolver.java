@@ -47,9 +47,9 @@ public class AbsolArtifactAgendaResolver implements ForAgainstAgendaResolver {
         StringBuilder message = new StringBuilder();
         message.append("Custom objective _Ixthian Rex Point_ has been added.\n");
         for (Player playerWL : game.getRealPlayers()) {
-            if (playerWL.getPlanets().contains("mr")) {
+            if (playerWL.containsPlanet("mr")) {
                 game.scorePublicObjective(playerWL.getUserID(), poIndex);
-                message.append(playerWL.getRepresentation()).append(" scored _Ixthian Rex Point_.\n");
+                message.append(playerWL.toString()).append(" scored _Ixthian Rex Point_.\n");
                 Helper.checkEndGame(game, playerWL);
             }
         }

@@ -54,7 +54,7 @@ public class NaaluCommanderService {
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + " is using M'aban, the Naalu Commander, to look at the top & bottom agenda, and their neighbour's promissory notes.");
         }
         List<Button> buttons = new ArrayList<>();

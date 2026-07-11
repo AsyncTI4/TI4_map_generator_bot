@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
@@ -16,6 +17,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
+import ti4.service.planet.PlanetButtonService;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -58,16 +60,12 @@ class IxthianGiftAcd2ButtonHandler {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Ixthian Gift_.");
             return;
         }
-        List<Button> buttons = new ArrayList<>();
-        for (String planet : target.getPlanets()) {
-            Tile tile = game.getTileFromPlanet(planet);
-            if (tile == null || tile.isHomeSystem(game)) {
-                continue;
-            }
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + "ixthianGiftPlanet_" + target.getFaction() + "_" + planet,
-                    Helper.getPlanetRepresentation(planet, game)));
-        }
+        List<Button> buttons = PlanetButtonService.buttonsForOwnedPlanets(
+                target,
+                game,
+                location -> !location.tile().isHomeSystem(game),
+                ButtonStyle.SUCCESS,
+                player.factionButtonChecker() + "ixthianGiftPlanet_" + target.getFaction() + "_");
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -92,8 +90,8 @@ class IxthianGiftAcd2ButtonHandler {
         }
         Player target = game.getPlayerFromColorOrFaction(parts[0]);
         String planet = parts[1];
-        Tile tile = game.getTileFromPlanet(planet);
-        Planet unitHolder = game.getUnitHolderFromPlanet(planet);
+        Tile tile = game.getTileContainingPlanet(planet);
+        Planet unitHolder = game.getPlanet(planet);
         if (target == null || tile == null || unitHolder == null) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Ixthian Gift_.");
             return;

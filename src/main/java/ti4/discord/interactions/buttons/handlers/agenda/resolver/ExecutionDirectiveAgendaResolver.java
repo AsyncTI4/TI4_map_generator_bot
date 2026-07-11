@@ -25,7 +25,7 @@ public class ExecutionDirectiveAgendaResolver implements AgendaResolver {
             for (Player p4 : Helper.getSpeakerOrFullPriorityOrderFromPlayer(player2, game)) {
                 if (p4 != player2) {
                     game.setSpeakerUserID(p4.getUserID());
-                    message += " Also passed the Speaker token to " + p4.getRepresentation() + ".";
+                    message += " Also passed the Speaker token to " + p4.toString() + ".";
                     break;
                 }
             }

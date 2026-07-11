@@ -33,7 +33,7 @@ public class CheckDistanceHelper {
     public static Map<String, Integer> getTileDistancesRelativeToAllYourUnlockedTiles(Game game, Player player) {
         Map<String, Integer> distances = new HashMap<>();
         List<Tile> originTiles = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tileUnlockedForMoving(game, player, tile) && FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 distances.put(tile.getPosition(), 0);
                 originTiles.add(tile);
@@ -91,7 +91,7 @@ public class CheckDistanceHelper {
                                     && player != null
                                     && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.hasAbility("celestial_being")
-                                    && !player.getRelics().contains("circletofthevoid")
+                                    && !player.hasRelic("circletofthevoid")
                                     && !player.hasAbility("voidborn")
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !ButtonHelper.isLawInPlay(game, "shared_research"))
@@ -99,7 +99,7 @@ public class CheckDistanceHelper {
                                     && player != null
                                     && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.hasAbility("celestial_being")
-                                    && !player.getRelics().contains("circletofthevoid")
+                                    && !player.hasRelic("circletofthevoid")
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !player.hasAbility("gashlai_physiology")
                                     && !player.hasTech("tf-mr"))
@@ -110,7 +110,7 @@ public class CheckDistanceHelper {
                                     && tile2 != null
                                     && !ButtonHelper.doesPlayerHaveFSHere("yssaril_flagship", player, tile2)
                                     && (!player.hasUnit("mentak_cruiser3")
-                                            || tile2.getSpaceUnitHolder().getUnitCount(UnitType.Cruiser, player) < 1))
+                                            || !tile2.hasUnitInSpace(UnitType.Cruiser, player)))
                             || (player != null
                                     && FoWHelper.otherPlayersHaveMovementBlockersInSystem(player, tile, game))
                             || (tile.isAsteroidField()
@@ -119,7 +119,7 @@ public class CheckDistanceHelper {
                                     && !player.hasAbility("celestial_being")
                                     && !player.hasTech("amd")
                                     && !player.hasTech("wavelength")
-                                    && !player.getRelics().contains("circletofthevoid")
+                                    && !player.hasRelic("circletofthevoid")
                                     && !player.hasTech("absol_amd")
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2))) {
                         continue;

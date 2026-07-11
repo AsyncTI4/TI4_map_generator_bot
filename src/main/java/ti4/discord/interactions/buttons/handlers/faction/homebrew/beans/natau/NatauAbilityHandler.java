@@ -99,7 +99,7 @@ public class NatauAbilityHandler {
 
         List<Button> buttons = List.of(Buttons.red("deleteButtons", "Done Viewing"));
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-                event.getMessageChannel(), player.getRepresentation() + "##Doctrines", embeds, buttons);
+                event.getMessageChannel(), player.toString() + "##Doctrines", embeds, buttons);
     }
 
     private static MessageEmbed buildDoctrineEmbed(String title, List<AbilityModel> doctrines) {
@@ -114,7 +114,7 @@ public class NatauAbilityHandler {
                 if (!description.isEmpty()) {
                     description.append("\n\n");
                 }
-                description.append(doctrine.getRepresentation());
+                description.append(doctrine.toString());
             }
         }
 
@@ -142,7 +142,7 @@ public class NatauAbilityHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", please choose " + doctrinesRemaining + " doctrine"
+                player.toString() + ", please choose " + doctrinesRemaining + " doctrine"
                         + (doctrinesRemaining == 1 ? "" : "s") + " to place in your play area:",
                 buttons);
     }
@@ -178,8 +178,7 @@ public class NatauAbilityHandler {
         if (activeDoctrines.size() < 2) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " added " + addedDoctrine.getNameRepresentation()
-                            + " to their play area.");
+                    player.toString() + " added " + addedDoctrine.getNameRepresentation() + " to their play area.");
             ButtonHelper.deleteMessage(event);
             offerDoctrineSetupButtons(event, game, player);
             return;
@@ -187,7 +186,7 @@ public class NatauAbilityHandler {
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " added " + addedDoctrine.getNameRepresentation()
+                player.toString() + " added " + addedDoctrine.getNameRepresentation()
                         + " to their play area. Both doctrines have now been chosen.");
         ButtonHelper.deleteMessage(event);
     }
@@ -219,8 +218,7 @@ public class NatauAbilityHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentation()
-                        + ", your doctrines have been readied. Please choose which doctrine to replace:",
+                player.toString() + ", your doctrines have been readied. Please choose which doctrine to replace:",
                 buttons);
     }
 
@@ -289,7 +287,7 @@ public class NatauAbilityHandler {
 
         MessageHelper.sendMessageToChannel(
                 game.getActionsChannel(),
-                player.getRepresentation() + " replaced "
+                player.toString() + " replaced "
                         + Mapper.getAbility(activeDoctrineId).getNameRepresentation() + " with "
                         + Mapper.getAbility(inactiveDoctrineId).getNameRepresentation() + ".");
 

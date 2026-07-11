@@ -38,11 +38,11 @@ public class FealtyUplinkService {
     public boolean canUseFealty(Game game, Player player, Tile tile) {
         if (tile == null) return false;
         if (player.hasUnlockedBreakthrough("l1z1xbt")) return true;
-        return player.hasUnit("tk-fealtycore") && tile.getSpaceUnitHolder().getUnitCount(UnitType.Warsun, player) > 0;
+        return player.hasUnit("tk-fealtycore") && tile.hasUnitInSpace(UnitType.Warsun, player);
     }
 
     public void postInitialButtons(Game game, Player player, String planetName) {
-        UnitHolder unitHolder = game.getUnitHolderFromPlanet(planetName);
+        UnitHolder unitHolder = game.getPlanet(planetName);
         if (unitHolder != null) {
             boolean containsDMZ = unitHolder.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
             if (containsDMZ) {
@@ -66,7 +66,7 @@ public class FealtyUplinkService {
         String regex = "fealtyUplink_" + RegexHelper.unitHolderRegex(game, "planet");
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String planetName = matcher.group("planet");
-            Planet planet = game.getUnitHolderFromPlanet(planetName);
+            Planet planet = game.getPlanet(planetName);
             resolveAddInf(player, planet);
             ButtonHelper.deleteMessage(event);
         });

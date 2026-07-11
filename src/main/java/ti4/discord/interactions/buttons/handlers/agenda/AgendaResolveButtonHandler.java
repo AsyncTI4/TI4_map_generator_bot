@@ -71,6 +71,7 @@ import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.unit.UnitQueryService;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
 
@@ -235,7 +236,7 @@ class AgendaResolveButtonHandler {
                 playerWL.exhaustTech("pi");
                 MessageHelper.sendMessageToChannel(
                         playerWL.getCorrectChannel(),
-                        playerWL.getRepresentation()
+                        playerWL.toString()
                                 + " _Predictive Intelligence_ was exhausted since you voted for a losing outcome while using it.");
             }
         }
@@ -340,7 +341,7 @@ class AgendaResolveButtonHandler {
             } else {
                 message = rep + " you have a Rider to resolve.";
             }
-            if (rid.hasTech("dsatokcr") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, rid, "cruiser", true) < 8) {
+            if (rid.hasTech("dsatokcr") && UnitQueryService.countUnits(game, rid, "cruiser", true) < 8) {
                 MessageHelper.sendMessageToChannel(
                         rid.getCorrectChannel(),
                         rid.getFactionEmoji() + " may DEPLOY 1 cruiser to a system that contains their ships.");
@@ -351,7 +352,7 @@ class AgendaResolveButtonHandler {
                         "Use buttons to DEPLOY 1 cruiser to a system that contains your ships.",
                         buttons);
             }
-            if (rid.hasUnit("kaltrim_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, rid, "mech", true) < 4) {
+            if (rid.hasUnit("kaltrim_mech") && UnitQueryService.countUnits(game, rid, "mech", true) < 4) {
                 MessageHelper.sendMessageToChannel(
                         rid.getCorrectChannel(),
                         rid.getFactionEmoji() + " may DEPLOY 1 mech to a planet that contains their units.");
@@ -479,7 +480,7 @@ class AgendaResolveButtonHandler {
         MessageHelper.sendMessageToChannel(event.getChannel(), resMes);
         Player executiveOrderPlayer = game.getPlayerFromColorOrFaction(game.getStoredValue("executiveOrder"));
         if (executiveOrderPlayer != null) {
-            voteMessage = executiveOrderPlayer.getRepresentation()
+            voteMessage = executiveOrderPlayer.toString()
                     + ", please use this buttons to proceed after fully resolving the agenda.";
             buttons = StartTurnService.getStartOfTurnButtons(executiveOrderPlayer, game, true, event);
             game.removeStoredValue("executiveOrder");

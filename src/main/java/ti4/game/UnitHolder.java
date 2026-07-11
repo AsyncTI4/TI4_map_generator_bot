@@ -133,6 +133,10 @@ public abstract class UnitHolder {
         controlList.remove(cc);
     }
 
+    public boolean hasControl(String control) {
+        return controlList.contains(control);
+    }
+
     /**
      * Adds a variety of tokens from faction effects and other game mechanics (sleeper tokens,
      * frontier tokens, wormhole tokens, etc).
@@ -143,6 +147,10 @@ public abstract class UnitHolder {
 
     public boolean removeToken(String cc) {
         return tokenList.remove(cc);
+    }
+
+    public boolean containsToken(String token) {
+        return tokenList.contains(token);
     }
 
     public void removeAllTokens() {
@@ -323,6 +331,23 @@ public abstract class UnitHolder {
 
     public int getUnitCount(UnitType unitType, Player player) {
         return getUnitCount(unitType, player.getColor());
+    }
+
+    public boolean hasUnit(UnitType unitType, Player player) {
+        return hasUnit(unitType, player.getColor());
+    }
+
+    public boolean hasUnit(UnitType unitType, String color) {
+        return getUnitCount(unitType, color) > 0;
+    }
+
+    public boolean hasAnyUnit(Player player, UnitType... unitTypes) {
+        for (UnitType unitType : unitTypes) {
+            if (hasUnit(unitType, player)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getUnitCountForState(UnitKey unitKey, UnitState state) {

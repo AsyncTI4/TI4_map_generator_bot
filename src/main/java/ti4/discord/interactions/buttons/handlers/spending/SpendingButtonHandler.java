@@ -50,7 +50,7 @@ class SpendingButtonHandler {
         if (playerLeader != null && !playerLeader.isExhausted()) {
             playerLeader.setExhausted(true);
             String messageText =
-                    player.getRepresentation() + " exhausted " + Helper.getLeaderFullRepresentation(playerLeader) + ".";
+                    player.toString() + " exhausted " + Helper.getLeaderFullRepresentation(playerLeader) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), messageText);
         } else {
             game.removeStoredValue("keleresAgentTarget");
@@ -90,29 +90,28 @@ class SpendingButtonHandler {
         PlanetExhaust.doAction(player, planetName, game);
         player.addSpentThing(planetName);
 
-        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+        UnitHolder uH = game.getPlanet(planetName);
         if (uH != null) {
-            if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
-                Tile tile = game.getTileFromPlanet(planetName);
-                String msg = player.getRepresentation() + " added 1 infantry to "
+            if (uH.containsToken("attachment_arcane_citadel.png")) {
+                Tile tile = game.getTileContainingPlanet(planetName);
+                String msg = player.toString() + " added 1 infantry to "
                         + Helper.getPlanetRepresentation(planetName, game) + " due to the _Arcane Citadel_.";
                 AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planetName);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
-            if (uH.getTokenList().contains("attachment_facilitylogisticshub.png")) {
-                String msg = player.getRepresentation() + " gained 1 commodity due to exhausting "
+            if (uH.containsToken("attachment_facilitylogisticshub.png")) {
+                String msg = player.toString() + " gained 1 commodity due to exhausting "
                         + Helper.getPlanetRepresentation(planetName, game)
                         + " while it had a _Logistics Hub Facility_.";
                 player.setCommodities(player.getCommodities() + 1);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
-            if (uH.getTokenList().contains("attachment_facilityresearchlab.png")) {
+            if (uH.containsToken("attachment_facilityresearchlab.png")) {
                 int amountThereNow = game.changeCommsOnPlanet(1, planetName);
 
-                String msg =
-                        player.getRepresentation() + " gained 1 trade good on the _Research Lab_ due to exhausting "
-                                + Helper.getPlanetRepresentation(planetName, game)
-                                + ". It now has " + StringHelper.pluralize(amountThereNow, "trade good") + " on it.";
+                String msg = player.toString() + " gained 1 trade good on the _Research Lab_ due to exhausting "
+                        + Helper.getPlanetRepresentation(planetName, game)
+                        + ". It now has " + StringHelper.pluralize(amountThereNow, "trade good") + " on it.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
@@ -122,13 +121,27 @@ class SpendingButtonHandler {
                                     .getTechSpecialties()
                                     .isEmpty())
                     || ButtonHelper.checkForTechSkips(game, planetName)) {
-                String msg = player.getRepresentation()
+                String msg = player.toString()
                         + " due to your **Ancient Knowledge** ability, you may be eligible to receive a commodity here if you exhausted this planet ("
                         + planetName
                         + ") for its technology speciality.";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm));
                 buttons.add(Buttons.red("deleteButtons", "N/A"));
+                if (uH.containsToken("attachment_arcane_citadel.png")) {
+                    Tile tile = game.getTileContainingPlanet(planetName);
+                    String arcaneCitadelMessage = player.toString() + " added 1 infantry to "
+                            + Helper.getPlanetRepresentation(planetName, game) + " due to the _Arcane Citadel_.";
+                    AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planetName);
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), arcaneCitadelMessage);
+                }
+                if (uH.containsToken("attachment_facilitylogisticshub.png")) {
+                    String logisticsHubMessage = player.toString() + " gained 1 commodity due to exhausting "
+                            + Helper.getPlanetRepresentation(planetName, game)
+                            + " while it had a _Logistics Hub Facility_.";
+                    player.setCommodities(player.getCommodities() + 1);
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), logisticsHubMessage);
+                }
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getFactionEmoji()

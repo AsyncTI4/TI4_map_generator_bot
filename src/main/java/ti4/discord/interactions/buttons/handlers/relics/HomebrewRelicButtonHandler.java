@@ -31,7 +31,7 @@ class HomebrewRelicButtonHandler {
         game.scorePublicObjective(player.getUserID(), poIndex);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " scored a secret objective (they'll specify which one). The bot has already given you a victory point for this.");
         Helper.checkEndGame(game, player);
         ButtonHelper.deleteMessage(event);

@@ -44,7 +44,7 @@ public class EconomicEqualityAgendaResolver implements AgendaResolver {
                 DisasterWatchHelper.sendMessageInDisasterWatch(
                         game,
                         "The Galactic Council of " + game.getName() + " have generously volunteered "
-                                + playerB.getRepresentation() + " to donate " + maxLoss
+                                + playerB.toString() + " to donate " + maxLoss
                                 + " trade goods to the less economically fortunate citizens of the galaxy.");
             }
             DisasterWatchHelper.sendMessageInDisasterWatch(game, MiscEmojis.tg(maxLoss));

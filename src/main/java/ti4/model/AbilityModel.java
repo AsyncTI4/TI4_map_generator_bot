@@ -133,6 +133,11 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     }
 
     @Override
+    public String toString() {
+        return getRepresentation();
+    }
+
+    @Override
     public boolean search(String searchString) {
         return id.contains(searchString)
                 || name.toLowerCase().contains(searchString)

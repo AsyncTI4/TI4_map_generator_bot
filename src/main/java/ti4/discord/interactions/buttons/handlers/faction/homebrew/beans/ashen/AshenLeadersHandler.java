@@ -102,7 +102,7 @@ public class AshenLeadersHandler {
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " is resolving **Ashfall Effigy - Hell From Above** from "
                         + sourceTile.getRepresentationForButtons(game, player)
                         + ".");
@@ -138,8 +138,8 @@ public class AshenLeadersHandler {
             return false;
         }
 
-        Planet targetPlanet = game.getUnitHolderFromPlanet(bombardPlanet);
-        Tile targetTile = game.getTileFromPlanet(bombardPlanet);
+        Planet targetPlanet = game.getPlanet(bombardPlanet);
+        Tile targetTile = game.getTileContainingPlanet(bombardPlanet);
         if (targetPlanet == null || targetTile == null) {
             return false;
         }
@@ -153,7 +153,7 @@ public class AshenLeadersHandler {
                 if (!buttons.isEmpty()) {
                     MessageHelper.sendMessageToChannelWithButtons(
                             game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
-                            p2.getRepresentation() + ", please assign the BOMBARDMENT hit"
+                            p2.toString() + ", please assign the BOMBARDMENT hit"
                                     + (hits == 1 ? "" : "s")
                                     + " on "
                                     + targetPlanet.getRepresentation(game)
@@ -167,7 +167,7 @@ public class AshenLeadersHandler {
                         "Auto-assign Hit" + (hits == 1 ? "" : "s") + " For Dummy"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
-                        player.getRepresentation() + ", please assign the BOMBARDMENT hit"
+                        player.toString() + ", please assign the BOMBARDMENT hit"
                                 + (hits == 1 ? "" : "s")
                                 + " for the dummy player on "
                                 + targetPlanet.getRepresentation(game)
@@ -434,9 +434,9 @@ public class AshenLeadersHandler {
         AddUnitService.addUnits(event, destination, game, target.getColor(), "1 " + selectedUnit.getAsyncId());
         ButtonHelper.deleteMessage(event);
 
-        String message = ashenPlayer.getRepresentation()
+        String message = ashenPlayer.toString()
                 + " exhausted **Orrun**, the Ashen agent, to place "
-                + target.getRepresentation()
+                + target.toString()
                 + "'s "
                 + selectedUnit.getName()
                 + " in "
@@ -482,14 +482,14 @@ public class AshenLeadersHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 game.getActionsChannel(),
-                player.getRepresentation() + " used **Karos** to place 1 " + unitModel.getName() + " in "
+                player.toString() + " used **Karos** to place 1 " + unitModel.getName() + " in "
                         + tile.getRepresentationForButtons(game, player) + ".");
     }
 
     private static List<Tile> getEligibleDestinationTiles(Game game, Player target) {
         List<Tile> tiles = new ArrayList<>();
         String activeSystem = game.getActiveSystem();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tile.getPosition().equalsIgnoreCase(activeSystem)) {
                 continue;
             }
@@ -508,7 +508,7 @@ public class AshenLeadersHandler {
     }
 
     private static List<Tile> getEligibleHeroTiles(Game game, Player player) {
-        return game.getTileMap().values().stream()
+        return game.getTiles().stream()
                 .filter(tile -> FoWHelper.playerHasActualShipsInSystem(player, tile))
                 .filter(tile -> !CombatRollService.getUnitsInBombardment(tile, player, null)
                         .isEmpty())
@@ -537,7 +537,7 @@ public class AshenLeadersHandler {
     private static boolean isPlanetControlledByAnotherPlayer(Game game, Player player, String planetName) {
         return game.getRealPlayersNNeutral().stream()
                 .filter(otherPlayer -> otherPlayer != player)
-                .anyMatch(otherPlayer -> otherPlayer.getPlanets().contains(planetName));
+                .anyMatch(otherPlayer -> otherPlayer.containsPlanet(planetName));
     }
 
     private static String buildHeroBombardmentAssignment(
@@ -577,9 +577,9 @@ public class AshenLeadersHandler {
     }
 
     private static List<Tile> getEligibleCommanderPlacementTiles(Game game, Player player) {
-        return game.getTileMap().values().stream()
+        return game.getTiles().stream()
                 .filter(tile -> tile.getPlanetUnitHolders().stream()
-                        .anyMatch(planet -> player.getPlanets().contains(planet.getName())))
+                        .anyMatch(planet -> player.containsPlanet(planet.getName())))
                 .filter(tile -> !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game))
                 .sorted(Comparator.comparing(Tile::getPosition))
                 .toList();

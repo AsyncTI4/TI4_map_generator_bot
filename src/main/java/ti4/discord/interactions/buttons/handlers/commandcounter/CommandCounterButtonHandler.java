@@ -31,7 +31,7 @@ public class CommandCounterButtonHandler {
         player.setFleetCC(player.getFleetCC() - 1);
         String originalCCs = game.getStoredValue("originalCCsFor" + player.getFaction());
         int netGain = ButtonHelper.checkNetGain(player, originalCCs);
-        String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
+        String editedMessage = player.toString() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
         event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
         ButtonHelper.checkFleetInEveryTile(player, game);
@@ -42,7 +42,7 @@ public class CommandCounterButtonHandler {
         player.setTacticalCC(player.getTacticalCC() - 1);
         String originalCCs = game.getStoredValue("originalCCsFor" + player.getFaction());
         int netGain = ButtonHelper.checkNetGain(player, originalCCs);
-        String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
+        String editedMessage = player.toString() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
         event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -52,7 +52,7 @@ public class CommandCounterButtonHandler {
         player.setStrategicCC(player.getStrategicCC() - 1);
         String originalCCs = game.getStoredValue("originalCCsFor" + player.getFaction());
         int netGain = ButtonHelper.checkNetGain(player, originalCCs);
-        String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
+        String editedMessage = player.toString() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
         event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -62,11 +62,11 @@ public class CommandCounterButtonHandler {
         player.setFleetCC(player.getFleetCC() + 1);
         String originalCCs = game.getStoredValue("originalCCsFor" + player.getFaction());
         int netGain = ButtonHelper.checkNetGain(player, originalCCs);
-        String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
+        String editedMessage = player.toString() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
         event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
         if (ButtonHelper.isLawInPlay(game, "regulations") && player.getEffectiveFleetCC() > 4) {
-            String msg = player.getRepresentation() + ", reminder that _Fleet Regulations_ is a";
+            String msg = player.toString() + ", reminder that _Fleet Regulations_ is a";
             msg += " law in play, which is limiting fleet pool to 4 tokens.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         }
@@ -77,7 +77,7 @@ public class CommandCounterButtonHandler {
         player.setStrategicCC(player.getStrategicCC() + 1);
         String originalCCs = game.getStoredValue("originalCCsFor" + player.getFaction());
         int netGain = ButtonHelper.checkNetGain(player, originalCCs);
-        String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
+        String editedMessage = player.toString() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
         event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -87,7 +87,7 @@ public class CommandCounterButtonHandler {
         player.setTacticalCC(player.getTacticalCC() + 1);
         String originalCCs = game.getStoredValue("originalCCsFor" + player.getFaction());
         int netGain = ButtonHelper.checkNetGain(player, originalCCs);
-        String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
+        String editedMessage = player.toString() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
         event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -96,7 +96,7 @@ public class CommandCounterButtonHandler {
     public static void resetCCs(ButtonInteractionEvent event, Player player, Game game) {
         String originalCCs = game.getStoredValue("originalCCsFor" + player.getFaction());
         ButtonHelper.resetCCs(player, originalCCs);
-        String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
+        String editedMessage = player.toString() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: 0.";
         event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -109,7 +109,7 @@ public class CommandCounterButtonHandler {
 
         List<Button> buttons = ButtonHelper.getLoseCCButtons(player);
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(), player.getRepresentation() + " has chosen to lose 1 command token.");
+                player.getCorrectChannel(), player.toString() + " has chosen to lose 1 command token.");
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }

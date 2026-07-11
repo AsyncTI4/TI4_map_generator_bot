@@ -50,9 +50,8 @@ class SendDebt extends GameStateSubcommand {
         String pool = event.getOption(Constants.DEBT_POOL, Constants.DEBT_DEFAULT_POOL, OptionMapping::getAsString);
         SendDebtService.sendDebt(sendingPlayer, receivingPlayer, debtCountToSend, pool);
         CommanderUnlockCheckService.checkPlayer(receivingPlayer, "vaden");
-        String debtMsg =
-                sendingPlayer.getRepresentation() + " sent " + StringHelper.pluralize(debtCountToSend, "debt token")
-                        + " to " + receivingPlayer.getRepresentation() + ", for their \"" + pool + "\" pool.";
+        String debtMsg = sendingPlayer.toString() + " sent " + StringHelper.pluralize(debtCountToSend, "debt token")
+                + " to " + receivingPlayer.toString() + ", for their \"" + pool + "\" pool.";
         MessageHelper.sendMessageToChannel(sendingPlayer.getCorrectChannel(), debtMsg);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(receivingPlayer.getPrivateChannel(), debtMsg);

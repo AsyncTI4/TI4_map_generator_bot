@@ -67,7 +67,7 @@ class AbductionAcd2ButtonHandler {
         }
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " took " + target.getRepresentationNoPing() + "'s " + leader.getName()
+                player.toString() + " took " + target.getRepresentationNoPing() + "'s " + leader.getName()
                         + " (" + leader.getType() + ") for _Abduction_. " + player.getRepresentationNoPing()
                         + " may use its ability this turn; return it to " + target.getRepresentationNoPing()
                         + " at the end of this turn.");

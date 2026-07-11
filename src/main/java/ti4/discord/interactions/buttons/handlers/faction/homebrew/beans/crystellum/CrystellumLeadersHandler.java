@@ -148,7 +148,7 @@ public class CrystellumLeadersHandler {
         }
 
         String nonCrystellum = (activePlayer != player
-                ? (" " + player.getRepresentation() + " also gained " + numberOfNFShips + " trade goods.")
+                ? (" " + player.toString() + " also gained " + numberOfNFShips + " trade goods.")
                 : "");
 
         MessageHelper.sendMessageToChannel(
@@ -157,7 +157,7 @@ public class CrystellumLeadersHandler {
                         + ", used _Shardwright Veyla_ to allow "
                         + activePlayer.getRepresentationUnfogged()
                         + " to place " + numberOfNFShips + " fighters"
-                        + " in " + activeTile.getRepresentation() + "."
+                        + " in " + activeTile.toString() + "."
                         + nonCrystellum);
 
         ButtonHelper.deleteMessage(event);
@@ -171,7 +171,7 @@ public class CrystellumLeadersHandler {
         Tile homeTile = player.getHomeSystemTile();
         int count = 0;
 
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tile == null) {
                 continue;
             }

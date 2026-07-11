@@ -82,7 +82,7 @@ public class PromissoryNoteHelper {
                     if (pnOwner == null) {
                         MessageHelper.sendMessageToChannel(
                                 player.getCardsInfoThread(),
-                                player.getRepresentation()
+                                player.toString()
                                         + ", one of your promissory notes has no owner. The promissory note id is "
                                         + pn.getKey() + " and number is " + pn.getValue() + ".");
                         continue;
@@ -119,7 +119,7 @@ public class PromissoryNoteHelper {
                             if (pnOwner == null) {
                                 MessageHelper.sendMessageToChannel(
                                         player.getCardsInfoThread(),
-                                        player.getRepresentation()
+                                        player.toString()
                                                 + ", one of your promissory notes has no owner. The promissory note id is "
                                                 + pn.getKey() + " and number is " + pn.getValue() + ".");
                                 continue;
@@ -225,8 +225,7 @@ public class PromissoryNoteHelper {
                 && !TaPromissoryHandler.hasLegalAdvancedStructuralEngineeringTargets(player, game)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + ", there are no legal non-home planets for _Advanced Structural Engineering_.");
+                    player.toString() + ", there are no legal non-home planets for _Advanced Structural Engineering_.");
             return;
         }
         if (pn.getPlayArea() && !player.isPlayerMemberOfAlliance(owner)) {
@@ -251,7 +250,7 @@ public class PromissoryNoteHelper {
         }
 
         String emojiToUse = game.isFowMode() ? "" : owner.getFactionEmoji();
-        String sb = player.getRepresentation() + " played _" + pnName + "_.";
+        String sb = player.toString() + " played _" + pnName + "_.";
         MessageEmbed pnEmbed = pn.getRepresentationEmbed();
 
         // Send the message up top before "resolving" so that buttons are at the bottom
@@ -352,14 +351,14 @@ public class PromissoryNoteHelper {
             game.drawSecretObjective(player.getUserID());
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + " drew an extra secret objective due to _Plots Within Plots_. Please discard an extra secret objective.");
         }
         if ("sigma_sycophancy".equalsIgnoreCase(id)) {
             game.drawSecretObjective(player.getUserID());
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + " drew an extra secret objective due to _Sycophancy_. Please discard an extra secret objective.");
         }
         if ("dspnvade".equalsIgnoreCase(id)) {
@@ -383,7 +382,7 @@ public class PromissoryNoteHelper {
             ActionCardHelper.sendPlotCardInfo(game, owner);
             MessageHelper.sendMessageToChannel(
                     owner.getCardsInfoThread(),
-                    owner.getRepresentation() + " _Black Ops_ has been played by " + player.getRepresentationNoPing()
+                    owner.toString() + " _Black Ops_ has been played by " + player.getRepresentationNoPing()
                             + ". Please choose a Plot to put into play with a control token from them on it.");
             owner.removeOwnedPromissoryNoteByID(id);
             player.removePromissoryNote(id);
@@ -434,7 +433,7 @@ public class PromissoryNoteHelper {
             }
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", please choose the neighbor to pass the note to.",
+                    player.toString() + ", please choose the neighbor to pass the note to.",
                     buttons);
         }
         if (!"agendas_absol".equals(game.getAgendaDeckID()) && id.endsWith("_ps") && !id.contains("absol")) {
@@ -564,7 +563,7 @@ public class PromissoryNoteHelper {
             List<Button> afterButtons = AgendaWhensAftersHelper.getAfterButtons(game);
             MessageHelper.sendMessageToChannelWithFactionReact(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + "Please choose your Rider target.",
+                    player.toString() + "Please choose your Rider target.",
                     game,
                     player,
                     riderButtons);
@@ -577,7 +576,7 @@ public class PromissoryNoteHelper {
             // List<Button> afterButtons = AgendaWhensAftersHelper.getAfterButtons(game);
             MessageHelper.sendMessageToChannelWithFactionReact(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + "Please choose your Rider target.",
+                    player.toString() + "Please choose your Rider target.",
                     game,
                     player,
                     riderButtons);
@@ -590,7 +589,7 @@ public class PromissoryNoteHelper {
             // List<Button> afterButtons = AgendaWhensAftersHelper.getAfterButtons(game);
             MessageHelper.sendMessageToChannelWithFactionReact(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + "Please choose your Rider target.",
+                    player.toString() + "Please choose your Rider target.",
                     game,
                     player,
                     riderButtons);
@@ -602,7 +601,7 @@ public class PromissoryNoteHelper {
             List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", please use buttons to explore a planet you control.",
+                    player.toString() + ", please use buttons to explore a planet you control.",
                     buttons);
         }
         if ("dspnbelk".equalsIgnoreCase(id)) {
@@ -666,7 +665,7 @@ public class PromissoryNoteHelper {
             List<Button> exploreButtons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", explore each planet that contains your mechs.",
+                    player.toString() + ", explore each planet that contains your mechs.",
                     exploreButtons);
         }
         if ("sigma_primitivism".equalsIgnoreCase(id)) {
@@ -675,7 +674,7 @@ public class PromissoryNoteHelper {
             player.setTg(oldTgs + 4);
             MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", you have gained 1 command token and 4 trade goods (" + oldTgs
+                    player.toString() + ", you have gained 1 command token and 4 trade goods (" + oldTgs
                             + " -> " + (oldTgs + 4)
                             + ") from playing _Primitivism_. Please use the button to gain your command token.",
                     transact2);
@@ -749,7 +748,7 @@ public class PromissoryNoteHelper {
         sendPromissoryNoteInfo(game, sourcePlayer, false);
         MessageHelper.sendMessageToChannel(
                 sourcePlayer.getCardsInfoThread(),
-                "# " + sourcePlayer.getRepresentation() + " you lost the promissory note _"
+                "# " + sourcePlayer.toString() + " you lost the promissory note _"
                         + Mapper.getPromissoryNote(promissoryNoteId).getName() + "_.");
 
         targetPlayer.setPromissoryNote(promissoryNoteId);
@@ -757,7 +756,7 @@ public class PromissoryNoteHelper {
 
         MessageHelper.sendMessageToChannel(
                 targetPlayer.getCardsInfoThread(),
-                "# " + targetPlayer.getRepresentation() + " you gained the promissory note _"
+                "# " + targetPlayer.toString() + " you gained the promissory note _"
                         + Mapper.getPromissoryNote(promissoryNoteId).getName() + "_.");
     }
 }

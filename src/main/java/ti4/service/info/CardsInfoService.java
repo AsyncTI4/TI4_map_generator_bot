@@ -34,13 +34,14 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class CardsInfoService {
 
     public static void sendCardsInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         if (player == null) return;
-        String headerText = player.getRepresentation() + " Somebody" + CommandHelper.getHeaderText(event);
+        String headerText = player.toString() + " Somebody" + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendCardsInfo(game, player);
     }
@@ -123,7 +124,7 @@ public class CardsInfoService {
             buttons.add(Buttons.gray(
                     "startTradeStationConvert", "Convert Commodities With Space Station", MiscEmojis.comm));
         }
-        if (player.getPlanets().contains("conviction")
+        if (player.containsPlanet("conviction")
                 && !player.getExhaustedPlanetsAbilities().contains("conviction")) {
             buttons.add(Buttons.gray(
                     "planetAbilityExhaust_conviction",
@@ -264,12 +265,11 @@ public class CardsInfoService {
             buttons.add(Buttons.gray(
                     "getAgentSelection_hyperagent", "Use Hyper Agent on Someone Else", FactionEmojis.Mentak));
         }
-        if (player.hasTech("tf-predictivecommand")
-                && !player.getExhaustedTechs().contains("tf-predictivecommand")) {
+        if (player.hasTech("tf-predictivecommand") && !player.isTechExhausted("tf-predictivecommand")) {
             buttons.add(Buttons.gray(
                     "exhaustTech_tf-predictivecommand", "Exhaust Predictive Command", FactionEmojis.mykomentori));
         }
-        if (player.hasTech("tf-radiantsigils") && !player.getExhaustedTechs().contains("tf-radiantsigils")) {
+        if (player.hasTech("tf-radiantsigils") && !player.isTechExhausted("tf-radiantsigils")) {
             buttons.add(Buttons.gray("exhaustTech_tf-radiantsigils", "Exhaust Radiant Sigils", FactionEmojis.edyn));
         }
         if (player.hasUnexhaustedLeader("firmamentagent")) {
@@ -317,7 +317,7 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("ghotiagent")) {
             buttons.add(Buttons.gray("getAgentSelection_ghotiagent", "Use Ghoti Agent", FactionEmojis.ghoti));
         }
-        if (!player.getNomboxTile().getUnitHolders().get("space").getUnits().isEmpty()) {
+        if (!player.getNomboxTile().getSpaceUnitHolder().getUnits().isEmpty()) {
             FactionEmojis f = FactionEmojis.Cabal;
             if (player.hasAbility("mark_of_pharadn")) {
                 f = FactionEmojis.pharadn;
@@ -359,12 +359,12 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("exhaustAgent_vaylerianagent", "Use Vaylerian Agent", FactionEmojis.vaylerian));
         }
         if (player.ownsUnit("ghost_mech")
-                && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0
+                && UnitQueryService.countUnits(game, player, "mech", false) > 0
                 && !ButtonHelper.isLawInPlay(game, "articles_war")) {
             buttons.add(Buttons.gray("creussMechStep1_", "Use Creuss Mech", FactionEmojis.Ghost));
         }
         if (player.ownsUnit("nivyn_mech2")
-                && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0
+                && UnitQueryService.countUnits(game, player, "mech", false) > 0
                 && !game.getLaws().containsKey("articles_war")) {
             buttons.add(Buttons.gray("nivynMechStep1_", "Use Nivyn Mech", FactionEmojis.nivyn));
         }
@@ -448,7 +448,7 @@ public class CardsInfoService {
         if (game.isTwilightsFallMode() && game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + ", a reminder that genomes can be _Shatter_'d! Use best judgement on whether that is likely to occur and whether you should wait for a _Shatter_ (usually it will not).");
         }
     }

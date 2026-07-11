@@ -31,7 +31,7 @@ class PrismButtonHandler {
                         + " will not be able to gain it again at a later point.");
         MessageHelper.sendMessageToChannelWithButton(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", please choose a technology to gain that also has "
+                player.toString() + ", please choose a technology to gain that also has "
                         + techM1.getRequirements().orElse("").length() + " prerequisites.",
                 Buttons.GET_A_FREE_TECH);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);

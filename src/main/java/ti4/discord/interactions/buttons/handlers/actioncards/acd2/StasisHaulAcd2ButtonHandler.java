@@ -80,7 +80,7 @@ class StasisHaulAcd2ButtonHandler {
         buttons.add(Buttons.red("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + "'s " + type.humanReadableName() + " in " + where
+                player.toString() + "'s " + type.humanReadableName() + " in " + where
                         + " has **+2 capacity** during this tactical action (_Stasis Haul_). Click below to gain 1"
                         + " commodity for each different system it moves into or through.",
                 buttons);

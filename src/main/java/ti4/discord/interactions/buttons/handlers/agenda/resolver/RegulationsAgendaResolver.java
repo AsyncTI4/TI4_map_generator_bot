@@ -20,8 +20,8 @@ public class RegulationsAgendaResolver implements ForAgainstAgendaResolver {
                 ButtonHelper.checkFleetInEveryTile(p, game);
             }
             if (p.getEffectiveFleetCC() > 4) {
-                String msg = p.getRepresentation()
-                        + ", please lose command tokens from your fleet pool until you are at 4 total.";
+                String msg =
+                        p.toString() + ", please lose command tokens from your fleet pool until you are at 4 total.";
                 var buttons = ButtonHelper.getLoseFleetCCButtons(p);
                 MessageHelper.sendMessageToChannelWithButtons(p.getCorrectChannel(), msg, buttons);
             }

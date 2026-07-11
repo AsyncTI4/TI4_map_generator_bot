@@ -96,7 +96,7 @@ public class FactionRecordOfStrategyCardPickService {
             Map<String, Integer> custodians) {
         for (Player player : game.getRealPlayers()) {
             String scs = game.getStoredValue("Round" + round + "SCPickFor" + faction);
-            if (!player.getFaction().equalsIgnoreCase(faction) || scs.isEmpty()) {
+            if (!player.isFaction(faction) || scs.isEmpty()) {
                 continue;
             }
             gamesThatHadThem.incrementAndGet();

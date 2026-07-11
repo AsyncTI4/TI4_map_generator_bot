@@ -211,8 +211,8 @@ public final class RiftSetModeService {
                     "## While trying to explore the planet, you find something dark and dangerous..." + "\n-# "
                             + getGMs(game));
             StellarConverterService.secondHalfOfStellar(game, planetName, event, player);
-            Tile tile = game.getTileFromPlanet(planetName);
-            UnitHolder unitHolder = tile.getUnitHolderFromPlanet(planetName);
+            Tile tile = game.getTileContainingPlanet(planetName);
+            UnitHolder unitHolder = tile.getPlanet(planetName);
             unitHolder.removeAllTokens();
             unitHolder.addToken("token_worlddestroyed_riftset.png");
             return true;
@@ -342,7 +342,7 @@ public final class RiftSetModeService {
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                "**Sacrifice** was performed. " + player.getRepresentation() + " gained "
+                "**Sacrifice** was performed. " + player.toString() + " gained "
                         + (totalTGsGained == 0
                                 ? "0"
                                 : MiscEmojis.tg(totalTGsGained) + " " + player.gainTG(totalTGsGained))
@@ -405,7 +405,7 @@ public final class RiftSetModeService {
                 game.getMainGameChannel(),
                 "# All " + MiscEmojis.GravityRift + " tremble violently!\n" + "## Ships nearby shake as a terrifying "
                         + MiscEmojis.GravityRift + " force builds — danger is imminent.");
-        return game.getTileMap().values().stream()
+        return game.getTiles().stream()
                 .filter(tile -> tile.isGravityRift(game, null))
                 .collect(Collectors.toList());
     }

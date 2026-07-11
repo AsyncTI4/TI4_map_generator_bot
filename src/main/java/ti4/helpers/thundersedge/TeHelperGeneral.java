@@ -48,7 +48,7 @@ public class TeHelperGeneral {
             }
             List<String> susPlanets = new ArrayList<>();
             for (String planet : game.getPlanetsPlayerIsCoexistingOn(player)) {
-                UnitHolder uH = game.getUnitHolderFromPlanet(planet);
+                UnitHolder uH = game.getPlanet(planet);
                 boolean otherPresent = false;
                 for (Player p2 : game.getRealPlayersNNeutral()) {
                     if (p2 == player) {
@@ -96,7 +96,7 @@ public class TeHelperGeneral {
         }
 
         for (Planet station : tile.getSpaceStations()) {
-            Player prevOwner = game.getPlayerThatControlsPlanet(station.getName());
+            Player prevOwner = game.getPlanetOwner(station.getName());
             if (newOwner == prevOwner) {
                 continue;
             }
@@ -108,7 +108,7 @@ public class TeHelperGeneral {
             }
             MessageHelper.sendMessageToChannel(
                     newOwner.getCorrectChannel(),
-                    newOwner.getRepresentation() + " acquired control of the " + station.getRepresentation(game)
+                    newOwner.toString() + " acquired control of the " + station.getRepresentation(game)
                             + " space station.");
         }
     }
@@ -135,8 +135,7 @@ public class TeHelperGeneral {
                     .map(t -> Buttons.green(
                             "placeThundersEdge_" + t.getPosition(), t.getRepresentationForButtons(game, player)))
                     .forEach(newButtons::add);
-            newMessage =
-                    player.getRepresentation() + ", please choose which system you wish to place Thunder's Edge in.";
+            newMessage = player.toString() + ", please choose which system you wish to place Thunder's Edge in.";
 
         } else if ((matcher = Pattern.compile(part2).matcher(buttonID)).matches()) {
             String pos = matcher.group("pos");
@@ -144,7 +143,7 @@ public class TeHelperGeneral {
             String prefix = player.factionButtonChecker() + "placeThundersEdge_" + pos + "_";
 
             int most = exp.getMostCompleteByAny();
-            newMessage = player.getRepresentation() + ", you are placing place Thunder's Edge in "
+            newMessage = player.toString() + ", you are placing place Thunder's Edge in "
                     + tile.getRepresentationForButtons(game, player) + ".";
             newMessage += "\nYou must select one of the players with the most completed expeditions to place " + most
                     + " infantry on Thunder's Edge.";
@@ -167,7 +166,7 @@ public class TeHelperGeneral {
                 AddUnitService.addUnits(event, tile, game, p2.getColor(), most + " inf thundersedge");
                 ButtonHelper.deleteMessage(event);
                 String message = "Placed Thunder's Edge in " + tile.getRepresentationForButtons(game, player)
-                        + " and added " + most + " " + p2.getRepresentation() + " infantry.";
+                        + " and added " + most + " " + p2.toString() + " infantry.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 CommanderUnlockCheckService.checkPlayer(
                         p2, "arborec", "sol", "ghost", "naalu", "sardakk", "xxcha", "cabal");

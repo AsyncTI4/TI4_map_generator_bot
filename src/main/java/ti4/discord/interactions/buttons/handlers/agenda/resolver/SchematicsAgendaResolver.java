@@ -16,9 +16,7 @@ public class SchematicsAgendaResolver implements AgendaResolver {
     public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         if (!"for".equalsIgnoreCase(winner)) {
             for (Player player : game.getRealPlayers()) {
-                if (player.getTechs().contains("ws")
-                        || player.getTechs().contains("pws2")
-                        || player.getTechs().contains("dsrohdws")) {
+                if (player.hasExactTech("ws") || player.hasExactTech("pws2") || player.hasExactTech("dsrohdws")) {
                     ActionCardHelper.discardRandomAC(event, game, player, player.getAcCount());
                 }
             }

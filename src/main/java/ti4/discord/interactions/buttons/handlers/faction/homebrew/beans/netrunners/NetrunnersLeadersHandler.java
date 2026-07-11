@@ -33,8 +33,8 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.unit.AddUnitService;
-import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class NetrunnersLeadersHandler {
@@ -73,7 +73,7 @@ public class NetrunnersLeadersHandler {
         MessageChannel channel =
                 player.getCardsInfoThread() == null ? player.getCorrectChannel() : player.getCardsInfoThread();
         MessageHelper.sendMessageToChannelWithButtons(
-                channel, player.getRepresentation() + ", please choose a player to use _Overclock_ on:", buttons);
+                channel, player.toString() + ", please choose a player to use _Overclock_ on:", buttons);
     }
 
     public static void startOverclockSession(Game game, Player netrunner, Player affectedPlayer) {
@@ -102,7 +102,7 @@ public class NetrunnersLeadersHandler {
             return List.of();
         }
 
-        return game.getTileMap().values().stream()
+        return game.getTiles().stream()
                 .filter(Objects::nonNull)
                 .filter(tile -> tile.containsPlayersUnitsWithModelCondition(affectedPlayer, UnitModel::getIsStructure))
                 .toList();
@@ -155,8 +155,8 @@ public class NetrunnersLeadersHandler {
 
         MessageHelper.sendMessageToChannel(
                 game.getActionsChannel(),
-                player.getRepresentation() + " exhausted **Overclock** to allow "
-                        + affectedPlayer.getRepresentation()
+                player.toString() + " exhausted **Overclock** to allow "
+                        + affectedPlayer.toString()
                         + " to produce up to 2 units with tiles containing their structures.");
 
         MessageHelper.sendMessageToChannelWithButtons(
@@ -331,7 +331,7 @@ public class NetrunnersLeadersHandler {
         if (targets.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     netrunner.getCorrectChannel(),
-                    netrunner.getRepresentation()
+                    netrunner.toString()
                             + " used **Digital Uprising**, but no players with control tokens in the **"
                             + NetrunnersAbilitiesHandler.SYSTEM_BREACH_POOL
                             + "** pool have structures on non-home planets to destroy.");
@@ -348,7 +348,7 @@ public class NetrunnersLeadersHandler {
                 .toList();
         MessageHelper.sendMessageToChannelWithButtons(
                 netrunner.getCorrectChannel(),
-                netrunner.getRepresentation() + " used **Digital Uprising**. "
+                netrunner.toString() + " used **Digital Uprising**. "
                         + targetPings
                         + ", use your button to choose and destroy 1 structure you own on a non-home planet.",
                 buttons);
@@ -403,7 +403,7 @@ public class NetrunnersLeadersHandler {
 
         MessageHelper.sendMessageToChannel(
                 game.getActionsChannel(),
-                target.getRepresentation() + " destroyed 1 " + getStructureName(target, structure)
+                target.toString() + " destroyed 1 " + getStructureName(target, structure)
                         + " on " + Helper.getPlanetRepresentation(unitHolderName, game)
                         + " for " + netrunner.getRepresentation(false, true)
                         + "'s **Digital Uprising**. Added 2 "
@@ -461,16 +461,16 @@ public class NetrunnersLeadersHandler {
 
     private static boolean canUseSpaceCannonAgainstActivePlayer(
             Player activePlayer, Game game, Tile tile, Player rollingPlayer) {
-        if (rollingPlayer == activePlayer || activePlayer.getAllianceMembers().contains(rollingPlayer.getFaction())) {
+        if (rollingPlayer == activePlayer || activePlayer.hasAllianceMember(rollingPlayer.getFaction())) {
             return FoWHelper.otherPlayersHaveShipsInSystem(activePlayer, tile, game);
         }
         return true;
     }
 
     private static BorrowedPds getBestBorrowedPds(Game game, Player netrunner, Player owner, Tile targetTile) {
-        return CheckUnitContainmentService.getTilesContainingPlayersUnits(game, owner, UnitType.Pds).stream()
+        return UnitQueryService.getTilesContainingPlayersUnits(game, owner, UnitType.Pds).stream()
                 .filter(pdsTile -> isCommanderPdsTileUsable(game, netrunner, targetTile, pdsTile))
-                .flatMap(pdsTile -> pdsTile.getUnitHolders().values().stream()
+                .flatMap(pdsTile -> pdsTile.getUnitHolderValues().stream()
                         .flatMap(unitHolder -> getBorrowedPds(owner, pdsTile, unitHolder).stream()))
                 .filter(pds -> isCommanderPdsInRange(game, netrunner, owner, targetTile, pds))
                 .max(Comparator.comparingInt(pds -> getPdsScore(owner, pds.model())))
@@ -538,7 +538,7 @@ public class NetrunnersLeadersHandler {
         if (game == null || target == null) {
             return List.of();
         }
-        return ButtonHelper.getTilesOfPlayersSpecificUnits(game, target, UnitType.Pds, UnitType.Spacedock).stream()
+        return UnitQueryService.getTilesContainingPlayersUnits(game, target, UnitType.Pds, UnitType.Spacedock).stream()
                 .flatMap(tile -> tile.getPlanetUnitHolders().stream()
                         .filter(planet -> !planet.isHomePlanet(game))
                         .flatMap(planet -> getRevolutionStructures(target, tile, planet).stream()))
@@ -575,7 +575,7 @@ public class NetrunnersLeadersHandler {
         if (target == null || tile == null || unitType == null) {
             return null;
         }
-        UnitHolder unitHolder = tile.getUnitHolders().get(unitHolderName);
+        UnitHolder unitHolder = tile.getUnitHolder(unitHolderName);
         if (!(unitHolder instanceof Planet)) {
             return null;
         }

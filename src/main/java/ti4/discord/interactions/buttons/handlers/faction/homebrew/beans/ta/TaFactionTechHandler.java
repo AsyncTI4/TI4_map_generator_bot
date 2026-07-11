@@ -18,6 +18,7 @@ import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.planet.PlanetService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class TaFactionTechHandler {
@@ -38,7 +39,7 @@ public class TaFactionTechHandler {
 
         List<String> designPlanets = new ArrayList<>();
         for (String planetName : player.getPlanets()) {
-            Tile tile = game.getTileFromPlanet(planetName);
+            Tile tile = game.getTileContainingPlanet(planetName);
             if (tile == null) {
                 continue;
             }
@@ -57,8 +58,8 @@ public class TaFactionTechHandler {
 
         List<Button> buttons = new ArrayList<>();
         for (String planetName : designPlanets) {
-            Tile tile = game.getTileFromPlanet(planetName);
-            Planet planet = tile.getUnitHolderFromPlanet(planetName);
+            Tile tile = game.getTileContainingPlanet(planetName);
+            Planet planet = tile.getPlanet(planetName);
             if (tile == null || planet == null) {
                 continue;
             }
@@ -97,14 +98,14 @@ public class TaFactionTechHandler {
             return;
         }
 
-        Planet planet = tile.getUnitHolderFromPlanet(planetName);
+        Planet planet = tile.getPlanet(planetName);
         if (planet == null) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
         if (!player.hasTech(YELLOW_TECH)
-                || !player.getPlanetsAllianceMode().contains(planetName)
+                || !player.canUsePlanet(planetName)
                 || !TaAbilityHandler.planetHasAnyDesignAttached(tile, planetName)) {
             ButtonHelper.deleteMessage(event);
             return;
@@ -148,23 +149,21 @@ public class TaFactionTechHandler {
         Tile tile = game.getTileByPosition(tilePosition);
         if (tile == null
                 || !player.hasTech(YELLOW_TECH)
-                || !player.getPlanetsAllianceMode().contains(planetName)
+                || !player.canUsePlanet(planetName)
                 || !TaAbilityHandler.planetHasAnyDesignAttached(tile, planetName)
                 || (!"pds".equals(structureType) && (!"spacedock".equals(structureType)))) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
-        int pdsRemaining =
-                player.getUnitCap("pd") - ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false);
+        int pdsRemaining = player.getUnitCap("pd") - UnitQueryService.countUnits(game, player, "pds", false);
 
-        int sdRemaining =
-                player.getUnitCap("sd") - ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "spacedock", false);
+        int sdRemaining = player.getUnitCap("sd") - UnitQueryService.countUnits(game, player, "spacedock", false);
 
         if ("pds".equals(structureType) && pdsRemaining < 1) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", you have no PDS remaining in your reinforcements.");
+                    player.toString() + ", you have no PDS remaining in your reinforcements.");
             ButtonHelper.deleteMessage(event);
             ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
             return;
@@ -173,7 +172,7 @@ public class TaFactionTechHandler {
         if ("spacedock".equals(structureType) && sdRemaining < 1) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", you have no more Space Docks in your reinforcements.");
+                    player.toString() + ", you have no more Space Docks in your reinforcements.");
             ButtonHelper.deleteMessage(event);
             ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
             return;
@@ -222,7 +221,7 @@ public class TaFactionTechHandler {
 
         List<Button> buttons = new ArrayList<>();
         for (String planetName : costPlanets) {
-            Planet planet = game.getUnitHolderFromPlanet(planetName);
+            Planet planet = game.getPlanet(planetName);
             if (planet == null) {
                 ButtonHelper.deleteMessage(event);
                 return;
@@ -236,7 +235,7 @@ public class TaFactionTechHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", please choose a planet to exhaust for _Resource Optimization_.",
+                player.toString() + ", please choose a planet to exhaust for _Resource Optimization_.",
                 buttons);
     }
 
@@ -247,8 +246,7 @@ public class TaFactionTechHandler {
         }
 
         String costPlanet = buttonID.substring(RO_PLANET_EXHAUST.length());
-        if (!player.getPlanets().contains(costPlanet)
-                || !player.getReadiedPlanets().contains(costPlanet)) {
+        if (!player.containsPlanet(costPlanet) || !player.hasPlanetReady(costPlanet)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -265,7 +263,7 @@ public class TaFactionTechHandler {
 
         List<Button> buttons = new ArrayList<>();
         for (String planetName : targetPlanets) {
-            Planet planet = game.getUnitHolderFromPlanet(planetName);
+            Planet planet = game.getPlanet(planetName);
             if (planet == null) {
                 ButtonHelper.deleteMessage(event);
                 return;
@@ -278,7 +276,7 @@ public class TaFactionTechHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", please choose a planet to ready using _Resource Optimization_.",
+                player.toString() + ", please choose a planet to ready using _Resource Optimization_.",
                 buttons);
     }
 
@@ -297,8 +295,7 @@ public class TaFactionTechHandler {
 
         String costPlanet = parts[0];
         String targetPlanet = parts[1];
-        if (!player.getPlanets().contains(targetPlanet)
-                || !player.getExhaustedPlanets().contains(targetPlanet)) {
+        if (!player.containsPlanet(targetPlanet) || !player.isPlanetExhausted(targetPlanet)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -315,7 +312,7 @@ public class TaFactionTechHandler {
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " exhausted " + Helper.getPlanetRepresentation(costPlanet, game)
                         + " to ready " + Helper.getPlanetRepresentation(targetPlanet, game)
                         + " using _Resource Optimization_."

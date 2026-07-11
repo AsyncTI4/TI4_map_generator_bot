@@ -81,6 +81,7 @@ import ti4.model.TechSpecialtyModel.TechSpecialty;
 import ti4.model.TechnologyModel;
 import ti4.model.TokenModel;
 import ti4.model.UnitModel;
+import ti4.service.abilities.SmotheringPresenceService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.emoji.CardEmojis;
@@ -100,8 +101,8 @@ import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
-import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
+import ti4.service.unit.UnitQueryService;
 
 public final class Helper {
 
@@ -131,7 +132,7 @@ public final class Helper {
 
     public static boolean doesAllianceMemberOwnPlanet(Game game, String planet, Player p1) {
         for (Player player : game.getRealPlayers()) {
-            if (player.getPlanets().contains(planet) && p1.getAllianceMembers().contains(player.getFaction())) {
+            if (player.containsPlanet(planet) && p1.hasAllianceMember(player.getFaction())) {
                 return true;
             }
         }
@@ -247,7 +248,7 @@ public final class Helper {
             return true;
         }
         if (player.hasAbility("mobile_command")
-                && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Flagship)
+                && UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Flagship)
                         .isEmpty()) {
             return false;
         }
@@ -401,7 +402,7 @@ public final class Helper {
 
     public static Player getPlayerWithThisSC(Game game, int sc) {
         for (Player p2 : game.getRealPlayers()) {
-            if (p2.getSCs().contains(sc)) {
+            if (p2.hasStrategyCard(sc)) {
                 return p2;
             }
         }
@@ -570,7 +571,7 @@ public final class Helper {
     }
 
     public static void addTokenPlanetToTile(Game game, Tile tile, String planetName) {
-        Tile existingTile = game.getTileFromPlanet(planetName);
+        Tile existingTile = game.getTileContainingPlanet(planetName);
         if (existingTile != null) {
             TokenPlanetService.moveTokenPlanet(game, null, tile, planetName);
         } else {
@@ -657,7 +658,7 @@ public final class Helper {
         planetID = planetID.toLowerCase().replace(" ", "");
         planetID = planetID.replace("'", "");
         planetID = planetID.replace("-", "");
-        Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        Planet unitHolder = game.getPlanet(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return "Unable to find planet unitholder for " + planetID;
         }
@@ -671,7 +672,7 @@ public final class Helper {
         planetID = planetID.replace("'", "");
         planetID = planetID.replace("-", "");
         planetID = planetID.replace(".", "");
-        Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        Planet unitHolder = game.getPlanet(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return "Unable to find planet unitholder for " + planetID;
         }
@@ -685,7 +686,7 @@ public final class Helper {
     }
 
     public static String getPlanetRepresentationPlusEmojiPlusResourceInfluence(String planetID, Game game) {
-        Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        Planet unitHolder = game.getPlanet(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
@@ -737,7 +738,7 @@ public final class Helper {
     }
 
     private static String getPlanetRepresentationPlusEmojiPlusInfluence(String planetID, Game game) {
-        Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        Planet unitHolder = game.getPlanet(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
@@ -747,7 +748,7 @@ public final class Helper {
     }
 
     private static String getPlanetRepresentationPlusEmojiPlusResources(String planetID, Game game) {
-        Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        Planet unitHolder = game.getPlanet(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
@@ -820,7 +821,7 @@ public final class Helper {
                 if (player == null || player.getFaction() == null) {
                     continue;
                 }
-                if (player.getSCs() != null && player.getSCs().contains(sc) && !game.isFowMode()) {
+                if (player.getSCs() != null && player.hasStrategyCard(sc) && !game.isFowMode()) {
                     held = true;
                     break;
                 }
@@ -866,7 +867,7 @@ public final class Helper {
                 if (player == null || player.getFaction() == null) {
                     continue;
                 }
-                if (player.getSCs() != null && player.getSCs().contains(sc) && !game.isFowMode()) {
+                if (player.getSCs() != null && player.hasStrategyCard(sc) && !game.isFowMode()) {
                     held = true;
                     break;
                 }
@@ -965,7 +966,7 @@ public final class Helper {
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         player.resetProducedUnits();
         for (String planet : planets) {
-            Planet uh = game.getUnitHolderFromPlanet(planet);
+            Planet uh = game.getPlanet(planet);
             if (uh == null) continue; // custodia, ghoti, etc.
 
             boolean containsDMZ = uh.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
@@ -974,7 +975,7 @@ public final class Helper {
                 continue;
             }
             if ("spacedock".equalsIgnoreCase(unit)) {
-                if (uh.getUnitCount(UnitType.Spacedock, player) > 0) {
+                if (uh.hasUnit(UnitType.Spacedock, player)) {
                     continue;
                 }
             }
@@ -998,11 +999,10 @@ public final class Helper {
             if (planet.contains("ghoti") || planet.contains("custodia")) {
                 continue;
             }
-            if (game.getTileFromPlanet(planet) != player.getHomeSystemTile()) {
+            if (game.getTileContainingPlanet(planet) != player.getHomeSystemTile()) {
                 continue;
             }
-            if (game.getUnitHolderFromPlanet(planet) == null
-                    || game.getUnitHolderFromPlanet(planet).isSpaceStation(game)) {
+            if (game.getPlanet(planet) == null || game.getPlanet(planet).isSpaceStation(game)) {
                 continue;
             }
             String id = player.factionButtonChecker() + prefix + "_" + unit + "_" + planet;
@@ -1243,7 +1243,7 @@ public final class Helper {
             }
             String secondHalf = thing.split("_")[1];
             String flavor = thing.split("_")[0];
-            if (flavor.contains("planet") && player.getExhaustedPlanets().contains(secondHalf)) {
+            if (flavor.contains("planet") && player.isPlanetExhausted(secondHalf)) {
                 player.refreshPlanet(secondHalf);
             }
         }
@@ -1272,7 +1272,7 @@ public final class Helper {
                 continue;
             }
 
-            if (player.getExhaustedPlanets().contains(thing)) {
+            if (player.isPlanetExhausted(thing)) {
                 player.refreshPlanet(thing);
                 player.removeSpentThing(thing);
             }
@@ -1328,7 +1328,7 @@ public final class Helper {
                     && !thing.contains("commander")
                     && !thing.contains("agent")
                     && !thing.contains("Agent")) {
-                Planet planet = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
+                Planet planet = game.getPlanet(AliasHandler.resolvePlanet(thing));
                 msg.append("> ");
                 if (planet == null) {
                     if (thing.contains("comm")) {
@@ -1348,7 +1348,7 @@ public final class Helper {
                     } else {
                         planetsSpent.add(thing);
                     }
-                    Tile t = game.getTileFromPlanet(planet.getName());
+                    Tile t = game.getTileContainingPlanet(planet.getName());
                     if (t != null && !t.isHomeSystem(game)) {
                         if (planet.getResources() > bestRes) {
                             bestRes = planet.getResources();
@@ -1806,7 +1806,7 @@ public final class Helper {
                         }
                         if (player.hasUnit("axis_mech")
                                 && !ButtonHelper.isLawInPlay(game, "articles_war")
-                                && uH.getUnitCount(UnitType.Mech, player) > 0) {
+                                && uH.hasUnit(UnitType.Mech, player)) {
                             productionValue = Math.max(5, productionValue);
                         }
                     } else {
@@ -1837,7 +1837,7 @@ public final class Helper {
         }
         if (uH instanceof Planet planet) {
             if (TaPromissoryHandler.planetHasAdvancedStructuralEngineering(planet)
-                    && player.getPlanets().contains(planet.getName())) {
+                    && player.containsPlanet(planet.getName())) {
                 productionValueTotal += Math.max(0, planet.getResources());
             }
         }
@@ -1850,7 +1850,7 @@ public final class Helper {
                                     && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)))) {
                 productionValueTotal += 5;
             } else {
-                if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Warsun)
+                if (UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Warsun)
                                 .contains(tile)
                         && player.hasTech("tf-mr")) {
                     productionValueTotal += 5;
@@ -1866,7 +1866,7 @@ public final class Helper {
             }
         }
 
-        if (!player.getPlanets().contains(uH.getName())) {
+        if (!player.containsPlanet(uH.getName())) {
             return productionValueTotal;
         }
         if (game.mecatols().contains(planet) && player.hasIIHQ() && player.controlsMecatol(true)) {
@@ -1980,8 +1980,7 @@ public final class Helper {
             }
         }
         if (player.hasTech("absol_ah")
-                && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
-                        || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
+                && (uH.hasUnit(UnitType.Pds, player.getColor()) || uH.hasUnit(UnitType.Spacedock, player.getColor()))) {
             int structures = uH.getUnitCount(UnitType.Spacedock, player.getColor())
                     + uH.getUnitCount(UnitType.Pds, player.getColor());
             productionValueTotal += structures;
@@ -1995,9 +1994,9 @@ public final class Helper {
         }
         if (player.hasTech("ah")
                 && planetUnitVal < 1
-                && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
-                        || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0
-                        || (uH.getUnitCount(UnitType.Mech, player.getColor()) > 0) && player.hasAbility("byssus"))) {
+                && (uH.hasUnit(UnitType.Pds, player.getColor())
+                        || uH.hasUnit(UnitType.Spacedock, player.getColor())
+                        || (uH.hasUnit(UnitType.Mech, player.getColor())) && player.hasAbility("byssus"))) {
             productionValueTotal += 1;
             planetUnitVal = 1;
             if (player.hasRelic("boon_of_the_cerulean_god")) {
@@ -2010,9 +2009,7 @@ public final class Helper {
                 productionValueTotal++;
             }
         } else {
-            if (player.hasTech("absol_ie")
-                    && planetUnitVal < 1
-                    && player.getPlanets().contains(uH.getName())) {
+            if (player.hasTech("absol_ie") && planetUnitVal < 1 && player.containsPlanet(uH.getName())) {
                 productionValueTotal += 1;
                 planetUnitVal = 1;
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
@@ -2022,7 +2019,7 @@ public final class Helper {
                     productionValueTotal++;
                 }
             } else {
-                if (player.getPlanets().contains(uH.getName())
+                if (player.containsPlanet(uH.getName())
                         && player.hasTech("dsbentg")
                         && planetUnitVal < 1
                         && (!uH.getTokenList().isEmpty()
@@ -2039,9 +2036,7 @@ public final class Helper {
                     }
                     planetUnitVal = 1;
                 }
-                if (player.getReadiedPlanets().contains(uH.getName())
-                        && player.hasAbility("synthesis")
-                        && planetUnitVal < 1) {
+                if (player.hasPlanetReady(uH.getName()) && player.hasAbility("synthesis") && planetUnitVal < 1) {
                     productionValueTotal += 1;
                     if (player.hasRelic("boon_of_the_cerulean_god")) {
                         productionValueTotal++;
@@ -2054,7 +2049,7 @@ public final class Helper {
                 }
             }
         }
-        if (player.getPlanets().contains(uH.getName())
+        if (player.containsPlanet(uH.getName())
                 && player.getLeader("nokarhero").map(Leader::isActive).orElse(false)) {
             productionValueTotal += 3;
             productionValueTotal -= planetUnitVal;
@@ -2087,24 +2082,13 @@ public final class Helper {
             return 0;
         }
         if (game.isTwilightsFallMode()) {
-            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-                if (p2.hasTech("tf-smotheringpresence")) {
-                    for (String tilePos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
-
-                        Tile t2 = game.getTileByPosition(tilePos);
-                        for (UnitHolder uH : t2.getUnitHolders().values()) {
-                            if (uH.getUnitCount(UnitType.Pds, p2.getColor()) > 0
-                                    || uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
-                                return 0;
-                            }
-                        }
-                    }
-                }
+            if (SmotheringPresenceService.isSmothered(game, player, tile)) {
+                return 0;
             }
         }
         int productionValueTotal = 0;
         if (!singleDock) {
-            for (UnitHolder uH : tile.getUnitHolders().values()) {
+            for (UnitHolder uH : tile.getUnitHolderValues()) {
                 productionValueTotal += getProductionValueOfUnitHolder(player, game, tile, uH);
             }
             if (tile.getUnitHolders().size() == 1
@@ -2120,7 +2104,7 @@ public final class Helper {
             }
         } else {
             int highestProd = 0;
-            for (UnitHolder uH : tile.getUnitHolders().values()) {
+            for (UnitHolder uH : tile.getUnitHolderValues()) {
                 for (UnitKey unit : uH.getUnits().keySet()) {
                     if (unit.getColor().equalsIgnoreCase(player.getColor())) {
                         UnitModel unitModel = player.getPriorityUnitByAsyncID(unit.asyncID(), uH);
@@ -2146,7 +2130,7 @@ public final class Helper {
                                 }
                                 if (player.hasUnit("axis_mech")
                                         && !ButtonHelper.isLawInPlay(game, "articles_war")
-                                        && uH.getUnitCount(UnitType.Mech, player) > 0) {
+                                        && uH.hasUnit(UnitType.Mech, player)) {
                                     productionValue = Math.max(5, productionValue);
                                 }
                             }
@@ -2166,7 +2150,7 @@ public final class Helper {
             productionValueTotal = highestProd;
         }
         if (productionValueTotal > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "gledgecommander")) {
-            productionValueTotal += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd");
+            productionValueTotal += UnitQueryService.countUnits(game, player, "sd");
         }
         if (productionValueTotal > 0 && player.hasAbility("policy_the_environment_plunder")) {
             productionValueTotal -= 2;
@@ -2233,18 +2217,17 @@ public final class Helper {
         List<Button> unitButtons = new ArrayList<>();
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "saarcommander")) {
-            for (Tile tile :
-                    CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)) {
+            for (Tile tile : UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock)) {
                 if (tile.getPosition().equalsIgnoreCase(origTile.getPosition())
                         || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                     continue;
                 }
-                for (UnitHolder uH : tile.getUnitHolders().values()) {
+                for (UnitHolder uH : tile.getUnitHolderValues()) {
                     if (player.getUnitsOwned().contains("saar_spacedock")
                             || player.getUnitsOwned().contains("saar_spacedock2")
-                            || uH.getUnitCount(UnitType.Spacedock, player) > 0) {
+                            || uH.hasUnit(UnitType.Spacedock, player)) {
                         if (uH instanceof Planet planet) {
-                            if (player.getPlanetsAllianceMode().contains(uH.getName())) {
+                            if (player.canUsePlanet(uH.getName())) {
                                 String pp = planet.getName();
                                 Button inf1Button = Buttons.green(
                                         player.factionButtonChecker() + placePrefix + "_infantry_" + pp,
@@ -2288,7 +2271,7 @@ public final class Helper {
         String planetInteg = "";
         if (warfareNOtherstuff.contains("integrated")) {
             planetInteg = warfareNOtherstuff.replace("integrated", "");
-            UnitHolder plan = ButtonHelper.getUnitHolderFromPlanetName(planetInteg, game);
+            UnitHolder plan = game.getPlanet(planetInteg);
             if (plan instanceof Planet planetUh) {
                 resourcelimit = planetUh.getResources();
             }
@@ -2459,14 +2442,13 @@ public final class Helper {
                 ActionCardHelper.sendActionCardInfo(game, player, event);
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
-                        player.getRepresentation()
-                                + ", a reminder that you have _War Machine_, and this is the window for it.");
+                        player.toString() + ", a reminder that you have _War Machine_, and this is the window for it.");
             }
         }
         if (player.ownsUnit("greentf_mech") && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
             greenMechd = true;
             for (String pp : player.getPlanets()) {
-                if (game.getTileFromPlanet(pp) == null) {
+                if (game.getTileContainingPlanet(pp) == null) {
                     continue;
                 }
                 Button mfButton = Buttons.green(
@@ -2495,7 +2477,7 @@ public final class Helper {
                         game.getStrategyCardModelByName(warfareNOtherstuff).orElse(null);
                 if (model != null && model.usesAutomationForSCID("te6warfare")) singleDock = false;
                 if (singleDock) {
-                    if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) < 1
+                    if (!unitHolder.hasUnit(UnitType.Spacedock, player.getColor())
                             && !player.hasUnit("saar_spacedock")
                             && !player.hasUnit("absol_saar_spacedock")
                             && !player.hasUnit("absol_saar_spacedock2")
@@ -2510,12 +2492,7 @@ public final class Helper {
                 if (("tacticalAction".equalsIgnoreCase(warfareNOtherstuff)
                                 || "warfare".equalsIgnoreCase(warfareNOtherstuff))
                         && getProductionValueOfUnitHolder(player, game, tile, unitHolder) == 0
-                        && getProductionValueOfUnitHolder(
-                                        player,
-                                        game,
-                                        tile,
-                                        tile.getUnitHolders().get("space"))
-                                == 0) {
+                        && getProductionValueOfUnitHolder(player, game, tile, tile.getSpaceUnitHolder()) == 0) {
                     continue;
                 }
 
@@ -2523,7 +2500,7 @@ public final class Helper {
                         && !unitHolder.getName().equalsIgnoreCase(planetInteg)) {
                     continue;
                 }
-                if (!player.getPlanetsAllianceMode().contains(unitHolder.getName())
+                if (!player.canUsePlanet(unitHolder.getName())
                         && !"genericModifyAllTiles".equals(warfareNOtherstuff)
                         && !"genericBuild".equals(warfareNOtherstuff)
                         && !game.getPlanetsPlayerIsCoexistingOn(player).contains(unitHolder.getName())) {
@@ -2567,7 +2544,7 @@ public final class Helper {
                         player.factionButtonChecker() + placePrefix + "_mech_" + pp,
                         "Produce Mech on " + getPlanetRepresentation(pp, game),
                         UnitEmojis.mech);
-                if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
+                if (UnitQueryService.countUnits(game, player, "mech") > 3) {
                     mfButton = Buttons.gray(
                             player.factionButtonChecker() + placePrefix + "_mech_" + pp,
                             "Produce Mech on " + getPlanetRepresentation(pp, game),
@@ -2581,7 +2558,7 @@ public final class Helper {
                             player.factionButtonChecker() + placePrefix + "_mech_space" + tile.getPosition(),
                             "Produce Mech in space",
                             UnitEmojis.mech);
-                    if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
+                    if (UnitQueryService.countUnits(game, player, "mech") > 3) {
                         spaceMechButton = Buttons.gray(
                                 player.factionButtonChecker() + placePrefix + "_mech_space" + tile.getPosition(),
                                 "Produce Mech in space",
@@ -2680,7 +2657,7 @@ public final class Helper {
                 if ("ghoti".equalsIgnoreCase(planet) || planet.contains("custodia")) {
                     continue;
                 }
-                Tile tile = game.getTileFromPlanet(planet);
+                Tile tile = game.getTileContainingPlanet(planet);
                 if (!getPlanetRepresentation(planet, game).toLowerCase().contains("mecatol") || ac) {
                     if (tile != null && !tilePos.contains(tile.getPosition())) {
                         tilePos.add(tile.getPosition());
@@ -2692,12 +2669,12 @@ public final class Helper {
                 }
             }
         } else {
-            for (Tile tile : game.getTileMap().values()) {
+            for (Tile tile : game.getTiles()) {
                 if (FoWHelper.playerHasUnitsInSystem(player, tile) && !tile.isHomeSystem(game)) {
                     Button button = Buttons.gray(
                             finsFactionCheckerPrefix + "diplo_" + tile.getPosition() + "_" + "mahact"
                                     + mahact.getColor(),
-                            tile.getRepresentation() + " System");
+                            tile.toString() + " System");
                     planetButtons.add(button);
                 }
             }
@@ -2707,7 +2684,7 @@ public final class Helper {
     }
 
     public static int getPlanetResources(String planetID, Game game) {
-        Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        Planet unitHolder = game.getPlanet(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return 0;
         }
@@ -2715,7 +2692,7 @@ public final class Helper {
     }
 
     public static int getPlanetInfluence(String planetID, Game game) {
-        Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        Planet unitHolder = game.getPlanet(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return 0;
         }
@@ -3169,7 +3146,7 @@ public final class Helper {
     }
 
     /**
-     * DEPRECATED - Use TechnologyModel.getRepresentation() instead
+     * DEPRECATED - Use TechnologyModel.toString() instead
      */
     @Deprecated
     public static String getTechRepresentation(String techID) {
@@ -3187,7 +3164,7 @@ public final class Helper {
     }
 
     /**
-     * DEPRECATED - Use AgendaModel.getRepresentation() instead
+     * DEPRECATED - Use AgendaModel.toString() instead
      */
     @Deprecated
     public static String getAgendaRepresentation(@NotNull String agendaID) {
@@ -3321,7 +3298,7 @@ public final class Helper {
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg.toString());
 
-            List<Tile> tiles = new ArrayList<>(game.getTileMap().values());
+            List<Tile> tiles = new ArrayList<>(game.getTiles());
             for (Tile tile : tiles) {
                 if (tile == null) {
                     continue;
@@ -3356,18 +3333,17 @@ public final class Helper {
                     if (tile == null) {
                         continue;
                     }
-                    UnitHolder unitHolder = tile.getUnitHolders().get(pl);
+                    UnitHolder unitHolder = tile.getPlanet(pl);
                     if (unitHolder != null
                             && unitHolder.getTokenList() != null
-                            && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
+                            && unitHolder.containsToken("attachment_tombofemphidia.png")) {
                         player.removeRelic("emphidia");
                         player.removeExhaustedRelic("emphidia");
 
                         Integer poIndex = game.addCustomPO("The Crown of Emphidia", 1);
                         game.scorePublicObjective(player.getUserID(), poIndex);
                         MessageHelper.sendMessageToChannel(
-                                player.getCorrectChannel(),
-                                player.getRepresentation() + " scored _The Crown of Emphidia_.");
+                                player.getCorrectChannel(), player.toString() + " scored _The Crown of Emphidia_.");
                     }
                 }
             }
@@ -3461,11 +3437,11 @@ public final class Helper {
 
     public static boolean mechCheck(String planetName, Game game, Player player) {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
-        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        UnitHolder unitHolder = tile.getPlanet(planetName);
         if (player.hasUnlockedBreakthrough("ironbt")) {
             return true;
         }
-        return unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0;
+        return unitHolder.hasUnit(UnitType.Mech, player.getColor());
     }
 
     /**

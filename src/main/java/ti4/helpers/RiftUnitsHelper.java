@@ -434,7 +434,7 @@ public final class RiftUnitsHelper {
                     return;
                 }
             }
-            String msg = player.getRepresentation()
+            String msg = player.toString()
                     + " if the wormhole nexus was improperly unlocked during this action, you can use the button below to unflip it.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("unflipMallice", "Unflip Mallice"));

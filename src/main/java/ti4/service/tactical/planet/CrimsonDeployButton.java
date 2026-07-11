@@ -23,7 +23,7 @@ public final class CrimsonDeployButton implements PlanetAbilityButton {
         boolean teCondition = ctx.mainPlayer.hasUnit("crimson_mech")
                 && !ctx.tile.isScar()
                 && !ButtonHelper.isLawInPlay(ctx.game, "articles_war")
-                && (ctx.tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE)
+                && (ctx.tile.getSpaceUnitHolder().containsToken(Constants.TOKEN_BREACH_ACTIVE)
                         || FoWHelper.otherPlayersHaveShipsInSystem(ctx.mainPlayer, ctx.tile, ctx.game))
                 && hasReinforcement;
         boolean tkCondition = ctx.mainPlayer.hasUnit("tk-revenant")

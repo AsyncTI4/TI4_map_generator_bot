@@ -21,6 +21,7 @@ import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class NetrunnersUnitsHandler {
@@ -40,7 +41,7 @@ public class NetrunnersUnitsHandler {
         }
 
         Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
-        UnitHolder unitHolder = tile.getUnitHolders().get(unitHolderName);
+        UnitHolder unitHolder = tile.getUnitHolder(unitHolderName);
         UnitModel placedUnit = player == null ? null : player.getUnitFromUnitKey(unitKey);
         if (player == null
                 || unitHolder == null
@@ -48,7 +49,7 @@ public class NetrunnersUnitsHandler {
                 || !placedUnit.getIsStructure()
                 || !player.hasUnit(MECH_ID)
                 || ButtonHelper.isLawInPlay(game, "articles_war")
-                || ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) >= 4
+                || UnitQueryService.countUnits(game, player, "mech", true) >= 4
                 || !(unitHolder instanceof Planet)) {
             return;
         }
@@ -74,12 +75,12 @@ public class NetrunnersUnitsHandler {
         }
 
         Tile tile = game.getTileByPosition(parts[0]);
-        UnitHolder unitHolder = tile == null ? null : tile.getUnitHolders().get(parts[1]);
+        UnitHolder unitHolder = tile == null ? null : tile.getUnitHolder(parts[1]);
         if (tile == null
                 || unitHolder == null
                 || !player.hasUnit(MECH_ID)
                 || ButtonHelper.isLawInPlay(game, "articles_war")
-                || ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) >= 4
+                || UnitQueryService.countUnits(game, player, "mech", true) >= 4
                 || !(unitHolder instanceof Planet)) {
             return;
         }
@@ -103,7 +104,7 @@ public class NetrunnersUnitsHandler {
         if (game == null || player == null || tile == null || player.hasUnit(FLAGSHIP_ID)) {
             return false;
         }
-        return tile.getUnitHolders().values().stream()
+        return tile.getUnitHolderValues().stream()
                 .anyMatch(unitHolder -> isSpaceDockBlockadedByEmp(game, player, tile, unitHolder));
     }
 
@@ -172,12 +173,12 @@ public class NetrunnersUnitsHandler {
                 || player == null
                 || tile == null
                 || unitHolder == null
-                || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) < 1) {
+                || !unitHolder.hasUnit(UnitType.Spacedock, player.getColor())) {
             return false;
         }
 
         for (Player otherPlayer : game.getRealPlayersExcludingThis(player)) {
-            if (player.getAllianceMembers().contains(otherPlayer.getFaction())) {
+            if (player.hasAllianceMember(otherPlayer.getFaction())) {
                 continue;
             }
             if (ButtonHelper.doesPlayerHaveFSHere(FLAGSHIP_ID, otherPlayer, tile)) {

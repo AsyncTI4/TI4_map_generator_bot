@@ -39,7 +39,7 @@ class SyndicateAcd2ButtonHandler {
         if (revealedCards.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", the action card deck is empty; _Syndicate_ cannot be resolved.");
+                    player.toString() + ", the action card deck is empty; _Syndicate_ cannot be resolved.");
             ButtonHelper.deleteMessage(event);
             return;
         }

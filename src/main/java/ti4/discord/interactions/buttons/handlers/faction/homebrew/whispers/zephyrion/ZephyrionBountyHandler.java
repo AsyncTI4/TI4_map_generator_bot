@@ -157,7 +157,7 @@ public class ZephyrionBountyHandler {
         ButtonHelperAgents.resolveArtunoCheck(bountyHolder, 3);
         MessageHelper.sendMessageToChannel(
                 bountyHolder.getCorrectChannel(),
-                bountyHolder.getRepresentation() + " claimed a bounty and so gained 3 trade goods."
+                bountyHolder.toString() + " claimed a bounty and so gained 3 trade goods."
                         + " The bounty claimed was on a " + StringUtils.capitalize(ship)
                         + " belonging to " + victim.getRepresentationNoPing() + ".");
         if (combat && bountyHolder.hasLeaderUnlocked("zephyrionhero")) {
@@ -169,7 +169,7 @@ public class ZephyrionBountyHandler {
             buttons.add(Buttons.red("deleteButtons", "Delete These"));
             MessageHelper.sendMessageToChannelWithButtons(
                     bountyHolder.getCardsInfoThread(),
-                    bountyHolder.getRepresentation() + ", you may use Monturak Homotol, the Zephyrion hero.",
+                    bountyHolder.toString() + ", you may use Monturak Homotol, the Zephyrion hero.",
                     buttons);
         }
     }

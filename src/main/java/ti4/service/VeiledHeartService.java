@@ -147,7 +147,7 @@ public class VeiledHeartService {
         buttons.add(Buttons.red("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentation() + " select a veiled "
+                player.toString() + " select a veiled "
                         + type.toString().toLowerCase() + " to "
                         + action.toString().toLowerCase() + ":",
                 buttons);
@@ -180,17 +180,17 @@ public class VeiledHeartService {
         switch (action) {
             case DRAW -> {
                 setStoredValue(player, getStoredValue(player) + card + "_");
-                msg = player.getRepresentation() + " has secretly drawn a veiled "
+                msg = player.toString() + " has secretly drawn a veiled "
                         + type.toString().toLowerCase()
                         + ". They may put it into play with a button in their cards info.";
             }
             case DISCARD -> {
                 setStoredValue(player, getStoredValue(player).replace(card + "_", ""));
-                msg = player.getRepresentation() + " has secretly discarded a veiled "
+                msg = player.toString() + " has secretly discarded a veiled "
                         + type.toString().toLowerCase() + ".";
             }
             default ->
-                msg = player.getRepresentation() + " tried to "
+                msg = player.toString() + " tried to "
                         + action.toString().toLowerCase() + " a veiled "
                         + type.toString().toLowerCase() + ", but was unable to.";
         }

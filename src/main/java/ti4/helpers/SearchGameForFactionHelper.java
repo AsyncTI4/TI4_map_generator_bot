@@ -80,7 +80,7 @@ public class SearchGameForFactionHelper {
         if (showSecondaries && !game.isHasEnded()) {
             List<String> secondaries = new ArrayList<>();
             for (int sc : game.getPlayedSCs()) {
-                if (!player.hasFollowedSC(sc) && !player.getSCs().contains(sc)) {
+                if (!player.hasFollowedSC(sc) && !player.hasStrategyCard(sc)) {
                     secondaries.add(CardEmojis.getSCBackFromInteger(sc).toString());
                 }
             }

@@ -33,7 +33,7 @@ public class KairnPromissoryHandler {
 
         List<String> legalPlanets = new ArrayList<>();
         for (String planetName : player.getPlanets()) {
-            Planet planet = game.getUnitHolderFromPlanet(planetName);
+            Planet planet = game.getPlanet(planetName);
             if (planet == null
                     || planet.isHomePlanet()
                     || planet.getAttachments().contains(ATTACHMENT_TOKEN)) {
@@ -45,14 +45,14 @@ public class KairnPromissoryHandler {
         if (legalPlanets.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", there are no legal planets to attach _Archaeological Outpost_ to.");
+                    player.toString() + ", there are no legal planets to attach _Archaeological Outpost_ to.");
             ButtonHelper.deleteMessage(event);
             return;
         }
 
         List<Button> buttons = new ArrayList<>();
         for (String planetName : legalPlanets) {
-            Tile tile = game.getTileFromPlanet(planetName);
+            Tile tile = game.getTileContainingPlanet(planetName);
             if (tile == null) {
                 continue;
             }
@@ -64,7 +64,7 @@ public class KairnPromissoryHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", please choose a non-home planet to attach _Archaeological Outpost_ to.",
+                player.toString() + ", please choose a non-home planet to attach _Archaeological Outpost_ to.",
                 buttons);
     }
 
@@ -96,13 +96,13 @@ public class KairnPromissoryHandler {
             return;
         }
 
-        Planet planet = tile.getUnitHolderFromPlanet(planetName);
+        Planet planet = tile.getPlanet(planetName);
         if (planet == null) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
-        if (!player.getPlanets().contains(planetName)
+        if (!player.containsPlanet(planetName)
                 || planet.isHomePlanet()
                 || planet.getAttachments().contains(ATTACHMENT_TOKEN)) {
             ButtonHelper.deleteMessage(event);
@@ -126,7 +126,7 @@ public class KairnPromissoryHandler {
 
         List<Button> buttons = new ArrayList<>();
         for (Planet planet : tile.getPlanetUnitHolders()) {
-            if (!player.getPlanetsAllianceMode().contains(planet.getName())
+            if (!player.canUsePlanet(planet.getName())
                     || !planet.getAttachments().contains(ATTACHMENT_TOKEN)) {
                 continue;
             }
@@ -140,7 +140,7 @@ public class KairnPromissoryHandler {
         if (!buttons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + ", you activated a system containing your _Archaeological Outpost_. Explore that planet.",
                     buttons);
         }

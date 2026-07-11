@@ -163,8 +163,8 @@ class Stats extends GameStateSubcommand {
                 String newCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
                 MessageHelper.sendMessageToEventChannel(
                         event,
-                        player.getRepresentation() + " updated command tokens: " + originalCCString + " -> "
-                                + newCCString + ".");
+                        player.toString() + " updated command tokens: " + originalCCString + " -> " + newCCString
+                                + ".");
             }
             if (optionT != null || optionF != null || optionS != null) {
                 Helper.isCCCountCorrect(player);
@@ -355,11 +355,11 @@ class Stats extends GameStateSubcommand {
                         player.factionButtonChecker() + "removePlayerPermissions_" + player.getFaction(),
                         "Remove View Permissions For " + player.getUserName()));
                 buttons.add(Buttons.red("deleteButtons", "Stay in channels"));
-                String msg = player.getRepresentation()
+                String msg = player.toString()
                         + ", do you wish to remove yourself from the game channels? If so, press this button.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
 
-                msg = player.getRepresentation()
+                msg = player.toString()
                         + ", you should know that NPC is only to be used in doomed scenarios, where your chances of winning are seemingly below 1%. You should be near eliminated or several rounds behind in scoring before using this (or perhaps have a real life reason to dip).";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 

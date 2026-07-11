@@ -34,7 +34,7 @@ class CheckAllDistance extends GameStateSubcommand {
         List<String> data = new ArrayList<>();
         StringBuilder sb = new StringBuilder("Distances");
         Game game = getGame();
-        List<String> positions = game.getTileMap().values().stream() // .filter(t -> t.getHyperlaneData(0) == null)
+        List<String> positions = game.getTiles().stream() // .filter(t -> t.getHyperlaneData(0) == null)
                 .map(Tile::getPosition)
                 .sorted()
                 .toList();

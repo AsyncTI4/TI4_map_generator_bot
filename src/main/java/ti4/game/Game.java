@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
@@ -66,6 +67,7 @@ import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 import ti4.helpers.settingsFramework.menus.BaseGameMiniMiltySettings;
@@ -366,16 +368,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 "Fixed the secret objectives. The total amount of secret objectives in deck is "
                         + getNumberOfSOsInTheDeck() + ". The number in players hands is "
                         + getNumberOfSOsInPlayersHands());
-    }
-
-    public Player getPlayerThatControlsPlanet(String planet) {
-        for (Player p : getRealPlayers()) {
-            if (p.getPlanets().contains(planet)) {
-                return p;
-            }
-        }
-
-        return null;
     }
 
     public Player setupNeutralPlayer(String color) {
@@ -706,8 +698,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (winner.getAllianceMembers() != null) {
             String faction = winner.getFaction();
             getRealPlayers().stream()
-                    .filter(p -> p.getAllianceMembers() != null
-                            && p.getAllianceMembers().contains(faction))
+                    .filter(p -> p.getAllianceMembers() != null && p.hasAllianceMember(faction))
                     .forEach(winners::add);
         }
 
@@ -744,7 +735,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         Player ally = getRealPlayersNDummies().stream()
-                .filter(p -> p != player && p.getAllianceMembers().contains(player.getFaction()))
+                .filter(p -> p != player && p.hasAllianceMember(player.getFaction()))
                 .findFirst()
                 .orElse(null);
 
@@ -1275,7 +1266,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public Player getPlayerFromSC(int sc) {
         for (Player player : getRealPlayersNDummies()) {
-            if (player.getSCs().contains(sc)) {
+            if (player.hasStrategyCard(sc)) {
                 return player;
             }
         }
@@ -1370,12 +1361,42 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public Player getPlanetOwner(String planet) {
-        for (Player player : getRealPlayers()) {
-            if (player.getPlanets().contains(planet)) {
+        return getPlanetOwner(planet, false);
+    }
+
+    public Map<UnitKey, Integer> getTacticalActionDisplacementUnitCounts(Set<String> excludedPositions) {
+        Map<UnitKey, Integer> quantities = new HashMap<>();
+        for (Entry<String, Map<UnitKey, List<Integer>>> entry : tacticalActionDisplacement.entrySet()) {
+            String position = entry.getKey().split("-")[0];
+            if (excludedPositions.contains(position)) {
+                continue;
+            }
+            for (Entry<UnitKey, List<Integer>> unitEntry : entry.getValue().entrySet()) {
+                quantities.merge(unitEntry.getKey(), Units.getTotalCount(unitEntry.getValue()), Integer::sum);
+            }
+        }
+        return quantities;
+    }
+
+    /** Returns the planet controller, optionally including the game's neutral player. */
+    @Nullable
+    public Player getPlanetOwner(String planet, boolean includeNeutral) {
+        List<Player> eligiblePlayers = includeNeutral ? getRealPlayersNNeutral() : getRealPlayers();
+        for (Player player : eligiblePlayers) {
+            if (player.containsPlanet(planet)) {
                 return player;
             }
         }
         return null;
+    }
+
+    /** Returns the cached planet state for an on-map or supported off-map planet, accepting planet aliases. */
+    @Nullable
+    public Planet getPlanet(String planetName) {
+        if (planetName == null) {
+            return null;
+        }
+        return getPlanetsInfo().get(AliasHandler.resolvePlanet(planetName.toLowerCase()));
     }
 
     public void setTyrant(Player speaker) {
@@ -3093,7 +3114,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 break;
             }
         }
-        if (player.getPlanets().contains("garbozia")) { // allow checking for garbozia
+        if (player.containsPlanet("garbozia")) { // allow checking for garbozia
             for (Entry<String, Integer> ac : getDiscardActionCards().entrySet()) {
                 if (ac.getValue().equals(acIDNumber) && getDiscardACStatus().get(ac.getKey()) == ACStatus.garbozia) {
                     acID = ac.getKey();
@@ -3720,7 +3741,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public Tile getTile(String tileID) {
         if (Constants.TOKEN_PLANETS.contains(tileID)) {
             for (Tile t : tileMap.values()) {
-                if (t.getUnitHolderFromPlanet(tileID) != null) {
+                if (t.getPlanet(tileID) != null) {
                     return t;
                 }
             }
@@ -3887,7 +3908,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public void removeTile(String position) {
         Tile tileToRemove = tileMap.get(position);
         if (tileToRemove != null) {
-            for (UnitHolder unitHolder : tileToRemove.getUnitHolders().values()) {
+            for (UnitHolder unitHolder : tileToRemove.getUnitHolderValues()) {
                 if (unitHolder instanceof Planet) {
                     removePlanet(unitHolder);
                 }
@@ -3910,7 +3931,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             String marrow = "A Song Like Marrow";
             for (Player p : players.values()) {
                 if (unscorePublicObjective(p.getUserID(), marrow)) {
-                    String msg = p.getRepresentation() + " lost 1 victory point because Styx is gone.";
+                    String msg = p.toString() + " lost 1 victory point because Styx is gone.";
                     MessageHelper.sendMessageToChannel(p.getCorrectChannel(), msg);
                 }
             }
@@ -3932,6 +3953,53 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             getPlanets();
         }
         return planets;
+    }
+
+    /** All tiles currently on the game board. */
+    public Collection<Tile> getTiles() {
+        return Collections.unmodifiableCollection(tileMap.values());
+    }
+
+    /** All unit holders on board tiles. This deliberately excludes player nomboxes. */
+    public Stream<UnitHolder> streamUnitHolders() {
+        return streamUnitHolderLocations().map(UnitHolderLocation::unitHolder);
+    }
+
+    /** All unit holders on board tiles, retaining their containing tile. */
+    public Stream<UnitHolderLocation> streamUnitHolderLocations() {
+        return tileMap.values().stream().flatMap(tile -> tile.getUnitHolderValues().stream()
+                .map(unitHolder -> new UnitHolderLocation(tile, unitHolder)));
+    }
+
+    /** All actual planets on board tiles. Synthetic/off-map planet cache entries are excluded. */
+    public Stream<Planet> streamPlanets() {
+        return streamPlanetLocations().map(PlanetLocation::planet);
+    }
+
+    /** All actual planets on board tiles, retaining tile and current controller. */
+    public Stream<PlanetLocation> streamPlanetLocations() {
+        return streamUnitHolderLocations()
+                .filter(location -> location.unitHolder() instanceof Planet)
+                .map(location -> new PlanetLocation(
+                        (Planet) location.unitHolder(),
+                        location.tile(),
+                        getPlanetOwner(location.unitHolder().getName())));
+    }
+
+    /** All on-board planets currently controlled by this player, retaining their containing tile. */
+    public Stream<PlanetLocation> streamControlledPlanetLocations(Player player) {
+        return streamPlanetLocations().filter(location -> location.owner() == player);
+    }
+
+    /** All cached planet states controlled by this player, including supported off-board planets. */
+    public Stream<Planet> streamControlledPlanets(Player player) {
+        return player.getPlanets().stream().map(this::getPlanet).filter(Objects::nonNull);
+    }
+
+    /** All on-board planets this player may use, including alliance-mode planets. */
+    public Stream<PlanetLocation> streamUsablePlanetLocations(Player player) {
+        return streamPlanetLocations()
+                .filter(location -> player.canUsePlanet(location.planet().getName()));
     }
 
     public void clearPlanetsCache() {
@@ -3974,6 +4042,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         planets.put("triad", new Planet("triad", new Point(0, 0)));
         planets.put("grove", new Planet("grove", new Point(0, 0)));
         return planets.keySet();
+    }
+
+    public boolean containsPlanet(String planetName) {
+        return getPlanets().contains(planetName);
     }
 
     public void rebuildTilePositionAutoCompleteList() {
@@ -4134,9 +4206,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
-                if (pnOwner != null
-                        && !pnOwner.getFaction().equalsIgnoreCase(player.getFaction())
-                        && pnOwner.hasLeaderUnlocked(leaderID)) {
+                if (pnOwner != null && !pnOwner.isFaction(player.getFaction()) && pnOwner.hasLeaderUnlocked(leaderID)) {
                     return true;
                 }
             }
@@ -4146,7 +4216,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         // that have the leader unlocked
         if (player.hasAbility("imperia") || player.hasAbility("imperia_y")) {
             for (Player player_ : getRealPlayersNDummies()) {
-                if (player_.getFaction().equalsIgnoreCase(player.getFaction())) continue;
+                if (player_.isFaction(player.getFaction())) continue;
                 if (player.getMahactCC().contains(player_.getColor()) && player_.hasLeaderUnlocked(leaderID)) {
                     return true;
                 }
@@ -4424,7 +4494,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             return ButtonHelper.getTileWithCoatl(this);
         }
         if (isLiberationC4Mode()) {
-            return getTileFromPlanet("ordinianc4");
+            return getTileContainingPlanet("ordinianc4");
         }
         for (String mr : Constants.MECATOL_SYSTEMS) {
             Tile tile = getTile(mr);
@@ -4442,7 +4512,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     @Nullable
-    public Tile getTileFromPlanet(String planetName) {
+    public Tile getTileContainingPlanet(String planetName) {
         for (Tile tile_ : tileMap.values()) {
             for (Entry<String, UnitHolder> unitHolderEntry :
                     tile_.getUnitHolders().entrySet()) {
@@ -4455,16 +4525,42 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return null;
     }
 
+    /** @deprecated Use {@link #getTileContainingPlanet(String)}. */
+    @Deprecated
+    @Nullable
+    public Tile getTileFromPlanet(String planetName) {
+        return getTileContainingPlanet(planetName);
+    }
+
+    /** @deprecated Use {@link #getPlanet(String)}. */
+    @Deprecated
+    @Nullable
+    public Planet getUnitHolderFromPlanet(String planetName) {
+        return getPlanet(planetName);
+    }
+
+    /** Resolves an on-board planet and its related game objects in one traversal result. */
+    public Optional<PlanetLocation> findPlanet(String planetName) {
+        Tile tile = getTileContainingPlanet(planetName);
+        if (tile == null) {
+            return Optional.empty();
+        }
+        Planet planet = tile.getPlanet(planetName);
+        if (planet == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new PlanetLocation(planet, tile, getPlanetOwner(planetName)));
+    }
+
     public List<String> getPlanetsPlayerIsCoexistingOn(Player player) {
         List<String> coexistPlanets = new ArrayList<>();
 
         for (Player p2 : getRealPlayersNNeutral()) {
-            if (p2.getFaction().equalsIgnoreCase(player.getFaction())
-                    || player.getAllianceMembers().contains(p2.getFaction())) {
+            if (p2.isFaction(player.getFaction()) || player.hasAllianceMember(p2.getFaction())) {
                 continue;
             }
             for (String planet : p2.getPlanets()) {
-                UnitHolder uH = getUnitHolderFromPlanet(planet);
+                UnitHolder uH = getPlanet(planet);
                 if (uH != null && FoWHelper.playerHasUnitsOnPlanet(player, uH)) {
                     coexistPlanets.add(planet);
                 }
@@ -4477,26 +4573,17 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         List<String> coexistPlanets = new ArrayList<>();
 
         for (Player p2 : getRealPlayers()) {
-            if (p2.getFaction().equalsIgnoreCase(player.getFaction())) {
+            if (p2.isFaction(player.getFaction())) {
                 continue;
             }
             for (String planet : player.getPlanets()) {
-                UnitHolder uH = getUnitHolderFromPlanet(planet);
+                UnitHolder uH = getPlanet(planet);
                 if (uH != null && FoWHelper.playerHasUnitsOnPlanet(p2, uH) && !coexistPlanets.contains(planet)) {
                     coexistPlanets.add(planet);
                 }
             }
         }
         return coexistPlanets;
-    }
-
-    @Nullable
-    public Planet getUnitHolderFromPlanet(String planetName) {
-        Tile tile_ = getTileFromPlanet(planetName);
-        if (tile_ == null) {
-            return null;
-        }
-        return tile_.getUnitHolderFromPlanet(planetName);
     }
 
     @Nullable

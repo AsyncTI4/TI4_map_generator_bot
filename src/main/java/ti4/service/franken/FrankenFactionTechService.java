@@ -19,7 +19,7 @@ public class FrankenFactionTechService {
             return;
         }
 
-        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added technologies:\n");
+        StringBuilder sb = new StringBuilder(player.toString()).append(" added technologies:\n");
         for (String techID : techIDs) {
             TechnologyModel techModel = Mapper.getTech(techID);
             if (player.getFactionTechs().contains(techID)) {
@@ -55,7 +55,7 @@ public class FrankenFactionTechService {
             return;
         }
 
-        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed faction technologies:\n");
+        StringBuilder sb = new StringBuilder(player.toString()).append(" removed faction technologies:\n");
         for (String techID : techIDs) {
             if (!player.getFactionTechs().contains(techID)) {
                 sb.append("> ").append(techID).append(" (player did not have this technology)");

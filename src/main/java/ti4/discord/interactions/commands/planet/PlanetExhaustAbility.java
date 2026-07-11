@@ -27,6 +27,7 @@ import ti4.service.planet.EmelparService;
 import ti4.service.planet.FaunusService;
 import ti4.service.planet.IndustrexService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.unit.UnitQueryService;
 
 public class PlanetExhaustAbility extends PlanetAddRemove {
 
@@ -92,7 +93,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             }
             case "mrte" -> {
                 channel = player.getCardsInfoThread();
-                output = player.getRepresentation()
+                output = player.toString()
                         + ", please choose a secret objective to discard - the bot will automatically draw a replacement:";
                 buttons.addAll(SecretObjectiveHelper.getSODiscardButtonsWithSuffix(player, "redraw"));
             }
@@ -132,7 +133,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 ButtonHelperAgents.toldarAgentInitiation(game, player, comms);
                 MessageHelper.sendMessageToChannel(
                         channel,
-                        player.getRepresentation() + " now has " + player.getCommodities() + " commodit"
+                        player.toString() + " now has " + player.getCommodities() + " commodit"
                                 + (player.getCommodities() == 1 ? "y" : "ies") + " (from the " + comms
                                 + " that were on the card).");
             }
@@ -143,7 +144,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             // Homebrew
             case "avernus" -> {
                 output = "Please choose the system where you wish to resolve **Star Forge** in.";
-                List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Warsun);
+                List<Tile> tiles = UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Warsun);
                 for (Tile tile : tiles) {
                     buttons.add(Buttons.green(
                             "starforgeTileFree_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
@@ -167,7 +168,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 // List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
                 MessageHelper.sendMessageToChannelWithFactionReact(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + ", please choose your target.",
+                        player.toString() + ", please choose your target.",
                         game,
                         player,
                         riderButtons);
@@ -180,7 +181,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             }
             case "ponthous" -> {
                 player.refreshPlanet(planet);
-                output = player.getRepresentation()
+                output = player.toString()
                         + " readied Ponthous with _Fractured Souls_. In async, readying the 3/3 planet is identical in effect.";
             }
             case "echo" -> {
@@ -194,11 +195,9 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             }
             case "eko" -> output = "blank";
             default -> {
-                if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null
+                if (game.getPlanet(planet) != null
                         && game.isAbsolMode()
-                        && ButtonHelper.getUnitHolderFromPlanetName(planet, game)
-                                .getTokenList()
-                                .contains("attachment_nanoforge.png")) {
+                        && game.getPlanet(planet).getTokenList().contains("attachment_nanoforge.png")) {
                     player.refreshPlanet(planet);
                 }
             }

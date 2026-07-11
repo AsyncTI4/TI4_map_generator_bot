@@ -10,7 +10,6 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.AgendaHelper;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.unit.AddUnitService;
@@ -25,9 +24,9 @@ public class RedistributionAgendaResolver implements AgendaResolver {
     @Override
     public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         for (Player player : game.getRealPlayers()) {
-            if (player.getPlanets().contains(winner.toLowerCase())) {
-                Planet uH = ButtonHelper.getUnitHolderFromPlanetName(winner, game);
-                Tile tile = game.getTileFromPlanet(winner);
+            if (player.containsPlanet(winner.toLowerCase())) {
+                Planet uH = game.getPlanet(winner);
+                Tile tile = game.getTileContainingPlanet(winner);
                 if (tile != null) {
                     DestroyUnitService.destroyAllUnits(event, tile, game, uH, false);
                 }
@@ -46,7 +45,7 @@ public class RedistributionAgendaResolver implements AgendaResolver {
                     if (tile != null) {
                         AddUnitService.addUnits(event, tile, game, p2.getColor(), "1 inf " + winner);
                     }
-                    String resolveStr = p2.getRepresentation()
+                    String resolveStr = p2.toString()
                             + " outright has the fewest victory points, and so 1 of their infantry infantry was added to "
                             + Helper.getPlanetRepresentation(winner, game) + " automatically.";
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), resolveStr);

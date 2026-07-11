@@ -57,9 +57,9 @@ public class StellarConverterStatisticsService {
     }
 
     private void getStellarConverterInfo(Game game, AtomicInteger count, Map<String, Integer> numberConverts) {
-        List<String> worldsThisGame = game.getTileMap().values().stream()
+        List<String> worldsThisGame = game.getTiles().stream()
                 .flatMap(tile -> tile.getPlanetUnitHolders().stream()) // planets
-                .filter(uh -> uh.getTokenList().contains(Constants.WORLD_DESTROYED_PNG))
+                .filter(uh -> uh.containsToken(Constants.WORLD_DESTROYED_PNG))
                 .map(UnitHolder::getName)
                 .toList();
 

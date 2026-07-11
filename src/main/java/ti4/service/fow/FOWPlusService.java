@@ -42,9 +42,8 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.option.FOWOptionService.FOWOption;
-import ti4.service.unit.AddUnitService;
+import ti4.service.unit.MoveUnitService;
 import ti4.service.unit.RemoveUnitService;
-import ti4.service.unit.RemoveUnitService.RemovedUnit;
 import ti4.spring.service.gameevent.GameEventDraft;
 
 /*
@@ -365,8 +364,8 @@ public final class FOWPlusService {
     public static void resolveSacrificeExplore(
             ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String planetID = buttonID.replace("fowplus_sacrifice_", "");
-        Tile tile = game.getTileFromPlanet(planetID);
-        UnitHolder unitHolder = game.getUnitHolderFromPlanet(planetID);
+        Tile tile = game.getTileContainingPlanet(planetID);
+        UnitHolder unitHolder = game.getPlanet(planetID);
         int mechs = unitHolder.getUnitCount(UnitType.Mech, player.getColor());
         int infs = unitHolder.getUnitCount(UnitType.Infantry, player.getColor());
 
@@ -393,14 +392,12 @@ public final class FOWPlusService {
         if (infs > 0) RemoveUnitService.removeUnit(event, currentTile, game, player, space, UnitType.Infantry, infs);
 
         String unitList = space.getPlayersUnitListOnHolder(player);
-        List<RemovedUnit> removed =
-                RemoveUnitService.removeUnits(event, currentTile, game, player.getColor(), unitList, false);
-        AddUnitService.addUnits(event, targetTile, game, player.getColor(), unitList, removed);
+        MoveUnitService.moveUnits(event, currentTile, game, player.getColor(), unitList, targetTile, "space");
         StartCombatService.combatCheck(game, event, targetTile);
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " Units ejected to " + targetPos + " due to Gravity Wave."
                         + (infs > 0
                                 ? " " + infs + " " + StringUtils.repeat(UnitEmojis.infantry.toString(), infs)

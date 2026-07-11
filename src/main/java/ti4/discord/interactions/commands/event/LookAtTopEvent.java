@@ -39,7 +39,7 @@ class LookAtTopEvent extends GameStateSubcommand {
             String eventID = game.lookAtTopEvent(i);
             sb.append(i + 1).append(": ");
             EventModel eventModel = Mapper.getEvent(eventID);
-            sb.append(eventModel.getRepresentation());
+            sb.append(eventModel.toString());
             sb.append('\n');
         }
         sb.append("-----------\n");

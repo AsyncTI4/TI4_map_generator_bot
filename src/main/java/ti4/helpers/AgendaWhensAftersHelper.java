@@ -45,7 +45,7 @@ public final class AgendaWhensAftersHelper {
                 game.setStoredValue("Pass On Shenanigans", part2);
                 continue;
             }
-            String msg = player.getRepresentation() + " you have the option to pre-pass on agenda shenanigans here."
+            String msg = player.toString() + " you have the option to pre-pass on agenda shenanigans here."
                     + " Agenda shenanigans are the action cards _Bribery_, _Confusing Legal Text_, _Confounding Legal Text_, and _Deadly Plot_."
                     + " Feel free not to pre-pass, this is simply an optional way to resolve agendas faster.";
             List<Button> buttons = new ArrayList<>();
@@ -103,7 +103,7 @@ public final class AgendaWhensAftersHelper {
         List<String> whens = getPossibleWhenNames(player);
         List<String> afters = getPossibleAfterNames(player);
         StringBuilder msg = new StringBuilder(
-                player.getRepresentation()
+                player.toString()
                         + " if you wish, to speed up the Agenda Phase, you can choose now to secretly pass on all \"when\"s and \"after\"s for both agendas in the upcoming Agenda Phase. "
                         + "You may currently play " + StringHelper.pluralize(whens.size(), "\"when\"")
                         + " and " + StringHelper.pluralize(afters.size(), "\"after\"")
@@ -140,7 +140,7 @@ public final class AgendaWhensAftersHelper {
         buttons.add(Buttons.red("undoPassOnAllWhensNAfters", "Undo Pass"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentation()
+                player.toString()
                         + ", you have successfully passed on all \"when\"s and \"after\"s for the entire Agenda Phase."
                         + " You can undo this during the agenda if necessary, or with this button.",
                 buttons);
@@ -177,7 +177,7 @@ public final class AgendaWhensAftersHelper {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
-                player.getRepresentation()
+                player.toString()
                         + ", you have successfully undone passing on all \"when\"s and \"after\"s for the Agenda Phase."
                         + " You may still need to handle \"when\"s and \"after\"s for any currently ongoing agenda.");
         game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "");
@@ -332,7 +332,7 @@ public final class AgendaWhensAftersHelper {
             }
         }
         String planet = "tarrock";
-        if (player.getPlanets().contains(planet)
+        if (player.containsPlanet(planet)
                 && !player.getExhaustedPlanetsAbilities().contains(planet)) {
             names.add("Tarrock Ability");
         }
@@ -384,7 +384,7 @@ public final class AgendaWhensAftersHelper {
             }
         }
         String planet = "tarrock";
-        if (player.getPlanets().contains(planet)
+        if (player.containsPlanet(planet)
                 && !player.getExhaustedPlanetsAbilities().contains(planet)) {
             buttons.add(Buttons.red("queueAfter_planet_" + planet, "Tarrock Ability"));
         }
@@ -569,8 +569,8 @@ public final class AgendaWhensAftersHelper {
                                     }
                                     MessageHelper.sendMessageToChannelWithFactionReact(
                                             player.getCorrectChannel(),
-                                            player.getRepresentation() + ", please choose your target for the "
-                                                    + ability + " ability.",
+                                            player.toString() + ", please choose your target for the " + ability
+                                                    + " ability.",
                                             game,
                                             player,
                                             riderButtons);
@@ -584,7 +584,7 @@ public final class AgendaWhensAftersHelper {
                                         "Edyn Unity Algorithm", game, player.factionButtonChecker());
                                 MessageHelper.sendMessageToChannelWithFactionReact(
                                         player.getCorrectChannel(),
-                                        player.getRepresentation() + ", please choose your target.",
+                                        player.toString() + ", please choose your target.",
                                         game,
                                         player,
                                         riderButtons);
@@ -595,7 +595,7 @@ public final class AgendaWhensAftersHelper {
                                             .orElse(null);
                                     playerLeader = CryypterHelper.keleresHeroCheck(player, playerLeader);
                                     if (playerLeader != null) {
-                                        String message = player.getRepresentation() + " played "
+                                        String message = player.toString() + " played "
                                                 + Helper.getLeaderFullRepresentation(playerLeader);
                                         player.removeLeader(playerLeader);
 
@@ -615,7 +615,7 @@ public final class AgendaWhensAftersHelper {
                                 }
                                 MessageHelper.sendMessageToChannelWithFactionReact(
                                         player.getCorrectChannel(),
-                                        player.getRepresentation() + ", please choose your target.",
+                                        player.toString() + ", please choose your target.",
                                         game,
                                         player,
                                         riderButtons);
@@ -648,7 +648,7 @@ public final class AgendaWhensAftersHelper {
                                     continue;
                                 }
                                 List<String> afters = getPossibleAfterNames(p2);
-                                StringBuilder msg = new StringBuilder(p2.getRepresentation()
+                                StringBuilder msg = new StringBuilder(p2.toString()
                                         + "due to the recent playing of an \"after\", you are now being asked to decide whether or not you will play an \"after\"."
                                         + " You can currently play "
                                         + StringHelper.pluralize(afters.size(), "\"after\"") + ".");
@@ -695,7 +695,7 @@ public final class AgendaWhensAftersHelper {
                     for (Player p2 : AgendaHelper.getPlayersWhoNeedToPreVoted(game)) {
                         MessageHelper.sendMessageToChannel(
                                 p2.getCardsInfoThread(),
-                                p2.getRepresentation()
+                                p2.toString()
                                         + ", the game is waiting upon you to decide voting before it moves onto voting.");
                     }
                 }
@@ -848,7 +848,7 @@ public final class AgendaWhensAftersHelper {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         offerPreVote(player);
         resolveAfterQueue(event, game);
-        String msg = player.getRepresentation() + " you have the option to pre-pass on agenda shenanigans here."
+        String msg = player.toString() + " you have the option to pre-pass on agenda shenanigans here."
                 + " Agenda shenanigans are the action cards _Bribery_, _Confusing Legal Text_, _Confounding Legal Text_, and _Deadly Plot_."
                 + " Feel free not to pre-pass, this is simply an optional way to resolve agendas faster.";
         buttons = new ArrayList<>();
@@ -877,7 +877,7 @@ public final class AgendaWhensAftersHelper {
         if (voteInfo[0] < 1) {
             return;
         }
-        String msg = player.getRepresentation()
+        String msg = player.toString()
                 + " if you intend to preset an abstention or vote on this agenda, you have the option to preset it here."
                 + " Feel free not to, this is simply an optional way to resolve agendas faster. Any pre-votes will be automatically erased if someone plays an \"after\".";
         List<Button> buttons = new ArrayList<>();
@@ -893,12 +893,12 @@ public final class AgendaWhensAftersHelper {
         if (game.isOmegaPhaseMode()) {
             if (argent != null) {
                 if (argent == player) {
-                    msg = player.getRepresentation()
+                    msg = player.toString()
                             + ", since this is game is in Omega Phase mode, all non-speaker players who can vote will need to pre-vote using this button before voting can begin. "
                             + "If you cannot vote due to playing a rider or having no votes, just ignore this button. "
                             + "Otherwise, since you have the **Zeal** ability, you need to vote first and do so now, even if you are speaker. Other players are free to wait to vote until they see your vote.";
                 } else {
-                    msg = player.getRepresentation()
+                    msg = player.toString()
                             + " since this is game is in Omega Phase mode, all non-speaker players who can vote will need to pre-vote using this button before voting can begin. "
                             + "If you cannot vote due to playing a rider or having no votes, or if you are speaker, just ignore this button. "
                             + "Since "
@@ -908,7 +908,7 @@ public final class AgendaWhensAftersHelper {
                             + ", you can wait to pre-vote until you see what they vote (assuming they can vote).";
                 }
             } else {
-                msg = player.getRepresentation() + ", since this is game is in Omega Phase mode,"
+                msg = player.toString() + ", since this is game is in Omega Phase mode,"
                         + " all non-speaker players who can vote will need to pre-vote using this button before voting can begin."
                         + " If you cannot vote due to playing a rider or having no votes, or if you are speaker, just ignore this button.";
             }
@@ -916,13 +916,13 @@ public final class AgendaWhensAftersHelper {
             if (game.isHiddenAgendaMode()) {
                 if (argent != null) {
                     if (argent == player) {
-                        msg = player.getRepresentation()
+                        msg = player.toString()
                                 + ", since this is game is in Hidden Agenda mode, all players will need to pre-vote (or pre-abstain) using these button before voting can begin."
                                 + " If you cannot vote due to playing a rider or having no votes just ignore this button."
                                 + " Otherwise, since you have the **Zeal** ability, you need to vote (or abstain) first, and to do so now."
                                 + " Other players are free to wait to vote until they see your vote.";
                     } else {
-                        msg = player.getRepresentation()
+                        msg = player.toString()
                                 + " since this is game is in Hidden Agenda mode, all players will need to pre-vote (or pre-abstain) using these button before voting can begin."
                                 + " If you cannot vote due to playing a rider or having no votes just ignore this button."
                                 + " Since "
@@ -932,7 +932,7 @@ public final class AgendaWhensAftersHelper {
                                 + ", you can wait to pre-vote until you see what they vote (assuming they can vote).";
                     }
                 } else {
-                    msg = player.getRepresentation()
+                    msg = player.toString()
                             + " since this is game is in Hidden Agenda mode, all players will need to pre-vote or pre-abstain using these button before voting can begin."
                             + " If you cannot vote due to playing a rider or having no votes just ignore this button.";
                 }
@@ -986,7 +986,7 @@ public final class AgendaWhensAftersHelper {
             for (Player player : game.getRealPlayers()) {
                 String factionChecker = player.factionButtonChecker();
                 String planet = "tarrock";
-                if (player.getPlanets().contains(planet)
+                if (player.containsPlanet(planet)
                         && !player.getExhaustedPlanetsAbilities().contains(planet)) {
                     afterButtons.add(Buttons.green(
                             factionChecker + "planetAbilityExhaust_" + planet,
@@ -1075,13 +1075,12 @@ public final class AgendaWhensAftersHelper {
                 }
                 if ("fin".equalsIgnoreCase(pnKey)) {
                     MessageHelper.sendMessageToChannel(
-                            mainGameChannel, player.getRepresentation() + ", you don't have the _Keleres Rider_.");
+                            mainGameChannel, player.toString() + ", you don't have the _Keleres Rider_.");
                     return;
                 }
                 if (player.getFaction().contains("keleres")) {
                     MessageHelper.sendMessageToChannel(
-                            mainGameChannel,
-                            player.getRepresentation() + ", you cannot play your own promissory note.");
+                            mainGameChannel, player.toString() + ", you cannot play your own promissory note.");
                     return;
                 }
             } else if ("Edyn Rider".equalsIgnoreCase(riderName)) {
@@ -1130,8 +1129,8 @@ public final class AgendaWhensAftersHelper {
                     Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
                     playerLeader = CryypterHelper.keleresHeroCheck(player, playerLeader);
                     if (playerLeader != null) {
-                        String message = player.getRepresentation() + " played "
-                                + Helper.getLeaderFullRepresentation(playerLeader);
+                        String message =
+                                player.toString() + " played " + Helper.getLeaderFullRepresentation(playerLeader);
                         player.removeLeader(playerLeader);
                         MessageHelper.sendMessageToChannel(
                                 event.getMessageChannel(),
@@ -1204,7 +1203,7 @@ public final class AgendaWhensAftersHelper {
         buttons.add(Buttons.red("deleteButtons", "Don't do anything"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentation()
+                player.toString()
                         + " due to the playing of an \"after\", your pre-vote was erased. You can use these buttons to pre-vote again.",
                 buttons);
     }

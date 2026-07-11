@@ -33,7 +33,7 @@ public class FrankenStartingTechService {
     private void addTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.addTech(techID);
         String techRep = Mapper.getTech(techID).getRepresentation(false);
-        String message = player.getRepresentation() + " added technology: " + techRep + ".";
+        String message = player.toString() + " added technology: " + techRep + ".";
 
         CommanderUnlockCheckService.checkPlayer(player, "mirveda", "jolnar", "nekro", "dihmohn");
         MessageHelper.sendEphemeralMessageToEventChannel(event, message);
@@ -42,7 +42,7 @@ public class FrankenStartingTechService {
     private void removeTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.removeTech(techID);
         String techRep = Mapper.getTech(techID).getRepresentation(false);
-        String message = player.getRepresentation() + " removed technology: " + techRep + ".";
+        String message = player.toString() + " removed technology: " + techRep + ".";
 
         MessageHelper.sendEphemeralMessageToEventChannel(event, message);
     }

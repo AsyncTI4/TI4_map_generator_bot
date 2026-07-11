@@ -42,7 +42,7 @@ public class RemoveAllCC extends GameStateCommand {
             return;
         }
 
-        for (Tile tile : getGame().getTileMap().values()) {
+        for (Tile tile : getGame().getTiles()) {
             tile.removeAllCC();
         }
     }

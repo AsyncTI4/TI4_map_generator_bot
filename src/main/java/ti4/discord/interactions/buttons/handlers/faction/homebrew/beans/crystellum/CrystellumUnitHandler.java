@@ -40,11 +40,11 @@ public class CrystellumUnitHandler {
 
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + " placed "
                             + fightersToAdd
                             + " fighters in "
-                            + unit.tile().getRepresentation()
+                            + unit.tile().toString()
                             + " using _The Fractal_ ability.");
 
             if (player.hasLeaderUnlocked("crystellumcommander")) {
@@ -56,7 +56,7 @@ public class CrystellumUnitHandler {
                         Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
-                        player.getRepresentation()
+                        player.toString()
                                 + ", the bot sees that you have _Highbearer Lumina_, the Crystellum commander unlocked. If the flagship was given +1 capacity due to the commander, you may press this button to add an additional fighter.",
                         buttons);
             }
@@ -91,7 +91,7 @@ public class CrystellumUnitHandler {
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 fighter");
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation() + " added 1 fighter to " + tile.getRepresentation()
+                player.toString() + " added 1 fighter to " + tile.toString()
                         + " from the _Highbearer Lumina_ commander capacity boost on _The Fractal_.");
 
         ButtonHelper.deleteMessage(event);
@@ -111,13 +111,13 @@ public class CrystellumUnitHandler {
         if (!(combatOnHolder instanceof Planet)) {
             return;
         }
-        if (combatOnHolder.getUnitCount(UnitType.Mech, player.getColor()) < 1) {
+        if (!combatOnHolder.hasUnit(UnitType.Mech, player.getColor())) {
             return;
         }
         if (tile.getSpaceUnitHolder() == null) {
             return;
         }
-        if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Fighter, player.getColor()) < 1) {
+        if (!tile.hasUnitInSpace(UnitType.Fighter, player.getColor())) {
             return;
         }
 
@@ -157,7 +157,7 @@ public class CrystellumUnitHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        UnitHolder planet = tile.getUnitHolders().get(planetName);
+        UnitHolder planet = tile.getPlanet(planetName);
         UnitHolder space = tile.getSpaceUnitHolder();
         if (planet == null || space == null) {
             ButtonHelper.deleteMessage(event);
@@ -171,11 +171,11 @@ public class CrystellumUnitHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        if (planet.getUnitCount(UnitType.Mech, player.getColor()) < 1) {
+        if (!planet.hasUnit(UnitType.Mech, player.getColor())) {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        if (space.getUnitCount(UnitType.Fighter, player.getColor()) < 1) {
+        if (!space.hasUnit(UnitType.Fighter, player.getColor())) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -185,7 +185,7 @@ public class CrystellumUnitHandler {
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " used _Refractum_ to redirect 1 produced hit against their ground force to a fighter in the active system.");
 
         List<Button> updatedButtons = new ArrayList<>();
@@ -201,8 +201,8 @@ public class CrystellumUnitHandler {
             updatedButtons.add(Buttons.gray(
                     factionChecker + "cancelGroundHits_" + tile.getPosition() + "_" + remainingHits, "Cancel a Hit"));
 
-            String msg2 = player.getRepresentation() + " you may autoassign "
-                    + StringHelper.pluralize(remainingHits, "hit") + ".";
+            String msg2 =
+                    player.toString() + " you may autoassign " + StringHelper.pluralize(remainingHits, "hit") + ".";
 
             event.getMessage()
                     .editMessage(msg2)

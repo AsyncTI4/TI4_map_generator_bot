@@ -10,10 +10,10 @@ import ti4.message.MessageHelper;
 public class PlanetService {
 
     public static void refreshPlanet(Player player, String planet) {
-        if (!player.getPlanets().contains(planet)) {
+        if (!player.containsPlanet(planet)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " the bot doesn't think you have a planet by the name of " + planet);
+                    player.toString() + " the bot doesn't think you have a planet by the name of " + planet);
         }
         player.refreshPlanet(planet);
     }

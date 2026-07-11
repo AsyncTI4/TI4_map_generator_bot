@@ -68,7 +68,7 @@ public final class TeHelperTechs {
         if (tile == null) return;
         for (Player p : game.getRealPlayers()) {
             UnitKey infKey = removeInfantry ? Units.getUnitKey(UnitType.Infantry, p.getColorID()) : null;
-            for (UnitHolder uh : tile.getUnitHolders().values()) {
+            for (UnitHolder uh : tile.getUnitHolderValues()) {
                 String stored = game.getStoredValue("magenPlaced" + p.getFaction() + uh.getName());
                 if (!stored.isEmpty()) {
                     if (removeInfantry) uh.removeUnit(infKey, Integer.parseInt(stored));
@@ -84,11 +84,11 @@ public final class TeHelperTechs {
         String ability = bulwark ? "_Black Trench Bulwark_" : "_Magen Defense Grid_";
         StringBuilder msg = new StringBuilder(
                 player.getFactionEmoji() + " resolved " + ability + " on " + tile.getPosition() + ":");
-        for (UnitHolder uh : tile.getUnitHolders().values()) {
+        for (UnitHolder uh : tile.getUnitHolderValues()) {
             int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
             if (player.hasAbility("byssus")) count += uh.getUnitCount(UnitType.Mech, player);
             for (String token : uh.getTokenList()) {
-                if (player.getPlanets().contains(uh.getName()) && token.contains("superweapon")) {
+                if (player.containsPlanet(uh.getName()) && token.contains("superweapon")) {
                     count++;
                 }
             }
@@ -150,11 +150,11 @@ public final class TeHelperTechs {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
             }
             case "nanomachines_repair" -> {
-                game.getTileMap().values().stream()
-                        .flatMap(t -> t.getUnitHolders().values().stream())
+                game.getTiles().stream()
+                        .flatMap(t -> t.getUnitHolderValues().stream())
                         .forEach(uh -> uh.removeAllUnitDamage(player.getColorID()));
-                String message = player.getRepresentation() + " used " + nano.getRepresentation(false)
-                        + " to repair all of their units.";
+                String message =
+                        player.toString() + " used " + nano.getRepresentation(false) + " to repair all of their units.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             }
             default -> {
@@ -167,7 +167,7 @@ public final class TeHelperTechs {
 
     private static List<Tile> tilesAdjToPlayersInf(Game game, Player player) {
         Predicate<UnitKey> isInf = uk -> uk.unitType() == UnitType.Infantry;
-        List<Tile> tilesWithInf = game.getTileMap().values().stream()
+        List<Tile> tilesWithInf = game.getTiles().stream()
                 .filter(t -> t.containsPlayersUnitsWithKeyCondition(player, isInf))
                 .toList();
         List<Tile> tilesAdjToInf = tilesWithInf.stream()
@@ -180,7 +180,7 @@ public final class TeHelperTechs {
 
     private static List<Tile> tilesContainingOrAdjacentToPlayersInf(Game game, Player player) {
         Predicate<UnitKey> isInf = uk -> uk.unitType() == UnitType.Infantry;
-        Set<Tile> tilesWithInf = new HashSet<>(game.getTileMap().values().stream()
+        Set<Tile> tilesWithInf = new HashSet<>(game.getTiles().stream()
                 .filter(t -> t.containsPlayersUnitsWithKeyCondition(player, isInf))
                 .toList());
         Set<Tile> adjacentTiles = tilesWithInf.stream()
@@ -194,7 +194,7 @@ public final class TeHelperTechs {
 
     public static boolean playerHasInfantryOnMap(Game game, Player player) {
         Predicate<UnitKey> isInf = uk -> uk.unitType() == UnitType.Infantry;
-        return game.getTileMap().values().stream().anyMatch(t -> t.containsPlayersUnitsWithKeyCondition(player, isInf));
+        return game.getTiles().stream().anyMatch(t -> t.containsPlayersUnitsWithKeyCondition(player, isInf));
     }
 
     public static List<Button> neuralParasiteButtons(Game game, Player player) {
@@ -229,14 +229,14 @@ public final class TeHelperTechs {
         TechnologyModel biorganic = getNeuralParasiteModel(game, player);
         String message;
         if (game.isFrankenGame()) {
-            message = player.getRepresentation()
+            message = player.toString()
                     + ", please choose a player to destroy 1 of their units on a controlled planet using "
                     + biorganic.getNameRepresentation() + ".";
         } else {
             // "At the start of your turn, destroy 1 of another player's infantry in or adjacent to a system that
             // contains
             // your infantry."
-            message = player.getRepresentation() + ", please choose a player to remove 1 of their infantry using "
+            message = player.toString() + ", please choose a player to remove 1 of their infantry using "
                     + biorganic.getNameRepresentation() + ".";
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
@@ -270,7 +270,7 @@ public final class TeHelperTechs {
 
         if (game.isFrankenGame()) {
             List<Button> buttons = frankenNeuralParasiteUnitButtons(game, player, victim);
-            String message = player.getRepresentation() + " is choosing one unit belonging to "
+            String message = player.toString() + " is choosing one unit belonging to "
                     + victim.getRepresentation(false, false) + " to destroy with _Neural Parasite_.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message, buttons);
             ButtonHelper.deleteMessage(event);
@@ -281,13 +281,13 @@ public final class TeHelperTechs {
 
         List<Button> buttons = new ArrayList<>();
         for (Tile t : tilesAdjToPlayersInf(game, player)) {
-            for (UnitHolder uh : t.getUnitHolders().values()) {
+            for (UnitHolder uh : t.getUnitHolderValues()) {
                 String id = "resolveNeuralParasite_" + t.getPosition() + "_" + uh.getName() + "_" + faction;
                 buttons.addAll(getButtonsForEachUnitState(game, t, uh, inf, id));
             }
         }
 
-        String message = player.getRepresentation() + " is choosing an infantry belonging to "
+        String message = player.toString() + " is choosing an infantry belonging to "
                 + victim.getRepresentation(false, false) + " to destroy.";
         message += "\n-# The number in parenthesis (#) is the total number of infantry at that location.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message, buttons);
@@ -298,7 +298,7 @@ public final class TeHelperTechs {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : tilesContainingOrAdjacentToPlayersInf(game, player)) {
             for (Planet planet : tile.getPlanetUnitHolders()) {
-                if (!victim.getPlanets().contains(planet.getName())) {
+                if (!victim.containsPlanet(planet.getName())) {
                     continue;
                 }
                 for (UnitKey unit : planet.getUnitKeys()) {
@@ -355,7 +355,7 @@ public final class TeHelperTechs {
                         player.getCorrectChannel(), "This Neural Parasite button is no longer valid.");
                 return;
             }
-            UnitHolder uh = tile.getUnitHolders().get(uhName);
+            UnitHolder uh = tile.getUnitHolder(uhName);
             if (uh == null) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(), "This Neural Parasite button is no longer valid.");
@@ -405,7 +405,7 @@ public final class TeHelperTechs {
             return;
         }
 
-        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        UnitHolder unitHolder = tile.getPlanet(planetName);
         if (!(unitHolder instanceof Planet)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), "This Neural Parasite button is no longer valid.");
@@ -476,7 +476,7 @@ public final class TeHelperTechs {
             Tile t = game.getTileByPosition(pos);
             t.getSpaceUnitHolder().addToken(Constants.TOKEN_INGRESS);
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "Ingress token added to " + t.getRepresentation() + ".");
+                    player.getCorrectChannel(), "Ingress token added to " + t.toString() + ".");
             initializePlanesplitterStep2(game, player, event);
             ButtonHelper.deleteMessage(event);
         } else {
@@ -490,7 +490,7 @@ public final class TeHelperTechs {
         String prefix = player.factionButtonChecker() + "planesplitterStep1_";
         List<Button> buttons = new ArrayList<>();
         if (player.hasUnlockedBreakthrough("cabalbt")) {
-            for (Tile tile : game.getTileMap().values()) {
+            for (Tile tile : game.getTiles()) {
                 if (tile.isGravityRift(game, player)) {
                     buttons.add(
                             Buttons.blue(prefix + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
@@ -499,13 +499,13 @@ public final class TeHelperTechs {
         } else {
             Set<String> adjTilePositions = new HashSet<>();
             if (game.isTwilightsFallMode()) {
-                for (Tile tile : game.getTileMap().values()) {
+                for (Tile tile : game.getTiles()) {
                     if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
                         adjTilePositions.add(tile.getPosition());
                     }
                 }
             } else {
-                for (Tile tile : game.getTileMap().values()) {
+                for (Tile tile : game.getTiles()) {
                     if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
                         adjTilePositions.addAll(
                                 FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true));
@@ -542,7 +542,7 @@ public final class TeHelperTechs {
             Tile t = game.getTileByPosition(pos);
             t.getSpaceUnitHolder().removeToken(Constants.TOKEN_INGRESS);
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "Ingress token removed from " + t.getRepresentation() + ".");
+                    player.getCorrectChannel(), "Ingress token removed from " + t.toString() + ".");
             ButtonHelper.deleteMessage(event);
         }
     }
@@ -562,9 +562,9 @@ public final class TeHelperTechs {
         String prefix = player.factionButtonChecker() + "planesplitterStep2_";
         List<Button> buttons = new ArrayList<>();
 
-        game.getTileMap().values().forEach(tile -> {
-            UnitHolder space = tile.getUnitHolders().get("space");
-            if (space.getTokenList().contains(Constants.TOKEN_INGRESS))
+        game.getTiles().forEach(tile -> {
+            UnitHolder space = tile.getSpaceUnitHolder();
+            if (space.containsToken(Constants.TOKEN_INGRESS))
                 buttons.add(Buttons.red(prefix + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
         });
         return buttons;
@@ -593,8 +593,7 @@ public final class TeHelperTechs {
         if (game.isFowMode()) {
             msg += "Speaker has been temporarily changed to simulate the effect of the technology.";
         } else {
-            msg += player.getRepresentation()
-                    + " has been temporarily made speaker to simulate the effect of the technology.";
+            msg += player.toString() + " has been temporarily made speaker to simulate the effect of the technology.";
         }
         game.setStoredValue("oldSpeakerExecutiveOrder", game.getSpeakerUserID());
         game.setSpeaker(player);

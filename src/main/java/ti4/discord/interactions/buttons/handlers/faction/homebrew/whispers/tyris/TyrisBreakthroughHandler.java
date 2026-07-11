@@ -80,8 +80,7 @@ public class TyrisBreakthroughHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    player.getRepresentation()
-                            + " has no eligible technologies to place on _Non-Linear Time Progression_.");
+                    player.toString() + " has no eligible technologies to place on _Non-Linear Time Progression_.");
             return;
         }
         MessageHelper.sendMessageToChannelWithButtons(
@@ -101,7 +100,7 @@ public class TyrisBreakthroughHandler {
         int count = getTyrisBTTechs(player, game).size();
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " placed _" + m.getName()
+                player.toString() + " placed _" + m.getName()
                         + "_ on _Non-Linear Time Progression_ (cost reduced by "
                         + StringHelper.pluralize(count, "resource") + " total).");
         ButtonHelper.deleteMessage(event);
@@ -116,7 +115,7 @@ public class TyrisBreakthroughHandler {
         String name = m != null ? "_" + m.getName() + "_" : techID;
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " removed " + name + " from _Non-Linear Time Progression_.");
+                player.toString() + " removed " + name + " from _Non-Linear Time Progression_.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -143,7 +142,7 @@ public class TyrisBreakthroughHandler {
             String name = m != null ? "_" + m.getName() + "_" : removed;
             MessageHelper.sendMessageToChannel(
                     p.getCorrectChannel(),
-                    p.getRepresentation() + "'s " + name
+                    p.toString() + "'s " + name
                             + " was removed from _Non-Linear Time Progression_ because a player passed.");
         } else {
             List<Button> buttons = new ArrayList<>();
@@ -154,7 +153,7 @@ public class TyrisBreakthroughHandler {
             }
             MessageHelper.sendMessageToChannelWithButtons(
                     p.getCardsInfoThread(),
-                    p.getRepresentation()
+                    p.toString()
                             + ", a player passed — choose 1 technology to remove from _Non-Linear Time Progression_:",
                     buttons);
         }

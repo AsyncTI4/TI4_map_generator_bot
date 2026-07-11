@@ -41,7 +41,7 @@ class RefreshLeader extends GameStateSubcommand {
         int tgCount = playerLeader.getTgCount();
         var game = getGame();
         RefreshLeaderService.refreshLeader(player, playerLeader, game);
-        StringBuilder message = new StringBuilder(player.getRepresentation())
+        StringBuilder message = new StringBuilder(player.toString())
                 .append(" readied ")
                 .append(Helper.getLeaderShortRepresentation(playerLeader));
         if (tgCount > 0) {

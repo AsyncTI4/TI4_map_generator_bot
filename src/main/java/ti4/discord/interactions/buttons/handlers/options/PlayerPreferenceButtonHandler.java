@@ -46,7 +46,7 @@ class PlayerPreferenceButtonHandler {
                     && !player.hasTechReady("gr")) {
                 if (!userSettings.isPrefersPassOnWhensAfters()) {
                     List<Button> buttons = new ArrayList<>();
-                    String msg = player.getRepresentation()
+                    String msg = player.toString()
                             + ", the bot may also auto react for you when you have no \"when\"s or \"after\"s."
                             + " Default for this is off. This will only apply to this game."
                             + " If you have any \"when\"s or \"after\"s or related \"when\"/\"after\" abilities, it will not do anything. ";

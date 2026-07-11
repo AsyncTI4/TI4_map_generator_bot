@@ -127,7 +127,7 @@ public class IronUnitsHandler {
         int infantryToPlace = Integer.parseInt(parts[1]);
         String planetName = parts[2];
         if (tile == null
-                || game.getUnitHolderFromPlanet(planetName) == null
+                || game.getPlanet(planetName) == null
                 || !player.getPromissoryNotes().containsKey(EJECTION_PN_ID)) {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "_Ejection_ is no longer available.");
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);

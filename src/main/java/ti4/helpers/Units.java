@@ -60,6 +60,12 @@ public class Units {
             return unitType.getUnitTypeEmoji();
         }
 
+        public String emojiString(int quantity) {
+            return quantity > 2
+                    ? quantity + "x " + unitEmoji()
+                    : unitEmoji().emojiString().repeat(quantity);
+        }
+
         @JsonIgnore
         public String getFileName() {
             if (JdaService.testingMode) {
@@ -103,6 +109,10 @@ public class Units {
             this.unitType = unitType;
             this.colorID = colorID;
         }
+    }
+
+    public static int getTotalCount(List<Integer> counts) {
+        return counts.stream().mapToInt(Integer::intValue).sum();
     }
 
     @Getter

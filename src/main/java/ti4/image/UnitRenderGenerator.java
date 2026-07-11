@@ -135,7 +135,7 @@ class UnitRenderGenerator {
             if (player == null) {
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(),
-                        "Could not find owner for " + unitKey + " in tile " + tile.getRepresentation() + ".");
+                        "Could not find owner for " + unitKey + " in tile " + tile.toString() + ".");
                 continue;
             }
 
@@ -176,7 +176,7 @@ class UnitRenderGenerator {
             if (unitModel == null) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation()
+                        player.toString()
                                 + ", a unit model could not be found for the unit with an async ID of "
                                 + unitKey.asyncID() + ".");
                 continue;

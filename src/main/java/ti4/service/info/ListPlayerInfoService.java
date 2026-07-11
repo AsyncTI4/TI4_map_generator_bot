@@ -29,7 +29,7 @@ import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.TileEmojis;
 import ti4.service.emoji.UnitEmojis;
-import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class ListPlayerInfoService {
@@ -192,7 +192,7 @@ public class ListPlayerInfoService {
 
         String current = planets.get(index);
 
-        Planet planet = game.getPlanetsInfo().get(current);
+        Planet planet = game.getPlanet(current);
         if (planet == null) {
             BotLogger.warning(
                     new LogOrigin(player),
@@ -321,9 +321,9 @@ public class ListPlayerInfoService {
         } else {
             PublicObjectiveModel model = Mapper.getPublicObjective(objID);
             if (x > 0) {
-                representation = new StringBuilder(x + ". " + model.getRepresentation() + "\n> ");
+                representation = new StringBuilder(x + ". " + model.toString() + "\n> ");
             } else {
-                representation = new StringBuilder(model.getRepresentation() + "\n> ");
+                representation = new StringBuilder(model.toString() + "\n> ");
             }
         }
         if (!game.isFowMode()) {
@@ -366,7 +366,7 @@ public class ListPlayerInfoService {
                 }
 
                 if (!scored && !player.hasAbility("nomadic") && !player.hasTech("tf-nomadic")) {
-                    if (player.getFaction().equals(game.getStoredValue("silverFlamed"))) {
+                    if (player.isFactionExact(game.getStoredValue("silverFlamed"))) {
                         representation.append(ExploreEmojis.SilverFlame);
                     } else if (!Helper.canPlayerScorePOs(game, player)) {
                         representation.append(TileEmojis.TileGreenBack);
@@ -503,7 +503,7 @@ public class ListPlayerInfoService {
             }
             case "outer_rim", "control_borderlands", "control_borderlands_omegaphase" -> {
                 int edge = 0;
-                for (Tile tile : game.getTileMap().values()) {
+                for (Tile tile : game.getTiles()) {
                     if (FoWHelper.playerHasUnitsInSystem(player, tile)
                             && tile.isEdgeOfBoard(game)
                             && tile != player.getHomeSystemTile()) {
@@ -514,7 +514,7 @@ public class ListPlayerInfoService {
             }
             case "make_history", "become_legend", "become_legend_omegaphase" -> {
                 int counter = 0;
-                for (Tile tile : game.getTileMap().values()) {
+                for (Tile tile : game.getTiles()) {
                     boolean tileCounts =
                             tile.isMecatol(game) || tile.isAnomaly(game, player) || ButtonHelper.isTileLegendary(tile);
                     if (FoWHelper.playerHasUnitsInSystem(player, tile) && tileCounts) {
@@ -529,8 +529,8 @@ public class ListPlayerInfoService {
                 List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
                 planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
                 for (String planet : planets) {
-                    UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-                    if (uH != null && game.getTileFromPlanet(planet) != player.getHomeSystemTile()) {
+                    UnitHolder uH = game.getPlanet(planet);
+                    if (uH != null && game.getTileContainingPlanet(planet) != player.getHomeSystemTile()) {
                         if (uH.getUnitCount(Units.UnitType.Spacedock, player) > 0
                                 || uH.getUnitCount(Units.UnitType.Pds, player) > 0) {
                             counter++;
@@ -539,10 +539,10 @@ public class ListPlayerInfoService {
                     }
                 }
                 if (player.hasAbility("privileged_citizenry")) {
-                    counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false);
+                    counter += UnitQueryService.countUnits(game, player, "pds", false);
                 }
                 if (player.hasAbility("orbital_foundries")) {
-                    counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                    counter += UnitQueryService.countUnits(game, player, "warsun", false);
                 }
                 return Math.min(counter, maxPlanets);
             }
@@ -577,7 +577,7 @@ public class ListPlayerInfoService {
                             int amount = 0;
                             for (String planet : player.getReadiedPlanets()) {
                                 if (ButtonHelper.checkForTechSkips(game, planet)) {
-                                    Planet unitHolder = game.getPlanetsInfo().get(planet);
+                                    Planet unitHolder = game.getPlanet(planet);
                                     List<String> techTypes = unitHolder.getTechSpecialities();
                                     for (String typeT : techTypes) {
                                         if (type.toString().equalsIgnoreCase(typeT)) {
@@ -614,7 +614,7 @@ public class ListPlayerInfoService {
             case "expand_borders", "subdue", "subdue_omegaphase" -> {
                 int count = 0;
                 for (Planet planet : player.getPlanetsForScoring(false)) {
-                    Tile tile = game.getTileFromPlanet(planet.getName());
+                    Tile tile = game.getTileContainingPlanet(planet.getName());
                     if (tile != null && !tile.isHomeSystem(game)) {
                         count++;
                     }
@@ -682,14 +682,14 @@ public class ListPlayerInfoService {
             case "build_defenses", "massive_cities", "massive_cities_omegaphase" -> {
                 int counter = 0;
                 if (player.hasAbility("orbital_foundries")) {
-                    counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                    counter += UnitQueryService.countUnits(game, player, "warsun", false);
                 }
                 if (player.hasUnit("ghoti_flagship")) {
-                    counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", false);
+                    counter += UnitQueryService.countUnits(game, player, "flagship", false);
                 }
                 return counter
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd", false);
+                        + UnitQueryService.countUnits(game, player, "pds", false)
+                        + UnitQueryService.countUnits(game, player, "sd", false);
             }
             case "lost_outposts", "ancient_monuments", "ancient_monuments_omegaphase" -> {
                 int count = 0;
@@ -706,16 +706,16 @@ public class ListPlayerInfoService {
                 return count;
             }
             case "engineer_marvel" -> {
-                return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "fs", false)
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "lady", false)
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                return UnitQueryService.countUnits(game, player, "fs", false)
+                        + UnitQueryService.countUnits(game, player, "lady", false)
+                        + UnitQueryService.countUnits(game, player, "warsun", false);
             }
             case "deep_space", "vast_territories", "vast_territories_omegaphase" -> {
                 return ButtonHelper.getNumberOfTilesPlayerIsInWithNoPlanets(game, player);
             }
             case "raise_fleet", "command_armada", "command_armada_omegaphase" -> {
                 int x = 0;
-                for (Tile tile : game.getTileMap().values()) {
+                for (Tile tile : game.getTiles()) {
                     if (FoWHelper.playerHasShipsInSystem(player, tile)) {
                         x = Math.max(x, ButtonHelper.checkNumberNonFighterShips(player, tile));
                     }
@@ -741,7 +741,7 @@ public class ListPlayerInfoService {
                 Set<Planet> planets = player.getPlanetsForScoring(false);
 
                 for (Planet planet : planets) {
-                    Tile tile = game.getTileFromPlanet(planet.getName());
+                    Tile tile = game.getTileContainingPlanet(planet.getName());
                     if (tile != null && tile.isHomeSystem(game) && tile != player.getHomeSystemTile()) {
                         count++;
                     }
@@ -750,7 +750,7 @@ public class ListPlayerInfoService {
             }
             case "supremacy", "supremacy_omegaphase" -> {
                 int count = 0;
-                for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                for (Tile tile : UnitQueryService.getTilesContainingPlayersUnits(
                         game,
                         player,
                         Units.UnitType.Flagship,
@@ -789,7 +789,7 @@ public class ListPlayerInfoService {
                     Set<Planet> planets = player.getPlanetsForScoring(false);
 
                     for (Planet planet : planets) {
-                        Tile planetTile = game.getTileFromPlanet(planet.getName());
+                        Tile planetTile = game.getTileContainingPlanet(planet.getName());
                         if (planetTile != null && adjPositions.contains(planetTile.getPosition())) {
                             planetsAdjToHomes.add(planet.getName());
                             homesAdjTo.add(tile);
@@ -818,7 +818,7 @@ public class ListPlayerInfoService {
                 Set<Planet> planets = player.getPlanetsForScoring(true);
 
                 for (Planet planet : planets) {
-                    Tile tile = game.getTileFromPlanet(planet.getName());
+                    Tile tile = game.getTileContainingPlanet(planet.getName());
                     for (Player p2 : game.getRealPlayers()) {
                         if (p2 == player) {
                             continue;
@@ -839,7 +839,7 @@ public class ListPlayerInfoService {
                 List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
                 planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
                 for (String p : planets) {
-                    Planet planet = game.getPlanetsInfo().get(p);
+                    Planet planet = game.getPlanet(p);
                     if (planet != null && planet.getUnitCount(Units.UnitType.Spacedock, player) < 1) {
                         count = Math.max(count, ButtonHelper.getNumberOfGroundForces(player, planet));
                     }
@@ -851,7 +851,7 @@ public class ListPlayerInfoService {
                 List<String> planets = player.getPlanetsAllianceMode();
                 planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
                 for (String planet : planets) {
-                    UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+                    UnitHolder uH = game.getPlanet(planet);
                     if (uH != null && uH.getUnitCount(Units.UnitType.Mech, player) > 0) {
                         count++;
                     }
@@ -882,8 +882,8 @@ public class ListPlayerInfoService {
                 return player.getFragments().size(); // 2 frags
             }
             case "dfat" -> {
-                Tile tile = Optional.ofNullable(game.getTileFromPlanet("mallice"))
-                        .orElseGet(() -> game.getTileFromPlanet("hexmallice"));
+                Tile tile = Optional.ofNullable(game.getTileContainingPlanet("mallice"))
+                        .orElseGet(() -> game.getTileContainingPlanet("hexmallice"));
                 if (!FoWHelper.playerHasUnitsInSystem(player, tile)) {
                     return 0;
                 } else {
@@ -942,7 +942,7 @@ public class ListPlayerInfoService {
             }
             case "lsc" -> {
                 int count = 0;
-                for (Tile tile : game.getTileMap().values()) {
+                for (Tile tile : game.getTiles()) {
                     if (ButtonHelper.checkNumberShips(player, tile) > 0) {
                         for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, false)) {
                             Tile tile2 = game.getTileByPosition(pos);
@@ -956,13 +956,13 @@ public class ListPlayerInfoService {
                 return count;
             }
             case "fwm" -> {
-                return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "spacedock"); // 3 SD
+                return UnitQueryService.countUnits(game, player, "spacedock"); // 3 SD
             }
             case "fsn" -> {
                 return player.getAcCount(); // 5 AC
             }
             case "gamf" -> {
-                return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false); // 5 dreads
+                return UnitQueryService.countUnits(game, player, "dreadnought", false); // 5 dreads
             }
             case "ans" -> {
                 int count = 0;
@@ -982,7 +982,7 @@ public class ListPlayerInfoService {
             }
             case "btgk" -> {
                 int alpha = 0;
-                for (Tile tile : game.getTileMap().values()) {
+                for (Tile tile : game.getTiles()) {
                     if (FoWHelper.doesTileHaveAlpha(game, tile.getPosition())
                             && FoWHelper.playerHasShipsInSystem(player, tile)) {
                         alpha = 1;
@@ -991,7 +991,7 @@ public class ListPlayerInfoService {
                 }
 
                 int beta = 0;
-                for (Tile tile : game.getTileMap().values()) {
+                for (Tile tile : game.getTiles()) {
                     if (FoWHelper.doesTileHaveBeta(game, tile.getPosition())
                             && FoWHelper.playerHasShipsInSystem(player, tile)) {
                         beta = 1;
@@ -1002,7 +1002,7 @@ public class ListPlayerInfoService {
             }
             case "ctr" -> {
                 int count = 0;
-                for (Tile tile : game.getTileMap().values()) {
+                for (Tile tile : game.getTiles()) {
                     if (ButtonHelper.checkNumberShips(player, tile) > 0) {
                         count++;
                     }
@@ -1015,8 +1015,8 @@ public class ListPlayerInfoService {
                     if (p2 == player) {
                         continue;
                     }
-                    for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(
-                            game, p2, Units.UnitType.Spacedock)) {
+                    for (Tile tile :
+                            UnitQueryService.getTilesContainingPlayersUnits(game, p2, Units.UnitType.Spacedock)) {
                         if (ButtonHelper.checkNumberShips(player, tile) > 0) {
                             count++;
                         }
@@ -1025,7 +1025,7 @@ public class ListPlayerInfoService {
                 return count;
             }
             case "eap" -> {
-                return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds"); // 4 PDS
+                return UnitQueryService.countUnits(game, player, "pds"); // 4 PDS
             }
             case "faa" -> { // 4 cultural
                 return ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", false, true);

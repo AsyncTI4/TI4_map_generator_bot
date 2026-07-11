@@ -66,15 +66,15 @@ public class RelicHelper {
         if (player.hasAbility("a_new_edifice")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + "Due to your **A New Edifice** ability, you get to explore 3 planets rather than get a relic. Reminder that they should be different planets. ");
             List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
             MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(), player.getRepresentation() + "Explore planet #1 ", buttons);
+                    player.getCorrectChannel(), player.toString() + "Explore planet #1 ", buttons);
             MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(), player.getRepresentation() + "Explore planet #2 ", buttons);
+                    player.getCorrectChannel(), player.toString() + "Explore planet #2 ", buttons);
             MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(), player.getRepresentation() + "Explore planet #3 ", buttons);
+                    player.getCorrectChannel(), player.toString() + "Explore planet #3 ", buttons);
             return;
         }
 
@@ -88,7 +88,7 @@ public class RelicHelper {
         player.addRelic(relicID);
         RelicModel relicModel = Mapper.getRelic(relicID);
 
-        String message = player.getRepresentation() + " drew the _" + relicModel.getName() + "_ relic.";
+        String message = player.toString() + " drew the _" + relicModel.getName() + "_ relic.";
         if (game.isFowMode()) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
         }
@@ -127,7 +127,7 @@ public class RelicHelper {
                 game.scorePublicObjective(player.getUserID(), poIndex);
                 helpMessage
                         .append("Custom objective _Shard of the Throne_ has been added.\n")
-                        .append(player.getRepresentation())
+                        .append(player.toString())
                         .append(" scored _Shard of the Throne_.");
             }
             case "quantumcore" -> {
@@ -139,7 +139,7 @@ public class RelicHelper {
             case "thetriad" -> {
                 for (Player p : game.getPlayers().values()) p.removePlanet("triad");
                 player.addPlanet("triad");
-                Planet triad = game.getPlanetsInfo().get("triad");
+                Planet triad = game.getPlanet("triad");
                 if (triad != null) triad.updateTriadStats(player);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(), "Added the Triad \"planet\" card to your play area.");
@@ -154,7 +154,7 @@ public class RelicHelper {
                         .append("Custom objective _")
                         .append(customPOName)
                         .append("_ has been added.\n")
-                        .append(player.getRepresentation())
+                        .append(player.toString())
                         .append(" scored _")
                         .append(customPOName)
                         .append("_.");
@@ -162,7 +162,7 @@ public class RelicHelper {
             case "bookoflatvinia" -> {
                 if (player.hasAbility("propagation")) {
                     List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                    String message2 = player.getRepresentation()
+                    String message2 = player.toString()
                             + ", you would research two technologies, but because of **Propagation**, you instead gain 6 command tokens."
                             + " Your current command tokens are " + player.getCCRepresentation()
                             + ". Use buttons to gain command tokens.";
@@ -182,7 +182,7 @@ public class RelicHelper {
                                     .map(startingTechOptions::contains)
                                     .orElse(false);
                             if (startingTechOptions.contains(model.getAlias()) || homebrewReplacesAnOption) {
-                                if (!player.getTechs().contains(tech)) {
+                                if (!player.hasExactTech(tech)) {
                                     techs.add(model);
                                 }
                             }
@@ -196,7 +196,7 @@ public class RelicHelper {
                         buttons = List.of(Buttons.GET_A_FREE_TECH, Buttons.DONE_DELETE_BUTTONS);
                         if (game.isTwilightsFallMode()) {
                             buttons = ButtonHelper.getGainCCButtons(player);
-                            String message2 = player.getRepresentation()
+                            String message2 = player.toString()
                                     + ", you would research two technologies, but because you have none to research, you instead gain 4 command tokens."
                                     + " Your current command tokens are " + player.getCCRepresentation()
                                     + ". Use buttons to gain command tokens.";
@@ -239,7 +239,7 @@ public class RelicHelper {
 
         if (shardCustomPOName != null && game.getCustomPublicVP().containsKey(shardCustomPOName)) {
             game.unscorePublicObjective(p1.getUserID(), shardCustomPOName);
-            String msg = p1.getRepresentation() + " lost 1 point due to losing _" + shardCustomPOName + "_.";
+            String msg = p1.toString() + " lost 1 point due to losing _" + shardCustomPOName + "_.";
             MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), msg);
         }
     }
@@ -265,8 +265,8 @@ public class RelicHelper {
             return;
         }
 
-        String p1 = sender.getRepresentation();
-        String p2 = receiver.getRepresentation();
+        String p1 = sender.toString();
+        String p2 = receiver.toString();
         String fragString = count + " " + trait + " " + ExploreEmojis.getFragEmoji(trait) + " relic fragment"
                 + (count == 1 ? "" : "s");
         String message = p1 + " sent " + fragString + " to " + p2;

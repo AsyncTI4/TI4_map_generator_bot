@@ -24,7 +24,7 @@ public final class BookOfLatviniaService {
     public static void purgeBookOfLatvinia(ButtonInteractionEvent event, Game game, Player player) {
         Set<String> skips = new HashSet<>();
         for (String planet : player.getPlanetsAllianceMode()) {
-            Planet p = game.getUnitHolderFromPlanet(planet);
+            Planet p = game.getPlanet(planet);
             if (p != null) {
                 skips.addAll(p.getTechSpecialities());
             }
@@ -42,14 +42,14 @@ public final class BookOfLatviniaService {
         Player prevSpeaker = game.getSpeaker();
         game.setSpeaker(player);
 
-        String msg = prevSpeaker.getRepresentation()
+        String msg = prevSpeaker.toString()
                 + ", the speaker token has been ripped from your grasp by the _Book of Latvinia_. "
                 + MiscEmojis.SpeakerToken;
         MessageHelper.sendMessageToChannel(prevSpeaker.getCorrectChannel(), msg);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " you have gained the speaker token. " + MiscEmojis.SpeakerToken);
+                    player.toString() + " you have gained the speaker token. " + MiscEmojis.SpeakerToken);
         }
     }
 
@@ -60,11 +60,11 @@ public final class BookOfLatviniaService {
         String message;
         if (id != null) {
             game.scorePublicObjective(player.getUserID(), id);
-            message = player.getRepresentation() + " has scored the \"Book of Latvinia\" custom objective.";
+            message = player.toString() + " has scored the \"Book of Latvinia\" custom objective.";
         } else {
             id = game.addCustomPO(book, 1);
             game.scorePublicObjective(player.getUserID(), id);
-            message = "Custom objective \"Book of Latvinia\" has been added.\n" + player.getRepresentation()
+            message = "Custom objective \"Book of Latvinia\" has been added.\n" + player.toString()
                     + " has scored the \"Book of Latvinia\" custom objective.";
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);

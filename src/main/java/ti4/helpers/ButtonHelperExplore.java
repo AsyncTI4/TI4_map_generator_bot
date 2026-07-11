@@ -34,7 +34,7 @@ class ButtonHelperExplore {
         }
         buttons = Helper.getPlaceUnitButtons(
                 event, player, game, tile, "freelancers", "placeOneNDone_dontskipfreelancers");
-        String message = player.getRepresentation() + " Use the buttons to produce 1 unit. "
+        String message = player.toString() + " Use the buttons to produce 1 unit. "
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
@@ -59,7 +59,7 @@ class ButtonHelperExplore {
             fragmentsToPurge.removeFirst();
         }
 
-        StringBuilder message = new StringBuilder(player.getRepresentation() + " purged ");
+        StringBuilder message = new StringBuilder(player.toString() + " purged ");
         if (fragmentsToPurge.size() == 1) {
             String fragId = fragmentsToPurge.getFirst();
             player.removeFragment(fragId);
@@ -99,7 +99,7 @@ class ButtonHelperExplore {
         if (player.hasTech("dslaner")) {
             player.setAtsCount(player.getAtsCount() + 1);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");
+                    event.getMessageChannel(), player.toString() + " put 1 commodity on _ATS Armaments_.");
         }
     }
 }

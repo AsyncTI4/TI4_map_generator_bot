@@ -43,8 +43,7 @@ public class MyrrPromissoryHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", there are no legal planets to attach _" + pnModel.getName()
-                            + "_ to.");
+                    player.toString() + ", there are no legal planets to attach _" + pnModel.getName() + "_ to.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -52,7 +51,7 @@ public class MyrrPromissoryHandler {
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", please choose a planet to attach _" + pnModel.getName() + "_ to.",
+                player.toString() + ", please choose a planet to attach _" + pnModel.getName() + "_ to.",
                 buttons);
     }
 
@@ -88,7 +87,7 @@ public class MyrrPromissoryHandler {
         }
 
         Tile tile = game.getTileByPosition(tilePosition);
-        Planet planet = game.getUnitHolderFromPlanet(planetName);
+        Planet planet = game.getPlanet(planetName);
         if (tile == null || planet == null || !isLegalFactoryLeaseTarget(player, game, planetName, attachmentId)) {
             ButtonHelper.deleteMessage(event);
             return;
@@ -112,7 +111,7 @@ public class MyrrPromissoryHandler {
                 continue;
             }
 
-            Tile tile = game.getTileFromPlanet(planetName);
+            Tile tile = game.getTileContainingPlanet(planetName);
             if (tile == null) {
                 continue;
             }
@@ -126,11 +125,11 @@ public class MyrrPromissoryHandler {
     }
 
     private static boolean isLegalFactoryLeaseTarget(Player player, Game game, String planetName, String attachmentId) {
-        if (!player.getPlanets().contains(planetName)) {
+        if (!player.containsPlanet(planetName)) {
             return false;
         }
 
-        Planet planet = game.getUnitHolderFromPlanet(planetName);
+        Planet planet = game.getPlanet(planetName);
         if (planet == null || planet.getAttachments().contains("attachment_" + attachmentId + ".png")) {
             return false;
         }

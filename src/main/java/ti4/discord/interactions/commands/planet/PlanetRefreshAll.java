@@ -23,6 +23,6 @@ public class PlanetRefreshAll extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
         PlanetService.refreshAllPlanets(player);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " readied all planets.");
+        MessageHelper.sendMessageToEventChannel(event, player.toString() + " readied all planets.");
     }
 }

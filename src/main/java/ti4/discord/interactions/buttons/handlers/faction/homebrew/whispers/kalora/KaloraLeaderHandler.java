@@ -30,7 +30,7 @@ public class KaloraLeaderHandler {
         if (leader == null) return;
         ExhaustLeaderService.exhaustLeader(game, player, leader);
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), player.getRepresentation() + " has exhausted Valzor, the Kalora agent.");
+                event.getMessageChannel(), player.toString() + " has exhausted Valzor, the Kalora agent.");
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

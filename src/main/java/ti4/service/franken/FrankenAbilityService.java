@@ -22,7 +22,7 @@ import ti4.model.GenericCardModel;
 public class FrankenAbilityService {
 
     public static void addAbilities(GenericInteractionCreateEvent event, Player player, List<String> abilityIDs) {
-        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added abilities:\n");
+        StringBuilder sb = new StringBuilder(player.toString()).append(" added abilities:\n");
         for (String abilityID : abilityIDs) {
             if (!Mapper.isValidAbility(abilityID)) continue;
             if (player.hasAbility(abilityID)) {
@@ -35,7 +35,7 @@ public class FrankenAbilityService {
                                 DraftCategory.ABILITY,
                                 abilityID,
                                 abilityModel.getNameRepresentation(),
-                                abilityModel.getRepresentation()));
+                                abilityModel.toString()));
             }
             sb.append('\n');
             player.addAbility(abilityID);
@@ -56,8 +56,7 @@ public class FrankenAbilityService {
                 player.setUnitCap(unitID, 12);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        "Set destroyer max to 12 for " + player.getRepresentation()
-                                + " due to the **Private Fleet** ability.");
+                        "Set destroyer max to 12 for " + player.toString() + " due to the **Private Fleet** ability.");
             }
             if ("policies".equalsIgnoreCase(abilityID)) {
                 player.removeAbility("policies");
@@ -79,8 +78,7 @@ public class FrankenAbilityService {
                 player.setUnitCap(unitID, 4);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        "Set space dock max to 4 for " + player.getRepresentation()
-                                + " due to the **Industrialists** ability.");
+                        "Set space dock max to 4 for " + player.toString() + " due to the **Industrialists** ability.");
             }
             if ("teeming".equalsIgnoreCase(abilityID)) {
                 String unitID = AliasHandler.resolveUnit("dreadnought");
@@ -89,7 +87,7 @@ public class FrankenAbilityService {
                 player.setUnitCap(unitID, 5);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
+                        "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.toString()
                                 + " due to the **Teeming** ability.");
             }
             if ("machine_cult".equalsIgnoreCase(abilityID)) {
@@ -97,7 +95,7 @@ public class FrankenAbilityService {
                 player.setUnitCap(unitID, 6);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        "Set mech unit maximum to 6 for " + player.getRepresentation()
+                        "Set mech unit maximum to 6 for " + player.toString()
                                 + ", due to their **Machine Cult** ability.");
             }
             if ("diplomats".equalsIgnoreCase(abilityID)) {
@@ -115,7 +113,7 @@ public class FrankenAbilityService {
                 buttons.add(Buttons.green("startAncientEmpire", "Place a Tomb Token"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + ", please place up to 14 Tomb tokens for **Ancient Empire**.",
+                        player.toString() + ", please place up to 14 Tomb tokens for **Ancient Empire**.",
                         buttons);
             }
         }
@@ -123,7 +121,7 @@ public class FrankenAbilityService {
     }
 
     public static void removeAbilities(GenericInteractionCreateEvent event, Player player, List<String> abilityIDs) {
-        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed abilities:\n");
+        StringBuilder sb = new StringBuilder(player.toString()).append(" removed abilities:\n");
         for (String abilityID : abilityIDs) {
             if (!player.hasAbility(abilityID)) {
                 sb.append("> ").append(abilityID).append(" (player did not have this ability)");

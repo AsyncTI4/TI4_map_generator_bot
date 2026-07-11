@@ -52,7 +52,7 @@ public class EronousPlanetService {
 
     private static Player getOwner(Game game, String planet) {
         return game.getPlayers().values().stream()
-                .filter(p -> p.getPlanets().contains(planet))
+                .filter(p -> p.containsPlanet(planet))
                 .findFirst()
                 .orElse(null);
     }

@@ -87,9 +87,7 @@ class StatusPhaseButtonHandler {
                     game.getMainGameChannel(), "No objective is revealed at this stage in this mode.");
             int playersWithSCs = 0;
             for (Player player2 : game.getRealPlayers()) {
-                if (player2.getSCs() != null
-                        && !player2.getSCs().isEmpty()
-                        && !player2.getSCs().contains(0)) {
+                if (player2.getSCs() != null && !player2.getSCs().isEmpty() && !player2.hasStrategyCard(0)) {
                     playersWithSCs++;
                 }
             }
@@ -143,8 +141,7 @@ class StatusPhaseButtonHandler {
 
     @ButtonHandler(Constants.SO_NO_SCORING)
     public static void soNoScoring(ButtonInteractionEvent event, Player player, Game game) {
-        String message =
-                player.getRepresentation() + " has opted not to score a secret objective at this point in time.";
+        String message = player.toString() + " has opted not to score a secret objective at this point in time.";
         game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "None");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         String key2 = "queueToScoreSOs";
@@ -170,8 +167,7 @@ class StatusPhaseButtonHandler {
     @ButtonHandler(Constants.PO_NO_SCORING)
     public static void poNoScoring(ButtonInteractionEvent event, Player player, Game game) {
         // AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING
-        String message =
-                player.getRepresentation() + " has opted not to score a public objective at this point in time.";
+        String message = player.toString() + " has opted not to score a public objective at this point in time.";
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         }

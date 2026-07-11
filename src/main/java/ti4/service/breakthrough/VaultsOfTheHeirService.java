@@ -25,8 +25,7 @@ public class VaultsOfTheHeirService {
     }
 
     public void postInitialButtons(GenericInteractionCreateEvent event, Game game, Player player) {
-        String message =
-                player.getRepresentation() + ", please choose a technology to purge using " + vaultsRep() + ".";
+        String message = player.toString() + ", please choose a technology to purge using " + vaultsRep() + ".";
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
             TechnologyModel model = Mapper.getTech(tech);

@@ -45,11 +45,10 @@ public class StatusCleanupService {
                             continue;
                         }
                         if (CommandCounterHelper.hasCC(player, tile)) {
-                            String msg =
-                                    player.getRepresentation() + ", in order to remove your command token from tile "
-                                            + tile.getRepresentationForButtons()
-                                            + " you need to first spend 1 command token from your command sheet, due to the ability of the Errant, the Toldar flagship."
-                                            + " If you don't wish to spend this command token, then your token will stay in the system. Use buttons to decide.";
+                            String msg = player.toString() + ", in order to remove your command token from tile "
+                                    + tile.getRepresentationForButtons()
+                                    + " you need to first spend 1 command token from your command sheet, due to the ability of the Errant, the Toldar flagship."
+                                    + " If you don't wish to spend this command token, then your token will stay in the system. Use buttons to decide.";
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Buttons.gray("placeCCBack_" + tile.getPosition(), "Don't Spend"));
                             buttons.add(Buttons.red("lose1CC", "Spend 1 Command Token"));
@@ -63,7 +62,7 @@ public class StatusCleanupService {
             for (UnitHolder unitHolder : unitHolders.values()) {
                 unitHolder.removeAllCC();
                 unitHolder.removeAllUnitDamage();
-                if (unitHolder.getTokenList().contains(Constants.TOKEN_SEVERED)) {
+                if (unitHolder.containsToken(Constants.TOKEN_SEVERED)) {
                     unitHolder.removeToken(Constants.TOKEN_SEVERED);
                 }
             }
@@ -115,7 +114,7 @@ public class StatusCleanupService {
             }
             if (player.getPromissoryNotesInPlayArea().contains("sigma_cyber")) {
                 for (String planet : game.getPlanets()) {
-                    game.getPlanetsInfo().get(planet).removeToken("attachment_sigma_cyber.png");
+                    game.getPlanet(planet).removeToken("attachment_sigma_cyber.png");
                 }
                 player.removePromissoryNote("sigma_cyber");
                 Player nonActivePlayer = game.getPNOwner("sigma_cyber");
@@ -134,7 +133,7 @@ public class StatusCleanupService {
                     buttons.add(Buttons.red("undoPassOnAllWhensNAfters", "Undo Pass"));
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCardsInfoThread(),
-                            player.getRepresentation()
+                            player.toString()
                                     + ", at the start of the game you indicated a willingness to auto-pass on \"when\"s and \"after\"s if you had none, and so you have been auto-passed."
                                     + " You can undo this during the agenda if necessary, or with this button.",
                             buttons);
@@ -216,7 +215,7 @@ public class StatusCleanupService {
                             && tech != null) {
                         game.removeStoredValue(shareKnowledgeConst);
                         player.removeTech(sharedKnowledge);
-                        String msg = player.getRepresentation() + ", " + tech.getRepresentation(false)
+                        String msg = player.toString() + ", " + tech.getRepresentation(false)
                                 + " has been removed, and _Share Knowledge_ has been returned to "
                                 + (game.isFrankenGame() ? "the owner" : "the Deepwrought player") + ".";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);

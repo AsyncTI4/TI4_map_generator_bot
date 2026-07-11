@@ -89,8 +89,7 @@ public class FrankenMapBuildContextHelper {
 
     private static List<PlayerTiles> getPlayerTileStateFranken(Game game) {
         List<PlayerTiles> result = new ArrayList<>();
-        Set<String> placedTiles =
-                game.getTileMap().values().stream().map(Tile::getTileID).collect(Collectors.toSet());
+        Set<String> placedTiles = game.getTiles().stream().map(Tile::getTileID).collect(Collectors.toSet());
         String discardedTilesStr = game.getStoredValue(DISCARDS_KEY);
         Set<String> discardedTiles = new HashSet<>();
         if (discardedTilesStr != null && !discardedTilesStr.isEmpty()) {

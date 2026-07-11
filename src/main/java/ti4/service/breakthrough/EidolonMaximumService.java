@@ -23,6 +23,7 @@ import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.regex.RegexService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class EidolonMaximumService {
@@ -54,10 +55,10 @@ public class EidolonMaximumService {
     private void checkIfAbleToFlip(Game game, Player player) {
         if (!playerHasIdleMax(player)) return;
 
-        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)) {
+        for (Tile tile : UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Mech)) {
             int count = 0;
             List<UnitHolder> availableSpots = new ArrayList<>();
-            for (UnitHolder uh : tile.getUnitHolders().values()) {
+            for (UnitHolder uh : tile.getUnitHolderValues()) {
                 int x = uh.getUnitCount(UnitType.Mech, player);
                 if (x > 0) availableSpots.add(uh);
                 count += x;
@@ -93,7 +94,7 @@ public class EidolonMaximumService {
             String keepUnitHolder = matcher.group("unitholder");
 
             // validate that there are still 4 mechs here
-            int mechs = tile.getUnitHolders().values().stream()
+            int mechs = tile.getUnitHolderValues().stream()
                     .mapToInt(h -> h.getUnitCount(UnitType.Mech, player))
                     .sum();
             if (mechs < 4) {
@@ -105,7 +106,7 @@ public class EidolonMaximumService {
 
             // Remove all other mechs
             UnitKey mech = Units.getUnitKey(UnitType.Mech, player.getColorID());
-            for (UnitHolder uh : tile.getUnitHolders().values()) {
+            for (UnitHolder uh : tile.getUnitHolderValues()) {
                 if (uh.getName().equals(keepUnitHolder) || uh.getUnitCount(mech) == 4) {
                     uh.removeUnit(mech, uh.getUnitCount(mech) - 1);
                 } else {

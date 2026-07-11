@@ -41,7 +41,7 @@ public class NetrunnersFactionTechsHandler {
 
         MessageHelper.sendMessageToChannel(
                 netrunner.getCorrectChannel(),
-                netrunner.getRepresentation() + " gained " + StringHelper.pluralize(tgGain, "trade good")
+                netrunner.toString() + " gained " + StringHelper.pluralize(tgGain, "trade good")
                         + " from **Data Mining** with " + StringHelper.pluralize(tokenCount, "control token")
                         + " in their **"
                         + NetrunnersAbilitiesHandler.SYSTEM_BREACH_POOL + "** pool. "
@@ -108,8 +108,8 @@ public class NetrunnersFactionTechsHandler {
         if (tile == null) {
             return false;
         }
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0) {
+        for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
+            if (unitHolder.hasUnit(UnitType.Spacedock, player.getColor())) {
                 return true;
             }
         }

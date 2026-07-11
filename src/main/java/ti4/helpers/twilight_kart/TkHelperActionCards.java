@@ -146,7 +146,7 @@ public class TkHelperActionCards {
                 player.addLeader(cardID);
                 MessageHelper.sendMessageToChannelWithEmbed(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " has acquired the genome: "
+                        player.toString() + " has acquired the genome: "
                                 + Mapper.getLeader(cardID).getName(),
                         Mapper.getLeader(cardID).getRepresentationEmbed(true));
             } else {
@@ -187,14 +187,12 @@ public class TkHelperActionCards {
     @ButtonHandler("tkCommission_")
     private static void beginTkCommission(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         List<Button> buttons = game.getPlanetsInfo().values().stream()
-                .filter(p -> !p.isHomePlanet(game)
-                        && !p.hasUnits()
-                        && !player.getPlanetsAllianceMode().contains(p.getName()))
-                .filter(p -> game.getTileFromPlanet(p.getName()) != null)
-                .filter(p -> game.getUnitHolderFromPlanet(p.getName()) != null
-                        && !game.getUnitHolderFromPlanet(p.getName()).isSpaceStation()
-                        && !p.getTokenList().contains("dmz")
-                        && !p.getTokenList().contains("dmz_large"))
+                .filter(p -> !p.isHomePlanet(game) && !p.hasUnits() && !player.canUsePlanet(p.getName()))
+                .filter(p -> game.getTileContainingPlanet(p.getName()) != null)
+                .filter(p -> game.getPlanet(p.getName()) != null
+                        && !game.getPlanet(p.getName()).isSpaceStation()
+                        && !p.containsToken("dmz")
+                        && !p.containsToken("dmz_large"))
                 .map(p -> {
                     String id = player.factionButtonChecker() + "resolveTkCommission_" + p.getName();
                     String label = Helper.getPlanetRepresentation(p.getName(), game);
@@ -209,7 +207,7 @@ public class TkHelperActionCards {
                 .toList();
 
         String prefix = player.factionButtonChecker() + "resolveTkCommission__";
-        String message = player.getRepresentation() + ", please choose a planet to place 1 neutral mech on.";
+        String message = player.toString() + ", please choose a planet to place 1 neutral mech on.";
         NewStuffHelper.checkAndHandlePaginationChange(
                 event, player.getCorrectChannel(), buttons, message, prefix, buttonID);
         ButtonHelper.deleteMessage(event);
@@ -221,14 +219,14 @@ public class TkHelperActionCards {
         String regex = "resolveTkCommission_" + RegexHelper.unitHolderRegex(game, "planet");
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String planet = matcher.group("planet");
-            Tile tile = game.getTileFromPlanet(planet);
+            Tile tile = game.getTileContainingPlanet(planet);
             String units = "mech " + planet + ", pds " + planet;
             TeHelperActionCards.resolvePiratesGeneric(event, game, player, tile, units);
             player.setTg(player.getTg() - 2);
-            String message = player.getRepresentation() + " paid some mercenaries 2 trade goods to post up at "
+            String message = player.toString() + " paid some mercenaries 2 trade goods to post up at "
                     + Helper.getPlanetRepresentation(planet, game) + ".";
             if (tile != null && tile.getPosition().contains("frac")) {
-                Planet uh = game.getUnitHolderFromPlanet(planet);
+                Planet uh = game.getPlanet(planet);
                 if (uh != null) {
                     uh.addToken("token_relictoken.png");
                 }
@@ -251,7 +249,7 @@ public class TkHelperActionCards {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             TeHelperActionCards.resolvePiratesGeneric(event, game, player, tile, "dd, 2 ff");
 
-            String message = player.getRepresentation() + " conscripted some pirates to post up at "
+            String message = player.toString() + " conscripted some pirates to post up at "
                     + tile.getRepresentationForButtons(game, player) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.deleteMessage(event);
@@ -360,7 +358,7 @@ public class TkHelperActionCards {
         int ir = 0, ii = 0;
         int hr = 0, hi = 0;
         for (String p : player.getExhaustedPlanets()) {
-            Planet planet = game.getPlanetsInfo().get(p);
+            Planet planet = game.getPlanet(p);
             for (String type : planet.getPlanetTypes()) {
                 switch (type) {
                     case "cultural" -> {
@@ -403,7 +401,7 @@ public class TkHelperActionCards {
     private static void resolveTkInitiate(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String type = buttonID.split("_")[1];
 
-        String msg = player.getRepresentation() + " chose to ";
+        String msg = player.toString() + " chose to ";
         switch (type) {
             case "tgs" -> {
                 int c = ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", false);
@@ -418,7 +416,7 @@ public class TkHelperActionCards {
                 int res = 0, inf = 0;
                 List<String> refreshed = new ArrayList<>();
                 for (String p : List.copyOf(player.getExhaustedPlanets())) {
-                    Planet planet = game.getPlanetsInfo().get(p);
+                    Planet planet = game.getPlanet(p);
                     for (String t2 : planet.getPlanetTypes()) {
                         if (t2.equals(type)) {
                             player.refreshPlanet(p);
@@ -457,7 +455,7 @@ public class TkHelperActionCards {
     private static void ordainReadyPlanet(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String planetName = buttonID.replace("ordainReadyPlanet_", "");
         player.refreshPlanet(planetName);
-        Planet planet = game.getPlanetsInfo().get(planetName);
+        Planet planet = game.getPlanet(planetName);
 
         String msg = player.getRepresentationUnfogged() + " readied planet: ";
         msg += Helper.getPlanetRepresentation(planetName, game) + ".";
@@ -499,7 +497,7 @@ public class TkHelperActionCards {
     @ButtonHandler("ordainDiscardOne_")
     private static void ordainDiscardOne(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player victim = game.getPlayerFromColorOrFaction(buttonID.split("_")[2]);
-        Planet planet = game.getPlanetsInfo().get(buttonID.split("_")[1]);
+        Planet planet = game.getPlanet(buttonID.split("_")[1]);
 
         List<String> abilities = victim.getTechs();
         // If they have biosynthetic, then that is the only discardable ability
@@ -517,7 +515,7 @@ public class TkHelperActionCards {
         buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Decline"));
 
         String msg = player.getRepresentationUnfogged() + ", use the buttons to discard 1 of ";
-        msg += victim.getRepresentation() + "'s abilities. You may still decline to discard, if you so wish:";
+        msg += victim.toString() + "'s abilities. You may still decline to discard, if you so wish:";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -550,7 +548,7 @@ public class TkHelperActionCards {
         Player active = game.getActivePlayer();
         int tact = active.getTacticalCC();
         if (tact > 0 && !"1".equals(active.getStoredValue("TactStartOfAction"))) {
-            String msg2 = active.getRepresentation() + " has had 1 command token removed from their tactics pool. ";
+            String msg2 = active.toString() + " has had 1 command token removed from their tactics pool. ";
             msg2 += "(" + tact + " ->" + (tact - 1) + ")";
             active.setTacticalCC(tact - 1);
 

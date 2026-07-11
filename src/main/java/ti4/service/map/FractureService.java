@@ -32,7 +32,7 @@ import ti4.service.unit.AddUnitService;
 public class FractureService {
 
     public static boolean isFractureInPlay(Game game) {
-        return game.getTileFromPlanet("styx") != null
+        return game.getTileContainingPlanet("styx") != null
                 || Stream.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7")
                         .allMatch(pos -> game.getTileByPosition(pos) != null);
     }
@@ -104,7 +104,7 @@ public class FractureService {
         List<Tile> automaticAdds = new ArrayList<>();
         List<String> errors = new ArrayList<>();
 
-        Tile extra = game.getTileFromPlanet(Constants.THUNDERSEDGE);
+        Tile extra = game.getTileContainingPlanet(Constants.THUNDERSEDGE);
         if (extra == null) extra = game.getMecatolTile();
         if (extra != null) automaticAdds.add(extra);
         if (extra == null) errors.add("Could not find Thunder's Edge or Mecatol Rex.");
@@ -156,7 +156,7 @@ public class FractureService {
 
             String msg = game.isFowMode()
                     ? GMService.gmPing(game)
-                    : player.getRepresentation() + ", please choose a system with a " + type.emoji()
+                    : player.toString() + ", please choose a system with a " + type.emoji()
                             + " to place an Ingress token.";
             buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
             MessageHelper.sendMessageToChannelWithButtons(
@@ -197,9 +197,9 @@ public class FractureService {
     private static List<Tile> getTilesWithSkipAndNoIngressAndNotAdding(
             Game game, TechnologyType type, List<Tile> alreadyCounted) {
         List<Tile> tiles = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (alreadyCounted.contains(tile)) continue;
-            if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS)) continue;
+            if (tile.getSpaceUnitHolder().containsToken(Constants.TOKEN_INGRESS)) continue;
             if (tile.getPlanetUnitHolders().stream().anyMatch(p -> p.hasTechSpecialty(type))) tiles.add(tile);
         }
         return tiles;

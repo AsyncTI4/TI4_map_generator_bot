@@ -24,7 +24,7 @@ public class PlayerTitleHelper {
 
     public static void offerEveryoneTitlePossibilities(Game game) {
         for (Player player : game.getRealAndEliminatedPlayers()) {
-            String msg = player.getRepresentation()
+            String msg = player.toString()
                     + ", you have the opportunity to anonymously bestow one title on someone else in this game."
                     + " Titles are just for fun, and have no real significance, but could a nice way to take something away from this game."
                     + " Feel free to not. If you choose to, it's a 2 button process. First select the title, then the player you wish to bestow it upon.\n\n"
@@ -67,7 +67,7 @@ public class PlayerTitleHelper {
             var userSettings = UserSettingsManager.get(player.getUserID());
             if (!userSettings.isHasIndicatedStatPreferences()) {
                 buttons = getOptInButtons(game, player);
-                msg = player.getRepresentation() + ", congratz on finishing a game of async!"
+                msg = player.toString() + ", congratz on finishing a game of async!"
                         + " Async has a website that collects and displays games and player stats, but we don't want to display your game stats without your permission."
                         + " You can indicate what you're comfortable with displaying below with the buttons, and once you submit an answer you will not be asked again."
                         + " However, you can always change your preferences with the `/statisticis opt_in` and `/statistics opt_out` commands."
@@ -348,8 +348,7 @@ public class PlayerTitleHelper {
     public static void resolveBestowTitleStep1(
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String title = buttonID.split("_")[1];
-        String msg = player.getRepresentation() + ", please choose the player you wish to give the title of \"" + title
-                + "\".";
+        String msg = player.toString() + ", please choose the player you wish to give the title of \"" + title + "\".";
         List<Button> buttons = new ArrayList<>();
         for (Player player2 : game.getRealPlayersNDummies()) {
             if (player2 == player) {
@@ -369,7 +368,7 @@ public class PlayerTitleHelper {
         String title = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
-        String msg = p2.getRepresentation() + ", someone has chosen to give you the title of \"" + title + "\".";
+        String msg = p2.toString() + ", someone has chosen to give you the title of \"" + title + "\".";
         String titles = game.getStoredValue("TitlesFor" + p2.getUserID());
         if (titles.isEmpty()) {
             game.setStoredValue("TitlesFor" + p2.getUserID(), title);

@@ -22,7 +22,7 @@ public class AddPlanetToPlayAreaService {
             return;
         }
 
-        Planet planet = tile.getUnitHolderFromPlanet(planetName);
+        Planet planet = tile.getPlanet(planetName);
         if (planet == null) return;
 
         Set<UnitKey> allUnitsOnPlanet = planet.getUnitKeys();
@@ -42,7 +42,7 @@ public class AddPlanetToPlayAreaService {
             if (player.getFaction() != null && player.getColor() != null) {
                 String colorID = Mapper.getColorID(player.getColor());
                 if (unitColor.equals(colorID)) {
-                    if (!player.getPlanetsAllianceMode().contains(planetName)) {
+                    if (!player.canUsePlanet(planetName)) {
                         AddPlanetService.addPlanet(player, planetName, game, event, false);
                     }
                     break;

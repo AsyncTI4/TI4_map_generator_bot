@@ -26,7 +26,7 @@ public class OnyxxaLeaderHandler {
         String msg = targetPlayer.getRepresentationUnfogged()
                 + ", please choose the system that you wish to move a ship from.";
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (FoWHelper.playerHasShipsInSystem(targetPlayer, tile)) {
                 buttons.add(Buttons.green(
                         "moveShipToAdjacentSystemStep2_" + tile.getPosition() + "_agent",
@@ -74,7 +74,7 @@ public class OnyxxaLeaderHandler {
 
     public static void postHeroMoveShipButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (FoWHelper.playerHasActualShipsInSystem(player, tile)) {
                 buttons.add(Buttons.green(
                         "moveShipToAdjacentSystemStep2_" + tile.getPosition() + "_combat",
@@ -84,14 +84,14 @@ public class OnyxxaLeaderHandler {
         buttons.add(Buttons.red("onyxxaHeroDone", "Done Resolving"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", please use buttons to resolve your _Titles Are Silly_ hero ability.",
+                player.toString() + ", please use buttons to resolve your _Titles Are Silly_ hero ability.",
                 buttons);
     }
 
     @ButtonHandler("onyxxaHeroDone")
     public static void onyxxaHeroDone(ButtonInteractionEvent event, Player player, Game game) {
         ButtonHelper.deleteMessage(event);
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (FoWHelper.playerHasActualShipsInSystem(player, tile)
                     && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                 StartCombatService.combatCheck(game, event, tile);

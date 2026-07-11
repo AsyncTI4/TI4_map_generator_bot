@@ -34,7 +34,7 @@ public class StoneEmbraceService {
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
         if (!canUseStoneEmbrace(player, primary, scModel)) return;
 
-        StringBuilder msg = new StringBuilder(player.getRepresentation())
+        StringBuilder msg = new StringBuilder(player.toString())
                 .append(" since you have ")
                 .append("Stone's Embrace")
                 .append(" you may exhaust a planet you control")
@@ -59,8 +59,7 @@ public class StoneEmbraceService {
         Integer sc = Integer.parseInt(buttonID.split("_")[1]);
         String planet = buttonID.split("_")[2];
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
-        if (!player.getFollowedSCs().contains(sc))
-            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, sc, game, event);
+        if (!player.hasFollowedSC(sc)) ButtonHelperFactionSpecific.resolveVadenSCDebt(player, sc, game, event);
         player.addFollowedSC(sc, event);
         StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), sc)
                 .ifPresent(scMessage ->

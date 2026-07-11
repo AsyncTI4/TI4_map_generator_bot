@@ -26,8 +26,7 @@ class ClassifiedRiderAcd2ButtonHandler {
         if (peekedSecrets.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + ", the secret objective deck is empty; _Classified Rider_ cannot be resolved.");
+                    player.toString() + ", the secret objective deck is empty; _Classified Rider_ cannot be resolved.");
             ButtonHelper.deleteMessage(event);
             return;
         }

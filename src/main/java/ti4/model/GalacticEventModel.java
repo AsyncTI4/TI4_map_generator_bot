@@ -56,6 +56,11 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
         return getRepresentation(null);
     }
 
+    @Override
+    public String toString() {
+        return getRepresentation();
+    }
+
     public int getComplexity() {
         return complexity == null ? 1 : complexity;
     }

@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
@@ -31,22 +30,16 @@ class SurveyAcd2ButtonHandler {
     public static void resolveSurvey(Player player, Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
 
-        List<Button> buttons = new ArrayList<>();
-        for (String planetName : player.getPlanetsAllianceMode()) {
-            Planet planet = game.getPlanetsInfo().get(planetName);
-            if (planet == null) {
-                continue;
-            }
-            for (String trait : TRAITS) {
-                if (planet.getPlanetTypes().contains(trait)) {
-                    buttons.add(Buttons.gray(
-                            player.factionButtonChecker() + "surveySelect_" + planetName + "_" + trait,
-                            "Explore " + Helper.getPlanetRepresentation(planetName, game) + " ("
-                                    + StringUtils.capitalize(trait) + ")",
-                            ExploreEmojis.getTraitEmoji(trait)));
-                }
-            }
-        }
+        List<Button> buttons = game.streamUsablePlanetLocations(player)
+                .flatMap(location -> TRAITS.stream()
+                        .filter(location.planet()::hasType)
+                        .map(trait -> Buttons.gray(
+                                player.factionButtonChecker() + "surveySelect_"
+                                        + location.planet().getName() + "_" + trait,
+                                "Explore " + location.planet().getRepresentation(game) + " ("
+                                        + StringUtils.capitalize(trait) + ")",
+                                ExploreEmojis.getTraitEmoji(trait))))
+                .toList();
 
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -70,7 +63,7 @@ class SurveyAcd2ButtonHandler {
         }
         String planetName = parts[0];
         String trait = parts[1];
-        if (!player.getPlanetsAllianceMode().contains(planetName)) {
+        if (!player.canUsePlanet(planetName)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), "You no longer control that planet for _Survey_.");
             ButtonHelper.deleteMessage(event);
@@ -180,8 +173,8 @@ class SurveyAcd2ButtonHandler {
 
     private static void resolveCard(
             Player player, Game game, ButtonInteractionEvent event, String cardId, String planetName) {
-        Tile tile = game.getTileFromPlanet(planetName);
-        String messageText = player.getRepresentation() + " resolved _"
+        Tile tile = game.getTileContainingPlanet(planetName);
+        String messageText = player.toString() + " resolved _"
                 + Mapper.getExplore(cardId).getName() + "_ on " + Helper.getPlanetRepresentation(planetName, game)
                 + " for _Survey_:";
         ExploreService.resolveExplore(event, cardId, tile, planetName, messageText, player, game);

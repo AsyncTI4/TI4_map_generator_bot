@@ -49,8 +49,7 @@ public class EdictPhaseHandler {
                     Buttons.green(tyrant.factionButtonChecker() + "resolveEdict_" + edicts.get(x), edict.getName()));
             embeds.add(edict.getRepresentationEmbed());
         }
-        String msg = tyrant.getRepresentation()
-                + " as Tyrant, you should now choose which of the 3 edicts you wish to resolve.";
+        String msg = tyrant.toString() + " as Tyrant, you should now choose which of the 3 edicts you wish to resolve.";
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(tyrant.getCorrectChannel(), msg, embeds, buttons);
         ButtonHelper.deleteMessage(event);
     }

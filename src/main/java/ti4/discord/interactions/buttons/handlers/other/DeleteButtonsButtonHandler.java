@@ -364,7 +364,7 @@ class DeleteButtonsButtonHandler {
                         && player.getHomeSystemTile() == tile
                         && !ButtonHelperAbilities.getTilesToRallyToTheCause(game, player)
                                 .isEmpty()) {
-                    String msg = player.getRepresentation()
+                    String msg = player.toString()
                             + " due to your **Rally to the Cause** ability, if you just produced a ship in your home system,"
                             + " you may produce up to 2 ships in a system that contains a planet with a trait,"
                             + " but does not contain a legendary planet or another player's units. Please use the button to resolve.";
@@ -374,7 +374,7 @@ class DeleteButtonsButtonHandler {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
                 }
                 if (player.hasTech("tf-rallythehorde")) {
-                    String msg = player.getRepresentation()
+                    String msg = player.toString()
                             + " due to your **Rally the Horde** ability, if you just produced a ship,"
                             + " you may place a neutral ship of that type in any system which does not possess any non-neutral ships. Press button to resolve";
                     List<Button> buttons2 = new ArrayList<>();
@@ -407,9 +407,8 @@ class DeleteButtonsButtonHandler {
                 if (!game.getStoredValue("lumi7System").isEmpty()) {
                     Tile tile = game.getTileByPosition(game.getStoredValue("lumi7System"));
                     CommandCounterHelper.addCC(event, player, tile);
-                    String message =
-                            player.getFactionEmojiOrColor() + " placed 1 command token from reinforcements in the "
-                                    + tile.getRepresentation() + " system.";
+                    String message = player.getFactionEmojiOrColor()
+                            + " placed 1 command token from reinforcements in the " + tile.toString() + " system.";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 }
             }

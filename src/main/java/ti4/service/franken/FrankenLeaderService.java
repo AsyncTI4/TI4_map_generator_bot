@@ -30,7 +30,7 @@ public class FrankenLeaderService {
             return;
         }
 
-        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added leaders:\n");
+        StringBuilder sb = new StringBuilder(player.toString()).append(" added leaders:\n");
         Boolean fakeCommanders = false;
         if (event instanceof SlashCommandInteractionEvent slash) {
             fakeCommanders = slash.getOption(Constants.FAKE_COMMANDERS, OptionMapping::getAsBoolean);
@@ -70,7 +70,7 @@ public class FrankenLeaderService {
     }
 
     public static void removeLeaders(GenericInteractionCreateEvent event, Player player, List<String> leaderIDs) {
-        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed leaders:\n");
+        StringBuilder sb = new StringBuilder(player.toString()).append(" removed leaders:\n");
         Game game = player.getGame();
         for (String leaderID : leaderIDs) {
             if (!player.hasLeader(leaderID)) {

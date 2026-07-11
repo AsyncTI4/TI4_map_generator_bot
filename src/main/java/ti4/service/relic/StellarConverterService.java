@@ -25,12 +25,12 @@ public class StellarConverterService {
 
     public static void secondHalfOfStellar(
             Game game, String planetName, GenericInteractionCreateEvent event, Player player) {
-        Tile tile = game.getTileFromPlanet(planetName);
+        Tile tile = game.getTileContainingPlanet(planetName);
         if (tile == null) {
             MessageHelper.replyToMessage(event, "System not found that contains planet.");
             return;
         }
-        UnitHolder unitHolder = tile.getUnitHolderFromPlanet(planetName);
+        UnitHolder unitHolder = tile.getPlanet(planetName);
         if (unitHolder == null) {
             MessageHelper.replyToMessage(event, "System not found that contains planet.");
             return;
@@ -44,7 +44,7 @@ public class StellarConverterService {
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message1);
         Player p = null;
         for (Player p2 : game.getRealPlayers()) {
-            if (p2.getPlanets().contains(planetName)) {
+            if (p2.containsPlanet(planetName)) {
                 p = p2;
                 MessageHelper.sendMessageToChannel(
                         p2.getCorrectChannel(),
@@ -66,12 +66,9 @@ public class StellarConverterService {
         if (player == null) {
             player = game.getPlayer(event.getUser().getId());
         }
-        message2.append(player.getRepresentation());
+        message2.append(player.toString());
         DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 0, message2 + ".");
-        if (game.isConventionsOfWarAbandonedMode()
-                && tile.isHomeSystem(game)
-                && tile.getPlanetUnitHolders().isEmpty()
-                && p != null) {
+        if (game.isConventionsOfWarAbandonedMode() && tile.isHomeSystem(game) && !tile.hasPlanets() && p != null) {
             if (event instanceof ButtonInteractionEvent buttonEvent) {
                 ButtonHelper.eliminatePlayer(game, buttonEvent, "eliminatePlayer_" + p.getFaction());
             }

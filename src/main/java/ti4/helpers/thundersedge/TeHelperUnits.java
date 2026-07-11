@@ -31,6 +31,7 @@ import ti4.model.UnitModel;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
+import ti4.service.unit.UnitQueryService;
 
 public final class TeHelperUnits {
 
@@ -59,7 +60,7 @@ public final class TeHelperUnits {
 
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         UnitHolder space = tile.getSpaceUnitHolder();
-        boolean hasBreach = space.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
+        boolean hasBreach = space.containsToken(Constants.TOKEN_BREACH_ACTIVE);
         boolean hasShips = tile.containsPlayersUnitsWithModelCondition(player, UnitModel::isNonFighterShip);
         if (!hasBreach && !(game.isTwilightKart() && hasShips)) {
             MessageHelper.sendMessageToChannel(
@@ -68,7 +69,8 @@ public final class TeHelperUnits {
         }
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String planet = matcher.group("planet");
-            AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "1 mech " + planet);
+            AddUnitService.addUnits(
+                    event, game.getTileContainingPlanet(planet), game, player.getColor(), "1 mech " + planet);
             String planetRep = Helper.getPlanetRepresentation(planet, game);
             String boringMsg = player.getRepresentation(true, false) + " deployed a Revenant on " + planetRep + ".";
             String flavorMsg = "Out of the cold depths of " + (game.isTwilightKart() ? "space" : "the active breach");
@@ -87,22 +89,22 @@ public final class TeHelperUnits {
     public static boolean affectedByQuietus(Game game, Player player, UnitHolder uh) {
         // Get the actual space unit holder if able
         if (!"space".equals(uh.getName())) {
-            Tile t = game.getTileFromPlanet(uh.getName());
+            Tile t = game.getTileContainingPlanet(uh.getName());
             if (t == null) return false;
             uh = t.getSpaceUnitHolder();
         }
 
         // The crimson rebellion player exists, and the tile has a breach
         Player crimson = Helper.getPlayerFromUnit(game, "crimson_flagship");
-        if (uh == null || crimson == null || !uh.getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE)) {
+        if (uh == null || crimson == null || !uh.containsToken(Constants.TOKEN_BREACH_ACTIVE)) {
             return false;
         }
 
         // The crimson (fs) player has their flagship on a breach as well, and the affected player is not crimson
-        for (Tile fs : ButtonHelper.getTilesOfPlayersSpecificUnits(game, crimson, UnitType.Flagship)) {
-            if (fs.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE)
+        for (Tile fs : UnitQueryService.getTilesContainingPlayersUnits(game, crimson, UnitType.Flagship)) {
+            if (fs.getSpaceUnitHolder().containsToken(Constants.TOKEN_BREACH_ACTIVE)
                     && player != crimson
-                    && !crimson.getAllianceMembers().contains(player.getFaction())) {
+                    && !crimson.hasAllianceMember(player.getFaction())) {
                 return true;
             }
         }
@@ -111,10 +113,10 @@ public final class TeHelperUnits {
         // nekro
         Player nekro = Helper.getPlayerFromUnlockedBreakthrough(game, "nekrobt");
         if (nekro != null && nekro.hasUnit("crimson_flagship")) {
-            for (Tile fs : ButtonHelper.getTilesOfPlayersSpecificUnits(game, nekro, UnitType.Flagship)) {
-                if (fs.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE)
+            for (Tile fs : UnitQueryService.getTilesContainingPlayersUnits(game, nekro, UnitType.Flagship)) {
+                if (fs.getSpaceUnitHolder().containsToken(Constants.TOKEN_BREACH_ACTIVE)
                         && player != nekro
-                        && !nekro.getAllianceMembers().contains(player.getFaction())) {
+                        && !nekro.hasAllianceMember(player.getFaction())) {
                     return true;
                 }
             }
@@ -141,7 +143,7 @@ public final class TeHelperUnits {
                 matcher -> {
                     Tile tile = game.getTileByPosition(matcher.group("pos"));
                     List<Button> buttons = getForerunnerSystemButtons(game, player, tile, forerunnerMap);
-                    String message = player.getRepresentation()
+                    String message = player.toString()
                             + ", please choose the system to move ground forces from using your Alarum, or click \"Done Moving\".";
                     message += TeHelperAbilities.unitSummary(game, player, forerunnerMap);
                     MessageHelper.editMessageWithButtons(event, message, buttons);
@@ -157,7 +159,7 @@ public final class TeHelperUnits {
             Tile source = game.getTileByPosition(matcher.group("source"));
             List<Button> buttons = getForerunnerUnitButtonsForSystem(
                     game, player, tile, source, forerunnerMap.get(matcher.group("source")));
-            String message = player.getRepresentation()
+            String message = player.toString()
                     + ", please choose the ground forces to move with your Alarum, or click \"Done Moving\" to move from a different system.";
             message += TeHelperAbilities.unitSummary(game, player, forerunnerMap);
             MessageHelper.editMessageWithButtons(event, message, buttons);
@@ -191,7 +193,7 @@ public final class TeHelperUnits {
 
             List<Button> buttons =
                     getForerunnerUnitButtonsForSystem(game, player, destination, source, forerunnerMap.get(pos));
-            String message = player.getRepresentation()
+            String message = player.toString()
                     + ", please choose the ground forces to move with your Alarum, or click \"Done Moving\" to move from a different system.";
             message += TeHelperAbilities.unitSummary(game, player, forerunnerMap);
             MessageHelper.editMessageWithButtons(event, message, buttons);
@@ -228,7 +230,7 @@ public final class TeHelperUnits {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitStrTo);
             }
             game.removeStoredValue("forerunnerMovementMap");
-            String msg = player.getRepresentation()
+            String msg = player.toString()
                     + " moved the following units into the active system with an Alarum:"
                     + TeHelperAbilities.unitSummary(game, player, forerunnerMap);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -329,7 +331,7 @@ public final class TeHelperUnits {
             if (player.is(relicDrawer)) continue;
             if (!player.hasUnit("naalu_mech_te") || ButtonHelper.isLawInPlay(game, "articles_war")) continue;
 
-            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
+            if (UnitQueryService.countUnits(game, player, "mech", true) < 4) {
                 List<Button> buttons = new ArrayList<>(
                         Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
                 buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Decline To Deploy Mech"));

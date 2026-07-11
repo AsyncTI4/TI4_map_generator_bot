@@ -481,7 +481,7 @@ class DefectorsAcd2ButtonHandler {
 
     private static Set<String> getDefectorsEligibleDestinationPositions(Game game, Player player) {
         Set<String> positions = new HashSet<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (isDefectorsPlacementTileEligible(player, game, tile)) {
                 positions.add(tile.getPosition());
             }

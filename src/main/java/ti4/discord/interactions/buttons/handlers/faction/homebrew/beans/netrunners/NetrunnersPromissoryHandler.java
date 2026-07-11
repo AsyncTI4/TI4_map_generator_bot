@@ -20,6 +20,7 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class NetrunnersPromissoryHandler {
@@ -220,15 +221,15 @@ public class NetrunnersPromissoryHandler {
     }
 
     private static List<Tile> getEligibleStructureTiles(Game game, Player player) {
-        return ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Pds, UnitType.Spacedock).stream()
+        return UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Pds, UnitType.Spacedock).stream()
                 .sorted(Comparator.comparing(Tile::getPosition))
                 .toList();
     }
 
     private static List<String> getEligibleStructurePlanets(Tile tile, Player player) {
         return tile.getPlanetUnitHolders().stream()
-                .filter(planet -> planet.getUnitCount(UnitType.Pds, player.getColor()) > 0
-                        || planet.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)
+                .filter(planet -> planet.hasUnit(UnitType.Pds, player.getColor())
+                        || planet.hasUnit(UnitType.Spacedock, player.getColor()))
                 .map(Planet::getName)
                 .sorted()
                 .toList();

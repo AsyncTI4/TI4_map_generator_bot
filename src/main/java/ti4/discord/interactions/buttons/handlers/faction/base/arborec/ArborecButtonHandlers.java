@@ -18,7 +18,7 @@ import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.unit.AddUnitService;
-import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class ArborecButtonHandlers {
@@ -93,7 +93,7 @@ public class ArborecButtonHandlers {
         Tile tile = TileHelper.getTile(event, planet, game);
         buttons = Helper.getPlaceUnitButtons(
                 event, player, game, tile, "arboCommander", "placeOneNDone_dontskiparboCommander");
-        String message = player.getRepresentation() + " Use the buttons to produce 1 unit. "
+        String message = player.toString() + " Use the buttons to produce 1 unit. "
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
@@ -102,8 +102,8 @@ public class ArborecButtonHandlers {
     public static List<Button> getArboHeroButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         List<Tile> tiles = new ArrayList<>();
-        tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Infantry));
-        tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Mech));
+        tiles.addAll(UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Infantry));
+        tiles.addAll(UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Mech));
         List<String> poses = new ArrayList<>();
         for (Tile tile : tiles) {
             if (!poses.contains(tile.getPosition())) {
@@ -121,7 +121,7 @@ public class ArborecButtonHandlers {
         String pos = buttonID.split("_")[1];
         List<Button> buttons =
                 Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "arboHeroBuild", "place");
-        String message = player.getRepresentation() + " Use the buttons to produce units. ";
+        String message = player.toString() + " Use the buttons to produce units. ";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }

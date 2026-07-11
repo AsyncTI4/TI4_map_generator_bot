@@ -38,8 +38,7 @@ class RelicPurge extends GameStateSubcommand {
         if (relicData != null) {
             MessageHelper.sendMessageToEventChannel(
                     event,
-                    player.getRepresentation() + " purged the relic _" + relicData.getName() + "_.\n> "
-                            + relicData.getText());
+                    player.toString() + " purged the relic _" + relicData.getName() + "_.\n> " + relicData.getText());
             RelicInfoService.sendRelicInfo(getGame(), player, event);
         } else {
             MessageHelper.sendMessageToEventChannel(event, "Good job, purged that bad relic.");

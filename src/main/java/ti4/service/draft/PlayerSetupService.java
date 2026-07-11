@@ -250,8 +250,7 @@ public class PlayerSetupService {
         if (isSpeaker) {
             game.setSpeakerUserID(player.getUserID());
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    MiscEmojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
+                    player.getCorrectChannel(), MiscEmojis.SpeakerToken + " Speaker assigned to: " + player.toString());
         }
         if (!game.isTwilightsFallMode()) {
             // STARTING PNs
@@ -379,7 +378,7 @@ public class PlayerSetupService {
             buttons.add(Buttons.green("startAncientEmpire", "Place a tomb token"));
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", please place up to 14 Tomb tokens for **Ancient Empire**.",
+                    player.toString() + ", please place up to 14 Tomb tokens for **Ancient Empire**.",
                     buttons);
         }
 
@@ -388,16 +387,14 @@ public class PlayerSetupService {
             player.setUnitCap(unitID, 12);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "Set destroyer max to 12 for " + player.getRepresentation()
-                            + ", due to the **Private Fleet** ability,");
+                    "Set destroyer max to 12 for " + player.toString() + ", due to the **Private Fleet** ability,");
         }
         if (player.hasAbility("industrialists")) {
             String unitID = AliasHandler.resolveUnit("spacedock");
             player.setUnitCap(unitID, 4);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "Set space dock max to 4 for " + player.getRepresentation()
-                            + ", due to the **Industrialists** ability,");
+                    "Set space dock max to 4 for " + player.toString() + ", due to the **Industrialists** ability,");
         }
         if (player.hasAbility("teeming")) {
             String unitID = AliasHandler.resolveUnit("dreadnought");
@@ -406,7 +403,7 @@ public class PlayerSetupService {
             player.setUnitCap(unitID, 5);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
+                    "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.toString()
                             + ", due to the **Teeming** ability.");
         }
         if (player.hasAbility("machine_cult")) {
@@ -414,8 +411,7 @@ public class PlayerSetupService {
             player.setUnitCap(unitID, 6);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "Set mech unit maximum to 6 for " + player.getRepresentation()
-                            + ", due to their **Machine Cult** ability.");
+                    "Set mech unit maximum to 6 for " + player.toString() + ", due to their **Machine Cult** ability.");
         }
         if (player.hasAbility("occupational_hazard")) {
             game.setStoredValue("opaBelterWayResolved", "");
@@ -439,7 +435,7 @@ public class PlayerSetupService {
             player.addTech(tech);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " gained the "
+                    player.toString() + " gained the "
                             + Mapper.getTech(tech).getNameRepresentation()
                             + " technology due to the _Age of Fighters_ galactic event.");
         }
@@ -466,7 +462,7 @@ public class PlayerSetupService {
                 player.addTech(tech);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " gained the "
+                        player.toString() + " gained the "
                                 + Mapper.getTech(tech).getNameRepresentation()
                                 + " technology due to the _Advent of the Warsun_ galactic event.");
             }
@@ -509,7 +505,7 @@ public class PlayerSetupService {
             player.setUnitCap(unitID, 6);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "Set mech unit maximum to 6 for " + player.getRepresentation()
+                    "Set mech unit maximum to 6 for " + player.toString()
                             + ", due to their **Mechanized Military** ability.");
         }
         if (player.hasAbility("doctrine") && player.hasAbility("paradigm") && player.hasAbility("natau_decree")) {
@@ -524,13 +520,12 @@ public class PlayerSetupService {
         if (player.hasAbility("factory_lease")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + " added the three \"Factory Lease\" promissory notes to their reinforcements.");
+                    player.toString() + " added the three \"Factory Lease\" promissory notes to their reinforcements.");
         }
         if (player.hasAbility("cycle_of_reclamation")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " added the 5 _Moon Phase_ cards to their play area.");
+                    player.toString() + " added the 5 _Moon Phase_ cards to their play area.");
         }
         CardsInfoService.sendVariousAdditionalButtons(game, player);
 
@@ -564,7 +559,7 @@ public class PlayerSetupService {
             player.setFleetCC(2);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "Set fleet pool to contain 2 command tokens for " + player.getRepresentation()
+                    "Set fleet pool to contain 2 command tokens for " + player.toString()
                             + ", due to the Kaltrim setup.");
         }
 

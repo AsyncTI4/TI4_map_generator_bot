@@ -43,7 +43,7 @@ class AddTileListRandom extends GameStateSubcommand {
         // Inject a new action row to the modal
         Modal.Builder newModalBuilder = Modal.create(modal.getId(), modal.getTitle());
         modal.getComponents().forEach(newModalBuilder::addComponents);
-        boolean hasExistingErTiles = game.getTileMap().values().stream()
+        boolean hasExistingErTiles = game.getTiles().stream()
                 .anyMatch(t -> t.getTileID().toLowerCase().startsWith("er"));
         TextInput sourcesInput = TextInput.create(Constants.INCLUDE_ERONOUS_TILES, TextInputStyle.SHORT)
                 .setPlaceholder("(Y)es / (N)o")

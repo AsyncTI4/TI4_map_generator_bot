@@ -20,15 +20,14 @@ class CompoundingInterestsAcd2ButtonHandler {
 
     @ButtonHandler("resolveCompoundingInterests")
     public static void resolveCompoundingInterests(Player player, Game game, ButtonInteractionEvent event) {
-        int tokenCount = (int) game.getTileMap().values().stream()
+        int tokenCount = (int) game.getTiles().stream()
                 .filter(tile -> CommandCounterHelper.hasCC(player, tile))
                 .count();
         ButtonHelper.deleteMessage(event);
         if (tokenCount == 0) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + " has no command tokens on the board; _Compounding Interests_ has no effect.");
+                    player.toString() + " has no command tokens on the board; _Compounding Interests_ has no effect.");
             return;
         }
         sendChoiceButtons(player, tokenCount);

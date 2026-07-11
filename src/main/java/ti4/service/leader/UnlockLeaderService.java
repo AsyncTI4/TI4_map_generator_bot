@@ -21,10 +21,9 @@ public class UnlockLeaderService {
         LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
         String message;
         if (leaderModel != null) {
-            message = player.getRepresentation() + " has unlocked their " + leaderModel.getType() + ".";
+            message = player.toString() + " has unlocked their " + leaderModel.getType() + ".";
         } else {
-            message =
-                    player.getRepresentation() + " unlocked " + Helper.getLeaderFullRepresentation(playerLeader) + ".";
+            message = player.toString() + " unlocked " + Helper.getLeaderFullRepresentation(playerLeader) + ".";
         }
         unlockLeader(leaderID, game, player, message);
     }

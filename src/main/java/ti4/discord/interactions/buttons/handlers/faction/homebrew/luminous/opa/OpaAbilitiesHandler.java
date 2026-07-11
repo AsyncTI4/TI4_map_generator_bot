@@ -56,7 +56,7 @@ public class OpaAbilitiesHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation()
+                player.toString()
                         + ", you may replace 1 anomaly system without planets with an asteroid field system tile using **Occupational Hazard**.",
                 buttons);
     }
@@ -94,7 +94,7 @@ public class OpaAbilitiesHandler {
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " replaced " + oldTileRepresentation + " with "
+                player.toString() + " replaced " + oldTileRepresentation + " with "
                         + newTile.getRepresentationForButtons(game, player) + " using **Occupational Hazard**.");
         resolveBelterWay(game, player);
         ButtonHelper.deleteMessage(event);
@@ -111,16 +111,13 @@ public class OpaAbilitiesHandler {
     }
 
     private static boolean isOccupationalHazardTarget(Game game, Player player, Tile tile) {
-        return tile != null
-                && tile.isAnomaly(game, player)
-                && !tile.isAsteroidField()
-                && tile.getPlanetUnitHolders().isEmpty();
+        return tile != null && tile.isAnomaly(game, player) && !tile.isAsteroidField() && !tile.hasPlanets();
     }
 
     private static List<TileModel> getOccupationalHazardCandidates(Game game) {
         boolean includeEronous = Boolean.parseBoolean(game.getStoredValue(Constants.INCLUDE_ERONOUS_TILES));
         Set<ComponentSource> sources = AddTileService.getSources(game, includeEronous);
-        Set<TileModel> existingTileModels = game.getTileMap().values().stream()
+        Set<TileModel> existingTileModels = game.getTiles().stream()
                 .map(Tile::getTileModel)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
@@ -146,12 +143,12 @@ public class OpaAbilitiesHandler {
         }
         game.setStoredValue(BELTER_WAY_RESOLVED, player.getFaction());
 
-        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" resolved **The Belter Way**.");
+        StringBuilder message = new StringBuilder(player.toString()).append(" resolved **The Belter Way**.");
 
         Tile homeTile = player.getHomeSystemTile();
         if (homeTile != null) {
             placeBrokenPlanet(game, homeTile, Constants.BROKENPLANET1);
-            if (!player.getPlanets().contains(Constants.BROKENPLANET1)) {
+            if (!player.containsPlanet(Constants.BROKENPLANET1)) {
                 AddPlanetService.addPlanet(player, Constants.BROKENPLANET1, game, null, true);
                 player.refreshPlanet(Constants.BROKENPLANET1);
             }
@@ -160,7 +157,7 @@ public class OpaAbilitiesHandler {
                     .append(".");
         }
 
-        List<Tile> eligibleAsteroidTiles = game.getTileMap().values().stream()
+        List<Tile> eligibleAsteroidTiles = game.getTiles().stream()
                 .filter(Objects::nonNull)
                 .filter(Tile::isAsteroidField)
                 .filter(tile -> homeTile == null || !tile.getPosition().equals(homeTile.getPosition()))
@@ -193,7 +190,7 @@ public class OpaAbilitiesHandler {
     }
 
     private static void placeBrokenPlanet(Game game, Tile tile, String planetName) {
-        if (tile == null || tile.getUnitHolderFromPlanet(planetName) != null) {
+        if (tile == null || tile.getPlanet(planetName) != null) {
             return;
         }
         AddTokenCommand.addToken(null, tile, planetName, game);
@@ -209,6 +206,6 @@ public class OpaAbilitiesHandler {
                                 Constants.BROKENPLANET5,
                                 Constants.BROKENPLANET6)
                         .stream()
-                        .anyMatch(planetName -> tile.getUnitHolderFromPlanet(planetName) != null);
+                        .anyMatch(planetName -> tile.getPlanet(planetName) != null);
     }
 }

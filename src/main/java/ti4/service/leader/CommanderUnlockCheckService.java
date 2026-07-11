@@ -18,7 +18,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
-import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class CommanderUnlockCheckService {
@@ -56,16 +56,15 @@ public class CommanderUnlockCheckService {
                 num += ButtonHelper.getAmountOfSpecificUnitsOnPlanets(player, game, "mech");
                 shouldBeUnlocked = (num >= 12);
             }
-            case "saar" -> shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "spacedock") >= 3);
+            case "saar" -> shouldBeUnlocked = (UnitQueryService.countUnits(game, player, "spacedock") >= 3);
             case "hacan" -> shouldBeUnlocked = (player.getTg() >= 10);
             case "sol" -> {
                 int resources = 0;
                 for (String planet : player.getPlanets()) {
                     if ("triad".equalsIgnoreCase(planet)
-                            || (game.getUnitHolderFromPlanet(planet) != null
-                                    && (game.getUnitHolderFromPlanet(planet).isSpaceStation()
-                                            || game.getUnitHolderFromPlanet(planet)
-                                                    .isFake()))) {
+                            || (game.getPlanet(planet) != null
+                                    && (game.getPlanet(planet).isSpaceStation()
+                                            || game.getPlanet(planet).isFake()))) {
                         continue;
                     }
                     resources += Helper.getPlanetResources(planet, game);
@@ -73,18 +72,16 @@ public class CommanderUnlockCheckService {
                 shouldBeUnlocked = (resources >= 12);
             }
             case "ghost" -> shouldBeUnlocked = (ButtonHelper.getAllTilesWithAlphaNBetaNUnits(player, game) >= 3);
-            case "l1z1x" ->
-                shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false) >= 4);
-            case "mentak" ->
-                shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser", false) >= 4);
+            case "l1z1x" -> shouldBeUnlocked = (UnitQueryService.countUnits(game, player, "dreadnought", false) >= 4);
+            case "mentak" -> shouldBeUnlocked = (UnitQueryService.countUnits(game, player, "cruiser", false) >= 4);
             case "naalu" -> {
                 Tile rex = game.getMecatolTile();
                 if (rex != null) {
                     for (String tilePos : FoWHelper.getAdjacentTiles(game, rex.getPosition(), player, false)) {
                         Tile tile = game.getTileByPosition(tilePos);
-                        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                            if (unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0
-                                    || unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
+                        for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
+                            if (unitHolder.hasUnit(UnitType.Mech, player.getColor())
+                                    || unitHolder.hasUnit(UnitType.Infantry, player.getColor())) {
                                 shouldBeUnlocked = true;
                             }
                         }
@@ -104,11 +101,11 @@ public class CommanderUnlockCheckService {
             case "sardakk" -> {
                 int count = 0;
                 for (String p : player.getPlanets()) {
-                    Tile tile = game.getTileFromPlanet(p);
+                    Tile tile = game.getTileContainingPlanet(p);
                     if (tile != null
                             && !tile.isHomeSystem(game)
-                            && game.getUnitHolderFromPlanet(p) != null
-                            && !game.getUnitHolderFromPlanet(p).isSpaceStation()) {
+                            && game.getPlanet(p) != null
+                            && !game.getPlanet(p).isSpaceStation()) {
                         count++;
                     }
                 }
@@ -119,10 +116,9 @@ public class CommanderUnlockCheckService {
                 int influence = 0;
                 for (String planet : player.getPlanets()) {
                     if ("triad".equalsIgnoreCase(planet)
-                            || (game.getUnitHolderFromPlanet(planet) != null
-                                    && (game.getUnitHolderFromPlanet(planet).isSpaceStation()
-                                            || game.getUnitHolderFromPlanet(planet)
-                                                    .isFake()))) {
+                            || (game.getPlanet(planet) != null
+                                    && (game.getPlanet(planet).isSpaceStation()
+                                            || game.getPlanet(planet).isFake()))) {
                         continue;
                     }
                     influence += Helper.getPlanetInfluence(planet, game);
@@ -131,18 +127,18 @@ public class CommanderUnlockCheckService {
             }
             case "yssaril" ->
                 shouldBeUnlocked = (player.getActionCards().size() > 7
-                        || (player.getExhaustedTechs().contains("mi")
+                        || (player.isTechExhausted("mi")
                                 && player.getActionCards().size() == 7));
             case "letnev", "muaat", "winnu", "yin" -> shouldBeUnlocked = true;
 
             // PoK
             case "argent" -> {
-                int num = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false)
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false)
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                int num = UnitQueryService.countUnits(game, player, "pds", false)
+                        + UnitQueryService.countUnits(game, player, "dreadnought", false)
+                        + UnitQueryService.countUnits(game, player, "destroyer", false)
+                        + UnitQueryService.countUnits(game, player, "warsun", false);
                 if (player.hasRelic("lightrailordnance")) {
-                    num += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "spacedock", false);
+                    num += UnitQueryService.countUnits(game, player, "spacedock", false);
                 }
                 shouldBeUnlocked = (num >= 6);
             }
@@ -152,14 +148,13 @@ public class CommanderUnlockCheckService {
             case "mahact" -> shouldBeUnlocked = (player.getMahactCC().size() >= 2);
             case "mahact_y" -> shouldBeUnlocked = (player.getMahactCC().size() >= 3);
             case "naaz" ->
-                shouldBeUnlocked =
-                        (CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Mech)
-                                        .size()
-                                >= 3);
+                shouldBeUnlocked = (UnitQueryService.getTilesContainingPlayersUnits(game, player, UnitType.Mech)
+                                .size()
+                        >= 3);
             case "nomad" -> shouldBeUnlocked = (player.getSoScored() >= 1);
             case "titans" -> {
-                int num = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds")
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "spacedock");
+                int num = UnitQueryService.countUnits(game, player, "pds")
+                        + UnitQueryService.countUnits(game, player, "spacedock");
                 shouldBeUnlocked = (num >= 5);
             }
             case "cabal" -> {
@@ -169,8 +164,8 @@ public class CommanderUnlockCheckService {
 
             // TE
             case "bastion" -> {
-                int totGalvanized = game.getTileMap().values().stream()
-                        .flatMap(t -> t.getUnitHolders().values().stream())
+                int totGalvanized = game.getTiles().stream()
+                        .flatMap(t -> t.getUnitHolderValues().stream())
                         .mapToInt(UnitHolder::getTotalGalvanizedCount)
                         .sum();
                 shouldBeUnlocked = (totGalvanized >= 3);
@@ -190,7 +185,7 @@ public class CommanderUnlockCheckService {
                 }
             }
             case "obsidian" -> {
-                for (Tile t : game.getTileMap().values()) {
+                for (Tile t : game.getTiles()) {
                     if (t.getPosition().startsWith("frac") && t.containsPlayersUnits(player)) {
                         shouldBeUnlocked = true;
                         break;
@@ -211,15 +206,14 @@ public class CommanderUnlockCheckService {
                         (ButtonHelper.getNumberOfUnitsNotInOrAdjacentToHS(player, game, UnitType.Spacedock) >= 1);
             case "cheiran" ->
                 shouldBeUnlocked = (ButtonHelper.getNumberOfStructuresOnNonHomePlanets(player, game) >= 4);
-            case "cymiae" ->
-                shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "infantry", false) >= 10);
+            case "cymiae" -> shouldBeUnlocked = (UnitQueryService.countUnits(game, player, "infantry", false) >= 10);
             case "dihmohn" -> shouldBeUnlocked = (ButtonHelper.getNumberOfUnitUpgrades(player) > 0);
             case "edyn" -> shouldBeUnlocked = (!game.getLaws().isEmpty());
             case "freesystems" ->
                 shouldBeUnlocked = (ButtonHelper.getNumberOfUncontrolledNonLegendaryPlanets(game) == 0);
             case "ghemina" ->
-                shouldBeUnlocked = ((ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", false)
-                                + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "lady", false))
+                shouldBeUnlocked = ((UnitQueryService.countUnits(game, player, "flagship", false)
+                                + UnitQueryService.countUnits(game, player, "lady", false))
                         >= 2);
             case "ghoti" ->
                 shouldBeUnlocked = (ButtonHelper.getNumberOfTilesPlayerIsInWithNoPlanets(game, player) >= 3);
@@ -229,8 +223,8 @@ public class CommanderUnlockCheckService {
             case "kollecc" ->
                 shouldBeUnlocked = (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() >= 4);
             case "kyro" ->
-                shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "infantry", false) >= 6
-                        && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "fighter", false) >= 6);
+                shouldBeUnlocked = (UnitQueryService.countUnits(game, player, "infantry", false) >= 6
+                        && UnitQueryService.countUnits(game, player, "fighter", false) >= 6);
             case "lanefir" -> shouldBeUnlocked = (game.getNumberOfPurgedFragments() >= 7);
             case "lizho" -> shouldBeUnlocked = (player.getTrapCardsPlanets().size() >= 3);
             case "mirveda" -> shouldBeUnlocked = (ButtonHelper.getNumberOfUnitUpgrades(player) >= 2);
@@ -243,8 +237,7 @@ public class CommanderUnlockCheckService {
                         && ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", true) >= 1
                         && ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", true) >= 1);
             case "rohdhna" -> shouldBeUnlocked = (ButtonHelper.checkHighestProductionSystem(player, game) >= 7);
-            case "tnelis" ->
-                shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false) >= 6);
+            case "tnelis" -> shouldBeUnlocked = (UnitQueryService.countUnits(game, player, "destroyer", false) >= 6);
             case "vaden" ->
                 shouldBeUnlocked = (ButtonHelper.howManyDifferentDebtPlayerHas(player)
                         > (game.getRealPlayers().size() / 2) - 1);
@@ -264,22 +257,21 @@ public class CommanderUnlockCheckService {
 
             // Balacasi
             case "arvaxi", "kalora" -> shouldBeUnlocked = true;
-            case "lunarium" ->
-                shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "carrier", false) >= 4);
+            case "lunarium" -> shouldBeUnlocked = (UnitQueryService.countUnits(game, player, "carrier", false) >= 4);
             case "tyris" ->
                 shouldBeUnlocked =
                         (ButtonHelper.getNumberOfUnitsNotInOrAdjacentToHS(player, game, UnitType.Infantry) >= 5);
             case "vyserix" -> {
                 int num = 0;
                 for (String planetID : player.getPlanets()) {
-                    Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetID, game);
+                    Planet planet = game.getPlanet(planetID);
                     if (planet != null && !planet.getTechSpecialities().isEmpty()) num++;
                 }
                 shouldBeUnlocked = (num >= 3);
             }
             case "zephyrion" -> {
-                int num = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser", false);
+                int num = UnitQueryService.countUnits(game, player, "pds", false)
+                        + UnitQueryService.countUnits(game, player, "cruiser", false);
                 shouldBeUnlocked = (num >= 7);
             }
 
@@ -287,14 +279,13 @@ public class CommanderUnlockCheckService {
             case "dream" ->
                 shouldBeUnlocked = (DreamButtonHandler.getNexusTokenTiles(game).size() >= 3);
             case "ta" -> shouldBeUnlocked = (TaAbilityHandler.getControlledPlanetCountWithAnyDesign(player, game) >= 4);
-            case "netrunners" ->
-                shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false) >= 4);
+            case "netrunners" -> shouldBeUnlocked = (UnitQueryService.countUnits(game, player, "pds", false) >= 4);
             case "crystellum" ->
                 shouldBeUnlocked =
                         (CrystellumLeadersHandler.getCrystellumCommanderCapacitySystemCount(game, player) >= 3);
             case "natau" -> {
                 int qualifyingSystems = 0;
-                for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player)) {
+                for (Tile tile : UnitQueryService.getTilesContainingPlayersUnits(game, player)) {
                     if (tile.isAnomaly(game, player)
                             || FoWHelper.isTileAdjacentToAnAnomaly(game, tile.getPosition(), player)) {
                         qualifyingSystems++;
@@ -306,7 +297,7 @@ public class CommanderUnlockCheckService {
             // theodisi
             case "ardentia" -> {
                 int qualifyingSystems = 0;
-                for (Tile tile : game.getTileMap().values()) {
+                for (Tile tile : game.getTiles()) {
                     if (tile.hasPlayerCC(player)) {
                         qualifyingSystems++;
                     }

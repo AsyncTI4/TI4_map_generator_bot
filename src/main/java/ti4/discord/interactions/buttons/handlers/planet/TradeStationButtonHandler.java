@@ -21,8 +21,7 @@ class TradeStationButtonHandler {
         List<Button> buttons = new ArrayList<>();
         String onlyPlanet = null;
         for (String planet : player.getReadiedPlanets()) {
-            if (game.getUnitHolderFromPlanet(planet) == null
-                    || !game.getUnitHolderFromPlanet(planet).isSpaceStation(game)) {
+            if (game.getPlanet(planet) == null || !game.getPlanet(planet).isSpaceStation(game)) {
                 continue;
             }
             onlyPlanet = planet;
@@ -33,12 +32,12 @@ class TradeStationButtonHandler {
             return;
         } else if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), player.getRepresentation() + ", you have no readied space stations.");
+                    event.getChannel(), player.toString() + ", you have no readied space stations.");
             return;
         }
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                player.getRepresentation()
+                player.toString()
                         + ", please choose the space station you wish to exhaust to wash your commodit"
                         + (player.getCommodities() == 1 ? "y" : "ies")
                         + ". A reminder that the space station must be readied in order to exhaust it this way.",
@@ -52,7 +51,7 @@ class TradeStationButtonHandler {
         CommodityConversionService.convertAllComm(event, player, game);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " exhausted " + Helper.getPlanetRepresentation(planet, game)
+                player.toString() + " exhausted " + Helper.getPlanetRepresentation(planet, game)
                         + ", washing their commodit" + (player.getCommodities() == 1 ? "y" : "ies") + ".");
     }
 }

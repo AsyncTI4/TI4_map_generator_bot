@@ -26,7 +26,7 @@ public class FrankenUnitService {
             return;
         }
 
-        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added units:\n");
+        StringBuilder sb = new StringBuilder(player.toString()).append(" added units:\n");
         for (String unitID : unitIDs) {
             UnitModel unitModel = Mapper.getUnit(unitID);
             if (player.getGame().isTwilightsFallMode()
@@ -66,7 +66,7 @@ public class FrankenUnitService {
     }
 
     public static void removeUnits(GenericInteractionCreateEvent event, Player player, List<String> unitIDs) {
-        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed units:\n");
+        StringBuilder sb = new StringBuilder(player.toString()).append(" removed units:\n");
         for (String unitID : unitIDs) {
             if (!player.ownsUnit(unitID)) {
                 sb.append("> ").append(unitID).append(" (player did not have this unit)");

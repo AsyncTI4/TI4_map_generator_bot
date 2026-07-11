@@ -38,11 +38,11 @@ class ExplorePlanet extends GameStateSubcommand {
         OptionMapping planetOption = event.getOption(Constants.PLANET);
         String planetName = AliasHandler.resolvePlanet(StringUtils.substringBefore(planetOption.getAsString(), " ("));
         Game game = getGame();
-        if (!game.getPlanets().contains(planetName)) {
+        if (!game.containsPlanet(planetName)) {
             MessageHelper.sendMessageToEventChannel(event, "Planet not found in map");
             return;
         }
-        Tile tile = game.getTileFromPlanet(planetName);
+        Tile tile = game.getTileContainingPlanet(planetName);
         if (tile == null) {
             MessageHelper.sendMessageToEventChannel(event, "System not found that contains planet");
             return;

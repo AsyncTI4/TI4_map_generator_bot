@@ -64,11 +64,11 @@ class SwapSC extends GameStateSubcommand {
         player2.addSC(player1SC);
         player2.removeSC(player2SC);
 
-        String sb = player1.getRepresentation() + " swapped strategy cards with " + player2.getRepresentation() + "\n"
+        String sb = player1.toString() + " swapped strategy cards with " + player2.toString() + "\n"
                 + "> "
-                + player2.getRepresentation() + CardEmojis.getSCFrontFromInteger(player2SC) + " " + ":arrow_right:"
+                + player2.toString() + CardEmojis.getSCFrontFromInteger(player2SC) + " " + ":arrow_right:"
                 + " " + CardEmojis.getSCFrontFromInteger(player1SC) + "\n" + "> "
-                + player1.getRepresentation() + CardEmojis.getSCFrontFromInteger(player1SC) + " " + ":arrow_right:"
+                + player1.toString() + CardEmojis.getSCFrontFromInteger(player1SC) + " " + ":arrow_right:"
                 + " " + CardEmojis.getSCFrontFromInteger(player2SC) + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
     }

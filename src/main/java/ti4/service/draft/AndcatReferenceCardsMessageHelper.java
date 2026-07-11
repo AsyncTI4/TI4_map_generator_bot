@@ -92,7 +92,7 @@ public class AndcatReferenceCardsMessageHelper {
         List<FactionModel> factionsInPackage = AndcatReferenceCardsDraftable.getFactionsInPackage(refPackage);
         MessageV2Builder messageBuilder = new MessageV2Builder(cardsInfoThread, 3);
 
-        messageBuilder.appendLine(player.getRepresentation() + ", select how each faction will be used.");
+        messageBuilder.appendLine(player.toString() + ", select how each faction will be used.");
 
         // Part: Home System
         String factionForPart = refPackage.homeSystemFaction();
@@ -661,7 +661,7 @@ public class AndcatReferenceCardsMessageHelper {
             message.append("### Unordered Players").append(System.lineSeparator());
             for (String playerUserId : unorderedPlayers) {
                 Player player = draftManager.getGame().getPlayer(playerUserId);
-                message.append("> - ").append(player.getRepresentation()).append(System.lineSeparator());
+                message.append("> - ").append(player.toString()).append(System.lineSeparator());
             }
         }
 

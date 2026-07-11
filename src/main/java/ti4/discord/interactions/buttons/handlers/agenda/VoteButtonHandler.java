@@ -51,7 +51,7 @@ class VoteButtonHandler {
             pfaction2 = player.getFaction();
         }
         if (pfaction2 != null) {
-            String voteMessage = player.getRepresentation()
+            String voteMessage = player.toString()
                     + " is up to vote. Please use the buttons to choose the outcome you wish to vote for.";
             String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
             List<Button> outcomeActionRow;
@@ -61,7 +61,7 @@ class VoteButtonHandler {
             } else if (agendaDetails.contains("Player") || agendaDetails.contains("player")) {
                 outcomeActionRow = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "outcome", null);
             } else if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
-                voteMessage = player.getRepresentation() + " is up to vote."
+                voteMessage = player.toString() + " is up to vote."
                         + " Since there are too many planets in the game to represent all as buttons,"
                         + " please use the buttons to choose the player who controls the planet you wish to vote for."
                         + " You will then be given a list of their planets to vote for.";
@@ -122,12 +122,12 @@ class VoteButtonHandler {
         List<Button> planetOutcomeButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
         for (String planet : planets) {
-            Planet p = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            Planet p = game.getPlanet(planet);
             if (p != null && p.isSpaceStation(game)) continue;
             String agendaDetails = game.getCurrentAgendaInfo().split("_")[1].toLowerCase();
             if (agendaDetails.contains("non-home")) {
-                if (game.getTileFromPlanet(planet) != null
-                        && game.getTileFromPlanet(planet).isHomeSystem(game)) {
+                if (game.getTileContainingPlanet(planet) != null
+                        && game.getTileContainingPlanet(planet).isHomeSystem(game)) {
                     continue;
                 }
                 if ("mrte".equalsIgnoreCase(planet) || "mr".equalsIgnoreCase(planet)) {

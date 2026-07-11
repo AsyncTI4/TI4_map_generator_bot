@@ -227,7 +227,7 @@ public class DraftTileManager {
         Tile tile = new Tile(tileID, "none");
         draftTile.setTile(tile);
 
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+        for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
             if (unitHolder instanceof Planet planet) {
                 draftTile.addPlanet(planet);
             }
@@ -239,7 +239,7 @@ public class DraftTileManager {
 
         if (tile.isAnomaly()) {
             draftTile.setTierList(TierList.anomaly);
-        } else if (tile.getPlanetUnitHolders().isEmpty()) {
+        } else if (!tile.hasPlanets()) {
             draftTile.setTierList(TierList.red);
         } else {
             draftTile.setTierList(TierList.high);

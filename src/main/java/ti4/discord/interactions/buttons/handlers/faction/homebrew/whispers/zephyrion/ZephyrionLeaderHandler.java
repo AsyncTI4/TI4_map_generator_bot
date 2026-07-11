@@ -24,8 +24,8 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.leader.PlayHeroService;
-import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class ZephyrionLeaderHandler {
@@ -40,7 +40,7 @@ public class ZephyrionLeaderHandler {
                 if ("flagship".equalsIgnoreCase(ship) || "warsun".equalsIgnoreCase(ship)) {
                     continue;
                 }
-                if (otherPlayer.getFaction().equalsIgnoreCase(faction)) {
+                if (otherPlayer.isFaction(faction)) {
                     buttons.add(Buttons.gray(
                             "zephAgentRes_" + faction + "_" + ship,
                             StringUtils.capitalize(ship),
@@ -79,7 +79,7 @@ public class ZephyrionLeaderHandler {
         UnitType type = Mapper.getUnitKey(AliasHandler.resolveUnit(unitTypeString), p2.getColorID())
                 .unitType();
         List<Tile> validTiles = new ArrayList<>();
-        for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, type)) {
+        for (Tile tile : UnitQueryService.getTilesContainingPlayersUnits(game, p2, type)) {
             UnitHolder space = tile.getSpaceUnitHolder();
             if (space.getUnitCount(type, p2.getColor()) > 0 && CommandCounterHelper.hasCC(p2, tile)) {
                 validTiles.add(tile);
@@ -102,9 +102,7 @@ public class ZephyrionLeaderHandler {
             }
             destroyButtons.add(Buttons.gray("deleteButtons", "Done"));
             MessageHelper.sendMessageToChannelWithButtons(
-                    game.getMainGameChannel(),
-                    p2.getRepresentation() + ", choose which ship to destroy.",
-                    destroyButtons);
+                    game.getMainGameChannel(), p2.toString() + ", choose which ship to destroy.", destroyButtons);
             ButtonHelper.deleteMessage(event);
         }
     }
@@ -168,7 +166,7 @@ public class ZephyrionLeaderHandler {
         buttons.add(Buttons.gray("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getMainGameChannel(),
-                p2.getRepresentation() + ", remove units that exceed capacity and gain 1 trade good each.",
+                p2.toString() + ", remove units that exceed capacity and gain 1 trade good each.",
                 buttons);
     }
 
@@ -233,7 +231,7 @@ public class ZephyrionLeaderHandler {
         if (hero == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + " could not find Monturak Homotol, the Zephyrion hero. Please resolve manually.");
             ButtonHelper.deleteMessage(event);
             return;
@@ -241,7 +239,7 @@ public class ZephyrionLeaderHandler {
         PlayHeroService.removeLeader(game, player, hero);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " resolved Monturak Homotol, the Zephyrion hero. Monturak Homotol has been purged.");
 
         if ("flagship".equalsIgnoreCase(unitTypeString) || "warsun".equalsIgnoreCase(unitTypeString)) {
@@ -249,14 +247,14 @@ public class ZephyrionLeaderHandler {
             game.scorePublicObjective(player.getUserID(), poIndex);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " destroyed a " + StringUtils.capitalize(unitTypeString)
+                    player.toString() + " destroyed a " + StringUtils.capitalize(unitTypeString)
                             + " with a bounty token and gained 1 victory point.");
         } else {
             List<Button> buttons = Helper.getTileWithShipsPlaceUnitButtons(player, game, unitTypeString, "place");
             buttons.add(Buttons.red("deleteButtons", "Done"));
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", use the buttons to place " + StringUtils.capitalize(unitTypeString)
+                    player.toString() + ", use the buttons to place " + StringUtils.capitalize(unitTypeString)
                             + "s in systems that contain your ships.",
                     buttons);
         }

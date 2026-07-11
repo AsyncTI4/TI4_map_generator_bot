@@ -82,7 +82,7 @@ class CorrectFaction extends GameStateSubcommand {
             if (tech.trim().isEmpty()) {
                 continue;
             }
-            if (!player.getTechs().contains(tech)) {
+            if (!player.hasExactTech(tech)) {
                 player.addFactionTech(tech);
             }
         }

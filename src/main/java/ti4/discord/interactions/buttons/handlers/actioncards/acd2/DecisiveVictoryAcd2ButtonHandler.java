@@ -20,8 +20,7 @@ class DecisiveVictoryAcd2ButtonHandler {
         if (tile == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + " could not resolve _Decisive Victory_ because there is no active system.");
+                    player.toString() + " could not resolve _Decisive Victory_ because there is no active system.");
             event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }

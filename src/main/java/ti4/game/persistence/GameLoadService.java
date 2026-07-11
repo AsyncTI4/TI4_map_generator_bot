@@ -928,8 +928,7 @@ class GameLoadService {
                 case Constants.AUTO_SABO_PASS_MEDIAN ->
                     player.setAutoSaboPassMedian(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.CAPTURE -> {
-                    UnitHolder unitHolder =
-                            player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
+                    UnitHolder unitHolder = player.getNomboxTile().getSpaceUnitHolder();
                     StringTokenizer unitTokens = new StringTokenizer(tokenizer.nextToken(), ";");
                     while (unitTokens.hasMoreTokens()) {
                         StringTokenizer unitInfo = new StringTokenizer(unitTokens.nextToken(), ",");
@@ -1195,13 +1194,13 @@ class GameLoadService {
             if (isNotBlank(val)) counts.add(Integer.parseInt(val));
         }
         for (int x = counts.size(); x < UnitState.values().length; x++) counts.add(0);
-        if (!tile.getUnitHolders().containsKey(unitHolderName)) {
+        if (!tile.hasUnitHolder(unitHolderName)) {
             BotLogger.error(
                     new LogOrigin(game),
                     "Invalid UnitHolder detected during load: " + tile.getTileID() + " / " + unitHolderName);
             return;
         }
-        tile.getUnitHolders().get(unitHolderName).getUnitsByState().put(uk, counts);
+        tile.getUnitHolder(unitHolderName).getUnitsByState().put(uk, counts);
     }
 
     private static void readPlanetTokens(Tile tile, String data, String unitHolderName) {

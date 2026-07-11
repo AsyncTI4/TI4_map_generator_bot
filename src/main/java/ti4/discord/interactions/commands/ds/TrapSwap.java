@@ -30,13 +30,13 @@ class TrapSwap extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         String planetName = event.getOption(Constants.PLANET).getAsString();
-        if (!game.getPlanets().contains(planetName)) {
+        if (!game.containsPlanet(planetName)) {
             MessageHelper.replyToMessage(event, "Planet not found in map");
             return;
         }
 
         String planetName2 = event.getOption(Constants.PLANET2).getAsString();
-        if (!game.getPlanets().contains(planetName2)) {
+        if (!game.containsPlanet(planetName2)) {
             MessageHelper.replyToMessage(event, "Planet2 not found in map");
             return;
         }
@@ -54,8 +54,7 @@ class TrapSwap extends GameStateSubcommand {
         }
 
         Player player = getPlayer();
-        if (unitHolder.getTokenList().contains(Constants.LIZHO_TRAP_PNG)
-                && unitHolder2.getTokenList().contains(Constants.LIZHO_TRAP_PNG)) {
+        if (unitHolder.containsToken(Constants.LIZHO_TRAP_PNG) && unitHolder2.containsToken(Constants.LIZHO_TRAP_PNG)) {
             Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
             String trap1 = null;
             String trap2 = null;
@@ -82,7 +81,7 @@ class TrapSwap extends GameStateSubcommand {
     private static UnitHolder getUnitHolder(SlashCommandInteractionEvent event, Game game, String planetName) {
         Tile tile = null;
         UnitHolder unitHolder = null;
-        for (Tile tile_ : game.getTileMap().values()) {
+        for (Tile tile_ : game.getTiles()) {
             if (tile != null) {
                 break;
             }

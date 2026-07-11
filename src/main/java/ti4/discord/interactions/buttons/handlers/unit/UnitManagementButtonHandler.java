@@ -49,7 +49,7 @@ class UnitManagementButtonHandler {
         String pos = buttonID.replace("genericBuild_", "");
         List<Button> buttons =
                 Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "genericBuild", "place");
-        String message = player.getRepresentation() + ", use the buttons to produce units. ";
+        String message = player.toString() + ", use the buttons to produce units. ";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -59,7 +59,7 @@ class UnitManagementButtonHandler {
         String pos = buttonID.replace("genericModifyAllTiles_", "");
         List<Button> buttons = Helper.getPlaceUnitButtons(
                 event, player, game, game.getTileByPosition(pos), "genericModifyAllTiles", "place");
-        String message = player.getRepresentation() + ", use the buttons to modify units. ";
+        String message = player.toString() + ", use the buttons to modify units. ";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -79,7 +79,7 @@ class UnitManagementButtonHandler {
         String pos = buttonID.split("_")[0];
         List<Button> buttons = Helper.getPlaceUnitButtons(
                 event, player, game, game.getTileByPosition(pos), type, "placeOneNDone_dontskip");
-        String message = player.getRepresentation() + ", use the buttons to produce 1 unit.\n> "
+        String message = player.toString() + ", use the buttons to produce 1 unit.\n> "
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
@@ -89,12 +89,11 @@ class UnitManagementButtonHandler {
     public static void removeAllStructures(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         ButtonHelper.deleteMessage(event);
         String planet = buttonID.split("_")[1];
-        UnitHolder plan = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        UnitHolder plan = game.getPlanet(planet);
         plan.removeAllUnits(player.getColor());
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                "Removed all units on " + planet + " for " + player.getRepresentation() + ".");
-        AddPlanetToPlayAreaService.addPlanetToPlayArea(event, game.getTileFromPlanet(planet), planet, game);
+                event.getMessageChannel(), "Removed all units on " + planet + " for " + player.toString() + ".");
+        AddPlanetToPlayAreaService.addPlanetToPlayArea(event, game.getTileContainingPlanet(planet), planet, game);
     }
 
     @ButtonHandler("refreshLandingButtons")

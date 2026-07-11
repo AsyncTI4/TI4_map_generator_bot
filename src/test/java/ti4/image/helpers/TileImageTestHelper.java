@@ -42,7 +42,7 @@ public class TileImageTestHelper {
     }
 
     public void addUnitsAndControlToPlanet(Player p, Tile t, String planetName, UnitType... units) {
-        Planet planet = t.getUnitHolderFromPlanet(planetName);
+        Planet planet = t.getPlanet(planetName);
         if (planet == null) return;
         p.addPlanet(planetName);
         planet.addControl(Mapper.getControlID(p.getColor()));
@@ -50,7 +50,7 @@ public class TileImageTestHelper {
     }
 
     public void addTokensToHolder(Tile t, String holderName, String... tokens) {
-        UnitHolder uh = t.getUnitHolders().get(holderName);
+        UnitHolder uh = t.getUnitHolder(holderName);
         if (uh == null) return;
         for (String token : tokens) uh.addToken(token);
     }

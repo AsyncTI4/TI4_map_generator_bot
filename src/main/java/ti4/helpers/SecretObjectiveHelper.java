@@ -43,7 +43,7 @@ public class SecretObjectiveHelper {
             return false;
         }
 
-        StringBuilder message = new StringBuilder(player.getRepresentation() + " scored ");
+        StringBuilder message = new StringBuilder(player.toString() + " scored ");
         for (Map.Entry<String, Integer> entry : player.getSecretsScored().entrySet()) {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
@@ -69,7 +69,7 @@ public class SecretObjectiveHelper {
                 game.scorePublicObjective(player.getUserID(), poIndex);
                 MessageHelper.sendMessageToChannel(
                         game.getActionsChannel(),
-                        player.getRepresentation()
+                        player.toString()
                                 + " also scored 1 victory point due to _Zealous Orthodoxy_. Everyone will gain their commander ability.");
                 for (Leader leaderP : player.getLeaders()) {
                     if (leaderP.getId().contains("commander")) {
@@ -134,7 +134,7 @@ public class SecretObjectiveHelper {
                 if (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() == 2) {
                     List<String> playerFragments = player.getFragments();
                     List<String> fragmentsToPurge = new ArrayList<>(playerFragments);
-                    StringBuilder message2 = new StringBuilder(player.getRepresentation() + " purged");
+                    StringBuilder message2 = new StringBuilder(player.toString() + " purged");
                     for (String fragId : fragmentsToPurge) {
                         player.removeFragment(fragId);
                         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
@@ -200,14 +200,13 @@ public class SecretObjectiveHelper {
             FoWHelper.pingPlayersDifferentMessages(game, event, player, message.toString(), "Scores changed");
             MessageHelper.sendMessageToChannel(channel, "All players notified");
         }
-        String headerText = player.getRepresentation();
+        String headerText = player.toString();
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
         if (player.hasAbility("dark_purpose")) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " gains 1 command token due to **Dark Purpose**.");
+                    player.getCorrectChannel(), player.toString() + " gains 1 command token due to **Dark Purpose**.");
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
                     + player.getCCRepresentation()
@@ -221,15 +220,14 @@ public class SecretObjectiveHelper {
             buttons.add(Buttons.red("deleteButtons", "Done"));
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
+                    player.toString()
                             + " if another player satisfied the requirements of the SO you just scored, you can use this button to draw an SO via your plausible deniability ability.",
                     buttons);
         }
 
         if (player.hasTech("tf-yinascendant")) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " gains 1 splice card due to _Yin Ascendant_.");
+                    player.getCorrectChannel(), player.toString() + " gains 1 splice card due to _Yin Ascendant_.");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
             buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));

@@ -58,13 +58,13 @@ public class KaloraUnitHandler {
 
     public static void offerMechButtons(Player player, Game game, Tile tile) {
         boolean hasMechOnTakenPlanet = tile.getPlanetUnitHolders().stream()
-                .anyMatch(uH -> uH.getUnitCount(UnitType.Mech, player.getColor()) > 0
+                .anyMatch(uH -> uH.hasUnit(UnitType.Mech, player.getColor())
                         && game.getStoredValue("planetsTakenThisRound").contains(uH.getName()));
         if (!hasMechOnTakenPlanet) return;
 
         List<Button> buttons = new ArrayList<>();
         for (Tile t : ButtonHelper.getTilesWithShipsInTheSystem(player, game)) {
-            if (t.getPlanetUnitHolders().isEmpty()) {
+            if (!t.hasPlanets()) {
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + "kaloraExploreFront_" + t.getPosition(),
                         t.getRepresentationForButtons(game, player),

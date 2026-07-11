@@ -447,7 +447,7 @@ public class TileGenerator {
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
                             .getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
                     drawOnWormhole(tile, tileGraphics, blockedWormholeImage, 40);
-                } else if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)) {
+                } else if (tile.getSpaceUnitHolder().containsToken(Constants.TOKEN_SEVERED)) {
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
                             .getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
                     drawOnWormhole(tile, tileGraphics, blockedWormholeImage, 40, true);
@@ -531,8 +531,7 @@ public class TileGenerator {
                 if (isFoWPrivate && tile.hasFog(fowPlayer)) return tileOutput;
 
                 List<Rectangle> rectangles = new ArrayList<>();
-                Collection<UnitHolder> unitHolders =
-                        new ArrayList<>(tile.getUnitHolders().values());
+                Collection<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolderValues());
                 UnitHolder spaceUnitHolder = tile.getSpaceUnitHolder();
                 if (spaceUnitHolder != null) {
                     addSleeperToken(tile, tileGraphics, spaceUnitHolder, TileGenerator::isValidCustodianToken, game);
@@ -954,7 +953,7 @@ public class TileGenerator {
 
                 int x = TILE_PADDING;
                 int y = TILE_PADDING;
-                boolean isEmpty = tile.getPlanetUnitHolders().isEmpty();
+                boolean isEmpty = !tile.hasPlanets();
 
                 if (!isEmpty) {
                     BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
@@ -1154,7 +1153,7 @@ public class TileGenerator {
                 BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
                 tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
 
-                for (UnitHolder uh : tile.getUnitHolders().values()) {
+                for (UnitHolder uh : tile.getUnitHolderValues()) {
                     if (!(uh instanceof Planet planet)) {
                         continue;
                     }
@@ -1690,9 +1689,7 @@ public class TileGenerator {
                             tileGraphics, controlTokenImage, player, imgX, imgY, convertToGeneric, scale);
                     rectangles.add(
                             new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
-                    if (player != null
-                            && player.isRealPlayer()
-                            && player.getExhaustedPlanets().contains(unitHolder.getName())) {
+                    if (player != null && player.isRealPlayer() && player.isPlanetExhausted(unitHolder.getName())) {
                         BufferedImage exhaustedTokenImage = ImageHelper.readScaled(
                                 ResourceHelper.getResourceFromFolder("command_token/", "exhaustedControl.png"), scale);
                         DrawingUtil.drawControlToken(
@@ -1707,9 +1704,7 @@ public class TileGenerator {
                             tileGraphics, controlTokenImage, player, imgX, imgY, convertToGeneric, scale);
                     rectangles.add(
                             new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
-                    if (player != null
-                            && player.isRealPlayer()
-                            && player.getExhaustedPlanets().contains(unitHolder.getName())) {
+                    if (player != null && player.isRealPlayer() && player.isPlanetExhausted(unitHolder.getName())) {
                         BufferedImage exhaustedTokenImage = ImageHelper.readScaled(
                                 ResourceHelper.getResourceFromFolder("command_token/", "exhaustedControl"), scale);
                         DrawingUtil.drawControlToken(
@@ -1904,7 +1899,7 @@ public class TileGenerator {
             return true;
         }
         for (Player player : game.getRealPlayers()) {
-            if (player.hasAbility("synthesis") && player.getReadiedPlanets().contains(unitHolder.getName())) {
+            if (player.hasAbility("synthesis") && player.hasPlanetReady(unitHolder.getName())) {
                 return true;
             }
         }
@@ -2093,7 +2088,7 @@ public class TileGenerator {
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
                             .getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
                     tileGraphics.drawImage(blockedWormholeImage, drawX + offsetX + 40, drawY + offsetY + 40, null);
-                } else if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)
+                } else if (tile.getSpaceUnitHolder().containsToken(Constants.TOKEN_SEVERED)
                         && isWormholeToken(tokenPath)) {
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
                             .getTokenFile("agenda_wormhole_blocked"

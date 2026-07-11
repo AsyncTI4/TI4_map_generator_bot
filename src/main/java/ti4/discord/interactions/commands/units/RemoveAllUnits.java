@@ -51,7 +51,7 @@ public class RemoveAllUnits extends GameStateCommand {
 
         String color = getPlayer().getColor();
         tile.removeAllUnits(color);
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+        for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
             AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, unitHolder.getName(), game);
         }
 

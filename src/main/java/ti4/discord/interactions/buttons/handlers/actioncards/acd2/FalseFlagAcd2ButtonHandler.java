@@ -59,7 +59,7 @@ class FalseFlagAcd2ButtonHandler {
             return;
         }
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tile != null && CommandCounterHelper.hasCC(target, tile)) {
                 buttons.add(Buttons.gray(
                         player.factionButtonChecker() + "falseFlagFrom_" + target.getFaction() + "_"
@@ -103,7 +103,7 @@ class FalseFlagAcd2ButtonHandler {
                         + " for _False Flag_.");
 
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + "falseFlagTo_" + target.getFaction() + "_" + tile.getPosition(),
@@ -148,7 +148,7 @@ class FalseFlagAcd2ButtonHandler {
     }
 
     private static boolean hasAnyCommandToken(Game game, Player player) {
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tile != null && CommandCounterHelper.hasCC(player, tile)) {
                 return true;
             }

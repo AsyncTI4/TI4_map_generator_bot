@@ -303,7 +303,7 @@ public class CustomHyperlaneService {
     }
 
     private static List<String> getStaticHyperlanePositions(Game game) {
-        return game.getTileMap().values().stream()
+        return game.getTiles().stream()
                 .filter(CustomHyperlaneService::isStaticHyperlane)
                 .map(Tile::getPosition)
                 .collect(Collectors.toList());

@@ -54,7 +54,7 @@ class MahactHeroButtonHandler {
 
         game.setStoredValue("mahactHeroTarget", player.getFaction());
 
-        UnitHolder unitHolder = tile1.getUnitHolders().get("space");
+        UnitHolder unitHolder = tile1.getSpaceUnitHolder();
         Map<Units.UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         for (Map.Entry<Units.UnitKey, Integer> unitEntry : units.entrySet()) {
             if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
@@ -107,7 +107,7 @@ class MahactHeroButtonHandler {
         List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, game, tile2);
         Player player2 = player;
         for (Player p2 : players) {
-            if (p2 != player && !player.getAllianceMembers().contains(p2.getFaction())) {
+            if (p2 != player && !player.hasAllianceMember(p2.getFaction())) {
                 player2 = p2;
                 break;
             }

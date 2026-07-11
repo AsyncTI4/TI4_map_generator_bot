@@ -9,8 +9,7 @@ import ti4.service.tactical.PostMovementButtonContext;
 
 public final class SardakkHeroButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.player().hasLeaderUnlocked("sardakkhero")
-                && !ctx.tile().getPlanetUnitHolders().isEmpty();
+        return ctx.player().hasLeaderUnlocked("sardakkhero") && ctx.tile().hasPlanets();
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {

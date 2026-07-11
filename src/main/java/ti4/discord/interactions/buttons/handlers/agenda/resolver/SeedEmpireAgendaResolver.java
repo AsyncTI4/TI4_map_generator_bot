@@ -23,7 +23,7 @@ public class SeedEmpireAgendaResolver implements ForAgainstAgendaResolver {
         for (Player playerWL : winOrLose) {
             game.scorePublicObjective(playerWL.getUserID(), poIndex);
             MessageHelper.sendMessageToChannel(
-                    playerWL.getCorrectChannel(), playerWL.getRepresentation() + " scored _Seed of an Empire_.");
+                    playerWL.getCorrectChannel(), playerWL.toString() + " scored _Seed of an Empire_.");
             Helper.checkEndGame(game, playerWL);
             if (playerWL.getTotalVictoryPoints() >= game.getVp()) {
                 break;
@@ -40,7 +40,7 @@ public class SeedEmpireAgendaResolver implements ForAgainstAgendaResolver {
         for (Player playerWL : winOrLose) {
             game.scorePublicObjective(playerWL.getUserID(), poIndex);
             MessageHelper.sendMessageToChannel(
-                    playerWL.getCorrectChannel(), playerWL.getRepresentation() + " scored _Seed of an Empire_.");
+                    playerWL.getCorrectChannel(), playerWL.toString() + " scored _Seed of an Empire_.");
             Helper.checkEndGame(game, playerWL);
             if (playerWL.getTotalVictoryPoints() >= game.getVp()) {
                 break;

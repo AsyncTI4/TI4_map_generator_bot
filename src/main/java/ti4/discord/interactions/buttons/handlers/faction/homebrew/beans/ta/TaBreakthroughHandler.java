@@ -41,7 +41,7 @@ public class TaBreakthroughHandler {
         }
 
         for (String sourcePlanet : player.getPlanets()) {
-            Tile sourceTile = game.getTileFromPlanet(sourcePlanet);
+            Tile sourceTile = game.getTileContainingPlanet(sourcePlanet);
             if (sourceTile == null) {
                 continue;
             }
@@ -80,7 +80,7 @@ public class TaBreakthroughHandler {
             return null;
         }
 
-        Planet planet = tile.getUnitHolderFromPlanet(planetName);
+        Planet planet = tile.getPlanet(planetName);
         if (planet == null) {
             return null;
         }
@@ -105,7 +105,7 @@ public class TaBreakthroughHandler {
             return targets;
         }
 
-        Tile sourceTile = game.getTileFromPlanet(sourcePlanet);
+        Tile sourceTile = game.getTileContainingPlanet(sourcePlanet);
         if (sourceTile == null) {
             return targets;
         }
@@ -126,7 +126,7 @@ public class TaBreakthroughHandler {
                 if (sourcePlanet.equals(planetName)) {
                     continue;
                 }
-                if (!player.getPlanets().contains(planetName)) {
+                if (!player.containsPlanet(planetName)) {
                     continue;
                 }
                 if (TaAbilityHandler.planetHasAnyDesignAttached(adjacentTile, planetName)) {
@@ -169,7 +169,7 @@ public class TaBreakthroughHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation()
+                player.toString()
                         + ", you may use _Adaptive Economy_ to move 1 design to an adjacent planet you control, then ready that planet.",
                 buttons);
     }
@@ -216,7 +216,7 @@ public class TaBreakthroughHandler {
         List<Button> buttons = new ArrayList<>();
 
         for (String sourcePlanet : player.getPlanets()) {
-            Tile sourceTile = game.getTileFromPlanet(sourcePlanet);
+            Tile sourceTile = game.getTileContainingPlanet(sourcePlanet);
             if (sourceTile == null) {
                 continue;
             }
@@ -245,9 +245,7 @@ public class TaBreakthroughHandler {
         buttons.add(Buttons.red("deleteButtons", "Decline"));
 
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                player.getRepresentation() + ", choose a planet to move a design from.",
-                buttons);
+                event.getMessageChannel(), player.toString() + ", choose a planet to move a design from.", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -278,8 +276,8 @@ public class TaBreakthroughHandler {
             return;
         }
 
-        Tile sourceTile = game.getTileFromPlanet(sourcePlanet);
-        if (sourceTile == null || !player.getPlanets().contains(sourcePlanet)) {
+        Tile sourceTile = game.getTileContainingPlanet(sourcePlanet);
+        if (sourceTile == null || !player.containsPlanet(sourcePlanet)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -317,7 +315,7 @@ public class TaBreakthroughHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation()
+                player.toString()
                         + ", choose a planet to move the design from "
                         + Helper.getPlanetRepresentation(sourcePlanet, game)
                         + " to.",
@@ -353,15 +351,15 @@ public class TaBreakthroughHandler {
             return;
         }
 
-        Tile sourceTile = game.getTileFromPlanet(sourcePlanet);
-        Tile targetTile = game.getTileFromPlanet(targetPlanet);
+        Tile sourceTile = game.getTileContainingPlanet(sourcePlanet);
+        Tile targetTile = game.getTileContainingPlanet(targetPlanet);
         if (sourceTile == null || targetTile == null) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
-        if (!player.getPlanets().contains(sourcePlanet)
-                || !player.getPlanets().contains(targetPlanet)
+        if (!player.containsPlanet(sourcePlanet)
+                || !player.containsPlanet(targetPlanet)
                 || sourcePlanet.equals(targetPlanet)) {
             ButtonHelper.deleteMessage(event);
             return;
@@ -391,7 +389,7 @@ public class TaBreakthroughHandler {
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation()
+                player.toString()
                         + " used _Adaptive Economy_ to move a design from "
                         + Helper.getPlanetRepresentation(sourcePlanet, game)
                         + " to "

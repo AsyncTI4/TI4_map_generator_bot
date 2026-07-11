@@ -44,9 +44,9 @@ public final class VoiceOfTheCouncilHelper {
         sb.append("**Voice of the Council**\n");
         if (previousElectee != null && !previousElectee.equalsIgnoreCase(player.getFaction())) {
             var previousPlayer = game.getPlayerFromColorOrFaction(previousElectee);
-            sb.append(previousPlayer.getRepresentation()).append(" is no longer _Voice of the Council_.\n");
+            sb.append(previousPlayer.toString()).append(" is no longer _Voice of the Council_.\n");
         }
-        sb.append(player.getRepresentation()).append(" has been elected as _Voice of the Council_.");
+        sb.append(player.toString()).append(" has been elected as _Voice of the Council_.");
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), sb.toString());
         Helper.checkEndGame(game, player);
     }

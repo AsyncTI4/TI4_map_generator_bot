@@ -53,7 +53,7 @@ public class VoidTetherService {
                 return true;
             }
             for (Planet planet : t.getPlanetUnitHolders()) {
-                if (player.getPlanetsAllianceMode().contains(planet.getName())) {
+                if (player.canUsePlanet(planet.getName())) {
                     return true;
                 }
             }

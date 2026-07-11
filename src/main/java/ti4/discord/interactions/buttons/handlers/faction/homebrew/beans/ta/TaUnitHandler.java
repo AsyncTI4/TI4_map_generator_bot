@@ -23,6 +23,7 @@ import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
+import ti4.service.unit.UnitQueryService;
 
 @UtilityClass
 public class TaUnitHandler {
@@ -44,8 +45,8 @@ public class TaUnitHandler {
                 || !player.hasUnit(MECH_ID)
                 || planetName.isBlank()
                 || ButtonHelper.isLawInPlay(game, "articles_war")
-                || (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) >= 4)
-                || !player.getPlanetsAllianceMode().contains(planetName)) {
+                || (UnitQueryService.countUnits(game, player, "mech", true) >= 4)
+                || !player.canUsePlanet(planetName)) {
             return;
         }
 
@@ -82,9 +83,9 @@ public class TaUnitHandler {
                 || planetName == null
                 || tile == null
                 || !player.hasUnit(MECH_ID)
-                || !player.getPlanetsAllianceMode().contains(planetName)
+                || !player.canUsePlanet(planetName)
                 || ButtonHelper.isLawInPlay(game, "articles_war")
-                || (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) >= 4)) {
+                || (UnitQueryService.countUnits(game, player, "mech", true) >= 4)) {
             return;
         }
 
@@ -173,7 +174,7 @@ public class TaUnitHandler {
     }
 
     private static void clearWorldshaperModifiersOnOtherTiles(Game game, Tile currentTile) {
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTiles()) {
             if (tile == null || tile == currentTile) {
                 continue;
             }
@@ -237,7 +238,7 @@ public class TaUnitHandler {
     private static List<String> getFriendlyWorldshaperPlanets(Player player, Tile tile) {
         List<String> friendlyPlanets = new ArrayList<>();
         for (Planet planet : tile.getPlanetUnitHolders()) {
-            if (player.getPlanetsAllianceMode().contains(planet.getName())) {
+            if (player.canUsePlanet(planet.getName())) {
                 friendlyPlanets.add(planet.getName());
             }
         }

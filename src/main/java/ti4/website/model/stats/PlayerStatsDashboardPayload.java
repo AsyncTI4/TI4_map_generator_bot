@@ -204,7 +204,7 @@ public class PlayerStatsDashboardPayload {
 
         // Legendary Count
         long legendaryCount = player.getPlanets().stream()
-                .map(pID -> game.getPlanetsInfo().get(pID))
+                .map(pID -> game.getPlanet(pID))
                 .filter(Objects::nonNull)
                 .filter(Planet::isLegendary)
                 .count();
@@ -212,19 +212,19 @@ public class PlayerStatsDashboardPayload {
 
         // Traits
         long culturalCount = player.getPlanets().stream()
-                .map(pID -> game.getPlanetsInfo().get(pID))
+                .map(pID -> game.getPlanet(pID))
                 .filter(Objects::nonNull)
-                .filter(p -> p.getPlanetTypes().contains("cultural"))
+                .filter(p -> p.hasType("cultural"))
                 .count();
         long hazardousCount = player.getPlanets().stream()
-                .map(pID -> game.getPlanetsInfo().get(pID))
+                .map(pID -> game.getPlanet(pID))
                 .filter(Objects::nonNull)
-                .filter(p -> p.getPlanetTypes().contains("hazardous"))
+                .filter(p -> p.hasType("hazardous"))
                 .count();
         long industrialCount = player.getPlanets().stream()
-                .map(pID -> game.getPlanetsInfo().get(pID))
+                .map(pID -> game.getPlanet(pID))
                 .filter(Objects::nonNull)
-                .filter(p -> p.getPlanetTypes().contains("industrial"))
+                .filter(p -> p.hasType("industrial"))
                 .count();
         planetTotals.put(
                 "traits",
@@ -239,7 +239,7 @@ public class PlayerStatsDashboardPayload {
         AtomicInteger greenCount = new AtomicInteger();
         AtomicInteger redCount = new AtomicInteger();
         player.getPlanets().stream()
-                .map(pID -> game.getPlanetsInfo().get(pID))
+                .map(pID -> game.getPlanet(pID))
                 .filter(Objects::nonNull)
                 .map(Planet::getTechSpecialities)
                 .flatMap(Collection::stream)

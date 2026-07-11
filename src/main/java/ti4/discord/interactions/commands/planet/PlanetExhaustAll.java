@@ -24,6 +24,6 @@ public class PlanetExhaustAll extends GameStateSubcommand {
         for (String planet : player.getPlanets()) {
             player.exhaustPlanet(planet);
         }
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " exhausted all planets.");
+        MessageHelper.sendMessageToEventChannel(event, player.toString() + " exhausted all planets.");
     }
 }

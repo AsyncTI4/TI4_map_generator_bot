@@ -26,7 +26,7 @@ public class NeuraloopService {
                 DrawSecretService.drawSO(null, game, player);
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(),
-                        "## " + player.getRepresentation()
+                        "## " + player.toString()
                                 + " draws a secret objective due to their **Incomprehensible** ability.");
             }
             if (player.hasRelic("neuraloop")) {
@@ -80,7 +80,7 @@ public class NeuraloopService {
             case "stage2" -> deck = "stage 2 public objective";
             case "secret" -> deck = "secret objective";
         }
-        String msg = player.getRepresentation()
+        String msg = player.toString()
                 + ", please choose the relic you wish to purge in order to replace the objective with a " + deck + ".";
         List<Button> buttons = getNeuraloopButton(player, poID, type);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -102,7 +102,7 @@ public class NeuraloopService {
         player.removeExhaustedRelic(relic);
         RelicHelper.resolveRelicLossEffects(game, player, relic);
         game.removeRevealedObjective(poID);
-        String msg = "## " + game.getPing() + " " + player.getRepresentation() + " is using _Neuraloop_, purging "
+        String msg = "## " + game.getPing() + " " + player.toString() + " is using _Neuraloop_, purging "
                 + ("neuraloop".equals(relic) ? "itself" : Mapper.getRelic(relic).getName())
                 + ", to replace the recently revealed objective with a random " + deck + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);

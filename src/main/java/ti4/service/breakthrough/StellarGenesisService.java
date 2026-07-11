@@ -29,7 +29,7 @@ public class StellarGenesisService {
 
     public static void serveAvernusButtons(Game game, Player player) {
         List<Tile> playerPlanetTiles = player.getPlanets().stream()
-                .map(game::getTileFromPlanet)
+                .map(game::getTileContainingPlanet)
                 .filter(Objects::nonNull)
                 .toList();
         Set<Tile> adjToPlanetTiles = playerPlanetTiles.stream()
@@ -57,8 +57,8 @@ public class StellarGenesisService {
 
             AddPlanetService.addPlanet(player, Constants.AVERNUS, game, event, false);
             player.getExhaustedPlanets().remove(Constants.AVERNUS);
-            String message = player.getRepresentation() + " placed Avernus in "
-                    + tile.getRepresentationForButtons(game, player) + ".";
+            String message =
+                    player.toString() + " placed Avernus in " + tile.getRepresentationForButtons(game, player) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.deleteMessage(event);
         }

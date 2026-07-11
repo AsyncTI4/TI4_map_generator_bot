@@ -21,13 +21,13 @@ public class GrantReallocationAgendaResolver implements AgendaResolver {
         if (player2 == null) return;
         MessageHelper.sendMessageToChannelWithButtons(
                 player2.getCorrectChannel(),
-                player2.getRepresentation() + ", please choose a technology to gain.",
+                player2.toString() + ", please choose a technology to gain.",
                 List.of(Buttons.GET_A_TECH));
 
         List<Button> buttons = ButtonHelper.getLoseFleetCCButtons(player2);
         MessageHelper.sendMessageToChannelWithButtons(
                 player2.getCorrectChannel(),
-                player2.getRepresentation()
+                player2.toString()
                         + ", after you have gained your technology, please remove one token from your fleet pool for each prerequisite on that technology.",
                 buttons);
     }

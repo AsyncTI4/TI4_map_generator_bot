@@ -160,9 +160,8 @@ public record MantisMapBuildContext(
     private static List<PlayerTiles> getPlayerTileState(
             DraftManager draftManager, MantisTileDraftable mantisDraftable) {
         List<PlayerTiles> result = new ArrayList<>();
-        Set<String> placedTiles = draftManager.getGame().getTileMap().values().stream()
-                .map(Tile::getTileID)
-                .collect(Collectors.toSet());
+        Set<String> placedTiles =
+                draftManager.getGame().getTiles().stream().map(Tile::getTileID).collect(Collectors.toSet());
         Set<String> discardedTiles = new HashSet<>(mantisDraftable.getDiscardedTileIDs());
         for (Entry<String, PlayerDraftState> entry :
                 draftManager.getPlayerStates().entrySet()) {

@@ -327,9 +327,9 @@ class ButtonHelperModifyUnitsTest extends BaseTi4Test {
                 ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
 
         assertTrue(actualMessage.contains("Repaired 1 <warsun> due to _Duranium Armor_"));
-        assertEquals(1, tile.getUnitHolders().get(Constants.SPACE).getDamagedUnitCount(warsunUnitKey));
-        assertEquals(2, tile.getUnitHolders().get(Constants.SPACE).getDamagedUnitCount(dreadnoughtUnitKey));
-        assertEquals(2, tile.getUnitHolders().get(Constants.SPACE).getDamagedUnitCount(flagshipUnitKey));
+        assertEquals(1, tile.getSpaceUnitHolder().getDamagedUnitCount(warsunUnitKey));
+        assertEquals(2, tile.getSpaceUnitHolder().getDamagedUnitCount(dreadnoughtUnitKey));
+        assertEquals(2, tile.getSpaceUnitHolder().getDamagedUnitCount(flagshipUnitKey));
     }
 
     @Test
@@ -347,8 +347,8 @@ class ButtonHelperModifyUnitsTest extends BaseTi4Test {
                 ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, false, false);
 
         assertTrue(actualMessage.contains("Repaired 1 <dreadnought> due to _Duranium Armor_"));
-        assertEquals(1, tile.getUnitHolders().get(Constants.SPACE).getUnitCount(dreadnoughtUnitKey));
-        assertEquals(0, tile.getUnitHolders().get(Constants.SPACE).getDamagedUnitCount(dreadnoughtUnitKey));
+        assertEquals(1, tile.getSpaceUnitHolder().getUnitCount(dreadnoughtUnitKey));
+        assertEquals(0, tile.getSpaceUnitHolder().getDamagedUnitCount(dreadnoughtUnitKey));
     }
 
     @Test
@@ -366,8 +366,8 @@ class ButtonHelperModifyUnitsTest extends BaseTi4Test {
                 ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
 
         assertFalse(actualMessage.contains("Repaired 1 <dreadnought> due to _Duranium Armor_"));
-        assertEquals(0, tile.getUnitHolders().get(Constants.SPACE).getUnitCount(dreadnoughtUnitKey));
-        assertEquals(0, tile.getUnitHolders().get(Constants.SPACE).getDamagedUnitCount(dreadnoughtUnitKey));
+        assertEquals(0, tile.getSpaceUnitHolder().getUnitCount(dreadnoughtUnitKey));
+        assertEquals(0, tile.getSpaceUnitHolder().getDamagedUnitCount(dreadnoughtUnitKey));
     }
 
     @Test
@@ -383,8 +383,8 @@ class ButtonHelperModifyUnitsTest extends BaseTi4Test {
                 ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 4, null, false, false);
 
         assertTrue(actualMessage.contains("Repaired 1 <dreadnought> due to _Duranium Armor_"));
-        assertEquals(3, tile.getUnitHolders().get(Constants.SPACE).getUnitCount(dreadnoughtUnitKey));
-        assertEquals(2, tile.getUnitHolders().get(Constants.SPACE).getDamagedUnitCount(dreadnoughtUnitKey));
+        assertEquals(3, tile.getSpaceUnitHolder().getUnitCount(dreadnoughtUnitKey));
+        assertEquals(2, tile.getSpaceUnitHolder().getDamagedUnitCount(dreadnoughtUnitKey));
     }
 
     private static Player createPlayerWithDuraniumArmor(Game game, String color) {

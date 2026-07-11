@@ -46,7 +46,7 @@ class SeizedResearchAcd2ButtonHandler {
     public static void resolveSeizedResearchPlanet(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planetName = buttonID.replace("seizedResearchPlanet_", "");
-        Planet planet = game.getPlanetsInfo().get(planetName);
+        Planet planet = game.getPlanet(planetName);
         if (planet == null
                 || !player.hasPlanet(planetName)
                 || planet.getTechSpecialities().isEmpty()) {
@@ -104,7 +104,7 @@ class SeizedResearchAcd2ButtonHandler {
 
         String planetName = payload.substring(0, separator);
         TechSpecialty specialty = parseTechSpecialty(payload.substring(separator + 1));
-        Planet planet = game.getPlanetsInfo().get(planetName);
+        Planet planet = game.getPlanet(planetName);
         if (specialty == null
                 || planet == null
                 || !player.hasPlanet(planetName)

@@ -13,7 +13,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatUnitSelectionHelper;
@@ -27,7 +26,7 @@ class ClassifiedWeaponsAcd2ButtonHandler {
         List<Button> buttons = new ArrayList<>();
         Tile activeTile = game.getTileByPosition(game.getActiveSystem());
         if (activeTile != null) {
-            UnitHolder spaceHolder = activeTile.getUnitHolders().get(Constants.SPACE);
+            UnitHolder spaceHolder = activeTile.getSpaceUnitHolder();
             if (spaceHolder != null) {
                 Map<UnitModel, Integer> combatUnits =
                         CombatUnitSelectionHelper.collectCombatRoundUnits(activeTile, spaceHolder, player);

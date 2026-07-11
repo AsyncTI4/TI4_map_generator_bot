@@ -41,7 +41,7 @@ public class CaptureUnitService {
                 continue;
             }
             if (!player.hasUnit("cabal_mech")) continue;
-            if (planet.getUnitCount(UnitType.Mech, player) == 0) continue;
+            if (!planet.hasUnit(UnitType.Mech, player)) continue;
             capturing.add(player);
         }
         return capturing;
@@ -62,7 +62,7 @@ public class CaptureUnitService {
             if (p.unitBelongsToPlayer(removed.unitKey()) && removed.unitKey().unitType() == UnitType.Flagship) continue;
 
             // If the flagship was not destroyed
-            if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, p) > 0) {
+            if (tile.hasUnitInSpace(UnitType.Flagship, p)) {
                 cabalsWithFs.add(p);
                 continue;
             }
@@ -105,13 +105,13 @@ public class CaptureUnitService {
             if (!counted.add(key.colorID())) continue;
 
             Player p2 = game.getPlayerByUnitKey(key).orElse(null);
-            if (p2 != null && p2 != owner && !p2.getAllianceMembers().contains(owner.getFaction())) {
+            if (p2 != null && p2 != owner && !p2.hasAllianceMember(owner.getFaction())) {
                 playerOpponents.add(p2);
             }
         }
         if (owner != game.getActivePlayer()
                 && game.getActivePlayer() != null
-                && !game.getActivePlayer().getAllianceMembers().contains(owner.getFaction())) {
+                && !game.getActivePlayer().hasAllianceMember(owner.getFaction())) {
             playerOpponents.add(game.getActivePlayer());
         }
         return playerOpponents;

@@ -108,7 +108,7 @@ class SystemInfo extends GameStateSubcommand {
                 }
                 List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, game, tile);
                 if (!players.isEmpty()
-                        && !player.getAllianceMembers().contains(players.get(0).getFaction())
+                        && !player.hasAllianceMember(players.get(0).getFaction())
                         && FoWHelper.playerHasShipsInSystem(player, tile)) {
                     Player player2 = players.get(0);
                     if (player2 == player) {
@@ -119,7 +119,7 @@ class SystemInfo extends GameStateSubcommand {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
                     return;
                 } else {
-                    for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                    for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
                         if (unitHolder instanceof Planet) {
                             if (ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName())
                                             .size()

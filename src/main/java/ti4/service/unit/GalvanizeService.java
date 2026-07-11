@@ -49,7 +49,7 @@ public class GalvanizeService {
         String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         String pos = tile.getPosition() + "_";
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+        for (UnitHolder unitHolder : tile.getUnitHolderValues()) {
             String uhName = unitHolder.getName();
             String uhRepresentation;
             if ("space".equalsIgnoreCase(uhName)) {
@@ -89,7 +89,7 @@ public class GalvanizeService {
         RegexService.runMatcher(regex, buttonID, matcher -> {
             UnitKey unitKey = Mapper.getUnitKey(matcher.group("unittype"), player.getColorID());
             Tile tile = game.getTileByPosition(matcher.group("pos"));
-            UnitHolder uh = tile.getUnitHolders().get(matcher.group("holder"));
+            UnitHolder uh = tile.getUnitHolder(matcher.group("holder"));
             resolveGalvanize(event, game, player, tile, uh, unitKey, false);
         });
     }
@@ -101,7 +101,7 @@ public class GalvanizeService {
         RegexService.runMatcher(regex, buttonID, matcher -> {
             UnitKey unitKey = Mapper.getUnitKey(matcher.group("unittype"), player.getColorID());
             Tile tile = game.getTileByPosition(matcher.group("pos"));
-            UnitHolder uh = tile.getUnitHolders().get(matcher.group("holder"));
+            UnitHolder uh = tile.getUnitHolder(matcher.group("holder"));
             resolveGalvanize(event, game, player, tile, uh, unitKey, true);
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "bastion");
         });
@@ -122,8 +122,8 @@ public class GalvanizeService {
         refreshGalvanizeButtons(event, game, player, tile);
         String descr = unit.unitType().humanReadableName() + grammar + uhName;
         String addRemove = add ? " galvanized " : " removed galvanize from ";
-        String msg = player.getRepresentation() + addRemove + descr + " in tile "
-                + tile.getRepresentationForButtons(game, player);
+        String msg =
+                player.toString() + addRemove + descr + " in tile " + tile.getRepresentationForButtons(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 

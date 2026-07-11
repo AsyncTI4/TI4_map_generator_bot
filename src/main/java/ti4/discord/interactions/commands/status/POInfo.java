@@ -44,7 +44,7 @@ class POInfo extends GameStateSubcommand {
             stringBuilder
                     .append(publicObjectiveNumber)
                     .append(". ")
-                    .append(publicObjective.getRepresentation())
+                    .append(publicObjective.toString())
                     .append('\n');
 
             if (includeScored && scoredPublicObjectives.containsKey(publicObjective.getAlias())) {

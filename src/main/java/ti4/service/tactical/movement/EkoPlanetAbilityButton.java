@@ -8,7 +8,7 @@ import ti4.service.tactical.MoveContext;
 
 public final class EkoPlanetAbilityButton implements MoveAbilityButton {
     public boolean enabled(MoveContext ctx) {
-        return ctx.player.getPlanets().contains("eko")
+        return ctx.player.containsPlanet("eko")
                 && !ctx.player.getExhaustedPlanetsAbilities().contains("eko");
     }
 

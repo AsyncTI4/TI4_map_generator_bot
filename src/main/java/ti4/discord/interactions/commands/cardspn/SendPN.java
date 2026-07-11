@@ -129,8 +129,8 @@ class SendPN extends GameStateSubcommand {
 
         String conditionalPNName = placeDirectlyInPlayArea ? "_" + pnModel.getName() + "_" : "a promissory note";
         String preposition = placeDirectlyInPlayArea ? " directly to the play area of " : " to the hand of ";
-        String message = player.getRepresentation() + " sent " + CardEmojis.PN + conditionalPNName + preposition
-                + targetPlayer.getRepresentation() + ".";
+        String message = player.toString() + " sent " + CardEmojis.PN + conditionalPNName + preposition
+                + targetPlayer.toString() + ".";
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(targetPlayer.getPrivateChannel(), message);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Promissory note sent.");

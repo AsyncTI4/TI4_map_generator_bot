@@ -34,7 +34,7 @@ public class WebStrategyCard {
 
         // Check if picked and by whom
         for (var player : game.getPlayers().values()) {
-            if (player.getSCs().contains(scNumber)) {
+            if (player.hasStrategyCard(scNumber)) {
                 webSC.picked = true;
                 webSC.pickedByFaction = player.getFaction();
                 break;

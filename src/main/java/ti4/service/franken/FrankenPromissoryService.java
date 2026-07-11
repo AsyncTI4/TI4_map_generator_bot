@@ -15,7 +15,7 @@ public class FrankenPromissoryService {
 
     public static void addPromissoryNotes(
             GenericInteractionCreateEvent event, Game game, Player player, List<String> pnIDs) {
-        StringBuilder sb = new StringBuilder(player.getRepresentation())
+        StringBuilder sb = new StringBuilder(player.toString())
                 .append(" added ")
                 .append(pnIDs.size() == 1 ? "a " : "")
                 .append("promissory note")
@@ -50,7 +50,7 @@ public class FrankenPromissoryService {
     }
 
     public static void removePromissoryNotes(GenericInteractionCreateEvent event, Player player, List<String> pnIDs) {
-        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed promissory notes:\n");
+        StringBuilder sb = new StringBuilder(player.toString()).append(" removed promissory notes:\n");
         for (String pnID : pnIDs) {
             if (!player.ownsPromissoryNote(pnID)) {
                 sb.append("> ").append(pnID).append(" (player did not own this promissory note)");

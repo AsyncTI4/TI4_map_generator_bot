@@ -69,13 +69,13 @@ public class ArvaxiAbilityHandler {
     }
 
     public static void onExplorePlanet(Player player, Game game, String planetName) {
-        Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+        Planet planet = game.getPlanet(planetName);
         if (planet != null && planet.getUnitCount(player.getColorID()) >= 3) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", please draw an action card because of **Ultimate Authority**.",
+                    player.toString() + ", please draw an action card because of **Ultimate Authority**.",
                     buttons);
         }
     }

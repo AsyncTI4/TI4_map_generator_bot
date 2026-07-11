@@ -20,7 +20,7 @@ public class ElectSecretAgendaResolver implements AgendaResolver {
         if (game.isFowMode()) {
             message = "The elected player drew a secret objective.";
         } else {
-            message = player2.getRepresentation() + " drew a secret objective as the elected player.";
+            message = player2.toString() + " drew a secret objective as the elected player.";
         }
         game.drawSecretObjective(player2.getUserID());
         if (player2.hasAbility("plausible_deniability")) {

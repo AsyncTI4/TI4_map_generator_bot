@@ -421,7 +421,7 @@ public class MiltyDraftManager {
                     && player != nextDrafter) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
-                        player.getRepresentation() + " You can queue your remaining choices with these buttons",
+                        player.toString() + " You can queue your remaining choices with these buttons",
                         getQueueButtons(player, game));
             }
         } else {

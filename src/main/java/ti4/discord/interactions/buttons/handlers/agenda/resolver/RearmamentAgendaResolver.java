@@ -24,7 +24,7 @@ public class RearmamentAgendaResolver implements ForAgainstAgendaResolver {
             if (player.hasActiveBreakthrough("naazbt")) {
                 continue;
             }
-            String message = player.getRepresentation() + ", please choose a home system planet to place a mech on.";
+            String message = player.toString() + ", please choose a home system planet to place a mech on.";
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     message,
@@ -35,8 +35,8 @@ public class RearmamentAgendaResolver implements ForAgainstAgendaResolver {
     @Override
     public void handleAgainst(Game game, ButtonInteractionEvent event, int agendaNumericId) {
         for (Player player : game.getRealPlayers()) {
-            for (Tile tile : game.getTileMap().values()) {
-                for (UnitHolder capChecker : tile.getUnitHolders().values()) {
+            for (Tile tile : game.getTiles()) {
+                for (UnitHolder capChecker : tile.getUnitHolderValues()) {
                     int count = capChecker.getUnitCount(UnitType.Mech, player.getColor());
                     if (count > 0) {
                         String colorID = Mapper.getColorID(player.getColor());
