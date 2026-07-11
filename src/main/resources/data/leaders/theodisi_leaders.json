@@ -150,9 +150,9 @@
     "id": "kairncommander",
     "faction": "kairn",
     "type": "commander",
-    "name": "Serel Venn",
+    "name": "Seral Venn",
     "title": "Bounding Cartographer",
-    "abilityWindow": "At the start of the stratey phase:",
+    "abilityWindow": "At the start of the strategy phase:",
     "abilityText": "Choose 1 non-home non-legendary planet. Explore that planet as if it were any trait.",
     "unlockCondition": "Have 2 cards from different exploration decks in your play area.",
     "source": "theodisi"
