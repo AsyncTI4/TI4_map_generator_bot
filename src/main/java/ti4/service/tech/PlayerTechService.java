@@ -856,8 +856,7 @@ public class PlayerTechService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), buttonText, buttons);
         }
-        CommanderUnlockCheckService.checkPlayer(
-                player, "jolnar", "nekro", "mirveda", "dihmohn", "kryxos", "arcanum");
+        CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn", "kryxos", "arcanum");
 
         if (game.isTwilightsFallMode()
                 && game.getRound() == 1
