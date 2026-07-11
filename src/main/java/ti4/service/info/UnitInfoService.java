@@ -14,6 +14,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.franken.FrankenAlternateTextService;
+import ti4.service.unit.UnitModelValueInjectionService;
 
 @UtilityClass
 public class UnitInfoService {
@@ -49,8 +50,11 @@ public class UnitInfoService {
         } else {
             unitList.addAll(player.getSpecialUnitsOwned());
         }
-        for (UnitModel unitModel :
-                unitList.stream().sorted().map(Mapper::getUnit).toList()) {
+        for (UnitModel unitModel : unitList.stream()
+                .sorted()
+                .map(Mapper::getUnit)
+                .map(unit -> UnitModelValueInjectionService.injectPlayerUnitValues(player, unit))
+                .toList()) {
             MessageEmbed unitRepresentationEmbed =
                     FrankenAlternateTextService.getUnitEmbed(player.getGame(), unitModel, false);
             messageEmbeds.add(unitRepresentationEmbed);
