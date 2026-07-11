@@ -10,6 +10,7 @@ import ti4.helpers.thundersedge.TeHelperAgents;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public final class CommandCounterHelper {
 
@@ -48,6 +49,14 @@ public final class CommandCounterHelper {
                     player.getGame(), tile.getPosition(), colorMention + " has placed a command token in the system.");
         }
         tile.addCC(ccID);
+
+        if (player.hasLeader("ardentiacommander")) {
+            CommanderUnlockCheckService.checkPlayer(player, "ardentia");
+        }
+        if (player.hasLeader("verydithcommander")) {
+            CommanderUnlockCheckService.checkAllPlayersInGame(player.getGame(), "verydith");
+        }
+
         for (Player p : player.getGame().getRealPlayers()) {
             if (p.hasUnexhaustedLeader("naaluagent-te")) {
                 TeHelperAgents.serveNaaluAgentButtons(player.getGame(), p, tile, player);
