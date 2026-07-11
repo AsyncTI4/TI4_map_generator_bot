@@ -230,7 +230,7 @@ class CombatRollPayloadRendererParityTest extends BaseTi4Test {
                 MockedStatic<SpringContext> spring = mockStatic(SpringContext.class)) {
             spring.when(() -> SpringContext.getBean(CombatReplayService.class)).thenReturn(replayService);
 
-            CombatRollService.secondHalfOfCombatRoll(
+            CombatRollService.runCombatRoll(
                     sol, harness.game, event, tile, Constants.SPACE, CombatRollType.combatround, false);
         }
 
@@ -262,10 +262,10 @@ class CombatRollPayloadRendererParityTest extends BaseTi4Test {
             Harness harness, Player player, Player opponent, Tile tile, CombatRollType rollType) {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         Map<Pair<UnitModel, UnitHolder>, Integer> playerUnits =
-                CombatRollService.getUnitsInCombatByHolder(tile, space, player, null, rollType, harness.game);
-        Map<UnitModel, Integer> playerUnitsFlat = CombatRollService.flattenUnitMap(playerUnits);
+                CombatUnitResolver.getUnitsInCombatByHolder(tile, space, player, null, rollType, harness.game);
+        Map<UnitModel, Integer> playerUnitsFlat = CombatUnitResolver.flattenUnitMap(playerUnits);
         Map<UnitModel, Integer> opponentUnits =
-                CombatRollService.getUnitsInCombat(tile, space, opponent, null, rollType, harness.game);
+                CombatUnitResolver.getUnitsInCombat(tile, space, opponent, null, rollType, harness.game);
         TileModel tileModel = tile.getTileModel();
         List<NamedCombatModifierModel> modifiers = CombatModHelper.getModifiers(
                 player,
@@ -286,18 +286,13 @@ class CombatRollPayloadRendererParityTest extends BaseTi4Test {
                 rollType,
                 Constants.COMBAT_EXTRA_ROLLS);
 
-        CombatRollService.CombatRollResult result = CombatRollService.rollForUnitsWithResult(
-                playerUnits,
-                extraRolls,
-                modifiers,
-                List.of(),
-                player,
-                opponent,
-                harness.game,
-                rollType,
-                null,
-                tile,
-                space);
+        CombatRollPipelineState state =
+                new CombatRollPipelineState(player, harness.game, null, tile, space.getName(), rollType, false);
+        state.setCombatOnHolder(space);
+        state.setPlayerUnits(playerUnits);
+        state.setOpponent(opponent);
+        state.setModifiers(new CombatRollModifiers(modifiers, extraRolls, List.of()));
+        CombatRollResult result = UnitRollExecution.rollForUnitsWithResult(state);
         String combatSummary = CombatMessageHelper.displayCombatSummary(player, tile, space, rollType);
         String productionMessage = combatSummary + result.message();
         CombatRollPayload.RollHeader header =

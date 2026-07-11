@@ -40,7 +40,7 @@ public class BombardmentService {
             return;
         }
         Map<Pair<UnitModel, UnitHolder>, Integer> bombardUnits =
-                CombatRollService.getUnitsInBombardment(tile, player, null);
+                CombatUnitResolver.getUnitsInBombardment(tile, player, null);
         String planet = getBestBombardablePlanet(player, game, tile);
         List<BombardmentAssignment> assignments = new ArrayList<>();
         for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : bombardUnits.entrySet()) {

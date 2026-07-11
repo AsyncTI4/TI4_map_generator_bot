@@ -110,10 +110,15 @@ import ti4.service.abilities.MahactTokenService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.button.ReactionService;
+import ti4.service.combat.CombatRollModifiers;
+import ti4.service.combat.CombatRollPipelineState;
+import ti4.service.combat.CombatRollResult;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.CombatStatsService;
+import ti4.service.combat.CombatUnitResolver;
 import ti4.service.combat.CombatUnitSelectionHelper;
+import ti4.service.combat.UnitRollExecution;
 import ti4.service.decks.ShowActionCardsService;
 import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
@@ -6864,7 +6869,7 @@ public class ButtonHelper {
         }
         CombatRollType rollType = CombatRollType.combatround;
         Map<UnitModel, Integer> playerUnitsByQuantity =
-                CombatRollService.getUnitsInCombat(tile, combatOnHolder, player, event, rollType, game);
+                CombatUnitResolver.getUnitsInCombat(tile, combatOnHolder, player, event, rollType, game);
         List<UnitModel> units = new ArrayList<>(playerUnitsByQuantity.keySet());
         for (UnitModel unitModel : units) {
             playerUnitsByQuantity.put(unitModel, 0);
@@ -6888,12 +6893,12 @@ public class ButtonHelper {
         }
         game.setStoredValue("thalnosPlusOne", "true");
         List<UnitHolder> combatHoldersForOpponent = new ArrayList<>(List.of(combatOnHolder));
-        Player opponent = CombatRollService.getOpponent(player, combatHoldersForOpponent, game);
+        Player opponent = CombatUnitResolver.getOpponent(player, combatHoldersForOpponent, game);
         if (opponent == null) {
             opponent = player;
         }
         Map<UnitModel, Integer> opponentUnitsByQuantity =
-                CombatRollService.getUnitsInCombat(tile, combatOnHolder, opponent, event, rollType, game);
+                CombatUnitResolver.getUnitsInCombat(tile, combatOnHolder, opponent, event, rollType, game);
 
         TileModel tileModel = TileHelper.getTileById(tile.getTileID());
         List<NamedCombatModifierModel> modifiers = CombatModHelper.getModifiers(
@@ -6927,22 +6932,16 @@ public class ButtonHelper {
         tempMods.addAll(tempOpponentMods);
 
         String message = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
-        message += CombatRollService.rollForUnits(
-                playerUnitsByQuantity,
-                extraRolls,
-                modifiers,
-                tempMods,
-                player,
-                opponent,
-                game,
-                rollType,
-                event,
-                tile,
-                combatOnHolder);
+        CombatRollPipelineState rollState =
+                new CombatRollPipelineState(player, game, event, tile, combatOnHolder.getName(), rollType, false);
+        rollState.setCombatOnHolder(combatOnHolder);
+        rollState.setPlayerUnitsByModel(playerUnitsByQuantity, combatOnHolder);
+        rollState.setOpponent(opponent);
+        rollState.setModifiers(new CombatRollModifiers(modifiers, extraRolls, tempMods));
+        CombatRollResult rollResult = UnitRollExecution.rollForUnitsWithResult(rollState);
+        message += rollResult.message();
         FOWCombatThreadMirroring.mirrorCombatMessage(event, player, game, message);
-        String hits = substringAfter(message, "Total hits ");
-        hits = hits.split(" ")[0].replace("*", "");
-        int h = Integer.parseInt(hits);
+        int h = rollResult.totalHits();
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
         if (message.endsWith(";\n")) {

@@ -27,8 +27,8 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.BombardmentService;
-import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
+import ti4.service.combat.CombatUnitResolver;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
@@ -107,7 +107,7 @@ class BombardmentButtonHandler {
             return buttons;
         }
         Map<Pair<UnitModel, UnitHolder>, Integer> bombardUnits =
-                CombatRollService.getUnitsInBombardment(tile, player, null);
+                CombatUnitResolver.getUnitsInBombardment(tile, player, null);
 
         List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
                 game.getStoredValue("assignedBombardment" + player.getFaction()),

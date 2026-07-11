@@ -22,7 +22,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.RemoveCommandCounterService;
-import ti4.service.combat.CombatRollService;
+import ti4.service.combat.CombatRollPublication;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -1267,7 +1267,7 @@ public class DreamButtonHandler {
             if (!playersInCombat.isBlank() && playersInCombat.contains(player.getFaction())) {
                 for (Player opponent : game.getRealPlayersExcludingThis(player)) {
                     if (playersInCombat.contains(opponent.getFaction())) {
-                        CombatRollService.sendSpaceAssignHitsButtons(event, game, opponent, tile, 1);
+                        CombatRollPublication.sendSpaceAssignHitsButtons(event, game, opponent, tile, 1);
                         break;
                     }
                 }

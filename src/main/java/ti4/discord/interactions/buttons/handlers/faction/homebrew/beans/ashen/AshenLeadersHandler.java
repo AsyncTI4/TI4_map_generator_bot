@@ -28,6 +28,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
+import ti4.service.combat.CombatUnitResolver;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.unit.AddUnitService;
@@ -116,7 +117,7 @@ public class AshenLeadersHandler {
             game.setStoredValue(
                     "assignedBombardment" + player.getFaction(),
                     buildHeroBombardmentAssignment(player, game, sourceTile, planet));
-            CombatRollService.secondHalfOfCombatRoll(
+            CombatRollService.runCombatRoll(
                     player, game, event, sourceTile, "space", CombatRollType.bombardment, false);
         }
 
@@ -510,7 +511,7 @@ public class AshenLeadersHandler {
     private static List<Tile> getEligibleHeroTiles(Game game, Player player) {
         return game.getTileMap().values().stream()
                 .filter(tile -> FoWHelper.playerHasActualShipsInSystem(player, tile))
-                .filter(tile -> !CombatRollService.getUnitsInBombardment(tile, player, null)
+                .filter(tile -> !CombatUnitResolver.getUnitsInBombardment(tile, player, null)
                         .isEmpty())
                 .filter(tile -> !getHeroTargetPlanets(game, player, tile).isEmpty())
                 .sorted(Comparator.comparing(Tile::getPosition))
@@ -544,7 +545,7 @@ public class AshenLeadersHandler {
             Player player, Game game, Tile sourceTile, String targetPlanet) {
         StringBuilder assignment = new StringBuilder();
         Map<UnitModel, Integer> bombardUnits =
-                CombatRollService.flattenUnitMap(CombatRollService.getUnitsInBombardment(sourceTile, player, null));
+                CombatUnitResolver.flattenUnitMap(CombatUnitResolver.getUnitsInBombardment(sourceTile, player, null));
         for (Map.Entry<UnitModel, Integer> entry : bombardUnits.entrySet()) {
             for (int x = 0; x < entry.getValue(); x++) {
                 assignment

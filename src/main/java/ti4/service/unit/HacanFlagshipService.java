@@ -14,7 +14,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.RegexHelper;
 import ti4.message.MessageHelper;
-import ti4.service.combat.CombatRollService;
+import ti4.service.combat.CombatRollPublication;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.regex.RegexService;
 
@@ -109,7 +109,7 @@ public class HacanFlagshipService {
             if (!playersInCombat.isBlank() && playersInCombat.contains(player.getFaction())) {
                 for (Player opponent : game.getRealPlayersExcludingThis(player)) {
                     if (playersInCombat.contains(opponent.getFaction())) {
-                        CombatRollService.sendSpaceAssignHitsButtons(event, game, opponent, tile, hits);
+                        CombatRollPublication.sendSpaceAssignHitsButtons(event, game, opponent, tile, hits);
                         break;
                     }
                 }

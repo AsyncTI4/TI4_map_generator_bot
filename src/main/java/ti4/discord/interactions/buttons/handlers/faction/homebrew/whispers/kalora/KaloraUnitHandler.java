@@ -44,7 +44,7 @@ public class KaloraUnitHandler {
         String tilePos = parts[0];
         String planet = parts[1];
         game.setStoredValue("bombardmentTarget" + player.getFaction(), planet);
-        CombatRollService.secondHalfOfCombatRoll(
+        CombatRollService.runCombatRoll(
                 player, game, event, game.getTileByPosition(tilePos), "space", CombatRollType.bombardment, false);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }

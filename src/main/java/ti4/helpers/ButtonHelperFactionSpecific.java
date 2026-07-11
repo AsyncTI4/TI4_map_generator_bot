@@ -57,9 +57,13 @@ import ti4.model.enums.CombatMod.CombatModType;
 import ti4.service.VeiledHeartService;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.button.ReactionService;
-import ti4.service.combat.CombatRollService;
+import ti4.service.combat.CombatRollModifiers;
+import ti4.service.combat.CombatRollPipelineState;
+import ti4.service.combat.CombatRollResult;
 import ti4.service.combat.CombatRollType;
+import ti4.service.combat.CombatUnitResolver;
 import ti4.service.combat.StartCombatService;
+import ti4.service.combat.UnitRollExecution;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -1521,7 +1525,7 @@ public final class ButtonHelperFactionSpecific {
         int totalHits = 0;
         StringBuilder resultBuilder = new StringBuilder(result);
         Map<UnitModel, Integer> playerUnits =
-                CombatRollService.getUnitsInCombat(tile, space, player, event, CombatRollType.combatround, game);
+                CombatUnitResolver.getUnitsInCombat(tile, space, player, event, CombatRollType.combatround, game);
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unit = entry.getKey();
             int numOfUnit;
@@ -2692,11 +2696,15 @@ public final class ButtonHelperFactionSpecific {
                         p1, tile.getTileModel(), planet, false, CombatRollType.combatround));
 
         String message = CombatMessageHelper.displayCombatSummary(p1, tile, planet, CombatRollType.combatround);
-        message += CombatRollService.rollForUnits(
-                units, rollMods, flatMods, tempMods, p1, p2, game, CombatRollType.combatround, event, tile, planet);
-        String hits = substringAfter(message, "Total hits ");
-        hits = hits.split(" ")[0].replace("*", "");
-        int h = Integer.parseInt(hits);
+        CombatRollPipelineState rollState =
+                new CombatRollPipelineState(p1, game, event, tile, planet.getName(), CombatRollType.combatround, false);
+        rollState.setCombatOnHolder(planet);
+        rollState.setPlayerUnitsByModel(units, planet);
+        rollState.setOpponent(p2);
+        rollState.setModifiers(new CombatRollModifiers(flatMods, rollMods, tempMods));
+        CombatRollResult rollResult = UnitRollExecution.rollForUnitsWithResult(rollState);
+        message += rollResult.message();
+        int h = rollResult.totalHits();
         if (message.endsWith(";\n")) {
             message = message.substring(0, message.length() - 2);
         }

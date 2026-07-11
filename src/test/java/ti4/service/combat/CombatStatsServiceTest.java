@@ -11,6 +11,7 @@ import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.CombatModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
@@ -53,9 +54,9 @@ class CombatStatsServiceTest extends BaseTi4Test {
         tile.addUnit("space", Units.getUnitKey(UnitType.Destroyer, neutral.getColorID()), 2);
 
         TileModel tileModel = tile.getTileModel();
-        Map<UnitModel, Integer> winnuUnits = CombatRollService.getUnitsInCombat(
+        Map<UnitModel, Integer> winnuUnits = CombatUnitResolver.getUnitsInCombat(
                 tile, tile.getUnitHolders().get("space"), winnu, null, CombatRollType.combatround, testGame);
-        Map<UnitModel, Integer> neutralUnits = CombatRollService.getUnitsInCombat(
+        Map<UnitModel, Integer> neutralUnits = CombatUnitResolver.getUnitsInCombat(
                 tile, tile.getUnitHolders().get("space"), neutral, null, CombatRollType.combatround, testGame);
         UnitModel winnuFlagship = winnuUnits.keySet().stream()
                 .filter(unit -> "winnu_flagship".equals(unit.getId()))
@@ -104,9 +105,9 @@ class CombatStatsServiceTest extends BaseTi4Test {
             tile.addUnit("space", Units.getUnitKey(UnitType.Mech, bluetf.getColorID()), 4);
             tile.addUnit("space", Units.getUnitKey(UnitType.Carrier, neutral.getColorID()), 1);
 
-            Map<UnitModel, Integer> bluetfUnits = CombatRollService.getUnitsInCombat(
+            Map<UnitModel, Integer> bluetfUnits = CombatUnitResolver.getUnitsInCombat(
                     tile, tile.getUnitHolders().get("space"), bluetf, null, CombatRollType.combatround, testGame);
-            Map<UnitModel, Integer> neutralUnits = CombatRollService.getUnitsInCombat(
+            Map<UnitModel, Integer> neutralUnits = CombatUnitResolver.getUnitsInCombat(
                     tile, tile.getUnitHolders().get("space"), neutral, null, CombatRollType.combatround, testGame);
 
             String rollOutput = getCombatRollOutput(tile, bluetfUnits, neutralUnits);
@@ -130,9 +131,9 @@ class CombatStatsServiceTest extends BaseTi4Test {
             tile.addUnit("space", Units.getUnitKey(UnitType.Mech, bluetf.getColorID()), 4);
             tile.addUnit("space", Units.getUnitKey(UnitType.Carrier, neutral.getColorID()), 1);
 
-            Map<UnitModel, Integer> bluetfUnits = CombatRollService.getUnitsInCombat(
+            Map<UnitModel, Integer> bluetfUnits = CombatUnitResolver.getUnitsInCombat(
                     tile, tile.getUnitHolders().get("space"), bluetf, null, CombatRollType.combatround, testGame);
-            Map<UnitModel, Integer> neutralUnits = CombatRollService.getUnitsInCombat(
+            Map<UnitModel, Integer> neutralUnits = CombatUnitResolver.getUnitsInCombat(
                     tile, tile.getUnitHolders().get("space"), neutral, null, CombatRollType.combatround, testGame);
 
             String rollOutput = getCombatRollOutput(tile, bluetfUnits, neutralUnits);
@@ -168,18 +169,14 @@ class CombatStatsServiceTest extends BaseTi4Test {
                 CombatRollType.combatround,
                 Constants.COMBAT_EXTRA_ROLLS);
 
-        return CombatRollService.rollForUnits(
-                playerUnits,
-                extraRolls,
-                modifiers,
-                List.of(),
-                bluetf,
-                neutral,
-                testGame,
-                CombatRollType.combatround,
-                null,
-                tile,
-                tile.getUnitHolders().get("space"));
+        UnitHolder space = tile.getUnitHolders().get("space");
+        CombatRollPipelineState state = new CombatRollPipelineState(
+                bluetf, testGame, null, tile, space.getName(), CombatRollType.combatround, false);
+        state.setCombatOnHolder(space);
+        state.setPlayerUnitsByModel(playerUnits, space);
+        state.setOpponent(neutral);
+        state.setModifiers(new CombatRollModifiers(modifiers, extraRolls, List.of()));
+        return UnitRollExecution.rollForUnitsWithResult(state).message();
     }
 
     private static Player setupPlayer(String faction) {

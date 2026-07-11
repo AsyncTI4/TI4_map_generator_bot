@@ -17,8 +17,8 @@ import ti4.image.PositionMapper;
 import ti4.model.FactionModel;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.TileModel;
-import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
+import ti4.service.combat.CombatUnitResolver;
 import ti4.service.player.PlayerColorService;
 import ti4.testUtils.BaseTi4Test;
 
@@ -97,9 +97,9 @@ class CombatModifierTest extends BaseTi4Test {
     private static Set<String> getCombatMods(Player p1, Player p2, Tile tile, String uh, CombatRollType type) {
         TileModel model = tile.getTileModel();
         var unitsMap =
-                CombatRollService.getUnitsInCombat(tile, tile.getUnitHolders().get(uh), p1, null, type, testGame);
+                CombatUnitResolver.getUnitsInCombat(tile, tile.getUnitHolders().get(uh), p1, null, type, testGame);
         var oppUnits =
-                CombatRollService.getUnitsInCombat(tile, tile.getUnitHolders().get(uh), p2, null, type, testGame);
+                CombatUnitResolver.getUnitsInCombat(tile, tile.getUnitHolders().get(uh), p2, null, type, testGame);
 
         Set<String> modifiers = new HashSet<>();
         CombatModHelper.getModifiers(p1, p2, unitsMap, oppUnits, model, testGame, type, Constants.COMBAT_MODIFIERS)

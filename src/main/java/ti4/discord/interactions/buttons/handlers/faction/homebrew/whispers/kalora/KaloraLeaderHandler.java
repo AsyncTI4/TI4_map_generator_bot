@@ -17,7 +17,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
-import ti4.service.combat.CombatRollService;
+import ti4.service.combat.CombatUnitResolver;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.ExhaustLeaderService;
 
@@ -64,7 +64,7 @@ public class KaloraLeaderHandler {
                 Tile adjacentTile = game.getTileByPosition(adjacentPos);
                 if (adjacentTile == null) continue;
                 Map<Pair<UnitModel, UnitHolder>, Integer> adjacentUnits =
-                        CombatRollService.getUnitsInBombardment(adjacentTile, player, null);
+                        CombatUnitResolver.getUnitsInBombardment(adjacentTile, player, null);
                 adjacentUnits.forEach((pair, count) -> units.merge(pair, count, Integer::sum));
             }
         } finally {

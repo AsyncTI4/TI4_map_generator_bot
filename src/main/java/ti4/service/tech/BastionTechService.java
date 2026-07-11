@@ -1,7 +1,5 @@
 package ti4.service.tech;
 
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +28,12 @@ import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.UnitModel;
 import ti4.model.enums.CombatMod.CombatModType;
-import ti4.service.combat.CombatRollService;
+import ti4.service.combat.CombatRollModifiers;
+import ti4.service.combat.CombatRollPipelineState;
+import ti4.service.combat.CombatRollResult;
 import ti4.service.combat.CombatRollType;
+import ti4.service.combat.CombatUnitResolver;
+import ti4.service.combat.UnitRollExecution;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.regex.RegexService;
 
@@ -124,7 +126,7 @@ public class BastionTechService {
                 return;
             }
 
-            var units = CombatRollService.getProximaBombardUnit(p1);
+            var units = CombatUnitResolver.getProximaBombardUnit(p1);
             String planetN = planet.getName();
             game.setStoredValue("bombardmentTarget" + p1.getFaction(), planetN);
             for (Map.Entry<UnitModel, Integer> entry : units.entrySet()) {
@@ -179,11 +181,15 @@ public class BastionTechService {
                     p2, tile.getTileModel(), planet, true, CombatRollType.bombardment));
 
             String message = CombatMessageHelper.displayCombatSummary(p1, tile, planet, CombatRollType.bombardment);
-            message += CombatRollService.rollForUnits(
-                    units, rollMods, flatMods, tempMods, p1, p2, game, CombatRollType.bombardment, event, tile, planet);
-            String hits = substringAfter(message, "Total hits ");
-            hits = hits.split(" ")[0].replace("*", "");
-            int h = Integer.parseInt(hits);
+            CombatRollPipelineState rollState = new CombatRollPipelineState(
+                    p1, game, event, tile, planet.getName(), CombatRollType.bombardment, false);
+            rollState.setCombatOnHolder(planet);
+            rollState.setPlayerUnitsByModel(units, planet);
+            rollState.setOpponent(p2);
+            rollState.setModifiers(new CombatRollModifiers(flatMods, rollMods, tempMods));
+            CombatRollResult rollResult = UnitRollExecution.rollForUnitsWithResult(rollState);
+            message += rollResult.message();
+            int h = rollResult.totalHits();
             if (message.endsWith(";\n")) {
                 message = message.substring(0, message.length() - 2);
             }
@@ -201,11 +207,10 @@ public class BastionTechService {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
             message = CombatMessageHelper.displayCombatSummary(p1, tile, planet, CombatRollType.bombardment);
-            message += CombatRollService.rollForUnits(
-                    units, rollMods, flatMods, tempMods, p1, p1, game, CombatRollType.bombardment, event, tile, planet);
-            hits = substringAfter(message, "Total hits ");
-            hits = hits.split(" ")[0].replace("*", "");
-            h = Integer.parseInt(hits);
+            rollState.setOpponent(p1);
+            rollResult = UnitRollExecution.rollForUnitsWithResult(rollState);
+            message += rollResult.message();
+            h = rollResult.totalHits();
             if (message.endsWith(";\n")) {
                 message = message.substring(0, message.length() - 2);
             }

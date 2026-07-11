@@ -25,9 +25,9 @@ import ti4.image.TileHelper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
-import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.CombatStatsService;
+import ti4.service.combat.CombatUnitResolver;
 import ti4.service.combat.CombatUnitSelectionHelper;
 
 /**
@@ -316,7 +316,7 @@ public class CombatReplaySideBetPayoutService {
             }
         }
         if (player.hasRelic("metalivoidarmaments")) {
-            afbUnits.put(CombatRollService.getMetaliAFBUnit(player), 1);
+            afbUnits.put(CombatUnitResolver.getMetaliAFBUnit(player), 1);
         }
         return afbUnits;
     }
