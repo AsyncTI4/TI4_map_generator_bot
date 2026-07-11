@@ -692,11 +692,27 @@ final class LoreEffects {
         return new EffectDescription(who(ctx) + " drew " + StringHelper.pluralize(n, "action card") + ".", false);
     }
 
+    /**
+     * Resolves a token/attachment name to its canonical stored id, in the same priority order as
+     * the {@code /add_token} and {@code /remove_token} slash commands: attachments (e.g.
+     * "positiveres" -> "attachment_positiveres.png") are tried before generic tokens (wormholes,
+     * DMZ, etc.), falling back to the raw input for anything the bot doesn't recognize.
+     * {@code Mapper.getTokenID} alone only knows generic tokens — an attachment name resolved
+     * that way stores the bare model id instead of its image filename. The stat modifier still
+     * applies either way ({@code Mapper.getAttachmentInfo} accepts both forms), but the bare id
+     * never resolves to an image file, so the token silently never renders on the map.
+     */
+    private static String resolveTokenOrAttachment(String rawId) {
+        String attachmentId = Mapper.getAttachmentImagePath(AliasHandler.resolveAttachment(rawId));
+        if (attachmentId != null) return attachmentId;
+        String tokenId = Mapper.getTokenID(AliasHandler.resolveToken(rawId));
+        return tokenId != null ? tokenId : rawId;
+    }
+
     // token <tokenId>  -> drops a token on the target holder (name resolved via Mapper, e.g. "gravityrift")
     private static EffectDescription effectToken(EffectContext ctx) {
         if (ctx.tile == null || ctx.args.length == 0) return null;
-        String tokenId = Mapper.getTokenID(ctx.arg(0));
-        if (tokenId == null) tokenId = ctx.arg(0);
+        String tokenId = resolveTokenOrAttachment(ctx.arg(0));
         ctx.tile.addToken(tokenId, ctx.holder);
         String readableName = tokenId.replaceFirst("^token_", "").replaceFirst("\\.png$", "");
         String location = ctx.tile.getPosition() + (Constants.SPACE.equals(ctx.holder) ? "" : " (" + ctx.holder + ")");
@@ -707,8 +723,7 @@ final class LoreEffects {
     // removetoken <tokenId> [planet]  -> removes a token or planet attachment from the target holder
     private static EffectDescription effectRemoveToken(EffectContext ctx) {
         if (ctx.tile == null || ctx.args.length == 0) return null;
-        String tokenId = Mapper.getTokenID(ctx.arg(0));
-        if (tokenId == null) tokenId = ctx.arg(0);
+        String tokenId = resolveTokenOrAttachment(ctx.arg(0));
 
         String holder = ctx.holder;
         if (ctx.args.length >= 2) {
