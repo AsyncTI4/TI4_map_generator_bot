@@ -1259,7 +1259,7 @@ public class ExploreService {
             game.setStoredValue("fortuneSeekers", "Used");
         }
 
-        CommanderUnlockCheckService.checkPlayer(player, "kollecc", "bentor", "ghost");
+        CommanderUnlockCheckService.checkPlayer(player, "kollecc", "bentor", "ghost", "kairn");
         if (player.getPlanets().contains(planetID)) {
             ButtonHelperAbilities.offerOrladinPlunderButtons(player, game, planetID);
         }

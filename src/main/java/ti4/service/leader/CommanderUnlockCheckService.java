@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesCommanderUnlockHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -17,9 +18,7 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.model.UnitModel;
 import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
@@ -306,62 +305,9 @@ public class CommanderUnlockCheckService {
             }
 
             // theodisi
-            case "ardentia" -> {
-                int qualifyingSystems = 0;
-                for (Tile tile : game.getTileMap().values()) {
-                    if (tile.hasPlayerCC(player)) {
-                        qualifyingSystems++;
-                    }
-                }
-                shouldBeUnlocked = (qualifyingSystems >= 4);
-            }
-            case "verydith" -> {
-                for (Tile tile : game.getTileMap().values()) {
-                    if (!tile.containsPlayersUnits(player)) {
-                        continue;
-                    }
-
-                    int otherCommandTokens = 0;
-                    for (Player otherPlayer : game.getRealPlayers()) {
-                        if (otherPlayer != player && tile.hasPlayerCC(otherPlayer)) {
-                            otherCommandTokens++;
-                        }
-                    }
-
-                    if (otherCommandTokens >= 2) {
-                        shouldBeUnlocked = true;
-                        break;
-                    }
-                }
-            }
-            case "myrr" -> {
-                for (Tile tile : game.getTileMap().values()) {
-                    UnitHolder space = tile.getSpaceUnitHolder();
-                    if (space == null) {
-                        continue;
-                    }
-
-                    for (UnitKey unitKey : space.getUnitKeys()) {
-                        if (!player.unitBelongsToPlayer(unitKey)) {
-                            continue;
-                        }
-
-                        UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                        if (unitModel == null || !unitModel.isNonFighterShip()) {
-                            continue;
-                        }
-
-                        if (space.getUnitCount(unitKey) >= 4) {
-                            shouldBeUnlocked = true;
-                            break;
-                        }
-                    }
-
-                    if (shouldBeUnlocked) {
-                        break;
-                    }
-                }
-            }
+            case "ardentia", "verydith", "myrr", "kairn", "kryxos", "arcanum" ->
+                shouldBeUnlocked =
+                        LostLegaciesCommanderUnlockHandler.meetsCommanderUnlockCondition(player, game, faction);
         }
         if (shouldBeUnlocked) {
             UnlockLeaderService.unlockLeader(leaderId, game, player);
