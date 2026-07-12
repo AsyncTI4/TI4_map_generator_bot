@@ -98,6 +98,7 @@ public class CombatRollPublication {
         offerSpaceCannonHitAssignmentButtons(state, adjustedRoll.hits());
         offerVyserixMorayButtons(state, adjustedRoll.hits());
         handleBombardmentResults(state, adjustedRoll.hits());
+        state.message = message;
         state.hits = adjustedRoll.hits();
     }
 
@@ -124,10 +125,10 @@ public class CombatRollPublication {
             return new AdjustedRollResult(state.message, hits);
         }
         UnitHolder planet = state.game.getUnitHolderFromPlanet(state.bombardPlanet);
-        if (planet == null || planet.getGalvanizedUnitCount(state.player.getColorID()) < 1) {
+        if (planet == null || planet.getGalvanizedUnitCount(state.opponent.getColorID()) < 1) {
             return new AdjustedRollResult(state.message, hits);
         }
-        int adjustedHits = Math.max(0, hits - planet.getGalvanizedUnitCount(state.player.getColorID()));
+        int adjustedHits = Math.max(0, hits - planet.getGalvanizedUnitCount(state.opponent.getColorID()));
         int canceledHits = hits - adjustedHits;
         String adjustedMessage = state.message + "\n_Proxima Targeting VI_ canceled " + canceledHits + " hit"
                 + (canceledHits == 1 ? "" : "s") + " automatically.";

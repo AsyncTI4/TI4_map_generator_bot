@@ -139,7 +139,7 @@ class CombatStatsServiceTest extends BaseTi4Test {
             String rollOutput = getCombatRollOutput(tile, bluetfUnits, neutralUnits);
 
             Assertions.assertTrue(rollOutput.contains("Applied +2 to the rolls of 1 unit with _Supercharge_."));
-            Assertions.assertTrue(rollOutput.contains("Tizona 2 rolls (+4 rolls), always hits (+2 mods)"));
+            Assertions.assertTrue(rollOutput.contains("Tizona 2 rolls (+1 rolls), always hits (+2 mods)"), rollOutput);
             Assertions.assertFalse(rollOutput.contains("always hits (+3 mods)"));
         } finally {
             bluetf.removeOwnedUnitByID("tf-echoofascension");

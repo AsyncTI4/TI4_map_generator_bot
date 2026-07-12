@@ -13,7 +13,7 @@ import ti4.contest.replay.core.CombatRollPayload;
 import ti4.contest.replay.core.CombatRollPayload.CombatRollNotePlacement;
 import ti4.contest.replay.core.CombatRollPayload.CombatRollNoteType;
 import ti4.contest.replay.core.CombatRollPayload.DieRollSource;
-import ti4.contest.replay.core.CombatRollPayload.RollSegmentType;
+import ti4.contest.replay.core.CombatRollPayload.UnitRollType;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.game.Game;
@@ -25,7 +25,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
-import ti4.helpers.CombatMessageHelper;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
@@ -36,6 +35,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.service.breakthrough.ValefarZService;
+import ti4.service.combat.UnitRollExecution.RerollResult;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 
@@ -47,8 +47,9 @@ class UnitRollAbilities {
         if (unit.unitModel.getUnitType() != UnitType.Flagship
                 || !ValefarZService.hasFlagshipAbility(unit.pipeline.game, unit.pipeline.player, "jolnar_flagship"))
             return;
-        unit.chanceOfAllHits *= Math.pow(2.0 / (11 - unit.toHit + unit.modifierToHit), unit.numRolls * unit.multiplier);
-        for (Die die : unit.resultRolls) {
+        unit.groupAllHitsProbability *=
+                Math.pow(2.0 / (11 - unit.toHit + unit.modifierToHit), unit.numRolls * unit.multiplier);
+        for (Die die : unit.activeDice) {
             if (die.getResult() >= 9) unit.addHits(2);
             unit.addMaximumHits(2);
         }
@@ -57,11 +58,20 @@ class UnitRollAbilities {
     static void resolveTeklarEliteExtraHits(UnitRollExecution.UnitRollState unit) {
         if (unit.unitModel.getUnitType() != UnitType.Infantry || !unit.pipeline.player.hasUnit("tk-tekklarelite"))
             return;
-        unit.chanceOfAllHits *= Math.pow(2.0 / (11 - unit.toHit + unit.modifierToHit), unit.numRolls * unit.multiplier);
-        for (Die die : unit.resultRolls) {
+        unit.groupAllHitsProbability *=
+                Math.pow(2.0 / (11 - unit.toHit + unit.modifierToHit), unit.numRolls * unit.multiplier);
+        for (Die die : unit.activeDice) {
             if (die.isSuccess()) unit.addHits(1);
             unit.addMaximumHits(1);
         }
+    }
+
+    private static int applyTeklarEliteToRerollHits(
+            UnitRollExecution.UnitRollState unit, List<Die> rerolls, int rerollHits) {
+        if (unit.unitModel.getUnitType() != UnitType.Infantry || !unit.pipeline.player.hasUnit("tk-tekklarelite")) {
+            return rerollHits;
+        }
+        return rerollHits + DiceHelper.countSuccesses(rerolls);
     }
 
     static void resolveZephyrionCommanderExtraHits(UnitRollExecution.UnitRollState unit) {
@@ -69,15 +79,16 @@ class UnitRollAbilities {
                         && unit.pipeline.rollType != CombatRollType.SpaceCannonOffence)
                 || !unit.pipeline.game.playerHasLeaderUnlockedOrAlliance(unit.pipeline.player, "zephyrioncommander"))
             return;
-        for (Die die : unit.resultRolls) {
+        for (Die die : unit.activeDice) {
             if (die.getResult() == 10) unit.addHits(1);
             unit.addMaximumHits(1);
         }
     }
 
     static void activateJusticerGraviton(UnitRollExecution.UnitRollState unit) {
-        if (!unit.pipeline.player.ownsUnit("tf-justicerrail")
-                || unit.pipeline.rollType != CombatRollType.SpaceCannonOffence) return;
+        if (!"tf-justicerrail".equals(unit.unitModel.getId())
+                || unit.pipeline.rollType != CombatRollType.SpaceCannonOffence
+                || unit.hitRolls < 1) return;
         unit.pipeline.game.setStoredValue(unit.pipeline.player.getFaction() + "graviton", "yes");
     }
 
@@ -94,46 +105,25 @@ class UnitRollAbilities {
         int diceToReroll = rerollBombardmentHits ? unit.hitRolls : unit.numMisses;
         if (diceToReroll < 1) return;
 
-        unit.secondaryRolls = DiceHelper.rollDice(unit.toHit - unit.modifierToHit, diceToReroll);
+        RerollResult reroll =
+                rerollBombardmentHits ? unit.rollReplacementDice(diceToReroll) : unit.rollMisses(diceToReroll);
         if (rerollBombardmentHits) {
-            unit.resultRolls.removeIf(Die::isSuccess);
+            unit.activeDice.removeIf(Die::isSuccess);
         } else {
-            unit.resultRolls.removeIf(Predicate.not(Die::isSuccess));
-            unit.pipeline.chanceOfAllHits *= Math.pow((11 - unit.toHit + unit.modifierToHit) / 10.0, diceToReroll);
-            unit.pipeline.chanceOfAllMiss *= Math.pow((unit.toHit - unit.modifierToHit - 1) / 10.0, diceToReroll);
-            unit.pipeline.maximumHits += unit.numRolls * unit.multiplier;
+            unit.activeDice.removeIf(Predicate.not(Die::isSuccess));
         }
-        unit.pipeline.player.setExpectedHitsTimes10(unit.pipeline.player.getExpectedHitsTimes10()
-                + (diceToReroll * (11 - unit.toHit + unit.modifierToHit)));
-        int rerollHits = DiceHelper.countSuccesses(unit.secondaryRolls);
+        int rerollHits = applyTeklarEliteToRerollHits(unit, reroll.dice(), reroll.hits());
+        rerollHits = applyValorToCombatRerollHits(unit, reroll.dice(), rerollHits);
         unit.addResolvedHits(rerollHits);
         if (rerollBombardmentHits) unit.pipeline.totalHits -= unit.hitRolls;
 
         int displayedExtraRolls = rerollBombardmentHits ? unit.extraRollsForUnit : 0;
-        RollSegmentType segmentType = rerollBombardmentHits
-                ? RollSegmentType.JOL_NAR_COMMANDER_REROLL_HITS
-                : RollSegmentType.JOL_NAR_COMMANDER_REROLL_MISSES;
+        UnitRollType payloadRollType = rerollBombardmentHits
+                ? UnitRollType.JOL_NAR_COMMANDER_REROLL_HITS
+                : UnitRollType.JOL_NAR_COMMANDER_REROLL_MISSES;
         DieRollSource rollSource = rerollBombardmentHits ? DieRollSource.REROLL_HIT : DieRollSource.REROLL_MISS;
-        String unitRoll = CombatMessageHelper.displayUnitRoll(
-                unit.unitModel,
-                unit.toHit,
-                unit.modifierToHit,
-                unit.numOfUnit,
-                unit.numRollsPerUnit,
-                displayedExtraRolls,
-                unit.secondaryRolls,
-                rerollHits);
-        unit.pipeline.payloadBuilder.addUnitRoll(
-                unit.unitModel,
-                unit.toHit,
-                unit.modifierToHit,
-                unit.numOfUnit,
-                unit.numRollsPerUnit,
-                displayedExtraRolls,
-                segmentType,
-                unit.secondaryRolls,
-                rerollHits,
-                rollSource);
+        String unitRoll =
+                unit.renderAndRecordRoll(displayedExtraRolls, payloadRollType, reroll.dice(), rerollHits, rollSource);
         unit.pipeline
                 .resultBuilder
                 .append("Rerolling ")
@@ -176,7 +166,7 @@ class UnitRollAbilities {
         if (!unit.pipeline.player.ownsUnit("gledge_pds")) return;
         String message = unit.pipeline.player.getRepresentation()
                 + " use the buttons to explore a planet with the PDS that got the hit.";
-        for (Die die : unit.resultRolls) {
+        for (Die die : unit.activeDice) {
             if (die.getResult() < 9) continue;
             List<Button> buttons = new ArrayList<>();
             for (String planet :
@@ -200,35 +190,13 @@ class UnitRollAbilities {
         if (!IronLeadersHandler.shouldAutoRerollCommanderMechMisses(
                         unit.pipeline.game, unit.pipeline.player, unit.unitModel, unit.pipeline.rollType)
                 || unit.numMisses < 1) return;
-        unit.secondaryRolls = DiceHelper.rollDice(unit.toHit - unit.modifierToHit, unit.numMisses);
-        unit.resultRolls.removeIf(Predicate.not(Die::isSuccess));
-        unit.pipeline.player.setExpectedHitsTimes10(unit.pipeline.player.getExpectedHitsTimes10()
-                + (unit.numMisses * (11 - unit.toHit + unit.modifierToHit)));
-        unit.pipeline.chanceOfAllHits *= Math.pow((11 - unit.toHit + unit.modifierToHit) / 10.0, unit.numMisses);
-        unit.pipeline.chanceOfAllMiss *= Math.pow((unit.toHit - unit.modifierToHit - 1) / 10.0, unit.numMisses);
-        unit.pipeline.maximumHits += unit.numRolls * unit.multiplier;
-        int rerollHits = DiceHelper.countSuccesses(unit.secondaryRolls);
+        RerollResult reroll = unit.rollMisses(unit.numMisses);
+        unit.activeDice.removeIf(Predicate.not(Die::isSuccess));
+        int rerollHits = applyTeklarEliteToRerollHits(unit, reroll.dice(), reroll.hits());
+        rerollHits = applyValorToCombatRerollHits(unit, reroll.dice(), rerollHits);
         unit.addResolvedHits(rerollHits);
-        String unitRoll = CombatMessageHelper.displayUnitRoll(
-                unit.unitModel,
-                unit.toHit,
-                unit.modifierToHit,
-                unit.numOfUnit,
-                unit.numRollsPerUnit,
-                0,
-                unit.secondaryRolls,
-                rerollHits);
-        unit.pipeline.payloadBuilder.addUnitRoll(
-                unit.unitModel,
-                unit.toHit,
-                unit.modifierToHit,
-                unit.numOfUnit,
-                unit.numRollsPerUnit,
-                0,
-                RollSegmentType.IRON_COMMANDER_REROLL_MISSES,
-                unit.secondaryRolls,
-                rerollHits,
-                DieRollSource.REROLL_MISS);
+        String unitRoll = unit.renderAndRecordRoll(
+                0, UnitRollType.IRON_COMMANDER_REROLL_MISSES, reroll.dice(), rerollHits, DieRollSource.REROLL_MISS);
         unit.pipeline
                 .resultBuilder
                 .append("Rerolling ")
@@ -237,21 +205,20 @@ class UnitRollAbilities {
                 .append(unit.numMisses == 1 ? "" : "es")
                 .append(" due to Captain Vakros, the Iron Tide Commander:\n")
                 .append(unitRoll);
-        unit.resultRolls.addAll(unit.secondaryRolls);
+        unit.activeDice.addAll(reroll.dice());
         unit.numMisses -= rerollHits;
-        unit.secondaryRolls = new ArrayList<>();
     }
 
     static void resolveThalnosMisses(UnitRollExecution.UnitRollState unit) {
         if (!unit.pipeline.isThalnosReroll) return;
         if (unit.pipeline.hacanFlagship) {
             unit.numMisses -= (int)
-                    unit.resultRolls.stream().filter(Die::eligibleForHeartPlus).count();
+                    unit.activeDice.stream().filter(Die::eligibleForHeartPlus).count();
             unit.pipeline.hacanFsButtons.add(buildHacanFlagshipThalnosButton(
-                    unit.pipeline.player, unit.unitModel.getUnitType(), unit.resultRolls));
+                    unit.pipeline.player, unit.unitModel.getUnitType(), unit.activeDice));
         } else if (unit.pipeline.tkHacanWarsun) {
             unit.numMisses = 0;
-            unit.pipeline.hacanFsButtons.add(buildTkHacanWSThalnosButton(unit.resultRolls));
+            unit.pipeline.hacanFsButtons.add(buildTkHacanWSThalnosButton(unit.activeDice));
         }
         if ((unit.pipeline.hacanFlagship || unit.pipeline.tkHacanWarsun) && !unit.extraRollsCount) {
             unit.pipeline.hacanFsThalnosDestroyTypes.add(unit.unitModel.getUnitType());
@@ -298,7 +265,7 @@ class UnitRollAbilities {
         int availableInfantry =
                 unit.pipeline.space.getUnitCount(Units.UnitType.Infantry, unit.pipeline.opponent.getColor());
         if (availableInfantry < 1) return;
-        int infantryKills = (int) Stream.concat(unit.resultRolls.stream(), unit.secondaryRolls.stream())
+        int infantryKills = (int) Stream.concat(unit.primaryDiceHistory.stream(), unit.rerollDiceHistory.stream())
                 .filter(die -> die.getResult() > 8)
                 .count();
         infantryKills = Math.min(infantryKills, availableInfantry);
@@ -346,51 +313,18 @@ class UnitRollAbilities {
 
     // REROLL CHAINS
 
-    static void resolveMunitionsReservesReroll(UnitRollExecution.UnitRollState unit) {
+    static List<Die> resolveMunitionsReservesReroll(UnitRollExecution.UnitRollState unit) {
         if (!unit.pipeline.game.getStoredValue("munitionsReserves").equalsIgnoreCase(unit.pipeline.player.getFaction())
                 || unit.pipeline.rollType != CombatRollType.combatround
                 || unit.numMisses < 1
-                || unit.pipeline.isThalnosReroll) return;
-        unit.secondaryRolls = DiceHelper.rollDice(unit.toHit - unit.modifierToHit, unit.numMisses);
-        unit.resultRolls.removeIf(Predicate.not(Die::isSuccess));
-        unit.pipeline.player.setExpectedHitsTimes10(unit.pipeline.player.getExpectedHitsTimes10()
-                + (unit.numMisses * (11 - unit.toHit + unit.modifierToHit)));
-        unit.pipeline.chanceOfAllHits *= Math.pow((11 - unit.toHit + unit.modifierToHit) / 10.0, unit.numMisses);
-        unit.pipeline.chanceOfAllMiss *= Math.pow((unit.toHit - unit.modifierToHit - 1) / 10.0, unit.numMisses);
-        unit.pipeline.maximumHits += unit.numRolls * unit.multiplier;
-        int rerollHits = DiceHelper.countSuccesses(unit.secondaryRolls);
-        if (hasValorAbilityHolder(unit.pipeline.game)
-                && ButtonHelperAgents.getGloryTokenTiles(unit.pipeline.game).contains(unit.pipeline.activeSystem)) {
-            for (Die die : unit.secondaryRolls) {
-                if (die.getResult() <= 9) continue;
-                rerollHits++;
-                MessageHelper.sendMessageToChannel(
-                        unit.pipeline.event.getMessageChannel(),
-                        unit.pipeline.player.getRepresentation()
-                                + " got an extra hit due to the **Valor** ability (it has been accounted for in the hit count).");
-            }
-        }
+                || unit.pipeline.isThalnosReroll) return List.of();
+        RerollResult reroll = unit.rollMisses(unit.numMisses);
+        unit.activeDice.removeIf(Predicate.not(Die::isSuccess));
+        int rerollHits = applyTeklarEliteToRerollHits(unit, reroll.dice(), reroll.hits());
+        rerollHits = applyValorToCombatRerollHits(unit, reroll.dice(), rerollHits);
         unit.addResolvedHits(rerollHits);
-        String unitRoll = CombatMessageHelper.displayUnitRoll(
-                unit.unitModel,
-                unit.toHit,
-                unit.modifierToHit,
-                unit.numOfUnit,
-                unit.numRollsPerUnit,
-                0,
-                unit.secondaryRolls,
-                rerollHits);
-        unit.pipeline.payloadBuilder.addUnitRoll(
-                unit.unitModel,
-                unit.toHit,
-                unit.modifierToHit,
-                unit.numOfUnit,
-                unit.numRollsPerUnit,
-                0,
-                RollSegmentType.MUNITIONS_RESERVES_REROLL,
-                unit.secondaryRolls,
-                rerollHits,
-                DieRollSource.MUNITIONS_RESERVES);
+        String unitRoll = unit.renderAndRecordRoll(
+                0, UnitRollType.MUNITIONS_RESERVES_REROLL, reroll.dice(), rerollHits, DieRollSource.MUNITIONS_RESERVES);
         unit.pipeline
                 .resultBuilder
                 .append("**Munitions Reserve** rerolling ")
@@ -399,40 +333,22 @@ class UnitRollAbilities {
                 .append(unit.numMisses == 1 ? "" : "es")
                 .append(": ")
                 .append(unitRoll);
-        unit.resultRolls.addAll(unit.secondaryRolls);
-        unit.secondaryRolls.clear();
+        unit.activeDice.addAll(reroll.dice());
+        return reroll.dice();
     }
 
     static void resolveInitialKaltrimCommanderRerolls(UnitRollExecution.UnitRollState unit) {
         if (!unit.pipeline.game.playerHasLeaderUnlockedOrAlliance(unit.pipeline.player, "kaltrimcommander")) return;
         int ones = (int)
-                unit.resultRolls.stream().filter(die -> die.getResult() == 1).count();
+                unit.activeDice.stream().filter(die -> die.getResult() == 1).count();
         if (ones < 1) return;
-        unit.secondaryRolls = DiceHelper.rollDice(unit.toHit - unit.modifierToHit, ones);
-        unit.pipeline.player.setExpectedHitsTimes10(
-                unit.pipeline.player.getExpectedHitsTimes10() + (ones * (11 - unit.toHit + unit.modifierToHit)));
-        int rerollHits = DiceHelper.countSuccesses(unit.secondaryRolls);
+        unit.activeDice.removeIf(die -> die.getResult() == 1);
+        RerollResult reroll = unit.rollReplacementDice(ones);
+        int rerollHits = applyTeklarEliteToRerollHits(unit, reroll.dice(), reroll.hits());
+        rerollHits = applyValorToCombatRerollHits(unit, reroll.dice(), rerollHits);
         unit.addResolvedHits(rerollHits);
-        String unitRoll = CombatMessageHelper.displayUnitRoll(
-                unit.unitModel,
-                unit.toHit,
-                unit.modifierToHit,
-                unit.numOfUnit,
-                unit.numRollsPerUnit,
-                0,
-                unit.secondaryRolls,
-                rerollHits);
-        unit.pipeline.payloadBuilder.addUnitRoll(
-                unit.unitModel,
-                unit.toHit,
-                unit.modifierToHit,
-                unit.numOfUnit,
-                unit.numRollsPerUnit,
-                0,
-                RollSegmentType.KALTRIM_COMMANDER_REROLL_ONES,
-                unit.secondaryRolls,
-                rerollHits,
-                DieRollSource.REROLL_ONE);
+        String unitRoll = unit.renderAndRecordRoll(
+                0, UnitRollType.KALTRIM_COMMANDER_REROLL_ONES, reroll.dice(), rerollHits, DieRollSource.REROLL_ONE);
         unit.pipeline
                 .resultBuilder
                 .append("Rerolling ")
@@ -441,28 +357,24 @@ class UnitRollAbilities {
                 .append(ones == 1 ? "" : "s")
                 .append(" of 1 due to the Kaltrim Commander:\n ")
                 .append(unitRoll);
+        unit.activeDice.addAll(reroll.dice());
     }
 
-    static void resolvePostMunitionsKaltrimCommanderRerolls(UnitRollExecution.UnitRollState unit) {
-        if (!unit.pipeline.game.playerHasLeaderUnlockedOrAlliance(unit.pipeline.player, "kaltrimcommander")) return;
-        int ones = (int)
-                unit.resultRolls.stream().filter(die -> die.getResult() == 1).count();
-        unit.resultRolls.removeIf(die -> die.getResult() == 1);
+    static void resolvePostMunitionsKaltrimCommanderRerolls(
+            UnitRollExecution.UnitRollState unit, List<Die> munitionsDice) {
+        if (!unit.pipeline.game.playerHasLeaderUnlockedOrAlliance(unit.pipeline.player, "kaltrimcommander")
+                || munitionsDice.isEmpty()) return;
+        int ones =
+                (int) munitionsDice.stream().filter(die -> die.getResult() == 1).count();
         if (ones < 1) return;
-        unit.secondaryRolls = DiceHelper.rollDice(unit.toHit - unit.modifierToHit, ones);
-        unit.pipeline.player.setExpectedHitsTimes10(
-                unit.pipeline.player.getExpectedHitsTimes10() + (ones * (11 - unit.toHit + unit.modifierToHit)));
-        int rerollHits = DiceHelper.countSuccesses(unit.secondaryRolls);
+        unit.activeDice.removeAll(
+                munitionsDice.stream().filter(die -> die.getResult() == 1).toList());
+        RerollResult reroll = unit.rollReplacementDice(ones);
+        int rerollHits = applyTeklarEliteToRerollHits(unit, reroll.dice(), reroll.hits());
+        rerollHits = applyValorToCombatRerollHits(unit, reroll.dice(), rerollHits);
         unit.addResolvedHits(rerollHits);
-        String unitRoll = CombatMessageHelper.displayUnitRoll(
-                unit.unitModel,
-                unit.toHit,
-                unit.modifierToHit,
-                unit.numOfUnit,
-                unit.numRollsPerUnit,
-                0,
-                unit.secondaryRolls,
-                rerollHits);
+        String unitRoll = unit.renderAndRecordRoll(
+                0, UnitRollType.KALTRIM_COMMANDER_REROLL_ONES, reroll.dice(), rerollHits, DieRollSource.REROLL_ONE);
         unit.pipeline
                 .resultBuilder
                 .append("Rerolling ")
@@ -471,6 +383,7 @@ class UnitRollAbilities {
                 .append(ones == 1 ? "" : "s")
                 .append(" of 1 due to the Kaltrim Commander:\n ")
                 .append(unitRoll);
+        unit.activeDice.addAll(reroll.dice());
     }
 
     // AFTER DICE: CASCADING DICE AND IMMEDIATE ABILITY EFFECTS
@@ -520,35 +433,25 @@ class UnitRollAbilities {
         if (!"sigma_jolnar_flagship_1".equalsIgnoreCase(id) && !"sigma_jolnar_flagship_2".equalsIgnoreCase(id)) return;
         int additionalDice = unit.hitRolls;
         while (unit.hitRolls < 100 && additionalDice > 0) {
-            List<Die> rolls = DiceHelper.rollDice(unit.toHit - unit.modifierToHit, additionalDice);
+            int remainingHitCapacity = 100 - unit.hitRolls;
+            List<Die> rolls = DiceHelper.rollDice(
+                    unit.toHit - unit.modifierToHit, Math.min(additionalDice, remainingHitCapacity));
             additionalDice = DiceHelper.countSuccesses(rolls);
             unit.addHits(additionalDice);
-            unit.resultRolls.addAll(rolls);
+            unit.recordAdditionalDice(rolls);
         }
     }
 
     static void resolveValorExtraHits(UnitRollExecution.UnitRollState unit) {
-        Player gloryHolder = Helper.getPlayerFromAbility(unit.pipeline.game, "valor");
-        if (gloryHolder == null) {
-            gloryHolder = unit.pipeline.game.getRealPlayers().stream()
-                    .filter(player -> player.hasTech("tf-glorioushalls"))
-                    .findFirst()
-                    .orElse(null);
-        }
-        boolean systemValor = unit.pipeline.rollType == CombatRollType.combatround
-                && gloryHolder != null
-                && ButtonHelperAgents.getGloryTokenTiles(unit.pipeline.game).contains(unit.pipeline.activeSystem);
-        List<String> valorAbilities = new ArrayList<>();
-        if (systemValor) {
+        List<String> valorAbilities = getActiveValorAbilities(unit);
+        if (hasSystemValor(unit)) {
             ButtonHelperAbilities.readyBannerHalls(unit.pipeline.game);
-            valorAbilities.add(unit.pipeline.game.isTwilightsFallMode() ? "Glorious Halls" : "Valor");
         }
-        if (unit.pipeline.player.hasTech("tf-valortf")) valorAbilities.add("Valor");
 
         for (String abilityName : valorAbilities) {
-            unit.chanceOfAllHits *=
+            unit.groupAllHitsProbability *=
                     Math.pow(1.0 / (11 - unit.toHit + unit.modifierToHit), unit.numRolls * unit.multiplier);
-            for (Die die : unit.resultRolls) {
+            for (Die die : unit.activeDice) {
                 if (die.getResult() >= 10) {
                     unit.addHits(1);
                     MessageHelper.sendMessageToChannel(
@@ -556,9 +459,46 @@ class UnitRollAbilities {
                             unit.pipeline.player.getRepresentation() + " got an extra hit due to the **" + abilityName
                                     + "** ability (it has been accounted for in the hit count).");
                 }
-                unit.maximumHits++;
+                unit.groupMaximumHits++;
             }
         }
+    }
+
+    private static int applyValorToCombatRerollHits(
+            UnitRollExecution.UnitRollState unit, List<Die> rerollDice, int hits) {
+        for (String abilityName : getActiveValorAbilities(unit)) {
+            for (Die die : rerollDice) {
+                if (die.getResult() < 10) continue;
+                hits++;
+                MessageHelper.sendMessageToChannel(
+                        unit.pipeline.event.getMessageChannel(),
+                        unit.pipeline.player.getRepresentation() + " got an extra hit due to the **" + abilityName
+                                + "** ability (it has been accounted for in the hit count).");
+            }
+        }
+        return hits;
+    }
+
+    private static List<String> getActiveValorAbilities(UnitRollExecution.UnitRollState unit) {
+        if (unit.pipeline.rollType != CombatRollType.combatround) return List.of();
+        List<String> abilities = new ArrayList<>();
+        if (hasSystemValor(unit)) {
+            abilities.add(unit.pipeline.game.isTwilightsFallMode() ? "Glorious Halls" : "Valor");
+        }
+        if (unit.pipeline.player.hasTech("tf-valortf")) abilities.add("Valor");
+        return abilities;
+    }
+
+    private static boolean hasSystemValor(UnitRollExecution.UnitRollState unit) {
+        Player gloryHolder = Helper.getPlayerFromAbility(unit.pipeline.game, "valor");
+        if (gloryHolder == null) {
+            gloryHolder = unit.pipeline.game.getRealPlayers().stream()
+                    .filter(player -> player.hasTech("tf-glorioushalls"))
+                    .findFirst()
+                    .orElse(null);
+        }
+        return gloryHolder != null
+                && ButtonHelperAgents.getGloryTokenTiles(unit.pipeline.game).contains(unit.pipeline.activeSystem);
     }
 
     static boolean hasValorAbilityHolder(Game game) {
@@ -569,7 +509,7 @@ class UnitRollAbilities {
     static void resolveVadenFlagshipTradeGood(UnitRollExecution.UnitRollState unit) {
         if (!"vaden_flagship".equalsIgnoreCase(unit.unitModel.getId())
                 || unit.pipeline.rollType != CombatRollType.bombardment
-                || unit.resultRolls.stream().noneMatch(die -> die.getResult() > 4)) return;
+                || unit.activeDice.stream().noneMatch(Die::isSuccess)) return;
         unit.pipeline.player.setTg(unit.pipeline.player.getTg() + 1);
         ButtonHelperAbilities.pillageCheck(unit.pipeline.player, unit.pipeline.game);
         ButtonHelperAgents.resolveArtunoCheck(unit.pipeline.player, 1);

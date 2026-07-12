@@ -19,6 +19,11 @@ public final class DiceHelper {
             result = ThreadLocalRandom.current().nextInt(1, 11);
         }
 
+        private Die(int threshold, int result) {
+            this.threshold = threshold;
+            this.result = result;
+        }
+
         public String getGreenDieIfSuccessOrRedDieIfFailure() {
             if (isSuccess()) {
                 return DiceEmojis.getGreenDieEmoji(result);
@@ -61,9 +66,8 @@ public final class DiceHelper {
     }
 
     public static Die spoof(int threshold, int result) {
-        Die d = new Die(threshold);
-        while (d.getResult() != result) d = new Die(threshold);
-        return d;
+        if (result < 1 || result > 10) throw new IllegalArgumentException("Die result must be between 1 and 10");
+        return new Die(threshold, result);
     }
 
     public static List<Die> rollDice(int threshold, int numDice) {

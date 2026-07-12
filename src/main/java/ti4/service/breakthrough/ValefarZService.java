@@ -37,6 +37,12 @@ public class ValefarZService {
         if (player == null) return false;
         if (player.getUnitsOwned().contains(flagship)) return true;
 
+        return hasCopiedFlagshipAbility(game, player, flagship);
+    }
+
+    public boolean hasCopiedFlagshipAbility(Game game, Player player, String flagship) {
+        if (player == null) return false;
+
         // Check for Valefar Z
         if (player.hasUnlockedBreakthrough("nekrobt")) {
             String valefarZ = game.getStoredValue("valefarZ");

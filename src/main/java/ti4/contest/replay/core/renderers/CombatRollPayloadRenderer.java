@@ -71,7 +71,7 @@ public class CombatRollPayloadRenderer {
 
     private void appendRollPrefix(StringBuilder message, UnitRoll unitRoll) {
         int count = Math.max(0, unitRoll.dice().size());
-        switch (unitRoll.segmentType()) {
+        switch (unitRoll.rollType()) {
             case JOL_NAR_COMMANDER_REROLL_HITS ->
                 message.append("Rerolling ")
                         .append(count)

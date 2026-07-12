@@ -293,6 +293,7 @@ class CombatRollPayloadRendererParityTest extends BaseTi4Test {
         state.setOpponent(opponent);
         state.setModifiers(new CombatRollModifiers(modifiers, extraRolls, List.of()));
         CombatRollResult result = UnitRollExecution.rollForUnitsWithResult(state);
+        CombatRollTestSupport.assertThat(result).completed();
         String combatSummary = CombatMessageHelper.displayCombatSummary(player, tile, space, rollType);
         String productionMessage = combatSummary + result.message();
         CombatRollPayload.RollHeader header =
@@ -301,7 +302,7 @@ class CombatRollPayloadRendererParityTest extends BaseTi4Test {
         String rendered = CombatRollPayloadRenderer.render(payload);
 
         assertEquals(productionMessage, rendered);
-        return new RenderedRoll(productionMessage, payload);
+        return new RenderedRoll(productionMessage, payload, result);
     }
 
     private CombatRollPayload.RollHeader buildHeader(
@@ -352,7 +353,7 @@ class CombatRollPayloadRendererParityTest extends BaseTi4Test {
         return dice;
     }
 
-    private record RenderedRoll(String productionMessage, CombatRollPayload payload) {}
+    private record RenderedRoll(String productionMessage, CombatRollPayload payload, CombatRollResult result) {}
 
     private static final class Harness {
         private final Game game = new Game();

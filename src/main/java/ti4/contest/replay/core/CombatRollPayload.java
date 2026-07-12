@@ -43,12 +43,8 @@ public record CombatRollPayload(
         AFTER_TOTAL
     }
 
-    public enum RollSegmentType {
+    public enum UnitRollType {
         PRIMARY,
-        SUPERCHARGE_SELECTED_UNIT,
-        SUPERCHARGE_REST,
-        GRAVLEASH_SELECTED_UNIT,
-        GRAVLEASH_REST,
         JOL_NAR_COMMANDER_REROLL_MISSES,
         JOL_NAR_COMMANDER_REROLL_HITS,
         IRON_COMMANDER_REROLL_MISSES,
@@ -119,7 +115,7 @@ public record CombatRollPayload(
             int printedHitsOn,
             int modifier,
             int effectiveThreshold,
-            RollSegmentType segmentType,
+            UnitRollType rollType,
             List<DieRoll> dice,
             int hits) {
         public UnitRoll {

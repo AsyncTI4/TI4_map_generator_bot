@@ -22,7 +22,7 @@ import ti4.contest.replay.core.CombatRollPayload;
 import ti4.contest.replay.core.CombatRollPayload.CombatRollNotePlacement;
 import ti4.contest.replay.core.CombatRollPayload.CombatRollNoteType;
 import ti4.contest.replay.core.CombatRollPayload.DieRollSource;
-import ti4.contest.replay.core.CombatRollPayload.RollSegmentType;
+import ti4.contest.replay.core.CombatRollPayload.UnitRollType;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -42,6 +42,7 @@ import ti4.image.Mapper;
 import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.UnitModel;
+import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.unit.HacanFlagshipService;
 
@@ -56,7 +57,7 @@ public class UnitRollExecution {
         for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : state.playerUnits.entrySet()) {
             UnitRollState unit = prepareUnitRoll(state, entry);
             if (unit == null) continue;
-            rollUnitSegments(unit);
+            rollUnitGroups(unit);
         }
         recordRollStatistics(state);
         applyHitMultipliers(state);
@@ -65,8 +66,7 @@ public class UnitRollExecution {
         offerHacanFlagshipRerolls(state);
         appendThalnosRerollOffer(state);
         appendAdditionalHitMessages(state);
-        appendDelayedRollNotes(state);
-        appendExtraRollMessages(state);
+        appendDelayedRollNotesAndExtraMessages(state);
         clearMunitionsReserves(state);
         return buildCombatRollResult(state);
     }
@@ -81,17 +81,16 @@ public class UnitRollExecution {
         normalizeThalnosUnitDice(unit);
         applyExperimentalBattlestationLimit(unit);
         applyTnelisAgentLimit(unit);
-        if (!applyMetaliVoidLimit(unit)) return null;
-        selectSingleUnitBoostSegments(unit);
-        unit.ogNumOfUnit = unit.numOfUnit;
-        unit.baseModifierToHit = unit.modifierToHit;
+        if (isDuplicateMetaliVoidUnit(unit)) return null;
+        applyMetaliVoidLimit(unit);
+        unit.rollGroups = buildUnitRollGroups(unit);
         return unit;
     }
 
     private static void calculateUnitCombatModifier(UnitRollState unit) {
-        unit.modifierToHit = CombatModHelper.getCombinedModifierForUnit(
+        unit.preparedModifierToHit = CombatModHelper.getCombinedModifierForUnit(
                 unit.unitModel,
-                unit.numOfUnit,
+                unit.preparedUnitCount,
                 unit.pipeline.mods,
                 unit.pipeline.player,
                 unit.pipeline.opponent,
@@ -109,7 +108,7 @@ public class UnitRollExecution {
                 .collect(Collectors.toList());
         unit.extraRollsForUnit = CombatModHelper.getCombinedModifierForUnit(
                 unit.unitModel,
-                unit.numOfUnit,
+                unit.preparedUnitCount,
                 unit.availableExtraRolls,
                 unit.pipeline.player,
                 unit.pipeline.opponent,
@@ -159,7 +158,7 @@ public class UnitRollExecution {
         if (unit.pipeline.rollType != CombatRollType.SpaceCannonOffence
                 || unit.numRollsPerUnit != 3
                 || !"spacedock".equalsIgnoreCase(unit.unitModel.getBaseType())) return;
-        unit.numOfUnit = 1;
+        unit.preparedUnitCount = 1;
         unit.pipeline.game.setStoredValue("EBSFaction", "");
     }
 
@@ -167,34 +166,59 @@ public class UnitRollExecution {
         if (unit.pipeline.rollType != CombatRollType.bombardment
                 || unit.numRollsPerUnit < 2
                 || !"destroyer".equalsIgnoreCase(unit.unitModel.getBaseType())) return;
-        unit.numOfUnit = 1;
+        unit.preparedUnitCount = 1;
         unit.pipeline.game.setStoredValue("TnelisAgentFaction", "");
     }
 
-    private static boolean applyMetaliVoidLimit(UnitRollState unit) {
-        boolean usingMetaliVoid =
-                unit.unitModel.getAfbDieCount() == 0 && unit.unitModel.getAfbDieCount(unit.pipeline.player) == 3;
-        if (unit.pipeline.rollType != CombatRollType.AFB || !usingMetaliVoid) return true;
-        unit.numOfUnit = 1;
-        if (unit.pipeline.metaliVoidCounted) return false;
-        unit.pipeline.metaliVoidCounted = true;
-        return true;
+    private static boolean isDuplicateMetaliVoidUnit(UnitRollState unit) {
+        return isMetaliVoidUnit(unit) && unit.pipeline.metaliVoidCounted;
     }
 
-    private static void selectSingleUnitBoostSegments(UnitRollState unit) {
-        if (unit.pipeline.rollType != CombatRollType.combatround || unit.pipeline.isThalnosReroll) return;
+    private static void applyMetaliVoidLimit(UnitRollState unit) {
+        if (!isMetaliVoidUnit(unit)) return;
+        unit.preparedUnitCount = 1;
+        unit.pipeline.metaliVoidCounted = true;
+    }
+
+    private static boolean isMetaliVoidUnit(UnitRollState unit) {
+        return unit.pipeline.rollType == CombatRollType.AFB
+                && unit.unitModel.getAfbDieCount() == 0
+                && unit.unitModel.getAfbDieCount(unit.pipeline.player) == 3;
+    }
+
+    private static List<UnitRollGroup> buildUnitRollGroups(UnitRollState unit) {
+        int totalDice = (unit.preparedUnitCount * unit.numRollsPerUnit) + unit.extraRollsForUnit;
+        UnitRollGroup allUnits = new UnitRollGroup(
+                unit.preparedUnitCount, unit.preparedModifierToHit, totalDice, unit.extraRollsForUnit);
+        if (unit.pipeline.rollType != CombatRollType.combatround || unit.pipeline.isThalnosReroll) {
+            return List.of(allUnits);
+        }
         boolean hasBoost = unit.pipeline.player.hasTech("tf-supercharge")
                 || (unit.pipeline.player.hasUnlockedBreakthrough("letnevbt")
                         && "space".equalsIgnoreCase(unit.pipeline.unitHolder.getName()));
         String key = "highestValueSingleUnit" + unit.pipeline.player.getFaction();
-        if (!hasBoost || !unit.pipeline.game.getStoredValue(key).equalsIgnoreCase(unit.unitModel.getAsyncId())) return;
-        unit.singleUnitUse = new ArrayList<>(List.of("singleUnit", "RestOfUnits"));
+        if (!hasBoost || !unit.pipeline.game.getStoredValue(key).equalsIgnoreCase(unit.unitModel.getAsyncId())) {
+            return List.of(allUnits);
+        }
+        int selectedExtraRolls = Math.min(1, unit.extraRollsForUnit);
+        int remainingExtraRolls = unit.extraRollsForUnit - selectedExtraRolls;
+        UnitRollGroup selectedUnit = new UnitRollGroup(
+                1,
+                unit.preparedModifierToHit + unit.pipeline.letnevBTBoost,
+                unit.numRollsPerUnit + selectedExtraRolls,
+                selectedExtraRolls);
+        UnitRollGroup remainingUnits = new UnitRollGroup(
+                unit.preparedUnitCount - 1,
+                unit.preparedModifierToHit,
+                ((unit.preparedUnitCount - 1) * unit.numRollsPerUnit) + remainingExtraRolls,
+                remainingExtraRolls);
         unit.pipeline.game.removeStoredValue(key);
+        return remainingUnits.diceCount() > 0 ? List.of(selectedUnit, remainingUnits) : List.of(selectedUnit);
     }
 
-    private static void rollUnitSegments(UnitRollState unit) {
-        for (String segmentName : unit.singleUnitUse) {
-            if (!prepareUnitRollSegment(unit, segmentName)) continue;
+    private static void rollUnitGroups(UnitRollState unit) {
+        for (UnitRollGroup group : unit.rollGroups) {
+            prepareUnitRollGroup(unit, group);
             resolveJolNarFlagshipExtraHits(unit);
             resolveTeklarEliteExtraHits(unit);
             resolveZephyrionCommanderExtraHits(unit);
@@ -211,40 +235,19 @@ public class UnitRollExecution {
             resolveIronCommanderRerolls(unit);
             offerGledgePdsExploration(unit);
             resolveInitialKaltrimCommanderRerolls(unit);
-            resolveMunitionsReservesReroll(unit);
-            resolvePostMunitionsKaltrimCommanderRerolls(unit);
+            List<Die> munitionsDice = resolveMunitionsReservesReroll(unit);
+            resolvePostMunitionsKaltrimCommanderRerolls(unit, munitionsDice);
             resolveStrikeWingAlphaInfantryKills(unit);
             rewardMercenaryCaptains(unit);
             accumulateNearMisses(unit);
         }
     }
 
-    private static boolean prepareUnitRollSegment(UnitRollState unit, String segmentName) {
-        unit.numOfUnit = unit.ogNumOfUnit;
-        unit.modifierToHit = unit.baseModifierToHit;
-        int dice = (unit.ogNumOfUnit * unit.numRollsPerUnit) + unit.extraRollsForUnit;
-        if ("singleUnit".equals(segmentName)) {
-            dice = unit.numRollsPerUnit + Math.min(1, unit.extraRollsForUnit);
-            unit.modifierToHit += unit.pipeline.letnevBTBoost;
-            unit.numOfUnit = 1;
-        } else if ("RestOfUnits".equals(segmentName)) {
-            unit.numOfUnit = unit.ogNumOfUnit - 1;
-            dice -= unit.numRollsPerUnit + Math.min(1, unit.extraRollsForUnit);
-        }
-        if (dice == 0) return false;
-        unit.segmentType = switch (segmentName) {
-            case "singleUnit" ->
-                unit.pipeline.player.hasTech("tf-supercharge")
-                        ? RollSegmentType.SUPERCHARGE_SELECTED_UNIT
-                        : RollSegmentType.GRAVLEASH_SELECTED_UNIT;
-            case "RestOfUnits" ->
-                unit.pipeline.player.hasTech("tf-supercharge")
-                        ? RollSegmentType.SUPERCHARGE_REST
-                        : RollSegmentType.GRAVLEASH_REST;
-            default -> RollSegmentType.PRIMARY;
-        };
-        unit.recordPrimaryRoll(DiceHelper.rollDice(unit.toHit - unit.modifierToHit, dice));
-        return true;
+    private static void prepareUnitRollGroup(UnitRollState unit, UnitRollGroup group) {
+        unit.numOfUnit = group.unitCount();
+        unit.modifierToHit = group.modifierToHit();
+        unit.displayedExtraRolls = group.extraRolls();
+        unit.recordPrimaryRoll(DiceHelper.rollDice(unit.toHit - unit.modifierToHit, group.diceCount()));
     }
 
     private static void recordPrimaryRollTotals(UnitRollState unit) {
@@ -256,33 +259,19 @@ public class UnitRollExecution {
                         && unit.perUnitHolder instanceof Planet planet
                 ? "on **" + Helper.getPlanetRepresentationNoResInf(planet.getName(), unit.pipeline.game) + "**"
                 : "";
-        String unitRoll = CombatMessageHelper.displayUnitRoll(
-                unit.unitModel,
-                unit.toHit,
-                unit.modifierToHit,
-                unit.numOfUnit,
-                unit.numRollsPerUnit,
-                unit.extraRollsForUnit,
-                unit.resultRolls,
+        unit.pipeline.resultBuilder.append(unit.renderAndRecordRoll(
+                unit.displayedExtraRolls,
+                UnitRollType.PRIMARY,
+                unit.activeDice,
                 unit.hitRolls,
-                holderLabel);
-        unit.pipeline.resultBuilder.append(unitRoll);
-        unit.pipeline.payloadBuilder.addUnitRoll(
-                unit.unitModel,
-                unit.toHit,
-                unit.modifierToHit,
-                unit.numOfUnit,
-                unit.numRollsPerUnit,
-                unit.extraRollsForUnit,
-                unit.segmentType,
-                unit.resultRolls,
-                unit.hitRolls,
-                DieRollSource.PRIMARY);
+                DieRollSource.PRIMARY,
+                holderLabel));
     }
 
     private static void accumulateNearMisses(UnitRollState unit) {
-        unit.pipeline.nearMisses += (int) IterableUtils.countMatches(unit.resultRolls, Die::eligibleForHeartPlus);
-        unit.pipeline.nearMisses += (int) IterableUtils.countMatches(unit.secondaryRolls, Die::eligibleForHeartPlus);
+        unit.pipeline.nearMisses +=
+                (int) IterableUtils.countMatches(unit.primaryDiceHistory, Die::eligibleForHeartPlus);
+        unit.pipeline.nearMisses += (int) IterableUtils.countMatches(unit.rerollDiceHistory, Die::eligibleForHeartPlus);
     }
 
     private static void prepareSingleUnitRollBoost(UnitRollPipelineState state) {
@@ -374,21 +363,31 @@ public class UnitRollExecution {
     }
 
     private static void applyHitMultipliers(UnitRollPipelineState state) {
-        if (state.usesX89c4) state.totalHits *= 2;
+        if (state.usesX89c4) multiplyHits(state, 2);
         if (state.game.isConventionsOfWarAbandonedMode() && state.rollType == CombatRollType.bombardment) {
-            state.totalHits *= 3;
+            multiplyHits(state, 3);
         }
         state.useDoubleBoomEmoji = state.usesX89c4;
         if (state.player.hasStoredValue("RazeFaction") && state.rollType == CombatRollType.bombardment) {
             state.useDoubleBoomEmoji = true;
-            state.totalHits *= 2;
+            multiplyHits(state, 2);
         }
         if (state.totalHits < 1) state.useDoubleBoomEmoji = false;
-        if (state.totalHits > 0 && state.rollType == CombatRollType.bombardment && state.player.hasTech("dszelir"))
+        if (state.totalHits > 0 && state.rollType == CombatRollType.bombardment && state.player.hasTech("dszelir")) {
             state.totalHits++;
+            state.maximumHits++;
+        }
         if (state.totalHits > 0
                 && state.rollType != CombatRollType.combatround
-                && state.player.hasTech("tf-shardsaturation")) state.totalHits++;
+                && state.player.hasTech("tf-shardsaturation")) {
+            state.totalHits++;
+            state.maximumHits++;
+        }
+    }
+
+    private static void multiplyHits(UnitRollPipelineState state, int multiplier) {
+        state.totalHits *= multiplier;
+        state.maximumHits *= multiplier;
     }
 
     private static void appendHitResults(UnitRollPipelineState state) {
@@ -453,11 +452,8 @@ public class UnitRollExecution {
         }
     }
 
-    private static void appendDelayedRollNotes(UnitRollPipelineState state) {
+    private static void appendDelayedRollNotesAndExtraMessages(UnitRollPipelineState state) {
         state.delayedAfterTotalNotes.forEach(state.payloadBuilder::addNote);
-    }
-
-    private static void appendExtraRollMessages(UnitRollPipelineState state) {
         if (!state.extra.isEmpty()) state.resultBuilder.append("\n\n").append(state.extra);
     }
 
@@ -594,67 +590,67 @@ public class UnitRollExecution {
         final UnitModel unitModel;
         final UnitHolder perUnitHolder;
         int toHit;
-        int baseModifierToHit;
-        int numOfUnit;
+        int preparedUnitCount;
+        int preparedModifierToHit;
         int numRollsPerUnit;
         int extraRollsForUnit;
         boolean extraRollsCount;
-        List<String> singleUnitUse;
-        int ogNumOfUnit;
+        List<UnitRollGroup> rollGroups;
         List<NamedCombatModifierModel> availableExtraRolls = List.of();
 
-        // Segment-lifetime fields are reset by prepareUnitRollSegment before every segment.
-        RollSegmentType segmentType;
-        List<Die> resultRolls;
+        // Group-lifetime fields are reset by prepareUnitRollGroup before every separately rolled unit group.
+        int displayedExtraRolls;
+        final List<Die> primaryDiceHistory = new ArrayList<>();
+        List<Die> activeDice;
         int hitRolls;
+        int numOfUnit;
         int modifierToHit;
         int numRolls;
         int multiplier;
-        List<Die> secondaryRolls = new ArrayList<>();
+        final List<Die> rerollDiceHistory = new ArrayList<>();
         int numMisses;
-        int maximumHits;
-        double chanceOfAllHits;
+        int groupMaximumHits;
+        double groupAllHitsProbability;
 
         UnitRollState(UnitRollPipelineState pipeline, Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry) {
             this.pipeline = pipeline;
             this.unitModel = entry.getKey().getLeft();
             this.perUnitHolder = entry.getKey().getRight();
-            this.segmentType = null;
-            this.resultRolls = List.of();
+            this.activeDice = List.of();
             this.hitRolls = 0;
             this.toHit = unitModel.getCombatDieHitsOnForAbility(pipeline.rollType, pipeline.player);
+            this.preparedUnitCount = entry.getValue();
+            this.preparedModifierToHit = 0;
+            this.numOfUnit = 0;
             this.modifierToHit = 0;
-            this.baseModifierToHit = 0;
             this.numRolls = 0;
             this.multiplier = 1;
-            this.numOfUnit = entry.getValue();
             this.numRollsPerUnit = unitModel.getCombatDieCountForAbility(pipeline.rollType, pipeline.player);
             this.extraRollsForUnit = 0;
             this.extraRollsCount = false;
-            this.singleUnitUse = new ArrayList<>(List.of("no"));
-            this.ogNumOfUnit = numOfUnit;
+            this.rollGroups = List.of();
         }
 
         void recordPrimaryRoll(List<Die> dice) {
-            resultRolls = dice;
+            primaryDiceHistory.clear();
+            primaryDiceHistory.addAll(dice);
+            activeDice = new ArrayList<>(dice);
+            rerollDiceHistory.clear();
             numRolls = dice.size();
             multiplier = pipeline.usesX89c4 ? 2 : 1;
-            hitRolls = DiceHelper.countSuccesses(resultRolls);
-            secondaryRolls = new ArrayList<>();
+            hitRolls = DiceHelper.countSuccesses(activeDice);
             numMisses = 0;
             pipeline.player.setExpectedHitsTimes10(
                     pipeline.player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
-            pipeline.chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numRolls);
+            groupAllHitsProbability = Math.pow((11 - toHit + modifierToHit) / 10.0, numRolls);
             pipeline.chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numRolls);
-            pipeline.maximumHits += numRolls;
-            maximumHits = pipeline.maximumHits;
-            chanceOfAllHits = pipeline.chanceOfAllHits;
+            groupMaximumHits = numRolls;
         }
 
         void commitPrimaryRollTotals() {
-            pipeline.maximumHits = maximumHits;
-            pipeline.chanceOfAllHits = chanceOfAllHits;
-            numMisses = numRolls - hitRolls;
+            pipeline.maximumHits += groupMaximumHits;
+            pipeline.chanceOfAllHits *= groupAllHitsProbability;
+            numMisses = numRolls - DiceHelper.countSuccesses(activeDice);
             pipeline.totalMisses += numMisses;
             pipeline.totalHits += hitRolls;
         }
@@ -664,17 +660,72 @@ public class UnitRollExecution {
         }
 
         void addMaximumHits(int hits) {
-            maximumHits += hits;
+            groupMaximumHits += hits;
         }
 
         void addResolvedHits(int hits) {
             pipeline.totalHits += hits;
         }
 
+        void recordAdditionalDice(List<Die> dice) {
+            pipeline.player.setExpectedHitsTimes10(
+                    pipeline.player.getExpectedHitsTimes10() + (dice.size() * (11 - toHit + modifierToHit)));
+            groupAllHitsProbability *= Math.pow((11 - toHit + modifierToHit) / 10.0, dice.size());
+            pipeline.chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, dice.size());
+            groupMaximumHits += dice.size();
+            numRolls += dice.size();
+            activeDice.addAll(dice);
+            primaryDiceHistory.addAll(dice);
+        }
+
+        RerollResult rollMisses(int diceCount) {
+            RerollResult result = rollReplacementDice(diceCount);
+            pipeline.chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, diceCount);
+            pipeline.chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, diceCount);
+            return result;
+        }
+
+        RerollResult rollReplacementDice(int diceCount) {
+            List<Die> dice = DiceHelper.rollDice(toHit - modifierToHit, diceCount);
+            rerollDiceHistory.addAll(dice);
+            pipeline.player.setExpectedHitsTimes10(
+                    pipeline.player.getExpectedHitsTimes10() + (diceCount * (11 - toHit + modifierToHit)));
+            return new RerollResult(dice, DiceHelper.countSuccesses(dice));
+        }
+
         void destroyMissedUnits() {
             UnitRollAbilities.destroyThalnosMissedUnits(this);
         }
+
+        String renderAndRecordRoll(
+                int displayedExtraRolls, UnitRollType payloadRollType, List<Die> dice, int hits, DieRollSource source) {
+            return renderAndRecordRoll(displayedExtraRolls, payloadRollType, dice, hits, source, "");
+        }
+
+        String renderAndRecordRoll(
+                int displayedExtraRolls,
+                UnitRollType payloadRollType,
+                List<Die> dice,
+                int hits,
+                DieRollSource source,
+                String holderLabel) {
+            pipeline.payloadBuilder.addUnitRoll(this, displayedExtraRolls, payloadRollType, dice, hits, source);
+            return CombatMessageHelper.displayUnitRoll(
+                    unitModel,
+                    toHit,
+                    modifierToHit,
+                    numOfUnit,
+                    numRollsPerUnit,
+                    displayedExtraRolls,
+                    dice,
+                    hits,
+                    holderLabel);
+        }
     }
+
+    record UnitRollGroup(int unitCount, int modifierToHit, int diceCount, int extraRolls) {}
+
+    record RerollResult(List<Die> dice, int hits) {}
 
     static class UnitRollPipelineState {
         Map<Pair<UnitModel, UnitHolder>, Integer> playerUnits;
@@ -730,7 +781,9 @@ public class UnitRollExecution {
             playerUnitsList = playerUnits.keySet().stream().map(Pair::getLeft).collect(Collectors.toList());
             List<UnitType> unitTypes =
                     playerUnitsList.stream().map(UnitModel::getUnitType).toList();
-            hacanFlagship = player.hasUnit("hacan_flagship") && unitTypes.contains(UnitType.Flagship);
+            hacanFlagship = playerUnitsList.stream().anyMatch(unit -> "hacan_flagship".equals(unit.getId()))
+                    || (unitTypes.contains(UnitType.Flagship)
+                            && ValefarZService.hasCopiedFlagshipAbility(game, player, "hacan_flagship"));
             tkHacanWarsun = player.hasUnit("tk-fallofkenara") && unitTypes.contains(UnitType.Warsun);
             isThalnosReroll = "true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"));
             space = activeSystem.getUnitHolders().get(Constants.SPACE);
@@ -760,7 +813,7 @@ public class UnitRollExecution {
                 merged.put(k, countByIdentity.get(k));
                 continue;
             }
-            IdentityHashMap<Pair<UnitModel, UnitHolder>, Integer> perKeyToHit = new IdentityHashMap<>();
+            IdentityHashMap<Pair<UnitModel, UnitHolder>, UnitMergeProfile> profiles = new IdentityHashMap<>();
             for (Pair<UnitModel, UnitHolder> key : keys) {
                 UnitModel m = key.getLeft();
                 UnitHolder h = key.getRight();
@@ -781,12 +834,24 @@ public class UnitRollExecution {
                         state.rollType,
                         state.activeSystem,
                         h);
-                perKeyToHit.put(key, toHit - mod);
+                int extraDicePerUnit = CombatModHelper.getCombinedModifierForUnit(
+                        m,
+                        1,
+                        state.extraRolls,
+                        state.player,
+                        state.opponent,
+                        state.game,
+                        state.playerUnitsList,
+                        state.rollType,
+                        state.activeSystem,
+                        h);
+                int dicePerUnit = m.getCombatDieCountForAbility(state.rollType, state.player);
+                profiles.put(key, new UnitMergeProfile(toHit - mod, dicePerUnit, extraDicePerUnit));
             }
-            Set<Integer> distinctToHits = new HashSet<>(perKeyToHit.values());
-            if (distinctToHits.size() > 1) {
+            Set<UnitMergeProfile> distinctProfiles = new HashSet<>(profiles.values());
+            if (distinctProfiles.size() > 1) {
                 divergingModels.add(modelEntry.getKey());
-                keys.sort(Comparator.comparingInt(perKeyToHit::get));
+                keys.sort(Comparator.comparing(profiles::get));
                 for (Pair<UnitModel, UnitHolder> k : keys) merged.put(k, countByIdentity.get(k));
             } else {
                 int totalCount = keys.stream().mapToInt(countByIdentity::get).sum();
@@ -797,6 +862,18 @@ public class UnitRollExecution {
     }
 
     record PreparedModifiers(List<NamedCombatModifierModel> rollModifiers, String display) {}
+
+    private record UnitMergeProfile(int effectiveThreshold, int dicePerUnit, int extraDicePerUnit)
+            implements Comparable<UnitMergeProfile> {
+        @Override
+        public int compareTo(UnitMergeProfile other) {
+            int thresholdComparison = Integer.compare(effectiveThreshold, other.effectiveThreshold);
+            if (thresholdComparison != 0) return thresholdComparison;
+            int diceComparison = Integer.compare(dicePerUnit, other.dicePerUnit);
+            if (diceComparison != 0) return diceComparison;
+            return Integer.compare(extraDicePerUnit, other.extraDicePerUnit);
+        }
+    }
 
     static class RollPayloadBuilder {
         final List<CombatRollPayload.CombatRollNote> notes = new ArrayList<>();
@@ -854,32 +931,28 @@ public class UnitRollExecution {
         }
 
         void addUnitRoll(
-                UnitModel unitModel,
-                int toHit,
-                int modifier,
-                int unitQuantity,
-                int numRollsPerUnit,
+                UnitRollState unit,
                 int extraRolls,
-                RollSegmentType segmentType,
-                List<DiceHelper.Die> resultRolls,
+                UnitRollType payloadRollType,
+                List<DiceHelper.Die> dice,
                 int hits,
                 DieRollSource source) {
-            diceRolled += resultRolls.size();
+            diceRolled += dice.size();
             unitRolls.add(new CombatRollPayload.UnitRoll(
-                    unitModel.getId(),
-                    unitModel.getAsyncId(),
-                    unitModel.getBaseType(),
-                    unitModel.getName(),
-                    getDisplayedUnitName(unitModel),
-                    unitModel.getUnitEmoji().toString(),
-                    unitQuantity,
-                    numRollsPerUnit,
+                    unit.unitModel.getId(),
+                    unit.unitModel.getAsyncId(),
+                    unit.unitModel.getBaseType(),
+                    unit.unitModel.getName(),
+                    getDisplayedUnitName(unit.unitModel),
+                    unit.unitModel.getUnitEmoji().toString(),
+                    unit.numOfUnit,
+                    unit.numRollsPerUnit,
                     extraRolls,
-                    toHit,
-                    modifier,
-                    toHit - modifier,
-                    segmentType,
-                    toDieRolls(resultRolls, source),
+                    unit.toHit,
+                    unit.modifierToHit,
+                    unit.toHit - unit.modifierToHit,
+                    payloadRollType,
+                    toDieRolls(dice, source),
                     hits));
         }
 
@@ -892,9 +965,9 @@ public class UnitRollExecution {
                     new CombatRollPayload.RollTotal(diceRolled, displayedTotalHits, misses, maximumHits));
         }
 
-        List<CombatRollPayload.DieRoll> toDieRolls(List<DiceHelper.Die> resultRolls, DieRollSource source) {
-            if (resultRolls.isEmpty()) return List.of();
-            return resultRolls.stream()
+        List<CombatRollPayload.DieRoll> toDieRolls(List<DiceHelper.Die> dice, DieRollSource source) {
+            if (dice.isEmpty()) return List.of();
+            return dice.stream()
                     .map(die ->
                             new CombatRollPayload.DieRoll(die.getResult(), die.getThreshold(), die.isSuccess(), source))
                     .toList();
