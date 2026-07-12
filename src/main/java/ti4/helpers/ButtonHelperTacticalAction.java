@@ -315,7 +315,9 @@ public final class ButtonHelperTacticalAction {
                     "zephyrion",
                     "vyserix",
                     "crystellum",
-                    "myrr");
+                    "myrr",
+                    "oblivion",
+                    "thrones");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "cabal");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "naalu");

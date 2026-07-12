@@ -10,6 +10,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
 import ti4.model.ExploreModel;
@@ -138,7 +139,141 @@ public class LostLegaciesCommanderUnlockHandler {
 
                 yield colorsWithTech >= 2;
             }
+            case "oblivion" -> {
+                yield getPlayersUnitTilesAdjacentToEmptyTiles(game, player).size() >= 3;
+            }
+            case "revenant" -> {
+                long otherPlayersWithUnlockedCommanders = game.getRealPlayers().stream()
+                        .filter(otherPlayer -> otherPlayer != player)
+                        .filter(otherPlayer -> otherPlayer.getLeaders().stream()
+                                .anyMatch(leader -> Constants.COMMANDER.equals(leader.getType()) && !leader.isLocked()))
+                        .count();
+
+                yield otherPlayersWithUnlockedCommanders >= 2;
+            }
+            case "revenantmyrr" -> {
+                Set<String> qualifyingUnitTypes = new HashSet<>();
+
+                for (var entry : player.getCurrentProducedUnits().entrySet()) {
+                    String unitAlias = getProducedUnitAlias(entry.getKey());
+                    if (unitAlias == null || entry.getValue() < 2) {
+                        continue;
+                    }
+
+                    qualifyingUnitTypes.add(unitAlias);
+                    if (qualifyingUnitTypes.size() >= 2) {
+                        yield true;
+                    }
+                }
+
+                yield false;
+            }
+            case "revenantoblivion" -> {
+                int numberOfPlanetsWithUniqueTraits = 0;
+                if (ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", false) >= 1) {
+                    numberOfPlanetsWithUniqueTraits++;
+                }
+                if (ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", false) >= 1) {
+                    numberOfPlanetsWithUniqueTraits++;
+                }
+                if (ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial", false) >= 1) {
+                    numberOfPlanetsWithUniqueTraits++;
+                }
+                yield numberOfPlanetsWithUniqueTraits >= 3;
+            }
+            case "revenantponthous" -> {
+                int sustainUnitsOnBoard = 0;
+
+                for (Tile tile : game.getTileMap().values()) {
+                    if (!tile.containsPlayersUnits(player)) {
+                        continue;
+                    }
+
+                    for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                        for (UnitKey unitKey :
+                                unitHolder.getUnitsByStateForPlayer(player).keySet()) {
+                            UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                            if (unitModel == null || !unitModel.getSustainDamage()) {
+                                continue;
+                            }
+
+                            sustainUnitsOnBoard += unitHolder.getUnitCount(unitKey);
+                            if (sustainUnitsOnBoard >= 3) {
+                                yield true;
+                            }
+                        }
+                    }
+                }
+
+                yield false;
+            }
+            case "thrones" -> {
+                int unitsAdjacentToAnomalies = 0;
+                for (Tile tile : game.getTileMap().values()) {
+                    if (!tile.containsPlayersUnits(player)) {
+                        continue;
+                    }
+
+                    if (FoWHelper.isTileAdjacentToAnAnomaly(game, tile.getPosition(), player)
+                            || tile.isAnomaly(game, player)) {
+                        unitsAdjacentToAnomalies++;
+                    }
+                }
+
+                yield unitsAdjacentToAnomalies >= 3;
+            }
+            case "ponthous" -> {
+                for (Tile tile : game.getTileMap().values()) {
+                    if (!tile.containsPlayersUnits(player)) {
+                        continue;
+                    }
+
+                    for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                        if (unitHolder.getDamagedUnitCount(player.getColorID()) > 0) {
+                            yield true;
+                        }
+                    }
+                }
+
+                yield false;
+            }
             default -> false;
         };
+    }
+
+    public static Set<Tile> getPlayersUnitTilesAdjacentToEmptyTiles(Game game, Player player) {
+        Set<Tile> qualifyingUnitTiles = new HashSet<>();
+        if (game == null || player == null) {
+            return qualifyingUnitTiles;
+        }
+
+        for (Tile tile : game.getTileMap().values()) {
+            if (!tile.containsPlayersUnits(player)) {
+                continue;
+            }
+            for (String adjacentPosition : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, false)) {
+                Tile adjacentTile = game.getTileByPosition(adjacentPosition);
+                if (adjacentTile != null && adjacentTile.getPlanetUnitHolders().isEmpty()) {
+                    qualifyingUnitTiles.add(tile);
+                    break;
+                }
+            }
+        }
+
+        return qualifyingUnitTiles;
+    }
+
+    private static String getProducedUnitAlias(String producedUnitKey) {
+        int lastSeparator = producedUnitKey.lastIndexOf('_');
+        if (lastSeparator < 0) {
+            return null;
+        }
+
+        int middleSeparator = producedUnitKey.lastIndexOf('_', lastSeparator - 1);
+        if (middleSeparator < 0) {
+            return null;
+        }
+
+        return producedUnitKey.substring(0, middleSeparator);
     }
 }

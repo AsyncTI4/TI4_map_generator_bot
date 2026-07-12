@@ -40,6 +40,7 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.LoreService;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
@@ -382,6 +383,7 @@ class DeleteButtonsButtonHandler {
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
                 }
+                CommanderUnlockCheckService.checkPlayer(player, "revenantmyrr");
             }
         }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
