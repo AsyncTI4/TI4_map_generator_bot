@@ -313,7 +313,7 @@ final class CombatRollTestSupport {
             player.getLeader(leaderId).orElseThrow().setLocked(false);
         }
 
-        CombatRollPipelineState preparedState(
+        CombatContext preparedState(
                 Player player, Player opponent, Tile tile, UnitHolder holder, CombatRollType rollType) {
             Map<Pair<UnitModel, UnitHolder>, Integer> units =
                     CombatUnitResolver.getUnitsInCombatByHolder(tile, holder, player, event, rollType, game);
@@ -340,8 +340,7 @@ final class CombatRollTestSupport {
                     rollType,
                     holder,
                     Constants.COMBAT_EXTRA_ROLLS);
-            CombatRollPipelineState state =
-                    new CombatRollPipelineState(player, game, event, tile, holder.getName(), rollType, false);
+            CombatContext state = new CombatContext(player, game, event, tile, holder.getName(), rollType, false);
             state.setCombatOnHolder(holder);
             state.setPlayerUnits(units);
             state.setOpponent(opponent);

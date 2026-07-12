@@ -286,8 +286,7 @@ class CombatRollPayloadRendererParityTest extends BaseTi4Test {
                 rollType,
                 Constants.COMBAT_EXTRA_ROLLS);
 
-        CombatRollPipelineState state =
-                new CombatRollPipelineState(player, harness.game, null, tile, space.getName(), rollType, false);
+        CombatContext state = new CombatContext(player, harness.game, null, tile, space.getName(), rollType, false);
         state.setCombatOnHolder(space);
         state.setPlayerUnits(playerUnits);
         state.setOpponent(opponent);

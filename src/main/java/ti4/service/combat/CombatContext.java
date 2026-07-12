@@ -10,7 +10,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.model.UnitModel;
 
-public final class CombatRollPipelineState {
+public final class CombatContext {
     final Player player;
     final Game game;
     final GenericInteractionCreateEvent event;
@@ -23,15 +23,15 @@ public final class CombatRollPipelineState {
     Player opponent;
     CombatRollModifiers modifiers;
     String bombardPlanet = "";
-    CombatRollResult rollResult;
-    String message;
-    CombatRollPayload payload;
+    CombatRollResult rawRollResult;
+    String publishedMessage;
+    CombatRollPayload publishedPayload;
     int opponentRound;
     int playerRound;
-    int hits;
+    int publishedHits;
     CombatRollStatus stoppedStatus;
 
-    public CombatRollPipelineState(
+    public CombatContext(
             Player player,
             Game game,
             GenericInteractionCreateEvent event,

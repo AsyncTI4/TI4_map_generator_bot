@@ -58,13 +58,13 @@ class UnitRollMergeTest extends BaseTi4Test {
         tile.addGalvanize(first.getName(), Units.getUnitKey(UnitType.Infantry, player.getColorID()), 1);
         NamedCombatModifierModel galvanize = new NamedCombatModifierModel(
                 Mapper.getCombatModifiers().get("roll_1_for_galvanize_combat"), "Galvanized");
-        CombatRollPipelineState combat = new CombatRollPipelineState(
+        CombatContext combat = new CombatContext(
                 player, harness.game, harness.event, tile, first.getName(), CombatRollType.combatround, false);
         combat.setCombatOnHolder(first);
         combat.setPlayerUnits(units);
         combat.setOpponent(opponent);
         combat.setModifiers(new CombatRollModifiers(List.of(), List.of(galvanize), List.of()));
-        UnitRollExecution.UnitRollPipelineState pipeline = new UnitRollExecution.UnitRollPipelineState(combat);
+        UnitRollExecution.CombatRollState pipeline = new UnitRollExecution.CombatRollState(combat);
         pipeline.mods = List.of();
 
         UnitMergeResult result = UnitRollExecution.mergeAndDetectDivergence(pipeline);
@@ -85,13 +85,13 @@ class UnitRollMergeTest extends BaseTi4Test {
         Map<Pair<UnitModel, UnitHolder>, Integer> units = new LinkedHashMap<>();
         units.put(Pair.of(firstModel, first), 1);
         units.put(Pair.of(secondModel, second), 2);
-        CombatRollPipelineState combat = new CombatRollPipelineState(
+        CombatContext combat = new CombatContext(
                 player, harness.game, harness.event, tile, first.getName(), CombatRollType.bombardment, false);
         combat.setCombatOnHolder(first);
         combat.setPlayerUnits(units);
         combat.setOpponent(opponent);
         combat.setModifiers(new CombatRollModifiers(List.of(), List.of(), List.of()));
-        UnitRollExecution.UnitRollPipelineState pipeline = new UnitRollExecution.UnitRollPipelineState(combat);
+        UnitRollExecution.CombatRollState pipeline = new UnitRollExecution.CombatRollState(combat);
         pipeline.mods = List.of();
         return new Fixture(pipeline);
     }
@@ -107,5 +107,5 @@ class UnitRollMergeTest extends BaseTi4Test {
         return model;
     }
 
-    private record Fixture(UnitRollExecution.UnitRollPipelineState pipeline) {}
+    private record Fixture(UnitRollExecution.CombatRollState pipeline) {}
 }

@@ -28,8 +28,8 @@ import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.UnitModel;
 import ti4.model.enums.CombatMod.CombatModType;
+import ti4.service.combat.CombatContext;
 import ti4.service.combat.CombatRollModifiers;
-import ti4.service.combat.CombatRollPipelineState;
 import ti4.service.combat.CombatRollResult;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.CombatUnitResolver;
@@ -181,8 +181,8 @@ public class BastionTechService {
                     p2, tile.getTileModel(), planet, true, CombatRollType.bombardment));
 
             String message = CombatMessageHelper.displayCombatSummary(p1, tile, planet, CombatRollType.bombardment);
-            CombatRollPipelineState rollState = new CombatRollPipelineState(
-                    p1, game, event, tile, planet.getName(), CombatRollType.bombardment, false);
+            CombatContext rollState =
+                    new CombatContext(p1, game, event, tile, planet.getName(), CombatRollType.bombardment, false);
             rollState.setCombatOnHolder(planet);
             rollState.setPlayerUnitsByModel(units, planet);
             rollState.setOpponent(p2);

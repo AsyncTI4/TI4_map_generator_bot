@@ -57,8 +57,8 @@ import ti4.model.enums.CombatMod.CombatModType;
 import ti4.service.VeiledHeartService;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.button.ReactionService;
+import ti4.service.combat.CombatContext;
 import ti4.service.combat.CombatRollModifiers;
-import ti4.service.combat.CombatRollPipelineState;
 import ti4.service.combat.CombatRollResult;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.CombatUnitResolver;
@@ -2696,8 +2696,8 @@ public final class ButtonHelperFactionSpecific {
                         p1, tile.getTileModel(), planet, false, CombatRollType.combatround));
 
         String message = CombatMessageHelper.displayCombatSummary(p1, tile, planet, CombatRollType.combatround);
-        CombatRollPipelineState rollState =
-                new CombatRollPipelineState(p1, game, event, tile, planet.getName(), CombatRollType.combatround, false);
+        CombatContext rollState =
+                new CombatContext(p1, game, event, tile, planet.getName(), CombatRollType.combatround, false);
         rollState.setCombatOnHolder(planet);
         rollState.setPlayerUnitsByModel(units, planet);
         rollState.setOpponent(p2);

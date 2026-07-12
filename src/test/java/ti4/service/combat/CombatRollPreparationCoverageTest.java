@@ -36,9 +36,10 @@ class CombatRollPreparationCoverageTest extends BaseTi4Test {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         player.addRelic("metalivoidarmaments");
         player.addTech("tf-projectionofpow");
-        CombatRollPipelineState state = state(harness, player, tile, space, CombatRollType.AFB);
+        CombatContext state = state(harness, player, tile, space, CombatRollType.AFB);
 
-        CombatRollPreparation.addSpecialUnitsForRoll(state);
+        CombatRollPreparation.addMetaliVoidArmamentsUnit(state);
+        CombatRollPreparation.addProjectionOfPowerTechUnit(state);
 
         assertEquals(2, state.playerUnits.size());
         assertTrue(state.playerUnits.keySet().stream()
@@ -56,9 +57,9 @@ class CombatRollPreparationCoverageTest extends BaseTi4Test {
         player.addAbility("projection_of_power");
         Tile target = harness.tile("19");
         UnitHolder targetSpace = target.getUnitHolders().get(Constants.SPACE);
-        CombatRollPipelineState state = state(harness, player, target, targetSpace, CombatRollType.combatround);
+        CombatContext state = state(harness, player, target, targetSpace, CombatRollType.combatround);
 
-        CombatRollPreparation.addSpecialUnitsForRoll(state);
+        CombatRollPreparation.addProjectionOfPowerAbilityUnit(state);
         assertTrue(state.playerUnits.isEmpty());
 
         String adjacentPosition = ti4.image.PositionMapper.getAdjacentTilePositions(target.getPosition()).stream()
@@ -69,7 +70,7 @@ class CombatRollPreparationCoverageTest extends BaseTi4Test {
         UnitHolder dockPlanet = dockSystem.getPlanetUnitHolders().getFirst();
         harness.add(dockSystem, dockPlanet, player, UnitType.Spacedock, 1);
 
-        CombatRollPreparation.addSpecialUnitsForRoll(state);
+        CombatRollPreparation.addProjectionOfPowerAbilityUnit(state);
         assertEquals(1, state.playerUnits.size());
         assertTrue(state.playerUnits.keySet().stream()
                 .map(pair -> pair.getLeft().getId())
@@ -85,10 +86,10 @@ class CombatRollPreparationCoverageTest extends BaseTi4Test {
         zelian.setBreakthroughUnlocked("zelianbt", true);
         zelian.setBreakthroughActive("zelianbt", true);
         zelian.addPlanet(planet.getName());
-        CombatRollPipelineState state =
+        CombatContext state =
                 state(harness, zelian, tile, tile.getUnitHolders().get(Constants.SPACE), CombatRollType.combatround);
 
-        CombatRollPreparation.addSpecialUnitsForRoll(state);
+        CombatRollPreparation.addZelianBreakthroughPlanetUnits(state);
 
         assertEquals(1, state.playerUnits.size());
         assertTrue(state.playerUnits.keySet().stream()
@@ -104,10 +105,10 @@ class CombatRollPreparationCoverageTest extends BaseTi4Test {
         Tile tile = harness.tile("27");
         UnitHolder controlled = tile.getPlanetUnitHolders().getFirst();
         player.addPlanet(controlled.getName());
-        CombatRollPipelineState state =
+        CombatContext state =
                 state(harness, player, tile, tile.getUnitHolders().get(Constants.SPACE), CombatRollType.combatround);
 
-        CombatRollPreparation.addSpecialUnitsForRoll(state);
+        CombatRollPreparation.addHostilePlanetoidsPlanetUnits(state);
 
         assertEquals(1, state.playerUnits.size());
         assertTrue(state.playerUnits.keySet().stream()
@@ -122,15 +123,15 @@ class CombatRollPreparationCoverageTest extends BaseTi4Test {
         Tile tile = harness.tile("19");
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         harness.game.getLaws().put("articles_war", 1);
-        CombatRollPipelineState state = state(harness, player, tile, space, CombatRollType.combatround);
+        CombatContext state = state(harness, player, tile, space, CombatRollType.combatround);
         UnitModel disabled = Mapper.getUnit("naaz_mech_space");
         UnitModel carrier = Mapper.getUnit("carrier");
         state.playerUnits.put(Pair.of(disabled, space), 1);
         state.playerUnits.put(Pair.of(carrier, space), 1);
         player.addRelic("metalivoidarmaments");
-        CombatRollPipelineState afbState = state(harness, player, tile, space, CombatRollType.AFB);
+        CombatContext afbState = state(harness, player, tile, space, CombatRollType.AFB);
         afbState.playerUnits.putAll(state.playerUnits);
-        CombatRollPreparation.addSpecialUnitsForRoll(afbState);
+        CombatRollPreparation.addMetaliVoidArmamentsUnit(afbState);
 
         try (MockedStatic<MessageHelper> ignored = mockStatic(MessageHelper.class)) {
             CombatRollPreparation.removeUnitsDisabledByArticlesOfWar(afbState);
@@ -149,7 +150,7 @@ class CombatRollPreparationCoverageTest extends BaseTi4Test {
         Player opponent = harness.player("mentak");
         Tile tile = harness.tile("19");
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
-        CombatRollPipelineState state = state(harness, player, tile, space, CombatRollType.combatround);
+        CombatContext state = state(harness, player, tile, space, CombatRollType.combatround);
 
         CombatRollPreparation.resolveCombatRollOpponent(state);
         assertSame(player, state.opponent);
@@ -166,7 +167,7 @@ class CombatRollPreparationCoverageTest extends BaseTi4Test {
         Player player = harness.player("argent");
         Tile tile = harness.tile("19");
         String planet = tile.getPlanetUnitHolders().getFirst().getName();
-        CombatRollPipelineState state =
+        CombatContext state =
                 state(harness, player, tile, tile.getUnitHolders().get(Constants.SPACE), CombatRollType.bombardment);
         state.bombardPlanet = planet;
         NamedCombatModifierModel plasma = modifier("plus1_roll_plasmascoring");
@@ -225,7 +226,7 @@ class CombatRollPreparationCoverageTest extends BaseTi4Test {
         netrunner.addAbility("control_network");
         Tile tile = harness.tile("19");
         UnitHolder space = tile.getSpaceUnitHolder();
-        CombatRollPipelineState state = state(harness, shooter, tile, space, CombatRollType.SpaceCannonOffence);
+        CombatContext state = state(harness, shooter, tile, space, CombatRollType.SpaceCannonOffence);
         state.opponent = target;
         harness.game.setStoredValue("controlNetworkSpaceCannonTile" + shooter.getFaction(), tile.getTileID());
         harness.game.setStoredValue("controlNetworkSpaceCannonHolder" + shooter.getFaction(), space.getName());
@@ -251,7 +252,7 @@ class CombatRollPreparationCoverageTest extends BaseTi4Test {
         UnitHolder planet = tile.getPlanetUnitHolders().getFirst();
         harness.add(tile, planet, iron, UnitType.Mech, 1);
         harness.add(tile, planet, sol, UnitType.Infantry, 1);
-        CombatRollPipelineState state = state(harness, iron, tile, planet, CombatRollType.combatround);
+        CombatContext state = state(harness, iron, tile, planet, CombatRollType.combatround);
         state.opponent = sol;
         state.playerUnits = CombatUnitResolver.getUnitsInCombatByHolder(
                 tile, planet, iron, harness.event, CombatRollType.combatround, harness.game);
@@ -278,7 +279,7 @@ class CombatRollPreparationCoverageTest extends BaseTi4Test {
         Player defender = harness.player("mentak");
         Tile tile = harness.tile("19");
         UnitHolder planet = tile.getPlanetUnitHolders().getFirst();
-        CombatRollPipelineState combat = state(harness, attacker, tile, planet, CombatRollType.combatround);
+        CombatContext combat = state(harness, attacker, tile, planet, CombatRollType.combatround);
         combat.opponent = defender;
         addCurrentTemporaryModifier(attacker, tile, planet, "plus1_1round_all", "action_cards", "mb1");
 
@@ -287,7 +288,7 @@ class CombatRollPreparationCoverageTest extends BaseTi4Test {
         assertTrue(playerModifiers.temporaryModifiers().stream().anyMatch(modifier -> "plus1_1round_all"
                 .equals(modifier.getModifier().getAlias())));
 
-        CombatRollPipelineState bombardment = state(harness, attacker, tile, planet, CombatRollType.bombardment);
+        CombatContext bombardment = state(harness, attacker, tile, planet, CombatRollType.bombardment);
         bombardment.opponent = defender;
         addCurrentTemporaryModifier(defender, tile, planet, "minus4_bombard", "action_cards", "bunker");
 
@@ -311,14 +312,14 @@ class CombatRollPreparationCoverageTest extends BaseTi4Test {
         return new NamedCombatModifierModel(Mapper.getCombatModifiers().get(alias), alias);
     }
 
-    private static CombatRollPipelineState state(
+    private static CombatContext state(
             CombatRollTestSupport.Harness harness,
             Player player,
             Tile tile,
             UnitHolder holder,
             CombatRollType rollType) {
-        CombatRollPipelineState state = new CombatRollPipelineState(
-                player, harness.game, harness.event, tile, holder.getName(), rollType, false);
+        CombatContext state =
+                new CombatContext(player, harness.game, harness.event, tile, holder.getName(), rollType, false);
         state.setCombatOnHolder(holder);
         state.setPlayerUnits(new HashMap<Pair<UnitModel, UnitHolder>, Integer>());
         return state;

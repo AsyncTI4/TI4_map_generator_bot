@@ -61,27 +61,16 @@ public class CombatRollPublication {
         String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign ";
         msg2 += (hits == 1 ? "the hit" : "hits") + ". ";
         msg2 += ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, hits, event, true);
-        if (opponent.hasRelic("metalivoidshielding")) {
-            RelicModel relicModel = Mapper.getRelic("metalivoidshielding");
-            msg2 += "\nReminder: You have the _" + relicModel.getName() + "_ relic,";
-            msg2 += " you may SUSTAIN DAMAGE on one of your non-fighter ships instead of taking a hit.";
-        }
+        msg2 = appendMetalivoidShieldingReminder(opponent, msg2);
         String combatRoundKey = "combatRoundTracker" + opponent.getFaction() + tile.getPosition() + "space";
         String combatRoundValue = game.getStoredValue(combatRoundKey);
-        if (opponent.hasUnlockedBreakthrough("crystellumbt") && "1".equals(combatRoundValue)) {
-            msg2 +=
-                    "\nReminder: You have _Defensive Architecture_.\nFor each unit in the active system that is at capacity, you may give one other non-fighter ship in the same system SUSTAIN DAMAGE until the end of this combat. This is not tracked by the bot.";
-        }
+        msg2 = appendDefensiveArchitectureReminder(opponent, msg2, "1".equals(combatRoundValue));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
     }
 
-    private static boolean isFoWPrivateChannelRoll(CombatRollPipelineState state) {
-        return state.event.getMessageChannel().equals(state.player.getPrivateChannel());
-    }
-
-    static void publish(CombatRollPipelineState state) {
+    static void publish(CombatContext state) {
         MessageHelper.sendMessageToChannel(state.event.getMessageChannel(), "");
-        AdjustedRollResult adjustedRoll = applyProximaBombardmentCancellation(state);
+        ProximaAdjustment adjustedRoll = applyProximaBombardmentCancellation(state);
         String message = removeTrailingRollSeparator(adjustedRoll.message());
         message = appendAshenBombardmentReminder(state, message);
         MessageHelper.sendMessageToChannel(state.event.getMessageChannel(), message);
@@ -98,48 +87,52 @@ public class CombatRollPublication {
         offerSpaceCannonHitAssignmentButtons(state, adjustedRoll.hits());
         offerVyserixMorayButtons(state, adjustedRoll.hits());
         handleBombardmentResults(state, adjustedRoll.hits());
-        state.message = message;
-        state.hits = adjustedRoll.hits();
+        state.publishedMessage = message;
+        state.publishedHits = adjustedRoll.hits();
     }
 
-    private static String appendAshenBombardmentReminder(CombatRollPipelineState state, String message) {
+    private static boolean isFoWPrivateChannelRoll(CombatContext state) {
+        return state.event.getMessageChannel().equals(state.player.getPrivateChannel());
+    }
+
+    private static String appendAshenBombardmentReminder(CombatContext state, String message) {
         if (state.player.hasBreakthrough("ashenbt")) {
             return AshenBreakthroughHandler.appendBombardmentManualReminder(state.player, state.rollType, message);
         }
         return message;
     }
 
-    private static AdjustedRollResult applyProximaBombardmentCancellation(CombatRollPipelineState state) {
-        int hits = state.rollResult.totalHits();
+    private static ProximaAdjustment applyProximaBombardmentCancellation(CombatContext state) {
+        int hits = state.rawRollResult.totalHits();
         if (state.rollType != CombatRollType.bombardment
                 || state.opponent == state.player
                 || !state.opponent.hasTech("proxima")
                 || hits < 1) {
-            return new AdjustedRollResult(state.message, hits);
+            return new ProximaAdjustment(state.publishedMessage, hits);
         }
         if (state.opponent.hasTech("tf-proxima")) {
-            return new AdjustedRollResult(
-                    state.message + "\n_Proxima Targeting VI_ canceled 1 hit automatically.", hits - 1);
+            return new ProximaAdjustment(
+                    state.publishedMessage + "\n_Proxima Targeting VI_ canceled 1 hit automatically.", hits - 1);
         }
         if (state.bombardPlanet.isEmpty()) {
-            return new AdjustedRollResult(state.message, hits);
+            return new ProximaAdjustment(state.publishedMessage, hits);
         }
         UnitHolder planet = state.game.getUnitHolderFromPlanet(state.bombardPlanet);
         if (planet == null || planet.getGalvanizedUnitCount(state.opponent.getColorID()) < 1) {
-            return new AdjustedRollResult(state.message, hits);
+            return new ProximaAdjustment(state.publishedMessage, hits);
         }
         int adjustedHits = Math.max(0, hits - planet.getGalvanizedUnitCount(state.opponent.getColorID()));
         int canceledHits = hits - adjustedHits;
-        String adjustedMessage = state.message + "\n_Proxima Targeting VI_ canceled " + canceledHits + " hit"
+        String adjustedMessage = state.publishedMessage + "\n_Proxima Targeting VI_ canceled " + canceledHits + " hit"
                 + (canceledHits == 1 ? "" : "s") + " automatically.";
-        return new AdjustedRollResult(adjustedMessage, adjustedHits);
+        return new ProximaAdjustment(adjustedMessage, adjustedHits);
     }
 
     private static String removeTrailingRollSeparator(String message) {
         return message.endsWith(";\n") ? message.substring(0, message.length() - 2) : message;
     }
 
-    private static boolean mirrorCombatReplay(CombatRollPipelineState state, String message) {
+    private static boolean mirrorCombatReplay(CombatContext state, String message) {
         CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
         boolean trackedCandidateRoll = combatReplayService.isTrackedCandidateRoll(
                 state.game, state.player, state.opponent, state.tile, state.rollType);
@@ -150,13 +143,13 @@ public class CombatRollPublication {
                 state.tile,
                 message,
                 state.rollType,
-                state.rollResult.whiff(),
-                state.rollResult.slam(),
-                state.payload);
+                state.rawRollResult.whiff(),
+                state.rawRollResult.slam(),
+                state.publishedPayload);
         return trackedCandidateRoll;
     }
 
-    private static void offerThalnosReroll(CombatRollPipelineState state, String message) {
+    private static void offerThalnosReroll(CombatContext state, String message) {
         if (!message.contains("adding +1, at the risk of your")) {
             return;
         }
@@ -171,7 +164,7 @@ public class CombatRollPublication {
                 state.event.getMessageChannel(), thalnosMessage, List.of(thalnosButton, decline));
     }
 
-    private static void handleBombardmentResults(CombatRollPipelineState state, int hits) {
+    private static void handleBombardmentResults(CombatContext state, int hits) {
         if (state.rollType != CombatRollType.bombardment) return;
 
         offerAshenCommanderBombardmentButtons(state, hits);
@@ -181,11 +174,11 @@ public class CombatRollPublication {
         exhaustBombardedPlanetWithX89(state);
     }
 
-    private static void offerAshenCommanderBombardmentButtons(CombatRollPipelineState state, int hits) {
+    private static void offerAshenCommanderBombardmentButtons(CombatContext state, int hits) {
         AshenLeadersHandler.offerCommanderBombardmentButtons(state.event, state.game, state.player, hits);
     }
 
-    private static void offerBombardmentHitAssignment(CombatRollPipelineState state, int hits) {
+    private static void offerBombardmentHitAssignment(CombatContext state, int hits) {
         if (hits < 1) return;
         if (AshenLeadersHandler.offerHeroBombardmentAssignButtons(
                 state.event, state.game, state.player, hits, state.bombardPlanet)) return;
@@ -200,7 +193,7 @@ public class CombatRollPublication {
     }
 
     private static void offerBombardmentHitAssignmentToTarget(
-            CombatRollPipelineState state, Player target, int hits, List<Button> buttons) {
+            CombatContext state, Player target, int hits, List<Button> buttons) {
         if (target == state.player || state.bombardPlanet.isEmpty()) return;
         if (!FoWHelper.playerHasUnitsOnPlanet(target, state.game.getUnitHolderFromPlanet(state.bombardPlanet))) return;
 
@@ -212,14 +205,14 @@ public class CombatRollPublication {
     }
 
     private static void sendBombardmentHitAssignmentToPlayer(
-            CombatRollPipelineState state, Player target, int hits, List<Button> buttons) {
+            CombatContext state, Player target, int hits, List<Button> buttons) {
         MessageHelper.sendMessageToChannelWithButtons(
                 state.event.getMessageChannel(),
                 target.getRepresentation() + ", please assign the BOMBARDMENT hit" + (hits == 1 ? "" : "s") + ".",
                 buttons);
     }
 
-    private static void sendBombardmentHitAssignmentForDummy(CombatRollPipelineState state, Player target, int hits) {
+    private static void sendBombardmentHitAssignmentForDummy(CombatContext state, Player target, int hits) {
         List<Button> buttons = List.of(Buttons.green(
                 target.dummyPlayerSpoof() + "autoAssignGroundHits_" + state.bombardPlanet + "_" + hits,
                 "Auto-assign Hit" + (hits == 1 ? "" : "s") + " For Dummy"));
@@ -230,7 +223,7 @@ public class CombatRollPublication {
                 buttons);
     }
 
-    private static void offerMeteorSlingsInfantryReplacement(CombatRollPipelineState state, int hits) {
+    private static void offerMeteorSlingsInfantryReplacement(CombatContext state, int hits) {
         if (hits < 1) return;
         if (!state.player.hasAbility("meteor_slings")
                 && !state.player.getPromissoryNotes().containsKey("dspnkhra")) return;
@@ -247,13 +240,13 @@ public class CombatRollPublication {
         MessageHelper.sendMessageToChannelWithButtons(state.event.getMessageChannel(), message, buttons);
     }
 
-    private static void offerKaloraBreakthroughInfantryCommit(CombatRollPipelineState state, int hits) {
+    private static void offerKaloraBreakthroughInfantryCommit(CombatContext state, int hits) {
         if (hits < 1 || !state.player.hasUnlockedBreakthrough("kalorabt")) return;
         KaloraBreakthroughHandler.offerCommitInfantryButton(
                 state.event, state.game, state.player, state.tile, state.bombardPlanet);
     }
 
-    private static void exhaustBombardedPlanetWithX89(CombatRollPipelineState state) {
+    private static void exhaustBombardedPlanetWithX89(CombatContext state) {
         if (!state.player.hasTech("x89c4")) return;
         for (Player target : state.game.getRealPlayers()) {
             if (!target.hasPlanetReady(state.bombardPlanet)) continue;
@@ -262,7 +255,7 @@ public class CombatRollPublication {
         }
     }
 
-    private static void exhaustX89Target(CombatRollPipelineState state, Player target) {
+    private static void exhaustX89Target(CombatContext state, Player target) {
         PlanetExhaust.doAction(target, state.bombardPlanet, state.game);
         MessageHelper.sendMessageToChannel(
                 target.getCorrectChannel(),
@@ -272,13 +265,13 @@ public class CombatRollPublication {
                         + " bombarded it with _X-89 Bacterial Weapon ΩΩ_.");
     }
 
-    private static void offerVyserixMorayButtons(CombatRollPipelineState state, int hits) {
+    private static void offerVyserixMorayButtons(CombatContext state, int hits) {
         if (state.rollType == CombatRollType.AFB && state.player.hasUnlockedBreakthrough("vyserixbt")) {
             VyserixBreakthroughHandler.offerMoraySystemButtons(state.event, state.game, state.player, state.tile, hits);
         }
     }
 
-    private static void offerSpaceCannonHitAssignmentButtons(CombatRollPipelineState state, int hits) {
+    private static void offerSpaceCannonHitAssignmentButtons(CombatContext state, int hits) {
         if ((!state.game.isFowMode() || isFoWPrivateChannelRoll(state))
                 && state.rollType == CombatRollType.SpaceCannonOffence
                 && hits > 0
@@ -314,7 +307,7 @@ public class CombatRollPublication {
         }
     }
 
-    private static void handlePublicCombatRoundResults(CombatRollPipelineState state, int hits) {
+    private static void handlePublicCombatRoundResults(CombatContext state, int hits) {
         if (state.rollType != CombatRollType.combatround || state.opponent == state.player) return;
         if (state.combatOnHolder instanceof Planet) {
             handleGroundCombatRoundResults(state, hits);
@@ -323,7 +316,7 @@ public class CombatRollPublication {
         }
     }
 
-    private static void handleGroundCombatRoundResults(CombatRollPipelineState state, int hits) {
+    private static void handleGroundCombatRoundResults(CombatContext state, int hits) {
         reportGroundCombatHits(state, hits);
         if (state.automated) {
             reportAutomatedValkyrieParticleWeaveHit(state, hits);
@@ -337,13 +330,13 @@ public class CombatRollPublication {
         }
     }
 
-    private static void reportGroundCombatHits(CombatRollPipelineState state, int hits) {
+    private static void reportGroundCombatHits(CombatContext state, int hits) {
         String message = "\n" + state.opponent.getRepresentation(true, true, true, true) + ", you suffered "
                 + StringHelper.pluralize(hits, "hit") + " in round #" + state.playerRound + ".";
         MessageHelper.sendMessageToChannel(state.event.getMessageChannel(), message);
     }
 
-    private static void offerGroundCombatHitAssignment(CombatRollPipelineState state, int hits) {
+    private static void offerGroundCombatHitAssignment(CombatContext state, int hits) {
         List<Button> buttons = new ArrayList<>();
         if (state.playerRound > state.opponentRound) {
             String prefix = state.opponent.isDummy() || state.opponent.isNpc() ? state.opponent.dummyPlayerSpoof() : "";
@@ -368,19 +361,26 @@ public class CombatRollPublication {
             buttons.add(Buttons.gray(
                     state.opponent.factionButtonChecker() + "cancelGroundHits_" + state.tile.getPosition() + "_" + hits,
                     "Cancel a Hit"));
-            AshenPromissoryHandler.addFromTheAshesButton(
-                    buttons, state.game, state.opponent, state.player, state.tile, state.combatOnHolder, hits);
-            if (state.opponent.hasUnit("crystellum_mech")) {
-                CrystellumUnitHandler.offerRefractumButtonIfRelevant(
-                        buttons, state.opponent, state.game, state.tile, state.combatOnHolder, hits);
-            }
+            addFromTheAshesGroundHitButton(state, hits, buttons);
+            addRefractumGroundHitButton(state, hits, buttons);
         }
         String message = state.opponent.getRepresentationUnfogged() + " you may autoassign "
                 + StringHelper.pluralize(hits, "hit") + ".";
         MessageHelper.sendMessageToChannelWithButtons(state.event.getMessageChannel(), message, buttons);
     }
 
-    private static void offerValkyrieParticleWeaveHitAssignment(CombatRollPipelineState state, int hits) {
+    private static void addFromTheAshesGroundHitButton(CombatContext state, int hits, List<Button> buttons) {
+        AshenPromissoryHandler.addFromTheAshesButton(
+                buttons, state.game, state.opponent, state.player, state.tile, state.combatOnHolder, hits);
+    }
+
+    private static void addRefractumGroundHitButton(CombatContext state, int hits, List<Button> buttons) {
+        if (!state.opponent.hasUnit("crystellum_mech")) return;
+        CrystellumUnitHandler.offerRefractumButtonIfRelevant(
+                buttons, state.opponent, state.game, state.tile, state.combatOnHolder, hits);
+    }
+
+    private static void offerValkyrieParticleWeaveHitAssignment(CombatContext state, int hits) {
         if (!state.opponent.hasTech("vpw")) return;
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
@@ -396,7 +396,7 @@ public class CombatRollPublication {
         MessageHelper.sendMessageToChannelWithButtons(state.event.getMessageChannel(), message, buttons);
     }
 
-    private static void offerNextGroundCombatRound(CombatRollPipelineState state) {
+    private static void offerNextGroundCombatRound(CombatContext state) {
         if (state.playerRound <= state.opponentRound) return;
         String prefix = state.opponent.isDummy() || state.opponent.isNpc() ? state.opponent.dummyPlayerSpoof() : "";
         List<Button> buttons = List.of(Buttons.blue(
@@ -408,21 +408,21 @@ public class CombatRollPublication {
         MessageHelper.sendMessageToChannelWithButtons(state.event.getMessageChannel(), message, buttons);
     }
 
-    private static void reportAutomatedValkyrieParticleWeaveHit(CombatRollPipelineState state, int hits) {
+    private static void reportAutomatedValkyrieParticleWeaveHit(CombatContext state, int hits) {
         if (!state.opponent.hasTech("vpw") || hits < 1) return;
         MessageHelper.sendMessageToChannel(
                 state.event.getMessageChannel(),
                 state.player.getRepresentation() + " suffered 1 hit due to _Valkyrie Particle Weave_.");
     }
 
-    private static void handleSpaceCombatRoundResults(CombatRollPipelineState state, int hits) {
+    private static void handleSpaceCombatRoundResults(CombatContext state, int hits) {
         List<Button> buttons = buildNextSpaceCombatRoundButtons(state);
         reportSpaceCombatHits(state, hits);
         if (hits > 0) sendSpaceCombatHitAssignment(state, hits, buttons);
         else offerNextSpaceCombatRound(state, buttons);
     }
 
-    private static List<Button> buildNextSpaceCombatRoundButtons(CombatRollPipelineState state) {
+    private static List<Button> buildNextSpaceCombatRoundButtons(CombatContext state) {
         List<Button> buttons = new ArrayList<>();
         if (state.playerRound <= state.opponentRound) return buttons;
         String idPrefix = state.opponent.isDummy() || state.opponent.isNpc() ? state.opponent.dummyPlayerSpoof() : "";
@@ -434,20 +434,19 @@ public class CombatRollPublication {
         return buttons;
     }
 
-    private static void reportSpaceCombatHits(CombatRollPipelineState state, int hits) {
+    private static void reportSpaceCombatHits(CombatContext state, int hits) {
         String message = "\n" + state.opponent.getRepresentation(true, true, true, true) + ", you suffered "
                 + StringHelper.pluralize(hits, "hit") + " in round #" + state.playerRound + ".";
         MessageHelper.sendMessageToChannel(state.event.getMessageChannel(), message);
     }
 
-    private static void sendSpaceCombatHitAssignment(CombatRollPipelineState state, int hits, List<Button> buttons) {
+    private static void sendSpaceCombatHitAssignment(CombatContext state, int hits, List<Button> buttons) {
         addSpaceCombatHitAssignmentButtons(state, hits, buttons);
         String message = buildSpaceCombatHitAssignmentMessage(state, hits);
         MessageHelper.sendMessageToChannelWithButtons(state.event.getMessageChannel(), message, buttons);
     }
 
-    private static void addSpaceCombatHitAssignmentButtons(
-            CombatRollPipelineState state, int hits, List<Button> buttons) {
+    private static void addSpaceCombatHitAssignmentButtons(CombatContext state, int hits, List<Button> buttons) {
         if (state.opponent.isDummy() || state.opponent.isNpc()) {
             buttons.add(Buttons.green(
                     state.opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + state.tile.getPosition() + "_" + hits,
@@ -463,37 +462,46 @@ public class CombatRollPublication {
                 "Manually Assign Hit" + (hits == 1 ? "" : "s")));
         buttons.add(Buttons.gray(
                 factionChecker + "cancelSpaceHits_" + state.tile.getPosition() + "_" + hits, "Cancel a Hit"));
-        if (state.opponent.hasAbility("refraction")) {
-            CrystellumAbilityHandler.addRefractionButtonIfRelevant(
-                    buttons, state.opponent, state.game, state.tile, hits);
-        }
+        addRefractionSpaceHitButton(state, hits, buttons);
     }
 
-    private static String buildSpaceCombatHitAssignmentMessage(CombatRollPipelineState state, int hits) {
+    private static void addRefractionSpaceHitButton(CombatContext state, int hits, List<Button> buttons) {
+        if (!state.opponent.hasAbility("refraction")) return;
+        CrystellumAbilityHandler.addRefractionButtonIfRelevant(buttons, state.opponent, state.game, state.tile, hits);
+    }
+
+    private static String buildSpaceCombatHitAssignmentMessage(CombatContext state, int hits) {
         String message = state.opponent.getRepresentationNoPing() + ", you may automatically assign "
                 + (hits == 1 ? "the hit" : "hits") + ". "
                 + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(
                         state.opponent, state.game, state.tile, hits, state.event, true);
-        if (state.opponent.hasRelic("metalivoidshielding")) {
-            message += "\nReminder: You have the _"
-                    + Mapper.getRelic("metalivoidshielding").getName()
-                    + "_ relic, you may SUSTAIN DAMAGE on one of your non-fighter ships instead of taking a hit.";
-        }
-        if (state.opponent.hasUnlockedBreakthrough("crystellumbt") && state.playerRound == 1) {
-            message +=
-                    "\nReminder: You have _Defensive Architecture_.\nFor each unit in the active system that is at capacity, you may give one other non-fighter ship in the same system SUSTAIN DAMAGE until the end of this combat. This is not tracked by the bot.";
-        }
+        message = appendMetalivoidShieldingReminder(state.opponent, message);
+        message = appendDefensiveArchitectureReminder(state.opponent, message, state.playerRound == 1);
         return message;
     }
 
-    private static void offerNextSpaceCombatRound(CombatRollPipelineState state, List<Button> buttons) {
+    private static String appendMetalivoidShieldingReminder(Player opponent, String message) {
+        if (!opponent.hasRelic("metalivoidshielding")) return message;
+        RelicModel relicModel = Mapper.getRelic("metalivoidshielding");
+        return message + "\nReminder: You have the _" + relicModel.getName()
+                + "_ relic, you may SUSTAIN DAMAGE on one of your non-fighter ships instead of taking a hit.";
+    }
+
+    private static String appendDefensiveArchitectureReminder(
+            Player opponent, String message, boolean firstCombatRound) {
+        if (!opponent.hasUnlockedBreakthrough("crystellumbt") || !firstCombatRound) return message;
+        return message
+                + "\nReminder: You have _Defensive Architecture_.\nFor each unit in the active system that is at capacity, you may give one other non-fighter ship in the same system SUSTAIN DAMAGE until the end of this combat. This is not tracked by the bot.";
+    }
+
+    private static void offerNextSpaceCombatRound(CombatContext state, List<Button> buttons) {
         if (state.playerRound <= state.opponentRound) return;
         String message = state.opponent.getRepresentationUnfogged() + " you may roll dice for Combat Round #"
                 + (state.opponentRound + 1) + ".";
         MessageHelper.sendMessageToChannelWithButtons(state.event.getMessageChannel(), message, buttons);
     }
 
-    private static void handleAntiFighterBarrageResults(CombatRollPipelineState state, int hits) {
+    private static void handleAntiFighterBarrageResults(CombatContext state, int hits) {
         if (state.rollType != CombatRollType.AFB || hits < 1) return;
         String message = state.opponent.getRepresentation() + ", you may automatically assign "
                 + (hits == 1 ? "the hit" : "hits") + " from AFB.";
@@ -501,7 +509,7 @@ public class CombatRollPublication {
                 state.event.getMessageChannel(), message, buildAntiFighterBarrageAssignmentButtons(state, hits));
     }
 
-    private static List<Button> buildAntiFighterBarrageAssignmentButtons(CombatRollPipelineState state, int hits) {
+    private static List<Button> buildAntiFighterBarrageAssignmentButtons(CombatContext state, int hits) {
         List<Button> buttons = new ArrayList<>();
         String label = "Auto-assign Hit" + (hits == 1 ? "" : "s");
         if (state.opponent.isNpc() || state.opponent.isDummy()) {
@@ -522,7 +530,7 @@ public class CombatRollPublication {
         return buttons;
     }
 
-    private static void relayFogOfWarCombatResult(CombatRollPipelineState state, String message) {
+    private static void relayFogOfWarCombatResult(CombatContext state, String message) {
         if (!isFoWPrivateChannelRoll(state)) return;
         if (state.rollType == CombatRollType.SpaceCannonOffence) {
             relayPrivateSpaceCannonResult(state, message);
@@ -531,7 +539,7 @@ public class CombatRollPublication {
         }
     }
 
-    private static void relayPrivateSpaceCannonResult(CombatRollPipelineState state, String message) {
+    private static void relayPrivateSpaceCannonResult(CombatContext state, String message) {
         MessageHelper.sendMessageToChannel(
                 state.opponent.getCorrectChannel(),
                 state.opponent.getRepresentationUnfogged() + " "
@@ -541,14 +549,14 @@ public class CombatRollPublication {
                 "Roll result was sent to " + state.opponent.getRepresentationNoPing());
     }
 
-    private static void remindPlayerToRelayPrivateBombardment(CombatRollPipelineState state) {
+    private static void remindPlayerToRelayPrivateBombardment(CombatContext state) {
         MessageHelper.sendMessageToChannel(
                 state.player.getCorrectChannel(),
                 state.player.getRepresentationUnfogged()
                         + " This roll result is not automatically relayed. Please communicate the hits to the opponent manually.");
     }
 
-    private static void handleFogOfWarDummyCombatResult(CombatRollPipelineState state, int hits) {
+    private static void handleFogOfWarDummyCombatResult(CombatContext state, int hits) {
         if ((state.opponent.isDummy() || state.opponent.isNpc()) && hits > 0) {
             List<Button> buttons = new ArrayList<>();
             if (state.combatOnHolder instanceof Planet) {
@@ -586,8 +594,7 @@ public class CombatRollPublication {
         }
     }
 
-    private static void reportSurprisingDiceRoll(
-            CombatRollPipelineState state, String message, boolean trackedCandidateRoll) {
+    private static void reportSurprisingDiceRoll(CombatContext state, String message, boolean trackedCandidateRoll) {
         if (!trackedCandidateRoll && !"none".equals(state.game.getStoredValue("surprisingDiceRoll"))) {
             StringBuilder disaster;
             if ("hits".equals(state.game.getStoredValue("surprisingDiceRoll"))) {
@@ -606,5 +613,5 @@ public class CombatRollPublication {
         }
     }
 
-    private record AdjustedRollResult(String message, int hits) {}
+    private record ProximaAdjustment(String message, int hits) {}
 }

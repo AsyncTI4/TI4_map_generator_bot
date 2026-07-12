@@ -170,8 +170,8 @@ class CombatStatsServiceTest extends BaseTi4Test {
                 Constants.COMBAT_EXTRA_ROLLS);
 
         UnitHolder space = tile.getUnitHolders().get("space");
-        CombatRollPipelineState state = new CombatRollPipelineState(
-                bluetf, testGame, null, tile, space.getName(), CombatRollType.combatround, false);
+        CombatContext state =
+                new CombatContext(bluetf, testGame, null, tile, space.getName(), CombatRollType.combatround, false);
         state.setCombatOnHolder(space);
         state.setPlayerUnitsByModel(playerUnits, space);
         state.setOpponent(neutral);

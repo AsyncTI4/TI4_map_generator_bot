@@ -29,17 +29,6 @@ public class CombatStatsService {
             Tile activeSystem,
             @Nullable Player opponent,
             boolean includeDisplayOnlyScaling) {
-        EffectiveCombatStats effectiveCombatStats =
-                getEffectiveCombatStats(unitModel, player, activeSystem, opponent, includeDisplayOnlyScaling);
-        return new CombatRoundProfile(participates, effectiveCombatStats.diceCount(), effectiveCombatStats.hitsOn());
-    }
-
-    private static EffectiveCombatStats getEffectiveCombatStats(
-            UnitModel unitModel,
-            Player player,
-            Tile activeSystem,
-            @Nullable Player opponent,
-            boolean includeDisplayOnlyScaling) {
         int numRollsPerUnit = unitModel.getCombatDieCountForAbility(CombatRollType.combatround, player);
         int extraDice = 0;
         if (isEidolonLandwasterMech(unitModel, player)) extraDice++;
@@ -56,7 +45,7 @@ public class CombatStatsService {
         if (isEidolonTerminusMech(unitModel, player)) hitBonus++;
         if (isEchoOfAscensionFlagship(unitModel, player)) hitBonus++;
         toHit = Math.max(1, toHit - hitBonus);
-        return new EffectiveCombatStats(numRollsPerUnit, toHit);
+        return new CombatRoundProfile(participates, numRollsPerUnit, toHit);
     }
 
     private static boolean isEchoOfAscensionFlagship(UnitModel unitModel, Player player) {
@@ -81,6 +70,4 @@ public class CombatStatsService {
      * whether the unit participates, how many dice it rolls, and what value it hits on.
      */
     public record CombatRoundProfile(boolean participates, int diceCount, int hitsOn) {}
-
-    private record EffectiveCombatStats(int diceCount, int hitsOn) {}
 }

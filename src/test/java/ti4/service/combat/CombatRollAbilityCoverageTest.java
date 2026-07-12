@@ -159,15 +159,16 @@ class CombatRollAbilityCoverageTest extends BaseTi4Test {
         harness.addToSpace(tile, vaden, UnitType.Flagship, 1);
         UnitRollExecution.UnitRollState unit =
                 preparedUnit(harness, vaden, sol, tile, tile.getSpaceUnitHolder(), CombatRollType.bombardment);
+        UnitRollExecution.UnitGroupRollState roll = new UnitRollExecution.UnitGroupRollState();
         int originalTradeGoods = vaden.getTg();
 
         try (MockedStatic<MessageHelper> ignored = mockStatic(MessageHelper.class)) {
-            unit.activeDice = List.of(DiceHelper.spoof(4, 4));
-            UnitRollAbilities.resolveVadenFlagshipTradeGood(unit);
+            roll.recordPrimaryRoll(unit, List.of(DiceHelper.spoof(4, 4)));
+            UnitRollAbilities.resolveVadenFlagshipTradeGood(unit, roll);
             assertEquals(originalTradeGoods + 1, vaden.getTg(), "a modified 4 that succeeds must trigger the flagship");
 
-            unit.activeDice = List.of(DiceHelper.spoof(6, 5));
-            UnitRollAbilities.resolveVadenFlagshipTradeGood(unit);
+            roll.recordPrimaryRoll(unit, List.of(DiceHelper.spoof(6, 5)));
+            UnitRollAbilities.resolveVadenFlagshipTradeGood(unit, roll);
             assertEquals(originalTradeGoods + 1, vaden.getTg(), "a raw 5 that fails after modifiers must not trigger");
         }
     }
@@ -683,7 +684,7 @@ class CombatRollAbilityCoverageTest extends BaseTi4Test {
         Tile tile = harness.tile("19");
         harness.addToSpace(tile, zephyrion, UnitType.Cruiser, 1);
         harness.addToSpace(tile, argent, UnitType.Carrier, 1);
-        CombatRollPipelineState state = harness.preparedState(
+        CombatContext state = harness.preparedState(
                 zephyrion, argent, tile, tile.getSpaceUnitHolder(), CombatRollType.SpaceCannonOffence);
         CombatModifierModel penalty = new CombatModifierModel();
         penalty.setAlias("test_stacked_space_cannon_penalty");
@@ -743,7 +744,7 @@ class CombatRollAbilityCoverageTest extends BaseTi4Test {
         extraDie.setValue(1);
         extraDie.setScope("ca");
         extraDie.setForCombatAbility(CombatRollType.combatround);
-        CombatRollPipelineState state =
+        CombatContext state =
                 harness.preparedState(naalu, sol, tile, tile.getSpaceUnitHolder(), CombatRollType.combatround);
         state.setModifiers(new CombatRollModifiers(
                 java.util.List.of(),
@@ -767,9 +768,9 @@ class CombatRollAbilityCoverageTest extends BaseTi4Test {
             Tile tile,
             UnitHolder holder,
             CombatRollType rollType) {
-        UnitRollExecution.UnitRollPipelineState pipeline = new UnitRollExecution.UnitRollPipelineState(
-                harness.preparedState(player, opponent, tile, holder, rollType));
+        UnitRollExecution.CombatRollState pipeline =
+                new UnitRollExecution.CombatRollState(harness.preparedState(player, opponent, tile, holder, rollType));
         return new UnitRollExecution.UnitRollState(
-                pipeline, pipeline.playerUnits.entrySet().iterator().next());
+                pipeline, pipeline.workingUnits.entrySet().iterator().next());
     }
 }

@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mockStatic;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,18 +33,22 @@ class CombatRollRemainingCoverageTest extends BaseTi4Test {
         harness.addToSpace(tile, hacan, UnitType.Flagship, 1);
         harness.addToSpace(tile, sol, UnitType.Carrier, 1);
         UnitRollExecution.UnitRollState unit = thalnosUnit(harness, hacan, sol, tile, UnitType.Flagship);
-        unit.activeDice = new ArrayList<>(List.of(DiceHelper.spoof(7, 6), DiceHelper.spoof(7, 1)));
-        unit.numMisses = 2;
+        UnitRollExecution.UnitGroupRollState roll = new UnitRollExecution.UnitGroupRollState();
+        roll.recordPrimaryRoll(unit, List.of(DiceHelper.spoof(7, 6), DiceHelper.spoof(7, 1)));
+        roll.commitPrimaryRollTotals(unit);
 
         try (MockedStatic<MessageHelper> ignored = mockStatic(MessageHelper.class)) {
-            UnitRollAbilities.resolveThalnosMisses(unit);
+            UnitRollAbilities.resolveHacanFlagshipThalnosMisses(unit, roll);
+            UnitRollAbilities.resolveFallOfKenaraThalnosMisses(unit, roll);
+            UnitRollAbilities.trackThalnosDestroyTypes(unit);
+            UnitRollAbilities.resolveGenericThalnosMisses(unit, roll);
         }
 
-        assertEquals(1, unit.numMisses, "the spendable near miss must not be treated as a forced destruction");
-        assertEquals(1, unit.pipeline.hacanFsButtons.size());
-        assertTrue(unit.pipeline.hacanFsButtons.getFirst().getCustomId().contains("hacanFlagship_"));
-        assertTrue(unit.pipeline.hacanFsButtons.getFirst().getCustomId().endsWith("_1"));
-        assertTrue(unit.pipeline.hacanFsThalnosDestroyTypes.contains(UnitType.Flagship));
+        assertEquals(1, roll.currentMisses(), "the spendable near miss must not be treated as a forced destruction");
+        assertEquals(1, unit.context.hacanFsButtons.size());
+        assertTrue(unit.context.hacanFsButtons.getFirst().getCustomId().contains("hacanFlagship_"));
+        assertTrue(unit.context.hacanFsButtons.getFirst().getCustomId().endsWith("_1"));
+        assertTrue(unit.context.hacanFsThalnosDestroyTypes.contains(UnitType.Flagship));
     }
 
     @Test
@@ -59,14 +62,17 @@ class CombatRollRemainingCoverageTest extends BaseTi4Test {
         harness.addToSpace(tile, hacan, UnitType.Warsun, 1);
         harness.addToSpace(tile, sol, UnitType.Carrier, 1);
         UnitRollExecution.UnitRollState unit = thalnosUnit(harness, hacan, sol, tile, UnitType.Warsun);
-        unit.activeDice =
-                new ArrayList<>(List.of(DiceHelper.spoof(3, 1), DiceHelper.spoof(3, 2), DiceHelper.spoof(3, 10)));
-        unit.numMisses = 2;
+        UnitRollExecution.UnitGroupRollState roll = new UnitRollExecution.UnitGroupRollState();
+        roll.recordPrimaryRoll(unit, List.of(DiceHelper.spoof(3, 1), DiceHelper.spoof(3, 2), DiceHelper.spoof(3, 10)));
+        roll.commitPrimaryRollTotals(unit);
 
-        UnitRollAbilities.resolveThalnosMisses(unit);
+        UnitRollAbilities.resolveHacanFlagshipThalnosMisses(unit, roll);
+        UnitRollAbilities.resolveFallOfKenaraThalnosMisses(unit, roll);
+        UnitRollAbilities.trackThalnosDestroyTypes(unit);
+        UnitRollAbilities.resolveGenericThalnosMisses(unit, roll);
 
-        assertEquals(0, unit.numMisses);
-        assertTrue(unit.pipeline.hacanFsThalnosDestroyTypes.contains(UnitType.Warsun));
+        assertEquals(0, roll.currentMisses());
+        assertTrue(unit.context.hacanFsThalnosDestroyTypes.contains(UnitType.Warsun));
     }
 
     @Test
@@ -81,7 +87,7 @@ class CombatRollRemainingCoverageTest extends BaseTi4Test {
         harness.addToSpace(tile, jolnar, UnitType.Flagship, 1);
         harness.addToSpace(tile, sol, UnitType.Carrier, 1);
 
-        UnitRollExecution.UnitRollPipelineState pipeline = new UnitRollExecution.UnitRollPipelineState(
+        UnitRollExecution.CombatRollState pipeline = new UnitRollExecution.CombatRollState(
                 harness.preparedState(jolnar, sol, tile, tile.getSpaceUnitHolder(), CombatRollType.combatround));
 
         assertFalse(pipeline.hacanFlagship);
@@ -138,8 +144,8 @@ class CombatRollRemainingCoverageTest extends BaseTi4Test {
         sol.addRelic("metalivoidarmaments");
         harness.addToSpace(tile, sol, UnitType.Carrier, 2);
         harness.addToSpace(tile, mentak, UnitType.Fighter, 1);
-        CombatRollPipelineState state = new CombatRollPipelineState(
-                sol, harness.game, harness.event, tile, Constants.SPACE, CombatRollType.AFB, false);
+        CombatContext state =
+                new CombatContext(sol, harness.game, harness.event, tile, Constants.SPACE, CombatRollType.AFB, false);
         CombatRollPreparation.validateCombatRollLocation(state);
         CombatRollPreparation.prepareCombatRoll(state);
 
@@ -267,13 +273,13 @@ class CombatRollRemainingCoverageTest extends BaseTi4Test {
         Map<Pair<UnitModel, UnitHolder>, Integer> units = new LinkedHashMap<>();
         Pair<UnitModel, UnitHolder> key = Pair.of(model, tile.getSpaceUnitHolder());
         units.put(key, 1);
-        CombatRollPipelineState combat = new CombatRollPipelineState(
+        CombatContext combat = new CombatContext(
                 player, harness.game, harness.event, tile, Constants.SPACE, CombatRollType.combatround, false);
         combat.setCombatOnHolder(tile.getSpaceUnitHolder());
         combat.setPlayerUnits(units);
         combat.setOpponent(opponent);
         combat.setModifiers(new CombatRollModifiers(List.of(), List.of(), List.of()));
-        UnitRollExecution.UnitRollPipelineState pipeline = new UnitRollExecution.UnitRollPipelineState(combat);
+        UnitRollExecution.CombatRollState pipeline = new UnitRollExecution.CombatRollState(combat);
         return new UnitRollExecution.UnitRollState(pipeline, Map.entry(key, 1));
     }
 }

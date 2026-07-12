@@ -71,8 +71,8 @@ class CombatUnitCatalogSmokeTest extends BaseTi4Test {
                 () -> profile(model, rollType) + " has an invalid printed threshold: " + threshold);
         Map<Pair<UnitModel, UnitHolder>, Integer> units = new LinkedHashMap<>();
         units.put(Pair.of(model, holder), 1);
-        CombatRollPipelineState combat = new CombatRollPipelineState(
-                player, harness.game, harness.event, tile, holder.getName(), rollType, false);
+        CombatContext combat =
+                new CombatContext(player, harness.game, harness.event, tile, holder.getName(), rollType, false);
         combat.setCombatOnHolder(holder);
         combat.setPlayerUnits(units);
         combat.setOpponent(opponent);

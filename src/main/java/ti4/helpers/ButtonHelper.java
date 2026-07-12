@@ -110,8 +110,8 @@ import ti4.service.abilities.MahactTokenService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.button.ReactionService;
+import ti4.service.combat.CombatContext;
 import ti4.service.combat.CombatRollModifiers;
-import ti4.service.combat.CombatRollPipelineState;
 import ti4.service.combat.CombatRollResult;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -6932,8 +6932,8 @@ public class ButtonHelper {
         tempMods.addAll(tempOpponentMods);
 
         String message = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
-        CombatRollPipelineState rollState =
-                new CombatRollPipelineState(player, game, event, tile, combatOnHolder.getName(), rollType, false);
+        CombatContext rollState =
+                new CombatContext(player, game, event, tile, combatOnHolder.getName(), rollType, false);
         rollState.setCombatOnHolder(combatOnHolder);
         rollState.setPlayerUnitsByModel(playerUnitsByQuantity, combatOnHolder);
         rollState.setOpponent(opponent);

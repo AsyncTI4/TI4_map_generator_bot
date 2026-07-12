@@ -38,7 +38,7 @@ import tools.jackson.databind.ObjectMapper;
 class CombatRollPreparation {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    static void validateCombatRollLocation(CombatRollPipelineState state) {
+    static void validateCombatRollLocation(CombatContext state) {
         state.combatOnHolder = state.tile.getUnitHolders().get(state.unitHolderName);
         if (state.combatOnHolder == null) {
             MessageHelper.sendMessageToChannel(
@@ -56,10 +56,14 @@ class CombatRollPreparation {
         }
     }
 
-    static void prepareCombatRoll(CombatRollPipelineState state) {
+    static void prepareCombatRoll(CombatContext state) {
         state.playerUnits = CombatUnitResolver.getUnitsInCombatByHolder(
                 state.tile, state.combatOnHolder, state.player, state.event, state.rollType, state.game);
-        addSpecialUnitsForRoll(state);
+        addMetaliVoidArmamentsUnit(state);
+        addProjectionOfPowerTechUnit(state);
+        addProjectionOfPowerAbilityUnit(state);
+        addZelianBreakthroughPlanetUnits(state);
+        addHostilePlanetoidsPlanetUnits(state);
         prepareBombardmentContext(state);
         removeUnitsDisabledByArticlesOfWar(state);
         if (reportAndCheckNoUnits(state)) {
@@ -76,7 +80,7 @@ class CombatRollPreparation {
         state.modifiers = collectRollModifiers(state, opponentUnits);
     }
 
-    static void resolveCombatRollOpponent(CombatRollPipelineState state) {
+    static void resolveCombatRollOpponent(CombatContext state) {
         if (state.opponent != null) {
             return;
         }
@@ -89,39 +93,44 @@ class CombatRollPreparation {
         if (state.opponent == null) state.opponent = state.player;
     }
 
-    static boolean isEmpSpaceCannonBlocked(CombatRollPipelineState state) {
+    static boolean isEmpSpaceCannonBlocked(CombatContext state) {
         return state.game.getRealPlayers().stream().anyMatch(realPlayer -> realPlayer.hasUnit("netrunners_flagship"))
                 && NetrunnersUnitsHandler.resolveEmpSpaceCannonBlock(
                         state.event, state.game, state.player, state.tile, state.rollType);
     }
 
-    static void addSpecialUnitsForRoll(CombatRollPipelineState state) {
-        if (state.rollType == CombatRollType.AFB && state.player.hasRelic("metalivoidarmaments")) {
-            state.playerUnits.put(
-                    new ImmutablePair<>(CombatUnitResolver.getMetaliAFBUnit(state.player), state.combatOnHolder), 1);
-        }
-        if (state.rollType == CombatRollType.AFB && state.player.hasTech("tf-projectionofpow")) {
-            state.playerUnits.put(
-                    new ImmutablePair<>(CombatUnitResolver.getProjectionUnit(state.player, true), state.combatOnHolder),
-                    1);
-        }
-        if (state.player.hasAbility("projection_of_power") && isAdjacentToPlayersSpaceDock(state)) {
-            state.playerUnits.put(
-                    new ImmutablePair<>(
-                            CombatUnitResolver.getProjectionUnit(state.player, false), state.combatOnHolder),
-                    1);
-        }
-        if (state.rollType == CombatRollType.combatround && state.player.hasActiveBreakthrough("zelianbt")) {
-            addEligiblePlanetCombatUnits(state, false);
-        }
-        if (state.rollType == CombatRollType.combatround
-                && state.player.hasTech("tf-hostileplanetoids")
-                && Constants.SPACE.equalsIgnoreCase(state.unitHolderName)) {
-            addEligiblePlanetCombatUnits(state, true);
-        }
+    static void addMetaliVoidArmamentsUnit(CombatContext state) {
+        if (state.rollType != CombatRollType.AFB || !state.player.hasRelic("metalivoidarmaments")) return;
+        state.playerUnits.put(
+                new ImmutablePair<>(CombatUnitResolver.getMetaliAFBUnit(state.player), state.combatOnHolder), 1);
     }
 
-    static void removeUnitsDisabledByArticlesOfWar(CombatRollPipelineState state) {
+    static void addProjectionOfPowerTechUnit(CombatContext state) {
+        if (state.rollType != CombatRollType.AFB || !state.player.hasTech("tf-projectionofpow")) return;
+        state.playerUnits.put(
+                new ImmutablePair<>(CombatUnitResolver.getProjectionUnit(state.player, true), state.combatOnHolder), 1);
+    }
+
+    static void addProjectionOfPowerAbilityUnit(CombatContext state) {
+        if (!state.player.hasAbility("projection_of_power") || !isAdjacentToPlayersSpaceDock(state)) return;
+        state.playerUnits.put(
+                new ImmutablePair<>(CombatUnitResolver.getProjectionUnit(state.player, false), state.combatOnHolder),
+                1);
+    }
+
+    static void addZelianBreakthroughPlanetUnits(CombatContext state) {
+        if (state.rollType != CombatRollType.combatround || !state.player.hasActiveBreakthrough("zelianbt")) return;
+        addEligiblePlanetCombatUnits(state, false);
+    }
+
+    static void addHostilePlanetoidsPlanetUnits(CombatContext state) {
+        if (state.rollType != CombatRollType.combatround
+                || !state.player.hasTech("tf-hostileplanetoids")
+                || !Constants.SPACE.equalsIgnoreCase(state.unitHolderName)) return;
+        addEligiblePlanetCombatUnits(state, true);
+    }
+
+    static void removeUnitsDisabledByArticlesOfWar(CombatContext state) {
         if (!ButtonHelper.isLawInPlay(state.game, "articles_war")) {
             return;
         }
@@ -147,7 +156,7 @@ class CombatRollPreparation {
         }
     }
 
-    static boolean reportAndCheckNoUnits(CombatRollPipelineState state) {
+    static boolean reportAndCheckNoUnits(CombatContext state) {
         if (!state.playerUnits.isEmpty()) {
             return false;
         }
@@ -162,15 +171,13 @@ class CombatRollPreparation {
         return true;
     }
 
-    static void prepareBombardmentContext(CombatRollPipelineState state) {
+    static void prepareBombardmentContext(CombatContext state) {
         state.bombardPlanet = state.game.getStoredValue("bombardmentTarget" + state.player.getFaction());
         if (state.rollType != CombatRollType.bombardment || state.bombardPlanet.isEmpty()) {
             state.bombardPlanet = "";
             return;
         }
-        if (state.player.hasUnit("ashen_flagship")) {
-            AshenUnitHandler.prepareFlagshipBombardmentContext(state.game, state.player, state.bombardPlanet);
-        }
+        prepareAshenFlagshipBombardmentContext(state);
         limitUnitsToBombardmentAssignments(state);
         state.opponent = state.game.getRealPlayersNNeutral().stream()
                 .filter(candidate -> candidate.getPlanets().contains(state.bombardPlanet))
@@ -178,7 +185,12 @@ class CombatRollPreparation {
                 .orElse(null);
     }
 
-    static void limitUnitsToBombardmentAssignments(CombatRollPipelineState state) {
+    static void prepareAshenFlagshipBombardmentContext(CombatContext state) {
+        if (!state.player.hasUnit("ashen_flagship")) return;
+        AshenUnitHandler.prepareFlagshipBombardmentContext(state.game, state.player, state.bombardPlanet);
+    }
+
+    static void limitUnitsToBombardmentAssignments(CombatContext state) {
         List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
                 state.game.getStoredValue("assignedBombardment" + state.player.getFaction()),
                 new TypeReference<List<BombardmentAssignment>>() {});
@@ -216,8 +228,7 @@ class CombatRollPreparation {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    static CombatRollModifiers collectRollModifiers(
-            CombatRollPipelineState state, Map<UnitModel, Integer> opponentUnits) {
+    static CombatRollModifiers collectRollModifiers(CombatContext state, Map<UnitModel, Integer> opponentUnits) {
         TileModel tileModel = TileHelper.getTileById(state.tile.getTileID());
         Map<UnitModel, Integer> playerUnitsFlat = CombatUnitResolver.flattenUnitMap(state.playerUnits);
         List<NamedCombatModifierModel> combatModifiers = CombatModHelper.getModifiers(
@@ -249,19 +260,26 @@ class CombatRollPreparation {
                         state.player, tileModel, state.combatOnHolder, false, state.rollType));
         temporaryModifiers.addAll(CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
                 state.opponent, tileModel, state.combatOnHolder, true, state.rollType));
-        if (state.game.getRealPlayers().stream().anyMatch(realPlayer -> realPlayer.hasAbility("control_network"))) {
-            temporaryModifiers.addAll(NetrunnersAbilitiesHandler.getPendingControlNetworkSpaceCannonModifier(
-                    state.game, state.player, state.tile, state.combatOnHolder, state.rollType));
-        }
-        if (state.player.hasTech("beironats")) {
-            extraRolls.addAll(IronFactionTechsHandler.getAdvancedTargetingSystemsExtraRollModifier(
-                    state.game, state.player, state.opponent, state.tile, state.combatOnHolder, state.rollType));
-        }
+        addControlNetworkModifiers(state, temporaryModifiers);
+        addAdvancedTargetingSystemsModifiers(state, extraRolls);
         return new CombatRollModifiers(combatModifiers, extraRolls, temporaryModifiers);
     }
 
-    static void removeUnassignedBombardmentExtraRolls(
-            CombatRollPipelineState state, List<NamedCombatModifierModel> extraRolls) {
+    static void addControlNetworkModifiers(CombatContext state, List<NamedCombatModifierModel> temporaryModifiers) {
+        if (state.game.getRealPlayers().stream().noneMatch(realPlayer -> realPlayer.hasAbility("control_network"))) {
+            return;
+        }
+        temporaryModifiers.addAll(NetrunnersAbilitiesHandler.getPendingControlNetworkSpaceCannonModifier(
+                state.game, state.player, state.tile, state.combatOnHolder, state.rollType));
+    }
+
+    static void addAdvancedTargetingSystemsModifiers(CombatContext state, List<NamedCombatModifierModel> extraRolls) {
+        if (!state.player.hasTech("beironats")) return;
+        extraRolls.addAll(IronFactionTechsHandler.getAdvancedTargetingSystemsExtraRollModifier(
+                state.game, state.player, state.opponent, state.tile, state.combatOnHolder, state.rollType));
+    }
+
+    static void removeUnassignedBombardmentExtraRolls(CombatContext state, List<NamedCombatModifierModel> extraRolls) {
         String storedAssignments = state.game.getStoredValue("assignedBombardment" + state.player.getFaction());
         if (storedAssignments.isEmpty() || state.rollType != CombatRollType.bombardment) {
             return;
@@ -291,7 +309,7 @@ class CombatRollPreparation {
         };
     }
 
-    static boolean isAdjacentToPlayersSpaceDock(CombatRollPipelineState state) {
+    static boolean isAdjacentToPlayersSpaceDock(CombatContext state) {
         for (Tile spaceDockTile :
                 ButtonHelper.getTilesOfPlayersSpecificUnits(state.game, state.player, UnitType.Spacedock)) {
             if (FoWHelper.getAdjacentTiles(state.game, spaceDockTile.getPosition(), state.player, false, true)
@@ -302,7 +320,7 @@ class CombatRollPreparation {
         return false;
     }
 
-    static void addEligiblePlanetCombatUnits(CombatRollPipelineState state, boolean spaceOnly) {
+    static void addEligiblePlanetCombatUnits(CombatContext state, boolean spaceOnly) {
         for (UnitHolder planet : state.tile.getPlanetUnitHolders()) {
             boolean eligibleHolder = spaceOnly
                     ? Constants.SPACE.equalsIgnoreCase(state.unitHolderName)

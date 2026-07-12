@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.contest.replay.core.CombatRollPayload;
+import ti4.contest.replay.core.CombatRollPayloadBuilder;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
 import ti4.game.Game;
@@ -87,8 +87,7 @@ public class CombatRollService {
             String unitHolderName,
             CombatRollType rollType,
             boolean automated) {
-        CombatRollPipelineState state =
-                new CombatRollPipelineState(player, game, event, tile, unitHolderName, rollType, automated);
+        CombatContext state = new CombatContext(player, game, event, tile, unitHolderName, rollType, automated);
         CombatRollPreparation.validateCombatRollLocation(state);
         if (state.isStopped()) return CombatRollResult.stopped(state.stoppedStatus);
         CombatRollPreparation.prepareCombatRoll(state);
@@ -97,36 +96,43 @@ public class CombatRollService {
         loadCombatRounds(state);
         announceCombatRound(state);
         CombatRollPublication.publish(state);
-        state.rollResult = state.rollResult.withPublishedResult(state.message, state.hits, state.payload);
-        return state.rollResult;
+        return state.rawRollResult.withPublishedResult(
+                state.publishedMessage, state.publishedHits, state.publishedPayload);
     }
 
-    private static void executeCombatRoll(CombatRollPipelineState state) {
+    private static void executeCombatRoll(CombatContext state) {
         CombatRollResult result = UnitRollExecution.rollForUnitsWithResult(state);
         String summary = CombatMessageHelper.displayCombatSummary(
                 state.player, state.tile, state.combatOnHolder, state.rollType);
         String message = summary + result.message();
-        CombatRollPayload.RollHeader header = UnitRollExecution.buildRollHeader(state, summary);
-        CombatRollPayload payload = result.payload().withHeader(header);
+        var payload = CombatRollPayloadBuilder.attachHeader(
+                result.payload(),
+                state.player,
+                state.opponent,
+                state.game,
+                state.tile,
+                state.combatOnHolder,
+                state.rollType,
+                summary);
         FOWCombatThreadMirroring.mirrorCombatMessage(state.event, state.player, state.game, message);
-        state.rollResult = result;
-        state.message = message;
-        state.payload = payload;
+        state.rawRollResult = result;
+        state.publishedMessage = message;
+        state.publishedPayload = payload;
     }
 
-    private static void loadCombatRounds(CombatRollPipelineState state) {
+    private static void loadCombatRounds(CombatContext state) {
         state.opponentRound = getStoredCombatRound(state, state.opponent, 0);
         state.playerRound = getStoredCombatRound(state, state.player, 1);
     }
 
-    private static int getStoredCombatRound(CombatRollPipelineState state, Player player, int defaultRound) {
+    private static int getStoredCombatRound(CombatContext state, Player player, int defaultRound) {
         String key =
                 "combatRoundTracker" + player.getFaction() + state.tile.getPosition() + state.combatOnHolder.getName();
         String storedRound = state.game.getStoredValue(key);
         return storedRound.isEmpty() ? defaultRound : Integer.parseInt(storedRound);
     }
 
-    private static void announceCombatRound(CombatRollPipelineState state) {
+    private static void announceCombatRound(CombatContext state) {
         if (state.playerRound > state.opponentRound && state.rollType == CombatRollType.combatround) {
             MessageHelper.sendMessageToChannel(
                     state.event.getMessageChannel(), "## __Start of Combat Round #" + state.playerRound + "__");
