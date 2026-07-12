@@ -40,7 +40,7 @@ public class LunariumBreakthroughHandler {
 
     @ButtonHandler("lunariumDarkSideTG")
     public static void resolveDarkSideTG(Player player, ButtonInteractionEvent event) {
-        player.setTg(player.getTg() + 1);
+        player.gainTG(1, true);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " gained 1 trade good using _Dark Side Exploitation_.");
