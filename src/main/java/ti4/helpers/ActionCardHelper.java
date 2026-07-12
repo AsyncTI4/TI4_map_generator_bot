@@ -1555,6 +1555,7 @@ public class ActionCardHelper {
 
             if ("black_market_intel".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveBlackMarketIntel", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
             if ("hidden_initiatives".equals(automationID)) {

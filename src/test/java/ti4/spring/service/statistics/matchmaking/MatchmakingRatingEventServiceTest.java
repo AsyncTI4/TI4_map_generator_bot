@@ -10,18 +10,18 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
-class MatchmakingRatingServiceTest {
+class MatchmakingRatingEventServiceTest {
 
     private static final int GAMES_TO_QUALIFY = 3;
-    private static final int[] RANKS = {1, 2, 2, 3, 3, 3};
+    private static final int[] RANKS = {1, 2, 2, 4, 5, 5};
     private static final long GAME_ENDED_EPOCH_MILLIS = Instant.now().toEpochMilli();
 
     @Test
     void generatingRatingsTwiceGivesSameResult() {
         List<MatchmakingRating> sortedRatings = sortedByRating(
-                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS)));
+                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS), false));
         List<MatchmakingRating> sortedRatings2 = sortedByRating(
-                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS)));
+                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS), false));
 
         assertThat(sortedRatings).isEqualTo(sortedRatings2);
     }
@@ -29,7 +29,7 @@ class MatchmakingRatingServiceTest {
     @Test
     void generatesSensibleRatings() {
         List<MatchmakingRating> ratings =
-                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS));
+                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS), false);
 
         List<MatchmakingRating> sortedRatings = sortedByRating(ratings);
 
@@ -49,16 +49,16 @@ class MatchmakingRatingServiceTest {
     @Test
     void excludesPlayersWithFewerThanThreeCompletedGames() {
         // Two games each means every player has only two completed games, below the three-game minimum.
-        assertThat(TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(2, RANKS)))
+        assertThat(TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(2, RANKS), false))
                 .isEmpty();
-        assertThat(TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(3, RANKS)))
+        assertThat(TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(3, RANKS), false))
                 .hasSize(6);
     }
 
     @Test
     void conservativeRatingsUseConservativeTrueSkillValue() {
         List<MatchmakingRating> meanRatings =
-                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS));
+                TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS), false);
         List<MatchmakingRating> conservativeRatings =
                 TrueSkillMatchmakingRatingService.calculateRatings(buildRankedGames(GAMES_TO_QUALIFY, RANKS), true);
 
