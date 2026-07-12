@@ -1483,6 +1483,21 @@
         "forCombatAbility": "bombardment"
     },
     {
+        "alias": "plus_x_carriers_lunarium_flagship",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "carriers_in_system",
+        "persistenceType": "ALWAYS",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "lunarium_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
         "alias": "miltymod_cruiser2_bonus_hits_9_10",
         "type": "bonus_hits",
         "value": "+1",

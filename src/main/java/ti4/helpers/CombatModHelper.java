@@ -212,7 +212,7 @@ public class CombatModHelper {
                                 && r.getMessage() != null)
                         .map(r -> unitHeader + ": " + r.getMessage())
                         .findFirst()
-                        .orElse(unitHeader + " " + unit.getAbility());
+                        .orElse(unitHeader + " " + unit.getAbility().orElse(""));
                 modifiers.add(new NamedCombatModifierModel(relevantMod.get(), unitModName));
             }
             if (unit.getUnitType() == UnitType.Flagship && player.hasUnlockedBreakthrough("nekrobt")) {
@@ -233,7 +233,8 @@ public class CombatModHelper {
                                     game)) {
                         modifiers.add(new NamedCombatModifierModel(
                                 relevantMod2.get(),
-                                fsUnit.getUnitEmoji() + " " + fsUnit.getName() + " " + fsUnit.getAbility()));
+                                fsUnit.getUnitEmoji() + " " + fsUnit.getName() + " "
+                                        + fsUnit.getAbility().orElse("")));
                     }
                 }
             }
@@ -845,6 +846,8 @@ public class CombatModHelper {
                         scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player);
                     }
                 }
+                case "carriers_in_system" ->
+                    scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Carrier, player);
                 case "arvaxi_engine" -> {
                     if (ArvaxiBreakthroughHandler.isAttachedToUnit(game, player, origUnit)) {
                         scalingCount = ArvaxiBreakthroughHandler.isBoon(game) ? 1 : -1;

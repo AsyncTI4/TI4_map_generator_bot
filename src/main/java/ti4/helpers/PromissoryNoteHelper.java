@@ -362,6 +362,12 @@ public class PromissoryNoteHelper {
                     player.getRepresentation()
                             + " drew an extra secret objective due to _Sycophancy_. Please discard an extra secret objective.");
         }
+        if ("bapnluna".equalsIgnoreCase(id)) {
+            game.drawSecretObjective(player.getUserID());
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " drew 1 secret objective due to _Theory Renovation_.");
+        }
         if ("dspnvade".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, event);
         }
