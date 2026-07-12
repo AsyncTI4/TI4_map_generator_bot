@@ -24,6 +24,7 @@ import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWCombatThreadMirroring;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParseUnitService;
@@ -197,6 +198,7 @@ class AssignHitsButtonHandlers {
                     UnitHolder holder =
                             planetName != null ? tile.getUnitHolderFromPlanet(planetName) : tile.getSpaceUnitHolder();
                     if (holder != null) holder.addDamagedUnit(Units.getUnitKey(type, player.getColorID()), amt);
+                    CommanderUnlockCheckService.checkPlayer(player, "ponthous");
 
                     String plural = (amt == 1 || "infantry".equalsIgnoreCase(type.humanReadableName())) ? "" : "s";
                     String msg = player.getRepresentationNoPing() + " sustained " + amt + " "

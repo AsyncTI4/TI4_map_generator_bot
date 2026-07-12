@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
 import ti4.draft.DraftCategory;
 import ti4.game.Player;
 import ti4.helpers.AliasHandler;
@@ -117,6 +118,9 @@ public class FrankenAbilityService {
                         player.getCorrectChannel(),
                         player.getRepresentation() + ", please place up to 14 Tomb tokens for **Ancient Empire**.",
                         buttons);
+            }
+            if ("primordial_secrets".equalsIgnoreCase(abilityID)) {
+                ArcanumAbilityHandler.offerPrimordialSecretsButtons(player.getGame(), player);
             }
         }
         MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());

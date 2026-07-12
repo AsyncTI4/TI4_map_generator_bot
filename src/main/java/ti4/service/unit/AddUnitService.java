@@ -242,7 +242,7 @@ public class AddUnitService {
             TaUnitHandler.offerWorldshaperOnFlagshipPlacement(event, game, unitKey, location, tile);
         }
 
-        CommanderUnlockCheckService.checkPlayer(player, "myrr", "natau");
+        CommanderUnlockCheckService.checkPlayer(player, "myrr", "natau", "oblivion", "revenantponthous", "thrones");
     }
 
     private static void checkFleetCapacity(Tile tile, String color, Game game) {
