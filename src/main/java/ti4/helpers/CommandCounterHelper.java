@@ -53,9 +53,7 @@ public final class CommandCounterHelper {
         if (player.hasLeader("ardentiacommander")) {
             CommanderUnlockCheckService.checkPlayer(player, "ardentia");
         }
-        if (player.hasLeader("verydithcommander")) {
-            CommanderUnlockCheckService.checkAllPlayersInGame(player.getGame(), "verydith");
-        }
+        CommanderUnlockCheckService.checkAllPlayersInGame(player.getGame(), "verydith");
 
         for (Player p : player.getGame().getRealPlayers()) {
             if (p.hasUnexhaustedLeader("naaluagent-te")) {

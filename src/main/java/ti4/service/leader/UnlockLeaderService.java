@@ -42,6 +42,10 @@ public class UnlockLeaderService {
         }
         playerLeader.setLocked(false);
 
+        if (Constants.COMMANDER.equals(playerLeader.getType())) {
+            CommanderUnlockCheckService.checkAllPlayersInGame(game, "revenant");
+        }
+
         LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity());
 

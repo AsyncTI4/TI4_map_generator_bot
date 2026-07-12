@@ -273,7 +273,7 @@ public class RelicHelper {
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), message);
         }
-        CommanderUnlockCheckService.checkPlayer(receiver, "kollecc", "bentor");
+        CommanderUnlockCheckService.checkPlayer(receiver, "kollecc", "bentor", "kairn");
 
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(receiver.getPrivateChannel(), message);
