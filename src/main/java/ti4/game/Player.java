@@ -112,6 +112,7 @@ import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitModelValueInjectionService;
 import ti4.service.user.AFKService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
@@ -334,6 +335,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 .map(Mapper::getUnit)
                 .filter(Objects::nonNull)
                 .filter(unit -> unitType == unit.getUnitType())
+                .map(this::injectPlayerUnitValues)
                 .findFirst()
                 .orElse(null);
     }
@@ -978,6 +980,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return getUnitsOwned().stream()
                 .map(Mapper::getUnit)
                 .filter(Objects::nonNull)
+                .map(this::injectPlayerUnitValues)
                 .toList();
     }
 
@@ -986,6 +989,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 .map(Mapper::getUnit)
                 .filter(Objects::nonNull)
                 .filter(unit -> unitType.equalsIgnoreCase(unit.getBaseType()))
+                .map(this::injectPlayerUnitValues)
                 .findFirst()
                 .orElse(null);
     }
@@ -995,7 +999,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 .map(Mapper::getUnit)
                 .filter(Objects::nonNull)
                 .filter(unit -> asyncID.equalsIgnoreCase(unit.getAsyncId()))
+                .map(this::injectPlayerUnitValues)
                 .toList();
+    }
+
+    private UnitModel injectPlayerUnitValues(UnitModel unit) {
+        return UnitModelValueInjectionService.injectPlayerUnitValues(this, unit);
     }
 
     public UnitModel getPriorityUnitByAsyncID(String asyncID, UnitHolder unitHolder) {
