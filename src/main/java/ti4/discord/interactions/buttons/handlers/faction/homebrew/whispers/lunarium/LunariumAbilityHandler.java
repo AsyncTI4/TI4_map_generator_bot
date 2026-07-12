@@ -108,10 +108,16 @@ public class LunariumAbilityHandler {
     public static void offerSubliminalIntuitionButtons(MessageChannel channel, Player player) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(player.factionButtonChecker() + "lunariumSubliminalSO", "Draw 1 Secret Objective"));
-        buttons.add(Buttons.blue(player.factionButtonChecker() + "lunariumSubliminalCC", "Gain 2 Command Tokens"));
+        String msg;
+        if (player.hasTechReady("balunag")) {
+            buttons.add(Buttons.blue(player.factionButtonChecker() + "lunariumSubliminalCC", "Gain 2 Command Tokens"));
+            msg = player.getRepresentationUnfogged()
+                    + ", you may use _Subliminal Intuition_ to draw 1 secret objective or gain 2 command tokens.";
+        } else {
+            msg = player.getRepresentationUnfogged()
+                    + ", you may use _Subliminal Intuition_ to draw 1 secret objective (already exhausted, so you cannot gain command tokens with it).";
+        }
         buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Decline"));
-        String msg = player.getRepresentationUnfogged()
-                + ", you may use _Subliminal Intuition_ to draw 1 secret objective or gain 2 command tokens.";
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, buttons);
     }
 
