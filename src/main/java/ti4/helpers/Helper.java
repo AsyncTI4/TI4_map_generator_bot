@@ -50,6 +50,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -2825,6 +2826,9 @@ public final class Helper {
                 ccCount += player_.getStrategicCC();
                 ccCount += player_.getTacticalCC();
                 ccCount += player_.getFleetCC();
+                if (player_.hasAbility("multitasking")) {
+                    ccCount += LunariumAbilityHandler.getFactionSheetCCs(game, player_);
+                }
             } else if (player_.hasAbility("primacy")
                     || player_.hasAbility("edict")
                     || player_.hasAbility("edict_y")

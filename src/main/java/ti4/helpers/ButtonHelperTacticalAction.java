@@ -18,6 +18,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -62,6 +63,10 @@ public final class ButtonHelperTacticalAction {
     public static void endOfTacticalActionThings(Player player, Game game, ButtonInteractionEvent event) {
         logTacticalAction(game, player);
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
+            if (player.hasUnit("lunarium_carrier2")) {
+                LunariumAbilityHandler.resolveCrypticHaulerIIFighters(
+                        event, game, player, game.getTileByPosition(game.getActiveSystem()));
+            }
             RiftSetModeService.concludeTacticalAction(player, game, event);
             ButtonHelper.exploreDET(player, game, event);
             ButtonHelperFactionSpecific.cleanCavUp(game, event);
