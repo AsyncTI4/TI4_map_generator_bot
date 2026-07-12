@@ -24,10 +24,6 @@ class TrueSkillMatchmakingRatingService {
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
     private static final int MINIMUM_GAMES_FOR_RANKING = 3;
 
-    static List<MatchmakingRating> calculateRatings(List<MatchmakingGame> games) {
-        return calculateRatings(games, false);
-    }
-
     static List<MatchmakingRating> calculateRatings(List<MatchmakingGame> games, boolean useConservativeRating) {
         games.sort(Comparator.comparingLong(MatchmakingGame::endedDate).thenComparing(MatchmakingGame::name));
 
