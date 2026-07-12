@@ -144,12 +144,12 @@ public class LostLegaciesCommanderUnlockHandler {
             }
             case "revenant" -> {
                 long otherPlayersWithUnlockedCommanders = game.getRealPlayers().stream()
-                    .filter(otherPlayer -> otherPlayer != player)
-                    .filter(otherPlayer -> otherPlayer.getLeaders().stream()
-                        .anyMatch(leader -> Constants.COMMANDER.equals(leader.getType()) && !leader.isLocked()))
-                    .count();
+                        .filter(otherPlayer -> otherPlayer != player)
+                        .filter(otherPlayer -> otherPlayer.getLeaders().stream()
+                                .anyMatch(leader -> Constants.COMMANDER.equals(leader.getType()) && !leader.isLocked()))
+                        .count();
 
-                 yield otherPlayersWithUnlockedCommanders >= 2;
+                yield otherPlayersWithUnlockedCommanders >= 2;
             }
             case "revenantmyrr" -> {
                 Set<String> qualifyingUnitTypes = new HashSet<>();
@@ -190,7 +190,8 @@ public class LostLegaciesCommanderUnlockHandler {
                     }
 
                     for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                        for (UnitKey unitKey : unitHolder.getUnitsByStateForPlayer(player).keySet()) {
+                        for (UnitKey unitKey :
+                                unitHolder.getUnitsByStateForPlayer(player).keySet()) {
                             UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                             if (unitModel == null || !unitModel.getSustainDamage()) {
                                 continue;
@@ -213,7 +214,8 @@ public class LostLegaciesCommanderUnlockHandler {
                         continue;
                     }
 
-                    if (FoWHelper.isTileAdjacentToAnAnomaly(game, tile.getPosition(), player) || tile.isAnomaly(game, player)) {
+                    if (FoWHelper.isTileAdjacentToAnAnomaly(game, tile.getPosition(), player)
+                            || tile.isAnomaly(game, player)) {
                         unitsAdjacentToAnomalies++;
                     }
                 }
@@ -232,7 +234,7 @@ public class LostLegaciesCommanderUnlockHandler {
                         }
                     }
                 }
-                
+
                 yield false;
             }
             default -> false;

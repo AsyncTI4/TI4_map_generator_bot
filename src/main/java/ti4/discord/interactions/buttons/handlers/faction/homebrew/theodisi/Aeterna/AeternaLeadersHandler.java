@@ -14,7 +14,7 @@ import ti4.service.leader.UnlockLeaderService;
 @UtilityClass
 public class AeternaLeadersHandler {
     private static final String UNLOCK = "unlockAeternaCommander";
-    
+
     public static Button offerAeternaCommanderUnlockButton(Player player) {
         if (player == null || !player.hasLeader("aeternacommander") || player.hasLeaderUnlocked("aeternacommander")) {
             return null;
@@ -25,7 +25,11 @@ public class AeternaLeadersHandler {
 
     @ButtonHandler(UNLOCK)
     public static void unlockAeternaCommander(ButtonInteractionEvent event, Player player, Game game) {
-        if (event == null || player == null || game == null || !player.hasLeader("aeternacommander") || player.hasLeaderUnlocked("aeternacommander")) {
+        if (event == null
+                || player == null
+                || game == null
+                || !player.hasLeader("aeternacommander")
+                || player.hasLeaderUnlocked("aeternacommander")) {
             return;
         }
 

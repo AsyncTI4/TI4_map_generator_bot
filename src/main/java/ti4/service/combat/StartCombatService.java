@@ -25,13 +25,11 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
@@ -333,17 +331,17 @@ public class StartCombatService {
         if (firstCombatThread) {
             if (player1.hasLeader("aeternacommander") && !player1.hasLeaderUnlocked("aeternacommander")) {
                 MessageHelper.sendMessageToChannelWithButton(
-                    player1.getCardsInfoThread(),
-                    player1.getRepresentation()
-                        + ", the bot thinks you have started a combat. If you lose this combat, press the button below to unlock _Vorun Kael_:",
-                    AeternaLeadersHandler.offerAeternaCommanderUnlockButton(player1));
+                        player1.getCardsInfoThread(),
+                        player1.getRepresentation()
+                                + ", the bot thinks you have started a combat. If you lose this combat, press the button below to unlock _Vorun Kael_:",
+                        AeternaLeadersHandler.offerAeternaCommanderUnlockButton(player1));
             }
             if (player2.hasLeader("aeternacommander") && !player2.hasLeaderUnlocked("aeternacommander")) {
                 MessageHelper.sendMessageToChannelWithButton(
-                    player2.getCardsInfoThread(),
-                    player2.getRepresentation()
-                        + ", the bot thinks you have started a combat. If you lose this combat, press the button below to unlock _Vorun Kael_:",
-                    AeternaLeadersHandler.offerAeternaCommanderUnlockButton(player2));
+                        player2.getCardsInfoThread(),
+                        player2.getRepresentation()
+                                + ", the bot thinks you have started a combat. If you lose this combat, press the button below to unlock _Vorun Kael_:",
+                        AeternaLeadersHandler.offerAeternaCommanderUnlockButton(player2));
             }
         }
 
