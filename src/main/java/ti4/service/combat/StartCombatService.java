@@ -27,8 +27,10 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
@@ -2303,10 +2305,20 @@ public class StartCombatService {
                                 "Reroll 1 Mech on " + nameOfHolder,
                                 FactionEmojis.blacktf));
                     }
+                    if (p.hasUnit("ralnel_mech")
+                            && isGroundCombat
+                            && !ButtonHelper.isLawInPlay(game, "articles_war")
+                            && unitH.getUnitCount(UnitType.Mech, p) > 0) {
+                        buttons.add(Buttons.gray(
+                                p.factionButtonChecker() + "ralnelPull_" + tile.getPosition() + "_" + unitH.getName(),
+                                "Use Ralnel Mech Ability on " + nameOfHolder,
+                                FactionEmojis.blacktf));
+                    }
 
                     // atokera
                     if (p.hasUnit("atokera_mech")
                             && isGroundCombat
+                            && !ButtonHelper.isLawInPlay(game, "articles_war")
                             && p.getReadiedPlanets().contains(unitH.getName())
                             && unitH.getUnitCount(UnitType.Mech, p) > 0) {
                         String id = p.factionButtonChecker() + "utilizeAtokeraMech_" + unitH.getName();

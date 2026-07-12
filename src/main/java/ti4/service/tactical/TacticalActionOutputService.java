@@ -274,7 +274,7 @@ public class TacticalActionOutputService {
 
             if (player.hasTech("gd")) {
                 maxBonus++;
-                output.append(", used _Gravity Drive_)");
+                output.append(", may have used _Gravity Drive_)");
             } else {
                 if (!game.isTwilightsFallMode()) {
                     output.append(", __does not have _Gravity Drive___)");
