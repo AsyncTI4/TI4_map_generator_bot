@@ -305,7 +305,7 @@ public class CommanderUnlockCheckService {
             }
 
             // theodisi
-            case "ardentia", "verydith", "myrr", "kairn", "kryxos", "arcanum" ->
+            case "ardentia", "verydith", "myrr", "kairn", "kryxos", "arcanum", "xytheris", "oblivion", "revenant", "revenantmyrr", "revenantoblivion", "revenantponthous", "thrones", "ponthous" ->
                 shouldBeUnlocked =
                         LostLegaciesCommanderUnlockHandler.meetsCommanderUnlockCondition(player, game, faction);
         }
