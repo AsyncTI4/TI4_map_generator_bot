@@ -985,6 +985,26 @@ public class ButtonHelperCommanders {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
+    @ButtonHandler("ralnelMechPull_")
+    public static void ralnelMechPull(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String mechorInf = buttonID.split("_")[1];
+        String planet1 = buttonID.split("_")[2];
+        String planet2 = buttonID.split("_")[3];
+        String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, game);
+        String planetRepresentation = Helper.getPlanetRepresentation(planet1, game);
+
+        String message = player.getFactionEmojiOrColor() + " moved 1 " + mechorInf + " from " + planetRepresentation2
+                + " to " + planetRepresentation + " using the Ralnel Mech ability.";
+        RemoveUnitService.removeUnits(
+                event, game.getTileFromPlanet(planet2), game, player.getColor(), "1 " + mechorInf + " " + planet2);
+        game.setStoredValue("coexistFlag", "yes");
+        AddUnitService.addUnits(
+                event, game.getTileFromPlanet(planet1), game, player.getColor(), "1 " + mechorInf + " " + planet1);
+        game.removeStoredValue("coexistFlag");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        ButtonHelper.deleteMessage(event);
+    }
+
     public static List<Button> getSardakkCommanderButtons(
             Game game, Player player, GenericInteractionCreateEvent event) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());

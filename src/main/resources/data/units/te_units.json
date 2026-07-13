@@ -210,7 +210,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "At the end of a round of combat on this planet, you may move up to 2 ground forces to this planet from planets in adjacent systems."
+        "ability": "At the end of a round of combat on this planet, you may move up to 2 ground forces to this planet from planets in adjacent systems.",
+        "notes": "Async is ruling that \"adjacent systems\" includes the system containing this planet."
     },
     {
         "id": "ralnel_destroyer",

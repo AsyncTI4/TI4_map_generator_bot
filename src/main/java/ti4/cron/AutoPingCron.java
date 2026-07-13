@@ -38,7 +38,7 @@ public class AutoPingCron {
             " this is a sternly worded letter from the bot regarding your noted absence.",
             " this is a firm request from the bot that you do something to end this situation.",
             " Half dozen times the charm they say.",
-            " I may write whatever I want here, not like you've checked in to read any of it anyways.",
+            " I can write whatever I want here, not like you've checked in to read any of it anyways.",
             " You should end turn soon, there might be a bear on the loose, and you know which friend gets eaten by the bear.",
             " There's a rumor going around that some game is looking for a replacement player. Not that the bot would know anything about that (who are we kidding, the bot knows everything, it just acts dumb sometimes to fool you into a state of compliance).",
             " Do you ever wonder what we're doing here? Such a short time here on earth, and here we are, spending some of it waiting for a TI4 game to move. Well, at least some of us probably are.",
@@ -84,7 +84,7 @@ public class AutoPingCron {
             " You ever read Malazan? You should check it out, since, you know, you have all this free time from not playing async.",
             " When people talk about a slow burn, I think they were expecting around 4 pings in between turns, not 40.",
             " ||Can I do spoiler tag pings? Guess you'll never know.||",
-            " They say money can't buy happiness, but I hear that trade goods may buy a war sun, which is basically the same thing.");
+            " They say money can't buy happiness, but I hear that trade goods can buy a war sun, which is basically the same thing.");
 
     public static void register() {
         CronManager.schedulePeriodically(AutoPingCron.class, AutoPingCron::autoPingGames, 5, 10, TimeUnit.MINUTES);
