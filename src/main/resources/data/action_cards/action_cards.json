@@ -1020,7 +1020,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Exhaust 1 non-home planet controlled by another player. Then gain trade goods equal to its resource value.",
-        "notes": "This cannot be used to target an exhausted planet.",
+        "notes": "This cannot be used to target an exhausted planet.  Async is ruling you can target the triad with this.",
         "flavorText": "Harrugh leapt down from the ledge, gyro-spear blazing in the sunlight. In front, the L1Z1X began to take notice. Behind his warriors stood at the ready. Win or lose, this would be the end.",
         "source": "base"
     },

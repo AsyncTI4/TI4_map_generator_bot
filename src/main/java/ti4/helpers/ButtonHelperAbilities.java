@@ -2060,6 +2060,14 @@ public final class ButtonHelperAbilities {
         }
     }
 
+    @ButtonHandler("claimPlanet_")
+    public static void claimPlanet(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        String planet = buttonID.split("_")[1];
+        AddPlanetService.addPlanet(player, planet, game);
+        oceanBoundCheck(game);
+    }
+
     public static void readyBannerHalls(Game game) {
         for (Player player : game.getRealPlayers()) {
             if (player.hasUnlockedBreakthrough("kjalengardbt")) {

@@ -469,6 +469,47 @@ public final class ButtonHelperModifyUnits {
             buttons.add(Buttons.gray("deleteButtons", "Don't Remove Structures"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
         }
+        if (!doesPlayerHaveGfOnPlanet(unitHolder, player)) {
+            Player opponent = game.getActivePlayer();
+            if (opponent == player) {
+                for (Player p : game.getRealPlayersNNeutral()) {
+                    if (p != player && FoWHelper.playerHasUnitsOnPlanet(p, unitHolder)) {
+                        opponent = p;
+                        break;
+                    }
+                }
+            }
+            if (opponent.hasTech("dxa") && opponent != player) {
+                String msg3 = opponent.getRepresentation()
+                        + " you may have an opportunity to use _Dacxive Animators_ on "
+                        + Helper.getPlanetRepresentation(planet, game)
+                        + ". Click to confirm a combat occurred and to add 1 infantry or delete these buttons.";
+                MessageHelper.sendMessageToChannelWithButtons(
+                        opponent.getCorrectChannel(), msg3, ButtonHelper.getDacxiveButtons(planet, opponent));
+            }
+            if (opponent != player && opponent.isActivePlayer()) {
+                Player otherOpponent = null;
+                for (Player p : game.getRealPlayersNNeutral()) {
+                    if (p != player && p != opponent && FoWHelper.playerHasUnitsOnPlanet(p, unitHolder)) {
+                        otherOpponent = p;
+                        break;
+                    }
+                }
+                if (otherOpponent != null) {
+                    String msg4 = opponent.getRepresentation()
+                            + " you may have an opportunity to claim the planet of "
+                            + Helper.getPlanetRepresentation(planet, game)
+                            + " or fight the coexisters. Click a button to decide.";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green(
+                            opponent.factionButtonChecker() + "claimPlanet_" + unitHolder.getName(), "Claim Planet"));
+                    buttons.add(Buttons.red(
+                            opponent.factionButtonChecker() + "startCombatOn_" + unitHolder.getName(),
+                            "Fight Coexisters"));
+                    MessageHelper.sendMessageToChannelWithButtons(opponent.getCorrectChannel(), msg4, buttons);
+                }
+            }
+        }
         IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "groundcombat");
         event.getMessage();
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
