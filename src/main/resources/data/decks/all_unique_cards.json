@@ -3,7 +3,7 @@
         "alias": "0726_all_uniques_not_for_normal_games_action_cards",
         "name": "0726 All Uniques Not For Normal Games - Action Cards",
         "type": "action_card",
-        "description": "Every unique action card referenced by any deck, minus deprecated. For testing, not for normal games.",
+        "description": "Every unique action card referenced by any deck, minus deprecated. A source pool for deckbuilding, not for normal games.",
         "cardIDs": [
             "tf-transpose1",
             "tf-mutate1",
@@ -382,7 +382,7 @@
         "alias": "0726_all_uniques_not_for_normal_games_relics",
         "name": "0726 All Uniques Not For Normal Games - Relics",
         "type": "relic",
-        "description": "Every unique relic referenced by any deck, minus deprecated. For testing, not for normal games.",
+        "description": "Every unique relic referenced by any deck, minus deprecated. A source pool for deckbuilding, not for normal games.",
         "cardIDs": [
             "codex",
             "dominusorb",
@@ -464,7 +464,7 @@
         "alias": "0726_all_uniques_not_for_normal_games_explores",
         "name": "0726 All Uniques Not For Normal Games - Explores",
         "type": "explore",
-        "description": "Every unique explore card referenced by any deck, minus deprecated. For testing, not for normal games.",
+        "description": "Every unique explore card referenced by any deck, minus deprecated. A source pool for deckbuilding, not for normal games.",
         "cardIDs": [
             "aw1",
             "biotic",
@@ -566,7 +566,7 @@
         "alias": "0726_all_uniques_not_for_normal_games_agendas",
         "name": "0726 All Uniques Not For Normal Games - Agendas",
         "type": "agenda",
-        "description": "Every unique agenda referenced by any deck, minus deprecated. For testing, not for normal games.",
+        "description": "Every unique agenda referenced by any deck, minus deprecated. A source pool for deckbuilding, not for normal games.",
         "cardIDs": [
             "little_omega_abolishment",
             "arbiter",
