@@ -152,6 +152,10 @@ public final class LoreService {
 
         public static LoreEntry fromString(String loreString) {
             String[] splitLore = loreString.split(";");
+            // A stored entry always has at least "target;loreText" (blank-text entries are never stored).
+            // Anything shorter is corrupt/legacy junk — skip it rather than throwing and poisoning the
+            // whole game's lore load (readLore drops the null).
+            if (splitLore.length < 2) return null;
             LoreEntry entry = new LoreEntry(splitLore[1]);
             entry.target = splitLore[0].trim();
             entry.footerText = splitLore.length > 2 ? splitLore[2] : "";
@@ -604,6 +608,7 @@ public final class LoreService {
         if (StringUtils.isNotBlank(loreString)) {
             for (String savedLore : loreString.split("\\|")) {
                 LoreEntry entry = LoreEntry.fromString(savedLore);
+                if (entry == null) continue; // corrupt/legacy segment — skip it, keep the rest loadable
                 loreMap.put(entry.target, entry);
             }
         }
@@ -750,6 +755,18 @@ public final class LoreService {
         String originalTarget = "";
         if (!target.startsWith("NEW")) {
             LoreEntry entry = getGameLore(game).get(target);
+            if (entry == null) {
+                // Stale button: the entry was deleted or renamed after this Lore Management message was
+                // rendered. Refresh the list in place (dropping the dead entry) and tell the GM why.
+                List<ActionRow> refreshed = Buttons.paginateButtons(getLoreButtons(game), LORE_BUTTONS, 1, "gmLore");
+                event.editComponents(refreshed).queue(Consumers.nop(), BotLogger::catchRestError);
+                event.getHook()
+                        .sendMessage("That lore entry no longer exists (it was likely deleted or renamed)."
+                                + " The Lore Management list has been refreshed.")
+                        .setEphemeral(true)
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                return;
+            }
             position.setValue(entry.target);
             lore.setValue(entry.loreText);
             if (!StringUtils.isBlank(entry.footerText)) {
@@ -820,6 +837,13 @@ public final class LoreService {
 
     @ModalHandler("gmLoreSave_")
     public static void saveLoreFromModal(ModalInteractionEvent event, Game game) {
+        // KNOWN LATENT RISK (documented, not guarded): event.getValue(id) returns null if the submitted
+        // modal lacks that component. All four fields (POSITION/MESSAGE/footer/rounds) are always present
+        // in the modal editLore() builds, so the .getAsString() chains below are safe for any modal opened
+        // by the current code. The only way to hit an NPE is submitting a modal opened before a deploy that
+        // renamed/removed one of these fields — an in-flight stale modal. The modal processor wraps handlers
+        // in try/catch, so such an NPE is logged, not fatal (dead UX only). Same applies to the "url" field
+        // in importLoreFromURL. If this ever bites, null-check each getValue() before .getAsString().
         String[] targets = event.getValue(Constants.POSITION).getAsString().split(",");
         String[] modalIdParts = event.getModalId().replace("gmLoreSave_", "").split(":", 5);
         String originalTarget = modalIdParts[0];
