@@ -478,6 +478,11 @@ public class ComponentActionHelper {
                     FactionEmojis.belkosea);
             compButtons.add(abilityButton);
         }
+        if (p1.hasAbility("borrowed_authority")) {
+            Button abilityButton =
+                    Buttons.green(factionChecker + "ardentiaBorrowedAuthority", "Borrowed Authority");
+            compButtons.add(abilityButton);
+        }
 
         // Other "abilities"
         if (p1.hasUnit("muaat_flagship")

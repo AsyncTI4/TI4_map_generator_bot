@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -459,6 +460,9 @@ class DeleteButtonsButtonHandler {
                 if (tile != null) {
                     StartCombatService.combatCheck(game, event, tile);
                 }
+            }
+            if (buttonID.equalsIgnoreCase("leadership") && player.hasAbility("seize_command")) {
+                ArdentiaAbilityHandler.useSeizeCommand(event, player, game);
             }
         }
         if ("diplomacy".equalsIgnoreCase(buttonID)) {
