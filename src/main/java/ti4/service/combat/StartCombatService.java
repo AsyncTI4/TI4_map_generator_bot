@@ -2308,11 +2308,14 @@ public class StartCombatService {
                     if (p.hasUnit("ralnel_mech")
                             && isGroundCombat
                             && !ButtonHelper.isLawInPlay(game, "articles_war")
+                            && ButtonHelperFactionSpecific.getRalnelPullButtons(p, game, tile, unitH)
+                                            .size()
+                                    > 1
                             && unitH.getUnitCount(UnitType.Mech, p) > 0) {
                         buttons.add(Buttons.gray(
                                 p.factionButtonChecker() + "ralnelPull_" + tile.getPosition() + "_" + unitH.getName(),
                                 "Use Ralnel Mech Ability on " + nameOfHolder,
-                                FactionEmojis.blacktf));
+                                FactionEmojis.Ralnel));
                     }
 
                     // atokera

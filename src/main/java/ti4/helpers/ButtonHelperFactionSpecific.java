@@ -2651,10 +2651,18 @@ public final class ButtonHelperFactionSpecific {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
 
         Planet planetUnit = tile.getUnitHolderFromPlanet(buttonID.split("_")[2]);
-        List<Button> buttons = new ArrayList<>();
-        Planet planetReal = planetUnit;
-        String planetId = planetReal.getName();
+        List<Button> buttons = getRalnelPullButtons(player, game, tile, planetUnit);
 
+        String message =
+                player.getRepresentationUnfogged() + ", please use the buttons to pull units from adjacent planets to "
+                        + Helper.getPlanetRepresentation(buttonID.split("_")[2], game) + ".";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+    }
+
+    public static List<Button> getRalnelPullButtons(Player player, Game game, Tile tile, UnitHolder planet) {
+        List<Button> buttons = new ArrayList<>();
+        String planetId = planet.getName();
         for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
             Tile tile2 = game.getTileByPosition(pos2);
             for (Planet planetUnit2 : tile2.getPlanetUnitHolders()) {
@@ -2681,11 +2689,7 @@ public final class ButtonHelperFactionSpecific {
             }
         }
         buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
-        String message =
-                player.getRepresentationUnfogged() + ", please use the buttons to pull units from adjacent planets to "
-                        + Helper.getPlanetRepresentation(planetId, game) + ".";
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        return buttons;
     }
 
     @ButtonHandler("blackTFMechReroll")
