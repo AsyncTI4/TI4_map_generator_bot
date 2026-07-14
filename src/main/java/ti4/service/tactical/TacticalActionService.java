@@ -128,9 +128,8 @@ public class TacticalActionService {
                 player.removeDebtTokens(borrowedAuthorityColor, 1, "Seize Command");
                 tile.addCC(ccId);
                 Player borrowedFrom = game.getPlayerFromColorOrFaction(borrowedAuthorityColor);
-                String borrowedFromName = borrowedFrom == null
-                        ? borrowedAuthorityColor
-                        : borrowedFrom.getFactionNameOrColor();
+                String borrowedFromName =
+                        borrowedFrom == null ? borrowedAuthorityColor : borrowedFrom.getFactionNameOrColor();
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation() + " returned " + borrowedFromName

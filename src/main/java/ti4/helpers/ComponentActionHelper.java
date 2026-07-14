@@ -14,6 +14,7 @@ import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -478,9 +479,11 @@ public class ComponentActionHelper {
                     FactionEmojis.belkosea);
             compButtons.add(abilityButton);
         }
-        if (p1.hasAbility("borrowed_authority")) {
-            Button abilityButton =
-                    Buttons.green(factionChecker + "ardentiaBorrowedAuthority", "Borrowed Authority");
+        if (ArdentiaAbilityHandler.canUseBorrowedAuthority(p1, game)) {
+            Button abilityButton = Buttons.green(
+                    factionChecker + prefix + "ability_borrowedAuthority",
+                    "Borrowed Authority",
+                    FactionEmojis.ardentia);
             compButtons.add(abilityButton);
         }
 
@@ -616,6 +619,8 @@ public class ComponentActionHelper {
                         buttons.add(starTile);
                     }
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                } else if ("borrowedAuthority".equalsIgnoreCase(buttonID)) {
+                    ArdentiaAbilityHandler.startBorrowedAuthority(event, p1, game);
                 } else if ("classifiedDevelopments".equalsIgnoreCase(buttonID)) {
                     List<Button> buttons = ButtonHelperAbilities.getSuperWeaponButtonsPart1(p1, game);
                     String message =

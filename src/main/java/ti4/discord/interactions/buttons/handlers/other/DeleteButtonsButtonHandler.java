@@ -71,6 +71,20 @@ class DeleteButtonsButtonHandler {
                 boolean cyber = false;
                 boolean malevolency = false;
                 int netGain = ButtonHelper.checkNetGain(player, shortCCs);
+                if (netGain > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "ardentiacommander")) {
+                    int commsBefore = player.getCommodities();
+                    player.gainCommodities(netGain);
+                    int commsGained = player.getCommodities() - commsBefore;
+
+                    if (commsGained > 0) {
+                        MessageHelper.sendMessageToChannel(
+                                game.getActionsChannel(),
+                                player.getRepresentation()
+                                        + " gained "
+                                        + commsGained
+                                        + " commodities due to _High Marshall Serisi_.");
+                    }
+                }
                 finalCCs += ". You gained a net total of " + StringHelper.pluralize(netGain, "command token");
                 for (String pn : player.getPromissoryNotes().keySet()) {
                     if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
@@ -461,7 +475,7 @@ class DeleteButtonsButtonHandler {
                     StartCombatService.combatCheck(game, event, tile);
                 }
             }
-            if (buttonID.equalsIgnoreCase("leadership") && player.hasAbility("seize_command")) {
+            if ("leadership".equalsIgnoreCase(buttonID) && player.hasAbility("seize_command")) {
                 ArdentiaAbilityHandler.useSeizeCommand(event, player, game);
             }
         }
