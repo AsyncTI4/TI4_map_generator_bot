@@ -107,7 +107,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
         MessageHelper.sendMessageToEventChannel(event, message.toString());
 
-        if (activePlayer.hasTech("dslaner")) {
+        if (activePlayer.hasTech("dslaner") && !game.isTwilightsFallMode()) {
             activePlayer.setAtsCount(activePlayer.getAtsCount() + 1);
             MessageHelper.sendMessageToEventChannel(
                     event, activePlayer.getRepresentation() + " put 1 commodity on _ATS Armaments_.");

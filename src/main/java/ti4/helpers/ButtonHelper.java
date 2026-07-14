@@ -5237,7 +5237,9 @@ public class ButtonHelper {
         Set<String> visibleFOWPositions =
                 FOWPlusService.isActive(game) ? FoWHelper.getTilePositionsToShow(game, player) : null;
         Tile centerTile = game.getTileByPosition("000");
-        if (centerTile != null && FOWPlusService.canActivatePosition("000", player, game, visibleFOWPositions)) {
+        if (game.getStoredValue("borrowedAuthorityColor").isEmpty()
+                && centerTile != null
+                && FOWPlusService.canActivatePosition("000", player, game, visibleFOWPositions)) {
             if (!CommandCounterHelper.hasCC(player, centerTile) || game.isWarfareAction() || game.isL1Hero()) {
                 Button rex = Buttons.green(
                         factionChecker + "ringTile_000",
@@ -5278,6 +5280,14 @@ public class ButtonHelper {
         if (game.isNaaluAgent() && tile.isHomeSystem(game)) return false;
         if (!FOWPlusService.canActivatePosition(tile.getPosition(), player, game, visiblePositions)) return false;
         if ("silver_flame".equalsIgnoreCase(tile.getTileID())) return false;
+        String borrowedAuthorityColor = game.getStoredValue("borrowedAuthorityColor");
+        if (!borrowedAuthorityColor.isEmpty()
+                && (tile.isHomeSystem(game)
+                        || tile.isMecatol(game)
+                        || FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)
+                        || CommandCounterHelper.hasCC(null, borrowedAuthorityColor, tile))) {
+            return false;
+        }
         if (tile.isAsteroidField()) {
             for (Player p2 : game.getRealPlayers()) {
                 if ((p2.hasTech("cm") || p2.hasTech("tf-nomadic"))

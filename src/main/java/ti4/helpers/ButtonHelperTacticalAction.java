@@ -437,6 +437,7 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("hiredGunsInPlay");
         game.removeStoredValue("allianceModeSimultaneousAction");
         game.removeStoredValue("absolLux");
+        game.removeStoredValue("borrowedAuthorityColor");
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
         DreamButtonHandler.clearDreamAgentAnomaly(game);
@@ -564,11 +565,17 @@ public final class ButtonHelperTacticalAction {
     @ButtonHandler("ringTile_")
     public static void selectActiveSystem(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("ringTile_", "");
+        Tile tile = game.getTileByPosition(pos);
+        if (!game.getStoredValue("borrowedAuthorityColor").isEmpty()
+                && !ButtonHelper.canActivateTile(game, player, tile)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "That system cannot be activated with _Borrowed Authority_.");
+            return;
+        }
         game.setActiveSystem(pos);
         game.setStoredValue("possiblyUsedRift", "");
         game.setStoredValue("lastActiveSystem", pos);
         List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
-        Tile tile = game.getTileByPosition(pos);
         if (FOWPlusService.isVoid(game, pos)) {
             tile = FOWPlusService.voidTile(pos);
         }

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -50,6 +51,7 @@ public class TeHelperBreakthroughs {
             case "dihmohnbt" -> DSHelperBreakthroughs.dihmohnBTExhaust(game, player);
             case "cheiranbt" -> DSHelperBreakthroughs.cheiranBTExhaust(game, player);
             case "dreambt" -> DreamButtonHandler.postDreamBtMoveNexusButtons(event, game, player);
+            case "kairnbt" -> KairnBreakthroughHandler.postInitialButtons(game, player);
             default -> {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
