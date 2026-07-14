@@ -21,6 +21,7 @@ public class UnitModelValueInjectionService {
         return injectValues(unit, values);
     }
 
+    // TODO: Add TF Nomad FS, 3 TF Mechs, TK Xxcha flag, Lightrail
     private UnitValueInjection getPlayerUnitValueInjection(Player player, UnitModel unit) {
         if (player.hasAbility("evolved_warforms") && unit.getUnitType() == UnitType.Mech) {
             return UnitValueInjection.of(

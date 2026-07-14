@@ -29,7 +29,7 @@
     "title": "Impetus of Control",
     "abilityName": "Echo of Subjugation - Harbinger of Chains",
     "abilityWindow": "ACTION:",
-    "abilityText": "Spend up to 1 of each player's command tokens on the game board. Return those tokens to their reinforcements and for each token removed this way gain 1 command token and 1 trade good. Then, purge this card.",
+    "abilityText": "Select up to 1 of each player's command tokens on the game board. Return those tokens to their reinforcements and for each token removed this way gain 1 command token and 1 trade good. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },

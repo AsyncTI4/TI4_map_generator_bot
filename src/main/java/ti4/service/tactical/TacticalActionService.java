@@ -26,6 +26,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperGeneral;
+import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
@@ -118,6 +119,32 @@ public class TacticalActionService {
     }
 
     public boolean spendAndPlaceTokenIfNecessary(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
+        String borrowedAuthorityColor = game.getStoredValue("borrowedAuthorityColor");
+        if (!borrowedAuthorityColor.isEmpty()) {
+            String ccId = Mapper.getCCID(borrowedAuthorityColor);
+            if (ccId != null
+                    && player.getDebtTokenCount(borrowedAuthorityColor, "Seize Command") > 0
+                    && !tile.hasCC(ccId)) {
+                player.removeDebtTokens(borrowedAuthorityColor, 1, "Seize Command");
+                tile.addCC(ccId);
+                Player borrowedFrom = game.getPlayerFromColorOrFaction(borrowedAuthorityColor);
+                String borrowedFromName =
+                        borrowedFrom == null ? borrowedAuthorityColor : borrowedFrom.getFactionNameOrColor();
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " returned " + borrowedFromName
+                                + "'s command token from their **Seize Command** debt pool to use _Borrowed Authority_.");
+                if (game.isFowMode()) {
+                    FoWHelper.pingSystem(
+                            game,
+                            tile.getPosition(),
+                            player.getFactionEmojiOrColor() + " activated a system using _Borrowed Authority_.");
+                }
+            }
+            game.removeStoredValue("borrowedAuthorityColor");
+            return true;
+        }
+
         boolean skipPlacingAbilities = shouldSkipPlacingAbilities(game, player);
         if (!skipPlacingAbilities
                 && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
