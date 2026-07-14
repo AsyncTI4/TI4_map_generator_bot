@@ -110,6 +110,7 @@ class PlayerMatchmakingDataFactory {
     private static Set<String> roleNames(Guild guild, String userId) {
         Member member = guild == null ? null : guild.getMemberById(userId);
         Set<String> roles = new HashSet<>();
+        if (member == null) return roles;
         for (String role : ROLES_TO_TRACK) {
             if (DiscordRoleUtility.hasRole(guild, member, role)) {
                 roles.add(role);
