@@ -204,7 +204,7 @@
         "name": "Cycle of Reclamation",
         "faction": "aeterna",
         "window": "During setup:",
-        "windowEffect": "Place the moon phase cards in your play area.\n\nUp to 3 times per action when 1 or more units are destroyed in a system containing or adjacent to your units you may place 1 neutral destroyer on a moon phase card in your play area.",
+        "windowEffect": "Place the moon phase cards in your play area.\n\nWhen 1 or more units are destroyed in a system containing or adjacent to a system containing your units except during a combat on your tactical actions, capture 1 neutral destroyer.",
         "source": "theodisi"
     },
     {
@@ -212,7 +212,7 @@
         "name": "New Moon",
         "faction": "aeterna",
         "window": "ACTION:",
-        "windowEffect": "Exhaust this card to do 1 of the following:\n\nPlace 1 neutral unit from this card into a system that contains no other player's ships.\n\nPlace 1 neutral cruiser on a moon phase card.",
+        "windowEffect": "Exhaust this card to do 1 of the following:\n\nPlace 1 captured neutral destroyer into a system that contains no other player's ships.\n\nCapture 1 neutral destoryer.",
         "source": "theodisi"
     },
     {
@@ -220,7 +220,7 @@
         "name": "Waning Moon",
         "faction": "aeterna",
         "window": "When you pass:",
-        "windowEffect": "You may exhaus this card. Return neutral units on this card with a combined cost of 4 or more to research 1 technology.",
+        "windowEffect": "You may exhaust this card. Return 4 captured neutral destroyers to research 1 technology.",
         "source": "theodisi"
     },
     {
@@ -228,7 +228,7 @@
         "name": "Full Moon",
         "faction": "aeterna",
         "window": "At the end of your turn:",
-        "windowEffect": "You may exhaust this card. Return neutral units on this card with a combined cost of 3 or more to place 1 structure on a planet you control.",
+        "windowEffect": "You may exhaust this card. Return 3 captured neutral destroyers to place 1 structure on a planet you control.",
         "source": "theodisi"
     },
     {
@@ -236,7 +236,7 @@
         "name": "Waxing Moon",
         "faction": "aeterna",
         "window": "At the start of your turn:",
-        "windowEffect": "You may exhaust this card. Return neutral units on this card with a combined cost of 2 to draw 2 action cards, then discard 1.",
+        "windowEffect": "You may exhaust this card. Return 2 captured neutral destroyers to draw 2 action cards, then discard 1.",
         "source": "theodisi"
     },
     {
@@ -244,7 +244,7 @@
         "name": "Lunar Eclipse",
         "faction": "aeterna",
         "window": "When you perform a strategic action:",
-        "windowEffect": "You may exhaust this card. Return 2 neutral units on this card to gain 1 command token.",
+        "windowEffect": "You may exhaust this card. Return 2 captured neutral destroyers to gain 1 command token.",
         "source": "theodisi"
     },
     {
