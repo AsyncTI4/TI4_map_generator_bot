@@ -2566,7 +2566,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     private void doAdditionalThingsWhenAddingTech(String techID) {
         // Set ATS Armaments to 0 when adding tech (if it was removed we reset it)
-        if ("dslaner".equalsIgnoreCase(techID)) {
+        if ("dslaner".equalsIgnoreCase(techID) || "tf-dslaner".equalsIgnoreCase(techID)) {
             setAtsCount(0);
         }
 

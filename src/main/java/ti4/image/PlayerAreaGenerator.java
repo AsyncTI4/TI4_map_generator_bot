@@ -2857,7 +2857,7 @@ public class PlayerAreaGenerator {
                 DrawingUtil.drawOneOrTwoLinesOfTextVertically(
                         graphics, techModel.getShortName(), x + deltaX + 7, y + 116, 116);
             }
-            if ("dslaner".equalsIgnoreCase(tech)) {
+            if ("dslaner".equalsIgnoreCase(tech) || "tf-dslaner".equalsIgnoreCase(tech)) {
                 DrawingUtil.drawTextVertically(
                         graphics, "" + player.getAtsCount(), x + deltaX + 15, y + 140, Storage.getFont16());
             }

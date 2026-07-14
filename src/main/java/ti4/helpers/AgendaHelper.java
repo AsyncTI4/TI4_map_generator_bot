@@ -3259,6 +3259,12 @@ public final class AgendaHelper {
 
     @ButtonHandler("eraseMyVote")
     public static void eraseMyVote(Player player, Game game) {
+        if ("agendaWaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "You cannot erase your vote until voting has started. Skip waiting if something has gone wrong.");
+            return;
+        }
         String pfaction = player.getFaction();
         if (game.isFowMode()) {
             pfaction = player.getColor();

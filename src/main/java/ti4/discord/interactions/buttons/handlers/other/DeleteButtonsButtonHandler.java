@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -70,6 +71,20 @@ class DeleteButtonsButtonHandler {
                 boolean cyber = false;
                 boolean malevolency = false;
                 int netGain = ButtonHelper.checkNetGain(player, shortCCs);
+                if (netGain > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "ardentiacommander")) {
+                    int commsBefore = player.getCommodities();
+                    player.gainCommodities(netGain);
+                    int commsGained = player.getCommodities() - commsBefore;
+
+                    if (commsGained > 0) {
+                        MessageHelper.sendMessageToChannel(
+                                game.getActionsChannel(),
+                                player.getRepresentation()
+                                        + " gained "
+                                        + commsGained
+                                        + " commodities due to _High Marshall Serisi_.");
+                    }
+                }
                 finalCCs += ". You gained a net total of " + StringHelper.pluralize(netGain, "command token");
                 for (String pn : player.getPromissoryNotes().keySet()) {
                     if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
@@ -459,6 +474,9 @@ class DeleteButtonsButtonHandler {
                 if (tile != null) {
                     StartCombatService.combatCheck(game, event, tile);
                 }
+            }
+            if ("leadership".equalsIgnoreCase(buttonID) && player.hasAbility("seize_command")) {
+                ArdentiaAbilityHandler.useSeizeCommand(event, player, game);
             }
         }
         if ("diplomacy".equalsIgnoreCase(buttonID)) {
