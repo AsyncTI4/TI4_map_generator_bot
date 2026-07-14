@@ -15,6 +15,7 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -122,6 +123,7 @@ public class ComponentActionHelper {
                                     game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
                                 case "crimsonbt" -> true;
                                 case "mahactbt" -> !p1.getTechs().isEmpty();
+                                case "kairnbt" -> KairnBreakthroughHandler.canUse(game, p1);
                                 case "saarbt" ->
                                     game.getTileMap().values().stream()
                                             .filter(Tile::isAsteroidField)
