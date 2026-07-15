@@ -19,6 +19,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUni
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -137,6 +138,13 @@ public final class ButtonHelperTacticalAction {
                         player.getRepresentationUnfogged()
                                 + ", you may exhaust _Discovery_ to explore a frontier token in a planetless system containing your ships.",
                         NatauDoctrineHandler.getUseDiscoveryButton(player));
+            }
+            if (player.hasTech("thkairny") && player.hasTechReady("thkairny")) {
+                MessageHelper.sendMessageToChannelWithButton(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", you have _Surveyor's Lens_ and as such may exhaust it to explore a planet in the active system:",
+                        KairnTechHandler.getSurveyorsLensButton(player));
             }
             if (!game.isAbsolMode()
                     && player.getRelics().contains("emphidia")
