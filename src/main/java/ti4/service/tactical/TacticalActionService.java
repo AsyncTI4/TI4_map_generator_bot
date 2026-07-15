@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.*;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -140,6 +141,7 @@ public class TacticalActionService {
                             tile.getPosition(),
                             player.getFactionEmojiOrColor() + " activated a system using _Borrowed Authority_.");
                 }
+                ArdentiaTechHandler.offerOverlordMatrixButton(game, tile);
             }
             game.removeStoredValue("borrowedAuthorityColor");
             return true;
@@ -154,6 +156,7 @@ public class TacticalActionService {
             }
             player.setTacticalCC(player.getTacticalCC() - 1);
             CommandCounterHelper.addCC(event, player, tile);
+            ArdentiaTechHandler.offerOverlordMatrixButton(game, tile);
             return true;
         }
         return false;
@@ -411,6 +414,7 @@ public class TacticalActionService {
         for (PostMovementAbilityButton ability : PostMovementAbilityButtons.ABILITIES) {
             if (ability.enabled(ctx)) buttons.addAll(ability.build(ctx));
         }
+        ArdentiaUnitHandler.addIronClawDeployButton(buttons, game, player, tile);
 
         return buttons;
     }

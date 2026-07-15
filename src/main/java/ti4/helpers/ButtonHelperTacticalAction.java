@@ -14,9 +14,10 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
@@ -146,7 +147,8 @@ public final class ButtonHelperTacticalAction {
                 systemButtons2.add(Buttons.green("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
             }
-            if (game.isWarfareAction()) {
+            if (game.isWarfareAction()
+                    && game.getStoredValue("ardentiaSubjugate").isEmpty()) {
                 Button redistro = Buttons.blue(
                         player.factionButtonChecker() + "redistributeCCButtons_deleteThisButton",
                         "Redistribute Command Tokens");
@@ -160,6 +162,7 @@ public final class ButtonHelperTacticalAction {
             CrystellumLeadersHandler.clearFacetBypass(game, player);
             resetStoredValuesForTacticalAction(game);
         }
+        ArdentiaTechHandler.clearOverlordMatrixGalvanization(game);
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
     }
 
@@ -438,8 +441,10 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("allianceModeSimultaneousAction");
         game.removeStoredValue("absolLux");
         game.removeStoredValue("borrowedAuthorityColor");
+        game.removeStoredValue("ardentiaSubjugate");
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
+        ArdentiaUnitHandler.clearIronClawDeployUsed(game);
         DreamButtonHandler.clearDreamAgentAnomaly(game);
         GameEventDraft.clear(game);
 
@@ -570,6 +575,10 @@ public final class ButtonHelperTacticalAction {
                 && !ButtonHelper.canActivateTile(game, player, tile)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "That system cannot be activated with _Borrowed Authority_.");
+            return;
+        }
+        if (!game.getStoredValue("ardentiaSubjugate").isEmpty() && tile.isHomeSystem(game)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Subjugate must activate a non-home system.");
             return;
         }
         game.setActiveSystem(pos);
