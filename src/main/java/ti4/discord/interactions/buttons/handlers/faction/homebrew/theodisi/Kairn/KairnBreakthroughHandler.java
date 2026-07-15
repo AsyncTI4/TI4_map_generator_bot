@@ -124,60 +124,36 @@ public class KairnBreakthroughHandler {
 
     @ButtonHandler(GAIN_FRAGMENT)
     public static void gainFragment(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] payload = buttonID.substring(GAIN_FRAGMENT.length()).split("\\|", 3);
-        if (payload.length != 3) {
+        String[] payload = buttonID.substring(GAIN_FRAGMENT.length()).split("\\|", 2);
+        if (payload.length != 2) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
         String purgedTrait = payload[0];
-        int gainedCount;
-        try {
-            gainedCount = Integer.parseInt(payload[1]);
-        } catch (NumberFormatException e) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        String fragmentId = payload[2];
-        ExploreModel fragment = Mapper.getExplore(fragmentId);
-        if (gainedCount >= 2
-                || fragment == null
-                || purgedTrait.equalsIgnoreCase(fragment.getType())
-                || !getPurgedFragments(game, fragment.getType()).contains(fragmentId)) {
+        String gainedTrait = payload[1];
+        List<String> availableFragments = getPurgedFragments(game, gainedTrait);
+        if (purgedTrait.equalsIgnoreCase(gainedTrait) || availableFragments.size() < 2) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
-                            + " cannot gain that purged relic fragment for _Relic Trading Hub_.");
+                            + " cannot gain 2 purged "
+                            + gainedTrait
+                            + " relic fragments for _Relic Trading Hub_.");
             ButtonHelper.deleteMessage(event);
             return;
         }
 
-        player.addFragment(fragmentId);
-        game.setNumberOfPurgedFragments(Math.max(0, game.getNumberOfPurgedFragments() - 1));
+        List<String> fragmentsToGain = availableFragments.subList(0, 2);
+        for (String fragmentId : fragmentsToGain) {
+            player.addFragment(fragmentId);
+        }
+        game.setNumberOfPurgedFragments(Math.max(0, game.getNumberOfPurgedFragments() - fragmentsToGain.size()));
+        ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " gained a " + fragmentEmoji(fragmentId)
-                        + fragmentLabel(fragmentId) + " from the purged fragments for _Relic Trading Hub_.");
-
-        if (gainedCount + 1 >= 2) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        List<Button> buttons = getFragmentGainButtons(game, player, purgedTrait, gainedCount + 1);
-        if (buttons.isEmpty()) {
-            MessageHelper.editMessageWithButtons(
-                    event,
-                    player.getRepresentationUnfogged()
-                            + " has no other differently-colored purged relic fragment to gain for _Relic Trading Hub_.",
-                    buttons);
-            return;
-        }
-        MessageHelper.editMessageWithButtons(
-                event,
-                player.getRepresentationUnfogged()
-                        + ", choose 1 more differently-colored purged relic fragment for _Relic Trading Hub_:",
-                buttons);
+                player.getRepresentationUnfogged() + " gained 2 " + fragmentTraitEmoji(gainedTrait) + " "
+                        + fragmentTraitLabel(gainedTrait) + "s from the purged fragments for _Relic Trading Hub_.");
     }
 
     private static List<Button> getMatchingPlanetButtons(Game game, Player player, String trait) {
@@ -194,40 +170,31 @@ public class KairnBreakthroughHandler {
     }
 
     private static void sendFragmentGainButtons(Game game, Player player, String purgedTrait) {
-        List<Button> buttons = getFragmentGainButtons(game, player, purgedTrait, 0);
+        List<Button> buttons = getFragmentGainButtons(game, player, purgedTrait);
 
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
-                            + " cannot gain a differently-colored purged relic fragment for _Relic Trading Hub_.");
+                            + " cannot gain 2 purged relic fragments of a different color for _Relic Trading Hub_.");
             return;
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
-                        + ", choose up to 2 differently-colored purged relic fragments to gain for _Relic Trading Hub_:",
+                        + ", choose a differently-colored purged fragment color to gain 2 of for _Relic Trading Hub_:",
                 buttons);
     }
 
-    private static List<Button> getFragmentGainButtons(Game game, Player player, String purgedTrait, int gainedCount) {
+    private static List<Button> getFragmentGainButtons(Game game, Player player, String purgedTrait) {
         List<Button> buttons = new ArrayList<>();
         for (String trait : List.of(Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS)) {
-            if (trait.equals(purgedTrait)) {
-                continue;
-            }
-            for (String fragmentId : getPurgedFragments(game, trait)) {
+            if (!trait.equals(purgedTrait) && getPurgedFragments(game, trait).size() >= 2) {
                 buttons.add(Buttons.green(
-                        player.factionButtonChecker()
-                                + GAIN_FRAGMENT
-                                + purgedTrait
-                                + "|"
-                                + gainedCount
-                                + "|"
-                                + fragmentId,
-                        "Gain " + fragmentLabel(fragmentId),
-                        fragmentEmoji(fragmentId)));
+                        player.factionButtonChecker() + GAIN_FRAGMENT + purgedTrait + "|" + trait,
+                        "Gain 2 " + trait + " fragments",
+                        fragmentTraitEmoji(trait)));
             }
         }
         return buttons;

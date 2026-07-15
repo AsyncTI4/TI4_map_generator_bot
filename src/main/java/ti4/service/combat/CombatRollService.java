@@ -33,6 +33,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
@@ -507,6 +508,11 @@ public class CombatRollService {
             message = AshenBreakthroughHandler.appendBombardmentManualReminder(player, rollType, message);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        if (rollType == CombatRollType.combatround
+                && Constants.SPACE.equalsIgnoreCase(unitHolderName)
+                && opponent != player) {
+            ArdentiaUnitHandler.offerSovereignsGavelButton(event, game, player, opponent, tile);
+        }
         CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
         boolean trackedCandidateRoll =
                 combatReplayService.isTrackedCandidateRoll(game, player, opponent, tile, rollType);
