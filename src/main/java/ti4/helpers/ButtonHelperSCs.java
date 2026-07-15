@@ -1354,6 +1354,7 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("scepterE_follow_")
     @ButtonHandler("mahactA_follow_")
+    @ButtonHandler("thardentiag_follow_")
     public static void mahactAndScepterFollow(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String lastChar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
         boolean setStatus = true;
@@ -1403,7 +1404,7 @@ public final class ButtonHelperSCs {
                     }
                 }
             }
-        } else {
+        } else if (buttonID.contains("scepterE")) {
             MessageHelper.sendMessageToChannel(
                     channel,
                     player.getRepresentationUnfogged() + " exhausted the _" + RelicHelper.sillySpelling()
@@ -1415,6 +1416,12 @@ public final class ButtonHelperSCs {
                         player.getRepresentation()
                                 + " Reminder that if you intend to participate in the splice, you still need to hit the participate in the splice button now.");
             }
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    player.getRepresentationUnfogged() + " exhausted _Cognitive Parallax Engine_ to follow "
+                            + Helper.getSCName(scNum, game) + ".");
+            player.exhaustTech("thardentiag");
         }
         Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
 
