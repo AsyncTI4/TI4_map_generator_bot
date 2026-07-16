@@ -18,6 +18,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -105,6 +106,9 @@ public class CardsInfoService {
         }
         if (player.hasTech("becrystmb") && player.isActivePlayer()) {
             buttons.add(CrystellumFactionTechHandler.getMolecularBindingButton(player));
+        }
+        if (RevenantBreakthroughHandler.canPurgeAgent(game, player)) {
+            buttons.add(RevenantBreakthroughHandler.getPurgeAgentButton(player));
         }
         if (player.hasAbility("doctrine") && player.hasAbility("paradigm") && player.hasAbility("natau_decree")) {
             buttons.add(NatauAbilityHandler.getShowDoctrinesButton(player));

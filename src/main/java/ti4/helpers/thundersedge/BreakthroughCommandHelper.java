@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -253,6 +254,9 @@ public final class BreakthroughCommandHelper {
             }
             if ("firmamentbt".equalsIgnoreCase(bt.getID())) {
                 SowingReapingService.sendTheSowingButtons(game);
+            }
+            if ("revenantbt".equalsIgnoreCase(bt.getID())) {
+                RevenantBreakthroughHandler.gainAttachedAgent(game, player);
             }
 
             if (!FractureService.isFractureInPlay(game) && !game.isNoFractureMode())
