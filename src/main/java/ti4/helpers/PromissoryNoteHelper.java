@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrPromissoryHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -260,10 +262,12 @@ public class PromissoryNoteHelper {
         }
         // And refresh cards info
         sendPromissoryNoteInfo(game, player, false);
-        sendPromissoryNoteInfo(game, owner, false);
-        MessageHelper.sendMessageToChannel(
-                owner.getCardsInfoThread(),
-                owner.getRepresentationUnfogged() + ", someone just played _" + pnName + "_.");
+        if (!"malevolency".equalsIgnoreCase(id)) {
+            sendPromissoryNoteInfo(game, owner, false);
+            MessageHelper.sendMessageToChannel(
+                    owner.getCardsInfoThread(),
+                    owner.getRepresentationUnfogged() + ", someone just played _" + pnName + "_.");
+        }
 
         if (id.contains("dspnveld")) {
             ButtonHelperFactionSpecific.offerVeldyrButtons(player, game, id);
@@ -357,6 +361,12 @@ public class PromissoryNoteHelper {
                     player.getCorrectChannel(),
                     player.getRepresentation()
                             + " drew an extra secret objective due to _Sycophancy_. Please discard an extra secret objective.");
+        }
+        if ("bapnluna".equalsIgnoreCase(id)) {
+            game.drawSecretObjective(player.getUserID());
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " drew 1 secret objective due to _Theory Renovation_.");
         }
         if ("dspnvade".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, event);
@@ -679,7 +689,16 @@ public class PromissoryNoteHelper {
         if ("bepnta".equalsIgnoreCase(id)) {
             TaPromissoryHandler.offerAdvancedStructuralEngineeringButtons(event, player, game);
         }
-        if (pn.getText().toLowerCase().contains("action:") && !"acq".equalsIgnoreCase(id)) {
+        if ("thpnmyrri".equalsIgnoreCase(id) || "thpnmyrrh".equalsIgnoreCase(id) || "thpnmyrrc".equalsIgnoreCase(id)) {
+            MyrrPromissoryHandler.offerFactoryLeaseButtons(event, player, game, id);
+        }
+        if ("thpnkairn".equalsIgnoreCase(id)) {
+            KairnPromissoryHandler.offerArchaeologicalOutpostButtons(event, player, game);
+        }
+
+        // These PNs' text contains "action:" but describe a trigger on another player's action
+        List<String> actionTextPNsNotOwnAction = List.of("acq", "bapnconc");
+        if (pn.getText().toLowerCase().contains("action:") && !actionTextPNsNotOwnAction.contains(id)) {
             ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
             game.setStoredValue(
                     "currentActionSummary" + player.getFaction(),

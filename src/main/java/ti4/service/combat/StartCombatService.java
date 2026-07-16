@@ -27,13 +27,12 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAgentHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBreakthroughHandler;
@@ -72,6 +71,8 @@ import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.gameevent.GameEventDraft;
+import ti4.spring.service.gameevent.GameSubEvent;
 
 @UtilityClass
 public class StartCombatService {
@@ -183,7 +184,10 @@ public class StartCombatService {
             game.setStoredValue(
                     "currentActionSummary" + player.getFaction(),
                     game.getStoredValue("currentActionSummary" + player.getFaction()) + " Had a space combat in "
-                            + tile.getRepresentationForButtons() + " against " + player2.getFactionEmoji() + ".");
+                            + tile.getRepresentationForButtons() + " against " + player2.getFactionNameOrColor()
+                            + ".");
+            GameEventDraft.stage(
+                    game, new GameSubEvent.Combat("space", tile.getPosition(), null, player2.getFaction()));
             return;
         }
         findOrCreateCombatThread(
@@ -224,7 +228,10 @@ public class StartCombatService {
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Had a ground combat on "
                         + Helper.getPlanetRepresentation(unitHolder.getName(), game) + " against "
-                        + player2.getFactionEmoji() + ".");
+                        + player2.getFactionNameOrColor() + ".");
+        GameEventDraft.stage(
+                game,
+                new GameSubEvent.Combat("ground", tile.getPosition(), unitHolder.getName(), player2.getFaction()));
         if (!game.isFowMode()) {
             findOrCreateCombatThread(
                     game,
@@ -320,6 +327,22 @@ public class StartCombatService {
         if (player1.hasAbility("refraction") || player2.hasAbility("refraction")) {
             CrystellumAbilityHandler.resetRefractionForCombat(game, player1, tile);
             CrystellumAbilityHandler.resetRefractionForCombat(game, player2, tile);
+        }
+        if (firstCombatThread) {
+            if (player1.hasLeader("aeternacommander") && !player1.hasLeaderUnlocked("aeternacommander")) {
+                MessageHelper.sendMessageToChannelWithButton(
+                        player1.getCardsInfoThread(),
+                        player1.getRepresentation()
+                                + ", the bot thinks you have started a combat. If you lose this combat, press the button below to unlock _Vorun Kael_:",
+                        AeternaLeadersHandler.offerAeternaCommanderUnlockButton(player1));
+            }
+            if (player2.hasLeader("aeternacommander") && !player2.hasLeaderUnlocked("aeternacommander")) {
+                MessageHelper.sendMessageToChannelWithButton(
+                        player2.getCardsInfoThread(),
+                        player2.getRepresentation()
+                                + ", the bot thinks you have started a combat. If you lose this combat, press the button below to unlock _Vorun Kael_:",
+                        AeternaLeadersHandler.offerAeternaCommanderUnlockButton(player2));
+            }
         }
 
         TextChannel textChannel = (TextChannel) channel;
@@ -958,13 +981,13 @@ public class StartCombatService {
                         buttons);
             }
             if ("space".equalsIgnoreCase(type) && player.hasUnexhaustedLeader("kaloraagent")) {
-                KaloraAgentHandler.offerKaloraAgentButtons(player, msg);
+                KaloraLeaderHandler.offerKaloraAgentButtons(player, msg);
             }
             if ("space".equalsIgnoreCase(type) && ButtonHelper.doesPlayerHaveFSHere("onyxxa_flagship", player, tile)) {
                 OnyxxaUnitHandler.offerFlagshipWinButton(player, msg);
             }
             if ("space".equalsIgnoreCase(type) && game.playerHasLeaderUnlockedOrAlliance(player, "arvaxicommander")) {
-                ArvaxiCommanderHandler.sendCombatButtons(player, otherPlayer, game, msg);
+                ArvaxiLeaderHandler.sendCombatButtons(player, otherPlayer, game, msg);
             }
             if (player.hasTechReady("dskortg") && CommandCounterHelper.hasCC(player, tile)) {
                 buttons = new ArrayList<>();
@@ -1485,7 +1508,6 @@ public class StartCombatService {
                 IronFactionTechsHandler.addAdvancedTargetingSystemsButton(buttons, game, p2, p1, pos, groundOrSpace);
             }
         }
-
         checkAndAddSubatomicButton(game, p1, isSpaceCombat, tile, buttons);
         checkAndAddSubatomicButton(game, p2, isSpaceCombat, tile, buttons);
 
@@ -2280,10 +2302,23 @@ public class StartCombatService {
                                 "Reroll 1 Mech on " + nameOfHolder,
                                 FactionEmojis.blacktf));
                     }
+                    if (p.hasUnit("ralnel_mech")
+                            && isGroundCombat
+                            && !ButtonHelper.isLawInPlay(game, "articles_war")
+                            && ButtonHelperFactionSpecific.getRalnelPullButtons(p, game, tile, unitH)
+                                            .size()
+                                    > 1
+                            && unitH.getUnitCount(UnitType.Mech, p) > 0) {
+                        buttons.add(Buttons.gray(
+                                p.factionButtonChecker() + "ralnelPull_" + tile.getPosition() + "_" + unitH.getName(),
+                                "Use Ralnel Mech Ability on " + nameOfHolder,
+                                FactionEmojis.Ralnel));
+                    }
 
                     // atokera
                     if (p.hasUnit("atokera_mech")
                             && isGroundCombat
+                            && !ButtonHelper.isLawInPlay(game, "articles_war")
                             && p.getReadiedPlanets().contains(unitH.getName())
                             && unitH.getUnitCount(UnitType.Mech, p) > 0) {
                         String id = p.factionButtonChecker() + "utilizeAtokeraMech_" + unitH.getName();

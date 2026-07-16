@@ -1,0 +1,39 @@
+{
+    "tileBack": "green",
+    "id": "th7",
+    "name": "Syphos/Crythisis/The Arcanum - Arcanum",
+    "aliases": [
+        "th7",
+        "syphos",
+        "crythisis",
+        "thearcanum",
+        "arcanum"
+    ],
+    "imagePath": "th7_arcanumhs.png",
+    "shipPositionsType": "TYPE03",
+    "spaceTokenLocations": [
+        {
+            "x": 250.0,
+            "y": 90.0
+        },
+        {
+            "x": 80.0,
+            "y": 10.0
+        },
+        {
+            "x": 135.0,
+            "y": 105.0
+        },
+        {
+            "x": 80.0,
+            "y": 185.0
+        }
+    ],
+    "wormholes": [],
+    "planets": [
+        "syphos",
+        "crythisis",
+        "thearcanum"
+    ],
+    "source": "theodisi"
+}

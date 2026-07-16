@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.PhantomEnergyHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -122,7 +122,9 @@ public final class ButtonHelperAbilities {
     @ButtonHandler("autoneticMemoryStep3a")
     public static void autoneticMemoryStep3a(ButtonInteractionEvent event, Game game, Player player) {
         ActionCardHelper.pickACardFromDiscardStep1(game, player);
-        ActionCardHelper.sendACDiscardButtons(player);
+        if (!game.isTwilightsFallMode()) {
+            ActionCardHelper.sendACDiscardButtons(player);
+        }
         ButtonHelper.deleteMessage(event);
     }
 
@@ -207,7 +209,7 @@ public final class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 "Please choose the system to produce up to 2 ships in.",
-                getTilesToRallyToTheCause(game, player));
+                getTilesToRallyTheHorde(game, player));
     }
 
     @ButtonHandler("startBestow")
@@ -2003,7 +2005,18 @@ public final class ButtonHelperAbilities {
                                 && ("wavelength".equalsIgnoreCase(tech) || "antimatter".equalsIgnoreCase(tech))) {
                             continue;
                         }
-                        techToGain.add(tech);
+                        boolean someoneElseHasIt = false;
+                        if (game.isTwilightsFallMode()) {
+                            for (Player p : game.getRealPlayersExcludingThis(victim)) {
+                                if (p.getTechs().contains(tech)) {
+                                    someoneElseHasIt = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!someoneElseHasIt) {
+                            techToGain.add(tech);
+                        }
                     }
                 }
             }
@@ -2045,6 +2058,14 @@ public final class ButtonHelperAbilities {
                     player.getRepresentation() + " gained 2tg due to their raider coves ability");
             ButtonHelperAgents.resolveArtunoCheck(player, 2);
         }
+    }
+
+    @ButtonHandler("claimPlanet_")
+    public static void claimPlanet(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        String planet = buttonID.split("_")[1];
+        AddPlanetService.addPlanet(player, planet, game);
+        oceanBoundCheck(game);
     }
 
     public static void readyBannerHalls(Game game) {
@@ -2285,7 +2306,7 @@ public final class ButtonHelperAbilities {
             if (player.hasAbility("marked_prey")) {
                 ZephyrionBountyHandler.offerBountyButtons(game, player, false);
             }
-            PhantomEnergyHandler.checkFlagshipPhantomEnergy(game, player);
+            TyrisAbilityHandler.checkFlagshipPhantomEnergy(game, player);
             if (player.hasAbility("protocols")) {
                 List<Button> buttons = getAvailableProtocols(player);
                 String sb = player.getRepresentationUnfogged() + ", your **Protocols** ability was triggered."

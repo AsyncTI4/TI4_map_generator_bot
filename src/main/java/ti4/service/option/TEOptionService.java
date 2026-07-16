@@ -96,7 +96,12 @@ public class TEOptionService {
     private static void toggleTFHomebrew(ButtonInteractionEvent event, Game game, String buttonID) {
         String homebrew = buttonID.split("_")[1];
         switch (homebrew) {
-            case "twilightkart" -> game.setTwilightKart(!game.isTwilightKart());
+            case "twilightkart" -> {
+                game.setTwilightKart(!game.isTwilightKart());
+                if (game.isTwilightKart()) {
+                    game.setupTwilightsFallMode(event);
+                }
+            }
             case "twilightds" -> {
                 game.setTwilightDS(!game.isTwilightDS());
                 if (game.isTwilightDS()) {

@@ -21,6 +21,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.service.regex.RegexService;
+import ti4.spring.service.gameevent.GameEventDraft;
 
 @UtilityClass
 public class TacticalActionDisplacementService {
@@ -80,6 +81,7 @@ public class TacticalActionDisplacementService {
         }
         if (player.hasTech("dsmirvpds")
                 || player.hasUnlockedBreakthrough("mirvedabt")
+                || player.hasUnit("tk-keshnu")
                 || player.hasUnit("mirveda_pds")) {
             movableFromPlanets.add(UnitType.Pds);
         }
@@ -176,6 +178,7 @@ public class TacticalActionDisplacementService {
     public boolean applyDisplacementToActiveSystem(Game game, Tile tile) {
         boolean moved = false;
         UnitHolder activeSystemSpace = tile.getSpaceUnitHolder();
+        GameEventDraft.stageMovement(game, tile.getPosition(), game.getTacticalActionDisplacement());
         for (Entry<String, Map<UnitKey, List<Integer>>> e :
                 game.getTacticalActionDisplacement().entrySet()) {
             for (Entry<UnitKey, List<Integer>> unit : e.getValue().entrySet()) {

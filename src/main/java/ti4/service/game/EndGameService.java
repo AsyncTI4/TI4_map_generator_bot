@@ -24,6 +24,7 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.RepositoryDispatchEvent;
+import ti4.helpers.StatusHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.MapRenderPipeline;
@@ -62,6 +63,8 @@ public class EndGameService {
             deleteRole = false;
         }
         if (!game.isHasEnded()) {
+            // The game-winning objective may have just been staged into the status-scoring draft.
+            StatusHelper.commitStatusScoringEvent(game);
             List<String> winners =
                     game.getWinners().stream().map(Player::getFaction).toList();
             GameEventService.commit(

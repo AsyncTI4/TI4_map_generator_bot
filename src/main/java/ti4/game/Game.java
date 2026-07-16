@@ -4097,10 +4097,25 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (!leaderID.contains("commander")) return false;
 
         if (leaderIsFake(leaderID) && !"gateteen".equalsIgnoreCase(getName())) {
+            if (!player.getAllianceMembers().isEmpty()) {
+                if (player.hasAbility("imperia") || player.hasAbility("imperia_y")) {
+                    for (Player player_ : getRealPlayersNDummies()) {
+                        if (player_.getFaction().equalsIgnoreCase(player.getFaction())) continue;
+                        if (player.getMahactCC().contains(player_.getColor())
+                                && player_.hasLeaderUnlocked(leaderID)
+                                && leaderID.contains(player_.getFaction())) {
+                            return true;
+                        }
+                    }
+                }
+            }
             return false;
         }
 
         if ("sardakkcommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-valkyrie")) {
+            return true;
+        }
+        if ("lanefircommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-dslaner")) {
             return true;
         }
         if ("ghoticommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-abyssaltunneling")) {

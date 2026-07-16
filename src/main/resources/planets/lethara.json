@@ -1,0 +1,27 @@
+{
+    "id": "lethara",
+    "tileId": null,
+    "name": "Lethara",
+    "aliases": [
+        "Lethara"
+    ],
+    "positionInTile": null,
+    "resources": 0,
+    "influence": 2,
+    "factionHomeworld": null,
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": "Thone of Sloth",
+    "legendaryAbilityText": "ACTION: Exhaust this card and spend 2 influence to gain 1 command token.",
+    "planetLayout": {
+        "unitHolderName": "lethara",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 50,
+            "y": 45
+        },
+        "planetRadius": 33
+    },
+    "contrastColor": "orange",
+    "source": "theodisi"
+}

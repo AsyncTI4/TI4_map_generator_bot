@@ -50,6 +50,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.discord.utility.DiscordErrorUtility;
@@ -96,6 +98,7 @@ import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.DeepgloomService;
 import ti4.service.breakthrough.ValefarZService;
+import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -109,6 +112,7 @@ import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.UnitModelValueInjectionService;
 import ti4.service.user.AFKService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
@@ -331,6 +335,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 .map(Mapper::getUnit)
                 .filter(Objects::nonNull)
                 .filter(unit -> unitType == unit.getUnitType())
+                .map(this::injectPlayerUnitValues)
                 .findFirst()
                 .orElse(null);
     }
@@ -597,6 +602,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public String getFactionCheckerPrefix() {
+        return factionButtonChecker();
     }
 
     public String factionButtonChecker() {
@@ -971,6 +980,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return getUnitsOwned().stream()
                 .map(Mapper::getUnit)
                 .filter(Objects::nonNull)
+                .map(this::injectPlayerUnitValues)
                 .toList();
     }
 
@@ -979,6 +989,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 .map(Mapper::getUnit)
                 .filter(Objects::nonNull)
                 .filter(unit -> unitType.equalsIgnoreCase(unit.getBaseType()))
+                .map(this::injectPlayerUnitValues)
                 .findFirst()
                 .orElse(null);
     }
@@ -988,7 +999,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 .map(Mapper::getUnit)
                 .filter(Objects::nonNull)
                 .filter(unit -> asyncID.equalsIgnoreCase(unit.getAsyncId()))
+                .map(this::injectPlayerUnitValues)
                 .toList();
+    }
+
+    private UnitModel injectPlayerUnitValues(UnitModel unit) {
+        return UnitModelValueInjectionService.injectPlayerUnitValues(this, unit);
     }
 
     public UnitModel getPriorityUnitByAsyncID(String asyncID, UnitHolder unitHolder) {
@@ -1464,6 +1480,24 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (ownsUnit("rohdhna_warsun3")) {
             bonus += ButtonHelper.getNumberOfUnitsOnTheBoard(game, this, "warsun", false);
         }
+        if (hasTech("thkairng")) {
+            Set<String> controlledTraits = new HashSet<>();
+            for (String planetName : getPlanets()) {
+                Planet planet = game.getUnitHolderFromPlanet(planetName);
+                if (planet == null) {
+                    continue;
+                }
+
+                for (String trait : planet.getPlanetTypes()) {
+                    if (Constants.CULTURAL.equals(trait)
+                            || Constants.HAZARDOUS.equals(trait)
+                            || Constants.INDUSTRIAL.equals(trait)) {
+                        controlledTraits.add(trait);
+                    }
+                }
+            }
+            bonus += controlledTraits.size();
+        }
         if (game.isFacilitiesMode()) {
             for (String planet : getPlanets()) {
                 UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
@@ -1686,11 +1720,17 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
 
         Emoji parsedEmoji = Emoji.fromFormatted(emoji);
-        if (parsedEmoji instanceof CustomEmoji) {
-            TI4Emoji replacement = TI4Emoji.findEmojiFromJustName(parsedEmoji.getName());
+        if (parsedEmoji instanceof CustomEmoji customEmoji) {
+            TI4Emoji replacement = TI4Emoji.findEmojiFromJustName(customEmoji.getName());
             if (replacement != null) {
                 emoji = replacement.emojiString();
                 setFactionEmoji(emoji);
+                return emoji;
+            }
+            if (isInaccessibleCustomEmoji(customEmoji)) {
+                setFactionEmoji(null);
+                notifyCustomFactionEmojiWasReset(customEmoji);
+                return null;
             }
             return emoji;
         }
@@ -1701,6 +1741,20 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
         setFactionEmoji(null);
         return null;
+    }
+
+    private static boolean isInaccessibleCustomEmoji(CustomEmoji emoji) {
+        if (JdaService.testingMode || JdaService.jda == null) return false;
+        return !ApplicationEmojiService.isValidAppEmoji(emoji) && JdaService.jda.getEmojiById(emoji.getId()) == null;
+    }
+
+    private void notifyCustomFactionEmojiWasReset(CustomEmoji oldEmoji) {
+        if (game == null) return;
+        MessageHelper.sendMessageToChannel(
+                getCorrectChannel(),
+                getRepresentationUnfogged() + " your custom faction icon `:" + oldEmoji.getName()
+                        + ":` is from a server the bot no longer has access to, so it has been reset to the default."
+                        + " You may pick a new one with `/franken set_faction_icon`.");
     }
 
     public String fogSafeEmoji() {
@@ -2530,7 +2584,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     private void doAdditionalThingsWhenAddingTech(String techID) {
         // Set ATS Armaments to 0 when adding tech (if it was removed we reset it)
-        if ("dslaner".equalsIgnoreCase(techID)) {
+        if ("dslaner".equalsIgnoreCase(techID) || "tf-dslaner".equalsIgnoreCase(techID)) {
             setAtsCount(0);
         }
 
@@ -2609,6 +2663,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if ("inf2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("uydaibt")) {
             addOwnedUnitByID("death_commandos3");
             removeOwnedUnitByID("infantry2");
+        }
+        if (hasUnlockedBreakthrough("arcanumbt") || hasUnlockedBreakthrough("arcanumbtback")) {
+            ArcanumBreakthroughHandler.handlePowerWordWishTechGain(this, techID);
+        }
+        if (ownsUnit("kryxos_flagship2") || ownsUnit("kryxos_mech2")) {
+            KryxosUnitHandler.offerEvolutionButtons(this, game, techID);
         }
     }
 
@@ -2723,6 +2783,17 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                     getCorrectChannel(),
                     getRepresentation()
                             + ", you may choose to exhaust the _Nano-Forge_ legendary ability to ready the planet it's attached to.",
+                    buttons);
+        }
+        if ("ponthous".equalsIgnoreCase(planet)
+                && !getExhaustedPlanetsAbilities().contains(planet)) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("planetAbilityExhaust_" + planet, "Use Ponthous Ability"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    getCorrectChannel(),
+                    getRepresentation()
+                            + ", you may exhaust the Ponthous ability and \"exhaust\" the Ponthous + or - card to ready Ponthous.",
                     buttons);
         }
     }

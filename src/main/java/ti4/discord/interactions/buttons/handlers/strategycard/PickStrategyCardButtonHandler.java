@@ -1,7 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.strategycard;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
@@ -162,61 +161,61 @@ public class PickStrategyCardButtonHandler {
         return true;
     }
 
-    @ButtonHandler("checksNBalancesPt2_")
-    public static void resolvePt2ChecksNBalances(
-            ButtonInteractionEvent event, Player player, Game game, String buttonID) {
-        String scPicked = buttonID.split("_")[1];
-        int scpick = Integer.parseInt(scPicked);
-        String factionPicked = buttonID.split("_")[2];
-        Player p2 = game.getPlayerFromColorOrFaction(factionPicked);
+    // @ButtonHandler("checksNBalancesPt2_")
+    // public static void resolvePt2ChecksNBalances(
+    //         ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+    //     String scPicked = buttonID.split("_")[1];
+    //     int scpick = Integer.parseInt(scPicked);
+    //     String factionPicked = buttonID.split("_")[2];
+    //     Player p2 = game.getPlayerFromColorOrFaction(factionPicked);
 
-        PlayerStatsService.secondHalfOfPickSC(event, game, p2, scpick);
+    //     PlayerStatsService.secondHalfOfPickSC(event, game, p2, scpick);
 
-        String recipientMessage = p2.getRepresentationUnfogged() + " was given " + Helper.getSCName(scpick, game)
-                + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "");
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), recipientMessage);
+    //     String recipientMessage = p2.getRepresentationUnfogged() + " was given " + Helper.getSCName(scpick, game)
+    //             + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "");
+    //     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), recipientMessage);
 
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), p2.getColor() + " was given " + Helper.getSCName(scpick, game));
-        }
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        List<Button> buttons = getPlayerOptionsForChecksNBalances(player, game, scpick);
-        if (buttons.isEmpty()) {
-            StartPhaseService.startActionPhase(event, game);
-            game.setStoredValue("willRevolution", "");
-        } else {
-            boolean foundPlayer = false;
-            Player privatePlayer = null;
-            List<Player> players = game.getRealPlayers();
-            if (game.isReverseSpeakerOrder()
-                    || !game.getStoredValue("willRevolution").isEmpty()) {
-                Collections.reverse(players);
-            }
-            for (Player p3 : players) {
-                if (p3.getFaction().equalsIgnoreCase(game.getStoredValue("politicalStabilityFaction"))) {
-                    continue;
-                }
-                if (foundPlayer) {
-                    privatePlayer = p3;
-                    foundPlayer = false;
-                }
-                if (p3 == player) {
-                    foundPlayer = true;
-                }
-            }
-            if (privatePlayer == null) {
-                privatePlayer = game.getRealPlayers().getFirst();
-            }
-            game.setPhaseOfGame("strategy");
-            game.updateActivePlayer(privatePlayer);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    privatePlayer.getCorrectChannel(),
-                    privatePlayer.getRepresentationUnfogged()
-                            + ", please use buttons to pick which strategy card you wish to give someone else.",
-                    Helper.getRemainingSCButtons(game, privatePlayer));
-        }
-    }
+    //     if (game.isFowMode()) {
+    //         MessageHelper.sendMessageToChannel(
+    //                 player.getCorrectChannel(), p2.getColor() + " was given " + Helper.getSCName(scpick, game));
+    //     }
+    //     event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    //     List<Button> buttons = getPlayerOptionsForChecksNBalances(player, game, scpick);
+    //     if (buttons.isEmpty()) {
+    //         StartPhaseService.startActionPhase(event, game);
+    //         game.setStoredValue("willRevolution", "");
+    //     } else {
+    //         boolean foundPlayer = false;
+    //         Player privatePlayer = null;
+    //         List<Player> players = game.getRealPlayers();
+    //         if (game.isReverseSpeakerOrder()
+    //                 || !game.getStoredValue("willRevolution").isEmpty()) {
+    //             Collections.reverse(players);
+    //         }
+    //         for (Player p3 : players) {
+    //             if (p3.getFaction().equalsIgnoreCase(game.getStoredValue("politicalStabilityFaction"))) {
+    //                 continue;
+    //             }
+    //             if (foundPlayer) {
+    //                 privatePlayer = p3;
+    //                 foundPlayer = false;
+    //             }
+    //             if (p3 == player) {
+    //                 foundPlayer = true;
+    //             }
+    //         }
+    //         if (privatePlayer == null) {
+    //             privatePlayer = game.getRealPlayers().getFirst();
+    //         }
+    //         game.setPhaseOfGame("strategy");
+    //         game.updateActivePlayer(privatePlayer);
+    //         MessageHelper.sendMessageToChannelWithButtons(
+    //                 privatePlayer.getCorrectChannel(),
+    //                 privatePlayer.getRepresentationUnfogged()
+    //                         + ", please use buttons to pick which strategy card you wish to give someone else.",
+    //                 Helper.getRemainingSCButtons(game, privatePlayer));
+    //     }
+    // }
 
     public static List<Button> getPlayerOptionsForChecksNBalances(Player player, Game game, int scPicked) {
         List<Button> buttons = new ArrayList<>();

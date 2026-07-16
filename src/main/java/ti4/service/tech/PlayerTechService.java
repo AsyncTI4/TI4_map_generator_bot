@@ -17,7 +17,9 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -66,8 +68,10 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameSubEvent;
 
 @UtilityClass
 public class PlayerTechService {
@@ -91,7 +95,10 @@ public class PlayerTechService {
                 message += "\nAutomatically flipped _The Queens’ Wrath_ and applied Tribune dreadnoughts.";
             }
         }
-        CommanderUnlockCheckService.checkPlayer(player, "mirveda", "jolnar", "nekro", "dihmohn");
+        if ("thkairng".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
+            message += "\nYour commodities are now " + player.getCommoditiesTotal();
+        }
+        CommanderUnlockCheckService.checkPlayer(player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum");
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 
@@ -230,7 +237,9 @@ public class PlayerTechService {
         }
 
         player.exhaustTech(tech);
-        GameEventService.commit(game, GameEventType.CARD_PLAY_TECH_EXHAUST, player, Map.of("cardId", tech));
+        if (!GameEventDraft.stage(game, new GameSubEvent.TechExhausted(player.getFaction(), tech))) {
+            GameEventService.commit(game, GameEventType.CARD_PLAY_TECH_EXHAUST, player, Map.of("cardId", tech));
+        }
 
         // Handle Ignis Aurora Techs
         if (tech.startsWith("baldrick_")) {
@@ -335,6 +344,8 @@ public class PlayerTechService {
             }
             case "td", "absol_td" -> // Transit Diodes
                 ButtonHelper.resolveTransitDiodesStep1(game, player);
+            case "batyriy" -> // Temporal Displacement
+                TyrisAbilityHandler.resolveTemporalDisplacementStep1(game, player);
             case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                 Button gainCC = Buttons.green(
                         player.factionButtonChecker() + "gain_CCdeletethismessage", "Gain Command Tokens");
@@ -848,7 +859,7 @@ public class PlayerTechService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), buttonText, buttons);
         }
-        CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn");
+        CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn", "kryxos", "arcanum");
 
         if (game.isTwilightsFallMode()
                 && game.getRound() == 1
@@ -911,6 +922,14 @@ public class PlayerTechService {
             List<Button> buttons2 =
                     new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2, buttons2);
+        }
+        if (NatauDoctrineHandler.canUseKnowledgeExhaust(player)
+                && !NatauDoctrineHandler.eligibleKnowledgePlanets(player).isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButton(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", after researching a technology, you may exhaust _Knowledge_ and 1 planet you control that has a technology specialty to research a technology of that color.",
+                    NatauDoctrineHandler.getUseKnowledgeButton(player));
         }
 
         ButtonHelper.deleteMessage(event);

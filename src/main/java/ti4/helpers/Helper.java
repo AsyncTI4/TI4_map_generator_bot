@@ -49,7 +49,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -799,7 +800,8 @@ public final class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getExhaustedPlanets());
         for (String planet : planets) {
-            Button button = Buttons.green("refresh_" + planet, getPlanetRepresentation(planet, game));
+            Button button = Buttons.green(
+                    player.getFactionCheckerPrefix() + "refresh_" + planet, getPlanetRepresentation(planet, game));
             planetButtons.add(button);
         }
         return planetButtons;
@@ -1643,6 +1645,9 @@ public final class Helper {
                     NetrunnersAbilitiesHandler.getControlNetworkProductionMessage(game, player, tile, cost, unitCount);
             if (!controlNetworkMessage.isEmpty()) {
                 msg.append(controlNetworkMessage);
+                if (player.hasUnlockedBreakthrough("arcanumbtback")) {
+                    msg.append("\n-1 from Power Word: Wish");
+                }
                 return msg.toString();
             }
         }
@@ -1728,6 +1733,9 @@ public final class Helper {
                         .append(cost == 1 ? "" : "s")
                         .append(".");
             }
+        }
+        if (player.hasUnlockedBreakthrough("arcanumbtback")) {
+            msg.append("\n-1 from Power Word: Wish");
         }
         msg.append(siphonDiscountMessage);
         return msg.toString();
@@ -1834,10 +1842,11 @@ public final class Helper {
                 productionValueTotal += productionValue * uH.getUnits().get(unit);
             }
         }
-        if (uH instanceof Planet planet
-                && TaPromissoryHandler.planetHasAdvancedStructuralEngineering(planet)
-                && player.getPlanets().contains(planet.getName())) {
-            productionValueTotal += Math.max(0, planet.getResources());
+        if (uH instanceof Planet planet) {
+            if (TaPromissoryHandler.planetHasAdvancedStructuralEngineering(planet)
+                    && player.getPlanets().contains(planet.getName())) {
+                productionValueTotal += Math.max(0, planet.getResources());
+            }
         }
         String planet = uH.getName();
         int planetUnitVal = 0;
@@ -1884,6 +1893,43 @@ public final class Helper {
                     productionValueTotal++;
                 }
                 planetUnitVal = 2;
+            }
+
+            if (token.contains("factoryleaseh") && uH instanceof Planet p) {
+                productionValueTotal += p.getResources();
+                if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+                if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
+                if (cosmicSuper) {
+                    productionValueTotal++;
+                }
+            }
+            if (token.contains("factoryleasec") && uH instanceof Planet p) {
+                productionValueTotal += p.getInfluence();
+                if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+                if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
+                if (cosmicSuper) {
+                    productionValueTotal++;
+                }
+            }
+            if (token.contains("factoryleasei")) {
+                productionValueTotal += tile.getPlanetUnitHolders().size();
+                if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+                if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
+                if (cosmicSuper) {
+                    productionValueTotal++;
+                }
             }
 
             if (token.contains("automatons") && planetUnitVal < 3) {
@@ -2158,8 +2204,8 @@ public final class Helper {
                         || (!game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")
                                 && !player.hasTech("tf-quantumdrive"))) {
                     cost += (int) removedUnit.getCost() * entry.getValue();
-                    if (MobilizationEngineHandler.hasEngineAttached(game)) {
-                        cost += MobilizationEngineHandler.getCostMod(game, player, removedUnit) * entry.getValue();
+                    if (ArvaxiBreakthroughHandler.hasEngineAttached(game)) {
+                        cost += ArvaxiBreakthroughHandler.getCostMod(game, player, removedUnit) * entry.getValue();
                     }
                 }
                 totalUnits += entry.getValue();
@@ -2182,6 +2228,9 @@ public final class Helper {
         if (wantCost) {
             if (player.ownsUnit("netrunners_spacedock") || player.ownsUnit("netrunners_spacedock2")) {
                 cost = NetrunnersFactionTechsHandler.applySiphonDiscount(game, player, cost);
+            }
+            if (player.hasUnlockedBreakthrough("arcanumbtback")) {
+                cost = Math.max(0, cost - 1);
             }
             return cost;
         } else {
@@ -2786,6 +2835,9 @@ public final class Helper {
                 ccCount += player_.getStrategicCC();
                 ccCount += player_.getTacticalCC();
                 ccCount += player_.getFleetCC();
+                if (player_.hasAbility("multitasking")) {
+                    ccCount += LunariumAbilityHandler.getFactionSheetCCs(game, player_);
+                }
             } else if (player_.hasAbility("primacy")
                     || player_.hasAbility("edict")
                     || player_.hasAbility("edict_y")

@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -97,7 +97,7 @@ public class RelicHelper {
         resolveRelicEffects(event, game, player, relicID);
         TeHelperUnits.serveIconoclastDeployAbility(game, player);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")) {
-            OnyxxaCommanderHandler.onDrawRelic(player);
+            OnyxxaLeaderHandler.onDrawRelic(player);
         }
 
         if (checked) game.shuffleRelics();
@@ -273,7 +273,7 @@ public class RelicHelper {
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), message);
         }
-        CommanderUnlockCheckService.checkPlayer(receiver, "kollecc", "bentor");
+        CommanderUnlockCheckService.checkPlayer(receiver, "kollecc", "bentor", "kairn");
 
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(receiver.getPrivateChannel(), message);

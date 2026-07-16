@@ -192,7 +192,7 @@ public class NatauAbilityHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveParadigmStartOfStrategy(GenericInteractionCreateEvent event, Game game, Player player) {
+    public static void resolveParadigmStartOfStatus(GenericInteractionCreateEvent event, Game game, Player player) {
         if (event == null || game == null || !hasNatauDoctrinePackage(player)) {
             return;
         }

@@ -316,6 +316,38 @@ public class CustomHyperlaneService {
                 && !isCustomHyperlaneTile(tile);
     }
 
+    /** Rotates a 6x6 hyperlane connection matrix string by 60 degrees: [i][j] -> [(i+1)%6][(j+1)%6]. */
+    public static String rotateMatrix60(String matrix) {
+        if (matrix == null) return null;
+        String[] rows = matrix.split(";");
+        int size = 6;
+        int[][] mat = new int[size][size];
+
+        for (int i = 0; i < size; i++) {
+            String[] cols = rows[i].split(",");
+            for (int j = 0; j < size; j++) {
+                mat[i][j] = Integer.parseInt(cols[j].trim());
+            }
+        }
+
+        int[][] rotated = new int[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                rotated[(i + 1) % size][(j + 1) % size] = mat[i][j];
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size; i++) {
+            if (i > 0) sb.append(";");
+            for (int j = 0; j < size; j++) {
+                if (j > 0) sb.append(",");
+                sb.append(rotated[i][j]);
+            }
+        }
+        return sb.toString();
+    }
+
     public static String encodeMatrix(String matrix) {
         StringBuilder binaryBuilder = new StringBuilder(36);
         String[] rows = matrix.split(";");

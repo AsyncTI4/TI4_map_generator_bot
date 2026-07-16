@@ -30,6 +30,7 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
@@ -1049,10 +1050,14 @@ public final class ButtonHelperFactionSpecific {
     @ButtonHandler("yssarilAgentAsJr")
     public static void yssarilAgentAsJr(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons2 = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
-        player.getLeader("yssarilagent").get().setExhausted(true);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getFactionEmoji() + " is using Clever Clever JR-XS455-O, the Relic/Yssaril agent.");
+        Leader yssarilAgent = player.getLeader("yssarilagent").get();
+        yssarilAgent.setExhausted(true);
+        String jrMessage = player.getFactionEmoji() + " is using Clever Clever JR-XS455-O, the Relic/Yssaril agent.";
+        if (RevenantBreakthroughHandler.isReadyRevenantRisingAttachedAgent(game, player, yssarilAgent)) {
+            jrMessage +=
+                    "\n-# Please manually exhaust _Revenant Rising_ for this attached agent's use using /breakthrough exhaust.";
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), jrMessage);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 "Use buttons to decide on whom to use Clever Clever JR-XS455-O, the Relic/Yssaril agent.",
@@ -2645,6 +2650,53 @@ public final class ButtonHelperFactionSpecific {
                 player.getFactionEmoji() + " has spent a strategy command token to repair all their damaged mechs.");
     }
 
+    @ButtonHandler("ralnelPull")
+    public static void ralnelPull(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+
+        Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
+
+        Planet planetUnit = tile.getUnitHolderFromPlanet(buttonID.split("_")[2]);
+        List<Button> buttons = getRalnelPullButtons(player, game, tile, planetUnit);
+
+        String message =
+                player.getRepresentationUnfogged() + ", please use the buttons to pull units from adjacent planets to "
+                        + Helper.getPlanetRepresentation(buttonID.split("_")[2], game) + ".";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+    }
+
+    public static List<Button> getRalnelPullButtons(Player player, Game game, Tile tile, UnitHolder planet) {
+        List<Button> buttons = new ArrayList<>();
+        String planetId = planet.getName();
+        for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+            Tile tile2 = game.getTileByPosition(pos2);
+            for (Planet planetUnit2 : tile2.getPlanetUnitHolders()) {
+                Planet planetReal2 = planetUnit2;
+                int numMechs = 0;
+                int numInf = 0;
+                String colorID = Mapper.getColorID(player.getColor());
+                if (planetUnit2.getUnits() != null) {
+                    numMechs = planetUnit2.getUnitCount(UnitType.Mech, colorID);
+                    numInf = planetUnit2.getUnitCount(UnitType.Infantry, colorID);
+                }
+                String planetId2 = planetReal2.getName();
+                String planetName2 = Helper.getPlanetName(planetId2);
+                if (numInf > 0 && !planetId.equalsIgnoreCase(planetId2)) {
+                    String id = "ralnelMechPull_infantry_" + planetId + "_" + planetId2;
+                    String label = "1 Infantry From " + planetName2;
+                    buttons.add(Buttons.green(id, label, UnitEmojis.infantry));
+                }
+                if (numMechs > 0 && !planetId.equalsIgnoreCase(planetId2)) {
+                    String id = "ralnelMechPull_mech_" + planetId + "_" + planetId2;
+                    String label = "1 Mech From " + planetName2;
+                    buttons.add(Buttons.blue(id, label, UnitEmojis.mech));
+                }
+            }
+        }
+        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+        return buttons;
+    }
+
     @ButtonHandler("blackTFMechReroll")
     public static void blackTFMechReroll(ButtonInteractionEvent event, Game game, Player p1, String buttonID) {
 
@@ -2791,8 +2843,7 @@ public final class ButtonHelperFactionSpecific {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String id = "naaluHeroSend_" + p2.getFaction() + "_"
                 + player.getPromissoryNotes().get("malevolency");
-        ButtonHelperHeroes.resolveNaaluHeroSend(player, game, id, null);
-        ButtonHelper.deleteMessage(event);
+        ButtonHelperHeroes.resolveNaaluHeroSend(player, game, id, event);
     }
 
     @ButtonHandler("redCreussWashFull")
@@ -2972,13 +3023,13 @@ public final class ButtonHelperFactionSpecific {
         String traitNameWithEmoji = ExploreEmojis.getTraitEmoji(deckType) + deckType;
         if (deck.isEmpty() && game.getExploreDiscard(deckType).isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
+                    player.getCorrectChannel(),
                     "The" + traitNameWithEmoji + " exploration deck & discard is empty - nothing to look at.");
             return;
         }
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
+                    player.getCorrectChannel(),
                     "The top card of the " + traitNameWithEmoji + " exploration deck has been sent to "
                             + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
         } else {
@@ -2990,7 +3041,9 @@ public final class ButtonHelperFactionSpecific {
 
         // Cards Info Message
         String topCard = deck.getFirst();
-        game.setStoredValue("lastExpLookedAt" + player.getFaction() + deckType, topCard);
+        if (!game.isTwilightsFallMode()) {
+            game.setStoredValue("lastExpLookedAt" + player.getFaction() + deckType, topCard);
+        }
         ExploreModel explore = Mapper.getExplore(topCard);
         String message = "You looked at the top of the " + traitNameWithEmoji + " exploration deck and saw _"
                 + explore.getName() + "_.";
@@ -3011,7 +3064,12 @@ public final class ButtonHelperFactionSpecific {
     }
 
     public static void resolveKolleccAbilities(Player player, Game game) {
-        if (player.hasAbility("treasure_hunters")) {
+        if (player.hasAbility("treasure_hunters") && game.isTwilightDS()) {
+            ButtonHelperFactionSpecific.resolveExpLook(player, game, null, "industrial");
+            ButtonHelperFactionSpecific.resolveExpLook(player, game, null, "hazardous");
+            ButtonHelperFactionSpecific.resolveExpLook(player, game, null, "cultural");
+        }
+        if (player.hasAbility("treasure_hunters") && !game.isTwilightDS()) {
             // resolve treasure hunters
             String msg =
                     player.getRepresentation() + ", please choose which exploration deck to look at the top card of.";

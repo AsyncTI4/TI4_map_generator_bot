@@ -14,7 +14,9 @@ import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -121,6 +123,12 @@ public class ComponentActionHelper {
                                     game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
                                 case "crimsonbt" -> true;
                                 case "mahactbt" -> !p1.getTechs().isEmpty();
+                                case "kairnbt" -> KairnBreakthroughHandler.canUse(game, p1);
+                                case "ardentiabt" ->
+                                    game.getRealPlayers().stream()
+                                            .anyMatch(otherPlayer -> otherPlayer != p1
+                                                    && !ButtonHelper.getTilesWithYourCC(otherPlayer, game, event)
+                                                            .isEmpty());
                                 case "saarbt" ->
                                     game.getTileMap().values().stream()
                                             .filter(Tile::isAsteroidField)
@@ -414,7 +422,7 @@ public class ComponentActionHelper {
             compButtons.add(abilityButton);
         }
         if (game.playerHasLeaderUnlockedOrAlliance(p1, "tyriscommander")) {
-            TyrisCommanderHandler.addCommanderActionButton(p1, factionChecker, prefix, compButtons);
+            TyrisLeaderHandler.addCommanderActionButton(p1, factionChecker, prefix, compButtons);
         }
         if (p1.hasAbility("mutineers")
                 && !ButtonHelperAbilities.getTilesToMutineers(game, p1).isEmpty()
@@ -478,6 +486,13 @@ public class ComponentActionHelper {
                     FactionEmojis.belkosea);
             compButtons.add(abilityButton);
         }
+        if (ArdentiaAbilityHandler.canUseBorrowedAuthority(p1, game)) {
+            Button abilityButton = Buttons.green(
+                    factionChecker + prefix + "ability_borrowedAuthority",
+                    "Borrowed Authority",
+                    FactionEmojis.ardentia);
+            compButtons.add(abilityButton);
+        }
 
         // Other "abilities"
         if (p1.hasUnit("muaat_flagship")
@@ -519,7 +534,6 @@ public class ComponentActionHelper {
             Button absolButton = Buttons.gray(factionChecker + prefix + "absolMOW_", "Minister of War Action");
             compButtons.add(absolButton);
         }
-
         // Generic
         Button genButton = Buttons.gray(factionChecker + prefix + "generic_", "Generic Component Action");
         compButtons.add(genButton);
@@ -611,6 +625,8 @@ public class ComponentActionHelper {
                         buttons.add(starTile);
                     }
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                } else if ("borrowedAuthority".equalsIgnoreCase(buttonID)) {
+                    ArdentiaAbilityHandler.startBorrowedAuthority(event, p1, game);
                 } else if ("classifiedDevelopments".equalsIgnoreCase(buttonID)) {
                     List<Button> buttons = ButtonHelperAbilities.getSuperWeaponButtonsPart1(p1, game);
                     String message =
@@ -634,7 +650,7 @@ public class ComponentActionHelper {
                             Helper.getPlanetPlaceUnitButtons(p1, game, "2gf", "placeOneNDone_skipbuildorbital"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("tyrisCommanderMech".equalsIgnoreCase(buttonID)) {
-                    TyrisCommanderHandler.resolveMechAction(p1, game, event);
+                    TyrisLeaderHandler.resolveMechAction(p1, game, event);
                 } else if ("mutineers".equalsIgnoreCase(buttonID)) {
                     String factionEmoji = p1.getFactionEmoji();
                     String successMessage = factionEmoji + " spent 1 strategy token using "

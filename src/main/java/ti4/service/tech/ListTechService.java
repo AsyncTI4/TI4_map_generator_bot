@@ -209,6 +209,10 @@ public class ListTechService {
                     " The buttons shown correspond to technologies that the bot believes you meet the prerequisites for."
                             + " To get a technology that isn't shown, please use the \"Get Other Technology\" button.";
         }
+        if (player.hasAbility("doctrine_knowledge")) {
+            message +=
+                    "\n\n**REMINDER**: You have the _Knowledge_ doctrine and therefore may ignore 1 prerequisite on techs owned by your neighbors. This is not automated, and you must use the \"Get Other Technology\" button.";
+        }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
     }
 

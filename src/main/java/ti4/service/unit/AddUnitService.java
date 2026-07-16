@@ -51,15 +51,8 @@ public class AddUnitService {
                 NetrunnersLeadersHandler.checkCommanderUnlock(game, unit.unitKey());
             }
             Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
-            if (player != null
-                    && player.hasUnit("ta_flagship")
-                    && unit.unitKey().unitType() == UnitType.Flagship) {
-                TaUnitHandler.offerWorldshaperOnFlagshipPlacement(
-                        event, game, unit.unitKey(), unit.uh().getName(), tile);
-            }
-            if (player != null && player.hasLeader("nataucommander")) {
-                CommanderUnlockCheckService.checkPlayer(player, "natau");
-            }
+            handlePostAddUnitPlayerEffects(
+                    event, game, tile, unit.unitKey(), unit.uh().getName(), player);
 
             String color = unit.unitKey().colorID();
             handleFogOfWar(tile, color, game, unit.unitKey() + " " + unit.getTotalRemoved());
@@ -92,15 +85,7 @@ public class AddUnitService {
             }
             Player player =
                     game.getPlayerFromColorOrFaction(parsedUnit.unitKey().colorID());
-            if (player != null
-                    && player.hasUnit("ta_flagship")
-                    && parsedUnit.unitKey().unitType() == UnitType.Flagship) {
-                TaUnitHandler.offerWorldshaperOnFlagshipPlacement(
-                        event, game, parsedUnit.unitKey(), parsedUnit.location(), tile);
-            }
-            if (player != null && player.hasLeader("nataucommander")) {
-                CommanderUnlockCheckService.checkPlayer(player, "natau");
-            }
+            handlePostAddUnitPlayerEffects(event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), player);
         }
 
         handleFogOfWar(tile, color, game, unitList);
@@ -126,15 +111,7 @@ public class AddUnitService {
             }
             Player player =
                     game.getPlayerFromColorOrFaction(parsedUnit.unitKey().colorID());
-            if (player != null
-                    && player.hasUnit("ta_flagship")
-                    && parsedUnit.unitKey().unitType() == UnitType.Flagship) {
-                TaUnitHandler.offerWorldshaperOnFlagshipPlacement(
-                        event, game, parsedUnit.unitKey(), parsedUnit.location(), tile);
-            }
-            if (player != null && player.hasLeader("nataucommander")) {
-                CommanderUnlockCheckService.checkPlayer(player, "natau");
-            }
+            handlePostAddUnitPlayerEffects(event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), player);
         }
 
         handleFogOfWar(tile, color, game, unitList);
@@ -212,13 +189,7 @@ public class AddUnitService {
             if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasLeader("netrunnerscommander"))) {
                 NetrunnersLeadersHandler.checkCommanderUnlock(game, parsedUnit.unitKey());
             }
-            if (player.hasUnit("ta_flagship") && parsedUnit.unitKey().unitType() == UnitType.Flagship) {
-                TaUnitHandler.offerWorldshaperOnFlagshipPlacement(
-                        event, game, parsedUnit.unitKey(), parsedUnit.location(), tile);
-            }
-            if (player.hasLeader("nataucommander")) {
-                CommanderUnlockCheckService.checkPlayer(player, "natau");
-            }
+            handlePostAddUnitPlayerEffects(event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), player);
             if (!first) {
                 unitListBuilder.append(", ");
             }
@@ -254,6 +225,24 @@ public class AddUnitService {
 
     private static void markTileAsPinged(Game game, Tile tile) {
         game.setTileAsPinged(tile.getPosition());
+    }
+
+    private static void handlePostAddUnitPlayerEffects(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Tile tile,
+            Units.UnitKey unitKey,
+            String location,
+            Player player) {
+        if (player == null) {
+            return;
+        }
+
+        if (player.hasUnit("ta_flagship") && unitKey.unitType() == UnitType.Flagship) {
+            TaUnitHandler.offerWorldshaperOnFlagshipPlacement(event, game, unitKey, location, tile);
+        }
+
+        CommanderUnlockCheckService.checkPlayer(player, "myrr", "natau", "oblivion", "revenantponthous", "thrones");
     }
 
     private static void checkFleetCapacity(Tile tile, String color, Game game) {

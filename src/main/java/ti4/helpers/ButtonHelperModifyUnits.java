@@ -65,6 +65,7 @@ import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.gameevent.GameEventDraft;
 
 public final class ButtonHelperModifyUnits {
 
@@ -467,6 +468,47 @@ public final class ButtonHelperModifyUnits {
                     "Remove Structures"));
             buttons.add(Buttons.gray("deleteButtons", "Don't Remove Structures"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
+        }
+        if (!doesPlayerHaveGfOnPlanet(unitHolder, player)) {
+            Player opponent = game.getActivePlayer();
+            if (opponent == player) {
+                for (Player p : game.getRealPlayersNNeutral()) {
+                    if (p != player && FoWHelper.playerHasUnitsOnPlanet(p, unitHolder)) {
+                        opponent = p;
+                        break;
+                    }
+                }
+            }
+            if (opponent.hasTech("dxa") && opponent != player) {
+                String msg3 = opponent.getRepresentation()
+                        + " you may have an opportunity to use _Dacxive Animators_ on "
+                        + Helper.getPlanetRepresentation(planet, game)
+                        + ". Click to confirm a combat occurred and to add 1 infantry or delete these buttons.";
+                MessageHelper.sendMessageToChannelWithButtons(
+                        opponent.getCorrectChannel(), msg3, ButtonHelper.getDacxiveButtons(planet, opponent));
+            }
+            if (opponent != player && opponent.isActivePlayer()) {
+                Player otherOpponent = null;
+                for (Player p : game.getRealPlayersNNeutral()) {
+                    if (p != player && p != opponent && FoWHelper.playerHasUnitsOnPlanet(p, unitHolder)) {
+                        otherOpponent = p;
+                        break;
+                    }
+                }
+                if (otherOpponent != null) {
+                    String msg4 = opponent.getRepresentation()
+                            + " you may have an opportunity to claim the planet of "
+                            + Helper.getPlanetRepresentation(planet, game)
+                            + " or fight the coexisters. Click a button to decide.";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green(
+                            opponent.factionButtonChecker() + "claimPlanet_" + unitHolder.getName(), "Claim Planet"));
+                    buttons.add(Buttons.red(
+                            opponent.factionButtonChecker() + "startCombatOn_" + unitHolder.getName(),
+                            "Fight Coexisters"));
+                    MessageHelper.sendMessageToChannelWithButtons(opponent.getCorrectChannel(), msg4, buttons);
+                }
+            }
         }
         IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "groundcombat");
         event.getMessage();
@@ -1253,6 +1295,30 @@ public final class ButtonHelperModifyUnits {
                             + Helper.getPlanetRepresentation(unitHolder.getName(), game);
                     buttons.add(Buttons.green(id, label, UnitEmojis.mech));
                 }
+                if (player.hasAbility("miniaturization")) {
+                    limit = unitHolder.getUnitCount(UnitType.Pds, player.getColor());
+                    for (int x = 1; x < limit + 1; x++) {
+                        if (x > 2) {
+                            break;
+                        }
+                        String id = factionChecker + "retreatGroundUnits_" + pos1 + "_" + pos2 + "_" + x + "_pds_"
+                                + unitHolder.getName();
+                        String label = "Retreat " + StringHelper.pluralize(x, "PDS") + " on "
+                                + Helper.getPlanetRepresentation(unitHolder.getName(), game);
+                        buttons.add(Buttons.green(id, label, UnitEmojis.pds));
+                    }
+                    limit = unitHolder.getUnitCount(UnitType.Spacedock, player.getColor());
+                    for (int x = 1; x < limit + 1; x++) {
+                        if (x > 2) {
+                            break;
+                        }
+                        String id = factionChecker + "retreatGroundUnits_" + pos1 + "_" + pos2 + "_" + x + "_spacedock_"
+                                + unitHolder.getName();
+                        String label = "Retreat " + StringHelper.pluralize(x, "Spacedock") + " on "
+                                + Helper.getPlanetRepresentation(unitHolder.getName(), game);
+                        buttons.add(Buttons.green(id, label, UnitEmojis.spacedock));
+                    }
+                }
             }
         }
         Button concludeMove = Buttons.gray(factionChecker + "deleteButtons", "Done Retreating troops");
@@ -1699,9 +1765,12 @@ public final class ButtonHelperModifyUnits {
 
         Tile src = game.getTileByPosition(pos1);
         Tile dest = game.getTileByPosition(pos2);
+        UnitHolder sourceHolder = src.getUnitHolderFromPlanet(planet);
+        Map<UnitKey, List<Integer>> beforeRetreat = GameEventDraft.snapshotRetreatUnits(player, sourceHolder);
         boolean damaged = buttonLabel.toLowerCase().contains("damaged");
         MoveUnitService.moveUnits(
                 event, src, game, player.getColor(), amount + " " + unitType + " " + planet, dest, "space", damaged);
+        GameEventDraft.stageRetreat(game, player, pos1, planet, pos2, Constants.SPACE, beforeRetreat, sourceHolder);
 
         List<Button> systemButtons = getRetreatingGroundTroopsButtons(player, game, pos1, pos2);
         String retreatMessage = player.getFactionEmojiOrColor() + " retreated " + amount + " " + unitType + " on "
@@ -1725,6 +1794,8 @@ public final class ButtonHelperModifyUnits {
         Tile tile1 = game.getTileByPosition(pos1);
         Tile tile2 = game.getTileByPosition(pos2);
         tile2 = FlipTileService.flipTileIfNeeded(event, tile2, game);
+        UnitHolder sourceSpace = tile1.getSpaceUnitHolder();
+        Map<UnitKey, List<Integer>> beforeRetreat = GameEventDraft.snapshotRetreatUnits(player, sourceSpace);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "kollecccommander")
                 && !buttonID.contains("skilled")
                 && !CommandCounterHelper.hasCC(event, player.getColor(), tile1)) {
@@ -1785,6 +1856,8 @@ public final class ButtonHelperModifyUnits {
                         event, tile1, game, player.getColor(), totalUnits + " " + unitName, tile2, "space");
             }
         }
+        GameEventDraft.stageRetreat(
+                game, player, pos1, Constants.SPACE, pos2, Constants.SPACE, beforeRetreat, sourceSpace);
 
         if (tile2 != null && tile2.getPosition().startsWith("frac")) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
@@ -2489,6 +2562,7 @@ public final class ButtonHelperModifyUnits {
         UnitHolder uh = tile.getUnitHolders().get("space");
         for (UnitKey unit : uh.getUnitsByStateForPlayer(player).keySet()) {
             UnitModel um = player.getUnitFromUnitKey(unit);
+            if (um == null || !um.getIsShip()) continue;
             buttons.add(Buttons.gray("chooseGravleash_" + um.getAsyncId(), um.getName(), unit.unitEmoji()));
         }
         String msg = player.getRepresentation() + ", please choose which of your ships in "

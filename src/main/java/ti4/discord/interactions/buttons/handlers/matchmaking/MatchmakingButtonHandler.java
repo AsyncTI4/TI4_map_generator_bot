@@ -38,9 +38,9 @@ import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameLaunchPostService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
-import ti4.spring.context.SpringContext;
 import ti4.spring.service.statistics.UserGameInfoService;
 import ti4.spring.service.statistics.matchmaking.queue.MatchmakerService;
+import ti4.spring.service.statistics.matchmaking.queue.MatchmakingQueueSearchService;
 import ti4.spring.service.statistics.matchmaking.queue.PartyValidator;
 import ti4.spring.service.statistics.matchmaking.queue.PlayerSearchCriteria;
 import ti4.spring.service.statistics.matchmaking.queue.ViewMatchmakingQueueService;
@@ -95,8 +95,7 @@ class MatchmakingButtonHandler {
     @ButtonHandler(value = QUEUE_FOR_TIGL_BUTTON_ID, save = false)
     public static void offerQueueForTiglModal(ButtonInteractionEvent event) {
         if (cannotQueue(event)) return;
-        if (SpringContext.getBean(MatchmakerService.class)
-                .isUserInParty(event.getUser().getId())) {
+        if (MatchmakerService.get().isUserInParty(event.getUser().getId())) {
             event.reply(
                             "You cannot queue for TIGL as part of a group. Use the Leave Queue button to leave your group first.")
                     .setEphemeral(true)
@@ -122,10 +121,14 @@ class MatchmakingButtonHandler {
     }
 
     private static boolean isTiglThread(ButtonInteractionEvent event) {
-        return event.getChannel() instanceof ThreadChannel thread
-                && thread.getParentChannel() != null
-                && CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL.equalsIgnoreCase(
-                        thread.getParentChannel().getName());
+        return CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL.equalsIgnoreCase(getParentForumName(event));
+    }
+
+    private static String getParentForumName(ButtonInteractionEvent event) {
+        if (!(event.getChannel() instanceof ThreadChannel thread)) {
+            return null;
+        }
+        return thread.getParentChannel().getName();
     }
 
     @ButtonHandler(value = FORM_GROUP_BUTTON_ID, save = false)
@@ -142,7 +145,7 @@ class MatchmakingButtonHandler {
     }
 
     private static boolean cannotQueue(ButtonInteractionEvent event) {
-        MatchmakerService matchmakerService = SpringContext.getBean(MatchmakerService.class);
+        MatchmakerService matchmakerService = MatchmakerService.get();
         if (MatchmakerService.isQueueingDisabled()) {
             event.reply("Queueing is currently disabled.")
                     .setEphemeral(true)
@@ -160,7 +163,7 @@ class MatchmakingButtonHandler {
     }
 
     private static boolean cannotForm(ButtonInteractionEvent event) {
-        MatchmakerService matchmakerService = SpringContext.getBean(MatchmakerService.class);
+        MatchmakerService matchmakerService = MatchmakerService.get();
         if (MatchmakerService.isQueueingDisabled()) {
             event.reply("Queueing is currently disabled.")
                     .setEphemeral(true)
@@ -179,8 +182,7 @@ class MatchmakingButtonHandler {
     private static Modal buildQueueModal(ButtonInteractionEvent event, String modalId, String title) {
         String userId = event.getUser().getId();
         UserSettings userSettings = UserSettingsManager.get(userId);
-        List<String> groupMemberIds =
-                SpringContext.getBean(MatchmakerService.class).partyMemberIds(userId);
+        List<String> groupMemberIds = MatchmakerService.get().partyMemberIds(userId);
 
         final boolean REQUIRE_SELECTION = true;
         CheckboxGroup expansions = buildCheckboxGroup(
@@ -294,7 +296,7 @@ class MatchmakingButtonHandler {
 
     @ButtonHandler(value = LEAVE_QUEUE_BUTTON_ID, save = false)
     public static void leaveQueue(ButtonInteractionEvent event) {
-        MatchmakerService matchmakerService = SpringContext.getBean(MatchmakerService.class);
+        MatchmakerService matchmakerService = MatchmakerService.get();
         if (MatchmakerService.isQueueingDisabled()) {
             MessageHelper.sendEphemeralMessageToEventChannel(
                     event, "Leaving queue is currently disabled. Try again later.");
@@ -306,9 +308,14 @@ class MatchmakingButtonHandler {
 
     @ButtonHandler(value = VIEW_QUEUE_BUTTON_ID, save = false)
     public static void viewQueue(ButtonInteractionEvent event) {
-        ViewMatchmakingQueueService viewMatchmakingQueueService =
-                SpringContext.getBean(ViewMatchmakingQueueService.class);
-        List<MessageEmbed> embeds = viewMatchmakingQueueService.getMessageEmbeds();
+        Boolean tiglFilter = null;
+        String parentName = getParentForumName(event);
+        if (CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL.equalsIgnoreCase(parentName)) {
+            tiglFilter = true;
+        } else if (CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL.equalsIgnoreCase(parentName)) {
+            tiglFilter = false;
+        }
+        List<MessageEmbed> embeds = ViewMatchmakingQueueService.get().getMessageEmbeds(tiglFilter);
         for (MessageEmbed embed : embeds) {
             event.getHook()
                     .setEphemeral(true)
@@ -326,7 +333,7 @@ class MatchmakingButtonHandler {
 
         saveMatchmakingPreferences(event, userSettings);
 
-        Optional<String> error = SpringContext.getBean(MatchmakerService.class).queue(userId, false);
+        Optional<String> error = MatchmakerService.get().queue(userId, false);
         if (error.isPresent()) {
             replyEphemeral(event, error.get());
             return;
@@ -344,7 +351,7 @@ class MatchmakingButtonHandler {
 
         saveTiglMatchmakingPreferences(event, userSettings);
 
-        Optional<String> error = SpringContext.getBean(MatchmakerService.class).queue(userId, true);
+        Optional<String> error = MatchmakerService.get().queue(userId, true);
         if (error.isPresent()) {
             replyEphemeral(event, error.get());
             return;
@@ -368,13 +375,32 @@ class MatchmakingButtonHandler {
             replyEphemeral(event, "Queueing is currently disabled.");
             return;
         }
+        boolean isMakingNewGamesOrTiglGamesThread = isMakingNewGamesOrTiglGamesThread(event);
+        if (isMakingNewGamesOrTiglGamesThread) {
+            MatchmakingQueueSearchService.get()
+                    .register(event.getChannelId(), event.getMessage().getId(), criteria);
+        }
         int added = CreateGameButtonHandler.addPlayersFromQueueSearch(event, criteria);
+        String continuation = isMakingNewGamesOrTiglGamesThread
+                ? " I'll keep searching each time the matchmaker runs until the game is launched."
+                : "";
         if (added == 0) {
-            replyEphemeral(event, "No matching players were found in the queue.");
+            replyEphemeral(event, "No matching players were found in the queue right now." + continuation);
             return;
         }
         replyEphemeral(
-                event, "Added " + added + " matching " + pluralize(added, "player") + " from the queue to this game.");
+                event,
+                "Added " + added + " matching " + pluralize(added, "player") + " from the queue to this game."
+                        + continuation);
+    }
+
+    private static boolean isMakingNewGamesOrTiglGamesThread(ModalInteractionEvent event) {
+        if (!(event.getChannel() instanceof ThreadChannel thread)) {
+            return false;
+        }
+        String parentName = thread.getParentChannel().getName();
+        return CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL.equalsIgnoreCase(parentName)
+                || CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL.equalsIgnoreCase(parentName);
     }
 
     private static PlayerSearchCriteria buildSearchCriteria(ModalInteractionEvent event) {
@@ -417,7 +443,7 @@ class MatchmakingButtonHandler {
             return;
         }
 
-        Optional<String> error = SpringContext.getBean(MatchmakerService.class).formGroup(creatorId, memberIds);
+        Optional<String> error = MatchmakerService.get().formGroup(creatorId, memberIds);
         if (error.isPresent()) {
             replyEphemeral(event, "Couldn't form the group: " + error.get());
             return;

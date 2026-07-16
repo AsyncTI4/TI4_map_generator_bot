@@ -1,8 +1,11 @@
 package ti4.helpers;
 
+import static java.util.Map.entry;
+
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public final class Constants {
     // Staff Pings
@@ -23,6 +26,27 @@ public final class Constants {
 
     // Server IDs
     public static final String ASYNCTI4_HUB_SERVER_ID = "943410040369479690";
+
+    public static final Map<String, String> EMOJI_FARM_SERVERS = Map.ofEntries(
+            entry("1155639926675746886", "Emoji Farm 1"),
+            entry("1156671516784730314", "Emoji Farm 2"),
+            entry("1156686770436591637", "Emoji Farm 3"),
+            entry("1158956227829706762", "Emoji Farm 4"),
+            entry("1158956387376828507", "Emoji Farm 5"),
+            entry("1158956545019760750", "Emoji Farm 6"),
+            entry("1158956865875615836", "Emoji Farm 7"),
+            entry("1158956969290383360", "Emoji Farm 8"),
+            entry("1164297443379249302", "Emoji Farm 9"),
+            entry("1164298025603190864", "Emoji Farm 10"),
+            entry("1171620536833560676", "Emoji Farm 11"),
+            entry("1180152020582289478", "Emoji Farm 12"),
+            entry("1180160763353124864", "Emoji Farm 13"),
+            entry("1197344983531913267", "Emoji Farm 14"),
+            entry("1220415501608681512", "Emoji Farm 15"),
+            entry("1220415609725124660", "Emoji Farm 16"),
+            entry("1220415693837832212", "Emoji Farm 17"),
+            entry("1243245147551170582", "Emoji Farm 18"),
+            entry("1303437221361352715", "Emoji Farm 19"));
 
     public static String jazzPing() {
         return "<@" + jazzId + ">";
@@ -106,6 +130,12 @@ public final class Constants {
     public static final String ALLIANCE_MODE = "alliance_mode";
     public static final String FOW_MODE = "fow_mode";
     public static final String AVERNUS = "avernus";
+    public static final String BROKENPLANET1 = "brokenplanet1";
+    public static final String BROKENPLANET2 = "brokenplanet2";
+    public static final String BROKENPLANET3 = "brokenplanet3";
+    public static final String BROKENPLANET4 = "brokenplanet4";
+    public static final String BROKENPLANET5 = "brokenplanet5";
+    public static final String BROKENPLANET6 = "brokenplanet6";
     public static final String FOW_OPTIONS = "fow_options";
     public static final String BASE_GAME_MODE = "base_game_mode";
     public static final String THUNDERS_EDGE_MODE = "thunders_edge_mode";
@@ -117,6 +147,8 @@ public final class Constants {
     public static final String SPIN_MODE = "spin_mode";
     public static final String BUTTON_PRESS_COUNT = "button_press_count";
     public static final String EVENT_SEQUENCE_COUNTER = "event_sequence_counter";
+    public static final String PENDING_SUB_EVENTS_JSON = "pending_sub_events_json";
+    public static final String PENDING_MOVEMENT_STATE = "pending_movement_state";
     public static final String ABSOL_MODE = "absol_mode";
     public static final String PROMISES_PROMISES = "promises_promises";
     public static final String FLAGSHIPPING = "flagshipping";
@@ -420,8 +452,20 @@ public final class Constants {
     private static final String CRADLE = "cradle";
     private static final String ILLUSION = "illusion";
     private static final String PHANTASM = "phantasm";
-    public static final List<String> TOKEN_PLANETS =
-            List.of(MIRAGE, OASIS, CRADLE, ILLUSION, PHANTASM, AVERNUS, THUNDERSEDGE);
+    public static final List<String> TOKEN_PLANETS = List.of(
+            MIRAGE,
+            OASIS,
+            CRADLE,
+            ILLUSION,
+            PHANTASM,
+            AVERNUS,
+            THUNDERSEDGE,
+            BROKENPLANET1,
+            BROKENPLANET2,
+            BROKENPLANET3,
+            BROKENPLANET4,
+            BROKENPLANET5,
+            BROKENPLANET6);
 
     public static final String FRONTIER = "frontier";
 
@@ -609,6 +653,7 @@ public final class Constants {
     public static final String SC_FOLLOW = "sc_follow";
     public static final String SC_PLAY = "sc_play";
     public static final String SC_UNPLAY = "sc_unplay";
+    public static final String UNPASS = "unpass";
     public static final String SC_PICK = "sc_pick";
     public static final String SC_UNPICK = "sc_unpick";
     public static final String PASS = "pass";
@@ -1206,6 +1251,7 @@ public final class Constants {
     public static final String ABILITY_4 = "ability_4";
     public static final String ABILITY_5 = "ability_5";
     public static final String ABILITIES = "abilities";
+    public static final String EXHAUSTED_ABILITIES = "exhausted_abilities";
     public static final String ABILITY_INFO = "ability_info";
     public static final String ABILITY_ADD = "ability_add";
     public static final String ABILITY_REMOVE = "ability_remove";

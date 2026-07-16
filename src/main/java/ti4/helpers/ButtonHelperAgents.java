@@ -20,8 +20,9 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaAgentHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionAgentHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionLeaderHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -60,8 +61,10 @@ import ti4.service.unit.GalvanizeService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.gameevent.GameEventDraft;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameSubEvent;
 
 public final class ButtonHelperAgents {
 
@@ -602,7 +605,9 @@ public final class ButtonHelperAgents {
         if (playerLeader == null) {
             return;
         }
-        GameEventService.commit(game, GameEventType.CARD_PLAY_AGENT, player, Map.of("cardId", agent));
+        if (!GameEventDraft.stage(game, new GameSubEvent.LeaderPlayed(player.getFaction(), "AGENT", agent))) {
+            GameEventService.commit(game, GameEventType.CARD_PLAY_AGENT, player, Map.of("cardId", agent));
+        }
 
         ExhaustLeaderService.exhaustLeader(game, player, playerLeader);
         playerLeader.getLeaderModel().ifPresent(agentModel -> SpringContext.getBean(CombatReplayService.class)
@@ -756,7 +761,7 @@ public final class ButtonHelperAgents {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
                     + "Rhino the Adventurer, the Zephyrion" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
-            ZephyrionAgentHandler.postInitialButtons(game, player);
+            ZephyrionLeaderHandler.postAgentTargetButtons(game, player);
         }
         if ("tyrisagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
@@ -979,7 +984,7 @@ public final class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.replace("onyxxaagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
-            OnyxxaAgentHandler.postInitialButtons(game, p2);
+            OnyxxaLeaderHandler.postAgentMoveShipButtons(game, p2);
         }
 
         if ("redcreussagent".equalsIgnoreCase(agent) || "crimsonagent".equalsIgnoreCase(agent)) {
@@ -1520,6 +1525,9 @@ public final class ButtonHelperAgents {
         }
         if ("ralnelagent".equalsIgnoreCase(agent)) {
             TeHelperAgents.postRalNelAgentStep1(game, player);
+        }
+        if ("ardentiaagent".equalsIgnoreCase(agent)) {
+            ArdentiaLeadersHandler.startArdentiaAgentStep1(game, player);
         }
 
         if (event instanceof ButtonInteractionEvent buttonEvent) {

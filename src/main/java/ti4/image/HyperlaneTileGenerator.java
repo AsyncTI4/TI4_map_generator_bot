@@ -283,48 +283,13 @@ final class HyperlaneTileGenerator {
         int minRotation = 0;
         String current = matrix;
         for (int rot = 1; rot < 6; rot++) {
-            current = rotateMatrix60(current);
+            current = CustomHyperlaneService.rotateMatrix60(current);
             if (current.compareTo(minMatrix) < 0) {
                 minMatrix = current;
                 minRotation = rot * 60;
             }
         }
         return new MatrixRotationResult(minMatrix, minRotation);
-    }
-
-    // Rotates a 6x6 matrix string by 60 degrees
-    private static String rotateMatrix60(String matrix) {
-        if (matrix == null) return null;
-        String[] rows = matrix.split(";");
-        int size = 6;
-        int[][] mat = new int[size][size];
-
-        // Parse matrix string to int array
-        for (int i = 0; i < size; i++) {
-            String[] cols = rows[i].split(",");
-            for (int j = 0; j < size; j++) {
-                mat[i][j] = Integer.parseInt(cols[j].trim());
-            }
-        }
-
-        // Rotate: [i][j] -> [(i+1)%6][(j+1)%6]
-        int[][] rotated = new int[size][size];
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                rotated[(i + 1) % size][(j + 1) % size] = mat[i][j];
-            }
-        }
-
-        // Convert back to string
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < size; i++) {
-            if (i > 0) sb.append(";");
-            for (int j = 0; j < size; j++) {
-                if (j > 0) sb.append(",");
-                sb.append(rotated[i][j]);
-            }
-        }
-        return sb.toString();
     }
 
     // Connection rules to angles with shape cache

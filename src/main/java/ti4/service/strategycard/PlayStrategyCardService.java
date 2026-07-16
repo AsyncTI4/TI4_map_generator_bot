@@ -17,7 +17,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -379,6 +379,8 @@ public class PlayStrategyCardService {
         if (!scModel.usesAutomationForSCID("pok1leadership") && !winnuHero && !isOverrule) {
             String sillySpelling = RelicHelper.sillySpelling();
             Button emelpar = Buttons.red("scepterE_follow_" + scToPlay, "Exhaust " + sillySpelling);
+            Button cognitiveParallax =
+                    Buttons.green("thardentiag_follow_" + scToPlay, "Exhaust Cognitive Parallax Engine");
             for (Player player3 : playersToFollow) {
                 if (player3 == player) {
                     continue;
@@ -402,6 +404,14 @@ public class PlayStrategyCardService {
                             player3.getCardsInfoThread(),
                             player3.getRepresentationUnfogged() + ", you may follow **" + stratCardName
                                     + "** with the _" + sillySpelling + "_.",
+                            empNMahButtons);
+                }
+                if (player3.hasTechReady("thardentiag")) {
+                    empNMahButtons.addFirst(cognitiveParallax);
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player3.getCardsInfoThread(),
+                            player3.getRepresentationUnfogged() + ", you may follow **" + stratCardName
+                                    + "** with _Cognitive Parallax Engine_",
                             empNMahButtons);
                 }
                 if (player3.hasUnexhaustedLeader("mahactagent")) {
@@ -467,7 +477,7 @@ public class PlayStrategyCardService {
                 OnyxxaBreakthroughHandler.offerSCRollButton(game, p);
             }
             if (p != player && !p.hasLeaderUnlocked("onyxxacommander") && p.hasLeader("onyxxacommander")) {
-                OnyxxaCommanderHandler.offerCommanderUnlockButton(p);
+                OnyxxaLeaderHandler.offerCommanderUnlockButton(p);
             }
         }
         if (scModel.usesAutomationForSCID("anarchy8")) {

@@ -18,9 +18,15 @@ class Bounties extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         Player player = getPlayer();
-        if (!player.hasAbility("marked_prey")) {
+        if (game.getRealPlayers().stream().noneMatch(p -> p.hasAbility("marked_prey"))) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "You do not have the Marked Prey ability and cannot manage bounties.");
+                    event, "No player in this game has the Marked Prey ability, so there are no bounties.");
+            return;
+        }
+        if (!player.hasAbility("marked_prey")) {
+            String currentBounties = String.join(", ", ZephyrionBountyHandler.getBountiesForPlayer(game));
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Current bounties: " + (currentBounties.isEmpty() ? "none." : currentBounties + "."));
             return;
         }
         ZephyrionBountyHandler.offerBountyButtons(game, player);

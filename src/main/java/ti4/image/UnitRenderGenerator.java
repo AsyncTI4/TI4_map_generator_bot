@@ -714,6 +714,7 @@ class UnitRenderGenerator {
         return switch (unitKey.unitType()) {
             case Lady -> unitPath.replace("lady", "fs");
             case Celagrom -> unitPath.replace("celagrom", "fs");
+            case Aurelion -> unitPath.replace("aurelion", "fs");
             case Cavalry -> {
                 boolean hasM2Tech = game.getPNOwner("cavalry") != null
                         && game.getPNOwner("cavalry").hasTech("m2");
@@ -783,7 +784,12 @@ class UnitRenderGenerator {
         typeOrder.addAll(List.of(
                 UnitType.Flagship, UnitType.Dreadnought, UnitType.Carrier, UnitType.Cruiser, UnitType.Destroyer));
         typeOrder.addAll(List.of(
-                UnitType.Warsun, UnitType.TyrantsLament, UnitType.Cavalry, UnitType.Lady, UnitType.Celagrom)); // other
+                UnitType.Warsun,
+                UnitType.TyrantsLament,
+                UnitType.Cavalry,
+                UnitType.Lady,
+                UnitType.Celagrom,
+                UnitType.Aurelion)); // other
 
         List<String> playerOrder = unitHolder.getUnitColorsOnHolder();
         if (game.getActivePlayer() != null && !playerOrder.isEmpty()) {
@@ -924,7 +930,8 @@ class UnitRenderGenerator {
     private static Point getUnitTagLocation(String unitID) {
         return switch (unitID) {
             case "ws" -> new Point(-10, 45); // War Sun
-            case "fs", "lord", "lady", "tyrantslament", "cavalry", "celagrom" -> new Point(10, 55); // Flagship
+            case "fs", "lord", "lady", "tyrantslament", "cavalry", "celagrom", "aurelion" ->
+                new Point(10, 55); // Flagship
             case "dn" -> new Point(10, 50); // Dreadnought
             case "ca" -> new Point(0, 40); // Cruiser
             case "cv" -> new Point(0, 40); // Carrier
