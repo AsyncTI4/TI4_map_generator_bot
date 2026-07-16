@@ -97,7 +97,7 @@
         "requirements": "Y",
         "faction": "kairn",
         "source": "theodisi",
-        "text": "At the end of a tactical action, you may exhaust this card to explore 1 planet in the active system. When you gain a relic fragment during exploration, you may remove 1 infantry form the explored planet to ready this card."
+        "text": "At the end of a tactical action, you may exhaust this card to explore 1 planet you control in the active system. When you gain a relic fragment during exploration, you may remove 1 infantry form the explored planet to ready this card."
     },
     {
         "alias": "thkairng",

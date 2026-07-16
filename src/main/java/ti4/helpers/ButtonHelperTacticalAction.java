@@ -16,6 +16,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnPromissoryHandler;
@@ -171,6 +172,8 @@ public final class ButtonHelperTacticalAction {
             resetStoredValuesForTacticalAction(game);
         }
         ArdentiaTechHandler.clearOverlordMatrixGalvanization(game);
+        ArcanumBreakthroughHandler.clearPowerWordWish(game);
+        KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
     }
 
@@ -452,6 +455,8 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("ardentiaSubjugate");
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
+        ArcanumBreakthroughHandler.clearPowerWordWish(game);
+        KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         ArdentiaUnitHandler.clearIronClawDeployUsed(game);
         DreamButtonHandler.clearDreamAgentAnomaly(game);
         GameEventDraft.clear(game);
@@ -721,6 +726,8 @@ public final class ButtonHelperTacticalAction {
                         button2);
             }
         }
+
+        ArcanumBreakthroughHandler.offerPowerWordWish(event, game, player);
 
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, tile, game);
         if ((player.hasTech("sdn") || player.hasTech("absol_sdn") || player.hasTech("wavelength"))
