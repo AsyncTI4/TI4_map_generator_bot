@@ -1,6 +1,7 @@
 package ti4.service.leader;
 
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -71,5 +72,6 @@ public class ExhaustLeaderService {
                             + " You are encouraged to ping the table and ask for any *Shatter*s if this genome is important, and likely to be _Shatter_'d."
                             + " Otherwise, just assume no _Shatter_ and fix later if necessary.");
         }
+        RevenantBreakthroughHandler.exhaustRevenantRisingForAttachedAgent(game, player, leader);
     }
 }
