@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -222,6 +223,8 @@ public class TacticalActionOutputService {
             return summary.toString();
         }
         summary.append(String.join("\n", lines));
+        String powerWordWishMoveNote = ArcanumBreakthroughHandler.getPowerWordWishMoveNote(game, player, tile);
+        if (!powerWordWishMoveNote.isEmpty()) summary.append('\n').append(powerWordWishMoveNote);
         String extraSummary = buildShortSummary(game, Set.of(tile.getPosition()));
         if (extraSummary != null && inclSummary) summary.append('\n').append(extraSummary);
         return summary.toString();

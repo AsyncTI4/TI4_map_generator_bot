@@ -186,7 +186,7 @@
         "alias": "kairn",
         "factionName": "The Explorers of Kairn",
         "homeSystem": "th5",
-        "startingFleet": "2 dn, 1 cv, 2 ff, 1 mf d, 1 mf p, 1 sd p, 1 sd d, 1 sd k",
+        "startingFleet": "2 dn, 1 cv, 2 ff, 1 mf d, 1 mf p, 1 sd p, 1 sd d",
         "commodities": 3,
         "factionTech": [
             "thkairny",

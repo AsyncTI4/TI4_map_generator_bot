@@ -534,7 +534,6 @@ public class ComponentActionHelper {
             Button absolButton = Buttons.gray(factionChecker + prefix + "absolMOW_", "Minister of War Action");
             compButtons.add(absolButton);
         }
-
         // Generic
         Button genButton = Buttons.gray(factionChecker + prefix + "generic_", "Generic Component Action");
         compButtons.add(genButton);

@@ -22,6 +22,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
@@ -600,6 +601,7 @@ public class ExploreService {
             case Constants.FRAGMENT -> {
                 player.addFragment(cardID);
                 game.purgeExplore(ogID);
+                KairnTechHandler.offerSurveyorsLensReady(event, game, player, tile, planetID, cardID);
             }
             case "leader" -> {
                 String leader = cardID.replace("gain", "");

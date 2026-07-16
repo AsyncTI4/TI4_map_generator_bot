@@ -30,6 +30,7 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
@@ -1049,10 +1050,14 @@ public final class ButtonHelperFactionSpecific {
     @ButtonHandler("yssarilAgentAsJr")
     public static void yssarilAgentAsJr(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons2 = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
-        player.getLeader("yssarilagent").get().setExhausted(true);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getFactionEmoji() + " is using Clever Clever JR-XS455-O, the Relic/Yssaril agent.");
+        Leader yssarilAgent = player.getLeader("yssarilagent").get();
+        yssarilAgent.setExhausted(true);
+        String jrMessage = player.getFactionEmoji() + " is using Clever Clever JR-XS455-O, the Relic/Yssaril agent.";
+        if (RevenantBreakthroughHandler.isReadyRevenantRisingAttachedAgent(game, player, yssarilAgent)) {
+            jrMessage +=
+                    "\n-# Please manually exhaust _Revenant Rising_ for this attached agent's use using /breakthrough exhaust.";
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), jrMessage);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 "Use buttons to decide on whom to use Clever Clever JR-XS455-O, the Relic/Yssaril agent.",
