@@ -47,22 +47,8 @@ public enum FrankenBanList {
                                     "zeal")),
                     Map.entry(
                             Constants.BAN_FLEET,
-                            List.of(
-                                    "dihmohn",
-                                    "edyn",
-                                    "ghoti",
-                                    "nekro",
-                                    "qhet",
-                                    "titans",
-                                    "winnu")),
-                    Map.entry(
-                            Constants.BAN_HS,
-                            List.of(
-                                    "ghemina",
-                                    "gledge",
-                                    "nokar",
-                                    "saar",
-                                    "thrones")),
+                            List.of("dihmohn", "edyn", "ghoti", "nekro", "qhet", "titans", "winnu")),
+                    Map.entry(Constants.BAN_HS, List.of("ghemina", "gledge", "nokar", "saar", "thrones")),
                     Map.entry(
                             Constants.LEADER,
                             List.of(
@@ -169,13 +155,7 @@ public enum FrankenBanList {
                                     "zealots_flagship",
                                     "zelian_flagship",
                                     "zelian_mech")),
-                    Map.entry(
-                            Constants.TILE_NAME,
-                            List.of(
-                                    "102",
-                                    "21",
-                                    "22",
-                                    "23")))),
+                    Map.entry(Constants.TILE_NAME, List.of("102", "21", "22", "23")))),
 
     OP_Components(
             "OP Components",
@@ -183,32 +163,12 @@ public enum FrankenBanList {
             Map.ofEntries(
                     Map.entry(
                             Constants.LEADER,
-                            List.of(
-                                    "edynhero",
-                                    "lanefirhero",
-                                    "mahactcommander_y",
-                                    "naaluagent",
-                                    "winnuhero")),
-                    Map.entry(
-                            Constants.TECH,
-                            List.of(
-                                    "asn",
-                                    "dsuydab",
-                                    "dt2",
-                                    "lw2",
-                                    "qdn")),
+                            List.of("edynhero", "lanefirhero", "mahactcommander_y", "naaluagent", "winnuhero")),
+                    Map.entry(Constants.TECH, List.of("asn", "dsuydab", "dt2", "lw2", "qdn")),
                     Map.entry(
                             Constants.BREAKTHROUGH,
-                            List.of(
-                                    "kyrobt",
-                                    "lanefirbt",
-                                    "letnevbt",
-                                    "nomadbt",
-                                    "solbt",
-                                    "zealotsbt")),
-                    Map.entry(
-                            Constants.UNIT_ID,
-                            List.of("mahact_mech_y")),
+                            List.of("kyrobt", "lanefirbt", "letnevbt", "nomadbt", "solbt", "zealotsbt")),
+                    Map.entry(Constants.UNIT_ID, List.of("mahact_mech_y")),
                     Map.entry(
                             Constants.ABILITY,
                             List.of(
@@ -219,11 +179,7 @@ public enum FrankenBanList {
                                     "sundered",
                                     "technological_singularity",
                                     "telepathic")),
-                    Map.entry(
-                            Constants.TILE_NAME,
-                            List.of(
-                                    "115",
-                                    "99"))));
+                    Map.entry(Constants.TILE_NAME, List.of("115", "99"))));
 
     private final String id;
 
