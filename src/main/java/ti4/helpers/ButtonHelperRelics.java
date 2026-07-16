@@ -63,7 +63,7 @@ public class ButtonHelperRelics {
         List<Button> buttons = new ArrayList<>();
         for (String planetName : player.getPlanetsAllianceMode()) {
             Planet planet = game.getPlanetsInfo().get(planetName);
-            if (planet == null || planet.isFake() || planet.isSpaceStation()) {
+            if (planet == null || planet.isFake() || planet.isSpaceStation(game)) {
                 continue;
             }
             if (ButtonHelper.isPlanetLegendaryOrHome(planetName, game, false, null)) {

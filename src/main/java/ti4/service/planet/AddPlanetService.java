@@ -3,6 +3,7 @@ package ti4.service.planet;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -11,7 +12,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -46,6 +47,10 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
+import ti4.spring.service.gameevent.GameEventDraft;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameSubEvent;
 
 @UtilityClass
 public class AddPlanetService {
@@ -71,7 +76,7 @@ public class AddPlanetService {
                 return;
             }
         }
-        if (game.getRevealedPublicObjectives().size() < 3 || (unitHolder != null && unitHolder.isSpaceStation())) {
+        if (game.getRevealedPublicObjectives().size() < 3 || (unitHolder != null && unitHolder.isSpaceStation(game))) {
             setup = true;
         }
         if ("avernus".equalsIgnoreCase(planet)) {
@@ -144,6 +149,7 @@ public class AddPlanetService {
             if (unitHolder.getTokenList().contains(Constants.CUSTODIAN_TOKEN_PNG)) {
                 unitHolder.removeToken(Constants.CUSTODIAN_TOKEN_PNG);
                 game.scorePublicObjective(player.getUserID(), 0);
+                GameEventService.commit(game, GameEventType.OBJECTIVE_SCORED, player, Map.of("category", "CUSTODIAN"));
                 MessageChannel channel = game.getMainGameChannel();
                 if (game.isFowMode()) {
                     channel = player.getPrivateChannel();
@@ -270,11 +276,11 @@ public class AddPlanetService {
                 }
             }
         }
-        if ((alreadyOwned || player.hasAbility("contagion_blex") || player.hasAbility("plague_reservoir"))
+        if ((!alreadyOwned && player.hasAbility("contagion_blex") || player.hasAbility("plague_reservoir"))
                 && player.hasTech("dxa")
                 && !doubleCheck
                 && !setup
-                && !unitHolder.isSpaceStation()) {
+                && !unitHolder.isSpaceStation(game)) {
             String msg10 = player.getRepresentationUnfogged()
                     + " you may have an opportunity to use _Dacxive Animators_ on "
                     + Helper.getPlanetRepresentation(planet, game)
@@ -389,7 +395,7 @@ public class AddPlanetService {
                 && !setup
                 && tile != null
                 && tile.getPosition().startsWith("frac")) {
-            OnyxxaCommanderHandler.onGainFracturePlanet(event, player, game, previousOwner);
+            OnyxxaLeaderHandler.onGainFracturePlanet(event, player, game, previousOwner);
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander") && !setup) {
             if (alreadyOwned && "mirage".equalsIgnoreCase(planet)) {
@@ -410,6 +416,7 @@ public class AddPlanetService {
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Established control of "
                         + Helper.getPlanetRepresentation(planet, game) + ".");
+        GameEventDraft.stage(game, new GameSubEvent.ControlEstablished(planet));
         if ((game.getPhaseOfGame().contains("agenda")
                         || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
                 && player.hasAbility("scavenge")
@@ -590,7 +597,7 @@ public class AddPlanetService {
                         buttons);
             }
         }
-        if (!unitHolder.isSpaceStation()
+        if (!unitHolder.isSpaceStation(game)
                 && IsPlayerElectedService.isPlayerElected(game, player, "minister_exploration")) {
             String fac = player.getFactionEmoji();
             MessageHelper.sendMessageToChannel(
@@ -653,7 +660,8 @@ public class AddPlanetService {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
-        CommanderUnlockCheckService.checkPlayer(player, "sol", "vaylerian", "olradin", "xxcha", "sardakk");
+        CommanderUnlockCheckService.checkPlayer(
+                player, "sol", "vaylerian", "olradin", "xxcha", "sardakk", "revenantoblivion", "kairn");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "freesystems");
         if (game.mecatols().contains(planet) && player.controlsMecatol(true)) {
             CommanderUnlockCheckService.checkPlayer(player, "winnu");

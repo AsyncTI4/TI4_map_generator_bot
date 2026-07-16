@@ -126,6 +126,22 @@ public enum FactionEmojis implements TI4Emoji {
     // luminous
     arachnera,
     psm,
+    opa,
+
+    // theodisi
+    aeterna,
+    arcanum,
+    ardentia,
+    kairn,
+    kryxos,
+    myrr,
+    oblivion,
+    ponthous,
+    revenant,
+    thrones,
+    verydith,
+    veylor,
+    xytheris,
 
     // nomadfalcon
     erock,
@@ -327,6 +343,19 @@ public enum FactionEmojis implements TI4Emoji {
             case "sarcosa" -> sarcosa;
             case "toldar" -> toldar;
             case "belkosea" -> belkosea;
+            case "aeterna" -> aeterna;
+            case "arcanum" -> arcanum;
+            case "ardentia" -> ardentia;
+            case "kairn" -> kairn;
+            case "kryxos" -> kryxos;
+            case "myrr" -> myrr;
+            case "oblivion" -> oblivion;
+            case "ponthous" -> ponthous;
+            case "revenant" -> revenant;
+            case "thrones" -> thrones;
+            case "verydith" -> verydith;
+            case "veylor" -> veylor;
+            case "xytheris" -> xytheris;
             case "admins" -> AdminsFaction;
             case "qulane" -> Qulane;
             case "canto" -> canto;
@@ -402,6 +431,7 @@ public enum FactionEmojis implements TI4Emoji {
 
             case "arachnera" -> arachnera;
             case "psm" -> psm;
+            case "opa" -> opa;
 
             case "netharii" -> netharii;
             case "drahn" -> Drahn;

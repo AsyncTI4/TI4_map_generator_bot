@@ -29,20 +29,16 @@ import ti4.contest.replay.core.CombatRollPayload.DieRollSource;
 import ti4.contest.replay.core.CombatRollPayload.RollSegmentType;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixBreakthroughHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -50,6 +46,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.BombardmentAssignment;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -82,13 +79,18 @@ import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
+import ti4.service.leader.UnlockLeaderService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.HacanFlagshipService;
+import ti4.service.unit.UnitModelValueInjectionService;
 import ti4.spring.context.SpringContext;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class CombatRollService {
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public boolean checkIfUnitsOfType(
             Player player,
@@ -113,13 +115,16 @@ public class CombatRollService {
         if (rollType == CombatRollType.bombardment) {
             AshenUnitHandler.clearFlagshipBombardmentContexts(game);
             if (game.getStoredValue("assignedBombardment" + player.getFaction()).isEmpty()) {
-                BombardmentService.autoAssignAllBombardmentToAPlanet(player, game);
+                BombardmentService.autoAssignAllBombardmentToAPlanet(player, game, tile);
             }
+            List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
+                    game.getStoredValue("assignedBombardment" + player.getFaction()),
+                    new TypeReference<List<BombardmentAssignment>>() {});
+
             boolean hasValidBombardment = false;
             List<String> bombardedPlanets = new ArrayList<>();
             for (String planet : BombardmentService.getBombardablePlanets(player, game, tile)) {
-                if (game.getStoredValue("assignedBombardment" + player.getFaction())
-                        .contains(planet)) {
+                if (assignedUnits.stream().anyMatch(a -> a.planet().equals(planet))) {
                     game.setStoredValue("bombardmentTarget" + player.getFaction(), planet);
                     secondHalfOfCombatRoll(
                             player, game, event, tile, unitHolderName, CombatRollType.bombardment, false);
@@ -263,18 +268,25 @@ public class CombatRollService {
             if (player.hasUnit("ashen_flagship")) {
                 AshenUnitHandler.prepareFlagshipBombardmentContext(game, player, bombardPlanet);
             }
-            String assignedUnits = game.getStoredValue("assignedBombardment" + player.getFaction());
-            int count;
+            List<BombardmentAssignment> assignedUnits = MAPPER.readValue(
+                    game.getStoredValue("assignedBombardment" + player.getFaction()),
+                    new TypeReference<List<BombardmentAssignment>>() {});
+            Map<String, Integer> remainingAssignedByAsyncId = new HashMap<>();
+            for (BombardmentAssignment assignedUnit : assignedUnits) {
+                if (assignedUnit.planet().equals(bombardPlanet) && assignedUnit.sourceId() != null) {
+                    String asyncId = assignedUnit.sourceId();
+                    remainingAssignedByAsyncId.merge(asyncId, 1, Integer::sum);
+                }
+            }
             List<Pair<UnitModel, UnitHolder>> unitMods = new ArrayList<>(playerUnitsByQuantity.keySet());
             for (Pair<UnitModel, UnitHolder> mod : unitMods) {
-                count = 0;
-                for (String assignedUnit : assignedUnits.split(";")) {
-                    if (assignedUnit.endsWith(bombardPlanet)
-                            && assignedUnit.contains(mod.getLeft().getAsyncId() + "_")) {
-                        count++;
-                    }
-                }
+                // The same asyncId can span multiple holders here, so split the assigned total across them
+                // instead of giving every holder the full matched count.
+                String asyncId = mod.getLeft().getAsyncId();
+                int available = remainingAssignedByAsyncId.getOrDefault(asyncId, 0);
+                int count = Math.min(available, playerUnitsByQuantity.get(mod));
                 if (count > 0) {
+                    remainingAssignedByAsyncId.put(asyncId, available - count);
                     playerUnitsByQuantity.put(mod, count);
                 } else {
                     playerUnitsByQuantity.remove(mod);
@@ -323,6 +335,36 @@ public class CombatRollService {
                             "Skipping Annihilator (L1Z1X mech) BOMBARDMENT rolls due to _Articles of War_.");
                 }
             }
+        }
+
+        StringBuilder powerWordWishCombatNote = new StringBuilder();
+        if (rollType == CombatRollType.combatround) {
+            Map<Pair<UnitModel, UnitHolder>, Integer> adjustedUnits = new HashMap<>();
+            for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : playerUnitsByQuantity.entrySet()) {
+                UnitModel unit = entry.getKey().getLeft();
+                UnitHolder holder = entry.getKey().getRight();
+                int boostedCount = ArcanumBreakthroughHandler.getPowerWordWishCombatBonus(
+                        game, player, tile, holder, unit, entry.getValue());
+                if (boostedCount > 0) {
+                    powerWordWishCombatNote
+                            .append("> _Power Word: Wish_: ")
+                            .append(boostedCount)
+                            .append(" ")
+                            .append(unit.getName())
+                            .append(" receives +2 combat this round.\n");
+                    if (entry.getValue() > boostedCount) {
+                        adjustedUnits.put(entry.getKey(), entry.getValue() - boostedCount);
+                    }
+                    UnitModel boostedUnit = UnitModelValueInjectionService.injectValues(
+                            unit,
+                            UnitModelValueInjectionService.IntegerValueInjection.create()
+                                    .combatHitsOn(-2));
+                    adjustedUnits.merge(new ImmutablePair<>(boostedUnit, holder), boostedCount, Integer::sum);
+                } else {
+                    adjustedUnits.merge(entry.getKey(), entry.getValue(), Integer::sum);
+                }
+            }
+            playerUnitsByQuantity = adjustedUnits;
         }
 
         if (playerUnitsByQuantity.isEmpty()) {
@@ -382,18 +424,36 @@ public class CombatRollService {
                 Constants.COMBAT_EXTRA_ROLLS);
 
         List<NamedCombatModifierModel> extraRollsDup = new ArrayList<>(extraRolls);
-        for (NamedCombatModifierModel mod : extraRollsDup) {
-            if ("plus1_roll_plasmascoring".equalsIgnoreCase(mod.getModifier().getAlias())) {
-                if (!game.getStoredValue("assignedBombardment" + player.getFaction())
-                        .contains("plasma_99_" + bombardPlanet + ";")) {
-                    extraRolls.remove(mod);
+
+        String gameAssignedBombardment = game.getStoredValue("assignedBombardment" + player.getFaction());
+        if (!gameAssignedBombardment.isEmpty() && rollType == CombatRollType.bombardment) {
+            List<BombardmentAssignment> assignedBombardment =
+                    MAPPER.readValue(gameAssignedBombardment, new TypeReference<List<BombardmentAssignment>>() {});
+            String tempBombardPlanet = bombardPlanet;
+            for (NamedCombatModifierModel mod : extraRollsDup) {
+                if ("plus1_roll_plasmascoring"
+                        .equalsIgnoreCase(mod.getModifier().getAlias())) {
+                    if (assignedBombardment.stream()
+                            .filter(a -> a.planet().equals(tempBombardPlanet))
+                            .noneMatch(a -> "plasmascoring".equals(a.sourceId()))) {
+                        extraRolls.remove(mod);
+                    }
                 }
-            }
-            if ("plus1_roll_argent_commander_bombard"
-                    .equalsIgnoreCase(mod.getModifier().getAlias())) {
-                if (!game.getStoredValue("assignedBombardment" + player.getFaction())
-                        .contains("argentcommander_99_" + bombardPlanet + ";")) {
-                    extraRolls.remove(mod);
+                if ("plus1_roll_argent_commander_bombard"
+                        .equalsIgnoreCase(mod.getModifier().getAlias())) {
+                    if (assignedBombardment.stream()
+                            .filter(a -> a.planet().equals(tempBombardPlanet))
+                            .noneMatch(a -> "argentcommander".equals(a.sourceId()))) {
+                        extraRolls.remove(mod);
+                    }
+                }
+                if ("roll_1_for_galvanize_bombard"
+                        .equalsIgnoreCase(mod.getModifier().getAlias())) {
+                    if (assignedBombardment.stream()
+                            .filter(a -> a.planet().equals(tempBombardPlanet))
+                            .noneMatch(a -> a.galvanized())) {
+                        extraRolls.remove(mod);
+                    }
                 }
             }
         }
@@ -430,6 +490,16 @@ public class CombatRollService {
                 combatOnHolder);
         String combatSummary = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
         String message = combatSummary + rollResult.message();
+        if (!powerWordWishCombatNote.isEmpty()) {
+            String modifierHeader = "With modifiers: \n";
+            int modifierHeaderIndex = message.indexOf(modifierHeader);
+            if (modifierHeaderIndex >= 0) {
+                int insertIndex = modifierHeaderIndex + modifierHeader.length();
+                message = message.substring(0, insertIndex) + powerWordWishCombatNote + message.substring(insertIndex);
+            } else {
+                message = combatSummary + modifierHeader + powerWordWishCombatNote + rollResult.message();
+            }
+        }
         CombatRollPayload.RollHeader rollHeader =
                 buildRollHeader(game, player, opponent, tile, combatOnHolder, rollType, combatSummary);
         CombatRollPayload payload = rollResult.payload().withHeader(rollHeader);
@@ -480,6 +550,11 @@ public class CombatRollService {
             message = AshenBreakthroughHandler.appendBombardmentManualReminder(player, rollType, message);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        if (rollType == CombatRollType.combatround
+                && Constants.SPACE.equalsIgnoreCase(unitHolderName)
+                && opponent != player) {
+            ArdentiaUnitHandler.offerSovereignsGavelButton(event, game, player, opponent, tile);
+        }
         CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
         boolean trackedCandidateRoll =
                 combatReplayService.isTrackedCandidateRoll(game, player, opponent, tile, rollType);
@@ -775,6 +850,17 @@ public class CombatRollService {
             MessageHelper.sendMessageToChannelWithButtons(channel, msg2, buttons);
         }
 
+        if (rollType == CombatRollType.AFB && player.hasUnlockedBreakthrough("vyserixbt")) {
+            VyserixBreakthroughHandler.offerMoraySystemButtons(event, game, player, tile, h);
+        }
+
+        if (rollType != CombatRollType.combatround
+                && h >= 3
+                && player.hasLeader("xytheriscommander")
+                && !player.hasLeaderUnlocked("xytheriscommander")) {
+            UnlockLeaderService.unlockLeader("xytheriscommander", game, player);
+        }
+
         if (rollType == CombatRollType.bombardment) {
             AshenLeadersHandler.offerCommanderBombardmentButtons(event, game, player, h);
             if (h > 0) {
@@ -826,6 +912,9 @@ public class CombatRollService {
                             + (h == 1 ? "the BOMBARDMENT hit" : "some BOMBARDMENT hits")
                             + " to place infantry instead. Use these buttons to do so, and press done when done. The bot did not track how many hits you got. ";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
+                }
+                if (player.hasUnlockedBreakthrough("kalorabt")) {
+                    KaloraBreakthroughHandler.offerCommitInfantryButton(event, game, player, tile, bombardPlanet);
                 }
             }
             if (player.hasTech("x89c4")) {
@@ -1006,8 +1095,17 @@ public class CombatRollService {
         }
         StringBuilder resultBuilder = new StringBuilder(result);
         boolean metaliVoidCounted = false;
-        boolean unitUndecided = game.getStoredValue("highestValueSingleUnit" + player.getFaction())
-                .isEmpty();
+        String highestValueSingleUnitKey = "highestValueSingleUnit" + player.getFaction();
+        String storedHighestValueUnit = game.getStoredValue(highestValueSingleUnitKey);
+        boolean unitUndecided = storedHighestValueUnit.isEmpty()
+                || playerUnits.keySet().stream()
+                        .noneMatch(k -> k.getLeft().getAsyncId().equalsIgnoreCase(storedHighestValueUnit));
+        if (!storedHighestValueUnit.isEmpty() && unitUndecided) {
+            // A manual Gravleash/Supercharge choice (chooseGravleash_) that isn't part of this combat
+            // round - wrong tile, or the chosen unit has since died/retreated - would otherwise block
+            // auto-pick forever, since this flag never becomes true again once set.
+            game.removeStoredValue(highestValueSingleUnitKey);
+        }
         if (rollType == CombatRollType.combatround
                 && (player.hasTech("tf-supercharge")
                         || (player.hasUnlockedBreakthrough("letnevbt")
@@ -2267,7 +2365,7 @@ public class CombatRollService {
         output.forEach((k, v) -> flatOutput.merge(k.getLeft(), v, Integer::sum));
         checkBadUnits(player, event, unitsByAsyncId, flatOutput);
         if (player.getGame() != null && player.getGame().playerHasLeaderUnlockedOrAlliance(player, "kaloracommander")) {
-            KaloraCommanderHandler.addCommanderBombardmentUnits(player, tile, output);
+            KaloraLeaderHandler.addCommanderBombardmentUnits(player, tile, output);
         }
         return output;
     }
@@ -2395,7 +2493,7 @@ public class CombatRollService {
                 boolean spaceStation =
                         (player.hasUnlockedBreakthrough("gledgebt") || player.hasTech("tf-mantlecracking"))
                                 && planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG);
-                if ((planet.isSpaceStation() || spaceStation)
+                if ((planet.isSpaceStation(game) || spaceStation)
                         && player.getPlanets().contains(planet.getName())) {
                     if (player.hasUnlockedBreakthrough("gledgebt")) {
                         UnitModel planetFakeUnit = new UnitModel();

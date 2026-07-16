@@ -51,6 +51,10 @@ import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.planet.EronousPlanetService;
 import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.service.gameevent.GameEventDraft;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameSubEvent;
 
 @UtilityClass
 public final class StatusHelper {
@@ -154,7 +158,11 @@ public final class StatusHelper {
     }
 
     public static void beginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
+        // On a re-entered scoring phase, commit the previously staged scores instead of letting open() wipe them.
+        commitStatusScoringEvent(game);
         game.setPhaseOfGame("statusScoring");
+        GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "status"));
+        GameEventDraft.open(game);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
         GMService.logActivity(game, "**StatusScoring** Phase for Round " + game.getRound() + " started.", true);
         for (Player player : game.getRealPlayers()) {
@@ -173,7 +181,7 @@ public final class StatusHelper {
                 maxVP = player.getTotalVictoryPoints();
             }
             if (player.hasAbility("paradigm")) {
-                NatauAbilityHandler.resolveParadigmStartOfStrategy(event, game, player);
+                NatauAbilityHandler.resolveParadigmStartOfStatus(event, game, player);
             }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "vadencommander")) {
                 int numScoredSOs = player.getSoScored();
@@ -1078,5 +1086,37 @@ public final class StatusHelper {
         }
         ButtonHelper.deleteMessage(event);
         ReactionCheckService.checkForAllReactions(event, game);
+    }
+
+    public static boolean isStatusScoring(Game game) {
+        return "statusScoring".equalsIgnoreCase(game.getPhaseOfGame());
+    }
+
+    /** Stages the score into the status-scoring draft when one is open, else commits a top-level event. */
+    public static void recordObjectiveScored(Game game, Player player, String objectiveId, String category) {
+        if (isStatusScoring(game)
+                && GameEventDraft.stage(
+                        game, new GameSubEvent.ObjectiveScored(player.getFaction(), objectiveId, category))) {
+            return;
+        }
+        GameEventService.commit(
+                game, GameEventType.OBJECTIVE_SCORED, player, Map.of("objectiveId", objectiveId, "category", category));
+    }
+
+    /**
+     * Commits the staged scoring sub-events as one STATUS_SCORING event. Safe to call from any status-scoring exit
+     * path: no-op outside the statusScoring phase (so it never drains an unrelated tactical draft) or when nothing
+     * was staged.
+     */
+    public static void commitStatusScoringEvent(Game game) {
+        if (!isStatusScoring(game)) {
+            return;
+        }
+        List<GameSubEvent> subEvents = GameEventDraft.drain(game);
+        if (subEvents.isEmpty()) {
+            return;
+        }
+        GameEventService.commit(
+                game, GameEventType.STATUS_SCORING, null, Map.of("subEvents", GameEventDraft.toJsonNode(subEvents)));
     }
 }

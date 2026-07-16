@@ -60,17 +60,21 @@ class PlayerMatchmakingDataFactory {
     }
 
     static Map<String, PlayerMatchmakingData> buildForUsers(List<String> userIds, List<String> leaderRestrictions) {
-        return buildForUsers(userIds, leaderRestrictions, false, List.of());
+        return buildForUsers(userIds, leaderRestrictions, false, List.of(), Duration.ZERO);
     }
 
     static Map<String, PlayerMatchmakingData> buildForUsers(
-            List<String> userIds, List<String> leaderRestrictions, boolean tigl, List<String> tiglRanks) {
+            List<String> userIds,
+            List<String> leaderRestrictions,
+            boolean tigl,
+            List<String> tiglRanks,
+            Duration queueWait) {
         Map<String, Rating> ratings = MatchmakingRatingEventService.get().getPlayerRatings(new HashSet<>(userIds));
         Guild guild = JdaService.guildPrimary;
 
         Map<String, PlayerMatchmakingData> dataById = new HashMap<>();
         for (String id : userIds) {
-            dataById.put(id, build(id, leaderRestrictions, ratings, guild, Duration.ZERO, tigl, tiglRanks));
+            dataById.put(id, build(id, leaderRestrictions, ratings, guild, queueWait, tigl, tiglRanks));
         }
         return dataById;
     }
@@ -106,6 +110,7 @@ class PlayerMatchmakingDataFactory {
     private static Set<String> roleNames(Guild guild, String userId) {
         Member member = guild == null ? null : guild.getMemberById(userId);
         Set<String> roles = new HashSet<>();
+        if (member == null) return roles;
         for (String role : ROLES_TO_TRACK) {
             if (DiscordRoleUtility.hasRole(guild, member, role)) {
                 roles.add(role);

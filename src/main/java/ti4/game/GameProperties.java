@@ -68,6 +68,10 @@ public class GameProperties {
     private String activeSystem;
     private String currentAgendaInfo = "";
     private String currentACDrawStatusInfo = "";
+    // Undo-safe draft of tactical sub-events, persisted as one JSON line; "" means closed.
+    private String pendingSubEventsJson = "";
+    // Undo-safe compact movement captured when tactical displacement is committed.
+    private String pendingMovementState = "";
     private String latestCommand = "";
     private String latestOutcomeVotedFor = "";
     private String playersWhoHitPersistentNoAfter = "";
@@ -86,6 +90,7 @@ public class GameProperties {
     // Aggregate Game Stats
     private @ExportableField int activationCount;
     private @ExportableField int buttonPressCount;
+    private @ExportableField long eventSequenceCounter;
     private @ExportableField int mapImageGenerationCount;
     private @ExportableField int numberOfPurgedFragments;
     private @ExportableField int pingSystemCounter;

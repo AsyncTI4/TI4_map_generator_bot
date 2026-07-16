@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesCommanderUnlockHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -302,6 +303,24 @@ public class CommanderUnlockCheckService {
                 }
                 shouldBeUnlocked = (qualifyingSystems >= 3);
             }
+
+            // theodisi
+            case "ardentia",
+                    "verydith",
+                    "myrr",
+                    "kairn",
+                    "kryxos",
+                    "arcanum",
+                    "xytheris",
+                    "oblivion",
+                    "revenant",
+                    "revenantmyrr",
+                    "revenantoblivion",
+                    "revenantponthous",
+                    "thrones",
+                    "ponthous" ->
+                shouldBeUnlocked =
+                        LostLegaciesCommanderUnlockHandler.meetsCommanderUnlockCondition(player, game, faction);
         }
         if (shouldBeUnlocked) {
             UnlockLeaderService.unlockLeader(leaderId, game, player);

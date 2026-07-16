@@ -16,7 +16,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamBut
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisHeroHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -38,6 +38,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.model.PromissoryNoteModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -200,7 +201,7 @@ public class StartTurnService {
         ButtonHelperFactionSpecific.resolveMykoMechCheck(player, game);
         ButtonHelperFactionSpecific.resolveKolleccAbilities(player, game);
         if (player.hasLeaderUnlocked("tyrishero")) {
-            TyrisHeroHandler.offerHeroAtStartOfTurn(game, player);
+            TyrisLeaderHandler.offerHeroAtStartOfTurn(game, player);
         }
         if (!game.getStoredValue("futureMessageFor" + player.getFaction()).isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -464,7 +465,7 @@ public class StartTurnService {
         List<Button> startButtons = new ArrayList<>();
         boolean hadAnyUnplayedSCs = false;
 
-        if (doneActionThisTurn && (player.hasTech("fl") || TyrisHeroHandler.isHeroActiveThisRound(game, player))) {
+        if (doneActionThisTurn && (player.hasTech("fl") || TyrisLeaderHandler.isHeroActiveThisRound(game, player))) {
             confirmed2ndAction = true;
         }
         if (!doneActionThisTurn || confirmed2ndAction) {
@@ -477,11 +478,28 @@ public class StartTurnService {
                     - acButtons.size();
             if (game.isFowMode()) {
                 numOfComponentActions += acButtons.size();
+            } else {
+                for (String pn : player.getPromissoryNotes().keySet()) {
+                    PromissoryNoteModel prom = Mapper.getPromissoryNote(pn);
+                    if (pn != null
+                            && prom != null
+                            && prom.getOwner() != null
+                            && game.getPNOwner(pn) != player
+                            && !prom.getOwner().equalsIgnoreCase(player.getFaction())
+                            && !prom.getOwner().equalsIgnoreCase(player.getColor())
+                            && !player.getPromissoryNotesInPlayArea().contains(pn)
+                            && prom.getText() != null) {
+                        String pnText = prom.getText();
+                        if (pnText.toLowerCase().contains("action:")
+                                && !"bmf".equalsIgnoreCase(pn)
+                                && !"acq".equalsIgnoreCase(pn)
+                                && !"bapnconc".equalsIgnoreCase(pn)) {
+                            numOfComponentActions--;
+                        }
+                    }
+                }
             }
-            if (IsPlayerElectedService.isPlayerElected(player.getGame(), player, "censure")
-                    || IsPlayerElectedService.isPlayerElected(player.getGame(), player, "absol_censure")) {
-                numOfComponentActions += 1;
-            }
+
             Button componentAction = Buttons.green(
                     factionChecker + "componentAction", "Component Action (" + numOfComponentActions + ")");
 
@@ -715,6 +733,12 @@ public class StartTurnService {
                             && !player.getExhaustedTechs().contains("absol_td"))) {
                 startButtons.add(Buttons.gray(
                         factionChecker + "exhaustTech_td", "Exhaust Transit Diodes", TechEmojis.CyberneticTech));
+            }
+            if (player.hasTech("batyriy") && !player.getExhaustedTechs().contains("batyriy")) {
+                startButtons.add(Buttons.gray(
+                        factionChecker + "exhaustTech_batyriy",
+                        "Exhaust Temporal Displacement",
+                        TechEmojis.CyberneticTech));
             }
             if (player.hasUnexhaustedLeader("kolleccagent")) {
                 startButtons.add(Buttons.gray(

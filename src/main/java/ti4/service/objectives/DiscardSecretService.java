@@ -6,8 +6,11 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumUnitHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -45,6 +48,20 @@ public class DiscardSecretService {
         }
 
         handleSecretObjectiveDrawOrder(game, player);
+        String phase = game.getPhaseOfGame();
+        boolean isInitialSetup = phase == null
+                || phase.isBlank()
+                || "miltydraft".equalsIgnoreCase(phase)
+                || "playerSetup".equalsIgnoreCase(phase);
+        if (!isInitialSetup) {
+            if (player.hasUnlockedBreakthrough("lunariumbt")) {
+                LunariumBreakthroughHandler.offerReadyPlanetButtons(game, player);
+            }
+            if (player.hasUnit("lunarium_mech")
+                    && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
+                LunariumUnitHandler.offerDeployMechButton(game, player);
+            }
+        }
         return true;
     }
 

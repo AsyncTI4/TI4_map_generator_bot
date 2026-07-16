@@ -17,6 +17,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
 import ti4.image.Mapper;
+import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.service.regex.RegexService;
 
@@ -44,7 +45,7 @@ public class FaunusService {
             if (game.isFowMode() && !tiles.contains(t.getPosition())) continue;
 
             // skip space stations
-            if (p.isSpaceStation()) continue;
+            if (p.isSpaceStation(game)) continue;
 
             String id = player.factionButtonChecker() + "faunusTake_" + p.getName();
             String label = Helper.getPlanetRepresentation(p.getName(), game);
@@ -66,6 +67,10 @@ public class FaunusService {
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String planet = matcher.group("planet");
             AddPlanetService.addPlanet(player, planet, game, event, false);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + " took control of "
+                            + Helper.getPlanetRepresentation(planet, game) + " with Faunus.");
             ButtonHelper.deleteMessage(event);
         });
     }

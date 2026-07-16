@@ -4,13 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.tuple.Pair;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
+import ti4.helpers.BombardmentAssignment;
+import ti4.helpers.BombardmentAssignmentType;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.model.UnitModel;
+import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class BombardmentService {
@@ -29,36 +34,35 @@ public class BombardmentService {
         return planets;
     }
 
-    public static void autoAssignAllBombardmentToAPlanet(Player player, Game game) {
-        Tile tile = game.getTileByPosition(game.getActiveSystem());
+    public static void autoAssignAllBombardmentToAPlanet(Player player, Game game, Tile tile) {
         game.removeStoredValue("assignedBombardment" + player.getFaction());
         if (tile == null) {
             return;
         }
-        Map<UnitModel, Integer> bombardUnits =
-                CombatRollService.flattenUnitMap(CombatRollService.getUnitsInBombardment(tile, player, null));
+        Map<Pair<UnitModel, UnitHolder>, Integer> bombardUnits =
+                CombatRollService.getUnitsInBombardment(tile, player, null);
         String planet = getBestBombardablePlanet(player, game, tile);
-        for (Map.Entry<UnitModel, Integer> entry : bombardUnits.entrySet()) {
+        List<BombardmentAssignment> assignments = new ArrayList<>();
+        for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : bombardUnits.entrySet()) {
+            int galvanizedCount = entry.getKey()
+                    .getValue()
+                    .getGalvanizedUnitCount(entry.getKey().getKey().getUnitType(), player.getColorID());
             for (int x = 0; x < entry.getValue(); x++) {
-                String name = entry.getKey().getAsyncId() + "_" + x;
-
-                String assignedUnit = name + "_" + planet;
-                game.setStoredValue(
-                        "assignedBombardment" + player.getFaction(),
-                        game.getStoredValue("assignedBombardment" + player.getFaction()) + assignedUnit + ";");
+                String asyncId = entry.getKey().getKey().getAsyncId();
+                assignments.add(new BombardmentAssignment(
+                        asyncId, planet, galvanizedCount > 0, BombardmentAssignmentType.UNIT));
+                galvanizedCount--;
             }
         }
         if (player.hasTech("ps") || player.hasTech("absol_ps")) {
-            game.setStoredValue(
-                    "assignedBombardment" + player.getFaction(),
-                    game.getStoredValue("assignedBombardment" + player.getFaction()) + "plasma_99_" + planet + ";");
+            assignments.add(new BombardmentAssignment("plasmascoring", planet, false, BombardmentAssignmentType.TECH));
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander") || player.hasTech("tf-zealous")) {
-            game.setStoredValue(
-                    "assignedBombardment" + player.getFaction(),
-                    game.getStoredValue("assignedBombardment" + player.getFaction()) + "argentcommander_99_" + planet
-                            + ";");
+            assignments.add(
+                    new BombardmentAssignment("argentcommander", planet, false, BombardmentAssignmentType.LEADER));
         }
+        game.setStoredValue(
+                "assignedBombardment" + player.getFaction(), new ObjectMapper().writeValueAsString(assignments));
     }
 
     private static String getBestBombardablePlanet(Player player, Game game, Tile tile) {

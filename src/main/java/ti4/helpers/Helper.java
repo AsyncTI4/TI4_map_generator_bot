@@ -47,10 +47,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -800,7 +800,8 @@ public final class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getExhaustedPlanets());
         for (String planet : planets) {
-            Button button = Buttons.green("refresh_" + planet, getPlanetRepresentation(planet, game));
+            Button button = Buttons.green(
+                    player.getFactionCheckerPrefix() + "refresh_" + planet, getPlanetRepresentation(planet, game));
             planetButtons.add(button);
         }
         return planetButtons;
@@ -970,7 +971,7 @@ public final class Helper {
 
             boolean containsDMZ = uh.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
 
-            if (containsDMZ || uh.isSpaceStation()) {
+            if (containsDMZ || uh.isSpaceStation(game)) {
                 continue;
             }
             if ("spacedock".equalsIgnoreCase(unit)) {
@@ -1002,7 +1003,7 @@ public final class Helper {
                 continue;
             }
             if (game.getUnitHolderFromPlanet(planet) == null
-                    || game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
+                    || game.getUnitHolderFromPlanet(planet).isSpaceStation(game)) {
                 continue;
             }
             String id = player.factionButtonChecker() + prefix + "_" + unit + "_" + planet;
@@ -1324,7 +1325,6 @@ public final class Helper {
                     && !thing.contains("ghostbt")
                     && !thing.contains("tyrisbt")
                     && !thing.contains("dwsDiscount")
-                    && !NetrunnersLeadersHandler.isOverclockSpentThing(thing)
                     && !thing.contains("aida")
                     && !thing.contains("commander")
                     && !thing.contains("agent")
@@ -1437,10 +1437,6 @@ public final class Helper {
                             .append(MiscEmojis.Resources_1)
                             .append('\n');
                     res += 1;
-                }
-                if (NetrunnersLeadersHandler.isOverclockSpentThing(thing)) {
-                    msg.append(NetrunnersLeadersHandler.getOverclockSpentMessage(game, thing));
-                    res += NetrunnersLeadersHandler.getOverclockSpentResources(thing);
                 }
                 if (thing.contains("boon")) {
                     msg.append("> Used Boon Relic ").append(ExploreEmojis.Relic).append('\n');
@@ -1640,15 +1636,18 @@ public final class Helper {
         }
         int cost = calculateCostOfProducedUnits(player, game, true);
         int unitCount = calculateCostOfProducedUnits(player, game, false);
-        String siphonIIDiscountMessage = "";
-        if (player.hasTech("benetrunnerssd")) {
-            siphonIIDiscountMessage = NetrunnersFactionTechsHandler.getSiphonIIDiscountMessage(game, player);
+        String siphonDiscountMessage = "";
+        if (player.ownsUnit("netrunners_spacedock") || player.ownsUnit("netrunners_spacedock2")) {
+            siphonDiscountMessage = NetrunnersFactionTechsHandler.getSiphonDiscountMessage(game, player);
         }
         if (player.hasAbility("control_network")) {
             String controlNetworkMessage =
                     NetrunnersAbilitiesHandler.getControlNetworkProductionMessage(game, player, tile, cost, unitCount);
             if (!controlNetworkMessage.isEmpty()) {
                 msg.append(controlNetworkMessage);
+                if (player.hasUnlockedBreakthrough("arcanumbtback")) {
+                    msg.append("\n-1 from Power Word: Wish");
+                }
                 return msg.toString();
             }
         }
@@ -1735,7 +1734,10 @@ public final class Helper {
                         .append(".");
             }
         }
-        msg.append(siphonIIDiscountMessage);
+        if (player.hasUnlockedBreakthrough("arcanumbtback")) {
+            msg.append("\n-1 from Power Word: Wish");
+        }
+        msg.append(siphonDiscountMessage);
         return msg.toString();
     }
 
@@ -1840,10 +1842,11 @@ public final class Helper {
                 productionValueTotal += productionValue * uH.getUnits().get(unit);
             }
         }
-        if (uH instanceof Planet planet
-                && TaPromissoryHandler.planetHasAdvancedStructuralEngineering(planet)
-                && player.getPlanets().contains(planet.getName())) {
-            productionValueTotal += Math.max(0, planet.getResources());
+        if (uH instanceof Planet planet) {
+            if (TaPromissoryHandler.planetHasAdvancedStructuralEngineering(planet)
+                    && player.getPlanets().contains(planet.getName())) {
+                productionValueTotal += Math.max(0, planet.getResources());
+            }
         }
         String planet = uH.getName();
         int planetUnitVal = 0;
@@ -1890,6 +1893,43 @@ public final class Helper {
                     productionValueTotal++;
                 }
                 planetUnitVal = 2;
+            }
+
+            if (token.contains("factoryleaseh") && uH instanceof Planet p) {
+                productionValueTotal += p.getResources();
+                if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+                if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
+                if (cosmicSuper) {
+                    productionValueTotal++;
+                }
+            }
+            if (token.contains("factoryleasec") && uH instanceof Planet p) {
+                productionValueTotal += p.getInfluence();
+                if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+                if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
+                if (cosmicSuper) {
+                    productionValueTotal++;
+                }
+            }
+            if (token.contains("factoryleasei")) {
+                productionValueTotal += tile.getPlanetUnitHolders().size();
+                if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+                if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
+                if (cosmicSuper) {
+                    productionValueTotal++;
+                }
             }
 
             if (token.contains("automatons") && planetUnitVal < 3) {
@@ -2164,8 +2204,8 @@ public final class Helper {
                         || (!game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")
                                 && !player.hasTech("tf-quantumdrive"))) {
                     cost += (int) removedUnit.getCost() * entry.getValue();
-                    if (MobilizationEngineHandler.hasEngineAttached(game)) {
-                        cost += MobilizationEngineHandler.getCostMod(game, player, removedUnit) * entry.getValue();
+                    if (ArvaxiBreakthroughHandler.hasEngineAttached(game)) {
+                        cost += ArvaxiBreakthroughHandler.getCostMod(game, player, removedUnit) * entry.getValue();
                     }
                 }
                 totalUnits += entry.getValue();
@@ -2186,8 +2226,11 @@ public final class Helper {
         }
         totalUnits += numInf + numFF;
         if (wantCost) {
-            if (player.hasTech("benetrunnerssd")) {
-                cost = NetrunnersFactionTechsHandler.applySiphonIIDiscount(game, player, cost);
+            if (player.ownsUnit("netrunners_spacedock") || player.ownsUnit("netrunners_spacedock2")) {
+                cost = NetrunnersFactionTechsHandler.applySiphonDiscount(game, player, cost);
+            }
+            if (player.hasUnlockedBreakthrough("arcanumbtback")) {
+                cost = Math.max(0, cost - 1);
             }
             return cost;
         } else {
@@ -2792,6 +2835,9 @@ public final class Helper {
                 ccCount += player_.getStrategicCC();
                 ccCount += player_.getTacticalCC();
                 ccCount += player_.getFleetCC();
+                if (player_.hasAbility("multitasking")) {
+                    ccCount += LunariumAbilityHandler.getFactionSheetCCs(game, player_);
+                }
             } else if (player_.hasAbility("primacy")
                     || player_.hasAbility("edict")
                     || player_.hasAbility("edict_y")

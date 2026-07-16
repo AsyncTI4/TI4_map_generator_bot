@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.MobilizationEngineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -34,6 +34,8 @@ import ti4.model.UnitModel;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.CardEmojis;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class CombatModHelper {
@@ -210,7 +212,7 @@ public class CombatModHelper {
                                 && r.getMessage() != null)
                         .map(r -> unitHeader + ": " + r.getMessage())
                         .findFirst()
-                        .orElse(unitHeader + " " + unit.getAbility());
+                        .orElse(unitHeader + " " + unit.getAbility().orElse(""));
                 modifiers.add(new NamedCombatModifierModel(relevantMod.get(), unitModName));
             }
             if (unit.getUnitType() == UnitType.Flagship && player.hasUnlockedBreakthrough("nekrobt")) {
@@ -231,7 +233,8 @@ public class CombatModHelper {
                                     game)) {
                         modifiers.add(new NamedCombatModifierModel(
                                 relevantMod2.get(),
-                                fsUnit.getUnitEmoji() + " " + fsUnit.getName() + " " + fsUnit.getAbility()));
+                                fsUnit.getUnitEmoji() + " " + fsUnit.getName() + " "
+                                        + fsUnit.getAbility().orElse("")));
                     }
                 }
             }
@@ -624,7 +627,30 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
-            case "technotemplar" -> meetsCondition = player.hasUnit("vyserix_mech");
+            case "technotemplar" -> {
+                if (tile != null && player.hasUnit("vyserix_mech")) {
+                    List<Tile> tilesToCheck = new ArrayList<>();
+                    tilesToCheck.add(tile);
+                    if (unitsByQuantity.keySet().stream().anyMatch(UnitModel::getDeepSpaceCannon)) {
+                        for (String adjPos :
+                                FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                            Tile adjTile = game.getTileByPosition(adjPos);
+                            if (adjTile != null) {
+                                tilesToCheck.add(adjTile);
+                            }
+                        }
+                    }
+                    checkTiles:
+                    for (Tile t : tilesToCheck) {
+                        for (UnitHolder uh : t.getPlanetUnitHolders()) {
+                            if (uh.getUnitCount(UnitType.Mech, player.getColor()) > 0) {
+                                meetsCondition = true;
+                                break checkTiles;
+                            }
+                        }
+                    }
+                }
+            }
             case "opponent_strat_cards_exhausted" ->
                 meetsCondition = opponent != null && game.getPlayedSCs().containsAll(opponent.getSCs());
             case "space_dock_on_holder" -> {
@@ -820,9 +846,11 @@ public class CombatModHelper {
                         scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player);
                     }
                 }
+                case "carriers_in_system" ->
+                    scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Carrier, player);
                 case "arvaxi_engine" -> {
-                    if (MobilizationEngineHandler.isAttachedToUnit(game, player, origUnit)) {
-                        scalingCount = MobilizationEngineHandler.isBoon(game) ? 1 : -1;
+                    if (ArvaxiBreakthroughHandler.isAttachedToUnit(game, player, origUnit)) {
+                        scalingCount = ArvaxiBreakthroughHandler.isBoon(game) ? 1 : -1;
                     }
                 }
                 case "mechs_on_planet" -> {
@@ -873,7 +901,8 @@ public class CombatModHelper {
                 case "opponent_sftt" -> scalingCount = getOpponentSfttCount(opponent);
                 case "nonhome_system_with_planet" -> scalingCount = getSystemsWithControlledPlanets(game, player);
                 case "galvanized_unit_count" -> {
-                    scalingCount = getGalvanizedUnitCount(game, unitHolder, origUnit, player);
+                    scalingCount = getGalvanizedUnitCount(
+                            game, unitHolder, origUnit, player, rollType == CombatRollType.bombardment);
                     if (rollType == CombatRollType.SpaceCannonOffence && origUnit.getDeepSpaceCannon()) {
                         for (String adjPos :
                                 FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
@@ -951,7 +980,27 @@ public class CombatModHelper {
     }
 
     private static int getGalvanizedUnitCount(Game game, UnitHolder uH, UnitModel origUnit, Player player) {
+        return getGalvanizedUnitCount(game, uH, origUnit, player, false);
+    }
+
+    private static int getGalvanizedUnitCount(
+            Game game, UnitHolder uH, UnitModel origUnit, Player player, boolean isBombardment) {
         UnitKey uk = Units.getUnitKey(origUnit.getUnitType(), player.getColorID());
+
+        if (isBombardment) {
+            String bombardmentTarget = game.getStoredValue("bombardmentTarget" + player.getFaction());
+            List<BombardmentAssignment> bombardmentAssignments = new ObjectMapper()
+                    .readValue(
+                            game.getStoredValue("assignedBombardment" + player.getFaction()),
+                            new TypeReference<List<BombardmentAssignment>>() {});
+            return bombardmentAssignments.stream()
+                    .filter(a -> a.planet().equals(bombardmentTarget)
+                            && a.galvanized()
+                            && a.sourceId().equals(uk.asyncID()))
+                    .mapToInt(a -> 1)
+                    .sum();
+        }
+
         return uH.getGalvanizedUnitCount(uk);
     }
 }

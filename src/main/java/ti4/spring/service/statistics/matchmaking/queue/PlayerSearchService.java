@@ -1,5 +1,6 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.settings.users.UserSettings;
 import ti4.spring.context.SpringContext;
@@ -24,21 +24,34 @@ public class PlayerSearchService {
         return SpringContext.getBean(PlayerSearchService.class);
     }
 
-    @Transactional
-    public List<String> searchAndAdd(PlayerSearchCriteria criteria, List<String> existingMemberIds) {
+    public List<String> searchAndAdd(PlayerSearchCriteria criteria, List<String> existingMemberIds, Duration hostWait) {
         if (DatabasePersistenceGate.isDisabled()) return List.of();
 
         int targetSize = maxPlayerCount(criteria.playerCounts());
         int openSlots = targetSize - existingMemberIds.size();
         if (openSlots <= 0) return List.of();
 
+        MatchmakingQueueLock.LOCK.lock();
+        try {
+            return searchAndAddLocked(criteria, existingMemberIds, hostWait, targetSize, openSlots);
+        } finally {
+            MatchmakingQueueLock.LOCK.unlock();
+        }
+    }
+
+    private List<String> searchAndAddLocked(
+            PlayerSearchCriteria criteria,
+            List<String> existingMemberIds,
+            Duration hostWait,
+            int targetSize,
+            int openSlots) {
         List<QueuedParty> queued = new ArrayList<>(queueStore.loadQueuedParties());
         queued.sort(Comparator.comparing(party -> party.party().getQueuedAt()));
 
         Map<MatchmakingQueueMember, PlayerMatchmakingData> partyData =
                 PlayerMatchmakingDataFactory.buildForParties(queued);
         Map<String, PlayerMatchmakingData> hostData = PlayerMatchmakingDataFactory.buildForUsers(
-                existingMemberIds, criteria.restrictions(), criteria.tigl(), criteria.tiglRanks());
+                existingMemberIds, criteria.restrictions(), criteria.tigl(), criteria.tiglRanks(), hostWait);
 
         Set<String> takenUserIds = new HashSet<>(existingMemberIds);
         List<PlayerMatchmakingData> selectedGroup = new ArrayList<>(hostData.values());

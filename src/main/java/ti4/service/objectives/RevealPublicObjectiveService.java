@@ -8,8 +8,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.RewriteDestinyHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -56,10 +56,10 @@ public class RevealPublicObjectiveService {
         NeuraloopService.offerInitialNeuraloopChoice(game, objective.getKey());
         for (Player player : game.getRealPlayers()) {
             if (player.hasAbility("rewrite_destiny")) {
-                RewriteDestinyHandler.offerRewriteDestiny(game, player, objective.getKey(), 2);
+                TyrisAbilityHandler.offerRewriteDestiny(game, player, objective.getKey(), 2);
             }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "tyriscommander")) {
-                TyrisCommanderHandler.offerInfantry(game, player);
+                TyrisLeaderHandler.offerInfantry(game, player);
             }
         }
         var channel = game.getActionsChannel();
@@ -203,10 +203,10 @@ public class RevealPublicObjectiveService {
         NeuraloopService.offerInitialNeuraloopChoice(game, objective.getKey());
         for (Player player : game.getRealPlayers()) {
             if (player.hasAbility("rewrite_destiny")) {
-                RewriteDestinyHandler.offerRewriteDestiny(game, player, objective.getKey(), 1);
+                TyrisAbilityHandler.offerRewriteDestiny(game, player, objective.getKey(), 1);
             }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "tyriscommander")) {
-                TyrisCommanderHandler.offerInfantry(game, player);
+                TyrisLeaderHandler.offerInfantry(game, player);
             }
         }
         if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {

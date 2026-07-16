@@ -653,6 +653,21 @@ class GameLoadService {
                         game.setButtonPressCount(Integer.parseInt(info));
                     }
                 }
+                case Constants.EVENT_SEQUENCE_COUNTER -> {
+                    if (isNotBlank(info)) {
+                        game.setEventSequenceCounter(Long.parseLong(info));
+                    }
+                }
+                case Constants.PENDING_SUB_EVENTS_JSON -> {
+                    if (isNotBlank(info)) {
+                        game.setPendingSubEventsJson(info);
+                    }
+                }
+                case Constants.PENDING_MOVEMENT_STATE -> {
+                    if (isNotBlank(info)) {
+                        game.setPendingMovementState(info);
+                    }
+                }
                 case Constants.STARTED_DATE -> {
                     if (isNotBlank(info)) {
                         game.setStartedDate(Long.parseLong(info));
@@ -1016,6 +1031,8 @@ class GameLoadService {
                 case Constants.DRAFT_QUEUE -> player.loadItemsToDraft(getCardList(tokenizer.nextToken()));
                 case Constants.DRAFT_HAND -> player.loadDraftHand(getCardList(tokenizer.nextToken()));
                 case Constants.ABILITIES -> player.setAbilities(new HashSet<>(getCardList(tokenizer.nextToken())));
+                case Constants.EXHAUSTED_ABILITIES ->
+                    player.setExhaustedAbilities(new HashSet<>(getCardList(tokenizer.nextToken())));
                 case Constants.TECH_EXHAUSTED -> player.setExhaustedTechs(getCardList(tokenizer.nextToken()));
                 case Constants.TECH_PURGED -> player.setPurgedTechs(getCardList(tokenizer.nextToken()));
                 case Constants.RELICS -> player.setRelics(getCardList(tokenizer.nextToken()));

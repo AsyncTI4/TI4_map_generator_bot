@@ -1,5 +1,8 @@
 package ti4.discord.interactions.commands;
 
+import java.util.HashMap;
+import java.util.Map;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import ti4.game.Game;
@@ -8,6 +11,10 @@ import ti4.game.persistence.GameManager;
 import ti4.logging.RollbarManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
+import ti4.spring.service.gameevent.GameEventDraft;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameSubEvent;
 
 record CommandGameState(boolean saveGame, boolean playerCommand) {
 
@@ -39,9 +46,34 @@ record CommandGameState(boolean saveGame, boolean playerCommand) {
     void postExecute(SlashCommandInteractionEvent event) {
         if (saveGame) {
             Game game = CommandGameState.game.get();
+            // Emit the manual-command event BEFORE the save so its counter increment is persisted with the game.
+            logManualCommand(event, game);
             GameManager.save(game, EventAuditService.getReason(event));
         }
         clear();
+    }
+
+    private static void logManualCommand(SlashCommandInteractionEvent event, Game game) {
+        if (game == null) return;
+
+        String commandString = event.getCommandString();
+        Member member = event.getMember();
+        String userName = member == null ? null : member.getEffectiveName();
+
+        // Nest under an open tactical-action draft when present; otherwise emit a top-level event.
+        if (GameEventDraft.stage(game, new GameSubEvent.ManualCommand(userName, commandString))) {
+            return;
+        }
+
+        // Attribute to the invoking user's player (not any target-player option) when resolvable.
+        Player player =
+                CommandHelper.getPlayerFromGame(game, member, event.getUser().getId());
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("command", commandString);
+        if (userName != null) {
+            payload.put("user", userName);
+        }
+        GameEventService.commit(game, GameEventType.MANUAL_COMMAND, player, payload);
     }
 
     void clear() {

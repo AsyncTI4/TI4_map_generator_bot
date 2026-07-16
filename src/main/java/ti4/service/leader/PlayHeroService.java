@@ -18,7 +18,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamBut
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaHeroHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanHeroHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -67,6 +68,10 @@ import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.gameevent.GameEventDraft;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameSubEvent;
 
 @UtilityClass
 public class PlayHeroService {
@@ -98,6 +103,10 @@ public class PlayHeroService {
 
     public static void playHero(GenericInteractionCreateEvent event, Game game, Player player, Leader playerLeader) {
         LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
+        if (!GameEventDraft.stage(
+                game, new GameSubEvent.LeaderPlayed(player.getFaction(), "HERO", playerLeader.getId()))) {
+            GameEventService.commit(game, GameEventType.CARD_PLAY_HERO, player, Map.of("cardId", playerLeader.getId()));
+        }
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity());
         StringBuilder sb = new StringBuilder();
         if (leaderModel != null) {
@@ -229,7 +238,7 @@ public class PlayHeroService {
                     ButtonHelperRelics.offerTitansHeroButtons(player, game, event);
                 }
             }
-            case "onyxxahero" -> OnyxxaHeroHandler.postInitialButtons(game, player);
+            case "onyxxahero" -> OnyxxaLeaderHandler.postHeroMoveShipButtons(game, player);
             case "xanhero" -> XanHeroHandler.postInitialButtons(game, player);
             case "dreamhero" -> DreamButtonHandler.postDreamHeroButtons(game, player);
             case "ashenhero" -> AshenLeadersHandler.postHeroButtons(event, game, player);
@@ -247,6 +256,7 @@ public class PlayHeroService {
                         player.getCorrectChannel(),
                         "You will unfortunately need to use dicecord's `/roll` command for the SPACE CANNON and BOMBARDMENT of all your units against one system and planet respectively.");
             }
+            case "ardentiahero" -> ArdentiaLeadersHandler.startArdentiaHero(event, game, player);
             case "florzenhero" -> {
                 for (Tile tile : game.getTileMap().values()) {
                     for (UnitHolder uH : tile.getPlanetUnitHolders()) {

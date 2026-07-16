@@ -54,6 +54,7 @@ import ti4.service.game.SetOrderService;
 public class FrankenDraftBagService {
 
     public static final String ACTION_NAME = "frankenDraftAction;";
+    private static final int FACTIONS_PER_CONTAINER = 7;
 
     public static List<Color> getAccents() {
         return new ArrayList<>(List.of(
@@ -224,9 +225,25 @@ public class FrankenDraftBagService {
         List<Color> accents = getAccents();
         MessageV2Builder builder = new MessageV2Builder(bagChannel);
         for (DraftCategory cat : DraftCategory.values()) {
-            Container c = draftBagCategoryContainer(player, cat);
-            if (c != null) builder.append(c.withAccentColor(accents.getFirst()));
-            Collections.rotate(accents, -1);
+            List<DraftItem> items = player.getCurrentDraftBag().getCategory(cat);
+            if (draft instanceof FrankenDrazDraft
+                    && cat == DraftCategory.FACTION
+                    && items.size() > FACTIONS_PER_CONTAINER) {
+                int containerCount = Math.ceilDiv(items.size(), FACTIONS_PER_CONTAINER);
+                for (int i = 0; i < items.size(); i += FACTIONS_PER_CONTAINER) {
+                    int containerNumber = i / FACTIONS_PER_CONTAINER + 1;
+                    List<DraftItem> containerItems =
+                            items.subList(i, Math.min(i + FACTIONS_PER_CONTAINER, items.size()));
+                    Container c = draftBagCategoryContainer(
+                            player, cat, containerItems, " (" + containerNumber + "/" + containerCount + ")");
+                    if (c != null) builder.append(c.withAccentColor(accents.getFirst()));
+                    Collections.rotate(accents, -1);
+                }
+            } else {
+                Container c = draftBagCategoryContainer(player, cat, items, "");
+                if (c != null) builder.append(c.withAccentColor(accents.getFirst()));
+                Collections.rotate(accents, -1);
+            }
         }
         builder.send();
 
@@ -277,7 +294,8 @@ public class FrankenDraftBagService {
         updateDraftStatusMessage(game);
     }
 
-    private static Container draftBagCategoryContainer(Player player, DraftCategory cat) {
+    private static Container draftBagCategoryContainer(
+            Player player, DraftCategory cat, List<DraftItem> items, String titleSuffix) {
         Game game = player.getGame();
         int catLimit = FrankenDraft.getItemLimitForCategory(cat, game);
         if (catLimit == 0) return null;
@@ -286,14 +304,13 @@ public class FrankenDraftBagService {
         int amtTaken = player.getDraftHand().getCategoryCount(cat);
         amtTaken += player.getDraftQueue().getCategoryCount(cat);
         String progress = " (" + amtTaken + "/" + catLimit + ")";
-        components.add(TextDisplay.of(cat.title(game) + progress));
+        components.add(TextDisplay.of(cat.title(game) + progress + titleSuffix));
 
-        List<DraftItem> all = player.getCurrentDraftBag().getCategory(cat);
-        if (all.isEmpty()) {
+        if (items.isEmpty()) {
             components.add(TextDisplay.of("There are no items of this category remaining"));
         } else {
             // Add each item to the container
-            for (DraftItem item : all) {
+            for (DraftItem item : items) {
                 if (components.size() > 1) components.add(Separator.createDivider(Spacing.LARGE));
                 components.addAll(item.getTextDisplays(game, player, cat != DraftCategory.FACTION));
                 if (item instanceof FactionDraftItem) {
@@ -308,15 +325,14 @@ public class FrankenDraftBagService {
                 components.add(TextDisplay.of(undraftable));
             } else {
                 // ... Or add buttons to the container
-                List<Button> buttons = getSelectionButtons(player, cat);
+                List<Button> buttons = getSelectionButtons(player, cat, items);
                 if (!buttons.isEmpty()) components.addAll(ActionRow.partitionOf(buttons));
             }
         }
         return Container.of(components);
     }
 
-    private static List<Button> getSelectionButtons(Player player, DraftCategory cat) {
-        List<DraftItem> items = player.getCurrentDraftBag().getCategory(cat);
+    private static List<Button> getSelectionButtons(Player player, DraftCategory cat, List<DraftItem> items) {
         List<Button> buttons = new ArrayList<>();
         boolean draftable = DraftItem.isDraftable(player, cat);
         if (!items.isEmpty()) {

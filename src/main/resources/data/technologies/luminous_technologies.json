@@ -44,5 +44,28 @@
         "baseUpgrade": "pds2",
         "text": "This unit is placed in the space area of a system. No more than 2 Orbital Defense Platform II may be placed in space per system. You may use this unit’s SPACE CANNON against ships that are adjacent to this unit’s system.",
         "source": "luminous"
+    },
+    {
+        "alias": "luopar",
+        "name": "Carbon Silicate Laced Plating",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "R",
+        "faction": "opa",
+        "text": "Once per space combat you may either have one of your units gain the SUSTAIN DAMAGE ability or when one of your units uses SUSTAIN DAMAGE, cancel 2 hits instead of 1.",
+        "source": "luminous"
+    },
+    {
+        "alias": "luopacv",
+        "name": "Mine Runner II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "BB",
+        "faction": "opa",
+        "baseUpgrade": "cv2",
+        "text": "When a player would explore a planet in a system that contains this unit, explore that planet an additional time.",
+        "source": "luminous"
     }
 ]

@@ -21,6 +21,7 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StatusHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
@@ -68,6 +69,7 @@ public class ScorePublicObjectiveService {
                     channel,
                     player.getFactionEmoji() + ", no such public objective ID found, or already scored, please retry.");
         } else {
+            StatusHelper.recordObjectiveScored(game, player, id, "PUBLIC");
             informAboutScoring(event, channel, game, player, poID);
             if (player.hasAbility("primordial")) {
                 KaloraAbilityHandler.primordial(player, game);
@@ -216,6 +218,24 @@ public class ScorePublicObjectiveService {
                                 + " __either__ the resource or influence requirement of this objective, but __not__ both.";
             }
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
+            List<Integer> unfollowedSCs = player.getUnfollowedSCs();
+            if (unfollowedSCs != null
+                    && !unfollowedSCs.contains(1)
+                    && !game.getPhaseOfGame().contains("action")
+                    && !unfollowedSCs.contains(6)
+                    && !unfollowedSCs.contains(7)) {
+                message2 = player.getRepresentationUnfogged()
+                        + ", please choose the planets you wish to exhaust to score the objective.";
+                game.setStoredValue("resetSpend", "sup");
+                for (String planet : player.getPlanets()) {
+                    if (!player.getExhaustedPlanets().contains(planet)) {
+                        player.exhaustPlanet(planet);
+                        player.addSpentThing(planet);
+                    }
+                }
+                message2 += "\n" + Helper.buildSpentThingsMessage(player, game, "both");
+                buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
+            }
             Button DoneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);

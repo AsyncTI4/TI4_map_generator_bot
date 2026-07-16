@@ -14,7 +14,7 @@ record MatchmakingGame(String name, long endedDate, List<MatchmakingPlayer> play
         Map<GameEntity, List<PlayerEntity>> gamePlayers = new LinkedHashMap<>();
         for (PlayerEntity player : players) {
             gamePlayers
-                    .computeIfAbsent(player.getGame(), game -> new ArrayList<>())
+                    .computeIfAbsent(player.getGame(), _ -> new ArrayList<>())
                     .add(player);
         }
 

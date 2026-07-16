@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAgentHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -54,6 +54,10 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.gameevent.GameEventDraft;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameSubEvent;
 
 @UtilityClass
 public class ActionCardHelper {
@@ -751,6 +755,14 @@ public class ActionCardHelper {
             }
         }
         recordTrackedActionCardPlay(game, player, actionCardTitle);
+        if (!GameEventDraft.stage(
+                game, new GameSubEvent.ActionCardPlayed(player.getFaction(), acID, actionCardTitle))) {
+            GameEventService.commit(
+                    game,
+                    GameEventType.CARD_PLAY_ACTION_CARD,
+                    player,
+                    Map.of("cardId", acID, "cardName", actionCardTitle));
+        }
 
         boolean hasUnyieldingWill = player.hasTech("baarvag");
         boolean actionCardIsCancelable = isActionCardCancelable(actionCard) && !twinned && !hasUnyieldingWill;
@@ -1543,6 +1555,7 @@ public class ActionCardHelper {
 
             if ("black_market_intel".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveBlackMarketIntel", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
             if ("hidden_initiatives".equals(automationID)) {
@@ -2052,7 +2065,7 @@ public class ActionCardHelper {
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
                 }
             }
-            ArvaxiAgentHandler.postInitialButtons(game, player, acID);
+            ArvaxiLeaderHandler.postAgentOfferButtons(game, player, acID);
         }
 
         // Fog of war ping

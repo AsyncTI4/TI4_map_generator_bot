@@ -1,0 +1,218 @@
+[
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "borrowed_authority",
+        "additionalComponents": [
+            "ABILITY:seize_command"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "seize_command",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "factory_lease",
+        "additionalComponents": [
+            "PN:thpnmyrrh",
+            "PN:thpnmyrri",
+            "PN:thpnmyrrc"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "PN",
+        "itemId": "thpnmyrrh",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "PN",
+        "itemId": "thpnmyrrc",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "PN",
+        "itemId": "thpnmyrri",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "expeditionary_cache",
+        "additionalComponents": [
+            "ABILITY:shared_discoveries"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "shared_discoveries",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "kryxos_flagship",
+        "additionalComponents": [
+            "TECH:thkryxosfs"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "thkryxosfs",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "kryxos_mech",
+        "additionalComponents": [
+            "TECH:thkryxosmf"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "thkryxosmf",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "primordial_secrets",
+        "additionalComponents": [
+            "ABILITY:forbidden_knowledge"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "forbidden_knowledge",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "thrones_of_ruin",
+        "additionalComponents": [
+            "ABILITY:traces_of_ruin"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "traces_of_ruin",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "throneshero",
+        "additionalComponents": [
+            "ABILITY:traces_of_ruin"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "PN",
+        "itemId": "thpnthrones",
+        "additionalComponents": [
+            "ABILITY:traces_of_ruin"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "cycle_of_reclamation",
+        "additionalComponents": [
+            "ABILITY:new_moon_phase",
+            "ABILITY:waning_moon_phase",
+            "ABILITY:full_moon_phase",
+            "ABILITY:waxing_moon_phase",
+            "ABILITY:lunar_eclipse_phase"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "new_moon_phase",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "waning_moon_phase",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "full_moon_phase",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "waxing_moon_phase",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "lunar_eclipse_phase",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "testing_yard",
+        "optionalSwaps": [
+            "STARTINGFLEET:kryxos"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "STARTINGFLEET",
+        "itemId": "kryxos",
+        "undraftable": true,
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "STARTINGTECH",
+        "itemId": "aeterna",
+        "alternateText": "Choose up to 2 technologies with 0 prerequisites owned by no other player.",
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "STARTINGTECH",
+        "itemId": "arcanum",
+        "alternateText": "Choose 2 technologies in the same color with no prerequisites.",
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "STARTINGTECH",
+        "itemId": "revenant",
+        "alternateText": "Choose 2 technologies in different colors with 1 total prerequisite.",
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "revenantcommander",
+        "additionalComponents": [
+            "ABILITY:allure_of_darkness"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "allure_of_darkness",
+        "undraftable": true,
+        "source": "theodisi"
+    }
+]

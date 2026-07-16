@@ -27,7 +27,7 @@
         "text": "Choose 1 player. That player cannot vote on this agenda.",
         "automationID": "assassin",
         "flavorText": "With a sickening crunch of bone and metal, unit.desgn.FLAYESH extracted its stinger from the blood-drenched skull of the Jol-Nar councilor.",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "assassin3",
@@ -37,7 +37,7 @@
         "text": "Choose 1 player. That player cannot vote on this agenda.",
         "automationID": "assassin",
         "flavorText": "With a sickening crunch of bone and metal, unit.desgn.FLAYESH extracted its stinger from the blood-drenched skull of the Jol-Nar councilor.",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "assassin4",
@@ -47,7 +47,7 @@
         "text": "Choose 1 player. That player cannot vote on this agenda.",
         "automationID": "assassin",
         "flavorText": "With a sickening crunch of bone and metal, unit.desgn.FLAYESH extracted its stinger from the blood-drenched skull of the Jol-Nar councilor.",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "bribery",
@@ -56,6 +56,7 @@
         "window": "After the speaker votes on an agenda",
         "text": "Spend any number of trade goods. For each trade good spent, cast 1 additional vote for the outcome on which you voted.",
         "automationID": "bribery",
+        "notes": "This card is useless if argent is speaker or if representative government is in place.",
         "flavorText": "We think that this initiative would spell disaster for the galaxy, not just the Creuss. Taivra said, quietly slipping Z'eu an envelope. \"Don't you agree?\"",
         "source": "base"
     },
@@ -67,7 +68,7 @@
         "text": "Spend any number of trade goods. For each trade good spent, cast 1 additional vote for the outcome on which you voted.",
         "automationID": "bribery",
         "flavorText": "We think that this initiative would spell disaster for the galaxy, not just the Creuss. Taivra said, quietly slipping Z'eu an envelope. \"Don't you agree?\"",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "bribery3",
@@ -77,7 +78,7 @@
         "text": "Spend any number of trade goods. For each trade good spent, cast 1 additional vote for the outcome on which you voted.",
         "automationID": "bribery",
         "flavorText": "We think that this initiative would spell disaster for the galaxy, not just the Creuss. Taivra said, quietly slipping Z'eu an envelope. \"Don't you agree?\"",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "bribery4",
@@ -87,7 +88,7 @@
         "text": "Spend any number of trade goods. For each trade good spent, cast 1 additional vote for the outcome on which you voted.",
         "automationID": "bribery",
         "flavorText": "We think that this initiative would spell disaster for the galaxy, not just the Creuss. Taivra said, quietly slipping Z'eu an envelope. \"Don't you agree?\"",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "bunker",
@@ -215,13 +216,14 @@
         "window": "At the start of an invasion in a system that contains 1 or more of your opponents' PDS units",
         "text": "Your opponents' PDS units lose PLANETARY SHIELD and SPACE CANNON during this invasion.",
         "flavorText": "Ssruu has met their systems and fixed them. Ssruu dropped a handful of ripped wires and broken circuitry on the pedestal before Q'uesh Sish. \"He will await his next task aboard his ship.\"",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "distinguished",
         "name": "Distinguished Councilor",
         "phase": "Agenda",
         "window": "After you cast votes on an outcome of an agenda",
+        "notes": "This card is useless if representative government is in place.",
         "text": "Cast 5 additional votes for that outcome.",
         "flavorText": "Elder Junn was a wonder to behold. He knew the name of every senator, made small talk effortlessly, and commanded attention when he spoke. Magmus hated everything about him.",
         "source": "base"
@@ -234,7 +236,7 @@
         "text": "Cast 5 additional votes for that outcome.",
         "automationID": "distinguished",
         "flavorText": "Elder Junn was a wonder to behold. He knew the name of every senator, made small talk effortlessly, and commanded attention when he spoke. Magmus hated everything about him.",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "economic_initiative",
@@ -276,7 +278,7 @@
         "notes": "This resolves in the same window as normal SPACE CANNON fire, and any existing SPACE CANNON abilities will be rolled at the same time. This cannot be used against yourself.",
         "automationID": "experimental",
         "flavorText": "Arm the relay! Mendosa bared his fangs. \"The Saar will not submit!\"",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "f_prototype",
@@ -366,7 +368,7 @@
         "text": "Spend 4 trade goods to research 1 technology",
         "automationID": "f_researched",
         "flavorText": "Stunned, Rin looked over the data, scarcely able to believe what he was seeing. It was nothing short of a major breakthrough. The Headmaster would be pleased.",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "f_researched3",
@@ -376,7 +378,7 @@
         "text": "Spend 4 trade goods to research 1 technology",
         "automationID": "f_researched",
         "flavorText": "Stunned, Rin looked over the data, scarcely able to believe what he was seeing. It was nothing short of a major breakthrough. The Headmaster would be pleased.",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "f_researched4",
@@ -386,7 +388,7 @@
         "text": "Spend 4 trade goods to research 1 technology",
         "automationID": "f_researched",
         "flavorText": "Stunned, Rin looked over the data, scarcely able to believe what he was seeing. It was nothing short of a major breakthrough. The Headmaster would be pleased.",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "f_deployment",
@@ -406,7 +408,7 @@
         "text": "Place 3 infantry from your reinforcements on 1 planet you control.",
         "automationID": "f_deployment",
         "flavorText": "The soldiers poured fire on the writhing mass, but as each tendril vaporized, two more took its place. Panic wormed into the troopers' minds; was the creature growing?",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "ghost_ship",
@@ -426,7 +428,7 @@
         "text": "Place 1 destroyer from your reinforcements in a non-home system that contains a wormhole and does not contain other players' ships.",
         "automationID": "ghost_ship",
         "flavorText": "Reports of Creuss vessels sighted in the area had surely been exaggerated. After all, the Creuss had no business this far from the Shaleri passage, and usually kept to themselves.",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "imp_rider",
@@ -456,7 +458,7 @@
         "text": "Choose 1 system. During this tactical action, your ships in the chosen system can move through systems that contain other players' ships.",
         "automationID": "silence_space",
         "flavorText": "The Barony ships seemed to defy reality, bending light around them at impossible angles - naught but inky-black contours could be seen.",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "industrial_initiative",
@@ -486,7 +488,7 @@
         "text": "Replace each PDS and space dock that is on that planet with a matching unit from your reinforcements.",
         "automationID": "infiltrate",
         "flavorText": "The 1X had scarcely interfaced with the mainframe before it belonged to them completely.",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "insub",
@@ -712,7 +714,7 @@
         "window": "When another player chooses a strategy card during the strategy phase",
         "text": "That player must choose a different strategy card instead, if able.",
         "flavorText": "In the months that followed the report, the Council was quick to censure the Jol-Nar for their unethical practices.",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "meltdown",
@@ -991,7 +993,7 @@
         "text": "Remove 1 of your command tokens from the game board and return it to your reinforcements.",
         "automationID": "unexpected",
         "flavorText": "M'aban's voice was barely a whisper, cracking as hundreds of flashing lights appeared on her scanner. \"We've been tricked.\"",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "unstable",
@@ -1020,7 +1022,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Exhaust 1 non-home planet controlled by another player. Then gain trade goods equal to its resource value.",
-        "notes": "This cannot be used to target an exhausted planet.",
+        "notes": "This cannot be used to target an exhausted planet.  Async is ruling you can target the triad with this.",
         "flavorText": "Harrugh leapt down from the ledge, gyro-spear blazing in the sunlight. In front, the L1Z1X began to take notice. Behind his warriors stood at the ready. Win or lose, this would be the end.",
         "source": "base"
     },
@@ -1044,7 +1046,7 @@
         "text": "Discard that agenda and reveal 1 agenda from the top of the deck. Players vote on this agenda instead.",
         "automationID": "veto",
         "flavorText": "Magmus batted the now charred corpse aside with the back of his golden gauntlet. \"The Muuat reject your proposal.\"",
-        "source": "base"
+        "source": "asteroid"
     },
     {
         "alias": "veto3",
@@ -1194,7 +1196,7 @@
         "window": "After you perform an action",
         "text": "You may perform an additional action this turn.",
         "flavorText": "Viktor laced his long fingers with a wicked smile. Unlenn would be proud. The tactician's reputation was well-earned; even pawns could unseat kings.",
-        "source": "codex1"
+        "source": "asteroid"
     },
     {
         "alias": "plagiarize",
@@ -1214,7 +1216,7 @@
         "text": "Spend 5 influence and choose a non-faction technology owned by 1 of your neighbors. Gain that technology.",
         "automationID": "plagiarize",
         "flavorText": "The Yssaril spies handed over their prize to Connor, who in turn passed it to the Sol engineers with a grim smile. \"Now then, boys,\" he said, one hand on his rifle, \"about those loose ends...\"",
-        "source": "codex1"
+        "source": "asteroid"
     },
     {
         "alias": "rally",
@@ -1329,7 +1331,7 @@
         "name": "Archaeological Expedition",
         "phase": "Action",
         "window": "Action",
-        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control. gain any relic fragments that you reveal and discard the rest.",
+        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control; gain any relic fragments that you reveal and discard the rest.",
         "automationID": "arch_expedition",
         "flavorText": "Hiari pressed the activation glyphs, and the ancient door hissed open. As she stepped into the pitch-black interior of the Mahact tomb, she felt a shiver of anticipation. Perhaps, finally, she would find the Codex.",
         "source": "pok"
@@ -1339,7 +1341,7 @@
         "name": "Archaeological Expedition",
         "phase": "Action",
         "window": "Action",
-        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control. gain any relic fragments that you reveal and discard the rest.",
+        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control; gain any relic fragments that you reveal and discard the rest.",
         "automationID": "arch_expedition",
         "flavorText": "Hiari pressed the activation glyphs, and the ancient door hissed open. As she stepped into the pitch-black interior of the Mahact tomb, she felt a shiver of anticipation. Perhaps, finally, she would find the Codex.",
         "source": "asteroid"
@@ -1349,7 +1351,7 @@
         "name": "Archaeological Expedition",
         "phase": "Action",
         "window": "Action",
-        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control. gain any relic fragments that you reveal and discard the rest.",
+        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control; gain any relic fragments that you reveal and discard the rest.",
         "automationID": "arch_expedition",
         "flavorText": "Hiari pressed the activation glyphs, and the ancient door hissed open. As she stepped into the pitch-black interior of the Mahact tomb, she felt a shiver of anticipation. Perhaps, finally, she would find the Codex.",
         "source": "asteroid"
@@ -1359,7 +1361,7 @@
         "name": "Archaeological Expedition",
         "phase": "Action",
         "window": "Action",
-        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control. gain any relic fragments that you reveal and discard the rest.",
+        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control; gain any relic fragments that you reveal and discard the rest.",
         "automationID": "arch_expedition",
         "flavorText": "Hiari pressed the activation glyphs, and the ancient door hissed open. As she stepped into the pitch-black interior of the Mahact tomb, she felt a shiver of anticipation. Perhaps, finally, she would find the Codex.",
         "source": "asteroid"
