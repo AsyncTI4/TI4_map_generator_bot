@@ -56,10 +56,14 @@ public class RevenantBreakthroughHandler {
 
         LeaderModel agent = Mapper.getLeader(agentId);
         String agentName = agent == null ? agentId : agent.getName();
-        MessageHelper.sendMessageToChannelWithEmbed(
-                player.getCorrectChannel(),
-                player.getRepresentation() + " drew and attached _" + agentName + "_ to _Revenant Rising_.",
-                agent.getRepresentationEmbed());
+        String attachmentMessage =
+                player.getRepresentation() + " drew and attached _" + agentName + "_ to _Revenant Rising_.";
+        if (agent == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), attachmentMessage);
+        } else {
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(), attachmentMessage, agent.getRepresentationEmbed());
+        }
         if (agent != null && player.getCardsInfoThread() != null) {
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCardsInfoThread(), "__Revenant Rising Attached Agent__", agent.getRepresentationEmbed());
