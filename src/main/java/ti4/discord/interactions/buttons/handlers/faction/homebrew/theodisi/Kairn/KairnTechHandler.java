@@ -7,7 +7,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -18,9 +17,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
-import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.explore.ExploreService;
 import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
@@ -28,10 +25,16 @@ public class KairnTechHandler {
     private static final String SURVEYORS_LENS = "thkairny";
     private static final String EXHAUST_LENS = "kairnExhaustLens";
     private static final String SURVEY_PLANET = "surveyTargetPlanet_";
-    private static final String LENS_TRAIT = "exploreLensTrait_";
     private static final String READY_LENS = "kairnReadyLens_";
     private static final String DECLINE_READY_LENS = "kairnDeclineReadyLens_";
     private static final String FRAGMENT_WINDOW = "kairnLensFragment_";
+
+    public static void clearSurveyorsLensFragmentWindows(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            game.removeStoredValue(FRAGMENT_WINDOW + player.getFaction());
+        }
+    }
+
     private static final Set<String> EXPLORATION_TRAITS =
             Set.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL);
 
@@ -99,72 +102,20 @@ public class KairnTechHandler {
             return;
         }
 
-        List<Button> buttons = new ArrayList<>();
-        for (String trait : planet.getPlanetTypes()) {
-            if (!EXPLORATION_TRAITS.contains(trait)) {
-                continue;
-            }
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + LENS_TRAIT + trait + "|" + planetName,
-                    "Explore as " + StringUtils.capitalize(trait),
-                    ExploreEmojis.getTraitEmoji(trait)));
-        }
+        List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, planet, player);
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "That planet has no explorable trait.");
             ButtonHelper.deleteMessage(event);
             return;
         }
 
+        player.exhaustTech(SURVEYORS_LENS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentationUnfogged() + ", choose which trait to explore " + planet.getRepresentation(game)
-                        + " as.",
+                player.getRepresentationUnfogged() + ", choose how to explore " + planet.getRepresentation(game)
+                        + " using _Surveyor's Lens_.",
                 buttons);
         ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(LENS_TRAIT)
-    public static void resolveLensTrait(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (game == null || player == null) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        String[] payload = buttonID.substring(LENS_TRAIT.length()).split("\\|", 2);
-        if (payload.length != 2) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        String trait = payload[0];
-        String planetName = payload[1];
-        Tile tile = game.getTileFromPlanet(planetName);
-        Planet planet = game.getUnitHolderFromPlanet(planetName);
-        if (!player.hasTechReady(SURVEYORS_LENS)
-                || tile == null
-                || planet == null
-                || !tile.getPosition().equals(game.getActiveSystem())
-                || !EXPLORATION_TRAITS.contains(trait)
-                || !planet.getPlanetTypes().contains(trait)) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "That exploration is no longer eligible for Surveyor's Lens.");
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        String cardID = game.drawExplore(trait);
-        if (cardID == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "There are no cards left in that exploration deck.");
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        player.exhaustTech(SURVEYORS_LENS);
-        ButtonHelper.deleteMessage(event);
-        String message = player.getRepresentation() + " explored " + planet.getRepresentation(game)
-                + " using _Surveyor's Lens_.";
-        ExploreService.resolveExplore(event, cardID, tile, planetName, message, player, game);
     }
 
     public static void offerSurveyorsLensReady(

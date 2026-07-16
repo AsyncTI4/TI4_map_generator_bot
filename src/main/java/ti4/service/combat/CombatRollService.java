@@ -33,6 +33,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
@@ -82,6 +83,7 @@ import ti4.service.leader.UnlockLeaderService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.HacanFlagshipService;
+import ti4.service.unit.UnitModelValueInjectionService;
 import ti4.spring.context.SpringContext;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -335,6 +337,36 @@ public class CombatRollService {
             }
         }
 
+        StringBuilder powerWordWishCombatNote = new StringBuilder();
+        if (rollType == CombatRollType.combatround) {
+            Map<Pair<UnitModel, UnitHolder>, Integer> adjustedUnits = new HashMap<>();
+            for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : playerUnitsByQuantity.entrySet()) {
+                UnitModel unit = entry.getKey().getLeft();
+                UnitHolder holder = entry.getKey().getRight();
+                int boostedCount = ArcanumBreakthroughHandler.getPowerWordWishCombatBonus(
+                        game, player, tile, holder, unit, entry.getValue());
+                if (boostedCount > 0) {
+                    powerWordWishCombatNote
+                            .append("> _Power Word: Wish_: ")
+                            .append(boostedCount)
+                            .append(" ")
+                            .append(unit.getName())
+                            .append(" receives +2 combat this round.\n");
+                    if (entry.getValue() > boostedCount) {
+                        adjustedUnits.put(entry.getKey(), entry.getValue() - boostedCount);
+                    }
+                    UnitModel boostedUnit = UnitModelValueInjectionService.injectValues(
+                            unit,
+                            UnitModelValueInjectionService.IntegerValueInjection.create()
+                                    .combatHitsOn(-2));
+                    adjustedUnits.merge(new ImmutablePair<>(boostedUnit, holder), boostedCount, Integer::sum);
+                } else {
+                    adjustedUnits.merge(entry.getKey(), entry.getValue(), Integer::sum);
+                }
+            }
+            playerUnitsByQuantity = adjustedUnits;
+        }
+
         if (playerUnitsByQuantity.isEmpty()) {
             String fightingOnUnitHolderName = unitHolderName;
             if (!Constants.SPACE.equalsIgnoreCase(unitHolderName)) {
@@ -458,6 +490,16 @@ public class CombatRollService {
                 combatOnHolder);
         String combatSummary = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
         String message = combatSummary + rollResult.message();
+        if (!powerWordWishCombatNote.isEmpty()) {
+            String modifierHeader = "With modifiers: \n";
+            int modifierHeaderIndex = message.indexOf(modifierHeader);
+            if (modifierHeaderIndex >= 0) {
+                int insertIndex = modifierHeaderIndex + modifierHeader.length();
+                message = message.substring(0, insertIndex) + powerWordWishCombatNote + message.substring(insertIndex);
+            } else {
+                message = combatSummary + modifierHeader + powerWordWishCombatNote + rollResult.message();
+            }
+        }
         CombatRollPayload.RollHeader rollHeader =
                 buildRollHeader(game, player, opponent, tile, combatOnHolder, rollType, combatSummary);
         CombatRollPayload payload = rollResult.payload().withHeader(rollHeader);
