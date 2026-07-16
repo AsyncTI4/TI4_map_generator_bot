@@ -31,6 +31,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.acd2.PublicOutrageA
 import ti4.discord.interactions.buttons.handlers.actioncards.acd2.SettlementsAcd2ButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanAbilityHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
@@ -2531,6 +2532,11 @@ public final class AgendaHelper {
         } else {
             aCount = Integer.parseInt(agendaCount) + 1;
         }
+        if (aCount > 1 && VeylorAbilitiesHandler.offerTightSchedulingRevealChoice(game, revealFromBottom)) {
+            MessageHelper.sendMessageToChannel(
+                    channel, game.getPing() + "The agenda reveal is waiting for Veylor to resolve _Tight Scheduling_.");
+            return;
+        }
         game.setStoredValue("agendaCount", aCount + "");
         if (aCount == 1 && game.isShowBanners() && !game.isOmegaPhaseMode()) {
             BannerGenerator.drawPhaseBanner("agenda", game.getRound(), game.getActionsChannel());
@@ -2689,6 +2695,9 @@ public final class AgendaHelper {
         MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
         String revealMessage = game.getPing() + ", an agenda has been revealed.";
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
+        if (!action && aCount == 1) {
+            VeylorAbilitiesHandler.offerTightScheduling(game);
+        }
 
         AutoPingMetadataManager.setupAutoPing(game.getName());
 

@@ -81,6 +81,7 @@
             "CYBERNETIC"
         ],
         "text": "When you gain this breakthrough and each time you score a secret objective you may draw 1 random unused agent and attach it to this card. This card has the ability text of each agent attached to it. Once per game round when you would exhaist this agent you may purge 1 agent attached to this card instead.",
+        "notes": "Due to how some agents are wired in async, the agenmt purge option is always available in cards info. Use it instead of exhausting an agent when you normally would if you plan to purge one.",
         "source": "theodisi"
     },
     {

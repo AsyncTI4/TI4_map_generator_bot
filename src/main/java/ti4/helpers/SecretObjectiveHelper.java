@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumLeaderHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -242,6 +243,7 @@ public class SecretObjectiveHelper {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "lunariumcommander")) {
             LunariumLeaderHandler.drawSO(event, game, player);
         }
+        RevenantBreakthroughHandler.gainAttachedAgent(game, player);
         return Helper.checkEndGame(game, player);
     }
 

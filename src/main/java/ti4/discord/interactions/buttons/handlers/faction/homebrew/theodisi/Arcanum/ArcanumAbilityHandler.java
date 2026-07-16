@@ -20,6 +20,7 @@ public class ArcanumAbilityHandler {
     private static final List<String> PRIMORDIAL_TECHS =
             List.of("tharcanumpmy", "tharcanumpmg", "tharcanumpmr", "tharcanumpmb");
 
+    // Primordial Secrets
     public static void offerPrimordialSecretsButtons(Game game, Player player) {
         if (game == null || player == null || !player.hasAbility(PRIMORDIAL_SECRETS) || hasChosenPrimordial(player)) {
             return;
@@ -67,7 +68,7 @@ public class ArcanumAbilityHandler {
             return;
         }
 
-        player.addTech(techId);
+        player.addFactionTech(techId);
         MessageHelper.sendMessageToChannelWithEmbed(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " added " + Mapper.getTech(techId).getNameRepresentation()
