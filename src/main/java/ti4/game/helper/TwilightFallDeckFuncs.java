@@ -116,7 +116,7 @@ public interface TwilightFallDeckFuncs {
         for (String card : alreadyDrawn) {
             // savedParadigms includes veiled paradigms, which should only be removed if includeVeiledCards is false
             boolean shouldRemove = true;
-            if (isVeiledHeartMode() & includeVeiledCards) {
+            if (isVeiledHeartMode() && includeVeiledCards) {
                 for (Player p2 : getRealPlayersNNeutral()) {
                     if (getStoredValue("veiledCards" + p2.getFaction()).contains(card)) {
                         shouldRemove = false;
