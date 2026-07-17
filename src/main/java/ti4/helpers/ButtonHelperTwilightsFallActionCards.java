@@ -636,18 +636,6 @@ public final class ButtonHelperTwilightsFallActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("resolveGenophage")
-    public static void resolveGenophage(Game game, Player player, ButtonInteractionEvent event) {
-        List<Button> buttons = new ArrayList<>();
-        for (Player p2 : player.getNeighbouringPlayers(false)) {
-            buttons.add(
-                    Buttons.gray("genophageStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
-        }
-        String msg = player.getRepresentation() + ", please choose the neighbor you wish to _Genophage_.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
     public static void resolveLawsHero(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
@@ -688,6 +676,18 @@ public final class ButtonHelperTwilightsFallActionCards {
                 + player.getFactionNameOrColor() + "; it has been purged.";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveGenophage")
+    public static void resolveGenophage(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : player.getNeighbouringPlayers(false)) {
+            buttons.add(
+                    Buttons.gray("genophageStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
+        }
+        String msg = player.getRepresentation() + ", please choose the neighbor you wish to _Genophage_.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
 
