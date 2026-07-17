@@ -1555,7 +1555,7 @@ public final class ButtonHelperTwilightsFall {
             return;
         }
         String cardID = cardsToDraw.getFirst();
-        if (buttonID.split("_").length > 2 && !buttonID.contains("pinktfmech")) {
+        if (buttonID.split("_").length > 2 && !buttonID.contains("pinktfmech") && !buttonID.contains("sentient")) {
             cardID = buttonID.split("_")[2];
             ButtonHelper.deleteMessage(event);
         }

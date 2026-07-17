@@ -169,8 +169,10 @@ public class ButtonHelperHeroes {
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
-                if (unitModel == null || (unitModel.getIsStructure() && !Objects.equals(unitHolder.getName(), "space")))
-                    continue;
+                if (unitModel == null
+                        || (unitModel.getIsStructure()
+                                && !Objects.equals(unitHolder.getName(), "space")
+                                && !player.hasAbility("miniaturization"))) continue;
                 UnitKey unitKey = unitEntry.getKey();
                 String unitName = unitKey.unitName();
                 int totalUndamagedUnits = unitEntry.getValue();
@@ -886,10 +888,7 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             Planet planetReal = game.getPlanetsInfo().get(planet);
-            boolean oneOfThree = planetReal != null
-                    && isNotBlank(planetReal.getOriginalPlanetType())
-                    && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
-            if (oneOfThree || planet.contains("custodiavigilia") || planet.contains("ghoti")) {
+            if (!planet.contains("mr") && planetReal.isHomePlanet(game) && !planetReal.isSpaceStation()) {
                 buttons.add(
                         Buttons.green("freeSystemsHeroPlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
             }
