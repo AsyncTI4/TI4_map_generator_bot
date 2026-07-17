@@ -18,7 +18,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -91,6 +90,12 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("ironagent")) {
             buttons.add(IronLeadersHandler.getMasterOfDefenseCardsInfoButton());
         }
+        if (player.hasUnexhaustedLeader("revenantarcanumagent")) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "useRevArcanumAgent_other",
+                    "Use Runebearer Lothos on Another Player",
+                    FactionEmojis.revenant));
+        }
         if (player.hasUnexhaustedLeader("ashenagent")) {
             buttons.add(AshenLeadersHandler.getAshTenderCardsInfoButton(player));
         }
@@ -106,9 +111,6 @@ public class CardsInfoService {
         }
         if (player.hasTech("becrystmb") && player.isActivePlayer()) {
             buttons.add(CrystellumFactionTechHandler.getMolecularBindingButton(player));
-        }
-        if (RevenantBreakthroughHandler.canPurgeAgent(game, player)) {
-            buttons.add(RevenantBreakthroughHandler.getPurgeAgentButton(player));
         }
         if (player.hasAbility("doctrine") && player.hasAbility("paradigm") && player.hasAbility("natau_decree")) {
             buttons.add(NatauAbilityHandler.getShowDoctrinesButton(player));
