@@ -200,8 +200,10 @@ public class VeiledHeartService {
                         .ifPresent(type -> {
                             if (card.isEmpty()) {
                                 sendVeiledButtons(action, type, player);
-                            } else {
+                            } else if (targetPlayer == null) {
                                 doAction(action, type, player, card);
+                            } else {
+                                doAction(action, type, player, Integer.parseInt(card), targetPlayer);
                             }
                         }));
         ButtonHelper.deleteMessage(event);
@@ -218,7 +220,7 @@ public class VeiledHeartService {
                 setStoredValue(player, getStoredValue(player) + card + "_");
                 msg = player.getRepresentation() + " has secretly drawn a veiled "
                         + type.toString().toLowerCase()
-                        + ". They may put it into play with a button in their cards info.";
+                        + ". They may put it into play with a button in their `#cards-info` thread.";
             }
             case DISCARD -> {
                 setStoredValue(player, getStoredValue(player).replace(card + "_", ""));
