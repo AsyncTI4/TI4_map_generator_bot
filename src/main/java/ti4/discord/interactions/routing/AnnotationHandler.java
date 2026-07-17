@@ -328,7 +328,9 @@ public class AnnotationHandler {
         }
     }
 
-    private static List<Class<?>> getAllClasses() {
+    // Package-private (not private) so AnnotationHandlerDuplicateTest can reuse this exact scan. If more
+    // internals end up needing similar test access, extract a proper seam instead of relaxing further.
+    static List<Class<?>> getAllClasses() {
         if (classes.isEmpty()) {
             Reflections reflections = new Reflections(new ConfigurationBuilder()
                     .setUrls(ClasspathHelper.forJavaClassPath())
