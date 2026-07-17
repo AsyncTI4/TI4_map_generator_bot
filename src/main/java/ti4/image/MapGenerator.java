@@ -1080,7 +1080,7 @@ public class MapGenerator implements AutoCloseable {
         if (game.isTwilightsFallMode()) {
             int cardCount, fullDeck;
 
-            cardCount = game.getAbilitySpliceDeck(true).size();
+            cardCount = game.getAbilitySpliceDeck(false).size();
             fullDeck = Mapper.getDeck(game.getAbilitySpliceDeckID()).getCardCount();
             drawPAImageScaled(x, y, "cardback_tf_ability.jpg", cardWidth, cardHeight);
             DrawingUtil.superDrawString(
@@ -1097,7 +1097,7 @@ public class MapGenerator implements AutoCloseable {
             addWebsiteOverlay("Ability Splice Deck", overlayText, x, y, cardWidth, cardHeight);
             x += horSpacing;
 
-            cardCount = game.getUnitSpliceDeck(true).size();
+            cardCount = game.getUnitSpliceDeck(false).size();
             fullDeck = Mapper.getDeck(game.getUnitSpliceDeckID()).getCardCount();
             drawPAImageScaled(x, y, "cardback_unit_upgrade.jpg", cardWidth, cardHeight);
             DrawingUtil.superDrawString(
@@ -1114,7 +1114,7 @@ public class MapGenerator implements AutoCloseable {
             addWebsiteOverlay("Unit Upgrade Splice Deck", overlayText, x, y, cardWidth, cardHeight);
             x += horSpacing;
 
-            cardCount = game.getGenomeSpliceDeck(true).size();
+            cardCount = game.getGenomeSpliceDeck(false).size();
             fullDeck = Mapper.getDeck(game.getGenomeSpliceDeckID()).getCardCount();
             drawPAImageScaled(x, y, "cardback_genome.jpg", cardWidth, cardHeight);
             DrawingUtil.superDrawString(
@@ -1131,7 +1131,7 @@ public class MapGenerator implements AutoCloseable {
             addWebsiteOverlay("Genome Splice Deck", overlayText, x, y, cardWidth, cardHeight);
             x += horSpacing;
 
-            cardCount = game.getParadigmSpliceDeck(true).size();
+            cardCount = game.getParadigmSpliceDeck(false).size();
             fullDeck = Mapper.getDeck(game.getParadigmSpliceDeckID()).getCardCount();
             drawPAImageScaled(x, y, "cardback_paradigm.jpg", cardWidth, cardHeight);
             DrawingUtil.superDrawString(

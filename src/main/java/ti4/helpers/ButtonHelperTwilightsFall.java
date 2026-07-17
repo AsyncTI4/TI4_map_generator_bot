@@ -1309,7 +1309,27 @@ public final class ButtonHelperTwilightsFall {
                 embeds.add(Mapper.getUnit(card).getRepresentationEmbed());
             }
         }
-        MessageHelper.sendMessageEmbedsToThread(event.getChannel(), "Remaining cards of type: " + type, embeds);
+        String message = String.format("These %d cards are left in the %s deck:", cards.size(), type);
+        if (game.isVeiledHeartMode()) {
+            int veiledCount = VeiledHeartService.countVeiledCards(game, type);
+            if (veiledCount > 0) {
+                int deckCount = cards.size() - veiledCount;
+                if (deckCount > 0) {
+                    message = """
+                            There are %d cards left in the %s deck.
+                            However, there are also %d veiled %s cards among players.
+                            So, the %d cards in the deck could be any of these %d cards:""";
+                    message = String.format(message, deckCount, type, veiledCount, type, deckCount, cards.size());
+                } else {
+                    message = String.format(
+                            "The %s deck is empty. These are the %d veiled %s cards among players:",
+                            type, veiledCount, type);
+                }
+            }
+        }
+        String threadName = "Remaining cards of type: " + type;
+        MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);
+        MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, embeds);
     }
 
     public static List<MessageEmbed> getSpliceEmbeds(Game game, String type, List<String> cards, Player player) {
@@ -1389,8 +1409,12 @@ public final class ButtonHelperTwilightsFall {
         if (buttonID.contains("_")) {
             type = buttonID.split("_")[1];
         }
-        List<Button> buttons = new ArrayList<>();
 
+        if (game.isVeiledHeartMode()) {
+            VeiledHeartService.sendVeiledButtons(VeiledHeartService.VeiledCardAction.DISCARD, type, player);
+        }
+
+        List<Button> buttons = new ArrayList<>();
         if ("ability".equalsIgnoreCase(type)) {
             for (String tech : player.getTechs()) {
                 if ("antimatter".equalsIgnoreCase(tech) || "wavelength".equalsIgnoreCase(tech)) {
@@ -1599,13 +1623,7 @@ public final class ButtonHelperTwilightsFall {
                         Mapper.getUnit(cardID).getRepresentationEmbed());
             }
         } else {
-            game.setStoredValue(
-                    "veiledCards" + player.getFaction(),
-                    game.getStoredValue("veiledCards" + player.getFaction()) + cardID + "_");
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationNoPing()
-                            + " has taken a secret card. They may put it into play with a button in their `#cards-info` thread.");
+            VeiledHeartService.doAction(VeiledHeartService.VeiledCardAction.DRAW, type, player, cardID);
         }
         if (buttonID.contains("pinktfmech")) {
             MessageHelper.sendMessageToChannelWithButtons(

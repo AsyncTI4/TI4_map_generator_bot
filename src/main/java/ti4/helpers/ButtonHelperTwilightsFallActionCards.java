@@ -29,6 +29,7 @@ import ti4.model.LeaderModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
+import ti4.service.VeiledHeartService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.map.FractureService;
@@ -635,18 +636,6 @@ public final class ButtonHelperTwilightsFallActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("resolveGenophage")
-    public static void resolveGenophage(Game game, Player player, ButtonInteractionEvent event) {
-        List<Button> buttons = new ArrayList<>();
-        for (Player p2 : player.getNeighbouringPlayers(false)) {
-            buttons.add(
-                    Buttons.gray("genophageStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
-        }
-        String msg = player.getRepresentation() + ", please choose the neighbor you wish to _Genophage_.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
     public static void resolveLawsHero(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
@@ -690,6 +679,18 @@ public final class ButtonHelperTwilightsFallActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("resolveGenophage")
+    public static void resolveGenophage(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : player.getNeighbouringPlayers(false)) {
+            buttons.add(
+                    Buttons.gray("genophageStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
+        }
+        String msg = player.getRepresentation() + ", please choose the neighbor you wish to _Genophage_.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("genophageStep2")
     public static void genophageStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
@@ -704,6 +705,9 @@ public final class ButtonHelperTwilightsFallActionCards {
                     "genophageStep3_" + p2.getFaction() + "_" + agent,
                     lead.getTFNameIfAble(),
                     FactionEmojis.getFactionIcon(lead.getFaction())));
+        }
+        if (game.isVeiledHeartMode()) {
+            buttons.addAll(VeiledHeartService.getVeiledDiscardButtonsForGenophage(player, p2));
         }
         String msg =
                 player.getRepresentation() + ", please choose the genome of your neighbor that you wish to remove.";

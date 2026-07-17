@@ -54,6 +54,23 @@ public class VeiledHeartService {
             return Optional.empty();
         }
 
+        static Optional<VeiledCardType> fromString(String str) {
+            str = str.toLowerCase();
+            if (str.contains("abil") || str.contains("tech")) {
+                return Optional.of(ABILITY);
+            }
+            if (str.contains("unit") || str.contains("upgr")) {
+                return Optional.of(UNIT);
+            }
+            if (str.contains("genome") || str.contains("agent")) {
+                return Optional.of(GENOME);
+            }
+            if (str.contains("para") || str.contains("hero")) {
+                return Optional.of(PARADIGM);
+            }
+            return Optional.empty();
+        }
+
         boolean matches(String card) {
             return Optional.of(this).equals(fromCard(card));
         }
@@ -100,6 +117,20 @@ public class VeiledHeartService {
         return getVeiledCards(player).filter(type::matches);
     }
 
+    private static List<String> getVeiledCards(Game game, VeiledCardType type) {
+        List<String> veiledCards = new ArrayList<>();
+        for (Player player : game.getRealPlayers()) {
+            veiledCards.addAll(getVeiledCards(type, player).toList());
+        }
+        return veiledCards;
+    }
+
+    public static int countVeiledCards(Game game, String typeStr) {
+        return VeiledCardType.fromString(typeStr)
+                .map(type -> getVeiledCards(game, type).size())
+                .orElse(0);
+    }
+
     private static Map<VeiledCardType, List<String>> getVeiledCardsByType(Player player) {
         Map<VeiledCardType, List<String>> veiledCardsByType = new HashMap<>();
         for (VeiledCardType cardType : VeiledCardType.values()) {
@@ -122,6 +153,16 @@ public class VeiledHeartService {
                 .toList();
     }
 
+    public static List<Button> getVeiledDiscardButtonsForGenophage(Player activePlayer, Player targetPlayer) {
+        List<Button> buttons = new ArrayList<>();
+        String buttonIdFormat = "veiled_discard_genome_%d_" + targetPlayer.getFaction();
+        long cardCount = getVeiledCards(VeiledCardType.GENOME, targetPlayer).count();
+        for (long i = 0; i < cardCount; i++) {
+            buttons.add(Buttons.gray(String.format(buttonIdFormat, i), "Veiled Genome " + (i + 1)));
+        }
+        return buttons;
+    }
+
     private static String getRepresentation(VeiledCardType type, String card) {
         return switch (type) {
             case ABILITY -> Mapper.getTech(card).getName();
@@ -134,6 +175,10 @@ public class VeiledHeartService {
         for (VeiledCardType type : VeiledCardType.values()) {
             sendVeiledButtons(action, type, player);
         }
+    }
+
+    public static void sendVeiledButtons(VeiledCardAction action, String typeStr, Player player) {
+        VeiledCardType.fromString(typeStr).ifPresent(type -> sendVeiledButtons(action, type, player));
     }
 
     private static void sendVeiledButtons(VeiledCardAction action, VeiledCardType type, Player player) {
@@ -159,6 +204,7 @@ public class VeiledHeartService {
         String actionString = splitID[1];
         String typeString = splitID[2];
         String card = splitID.length > 3 ? splitID[3] : "";
+        Player targetPlayer = splitID.length > 4 ? game.getPlayerFromColorOrFaction(splitID[4]) : null;
         Stream.of(VeiledCardAction.values())
                 .filter(action -> actionString.equalsIgnoreCase(action.toString()))
                 .findAny()
@@ -168,11 +214,17 @@ public class VeiledHeartService {
                         .ifPresent(type -> {
                             if (card.isEmpty()) {
                                 sendVeiledButtons(action, type, player);
-                            } else {
+                            } else if (targetPlayer == null) {
                                 doAction(action, type, player, card);
+                            } else {
+                                doAction(action, type, player, Integer.parseInt(card), targetPlayer);
                             }
                         }));
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static void doAction(VeiledCardAction action, String typeStr, Player player, String card) {
+        VeiledCardType.fromString(typeStr).ifPresent(type -> doAction(action, type, player, card));
     }
 
     public static void doAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
@@ -182,7 +234,7 @@ public class VeiledHeartService {
                 setStoredValue(player, getStoredValue(player) + card + "_");
                 msg = player.getRepresentation() + " has secretly drawn a veiled "
                         + type.toString().toLowerCase()
-                        + ". They may put it into play with a button in their cards info.";
+                        + ". They may put it into play with a button in their `#cards-info` thread.";
             }
             case DISCARD -> {
                 setStoredValue(player, getStoredValue(player).replace(card + "_", ""));
@@ -195,6 +247,20 @@ public class VeiledHeartService {
                         + type.toString().toLowerCase() + ", but was unable to.";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+    }
+
+    public static void doAction(
+            VeiledCardAction action, VeiledCardType type, Player activePlayer, int cardIndex, Player targetPlayer) {
+        List<String> cards = getVeiledCards(type, targetPlayer).toList();
+        if (cards.size() <= cardIndex) {
+            return;
+        }
+        doAction(action, type, targetPlayer, cards.get(cardIndex));
+        MessageHelper.sendMessageToChannel(
+                activePlayer.getCorrectChannel(),
+                activePlayer.getRepresentation() + " made " + targetPlayer.getRepresentation() + " "
+                        + action.toString().toLowerCase() + " a veiled "
+                        + type.toString().toLowerCase() + "!");
     }
 
     public static int veiledField(Graphics graphics, int x, int y, VeiledCardType type, int deltaX, Player player) {
