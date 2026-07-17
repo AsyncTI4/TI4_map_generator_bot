@@ -4,7 +4,7 @@
         "name": "Borrowed Authority",
         "faction": "ardentia",
         "window": "ACTION:",
-        "windowEffect": "Return 1 player's command token from your tactic pool and perform a tactical action in a non-home, non-Mecatol Rex system with no other player's units, using a token form that player's reinforcements.",
+        "windowEffect": "Return 1 player's command token from your tactic pool and perform a tactical action in a non-home, non-Mecatol Rex system with no other player's units, using a token from that player's reinforcements.",
         "source": "theodisi"
     },
     {
@@ -27,7 +27,7 @@
         "name": "Mandate of Presence",
         "faction": "verydith",
         "window": "Once per action phase, when you perform a strategic action:",
-        "windowEffect": "Select 1 player and 1 system that contains 1 or more of your units, no legendary planets, and no other player's units. That player places 1 command token from their reinforcements in that system.",
+        "windowEffect": "Select 1 player and 1 system that contains 1 or more of your units, contains no legendary planets, and contains no other player's units. That player places 1 command token from their reinforcements in that system.",
         "source": "theodisi"
     },
     {
@@ -42,7 +42,7 @@
         "id": "tight_scheduling",
         "name": "Tight Scheduling",
         "faction": "veylor",
-        "window": "After the first agenda is revealed",
+        "window": "After the first agenda is revealed:",
         "windowEffect": "Draw 3 agendas and place them in your hand. When an agenda would be revealed, you may reveal 1 agenda from your hand instead. At the end of the agenda phase, place the remaining agendas on the bottom of the deck in any order.",
         "source": "theodisi"
     },
@@ -59,7 +59,7 @@
         "name": "Factory Lease",
         "faction": "myrr",
         "window": "During setup, gain the Factory Lease promissory notes. At the start of the agenda phase:",
-        "windowEffect": "You may produce 1 unit other than a war sun in a system containing 1 of your space docks and no other players ships for each Factory Lease attachment on the game board.",
+        "windowEffect": "You may produce 1 unit with a cost of 4 or less in a system containing 1 of your space docks and no other players' ships for each Factory Lease attachment on the game board.",
         "source": "theodisi"
     },
     {
@@ -75,14 +75,14 @@
         "name": "Shared Discoveries",
         "faction": "kairn",
         "window": "At the end of a player's tactical action:",
-        "windowEffect": "You may remove 1 expedition token from a planet the active player controls in that system to allow them to explore that planet as if it were any trait.",
+        "windowEffect": "You may remove 1 expedition token from a planet the active player controls in that system to allow them to explore that planet as if it had any planet trait.",
         "source": "theodisi"
     },
     {
         "id": "colony_outposts",
         "name": "Colony Outposts",
         "faction": "kairn",
-        "window": "At the end of a tactical action that you explored a planet:",
+        "window": "At the end of a tactical action during which you explored a planet:",
         "windowEffect": "You may spend 1 command token to reveal cards from that planet's exploration deck until you reveal an attachment. Resolve that exploration and shuffle the revealed cards back into the deck.",
         "source": "theodisi"
     },
@@ -204,7 +204,7 @@
         "name": "Cycle of Reclamation",
         "faction": "aeterna",
         "window": "During setup:",
-        "windowEffect": "Place the moon phase cards in your play area.\n\nUp to 3 times per action when 1 or more units are destroyed in a system containing or adjacent to your units you may place 1 neutral destroyer on a moon phase card in your play area.",
+       "windowEffect": "Place the moon phase cards in your play area.\n\nWhen 1 or more units are destroyed in a system containing or adjacent to a system containing your units except during a combat on your tactical actions, capture 1 neutral destroyer.",
         "source": "theodisi"
     },
     {
@@ -212,7 +212,7 @@
         "name": "New Moon",
         "faction": "aeterna",
         "window": "ACTION:",
-        "windowEffect": "Exhaust this card to do 1 of the following:\n\nPlace 1 neutral unit from this card into a system that contains no other player's ships.\n\nPlace 1 neutral cruiser on a moon phase card.",
+        "windowEffect": "Exhaust this card to do 1 of the following:\n\nPlace 1 captured neutral unit into a system that contains no other player's ships.\n\nCapture 1 neutral cruiser.",
         "source": "theodisi"
     },
     {
@@ -220,7 +220,7 @@
         "name": "Waning Moon",
         "faction": "aeterna",
         "window": "When you pass:",
-        "windowEffect": "You may exhaus this card. Return neutral units on this card with a combined cost of 4 or more to research 1 technology.",
+        "windowEffect": "You may exhaust this card. Return captured neutral units with a combined cost of 4 or more to research 1 technology.",
         "source": "theodisi"
     },
     {
@@ -228,7 +228,7 @@
         "name": "Full Moon",
         "faction": "aeterna",
         "window": "At the end of your turn:",
-        "windowEffect": "You may exhaust this card. Return neutral units on this card with a combined cost of 3 or more to place 1 structure on a planet you control.",
+        "windowEffect": "You may exhaust this card. Return captured neutral units with a combined cost of 3 or more to place 1 structure on a planet you control.",
         "source": "theodisi"
     },
     {
@@ -236,7 +236,7 @@
         "name": "Waxing Moon",
         "faction": "aeterna",
         "window": "At the start of your turn:",
-        "windowEffect": "You may exhaust this card. Return neutral units on this card with a combined cost of 2 to draw 2 action cards, then discard 1.",
+        "windowEffect": "You may exhaust this card. Return captured neutral units with a combined cost of 2 or more to draw 2 action cards, then discard 1.",
         "source": "theodisi"
     },
     {
@@ -244,7 +244,7 @@
         "name": "Lunar Eclipse",
         "faction": "aeterna",
         "window": "When you perform a strategic action:",
-        "windowEffect": "You may exhaust this card. Return 2 neutral units on this card to gain 1 command token.",
+        "windowEffect": "You may exhaust this card. Return captured neutral units with a combined cost of 2 or more to gain 1 command token.",
         "source": "theodisi"
     },
     {
@@ -258,8 +258,8 @@
         "id": "last_stand",
         "name": "Last Stand",
         "faction": "ponthous",
-        "window": "During combat, when your last unit would be destroyed during the Assign Hits step:",
-        "windowEffect": "You may roll that unit's combat dice. For each result equal to or greater than that unit's combat value, produce 1 hit.\n\nIf the last of your opponent's participating units are destroyed by this roll, that unit is not destroyed.",
+        "window": "When your last unit would be destroyed during the Assign Hits step of combat:",
+        "windowEffect": "You may roll that unit's combat dice. For each result equal to or greater than that unit's combat value, produce 1 hit.\n\nIf all of your opponent's remaining participating units are destroyed by this roll, your unit is not destroyed.",
         "source": "theodisi"
     },
     {

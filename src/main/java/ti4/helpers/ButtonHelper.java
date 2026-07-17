@@ -55,10 +55,11 @@ import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
@@ -4282,6 +4283,7 @@ public class ButtonHelper {
                 && player == game.getActivePlayer()) {
             capacity += 2;
         }
+        capacity += ArcanumBreakthroughHandler.getPowerWordWishCapacityBonus(game, player, tile);
         int ageOfFightersFleet;
         if (game.isAgeOfFightersMode()) {
             if (player.hasTech("hcf2") || player.hasTech("absol_hcf2") || player.hasUnit("tf-hcf")) {
@@ -5237,7 +5239,9 @@ public class ButtonHelper {
         Set<String> visibleFOWPositions =
                 FOWPlusService.isActive(game) ? FoWHelper.getTilePositionsToShow(game, player) : null;
         Tile centerTile = game.getTileByPosition("000");
-        if (centerTile != null && FOWPlusService.canActivatePosition("000", player, game, visibleFOWPositions)) {
+        if (game.getStoredValue("borrowedAuthorityColor").isEmpty()
+                && centerTile != null
+                && FOWPlusService.canActivatePosition("000", player, game, visibleFOWPositions)) {
             if (!CommandCounterHelper.hasCC(player, centerTile) || game.isWarfareAction() || game.isL1Hero()) {
                 Button rex = Buttons.green(
                         factionChecker + "ringTile_000",
@@ -5278,6 +5282,14 @@ public class ButtonHelper {
         if (game.isNaaluAgent() && tile.isHomeSystem(game)) return false;
         if (!FOWPlusService.canActivatePosition(tile.getPosition(), player, game, visiblePositions)) return false;
         if ("silver_flame".equalsIgnoreCase(tile.getTileID())) return false;
+        String borrowedAuthorityColor = game.getStoredValue("borrowedAuthorityColor");
+        if (!borrowedAuthorityColor.isEmpty()
+                && (tile.isHomeSystem(game)
+                        || tile.isMecatol(game)
+                        || FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)
+                        || CommandCounterHelper.hasCC(null, borrowedAuthorityColor, tile))) {
+            return false;
+        }
         if (tile.isAsteroidField()) {
             for (Player p2 : game.getRealPlayers()) {
                 if ((p2.hasTech("cm") || p2.hasTech("tf-nomadic"))
@@ -6017,6 +6029,7 @@ public class ButtonHelper {
                 }
             }
         }
+        RevenantLeadersHandler.addRevArcanumAgentButtons(buttons, game, player, planet);
         return buttons;
     }
 

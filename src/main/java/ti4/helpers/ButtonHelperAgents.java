@@ -20,6 +20,7 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionLeaderHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
@@ -1524,6 +1525,9 @@ public final class ButtonHelperAgents {
         }
         if ("ralnelagent".equalsIgnoreCase(agent)) {
             TeHelperAgents.postRalNelAgentStep1(game, player);
+        }
+        if ("ardentiaagent".equalsIgnoreCase(agent)) {
+            ArdentiaLeadersHandler.startArdentiaAgentStep1(game, player);
         }
 
         if (event instanceof ButtonInteractionEvent buttonEvent) {

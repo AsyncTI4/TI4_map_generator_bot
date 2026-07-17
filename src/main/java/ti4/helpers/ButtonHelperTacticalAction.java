@@ -14,10 +14,13 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -137,6 +140,13 @@ public final class ButtonHelperTacticalAction {
                                 + ", you may exhaust _Discovery_ to explore a frontier token in a planetless system containing your ships.",
                         NatauDoctrineHandler.getUseDiscoveryButton(player));
             }
+            if (player.hasTech("thkairny") && player.hasTechReady("thkairny")) {
+                MessageHelper.sendMessageToChannelWithButton(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", you have _Surveyor's Lens_ and as such may exhaust it to explore a planet in the active system:",
+                        KairnTechHandler.getSurveyorsLensButton(player));
+            }
             if (!game.isAbsolMode()
                     && player.getRelics().contains("emphidia")
                     && !player.getExhaustedRelics().contains("emphidia")) {
@@ -146,7 +156,8 @@ public final class ButtonHelperTacticalAction {
                 systemButtons2.add(Buttons.green("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
             }
-            if (game.isWarfareAction()) {
+            if (game.isWarfareAction()
+                    && game.getStoredValue("ardentiaSubjugate").isEmpty()) {
                 Button redistro = Buttons.blue(
                         player.factionButtonChecker() + "redistributeCCButtons_deleteThisButton",
                         "Redistribute Command Tokens");
@@ -160,6 +171,9 @@ public final class ButtonHelperTacticalAction {
             CrystellumLeadersHandler.clearFacetBypass(game, player);
             resetStoredValuesForTacticalAction(game);
         }
+        ArdentiaTechHandler.clearOverlordMatrixGalvanization(game);
+        ArcanumBreakthroughHandler.clearPowerWordWish(game);
+        KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
     }
 
@@ -437,8 +451,13 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("hiredGunsInPlay");
         game.removeStoredValue("allianceModeSimultaneousAction");
         game.removeStoredValue("absolLux");
+        game.removeStoredValue("borrowedAuthorityColor");
+        game.removeStoredValue("ardentiaSubjugate");
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
+        ArcanumBreakthroughHandler.clearPowerWordWish(game);
+        KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
+        ArdentiaUnitHandler.clearIronClawDeployUsed(game);
         DreamButtonHandler.clearDreamAgentAnomaly(game);
         GameEventDraft.clear(game);
 
@@ -564,11 +583,21 @@ public final class ButtonHelperTacticalAction {
     @ButtonHandler("ringTile_")
     public static void selectActiveSystem(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("ringTile_", "");
+        Tile tile = game.getTileByPosition(pos);
+        if (!game.getStoredValue("borrowedAuthorityColor").isEmpty()
+                && !ButtonHelper.canActivateTile(game, player, tile)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "That system cannot be activated with _Borrowed Authority_.");
+            return;
+        }
+        if (!game.getStoredValue("ardentiaSubjugate").isEmpty() && tile.isHomeSystem(game)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Subjugate must activate a non-home system.");
+            return;
+        }
         game.setActiveSystem(pos);
         game.setStoredValue("possiblyUsedRift", "");
         game.setStoredValue("lastActiveSystem", pos);
         List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
-        Tile tile = game.getTileByPosition(pos);
         if (FOWPlusService.isVoid(game, pos)) {
             tile = FOWPlusService.voidTile(pos);
         }
@@ -697,6 +726,8 @@ public final class ButtonHelperTacticalAction {
                         button2);
             }
         }
+
+        ArcanumBreakthroughHandler.offerPowerWordWish(event, game, player);
 
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, tile, game);
         if ((player.hasTech("sdn") || player.hasTech("absol_sdn") || player.hasTech("wavelength"))

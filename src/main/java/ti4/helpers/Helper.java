@@ -1645,6 +1645,9 @@ public final class Helper {
                     NetrunnersAbilitiesHandler.getControlNetworkProductionMessage(game, player, tile, cost, unitCount);
             if (!controlNetworkMessage.isEmpty()) {
                 msg.append(controlNetworkMessage);
+                if (player.hasUnlockedBreakthrough("arcanumbtback")) {
+                    msg.append("\n-1 from Power Word: Wish");
+                }
                 return msg.toString();
             }
         }
@@ -1730,6 +1733,9 @@ public final class Helper {
                         .append(cost == 1 ? "" : "s")
                         .append(".");
             }
+        }
+        if (player.hasUnlockedBreakthrough("arcanumbtback")) {
+            msg.append("\n-1 from Power Word: Wish");
         }
         msg.append(siphonDiscountMessage);
         return msg.toString();
@@ -2222,6 +2228,9 @@ public final class Helper {
         if (wantCost) {
             if (player.ownsUnit("netrunners_spacedock") || player.ownsUnit("netrunners_spacedock2")) {
                 cost = NetrunnersFactionTechsHandler.applySiphonDiscount(game, player, cost);
+            }
+            if (player.hasUnlockedBreakthrough("arcanumbtback")) {
+                cost = Math.max(0, cost - 1);
             }
             return cost;
         } else {

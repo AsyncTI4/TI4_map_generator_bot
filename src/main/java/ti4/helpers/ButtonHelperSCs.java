@@ -17,6 +17,7 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.commandcounter.CommandCounterButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -1354,6 +1355,7 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("scepterE_follow_")
     @ButtonHandler("mahactA_follow_")
+    @ButtonHandler("thardentiag_follow_")
     public static void mahactAndScepterFollow(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String lastChar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
         boolean setStatus = true;
@@ -1385,6 +1387,7 @@ public final class ButtonHelperSCs {
             Leader playerLeader = player.unsafeGetLeader("mahactagent");
             if (playerLeader != null) {
                 playerLeader.setExhausted(true);
+                RevenantBreakthroughHandler.exhaustRevenantRisingForAttachedAgent(game, player, playerLeader);
                 for (Player p2 : game.getPlayers().values()) {
                     for (Integer sc2 : p2.getSCs()) {
                         if (sc2 == scNum) {
@@ -1403,7 +1406,7 @@ public final class ButtonHelperSCs {
                     }
                 }
             }
-        } else {
+        } else if (buttonID.contains("scepterE")) {
             MessageHelper.sendMessageToChannel(
                     channel,
                     player.getRepresentationUnfogged() + " exhausted the _" + RelicHelper.sillySpelling()
@@ -1415,6 +1418,12 @@ public final class ButtonHelperSCs {
                         player.getRepresentation()
                                 + " Reminder that if you intend to participate in the splice, you still need to hit the participate in the splice button now.");
             }
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    player.getRepresentationUnfogged() + " exhausted _Cognitive Parallax Engine_ to follow "
+                            + Helper.getSCName(scNum, game) + ".");
+            player.exhaustTech("thardentiag");
         }
         Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
 

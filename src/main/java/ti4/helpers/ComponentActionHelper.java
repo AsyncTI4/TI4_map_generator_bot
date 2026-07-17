@@ -14,6 +14,8 @@ import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -121,6 +123,12 @@ public class ComponentActionHelper {
                                     game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
                                 case "crimsonbt" -> true;
                                 case "mahactbt" -> !p1.getTechs().isEmpty();
+                                case "kairnbt" -> KairnBreakthroughHandler.canUse(game, p1);
+                                case "ardentiabt" ->
+                                    game.getRealPlayers().stream()
+                                            .anyMatch(otherPlayer -> otherPlayer != p1
+                                                    && !ButtonHelper.getTilesWithYourCC(otherPlayer, game, event)
+                                                            .isEmpty());
                                 case "saarbt" ->
                                     game.getTileMap().values().stream()
                                             .filter(Tile::isAsteroidField)
@@ -478,6 +486,13 @@ public class ComponentActionHelper {
                     FactionEmojis.belkosea);
             compButtons.add(abilityButton);
         }
+        if (ArdentiaAbilityHandler.canUseBorrowedAuthority(p1, game)) {
+            Button abilityButton = Buttons.green(
+                    factionChecker + prefix + "ability_borrowedAuthority",
+                    "Borrowed Authority",
+                    FactionEmojis.ardentia);
+            compButtons.add(abilityButton);
+        }
 
         // Other "abilities"
         if (p1.hasUnit("muaat_flagship")
@@ -519,7 +534,6 @@ public class ComponentActionHelper {
             Button absolButton = Buttons.gray(factionChecker + prefix + "absolMOW_", "Minister of War Action");
             compButtons.add(absolButton);
         }
-
         // Generic
         Button genButton = Buttons.gray(factionChecker + prefix + "generic_", "Generic Component Action");
         compButtons.add(genButton);
@@ -611,6 +625,8 @@ public class ComponentActionHelper {
                         buttons.add(starTile);
                     }
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                } else if ("borrowedAuthority".equalsIgnoreCase(buttonID)) {
+                    ArdentiaAbilityHandler.startBorrowedAuthority(event, p1, game);
                 } else if ("classifiedDevelopments".equalsIgnoreCase(buttonID)) {
                     List<Button> buttons = ButtonHelperAbilities.getSuperWeaponButtonsPart1(p1, game);
                     String message =

@@ -95,6 +95,9 @@ public class PlayerTechService {
                 message += "\nAutomatically flipped _The Queens’ Wrath_ and applied Tribune dreadnoughts.";
             }
         }
+        if ("thkairng".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
+            message += "\nYour commodities are now " + player.getCommoditiesTotal();
+        }
         CommanderUnlockCheckService.checkPlayer(player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum");
         MessageHelper.sendMessageToEventChannel(event, message);
     }

@@ -14,10 +14,10 @@
     "id": "ardentiacommander",
     "faction": "ardentia",
     "type": "commander",
-    "name": "High Marshall Serisi",
+    "name": "High Marshal Serisi",
     "title": "Arm of the Harbinger",
     "abilityWindow": "When you gain 1 or more command tokens:",
-    "abilityText": "gain 1 commodity for each command token gained.",
+    "abilityText": "Gain 1 commodity for each command token gained.",
     "unlockCondition": "Have your command tokens in 4 different systems.",
     "source": "theodisi"
   },
@@ -29,7 +29,7 @@
     "title": "Impetus of Control",
     "abilityName": "Echo of Subjugation - Harbinger of Chains",
     "abilityWindow": "ACTION:",
-    "abilityText": "Spend up to 1 of each player's command tokens on the game board. Return those tokens to their reinforcements and for each token removed this way gain 1 command token and 1 trade good. Then, purge this card.",
+    "abilityText": "Select up to 1 of each player's command tokens on the game board. Return those tokens to their reinforcements, and for each token removed this way, gain 1 command token and 1 trade good. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },
@@ -51,8 +51,8 @@
     "name": "Velorine Nevorith",
     "title": "Keeper of Keys",
     "abilityWindow": "At any time:",
-    "abilityText": "Increase the influence and resource values of planets in systems that contain other player's command tokens by 1.",
-    "unlockCondition": "Have units in a system that contains 2 or more other player's command tokens.",
+    "abilityText": "Increase the influence and resource values of planets in systems that contain other players' command tokens by 1.",
+    "unlockCondition": "Have units in a system that contains 2 or more other players' command tokens.",
     "source": "theodisi"
   },
   {
@@ -74,7 +74,7 @@
     "name": "Orrin Malvek",
     "title": "Deacon of Taxes & Prayer",
     "abilityWindow": "ACTION:",
-    "abilityText": "Exhaust this card. Draw 1 action card and look at the top agenda. Place it on top or bottom.",
+    "abilityText": "Exhaust this card. Draw 1 action card and look at the top card of the agenda deck. Place it on the top or bottom of the deck.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -85,7 +85,7 @@
     "name": "Cyrala Vey",
     "title": "Bishop of Law & Scripture",
     "abilityWindow": "After an agenda is resolved:",
-    "abilityText": "If the outcome you voted for is not resolved, produce 1 ship in a system that contains your ships with cost less than the votes you cast.",
+    "abilityText": "If the outcome you voted for is not resolved, produce 1 ship with a cost less than the number of votes you cast in a system that contains your ships.",
     "unlockCondition": "At the start of the agenda phase, exhaust all but 3 planets you control.",
     "source": "theodisi"
   },
@@ -97,7 +97,7 @@
     "title": "Cardinal of Governance & Faith",
     "abilityName": "Adoration of the Masses - Thousandfold Council",
     "abilityWindow": "During the agenda phase:",
-    "abilityText": "An additional agenda is voted on each agenda phase. When an agenda outcome you voted for is not resolved, gain 1 command token.",
+    "abilityText": "Vote on 1 additional agenda during each agenda phase. When an agenda outcome you voted for is not resolved, gain 1 command token.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },
@@ -108,7 +108,7 @@
     "name": "Kelron Dross",
     "title": "Ember-Sword",
     "abilityWindow": "When a player activates a system, you may exhaust this card:",
-    "abilityText": "That player may destroy 1 non-fighter ship with a cost less than 4. That system gains PRODUCTION equal to that unit's cost +2.",
+    "abilityText": "That player may destroy 1 non-fighter ship with a cost of less than 4. That system gains PRODUCTION equal to that unit's cost +2.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -153,7 +153,7 @@
     "name": "Seral Venn",
     "title": "Bounding Cartographer",
     "abilityWindow": "At the start of the strategy phase:",
-    "abilityText": "Choose 1 non-home non-legendary planet. Explore that planet as if it were any trait.",
+    "abilityText": "Choose 1 non-home, non-legendary planet. Explore that planet as if it had any planet trait.",
     "unlockCondition": "Have 2 cards from different exploration decks in your play area.",
     "source": "theodisi"
   },
@@ -165,7 +165,7 @@
     "title": "Explorer Extraordinaire",
     "abilityName": "New Ancestral Home - Thorough Appropriation",
     "abilityWindow": "ACTION:",
-    "abilityText": "Place up to 5 purged exploration cards that do not place tokens on the game board on top of their respective exploration decks. Then explore up to 5 planets you control. Then, purge this card.",
+    "abilityText": "Place up to 5 purged exploration cards that do not place tokens on the game board on top of their respective exploration decks. Then, explore up to 5 planets you control. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },
@@ -187,7 +187,7 @@
     "name": "Seraxis Thule",
     "title": "Battle Genealogist",
     "abilityWindow": "At any time:",
-    "abilityText": "Apply +1 to the combat and unit ability rolls of units you own the unit upgrade technology for.",
+    "abilityText": "Apply +1 to the combat rolls and unit ability rolls of units for which you own the unit upgrade technology.",
     "unlockCondition": "Own 2 unit upgrade technologies.",
     "source": "theodisi"
   },
@@ -210,7 +210,7 @@
     "name": "Veyla the Keeper",
     "title": "Custodian of Tomes",
     "abilityWindow": "When a player gains a non-faction technology:",
-    "abilityText": "You may exhaust this card and allow that player to return that technology to their deck and gain 1 non-unit upgrade technology with a number of prerequisites up to the number on that returned technology +1.",
+    "abilityText": "You may exhaust this card to allow that player to return that technology to its deck and gain 1 non-unit-upgrade technology with a number of prerequisites up to 1 greater than the number on the returned technology.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -233,7 +233,7 @@
     "title": "The Eternal Sage",
     "abilityName": "Power Conduits - True Resurrection",
     "abilityWindow": "ACTION:",
-    "abilityText": "Return up to 6 technologies you own to the deck. Gain purged relic fragments equal to the number returned then purge this card.",
+    "abilityText": "Return up to 6 technologies you own to the technology deck. Gain purged relic fragments equal to the number returned, then purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },
@@ -244,7 +244,7 @@
     "name": "Myrix",
     "title": "The Wax-Sealed",
     "abilityWindow": "When a player activates a system, you may exhaust this card:",
-    "abilityText": "That player selects 1 ship; it gains capacity and PRODUCTION values equal to the number of unit abilities it has during that tactical action. If it has those values, increase hem by that amount instead.",
+    "abilityText": "That player selects 1 ship; it gains capacity and PRODUCTION values equal to the number of unit abilities it has during that tactical action. If it already has those values, increase them by that amount instead.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -267,7 +267,7 @@
     "title": "The Venom-Queen",
     "abilityName": "Call of the Queen - The Endless Swarm",
     "abilityWindow": "ACTION:",
-    "abilityText": "Place this card near the board. Once per action, when you would roll dice for a unit ability, apply +4 to those dice. Purgre this card at the end of the round.",
+    "abilityText": "Place this card near the game board. Once per action, when you would roll dice for a unit ability, apply +4 to those dice. Purge this card at the end of the round.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },
@@ -301,7 +301,7 @@
     "title": "The Mouth of the Abyss",
     "abilityName": "Kenosis - Creatio Ex Nihilo",
     "abilityWindow": "ACTION:",
-    "abilityText": "Draw 2 unused red-backed tiles and 2 unused blue-backed tiles. Choose 1 of each and purge the others. Place those tiles on the edge of the game board adjacent to 2 systems and a place a frontier token in each system that contains no planets. Then, purge this card.",
+    "abilityText": "Draw 2 unused red-backed tiles and 2 unused blue-backed tiles. Choose 1 of each and purge the others. Place those tiles on the edge of the game board, adjacent to 2 systems, and place a frontier token in each system that contains no planets. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },
@@ -311,7 +311,7 @@
     "type": "agent",
     "name": "Xythis the Whispering Mask",
     "title": "Gravetender Eternal",
-    "abilityWindow": "Once per action, when a player exhausts a technology; You may exhaust this card:",
+    "abilityWindow": "Once per action, when a player exhausts a technology, you may exhaust this card:",
     "abilityText": "Ready that technology.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
@@ -335,7 +335,7 @@
     "title": "Revenant of Many",
     "abilityName": "Fallen Heroes - Remembered Rise",
     "abilityWindow": "When you unlock this card:",
-    "abilityText": "draw 3 random unused heroes. Choose 1 to attach to this card and purge the rest. This hero has the ability text of each hero attached to it.",
+    "abilityText": "Draw 3 random unused heroes. Choose 1 to attach to this card and purge the rest. This hero has the ability text of each hero attached to it.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },
@@ -346,7 +346,7 @@
     "name": "Koral Vel",
     "title": "Revenant of Verydith",
     "abilityWindow": "At the start of a player's turn:",
-    "abilityText": "You may exhaust this card, that player may produce 1 unit in a system that contains 1 or more of their ships.",
+    "abilityText": "You may exhaust this card. That player may produce 1 unit in a system that contains 1 or more of their ships.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -380,7 +380,7 @@
     "name": "Runebearer Lothos",
     "title": "Revenant of the Arcanum",
     "abilityWindow": "When a player explores a planet they control:",
-    "abilityText": "You may exhaust this card to allow that player to explore that planet as if it were any trait. If you choose another player, draw an aciton card.",
+    "abilityText": "You may exhaust this card to allow that player to explore that planet as if it had any planet trait. If you choose another player, draw an action card.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -390,7 +390,7 @@
     "type": "commander",
     "name": "Arlir Mirrored",
     "title": "Revenant of Oblivion",
-    "abilityWindow": "When you explore a planet that contians one of your structures:",
+    "abilityWindow": "When you explore a planet that contains 1 of your structures:",
     "abilityText": "You may draw an additional card. Choose 1 to resolve and discard the rest.",
     "unlockCondition": "Control a planet of each planet trait.",
     "source": "theodisi"
@@ -413,8 +413,8 @@
     "type": "agent",
     "name": "Zexan Myrix",
     "title": "Revenant of Xytheris",
-    "abilityWindow": "After a system is activated you may exhaust this card and choose 1 player:",
-    "abilityText": "Apply +1 to the combat rolls of that player's untis during that tactical action.",
+    "abilityWindow": "After a system is activated, you may exhaust this card and choose 1 player:",
+    "abilityText": "Apply +1 to the combat rolls of that player's units during that tactical action.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -460,18 +460,18 @@
     "title": "Thrall of the Rift",
     "abilityWindow": "At any time:",
     "abilityText": "You may ignore the effects of each anomaly.",
-    "unlockCondition": "Have unit in 3 systems containing or adjacent to anomalies.",
+    "unlockCondition": "Have units in 3 systems that contain or are adjacent to anomalies.",
     "source": "theodisi"
   },
   {
     "id": "throneshero",
     "faction": "thrones",
     "type": "hero",
-    "name": "Seraphine The Eternal",
+    "name": "Seraphine the Eternal",
     "title": "Bearer of Thrones",
     "abilityName": "Unbridled Chaos - Reunited Thrones",
     "abilityWindow": "ACTION:",
-    "abilityText": "Place 2 unused throne planets into your home system, gain control of them and ready each planet in your home system. Then, purge this card.",
+    "abilityText": "Place 2 unused throne planets into your home system, gain control of them, and ready each planet in your home system. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },
@@ -491,10 +491,10 @@
     "faction": "aeterna",
     "type": "commander",
     "name": "Vorun Kael",
-    "title": "Mourning Marshall",
-    "abilityWindow": "Once per action when you lose a combat:",
+    "title": "Mourning Marshal",
+    "abilityWindow": "Once per action, when you lose a combat:",
     "abilityText": "Gain 1 command token.",
-    "unlockCondition": "Lose a combat",
+    "unlockCondition": "Lose a combat.",
     "source": "theodisi"
   },
   {
@@ -503,7 +503,7 @@
     "type": "hero",
     "name": "Serapha Untar",
     "title": "Voice of the Tombs",
-    "abilityName": "Gravecall - Ferryman of Beyond",
+    "abilityName": "Gravecall - Ferryman of the Beyond",
     "abilityWindow": "At the start of a combat in a non-home system:",
     "abilityText": "Destroy all of your ships in that system and your opponent destroys ships in the active system with a combined cost equal to the combined cost of units you destroyed. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
@@ -539,7 +539,7 @@
     "title": "Fallen Stars",
     "abilityName": "Star-Sacrifice - Soul of the System",
     "abilityWindow": "ACTION:",
-    "abilityText": "Choose 1 non-home non-legendary planet you control. Destroy all units on that planet, purge its attachments and its planet card. Produce hits on your opponent's non-fighter ships in an adjacent system up to that planet's combined resource and influence value. Then, place the destroyed planet token on that planet and purge this card.",
+    "abilityText": "Choose 1 non-home, non-legendary planet you control. Destroy all units on that planet, and purge its attachments and planet card. Produce hits against your opponent's non-fighter ships in an adjacent system up to that planet's combined resource and influence values. Then, place the destroyed planet token on that planet and purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   }

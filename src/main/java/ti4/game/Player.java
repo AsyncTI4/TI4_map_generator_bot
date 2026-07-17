@@ -1480,6 +1480,24 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (ownsUnit("rohdhna_warsun3")) {
             bonus += ButtonHelper.getNumberOfUnitsOnTheBoard(game, this, "warsun", false);
         }
+        if (hasTech("thkairng")) {
+            Set<String> controlledTraits = new HashSet<>();
+            for (String planetName : getPlanets()) {
+                Planet planet = game.getUnitHolderFromPlanet(planetName);
+                if (planet == null) {
+                    continue;
+                }
+
+                for (String trait : planet.getPlanetTypes()) {
+                    if (Constants.CULTURAL.equals(trait)
+                            || Constants.HAZARDOUS.equals(trait)
+                            || Constants.INDUSTRIAL.equals(trait)) {
+                        controlledTraits.add(trait);
+                    }
+                }
+            }
+            bonus += controlledTraits.size();
+        }
         if (game.isFacilitiesMode()) {
             for (String planet : getPlanets()) {
                 UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
@@ -2566,7 +2584,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     private void doAdditionalThingsWhenAddingTech(String techID) {
         // Set ATS Armaments to 0 when adding tech (if it was removed we reset it)
-        if ("dslaner".equalsIgnoreCase(techID)) {
+        if ("dslaner".equalsIgnoreCase(techID) || "tf-dslaner".equalsIgnoreCase(techID)) {
             setAtsCount(0);
         }
 

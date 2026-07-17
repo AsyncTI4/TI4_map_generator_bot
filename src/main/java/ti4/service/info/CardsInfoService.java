@@ -90,6 +90,12 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("ironagent")) {
             buttons.add(IronLeadersHandler.getMasterOfDefenseCardsInfoButton());
         }
+        if (player.hasUnexhaustedLeader("revenantarcanumagent")) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "useRevArcanumAgent_other",
+                    "Use Runebearer Lothos on Another Player",
+                    FactionEmojis.revenant));
+        }
         if (player.hasUnexhaustedLeader("ashenagent")) {
             buttons.add(AshenLeadersHandler.getAshTenderCardsInfoButton(player));
         }
