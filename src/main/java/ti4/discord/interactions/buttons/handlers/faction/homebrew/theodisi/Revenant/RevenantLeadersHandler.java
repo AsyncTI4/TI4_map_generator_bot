@@ -200,7 +200,9 @@ public class RevenantLeadersHandler {
     public static void resolveRevArcanumAgentTrait(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] payload = buttonID.substring(REVARCAGENT_TRAIT.length()).split("\\|", 2);
-        if (payload.length != 2 || !payload[0].equals(game.getStoredValue(REVARCAGENT_WINDOW + player.getFaction()))) {
+        if (payload.length != 2
+                || !EXPLORATION_TRAITS.contains(payload[1])
+                || !payload[0].equals(game.getStoredValue(REVARCAGENT_WINDOW + player.getFaction()))) {
             ButtonHelper.deleteMessage(event);
             return;
         }
