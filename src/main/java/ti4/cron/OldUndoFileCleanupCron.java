@@ -10,7 +10,8 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Storage;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class OldUndoFileCleanupCron {
@@ -21,6 +22,7 @@ public class OldUndoFileCleanupCron {
     }
 
     private static void cleanup() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running OldUndoFileCleanupCron");
         try {
             cleanupOldUndoFiles();

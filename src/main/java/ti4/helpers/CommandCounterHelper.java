@@ -3,15 +3,16 @@ package ti4.helpers;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.thundersedge.TeHelperAgents;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.leader.CommanderUnlockCheckService;
 
-public class CommandCounterHelper {
+public final class CommandCounterHelper {
 
     public static void addCC(GenericInteractionCreateEvent event, Game game, String color, Tile tile) {
         addCC(event, game.getPlayerFromColorOrFaction(color), tile);
@@ -48,6 +49,12 @@ public class CommandCounterHelper {
                     player.getGame(), tile.getPosition(), colorMention + " has placed a command token in the system.");
         }
         tile.addCC(ccID);
+
+        if (player.hasLeader("ardentiacommander")) {
+            CommanderUnlockCheckService.checkPlayer(player, "ardentia");
+        }
+        CommanderUnlockCheckService.checkAllPlayersInGame(player.getGame(), "verydith");
+
         for (Player p : player.getGame().getRealPlayers()) {
             if (p.hasUnexhaustedLeader("naaluagent-te")) {
                 TeHelperAgents.serveNaaluAgentButtons(player.getGame(), p, tile, player);

@@ -7,27 +7,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.UnitHolder;
 import ti4.model.ColorModel;
 import ti4.model.PromissoryNoteModel;
 
 @UtilityClass
 public class ColorChangeHelper {
 
-    public static boolean colorIsExclusive(String color, Player player) {
+    public static boolean isColorAllowedForPlayer(String color, Player player) {
         String colorID = Mapper.getColorID(color);
         return switch (colorID) {
             // Riftset is exclusive to eronous always
-            case "ero" -> !player.getUserID().equals(Constants.eronousId);
+            case "ero" -> Constants.eronousId.equals(player.getUserID());
             // Lightgray is exclusive to chassit if chassit is in the game
             case "lgy" ->
-                !player.getUserID().equals(Constants.chassitId)
-                        && player.getGame().getPlayerIDs().contains(Constants.chassitId);
-            default -> false;
+                !player.getGame().getPlayerIDs().contains(Constants.chassitId)
+                        || Constants.chassitId.equals(player.getUserID());
+            default -> true;
         };
     }
 
@@ -45,14 +45,8 @@ public class ColorChangeHelper {
 
             Map<String, Integer> promissoryNotesChanged = new LinkedHashMap<>();
             for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
-                PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn.getKey());
-                if (!pnModel.isDupe() || game.getPNOwner(pn.getKey()) != player) {
-                    promissoryNotesChanged.put(pn.getKey(), pn.getValue());
-                    continue;
-                }
-                PromissoryNoteModel genericPNModel = pnModel.getSourcePNModel();
-                String newPNModelID = genericPNModel.getID().replace("<color>", newColorModel.getName());
-                promissoryNotesChanged.put(newPNModelID, pn.getValue());
+                String updatedPN = mapPromissoryNoteId(game, player, newColorModel, pn.getKey(), true);
+                promissoryNotesChanged.put(updatedPN, pn.getValue());
             }
             playerInfo.setPromissoryNotes(promissoryNotesChanged);
 
@@ -60,14 +54,8 @@ public class ColorChangeHelper {
             List<String> promissoryNotesInPlayArea = playerInfo.getPromissoryNotesInPlayArea();
             List<String> promissoryNotesInPlayAreaChanged = new ArrayList<>();
             for (String pn : promissoryNotesInPlayArea) {
-                PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn);
-                if (!pnModel.isDupe() || game.getPNOwner(pn) != player) {
-                    promissoryNotesInPlayAreaChanged.add(pn);
-                    continue;
-                }
-                PromissoryNoteModel genericPNModel = pnModel.getSourcePNModel();
-                String newPNModelID = genericPNModel.getID().replace("<color>", newColorModel.getName());
-                promissoryNotesInPlayAreaChanged.add(newPNModelID);
+                String updatedPN = mapPromissoryNoteId(game, player, newColorModel, pn, true);
+                promissoryNotesInPlayAreaChanged.add(updatedPN);
             }
             playerInfo.setPromissoryNotesInPlayArea(promissoryNotesInPlayAreaChanged);
 
@@ -82,13 +70,15 @@ public class ColorChangeHelper {
             }
 
             // Debt Tokens
-            Map<String, Integer> debtTokens = new LinkedHashMap<>(playerInfo.getDebtTokens());
-            for (Map.Entry<String, Integer> entry : debtTokens.entrySet()) {
-                String color = entry.getKey();
-                if (color.equals(oldColor)) {
-                    Integer count = entry.getValue();
-                    playerInfo.clearAllDebtTokens(color);
-                    playerInfo.addDebtTokens(newColor, count);
+            for (String pool : playerInfo.getAllDebtTokens().keySet()) {
+                Map<String, Integer> debtTokens = new LinkedHashMap<>(playerInfo.getDebtTokens(pool));
+                for (Map.Entry<String, Integer> entry : debtTokens.entrySet()) {
+                    String color = entry.getKey();
+                    if (color.equals(oldColor)) {
+                        Integer count = entry.getValue();
+                        playerInfo.clearAllDebtTokens(color, pool);
+                        playerInfo.addDebtTokens(newColor, count, pool);
+                    }
                 }
             }
         }
@@ -97,14 +87,8 @@ public class ColorChangeHelper {
         Set<String> ownedPromissoryNotes = player.getPromissoryNotesOwned();
         Set<String> ownedPromissoryNotesChanged = new HashSet<>();
         for (String pn : ownedPromissoryNotes) {
-            PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn);
-            if (!pnModel.isDupe()) {
-                ownedPromissoryNotesChanged.add(pn);
-                continue;
-            }
-            PromissoryNoteModel genericPNModel = pnModel.getSourcePNModel();
-            String newPNModelID = genericPNModel.getID().replace("<color>", newColorModel.getName());
-            ownedPromissoryNotesChanged.add(newPNModelID);
+            String updatedPN = mapPromissoryNoteId(game, player, newColorModel, pn, false);
+            ownedPromissoryNotesChanged.add(updatedPN);
         }
         player.setPromissoryNotesOwned(ownedPromissoryNotesChanged);
 
@@ -118,13 +102,27 @@ public class ColorChangeHelper {
                 .forEach(uh -> replaceIDsOnUnitHolder(uh, oldColorID, newColorID));
     }
 
+    private static String mapPromissoryNoteId(
+            Game game, Player owner, ColorModel newColorModel, String promissoryNoteId, boolean requireOwnerMatch) {
+        PromissoryNoteModel pnModel = Mapper.getPromissoryNote(promissoryNoteId);
+        if (!pnModel.isDupe()) {
+            return promissoryNoteId;
+        }
+        if (requireOwnerMatch && game.getPNOwner(promissoryNoteId) != owner) {
+            return promissoryNoteId;
+        }
+
+        PromissoryNoteModel genericPNModel = pnModel.getSourcePNModel();
+        return genericPNModel.getId().replace("<color>", newColorModel.getName());
+    }
+
     private static void replaceIDsOnUnitHolder(UnitHolder unitHolder, String oldColorID, String newColorID) {
         String oldColorSuffix = "_" + oldColorID + ".";
         String newColorSuffix = "_" + newColorID + ".";
 
         for (UnitKey unitKey : unitHolder.getUnitKeys()) {
-            if (unitKey.getColorID().equals(oldColorID)) {
-                UnitKey replacedKey = Units.getUnitKey(unitKey.getUnitType(), newColorID);
+            if (unitKey.colorID().equals(oldColorID)) {
+                UnitKey replacedKey = Units.getUnitKey(unitKey.unitType(), newColorID);
                 List<Integer> states = unitHolder.removeUnit(unitKey, unitHolder.getUnitCount(unitKey));
                 unitHolder.addUnitsWithStates(replacedKey, states);
             }

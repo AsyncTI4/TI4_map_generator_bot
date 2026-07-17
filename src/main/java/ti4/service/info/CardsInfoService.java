@@ -4,17 +4,30 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.buttons.Buttons;
-import ti4.commands.CommandHelper;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumFactionTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -47,6 +60,9 @@ public class CardsInfoService {
     }
 
     public static void sendVariousAdditionalButtons(Game game, Player player) {
+        ThreadChannel playerCardsInfoThread = player.getCardsInfoThread();
+        if (playerCardsInfoThread == null) return;
+
         List<Button> buttons = new ArrayList<>();
         Button transaction = Buttons.blue("transaction", "Transaction");
         buttons.add(transaction);
@@ -69,9 +85,54 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("hacanagent")) {
             buttons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
         }
+        if (player.hasUnexhaustedLeader("netrunnersagent")) {
+            buttons.add(NetrunnersLeadersHandler.getOverclockCardsInfoButton(player));
+        }
+        if (player.hasUnexhaustedLeader("ironagent")) {
+            buttons.add(IronLeadersHandler.getMasterOfDefenseCardsInfoButton());
+        }
+        if (player.hasUnexhaustedLeader("ashenagent")) {
+            buttons.add(AshenLeadersHandler.getAshTenderCardsInfoButton(player));
+        }
+        if (player.hasUnexhaustedLeader("taagent")) {
+            buttons.add(TaLeadersHandler.getLenCardsInfoButton());
+        }
+        if (player.hasUnexhaustedLeader("dreamagent")
+                && !DreamButtonHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
+            buttons.add(DreamButtonHandler.getDreamAgentCardsInfoButton(player));
+        }
+        if (player.hasUnexhaustedLeader("crystellumagent")) {
+            buttons.add(CrystellumLeadersHandler.getCrystellumAgentButton(player));
+        }
+        if (player.hasTech("becrystmb") && player.isActivePlayer()) {
+            buttons.add(CrystellumFactionTechHandler.getMolecularBindingButton(player));
+        }
+        if (RevenantBreakthroughHandler.canPurgeAgent(game, player)) {
+            buttons.add(RevenantBreakthroughHandler.getPurgeAgentButton(player));
+        }
+        if (player.hasAbility("doctrine") && player.hasAbility("paradigm") && player.hasAbility("natau_decree")) {
+            buttons.add(NatauAbilityHandler.getShowDoctrinesButton(player));
+        }
+        if (player.hasAbility("intrigue")) {
+            buttons.add(Buttons.blue("startIntrigueCard", "Pay For Intrigue Card", FactionEmojis.xin));
+        }
+        if (player.hasRelicReady("superweaponavailyn")) {
+            String factionChecker = player.factionButtonChecker();
+            buttons.add(Buttons.gray(
+                    factionChecker + "exhaustSuperweapon_availyn",
+                    "Produce 3 Fighters With Availyn",
+                    FactionEmojis.belkosea));
+        }
         if (player.hasSpaceStation()) {
-            buttons.add(
-                    Buttons.gray("startTradeStationConvert", "Convert Comms by Exhausting Station", MiscEmojis.comm));
+            buttons.add(Buttons.gray(
+                    "startTradeStationConvert", "Convert Commodities With Space Station", MiscEmojis.comm));
+        }
+        if (player.getPlanets().contains("conviction")
+                && !player.getExhaustedPlanetsAbilities().contains("conviction")) {
+            buttons.add(Buttons.gray(
+                    "planetAbilityExhaust_conviction",
+                    "Exhaust Conviction Ability To Replenish Comms",
+                    FactionEmojis.belkosea));
         }
         if (player.hasUnexhaustedLeader("researchagent")) {
             buttons.add(Buttons.gray("exhaustAgent_researchagent", "Use Research Genome", FactionEmojis.Deepwrought));
@@ -114,7 +175,38 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("getAgentSelection_florzenagent", "Use Florzen Agent", FactionEmojis.florzen));
         }
         if (player.hasUnexhaustedLeader("naazagent")) {
-            buttons.add(Buttons.gray("getAgentSelection_naazagent", "Use NRA Agent", FactionEmojis.Naaz));
+            buttons.add(
+                    Buttons.gray("getAgentSelection_naazagent", "Use NRA Agent on Someone Else", FactionEmojis.Naaz));
+        }
+        if (player.hasUnexhaustedLeader("empyreanagent")) {
+            buttons.add(Buttons.gray(
+                    "getAgentSelection_empyreanagent", "Use Empyrean Agent on Someone Else", FactionEmojis.Empyrean));
+        }
+        if (player.hasUnexhaustedLeader("keleresagent")) {
+            buttons.add(Buttons.gray(
+                    "getAgentSelection_keleresagent", "Use Keleres Agent on Someone Else", FactionEmojis.Keleres));
+        }
+        if (player.hasUnexhaustedLeader("winnuagent")) {
+            buttons.add(Buttons.gray(
+                    "getAgentSelection_winnuagent", "Use Winnu Agent on Someone Else", FactionEmojis.Winnu));
+        }
+        if (player.hasUnexhaustedLeader("jolnaragent")) {
+            buttons.add(Buttons.gray(
+                    "getAgentSelection_jolnaragent", "Use Jolnar Agent on Someone Else", FactionEmojis.Jolnar));
+        }
+        if (player.hasUnexhaustedLeader("l1z1xagent")) {
+            buttons.add(Buttons.gray(
+                    "getAgentSelection_l1z1xagent", "Use L1Z1X Agent on Someone Else", FactionEmojis.L1Z1X));
+        }
+        if (player.hasUnexhaustedLeader("experimentalagent")) {
+            buttons.add(Buttons.gray(
+                    "getAgentSelection_experimentalagent",
+                    "Use Experimental Genome on Someone Else",
+                    FactionEmojis.Jolnar));
+        }
+        if (player.hasUnexhaustedLeader("sardakkagent")) {
+            buttons.add(Buttons.gray(
+                    "getAgentSelection_sardakkagent", "Use Sardakk Agent on Someone Else", FactionEmojis.Sardakk));
         }
         if (player.hasUnexhaustedLeader("nokaragent")) {
             buttons.add(Buttons.gray("getAgentSelection_nokaragent", "Use Nokar Agent", FactionEmojis.nokar));
@@ -122,7 +214,6 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("zelianagent")) {
             buttons.add(Buttons.gray("getAgentSelection_zelianagent", "Use Zelian Agent", FactionEmojis.zelian));
         }
-
         if (player.hasUnexhaustedLeader("mirvedaagent")) {
             buttons.add(Buttons.gray("getAgentSelection_mirvedaagent", "Use Mirveda Agent", FactionEmojis.mirveda));
         }
@@ -150,17 +241,20 @@ public class CardsInfoService {
         if (player.hasUnlockedBreakthrough("yssarilbt")) {
             buttons.add(Buttons.green("startYssarilbt", "Use Yssaril Breakthrough", FactionEmojis.Yssaril));
         }
-        if (player.hasAbility("pillage")) {
+        if (player.hasAbility("control_network")) {
+            buttons.add(NetrunnersAbilitiesHandler.getControlNetworkCardsInfoButton(player));
+        }
+        if (player.hasAbility("pillage") && !game.isTwilightsFallMode()) {
             if (game.getStoredValue("willPillageOwnTransactions" + player.getFaction())
                     .isEmpty()) {
                 buttons.add(Buttons.green(
                         "setwillPillageOwnTransactions_no",
-                        "Turn off Pillage pings on your transactions",
+                        "Turn Off Pillage Pings On Your Transactions",
                         FactionEmojis.Mentak));
             } else {
                 buttons.add(Buttons.red(
                         "setwillPillageOwnTransactions_yes",
-                        "Turn on Pillage pings on your transactions",
+                        "Turn On Pillage Pings On Your Transactions",
                         FactionEmojis.Mentak));
             }
         }
@@ -174,15 +268,21 @@ public class CardsInfoService {
             buttons.add(Buttons.gray(
                     "getAgentSelection_hyperagent", "Use Hyper Agent on Someone Else", FactionEmojis.Mentak));
         }
+        if (player.hasTech("tf-predictivecommand")
+                && !player.getExhaustedTechs().contains("tf-predictivecommand")) {
+            buttons.add(Buttons.gray(
+                    "exhaustTech_tf-predictivecommand", "Exhaust Predictive Command", FactionEmojis.mykomentori));
+        }
+        if (player.hasTech("tf-radiantsigils") && !player.getExhaustedTechs().contains("tf-radiantsigils")) {
+            buttons.add(Buttons.gray("exhaustTech_tf-radiantsigils", "Exhaust Radiant Sigils", FactionEmojis.edyn));
+        }
         if (player.hasUnexhaustedLeader("firmamentagent")) {
             buttons.add(
                     Buttons.gray("getAgentSelection_firmamentagent", "Use Firmament Agent", FactionEmojis.Firmament));
         }
         if (player.hasAbility("laws_order") && !game.getLaws().isEmpty()) {
             buttons.add(Buttons.gray(
-                    player.getFinsFactionCheckerPrefix() + "useLawsOrder",
-                    "Pay To Ignore Laws",
-                    FactionEmojis.Keleres));
+                    player.factionButtonChecker() + "useLawsOrder", "Pay To Ignore Laws", FactionEmojis.Keleres));
         }
         if (game.isVeiledHeartMode()) {
             buttons.add(Buttons.green("revealVeiledCards", "Reveal Veiled Cards"));
@@ -238,8 +338,14 @@ public class CardsInfoService {
                 && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
             buttons.add(Buttons.green("getPsychoButtons", "Use Psychoarcheology", TechEmojis.BioticTech));
         }
+        if (player.hasTechReady("dsuydag")) {
+            buttons.add(Buttons.green("exhaustTech_dsuydag", "Exhaust Messiah Protocols", TechEmojis.BioticTech));
+        }
         if (player.hasUnexhaustedLeader("nekroagent")) {
             buttons.add(Buttons.gray("exhaustAgent_nekroagent", "Use Nekro Agent", FactionEmojis.Nekro));
+        }
+        if (player.hasReadyBreakthrough("lanefirbt")) {
+            buttons.add(Buttons.gray("useLanefirBt", "Use Lanefir Breakthrough", FactionEmojis.lanefir));
         }
         if (player.hasRelicReady("superweapongrom")) {
             buttons.add(Buttons.gray(
@@ -286,11 +392,15 @@ public class CardsInfoService {
             buttons.add(Buttons.blue("exhaustRelic_heartofixth", "Exhaust Heart of Ixth"));
         }
 
+        if (player.hasAbility("planetary_reconfiguration")) {
+            TaAbilityHandler.sendPlanetaryReconfigurationStatus(player, game);
+        }
+
         if (player.hasAbility("divination")
                 && !ButtonHelperAbilities.getAllOmenDie(game).isEmpty()) {
             StringBuilder omenDice = new StringBuilder();
             for (int omenDie : ButtonHelperAbilities.getAllOmenDie(game)) {
-                omenDice.append(" ").append(omenDie);
+                omenDice.append(' ').append(omenDie);
             }
             omenDice = new StringBuilder(omenDice.toString().trim());
             buttons.add(Buttons.gray("getOmenDice", "Use an omen die (" + omenDice + ")", FactionEmojis.mykomentori));
@@ -329,15 +439,21 @@ public class CardsInfoService {
         String message = "You may use these buttons to do various things:";
 
         // Refresh the various buttons if they're the last message in the thread
-        player.getCardsInfoThread()
+        playerCardsInfoThread
                 .retrieveMessageById(player.getCardsInfoThread().getLatestMessageId())
                 .queue(
                         msg -> {
                             if (msg != null && message.equals(msg.getContentRaw())) {
-                                msg.delete().queue();
+                                msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                             }
                         },
                         BotLogger::catchRestError);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(playerCardsInfoThread, message, buttons);
+        if (game.isTwilightsFallMode() && game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", a reminder that genomes can be _Shatter_'d! Use best judgement on whether that is likely to occur and whether you should wait for a _Shatter_ (usually it will not).");
+        }
     }
 }

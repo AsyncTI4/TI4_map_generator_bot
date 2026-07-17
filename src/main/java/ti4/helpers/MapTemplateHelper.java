@@ -11,15 +11,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileHelper;
 import ti4.image.TileStep;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
@@ -31,7 +31,7 @@ import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
 import ti4.service.milty.MiltyDraftSlice;
 
-public class MapTemplateHelper {
+public final class MapTemplateHelper {
 
     private static final String NUCLEUS_COLOR = "rainbow";
 

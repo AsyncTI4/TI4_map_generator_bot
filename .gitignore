@@ -27,3 +27,11 @@ runlocally clean.ps1
 runlocally.ps1
 *.tar
 *.log
+*test-save.txt
+src/test/resources/maps/undo
+tibot.db
+scripts/__pycache__/
+scripts/**/__pycache__/
+/ti4-backup/
+/ti4-bkup-cleaned/
+/.claude/settings.local.json

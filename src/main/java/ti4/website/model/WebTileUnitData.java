@@ -5,6 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.PdsCoverage;
@@ -13,15 +19,10 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
 import ti4.image.TileGenerator;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.website.WebPdsCoverage;
 
 @Data
-public class WebTileUnitData {
+public final class WebTileUnitData {
     private Map<String, List<WebEntityData>> space;
     private Map<String, WebTilePlanet> planets;
     private List<String> ccs;
@@ -56,7 +57,7 @@ public class WebTileUnitData {
 
         // Add virtual "special" tile for off-tile planets (custodiavigilia, oceans, etc.)
         WebTileUnitData specialTileData = extractOffTilePlanetsData(game);
-        if (specialTileData != null && !specialTileData.planets.isEmpty()) {
+        if (!specialTileData.planets.isEmpty()) {
             tileUnitData.put(Constants.SPECIAL, specialTileData);
         }
 
@@ -67,7 +68,7 @@ public class WebTileUnitData {
         WebTileUnitData tileData = new WebTileUnitData();
 
         // Set anomaly status
-        tileData.setAnomaly(tile.isAnomaly(game));
+        tileData.isAnomaly = tile.isAnomaly(game, null);
 
         // Extract command tokens from space
         UnitHolder spaceHolder = tile.getUnitHolders().get(Constants.SPACE);
@@ -93,11 +94,12 @@ public class WebTileUnitData {
             } else {
                 // For planets and space stations
                 if (unitHolder instanceof Planet planet) {
-                    WebTilePlanet planetData = tileData.planets.computeIfAbsent(holderName, k -> new WebTilePlanet());
+                    WebTilePlanet planetData = tileData.planets.computeIfAbsent(holderName, _ -> new WebTilePlanet());
 
-                    // Extract units and tokens
+                    // Extract units, tokens, and action cards
                     extractUnits(game, unitHolder, planetData.getEntities());
                     extractTokens(unitHolder, planetData.getEntities(), false);
+                    extractActionCards(game, planet, planetData.getEntities());
 
                     // Determine controller
                     String controllingFaction;
@@ -133,7 +135,7 @@ public class WebTileUnitData {
                 ti4.helpers.PdsCoverage detailed = entry.getValue();
                 pdsCoverage.put(entry.getKey(), new WebPdsCoverage(detailed.getCount(), detailed.getExpected()));
             }
-            tileData.setPds(pdsCoverage);
+            tileData.pds = pdsCoverage;
         }
 
         return tileData;
@@ -206,7 +208,7 @@ public class WebTileUnitData {
         for (UnitKey unitKey : unitHolder.getUnitKeys()) {
             Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
             int unitCount = unitHolder.getUnitCount(unitKey);
-            String unitId = getUnitIdFromType(unitKey.getUnitType());
+            String unitId = getUnitIdFromType(unitKey.unitType());
 
             if (player == null || unitId == null || unitCount <= 0) {
                 continue;
@@ -226,14 +228,14 @@ public class WebTileUnitData {
             // Get unit state counts: [healthy, damaged, galvanized, damaged+galvanized]
             List<Integer> unitStates = unitHolder.getUnitStates(unitKey);
             WebEntityData entityData = new WebEntityData(unitId, "unit", unitCount, sustainedDamage, unitStates);
-            factionEntities.computeIfAbsent(faction, k -> new ArrayList<>()).add(entityData);
+            factionEntities.computeIfAbsent(faction, _ -> new ArrayList<>()).add(entityData);
         }
 
         if (!factionEntities.isEmpty()) {
             // Add units to target entities
             for (Map.Entry<String, List<WebEntityData>> factionEntry : factionEntities.entrySet()) {
                 targetEntities
-                        .computeIfAbsent(factionEntry.getKey(), k -> new ArrayList<>())
+                        .computeIfAbsent(factionEntry.getKey(), _ -> new ArrayList<>())
                         .addAll(factionEntry.getValue());
             }
         }
@@ -271,14 +273,32 @@ public class WebTileUnitData {
 
             // For now, we'll treat all tokens as non-faction specific
             WebEntityData tokenData = new WebEntityData(ti4.image.Mapper.getTokenIDFromTokenPath(token), entityType, 1);
-            factionTokens.computeIfAbsent("neutral", k -> new ArrayList<>()).add(tokenData);
+            factionTokens.computeIfAbsent("neutral", _ -> new ArrayList<>()).add(tokenData);
         }
 
         // Merge token data with existing data
         for (Map.Entry<String, List<WebEntityData>> factionEntry : factionTokens.entrySet()) {
             targetEntities
-                    .computeIfAbsent(factionEntry.getKey(), k -> new ArrayList<>())
+                    .computeIfAbsent(factionEntry.getKey(), _ -> new ArrayList<>())
                     .addAll(factionEntry.getValue());
+        }
+    }
+
+    /**
+     * Extract action cards from a planet (Garbozia feature) and add them to the target entities map.
+     *
+     * @param game The game context
+     * @param planet The planet to extract action cards from
+     * @param targetEntities The map to add the extracted entities to
+     */
+    private static void extractActionCards(Game game, Planet planet, Map<String, List<WebEntityData>> targetEntities) {
+        if (!"garbozia".equals(planet.getName())) {
+            return;
+        }
+
+        for (String cardId : ActionCardHelper.getGarboziaActionCards(game).keySet()) {
+            WebEntityData cardData = new WebEntityData(cardId, "actioncard", 1);
+            targetEntities.computeIfAbsent("neutral", _ -> new ArrayList<>()).add(cardData);
         }
     }
 
@@ -368,6 +388,7 @@ public class WebTileUnitData {
             case TyrantsLament -> "tyrantslament";
             case Lady -> "lady";
             case Celagrom -> "celagrom";
+            case Aurelion -> "aurelion";
             case Cavalry -> "cavalry";
             case StarfallPds -> "starfallpds";
             default -> null;

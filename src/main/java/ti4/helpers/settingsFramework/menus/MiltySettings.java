@@ -1,7 +1,6 @@
 package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,16 +8,18 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.buttons.Buttons;
+import org.jetbrains.annotations.NotNull;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.draft.DraftSetupService;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.milty.MiltyService;
+import tools.jackson.databind.JsonNode;
 
 @Getter
 public class MiltySettings extends SettingsMenu {
@@ -40,7 +41,7 @@ public class MiltySettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public MiltySettings(Game game, JsonNode json) {
+    public MiltySettings(@NotNull Game game, JsonNode json) {
         super("main", "Draft Settings", "Edit draft settings, then start the draft!", null);
         this.game = game;
 
@@ -67,7 +68,7 @@ public class MiltySettings extends SettingsMenu {
         List<String> historicIDs = List.of("milty", "main");
         if (json != null
                 && json.has("menuId")
-                && historicIDs.contains(json.get("menuId").asText(""))) {
+                && historicIDs.contains(json.get("menuId").asString(""))) {
             draftMode.initialize(json.get("draftMode"));
         }
 
@@ -110,11 +111,6 @@ public class MiltySettings extends SettingsMenu {
         String prefix = menuAction + "_" + navId() + "_";
 
         buttons.add(Buttons.green(prefix + "startMilty", "Start Milty Draft!"));
-        // switch (draftMode.getValue()) {
-        //     case milty -> buttons.add(Buttons.green(prefix + "startMilty", "Start Milty Draft!"));
-        //     case franken -> buttons.add(Buttons.green(prefix + "startFranken", "Start Franken Draft!"));
-        //     default -> buttons.clear();
-        // }
         return buttons;
     }
 

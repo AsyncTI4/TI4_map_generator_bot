@@ -2,7 +2,6 @@ package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,18 +15,21 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
-import ti4.buttons.Buttons;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.map.Game;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftSlice;
+import tools.jackson.databind.JsonNode;
 
 // This is a sub-menu
 @Getter
@@ -87,7 +89,7 @@ public class SliceGenerationSettings extends SettingsMenu {
         List<String> historicIDs = new ArrayList<>(List.of("slice"));
         if (json != null
                 && json.has("menuId")
-                && historicIDs.contains(json.get("menuId").asText(""))) {
+                && historicIDs.contains(json.get("menuId").asString(""))) {
             numSlices.initialize(json.get("numSlices"));
             numFactions.initialize(json.get("numFactions"));
             minimumRes.initialize(json.get("minimumRes"));
@@ -153,7 +155,7 @@ public class SliceGenerationSettings extends SettingsMenu {
     public String menuSummaryString(String lastSettingTouched) {
         StringBuilder sb = new StringBuilder("# **__").append(menuName).append(":__**");
         for (String line : description) sb.append("\n- *").append(line).append("*");
-        sb.append("\n");
+        sb.append('\n');
 
         int pad = enabledSettings().stream()
                 .map(x -> x.getName().length())
@@ -162,11 +164,11 @@ public class SliceGenerationSettings extends SettingsMenu {
         for (SettingInterface setting : enabledSettings()) {
             sb.append("> ");
             sb.append(setting.longSummary(pad, lastSettingTouched));
-            sb.append("\n");
+            sb.append('\n');
         }
         if (presetSlices != null)
-            sb.append("> Using preset slices: ").append(presetSlices).append("\n");
-        if (!enabledSettings().isEmpty()) sb.append("\n"); // extra line for formatting
+            sb.append("> Using preset slices: ").append(presetSlices).append('\n');
+        if (!enabledSettings().isEmpty()) sb.append('\n'); // extra line for formatting
 
         if (!categories().isEmpty()) {
             List<String> catStrings = new ArrayList<>();
@@ -277,7 +279,7 @@ public class SliceGenerationSettings extends SettingsMenu {
                 .addComponents(Label.of("TTS String", ttsString))
                 .build();
         if (event instanceof ButtonInteractionEvent buttonEvent) {
-            buttonEvent.replyModal(modal).queue();
+            buttonEvent.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
             return null;
         }
         return "Unknown Event";
@@ -304,9 +306,15 @@ public class SliceGenerationSettings extends SettingsMenu {
             sources.addAll(mparent.getSourceSettings().getTileSources());
         }
 
-        parsedSlices = MiltyDraftHelper.parseSlicesFromString(sliceString, sources);
-        if (parsedSlices == null) {
+        String error = null;
+        try {
+            parsedSlices = MiltyDraftHelper.parseSlices(sliceString, sources);
+        } catch (Exception e) {
+            error = e.getMessage();
+        }
+        if (parsedSlices == null || error != null) {
             presetSlices = null;
+            if (error != null) return error;
             return "Invalid slice string";
         } else if (parsedSlices.size() < players) {
             presetSlices = null;

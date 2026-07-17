@@ -1,16 +1,18 @@
 package ti4.service.statistics.game;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.statistics.GameStatisticsFilterer;
+import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
+import ti4.game.Game;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.Helper;
 import ti4.helpers.SortHelper;
-import ti4.map.Game;
-import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -21,9 +23,10 @@ class GameLengthStatisticsService {
         AtomicInteger atomicTotal = new AtomicInteger();
         Map<String, Integer> endedGames = new HashMap<>();
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
-                game -> calculate(game, pastDays, atomicNum, atomicTotal, endedGames));
+                game -> calculate(game, pastDays, atomicNum, atomicTotal, endedGames),
+                ExecutionLockType.READ);
 
         int num = atomicNum.get();
         int total = atomicTotal.get();
@@ -44,7 +47,7 @@ class GameLengthStatisticsService {
             }
             longMsg.append("\n The average completion time of these games is: ")
                     .append(total / num)
-                    .append("\n");
+                    .append('\n');
         }
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Game Lengths", longMsg.toString());
@@ -54,14 +57,20 @@ class GameLengthStatisticsService {
             Game game, int pastDays, AtomicInteger num, AtomicInteger total, Map<String, Integer> endedGames) {
         if (game.isHasEnded()
                 && game.getWinner().isPresent()
-                && game.getPlayerCountForMap() > 2
+                && game.getRealAndEliminatedPlayers().size() > 2
                 && Helper.getDateDifference(
                                 game.getEndedDateString(), Helper.getDateRepresentation(System.currentTimeMillis()))
                         < pastDays) {
             num.getAndIncrement();
-            int dif = Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString());
-            endedGames.put(game.getName() + " (" + game.getPlayerCountForMap() + "p, " + game.getVp() + "pt)", dif);
-            total.addAndGet(dif);
+
+            long creationDateTime = game.getCreationDateTime();
+            long endedDateTime = game.getEndedDate();
+            int daysPlayed =
+                    (int) Duration.ofMillis(endedDateTime - creationDateTime).toDays();
+            endedGames.put(
+                    game.getName() + " (" + game.getRealAndEliminatedPlayers().size() + "p, " + game.getVp() + "pt)",
+                    daysPlayed);
+            total.addAndGet(daysPlayed);
         }
     }
 }

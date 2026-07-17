@@ -16,10 +16,10 @@
         "id": "ingressPlacement",
         "title": "<misc:ingress> Rules for placing Ingress Tokens",
         "description": [
-            "If the Fracture was brought into play by a breakthrough roll:",
+            "If The Fracture was brought into play by a breakthrough roll:",
             "\n> - For each synergy color on that player's breakthrough, they must place 3 tokens in systems with a matching technology specialty, if able.",
             "\n> - No more than 6 ingress tokens can be placed in this way.",
-            "\nIf the Fracture was brought into play by another ability, or by a breakthrough that does not have synergy (E.g. nekro's):",
+            "\nIf The Fracture was brought into play by another ability, or by a breakthrough that does not have synergy (E.g. nekro's):",
             "\n> - For each of the 4 technology specialties, the player must place a token in a system that has a matching specialty, if able.",
             "\n> - If there are not 4 distinct systems, the remaining tokens are not placed.",
             "\nFinally, the players place a token in the Thunder's Edge system, if it is in play, or the Mecatol Rex system, if the expedition has not been completed."
@@ -232,7 +232,7 @@
                 "title": "Rolling for The Fracture",
                 "text": [
                     "Each time a breakthrough is gained, there is a possibility that ",
-                    "the fracture will come into play. When a player gains their ",
+                    "The Fracture will come into play. When a player gains their ",
                     "breakthrough, regardless of the source, if The Fracture is not ",
                     "already in play, they roll one die. If their die roll is equal to 1 or ",
                     "10, they put The Fracture into play."

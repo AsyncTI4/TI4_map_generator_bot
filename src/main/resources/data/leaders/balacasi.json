@@ -34,40 +34,6 @@
         "source": "balacasi"
     },
     {
-        "id": "arachianagent",
-        "faction": "arachian",
-        "type": "agent",
-        "name": "Qekob",
-        "title": "The Weaver",
-        "abilityWindow": "Action",
-        "abilityText": "Choose a system with a player’s command token. That player may remove one of their ships from that system and place it in that player’s home system if it contains no other player’s ships.",
-        "unlockCondition": "Always Unlocked",
-        "source": "other"
-    },
-    {
-        "id": "arachiancommander",
-        "faction": "arachian",
-        "type": "commander",
-        "name": "Zraaqu",
-        "title": "The Spinner",
-        "abilityWindow": "At the start of a space combat in a system with your command token:",
-        "abilityText": "If you are the defender, you may choose up to 2 of your opponent’s units. Those units roll 1 less combat die during the first round of this combat.",
-        "unlockCondition": "Have 6 of your Command Tokens on the game board",
-        "source": "other"
-    },
-    {
-        "id": "arachianhero",
-        "faction": "arachian",
-        "type": "hero",
-        "name": "Zhossox",
-        "title": "Spider in Chief",
-        "abilityName": "Master Web",
-        "abilityWindow": "ACTION",
-        "abilityText": "Move up to 3 of your Command Tokens on the game board to an adjacent system. Then, purge this card. ",
-        "unlockCondition": "Have 3 scored objectives.",
-        "source": "other"
-    },
-    {
         "id": "xanagent",
         "faction": "xan",
         "type": "agent",
@@ -119,8 +85,8 @@
         "name": "Sirok",
         "title": "The Judicial",
         "abilityWindow": "When 1 or more of your units use BOMBARDMENT:",
-        "abilityText": "You may use the BOMBARDMENT ability of any of your units in systems that do not contain any planets.",
-        "unlockCondition": "Have units in 2 systems that do not contain planets.",
+        "abilityText": "You may use the BOMBARDMENT ability of any of your units in adjacent systems.",
+        "unlockCondition": "Retreat from a space combat",
         "source": "balacasi"
     },
     {
@@ -153,7 +119,7 @@
         "name": "Syphrydon Umbas",
         "title": "The Judicial",
         "abilityWindow": "After you score a secret objective:",
-        "abilityText": "You may draw 1 secret objective.",
+        "abilityText": "Draw 1 secret objective.",
         "unlockCondition": "Have 4 carriers on the game board",
         "source": "balacasi"
     },
@@ -186,9 +152,9 @@
         "type": "commander",
         "name": "Strategist Kreel",
         "title": "The Judicial",
-        "abilityWindow": "When you resolve the primary or secondary ability of the Leadership strategy card:",
-        "abilityText": "If you gained 1 or more command tokens from spending influence, gain 1 additional command token.",
-        "unlockCondition": "Have 2 control tokens on this card",
+        "abilityWindow": "",
+        "abilityText": "After you draw a relic, gain 1 command token. After you gain control of a planet in The Fracture that was controlled by a player other than Onyxxa, gain 1 relic.",
+        "unlockCondition": "Resolve the primary ability of a strategy card in 1 of your neighbors' play areas.",
         "source": "balacasi"
     },
     {
@@ -199,7 +165,7 @@
         "title": "The Invincible",
         "abilityName": "Titles Are Silly",
         "abilityWindow": "ACTION:",
-        "abilityText": "For each system that contains 1 or more of your ships, you may move 1 ship in that system into an adjacent system that doesn’t contain another player's ships.",
+        "abilityText": "Move up to 1 ship from each system that contains 1 or more of your ships into an adjacent system. Then, resolve space combat in each system that contains both yours and another player's ships and purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "balacasi"
     },
@@ -220,8 +186,8 @@
         "type": "commander",
         "name": "Chrono-Tactician Xelthar",
         "title": "The Judicial",
-        "abilityWindow": "ACTION:",
-        "abilityText": "Spend 1 token from your strategy pool to place 1 mech on a planet you control. When a public objective is revealed, you may place 1 infantry on a planet you control.",
+        "abilityWindow": "",
+        "abilityText": "ACTION: Spend 1 token from your strategy pool to place 1 mech on a planet you control.\nWhen a public objective is revealed: You may place 1 infantry on a planet you control.",
         "unlockCondition": "Have 5 infantry that are not in or adjacent to your home system",
         "source": "balacasi"
     },
@@ -233,7 +199,7 @@
         "title": "The Invincible",
         "abilityName": "Titles Are Silly",
         "abilityWindow": "At the start of your turn:",
-        "abilityText": "You may purge this card. If you do, during this turn you may perform any number of actions and after each action, you may gain 1 commodity or convert 1 commodity to a trade good.",
+        "abilityText": "You may purge this card. If you do, during this turn you may perform any number of actions.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "balacasi"
     },
@@ -243,8 +209,8 @@
         "type": "agent",
         "name": "The Vizier",
         "title": "The Wise",
-        "abilityWindow": "When a player produces fighters in a system: ",
-        "abilityText": "You may exhaust this card. That player may place any number of those units in adjacent systems containing 1 or more of their ships.",
+        "abilityWindow": "When a player places or produces fighters or destroyers in a system",
+        "abilityText": "You may exhaust this card. That player may place any number of those units in adjacent systems containing 1 or more of their units.",
         "unlockCondition": "Always Unlocked",
         "source": "balacasi"
     },
@@ -255,7 +221,7 @@
         "name": "The Synthesist",
         "title": "The Judicial",
         "abilityWindow": "When you research a non-unit upgrade technology: ",
-        "abilityText": "Gain 1 trade good per planet you control with a technology specialty matching any of the prerequisites of that technology.",
+        "abilityText": "Gain 1 trade good per planet you control that has a technology specialty of that technology's colour.",
         "unlockCondition": "Control 3 planets with technology specialties.",
         "source": "balacasi"
     },
@@ -278,7 +244,8 @@
         "name": "Rhino the Adventurer",
         "title": "The Wise",
         "abilityWindow": "ACTION:",
-        "abilityText": " Exhaust this card and choose another player. Choose a ship type that has a bounty token on that player’s faction sheet with a cost of 4 or less; the chosen player must choose 1 of their ships of that type in a system that contains 1 of their command tokens, if able. The chosen ship is destroyed and that player gains trade goods equal to its cost.",
+        "abilityText": "Exhaust this card and choose another player. Choose a ship type with a bounty token on that player’s faction sheet that costs 4 or less. That player must destroy 1 of their ships of that type from a system containing 1 of their command tokens, if able. That player gains trade goods equal to the destroyed ship’s cost, plus 1 for each unit removed due to capacity.",
+        "notes": "The destroyed ship must be in a system containing that player’s command token. If no such ship exists, nothing happens.",
         "unlockCondition": "Always Unlocked",
         "source": "balacasi"
     },
@@ -300,8 +267,8 @@
         "name": "Monturak Homotol",
         "title": "The Invincible",
         "abilityName": "Titles Are Silly",
-        "abilityWindow": "After you destroy an opponent’s War Sun or Flagship that has a bounty token on its unit space: ",
-        "abilityText": "If you have a War Sun or Flagship on the game board, you may place this card in your play area and place 1 bounty token on the unit space of one of those ships. Then, gain 1 victory point.\nIf one of your ships with a bounty token on its unit space is destroyed, lose 1 victory point and purge this card.",
+        "abilityWindow": "After you destroy a unit with a bounty token on its unit space during combat:",
+        "abilityText": "You may purge this card. If you do, if it was a flagship or War Sun, gain 1 victory point; otherwise, place all units of that type from your reinforcements in systems that contain 1 or more of your ships.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "balacasi"
     }

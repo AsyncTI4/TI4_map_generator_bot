@@ -8,21 +8,25 @@ public enum SourceEmojis implements TI4Emoji {
     // Source Icons
     PoK,
     Codex,
+    ThundersEdgeIcon,
 
     // Homebrew
     Absol,
     DiscordantStars,
     UnchartedSpace,
-    Monuments, //
+    Monuments,
     ActionDeck2,
     KeleresPlus,
     ProjectPi,
     Flagshipping,
-    PromisesPromises, //
+    PromisesPromises,
+    TwilightKart,
     Eronous,
     IgnisAurora,
     MiltyMod,
-    StrategicAlliance;
+    StrategicAlliance,
+    DeepReaches,
+    Theodisi;
 
     @Override
     public String toString() {

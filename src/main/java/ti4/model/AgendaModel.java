@@ -1,29 +1,38 @@
 package ti4.model;
 
-import java.awt.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.Data;
+import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.TI4Emoji;
 
 @Data
 public class AgendaModel implements ModelInterface, EmbeddableModel {
+    @Getter
     private String alias;
+
+    @Getter
     private String name;
+
     private String category;
     private String categoryDescription;
     private String type;
     private String target;
     private String text1;
     private String text2;
+    private String notes;
     private String forEmoji;
     private String againstEmoji;
     private String mapText;
@@ -50,12 +59,16 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         }
     }
 
-    public String getAlias() {
-        return alias;
+    public String getNameRepresentation() {
+        return getEmoji() + " _" + name + "_ " + source.emoji();
     }
 
-    public String getName() {
-        return name;
+    @JsonIgnore
+    public TI4Emoji getEmoji() {
+        return switch (getCategory()) {
+            case "edict" -> FactionEmojis.Mahact;
+            default -> CardEmojis.Agenda;
+        };
     }
 
     private String getCategory() {
@@ -117,16 +130,19 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         }
         sb.append(name).append("__** ");
         sb.append(source.emoji());
-        sb.append("\n");
+        sb.append('\n');
 
         sb.append("> **").append(type).append(":** *").append(target).append("*\n");
         if (!getText1().isEmpty()) {
             String arg = getText1().replace("For:", "**For:**");
-            sb.append("> ").append(arg).append("\n");
+            sb.append("> ").append(arg).append('\n');
         }
         if (!getText2().isEmpty()) {
             String arg = getText2().replace("Against:", "**Against:**");
-            sb.append("> ").append(arg).append("\n");
+            sb.append("> ").append(arg).append('\n');
+        }
+        if (notes != null) {
+            sb.append("> -# [").append(notes).append("]\n");
         }
         if (footnote() != null) sb.append(footnote());
 
@@ -144,18 +160,24 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
         String name = this.name == null ? "" : this.name;
-        eb.setTitle(CardEmojis.Agenda + "__" + name + "__" + source.emoji(), null);
-        eb.setColor(Color.blue);
+        eb.setTitle(getEmoji() + "__" + name + "__" + source.emoji(), null);
+        switch (getCategory()) {
+            case "edict" -> eb.setColor(Color.yellow);
+            default -> eb.setColor(Color.blue);
+        }
 
         // DESCRIPTION
         StringBuilder text = new StringBuilder("**" + getType() + ":** *" + getTarget() + "*\n");
         if (!getText1().isEmpty()) {
             String arg = getText1().replace("For:", "__**For:**__");
-            text.append(arg).append("\n");
+            text.append(arg).append('\n');
         }
         if (!getText2().isEmpty()) {
             String arg = getText2().replace("Against:", "__**Against:**__");
-            text.append(arg).append("\n");
+            text.append(arg).append('\n');
+        }
+        if (notes != null) {
+            text.append("-# [").append(notes).append("]\n");
         }
         eb.setDescription(text.toString());
 

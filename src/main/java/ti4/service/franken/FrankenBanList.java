@@ -1,155 +1,192 @@
 package ti4.service.franken;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import lombok.Getter;
 import ti4.helpers.Constants;
 
 public enum FrankenBanList {
-    CARTER_CUT(
-            "carter_cut",
-            "Removes Weak & Unbalanced Components for a more balanced draft",
+    Weak_Components(
+            "Weak Components",
+            "Removes Weak/Boring Components for a more empowered draft",
             Map.ofEntries(
+                    Map.entry(
+                            Constants.BREAKTHROUGH,
+                            List.of(
+                                    "argentbt",
+                                    "augersbt",
+                                    "axisbt",
+                                    "bastionbt",
+                                    "cymiaebt",
+                                    "firmamentbt_y",
+                                    "florzenbt",
+                                    "gheminabt",
+                                    "jolnarbt",
+                                    "mortheusbt",
+                                    "mykomentoribt",
+                                    "uydaibt",
+                                    "vaylerianbt")),
                     Map.entry(
                             Constants.ABILITY,
                             List.of(
-                                    "hired_guns",
+                                    "cargo_raiders",
+                                    "conspirators",
                                     "deep_mining",
+                                    "foresight",
+                                    "iconoclasm",
+                                    "illusory_presence",
+                                    "information_brokers",
+                                    "moult",
+                                    "munitions",
                                     "orbital_foundries",
                                     "rule_of_two",
-                                    "conspirators",
-                                    "iconoclasm",
-                                    "information_brokers",
-                                    "munitions",
                                     "starfall_gunnery",
-                                    "plague_reservoir",
-                                    "zeal",
-                                    "illusory_presence",
-                                    "foresight",
-                                    "cargo_raiders",
-                                    "pillage",
-                                    "technological_singularity",
-                                    "classified_developments",
-                                    "data_recovery",
-                                    "honor_bound",
-                                    "prescience")),
+                                    "zeal")),
                     Map.entry(
                             Constants.BAN_FLEET,
-                            List.of("titans", "edyn", "nekro", "winnu", "dihmohn", "ghoti", "qhet")),
-                    Map.entry(Constants.BAN_HS, List.of("gledge", "nokar", "saar", "ghemina")),
+                            List.of("dihmohn", "edyn", "ghoti", "nekro", "qhet", "titans", "winnu")),
+                    Map.entry(Constants.BAN_HS, List.of("ghemina", "gledge", "nokar", "saar", "thrones")),
                     Map.entry(
                             Constants.LEADER,
                             List.of(
                                     "argentagent",
-                                    "l1z1xagent",
-                                    "dihmohnagent",
-                                    "letnevagent",
-                                    "tnelisagent",
-                                    "gheminaagent",
-                                    "kortaliagent",
-                                    "florzenagent",
-                                    "solagent",
-                                    "nivynagent",
-                                    "ghostcommander",
                                     "cymiaecommander",
-                                    "zeliancommander",
-                                    "mortheuscommander",
-                                    "kolumecommander",
-                                    "hacancommander",
-                                    "l1z1xcommander",
+                                    "dihmohnagent",
                                     "edyncommander",
-                                    "kyrocommander",
-                                    "olradincommander",
-                                    "mentakcommander",
-                                    "naalucommander",
-                                    "kjalengardcommander",
-                                    "naaluhero",
-                                    "kolumehero",
+                                    "florzenagent",
+                                    "gheminaagent",
+                                    "hacancommander",
+                                    "keleresagent",
                                     "keleresheroodlynn",
-                                    "winnuhero")),
+                                    "kjalengardcommander",
+                                    "kolumecommander",
+                                    "kolumehero",
+                                    "kortaliagent",
+                                    "kyrocommander",
+                                    "l1z1xagent",
+                                    "l1z1xcommander",
+                                    "letnevagent",
+                                    "mentakcommander",
+                                    "mortheuscommander",
+                                    "naalucommander",
+                                    "nivynagent",
+                                    "olradincommander",
+                                    "solagent",
+                                    "tnelisagent",
+                                    "zealotscommander",
+                                    "zeliancommander")),
                     Map.entry(
                             Constants.PROMISSORY_NOTE_ID,
                             List.of(
+                                    "ambuscade",
+                                    "dspnatok",
+                                    "dspnchei",
+                                    "dspnkhra",
                                     "dspnkolu",
                                     "dspnmirv",
-                                    "ambuscade",
-                                    "ragh",
-                                    "dspnchei",
+                                    "dspnnoka",
                                     "dspnvayl",
                                     "dspnzeli",
-                                    "dspnnoka",
-                                    "dspnkhra")),
+                                    "ragh")),
                     Map.entry(
                             Constants.TECH,
                             List.of(
-                                    "dsvaylr",
-                                    "dskolly",
-                                    "dszelir",
-                                    "dsmortr",
-                                    "dsmykog",
-                                    "dsfreeg",
-                                    "dsolrar",
-                                    "dsnivyy",
+                                    "bio",
                                     "dsaxisb",
                                     "dsbentg",
-                                    "dsmirvr",
-                                    "dsrhodb",
-                                    "dsnivymf",
-                                    "dscheir",
-                                    "dsolrab",
-                                    "dsedyny",
-                                    "dsveldr",
-                                    "dskyroy",
-                                    "dskollb",
-                                    "dsflorg",
                                     "dsbenty",
+                                    "dscheir",
+                                    "dsedyny",
+                                    "dsflorg",
+                                    "dsfreeg",
+                                    "dskollb",
+                                    "dskolly",
                                     "dskyrog",
+                                    "dskyroy",
+                                    "dsmirvr",
+                                    "dsmortr",
+                                    "dsmykog",
+                                    "dsnivymf",
+                                    "dsnivyy",
+                                    "dsolrab",
+                                    "dsolrar",
+                                    "dsrhodb",
+                                    "dsvaylr",
+                                    "dsveldr",
+                                    "dszelir",
+                                    "gr",
                                     "htp",
-                                    "so",
                                     "ic",
-                                    "bio",
+                                    "is",
                                     "l4",
                                     "lgf",
+                                    "parasite-firm_y",
                                     "scc",
-                                    "tp",
-                                    "gr",
-                                    "is",
-                                    "dsuydab")),
+                                    "so",
+                                    "tp")),
                     Map.entry(
                             Constants.UNIT_ID,
                             List.of(
-                                    "kollecc_flagship",
-                                    "cheiran_flagship",
-                                    "mirveda_flagship",
-                                    "veldyr_flagship",
-                                    "kolume_flagship",
-                                    "nivyn_flagship",
-                                    "edyn_flagship",
-                                    "nokar_flagship",
-                                    "mykomentori_flagship",
-                                    "zealots_flagship",
-                                    "freesystems_flagship",
-                                    "zelian_flagship",
                                     "augers_flagship",
-                                    "vaylerian_mech",
-                                    "rohdhna_mech",
+                                    "axis_mech",
                                     "cabal_mech",
-                                    "nivyn_mech",
-                                    "l1z1x_mech",
-                                    "mortheus_mech",
+                                    "cheiran_flagship",
+                                    "edyn_flagship",
+                                    "florzen_mech",
+                                    "freesystems_flagship",
                                     "keleres_mech",
-                                    "zelian_mech",
-                                    "mirveda_mech")))),
+                                    "kollecc_flagship",
+                                    "kolume_flagship",
+                                    "l1z1x_mech",
+                                    "mirveda_flagship",
+                                    "mirveda_mech",
+                                    "mortheus_mech",
+                                    "mortheus_mech",
+                                    "mykomentori_flagship",
+                                    "mykomentori_mech",
+                                    "nivyn_flagship",
+                                    "nokar_flagship",
+                                    "nokar_mech",
+                                    "vaylerian_mech",
+                                    "veldyr_flagship",
+                                    "zealots_flagship",
+                                    "zelian_flagship",
+                                    "zelian_mech")),
+                    Map.entry(Constants.TILE_NAME, List.of("102", "21", "22", "23")))),
 
-    FOUR_PLAYER_BANS(
-            "4p_bans",
-            "Common Removes for 4P Franken games to balance out gameplay",
+    OP_Components(
+            "OP Components",
+            "Removes overpowered/toxic components for a more balanced draft",
             Map.ofEntries(
-                    Map.entry(Constants.LEADER, List.of("winnuhero", "mahactcommander", "xxchahero", "naaluagent")),
-                    Map.entry(Constants.TECH, List.of("lw2", "dt2", "ffac2", "qdn", "asn")),
-                    Map.entry(Constants.UNIT_ID, List.of("mahact_mech")),
-                    Map.entry(Constants.ABILITY, List.of("telepathic", "technological_singularity"))));
+                    Map.entry(
+                            Constants.LEADER,
+                            List.of("edynhero", "lanefirhero", "mahactcommander_y", "naaluagent", "winnuhero")),
+                    Map.entry(Constants.TECH, List.of("asn", "dsuydab", "dt2", "lw2", "qdn")),
+                    Map.entry(
+                            Constants.BREAKTHROUGH,
+                            List.of("kyrobt", "lanefirbt", "letnevbt", "nomadbt", "solbt", "zealotsbt")),
+                    Map.entry(Constants.UNIT_ID, List.of("mahact_mech_y")),
+                    Map.entry(
+                            Constants.ABILITY,
+                            List.of(
+                                    "classified_developments",
+                                    "honor_bound",
+                                    "pillage",
+                                    "prescience",
+                                    "sundered",
+                                    "technological_singularity",
+                                    "telepathic")),
+                    Map.entry(Constants.TILE_NAME, List.of("115", "99"))));
 
     private final String id;
+
+    @Getter
     private final String description;
+
+    @Getter
     private final Map<String, List<String>> bansByType;
 
     FrankenBanList(String id, String description, Map<String, List<String>> bansByType) {
@@ -162,37 +199,39 @@ public enum FrankenBanList {
         return id;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public Map<String, List<String>> getBansByType() {
-        return bansByType;
-    }
-
     public List<String> getFlattenedBans() {
         List<String> out = new ArrayList<>();
+
         for (Map.Entry<String, List<String>> e : bansByType.entrySet()) {
             for (String v : e.getValue()) {
                 out.add(e.getKey() + ": " + v);
             }
         }
+
         return Collections.unmodifiableList(out);
     }
 
     public static FrankenBanList fromString(String id) {
-        if (id == null) return null;
-        for (FrankenBanList list : values()) {
-            if (list.id.equalsIgnoreCase(id)) return list;
+        if (id == null) {
+            return null;
         }
+
+        for (FrankenBanList list : values()) {
+            if (list.id.equalsIgnoreCase(id)) {
+                return list;
+            }
+        }
+
         return null;
     }
 
     public static List<String> getAvailableBanListNames() {
         List<String> names = new ArrayList<>();
+
         for (FrankenBanList list : values()) {
             names.add(list.id);
         }
+
         return names;
     }
 
@@ -210,16 +249,32 @@ public enum FrankenBanList {
     }
 
     public boolean search(String searchString) {
-        if (searchString == null) return false;
+        if (searchString == null) {
+            return false;
+        }
+
         String lower = searchString.toLowerCase();
-        if (id.toLowerCase().contains(lower)) return true;
-        if (description.toLowerCase().contains(lower)) return true;
+
+        if (id.toLowerCase().contains(lower)) {
+            return true;
+        }
+
+        if (description.toLowerCase().contains(lower)) {
+            return true;
+        }
+
         for (Map.Entry<String, List<String>> e : bansByType.entrySet()) {
-            if (e.getKey().toLowerCase().contains(lower)) return true;
+            if (e.getKey().toLowerCase().contains(lower)) {
+                return true;
+            }
+
             for (String v : e.getValue()) {
-                if (v.toLowerCase().contains(lower)) return true;
+                if (v.toLowerCase().contains(lower)) {
+                    return true;
+                }
             }
         }
+
         return false;
     }
 

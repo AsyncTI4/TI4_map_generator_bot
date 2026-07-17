@@ -12,12 +12,19 @@ public enum GameStatTypes {
     FACTION_WINS("Wins per Faction", "Show the wins per faction"),
     SOS_SCORED("Times a secret objective has been scored", "Show the amount of times each secret objective was scored"),
     FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"),
+    FACTION_CUSTODIAN_PERCENT(
+            "Faction custodian percent", "Shows custodian percent for each faction, rounded to the nearest integer"),
+    FACTION_STYX_PERCENT("Faction styx percent", "Shows styx percent for each faction, rounded to the nearest integer"),
     FACTION_PERFORMANCE(
             "Faction performance", "Shows how much each faction over or under performs its expected win rate"),
     COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
     WINNING_PATH("Winners Path to Victory", "Shows a count of each game's path to victory"),
+    ENDING_ROUND_PHASE("End round and phase", "Shows how many games ended by round and phase"),
     PHASE_TIMES("Phase Times", "Shows how long each phase lasted, in days"),
     SUPPORT_WIN_COUNT("Wins with SftT", "Shows a count of wins that occurred holding a Support for the Throne"),
+    SECRET_OBJECTIVE_WIN_CHANCE("Secret objective win chance", "Shows win chance for secrets"),
+    GAME_MODE_COUNT("Game count by mode", "Shows game counts and percentages for each game mode"),
+    AVERAGE_MMR("Average MMR", "Show the average matchmaking rating of each game's players"),
     GAME_COUNT("Total game count", "Shows the total game count");
 
     private final String name;

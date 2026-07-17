@@ -3,20 +3,18 @@ package ti4.service.unit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Space;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.Units;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Space;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.testUtils.BaseTi4Test;
 
 class RemoveUnitServiceTest extends BaseTi4Test {
 
     @Test
     void removeUnits() {
-        beforeAll();
-
         var unitKey = new Units.UnitKey(Units.UnitType.Mech, "black");
         Tile tile = createTile("ixth", unitKey, 4);
         Game game = createGame(tile);

@@ -1,0 +1,67 @@
+[
+    {
+        "alias": "bepndream",
+        "name": "Visions",
+        "faction": "dream",
+        "color": "",
+        "playArea": false,
+        "source": "beans",
+        "text": "At the start of a tactical action: You may return this card to the Dreaming Throne player to remove 1 nexus token from a system containing a planet you control."
+    },
+    {
+        "alias": "bepncryst",
+        "name": "Fracture",
+        "faction": "crystellum",
+        "color": "",
+        "playArea": false,
+        "source": "beans",
+        "text": "After 1 of your non-fighter ships in the active system is destroyed during combat against a player other than the Crystellum player: Place 1 fighter from your reinforcements in that system. Then, return this card to the Crystellum player."
+    },
+    {
+        "alias": "bepnashen",
+        "name": "From the Ashes",
+        "faction": "ashen",
+        "color": "",
+        "playArea": false,
+        "source": "beans",
+        "text": "During a combat against a player that is not the Ashen Legion player: When 1 of your units would be destroyed during ground combat, it is not destroyed instead. Then, return this card to the Ashen Legion player."
+    },
+    {
+        "alias": "bepniron",
+        "name": "Ejection",
+        "faction": "iron",
+        "color": "",
+        "playArea": false,
+        "source": "beans",
+        "text": "During a combat against a player other than the Iron Tide player: When one of your mechs is destroyed, you may place 1 infantry from your reinforcements on that planet. If you do, return this card to the Iron Tide player."
+    },
+    {
+        "alias": "bepnta",
+        "name": "Advanced Structural Engineering",
+        "faction": "ta",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "attachment": "ase",
+        "source": "beans",
+        "text": "ACTION: Attach this card to a non-home planet you control. This planet gains PRODUCTION as if it were a unit equal to its resource value. PRODUCTION X."
+    },
+    {
+        "alias": "bepnnetrunners",
+        "name": "Shared Network Access",
+        "faction": "netrunners",
+        "color": "",
+        "playArea": false,
+        "source": "beans",
+        "text": "At the start of the Net-Runners player's turn: You may place any combination of up to 2 fighters and 2 infantry from your reinforcements in any system that contains one of your structures. Then, return this card to the Net-Runners player."
+    },
+    {
+        "alias": "bepnnatau",
+        "name": "Disciple",
+        "faction": "natau",
+        "color": "",
+        "playArea": true,
+        "text": "When you gain this card, place it face up in your play area. While this card is in your play area, you may treat it as though it has the text abilities of 1 doctrine in the Natau player's play area. When you activate a system that contains 1 or more of the Natau player's units, return this card to the Natau player.",
+        "source": "beans"
+    }
+]

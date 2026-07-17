@@ -6,9 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import ti4.game.Game;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.model.PublicObjectiveModel;
 
 public record Objective(
@@ -105,7 +105,7 @@ public record Objective(
                                     Mapper.getSecretObjectivesJustNames().get(name);
                             return nameOfPO != null ? nameOfPO : name;
                         },
-                        (key1, key2) -> key1,
+                        (key1, _) -> key1,
                         LinkedHashMap::new));
     }
 
@@ -137,9 +137,9 @@ public record Objective(
         Integer index = 1;
 
         if (type == Type.Stage1) {
-            inputList = game.getPublicObjectives1Peakable();
+            inputList = game.getPublicObjectives1Peekable();
         } else {
-            inputList = game.getPublicObjectives2Peakable();
+            inputList = game.getPublicObjectives2Peekable();
         }
 
         for (String key : inputList) {
@@ -156,10 +156,10 @@ public record Objective(
     private static List<String> getPeekPlayerIDs(Game game, String objectiveKey) {
         if (game.getPublicObjectives1Peeked().containsKey(objectiveKey)) {
             return new LinkedHashMap<>(game.getPublicObjectives1Peeked()).get(objectiveKey);
-        } else if (game.getPublicObjectives2Peeked().containsKey(objectiveKey)) {
-            return new LinkedHashMap<>(game.getPublicObjectives2Peeked()).get(objectiveKey);
-        } else {
-            return new ArrayList<>();
         }
+        if (game.getPublicObjectives2Peeked().containsKey(objectiveKey)) {
+            return new LinkedHashMap<>(game.getPublicObjectives2Peeked()).get(objectiveKey);
+        }
+        return new ArrayList<>();
     }
 }

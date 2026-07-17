@@ -18,6 +18,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     private String type;
     private String resolution;
     private String text;
+    private String notes;
     private String attachmentId;
     private String flavorText;
     private String imageURL;
@@ -64,11 +65,18 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
                 source);
     }
 
+    public String getNameRepresentation() {
+        return getTypeEmoji() + " _" + name + "_ " + source.emoji();
+    }
+
     public String textRepresentation() {
-        StringBuilder sb = new StringBuilder(getTypeEmoji()).append(" ");
-        if (source != null) sb.append(source.emoji()).append(" ");
+        StringBuilder sb = new StringBuilder(getTypeEmoji()).append(' ');
+        if (source != null) sb.append(source.emoji()).append(' ');
         sb.append("_").append(name).append("_\n> ");
         sb.append(PatternHelper.NEWLINE_OPTIONAL_GT_PATTERN.matcher(text).replaceAll("\n> "));
+        if (notes != null) {
+            sb.append("\n> -# [").append(notes).append("]");
+        }
         return sb.toString();
     }
 
@@ -94,11 +102,14 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(getTypeEmoji() + "__" + name + "__" + source.emoji(), null);
         eb.setColor(getEmbedColor());
         eb.setDescription(text);
+        if (notes != null) {
+            eb.setDescription(text + "\n-# [" + notes + "]");
+        }
 
         if (includeID) {
             StringBuilder sb = new StringBuilder();
             if (getAttachmentId().isPresent())
-                sb.append("Attachment: ").append(getAttachmentId().get()).append("\n");
+                sb.append("Attachment: ").append(getAttachmentId().get()).append('\n');
             sb.append("ID: ").append(id).append("  Source: ").append(source);
             eb.setFooter(sb.toString());
         }

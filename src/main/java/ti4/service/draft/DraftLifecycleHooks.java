@@ -1,16 +1,16 @@
 package ti4.service.draft;
 
 import java.util.function.Consumer;
-import ti4.map.Player;
+import ti4.game.Player;
 
 /**
  * The draft lifecycle goes through several stages. These hooks
  * should allow draft components to do extra work and control the flow
  * as needed, hopefully without being overbearing. More hooks should
  * be added only as really needed, and with default noop implementations.
- *
+ * <p>
  * The draft manager is responsible for checking and progressing through the lifecycle.
- *
+ * <p>
  * Draft stages:
  * 1. Initialization - Draftables generate their choices, etc.
  * 2. Drafting - Players make choices from draftables.
@@ -67,5 +67,5 @@ public abstract class DraftLifecycleHooks {
      * @return An optional consumer which will be invoked on this same player after setup, to do any additional work.
      */
     public abstract Consumer<Player> setupPlayer(
-            DraftManager draftManager, String playerUserId, PlayerSetupService.PlayerSetupState playerSetupState);
+            DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState);
 }

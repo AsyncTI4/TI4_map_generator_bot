@@ -1,0 +1,197 @@
+[
+    {
+        "id": "dream_nexus",
+        "name": "Dream Nexus",
+        "faction": "dream",
+        "permanentEffect": "You may treat systems that contain nexus tokens as adjacent to each other.",
+        "source": "beans"
+    },
+    {
+        "id": "the_waking",
+        "name": "The Waking",
+        "faction": "dream",
+        "window": "At the end of the status phase:",
+        "windowEffect": "Any player with ships in a system that contains a nexus token may remove 1 token from 1 of those systems.",
+        "source": "beans"
+    },
+    {
+        "id": "incomprehensible_form",
+        "name": "Incomprehensible Form",
+        "faction": "dream",
+        "window": "When 1 of your ships would be destroyed during space combat:",
+        "windowEffect": "You may instead remove 1 nexus token from the active system.",
+        "source": "beans"
+    },
+    {
+        "id": "refraction",
+        "name": "Refraction",
+        "faction": "crystellum",
+        "window": "After another player produces 1 or more hits against your units during space combat:",
+        "windowEffect": "You may assign 1 of those hits to 1 of your non-fighter ships in an adjacent system.",
+        "source": "beans"
+    },
+    {
+        "id": "fragmentation",
+        "name": "Fragmentation",
+        "faction": "crystellum",
+        "window": "After one or more of your non-fighter ships in the active system is destroyed during combat:",
+        "windowEffect": "You may place 1 fighter from your reinforcements in that system.",
+        "source": "beans"
+    },
+    {
+        "id": "phoenix_rising",
+        "name": "Phoenix Rising",
+        "faction": "ashen",
+        "window": "When you roll for your infantry's text ability:",
+        "windowEffect": "On a result of 9 or 10, you may choose for that unit to not be destroyed. If you do; you cannot resolve that unit's text ability.",
+        "source": "beans"
+    },
+    {
+        "id": "beauty_in_destruction",
+        "name": "Beauty in Destruction",
+        "faction": "ashen",
+        "window": "Once per action, when one of your units is destroyed during combat:",
+        "windowEffect": "You may spend 1 token from your strategy pool to gain that unit's corresponding unit upgrade technology.",
+        "source": "beans"
+    },
+    {
+        "id": "mechanized_military",
+        "name": "Mechanized Military",
+        "faction": "iron",
+        "window": "During setup:",
+        "windowEffect": "Take the 2 additional Iron Tide mechs and place them in your reinforcements; You have 6 mechs.",
+        "source": "beans"
+    },
+    {
+        "id": "exo-atmospheric",
+        "name": "Exo-Atmospheric",
+        "faction": "iron",
+        "permanentEffect": "Your mechs count as ships when in the space area of a system and may participate in space combat.",
+        "source": "beans"
+    },
+    {
+        "id": "iron_resilience",
+        "name": "Iron Resilience",
+        "faction": "iron",
+        "permanentEffect": "Your ground forces cannot be removed or destroyed by any game effects except when in combat or when exceeding capacity.",
+        "source": "beans"
+    },
+    {
+        "id": "planetary_reconfiguration",
+        "name": "Planetary Reconfiguration",
+        "faction": "ta",
+        "window": "After you explore a planet:",
+        "windowEffect": "You may attach 1 of your designs from your reinforcements to that planet if it does not already have one. When you lose control of a planet with a design attached to it, return that card to your reinforcements. Designs do not count as attachments for the purposes of scoring objectives.",
+        "source": "beans"
+    },
+    {
+        "id": "efficient_governance",
+        "name": "Efficient Governance",
+        "faction": "ta",
+        "window": "During the agenda phase, after an outcome you voted for is resolved:",
+        "windowEffect": "Ready up to 2 of your planets.",
+        "source": "beans"
+    },
+    {
+        "id": "system_breach",
+        "name": "System Breach",
+        "faction": "netrunners",
+        "window": "When another player places a structure:",
+        "windowEffect": "You may place one of that player's control tokens on your faction sheet.",
+        "source": "beans"
+    },
+    {
+        "id": "control_network",
+        "name": "Control Network",
+        "faction": "netrunners",
+        "window": "At any time:",
+        "windowEffect": "Before a player whose control token is on your faction sheet rolls dice for SPACE CANNON, you may remove 1 of those tokens to apply -1 to those dice. While you are the active player, you may remove a player's control token from your faction sheet to use the PRODUCTION ability of a space dock controlled by that player that you are blockading as if it were your own to produce ships.",
+        "source": "beans"
+    },
+    {
+        "id": "ransomware",
+        "name": "Ransomware",
+        "faction": "netrunners",
+        "window": "During the status phase:",
+        "windowEffect": "A player whose control token is on your faction sheet may give you 1 trade good to remove 1 of their control tokens there.",
+        "source": "beans"
+    },
+    {
+        "id": "doctrine",
+        "name": "Doctrine",
+        "faction": "natau",
+        "window": "During setup:",
+        "windowEffect": "Take the 6 Natau doctrines and place them in your reinforcements. Then, choose 2 doctrines; place them in your play area and ready them.",
+        "source": "beans"
+    },
+    {
+        "id": "paradigm",
+        "name": "Paradigm",
+        "faction": "natau",
+        "window": "At the start of the status phase:",
+        "windowEffect": "Ready each doctrine. Then, replace 1 of the doctrines in your play area with a doctrine from your reinforcements.",
+        "source": "beans"
+    },
+    {
+        "id": "natau_decree",
+        "name": "Decree",
+        "faction": "natau",
+        "permanentEffect": "You gain the text abilities of a doctrine while it is in your play area.",
+        "source": "beans"
+    },
+    {
+        "id": "doctrine_wrath",
+        "name": "Wrath",
+        "faction": "natau",
+        "permanentEffect": "During combat:\nYour units with SUSTAIN DAMAGE roll an additional combat die while not damaged.",
+        "window": "You may exhaust this card at the start of a combat to choose 2 other player's ships",
+        "windowEffect": "Those ships apply -1 to their combat rolls until the end of that combat.",
+        "source": "beans"
+    },
+    {
+        "id": "doctrine_strength",
+        "name": "Strength",
+        "faction": "natau",
+        "permanentEffect": "At the start of combat:\nChoose 1 of your participating units to gain SUSTAIN DAMAGE until the end of combat.",
+        "window": "When another player uses a unit ability against your units",
+        "windowEffect": "You may exhaust thsi card to cancel up to 2 of those hits.",
+        "source": "beans"
+    },
+    {
+        "id": "doctrine_revelation",
+        "name": "Revelation",
+        "faction": "natau",
+        "permanentEffect": "When you gain this card:\nChoose 2 non-objective common decks and place them on either side of this card. You may look at the top card of either of these decks at any time.",
+        "window": "When you would draw a card from any common deck",
+        "windowEffect": "You may exhaust this card to draw an additional card; choose 1 to keep or resolve and shuffle the rest back into that common deck.",
+        "notes": "This does not allow you to draw an additional agenda during the primary ability of the Politics strategy card, as you are not drawing from the deck, only looking at the top 2. However, this does allow you to draw 2 agendas during the agenda phase if you are the speaker, and choose which one to vote on.",
+        "source": "beans"
+    },
+    {
+        "id": "doctrine_knowledge",
+        "name": "Knowledge",
+        "faction": "natau",
+        "permanentEffect": "When you research a technology owned by one of your neighbors:\nYou may ignore 1 prerequisite on that technology.",
+        "window": "After you research a technology",
+        "windowEffect": "You may exhaust this card and 1 planet you control that has a technology specialty to research a technology of that color.",
+        "source": "beans"
+    },
+    {
+        "id": "doctrine_discovery",
+        "name": "Discovery",
+        "faction": "natau",
+        "permanentEffect": "When you would resolve the effects of an exploration card:\nYou may choose to discard that card without resolving its effects to gain 1 trade good.",
+        "window": "At the end of a tactical action",
+        "windowEffect": "You may exhaust this card to explore the frontier deck in a system that contains 1 or more of your ships and no planets.",
+        "source": "beans"
+    },
+    {
+        "id": "doctrine_stability",
+        "name": "Stability",
+        "faction": "natau",
+        "permanentEffect": "When 1 or more of your units use PRODUCTION, if you produce 3 or more non-fighter ships:\nYou may produce an additional 2 fighters or infantry at no cost. These units do not count against your PRODUCTION limit.",
+        "window": "When you use the PRODUCTION ability of 1 of your units",
+        "windowEffect": "You may exhaust this card to use the PRODUCTION ability of 1 of your space docks in a different system that does not contain your command tokens or another player's ships. If you do, place a command token from your reinforcements into that system.",
+        "source": "beans"
+    }
+]

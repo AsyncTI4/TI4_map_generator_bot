@@ -1,0 +1,316 @@
+package ti4.discord.interactions.commands.game;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.statistics.StatsTrackingButtonHandler;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.interactions.commands.GameStateSubcommand;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
+import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
+import ti4.service.draft.DraftManager;
+import ti4.service.fow.LoreService;
+import ti4.service.milty.MiltyDraftDisplayService;
+import ti4.service.milty.MiltyDraftManager;
+import ti4.settings.users.UserSettingsManager;
+
+class Replace extends GameStateSubcommand {
+
+    Replace() {
+        super(Constants.REPLACE, "Replace player in game", true, false);
+        addOptions(new OptionData(OptionType.STRING, Constants.PLAYER_FACTION, "Player being replaced")
+                .setAutoComplete(true)
+                .setRequired(true));
+        addOptions(
+                new OptionData(OptionType.USER, Constants.PLAYER, "Replacement player @playerName").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setAutoComplete(true));
+    }
+
+    @Override
+    public void execute(SlashCommandInteractionEvent event) {
+        boolean isBotHelper = CommandHelper.hasRole(event, JdaService.bothelperRoles);
+        Game game = getGame();
+        if (game.getPlayer(event.getUser().getId()) == null && !isBotHelper) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Only game players or BotHelpers can replace a player.");
+            return;
+        }
+
+        Player replacedPlayer = CommandHelper.getPlayerFromReplaceEvent(game, event);
+        if (replacedPlayer == null) {
+            MessageHelper.replyToMessage(
+                    event,
+                    "Could not find the player to replace. Please try again, and if the problem persists contact `@Bothelper`.");
+            return;
+        }
+
+        OptionMapping replacementPlayerOption = event.getOption(Constants.PLAYER);
+        if (replacementPlayerOption == null) {
+            MessageHelper.replyToMessage(event, "Specify player to be replaced.");
+            return;
+        }
+
+        User replacementUser = replacementPlayerOption.getAsUser();
+        Player possibleSpectatorToRemove = game.getPlayer(replacementUser.getId());
+        if (possibleSpectatorToRemove != null
+                && possibleSpectatorToRemove.getFaction() != null
+                && !"null".equalsIgnoreCase(possibleSpectatorToRemove.getFaction())) {
+            MessageHelper.replyToMessage(event, "Specify player that is **__not__** in the game to be the replacement");
+            return;
+        } else if (possibleSpectatorToRemove != null) {
+            game.removePlayer(possibleSpectatorToRemove.getUserID());
+        }
+
+        Guild guild = game.getGuild();
+        if (guild == null) {
+            guild = event.getGuild();
+        }
+        Member newMember = guild.getMemberById(replacementUser.getId());
+        if (newMember == null) {
+            MessageHelper.replyToMessage(event, "Added player must be on the game's server.");
+            return;
+        }
+
+        // REMOVE ROLE
+        Member oldMember = guild.getMemberById(replacedPlayer.getUserID());
+        List<Role> roles = guild.getRolesByName(game.getName(), true);
+        if (oldMember != null && roles.size() == 1) {
+            guild.removeRoleFromMember(oldMember, roles.getFirst()).queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+
+        var userSettings = UserSettingsManager.get(replacedPlayer.getUserID());
+        userSettings.setTrackRecord(userSettings.getTrackRecord() + "Got replaced in game " + game.getName() + ". ");
+        UserSettingsManager.save(userSettings);
+
+        // ADD ROLE
+        if (roles.size() == 1) {
+            guild.addRoleToMember(newMember, roles.getFirst()).queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+
+        Map<String, List<String>> scoredPublicObjectives = game.getScoredPublicObjectives();
+        for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
+            List<String> value = poEntry.getValue();
+            boolean removed = value.remove(replacedPlayer.getUserID());
+            if (removed) {
+                value.add(replacementUser.getId());
+            }
+            // for custodians
+            removed = value.remove(replacedPlayer.getUserID());
+            if (removed) {
+                value.add(replacementUser.getId());
+            }
+            removed = value.remove(replacedPlayer.getUserID());
+            if (removed) {
+                value.add(replacementUser.getId());
+            }
+            removed = value.remove(replacedPlayer.getUserID());
+            if (removed) {
+                value.add(replacementUser.getId());
+            }
+        }
+
+        String oldPlayerUserId = replacedPlayer.getUserID();
+        String oldPlayerUserName = replacedPlayer.getUserName();
+        LoreService.onPlayerReplaced(game, oldPlayerUserId, replacementUser.getId());
+        replacedPlayer.setUserID(replacementUser.getId());
+        replacedPlayer.setUserName(replacementUser.getName());
+        replacedPlayer.setTotalTurnTime(0);
+        replacedPlayer.setNumberOfTurns(0);
+        replacedPlayer.setNpc(false);
+        replacedPlayer.removeTeamMateID(oldPlayerUserId);
+        if (oldPlayerUserId.equals(game.getSpeakerUserID())) {
+            game.setSpeakerUserID(replacementUser.getId());
+        }
+        if (oldPlayerUserId.equals(game.getTyrantUserID())) {
+            game.setTyrantUserID(replacementUser.getId());
+        }
+        if (oldPlayerUserId.equals(game.getActivePlayerID())) {
+            game.setTemporaryPingDisable(true);
+            game.setActivePlayerID(replacementUser.getId());
+        }
+        Map<String, Player> playersById = game.getPlayers();
+        Map<String, Player> updatedPlayersById = new LinkedHashMap<>();
+        for (Map.Entry<String, Player> entry : playersById.entrySet()) {
+            String userId = entry.getKey();
+            if (userId.equalsIgnoreCase(oldPlayerUserId)) {
+                updatedPlayersById.put(replacedPlayer.getUserID(), replacedPlayer);
+            } else {
+                updatedPlayersById.put(userId, entry.getValue());
+            }
+        }
+        game.setPlayers(updatedPlayersById);
+
+        // UPDATE FOW PERMISSIONS
+        if (game.isFowMode()) {
+            long permission = Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+            TextChannel privateChannel = replacedPlayer.getPrivateChannel();
+            if (privateChannel != null) {
+                privateChannel.getMemberPermissionOverrides().stream()
+                        .filter(override -> Objects.equals(override.getMember(), oldMember))
+                        .findFirst()
+                        .ifPresent(
+                                oldOverride -> oldOverride.delete().queue(Consumers.nop(), BotLogger::catchRestError));
+
+                // Update private channel
+                if (oldMember != null) {
+                    String newPrivateChannelName = privateChannel
+                            .getName()
+                            .replace(getNormalizedName(oldMember), getNormalizedName(newMember));
+                    privateChannel
+                            .getManager()
+                            .setName(newPrivateChannelName)
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
+                }
+                privateChannel
+                        .getManager()
+                        .putMemberPermissionOverride(newMember.getIdLong(), permission, 0)
+                        .queue(success -> accessMessage(privateChannel, newMember));
+
+                // Update Cards Info
+                ThreadChannel cardsInfo = replacedPlayer.getCardsInfoThread();
+                String newCardsInfoName = cardsInfo
+                        .getName()
+                        .replace(
+                                oldPlayerUserName.replace("/", ""),
+                                replacedPlayer.getUserName().replace("/", ""));
+                cardsInfo.getManager().setName(newCardsInfoName).queue(Consumers.nop(), BotLogger::catchRestError);
+                if (oldMember != null) {
+                    cardsInfo.removeThreadMember(oldMember).queue(Consumers.nop(), BotLogger::catchRestError);
+                }
+                cardsInfo.addThreadMember(newMember).queue(success -> accessMessage(cardsInfo, newMember));
+
+                // Update private threads
+                if (oldMember != null) {
+                    game.getMainGameChannel()
+                            .getThreadChannels()
+                            .forEach(thread -> updateThread(thread, oldMember, newMember));
+
+                    game.getMainGameChannel()
+                            .retrieveArchivedPrivateThreadChannels()
+                            .queue(archivedThreads ->
+                                    archivedThreads.forEach(thread -> updateThread(thread, oldMember, newMember)));
+                }
+            }
+        }
+
+        Helper.fixGameChannelPermissions(event.getGuild(), game);
+        ThreadChannel mapThread = game.getBotMapUpdatesThread();
+        if (mapThread != null && !mapThread.isLocked()) {
+            mapThread
+                    .getManager()
+                    .setArchived(false)
+                    .queue(
+                            success -> mapThread.addThreadMember(newMember).queueAfter(5, TimeUnit.SECONDS),
+                            BotLogger::catchRestError);
+        }
+
+        game.getMiltyDraftManager().replacePlayer(oldPlayerUserId, replacedPlayer.getUserID());
+        updateDraftManagerPlayer(oldPlayerUserId, replacedPlayer.getUserID(), game);
+
+        if (game.getMiltyDraftManager().getDraftIndex()
+                < game.getMiltyDraftManager().getDraftOrder().size()) {
+            MiltyDraftManager manager = game.getMiltyDraftManager();
+            MiltyDraftDisplayService.repostDraftInformation(manager, game);
+        }
+
+        game.setReplacementMade(true);
+
+        if (!replacementUser.isBot()) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getChannel(),
+                    replacementUser.getAsMention()
+                            + " Should this game's stats be tracked for you, or the player you replaced?",
+                    List.of(
+                            Buttons.green(
+                                    StatsTrackingButtonHandler.statsTrackingButtonId("me", replacementUser.getId()),
+                                    "Me"),
+                            Buttons.gray(
+                                    StatsTrackingButtonHandler.statsTrackingButtonId(
+                                            "replaced", replacementUser.getId()),
+                                    "Replaced Player")));
+        }
+
+        String message = "Game: " + game.getName() + "  Player: " + oldPlayerUserId + " replaced by player: "
+                + replacementUser.getName();
+        if (FoWHelper.isPrivateGame(game) || game.getActionsChannel() == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        } else {
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
+        }
+    }
+
+    private void updateDraftManagerPlayer(String oldPlayerUserId, String newPlayerUserId, Game game) {
+        if (!DraftManager.hasDraftManager(game)) {
+            return;
+        }
+
+        DraftManager draftManager = game.getDraftManager();
+        if (!draftManager.getPlayerStates().containsKey(oldPlayerUserId)
+                || draftManager.getPlayerStates().containsKey(newPlayerUserId)) {
+            return;
+        }
+
+        draftManager.replacePlayer(oldPlayerUserId, newPlayerUserId);
+        if (draftManager.getOrchestrator() != null && draftManager.whatsStoppingDraftEnd() != null) {
+            draftManager.getOrchestrator().sendDraftButtons(draftManager);
+        }
+    }
+
+    private void updateThread(ThreadChannel thread, Member oldMember, Member newMember) {
+        thread.retrieveThreadMemberById(oldMember.getId())
+                .queue(
+                        oldThreadMember -> thread.getManager()
+                                .setArchived(false)
+                                .queue(success -> thread.removeThreadMember(oldMember)
+                                        .queue(success2 -> thread.addThreadMember(newMember)
+                                                .queue(success3 -> accessMessage(thread, newMember)))),
+                        failure -> {
+                            /* Old member is not in the thread -> Do nothing */
+                        });
+    }
+
+    private void accessMessage(MessageChannel channel, Member member) {
+        MessageHelper.sendMessageToChannel(
+                channel, "Access to " + channel.getName() + " granted for " + member.getAsMention());
+    }
+
+    private String getNormalizedName(Member member) {
+        String name = member.getNickname();
+        if (name == null) {
+            name = member.getEffectiveName();
+        }
+        name = name.toLowerCase()
+                .replaceAll("[\\s]+", "-")
+                .replaceAll("[^a-z0-9-]", "")
+                .replaceAll("-{2,}", "-")
+                .replaceAll("^-|-$", "");
+        return name;
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
+}

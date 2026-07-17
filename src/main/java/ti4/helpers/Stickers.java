@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-public class Stickers {
+public final class Stickers {
 
     private static final long HopesEnd = 1262605434905428087L;
     private static final long Mallice = 1262605513095516190L;
@@ -13,7 +13,7 @@ public class Stickers {
         return switch (planet.toLowerCase()) {
             case "hopesend" -> HopesEnd;
             case "mallice", "lockedmallice" -> Mallice;
-            case "mr" -> Mecatol;
+            case "mr", "mrte" -> Mecatol;
             case "mirage" -> Mirage;
             case "primor" -> Primor;
             case "semlore" -> SemLore;

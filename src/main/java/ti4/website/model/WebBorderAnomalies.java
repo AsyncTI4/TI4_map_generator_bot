@@ -3,19 +3,17 @@ package ti4.website.model;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
-import ti4.map.Game;
+import ti4.game.Game;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel.BorderAnomalyType;
 
 @Data
 public class WebBorderAnomalies {
 
-    @Data
-    public static class BorderAnomalyInfo {
-        private final String tile;
-        private final int direction;
-        private final String type; // e.g., "VOID_TETHER", "SPATIAL_TEAR", etc.
-    }
+    /**
+     * @param type e.g., "VOID_TETHER", "SPATIAL_TEAR", etc.
+     */
+    public record BorderAnomalyInfo(String tile, int direction, String type) {}
 
     private List<BorderAnomalyInfo> borderAnomalies;
 

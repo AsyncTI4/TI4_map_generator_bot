@@ -2,8 +2,9 @@ package ti4.cron;
 
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.emoji.ApplicationEmojiService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class ReuploadStaleEmojisCron {
@@ -17,6 +18,7 @@ public class ReuploadStaleEmojisCron {
     }
 
     private static void reuploadEmojisAndDeleteHanging() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running ReuploadStaleEmojisCron.");
         try {
             ApplicationEmojiService.reuploadStaleEmojis();

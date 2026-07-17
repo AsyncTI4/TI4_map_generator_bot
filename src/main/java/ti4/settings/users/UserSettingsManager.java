@@ -2,13 +2,14 @@ package ti4.settings.users;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Storage;
 import ti4.json.PersistenceManager;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
 @UtilityClass
 public class UserSettingsManager {
@@ -29,8 +30,14 @@ public class UserSettingsManager {
 
     private static UserSettings readFile(String userId) {
         try {
-            return PersistenceManager.readObjectFromJsonFile(USER_SETTINGS_PATH, userId + ".json", UserSettings.class);
-        } catch (IOException e) {
+            return UserSettingsFileLockManager.wrapWithReadLock(userId, () -> {
+                try {
+                    return readFileWithoutLock(userId);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
+        } catch (UncheckedIOException e) {
             BotLogger.error("Failed to read json data for UserSettingsManager.", e);
             return null;
         }
@@ -38,11 +45,24 @@ public class UserSettingsManager {
 
     private static void persistFile(UserSettings userSettings) {
         try {
-            PersistenceManager.writeObjectToJsonFile(
-                    USER_SETTINGS_PATH, userSettings.getUserId() + ".json", userSettings);
-        } catch (Exception e) {
+            UserSettingsFileLockManager.wrapWithWriteLock(userSettings.getUserId(), () -> {
+                try {
+                    writeFileWithoutLock(userSettings);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
+        } catch (UncheckedIOException e) {
             BotLogger.error("Failed to write json data for UserSettingsManager.", e);
         }
+    }
+
+    private static UserSettings readFileWithoutLock(String userId) throws IOException {
+        return PersistenceManager.readObjectFromJsonFile(USER_SETTINGS_PATH, userId + ".json", UserSettings.class);
+    }
+
+    private static void writeFileWithoutLock(UserSettings userSettings) throws IOException {
+        PersistenceManager.writeObjectToJsonFile(USER_SETTINGS_PATH, userSettings.getUserId() + ".json", userSettings);
     }
 
     public static List<UserSettings> getAllUserSettings() {

@@ -10,17 +10,18 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.JdaService;
+import ti4.game.Game;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
+import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedGame;
-import ti4.map.persistence.ManagedPlayer;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class RoleService {
@@ -37,9 +38,9 @@ public class RoleService {
             return;
         }
         for (ManagedGame managedGame : mapsJoined) {
-            String gameMessage = user.getAsMention() + " has joined the server!";
-            MessageHelper.sendMessageToChannel(managedGame.getTableTalkChannel(), gameMessage);
             Game game = managedGame.getGame();
+            String gameMessage = user.getAsMention() + " has joined the server!";
+            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), gameMessage);
             GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, true);
         }
     }
@@ -57,7 +58,7 @@ public class RoleService {
                     .getManager()
                     .setArchived(false)
                     .queue(
-                            success -> mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS),
+                            _ -> mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS),
                             BotLogger::catchRestError);
         }
 
@@ -81,12 +82,15 @@ public class RoleService {
     }
 
     public void checkIfNewUserIsInAnyGamesAndAddRole(User user) {
+        if (user == null) {
+            return;
+        }
         ManagedPlayer player = GameManager.getManagedPlayer(user.getId());
         if (player != null && !player.getGames().isEmpty()) {
             for (Guild guild : JdaService.guilds) {
                 Role role = getAsyncPlayerRole(guild);
                 if (guild.getMember(user) != null) {
-                    guild.addRoleToMember(user, role).queue();
+                    guild.addRoleToMember(user, role).queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }
         }

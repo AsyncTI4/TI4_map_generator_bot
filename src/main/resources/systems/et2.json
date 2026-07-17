@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "et2",
+    "name": "Husk -- The Craver Swarm",
+    "aliases": [
+        "et2",
+        "husk",
+        "craver"
+    ],
+    "imagePath": "et2.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "husk"
+    ],
+    "source": "endlesst"
+}

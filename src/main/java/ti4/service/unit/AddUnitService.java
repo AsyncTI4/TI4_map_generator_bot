@@ -6,6 +6,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -13,12 +21,10 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
@@ -34,8 +40,21 @@ public class AddUnitService {
             tile = FlipTileService.flipTileIfNeeded(tile, game);
             AddPlanetToPlayAreaService.addPlanetToPlayArea(
                     event, tile, unit.uh().getName(), game);
+            if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("system_breach"))) {
+                NetrunnersAbilitiesHandler.resolveSystemBreach(game, unit.unitKey(), unit.getTotalRemoved());
+            }
+            if (game.getRealPlayers().stream().anyMatch(player -> player.hasUnit("netrunners_mech"))) {
+                NetrunnersUnitsHandler.offerDeployMechWithStructure(
+                        event, game, tile, unit.unitKey(), unit.uh().getName(), unit.getTotalRemoved());
+            }
+            if (game.getRealPlayers().stream().anyMatch(player -> player.hasLeader("netrunnerscommander"))) {
+                NetrunnersLeadersHandler.checkCommanderUnlock(game, unit.unitKey());
+            }
+            Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
+            handlePostAddUnitPlayerEffects(
+                    event, game, tile, unit.unitKey(), unit.uh().getName(), player);
 
-            String color = unit.unitKey().getColorID();
+            String color = unit.unitKey().colorID();
             handleFogOfWar(tile, color, game, unit.unitKey() + " " + unit.getTotalRemoved());
             checkFleetCapacity(tile, color, game);
         }
@@ -51,9 +70,22 @@ public class AddUnitService {
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
             List<Integer> states = pickStatesForAddedUnit(parsedUnit, removed);
-            tile.getUnitHolders().get(parsedUnit.getLocation()).addUnitsWithStates(parsedUnit.getUnitKey(), states);
+            tile.getUnitHolders().get(parsedUnit.location()).addUnitsWithStates(parsedUnit.unitKey(), states);
             tile = FlipTileService.flipTileIfNeeded(tile, game);
-            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.getLocation(), game);
+            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.location(), game);
+            if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("system_breach"))) {
+                NetrunnersAbilitiesHandler.resolveSystemBreach(game, parsedUnit.unitKey(), states.size());
+            }
+            if (game.getRealPlayers().stream().anyMatch(player -> player.hasUnit("netrunners_mech"))) {
+                NetrunnersUnitsHandler.offerDeployMechWithStructure(
+                        event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), states.size());
+            }
+            if (game.getRealPlayers().stream().anyMatch(player -> player.hasLeader("netrunnerscommander"))) {
+                NetrunnersLeadersHandler.checkCommanderUnlock(game, parsedUnit.unitKey());
+            }
+            Player player =
+                    game.getPlayerFromColorOrFaction(parsedUnit.unitKey().colorID());
+            handlePostAddUnitPlayerEffects(event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), player);
         }
 
         handleFogOfWar(tile, color, game, unitList);
@@ -64,9 +96,22 @@ public class AddUnitService {
             GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList) {
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
         for (ParsedUnit parsedUnit : parsedUnits) {
-            tile.addUnit(parsedUnit.getLocation(), parsedUnit.getUnitKey(), parsedUnit.getCount());
+            tile.addUnit(parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count());
             tile = FlipTileService.flipTileIfNeeded(tile, game);
-            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.getLocation(), game);
+            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.location(), game);
+            if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("system_breach"))) {
+                NetrunnersAbilitiesHandler.resolveSystemBreach(game, parsedUnit.unitKey(), parsedUnit.count());
+            }
+            if (game.getRealPlayers().stream().anyMatch(player -> player.hasUnit("netrunners_mech"))) {
+                NetrunnersUnitsHandler.offerDeployMechWithStructure(
+                        event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), parsedUnit.count());
+            }
+            if (game.getRealPlayers().stream().anyMatch(player -> player.hasLeader("netrunnerscommander"))) {
+                NetrunnersLeadersHandler.checkCommanderUnlock(game, parsedUnit.unitKey());
+            }
+            Player player =
+                    game.getPlayerFromColorOrFaction(parsedUnit.unitKey().colorID());
+            handlePostAddUnitPlayerEffects(event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), player);
         }
 
         handleFogOfWar(tile, color, game, unitList);
@@ -100,6 +145,13 @@ public class AddUnitService {
             UnitType unitType = entry.getKey();
             Integer totalAmt = entry.getValue();
             String asyncId = unitType.getValue().toLowerCase();
+            if (player.getUnitsByAsyncID(asyncId).isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        game.getActionsChannel(),
+                        "Player " + player.getFactionEmojiOrColor() + " does not have any units of type "
+                                + unitType.humanReadableName() + ". Skipping.");
+                continue;
+            }
             UnitModel mod = player.getUnitsByAsyncID(asyncId).getFirst();
             // Ships go to space
             if (mod.getIsShip()
@@ -110,6 +162,12 @@ public class AddUnitService {
             }
 
             // Non-ships get distributed to planets, prioritizing high-resource planets
+            if (planetNames.isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        game.getActionsChannel(),
+                        "Could not find any planets for this unit list " + unitList + ". Let Fin know!");
+                continue;
+            }
             int minUnitsPerPlanet = totalAmt / planetNames.size();
             int remainder = totalAmt % planetNames.size();
             for (int i = 0; i < planetNames.size(); i++) {
@@ -125,18 +183,22 @@ public class AddUnitService {
         StringBuilder unitListBuilder = new StringBuilder();
         boolean first = true;
         for (ParsedUnit parsedUnit : assignedUnits) {
-            tile.addUnit(parsedUnit.getLocation(), parsedUnit.getUnitKey(), parsedUnit.getCount());
+            tile.addUnit(parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count());
             tile = FlipTileService.flipTileIfNeeded(tile, game);
-            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.getLocation(), game);
+            AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.location(), game);
+            if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasLeader("netrunnerscommander"))) {
+                NetrunnersLeadersHandler.checkCommanderUnlock(game, parsedUnit.unitKey());
+            }
+            handlePostAddUnitPlayerEffects(event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), player);
             if (!first) {
                 unitListBuilder.append(", ");
             }
             unitListBuilder
-                    .append(parsedUnit.getCount())
-                    .append(" ")
-                    .append(parsedUnit.getUnitKey().asyncID())
-                    .append(" ")
-                    .append(parsedUnit.getLocation());
+                    .append(parsedUnit.count())
+                    .append(' ')
+                    .append(parsedUnit.unitKey().asyncID())
+                    .append(' ')
+                    .append(parsedUnit.location());
             first = false;
         }
 
@@ -165,6 +227,24 @@ public class AddUnitService {
         game.setTileAsPinged(tile.getPosition());
     }
 
+    private static void handlePostAddUnitPlayerEffects(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Tile tile,
+            Units.UnitKey unitKey,
+            String location,
+            Player player) {
+        if (player == null) {
+            return;
+        }
+
+        if (player.hasUnit("ta_flagship") && unitKey.unitType() == UnitType.Flagship) {
+            TaUnitHandler.offerWorldshaperOnFlagshipPlacement(event, game, unitKey, location, tile);
+        }
+
+        CommanderUnlockCheckService.checkPlayer(player, "myrr", "natau", "oblivion", "revenantponthous", "thrones");
+    }
+
     private static void checkFleetCapacity(Tile tile, String color, Game game) {
         Player player = game.getPlayerFromColorOrFaction(color);
         if (player != null) {
@@ -173,11 +253,11 @@ public class AddUnitService {
     }
 
     private static List<Integer> pickStatesForAddedUnit(ParsedUnit unit, List<RemovedUnit> removed) {
-        int amtRemaining = unit.getCount();
+        int amtRemaining = unit.count();
         List<Integer> states = UnitState.emptyList();
         for (UnitState state : UnitState.defaultAddStatusOrder()) {
             for (RemovedUnit rm : removed) {
-                if (!rm.unitKey().equals(unit.getUnitKey())) continue;
+                if (!rm.unitKey().equals(unit.unitKey())) continue;
                 if (rm.getTotalRemoved() == 0) continue; // depleted
 
                 int amtRemoved = rm.states().get(state.ordinal());

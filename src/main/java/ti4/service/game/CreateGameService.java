@@ -5,10 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
@@ -29,26 +30,28 @@ import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
-import ti4.buttons.Buttons;
-import ti4.commands.CommandHelper;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.discord.utility.DiscordRoleUtility;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.image.ImageHelper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.service.async.ReserveGameNumberService;
 import ti4.service.image.FileUploadService;
 import ti4.settings.GlobalSettings;
 import ti4.settings.users.UserSettingsManager;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class CreateGameService {
@@ -83,7 +86,7 @@ public class CreateGameService {
         String threadName = "game-starts-and-ends";
         // SEARCH FOR EXISTING OPEN THREAD
         for (ThreadChannel threadChannel_ : threadChannels) {
-            if (threadChannel_.getName().equals(threadName)) {
+            if (threadName.equals(threadChannel_.getName())) {
                 String guildName = game.getGuild() == null
                         ? "Server Unknown"
                         : game.getGuild().getName();
@@ -112,7 +115,7 @@ public class CreateGameService {
         if (!serverCanHostNewGame(guild)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+                    "Server **" + guild.getName() + "** cannot host a new game - please contact @Admin to resolve.");
             return null;
         }
 
@@ -126,7 +129,7 @@ public class CreateGameService {
         }
 
         // CHECK IF GUILD HAS ALL PLAYERS LISTED
-        List<Member> missingMembers = inviteUsersToServer(guild, members, event.getMessageChannel());
+        List<Member> missingMembers = inviteUsersToServer(guild, members, event.getMessageChannel(), gameName);
 
         // CREATE ROLE
         Role role = guild.createRole().setName(gameName).setMentionable(true).complete();
@@ -139,6 +142,13 @@ public class CreateGameService {
 
         // CREATE GAME
         Game newGame = createNewGame(gameName, gameOwner);
+        if (event.getChannel() instanceof ThreadChannel thread) {
+            if (thread.getName().toLowerCase().contains("tigl")
+                    || newGame.getCustomName().toLowerCase().contains("tigl")
+                    || "making-tigl-games".equals(thread.getParentChannel().getName())) {
+                gameFunName = "TIGL " + gameFunName;
+            }
+        }
 
         // ADD PLAYERS
         for (Member member : members) {
@@ -156,7 +166,7 @@ public class CreateGameService {
         String newActionsChannelName = gameName + Constants.ACTIONS_CHANNEL_SUFFIX;
         String newBotThreadName = gameName + Constants.BOT_CHANNEL_SUFFIX;
         long gameRoleID = role.getIdLong();
-        long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+        long permission = Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
         // CREATE TABLETALK CHANNEL
         TextChannel chatChannel = guild.createTextChannel(newChatChannelName, categoryChannel)
@@ -171,14 +181,23 @@ public class CreateGameService {
                 .addRolePermissionOverride(gameRoleID, permission, 0)
                 .complete();
         newGame.setMainChannelID(actionsChannel.getId());
-
-        Role bothelperRole = getRole("Bothelper", guild);
         List<Member> nonGameBothelpers = new ArrayList<>();
+        Role bothelperRole = DiscordRoleUtility.getRole("Bothelper", guild);
         if (bothelperRole != null) {
             for (Member botHelper : guild.getMembersWithRoles(bothelperRole)) {
                 boolean inGame =
                         members.stream().anyMatch(member -> member.getId().equals(botHelper.getId()));
                 if (!inGame) {
+                    nonGameBothelpers.add(botHelper);
+                }
+            }
+        }
+        Role adminRole = DiscordRoleUtility.getRole("Admin", guild);
+        if (adminRole != null) {
+            for (Member botHelper : guild.getMembersWithRoles(adminRole)) {
+                boolean inGame =
+                        members.stream().anyMatch(member -> member.getId().equals(botHelper.getId()));
+                if (!inGame && !nonGameBothelpers.contains(botHelper)) {
                     nonGameBothelpers.add(botHelper);
                 }
             }
@@ -192,8 +211,8 @@ public class CreateGameService {
             actionsChannelManager =
                     actionsChannelManager.putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0);
         }
-        chatChannelManager.queue();
-        actionsChannelManager.queue();
+        chatChannelManager.queue(Consumers.nop(), BotLogger::catchRestError);
+        actionsChannelManager.queue(Consumers.nop(), BotLogger::catchRestError);
 
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel
@@ -206,6 +225,9 @@ public class CreateGameService {
 
         // Create Cards Info Threads
         for (Player player : newGame.getPlayers().values()) {
+            if (player.isNpc() || player.isDummy()) {
+                continue;
+            }
             player.getCardsInfoThread();
         }
 
@@ -223,19 +245,23 @@ public class CreateGameService {
         if (event.getChannel() instanceof ThreadChannel thread
                 && ("making-new-games".equals(thread.getParentChannel().getName())
                         || "making-private-games"
+                                .equals(thread.getParentChannel().getName())
+                        || "making-tigl-games".equals(thread.getParentChannel().getName())
+                        || "making-superfast-games"
                                 .equals(thread.getParentChannel().getName()))) {
             newGame.setLaunchPostThreadID(thread.getId());
+            if (thread.getName().toLowerCase().contains("tigl")
+                    || newGame.getCustomName().toLowerCase().contains("tigl")
+                    || "making-tigl-games".equals(thread.getParentChannel().getName())) {
+                TIGLHelper.initializeTIGLGame(newGame);
+            }
             ThreadChannelManager manager = thread.getManager()
                     .setName(StringUtils.left(newGame.getName() + "-launched [FULL] - " + thread.getName(), 100))
                     .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
-            if (thread.getName().toLowerCase().contains("tigl")
-                    || newGame.getCustomName().toLowerCase().contains("tigl")) {
-                TIGLHelper.initializeTIGLGame(newGame);
-            }
             if (missingMembers.isEmpty()) {
                 manager = manager.setArchived(true);
             }
-            manager.queue();
+            manager.queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         return newGame;
@@ -256,33 +282,42 @@ public class CreateGameService {
                 "How would you like to set up the players and map?",
                 List.of(miltyButton, nucleusButton, addMapString));
 
-        Button offerOptions = Buttons.green("offerGameOptionButtons", "Options");
-        MessageHelper.sendMessageToChannelWithButton(
-                actionsChannel, "Want to change Game options?\n-# `/game options`", offerOptions);
-
-        HomebrewService.offerGameHomebrewButtons(actionsChannel);
         ButtonHelper.offerPlayerSetupButtons(actionsChannel, game);
+        List<Button> setupButtons = new ArrayList<>();
+        setupButtons.add(Buttons.green("offerGameOptionButtons", "Aesthetic Options"));
+        setupButtons.add(Buttons.green("getHomebrewButtons", "Supported Homebrew"));
+        // MessageHelper.sendMessageToChannelWithButton(
+        //         actionsChannel, "Want to change Game options?\n-# `/game options`", offerOptions);
+
+        // HomebrewService.offerGameHomebrewButtons(actionsChannel);
+
         MessageHelper.sendMessageToChannel(
                 actionsChannel,
                 "Reminder that all games played on this server must abide by the [AsyncTI4 Code of Conduct](https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006)");
-        Button teOptions = Buttons.green("offerTEOptionButtons", "Galactic Events");
-        MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Enable Galactic Events", teOptions);
+        setupButtons.add(Buttons.green("offerTEOptionButtons", "Galactic Events"));
+        // MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Enable Galactic Events", teOptions);
 
-        Button tfOptions = Buttons.green("startTFGame", "Start Twilight's Fall Game");
-        MessageHelper.sendMessageToChannelWithButton(
-                actionsChannel,
-                "If you want to start a Twilight's Fall Game (alternate game mode included in Thunder's Edge) use this button",
-                tfOptions);
+        setupButtons.add(Buttons.green("startTFGame", "Start Twilight's Fall Game"));
+        // MessageHelper.sendMessageToChannelWithButton(
+        //         actionsChannel,
+        //         "If you want to start a Twilight's Fall Game (alternate game mode included in Thunder's Edge) use
+        // this button",
+        //         tfOptions);
+
+        setupButtons.add(Buttons.green("frankenSetup", "Start Franken Setup"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                actionsChannel, "These buttons can help you setup alternate game modes.", setupButtons);
 
         List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.red("setupBaseGameMode", "Start Base Game Only Setup"));
         buttons.add(Buttons.green("chooseExp_newPoK", "New PoK"));
         buttons.add(Buttons.gray("chooseExp_oldPoK", "Old PoK"));
         buttons.add(Buttons.blue("chooseExp_te", "Thunder's Edge + New PoK"));
         String expMsg = """
-                Which expansion are you using for this game?
+                ## Which expansion are you using for this game? (Required)
                 -# This will adjust available components accordingly. To elaborate on the options:
-                > **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, ACs, or the fracture. This mode has the new relics, finalized codex cards (except Xxcha hero), new tiles, and new Strategy Cards. It is the default if you do not press any of these buttons.
-                > **Old PoK** - Use only components from Prophecy of Kings expansion + Codex 1-4.5
+                > **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, action cards, or The Fracture. This mode has the new relics, finalized Codex cards (except Xxcha hero), new tiles, and new Strategy Cards. It is the default if you do not press any of these buttons.
+                > **Old PoK** - Use only components from Prophecy of Kings expansion + Codicies 1-4.5
                 > **Thunder's Edge + New PoK** - Use components from both expansions, including all mechanics from Thunder's Edge.\
 
                 -# Please realize that these are broad overviews and that some small components may not fit perfectly into these categories.""";
@@ -412,6 +447,11 @@ public class CreateGameService {
      * @return the list of missing members
      */
     public static List<Member> inviteUsersToServer(Guild guild, List<Member> members, MessageChannel channel) {
+        return inviteUsersToServer(guild, members, channel, null);
+    }
+
+    private static List<Member> inviteUsersToServer(
+            Guild guild, List<Member> members, MessageChannel channel, String gameName) {
         List<String> guildMemberIDs =
                 guild.getMembers().stream().map(ISnowflake::getId).toList();
         List<Member> missingMembers = new ArrayList<>();
@@ -426,43 +466,38 @@ public class CreateGameService {
                     "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
             sb.append(guild.getName()).append("** server.\n");
             sb.append(Helper.getGuildInviteURL(guild, missingMembers.size() + 15))
-                    .append("\n");
+                    .append('\n');
             sb.append("The following players need to join the server:\n");
             for (Member member : missingMembers) {
-                sb.append("> ").append(member.getAsMention()).append("\n");
+                sb.append("> ").append(member.getAsMention()).append('\n');
             }
-            sb.append(
-                    "You will be automatically added to the game channels when you join the server."
-                            + "\nNote that if for some reason you are not automatically added to the game after joining the server,"
-                            + " you can fix this by having one of the other game members run `/game ping` in the actions channel.");
+            sb.append("You will be automatically added to the game channels when you join the server.");
             MessageHelper.sendMessageToChannel(channel, sb.toString());
+            String msg2 =
+                    "If you have joined the server and cannot find your game, please click this button. If the invite has expired, please press this other button.";
+            String findGameButtonId = gameName == null ? "pingGame" : "pingGame_" + gameName;
+            Button findGameButton = Buttons.green(findGameButtonId, "Locate My Game");
+            Button resendInvite = Buttons.blue("resendInvite_" + guild.getId(), "Resend Server Invite");
+            MessageHelper.sendMessageToChannelWithButtons(channel, msg2, List.of(findGameButton, resendInvite));
         }
         return missingMembers;
     }
 
-    public static Integer getNextGameNumber() {
-        List<Integer> existingNums = getAllExistingPBDNumbers();
-        if (existingNums.isEmpty()) {
-            return 1;
-        }
-        int nextPBDNumber = Collections.max(existingNums) + 1;
-        while (ReserveGameNumberService.isGameNumReserved("pbd" + nextPBDNumber)) {
-            nextPBDNumber++;
-        }
-        return nextPBDNumber;
+    public static String getNextPbdGameName() {
+        String nextGameName;
+        do {
+            nextGameName = "pbd" + GameManager.getAndIncrementLatestPbdNumber();
+        } while (ReserveGameNumberService.isGameNumReserved(nextGameName));
+        return nextGameName;
     }
 
-    public static String getNextGameName() {
-        return "pbd" + getNextGameNumber();
-    }
-
-    public static String getLastGameName() {
-        List<Integer> existingNums = getAllExistingPBDNumbers();
-        if (existingNums.isEmpty()) {
-            return "pbd1";
+    @Nullable
+    public static String getLastPbdGameName() {
+        int latestPbdNumber = GameManager.getLatestPbdNumber();
+        if (latestPbdNumber == 0) {
+            return null;
         }
-        int nextPBDNumber = Collections.max(existingNums);
-        return "pbd" + nextPBDNumber;
+        return "pbd" + latestPbdNumber;
     }
 
     public static boolean gameOrRoleAlreadyExists(String name) {
@@ -482,39 +517,6 @@ public class CreateGameService {
 
         // CHECK
         return gameAndRoleNames.contains(name);
-    }
-
-    private static List<Integer> getAllExistingPBDNumbers() {
-        List<Guild> guilds = new ArrayList<>(JdaService.guilds);
-        List<Integer> pbdNumbers = new ArrayList<>();
-
-        // GET ALL PBD ROLES FROM ALL GUILDS
-        for (Guild guild : guilds) {
-            List<Role> pbdRoles = guild.getRoles().stream()
-                    .filter(r -> r.getName().startsWith("pbd"))
-                    .toList();
-
-            // EXISTING ROLE NAMES
-            for (Role role : pbdRoles) {
-                String pbdNum = role.getName().replace("pbd", "");
-                if (Helper.isInteger(pbdNum)) {
-                    pbdNumbers.add(Integer.parseInt(pbdNum));
-                }
-            }
-        }
-
-        // GET ALL EXISTING PBD MAP NAMES
-        List<String> gameNames = GameManager.getGameNames().stream()
-                .filter(gameName -> gameName.startsWith("pbd"))
-                .toList();
-        for (String gameName : gameNames) {
-            String pbdNum = gameName.replace("pbd", "");
-            if (Helper.isInteger(pbdNum)) {
-                pbdNumbers.add(Integer.parseInt(pbdNum));
-            }
-        }
-
-        return pbdNumbers;
     }
 
     @Nullable
@@ -598,7 +600,7 @@ public class CreateGameService {
 
     private static int getMaxGamesPerCategory() {
         int maxGamesPerCategory = GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.getAsInt(10);
-        return Math.max(1, Math.min(25, maxGamesPerCategory));
+        return Math.clamp(maxGamesPerCategory, 1, 25);
     }
 
     private static int getChannelCountForNewCategory() {
@@ -678,9 +680,9 @@ public class CreateGameService {
 
         EnumSet<Permission> allow = EnumSet.of(Permission.VIEW_CHANNEL);
         EnumSet<Permission> deny = EnumSet.of(Permission.VIEW_CHANNEL);
-        Role bothelperRole = getRole("Bothelper", guild);
-        Role spectatorRole = getRole("Spectator", guild);
-        Role everyoneRole = getRole("@everyone", guild);
+        Role bothelperRole = DiscordRoleUtility.getRole("Bothelper", guild);
+        Role spectatorRole = DiscordRoleUtility.getRole("Spectator", guild);
+        Role everyoneRole = DiscordRoleUtility.getRole("@everyone", guild);
         ChannelAction<Category> createCategoryAction = guild.createCategory(categoryName);
         if (bothelperRole != null)
             createCategoryAction =
@@ -691,10 +693,6 @@ public class CreateGameService {
         if (everyoneRole != null)
             createCategoryAction = createCategoryAction.addRolePermissionOverride(everyoneRole.getIdLong(), null, deny);
         return createCategoryAction.complete();
-    }
-
-    public static Role getRole(String name, Guild guild) {
-        return guild.getRolesByName(name, true).stream().findFirst().orElse(null);
     }
 
     public static String getNewPlayerInfoText() {
@@ -722,6 +720,56 @@ public class CreateGameService {
 
     public static boolean isGameCreationAllowed() {
         return GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.ALLOW_GAME_CREATION.toString(), Boolean.class, true);
+                GlobalSettings.ImplementedSettings.ALLOW_GAME_CREATION.toString(), Boolean.class, Boolean.TRUE);
+    }
+
+    public String autoGenerateGameName() {
+        // spotless:off
+        // if these words are changed, please replace them in place, to avoid disrupting the generation algorithm
+        // i.e. avoid deleting a word and putting a new word at the end, instead put the new word where the old word was
+        List<String> words = new ArrayList<>(Arrays.asList(
+            "Relativity", "Photon", "Crystalline", "Exoplanet", "Lunar", "Ecosystem", "Metastable", "Halogen",
+            "Fluorescence", "Helium", "Tachyon", "Jetpack", "Pluto", "Interstellar", "Cryptography", "Blueprint",
+            "Fission", "Disruptor", "Monolith", "Domino", "Doppelganger", "Freefall", "Zeta", "Hypocube",
+            "Levitation", "Chemical", "Biohazard", "Frequency", "Equinox", "Extrapolate", "Nanocarbon", "Cygnus",
+            "Labyrinth", "Zenith", "Acidic", "Oxygen", "Primordial", "Havoc", "Neutrino", "Vorpal",
+            "Solstice", "Qubit", "Cephalopod", "Vertebrate", "Magnetron", "Obelisk", "Yggdrasil", "Jargon",
+            "Compass", "Machination", "Incorporeal", "Electron", "Maglev", "Radiant", "Cosmology", "Tensor",
+            "Cryosleep", "Incandescent", "Eigenvector", "Atomizer", "Retina", "Dragonfly", "Nanotube",  "Mnemonic",
+            "Muon", "Convex", "Nulldrive", "Failsafe", "Equilibrium", "Abyss", "Hydra", "Friction",
+            "Equatorial", "Incursion", "Solenoid", "Illusion", "Inhibitor", "Sundial", "Microchip", "Krypton",
+            "Gravitational", "Entropy", "Taurus", "Hyperion", "Deuterium", "Voltage", "Viscosity", "Logarithm",
+            "Centrifuge", "Mercury", "Ioniser", "Parabola", "Starlight", "Hydrocarbon", "Precursor", "Scorpius",
+            "Covalent", "Paradox", "Chromosome", "Incognita", "Polarity", "Wintermute", "Imprint", "Overclock",
+            "Thermodynamics", "Zephyr", "Quadrant", "Cortex", "Luminance", "Irradiated", "Polymer", "Fluctuation",
+            "Cryogenics", "Pegasus", "Ferrocore", "Quaternary", "Ultrasonic", "Quasar", "Kinetic", "Chimera",
+            "Turbine", "Transduction", "Isotope", "Quicksilver", "Jovian", "Lateral", "Lithium", "Neurotoxin",
+            "Osmosis", "Thunderchild", "Piezoelectric", "Ablation", "Gigawatt", "Leviathan", "Moonstone", "Emerald",
+            "Toxicology", "Immaterial", "Disintegration", "Harmonics", "Android", "Constellation", "Parallax", "Cyborg",
+            "Tesseract", "Jupiter", "Volatile", "Moebius", "Uranium", "Phoenix", "Hardwired", "Uninhabitable",
+            "Phosphorus", "Horizon", "Oscillation", "Waveform", "Banshee", "Dissonance", "Omicron", "Xenobiology",
+            "Continuum", "Spacetime", "Eclipse", "Ultimatum", "Junkyard", "Inertia", "Hovercraft", "Symbiotic",
+            "Cellular", "Celestial", "Instability", "Decontamination", "Valence", "Diffusion", "Fractal", "Radioactive",
+            "Caduceus", "Quotient", "Atmosphere", "Apparatus", "Infosphere", "Juggernaut", "Pendulum", "Spectral",
+            "Harbinger", "Venus", "Lambda", "Alkaline", "Voyage", "Ozone", "Iota", "Synapse",
+            "Datastream", "Redshift", "Cerebral", "Fungi", "Wetware", "Dendrite", "Ziggurat", "Vermilion",
+            "Neptune", "Pathology", "Orthogonal", "Yesteryear", "Dinosaur", "Andromeda", "Catalyst", "Fabricator",
+            "Portal", "Molecular", "Encryption", "Hydrogen", "Theta", "Angstrom", "Epoch", "Digital",
+            "Sentinel", "Synchronisation", "Coriolis", "Comet", "Resonance", "Topography", "Gargoyle", "Forcefield",
+            "Citadel", "Hologram", "Circuitry", "Gemini", "Cyberspace", "Graphite", "Synthetic", "Trajectory",
+            "Nitrogen", "Odyssey", "Bioluminescence", "Lagrange", "Lightspeed", "Helix", "Photosynthesis", "Interface",
+            "Nanite", "Glacier", "Astrolabe", "Ultraviolet", "Enthalpy", "Observatory", "Solar", "Vacuum",
+            "Infrared", "Kaleidoscope", "Magnetosphere", "Gyroscope", "Diamond", "Optic", "Enzyme", "Causality"));
+        // extra words: "Waypoint", "Faraday", "Perihelion", "Penumbra", "Barycentric", "Helical", "Stoichiometry", "Mechatronic", "Cognitive", "Newtonian"
+        // avoid words that are similar to names of TI4 components (or parts thereof) e.g. "Quantum"
+        // also avoid words that are similar to existing words or the list e.g. "Cyberspace" -> Nullspace", "Subspace", "Hyperspace"
+        // spotless:on
+
+        return ThreadLocalRandom.current()
+                .ints(0, words.size())
+                .distinct()
+                .limit(3)
+                .mapToObj(words::get)
+                .collect(Collectors.joining("-"));
     }
 }

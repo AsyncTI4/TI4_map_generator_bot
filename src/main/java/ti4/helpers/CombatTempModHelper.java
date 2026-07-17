@@ -3,18 +3,20 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.experimental.UtilityClass;
+import ti4.game.Player;
+import ti4.game.UnitHolder;
 import ti4.image.Mapper;
-import ti4.map.Player;
-import ti4.map.UnitHolder;
 import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.TileModel;
 import ti4.service.combat.CombatRollType;
 
+@UtilityClass
 public class CombatTempModHelper {
 
-    public static void InitializeNewTempMods(Player player, TileModel tile, UnitHolder holder) {
+    public static void initializeNewTempMods(Player player, TileModel tile, UnitHolder holder) {
         List<TemporaryCombatModifierModel> unusedMods = player.getNewTempCombatModifiers();
         unusedMods = unusedMods.stream()
                 .filter(mod -> mod.getUseInTurn() == player.getNumberOfTurns())
@@ -27,7 +29,7 @@ public class CombatTempModHelper {
         player.clearNewTempCombatModifiers();
     }
 
-    public static void EnsureValidTempMods(Player player, TileModel tile, UnitHolder holder) {
+    public static void ensureValidTempMods(Player player, TileModel tile, UnitHolder holder) {
         List<TemporaryCombatModifierModel> tempMods = new ArrayList<>(player.getTempCombatModifiers());
 
         for (TemporaryCombatModifierModel mod : tempMods) {
@@ -52,15 +54,15 @@ public class CombatTempModHelper {
         }
     }
 
-    public static List<NamedCombatModifierModel> BuildCurrentRoundTempNamedModifiers(
-            Player player, TileModel tile, UnitHolder holder, Boolean isApplyToOpponent, CombatRollType rollType) {
-        EnsureValidTempMods(player, tile, holder);
+    public static List<NamedCombatModifierModel> buildCurrentRoundTempNamedModifiers(
+            Player player, TileModel tile, UnitHolder holder, boolean isApplyToOpponent, CombatRollType rollType) {
+        ensureValidTempMods(player, tile, holder);
         List<TemporaryCombatModifierModel> tempMods = new ArrayList<>(player.getTempCombatModifiers());
         List<NamedCombatModifierModel> currentRoundResults = new ArrayList<>();
         for (TemporaryCombatModifierModel mod : tempMods) {
             currentRoundResults.add(new NamedCombatModifierModel(
                     mod.getModifier(), Mapper.getRelatedName(mod.getRelatedID(), mod.getRelatedType())));
-            if (mod.getModifier().getPersistenceType().equals(Constants.MOD_TEMP_ONE_ROUND)
+            if (Constants.MOD_TEMP_ONE_ROUND.equals(mod.getModifier().getPersistenceType())
                     && rollType != CombatRollType.AFB) {
                 player.removeTempMod(mod);
             }
@@ -79,9 +81,9 @@ public class CombatTempModHelper {
         var combatModifiers = Mapper.getCombatModifiers();
         Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
                 .filter(modifier -> modifier.isRelevantTo(relatedType, relatedID)
-                        && (modifier.getPersistenceType().equals(Constants.MOD_TEMP_ONE_ROUND)
-                                || modifier.getPersistenceType().equals(Constants.MOD_TEMP_ONE_COMBAT)
-                                || modifier.getPersistenceType().equals(Constants.MOD_TEMP_ONE_TACTICAL_ACTION)))
+                        && (Constants.MOD_TEMP_ONE_ROUND.equals(modifier.getPersistenceType())
+                                || Constants.MOD_TEMP_ONE_COMBAT.equals(modifier.getPersistenceType())
+                                || Constants.MOD_TEMP_ONE_TACTICAL_ACTION.equals(modifier.getPersistenceType())))
                 .findFirst();
         if (relevantMod.isPresent()) {
             result = new TemporaryCombatModifierModel(relatedType, relatedID, relevantMod.get(), currentTurnCount);

@@ -2,12 +2,13 @@ package ti4.service.map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -15,28 +16,33 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ModalHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.URLReaderHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.listeners.annotations.ModalHandler;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.json.JsonMapperManager;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.service.fow.LoreService;
 import ti4.service.fow.LoreService.LoreEntry;
+import tools.jackson.databind.json.JsonMapper;
 
 @UtilityClass
 public class MapJsonIOService {
-    private final ObjectMapper mapper = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    private static final JsonMapper mapper = JsonMapperManager.basic()
+            .rebuild()
+            .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+            .build();
 
     @ModalHandler("importMapFromJSON")
     public void importMapFromJSON(ModalInteractionEvent event, Game game) {
@@ -58,7 +64,6 @@ public class MapJsonIOService {
         try {
             MapDataIO mapData = new MapDataIO();
             List<TileIO> tiles = new ArrayList<>();
-            Map<String, LoreService.LoreEntry> savedLoreMap = LoreService.getGameLore(game);
 
             for (Tile tile : game.getTileMap().values()) {
                 TileIO t = new TileIO();
@@ -104,10 +109,13 @@ public class MapJsonIOService {
                         pi.setAttachments(new ArrayList<>(planet.getAttachments()));
                         planetHasExportedData = true;
                     }
-                    LoreEntry loreData = savedLoreMap.get(planet.getName());
-                    if (includeLore && loreData != null) {
-                        pi.setPlanetLore(loreData.toString());
-                        planetHasExportedData = true;
+                    if (includeLore) {
+                        List<LoreEntry> planetLore = LoreService.getEntriesForBase(game, planet.getName());
+                        if (!planetLore.isEmpty()) {
+                            pi.setPlanetLore(buildLoreIO(planetLore.get(0)));
+                            pi.setPlanetLoreEntries(buildLoreIOList(planetLore));
+                            planetHasExportedData = true;
+                        }
                     }
                     if (planetHasExportedData) {
                         pis.add(pi);
@@ -118,9 +126,12 @@ public class MapJsonIOService {
                 }
 
                 // system lore
-                LoreEntry loreData = savedLoreMap.get(tile.getPosition());
-                if (includeLore && loreData != null) {
-                    t.setSystemLore(loreData.toString());
+                if (includeLore) {
+                    List<LoreEntry> systemLore = LoreService.getEntriesForBase(game, tile.getPosition());
+                    if (!systemLore.isEmpty()) {
+                        t.setSystemLore(buildLoreIO(systemLore.get(0)));
+                        t.setSystemLoreEntries(buildLoreIOList(systemLore));
+                    }
                 }
 
                 // custom adjacencies / overrides
@@ -146,6 +157,20 @@ public class MapJsonIOService {
             }
 
             mapData.setMapInfo(tiles);
+
+            if (includeLore) {
+                Map<String, List<LoreIO>> phaseLore = new HashMap<>();
+                for (String phase : LoreService.getPhaseTargetNames()) {
+                    List<LoreEntry> entries = LoreService.getEntriesForBase(game, phase);
+                    if (!entries.isEmpty()) {
+                        phaseLore.put(phase, buildLoreIOList(entries));
+                    }
+                }
+                if (!phaseLore.isEmpty()) {
+                    mapData.setPhaseLore(phaseLore);
+                }
+            }
+
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapData);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to export map to JSON " + Constants.solaxPing(), e);
@@ -153,7 +178,9 @@ public class MapJsonIOService {
         }
     }
 
-    public static void importMapFromJson(Game game, String jsonString, MessageChannel feedbackChannel) {
+    // Package-private for tests — allows calling directly with a JSON string and an in-memory
+    // Game, without needing a fake ModalInteractionEvent/URL fetch.
+    static void importMapFromJson(Game game, String jsonString, MessageChannel feedbackChannel) {
         StringBuilder errorSb = new StringBuilder();
         try {
             MapDataIO mapData = mapper.readValue(jsonString, MapDataIO.class);
@@ -166,16 +193,30 @@ public class MapJsonIOService {
             LoreService.clearLore(game);
 
             for (TileIO tileIO : mapData.getMapInfo()) {
-                if (handleTile(tileIO, game, errorSb)) {
-                    handleTokens(tileIO, game, errorSb);
-                    handleCustomHyperlane(tileIO, game, errorSb);
-                    handleBorderAnomalies(tileIO, game, errorSb);
-                    handleSystemLore(tileIO, game, errorSb);
-                    handlePlanetAttachments(tileIO, game, errorSb);
-                    handlePlanetLore(tileIO, game, errorSb);
-                    handleAdjacencyOverrides(tileIO, game, errorSb);
-                    handleCustomAdjacencies(tileIO, game, errorSb);
+                // Isolated per tile: an unexpected failure processing one tile must not abort the
+                // rest of the map (or phase lore, handled after this loop) — it's reported and
+                // skipped instead, same as every other per-item failure in this importer.
+                try {
+                    if (handleTile(tileIO, game, errorSb)) {
+                        handleTokens(tileIO, game, errorSb);
+                        handleCustomHyperlane(tileIO, game, errorSb);
+                        handleBorderAnomalies(tileIO, game, errorSb);
+                        handleSystemLore(tileIO, game, errorSb);
+                        handlePlanetAttachments(tileIO, game, errorSb);
+                        handlePlanetLore(tileIO, game, errorSb);
+                        handleAdjacencyOverrides(tileIO, game, errorSb);
+                        handleCustomAdjacencies(tileIO, game, errorSb);
+                    }
+                } catch (Exception e) {
+                    appendError(errorSb, tileIO, "unexpected error, tile skipped: " + e.getMessage());
                 }
+            }
+            try {
+                handlePhaseLore(mapData, game, errorSb);
+            } catch (Exception e) {
+                errorSb.append("- phase lore: unexpected error, skipped: ")
+                        .append(e.getMessage())
+                        .append('\n');
             }
 
             MessageHelper.sendMessageToChannel(feedbackChannel, "Map imported from JSON.");
@@ -185,7 +226,9 @@ public class MapJsonIOService {
                     Arrays.asList(Buttons.green("addFrontierTokens", "Yes"), Buttons.DONE_DELETE_BUTTONS));
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to import map from JSON " + Constants.solaxPing(), e);
-            MessageHelper.sendMessageToChannel(feedbackChannel, "Failed to import map from JSON: " + e.getMessage());
+            MessageHelper.sendMessageToChannel(
+                    feedbackChannel,
+                    "Failed to import map from JSON: " + e.getMessage() + "\n-# Solax has been pinged");
         }
 
         if (!errorSb.isEmpty()) {
@@ -254,7 +297,7 @@ public class MapJsonIOService {
         if (tileIO.getBorderAnomalies() == null) return;
 
         for (BorderAnomalyIO anomalyIO : tileIO.getBorderAnomalies()) {
-            BorderAnomalyModel.BorderAnomalyType anomalyType = null;
+            BorderAnomalyModel.BorderAnomalyType anomalyType;
             try {
                 anomalyType = BorderAnomalyModel.BorderAnomalyType.valueOf(
                         anomalyIO.getType().toUpperCase());
@@ -275,10 +318,8 @@ public class MapJsonIOService {
     }
 
     private static void handleSystemLore(TileIO tileIO, Game game, StringBuilder sb) {
-        String loreString = tileIO.getSystemLore();
-        if (loreString != null && !loreString.isEmpty()) {
-            LoreService.addLoreFromString(loreString, game);
-        }
+        List<LoreIO> entries = effectiveLoreEntries(tileIO.getSystemLoreEntries(), tileIO.getSystemLore());
+        importLoreList(tileIO.getPosition(), entries, game, sb, "system lore at " + tileIO.getPosition());
     }
 
     private static void handlePlanetAttachments(TileIO tileIO, Game game, StringBuilder sb) {
@@ -313,11 +354,106 @@ public class MapJsonIOService {
         if (tileIO.getPlanets() == null) return;
 
         for (PlanetIO planetIO : tileIO.getPlanets()) {
-            String loreString = planetIO.getPlanetLore();
-            if (loreString != null && !loreString.isEmpty()) {
-                LoreService.addLoreFromString(loreString, game);
+            List<LoreIO> entries = effectiveLoreEntries(planetIO.getPlanetLoreEntries(), planetIO.getPlanetLore());
+            importLoreList(planetIO.getPlanetID(), entries, game, sb, "planet lore for " + planetIO.getPlanetID());
+        }
+    }
+
+    private static void handlePhaseLore(MapDataIO mapData, Game game, StringBuilder sb) {
+        if (mapData.getPhaseLore() == null) return;
+
+        for (Map.Entry<String, List<LoreIO>> phaseEntry : mapData.getPhaseLore().entrySet()) {
+            importLoreList(
+                    phaseEntry.getKey(), phaseEntry.getValue(), game, sb, "phase lore for " + phaseEntry.getKey());
+        }
+    }
+
+    /** Prefers the full entry list (carries "#tag" siblings); falls back to the singular field
+     *  wrapped as a one-element list for older exports/hand-written JSON. */
+    private static List<LoreIO> effectiveLoreEntries(List<LoreIO> entries, LoreIO singular) {
+        if (entries != null && !entries.isEmpty()) return entries;
+        return singular == null ? List.of() : List.of(singular);
+    }
+
+    /**
+     * Imports every entry in {@code entries} under {@code rawTarget} via
+     * {@link LoreService#importValidatedLore}, which resolves the target, checks phase/trigger
+     * pairing, auto-tags a collision with an entry already imported under the same bare target
+     * (exactly what happens saving two modal entries on the same target), and reports effect-line
+     * warnings — so a JSON entry gets the same validation a GM typing it in gets, instead of the
+     * previous silent addLoreFromString path.
+     */
+    private static void importLoreList(
+            String rawTarget, List<LoreIO> entries, Game game, StringBuilder sb, String label) {
+        if (entries == null || entries.isEmpty()) return;
+        if (rawTarget == null) {
+            appendLoreError(sb, label, "(missing)", "missing position/planetID — all its lore entries were skipped");
+            return;
+        }
+
+        for (LoreIO io : entries) {
+            if (io == null || StringUtils.isBlank(io.getLoreText())) continue;
+
+            // One entry's failure — expected (bad enum) or not (any other exception) — must not
+            // stop the rest of this target's entries, or the target after it, from importing.
+            try {
+                LoreEntry candidate = new LoreEntry(LoreService.clean(io.getLoreText()));
+                candidate.footerText = LoreService.clean(io.getFooterText());
+                candidate.receiver = LoreService.RECEIVER.valueOf(io.getReceiver());
+                candidate.trigger = LoreService.TRIGGER.valueOf(io.getTrigger());
+                candidate.ping = LoreService.PING.valueOf(io.getPing());
+                candidate.persistance = LoreService.PERSISTANCE.valueOf(io.getPersistance());
+                candidate.fromRound = io.getFromRound() == null ? 0 : io.getFromRound();
+                candidate.tillRound = io.getTillRound() == null ? 0 : io.getTillRound();
+
+                LoreService.LoreImportResult result = LoreService.importValidatedLore(rawTarget, candidate, game);
+                if (result.target() == null) {
+                    appendLoreError(sb, label, rawTarget, "invalid target, phase/trigger mismatch, or text too long");
+                } else {
+                    for (String warning : result.warnings()) {
+                        appendLoreError(sb, label, result.target(), "warning: " + warning);
+                    }
+                }
+            } catch (IllegalArgumentException | NullPointerException e) {
+                // NullPointerException: Enum.valueOf(null) when a receiver/trigger/ping/persistance
+                // field is missing entirely, not just misspelled.
+                appendLoreError(
+                        sb, label, rawTarget, "unrecognized or missing receiver/trigger/ping/persistance value");
+            } catch (Exception e) {
+                appendLoreError(sb, label, rawTarget, "unexpected error, entry skipped: " + e.getMessage());
             }
         }
+    }
+
+    private static void appendLoreError(StringBuilder sb, String label, String target, String reason) {
+        sb.append("- ")
+                .append(label)
+                .append(" '")
+                .append(target)
+                .append("': ")
+                .append(reason)
+                .append('\n');
+    }
+
+    private static LoreIO buildLoreIO(LoreEntry loreEntry) {
+        LoreIO loreIO = new LoreIO();
+        loreIO.setLoreText(loreEntry.loreText);
+        loreIO.setFooterText(loreEntry.footerText);
+        loreIO.setReceiver(loreEntry.receiver.toString());
+        loreIO.setTrigger(loreEntry.trigger.toString());
+        loreIO.setPing(loreEntry.ping.toString());
+        loreIO.setPersistance(loreEntry.persistance.toString());
+        loreIO.setFromRound(loreEntry.fromRound);
+        loreIO.setTillRound(loreEntry.tillRound);
+        return loreIO;
+    }
+
+    private static List<LoreIO> buildLoreIOList(List<LoreEntry> loreEntries) {
+        List<LoreIO> out = new ArrayList<>();
+        for (LoreEntry entry : loreEntries) {
+            out.add(buildLoreIO(entry));
+        }
+        return out;
     }
 
     private static void handleAdjacencyOverrides(TileIO tileIO, Game game, StringBuilder sb) {
@@ -353,22 +489,20 @@ public class MapJsonIOService {
                 .append(tileIO.getPosition())
                 .append(": ")
                 .append(message)
-                .append("\n");
+                .append('\n');
     }
 
+    @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class MapDataIO {
         private List<TileIO> mapInfo;
-
-        public List<TileIO> getMapInfo() {
-            return mapInfo;
-        }
-
-        public void setMapInfo(List<TileIO> mapInfo) {
-            this.mapInfo = mapInfo;
-        }
+        // Keyed by phase pseudo-target name ("strategy"/"action"/"status"/"agenda") — see
+        // LoreService.getPhaseTargetNames. Phase lore has no tile of its own, so it can't live in
+        // any TileIO entry.
+        private Map<String, List<LoreIO>> phaseLore;
     }
 
+    @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class TileIO {
         private String position;
@@ -377,155 +511,49 @@ public class MapJsonIOService {
         private List<String> tokens;
         private String customHyperlaneString;
         private List<BorderAnomalyIO> borderAnomalies;
-        private String systemLore;
+        private LoreIO systemLore;
+        // Full set of entries sharing this position, including "#tag" siblings — systemLore above
+        // is entry #1 kept for back-compat with older exports/importers that only read the
+        // singular field. Import prefers this list when present; see effectiveLoreEntries.
+        private List<LoreIO> systemLoreEntries;
         private List<String> customAdjacencies;
         private List<AdjacencyOverrideIO> adjacencyOverrides;
-
-        public String getPosition() {
-            return position;
-        }
-
-        public void setPosition(String position) {
-            this.position = position.toLowerCase();
-        }
-
-        public String getTileID() {
-            return tileID;
-        }
-
-        public void setTileID(String tileID) {
-            this.tileID = tileID.toLowerCase();
-        }
-
-        public List<PlanetIO> getPlanets() {
-            return planets;
-        }
-
-        public void setPlanets(List<PlanetIO> planets) {
-            this.planets = planets;
-        }
-
-        public List<String> getTokens() {
-            return tokens;
-        }
-
-        public void setTokens(List<String> tokens) {
-            this.tokens = tokens;
-        }
-
-        public String getCustomHyperlaneString() {
-            return customHyperlaneString;
-        }
-
-        public void setCustomHyperlaneString(String customHyperlaneString) {
-            this.customHyperlaneString = customHyperlaneString;
-        }
-
-        public List<BorderAnomalyIO> getBorderAnomalies() {
-            return borderAnomalies;
-        }
-
-        public void setBorderAnomalies(List<BorderAnomalyIO> borderAnomalies) {
-            this.borderAnomalies = borderAnomalies;
-        }
-
-        public String getSystemLore() {
-            return systemLore;
-        }
-
-        public void setSystemLore(String systemLore) {
-            this.systemLore = systemLore;
-        }
-
-        public List<String> getCustomAdjacencies() {
-            return customAdjacencies;
-        }
-
-        public void setCustomAdjacencies(List<String> customAdjacencies) {
-            this.customAdjacencies = customAdjacencies;
-        }
-
-        public List<AdjacencyOverrideIO> getAdjacencyOverrides() {
-            return adjacencyOverrides;
-        }
-
-        public void setAdjacencyOverrides(List<AdjacencyOverrideIO> adjacencyOverrides) {
-            this.adjacencyOverrides = adjacencyOverrides;
-        }
     }
 
+    @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PlanetIO {
         private String planetID;
         private List<String> attachments;
-        private String planetLore;
-
-        public String getPlanetID() {
-            return planetID;
-        }
-
-        public void setPlanetID(String planetID) {
-            this.planetID = planetID;
-        }
-
-        public List<String> getAttachments() {
-            return attachments;
-        }
-
-        public void setAttachments(List<String> attachments) {
-            this.attachments = attachments;
-        }
-
-        public String getPlanetLore() {
-            return planetLore;
-        }
-
-        public void setPlanetLore(String planetLore) {
-            this.planetLore = planetLore;
-        }
+        private LoreIO planetLore;
+        // See TileIO#systemLoreEntries.
+        private List<LoreIO> planetLoreEntries;
     }
 
+    @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class BorderAnomalyIO {
         private Integer direction;
         private String type;
-
-        public Integer getDirection() {
-            return direction;
-        }
-
-        public void setDirection(Integer direction) {
-            this.direction = direction;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
     }
 
+    @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class AdjacencyOverrideIO {
         private String secondary;
         private Integer direction;
+    }
 
-        public String getSecondary() {
-            return secondary;
-        }
-
-        public void setSecondary(String secondary) {
-            this.secondary = secondary;
-        }
-
-        public Integer getDirection() {
-            return direction;
-        }
-
-        public void setDirection(Integer direction) {
-            this.direction = direction;
-        }
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class LoreIO {
+        private String loreText;
+        private String footerText;
+        private String receiver;
+        private String trigger;
+        private String ping;
+        private String persistance;
+        private Integer fromRound;
+        private Integer tillRound;
     }
 }

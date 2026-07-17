@@ -30,7 +30,7 @@ Branch permissions can be granted, but for now you may fork the repository and c
    * Ensure Default Install Settings are correct.
    * Create an install link, paste it into the discord server you want your bot in.
 5. Invite your Test Bot to your server
-6. Create a `bot-log` channel, and `Admin`, `Developer` and `Bothelper` roles; add the role IDs to `src/main/java/ti4/JdaService.java`
+6. Create a `bot-log` channel, and `Admin`, `Developer` and `Bothelper` roles; add the role IDs to `src/main/java/ti4/spring/jda/JdaService.java`
 
 # Setup a Test Bot
 
@@ -44,7 +44,7 @@ Download the latest JDK: https://adoptium.net/
 
 Setup vscode with the default extensions for java: https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack
 
-ctrl+shift+p: Java: Configure Java Runtime -> JavaSE-21
+ctrl+shift+p: Java: Configure Java Runtime -> JavaSE-26
 
 Create a discord server for testing
 Create a discord application: https://discord.com/developers/applications

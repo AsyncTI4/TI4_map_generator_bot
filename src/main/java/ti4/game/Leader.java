@@ -1,0 +1,171 @@
+package ti4.game;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.awt.Color;
+import java.util.Comparator;
+import java.util.Optional;
+import lombok.Getter;
+import lombok.Setter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.apache.commons.lang3.StringUtils;
+import ti4.helpers.Constants;
+import ti4.image.Mapper;
+import ti4.logging.BotLogger;
+import ti4.model.LeaderModel;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.franken.FrankenAlternateTextService;
+
+@Getter
+public class Leader {
+    private final String id;
+    private final String type;
+
+    @Setter
+    private int tgCount;
+
+    @Setter
+    private boolean exhausted;
+
+    @Setter
+    private boolean locked = true;
+
+    @Setter
+    private boolean active;
+
+    @JsonCreator
+    public Leader(
+            @JsonProperty("id") String id,
+            @JsonProperty("type") String type,
+            @JsonProperty("tgCount") int tgCount,
+            @JsonProperty("exhausted") boolean exhausted,
+            @JsonProperty("locked") boolean locked,
+            @JsonProperty("active") boolean active) {
+        this.id = id;
+        this.type = type;
+        this.tgCount = tgCount;
+        this.exhausted = exhausted;
+        this.locked = locked;
+        this.active = active;
+    }
+
+    public Leader(String id) {
+        this(id, null);
+    }
+
+    public Leader(String id, String type) {
+        this.id = id;
+        this.type = StringUtils.isBlank(type) ? getTypeFromLeaderId(id) : type;
+        if ("agent".equals(this.type)) {
+            locked = false;
+        }
+    }
+
+    private static String getTypeFromLeaderId(String id) {
+        if (id.contains(Constants.AGENT)) {
+            return Constants.AGENT;
+        }
+        if (id.contains(Constants.COMMANDER)) {
+            return Constants.COMMANDER;
+        }
+        if (id.contains(Constants.HERO)) {
+            return Constants.HERO;
+        }
+        if (id.contains(Constants.ENVOY)) {
+            return Constants.ENVOY;
+        }
+        BotLogger.error("Could not infer Leader type from id: " + id);
+        return null;
+    }
+
+    @JsonIgnore
+    public String getName() {
+        return getLeaderModel().map(LeaderModel::getName).orElse(id);
+    }
+
+    @JsonIgnore
+    public String getName(Game game) {
+        if (game.isTwilightsFallMode())
+            return getLeaderModel().map(LeaderModel::getTFNameIfAble).orElse(id);
+        return getLeaderModel().map(LeaderModel::getName).orElse(id);
+    }
+
+    @JsonIgnore
+    public Optional<LeaderModel> getLeaderModel() {
+        return Optional.ofNullable(Mapper.getLeader(id));
+    }
+
+    @JsonIgnore
+    public static Comparator<Leader> sortByType() {
+        return Comparator.comparing(Leader::getType);
+    }
+
+    @JsonIgnore
+    public MessageEmbed getLeaderEmbed() {
+        if (getLeaderModel().isEmpty()) {
+            return null;
+        }
+        EmbedBuilder eb = new EmbedBuilder();
+        MessageEmbed modelEmbed = getLeaderModel().get().getRepresentationEmbed(false, false, locked, false);
+        eb.copyFrom(modelEmbed);
+
+        if (tgCount > 0) {
+            String desc = modelEmbed.getDescription();
+            eb.setDescription(desc + "\n" + MiscEmojis.tg(tgCount));
+        }
+
+        if (exhausted) {
+            eb.setColor(Color.GRAY);
+        } else {
+            eb.setColor(Color.GREEN);
+        }
+
+        if (locked) {
+            eb.setColor(Color.RED);
+            eb.setAuthor("🔒 Locked");
+        }
+
+        if (active) {
+            eb.setColor(Color.BLUE);
+            eb.setAuthor("🔒 ACTIVE - Leader will be purged during Status Phase cleanup");
+        }
+
+        return eb.build();
+    }
+
+    @JsonIgnore
+    public MessageEmbed getLeaderEmbed(Game game) {
+        if (getLeaderModel().isEmpty()) {
+            return null;
+        }
+        EmbedBuilder eb = new EmbedBuilder();
+        MessageEmbed modelEmbed = FrankenAlternateTextService.getLeaderEmbed(
+                game, getLeaderModel().get(), false, false, locked, false, game.isTwilightsFallMode());
+        eb.copyFrom(modelEmbed);
+
+        if (tgCount > 0) {
+            String desc = modelEmbed.getDescription();
+            eb.setDescription(desc + "\n" + MiscEmojis.tg(tgCount));
+        }
+
+        if (exhausted) {
+            eb.setColor(Color.GRAY);
+        } else {
+            eb.setColor(Color.GREEN);
+        }
+
+        if (locked) {
+            eb.setColor(Color.RED);
+            eb.setAuthor("🔒 Locked");
+        }
+
+        if (active) {
+            eb.setColor(Color.BLUE);
+            eb.setAuthor("🔒 ACTIVE - Leader will be purged during Status Phase cleanup");
+        }
+
+        return eb.build();
+    }
+}

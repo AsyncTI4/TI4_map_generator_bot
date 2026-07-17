@@ -5,8 +5,8 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import ti4.buttons.Buttons;
-import ti4.map.Game;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -20,12 +20,15 @@ public class GameOptionService {
 
     private static void sendFactionReactOptionButtons(MessageChannel channel) {
         List<Button> factionReactButtons = new ArrayList<>();
-        factionReactButtons.add(Buttons.green("enableAidReacts", "Enable Faction Reactions"));
-        factionReactButtons.add(Buttons.red("disableAidReacts", "No Faction Reactions"));
+        factionReactButtons.add(Buttons.blue("enableAidReacts_faction", "Enable Faction Reactions"));
+        factionReactButtons.add(Buttons.blue("enableAidReacts_colour", "Enable Colour Reactions"));
+        factionReactButtons.add(Buttons.blue("enableAidReacts_strategy", "Enable Strategy Card Reactions"));
+        factionReactButtons.add(Buttons.green("enableAidReacts_all", "Enable All Reactions"));
+        factionReactButtons.add(Buttons.red("disableAidReacts", "No Reactions"));
         factionReactButtons.add(Buttons.gray("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
                 channel,
-                "Enable to have the bot react to player messages with their faction emoji.",
+                "Enable to have the bot react to player messages with their faction emoji, their colour emoji, their strategy card emoji, or all of the above.",
                 factionReactButtons);
     }
 

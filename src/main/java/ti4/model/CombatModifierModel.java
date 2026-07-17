@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Objects;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.service.combat.CombatRollType;
 
 @Data
@@ -24,6 +27,7 @@ public class CombatModifierModel implements ModelInterface {
     private String scopeExcept;
     private String condition;
     private CombatRollType forCombatAbility;
+    private String displayUnitAlias;
     private Boolean singleUnitMod = false;
     private Boolean applyEachForQuantity = false;
     private Boolean applyToOpponent = false;
@@ -52,7 +56,17 @@ public class CombatModifierModel implements ModelInterface {
             if ("_best_".equals(scope)) {
                 List<UnitModel> sortedAllUnits = new ArrayList<>(allUnits);
                 sortedAllUnits.sort(Comparator.comparingInt(a -> a.getCombatDieHitsOnForAbility(rollType, player)));
-                isInScope = Objects.equals(sortedAllUnits.getFirst().getAsyncId(), unit.getAsyncId());
+                UnitModel best = sortedAllUnits.getFirst();
+                if (sortedAllUnits.size() > 1) {
+                    UnitModel secondBest = sortedAllUnits.get(1);
+                    if (best.getCombatDieHitsOnForAbility(rollType, player)
+                            == secondBest.getCombatDieHitsOnForAbility(rollType, player)) {
+                        if (secondBest.getCombatDieCount() > best.getCombatDieCount()) {
+                            best = secondBest;
+                        }
+                    }
+                }
+                isInScope = Objects.equals(best.getAsyncId(), unit.getAsyncId());
             }
             if ("_bestCap_".equals(scope)) {
                 List<UnitModel> sortedAllUnits = new ArrayList<>(allUnits);
@@ -60,7 +74,7 @@ public class CombatModifierModel implements ModelInterface {
                         .filter(u -> u.getCapacityValue() > 0)
                         .toList();
                 List<UnitModel> sortedAllUnits2 = new ArrayList<>(sortedAllUnits);
-                if (sortedAllUnits2.size() > 0) {
+                if (!sortedAllUnits2.isEmpty()) {
                     sortedAllUnits2.sort(
                             Comparator.comparingInt(a -> a.getCombatDieHitsOnForAbility(rollType, player)));
                     isInScope = Objects.equals(sortedAllUnits2.getFirst().getAsyncId(), unit.getAsyncId());
@@ -75,12 +89,32 @@ public class CombatModifierModel implements ModelInterface {
             }
             if ("_ship_".equals(scope)) {
                 isInScope = unit.getIsShip();
+                if (game.getTileByPosition(game.getActiveSystem()) != null) {
+                    Tile tile = game.getTileByPosition(game.getActiveSystem());
+                    if ("purpletf_mech".equalsIgnoreCase(unit.getAlias())) {
+                        if (FoWHelper.playerHasShipsInSystem(player, tile)
+                                && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                            isInScope = true;
+                        }
+                    }
+                    if (ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)
+                            && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                        isInScope = true;
+                    }
+                }
             }
             if ("_ship_no_ff".equals(scope)) {
                 isInScope = unit.getIsShip() && !"fighter".equalsIgnoreCase(unit.getBaseType());
             }
             if ("_groundforce_".equals(scope)) {
                 isInScope = unit.getIsGroundForce();
+            }
+            if ("classifiedWeapons".equals(scope)) {
+                String storedValue = game.getStoredValue("classifiedWeapons");
+                int separatorIdx = storedValue.indexOf(';');
+                if (separatorIdx >= 0) {
+                    isInScope = storedValue.substring(separatorIdx + 1).equals(unit.getAsyncId());
+                }
             }
         }
         return isInScope;

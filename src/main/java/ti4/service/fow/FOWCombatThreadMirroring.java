@@ -11,16 +11,17 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CombatMessageHelper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedGame;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -56,7 +57,7 @@ public class FOWCombatThreadMirroring {
         if (messageMirrored) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(), player.getRepresentationNoPing() + "(You) said: " + messageText);
-            event.getMessage().delete().queue();
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -145,13 +146,12 @@ public class FOWCombatThreadMirroring {
             if (player != null && playerOther == player) {
                 continue;
             }
-            MessageChannel pChannel = playerOther.getPrivateChannel();
-            TextChannel pChan = (TextChannel) pChannel;
+            TextChannel pChannel = playerOther.getPrivateChannel();
+            TextChannel pChan = pChannel;
             if (pChan != null) {
                 boolean combatParticipant = combatParticipants.contains(playerOther);
                 String newMessage =
-                        (combatParticipant ? playerOther.getRepresentation(true, combatParticipant) + " " : "")
-                                + message;
+                        (combatParticipant ? playerOther.getRepresentation(true, true) + " " : "") + message;
 
                 List<ThreadChannel> threadChannels = pChan.getThreadChannels();
                 for (ThreadChannel threadChannel_ : threadChannels) {

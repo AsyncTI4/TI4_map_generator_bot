@@ -3,27 +3,28 @@ package ti4.service.relic;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.RandomHelper;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.unit.DestroyUnitService;
 
 @UtilityClass
 public class StellarConverterService {
 
-    public static void resolveStellar(Game game, ButtonInteractionEvent event, String buttonID) {
-        secondHalfOfStellar(game, buttonID.split("_")[1], event);
+    public static void resolveStellar(Game game, ButtonInteractionEvent event, String buttonID, Player player) {
+        secondHalfOfStellar(game, buttonID.split("_")[1], event, player);
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void secondHalfOfStellar(Game game, String planetName, GenericInteractionCreateEvent event) {
+    public static void secondHalfOfStellar(
+            Game game, String planetName, GenericInteractionCreateEvent event, Player player) {
         Tile tile = game.getTileFromPlanet(planetName);
         if (tile == null) {
             MessageHelper.replyToMessage(event, "System not found that contains planet.");
@@ -62,7 +63,10 @@ public class StellarConverterService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message2 + ".");
 
         message2.append(" by ");
-        message2.append(game.getPlayer(event.getUser().getId()).getRepresentation());
+        if (player == null) {
+            player = game.getPlayer(event.getUser().getId());
+        }
+        message2.append(player.getRepresentation());
         DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 0, message2 + ".");
         if (game.isConventionsOfWarAbandonedMode()
                 && tile.isHomeSystem(game)

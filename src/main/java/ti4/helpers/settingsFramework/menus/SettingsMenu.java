@@ -1,7 +1,6 @@
 package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,13 +20,12 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.helpers.Constants;
+import ti4.discord.interactions.listeners.context.ListenerContext;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.json.ObjectMapperFactory;
-import ti4.listeners.context.ListenerContext;
+import ti4.json.JsonMapperManager;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 
 /**
  * <h1>Jazzxhands Menu Framework</h1>
@@ -43,6 +41,7 @@ import ti4.message.logging.LogOrigin;
  */
 @Getter
 public abstract class SettingsMenu {
+
     // Prefix "Jazz Menu Framework"
     private static final @JsonIgnore String menuNav = "jmfN";
     static final @JsonIgnore String menuAction = "jmfA";
@@ -71,6 +70,10 @@ public abstract class SettingsMenu {
 
     List<SettingsMenu> categories() {
         return Collections.emptyList();
+    }
+
+    boolean showInParentSummary() {
+        return true;
     }
 
     List<Button> specialButtons() {
@@ -106,7 +109,7 @@ public abstract class SettingsMenu {
     String menuSummaryString(String lastSettingTouched) {
         StringBuilder sb = new StringBuilder("# **__").append(menuName).append(":__**");
         for (String line : description) sb.append("\n- *").append(line).append("*");
-        sb.append("\n");
+        sb.append('\n');
 
         int pad = enabledSettings().stream()
                 .map(x -> x.getName().length())
@@ -115,19 +118,21 @@ public abstract class SettingsMenu {
         for (SettingInterface setting : enabledSettings()) {
             sb.append("> ");
             sb.append(setting.longSummary(pad, lastSettingTouched));
-            sb.append("\n");
+            sb.append('\n');
         }
-        if (!enabledSettings().isEmpty()) sb.append("\n"); // extra line for formatting
+        if (!enabledSettings().isEmpty()) sb.append('\n'); // extra line for formatting
 
-        if (!categories().isEmpty()) {
+        List<SettingsMenu> summarized =
+                categories().stream().filter(SettingsMenu::showInParentSummary).toList();
+        if (!summarized.isEmpty()) {
             List<String> catStrings = new ArrayList<>();
-            for (SettingsMenu cat : categories()) {
+            for (SettingsMenu cat : summarized) {
                 catStrings.add(cat.shortSummaryString(false));
             }
             String catStr = String.join("\n\n", catStrings);
             if (sb.length() + catStr.length() > 1999) {
                 List<String> shorterCatStrings = new ArrayList<>();
-                for (SettingsMenu cat : categories()) {
+                for (SettingsMenu cat : summarized) {
                     shorterCatStrings.add(cat.shortSummaryString(true));
                 }
                 catStr = String.join("\n\n", shorterCatStrings);
@@ -203,18 +208,28 @@ public abstract class SettingsMenu {
         buttonFailed(event, userMsg, true);
     }
 
-    private void buttonFailed(GenericInteractionCreateEvent event, String userMsg, boolean pingJazz) {
-        if (pingJazz) {
-            BotLogger.error(
-                    new LogOrigin(event), userMsg + "\n" + Constants.jazzPing() + " Menu Framework button has failed.");
-            userMsg += "\n> *Jazz has been pinged to take a look.*";
+    private void buttonFailed(GenericInteractionCreateEvent event, String userMsg, boolean logError) {
+        if (logError) {
+            BotLogger.error(new LogOrigin(event), userMsg + "\nMenu Framework button has failed.");
         }
         if (event instanceof ButtonInteractionEvent buttonEvent)
-            buttonEvent.getHook().sendMessage(userMsg).setEphemeral(true).queue();
+            buttonEvent
+                    .getHook()
+                    .sendMessage(userMsg)
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         else if (event instanceof ModalInteractionEvent modalEvent)
-            modalEvent.getHook().sendMessage(userMsg).setEphemeral(true).queue();
+            modalEvent
+                    .getHook()
+                    .sendMessage(userMsg)
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         else if (event instanceof StringSelectInteractionEvent stringEvent)
-            stringEvent.getHook().sendMessage(userMsg).setEphemeral(true).queue();
+            stringEvent
+                    .getHook()
+                    .sendMessage(userMsg)
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     void setMessageId(String messageId) {
@@ -342,7 +357,7 @@ public abstract class SettingsMenu {
                         .getHook()
                         .editOriginal(newSummary)
                         .setComponents(actionRows)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
 
         } else if (event instanceof ModalInteractionEvent modalEvent) {
@@ -351,7 +366,7 @@ public abstract class SettingsMenu {
                         .getMessage()
                         .editMessage(newSummary)
                         .setComponents(actionRows)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
         } else if (event instanceof StringSelectInteractionEvent selectEvent) {
             if (messageId == null) {
@@ -414,7 +429,7 @@ public abstract class SettingsMenu {
             }
             List<List<Button>> paginated = ListUtils.partition(allButtons, allottedSpace - 2);
             int maxPage = paginated.size() - 1;
-            pageNum = Math.max(0, Math.min(pageNum, maxPage));
+            pageNum = Math.clamp(pageNum, 0, maxPage);
 
             String navString = menuNav + "_" + navId() + "_";
             List<Button> buttonsToUse = new ArrayList<>();
@@ -449,9 +464,8 @@ public abstract class SettingsMenu {
 
     @JsonIgnore
     public String json() {
-        ObjectMapper mapper = ObjectMapperFactory.build();
         try {
-            return mapper.writeValueAsString(this);
+            return JsonMapperManager.basic().writeValueAsString(this);
         } catch (Exception e) {
             BotLogger.error("Error mapping to json:", e);
         }

@@ -9,10 +9,17 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperTacticalAction;
@@ -23,16 +30,15 @@ import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
+import ti4.spring.service.gameevent.GameEventDraft;
 
+@UtilityClass
 public class TeHelperCommanders {
+
     @ButtonHandler("useDwsDiscount_")
     public static void useDwsTechDiscount(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String commanderFaction = buttonID.replace("useDwsDiscount_", "");
@@ -41,15 +47,15 @@ public class TeHelperCommanders {
 
         // Add the discount to spent things for the player using the discount
         player.addSpentThing("dwsDiscount_" + commanderFaction);
-        ButtonHelper.deleteTheOneButton(event, buttonID, false);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
         String editedMsg = Helper.buildSpentThingsMessage(player, game, "res");
-        event.editMessage(editedMsg).queue();
+        event.getMessage().editMessage(editedMsg).queue(Consumers.nop(), BotLogger::catchRestError);
 
         // Notify the DWS commander holder that their discount was used
         String message = dws.getRepresentation(true, true) + " ";
         message += game.isFowMode() ? player.getColorIfCanSeeStats(dws) : player.getRepresentation(true, false);
-        message += " has used your commander to get a discount on tech.";
-        message += " Use the buttons to gain or convert 1 commodity.";
+        message += " has used Aello to get a discount on researching.";
+        message += " Use these buttons to gain or convert 1 commodity.";
         message += "\n-# You have (" + dws.getCommoditiesRepresentation() + ") commodities.";
         List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(dws, true);
         MessageHelper.sendMessageToChannelWithButtons(dws.getCorrectChannel(), message, buttons);
@@ -58,7 +64,7 @@ public class TeHelperCommanders {
     public static void offerCrimsonCommanderButtons(Player player, Game game, GenericInteractionCreateEvent event) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "crimsoncommander")) {
             String message = player.getRepresentation(true, true)
-                    + " Resolve crimson commander using buttons\n> (note this is not available until the end of combat)";
+                    + ", resolve Ahk Siever using these buttons (this is not available until the end of combat).";
             message += "\n-# You have (" + player.getCommoditiesRepresentation() + ") commodities.";
             List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
@@ -69,9 +75,7 @@ public class TeHelperCommanders {
         String pos = game.getActiveSystem();
         Tile tile = game.getTileByPosition(pos);
 
-        List<Button> buttons = new ArrayList<>();
-        buttons = ButtonHelperTacticalAction.getButtonsForAllUnitsInSystem(player, game, tile, "Remove");
-        return buttons;
+        return ButtonHelperTacticalAction.getButtonsForAllUnitsInSystem(player, game, tile, "Remove");
     }
 
     @ButtonHandler("moveOjzRetreatS1_")
@@ -87,8 +91,7 @@ public class TeHelperCommanders {
             String unitStr = matcher.group("unittype") + " " + matcher.group("planet");
 
             if (buttonID.startsWith("move")) {
-                if (!ojzMap.containsKey(pos)) ojzMap.put(pos, new ArrayList<>());
-                ojzMap.get(pos).add(unitStr);
+                ojzMap.computeIfAbsent(pos, key -> new ArrayList<>()).add(unitStr);
             } else {
                 if (ojzMap.containsKey(pos)) ojzMap.get(pos).remove(unitStr);
                 if (ojzMap.containsKey(pos) && ojzMap.get(pos).isEmpty()) ojzMap.remove(pos);
@@ -97,7 +100,7 @@ public class TeHelperCommanders {
 
             List<Button> buttons = getWatchfulOjzUnitButtons(game, player, source, ojzMap.get(pos));
             String message = player.getRepresentation()
-                    + " Choose up to 2 ships to retreat as well as anything they transport using Watchful Ojz, the Ral Nel commander:";
+                    + ", choose up to 2 ships to retreat as well as anything they may transport using Watchful Ojz, the Ral Nel commander.";
             message += TeHelperAbilities.unitSummary(game, player, ojzMap);
             MessageHelper.editMessageWithButtons(event, message, buttons);
         } else {
@@ -128,11 +131,12 @@ public class TeHelperCommanders {
             List<Tile> tiles = ojzDestinations(game, player, pos);
             for (Tile t : tiles) {
                 buttons.add(Buttons.green(
-                        player.finChecker() + "ojzRetreatS3_" + t.getPosition(),
-                        "Retreat to " + t.getRepresentationForButtons(game, player)));
+                        player.factionButtonChecker() + "ojzRetreatS3_" + t.getPosition(),
+                        "Retreat To " + t.getRepresentationForButtons(game, player)));
             }
 
-            String message = player.getRepresentation() + " Choose a destination to send your retreating units:";
+            String message = player.getRepresentation()
+                    + ", please choose a destination system to send your retreating units to.";
             message += TeHelperAbilities.unitSummary(game, player, ojzMap);
             MessageHelper.editMessageWithButtons(event, message, buttons);
         } else {
@@ -149,6 +153,9 @@ public class TeHelperCommanders {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             HashMap<String, List<String>> ojzMap = TeHelperAbilities.readMoveMap(game.getStoredValue("OjzRetreatMap"));
             for (Map.Entry<String, List<String>> entry : ojzMap.entrySet()) {
+                Tile sourceTile = game.getTileByPosition(entry.getKey());
+                UnitHolder sourceSpace = sourceTile.getSpaceUnitHolder();
+                Map<UnitKey, List<Integer>> beforeRetreat = GameEventDraft.snapshotRetreatUnits(player, sourceSpace);
                 if (entry.getValue().contains("fs space")) movedFlagship = true;
                 List<String> units =
                         entry.getValue().stream().collect(Collectors.groupingBy(s -> s)).entrySet().stream()
@@ -163,14 +170,22 @@ public class TeHelperCommanders {
                         .toList();
                 String unitStrFrom = String.join(", ", units);
                 String unitStrTo = String.join(", ", unitsTo);
-                RemoveUnitService.removeUnits(
-                        event, game.getTileByPosition(entry.getKey()), game, player.getColor(), unitStrFrom);
+                RemoveUnitService.removeUnits(event, sourceTile, game, player.getColor(), unitStrFrom);
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitStrTo);
+                GameEventDraft.stageRetreat(
+                        game,
+                        player,
+                        entry.getKey(),
+                        Constants.SPACE,
+                        tile.getPosition(),
+                        Constants.SPACE,
+                        beforeRetreat,
+                        sourceSpace);
             }
             if (!player.hasUnit("ralnel_flagship")) movedFlagship = false;
             game.removeStoredValue("OjzRetreatMap");
 
-            String msg = player.getRepresentation() + " Retreated the following units to "
+            String msg = player.getRepresentation() + " retreated the following units to "
                     + tile.getRepresentationForButtons(game, player);
             msg += " using Watchful Ojz, the Ral Nel commander:";
             msg += TeHelperAbilities.unitSummary(game, player, ojzMap);
@@ -193,9 +208,9 @@ public class TeHelperCommanders {
             String uhName = "space".equals(uh.getName()) ? "Space" : Helper.getPlanetRepresentation(uh.getName(), game);
             for (UnitKey uk : uh.getUnitsByState().keySet()) {
                 // franken compat
-                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.getUnitType())
+                if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.unitType())
                         && !player.hasAbility("miniaturization")) continue;
-                if (uk.getUnitType() == UnitType.PlenaryOrbital) continue;
+                if (uk.unitType() == UnitType.PlenaryOrbital) continue;
 
                 // moved all of this unit already from this unit holder
                 String unitStr = uk.asyncID() + " " + uh.getName();
@@ -204,9 +219,9 @@ public class TeHelperCommanders {
                                 >= uh.getUnits().get(uk)) continue;
 
                 // otherwise, add the button
-                String id = player.finChecker() + "moveOjzRetreatS1_" + source.getPosition() + "_" + uk.asyncID() + "_"
-                        + uh.getName();
-                String label = uk.getUnitType().humanReadableName() + " from " + uhName;
+                String id = player.factionButtonChecker() + "moveOjzRetreatS1_" + source.getPosition() + "_"
+                        + uk.asyncID() + "_" + uh.getName();
+                String label = uk.unitType().humanReadableName() + " From " + uhName;
                 buttons.add(Buttons.green(id, label, uk.unitEmoji()));
             }
         }
@@ -219,8 +234,8 @@ public class TeHelperCommanders {
                 UnitType type = Units.findUnitType(data[0]);
                 String uhName = "space".equals(data[1]) ? "Space" : Helper.getPlanetRepresentation(data[1], game);
                 if (type != null) {
-                    String id = player.finChecker() + "undoOjzRetreatS1_" + source.getPosition() + "_" + type + "_"
-                            + data[1];
+                    String id = player.factionButtonChecker() + "undoOjzRetreatS1_" + source.getPosition() + "_" + type
+                            + "_" + data[1];
                     String label = "Return " + type.humanReadableName() + " to " + uhName;
                     buttons.add(Buttons.red(id, label, type.getUnitTypeEmoji()));
                 }
@@ -228,7 +243,8 @@ public class TeHelperCommanders {
         }
 
         // Choose another system button
-        buttons.add(Buttons.gray(player.finChecker() + "ojzRetreatS2_" + source.getPosition(), "Pick a destination"));
+        buttons.add(Buttons.gray(
+                player.factionButtonChecker() + "ojzRetreatS2_" + source.getPosition(), "Pick A Destination"));
         return buttons;
     }
 }

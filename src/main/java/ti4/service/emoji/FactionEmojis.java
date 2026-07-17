@@ -43,6 +43,7 @@ public enum FactionEmojis implements TI4Emoji {
     Deepwrought,
     Firmament,
     Obsidian,
+    Firma_Obs,
     Neutral,
 
     // Twilight's Fall
@@ -96,7 +97,10 @@ public enum FactionEmojis implements TI4Emoji {
     qhet,
     atokera,
     belkosea,
-    toldar, //
+    toldar,
+    kaltrim,
+    sarcosa,
+    xin, //
 
     // balacasi
     arvaxi,
@@ -108,6 +112,55 @@ public enum FactionEmojis implements TI4Emoji {
     vyserix,
     zephyrion,
     arachian,
+    zooid,
+
+    // beans
+    iron,
+    ta,
+    netrunners,
+    crystellum,
+    dream,
+    ashen,
+    natau,
+
+    // luminous
+    arachnera,
+    psm,
+    opa,
+
+    // theodisi
+    aeterna,
+    arcanum,
+    ardentia,
+    kairn,
+    kryxos,
+    myrr,
+    oblivion,
+    ponthous,
+    revenant,
+    thrones,
+    verydith,
+    veylor,
+    xytheris,
+
+    // nomadfalcon
+    erock,
+    explanetary,
+    councilors,
+
+    // endlesst
+    Unfallen,
+    Sophon,
+    Uempire,
+    Riftborn,
+    Hissho,
+    Uchoir,
+    Nakalim,
+    Horatio,
+    Craver,
+    Vaulter,
+    Vodyani,
+    Lumeris,
 
     // Franken
     Franken1,
@@ -279,13 +332,30 @@ public enum FactionEmojis implements TI4Emoji {
             case "onyxxa" -> onyxxa;
             case "tyris" -> tyris;
             case "arachian" -> arachian;
+            case "zooid" -> zooid;
             case "vyserix" -> vyserix;
             case "zephyrion" -> zephyrion;
             case "pharadn" -> pharadn;
             case "qhet" -> qhet;
             case "atokera" -> atokera;
+            case "kaltrim" -> kaltrim;
+            case "xin" -> xin;
+            case "sarcosa" -> sarcosa;
             case "toldar" -> toldar;
             case "belkosea" -> belkosea;
+            case "aeterna" -> aeterna;
+            case "arcanum" -> arcanum;
+            case "ardentia" -> ardentia;
+            case "kairn" -> kairn;
+            case "kryxos" -> kryxos;
+            case "myrr" -> myrr;
+            case "oblivion" -> oblivion;
+            case "ponthous" -> ponthous;
+            case "revenant" -> revenant;
+            case "thrones" -> thrones;
+            case "verydith" -> verydith;
+            case "veylor" -> veylor;
+            case "xytheris" -> xytheris;
             case "admins" -> AdminsFaction;
             case "qulane" -> Qulane;
             case "canto" -> canto;
@@ -333,6 +403,35 @@ public enum FactionEmojis implements TI4Emoji {
             case "raven" -> raven;
             case "syndicate" -> syndicate;
             case "terminator" -> terminator;
+
+            case "vaulter" -> Vaulter;
+            case "sophon" -> Sophon;
+            case "uempire" -> Uempire;
+            case "riftborn" -> Riftborn;
+            case "hissho" -> Hissho;
+            case "uchoir" -> Uchoir;
+            case "nakalim" -> Nakalim;
+            case "horatio" -> Horatio;
+            case "craver" -> Craver;
+            case "vodyani" -> Vodyani;
+            case "lumeris" -> Lumeris;
+            case "unfallen" -> Unfallen;
+
+            case "councilors" -> councilors;
+            case "erock" -> erock;
+            case "explanetary" -> explanetary;
+
+            case "dream" -> dream;
+            case "ashen" -> ashen;
+            case "iron" -> iron;
+            case "ta" -> ta;
+            case "netrunners" -> netrunners;
+            case "crystellum" -> crystellum;
+            case "natau" -> natau;
+
+            case "arachnera" -> arachnera;
+            case "psm" -> psm;
+            case "opa" -> opa;
 
             case "netharii" -> netharii;
             case "drahn" -> Drahn;

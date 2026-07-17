@@ -1,7 +1,6 @@
 package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -12,15 +11,16 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.SourceEmojis;
+import tools.jackson.databind.JsonNode;
 
 @Getter
 @JsonIgnoreProperties("messageId")
@@ -67,7 +67,7 @@ public class FactionDraftableSettings extends SettingsMenu {
         // Load JSON if applicable
         if (!(json == null
                 || !json.has("menuId")
-                || !MENU_ID.equals(json.get("menuId").asText("")))) {
+                || !MENU_ID.equals(json.get("menuId").asString("")))) {
             numFactions.initialize(json.get("numFactions"));
             banFactions.initialize(json.get("banFactions"));
             priFactions.initialize(json.get("priFactions"));
@@ -89,7 +89,8 @@ public class FactionDraftableSettings extends SettingsMenu {
         List<Button> ls = new ArrayList<>(super.specialButtons());
 
         if (parent != null && parent instanceof MiltySettings ms) {
-            if (ms.getSourceSettings().getDiscoStars().isVal())
+            if (ms.getSourceSettings().getDiscoStars().isVal()
+                    || ms.getSourceSettings().getBlueReverie().isVal())
                 ls.add(Buttons.red(
                         idPrefix + "homebrewFactionsOnly", "Only Homebrew Factions", SourceEmojis.DiscordantStars));
         }

@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import software.amazon.awssdk.utils.StringUtils;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
 
@@ -21,6 +21,13 @@ public class WhisperService {
             String anonY,
             MessageChannel feedbackChannel,
             Guild guild) {
+        if (game.isWhispersDisabled()) {
+            MessageHelper.sendMessageToChannel(
+                    feedbackChannel,
+                    "Whispers are disabled in this game. To reenable them, use `/game setup whispers_enabled:true`.");
+            return;
+        }
+
         String message;
         String realIdentity = player_.getRepresentationUnfogged();
         String player1 = ColorEmojis.getColorEmojiWithName(player.getColor());

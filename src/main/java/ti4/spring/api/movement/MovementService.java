@@ -6,32 +6,32 @@ import java.util.Map;
 import java.util.Map.Entry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.service.tactical.TacticalActionDisplacementService;
 import ti4.service.tactical.TacticalActionOutputService;
 
 @RequiredArgsConstructor
 @Service
-public class MovementService {
+class MovementService {
 
     /**
      * Apply the provided displacement to the given target position, handle token placement, and return the updated tile.
      */
-    public Tile commitMovement(
+    Tile commitMovement(
             Game game, Player player, String targetPosition, Map<String, List<MovementUnitCount>> displacement) {
         try {
             // Transform web payload into internal displacement structure, normalizing unit-holder keys
             Map<String, Map<UnitKey, List<Integer>>> internal = new HashMap<>();
             if (displacement != null) {
                 for (Entry<String, List<MovementUnitCount>> entry : displacement.entrySet()) {
-                    String normalizedKey = normalizeUnitHolderKey(game, entry.getKey());
+                    String normalizedKey = normalizeUnitHolderKey(entry.getKey());
                     List<MovementUnitCount> units = entry.getValue();
                     if (units == null) continue;
                     Map<UnitKey, List<Integer>> byKey = new HashMap<>();
@@ -75,7 +75,7 @@ public class MovementService {
         }
     }
 
-    private String normalizeUnitHolderKey(Game game, String raw) {
+    private String normalizeUnitHolderKey(String raw) {
         if (raw == null) return null;
         int dash = raw.indexOf('-');
         if (dash <= 0) return raw;
@@ -84,7 +84,7 @@ public class MovementService {
         // Normalize planet/unit-holder name (case-insensitive, alias-aware)
         String normalizedHolder = AliasHandler.resolvePlanet(holder);
         // Fallback to lower-case if alias handler did not map it
-        if (normalizedHolder == null || normalizedHolder.isBlank()) normalizedHolder = holder;
+        if (normalizedHolder.isBlank()) normalizedHolder = holder;
         normalizedHolder = normalizedHolder.toLowerCase();
         return pos + "-" + normalizedHolder;
     }

@@ -5,29 +5,32 @@ import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumUnitHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.info.SecretObjectiveInfoService;
 
 @UtilityClass
 public class DiscardSecretService {
 
-    public static void discardSO(Player player, int SOID, Game game) {
+    public static boolean discardSO(Player player, int soId, Game game) {
         String soIDString = "";
         for (Map.Entry<String, Integer> so : player.getSecrets().entrySet()) {
-            if (so.getValue().equals(SOID)) {
+            if (so.getValue().equals(soId)) {
                 soIDString = so.getKey();
             }
         }
-        boolean removed = game.discardSecretObjective(player.getUserID(), SOID);
+        boolean removed = game.discardSecretObjective(player.getUserID(), soId);
         if (!removed) {
             MessageHelper.sendMessageToPlayerCardsInfoThread(
                     player, "No such secret objective ID found, please retry.");
-            return;
+            return false;
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, "Secret objective discarded.");
 
@@ -45,6 +48,21 @@ public class DiscardSecretService {
         }
 
         handleSecretObjectiveDrawOrder(game, player);
+        String phase = game.getPhaseOfGame();
+        boolean isInitialSetup = phase == null
+                || phase.isBlank()
+                || "miltydraft".equalsIgnoreCase(phase)
+                || "playerSetup".equalsIgnoreCase(phase);
+        if (!isInitialSetup) {
+            if (player.hasUnlockedBreakthrough("lunariumbt")) {
+                LunariumBreakthroughHandler.offerReadyPlanetButtons(game, player);
+            }
+            if (player.hasUnit("lunarium_mech")
+                    && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
+                LunariumUnitHandler.offerDeployMechButton(game, player);
+            }
+        }
+        return true;
     }
 
     private static void handleSecretObjectiveDrawOrder(Game game, Player player) {

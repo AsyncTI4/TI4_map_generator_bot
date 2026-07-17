@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.utils.FileUpload;
+import ti4.game.Game;
+import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
@@ -17,9 +19,7 @@ import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.PositionMapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileStep;
-import ti4.map.Game;
-import ti4.map.Tile;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.service.image.FileUploadService;
 
 @UtilityClass
@@ -55,9 +55,8 @@ public class MantisBuildImageGeneratorService {
         if (mapImage == null) {
             return null;
         }
-        FileUpload fileUpload = FileUploadService.createFileUpload(mapImage, uniqueKey);
 
-        return fileUpload;
+        return FileUploadService.createFileUpload(mapImage, uniqueKey);
     }
 
     private BufferedImage generateImage(
@@ -191,7 +190,7 @@ public class MantisBuildImageGeneratorService {
      * @return between 3 and 8 (bounds based on constants)
      */
     private int getRingCount(Game game) {
-        return Math.max(Math.min(game.getRingCount(), RING_MAX_COUNT), RING_MIN_COUNT);
+        return Math.clamp(game.getRingCount(), RING_MIN_COUNT, RING_MAX_COUNT);
     }
 
     /**
@@ -216,7 +215,6 @@ public class MantisBuildImageGeneratorService {
     private int getMapWidth(Game game) {
         float ringCount = getRingCount(game);
         ringCount += ringCount == RING_MIN_COUNT ? 1.5f : 1;
-        int mapWidth = (int) (ringCount * 520 + EXTRA_X * 2);
-        return mapWidth;
+        return (int) (ringCount * 520 + EXTRA_X * 2);
     }
 }

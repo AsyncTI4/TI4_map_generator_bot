@@ -5,17 +5,19 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.regex.RegexService;
@@ -23,20 +25,39 @@ import ti4.service.regex.RegexService;
 @UtilityClass
 public class FealtyUplinkService {
 
-    private String fealtyRep() {
+    private String rep(Game game) {
+        if (game.isTwilightKart()) return Mapper.getUnit("tk-fealtycore").getNameRepresentation();
         return Mapper.getBreakthrough("l1z1xbt").getNameRepresentation();
     }
 
+    private String name(Game game) {
+        if (game.isTwilightKart()) return "_" + Mapper.getUnit("tk-fealtycore").getName() + "_";
+        return "_" + Mapper.getBreakthrough("l1z1xbt").getName() + "_";
+    }
+
+    public boolean canUseFealty(Game game, Player player, Tile tile) {
+        if (tile == null) return false;
+        if (player.hasUnlockedBreakthrough("l1z1xbt")) return true;
+        return player.hasUnit("tk-fealtycore") && tile.getSpaceUnitHolder().getUnitCount(UnitType.Warsun, player) > 0;
+    }
+
     public void postInitialButtons(Game game, Player player, String planetName) {
+        UnitHolder unitHolder = game.getUnitHolderFromPlanet(planetName);
+        if (unitHolder != null) {
+            boolean containsDMZ = unitHolder.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
+            if (containsDMZ) {
+                return;
+            }
+        }
         String prettyPlanet = Helper.getPlanetRepresentationNoResInf(planetName, game);
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
-                player.finChecker() + "fealtyUplink_" + planetName,
-                "Use Fealty Uplink on " + prettyPlanet,
+                player.factionButtonChecker() + "fealtyUplink_" + planetName,
+                "Use " + name(game) + " on " + prettyPlanet,
                 FactionEmojis.L1Z1X));
-        String message = "When you gain control of a planet, you can use " + fealtyRep();
+        String message = "When you gain control of a planet, you may use " + rep(game);
         message +=
-                " to place infantry equal to that planet's influence.\n-# > You may choose to do this either before or after exploring.";
+                " to place infantry equal to that planet's influence.\n-# You may choose to do this either before or after exploring.";
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCorrectChannel(), message, buttons);
     }
 
@@ -57,7 +78,7 @@ public class FealtyUplinkService {
             planet.addUnit(Units.getUnitKey(UnitType.Infantry, player.getColorID()), influence);
             String prettyPlanet = Helper.getPlanetRepresentationNoResInf(planet.getName(), player.getGame());
             String message = player.getRepresentationNoPing() + " Added " + influence + " infantry to " + prettyPlanet
-                    + " using " + fealtyRep() + ".";
+                    + " using " + rep(player.getGame()) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
     }

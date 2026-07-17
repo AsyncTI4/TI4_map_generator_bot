@@ -3,6 +3,7 @@ package ti4.service.turn;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
@@ -10,17 +11,22 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.buttons.Buttons;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Player;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.thundersedge.TeHelperGeneral;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Player;
-import ti4.map.Tile;
+import ti4.logging.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
@@ -29,6 +35,8 @@ import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.PlayHeroService;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
 public class EndTurnService {
@@ -50,6 +58,13 @@ public class EndTurnService {
     }
 
     public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (StringUtils.isNotEmpty(game.getCurrentActiveSystem())
+                && game.getStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED)
+                        .isEmpty()) {
+            ButtonHelperTacticalAction.logTacticalAction(game, player);
+        }
+        game.removeStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED);
+        GameEventService.commit(game, GameEventType.TURN, player, Map.of("passed", false));
         pingNextPlayer(event, game, player);
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
         if (!game.isFowMode()) {
@@ -66,19 +81,8 @@ public class EndTurnService {
     }
 
     private static void resetStoredValuesEndOfTurn(Game game, Player player) {
-        if (player.hasAbility("phantom_energy")
-                && !game.getStoredValue("phantomEnergy").isEmpty()) {
-            for (Tile tile : game.getTileMap().values()) {
-                if (tile.hasPlayerCC(player)) {
-                    for (String asyncID : tile.getSpaceUnitHolder()
-                            .getUnitAsyncIdsOnHolder(player.getColorID())
-                            .keySet()) {
-                        game.setStoredValue(
-                                "phantomEnergy",
-                                game.getStoredValue("phantomEnergy").replace(asyncID, ""));
-                    }
-                }
-            }
+        if (player.hasAbility("phantom_energy")) {
+            TyrisAbilityHandler.cleanupPhantomEnergy(game, player);
         }
         game.removeStoredValue("fortuneSeekers");
         game.setStoredValue("lawsDisabled", "no");
@@ -90,6 +94,15 @@ public class EndTurnService {
         game.removeStoredValue("mahactHeroTarget");
         game.removeStoredValue("possiblyUsedRift");
         game.removeStoredValue("heartWarnedThisTurn");
+        String fieldTestTech = game.getStoredValue("fieldTestTech" + player.getFaction());
+        if (!fieldTestTech.isEmpty()) {
+            player.removeTech(fieldTestTech);
+            game.removeStoredValue("fieldTestTech" + player.getFaction());
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing()
+                            + " lost temporary access to their _Field Test_ technology at the end of their turn.");
+        }
         game.setActiveSystem("");
     }
 
@@ -109,6 +122,12 @@ public class EndTurnService {
             MessageHelper.sendMessageToChannel(mainPlayer.getCardsInfoThread(), msg, buttons);
         }
 
+        if (mainPlayer.hasTech("tf-treasurehunters")) {
+            game.shuffleExplores();
+            MessageHelper.sendMessageToChannel(
+                    mainPlayer.getCorrectChannel(), "Shuffled the explore decks due to the treasure hunter ability");
+        }
+
         CommanderUnlockCheckService.checkPlayer(mainPlayer, "sol", "hacan");
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
@@ -122,7 +141,7 @@ public class EndTurnService {
             }
         }
         if (game.isFowMode()) {
-            FowCommunicationThreadService.checkNewNeighbors(game, mainPlayer);
+            FowCommunicationThreadService.checkNewCommPartners(game, mainPlayer);
             MessageHelper.sendMessageToChannel(
                     mainPlayer.getPrivateChannel(),
                     "# End of Turn " + mainPlayer.getInRoundTurnCount() + ", Round " + game.getRound() + " for "
@@ -146,8 +165,8 @@ public class EndTurnService {
         }
 
         // First, check for the ralnel hero and play it if it has been preset
-        if (game.getPlayers().values().stream().allMatch(Player::isPassed)
-                && game.getStoredValue("ralnelHero") != null) {
+        if (game.getRealPlayers().stream().allMatch(Player::isPassed)
+                && !game.getStoredValue("ralnelHero").isEmpty()) {
             String value = game.getStoredValue("ralnelHero");
             Matcher matcher = Pattern.compile(RegexHelper.factionRegex(game)).matcher(value);
             if (matcher.find()) {
@@ -160,11 +179,30 @@ public class EndTurnService {
             }
         }
 
-        if (game.getPlayers().values().stream().allMatch(Player::isPassed)) {
+        // Next, check if puppets on a string has been pre-played
+        if (game.getRealPlayers().stream().allMatch(Player::isPassed)
+                && !game.getStoredValue("Puppets On A String").isEmpty()) {
+            String value = game.getStoredValue("Puppets On A String").split("_")[0];
+            Player puppeteer = game.getPlayerFromColorOrFaction(value);
+            if (puppeteer != null && puppeteer.getPlayableActionCards().contains("puppetsonastring")) {
+                game.removeStoredValue("Puppets On A String");
+                ActionCardHelper.playAC(event, game, puppeteer, "puppetsonastring", game.getMainGameChannel());
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.red("startScoring", "Puppets On A String Sabo'd - Start Status Phase"));
+                buttons.add(Buttons.gray("deleteButtons", "Was Not Sabo'd"));
+                MessageHelper.sendMessageToChannel(
+                        puppeteer.getCorrectChannel(),
+                        "If _Puppets On A String_ is sabo'd, please use these buttons to start the status phase.",
+                        buttons);
+                return;
+            }
+        }
+
+        if (game.getRealPlayers().stream().allMatch(Player::isPassed)) {
             if (mainPlayer.getSecretsUnscored().containsKey("pe")) {
                 MessageHelper.sendMessageToChannel(
                         mainPlayer.getCardsInfoThread(),
-                        "You were the last player to pass, and so you can score _Prove Endurance_.");
+                        "You were the last player to pass, and so you may score _Prove Endurance_.");
             }
             CommanderUnlockCheckService.checkPlayer(mainPlayer, "ralnel");
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, mainPlayer, event)) {
@@ -180,7 +218,7 @@ public class EndTurnService {
             GameMessageManager.remove(game.getName(), GameMessageType.TURN)
                     .ifPresent(messageId -> game.getMainGameChannel()
                             .deleteMessageById(messageId)
-                            .queue());
+                            .queue(Consumers.nop(), BotLogger::catchRestError));
         }
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game);
         if (isFowPrivateGame) {

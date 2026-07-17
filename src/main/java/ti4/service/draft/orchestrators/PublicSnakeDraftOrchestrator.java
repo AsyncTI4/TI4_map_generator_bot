@@ -11,12 +11,12 @@ import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.PublicSnakeDraftSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.draft.DraftButtonService;
 import ti4.service.draft.DraftChoice;
@@ -29,7 +29,7 @@ import ti4.service.draft.DraftableType;
 import ti4.service.draft.OrchestratorState;
 import ti4.service.draft.PartialMapService;
 import ti4.service.draft.PlayerDraftState;
-import ti4.service.draft.PlayerSetupService.PlayerSetupState;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.draft.PublicDraftInfoService;
 
 /**
@@ -39,29 +39,21 @@ import ti4.service.draft.PublicDraftInfoService;
  * The picks are made in order, but that order "snakes" or reverses direction
  * after each player has made a pick.
  */
+@Setter
+@Getter
 public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     /**
      * The per-player state for PublicSnakeDraftOrchestrator.
      * Stores the player's position in the draft order.
      */
+    @Setter
+    @Getter
     public static class State extends OrchestratorState {
         private int orderIndex;
-
-        public int getOrderIndex() {
-            return orderIndex;
-        }
-
-        public void setOrderIndex(int orderIndex) {
-            this.orderIndex = orderIndex;
-        }
     }
 
-    @Getter
-    @Setter
     private int currentPlayerIndex;
 
-    @Getter
-    @Setter
     private boolean isReversing;
 
     public void initialize(DraftManager draftManager, List<String> presetPlayerOrder) {
@@ -169,7 +161,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         }
         // Ensure no one else has picked this choice
         if (!draftManager
-                .getPlayersWithChoiceKey(choice.getType(), choice.getChoiceKey())
+                .getPlayersWithChoiceKey(choice.type(), choice.choiceKey())
                 .isEmpty()) {
             return DraftButtonService.USER_MISTAKE_PREFIX + "That choice has already been taken.";
         }
@@ -177,7 +169,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         // Persist the choice in Player State.
         Map<DraftableType, List<DraftChoice>> playerChoices =
                 draftManager.getPlayerStates().get(playerUserId).getPicks();
-        playerChoices.computeIfAbsent(choice.getType(), k -> new ArrayList<>()).add(choice);
+        playerChoices.computeIfAbsent(choice.type(), _ -> new ArrayList<>()).add(choice);
 
         // Send announcement of pick
         Player player = draftManager.getGame().getPlayer(playerUserId);
@@ -187,8 +179,11 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             sb.append("(automatically) ");
         } else if (source == CommandSource.SLASH_COMMAND) {
             sb.append("(forcefully) ");
+        } else if (source == CommandSource.QUEUED_PICK) {
+            sb.append("(from queue) ");
         }
-        sb.append(choice.getFormattedName()).append("!");
+
+        sb.append(choice.formattedName()).append("!");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
 
         // Move the draft to the next player
@@ -220,11 +215,11 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         if (!undeterministicPicks && !totalPossiblePicks.isEmpty() && totalPossiblePicks.size() == simultaneousPicks) {
             Player nextPlayer = draftManager.getGame().getPlayer(getCurrentPlayer(playerOrder));
             DraftChoice forcedPick = totalPossiblePicks.getFirst();
-            Draftable forcedDraftable = draftManager.getDraftable(forcedPick.getType());
+            Draftable forcedDraftable = draftManager.getDraftable(forcedPick.type());
             String status = draftManager.routeCommand(
                     event,
                     nextPlayer,
-                    forcedDraftable.makeCommandKey(forcedPick.getChoiceKey()),
+                    forcedDraftable.makeCommandKey(forcedPick.choiceKey()),
                     DraftManager.CommandSource.DETERMINISTIC_PICK);
             DraftButtonService.handleButtonResult(event, status);
         } else {
@@ -236,7 +231,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
                     playerOrder,
                     getCurrentPlayer(playerOrder),
                     getNextPlayer(playerOrder),
-                    choice.getType());
+                    choice.type());
             PublicDraftInfoService.pingCurrentPlayer(
                     draftManager,
                     getCurrentPlayer(playerOrder),

@@ -1,1 +1,19 @@
-{"id":"s26","name":"Drak Mor II/Drak Mor VI","aliases":["s26","drakmorii","drakmorvi","drakmor","drak"],"imagePath":"S26_DrakMorII.png","planets":["drakmorii","drakmorvi"],"shipPositionsType":"TYPE05","tileBack":"blue","source":"somno"}
+{
+    "id": "s26",
+    "name": "Drak Mor II/Drak Mor VI",
+    "aliases": [
+        "s26",
+        "drakmorii",
+        "drakmorvi",
+        "drakmor",
+        "drak"
+    ],
+    "imagePath": "S26_DrakMorII.png",
+    "planets": [
+        "drakmorii",
+        "drakmorvi"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "blue",
+    "source": "somno"
+}

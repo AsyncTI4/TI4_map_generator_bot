@@ -14,16 +14,18 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
-import ti4.buttons.Buttons;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.ModalHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.FoWHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.listeners.annotations.ModalHandler;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
 /*
@@ -62,7 +64,7 @@ public class BlindSelectionService {
     }
 
     private static void filterForBlindSelection(
-            Game game, Player player, List<Button> buttons, String buttonPrefix, final String TYPE) {
+            Game game, Player player, List<Button> buttons, String buttonPrefix, String type) {
 
         Set<String> visibleTilePositions = FoWHelper.getTilePositionsToShow(game, player);
         StringBuilder validTargets = new StringBuilder(VALID_SEPARATOR);
@@ -72,7 +74,7 @@ public class BlindSelectionService {
             validTargets.append(target).append(VALID_SEPARATOR);
 
             boolean keep;
-            if (TYPE.equals(POSITION)) {
+            if (POSITION.equals(type)) {
                 // position selection: visible tile only
                 keep = visibleTilePositions.contains(target);
             } else {
@@ -99,12 +101,11 @@ public class BlindSelectionService {
         String encodedButtonPrefix =
                 Base64.getUrlEncoder().withoutPadding().encodeToString(buttonPrefix.getBytes(StandardCharsets.UTF_8));
         game.setStoredValue(VALIDATION_KEY, validTargets.toString());
-        buttons.add(Buttons.red("blindSelection~MDL_" + encodedButtonPrefix + "_" + TYPE, "Blind Target"));
+        buttons.add(Buttons.red("blindSelection~MDL_" + encodedButtonPrefix + "_" + type, "Blind Target"));
     }
 
-    @ButtonHandler("blindSelection~MDL")
-    public static void offerBlindPositionSelection(
-            ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+    @ButtonHandler(value = "blindSelection~MDL", save = false)
+    public static void offerBlindPositionSelection(ButtonInteractionEvent event, String buttonID) {
         String[] splitButton = buttonID.replace("blindSelection~MDL_", "").split("_");
         String encodedButtonPrefix = splitButton[0];
         String type = splitButton[1];
@@ -118,11 +119,11 @@ public class BlindSelectionService {
                 .addComponents(Label.of("Target", target))
                 .build();
 
-        event.replyModal(blindSelectionModal).queue();
+        event.replyModal(blindSelectionModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("blindSelection_")
-    public static void doBlindSelection(ModalInteractionEvent event, Player player, Game game) {
+    public static void doBlindSelection(ModalInteractionEvent event, Player player) {
         String[] buttonData = event.getModalId().split("_");
         String origMessageId = buttonData[1];
         String encodedButtonPrefix = buttonData[2];
@@ -131,8 +132,10 @@ public class BlindSelectionService {
 
         boolean invalidTarget = false;
         // Check for position
-        if (type.equals(POSITION) && !PositionMapper.isTilePositionValid(target)) {
-            invalidTarget = true;
+        if (POSITION.equals(type)) {
+            if (!PositionMapper.isTilePositionValid(target)) {
+                invalidTarget = true;
+            }
         } else {
             // Check for planet
             String planetID = AliasHandler.resolvePlanet(target);
@@ -157,40 +160,40 @@ public class BlindSelectionService {
                 Buttons.red("blindSelection~MDL_" + encodedButtonPrefix + "_" + type, "Change Selection"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", Please select the target:",
+                player.getRepresentation() + ", please choose the target.",
                 chooseTargetButtons);
 
-        event.getMessageChannel().deleteMessageById(origMessageId).queue();
+        event.getMessageChannel().deleteMessageById(origMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("blindValidation_")
-    public static void doBlindValidation(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+    public static void doBlindValidation(ButtonInteractionEvent event, String buttonID, Game game) {
         String[] parts = buttonID.split("_");
         String originalButtonPrefix = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
         String type = parts[2];
         String target = parts[3];
 
         Button actionButton = null;
-        String msg = "⛔ *" + target + "* was not valid for this action";
+        String msg = "⛔ **" + target + "** was not valid for this action";
         String validTargets = game.getStoredValue(VALIDATION_KEY);
         if (validTargets != null && validTargets.contains(VALID_SEPARATOR + target + VALID_SEPARATOR)) {
             originalButtonPrefix = insertFactionToButtonId(target, type, originalButtonPrefix, game);
-            msg = "✅ *" + target + "* is valid for this action";
+            msg = "✅ **" + target + "** is valid for this action";
             actionButton = Buttons.green(
                     originalButtonPrefix + "_" + target, event.getButton().getLabel());
         }
         game.removeStoredValue(VALIDATION_KEY);
 
         MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg, actionButton);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     // if the original button id contains TBDF, replace it with the faction of the owner of the target
     private static String insertFactionToButtonId(String target, String type, String originalButtonPrefix, Game game) {
         if (!originalButtonPrefix.contains(TBD_FACTION)) return originalButtonPrefix;
 
-        Player owner = null;
-        if (type.equals(POSITION)) {
+        Player owner;
+        if (POSITION.equals(type)) {
             owner = game.getPlayerThatControlsTile(game.getTileByPosition(target));
         } else {
             owner = game.getPlayerThatControlsPlanet(target);

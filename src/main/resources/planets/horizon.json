@@ -1,1 +1,22 @@
-{"id":"horizon","tileId":"110","name":"Horizon","aliases":["horizon"],"resources":1,"influence":2,"planetTypes":["CULTURAL"],"planetLayout":{"unitHolderName":"horizon","resourcesLocation":"TopRight","centerPosition":{"x":214,"y":92}},"source":"thunders_edge"}
+{
+    "id": "horizon",
+    "tileId": "110",
+    "name": "Horizon",
+    "aliases": [
+        "horizon"
+    ],
+    "resources": 1,
+    "influence": 2,
+    "planetTypes": [
+        "CULTURAL"
+    ],
+    "planetLayout": {
+        "unitHolderName": "horizon",
+        "resourcesLocation": "TopRight",
+        "centerPosition": {
+            "x": 216,
+            "y": 91
+        }
+    },
+    "source": "thunders_edge"
+}

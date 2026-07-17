@@ -4,8 +4,8 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import ti4.game.Game;
 import ti4.helpers.Constants;
-import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -67,7 +67,7 @@ public class MapPresetService {
                 }
                 List<String> tiles = List.of(
                         "{" + s1[4] + "}", // ring 0
-                        "18",
+                        "112",
                         "84a1",
                         "84a1",
                         s1[1],

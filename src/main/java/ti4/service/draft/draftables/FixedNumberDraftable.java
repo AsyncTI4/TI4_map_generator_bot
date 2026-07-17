@@ -3,7 +3,7 @@ package ti4.service.draft.draftables;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import ti4.map.Player;
+import ti4.game.Player;
 import ti4.service.draft.DraftButtonService;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
@@ -58,10 +58,10 @@ public abstract class FixedNumberDraftable extends Draftable {
         List<DraftChoice> picks = draftManager.getAllPicksOfType(getType());
         Set<String> pickSet = new HashSet<>();
         for (DraftChoice choice : picks) {
-            if (pickSet.contains(choice.getChoiceKey())) {
-                return "Multiple players have chosen " + choice.getChoiceKey() + " from draftable " + getType();
+            if (pickSet.contains(choice.choiceKey())) {
+                return "Multiple players have chosen " + choice.choiceKey() + " from draftable " + getType();
             }
-            pickSet.add(choice.getChoiceKey());
+            pickSet.add(choice.choiceKey());
         }
 
         return null;

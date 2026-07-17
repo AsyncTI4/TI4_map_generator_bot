@@ -18,17 +18,19 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
-import ti4.map.persistence.GameManager;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.WormholeModel;
 import ti4.service.combat.StartCombatService;
@@ -37,8 +39,7 @@ import ti4.service.game.GameNameService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.CheckUnitContainmentService;
 
-public class FoWHelper {
-
+public final class FoWHelper {
     public static boolean isPrivateGame(GenericInteractionCreateEvent event) {
         if (event == null) {
             return false;
@@ -59,9 +60,9 @@ public class FoWHelper {
     }
 
     public static boolean isPrivateGame(
-            Game game, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel_) {
+            Game game, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel2) {
         Channel eventChannel = event == null ? null : event.getChannel();
-        Channel channel = channel_ != null ? channel_ : eventChannel;
+        Channel channel = channel2 != null ? channel2 : eventChannel;
         if (channel == null) {
             return game.isFowMode();
         }
@@ -76,7 +77,7 @@ public class FoWHelper {
             }
             game = GameManager.getManagedGame(gameName).getGame();
         }
-        if (game.isFowMode() && channel_ != null || event != null) {
+        if (game.isFowMode() && channel2 != null || event != null) {
             return channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
         }
         return false;
@@ -238,6 +239,11 @@ public class FoWHelper {
 
     public static Set<String> getAdjacentTiles(
             Game game, String position, Player player, boolean toShow, boolean includeTile) {
+        return getAdjacentTiles(game, position, player, toShow, includeTile, false);
+    }
+
+    public static Set<String> getAdjacentTiles(
+            Game game, String position, Player player, boolean toShow, boolean includeTile, boolean forDistance) {
         if (FOWPlusService.isVoid(game, position)) return new HashSet<>();
 
         Set<String> adjacentPositions = traverseAdjacencies(game, false, position);
@@ -266,11 +272,32 @@ public class FoWHelper {
             }
         }
 
-        Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player);
+        Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player, false, forDistance);
         adjacentPositions.addAll(wormholeAdjacencies);
 
         Set<String> otherAdjacencies = getNonWormholeAdjacencies(game, position);
         adjacentPositions.addAll(otherAdjacencies);
+
+        // Nexus Token Adjacency for Dreaming Throne
+        if (player != null && player.hasAbility("dream_nexus")) {
+            adjacentPositions.addAll(DreamButtonHandler.getDreamNexusAdjacencies(game, player, position));
+        }
+        if (player != null
+                && (game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")
+                        || player.hasTech("tf-starbasewebway"))
+                && player == game.getActivePlayer()
+                && forDistance
+                && !game.getCurrentActiveSystem().isEmpty()
+                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                        .contains(game.getTileByPosition(position))) {
+
+            for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
+                if (tile.getPosition().equalsIgnoreCase(position)) {
+                    continue;
+                }
+                adjacentPositions.add(tile.getPosition());
+            }
+        }
 
         // If player has ghoti commander, is active player and has activated a system
         if (player != null
@@ -319,9 +346,21 @@ public class FoWHelper {
         }
 
         if (game.isCosmicPhenomenaeMode()) {
-            if (tile.isScar()) {
+            if (tile.isScar(game)) {
                 adjToFeatures.add(Feature.scar);
             }
+        }
+
+        if (game.getActivePlayer() != null
+                && game.getActivePlayer().hasUnlockedBreakthrough("nivynbt")
+                && tile.isScar(game)) {
+            adjToFeatures.add(Feature.egress);
+        }
+
+        if (game.getActivePlayer() != null
+                && game.getActivePlayer().hasTech("tf-fraactalspikedrives")
+                && !tile.getWormholes(game).isEmpty()) {
+            adjToFeatures.add(Feature.egress);
         }
 
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
@@ -329,6 +368,7 @@ public class FoWHelper {
                 switch (token) {
                     case Constants.TOKEN_BREACH_ACTIVE -> adjToFeatures.add(Feature.breach);
                     case Constants.TOKEN_INGRESS -> adjToFeatures.add(Feature.egress);
+                    case Constants.TOKEN_EGRESS -> adjToFeatures.add(Feature.ingress);
                 }
             }
         }
@@ -340,18 +380,22 @@ public class FoWHelper {
                 continue;
             }
             if (game.isCosmicPhenomenaeMode()) {
-                if (adjToFeatures.contains(Feature.scar) && t.isScar()) {
+                if (adjToFeatures.contains(Feature.scar) && t.isScar(game)) {
                     adjacentPositions.add(t.getPosition());
                     continue;
                 }
             }
             for (UnitHolder unitHolder : t.getUnitHolders().values()) {
                 for (String token : unitHolder.getTokenList()) {
-                    if (adjToFeatures.contains(Feature.breach) && token.equals(Constants.TOKEN_BREACH_ACTIVE)) {
+                    if (adjToFeatures.contains(Feature.breach) && Constants.TOKEN_BREACH_ACTIVE.equals(token)) {
                         adjacentPositions.add(t.getPosition());
                         break;
                     }
-                    if (adjToFeatures.contains(Feature.ingress) && token.equals(Constants.TOKEN_INGRESS)) {
+                    if (adjToFeatures.contains(Feature.ingress) && Constants.TOKEN_INGRESS.equals(token)) {
+                        adjacentPositions.add(t.getPosition());
+                        break;
+                    }
+                    if (adjToFeatures.contains(Feature.egress) && Constants.TOKEN_EGRESS.equals(token)) {
                         adjacentPositions.add(t.getPosition());
                         break;
                     }
@@ -361,7 +405,7 @@ public class FoWHelper {
         return adjacentPositions;
     }
 
-    private static Set<Tile> getEmptyTiles(Game game) {
+    public static Set<Tile> getEmptyTiles(Game game) {
         Set<Tile> emptyTiles = new HashSet<>();
         Collection<Tile> tileList = game.getTileMap().values();
         List<String> frontierTileList = Mapper.getFrontierTileIds();
@@ -468,9 +512,36 @@ public class FoWHelper {
         return tiles;
     }
 
+    public static boolean isTileInExileRange(Game game, Tile tile, Player player) {
+        if (player.hasUnit("crimson_destroyer")) {
+            List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
+            for (Tile tile2 : destroyers) {
+                if (getAdjacentTiles(game, tile.getPosition(), player, false, true)
+                        .contains(tile2.getPosition())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean isTileInUpgradedExileRange(Game game, Tile tile, Player player) {
+        if (player.hasUnit("crimson_destroyer2")) {
+            List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
+            for (String adjPos : getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                for (Tile tile2 : destroyers) {
+                    if (getAdjacentTiles(game, adjPos, player, false, true).contains(tile2.getPosition())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public static boolean isTileAdjacentToAnAnomaly(Game game, String position, Player player) {
         for (String adjPos : getAdjacentTilesAndNotThisTile(game, position, player, false)) {
-            if (game.getTileByPosition(adjPos).isAnomaly(game)) {
+            if (game.getTileByPosition(adjPos).isAnomaly(game, player)) {
                 return true;
             }
         }
@@ -619,7 +690,12 @@ public class FoWHelper {
      * <p>
      * Also takes into account player abilities and agendas
      */
-    private static Set<String> getWormholeAdjacencies(Game game, String position, Player player) {
+    private static Set<String> getWormholeAdjacencies(Game game, String position, Player player, boolean neighbors) {
+        return getWormholeAdjacencies(game, position, player, neighbors, false);
+    }
+
+    private static Set<String> getWormholeAdjacencies(
+            Game game, String position, Player player, boolean neighbors, boolean forDistance) {
         Set<String> adjacentPositions = new HashSet<>();
         Set<Tile> allTiles = new HashSet<>(game.getTileMap().values());
         Tile tile = game.getTileByPosition(position);
@@ -666,7 +742,11 @@ public class FoWHelper {
 
         boolean hasQuantumEntanglement = player != null && player.hasAbility("quantum_entanglement");
 
-        if (player != null && player.hasAbility("sundered")) {
+        if (player != null
+                && player.hasAbility("sundered")
+                && player == game.getActivePlayer()
+                && forDistance
+                && !game.getCurrentActiveSystem().isEmpty()) {
             Set<String> keepers = new HashSet<>(Set.of("epsilon"));
             if (hasQuantumEntanglement || wh_recon || absol_recon) {
                 keepers.addAll(Set.of("alpha", "beta"));
@@ -694,6 +774,43 @@ public class FoWHelper {
             } else if (wormholeIDs.contains(Constants.BETA)) {
                 wormholeIDs.add(Constants.ALPHA);
             }
+        }
+
+        if (player != null
+                && player == game.getActivePlayer()
+                && !game.getCurrentActiveSystem().isEmpty()
+                && player.hasTech("lgf")
+                && !player.getPlanets().contains("mrte")
+                && !player.getPlanets().contains("mr")
+                && (tile.getUnitHolders().containsKey("mrte")
+                        || tile.getUnitHolders().containsKey("mr"))) {
+            wormholeIDs.add(Constants.BETA);
+            wormholeIDs.add(Constants.ALPHA);
+        }
+
+        if (player != null
+                && player == game.getActivePlayer()
+                && !game.getCurrentActiveSystem().isEmpty()
+                && player.hasTech("tf-lazaxgatefolding")) {
+            boolean hasUncontrolledLeg = false;
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                if (planet.isLegendary() && !player.getPlanets().contains(planet.getName())) {
+                    hasUncontrolledLeg = true;
+                }
+            }
+            if (hasUncontrolledLeg) {
+                wormholeIDs.add(Constants.BETA);
+                wormholeIDs.add(Constants.ALPHA);
+            }
+        }
+        if (!hasQuantumEntanglement
+                && !wh_recon
+                && !absol_recon
+                && forDistance
+                && ButtonHelper.isLawInPlay(game, "travel_ban")
+                && !neighbors) {
+            wormholeIDs.remove(Constants.ALPHA);
+            wormholeIDs.remove(Constants.BETA);
         }
 
         if (wormholeIDs.isEmpty()) {
@@ -757,8 +874,8 @@ public class FoWHelper {
 
         for (Player player_ : game.getRealPlayers()) {
             Set<String> tiles = new HashSet<>(tilesToCheck);
-            if (player_.hasAbility("quantum_entanglement")) {
-                tiles.addAll(getWormholeAdjacencies(game, position, player_));
+            if (player_.hasAbility("quantum_entanglement") || ButtonHelper.isLawInPlay(game, "travel_ban")) {
+                tiles.addAll(getWormholeAdjacencies(game, position, player_, true));
             }
 
             if (includeSweep && startingTile.hasCC(Mapper.getSweepID(player_.getColor()))) {
@@ -791,7 +908,7 @@ public class FoWHelper {
         }
         if (playerPlanets.stream().anyMatch(unitHolderNames::contains)) {
             return true;
-        } else if (tile.isMecatol() && player.hasIIHQ()) {
+        } else if (tile.isMecatol(game) && player.hasIIHQ()) {
             return true;
         } else if ("s11".equals(tile.getTileID()) && canSeeStatsOfFaction(game, "cabal", player)) {
             return true;
@@ -838,7 +955,7 @@ public class FoWHelper {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
-            if (unitKey != null && unitKey.getColorID().equals(colorID)) {
+            if (unitKey != null && unitKey.colorID().equals(colorID)) {
                 return true;
             }
         }
@@ -854,7 +971,7 @@ public class FoWHelper {
 
         for (UnitKey unitKey : units.keySet()) {
             if (unitKey != null
-                    && unitKey.getColorID().equals(colorID)
+                    && unitKey.colorID().equals(colorID)
                     && player.getUnitFromAsyncID(unitKey.asyncID()) != null
                     && player.getUnitFromAsyncID(unitKey.asyncID()).getIsShip()) {
                 return true;
@@ -886,7 +1003,7 @@ public class FoWHelper {
             if (p2.hasTech("ah") && ButtonHelperAgents.doesTileHaveAStructureInIt(p2, tile)) {
                 return true;
             }
-            if (p2.hasAbility("decree") && tile.isAnomaly(game)) {
+            if ((p2.hasAbility("decree") || p2.hasTech("tf-radiantsigils")) && tile.isAnomaly(game, p2)) {
                 List<Tile> tiles = new ArrayList<>();
                 tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Infantry));
                 tiles.addAll(CheckUnitContainmentService.getTilesContainingPlayersUnits(game, p2, UnitType.Mech));
@@ -918,7 +1035,7 @@ public class FoWHelper {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
-            if (unitKey != null && unitKey.getColorID().equals(colorID) && unitKey.getUnitType() == UnitType.Fighter) {
+            if (unitKey != null && unitKey.colorID().equals(colorID) && unitKey.unitType() == UnitType.Fighter) {
                 return true;
             }
         }
@@ -963,7 +1080,7 @@ public class FoWHelper {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
-            if (unitKey != null && unitKey.getColorID().equals(colorID)) {
+            if (unitKey != null && unitKey.colorID().equals(colorID)) {
                 return true;
             }
         }
@@ -979,7 +1096,7 @@ public class FoWHelper {
             Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
             for (UnitKey unitKey : units.keySet()) {
-                if (unitKey != null && unitKey.getColorID().equals(colorID)) {
+                if (unitKey != null && unitKey.colorID().equals(colorID)) {
                     return true;
                 }
             }
@@ -995,7 +1112,7 @@ public class FoWHelper {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
         for (UnitKey unitKey : units.keySet()) {
-            if (unitKey != null && unitKey.getColorID().equals(colorID) && unitKey.getUnitType() == UnitType.Infantry) {
+            if (unitKey != null && unitKey.colorID().equals(colorID) && unitKey.unitType() == UnitType.Infantry) {
                 return true;
             }
         }
@@ -1014,9 +1131,15 @@ public class FoWHelper {
         }
         // get players adjacent
         for (Player player_ : game.getRealPlayers()) {
+
+            if (message.toLowerCase().contains(player_.getColor().toLowerCase())
+                    && !message.toLowerCase()
+                            .contains("split" + player_.getColor().toLowerCase())) {
+                continue; // skip pinging players if their color is mentioned in the message
+            }
             if (getTilePositionsToShow(game, player_).contains(position)) {
-                String playerMessage = player_.getRepresentation() + " - System " + tile.getRepresentationForButtons()
-                        + " has been pinged:\n>>> " + message;
+                String playerMessage = player_.getRepresentationUnfogged() + " - System "
+                        + tile.getRepresentationForButtons() + " has been pinged:\n>>> " + message;
                 List<Button> refreshButton = viewSystemButton
                         ? StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture")
                         : new ArrayList<>();

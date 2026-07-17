@@ -6,33 +6,42 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumLeaderHandler;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Player;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.UnitEmojis;
+import ti4.service.game.EndedGameScoringGuardService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.HeroUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
 
+@UtilityClass
 public class SecretObjectiveHelper {
 
-    public static void scoreSO(
+    public static boolean scoreSO(
             GenericInteractionCreateEvent event, Game game, Player player, int soID, MessageChannel channel) {
+        if (EndedGameScoringGuardService.sendPromptIfGameEnded(game, channel)) {
+            return false;
+        }
         Set<String> alreadyScoredSO = new HashSet<>(player.getSecretsScored().keySet());
         boolean scored = game.scoreSecretObjective(player.getUserID(), soID);
         if (!scored) {
             MessageHelper.sendMessageToChannel(channel, "No such Secret Objective ID found, please retry");
-            return;
+            return false;
         }
 
         StringBuilder message = new StringBuilder(player.getRepresentation() + " scored ");
@@ -40,11 +49,12 @@ public class SecretObjectiveHelper {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
             }
+            StatusHelper.recordObjectiveScored(game, player, entry.getKey(), "SECRET");
             if (ListPlayerInfoService.getObjectiveThreshold(entry.getKey(), game) > 0) {
                 message.append(SecretObjectiveInfoService.getSecretObjectiveRepresentationNoNewLine(entry.getKey()));
                 message.append(" (")
                         .append(ListPlayerInfoService.getPlayerProgressOnObjective(entry.getKey(), game, player))
-                        .append("/")
+                        .append('/')
                         .append(ListPlayerInfoService.getObjectiveThreshold(entry.getKey(), game))
                         .append(")\n");
             } else {
@@ -61,7 +71,7 @@ public class SecretObjectiveHelper {
                 MessageHelper.sendMessageToChannel(
                         game.getActionsChannel(),
                         player.getRepresentation()
-                                + " also scored 1 VP due to Zealous Orthodoxy. Everyone will gain their commander ability.");
+                                + " also scored 1 victory point due to _Zealous Orthodoxy_. Everyone will gain their commander ability.");
                 for (Leader leaderP : player.getLeaders()) {
                     if (leaderP.getId().contains("commander")) {
                         leader = leaderP.getId();
@@ -109,7 +119,17 @@ public class SecretObjectiveHelper {
                     && !game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        "## " + game.getPing() + " a player has scored an action phase secret.");
+                        "## " + game.getPing() + ", a player has scored an Action Phase secret objective.");
+            }
+            if (Mapper.getSecretObjective(entry.getKey()) != null
+                    && Mapper.getSecretObjective(entry.getKey())
+                            .getPhase()
+                            .toLowerCase()
+                            .contains("agenda")
+                    && !game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "## " + game.getPing() + ", a player has scored an Agenda Phase secret objective.");
             }
             if ("dhw".equalsIgnoreCase(entry.getKey())) { // destroy heretical works
                 if (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() == 2) {
@@ -126,33 +146,36 @@ public class SecretObjectiveHelper {
                                 message2.append(" " + ExploreEmojis.HFrag);
                             case "irf1", "irf2", "irf3", "irf4", "irf5" -> message2.append(" " + ExploreEmojis.IFrag);
                             case "urf1", "urf2", "urf3" -> message2.append(" " + ExploreEmojis.UFrag);
-                            default -> message2.append(" ").append(fragId);
+                            default -> message2.append(' ').append(fragId);
                         }
                     }
                     CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
                     message2.append(" relic fragments.");
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2.toString());
                 } else {
-                    String finChecker = player.getFinsFactionCheckerPrefix();
+                    String factionChecker = player.factionButtonChecker();
                     List<Button> purgeFragButtons = new ArrayList<>();
                     if (player.getCrf() > 0) {
-                        Button transact = Buttons.blue(finChecker + "purge_Frags_CRF_1", "Purge 1 Cultural Fragment");
+                        Button transact =
+                                Buttons.blue(factionChecker + "purge_Frags_CRF_1", "Purge 1 Cultural Fragment");
                         purgeFragButtons.add(transact);
                     }
                     if (player.getIrf() > 0) {
                         Button transact =
-                                Buttons.green(finChecker + "purge_Frags_IRF_1", "Purge 1 Industrial Fragment");
+                                Buttons.green(factionChecker + "purge_Frags_IRF_1", "Purge 1 Industrial Fragment");
                         purgeFragButtons.add(transact);
                     }
                     if (player.getHrf() > 0) {
-                        Button transact = Buttons.red(finChecker + "purge_Frags_HRF_1", "Purge 1 Hazardous Fragment");
+                        Button transact =
+                                Buttons.red(factionChecker + "purge_Frags_HRF_1", "Purge 1 Hazardous Fragment");
                         purgeFragButtons.add(transact);
                     }
                     if (player.getUrf() > 0) {
-                        Button transact = Buttons.gray(finChecker + "purge_Frags_URF_1", "Purge 1 Frontier Fragment");
+                        Button transact =
+                                Buttons.gray(factionChecker + "purge_Frags_URF_1", "Purge 1 Frontier Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    Button transact2 = Buttons.green(finChecker + "deleteButtons", "Done Purging");
+                    Button transact2 = Buttons.green(factionChecker + "deleteButtons", "Done Purging");
                     purgeFragButtons.add(transact2);
 
                     MessageHelper.sendMessageToChannelWithButtons(
@@ -193,37 +216,53 @@ public class SecretObjectiveHelper {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
 
+        if (player.hasTech("tf-plausibled")) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
+            buttons.add(Buttons.red("deleteButtons", "Done"));
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " if another player satisfied the requirements of the SO you just scored, you can use this button to draw an SO via your plausible deniability ability.",
+                    buttons);
+        }
+
         if (player.hasTech("tf-yinascendant")) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), player.getRepresentation() + " gains 1 card due to Yin Ascendant.");
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " gains 1 splice card due to _Yin Ascendant_.");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
             buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
-            buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome (Agent)"));
-            buttons.add(Buttons.red("deleteButtons", "Done resolving"));
-            String message2 = player.getRepresentationUnfogged() + " use buttons to resolve.";
+            buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
+            buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+            String message2 = player.getRepresentationUnfogged() + ", please use these buttons to resolve.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
         CommanderUnlockCheckService.checkPlayer(player, "nomad");
-        Helper.checkEndGame(game, player);
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "lunariumcommander")) {
+            LunariumLeaderHandler.drawSO(event, game, player);
+        }
+        RevenantBreakthroughHandler.gainAttachedAgent(game, player);
+        return Helper.checkEndGame(game, player);
     }
 
-    public static void showAll(Player player, Player player_, Game game) {
+    public static void showAll(Player player, Player player2, Game game) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(game.getName()).append("\n");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Showed Secret Objectives:").append("\n");
+        sb.append("Game: ").append(game.getName()).append('\n');
+        sb.append("Player: ").append(player.getUserName()).append('\n');
+        sb.append("Showed Secret Objectives:").append('\n');
         List<String> secrets = new ArrayList<>(player.getSecrets().keySet());
         Collections.shuffle(secrets);
         for (String id : secrets) {
             sb.append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id))
-                    .append("\n");
+                    .append('\n');
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player2, sb.toString());
         MessageHelper.sendMessageToPlayerCardsInfoThread(
                 player,
                 "All secret objectives in your hand have been shown to "
-                        + (game.isFowMode() ? "someone" : player_.getRepresentationNoPing()) + ".");
+                        + (game.isFowMode() ? "someone" : player2.getRepresentationNoPing()) + ".");
     }
 
     public static List<Button> getUnscoredSecretObjectiveButtons(Player player) {
@@ -298,8 +337,8 @@ public class SecretObjectiveHelper {
         }
         currentSecrets.removeAll(game.getSoToPoList());
         StringBuilder sb = new StringBuilder();
-        sb.append("__Game: ").append(game.getName()).append("__\n");
-        sb.append("__Unscored Action Phase Secrets__:\n");
+        sb.append("## Game: ").append(game.getName()).append('\n');
+        sb.append("### Unscored Action Phase Secrets:\n");
         int index = 1;
         for (String id : currentSecrets) {
             if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Action Phase")) {
@@ -313,12 +352,12 @@ public class SecretObjectiveHelper {
                         .append(soModel.getPhase())
                         .append(" Phase\n> ")
                         .append(soModel.getText())
-                        .append("\n");
+                        .append('\n');
                 index++;
             }
         }
         index = 1;
-        sb.append("\n").append("__Unscored Status Phase Secrets__:\n");
+        sb.append('\n').append("### Unscored Status Phase Secrets:\n");
         for (String id : currentSecrets) {
             if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Status Phase")) {
                 SecretObjectiveModel soModel = Mapper.getSecretObjective(id);
@@ -331,13 +370,13 @@ public class SecretObjectiveHelper {
                         .append(soModel.getPhase())
                         .append(" Phase\n> ")
                         .append(soModel.getText())
-                        .append("\n")
+                        .append('\n')
                         .append(getSecretObjectiveProgress(game, id));
                 index++;
             }
         }
         index = 1;
-        sb.append("\n").append("Unscored Agenda Phase Secrets: ").append("\n");
+        sb.append('\n').append("### Unscored Agenda Phase Secrets: ").append('\n');
         for (String id : currentSecrets) {
             if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Agenda Phase")) {
                 SecretObjectiveModel soModel = Mapper.getSecretObjective(id);
@@ -350,7 +389,7 @@ public class SecretObjectiveHelper {
                         .append(soModel.getPhase())
                         .append(" Phase\n> ")
                         .append(soModel.getText())
-                        .append("\n")
+                        .append('\n')
                         .append(getSecretObjectiveProgress(game, id));
                 index++;
             }
@@ -365,14 +404,17 @@ public class SecretObjectiveHelper {
         }
         StringBuilder sb = new StringBuilder("> ");
         for (Player player : game.getRealPlayers()) {
+            int progress = ListPlayerInfoService.getPlayerProgressOnObjective(id, game, player);
             sb.append(player.getFactionEmoji())
                     .append(": ")
-                    .append(ListPlayerInfoService.getPlayerProgressOnObjective(id, game, player))
-                    .append("/")
+                    .append(progress)
+                    .append('/')
                     .append(threshold)
-                    .append(" ");
+                    .append(progress >= threshold ? "#" : "")
+                    .append(UnitEmojis.Blank)
+                    .append(UnitEmojis.Blank);
         }
-        sb.append("\n");
+        sb.append('\n');
         return sb.toString();
     }
 

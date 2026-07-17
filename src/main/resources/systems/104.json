@@ -1,1 +1,15 @@
-{"id":"104","name":"Lesab","aliases":["te21","lesab"],"imagePath":"104_Lesab.png","planets":["lesab"],"shipPositionsType":"TYPE04","tileBack":"blue","source":"thunders_edge"}
+{
+    "id": "104",
+    "name": "Lesab",
+    "aliases": [
+        "te21",
+        "lesab"
+    ],
+    "imagePath": "104_Lesab.png",
+    "planets": [
+        "lesab"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "blue",
+    "source": "thunders_edge"
+}

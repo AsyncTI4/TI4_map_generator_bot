@@ -5,15 +5,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitType;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.model.UnitModel;
 
-public class PdsCoverageHelper {
+public final class PdsCoverageHelper {
 
     /**
      * Calculate PDS coverage for a specific tile, returning comprehensive coverage data per faction.
@@ -24,7 +25,7 @@ public class PdsCoverageHelper {
      * @return Map of faction -> comprehensive PDS coverage data, null if no coverage
      */
     public static Map<String, PdsCoverage> calculatePdsCoverage(Game game, Tile tile) {
-        if (game.isFowMode() || tile.getTileModel().isHyperlane()) {
+        if (game.isFowMode() || tile.getTileModel().isHyperlane() || tile.isScar()) {
             return null;
         }
 
@@ -42,6 +43,11 @@ public class PdsCoverageHelper {
                     diceCount.add(8 - mod);
                 }
             }
+            if (player.hasTech("tf-kinematicstarfall")) {
+                for (int i = checkNumberNonFighterShipsWithoutSpaceCannon(player, tile); i > 0; i--) {
+                    diceCount.add(9 - mod);
+                }
+            }
 
             // Check adjacent tiles for PDS coverage
             for (String adjTilePos : FoWHelper.getAdjacentTiles(game, tilePos, player, false, true)) {
@@ -49,11 +55,17 @@ public class PdsCoverageHelper {
                 if (adjTile == null) {
                     continue;
                 }
+                if (adjTile.isScar()) {
+                    continue;
+                }
+                if (TeHelperUnits.affectedByQuietus(game, player, adjTile)) {
+                    continue;
+                }
                 boolean sameTile = tilePos.equalsIgnoreCase(adjTilePos);
 
                 for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
                     // Check for Imperial II HQ on Mecatol Rex
-                    if (sameTile && Constants.MECATOLS.contains(unitHolder.getName())) {
+                    if (sameTile && game.mecatols().contains(unitHolder.getName())) {
                         if (player.controlsMecatol(false) && player.getPlanets().contains("custodiavigilia")) {
                             diceCount.add(5 - mod);
                         }
@@ -67,7 +79,7 @@ public class PdsCoverageHelper {
                         }
 
                         Units.UnitKey unitKey = unitEntry.getKey();
-                        if (game.getPlayerByColorID(unitKey.getColorID()).orElse(null) != player) {
+                        if (game.getPlayerByColorID(unitKey.colorID()).orElse(null) != player) {
                             continue;
                         }
 

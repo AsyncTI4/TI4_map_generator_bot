@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 
@@ -24,9 +24,9 @@ public class ValefarZService {
             MessageHelper.sendMessageToChannel(nekro.getCorrectChannel(), "Target has no flagship...?");
             return;
         }
-        String ability = fs.getAbility().orElse(fs.getName() + " has no text ability, womp womp");
-        String msg = "Placed a Valefar Z token on " + faction + "'s flagship, " + fs.getNameRepresentation()
-                + ", gaining the ability:\n> " + ability;
+        String ability = fs.getAbility().orElse("Cataclysmic Error: " + fs.getName() + " has no text ability.");
+        String msg = "Placed a Valefar Z token on the " + faction + " flagship, " + fs.getNameRepresentation()
+                + ", gaining this ability:\n> " + ability;
 
         game.setStoredValue("valefarZ", game.getStoredValue("valefarZ") + faction + "|");
         MessageHelper.sendMessageToChannel(nekro.getCorrectChannel(), msg);
@@ -47,6 +47,30 @@ public class ValefarZService {
             }
         }
         return false;
+    }
+
+    public List<String> getFlagshipAbilitys(Game game, Player player) {
+        List<String> abilities = new ArrayList<>();
+        if (player == null) return abilities;
+        for (String fs : player.getUnitsOwned()) {
+            if (fs.contains("_flagship")) {
+                abilities.add(fs);
+            }
+        }
+        // Check for Valefar Z
+        if (player.hasUnlockedBreakthrough("nekrobt")) {
+            String valefarZ = game.getStoredValue("valefarZ");
+            for (Player p : game.getPlayers().values()) {
+                if (valefarZ.contains(p.getFaction())) {
+                    for (String fs : p.getUnitsOwned()) {
+                        if (fs.contains("_flagship")) {
+                            abilities.add(fs);
+                        }
+                    }
+                }
+            }
+        }
+        return abilities;
     }
 
     public boolean hasAnyFlagshipAbility(Game game, Player player, String... flagships) {

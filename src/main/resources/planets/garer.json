@@ -1,0 +1,109 @@
+{
+    "id": "garer",
+    "tileId": "nf3",
+    "name": "Garer",
+    "aliases": [
+        "garer"
+    ],
+    "positionInTile": {
+        "x": 257.0,
+        "y": 136.0
+    },
+    "resources": 1,
+    "influence": 1,
+    "factionHomeworld": "explanetary",
+    "planetType": "FACTION",
+    "cardImagePath": null,
+    "techSpecialties": [
+        "WARFARE"
+    ],
+    "legendaryAbilityName": null,
+    "legendaryAbilityText": null,
+    "unitPositions": {
+        "unitHolderName": "garer",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 249.0,
+                    "y": 125.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 226.0,
+                    "y": 98.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 254.0,
+                    "y": 152.0
+                },
+                {
+                    "x": 271.0,
+                    "y": 152.0
+                },
+                {
+                    "x": 288.0,
+                    "y": 152.0
+                },
+                {
+                    "x": 263.0,
+                    "y": 163.0
+                },
+                {
+                    "x": 281.0,
+                    "y": 163.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 256.0,
+                    "y": 81.0
+                },
+                {
+                    "x": 274.0,
+                    "y": 81.0
+                },
+                {
+                    "x": 249.0,
+                    "y": 94.0
+                },
+                {
+                    "x": 267.0,
+                    "y": 94.0
+                },
+                {
+                    "x": 285.0,
+                    "y": 94.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 268.0,
+                    "y": 122.0
+                },
+                {
+                    "x": 235.0,
+                    "y": 122.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 308.0,
+                    "y": 92.0
+                },
+                {
+                    "x": 316.0,
+                    "y": 123.0
+                },
+                {
+                    "x": 308.0,
+                    "y": 154.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "source": "nomadfalcon"
+}

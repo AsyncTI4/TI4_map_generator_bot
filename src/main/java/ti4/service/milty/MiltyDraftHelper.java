@@ -17,6 +17,11 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
@@ -24,13 +29,8 @@ import ti4.image.ImageHelper;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
@@ -296,8 +296,10 @@ public class MiltyDraftHelper {
                 ComponentSource.codex3,
                 ComponentSource.codex4,
                 ComponentSource.pok));
-        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+        if (game.isDiscordantStarsMode()) {
             sources.add(ComponentSource.ds);
+        }
+        if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
@@ -360,8 +362,14 @@ public class MiltyDraftHelper {
 
             MiltyDraftTile draftTile = getDraftTileFromModel(tileModel);
             draftManager.addDraftTile(draftTile);
-            // System.out.println("yes");
         }
+    }
+
+    public static void addDraftTile(MiltyDraftManager manager, String tileID) {
+        TileModel model = TileHelper.getTileById(tileID);
+        if (model == null) return;
+        MiltyDraftTile draftTile = getDraftTileFromModel(model);
+        manager.addDraftTile(draftTile);
     }
 
     private static boolean isInvalid(TileModel tileModel) {
@@ -436,17 +444,16 @@ public class MiltyDraftHelper {
     }
 
     // TODO (Jazz): add map template
-    public static List<MiltyDraftSlice> parseSlicesFromString(
-            String sliceString, List<ComponentSource> allowedSources) {
+    public static List<MiltyDraftSlice> parseSlices(String input, List<ComponentSource> sources) throws Exception {
         try {
-            sliceString = sliceString.replace("|", ";");
+            input = input.replace("|", ";");
             MiltyDraftManager manager = new MiltyDraftManager();
-            manager.init(allowedSources);
-            manager.loadSlicesFromString(sliceString);
+            manager.init(sources);
+            manager.loadSlicesFromString(input);
             return manager.getSlices();
         } catch (Exception e) {
             BotLogger.error("invalid slice string", e);
-            return null;
+            throw e;
         }
     }
 }

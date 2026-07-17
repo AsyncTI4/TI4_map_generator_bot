@@ -1,21 +1,25 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.UnitHolder;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Units;
+import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.UnitHolder;
 import ti4.model.Source.ComponentSource;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.ExploreEmojis;
@@ -36,6 +40,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private String upgradesToUnitId;
     private String requiredTechId;
     private String faction;
+    private Boolean isUpgrade;
     private List<String> eligiblePlanetTypes;
     private int moveValue;
     private int productionValue;
@@ -64,6 +69,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private Boolean isSpaceOnly;
     private Boolean isPlanetOnly;
     private String ability;
+    private String notes;
     private String flavourText;
     private String unlock; // for Flagshipping homebrew
     private String homebrewReplacesID;
@@ -153,7 +159,11 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         if (!getValuesText().isEmpty()) eb.addField("Values:", getValuesText(), true);
         if (!getDiceText().isEmpty()) eb.addField("Dice Rolls:", getDiceText(), true);
         if (!getOtherText().isEmpty()) eb.addField("Traits:", getOtherText(), true);
-        if (getAbility().isPresent()) eb.addField("Ability:", getAbility().get(), false);
+        if (notes != null) {
+            eb.addField("Ability:", getAbility().orElse("") + "\n-# [" + notes + "]", false);
+        } else if (getAbility().isPresent()) {
+            eb.addField("Ability:", getAbility().get(), false);
+        }
         if (getUnlock().isPresent()) eb.addField("Unlock:", getUnlock().get(), false);
         // if (getImageURL() != null) eb.setThumbnail(getImageURL());
 
@@ -163,10 +173,16 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
+        return getNameRepresentation(null);
+    }
+
+    public String getNameRepresentation(UnitState state) {
         String factionEmoji = getFaction().isEmpty() ? "" : getFactionEmoji().toString();
         TI4Emoji unitEmoji = getUnitEmoji();
         String name = this.name == null ? "" : this.name;
-        return factionEmoji + unitEmoji + " " + name + " " + getSourceEmoji();
+        String stateStr =
+                (state == null || state == UnitState.none) ? "" : (state.stateEmoji() + " " + state.humanDescr());
+        return stateStr + " " + factionEmoji + " " + unitEmoji + " _" + name + "_ " + getSourceEmoji();
     }
 
     private String getSourceEmoji() {
@@ -187,16 +203,16 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             case combatround -> getCombatDieCount();
             case AFB -> getAfbDieCount(player);
             case bombardment -> getBombardDieCount(player);
-            case SpaceCannonOffence -> getSpaceCannonDieCount(player);
-            case SpaceCannonDefence -> getSpaceCannonDieCount(player);
+            case SpaceCannonOffence, SpaceCannonDefence -> getSpaceCannonDieCount(player);
         };
     }
 
     public int getAfbDieCount(Player player) {
-        if (player.hasRelic("metalivoidarmaments") && afbDieCount == 0) return 3;
-        if (capacityValue > 0
-                && player.getFaction().equalsIgnoreCase(player.getGame().getStoredValue("ShrapnelTurretsFaction"))
-                && getExpectedAfbHits() < 0.6) {
+        return getAfbDieCount(player, true);
+    }
+
+    private int getAfbDieCount(Player player, boolean allowShrapnelTurrets) {
+        if (allowShrapnelTurrets && shouldUseShrapnelTurrets(player)) {
             return 2;
         }
         if (afbDieCount == 0
@@ -204,11 +220,36 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
                 && player.getGame().playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
             return 1;
         }
+        if (afbDieCount == 0 && "pinktf_flagship".equalsIgnoreCase(id)) {
+            UnitModel dd = player.getUnitByType(UnitType.Destroyer);
+            UnitModel ca = player.getUnitByType(UnitType.Cruiser);
+            UnitModel dn = player.getUnitByType(UnitType.Dreadnought);
+            return Stream.of(dd, ca, dn)
+                    .filter(UnitModel::getIsUpgrade)
+                    .max(Comparator.comparing(m -> m.getExpectedAfbHits(player, allowShrapnelTurrets)))
+                    .map(m -> m.getAfbDieCount(player, allowShrapnelTurrets))
+                    .orElse(0);
+        }
         return afbDieCount;
     }
 
-    private double getExpectedAfbHits() {
-        return afbDieCount * ((10 - afbHitsOn) / 10.0d);
+    private double getExpectedAfbHits(Player player) {
+        return getExpectedAfbHits(player, true);
+    }
+
+    private double getExpectedAfbHits(Player player, boolean allowShrapnelTurrets) {
+        return getAfbDieCount(player, allowShrapnelTurrets)
+                * ((10 - getAfbHitsOn(player, allowShrapnelTurrets)) / 10.0d);
+    }
+
+    private boolean shouldUseShrapnelTurrets(Player player) {
+        return capacityValue > 0
+                && player.getFaction().equalsIgnoreCase(player.getGame().getStoredValue("ShrapnelTurretsFaction"))
+                && getExpectedAfbHits(player, false) < 0.6;
+    }
+
+    private double getExpectedBombardHits(Player player) {
+        return getBombardDieCount(player) * ((10 - getBombardHitsOn(player)) / 10.0d);
     }
 
     private boolean isWarsunOrDreadnought() {
@@ -229,6 +270,9 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         if (player.hasUnit("ralnel_destroyer2") && "destroyer".equalsIgnoreCase(baseType)) {
             return 1;
         }
+        if (player.hasUnit("tk-shellofloncara") && "flagship".equalsIgnoreCase(baseType)) {
+            return 3;
+        }
 
         return spaceCannonDieCount;
     }
@@ -247,14 +291,18 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
                 return 6;
             }
         }
+        if (player.hasUnit("tk-shellofloncara") && "flagship".equalsIgnoreCase(baseType)) {
+            return 5;
+        }
         return spaceCannonHitsOn;
     }
 
     public int getAfbHitsOn(Player player) {
-        if (player.hasRelic("metalivoidarmaments") && afbHitsOn == 0) return 6;
-        if (capacityValue > 0
-                && player.getGame().getStoredValue("ShrapnelTurretsFaction").equalsIgnoreCase(player.getFaction())
-                && getExpectedAfbHits() < 0.6) {
+        return getAfbHitsOn(player, true);
+    }
+
+    private int getAfbHitsOn(Player player, boolean allowShrapnelTurrets) {
+        if (allowShrapnelTurrets && shouldUseShrapnelTurrets(player)) {
             return 8;
         }
         if (afbDieCount == 0
@@ -262,10 +310,30 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
                 && player.getGame().playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
             return 5;
         }
+        if (afbDieCount == 0 && "pinktf_flagship".equalsIgnoreCase(id)) {
+            UnitModel dd = player.getUnitByType(UnitType.Destroyer);
+            UnitModel ca = player.getUnitByType(UnitType.Cruiser);
+            UnitModel dn = player.getUnitByType(UnitType.Dreadnought);
+            return Stream.of(dd, ca, dn)
+                    .filter(UnitModel::getIsUpgrade)
+                    .max(Comparator.comparing(m -> m.getExpectedAfbHits(player, allowShrapnelTurrets)))
+                    .map(model -> model.getAfbHitsOn(player, allowShrapnelTurrets))
+                    .orElse(0);
+        }
         return afbHitsOn;
     }
 
     public int getBombardDieCount(Player player) {
+        if ("pinktf_flagship".equalsIgnoreCase(id)) {
+            UnitModel dd = player.getUnitByType(UnitType.Destroyer);
+            UnitModel ca = player.getUnitByType(UnitType.Cruiser);
+            UnitModel dn = player.getUnitByType(UnitType.Dreadnought);
+            return Stream.of(dd, ca, dn)
+                    .filter(UnitModel::getIsUpgrade)
+                    .max(Comparator.comparing(m -> m.getExpectedBombardHits(player)))
+                    .map(m -> m.getBombardDieCount(player))
+                    .orElse(0);
+        }
         if (!player.getGame().getStoredValue("BlitzFaction").equalsIgnoreCase(player.getFaction())) {
             if (player.getGame().getStoredValue("TnelisAgentFaction").equalsIgnoreCase(player.getFaction())
                     && bombardDieCount == 0
@@ -283,6 +351,16 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     private int getBombardHitsOn(Player player) {
+        if ("pinktf_flagship".equalsIgnoreCase(id)) {
+            UnitModel dd = player.getUnitByType(UnitType.Destroyer);
+            UnitModel ca = player.getUnitByType(UnitType.Cruiser);
+            UnitModel dn = player.getUnitByType(UnitType.Dreadnought);
+            return Stream.of(dd, ca, dn)
+                    .filter(UnitModel::getIsUpgrade)
+                    .max(Comparator.comparing(m -> m.getExpectedBombardHits(player)))
+                    .map(m -> m.getBombardHitsOn(player))
+                    .orElse(0);
+        }
         if (!player.getGame().getStoredValue("BlitzFaction").equalsIgnoreCase(player.getFaction())) {
             if (player.getGame().getStoredValue("TnelisAgentFaction").equalsIgnoreCase(player.getFaction())
                     && bombardDieCount == 0
@@ -313,8 +391,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             case combatround -> getCombatHitsOn();
             case AFB -> getAfbHitsOn(player);
             case bombardment -> getBombardHitsOn(player);
-            case SpaceCannonOffence -> getSpaceCannonHitsOn(player);
-            case SpaceCannonDefence -> getSpaceCannonHitsOn(player);
+            case SpaceCannonOffence, SpaceCannonDefence -> getSpaceCannonHitsOn(player);
         };
     }
 
@@ -323,8 +400,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             case combatround -> getCombatHitsOn();
             case AFB -> getAfbHitsOn(player);
             case bombardment -> getBombardHitsOn(player);
-            case SpaceCannonOffence -> getSpaceCannonHitsOn(player);
-            case SpaceCannonDefence -> getSpaceCannonHitsOn(player);
+            case SpaceCannonOffence, SpaceCannonDefence -> getSpaceCannonHitsOn(player);
         };
     }
 
@@ -454,7 +530,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
         sb.append(name).append(" (");
-        if (getFaction().isPresent()) sb.append(getFaction().get()).append(" ");
+        if (getFaction().isPresent()) sb.append(getFaction().get()).append(' ');
         sb.append(baseType).append(") [");
         sb.append(source).append("]");
         return sb.toString();
@@ -467,7 +543,10 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             }
         }
         if (player.hasUnit("ralnel_destroyer2") && "destroyer".equalsIgnoreCase(baseType)) {
-            return player.hasTech("pds2");
+            return false;
+        }
+        if (player.hasUnit("tk-shellofloncara") && "flagship".equalsIgnoreCase(baseType)) {
+            return true;
         }
         return getDeepSpaceCannon();
     }
@@ -515,6 +594,11 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(isShip).orElse(false);
     }
 
+    @JsonIgnore
+    public boolean isNonFighterShip() {
+        return getIsShip() && getUnitType() != UnitType.Fighter;
+    }
+
     public boolean getIsSpaceOnly() {
         return Optional.ofNullable(isSpaceOnly).orElse(getIsShip());
     }
@@ -529,6 +613,13 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getUpgradesToUnitId() {
         return Optional.ofNullable(upgradesToUnitId);
+    }
+
+    public boolean getIsUpgrade() {
+        if (isUpgrade != null) {
+            return isUpgrade;
+        }
+        return upgradesFromUnitId != null;
     }
 
     public Optional<String> getRequiredTechId() {

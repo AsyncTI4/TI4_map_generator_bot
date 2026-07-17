@@ -10,13 +10,14 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.RelicModel;
@@ -41,7 +42,7 @@ public class RelicHelper {
                     .append(relicData.getName())
                     .append("_: ")
                     .append(relicData.getText())
-                    .append("\n");
+                    .append('\n');
         }
         String msg = player.getRepresentationUnfogged()
                 + ", please choose the relic that you wish to draw. The relic text is reproduced for your convenience.";
@@ -95,6 +96,9 @@ public class RelicHelper {
                 player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
         resolveRelicEffects(event, game, player, relicID);
         TeHelperUnits.serveIconoclastDeployAbility(game, player);
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")) {
+            OnyxxaLeaderHandler.onDrawRelic(player);
+        }
 
         if (checked) game.shuffleRelics();
     }
@@ -116,7 +120,7 @@ public class RelicHelper {
                     game.drawSecretObjective(player.getUserID());
                     helpMessage.append(" Drew a second secret objective due to **Plausible Deniability**.");
                 }
-                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
             }
             case "shard" -> {
                 Integer poIndex = game.addCustomPO("Shard of the Throne", 1);
@@ -127,8 +131,9 @@ public class RelicHelper {
                         .append(" scored _Shard of the Throne_.");
             }
             case "quantumcore" -> {
-                if (player.getBreakthroughID() != null && !player.isBreakthroughUnlocked() && game.isThundersEdge()) {
-                    BreakthroughCommandHelper.unlockBreakthrough(game, player);
+                String primaryBT = player.getBreakthroughID();
+                if (primaryBT != null && !player.isBreakthroughUnlocked(primaryBT) && game.isThundersEdge()) {
+                    BreakthroughCommandHelper.unlockAllBreakthroughs(game, player);
                 }
             }
             case "thetriad" -> {
@@ -137,7 +142,7 @@ public class RelicHelper {
                 Planet triad = game.getPlanetsInfo().get("triad");
                 if (triad != null) triad.updateTriadStats(player);
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(), "Added the Triad \"planet card\" to your play area.");
+                        player.getCorrectChannel(), "Added the Triad \"planet\" card to your play area.");
             }
 
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
@@ -209,29 +214,21 @@ public class RelicHelper {
                 }
             }
         }
-
+        CommanderUnlockCheckService.checkPlayer(player, "argent");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), helpMessage.toString());
         Helper.checkEndGame(game, player);
     }
 
     /** Meant to be called AFTER removing the relic from the player */
-    public void resolveRelicLossEffects(GenericInteractionCreateEvent event, Game game, Player p1, String relicID) {
-        // HANDLE LOSING SHARD OF THE THRONE
+    public void resolveRelicLossEffects(Game game, Player p1, String relicID) {
         String shardCustomPOName = null;
-        Integer shardPublicObjectiveID = null;
         switch (relicID) {
-            case "shard" -> {
-                shardCustomPOName = "Shard of the Throne";
-                shardPublicObjectiveID = game.getRevealedPublicObjectives().get(shardCustomPOName);
-            }
+            case "shard" -> shardCustomPOName = "Shard of the Throne";
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
                 int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
                 shardCustomPOName = "Shard of the Throne (" + absolShardNum + ")";
-                shardPublicObjectiveID = game.getRevealedPublicObjectives().get(shardCustomPOName);
             }
-            case "thetriad" -> {
-                p1.removePlanet("triad");
-            }
+            case "thetriad" -> p1.removePlanet("triad");
             case "obsidian", "absol_obsidian" -> {
                 if (p1.getSoScored() > p1.getMaxSOCount()) {
                     // do something for 4 scored secrets
@@ -240,11 +237,8 @@ public class RelicHelper {
             }
         }
 
-        if (shardCustomPOName != null
-                && shardPublicObjectiveID != null
-                && game.getCustomPublicVP().containsKey(shardCustomPOName)
-                && game.getCustomPublicVP().containsValue(shardPublicObjectiveID)) {
-            game.unscorePublicObjective(p1.getUserID(), shardPublicObjectiveID);
+        if (shardCustomPOName != null && game.getCustomPublicVP().containsKey(shardCustomPOName)) {
+            game.unscorePublicObjective(p1.getUserID(), shardCustomPOName);
             String msg = p1.getRepresentation() + " lost 1 point due to losing _" + shardCustomPOName + "_.";
             MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), msg);
         }
@@ -279,12 +273,10 @@ public class RelicHelper {
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), message);
         }
-        CommanderUnlockCheckService.checkPlayer(receiver, "kollecc", "bentor");
+        CommanderUnlockCheckService.checkPlayer(receiver, "kollecc", "bentor", "kairn");
 
         if (game.isFowMode()) {
-            String fail = "User for faction not found. Report to ADMIN";
-            String success = "The other player has been notified";
-            MessageHelper.sendPrivateMessageToPlayer(receiver, game, event, message, fail, success);
+            MessageHelper.sendMessageToChannel(receiver.getPrivateChannel(), message);
 
             // Add extra message for transaction visibility
             FoWHelper.pingPlayersTransaction(game, event, sender, receiver, fragString, null);
@@ -317,7 +309,7 @@ public class RelicHelper {
             int x = 1;
             for (String relicId : allRelics) {
                 String relicName = Mapper.getRelic(relicId).getName();
-                text.append("\n")
+                text.append('\n')
                         .append(x)
                         .append(". ")
                         .append(ExploreEmojis.Relic)

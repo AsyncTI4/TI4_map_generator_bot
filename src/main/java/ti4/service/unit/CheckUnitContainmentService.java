@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.Units;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
 
 @UtilityClass
 public class CheckUnitContainmentService {
@@ -17,7 +17,7 @@ public class CheckUnitContainmentService {
         Collections.addAll(unitTypes, type);
 
         return game.getTileMap().values().stream()
-                .filter(t -> t.containsPlayersUnitsWithKeyCondition(p1, unit -> unitTypes.contains(unit.getUnitType())))
+                .filter(t -> t.containsPlayersUnitsWithKeyCondition(p1, unit -> unitTypes.contains(unit.unitType())))
                 .toList();
     }
 }

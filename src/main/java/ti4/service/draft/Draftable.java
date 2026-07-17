@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
 
 public abstract class Draftable extends DraftLifecycleHooks {
@@ -30,7 +30,7 @@ public abstract class Draftable extends DraftLifecycleHooks {
     public final DraftChoice getDraftChoice(String choiceKey) {
         List<DraftChoice> allChoices = getAllDraftChoices();
         for (DraftChoice choice : allChoices) {
-            if (choice.getChoiceKey().equals(choiceKey)) {
+            if (choice.choiceKey().equals(choiceKey)) {
                 return choice;
             }
         }
@@ -41,9 +41,9 @@ public abstract class Draftable extends DraftLifecycleHooks {
      * Get all the draft choices that are available to this draft, just they keys.
      * @return A list of all draft choice keys.
      */
-    public final Set<String> getAllDraftChoiceKeys() {
+    private Set<String> getAllDraftChoiceKeys() {
         List<DraftChoice> allChoices = getAllDraftChoices();
-        return allChoices.stream().map(DraftChoice::getChoiceKey).collect(Collectors.toSet());
+        return allChoices.stream().map(DraftChoice::choiceKey).collect(Collectors.toSet());
     }
 
     // Interaction info
@@ -116,8 +116,8 @@ public abstract class Draftable extends DraftLifecycleHooks {
      */
     public String isValidDraftChoice(DraftManager draftManager, String playerUserId, DraftChoice choice) {
         Set<String> allChoiceKeys = getAllDraftChoiceKeys();
-        if (!allChoiceKeys.contains(choice.getChoiceKey())) {
-            return "The choiceKey " + choice.getChoiceKey() + " is not valid for draftable type " + getType();
+        if (!allChoiceKeys.contains(choice.choiceKey())) {
+            return "The choiceKey " + choice.choiceKey() + " is not valid for draftable type " + getType();
         }
         return null;
     }
@@ -184,7 +184,7 @@ public abstract class Draftable extends DraftLifecycleHooks {
     /**
      * Separator used in save/load strings.
      */
-    public static final String SAVE_SEPARATOR = ",";
+    protected static final String SAVE_SEPARATOR = ",";
     /**
      * Serialize any state that this draftable needs to persist.
      * Ex. the number of seats in a SeatDraftable.

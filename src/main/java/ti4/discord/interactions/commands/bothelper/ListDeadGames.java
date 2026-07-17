@@ -1,0 +1,134 @@
+package ti4.discord.interactions.commands.bothelper;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.commands.Subcommand;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
+import ti4.helpers.Constants;
+import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
+
+class ListDeadGames extends Subcommand {
+
+    private static final String WARNING_MESSAGE = " this is a warning that this game will be cleaned up tomorrow, "
+            + "unless someone takes a turn. You can ignore this if you want it deleted. Ping Fin if this should not be done.";
+
+    ListDeadGames() {
+        super(Constants.LIST_DEAD_GAMES, "List games that haven't moved in 2+ months but still have channels");
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Delete with with DELETE, otherwise warning")
+                .setRequired(true));
+    }
+
+    public void execute(SlashCommandInteractionEvent event) {
+        OptionMapping option = event.getOption(Constants.CONFIRM);
+        boolean delete = "DELETE".equals(option.getAsString());
+        StringBuilder sb = new StringBuilder("Dead Channels\n");
+        StringBuilder sb2 = new StringBuilder("Dead Roles\n");
+        int channelCount = 0;
+        int roleCount = 0;
+        for (ManagedGame game : GameManager.getManagedGames()) {
+            LocalDate now = LocalDate.now();
+            LocalDate gameCreationDay = Instant.ofEpochMilli(game.getCreationDateTime())
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+            if (Math.abs(ChronoUnit.DAYS.between(now, gameCreationDay)) < 30
+                    || !game.getName().contains("pbd")
+                    || game.getName().contains("test")) {
+                continue;
+            }
+            if (game.getName().contains("pbd1000")
+                    || game.getName().contains("pbd2863")
+                    || game.getName().contains("pbd3000")
+                    || "pbd104".equalsIgnoreCase(game.getName())
+                    || "pbd100".equalsIgnoreCase(game.getName())
+                    || "pbd100two".equalsIgnoreCase(game.getName())) {
+                continue;
+            }
+            long milliSinceLastTurnChange = System.currentTimeMillis() - game.getLastActivePlayerChange();
+
+            // TODO: we really shouldn't use these magical numbers.
+            if (game.isHasEnded()
+                    && game.getEndedDate() < game.getLastActivePlayerChange()
+                    && milliSinceLastTurnChange < 1259600000L) {
+                continue;
+            }
+            if (game.isHasEnded() || milliSinceLastTurnChange > 5259600000L) {
+                if (game.getMainGameChannel() != null) {
+                    channelCount += sendMessageToChannel(game, sb, delete);
+                }
+                Guild guild = game.getGuild();
+                if (guild == null) {
+                    continue;
+                }
+                Role r = null;
+                for (Role role : guild.getRoles()) {
+                    if (game.getName().equals(role.getName().toLowerCase())) {
+                        sb2.append(role.getName()).append('\n');
+                        r = role;
+                        roleCount++;
+                        break;
+                    }
+                }
+                if (r != null && delete) {
+                    r.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+                }
+            }
+        }
+        MessageHelper.sendMessageToChannel(event.getChannel(), sb + "Channel Count = " + channelCount);
+        MessageHelper.sendMessageToChannel(event.getChannel(), sb2 + "Role Count =" + roleCount);
+    }
+
+    private static int sendMessageToChannel(ManagedGame game, StringBuilder sb, boolean delete) {
+        var mainGameChannel = game.getMainGameChannel();
+        if (mainGameChannel == null || !mainGameChannel.getName().equalsIgnoreCase(game.getName() + "-actions")) {
+            return 0;
+        }
+
+        boolean warned = false;
+        int channelCount = 0;
+
+        if (JdaService.getAvailablePBDCategories().contains(mainGameChannel.getParentCategory())
+                && mainGameChannel.getParentCategory() != null
+                && !mainGameChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
+            sb.append(mainGameChannel.getJumpUrl()).append('\n');
+            channelCount++;
+            if (delete) {
+                mainGameChannel.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            } else {
+                warned = true;
+                // MessageHelper.sendMessageToChannel(mainGameChannel, ManagedGameService.getPingAllPlayers(game) +
+                // WARNING_MESSAGE);
+            }
+        }
+
+        var tableTalkChannel = game.getTableTalkChannel();
+        if (tableTalkChannel != null
+                && JdaService.getAvailablePBDCategories().contains(tableTalkChannel.getParentCategory())
+                && tableTalkChannel.getParentCategory() != null
+                && !tableTalkChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
+            if (tableTalkChannel.getName().contains(game.getName() + "-")) {
+                sb.append(tableTalkChannel.getJumpUrl()).append('\n');
+                channelCount++;
+                if (delete) {
+                    tableTalkChannel.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+                } else if (!warned) {
+                    // MessageHelper.sendMessageToChannel(mainGameChannel, ManagedGameService.getPingAllPlayers(game) +
+                    // WARNING_MESSAGE);
+                }
+            }
+        }
+
+        return channelCount;
+    }
+}

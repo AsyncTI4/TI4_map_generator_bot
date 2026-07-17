@@ -6,14 +6,15 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
+import ti4.draft.DraftCategory;
+import ti4.game.Player;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.BreakthroughHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
 import ti4.model.GenericCardModel;
@@ -29,9 +30,15 @@ public class FrankenAbilityService {
                 sb.append("> ").append(abilityID).append(" (player had this ability)");
             } else {
                 AbilityModel abilityModel = Mapper.getAbility(abilityID);
-                sb.append("> ").append(abilityModel.getRepresentation());
+                sb.append("> ")
+                        .append(FrankenAlternateTextService.getRepresentationWithAlternateText(
+                                player.getGame(),
+                                DraftCategory.ABILITY,
+                                abilityID,
+                                abilityModel.getNameRepresentation(),
+                                abilityModel.getRepresentation()));
             }
-            sb.append("\n");
+            sb.append('\n');
             player.addAbility(abilityID);
             if ("cunning".equalsIgnoreCase(abilityID)) {
                 Map<String, GenericCardModel> traps = Mapper.getTraps();
@@ -43,11 +50,8 @@ public class FrankenAbilityService {
                 }
             }
             if ("puppetsoftheblade".equalsIgnoreCase(abilityID)) {
-                List<GenericCardModel> allPlots =
-                        new ArrayList<>(Mapper.getPlots().values());
-                allPlots.forEach(plot -> player.setPlotCard(plot.getAlias()));
+                // Do not set up all plots automatically
             }
-
             if ("private_fleet".equalsIgnoreCase(abilityID)) {
                 String unitID = AliasHandler.resolveUnit("destroyer");
                 player.setUnitCap(unitID, 12);
@@ -66,10 +70,10 @@ public class FrankenAbilityService {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
-                                + ", I have automatically set all of your Policies to the positive side, but you can flip any of them now with these buttons.");
-                ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
-                ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
-                ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
+                                + ", the bot has automatically set all of your Policies to the positive side, but you can flip any of them now with these buttons.");
+                ButtonHelperHeroes.offerOlradinHeroFlips(player);
+                ButtonHelperHeroes.offerOlradinHeroFlips(player);
+                ButtonHelperHeroes.offerOlradinHeroFlips(player);
             }
             if ("industrialists".equalsIgnoreCase(abilityID)) {
                 String unitID = AliasHandler.resolveUnit("spacedock");
@@ -97,9 +101,6 @@ public class FrankenAbilityService {
                         "Set mech unit maximum to 6 for " + player.getRepresentation()
                                 + ", due to their **Machine Cult** ability.");
             }
-            if ("yin_breakthrough".equalsIgnoreCase(abilityID)) {
-                BreakthroughHelper.resolveYinBreakthroughAbility(player.getGame(), player);
-            }
             if ("diplomats".equalsIgnoreCase(abilityID)) {
                 ButtonHelperAbilities.resolveFreePeopleAbility(player.getGame());
                 MessageHelper.sendMessageToChannel(
@@ -118,8 +119,11 @@ public class FrankenAbilityService {
                         player.getRepresentation() + ", please place up to 14 Tomb tokens for **Ancient Empire**.",
                         buttons);
             }
+            if ("primordial_secrets".equalsIgnoreCase(abilityID)) {
+                ArcanumAbilityHandler.offerPrimordialSecretsButtons(player.getGame(), player);
+            }
         }
-        MessageHelper.sendMessageToEventChannel(event, sb.toString());
+        MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
 
     public static void removeAbilities(GenericInteractionCreateEvent event, Player player, List<String> abilityIDs) {
@@ -130,9 +134,9 @@ public class FrankenAbilityService {
             } else {
                 sb.append("> ").append(abilityID);
             }
-            sb.append("\n");
+            sb.append('\n');
             player.removeAbility(abilityID);
         }
-        MessageHelper.sendMessageToEventChannel(event, sb.toString());
+        MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
 }

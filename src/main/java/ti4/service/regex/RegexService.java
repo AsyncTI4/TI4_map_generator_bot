@@ -4,14 +4,16 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import ti4.helpers.Constants;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
-public class RegexService {
+public final class RegexService {
 
+    @FunctionalInterface
     public interface CheckedConsumer<T> {
         void accept(T m) throws Exception;
     }
 
+    @FunctionalInterface
     public interface CheckedPredicate<T> {
         boolean accept(T m) throws Exception;
     }

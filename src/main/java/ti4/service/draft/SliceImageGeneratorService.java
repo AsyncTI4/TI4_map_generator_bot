@@ -14,15 +14,15 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.UnitHolder;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.UnitHolder;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.service.draft.draftables.FactionDraftable;
@@ -69,7 +69,7 @@ public class SliceImageGeneratorService {
         return generateImage(draftManager.getGame(), slices, getPlayerFromSlice, getFactionFromPlayer, uniqueKey);
     }
 
-    public static FileUpload generateImage(
+    private static FileUpload generateImage(
             Game game,
             List<MiltyDraftSlice> slices,
             Function<String, String> getPlayerFromSlice,

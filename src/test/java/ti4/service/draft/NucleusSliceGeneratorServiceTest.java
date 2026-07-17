@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import ti4.game.Game;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.model.MapTemplateModel;
 import ti4.service.draft.NucleusSliceGeneratorService.NucleusOutcome;
 import ti4.testUtils.BaseTi4Test;
@@ -31,7 +31,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testStandard6p() {
-        beforeAll();
         Game game = createTestGame(6);
 
         testSuccessfulNucleusForGame(game);
@@ -39,7 +38,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testStandard5p() {
-        beforeAll();
         Game game = createTestGame(5);
 
         testSuccessfulNucleusForGame(game);
@@ -47,7 +45,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testStandard4p() {
-        beforeAll();
         Game game = createTestGame(4);
 
         testSuccessfulNucleusForGame(game);
@@ -55,7 +52,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testStandard3p() {
-        beforeAll();
         Game game = createTestGame(3);
 
         testSuccessfulNucleusForGame(game);
@@ -63,7 +59,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testStandard7p() {
-        beforeAll();
         Game game = createTestGame(7);
 
         testSuccessfulNucleusForGame(game);
@@ -71,7 +66,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testStandard8p() {
-        beforeAll();
         Game game = createTestGame(8);
 
         testSuccessfulNucleusForGame(game);
@@ -79,7 +73,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testAllSources6p() {
-        beforeAll();
 
         Game game = createTestGame(6);
         game.setUnchartedSpaceStuff(true);
@@ -102,7 +95,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testAllSources3p() {
-        beforeAll();
 
         Game game = createTestGame(3);
         game.setUnchartedSpaceStuff(true);
@@ -125,7 +117,6 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     @Test
     void testAllSources8p() {
-        beforeAll();
 
         Game game = createTestGame(8);
         game.setUnchartedSpaceStuff(true);
@@ -153,8 +144,8 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
         testSuccessfulNucleusForMiltySettings(game, settings);
     }
 
-    private void testSuccessfulNucleusForMiltySettings(Game game, MiltySettings settings) {
-        DraftSpec specs = DraftSpec.CreateFromMiltySettings(settings);
+    private static void testSuccessfulNucleusForMiltySettings(Game game, MiltySettings settings) {
+        DraftSpec specs = DraftSpec.createFromMiltySettings(settings);
 
         MapTemplateModel normalTemplate =
                 Mapper.getDefaultMapTemplateForPlayerCount(game.getPlayers().size());
@@ -173,9 +164,9 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
         }
     }
 
-    private void runTest(Game game, MapTemplateModel mapTemplate, DraftSpec specs, boolean strictMode) {
+    private static void runTest(Game game, MapTemplateModel mapTemplate, DraftSpec specs, boolean strictMode) {
         // Test that generator can succeed with these settings (often enough to be a unit test)
-        NucleusOutcome outcome = null;
+        NucleusOutcome outcome;
         Map<String, Integer> failureReasons = new HashMap<>();
         for (int i = 0; i < REASONABLE_MAX_ATTEMPTS; ++i) {
             outcome = NucleusSliceGeneratorService.tryGenerateNucleusAndSlices(
@@ -195,7 +186,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
         assertNull(mostCommonFailure);
     }
 
-    private Game createTestGame(int playerCount) {
+    private static Game createTestGame(int playerCount) {
         Game game = new Game();
         game.setName("testGame");
         for (int i = 0; i < playerCount; i++) {

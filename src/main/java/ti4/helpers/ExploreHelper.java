@@ -1,20 +1,23 @@
 package ti4.helpers;
 
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 
-public class ExploreHelper {
+public final class ExploreHelper {
 
     public static boolean checkForMech(String planetName, Game game, Player player) {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
         UnitKey mechKey = Units.getUnitKey(UnitType.Mech, player.getColorID());
+        if (player.hasUnlockedBreakthrough("ironbt")) {
+            return true;
+        }
         return unitHolder.getUnitCount(mechKey) > 0;
     }
 

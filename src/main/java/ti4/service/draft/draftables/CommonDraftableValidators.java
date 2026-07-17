@@ -11,10 +11,10 @@ import ti4.service.draft.PlayerDraftState;
  * Some helper methods for common things to validate.
  */
 @UtilityClass
-public class CommonDraftableValidators {
+class CommonDraftableValidators {
     public boolean isChoiceKeyInList(DraftChoice choice, List<String> validChoiceKeys) {
         for (String validChoice : validChoiceKeys) {
-            if (validChoice.equals(choice.getChoiceKey())) {
+            if (validChoice.equals(choice.choiceKey())) {
                 return true;
             }
         }

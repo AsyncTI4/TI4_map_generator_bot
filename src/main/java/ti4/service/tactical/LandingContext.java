@@ -3,14 +3,14 @@ package ti4.service.tactical;
 import java.util.ArrayList;
 import java.util.List;
 import software.amazon.awssdk.utils.StringUtils;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 
 public final class LandingContext {
     public final Game game;
@@ -99,7 +99,7 @@ public final class LandingContext {
         return owner == mainPlayer ? "" : (" " + StringUtils.capitalize(owner.getColor()) + " ");
     }
 
-    public String stateDescriptor(UnitState state) {
+    public static String stateDescriptor(UnitState state) {
         return state != UnitState.none ? " " + state.humanDescr() : "";
     }
 }

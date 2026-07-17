@@ -3,7 +3,7 @@ package ti4.service.emoji;
 import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
-import ti4.map.Game;
+import ti4.game.Game;
 
 public enum MiscEmojis implements TI4Emoji {
     // Tokens
@@ -22,6 +22,8 @@ public enum MiscEmojis implements TI4Emoji {
     CreussGamma, //
     LegendaryPlanet,
     SpeakerToken,
+    BenedictionToken,
+    Gavel,
     DoubleBoom,
     Ingress,
 
@@ -58,6 +60,11 @@ public enum MiscEmojis implements TI4Emoji {
     Scout,
     ScoutSpinner,
 
+    // Twilight's Fall
+    tf_ability,
+    tf_genome,
+    tf_paradigm,
+
     // Tiles
     Supernova,
     Asteroids,
@@ -74,6 +81,7 @@ public enum MiscEmojis implements TI4Emoji {
     NoAfters, //
     Winemaking,
     BortWindow,
+    BongoMahact,
     SpoonAbides,
     AsyncTI4Logo,
     TIGL,
@@ -81,7 +89,9 @@ public enum MiscEmojis implements TI4Emoji {
     BLT,
     Stroter,
     Wololo,
-    TaDont;
+    TaDont,
+    Zobat,
+    SharkLoan;
 
     public static TI4Emoji getCreussWormhole(@NotNull String wormhole) {
         return switch (wormhole.toLowerCase()) {

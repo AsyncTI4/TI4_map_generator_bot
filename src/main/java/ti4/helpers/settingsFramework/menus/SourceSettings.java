@@ -2,20 +2,22 @@ package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.game.Game;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
-import ti4.map.Game;
+import ti4.logging.BotLogger;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.SourceEmojis;
+import tools.jackson.databind.JsonNode;
 
 // This is a sub-menu
 @Getter
@@ -31,11 +33,15 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting discoStars;
     private final BooleanSetting betaTestMode;
     private final BooleanSetting unchartedSpace;
+    private final BooleanSetting blueReverie;
     private final BooleanSetting absol;
     private final BooleanSetting ignis;
     private final BooleanSetting eronous;
     private final BooleanSetting actionCardDeck2;
     private final BooleanSetting teDemo;
+    private final BooleanSetting whispers;
+    private final BooleanSetting deepreaches;
+    private final BooleanSetting lostLegacies;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -55,12 +61,16 @@ public class SourceSettings extends SettingsMenu {
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
         teDemo = new BooleanSetting("ThundersEdge", "Thunders Edge", game.isThundersEdge());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
+        blueReverie = new BooleanSetting("BlueReverie", "Blue Reverie", game.isBlueReverieMode());
         absol = new BooleanSetting("Absol", "Absol Mod", game.isAbsolMode());
         ignis = new BooleanSetting(
                 "Ignis",
                 "Ignis Aurora Mod",
                 game.getTechnologyDeckID().toLowerCase().contains("baldrick"));
         eronous = new BooleanSetting("Eronous", "Eronous Tiles", false);
+        whispers = new BooleanSetting("WhispersVoid", "Whispers from the Void", false);
+        deepreaches = new BooleanSetting("DeepReaches", "Deep Reaches", false);
+        lostLegacies = new BooleanSetting("LostLegacies", "Lost Legacies", false);
         actionCardDeck2 = new BooleanSetting("ActionCardDeck2", "Action Card Deck 2", game.isAcd2());
         // Emojis
         base.setEmoji(SourceEmojis.TI4BaseGame);
@@ -71,8 +81,14 @@ public class SourceSettings extends SettingsMenu {
         absol.setEmoji(SourceEmojis.Absol);
         eronous.setEmoji(SourceEmojis.Eronous);
         actionCardDeck2.setEmoji(SourceEmojis.ActionDeck2);
+        deepreaches.setEmoji(SourceEmojis.DeepReaches);
+        lostLegacies.setEmoji(SourceEmojis.Theodisi);
 
         // Other Initialization
+        discoStars.setExtraInfo("Adds Discordant Stars factions only.");
+        blueReverie.setExtraInfo("Adds Blue Reverie factions only.");
+        unchartedSpace.setExtraInfo("Adds Uncharted Space content.");
+        lostLegacies.setExtraInfo("Adds Lost Legacies factions only.");
         // miltymod.setExtraInfo("NOTE: this is NOT \"milty draft\", this is a homebrew mod that replaces components in
         // the game");
 
@@ -84,16 +100,20 @@ public class SourceSettings extends SettingsMenu {
         List<String> historicIDs = new ArrayList<>(List.of("source"));
         if (json != null
                 && json.has("menuId")
-                && historicIDs.contains(json.get("menuId").asText(""))) {
+                && historicIDs.contains(json.get("menuId").asString(""))) {
             base.initialize(json.get("base"));
             pok.initialize(json.get("pok"));
             codexes.initialize(json.get("codexes"));
             discoStars.initialize(json.get("discoStars"));
             teDemo.initialize(json.get("teDemo"));
             unchartedSpace.initialize(json.get("unchartedSpace"));
+            blueReverie.initialize(json.get("blueReverie"));
             absol.initialize(json.get("absol"));
             ignis.initialize(json.get("ignis"));
             eronous.initialize(json.get("eronous"));
+            whispers.initialize(json.get("whispers"));
+            deepreaches.initialize(json.get("deepreaches"));
+            lostLegacies.initialize(json.get("lostLegacies"));
             actionCardDeck2.initialize(json.get("actionCardDeck2"));
         }
         base.setEditable(false);
@@ -111,10 +131,14 @@ public class SourceSettings extends SettingsMenu {
         ls.add(codexes);
         ls.add(teDemo);
         ls.add(discoStars);
+        ls.add(blueReverie);
         ls.add(unchartedSpace);
         ls.add(absol);
         ls.add(ignis);
         ls.add(eronous);
+        ls.add(whispers);
+        ls.add(deepreaches);
+        ls.add(lostLegacies);
         ls.add(actionCardDeck2);
         return ls;
     }
@@ -136,10 +160,12 @@ public class SourceSettings extends SettingsMenu {
         List<ComponentSource> sources = new ArrayList<>();
         if (base.isVal()) sources.add(ComponentSource.base);
         if (pok.isVal()) sources.add(ComponentSource.pok);
+        if (teDemo.isVal()) sources.add(ComponentSource.thunders_edge);
         if (codexes.isVal())
             sources.addAll(List.of(
                     ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
-        if (unchartedSpace.isVal() || discoStars.isVal()) sources.add(ComponentSource.uncharted_space);
+        if (discoStars.isVal()) sources.add(ComponentSource.ds);
+        if (unchartedSpace.isVal()) sources.add(ComponentSource.uncharted_space);
         if (absol.isVal()) sources.add(ComponentSource.absol);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
         return sources;
@@ -154,10 +180,14 @@ public class SourceSettings extends SettingsMenu {
             sources.addAll(List.of(
                     ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
         if (discoStars.isVal()) sources.add(ComponentSource.ds);
+        if (blueReverie.isVal()) sources.add(ComponentSource.blue_reverie);
         if (absol.isVal()) sources.add(ComponentSource.absol);
         if (teDemo.isVal()) sources.add(ComponentSource.thunders_edge);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
         if (ignis.isVal()) sources.add(ComponentSource.ignis_aurora);
+        if (whispers.isVal()) sources.add(ComponentSource.balacasi);
+        if (deepreaches.isVal()) sources.add(ComponentSource.beans);
+        if (lostLegacies.isVal()) sources.add(ComponentSource.theodisi);
         return sources;
     }
 
@@ -180,19 +210,19 @@ public class SourceSettings extends SettingsMenu {
                         .sendMessage(
                                 "This setting doesn't fully change the decks, please resolve manually after starting the draft if you actually want to play base game mode. You can ping Bothelper for assistance.")
                         .setEphemeral(true)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case "Codexes" ->
                 event.getHook()
                         .sendMessage("This setting doesn't really do much. It only disables Keleres.")
                         .setEphemeral(true)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             case "DiscoStars" ->
                 event.getHook()
                         .sendMessage(
                                 "This setting only controls factions. If you want technologies, relics, explores, etc, you need to also enable **__Uncharted Space__**.")
                         .setEphemeral(true)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             case "ThundersEdge" -> {
                 game.setThundersEdge(true);
                 game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
@@ -221,26 +251,25 @@ public class SourceSettings extends SettingsMenu {
                 event.getHook()
                         .sendMessage((ignis) ? absolDS : pokStr)
                         .setEphemeral(true)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case "UnchartSpace", "Absol", "ActionCardDeck2" -> {
                 boolean abs = absol.isVal();
-                boolean ds = unchartedSpace.isVal();
-                boolean both = abs && ds;
+                boolean us = unchartedSpace.isVal();
+                boolean both = abs && us;
                 boolean acd2 = actionCardDeck2.isVal();
 
                 // Decks with both
-                String relic = both ? "relics_absol_ds" : (abs ? "relics_absol" : (ds ? "relics_ds" : "relics_pok"));
-                String techs = both ? "techs_ds_absol" : (abs ? "techs_absol" : (ds ? "techs_ds" : "techs_pok_c4"));
+                String relic = both ? "relics_absol_ds" : (abs ? "relics_absol" : (us ? "relics_ds" : "relics_pok"));
+                String techs = both ? "techs_ds_absol" : (abs ? "techs_absol" : (us ? "techs_ds" : "techs_pok_c4"));
 
                 // Decks for ABSOL
                 String agenda = abs ? "agendas_absol" : "agendas_pok";
 
                 // Decks for Uncharted Space
-                String explore = ds ? "explores_DS" : "explores_pok";
-                String acs = acd2 ? getAcd2Version(pok, teDemo) : (ds ? "action_cards_ds" : "action_cards_pok");
+                String explore = us ? "explores_DS" : "explores_pok";
+                String acs = acd2 ? getAcd2Version(pok, teDemo) : (us ? "action_cards_ds" : "action_cards_pok");
 
-                // set 'em up
                 decks.getRelics().setChosenKey(relic);
                 decks.getTechs().setChosenKey(techs);
                 decks.getAgendas().setChosenKey(agenda);
@@ -249,12 +278,15 @@ public class SourceSettings extends SettingsMenu {
 
                 var inclusions = new ArrayList<String>();
                 if (abs) inclusions.add("Absol Mod");
-                if (ds) inclusions.add("Uncharted Space");
+                if (us) inclusions.add("Uncharted Space");
                 if (acd2) inclusions.add("Action Deck 2");
                 String message = inclusions.isEmpty()
                         ? "Reset your decks to include only PoK cards."
                         : "Reset your decks to include all of the " + String.join(" and ", inclusions) + " cards.";
-                event.getHook().sendMessage(message).setEphemeral(true).queue();
+                event.getHook()
+                        .sendMessage(message)
+                        .setEphemeral(true)
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case "Eronous" -> {}
         }

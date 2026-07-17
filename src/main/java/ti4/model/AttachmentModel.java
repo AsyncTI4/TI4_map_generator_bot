@@ -7,6 +7,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.ExploreEmojis;
 
 @Data
 public class AttachmentModel implements ModelInterface, EmbeddableModel {
@@ -39,6 +40,10 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(name).orElse(id);
     }
 
+    public String getNameRepresentation() {
+        return ExploreEmojis.Chevrons + " _" + getName() + "_ " + source.emoji();
+    }
+
     public boolean isFakeAttachment() {
         return Optional.ofNullable(isFakeAttachment).orElse(false);
     }
@@ -59,7 +64,7 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
         sb.append(id);
-        if (name != null) sb.append(" ").append(getName());
+        if (name != null) sb.append(' ').append(getName());
         if (resourcesModifier != 0) sb.append(" R").append(resourcesModifier);
         if (influenceModifier != 0) sb.append(" I").append(influenceModifier);
 
@@ -82,10 +87,10 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
                     .append(spaceCannonHitsOn)
                     .append("x")
                     .append(spaceCannonDieCount)
-                    .append("\n");
-        if (abilityText != null) sb.append("Ability: ").append(abilityText).append("\n");
+                    .append('\n');
+        if (abilityText != null) sb.append("Ability: ").append(abilityText).append('\n');
         if (getToken().isPresent())
-            sb.append("Token: ").append(getToken().get()).append("\n");
+            sb.append("Token: ").append(getToken().get()).append('\n');
         if (isFakeAttachment != null) sb.append("(fake attachment)\n");
         eb.setDescription(sb.toString());
 

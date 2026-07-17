@@ -1,0 +1,171 @@
+[
+  {
+    "alias": "oblivionbt",
+    "name": "Call of the Void",
+    "shortName": "Call of\nthe Void",
+    "faction": "oblivion",
+    "synergy": [
+      "PROPULSION",
+      "CYBERNETIC"
+    ],
+    "text": "When you gain this breakthrough, draw red-backed tiles equal to the number of players. Starting with you and proceeding clockwise, each player places 1 on the edge of the game board so that it is adjacent to at least 2 other tiles. Place a frontier token in each of those systems without planets.\n\nWhen you explore the frontier deck, draw an additional card deck, choose 1 to resolve, and discard the rest.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "veylorbt",
+    "name": "Filibustered Legislation",
+    "shortName": "Filibustered\nLegislation",
+    "faction": "veylor",
+    "synergy": [
+      "CYBERNETIC",
+      "PROPULSION"
+    ],
+    "text": "When an agenda is resolved, you may exhaust this card. That agenda is resolved with no effect. Each player may ready 1 planet they control. During the agenda phase in which this effect is used, vote on 1 additional agenda.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "thronesbt",
+    "name": "Lost Throne",
+    "shortName": "Lost\nThrone",
+    "faction": "thrones",
+    "synergy": [
+      "PROPULSION",
+      "WARFARE"
+    ],
+    "text": "When you gain this breakthrough, place the Aurelion station token in a system that contains a planet you control. Then, flip this card.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "kryxosbt",
+    "name": "Prototype Innovators",
+    "shortName": "Prototype\nInnovators",
+    "faction": "kryxos",
+    "synergy": [
+      "WARFARE",
+      "CYBERNETIC"
+    ],
+    "text": "During each round of combat, or when you would roll dice for a unit ability, you may treat up to 3 units you control for which you own the corresponding unit upgrade technology as if they were Galvanized.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "kairnbt",
+    "name": "Relic Trading Hub",
+    "shortName": "Relic\nTrading Hub",
+    "faction": "kairn",
+    "synergy": [
+      "WARFARE",
+      "BIOTIC"
+    ],
+    "text": "ACTION: Exhaust this card and purge 1 relic fragment. Explore 1 planet with the same trait as the purged relic fragment and gain 2 purged relic fragments of any other color, if able.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "myrrbt",
+    "name": "Remote Workforce",
+    "shortName": "Remote\nWorkforce",
+    "faction": "myrr",
+    "synergy": [
+      "WARFARE",
+      "PROPULSION"
+    ],
+    "text": "After you use PRODUCTION on 1 or more units, you may exhaust this card to resolve the PRODUCTION abilities of each unit you control in another system. Increase the combined PRODUCTION of those units by 2 and reduce the combined cost of those units by 1.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "revenantbt",
+    "name": "Revenant Rising",
+    "shortName": "Revenant\nRising",
+    "faction": "revenant",
+    "synergy": [
+      "BIOTIC",
+      "CYBERNETIC"
+    ],
+    "text": "When you gain this breakthrough and each time you score a secret objective, you may draw 1 random unused agent and attach it to this card. This card has the ability text of each agent attached to it. Once per game round, when you would exhaust this card, you may purge 1 agent attached to this card instead.",
+    "notes": "Due to how some agents are wired in async, the agent purge option is always available in cards info. Use it instead of exhausting an agent when you normally would if you plan to purge one.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "xytherisbt",
+    "name": "Royal Rail Gun",
+    "shortName": "Royal\nRail Gun",
+    "faction": "xytheris",
+    "synergy": [
+      "PROPULSION",
+      "WARFARE"
+    ],
+    "text": "When you gain this breakthrough, add 4 PDS to your reinforcements. If you own a PDS unit upgrade technology, flip this card over and place it in your play area. Your PDS units gain the following ability text and adjust their printed values by the indicated amounts. If they do not have those values, they gain them.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "ponthousbt",
+    "name": "Self-Destruct Button",
+    "shortName": "Self-Destruct\nButton",
+    "faction": "ponthous",
+    "synergy": [
+      "BIOTIC",
+      "WARFARE"
+    ],
+    "text": "At the start of a combat, you may exhaust this card and destroy 1 non-fighter ship you control in that system. Produce hits equal to that unit's cost.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "ardentiabt",
+    "name": "Subjugate",
+    "shortName": "Subjugate",
+    "faction": "ardentia",
+    "synergy": [
+      "WARFARE",
+      "CYBERNETIC"
+    ],
+    "text": "ACTION: Exhaust this card and spend 3 influence. Return 1 other player's command token from the game board to its reinforcements, then perform a tactical action in a non-home system without spending a command token.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "aeternabt",
+    "name": "Twilight Defense Systems",
+    "shortName": "Twilight\nDefense Systems",
+    "faction": "aeterna",
+    "synergy": [
+      "PROPULSION",
+      "BIOTIC"
+    ],
+    "text": "Planets that contain your space docks or mechs gain PLANETARY SHIELD and SPACE CANNON 6 as if they were units. These planets may use their SPACE CANNON against ships that are adjacent to them. Other players' effects cannot make your units lose PLANETARY SHIELD.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "verydithbt",
+    "name": "Unyielding Accord",
+    "shortName": "Unyielding\nAccord",
+    "faction": "verydith",
+    "synergy": [
+      "PROPULSION",
+      "BIOTIC"
+    ],
+    "text": "When one or more other players place a command token in a system that contains 1 or more planets you control, ready 1 planet in that system and explore it.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "arcanumbt",
+    "name": "Power Word: Wish",
+    "shortName": "Power Word:\nWish",
+    "faction": "arcanum",
+    "synergy": [
+      "PROPULSION",
+      "WARFARE"
+    ],
+    "text": "When you gain this breakthrough choose a side for it to start on. When you research a propulsion or warfare technology, flip this card over. When you activate a system, you may apply +1 to the move value of 1 of those units and +2 to the combat value of 2 units you control during that tactical action.",
+    "source": "theodisi"
+  },
+  {
+    "alias": "arcanumbtback",
+    "name": "Power Word: Wish",
+    "shortName": "Power Word:\nWish",
+    "faction": "arcanum",
+    "synergy": [
+      "CYBERNETIC",
+      "BIOTIC"
+    ],
+    "text": "When you gain this breakthrough choose a side for it to start on. When you research a cybernetic or biotic technology, flip this card over. When you activate a system, apply +1 to the capacity value of 2 units until the end of that tactical action. When you use PRODUCTION, apply -1 to the combined cost of those produced units.",
+    "source": "theodisi"
+  }
+] 

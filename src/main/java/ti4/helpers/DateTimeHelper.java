@@ -12,12 +12,14 @@ import org.jetbrains.annotations.NotNull;
 @UtilityClass
 public class DateTimeHelper {
 
-    public static long getLongDateTimeFromDiscordSnowflake(long snowflake) {
-        return (snowflake >> 22) + 1420070400000L;
+    public static long getLongDateTimeFromDiscordSnowflake(ISnowflake snowflake) {
+        return snowflake.getTimeCreated().toInstant().toEpochMilli();
     }
 
-    public static long getLongDateTimeFromDiscordSnowflake(ISnowflake snowflake) {
-        return getLongDateTimeFromDiscordSnowflake(snowflake.getIdLong());
+    public static long getTimeinMinutes(long totalMillis) {
+        long totalSeconds = totalMillis / 1000; // total seconds (truncates)
+        long totalMinutes = totalSeconds / 60; // total minutes (truncates)
+        return totalMinutes;
     }
 
     public static String getTimeRepresentationToSeconds(long totalMillis) {

@@ -1,10 +1,12 @@
 package ti4.service.statistics;
 
 public enum PlayerStatTypes {
-    PLAYER_WIN_PERCENT("Player win percent", "Shows the win percent of each player rounded to the nearest integer"), //
-    PLAYER_GAME_COUNT("Player game count", "Shows the number of games each player has played in"),
-    PLAYER_MATCHMAKING_RATING(
-            "Player matchmaking rating", "Shows player matchmaking rating calculated with the TrueSkill algorithm");
+    PLAYER_WIN_PERCENT("Win percent", "Shows the win percent of each player rounded to the nearest integer"),
+    PLAYER_WIN_PERFORMANCE(
+            "Win performance", "Shows how much each player over or under performs their expected win rate"),
+    PLAYER_GAME_COUNT("Game count", "Shows the number of games each player has played in"),
+    PLAYER_AVERAGE_OPPONENT_MMR(
+            "Average opponent MMR", "Shows the average matchmaking rating of each player's opponents");
 
     private final String name;
     private final String description;

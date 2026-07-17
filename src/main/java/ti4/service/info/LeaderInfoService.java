@@ -7,23 +7,24 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.buttons.Buttons;
-import ti4.commands.CommandHelper;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
+import ti4.service.franken.FrankenAlternateTextService;
 
 @UtilityClass
 public class LeaderInfoService {
 
     public static void sendLeadersInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + " Somebody" + CommandHelper.getHeaderText(event);
+        String headerText = player.getRepresentationNoPing() + " Somebody" + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendLeadersInfo(game, player);
     }
@@ -68,11 +69,18 @@ public class LeaderInfoService {
         if (player.hasLeader("yssarilagent")) {
             for (Player otherPlayer : game.getPlayers().values()) {
                 if (otherPlayer != player) {
-                    Leader otherPlayerAgent = otherPlayer.unsafeGetLeader(Constants.AGENT);
-                    if (otherPlayerAgent == null) {
-                        continue;
+                    for (String leaderID : otherPlayer.getLeaderIDs()) {
+                        if (leaderID.contains("agent") && (Mapper.getLeader(leaderID) != null)) {
+                            yssarilEmbeds.add(FrankenAlternateTextService.getLeaderEmbed(
+                                    game,
+                                    Mapper.getLeader(leaderID),
+                                    false,
+                                    true,
+                                    false,
+                                    false,
+                                    game.isTwilightsFallMode()));
+                        }
                     }
-                    yssarilEmbeds.add(otherPlayerAgent.getLeaderEmbed());
                 }
             }
         }
@@ -85,7 +93,7 @@ public class LeaderInfoService {
 
         // ADD MAHACT IMPERIA REFERENCE
         List<MessageEmbed> imperiaEmbeds = new ArrayList<>();
-        if (player.hasAbility("imperia")) {
+        if (player.hasAbility("imperia") || player.hasAbility("imperia_y")) {
             for (Player otherPlayer : game.getPlayers().values()) {
                 if (otherPlayer != player) {
                     if (player.getMahactCC().contains(otherPlayer.getColor())) {
@@ -93,7 +101,7 @@ public class LeaderInfoService {
                         if (leader == null) {
                             continue;
                         }
-                        imperiaEmbeds.add(leader.getLeaderEmbed());
+                        imperiaEmbeds.add(leader.getLeaderEmbed(game));
                     }
                 }
             }
@@ -115,7 +123,7 @@ public class LeaderInfoService {
     private static List<MessageEmbed> getPlayersLeaderEmbeds(Player player) {
         List<MessageEmbed> embeds = new ArrayList<>();
         for (Leader leader : player.getLeaders()) {
-            embeds.add(leader.getLeaderEmbed());
+            embeds.add(leader.getLeaderEmbed(player.getGame()));
         }
         return embeds;
     }

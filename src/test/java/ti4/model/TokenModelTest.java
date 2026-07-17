@@ -20,7 +20,6 @@ class TokenModelTest extends BaseTi4Test {
 
     @Test
     void testTokens() {
-        beforeAll();
         List<TokenModel> tokens = new ArrayList<>(Mapper.getTokensValues());
         assertFalse(tokens.isEmpty(), "Did not import any tokens");
 

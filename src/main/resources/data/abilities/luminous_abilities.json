@@ -1,0 +1,85 @@
+[
+    {
+        "id": "nesting_burrows",
+        "name": "Nesting Burrows",
+        "faction": "arachnera",
+        "window": "After you produce 1 or more infantry:",
+        "windowEffect": "You may place up to 2 of those units on your faction sheet. Those units are captured.",
+        "source": "luminous"
+    },
+    {
+        "id": "necrogenesis",
+        "name": "Necrogenesis",
+        "faction": "arachnera",
+        "window": "Once per ground combat, after 1 of your opponent's units are destroyed:",
+        "windowEffect": "You may place 1 of your captured infantry from your faction sheet on that planet.",
+        "source": "luminous"
+    },
+    {
+        "id": "feeding_frenzy",
+        "name": "Feeding Frenzy",
+        "faction": "arachnera",
+        "permanentEffect": "Apply +1 to the result of each of your unit's combat rolls during ground combat on a planet that is in a nebula.",
+        "source": "luminous"
+    },
+    {
+        "id": "swarm",
+        "name": "Swarm",
+        "faction": "arachnera",
+        "window": "Once per action, during invasion on a planet that contains your units:",
+        "windowEffect": "You may resolve ground combat on that planet even if it does not contain another player's ground forces.",
+        "source": "luminous"
+    },
+    {
+        "id": "orbital_defense_grid",
+        "name": "Orbital Defense Grid",
+        "faction": "psm",
+        "permanentEffect": "PDS you control count as ships during space combat, but they cannot retreat.",
+        "source": "luminous"
+    },
+    {
+        "id": "galactic_industrial_complex",
+        "name": "Galactic Industrial Complex",
+        "faction": "psm",
+        "window": "ACTION:",
+        "windowEffect": "Return a promissory note to its owner. You may spend 3 resource or influence to place a PDS in a system you control.",
+        "source": "luminous"
+    },
+    {
+        "id": "psm_orbital_drops",
+        "name": "Orbital Drops",
+        "faction": "psm",
+        "permanentEffect": "When you would use Galactic Industrial Complex faction abiity you may plac ea mech from your reinforcements on a planet you control.",
+        "source": "luminous"
+    },
+    {
+        "id": "psm_mega_structures",
+        "name": "Mega Structures",
+        "faction": "psm",
+        "permanentEffect": "When scoring objectives you may treat each structure you control as if it is on its own separate planet for the purposes of scoring objectives.",
+        "source": "luminous"
+    },
+    {
+        "id": "occupational_hazard",
+        "name": "Occupational Hazard",
+        "faction": "opa",
+        "window": "At the start of the game:",
+        "windowEffect": "You may replace 1 anomaly system tile, that does not contain a planet, with an asteroid field anomaly system tile.",
+        "source": "luminous"
+    },
+    {
+        "id": "the_belter_way",
+        "name": "The Belter Way",
+        "faction": "opa",
+        "window": "At the start of the game:",
+        "windowEffect": "Place a broken planet token in each system that is an asteroid field anomaly.",
+        "source": "luminous"
+    },
+    {
+        "id": "opa_one_people",
+        "name": "One People",
+        "faction": "opa",
+        "permanentEffect": "Whenever another player gains control of a broken planet, you and that player each gain 1 tg.",
+        "source": "luminous"
+    }
+]

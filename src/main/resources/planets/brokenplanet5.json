@@ -1,0 +1,25 @@
+{
+    "id": "brokenplanet5",
+    "name": "Medina Station",
+    "aliases": [
+        "brokenplanet5",
+        "medinastation"
+    ],
+    "resources": 2,
+    "influence": 1,
+    "planetTypes": [
+        "HAZARDOUS"
+    ],
+    "planetLayout": {
+        "unitHolderName": "brokenplanet5",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 92,
+            "y": 66
+        },
+        "planetRadius": 60,
+        "extraIcons": 1
+    },
+    "flavourText": "Flavor text is the bane of all time-pressed devs.",
+    "source": "luminous"
+}

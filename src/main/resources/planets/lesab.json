@@ -1,1 +1,23 @@
-{"id":"lesab","tileId":"104","name":"Lesab","aliases":["lesab"],"resources":2,"influence":1,"planetTypes":["INDUSTRIAL","HAZARDOUS"],"planetLayout":{"unitHolderName":"lesab","resourcesLocation":"BottomLeft","centerPosition":{"x":170.0,"y":150.0}},"source":"thunders_edge"}
+{
+    "id": "lesab",
+    "tileId": "104",
+    "name": "Lesab",
+    "aliases": [
+        "lesab"
+    ],
+    "resources": 2,
+    "influence": 1,
+    "planetTypes": [
+        "INDUSTRIAL",
+        "HAZARDOUS"
+    ],
+    "planetLayout": {
+        "unitHolderName": "lesab",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 173,
+            "y": 148
+        }
+    },
+    "source": "thunders_edge"
+}

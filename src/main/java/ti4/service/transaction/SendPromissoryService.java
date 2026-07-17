@@ -2,12 +2,12 @@ package ti4.service.transaction;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.emoji.CardEmojis;
@@ -96,14 +96,16 @@ public class SendPromissoryService {
             Game game, Player sender, Player receiver, PromissoryNoteModel model, boolean reportLost) {
         String reportMsgFmt = sender.getRepresentation() + " sent %s of " + receiver.getRepresentation() + ".";
         String reportMsg;
-        if (model.isPlayedDirectlyToPlayArea()) {
+        if (model.isPlayedDirectlyToPlayArea() && !sender.isPlayerMemberOfAlliance(receiver)) {
             reportMsg = String.format(reportMsgFmt, model.getNameRepresentation() + " directly to the play area");
         } else {
             reportMsg = String.format(reportMsgFmt, "a promissory note to the hand");
         }
         MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), reportMsg);
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(sender.getCorrectChannel(), reportMsg);
+            MessageHelper.sendMessageToChannel(
+                    sender.getCorrectChannel(),
+                    reportMsg.replace(receiver.getRepresentation(), receiver.getColorIfCanSeeStats(sender)));
             String extra = null;
             if (model.getAlias().endsWith("_sftt")) extra = "Scores changed.";
             String whatSent = model.isPlayedDirectlyToPlayArea() ? model.getName() : "face down promissory note";

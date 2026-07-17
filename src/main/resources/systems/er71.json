@@ -29,9 +29,7 @@
             "y": 130.0
         }
     ],
-    "wormholes": [
-        null
-    ],
+    "wormholes": [],
     "planets": [],
     "isAsteroidField": true,
     "tileBack": "red",

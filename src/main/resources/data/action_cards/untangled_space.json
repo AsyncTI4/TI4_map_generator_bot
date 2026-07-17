@@ -1,0 +1,10 @@
+[
+    {
+        "alias": "us-ghost",
+        "name": "Ghost Experiment",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Place a Creuss wormhole token into a system. Then perform the Creuss Paradigm or hero ability.",
+        "source": "untangled_space"
+    }
+]

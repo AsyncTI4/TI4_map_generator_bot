@@ -2,18 +2,18 @@ package ti4.service.map;
 
 import java.awt.Point;
 import java.util.Map;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.TokenModel;
 
-public class TokenPlanetService {
+public final class TokenPlanetService {
     public enum TokenPlanets {
         mirage,
 
@@ -23,6 +23,12 @@ public class TokenPlanetService {
         thundersedge,
         illusion,
         phantasm,
+        brokenplanet1,
+        brokenplanet2,
+        brokenplanet3,
+        brokenplanet4,
+        brokenplanet5,
+        brokenplanet6,
     }
 
     public static String adsf() {
@@ -74,7 +80,13 @@ public class TokenPlanetService {
             tokenPlanetPosition = Constants.MIRAGE_TRIPLE_POSITION;
         }
 
-        Point tokenPlanetCenter = Constants.TOKEN_PLANET_CENTER_OFFSET;
+        PlanetModel planetModel = Mapper.getPlanet(planetName);
+        Point tokenPlanetCenter = new Point(71, 59);
+        if (planetModel != null
+                && planetModel.getPlanetLayout() != null
+                && planetModel.getPlanetLayout().getCenterPosition() != null) {
+            tokenPlanetCenter = planetModel.getPlanetLayout().getCenterPosition();
+        }
 
         Point planetCenter =
                 new Point(tokenPlanetPosition.x + tokenPlanetCenter.x, tokenPlanetPosition.y + tokenPlanetCenter.y);

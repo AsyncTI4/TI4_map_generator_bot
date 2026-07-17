@@ -1,0 +1,125 @@
+package ti4.discord.interactions.buttons.handlers.options;
+
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.helpers.ButtonHelper;
+import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
+import ti4.service.option.GameOptionService;
+
+final class GameOptionButtonHandler {
+
+    @ButtonHandler("enableAidReacts_")
+    public static void enableAidReact(ButtonInteractionEvent event, Game game, String buttonID) {
+        String value = buttonID.replace("enableAidReacts_", "");
+        String message = "[Error]";
+        switch (value) {
+            case "faction":
+                game.setBotFactionReacts(true);
+                message = "Faction";
+                break;
+            case "colour":
+                game.setBotColorReacts(true);
+                message = "Colour";
+                break;
+            case "strategy":
+                game.setBotStratReacts(true);
+                message = "Strategy card";
+                break;
+            case "all":
+                game.setBotFactionReacts(true);
+                game.setBotColorReacts(true);
+                game.setBotStratReacts(true);
+                message = "Faction, colour and strategy card";
+                break;
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                message + " reaction icons have been enabled. Use `/game options` to change this.");
+    }
+
+    @ButtonHandler("disableAidReacts")
+    public static void disableAidReact(ButtonInteractionEvent event, Game game) {
+        game.setBotFactionReacts(false);
+        game.setBotStratReacts(false);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), "Reaction icons have been disabled. Use `/game options` to change this.");
+    }
+
+    @ButtonHandler("showHexBorders_")
+    public static void editShowHexBorders(ButtonInteractionEvent event, Game game, String buttonID) {
+        String value = buttonID.replace("showHexBorders_", "");
+        game.setHexBorderStyle(value);
+        MessageHelper.sendMessageToChannel(
+                game.getMainGameChannel(),
+                "Updated Hex Border Style to `" + value + "`.\nUse `/game options` to change this.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(value = "offerGameOptionButtons", save = false)
+    public static void offerGameOptionButtons(Game game, MessageChannel channel) {
+        GameOptionService.offerGameOptionButtons(game, channel);
+    }
+
+    @ButtonHandler("showOwnedPNsInPlayerArea_turnON")
+    public static void showOwnedPNsInPlayerArea_turnON(ButtonInteractionEvent event, Game game) {
+        game.setShowOwnedPNsInPlayerArea(true);
+        event.editButton(GameOptionService.showOwnedPNs_ON).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("showOwnedPNsInPlayerArea_turnOFF")
+    public static void showOwnedPNsInPlayerArea_turnOFF(ButtonInteractionEvent event, Game game) {
+        game.setShowOwnedPNsInPlayerArea(false);
+        event.editButton(GameOptionService.showOwnedPNs_OFF).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("anonDeclare_")
+    public static void handleEnvironmentChoice(
+            ButtonInteractionEvent event, String buttonId, Game game, Player player) {
+        String declaration = buttonId.split("_")[1];
+        String old = game.getStoredValue(player.getUserID() + "anonDeclare");
+        if (old.isEmpty()) {
+            if (declaration.toLowerCase().contains("strong")) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(), "Someone has said that they have \"" + declaration + "\"");
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "Someone has said that they prefer a \"" + declaration + "\" environment.");
+            }
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Someone has changed their preference from \"" + old + "\" to  \"" + declaration + "\" ");
+        }
+        game.setStoredValue(player.getUserID() + "anonDeclare", declaration);
+    }
+
+    @ButtonHandler("setupBaseGameMode")
+    public static void setupBaseGameMode(ButtonInteractionEvent event, Game game) {
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                """
+                ## Base Game Setup Warning
+                This will start the base game setup flow.
+
+                - It is for **base game only**, with no PoK expansion content.
+                - It swaps the game over to the base game component setup path.
+                - If you were planning to use PoK, Discordant Stars, Blue Reverie, Thunder's Edge, or other homebrew content, do not continue.
+
+                Press **Continue Base Game Setup** ___only___ if that is what you want.""",
+                java.util.List.of(
+                        Buttons.red("setupBaseGameMode_confirm", "Continue Base Game Setup"),
+                        Buttons.gray("deleteButtons", "Cancel")));
+    }
+
+    @ButtonHandler("setupBaseGameMode_confirm")
+    public static void confirmSetupBaseGameMode(ButtonInteractionEvent event, Game game) {
+        game.initializeBaseGameMiniMiltySettings().postMessageAndButtons(event);
+    }
+}

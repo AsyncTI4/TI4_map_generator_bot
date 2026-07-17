@@ -1,13 +1,12 @@
 package ti4.service.franken;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.draft.DraftCategory;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 
@@ -22,30 +21,32 @@ public class FrankenPromissoryService {
                 .append("promissory note")
                 .append(pnIDs.size() == 1 ? "" : "s")
                 .append(":\n");
-        List<MessageEmbed> embeds = new ArrayList<>();
         for (String pnID : pnIDs) {
             Player pnOwner = game.getPNOwner(pnID);
             sb.append("> ");
             if (pnOwner != null) {
                 sb.append(pnID).append(" is already owned by ").append(pnOwner.getUserName());
-                sb.append("\n");
+                sb.append('\n');
                 continue;
             }
 
             if (player.ownsPromissoryNote(pnID)) {
                 sb.append(pnID).append(" (player already owned this promissory note)");
-                sb.append("\n");
+                sb.append('\n');
                 continue;
             }
-            sb.append(pnID);
 
             PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pnID);
-            embeds.add(pnModel.getRepresentationEmbed());
-            sb.append("\n");
+            String nameRepresentation = pnModel.getNameRepresentation();
+            String defaultRepresentation = nameRepresentation + "\n> "
+                    + FrankenAlternateTextService.formatInlineText(pnModel.getTextFormatted(game));
+            sb.append(FrankenAlternateTextService.getRepresentationWithAlternateText(
+                    game, DraftCategory.PN, pnID, nameRepresentation, defaultRepresentation));
+            sb.append('\n');
             player.addOwnedPromissoryNoteByID(pnID);
             player.setPromissoryNote(pnID);
         }
-        MessageHelper.sendMessageToChannelWithEmbeds(event.getMessageChannel(), sb.toString(), embeds);
+        MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
 
     public static void removePromissoryNotes(GenericInteractionCreateEvent event, Player player, List<String> pnIDs) {
@@ -56,10 +57,10 @@ public class FrankenPromissoryService {
             } else {
                 sb.append("> ").append(pnID);
             }
-            sb.append("\n");
+            sb.append('\n');
             player.removeOwnedPromissoryNoteByID(pnID);
             player.removePromissoryNote(pnID);
         }
-        MessageHelper.sendMessageToEventChannel(event, sb.toString());
+        MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
 }

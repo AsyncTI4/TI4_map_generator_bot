@@ -6,7 +6,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.StringHelper;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 import ti4.model.Source.ComponentSource;
 
 @Data
@@ -63,6 +63,10 @@ public class RuleModel implements ModelInterface, EmbeddableModel {
         if (description == null) return "";
         String descr = String.join("", description);
         return StringHelper.replaceWithEmojis(descr);
+    }
+
+    public String getNameRepresentation() {
+        return "_" + getTitle() + "_";
     }
 
     public MessageEmbed getRepresentationEmbed() {

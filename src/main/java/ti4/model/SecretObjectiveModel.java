@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -17,6 +17,7 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
     private String name;
     private String phase;
     private String text;
+    private String notes;
     private int points;
     private String homebrewReplacesID;
     private String imageURL;
@@ -38,16 +39,16 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
     @Override
     public SecretObjectiveModel duplicateAndSetColor(ColorModel newColor) {
         SecretObjectiveModel so = new SecretObjectiveModel();
-        so.setAlias(alias.replace("<color>", newColor.getName()));
-        so.setName(name.replace("<color>", newColor.getDisplayName()));
-        so.setPhase(phase);
-        so.setText(text.replace("<color>", newColor.getName()));
-        so.setPoints(points);
-        so.setHomebrewReplacesID(homebrewReplacesID);
-        so.setImageURL(imageURL);
-        so.setSource(source);
-        so.setSearchTags(new ArrayList<>(searchTags));
-        so.setSourceModel(this);
+        so.alias = alias.replace("<color>", newColor.getName());
+        so.name = name.replace("<color>", newColor.getDisplayName());
+        so.phase = phase;
+        so.text = text.replace("<color>", newColor.getName());
+        so.points = points;
+        so.homebrewReplacesID = homebrewReplacesID;
+        so.imageURL = imageURL;
+        so.source = source;
+        so.searchTags = new ArrayList<>(searchTags);
+        so.sourceModel = this;
         return so;
     }
 
@@ -62,6 +63,10 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
             return po1.points < po2.points ? -1 : 1;
         }
     };
+
+    public String getNameRepresentation() {
+        return CardEmojis.SecretObjective + " _" + name + "_ " + source.emoji();
+    }
 
     public String getRepresentation() {
         return getRepresentation(true);
@@ -84,6 +89,9 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
 
         // DESCRIPTION
         eb.setDescription(text);
+        if (notes != null) {
+            eb.setDescription(text + "\n-# [" + notes + "]");
+        }
 
         // FOOTER
         StringBuilder footer = new StringBuilder();

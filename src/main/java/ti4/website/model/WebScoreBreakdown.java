@@ -10,12 +10,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import lombok.Data;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Planet;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Planet;
-import ti4.map.Player;
 import ti4.model.PublicObjectiveModel;
 import ti4.service.info.ListPlayerInfoService;
 
@@ -144,13 +144,13 @@ public class WebScoreBreakdown {
 
                 // Handle custodians - can be multi-scored (check BEFORE the Mapper check)
                 if (Constants.CUSTODIAN.equals(poKey)) {
-                    addMultiScoredEntries(player, poKey, scoringPlayers, EntryType.CUSTODIAN, game, custodianEntries);
+                    addMultiScoredEntries(player, scoringPlayers, EntryType.CUSTODIAN, game, custodianEntries);
                     continue;
                 }
 
                 // Handle imperial - can be multi-scored (check BEFORE the Mapper check)
                 if (Constants.IMPERIAL_RIDER.equals(poKey)) {
-                    addMultiScoredEntries(player, poKey, scoringPlayers, EntryType.IMPERIAL, game, imperialEntries);
+                    addMultiScoredEntries(player, scoringPlayers, EntryType.IMPERIAL, game, imperialEntries);
                     continue;
                 }
 
@@ -238,6 +238,11 @@ public class WebScoreBreakdown {
                     continue;
                 }
 
+                // Skip Firmament/Obsidian "(Plotted)" secrets - these are 0 VP plot card triggers, not real scores
+                if (key.startsWith("(Plotted)")) {
+                    continue;
+                }
+
                 // Check if this player actually scored this custom objective
                 List<String> scoringPlayers = scoredPublics.get(key);
                 if (scoringPlayers == null || !scoringPlayers.contains(player.getUserID())) {
@@ -280,7 +285,7 @@ public class WebScoreBreakdown {
         int maxPublicObjectives = 1; // Base: 1 scoring opportunity (status phase)
 
         // Check for Imperial holder + untapped
-        if (hasImperialUntapped(player, game)) {
+        if (hasImperialUntapped(player)) {
             maxPublicObjectives++;
         }
 
@@ -373,11 +378,11 @@ public class WebScoreBreakdown {
 
         // Imperial points - can score one from Imperial SC and one from Winnu Hero (ADDITIVE)
         // QUALIFIES if has Mecatol Rex, otherwise will be added as POTENTIAL in addPotentialEntries
-        boolean hasMecatol = hasControlOfMecatol(player, game);
+        boolean hasMecatol = hasControlOfMecatol(player);
         EntryState imperialEntryState = hasMecatol ? EntryState.QUALIFIES : EntryState.POTENTIAL;
 
         // Imperial SC point - QUALIFIES if has Mecatol
-        if (hasImperialUntapped(player, game)) {
+        if (hasImperialUntapped(player)) {
             ScoreBreakdownEntry entry =
                     createEntry(EntryType.IMPERIAL, null, null, imperialEntryState, false, 1, null, null);
 
@@ -521,7 +526,6 @@ public class WebScoreBreakdown {
                 case SHARD -> "Shard of the Throne";
                 case STYX -> "A Song Like Marrow";
                 case AGENDA -> agendaKey != null ? agendaKey : "Agenda Point";
-                default -> "";
             };
         }
 
@@ -617,7 +621,7 @@ public class WebScoreBreakdown {
         return skips.size();
     }
 
-    private static boolean hasImperialUntapped(Player player, Game game) {
+    private static boolean hasImperialUntapped(Player player) {
         if (player == null) return false;
         return player.getSCs().contains(IMPERIAL_STRATEGY_CARD)
                 && !player.getExhaustedSCs().contains(IMPERIAL_STRATEGY_CARD);
@@ -633,7 +637,7 @@ public class WebScoreBreakdown {
         return hero.isActive() && !hero.isExhausted();
     }
 
-    private static boolean hasControlOfMecatol(Player player, Game game) {
+    private static boolean hasControlOfMecatol(Player player) {
         if (player == null) return false;
         return player.getPlanets().contains(MECATOL_REX_PLANET);
     }
@@ -713,16 +717,6 @@ public class WebScoreBreakdown {
         return entries.stream().anyMatch(e -> e.getType() == type);
     }
 
-    private static boolean alreadyHasEntry(List<ScoreBreakdownEntry> entries, EntryType type, EntryState state) {
-        if (entries == null) return false;
-        return entries.stream().anyMatch(e -> e.getType() == type && e.getState() == state);
-    }
-
-    private static boolean alreadyHasEntryForObjective(List<ScoreBreakdownEntry> entries, String objectiveKey) {
-        if (entries == null || objectiveKey == null) return false;
-        return entries.stream().anyMatch(e -> objectiveKey.equals(e.getObjectiveKey()));
-    }
-
     private static boolean hasShardOfTheThrone(Player player) {
         if (player == null) return false;
         return player.hasRelic(RELIC_SHARD) || player.hasRelic(RELIC_SHARD_ABSOL);
@@ -751,7 +745,6 @@ public class WebScoreBreakdown {
 
     private static void addMultiScoredEntries(
             Player player,
-            String poKey,
             List<String> scoringPlayers,
             EntryType type,
             Game game,
@@ -769,7 +762,7 @@ public class WebScoreBreakdown {
         List<String> opportunities = new ArrayList<>();
         opportunities.add("status phase");
 
-        if (hasImperialUntapped(player, game)) {
+        if (hasImperialUntapped(player)) {
             opportunities.add("imperial");
         }
 
@@ -781,22 +774,6 @@ public class WebScoreBreakdown {
     }
 
     // Helper class for public objective candidates with state information
-    private static class PublicObjectiveCandidate {
-        private final String key;
-        private final EntryType type;
-        private final int pointValue;
-        private final EntryState state;
-        private final int progress;
-        private final int threshold;
-
-        public PublicObjectiveCandidate(
-                String key, EntryType type, int pointValue, EntryState state, int progress, int threshold) {
-            this.key = key;
-            this.type = type;
-            this.pointValue = pointValue;
-            this.state = state;
-            this.progress = progress;
-            this.threshold = threshold;
-        }
-    }
+    private record PublicObjectiveCandidate(
+            String key, EntryType type, int pointValue, EntryState state, int progress, int threshold) {}
 }

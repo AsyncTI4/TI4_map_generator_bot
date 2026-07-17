@@ -1,21 +1,22 @@
 package ti4.cron;
 
-import static java.util.function.Predicate.not;
-
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedGame;
+import ti4.discord.utility.DiscordErrorUtility;
+import ti4.executors.ExecutionLockType;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.ConsumeGameUtility;
+import ti4.logging.BotLogger;
+import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class SabotageAutoReactCron {
@@ -33,56 +34,55 @@ public class SabotageAutoReactCron {
     }
 
     private static void autoReact() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running SabotageAutoReactCron.");
 
-        GameManager.getManagedGames().stream()
-                .filter(not(ManagedGame::isHasEnded))
-                .map(ManagedGame::getGame)
-                .forEach(SabotageAutoReactCron::autoReact);
+        Map<String, List<GameMessage>> acMessagesByGame = GameMessageManager.getAllByGame(GameMessageType.ACTION_CARD);
+
+        ConsumeGameUtility.consumeGames(
+                acMessagesByGame.keySet(),
+                game -> automaticallyReactToSabotageWindows(game, acMessagesByGame.get(game.getName())),
+                ExecutionLockType.WRITE);
 
         BotLogger.logCron("Finished SabotageAutoReactCron.");
     }
 
-    private static void autoReact(Game game) {
-        try {
-            automaticallyReactToSabotageWindows(game);
-        } catch (Exception e) {
-            BotLogger.error(new LogOrigin(game), "SabotageAutoReactCron failed for game: " + game.getName(), e);
-        }
-    }
-
-    private static void automaticallyReactToSabotageWindows(Game game) {
-        List<GameMessageManager.GameMessage> acMessages =
-                GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD);
-        if (acMessages.isEmpty()) {
-            return;
-        }
-
+    private static void automaticallyReactToSabotageWindows(Game game, List<GameMessage> acMessages) {
         for (Player player : game.getRealPlayers()) {
-            if (!playerShouldRandomlyReact(player) || SabotageService.canSabotage(player, game)) {
+            if (!playerShouldRandomlyReact(player, game)) {
                 continue;
             }
 
             for (var acMessage : acMessages) {
-                if (!ReactionService.checkForSpecificPlayerReact(acMessage.messageId(), player, game)) {
-                    String message = game.isFowMode() ? "No Sabotage" : null;
+                if (acMessage.factionsThatReacted().contains(player.getFaction())) {
+                    continue;
+                }
+
+                String message = game.isFowMode() ? "No Sabotage" : null;
+                try {
                     ReactionService.addReaction(player, false, message, null, acMessage.messageId(), game);
+                    acMessage.factionsThatReacted().add(player.getFaction());
+                } catch (Exception e) {
+                    if (DiscordErrorUtility.isUnknownMessageError(e)) {
+                        GameMessageManager.remove(game.getName(), acMessage.messageId());
+                        continue;
+                    }
+                    throw e;
                 }
             }
         }
     }
 
-    private static boolean playerShouldRandomlyReact(Player player) {
-        if (player.isAFK() && player.getAcCount() != 0) {
+    private static boolean playerShouldRandomlyReact(Player player, Game game) {
+        if (player.isAFK() || player.getAutoSaboPassMedian() == 0) {
             return false;
         }
-        return shouldRandomlyReact(player);
-    }
 
-    private static boolean shouldRandomlyReact(Player player) {
-        if (player.getAutoSaboPassMedian() == 0) {
+        boolean canSabotage = SabotageService.canSabotage(player, game);
+        if (canSabotage) {
             return false;
         }
+
         int rollMax = player.getAutoSaboPassMedian() * RUNS_PER_HOUR;
         int rollResult = ThreadLocalRandom.current().nextInt(1, rollMax + 1);
         return rollResult == rollMax;

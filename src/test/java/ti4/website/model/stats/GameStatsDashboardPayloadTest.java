@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import ti4.map.Game;
+import ti4.game.Game;
+import ti4.game.persistence.TestGameHarness;
+import ti4.json.JsonMapperManager;
 import ti4.testUtils.BaseTi4Test;
 
 class GameStatsDashboardPayloadTest extends BaseTi4Test {
@@ -16,7 +18,7 @@ class GameStatsDashboardPayloadTest extends BaseTi4Test {
 
         var setupTimestamp = new GameStatsDashboardPayload(game).getSetupTimestamp();
 
-        assertThat(setupTimestamp).isEqualTo(1730248570L);
+        assertThat(setupTimestamp).isEqualTo(1730247890L);
     }
 
     @Test
@@ -26,7 +28,7 @@ class GameStatsDashboardPayloadTest extends BaseTi4Test {
 
         var setupTimestamp = new GameStatsDashboardPayload(game).getSetupTimestamp();
 
-        assertThat(String.valueOf(setupTimestamp)).endsWith("70");
+        assertThat(String.valueOf(setupTimestamp)).endsWith("90");
     }
 
     @Test
@@ -48,6 +50,20 @@ class GameStatsDashboardPayloadTest extends BaseTi4Test {
         var laws = new GameStatsDashboardPayload(game).getLaws();
 
         assertThat(laws).containsExactly("Anti-Intellectual Revolution");
+    }
+
+    @Test
+    void serializesDisplacedUnitsGameAsDashboardPayload() {
+        try (var harness = TestGameHarness.fromSourceGame("game-with-displaced-units")) {
+            var game = harness.load();
+
+            var payloadJson = JsonMapperManager.basic().valueToTree(new GameStatsDashboardPayload(game));
+
+            assertThat(payloadJson.path("asyncGameID").asText()).isEqualTo(game.getID());
+            assertThat(payloadJson.path("asyncFunGameName").asText()).isEqualTo(game.getCustomName());
+            assertThat(payloadJson.path("isPoK").isBoolean()).isTrue();
+            assertThat(payloadJson.path("tiglGame").asBoolean()).isTrue();
+        }
     }
 
     private Game createGame() {

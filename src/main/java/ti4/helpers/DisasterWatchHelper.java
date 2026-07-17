@@ -5,13 +5,13 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
+import ti4.discord.JdaService;
+import ti4.game.Game;
+import ti4.game.Tile;
 import ti4.image.TileGenerator;
-import ti4.map.Game;
-import ti4.map.Tile;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class DisasterWatchHelper {

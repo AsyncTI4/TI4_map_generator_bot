@@ -7,12 +7,16 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
@@ -31,15 +35,33 @@ public class RevealPublicObjectiveService {
     }
 
     public static void revealS2(Game game, GenericInteractionCreateEvent event, boolean random) {
-        Map.Entry<String, Integer> objective;
-        if (random) {
-            objective = game.revealStage2Random();
-        } else {
-            objective = game.revealStage2();
+        Map.Entry<String, Integer> objective = random ? game.revealStage2Random() : game.revealStage2();
+        handleStage2Revealed(game, event, objective);
+    }
+
+    /** Reveals a stage 2 objective from the deck itself (ignoring the peekable upcoming objectives). */
+    public static void revealS2FromDeck(Game game, GenericInteractionCreateEvent event) {
+        handleStage2Revealed(game, event, game.revealStage2FromDeck());
+    }
+
+    private static void handleStage2Revealed(
+            Game game, GenericInteractionCreateEvent event, Map.Entry<String, Integer> objective) {
+        if (objective == null) {
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(), "No unrevealed stage 2 public objectives remain.");
+            return;
         }
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         NeuraloopService.offerInitialNeuraloopChoice(game, objective.getKey());
+        for (Player player : game.getRealPlayers()) {
+            if (player.hasAbility("rewrite_destiny")) {
+                TyrisAbilityHandler.offerRewriteDestiny(game, player, objective.getKey(), 2);
+            }
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "tyriscommander")) {
+                TyrisLeaderHandler.offerInfantry(game, player);
+            }
+        }
         var channel = game.getActionsChannel();
         if (game.isLiberationC4Mode()) {
             if (game.getRevealedPublicObjectives().get("Control Ordinian") == null
@@ -55,16 +77,16 @@ public class RevealPublicObjectiveService {
                 control.setDescription("Control Ordinian.");
                 control.setColor(WHITE_COLOR);
                 channel.sendMessageEmbeds(List.of(po.getRepresentationEmbed(), control.build()))
-                        .queue(m -> m.pin().queue());
+                        .queue(m -> m.pin().queue(Consumers.nop(), BotLogger::catchRestError));
             } else {
                 MessageHelper.sendMessageToChannel(
                         channel, "### " + game.getPing() + ", a stage 2 public objective has been revealed.");
                 channel.sendMessageEmbeds(po.getRepresentationEmbed())
-                        .queue(m -> m.pin().queue());
+                        .queue(m -> m.pin().queue(Consumers.nop(), BotLogger::catchRestError));
             }
         } else {
             channel.sendMessageEmbeds(po.getRepresentationEmbed())
-                    .queue(m -> m.pin().queue());
+                    .queue(m -> m.pin().queue(Consumers.nop(), BotLogger::catchRestError));
         }
 
         if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {
@@ -116,7 +138,7 @@ public class RevealPublicObjectiveService {
         MessageHelper.sendMessageToChannel(
                 channel, game.getPing() + ", two stage 2 public objectives has been revealed.");
         channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed()))
-                .queue(m -> m.pin().queue());
+                .queue(m -> m.pin().queue(Consumers.nop(), BotLogger::catchRestError));
 
         int maxSCsPerPlayer;
         if (game.getRealPlayers().isEmpty()) {
@@ -152,7 +174,7 @@ public class RevealPublicObjectiveService {
                 channel, game.getPing() + ", a secret objective has been converted to a public objective.");
         if (po != null) {
             channel.sendMessageEmbeds(List.of(po.getRepresentationEmbed()))
-                    .queue(m -> m.pin().queue());
+                    .queue(m -> m.pin().queue(Consumers.nop(), BotLogger::catchRestError));
         }
     }
 
@@ -161,19 +183,32 @@ public class RevealPublicObjectiveService {
     }
 
     public String revealS1(Game game, GenericInteractionCreateEvent event, boolean random) {
-        Map.Entry<String, Integer> objective;
-        if (random) {
-            objective = game.revealStage1Random();
-        } else {
-            objective = game.revealStage1();
-        }
+        Map.Entry<String, Integer> objective = random ? game.revealStage1Random() : game.revealStage1();
+        return handleStage1Revealed(game, event, objective);
+    }
+
+    /** Reveals a stage 1 objective from the deck itself (ignoring the peekable upcoming objectives). */
+    public String revealS1FromDeck(Game game, GenericInteractionCreateEvent event) {
+        return handleStage1Revealed(game, event, game.revealStage1FromDeck());
+    }
+
+    private String handleStage1Revealed(
+            Game game, GenericInteractionCreateEvent event, Map.Entry<String, Integer> objective) {
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         var channel = game.getActionsChannel();
         MessageHelper.sendMessageToChannel(
                 channel, "### " + game.getPing() + ", a stage 1 public objective has been revealed.");
         channel.sendMessageEmbeds(po.getRepresentationEmbed())
-                .queue(m -> m.pin().queue());
+                .queue(m -> m.pin().queue(Consumers.nop(), BotLogger::catchRestError));
         NeuraloopService.offerInitialNeuraloopChoice(game, objective.getKey());
+        for (Player player : game.getRealPlayers()) {
+            if (player.hasAbility("rewrite_destiny")) {
+                TyrisAbilityHandler.offerRewriteDestiny(game, player, objective.getKey(), 1);
+            }
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "tyriscommander")) {
+                TyrisLeaderHandler.offerInfantry(game, player);
+            }
+        }
         if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {
             if (!game.isFowMode() && !Objects.equals(objective.getKey(), Constants.IMPERIUM_REX_ID)) {
                 MessageHelper.sendMessageToChannel(
@@ -229,12 +264,12 @@ public class RevealPublicObjectiveService {
             liberate.setColor(WHITE_COLOR);
             channel.sendMessageEmbeds(
                             List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed(), liberate.build()))
-                    .queue(m -> m.pin().queue());
+                    .queue(m -> m.pin().queue(Consumers.nop(), BotLogger::catchRestError));
         } else {
             MessageHelper.sendMessageToChannel(
                     channel, game.getPing() + ", two stage 1 public objectives have been revealed.");
             channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed()))
-                    .queue(m -> m.pin().queue());
+                    .queue(m -> m.pin().queue(Consumers.nop(), BotLogger::catchRestError));
         }
 
         int maxSCsPerPlayer;
@@ -272,7 +307,7 @@ public class RevealPublicObjectiveService {
         PublicObjectiveModel po7 = Mapper.getPublicObjective(objective7.getKey());
         PublicObjectiveModel po8 = Mapper.getPublicObjective(objective8.getKey());
         PublicObjectiveModel po9 = Mapper.getPublicObjective(objective9.getKey());
-        if (game.getPublicObjectives1Peakable().isEmpty()) {
+        if (game.getPublicObjectives1Peekable().isEmpty()) {
             MessageHelper.sendMessageToChannel(channel, game.getPing() + ", all objectives have been revealed.");
             channel.sendMessageEmbeds(List.of(
                             po1.getRepresentationEmbed(),
@@ -283,7 +318,7 @@ public class RevealPublicObjectiveService {
                             po7.getRepresentationEmbed(),
                             po8.getRepresentationEmbed(),
                             po9.getRepresentationEmbed()))
-                    .queue(m -> m.pin().queue());
+                    .queue(m -> m.pin().queue(Consumers.nop(), BotLogger::catchRestError));
 
         } else {
             Map.Entry<String, Integer> objective5 = game.revealStage1();
@@ -302,7 +337,7 @@ public class RevealPublicObjectiveService {
                             po8.getRepresentationEmbed(),
                             po9.getRepresentationEmbed(),
                             po10.getRepresentationEmbed()))
-                    .queue(m -> m.pin().queue());
+                    .queue(m -> m.pin().queue(Consumers.nop(), BotLogger::catchRestError));
         }
 
         int maxSCsPerPlayer;

@@ -4,10 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
+import ti4.game.Game;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.model.AbilityModel;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
@@ -16,7 +17,14 @@ import ti4.service.emoji.TI4Emoji;
 public class AbilityDraftItem extends DraftItem {
 
     public AbilityDraftItem(String itemId) {
-        super(Category.ABILITY, itemId);
+        super(DraftCategory.ABILITY, itemId);
+    }
+
+    @JsonIgnore
+    @Override
+    public String getTitle(Game game) {
+        AbilityModel ability = getAbilityModel();
+        return ability.getNameRepresentation();
     }
 
     @JsonIgnore
@@ -37,7 +45,7 @@ public class AbilityDraftItem extends DraftItem {
         AbilityModel abilityModel = getAbilityModel();
         StringBuilder sb = new StringBuilder();
         if (abilityModel.getPermanentEffect().isPresent()) {
-            sb.append(abilityModel.getPermanentEffect().get()).append("\n");
+            sb.append(abilityModel.getPermanentEffect().get()).append('\n');
         }
         if (abilityModel.getWindow().isPresent()
                 && abilityModel.getWindowEffect().isPresent()) {
@@ -57,18 +65,18 @@ public class AbilityDraftItem extends DraftItem {
 
     @JsonIgnore
     private AbilityModel getAbilityModel() {
-        return Mapper.getAbility(ItemId);
+        return Mapper.getAbility(getItemId());
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.ABILITY);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.ABILITY, game.isTwilightsFallMode());
         return allItems;
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.ABILITY);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.ABILITY);
         return allItems;
     }
 
@@ -80,7 +88,7 @@ public class AbilityDraftItem extends DraftItem {
                 if (Arrays.asList(results).contains(ability)) {
                     continue;
                 }
-                allItems.add(generate(DraftItem.Category.ABILITY, ability));
+                allItems.add(generate(DraftCategory.ABILITY, ability));
             }
         }
         return allItems;
@@ -90,7 +98,7 @@ public class AbilityDraftItem extends DraftItem {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
             for (String ability : faction.getAbilities()) {
-                allItems.add(generate(DraftItem.Category.ABILITY, ability));
+                allItems.add(generate(DraftCategory.ABILITY, ability));
             }
         }
         return allItems;

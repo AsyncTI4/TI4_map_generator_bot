@@ -1,10 +1,10 @@
 package ti4.service.relic;
 
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
 
-public class TriadService {
+public final class TriadService {
 
     public static void checkAndUpdateTriad(Game game) {
         for (Player player : game.getPlayers().values()) {

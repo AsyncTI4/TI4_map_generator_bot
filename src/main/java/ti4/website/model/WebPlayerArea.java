@@ -9,17 +9,17 @@ import lombok.Data;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 
 @Data
 public class WebPlayerArea {
@@ -29,26 +29,14 @@ public class WebPlayerArea {
         IMAGE // Local image converted to WebP URL
     }
 
-    @Data
-    private static class UnitCountInfo {
-        private final int unitCap;
-        private final int deployedCount;
-    }
+    private record UnitCountInfo(int unitCap, int deployedCount) {}
 
-    @Data
-    public static class BreakthroughInfo {
-        private final String breakthroughId;
-        private final boolean unlocked;
-        private final boolean exhausted;
-        private final int tradeGoodsStored;
-    }
+    /**
+     * @param tradeGoodsStored TODO: MemePhilosopher uncomment this private final boolean active;
+     */
+    public record BreakthroughInfo(String breakthroughId, boolean unlocked, boolean exhausted, int tradeGoodsStored) {}
 
-    @Data
-    public static class PlotCardInfo {
-        private final String plotAlias;
-        private final Integer identifier;
-        private final List<String> factions;
-    }
+    public record PlotCardInfo(String plotAlias, Integer identifier, List<String> factions) {}
 
     // Basic properties
     private String userName;
@@ -138,6 +126,7 @@ public class WebPlayerArea {
     private String flexibleDisplayName;
     private Set<Integer> scs;
     private Boolean isSpeaker;
+    private Boolean isTyrant;
     private List<String> neighbors;
 
     // army values
@@ -178,6 +167,7 @@ public class WebPlayerArea {
     private Map<String, Integer> debtTokens;
 
     // Breakthrough (Thunder's Edge)
+    // TODO: MemePhilosopher make this a list
     private BreakthroughInfo breakthrough;
 
     // Plot cards (Firmament/Obsidian)
@@ -189,41 +179,44 @@ public class WebPlayerArea {
     // Decal ID
     private String decalId;
 
+    // Nekro Z Assimilator targets (Thunder's Edge) - factions whose flagships have been assimilated
+    private List<String> valefarZTargets;
+
     public static WebPlayerArea fromPlayer(Player player, Game game) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
 
         // Basic properties
-        webPlayerArea.setUserName(player.getUserName());
-        webPlayerArea.setFaction(player.getFaction());
+        webPlayerArea.userName = player.getUserName();
+        webPlayerArea.faction = player.getFaction();
 
         // Set faction image and type
         FactionImageResult factionImageResult = getFactionImagePathAndType(player);
-        webPlayerArea.setFactionImage(factionImageResult.path);
-        webPlayerArea.setFactionImageType(factionImageResult.type);
+        webPlayerArea.factionImage = factionImageResult.path;
+        webPlayerArea.factionImageType = factionImageResult.type;
 
-        webPlayerArea.setColor(player.getColor());
-        webPlayerArea.setColorDisplayName(player.getColorDisplayName());
-        webPlayerArea.setDisplayName(player.getDisplayName());
-        webPlayerArea.setDiscordId(player.getUserID());
-        webPlayerArea.setCardsInfoThreadLink(player.getCardsInfoThreadJumpLink());
-        webPlayerArea.setPassed(player.isPassed());
-        webPlayerArea.setEliminated(player.isEliminated());
-        webPlayerArea.setActive(player.isActivePlayer());
-        webPlayerArea.setHasZeroToken(player.hasTheZeroToken());
+        webPlayerArea.color = player.getColor();
+        webPlayerArea.colorDisplayName = player.getColorDisplayName();
+        webPlayerArea.displayName = player.getDisplayName();
+        webPlayerArea.discordId = player.getUserID();
+        webPlayerArea.cardsInfoThreadLink = player.getCardsInfoThreadJumpLink();
+        webPlayerArea.passed = player.isPassed();
+        webPlayerArea.eliminated = player.isEliminated();
+        webPlayerArea.active = player.isActivePlayer();
+        webPlayerArea.hasZeroToken = player.hasTheZeroToken();
 
         // Command counters
-        webPlayerArea.setTacticalCC(player.getTacticalCC());
-        webPlayerArea.setFleetCC(player.getFleetCC());
-        webPlayerArea.setStrategicCC(player.getStrategicCC());
+        webPlayerArea.tacticalCC = player.getTacticalCC();
+        webPlayerArea.fleetCC = player.getFleetCC();
+        webPlayerArea.strategicCC = player.getStrategicCC();
 
         // Calculate CC reinforcements
         int ccReinf = calculateCCReinforcements(player, game);
-        webPlayerArea.setCcReinf(ccReinf);
+        webPlayerArea.ccReinf = ccReinf;
 
         // Resources
-        webPlayerArea.setTg(player.getTg());
-        webPlayerArea.setCommodities(player.getCommodities());
-        webPlayerArea.setCommoditiesTotal(player.getCommoditiesTotal());
+        webPlayerArea.tg = player.getTg();
+        webPlayerArea.commodities = player.getCommodities();
+        webPlayerArea.commoditiesTotal = player.getCommoditiesTotal();
 
         // Resource and influence totals
         Integer resources = Helper.getPlayerResourcesAvailable(player, game);
@@ -231,46 +224,46 @@ public class WebPlayerArea {
         Integer totResources = Helper.getPlayerResourcesTotal(player, game);
         Integer totInfluence = Helper.getPlayerInfluenceTotal(player, game);
 
-        webPlayerArea.setResources(resources != null ? resources : 0);
-        webPlayerArea.setInfluence(influence != null ? influence : 0);
-        webPlayerArea.setTotResources(totResources != null ? totResources : 0);
-        webPlayerArea.setTotInfluence(totInfluence != null ? totInfluence : 0);
+        webPlayerArea.resources = resources != null ? resources : 0;
+        webPlayerArea.influence = influence != null ? influence : 0;
+        webPlayerArea.totResources = totResources != null ? totResources : 0;
+        webPlayerArea.totInfluence = totInfluence != null ? totInfluence : 0;
 
         // Optimal resource and influence calculations
         Integer optimalResources = Helper.getPlayerOptimalResourcesAvailable(player, game);
         Integer optimalInfluence = Helper.getPlayerOptimalInfluenceAvailable(player, game);
         Integer flexValue = Helper.getPlayerFlexResourcesInfluenceAvailable(player, game);
 
-        webPlayerArea.setOptimalResources(optimalResources != null ? optimalResources : 0);
-        webPlayerArea.setOptimalInfluence(optimalInfluence != null ? optimalInfluence : 0);
-        webPlayerArea.setFlexValue(flexValue != null ? flexValue : 0);
+        webPlayerArea.optimalResources = optimalResources != null ? optimalResources : 0;
+        webPlayerArea.optimalInfluence = optimalInfluence != null ? optimalInfluence : 0;
+        webPlayerArea.flexValue = flexValue != null ? flexValue : 0;
 
         // Total optimal resource and influence calculations (all planets)
         Integer totOptimalResources = Helper.getPlayerOptimalResourcesTotal(player, game);
         Integer totOptimalInfluence = Helper.getPlayerOptimalInfluenceTotal(player, game);
         Integer totFlexValue = Helper.getPlayerFlexResourcesInfluenceTotal(player, game);
 
-        webPlayerArea.setTotOptimalResources(totOptimalResources != null ? totOptimalResources : 0);
-        webPlayerArea.setTotOptimalInfluence(totOptimalInfluence != null ? totOptimalInfluence : 0);
-        webPlayerArea.setTotFlexValue(totFlexValue != null ? totFlexValue : 0);
+        webPlayerArea.totOptimalResources = totOptimalResources != null ? totOptimalResources : 0;
+        webPlayerArea.totOptimalInfluence = totOptimalInfluence != null ? totOptimalInfluence : 0;
+        webPlayerArea.totFlexValue = totFlexValue != null ? totFlexValue : 0;
 
         // Fragments
-        webPlayerArea.setCrf(player.getCrf());
-        webPlayerArea.setHrf(player.getHrf());
-        webPlayerArea.setIrf(player.getIrf());
-        webPlayerArea.setUrf(player.getUrf());
+        webPlayerArea.crf = player.getCrf();
+        webPlayerArea.hrf = player.getHrf();
+        webPlayerArea.irf = player.getIrf();
+        webPlayerArea.urf = player.getUrf();
 
         // Units and combat
-        webPlayerArea.setStasisInfantry(player.getStasisInfantry());
-        webPlayerArea.setActualHits(player.getActualHits());
-        webPlayerArea.setExpectedHitsTimes10(player.getExpectedHitsTimes10());
-        webPlayerArea.setUnitsOwned(player.getUnitsOwned());
+        webPlayerArea.stasisInfantry = player.getStasisInfantry();
+        webPlayerArea.actualHits = player.getActualHits();
+        webPlayerArea.expectedHitsTimes10 = player.getExpectedHitsTimes10();
+        webPlayerArea.unitsOwned = player.getUnitsOwned();
 
         // Strategy cards and promissory notes
-        webPlayerArea.setFollowedSCs(player.getFollowedSCs());
-        webPlayerArea.setUnfollowedSCs(player.getUnfollowedSCs());
-        webPlayerArea.setExhaustedSCs(player.getExhaustedSCs());
-        webPlayerArea.setPromissoryNotesInPlayArea(player.getPromissoryNotesInPlayArea());
+        webPlayerArea.followedSCs = player.getFollowedSCs();
+        webPlayerArea.unfollowedSCs = player.getUnfollowedSCs();
+        webPlayerArea.exhaustedSCs = player.getExhaustedSCs();
+        webPlayerArea.promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
 
         // Custom promissory notes (faction-specific only, excluding generic ones)
         List<String> customPromissoryNotes = new ArrayList<>();
@@ -280,98 +273,111 @@ public class WebPlayerArea {
                 customPromissoryNotes.add(pnID);
             }
         }
-        webPlayerArea.setCustomPromissoryNotes(customPromissoryNotes);
+        webPlayerArea.customPromissoryNotes = customPromissoryNotes;
 
         // Technologies
-        webPlayerArea.setTechs(player.getTechs());
-        webPlayerArea.setExhaustedTechs(player.getExhaustedTechs());
-        webPlayerArea.setFactionTechs(player.getFactionTechs());
-        webPlayerArea.setNotResearchedFactionTechs(player.getNotResearchedFactionTechs());
+        webPlayerArea.techs = player.getTechs();
+        webPlayerArea.exhaustedTechs = player.getExhaustedTechs();
+        webPlayerArea.factionTechs = player.getFactionTechs();
+        webPlayerArea.notResearchedFactionTechs = player.getNotResearchedFactionTechs();
 
         // Planets
-        webPlayerArea.setPlanets(player.getPlanets());
-        List<String> exhaustedPlanets = new ArrayList<>(player.getExhaustedPlanets());
-        // Ensure Custodia Vigilia is in exhausted planets if the player has it
-        // (it's always exhausted when gained via gainCustodiaVigilia())
-        if (player.getPlanets().contains("custodiavigilia") && !exhaustedPlanets.contains("custodiavigilia")) {
-            exhaustedPlanets.add("custodiavigilia");
-        }
-        // Also handle custodiavigiliaplus if it exists
-        if (player.getPlanets().contains("custodiavigiliaplus") && !exhaustedPlanets.contains("custodiavigiliaplus")) {
-            exhaustedPlanets.add("custodiavigiliaplus");
-        }
-        webPlayerArea.setExhaustedPlanets(exhaustedPlanets);
-        webPlayerArea.setExhaustedPlanetAbilities(player.getExhaustedPlanetsAbilities());
+        webPlayerArea.planets = player.getPlanets();
+        webPlayerArea.exhaustedPlanets = new ArrayList<>(player.getExhaustedPlanets());
+        webPlayerArea.exhaustedPlanetAbilities = player.getExhaustedPlanetsAbilities();
 
         // Relics and fragments
-        webPlayerArea.setFragments(player.getFragments());
-        webPlayerArea.setRelics(player.getRelics());
-        webPlayerArea.setExhaustedRelics(player.getExhaustedRelics());
+        webPlayerArea.fragments = player.getFragments();
+        webPlayerArea.relics = player.getRelics();
+        webPlayerArea.exhaustedRelics = player.getExhaustedRelics();
 
         // Leaders and secrets
-        webPlayerArea.setLeaders(player.getLeaders());
-        webPlayerArea.setLeaderIDs(player.getLeaderIDs());
-        webPlayerArea.setSecretsScored(player.getSecretsScored());
+        webPlayerArea.leaders = player.getLeaders();
+        webPlayerArea.leaderIDs = player.getLeaderIDs();
+        webPlayerArea.secretsScored = player.getSecretsScored();
 
+        Map<String, Integer> unscoredSecrets = player.getSecretsUnscored();
         // Known unscored secrets (populated if search warrant is in play)
         if (player.isSearchWarrant()) {
-            webPlayerArea.setKnownUnscoredSecrets(player.getSecretsUnscored());
+            webPlayerArea.knownUnscoredSecrets = unscoredSecrets;
         } else {
-            webPlayerArea.setKnownUnscoredSecrets(new HashMap<>());
+            webPlayerArea.knownUnscoredSecrets = new HashMap<>();
         }
 
-        webPlayerArea.setNumUnscoredSecrets(
-                player.getSecretsUnscored() != null
-                        ? player.getSecretsUnscored().size()
-                        : 0);
+        webPlayerArea.numUnscoredSecrets = unscoredSecrets.size();
 
         // Additional properties
-        webPlayerArea.setFlexibleDisplayName(player.getFlexibleDisplayName());
-        webPlayerArea.setScs(player.getSCs());
-        webPlayerArea.setIsSpeaker(player.isSpeaker());
-        webPlayerArea.setNeighbors(player.getNeighbouringPlayers(false).stream()
+        webPlayerArea.flexibleDisplayName = player.getFlexibleDisplayName();
+        webPlayerArea.scs = player.getSCs();
+        webPlayerArea.isSpeaker = player.isSpeaker();
+        webPlayerArea.isTyrant = player.isTyrant();
+        webPlayerArea.neighbors = player.getNeighbouringPlayers(false).stream()
                 .map(Player::getColor)
-                .toList());
+                .toList();
 
         // Army values
-        webPlayerArea.setSpaceArmyRes(player.getTotalResourceValueOfUnits("space"));
-        webPlayerArea.setGroundArmyRes(player.getTotalResourceValueOfUnits("ground"));
-        webPlayerArea.setSpaceArmyHealth(player.getTotalHPValueOfUnits("space"));
-        webPlayerArea.setGroundArmyHealth(player.getTotalHPValueOfUnits("ground"));
-        webPlayerArea.setSpaceArmyCombat(player.getTotalCombatValueOfUnits("space"));
-        webPlayerArea.setGroundArmyCombat(player.getTotalCombatValueOfUnits("ground"));
+        webPlayerArea.spaceArmyRes = player.getTotalResourceValueOfUnits("space");
+        webPlayerArea.groundArmyRes = player.getTotalResourceValueOfUnits("ground");
+        webPlayerArea.spaceArmyHealth = player.getTotalHPValueOfUnits("space");
+        webPlayerArea.groundArmyHealth = player.getTotalHPValueOfUnits("ground");
+        webPlayerArea.spaceArmyCombat = player.getTotalCombatValueOfUnits("space");
+        webPlayerArea.groundArmyCombat = player.getTotalCombatValueOfUnits("ground");
 
         // card counts
-        webPlayerArea.setSoCount(player.getSo());
-        webPlayerArea.setAcCount(player.getAcCount());
-        webPlayerArea.setPnCount(player.getPnCount());
+        webPlayerArea.soCount = player.getSo();
+        webPlayerArea.acCount = player.getAcCount();
+        webPlayerArea.pnCount = player.getPnCount();
 
         // victory points
-        webPlayerArea.setTotalVps(player.getTotalVictoryPoints());
+        webPlayerArea.totalVps = player.getTotalVictoryPoints();
 
         // secret objectives
-        webPlayerArea.setNumScoreableSecrets(player.getMaxSOCount());
+        webPlayerArea.numScoreableSecrets = player.getMaxSOCount();
 
         // Faction abilities
-        webPlayerArea.setAbilities(new ArrayList<>(player.getAbilities()));
+        webPlayerArea.abilities = new ArrayList<>(player.getAbilities());
 
         // Decal ID
-        webPlayerArea.setDecalId(player.getDecalSet());
+        webPlayerArea.decalId = player.getDecalSet();
+
+        // Nekro Z Assimilator targets (Thunder's Edge)
+        // Parse valefarZ stored value which contains factions whose flagships have been assimilated
+        List<String> valefarZTargets = new ArrayList<>();
+        if (player.hasUnlockedBreakthrough("nekrobt")) {
+            String valefarZValue = game.getStoredValue("valefarZ");
+            if (!valefarZValue.isEmpty()) {
+                for (String faction : valefarZValue.split("\\|")) {
+                    if (!faction.isEmpty()) {
+                        valefarZTargets.add(faction);
+                    }
+                }
+            }
+        }
+        webPlayerArea.valefarZTargets = valefarZTargets;
 
         // Breakthrough info (Thunder's Edge)
         if (game.isThundersEdge()) {
-            String breakthroughId = player.getBreakthroughID();
-            if (breakthroughId != null && !breakthroughId.isEmpty()) {
-                webPlayerArea.setBreakthrough(new BreakthroughInfo(
-                        breakthroughId,
-                        player.isBreakthroughUnlocked(),
-                        player.isBreakthroughExhausted(),
-                        player.getBreakthroughTGs()));
+            List<BreakthroughInfo> breakthroughs = new ArrayList<>();
+            for (String btID : player.getBreakthroughIDs()) {
+                boolean unl = player.isBreakthroughUnlocked(btID);
+                boolean exh = player.isBreakthroughExhausted(btID);
+                boolean act = player.isBreakthroughActive(btID);
+                int tgs = player.getBreakthroughTGs(btID);
+
+                // TODO: MemePhilosopher replace this ...
+                breakthroughs.add(new BreakthroughInfo(btID, unl, exh, tgs));
+                // ... with this
+                // breakthroughs.add(new BreakthroughInfo(btID, unl, exh, act, tgs));
+            }
+
+            // TODO: MemePhilosopher make this a list
+            if (!breakthroughs.isEmpty()) {
+                webPlayerArea.breakthrough = breakthroughs.getFirst();
             } else {
-                webPlayerArea.setBreakthrough(null);
+                webPlayerArea.breakthrough = null;
             }
         } else {
-            webPlayerArea.setBreakthrough(null);
+            webPlayerArea.breakthrough = null;
         }
 
         // Plot cards (Firmament/Obsidian)
@@ -389,14 +395,14 @@ public class WebPlayerArea {
                 plotCardsList.add(new PlotCardInfo(plotAliasToUse, identifier, factions));
             }
         }
-        webPlayerArea.setPlotCards(plotCardsList);
+        webPlayerArea.plotCards = plotCardsList;
 
         // Special token reinforcements
         // Sleeper tokens (Titans faction only)
         if (player.hasAbility("awaken") && !game.isTwilightsFallMode()) {
-            webPlayerArea.setSleeperTokensReinf(5 - game.getSleeperTokensPlacedCount());
+            webPlayerArea.sleeperTokensReinf = 5 - game.getSleeperTokensPlacedCount();
         } else {
-            webPlayerArea.setSleeperTokensReinf(0);
+            webPlayerArea.sleeperTokensReinf = 0;
         }
 
         // Ghost wormhole tokens (Ghost faction only)
@@ -424,9 +430,9 @@ public class WebPlayerArea {
             if (!betaOnMap) ghostWormholesInReinf.add("creussbeta");
             if (!gammaOnMap) ghostWormholesInReinf.add("creussgamma");
 
-            webPlayerArea.setGhostWormholesReinf(ghostWormholesInReinf);
+            webPlayerArea.ghostWormholesReinf = ghostWormholesInReinf;
         } else {
-            webPlayerArea.setGhostWormholesReinf(new ArrayList<>());
+            webPlayerArea.ghostWormholesReinf = new ArrayList<>();
         }
 
         // Breach tokens (Crimson Rebellion faction only)
@@ -436,11 +442,11 @@ public class WebPlayerArea {
                     .flatMap(t -> t.getUnitHolders().values().stream())
                     .flatMap(uh -> uh.getTokenList().stream())
                     .filter(tok ->
-                            tok.equals(Constants.TOKEN_BREACH_ACTIVE) || tok.equals(Constants.TOKEN_BREACH_INACTIVE))
+                            Constants.TOKEN_BREACH_ACTIVE.equals(tok) || Constants.TOKEN_BREACH_INACTIVE.equals(tok))
                     .count();
-            webPlayerArea.setBreachTokensReinf(Math.max(0, maxBreachTokens - totalBreaches));
+            webPlayerArea.breachTokensReinf = Math.max(0, maxBreachTokens - totalBreaches);
         } else {
-            webPlayerArea.setBreachTokensReinf(0);
+            webPlayerArea.breachTokensReinf = 0;
         }
 
         // Galvanize tokens (Bastion faction only)
@@ -450,9 +456,9 @@ public class WebPlayerArea {
                     .flatMap(t -> t.getUnitHolders().values().stream())
                     .mapToInt(UnitHolder::getTotalGalvanizedCount)
                     .sum();
-            webPlayerArea.setGalvanizeTokensReinf(Math.max(0, maxGalvanizeTokens - totGalvanized));
+            webPlayerArea.galvanizeTokensReinf = Math.max(0, maxGalvanizeTokens - totGalvanized);
         } else {
-            webPlayerArea.setGalvanizeTokensReinf(0);
+            webPlayerArea.galvanizeTokensReinf = 0;
         }
 
         // get reinforcement count
@@ -483,7 +489,7 @@ public class WebPlayerArea {
             unitInfoMap.put(unitID, unitCountInfo);
         }
 
-        webPlayerArea.setUnitCounts(unitInfoMap);
+        webPlayerArea.unitCounts = unitInfoMap;
 
         // Populate nombox data for players with captured units
         Map<String, List<String>> nomboxData = new HashMap<>();
@@ -494,12 +500,12 @@ public class WebPlayerArea {
             for (Units.UnitKey unitKey : nombox.getUnitKeys()) {
                 String unitId = unitKey.asyncID();
                 // Get the actual player/faction that owns this captured unit
-                Player unitOwner = game.getPlayerByColorID(unitKey.getColorID()).orElse(null);
+                Player unitOwner = game.getPlayerByColorID(unitKey.colorID()).orElse(null);
                 if (unitOwner != null) {
                     String unitFaction = unitOwner.getFaction();
                     int count = nombox.getUnitCount(unitKey);
 
-                    unitsByFaction.computeIfAbsent(unitFaction, k -> new HashMap<>());
+                    unitsByFaction.computeIfAbsent(unitFaction, _ -> new HashMap<>());
                     Map<String, Integer> unitCounts = unitsByFaction.get(unitFaction);
                     unitCounts.put(unitId, unitCounts.getOrDefault(unitId, 0) + count);
                 }
@@ -516,13 +522,12 @@ public class WebPlayerArea {
                 nomboxData.put(faction, unitList);
             }
         }
-        webPlayerArea.setNombox(nomboxData);
+        webPlayerArea.nombox = nomboxData;
 
-        // Mahact edict: only applies if the player is mahact and loads the mahact's "stolen" fleet supply
-        if (player.hasAbility("edict")) {
-            webPlayerArea.setMahactEdict(player.getMahactCC());
+        if (player.hasAbility("edict") || player.hasAbility("edict_y")) {
+            webPlayerArea.mahactEdict = player.getMahactCC();
         } else {
-            webPlayerArea.setMahactEdict(new ArrayList<>());
+            webPlayerArea.mahactEdict = new ArrayList<>();
         }
 
         // Debt tokens: debt that this player is OWED by other players (only include entries with count > 0)
@@ -532,14 +537,14 @@ public class WebPlayerArea {
                 debtTokens.put(debtEntry.getKey(), debtEntry.getValue());
             }
         }
-        webPlayerArea.setDebtTokens(debtTokens);
+        webPlayerArea.debtTokens = debtTokens;
 
         return webPlayerArea;
     }
 
     private static void fillUnits(Map<Units.UnitKey, Integer> unitCount, UnitHolder unitHolder) {
         for (Units.UnitKey uk : unitHolder.getUnitKeys()) {
-            if (uk.getUnitType() == Units.UnitType.Infantry || uk.getUnitType() == Units.UnitType.Fighter) {
+            if (uk.unitType() == Units.UnitType.Infantry || uk.unitType() == Units.UnitType.Fighter) {
                 unitCount.put(uk, unitCount.getOrDefault(uk, 0) + 1);
                 continue;
             }
@@ -571,15 +576,7 @@ public class WebPlayerArea {
     /**
      * Result class for faction image path and type
      */
-    private static class FactionImageResult {
-        final String path;
-        final FactionImageType type;
-
-        FactionImageResult(String path, FactionImageType type) {
-            this.path = path;
-            this.type = type;
-        }
-    }
+    private record FactionImageResult(String path, FactionImageType type) {}
 
     /**
      * Gets the appropriate faction image path and type for web interface.

@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedGame;
-import ti4.map.persistence.ManagedPlayer;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
+import ti4.game.persistence.ManagedPlayer;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class CommunityStatisticsService {

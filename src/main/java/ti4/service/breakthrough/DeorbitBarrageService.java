@@ -8,20 +8,20 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
+import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.regex.RegexService;
@@ -38,7 +38,7 @@ public class DeorbitBarrageService {
         List<Tile> asteroids =
                 game.getTileMap().values().stream().filter(asteroidWithUnit).toList();
 
-        List<Planet> eligibleTargets = asteroids.stream()
+        return asteroids.stream()
                 .map(Tile::getPosition)
                 .flatMap(pos -> FoWHelper.getAdjacentTiles(game, pos, player, false).stream())
                 .flatMap(pos -> FoWHelper.getAdjacentTiles(game, pos, player, false).stream())
@@ -48,7 +48,6 @@ public class DeorbitBarrageService {
                 .flatMap(tile -> tile.getPlanetUnitHolders().stream())
                 .filter(Planet::hasUnits)
                 .toList();
-        return eligibleTargets;
     }
 
     public void postInitialButtons(Game game, Player player) {
@@ -62,8 +61,8 @@ public class DeorbitBarrageService {
 
             buttons.add(Buttons.red("deorbitBarrageTarget_" + p2.getFaction(), null, p2.fogSafeEmoji()));
         }
-        String msg = player.getRepresentation() + " Choose a player whose planet you want to target with "
-                + deorbitRep(true);
+        String msg = player.getRepresentation() + ", please choose the player whose planet you want to target with "
+                + deorbitRep(true) + ".";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 
@@ -73,10 +72,10 @@ public class DeorbitBarrageService {
         Player player2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String target = Mapper.getColorID(matcher.group("faction"));
-            String prefixID = player.finChecker() + "deorbitBarragePlanet_";
+            String prefixID = player.factionButtonChecker() + "deorbitBarragePlanet_";
             List<Button> buttons = getAllPlanetsInRange(game, player).stream()
                     .filter(planet -> planet.getUnitCount(player2.getColorID()) > 0)
-                    .map(pl -> Buttons.gray(prefixID + pl.getName(), "Target " + pl.getName()))
+                    .map(pl -> Buttons.gray(prefixID + pl.getName(), "Target " + Helper.getPlanetName(pl.getName())))
                     .toList();
 
             MessageHelper.sendMessageToChannelWithButtons(
@@ -92,10 +91,11 @@ public class DeorbitBarrageService {
         for (int x = 0; x < Helper.getPlayerResourcesAvailable(player, game) + player.getTg() + 1; x++) {
             buttons.add(Buttons.gray("deorbitBarrageResource_" + planet + "_" + x, "" + x));
         }
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                "Choose how many resources you would like to spend (can spend tgs)",
-                buttons);
+        String message = "Choose how many resources you wish to spend.";
+        if (player.getTg() > 0) {
+            message = "Choose how many resources you wish to spend (you may spend trade goods as resources).";
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -103,18 +103,20 @@ public class DeorbitBarrageService {
     private static void deorbitBarrageStep3(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         String planet = buttonID.split("_")[1];
-        int resources = Integer.parseInt(buttonID.split("_")[2]);
+        int amount = Integer.parseInt(buttonID.split("_")[2]);
         Player p2 = game.getPlanetOwner(planet);
+        if (p2 == null) {
+            p2 = game.getPlayerFromColorOrFaction("neutral");
+        }
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " will target " + planetRep + " and spend " + resources
-                        + " resources to roll " + resources + " dice hitting on a 4+");
+                player.getRepresentationNoPing() + " is targeting " + planetRep + ". They spent "
+                        + StringHelper.pluralize(amount, "resource") + " to roll " + amount
+                        + " dice, hitting on a 4+.");
         ButtonHelper.deleteMessage(event);
-        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        int amount = resources;
-        int hits = 0;
         if (amount > 0) {
+            int hits = 0;
             StringBuilder msg = new StringBuilder(FactionEmojis.Saar + " rolled ");
             for (int x = 0; x < amount; x++) {
                 Die d1 = new Die(4);
@@ -123,26 +125,30 @@ public class DeorbitBarrageService {
                     hits++;
                 }
             }
-            msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
+            msg = new StringBuilder(msg.substring(0, msg.length() - 2) + ", producing "
+                    + (hits == 0 ? "no" : "a total of " + hits) + " hit" + (hits == 1 ? "" : "s") + ".");
             // bombard msg
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
             if (hits > 0) {
                 if (p2.hasAbility("data_recovery")) {
                     ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
                 }
+                buttons.add(Buttons.red(
+                        "getDamageButtons_" + game.getTileFromPlanet(planet).getPosition() + "_bombardment",
+                        "Assign Hit" + (hits == 1 ? "" : "s")));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
+                        p2.getRepresentation() + ", please assign the hits" + (hits == 1 ? "" : "s")
+                                + ". Reminder that the player who did the barrage officially assigns the hits, but that you can sustain if they assign a hit to mechs. Ask them how they would like you to assign hits.",
+                        buttons);
             }
-            buttons.add(Buttons.red(
-                    "getDamageButtons_" + game.getTileFromPlanet(planet).getPosition() + "_bombardment",
-                    "Assign Hit" + (hits == 1 ? "" : "s")));
-            MessageHelper.sendMessageToChannelWithButtons(
-                    game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
-                    p2.getRepresentation() + ", please assign the hits" + (hits == 1 ? "" : "s") + ".",
-                    buttons);
             buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
             Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(), "Use Buttons to Pay For The Rolled Dice", buttons);
+                    player.getCorrectChannel(),
+                    "Please pay " + StringHelper.pluralize(amount, "resource") + " for the rolled dice.",
+                    buttons);
         }
     }
 }

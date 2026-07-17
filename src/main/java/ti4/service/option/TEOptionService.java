@@ -1,17 +1,28 @@
 package ti4.service.option;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.container.Container;
+import net.dv8tion.jda.api.components.container.ContainerChildComponent;
+import net.dv8tion.jda.api.components.section.Section;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.commands.franken.ban.BanService;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.draft.TwilightsFallFrankenDraft;
+import ti4.game.Game;
 import ti4.helpers.ButtonHelper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
+import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.message.componentsV2.MessageV2Builder;
+import ti4.model.Source.ComponentSource;
+import ti4.model.SourceModel;
+import ti4.model.TechnologyModel;
+import ti4.service.emoji.SourceEmojis;
 import ti4.service.franken.FrankenDraftBagService;
 
 @UtilityClass
@@ -19,7 +30,7 @@ public class TEOptionService {
 
     @ButtonHandler("startTFGame")
     public static void startTFGame(Game game, ButtonInteractionEvent event) {
-        ButtonHelper.deleteMessage(event);
+        // ButtonHelper.deleteMessage(event);
         String msg = """
             There are currently two draft options for Twilight's Fall.
 
@@ -32,12 +43,15 @@ public class TEOptionService {
             The second option is closer to Rules As Written, the first is closer to a classic franken draft.""";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("startTFDraft_bag", "Use Bag Draft of Everything"));
-        buttons.add(Buttons.gray("startDraftSystem_andcatPreset", "Start Milty Draft + Later Inaugural Splice"));
+        buttons.add(Buttons.gray("startDraftSystem_andcatPresetMilty", "Start Milty Draft + Later Inaugural Splice"));
+        buttons.add(
+                Buttons.gray("startDraftSystem_andcatPresetNucleus", "Start Nucleus Draft + Later Inaugural Splice"));
+        buttons.add(Buttons.red("editTFHomebrew", "Enable TF Homebrew options"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
     }
 
     @ButtonHandler("startTFDraft")
-    public static void startTFDraft(Game game, ButtonInteractionEvent event) {
+    public static void startTFDraft(ButtonInteractionEvent event, Game game) {
         game.setupTwilightsFallMode(event);
         FrankenDraftBagService.setUpFrankenFactions(game, event, true);
         FrankenDraftBagService.clearPlayerHands(game);
@@ -46,9 +60,101 @@ public class TEOptionService {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("chooseExp_")
-    public static void chooseExp(Game game, ButtonInteractionEvent event, String buttonID) {
+    @ButtonHandler(value = "editTFHomebrew", save = false)
+    private static void postTwilightFallHomebrewOptions(ButtonInteractionEvent event, Game game) {
+        String msg = "Use the buttons to enable or disable various homebrew options:";
+        List<ContainerChildComponent> sections = getTFHomebrewInfo(game);
+        MessageV2Builder builder = new MessageV2Builder(game.getMainGameChannel());
+        builder.append(msg);
+        builder.append(Container.of(sections));
+        builder.append(Buttons.DONE_DELETE_BUTTONS);
+        builder.send();
 
+        // MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, buttons);
+    }
+
+    public static List<ContainerChildComponent> getTFHomebrewInfo(Game game) {
+        String idPre = "toggleTFHomebrew_";
+        List<ContainerChildComponent> sections = new ArrayList<>();
+
+        SourceModel tk = Mapper.getSource("twilight_kart");
+        String tkId = idPre + "twilightkart";
+        Button button = Buttons.rgToggle(game.isTwilightKart(), tkId, "Twilight Kart", SourceEmojis.TwilightKart);
+        sections.add(Section.of(button, tk.getRepresentationTextDisplays()));
+
+        SourceModel teds = Mapper.getSource("twilight_ds");
+        String tedsID = idPre + "twilightds";
+        Button button2 =
+                Buttons.rgToggle(game.isTwilightDS(), tedsID, "Discordant Stars", SourceEmojis.DiscordantStars);
+        sections.add(Section.of(button2, teds.getRepresentationTextDisplays()));
+        // sections.add(Separator.create(true, Spacing.LARGE));
+
+        return sections;
+    }
+
+    @ButtonHandler("toggleTFHomebrew")
+    private static void toggleTFHomebrew(ButtonInteractionEvent event, Game game, String buttonID) {
+        String homebrew = buttonID.split("_")[1];
+        switch (homebrew) {
+            case "twilightkart" -> {
+                game.setTwilightKart(!game.isTwilightKart());
+                if (game.isTwilightKart()) {
+                    game.setupTwilightsFallMode(event);
+                }
+            }
+            case "twilightds" -> {
+                game.setTwilightDS(!game.isTwilightDS());
+                if (game.isTwilightDS()) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("twilightDSSetup_justds", "Just DS Abilities"));
+                    buttons.add(Buttons.blue("twilightDSSetup_mixture", "Mixture of Normal and DS abilities"));
+                    MessageHelper.sendMessageToChannel(
+                            game.getMainGameChannel(),
+                            "Do you want to use just DS abilities or a mixture of Normal and DS abilities?",
+                            buttons);
+                }
+            }
+        }
+        postTwilightFallHomebrewOptions(event, game);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("twilightDSSetup_")
+    public static void twilightDSSetup(ButtonInteractionEvent event, Game game, String buttonID) {
+        String choice = buttonID.split("_")[1];
+        switch (choice.toLowerCase()) {
+            case "justds" -> {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Chose to just use DS abilities");
+                List<String> allCards = Mapper.getDeck("techs_tf").getNewShuffledDeck();
+                game.removeStoredValue("bannedTechs");
+                for (String tech : allCards) {
+                    BanService.appendStoredValue(game, "bannedTechs", tech);
+                }
+            }
+            case "mixture" -> {
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(), "Chose to just use a mixture of DS and normal abilities");
+                List<String> allCards = Mapper.getDeck("techs_tf").getNewShuffledDeck();
+                game.removeStoredValue("bannedTechs");
+                for (TechnologyModel tech : Mapper.getTechs().values()) {
+                    if (tech.getSource() == ComponentSource.twilight_ds) {
+                        allCards.add(tech.getID());
+                    }
+                }
+                Collections.shuffle(allCards);
+                String msg = "The following abilities have been banned:\n";
+                for (int x = 0; x < allCards.size() / 2; x++) {
+                    BanService.appendStoredValue(game, "bannedTechs", allCards.get(x));
+                    msg += Mapper.getTech(allCards.get(x)).getName() + "\n";
+                }
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+            }
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("chooseExp_")
+    public static void chooseExp(ButtonInteractionEvent event, Game game, String buttonID) {
         String choice = buttonID.split("_")[1];
         switch (choice.toLowerCase()) {
             case "newpok" -> {
@@ -73,7 +179,7 @@ public class TEOptionService {
                         + " components.");
     }
 
-    @ButtonHandler("offerTEOptionButtons")
+    @ButtonHandler(value = "offerTEOptionButtons", save = false)
     public static void offerTEOptionButtons(Game game, MessageChannel channel) {
         List<Button> galacticEventButtons = getGalacticEventButtons(game);
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
@@ -102,16 +208,7 @@ public class TEOptionService {
         // msg =
         //         "Thunder's Edge contains two new strategy cards, Construction and Warfare. You can use them in this
         // game by pressing the button below.";
-        // buttons = new ArrayList<>();
-        // buttons.add(Buttons.green("addNewSCs", "Use New Strategy Cards"));
-        // buttons.add(Buttons.red("deleteButtons", "Decline"));
-        // MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
 
-        // msg = "Thunder's Edge contains 7 new relics. You can use them in this game by pressing the button below.";
-        // buttons = new ArrayList<>();
-        // buttons.add(Buttons.green("addNewRelics", "Use New Relics"));
-        // buttons.add(Buttons.red("deleteButtons", "Decline"));
-        // MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
     }
 
     public static List<Button> getGalacticEventButtons(Game game) {
@@ -182,22 +279,20 @@ public class TEOptionService {
         } else {
             galacticEventButtons.add(Buttons.green("enableDaneMode_Cosmic_enable", "Enable Cosmic Phenomenae"));
         }
-        // if (game.isMonumentToTheAgesMode()) {
-        //     galacticEventButtons.add(Buttons.red("enableDaneMode_Monument_disable", "Disable Monuments to the
-        // Ages"));
-        // } else {
-        //     galacticEventButtons.add(Buttons.green("enableDaneMode_Monument_enable", "Enable Monuments to the
-        // Ages"));
-        // }
+        if (game.isMonumentToTheAgesMode()) {
+            galacticEventButtons.add(Buttons.red("enableDaneMode_Monument_disable", "Disable Monuments to the Ages"));
+        } else {
+            galacticEventButtons.add(Buttons.green("enableDaneMode_Monument_enable", "Enable Monuments to the Ages"));
+        }
         if (game.isWeirdWormholesMode()) {
             galacticEventButtons.add(Buttons.red("enableDaneMode_WeirdWormholes_disable", "Disable Weird Wormholes"));
         } else {
             galacticEventButtons.add(Buttons.green("enableDaneMode_WeirdWormholes_enable", "Enable Weird Wormholes"));
         }
         if (game.isWildWildGalaxyMode()) {
-            galacticEventButtons.add(Buttons.red("enableDaneMode_WildGalaxy_disable", "Disable Wild Wild Galaxy"));
+            galacticEventButtons.add(Buttons.red("enableDaneMode_WildGalaxy_disable", "Disable Wild, Wild Galaxy"));
         } else {
-            galacticEventButtons.add(Buttons.green("enableDaneMode_WildGalaxy_enable", "Enable Wild Wild Galaxy"));
+            galacticEventButtons.add(Buttons.green("enableDaneMode_WildGalaxy_enable", "Enable Wild, Wild Galaxy"));
         }
         if (game.isCallOfTheVoidMode()) {
             galacticEventButtons.add(Buttons.red("enableDaneMode_CallOfTheVoid_disable", "Disable Call of the Void"));

@@ -7,11 +7,12 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.statistics.GameStatisticsFilterer;
+import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.executors.ExecutionLockType;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.ConsumeGameUtility;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
 
@@ -21,20 +22,21 @@ class MostWinningColorStatisticsService {
     static void showMostWinningColor(SlashCommandInteractionEvent event) {
         Map<String, Integer> winnerColorCount = new HashMap<>();
 
-        GamesPage.consumeAllGames(
+        ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilterForWonGame(event),
-                game -> getWinningColor(game, winnerColorCount));
+                game -> getWinningColor(game, winnerColorCount),
+                ExecutionLockType.READ);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Wins per Colour:").append("\n");
+        sb.append("Wins per Colour:").append('\n');
         winnerColorCount.entrySet().stream()
                 .filter(e -> Mapper.isValidColor(e.getKey()))
                 .sorted(Map.Entry.comparingByValue())
-                .forEach(entry -> sb.append("`")
+                .forEach(entry -> sb.append('`')
                         .append(StringUtils.leftPad(entry.getValue().toString(), 4))
                         .append("x` ")
                         .append(ColorEmojis.getColorEmojiWithName(entry.getKey()))
-                        .append("\n"));
+                        .append('\n'));
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Wins per Colour", sb.toString());
     }

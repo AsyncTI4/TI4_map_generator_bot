@@ -3,9 +3,11 @@ package ti4.message.componentsV2;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.Component;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.container.Container;
 import net.dv8tion.jda.api.components.mediagallery.MediaGallery;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
@@ -15,7 +17,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
 public class MessageV2Editor {
     private final List<ReplaceMessagePart> replaceByCustomId = new ArrayList<>();
@@ -23,6 +25,7 @@ public class MessageV2Editor {
 
     public enum MessagePartType {
         TEXT_DISPLAY,
+        CONTAINER,
         BUTTON,
         STRING_SELECT,
         ENTITY_SELECT,
@@ -35,6 +38,9 @@ public class MessageV2Editor {
         @Getter
         private final MessagePartType type;
 
+        @Getter
+        private final Predicate<Component> pred;
+
         /**
          * The key to identify what's being replaced. Use
          * depends on the type:
@@ -45,34 +51,46 @@ public class MessageV2Editor {
         @Getter
         private final String replaceKey;
 
+        public ReplaceMessagePart(Predicate<Component> pred, Container part) {
+            this.part = part;
+            type = MessagePartType.CONTAINER;
+            replaceKey = null;
+            this.pred = pred;
+        }
+
         public ReplaceMessagePart(String oldCustomId, Button part) {
             this.part = part;
             type = MessagePartType.BUTTON;
             replaceKey = oldCustomId;
+            pred = null;
         }
 
         public ReplaceMessagePart(String oldCustomId, StringSelectMenu part) {
             this.part = part;
             type = MessagePartType.STRING_SELECT;
             replaceKey = oldCustomId;
+            pred = null;
         }
 
         public ReplaceMessagePart(String oldCustomId, EntitySelectMenu part) {
             this.part = part;
             type = MessagePartType.ENTITY_SELECT;
             replaceKey = oldCustomId;
+            pred = null;
         }
 
         public ReplaceMessagePart(String oldLineStartsWith, TextDisplay part) {
             this.part = part;
             type = MessagePartType.TEXT_DISPLAY;
             replaceKey = oldLineStartsWith;
+            pred = null;
         }
 
         public ReplaceMessagePart(String oldItemUrlPart, MediaGallery part) {
             this.part = part;
             type = MessagePartType.MEDIA_GALLERY;
             replaceKey = oldItemUrlPart;
+            pred = null;
         }
 
         public Component asComponent() {
@@ -119,6 +137,15 @@ public class MessageV2Editor {
     }
 
     /**
+     * For full container replacement, replace the container components if the predicate returns true
+     * @param newContent A replacement TextDisplay.
+     */
+    public MessageV2Editor replace(Predicate<Component> predicate, Container newContent) {
+        replaceByPattern.add(new ReplaceMessagePart(predicate, newContent));
+        return this;
+    }
+
+    /**
      * For text replacement, replace ALL TextDisplay components whose content matches with the provided regex string
      * @param contentPattern A string to test against each text component.
      * @param newContent A replacement TextDisplay.
@@ -142,7 +169,7 @@ public class MessageV2Editor {
      * Apply changes to recent messages in a channel. This is useful for editing
      * messages that are very likely to be near the bottom of a channel. Especially
      * useful for custom channels, such as draft channels.
-     *
+     * <p>
      * If you're doing any text updates, be sure that the pattern is highly specific.
      * This method will probably check messages you didn't intend.
      * @param channel The channel to edit messages in.
@@ -175,7 +202,7 @@ public class MessageV2Editor {
      * when a complex message is split into multiple messages. You can respond to
      * an interaction in one message, while also affecting related components that
      * were split into a different message.
-     *
+     * <p>
      * If you're doing any text updates, be sure that the pattern is highly specific.
      * This method will probably check messages you didn't intend.
      * @param targetMessage The message to edit, and use as a center point for surrounding messages.
@@ -202,7 +229,7 @@ public class MessageV2Editor {
 
                                 madeChanges = applyToMessage(message) || madeChanges;
                             }
-                            onApplied.accept(madeChanges);
+                            if (onApplied != null) onApplied.accept(madeChanges);
                         },
                         BotLogger::catchRestError);
     }

@@ -8,48 +8,57 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.experimental.UtilityClass;
 import org.apache.commons.collections4.ListUtils;
 import ti4.service.emoji.TI4Emoji;
 
+@UtilityClass
 public final class StringHelper {
 
+    private static final char ESCAPE_CHARACTER = '\\';
+    private static final Map<String, String> ESCAPABLES = createEscapables();
+    private static final String[] SUFFIXES = {"th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"};
+    private static final String[] FIRST_20_NUMBERS = {
+        "zero",
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six",
+        "seven",
+        "eight",
+        "nine",
+        "ten",
+        "eleven",
+        "twelve",
+        "thirteen",
+        "fourteen",
+        "fifteen",
+        "sixteen",
+        "seventeen",
+        "eighteen",
+        "nineteen",
+        "twenty"
+    };
+
+    public static String pluralize(int count, String word) {
+        return count + " " + word + (count == 1 ? "" : "s");
+    }
+
     public static String ordinal(int i) {
-        String[] suffixes = {"th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"};
         return switch (i % 100) {
             case 11, 12, 13 -> i + "th";
-            default -> i + suffixes[i % 10];
+            default -> i + SUFFIXES[i % 10];
         };
     }
 
     public static String numberToWords(int i) {
-        String[] first20 = {
-            "zero",
-            "one",
-            "two",
-            "three",
-            "four",
-            "five",
-            "six",
-            "seven",
-            "eight",
-            "nine",
-            "ten",
-            "eleven",
-            "twelve",
-            "thirteen",
-            "fourteen",
-            "fifteen",
-            "sixteen",
-            "seventeen",
-            "eighteen",
-            "nineteen",
-            "twenty"
-        };
-        if (i >= 0 && i <= 20) return first20[i];
+        if (i >= 0 && i <= 20) return FIRST_20_NUMBERS[i];
         return Integer.toString(i);
     }
 
-    private static Map<String, String> escapables() {
+    private static Map<String, String> createEscapables() {
         Map<String, String> escape = new LinkedHashMap<>();
         // Do not simply change these values.
         // If you need to change any value, add a line in escape to handle the old value
@@ -62,7 +71,7 @@ public final class StringHelper {
         escape.put(",", "{cma}");
         escape.put("\n", "{nl}");
         escape.put(" ", "{sp}");
-        return escape;
+        return Collections.unmodifiableMap(escape);
     }
 
     // Calling .replace over and over like this is actually pretty slow, probably better to iterate character by
@@ -70,7 +79,7 @@ public final class StringHelper {
     public static String escape(String input) {
         if (input == null) return null;
         String output = input;
-        for (Entry<String, String> entry : escapables().entrySet())
+        for (Entry<String, String> entry : ESCAPABLES.entrySet())
             output = output.replace(entry.getKey(), entry.getValue());
         return output.replace("\r", "");
     }
@@ -78,7 +87,7 @@ public final class StringHelper {
     public static String unescape(String input) {
         if (input == null) return null;
         String output = input;
-        for (Entry<String, String> entry : escapables().entrySet())
+        for (Entry<String, String> entry : ESCAPABLES.entrySet())
             output = output.replace(entry.getValue(), entry.getKey());
         output = output.replace("666fin", ":");
         output = output.replace("667fin", ",");
@@ -98,8 +107,6 @@ public final class StringHelper {
         }
         return "a".repeat(id.length() + 1);
     }
-
-    private static final char ESCAPE_CHARACTER = '\\';
 
     /**
      * For use in conjunction with safeSplit. First escapes any instance of the separator or

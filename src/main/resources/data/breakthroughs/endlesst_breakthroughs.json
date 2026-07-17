@@ -1,0 +1,145 @@
+[
+    {
+        "alias": "uempirebt",
+        "name": "Mezari Research Program",
+        "shortName": "Mezari\nResearch Program",
+        "faction": "uempire",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "Whenever you research a unit upgrade technology, you may produce any number of units of that type in any one system containing one of your space docks and no other player's units. If the upgrade was for a structure, you may pay three influence to place a structure of that type on a planet you control instead.",
+        "source": "endlesst"
+    },
+    {
+        "alias": "sophonbt",
+        "name": "Prototype Dimensional Ripper",
+        "shortName": "Prototype\nDimensional Ripper",
+        "faction": "sophon",
+        "synergy": [
+            "PROPULSION",
+            "BIOTIC"
+        ],
+        "text": "ACTION: Exhaust this card, then roll a die. On a roll of 1 or 10, put the Fracture into play if it isn't already. On a roll of 2 through 5, draw an action card. On a roll of 6 through 9, gain a random technology.",
+        "source": "endlesst"
+    },
+    {
+        "alias": "craverbt",
+        "name": "Adaptive Repurposing",
+        "shortName": "Adaptive\nRepurposing",
+        "faction": "craver",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "Whenever an opponent uses an action card during your turn, you may place that card into your hand instead of into the Discard pile. When you take control of a home planet, that planet's controller must give you a relic they control, if able.",
+        "source": "endlesst"
+    },
+    {
+        "alias": "horatiobt",
+        "name": "Gene Hunters",
+        "shortName": "Gene\nHunters",
+        "faction": "horatio",
+        "synergy": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "text": "When you gain this card and at the end of each Status Phase, gain a random unused Agent from another faction and place it in your play area, readied.",
+        "source": "endlesst"
+    },
+    {
+        "alias": "vaulterbt",
+        "name": "Underground Networks",
+        "shortName": "Underground\nNetworks",
+        "faction": "vaulter",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "Whenever you produce one or more infantry, you may place up to two of those infantry on this card. Whenever another player commits ground forces onto a planet you control, you may move any number of infantry from this card onto the planet being invaded.",
+        "source": "endlesst"
+    },
+    {
+        "alias": "vodyanibt",
+        "name": "Doctrine of the Cloth",
+        "shortName": "Doctrine\nof the Cloth",
+        "faction": "vodyani",
+        "synergy": [
+            "CYBERNETIC",
+            "PROPULSION"
+        ],
+        "text": "If gaining this breakthrough causes the Fracture to enter play or if the Fracture is already in play, you may place an Ingress token on your home system. At the start of your turn, if you have a number of commodities on your sheet equal to your maximum commodities, you may return those commodities to the supply to place that many infantry or fighters in the space area of any system that contains a planet you control and no other player's ships.",
+        "source": "endlesst"
+    },
+    {
+        "alias": "lumerisbt",
+        "name": "Dust-crazed Mercenaries",
+        "shortName": "Dust-crazed\nMercenaries",
+        "faction": "lumeris",
+        "synergy": [
+            "CYBERNETIC",
+            "BIOTIC"
+        ],
+        "text": "When you gain this breakthrough, capture a cruiser and a destroyer from the neutral reinforcements. Whenever a non-neutral ship is destroyed in combat, you may exhaust this card to capture one unit of the same type from the neutral reinforcements. Whenever a player gains a neutral unit from you as part of a transaction, they place that unit into the space area of any non-home system that contains no non-neutral ships and no planets you control.",
+        "source": "endlesst"
+    },
+    {
+        "alias": "unfallenbt",
+        "name": "Guardian Germination",
+        "shortName": "Guardian\nGermination",
+        "faction": "unfallen",
+        "synergy": [
+            "WARFARE",
+            "BIOTIC"
+        ],
+        "text": "When you activate a system that contains your units, choose up to one: If you control an infantry on a planet in the active system, replace one of those infantry with a mech from your reinforcements, OR if you control a mech on a planet in the active system, replace one of those mechs with a PDS from your reinforcements, OR if you control a PDS on a planet in the active system, replace one of those PDS units with four infantry from your reinforcements.",
+        "source": "endlesst"
+    },
+    {
+        "alias": "riftbornbt",
+        "name": "Consolidate Reality",
+        "shortName": "Consolidate\nReality",
+        "faction": "riftborn",
+        "synergy": [
+            "PROPULSION",
+            "CYBERNETIC"
+        ],
+        "text": "Gaining this Breakthrough causes the Fracture to enter play without a roll. When moving, you may treat Gravity Rifts, Egress tiles, and systems with Ingress tokens as if they were adjacent. At the start of the Status Phase, you may spend a command token from your Strategy Pool and remove an Ingress token from a system that contains units you control to research a technology.",
+        "source": "endlesst"
+    },
+    {
+        "alias": "hisshobt",
+        "name": "The Way of the Red Blade",
+        "shortName": "The Way\nof the Red Blade",
+        "faction": "riftborn",
+        "synergy": [
+            "WARFARE",
+            "CYBERNETIC"
+        ],
+        "text": "When you gain this breakthrough, palce the Hissho Ketton token in any non-home system that contains a legendary planet. At the end of a space combat that takes place in the system with the Ketton token, each participating player gains one trade good for each non-fighter ship that was destroyed in that space combat, then the winner of that combat draws an action card. If you were participating in that combat, you also gain one Keii for each non-fighter ship your opponent lost in that combat.",
+        "source": "endlesst"
+    },
+    {
+        "alias": "uchoirbt",
+        "name": "Sanctuary Sleepers",
+        "shortName": "Sanctuary\nSleepers",
+        "faction": "uchoir",
+        "synergy": [
+            "BIOTIC",
+            "PROPULSION"
+        ],
+        "text": "Whenever you activate a system that contains another player's command token and a planet with units they control, you may remove a ground force you control from the board and place it into coexistence on that planet. Whenever another player moves ships into or through a system that contains your coexisting units, you may steal a trade good from that player or gain two commodities from the supply.",
+        "source": "endlesst"
+    },
+    {
+        "alias": "nakalimbt",
+        "name": "Temples to the Lost",
+        "shortName": "Temples to\nthe Lost",
+        "faction": "nakalim",
+        "synergy": [
+            "NONE"
+        ],
+        "text": "When you gain this breakthrough, for each legendary planet choose a system adjacent to that planet that contains at least one planet. Place a Slumbering Ruin attachment on a planet in each of the chosen systems. They gain +1 to their Resource and Influence values. Do this before rolling for the Fracture. If gaining this breakthrough causes the Fracture to enter play, place an Ingress token in each system that contains a Slumbering Ruin attachment instead of into systems that contain tech specialties. Planets you control with attachments have SPACE CANNON 5 and can use that ability as if they were units.",
+        "source": "endlesst"
+    }
+]

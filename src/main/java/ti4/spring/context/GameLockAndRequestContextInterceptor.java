@@ -3,20 +3,27 @@ package ti4.spring.context;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 import ti4.executors.ExecutionLockManager;
-import ti4.map.persistence.GameManager;
+import ti4.executors.ExecutionLockType;
+import ti4.game.persistence.GameManager;
+import ti4.logging.BotLogger;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @Component
+@lombok.RequiredArgsConstructor
 public class GameLockAndRequestContextInterceptor implements HandlerInterceptor {
 
     private static final List<String> MUTATION_METHODS = List.of("PUT", "POST", "PATCH", "DELETE");
+    private final ActiveLeaseService activeLeaseService;
 
     @Override
     public boolean preHandle(
@@ -25,9 +32,15 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         if (gameName == null) return true;
         if (!GameManager.isValid(gameName)) throw new InvalidGameNameException(gameName);
 
-        boolean requestContextSetup = setupGameRequestContext(gameName, request, handler);
-        if (requestContextSetup) lockGame(gameName);
+        boolean shouldSaveGame = shouldSaveGame(request, handler);
+        if (shouldSaveGame && !activeLeaseService.mayMutate()) {
+            rejectInactiveMutation(response);
+            return false;
+        }
 
+        if (!shouldSetupGameRequestContext(handler)) return true;
+
+        setupGameRequestContext(gameName, shouldSaveGame);
         return true;
     }
 
@@ -40,7 +53,7 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
         return (gameNameObject instanceof String gameName) ? gameName : null;
     }
 
-    private boolean setupGameRequestContext(String gameName, HttpServletRequest request, Object handler) {
+    private boolean shouldSaveGame(HttpServletRequest request, Object handler) {
         boolean shouldSaveGame = MUTATION_METHODS.contains(request.getMethod());
         if (handler instanceof HandlerMethod handlerMethod) {
             SetupRequestContext annotation = handlerMethod.getMethodAnnotation(SetupRequestContext.class);
@@ -52,17 +65,41 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
                 shouldSaveGame &= annotation.save();
             }
         }
+        return shouldSaveGame;
+    }
 
-        var game = GameManager.getManagedGame(gameName).getGame();
-        RequestContext.setGame(game);
-        RequestContext.setSaveGame(shouldSaveGame);
+    private boolean shouldSetupGameRequestContext(Object handler) {
+        if (handler instanceof HandlerMethod handlerMethod) {
+            SetupRequestContext annotation = handlerMethod.getMethodAnnotation(SetupRequestContext.class);
+            return annotation == null || annotation.value();
+        }
         return true;
     }
 
-    private static void lockGame(String gameName) {
-        var lockType = RequestContext.shouldSaveGame()
-                ? ExecutionLockManager.LockType.WRITE
-                : ExecutionLockManager.LockType.READ;
+    private void setupGameRequestContext(String gameName, boolean shouldSaveGame) {
+        lockGame(gameName, shouldSaveGame);
+        try {
+            var game = GameManager.getManagedGame(gameName).getGame();
+            if (game == null) throw new RuntimeException("Unable to load game: " + gameName);
+            RequestContext.setGame(game);
+            RequestContext.setSaveGame(shouldSaveGame);
+        } catch (Exception e) {
+            unlockGame(gameName, shouldSaveGame);
+            throw e;
+        }
+    }
+
+    private static void rejectInactiveMutation(HttpServletResponse response) {
+        try {
+            response.sendError(
+                    HttpStatus.SERVICE_UNAVAILABLE.value(), "Service temporarily unavailable: bot is not active");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void lockGame(String gameName, boolean shouldSaveGame) {
+        var lockType = shouldSaveGame ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutionLockManager.lock(gameName, lockType);
     }
 
@@ -72,22 +109,29 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
             @NotNull HttpServletResponse response,
             @NotNull Object handler,
             Exception exception) {
-        var game = RequestContext.getGame();
-        if (game == null) return;
+        try {
+            var game = RequestContext.getGame();
+            if (game == null) return;
 
-        if (exception == null && RequestContext.shouldSaveGame()) {
-            var player = RequestContext.getPlayer();
-            GameManager.save(RequestContext.getGame(), player.getUserName() + " called " + request.getRequestURI());
+            if (exception == null && RequestContext.shouldSaveGame()) {
+                if (activeLeaseService.mayMutate()) {
+                    var player = RequestContext.getPlayer();
+                    GameManager.save(game, player.getUserName() + " called " + request.getRequestURI());
+                } else {
+                    BotLogger.warning(
+                            "Skipped web mutation save because this instance no longer owns the active lease. "
+                                    + request.getRequestURI());
+                }
+            }
+
+            unlockGame(game.getName(), RequestContext.shouldSaveGame());
+        } finally {
+            RequestContext.clearContext();
         }
-
-        unlockGame(game.getName());
-        RequestContext.clearContext();
     }
 
-    private static void unlockGame(String gameName) {
-        var lockType = RequestContext.shouldSaveGame()
-                ? ExecutionLockManager.LockType.WRITE
-                : ExecutionLockManager.LockType.READ;
+    private static void unlockGame(String gameName, boolean shouldSaveGame) {
+        var lockType = shouldSaveGame ? ExecutionLockType.WRITE : ExecutionLockType.READ;
         ExecutionLockManager.unlock(gameName, lockType);
     }
 }

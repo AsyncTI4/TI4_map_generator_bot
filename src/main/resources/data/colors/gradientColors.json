@@ -132,7 +132,7 @@
         "textColor": "black",
         "primaryColor": { "red": 6, "green": 75, "blue": 203 },
         "secondaryColor": { "red": 240, "green": 180, "blue": 6 },
-        "hue": "MILTI2"
+        "hue": "MULTI2"
     },
     {
         "alias": "psn",
@@ -204,7 +204,7 @@
         "textColor": "white",
         "primaryColor": { "red": 6, "green": 175, "blue": 50 },
         "secondaryColor": { "red": 5, "green": 45, "blue": 176 },
-        "hue": "MULTI2"
+        "hue": "MULTI3"
     },
     {
         "alias": "ero",
@@ -222,7 +222,7 @@
         "textColor": "white",
         "primaryColor": { "red": 109, "green": 0, "blue": 10 },
         "secondaryColor": { "red": 79, "green": 50, "blue": 81 },
-        "hue": "MULTI2"
+        "hue": "MULTI3"
     },
     {
         "alias": "dw",
@@ -232,5 +232,59 @@
         "primaryColor": { "red": 242, "green": 242, "blue": 242 },
         "secondaryColor": { "red": 255, "green": 210, "blue": 112 },
         "hue": "MULTI2"
+    },
+    {
+        "alias": "abr",
+        "name": "aberration",
+        "aliases": ["abr","aberration"],
+        "textColor": "black",
+        "primaryColor": { "red": 206, "green": 206, "blue": 206 },
+        "secondaryColor": { "red": 50, "green": 50, "blue": 50 },
+        "hue": "MULTI1"
+    },
+    {
+        "alias": "ryl",
+        "name": "royal",
+        "aliases": ["ryl", "royal"],
+        "textColor": "white",
+        "primaryColor": { "red": 119, "green": 17, "blue": 247 },
+        "secondaryColor": { "red": 42, "green": 7, "blue": 87 },
+        "hue": "PURPLE"
+    },
+    {
+        "alias": "nea",
+        "name": "neapolitan",
+        "aliases": ["nea", "neapolitan"],
+        "textColor": "black",
+        "primaryColor": { "red": 243, "green": 229, "blue": 171 },
+        "secondaryColor": { "red": 150, "green": 80, "blue": 42 },
+        "hue": "MULTI2"
+    },
+    {
+        "alias": "psy",
+        "name": "psychedelic",
+        "aliases": ["psy", "psychedelic"],
+        "textColor": "black",
+        "primaryColor": { "red": 146, "green": 6, "blue": 186 },
+        "secondaryColor": { "red": 245, "green": 245, "blue": 6 },
+        "hue": "MULTI3"
+    },
+    {
+        "alias": "cam",
+        "name": "camouflage",
+        "aliases": ["cam", "camouflage"],
+        "textColor": "white",
+        "primaryColor": { "red": 90, "green": 150, "blue": 100 },
+        "secondaryColor": { "red": 172, "green": 160, "blue": 116 },
+        "hue": "MULTI3"
+    },
+    {
+        "alias": "blt",
+        "name": "blight",
+        "aliases": ["blt", "blight"],
+        "textColor": "black",
+        "primaryColor": { "red": 240, "green": 138, "blue": 240 },
+        "secondaryColor": { "red": 177, "green": 229, "blue": 165 },
+        "hue": "MULTI3"
     }
 ]

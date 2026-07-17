@@ -10,7 +10,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
 @Configuration
 public class ImageIoConfiguration {
@@ -29,6 +29,7 @@ public class ImageIoConfiguration {
         };
     }
 
+    // This happens on occasion and I have no idea why. If you find a better solution, delete this.
     private static boolean ensureWebpWriterRegistered() {
         if (hasWebpWriter()) {
             BotLogger.info("WebP writer already registered at startup.");

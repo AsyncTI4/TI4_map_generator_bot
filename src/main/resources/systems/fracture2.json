@@ -3,7 +3,9 @@
     "name": "Fracture Egress Left",
     "aliases": [
         "fracture2",
-        "egressleft"
+        "egressleft",
+        "frac2",
+        "fracleftegr"
     ],
     "imagePath": "fracture2.png",
     "shipPositionsType": "TYPE08",

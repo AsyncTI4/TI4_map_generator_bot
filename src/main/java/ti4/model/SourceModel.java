@@ -1,10 +1,12 @@
 package ti4.model;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.model.Source.ComponentSource;
 
@@ -28,6 +30,10 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
         return source.toString();
     }
 
+    public String getNameRepresentation() {
+        return "_" + name + "_ " + source.emoji();
+    }
+
     @Override
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(null);
@@ -40,7 +46,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
 
         StringBuilder content = new StringBuilder();
         if (description != null) content.append("*").append(description).append("*\n\n");
-        if (data != null) content.append("Links:\n").append(getDataFormatted()).append("\n");
+        if (data != null) content.append("Links:\n").append(getDataFormatted()).append('\n');
         if (occurrences != null) content.append("Implementation: ").append(compTypeOccurrences(occurrences));
         eb.setDescription(content);
 
@@ -59,6 +65,27 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
         }
 
         return eb.build();
+    }
+
+    public List<TextDisplay> getRepresentationTextDisplays() {
+        List<TextDisplay> components = new ArrayList<>();
+
+        // Title
+        components.add(TextDisplay.of("### " + source.emoji() + " __" + name + "__"));
+
+        // Body
+        StringBuilder content = new StringBuilder();
+        if (description != null) content.append("*").append(description).append("*\n");
+        if (data != null) content.append(getDataFormatted()).append("\n");
+        if (!content.isEmpty()) {
+            components.add(TextDisplay.of(content.toString()));
+        }
+
+        // Footer
+        if (credits != null && !credits.isBlank()) {
+            components.add(TextDisplay.of("-# Credits: " + credits));
+        }
+        return components;
     }
 
     /**
@@ -85,7 +112,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
     private String getDataFormatted() {
         StringBuilder sb = new StringBuilder();
         for (String s : data) {
-            sb.append("- ").append(s).append("\n");
+            sb.append("- ").append(s).append('\n');
         }
         return sb.toString();
     }

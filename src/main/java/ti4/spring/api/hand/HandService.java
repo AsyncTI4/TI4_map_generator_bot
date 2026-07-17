@@ -3,7 +3,7 @@ package ti4.spring.api.hand;
 import java.util.HashSet;
 import java.util.Set;
 import org.springframework.stereotype.Service;
-import ti4.map.Player;
+import ti4.game.Player;
 
 @Service
 public class HandService {

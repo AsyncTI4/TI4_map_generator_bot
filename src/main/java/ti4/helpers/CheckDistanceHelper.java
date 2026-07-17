@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.helpers.Units.UnitType;
 
 @UtilityClass
 public class CheckDistanceHelper {
@@ -20,11 +22,11 @@ public class CheckDistanceHelper {
         if (distances.get(tilePosition2) != null) {
             return distances.get(tilePosition2);
         }
-        return countsRiftsAsNormal || !game.getTileByPosition(tilePosition1).isGravityRift(game) ? 100 : 99;
+        return countsRiftsAsNormal || !game.getTileByPosition(tilePosition1).isGravityRift(game, player) ? 100 : 99;
     }
 
     private static boolean tileUnlockedForMoving(Game game, Player player, Tile tile) {
-        if (ButtonHelper.nomadHeroAndDomOrbCheck(player, game)) return true;
+        if (ButtonHelper.canMoveOutOfLockedSystems(player, game)) return true;
         return !CommandCounterHelper.hasCC(player, tile) || tile.getPosition().equalsIgnoreCase(game.getActiveSystem());
     }
 
@@ -87,16 +89,18 @@ public class CheckDistanceHelper {
                     if (tile == null
                             || (tile.isNebula(game)
                                     && player != null
+                                    && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.hasAbility("celestial_being")
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !player.hasAbility("voidborn")
-                                    && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2)
+                                    && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !ButtonHelper.isLawInPlay(game, "shared_research"))
                             || (tile.isSupernova()
                                     && player != null
+                                    && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.hasAbility("celestial_being")
                                     && !player.getRelics().contains("circletofthevoid")
-                                    && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2)
+                                    && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !player.hasAbility("gashlai_physiology")
                                     && !player.hasTech("tf-mr"))
                             || (player != null
@@ -104,22 +108,27 @@ public class CheckDistanceHelper {
                                     && !player.hasTech("lwd")
                                     && !player.hasTech("absol_lwd")
                                     && tile2 != null
-                                    && !ButtonHelper.doesPlayerHaveFSHere("yssaril_flagship", player, tile2))
+                                    && !ButtonHelper.doesPlayerHaveFSHere("yssaril_flagship", player, tile2)
+                                    && (!player.hasUnit("mentak_cruiser3")
+                                            || tile2.getSpaceUnitHolder().getUnitCount(UnitType.Cruiser, player) < 1))
                             || (player != null
                                     && FoWHelper.otherPlayersHaveMovementBlockersInSystem(player, tile, game))
                             || (tile.isAsteroidField()
                                     && player != null
+                                    && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.hasAbility("celestial_being")
                                     && !player.hasTech("amd")
                                     && !player.hasTech("wavelength")
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !player.hasTech("absol_amd")
-                                    && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2))) {
+                                    && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2))) {
                         continue;
                     }
                 }
                 if (!forMap) {
-                    if (tile != null && tile.isGravityRift(game)) {
+                    if (tile != null
+                            && tile.isGravityRift(game, player)
+                            && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)) {
                         num = -1;
                         if (game.isCosmicPhenomenaeMode()) {
                             num = -2;
@@ -152,6 +161,6 @@ public class CheckDistanceHelper {
     }
 
     private static Set<String> adjacentPositions(Game game, String position, Player player) {
-        return FoWHelper.getAdjacentTilesAndNotThisTile(game, position, player, false);
+        return FoWHelper.getAdjacentTiles(game, position, player, false, false, true);
     }
 }

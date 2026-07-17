@@ -35,6 +35,8 @@ public class Source {
         uncharted_space,
         monuments,
         blue_reverie,
+        twilight_kart,
+        twilight_ds,
 
         // lil homebrew
         lazax,
@@ -46,6 +48,10 @@ public class Source {
         flagshipping,
         promises_promises,
         balacasi,
+        viability_patch,
+        beans,
+        endlesst,
+        theodisi,
 
         // async homebrew
         draft,
@@ -70,6 +76,7 @@ public class Source {
         luminous,
         holytispoon,
         salliance,
+        spice_thyme,
         nomadfalcon,
         unfulvio,
         andcat,
@@ -78,6 +85,7 @@ public class Source {
         memephilosopher,
         omega_phase,
         fowplus,
+        untangled_space,
 
         // eronous' stuff
         eronous,
@@ -123,11 +131,47 @@ public class Source {
             };
         }
 
-        public boolean isDs() {
+        public boolean isTe() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3, codex4, ds, uncharted_space, blue_reverie -> true;
+                case base, pok, codex1, codex2, codex3, codex4, thunders_edge -> true;
                 default -> false;
             };
+        }
+
+        public boolean isDs() {
+            return switch (this) {
+                case base, pok, codex1, codex2, codex3, codex4, ds, thunders_edge, uncharted_space -> true;
+                default -> false;
+            };
+        }
+
+        public boolean isBr() {
+            return switch (this) {
+                case base, pok, codex1, codex2, codex3, codex4, blue_reverie, thunders_edge -> true;
+                default -> false;
+            };
+        }
+
+        public boolean isTwilightFallish() {
+            return switch (this) {
+                case twilights_fall, twilight_kart, twilight_ds -> true;
+                default -> false;
+            };
+        }
+
+        public boolean isHiddenFromSearch() {
+            return switch (this) {
+                case deprecated, miltymod, lazax, little_omega, admins, dane_leaks -> true;
+                case keleresplus, project_pi, asteroid -> true;
+                case pbd100, pbd500, pbd1000 -> true;
+                default -> false;
+            };
+        }
+
+        public boolean isHiddenFromSearch(ComponentSource source) {
+            if (this == source) return false;
+
+            return !isOfficial();
         }
 
         public String emoji() {
@@ -136,6 +180,7 @@ public class Source {
                         case absol -> SourceEmojis.Absol;
                         case ds -> SourceEmojis.DiscordantStars;
                         case uncharted_space -> SourceEmojis.UnchartedSpace;
+                        case blue_reverie -> SourceEmojis.DiscordantStars;
                         case eronous, riftset -> SourceEmojis.Eronous;
                         case admins -> FactionEmojis.AdminsFaction;
                         case ignis_aurora, pbd2000 -> SourceEmojis.IgnisAurora;
@@ -147,6 +192,8 @@ public class Source {
                         case lazax -> FactionEmojis.Lazax;
                         case salliance -> SourceEmojis.StrategicAlliance;
                         case monuments -> SourceEmojis.Monuments;
+                        case twilight_kart -> SourceEmojis.TwilightKart;
+                        case twilight_ds -> SourceEmojis.DiscordantStars;
                         default -> null;
                     };
             return emoji == null ? "" : emoji.toString();
@@ -165,6 +212,7 @@ public class Source {
                 case codex3 -> "Codex 3 - Naalu, Yin, Keleres";
                 case codex4 -> "Codex 4 - Relics";
                 case ds -> "Discordant Stars [Homebrew]";
+                case blue_reverie -> "Blue Reverie [Homebrew]";
                 case absol -> "Absol's Mod [Homebrew]";
                 case flagshipping -> "Flagshipping [Homebrew]";
                 case promises_promises -> "Promises Promises [Homebrew]";
@@ -172,6 +220,7 @@ public class Source {
                 case monuments -> "Monuments+ [Homebrew]";
                 case omega_phase -> "Omega Phase [Homebrew]";
                 case voices_of_the_council -> "Voices of the Council [Homebrew]";
+                case theodisi -> "Lost Legacies [Homebrew]";
                 default -> toString();
             };
         }

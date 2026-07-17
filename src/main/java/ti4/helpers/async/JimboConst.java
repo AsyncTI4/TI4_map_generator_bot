@@ -20,7 +20,7 @@ import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 
 // Jazz's Interactive Map Builder
-class JimboConst {
+final class JimboConst {
     // Main Page
     public static final String mainPage = "jimbo_mainPage";
     public static final String exit = "jimbo_exit";
@@ -265,8 +265,7 @@ class JimboConst {
             }
             if (index < -1) continue;
             baseStringOrder.add(color);
-            if (!tilesByNum.containsKey(index)) tilesByNum.put(index, new HashMap<>());
-            tilesByNum.get(index).put(color, tile);
+            tilesByNum.computeIfAbsent(index, key -> new HashMap<>()).put(color, tile);
         }
 
         // Store the data for convenient use later

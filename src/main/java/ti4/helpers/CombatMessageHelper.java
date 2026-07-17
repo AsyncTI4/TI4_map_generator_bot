@@ -8,13 +8,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.DiceHelper.Die;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
@@ -25,7 +25,7 @@ import ti4.service.emoji.DiceEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 
-public class CombatMessageHelper {
+public final class CombatMessageHelper {
     public static void displayDuplicateUnits(GenericInteractionCreateEvent event, List<String> dupes) {
         if (dupes.isEmpty()) return;
         // Gracefully fail when units don't exist
@@ -58,6 +58,20 @@ public class CombatMessageHelper {
             int extraRolls,
             List<Die> resultRolls,
             int numHit) {
+        return displayUnitRoll(
+                unitModel, toHit, modifier, unitQuantity, numRollsPerUnit, extraRolls, resultRolls, numHit, "");
+    }
+
+    public static String displayUnitRoll(
+            UnitModel unitModel,
+            int toHit,
+            int modifier,
+            int unitQuantity,
+            int numRollsPerUnit,
+            int extraRolls,
+            List<Die> resultRolls,
+            int numHit,
+            String holderLabel) {
         String hitsSuffix = "";
         if (numHit > 1) {
             hitsSuffix = "s";
@@ -94,7 +108,11 @@ public class CombatMessageHelper {
             upgradedUnitName = unitModel.getName();
         }
 
-        List<String> optionalInfoParts = Arrays.asList(upgradedUnitName, unitRollsTextInfo, unitTypeHitsInfo);
+        String holderLabelSep = StringUtils.isNotBlank(holderLabel) && StringUtils.isBlank(unitRollsTextInfo)
+                ? holderLabel + ","
+                : holderLabel;
+        List<String> optionalInfoParts =
+                Arrays.asList(upgradedUnitName, holderLabelSep, unitRollsTextInfo, unitTypeHitsInfo);
         String optionalText =
                 optionalInfoParts.stream().filter(StringUtils::isNotBlank).collect(Collectors.joining(" "));
 
@@ -162,7 +180,7 @@ public class CombatMessageHelper {
                     modifierMessages.add(String.format("%s%s for %s", plusPrefix, modifierValue, unitScope));
                 }
             }
-            result += String.join("\n", modifierMessages) + "\n";
+            result += String.join("\n", modifierMessages).replace("Optional[", "") + "\n";
         }
         return result;
     }
@@ -228,6 +246,9 @@ public class CombatMessageHelper {
                 }
                 if (game.getStoredValue("letnevagent").equalsIgnoreCase(player.getFaction())) {
                     game.setStoredValue("letnevagent", "");
+                }
+                if (game.getStoredValue("classifiedWeapons").startsWith(player.getFaction() + ";")) {
+                    game.setStoredValue("classifiedWeapons", "");
                 }
             }
         }

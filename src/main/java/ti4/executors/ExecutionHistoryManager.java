@@ -7,7 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import ti4.helpers.TimedRunnable;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
+import ti4.logging.RollbarManager;
 
 public final class ExecutionHistoryManager {
 
@@ -25,12 +26,15 @@ public final class ExecutionHistoryManager {
         return () -> {
             int id = EXECUTION_COUNTER.incrementAndGet();
             executionStartTimes.put(id, new Execution(timedRunnable.getName(), Instant.now()));
+            RollbarManager.clear();
+            RollbarManager.put("task_name", timedRunnable.getName());
             try {
                 timedRunnable.run();
             } catch (Throwable t) {
                 BotLogger.error("Unhandled exception in task: " + timedRunnable.getName(), t);
             } finally {
                 executionStartTimes.remove(id);
+                RollbarManager.clear();
             }
         };
     }
@@ -44,7 +48,8 @@ public final class ExecutionHistoryManager {
             if (elapsedMinutes >= 2) {
                 BotLogger.error("A task has been executing for " + elapsedMinutes + " minutes and " + elapsedSeconds
                         + " seconds: " + execution.name);
-            } else if (elapsedMinutes == 1 && CircuitBreaker.incrementThresholdCount()) {
+            } else if (elapsedMinutes == 1
+                    && CircuitBreaker.incrementThresholdCount("Task running longer than 1 minute: " + execution.name)) {
                 BotLogger.warning("Incremented circuit breaker threshold. Task name: " + execution.name);
             }
         }

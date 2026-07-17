@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
+import ti4.game.Game;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.model.DeckModel;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
@@ -19,12 +20,19 @@ import ti4.service.emoji.TI4Emoji;
 public class AgentDraftItem extends DraftItem {
 
     public AgentDraftItem(String itemId) {
-        super(Category.AGENT, itemId);
+        super(DraftCategory.AGENT, itemId);
     }
 
     @JsonIgnore
     private LeaderModel getLeader() {
-        return Mapper.getLeader(ItemId);
+        return Mapper.getLeader(getItemId());
+    }
+
+    @JsonIgnore
+    @Override
+    public String getTitle(Game game) {
+        if (game.isTwilightsFallMode()) return getLeader().getTFNameRepresentation();
+        return getLeader().getNameRepresentation();
     }
 
     @JsonIgnore
@@ -34,7 +42,7 @@ public class AgentDraftItem extends DraftItem {
         if (leader == null) {
             return getAlias();
         }
-        return "Agent - " + leader.getName();
+        return leader.getName();
     }
 
     @JsonIgnore
@@ -66,14 +74,14 @@ public class AgentDraftItem extends DraftItem {
     public TI4Emoji getItemEmoji() {
         LeaderModel leader = getLeader();
         if (leader != null) {
-            return LeaderEmojis.getLeaderEmoji(leader.getID());
+            return LeaderEmojis.getLeaderEmoji(leader.getId());
         }
         return null;
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.AGENT);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.AGENT);
         return allItems;
     }
 
@@ -85,7 +93,7 @@ public class AgentDraftItem extends DraftItem {
             agents.removeIf(
                     (String leader) -> !"agent".equals(allLeaders.get(leader).getType()));
             for (String agent : agents) {
-                allItems.add(generate(Category.AGENT, agent));
+                allItems.add(generate(DraftCategory.AGENT, agent));
             }
         }
         return allItems;
@@ -93,20 +101,23 @@ public class AgentDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.AGENT);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.AGENT);
         return allItems;
     }
 
     private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
         Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
+        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedLeaders"));
         if (game.isTwilightsFallMode()) {
-            DeckModel deck = Mapper.getDeck("tf_genome");
+            DeckModel deck = Mapper.getDeck(game.getGenomeSpliceDeckID());
             for (String leader : deck.getNewShuffledDeck()) {
-                allItems.add(generate(Category.AGENT, leader));
+                if (Arrays.asList(results).contains(leader)) {
+                    continue;
+                }
+                allItems.add(generate(DraftCategory.AGENT, leader));
             }
         } else {
-            String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedLeaders"));
             for (FactionModel faction : factions) {
                 List<String> agents = faction.getLeaders();
                 agents.removeIf((String leader) ->
@@ -115,7 +126,7 @@ public class AgentDraftItem extends DraftItem {
                     if (Arrays.asList(results).contains(agent)) {
                         continue;
                     }
-                    allItems.add(generate(Category.AGENT, agent));
+                    allItems.add(generate(DraftCategory.AGENT, agent));
                 }
             }
         }

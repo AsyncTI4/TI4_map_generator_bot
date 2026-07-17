@@ -1,5 +1,7 @@
 on: workflow_dispatch
 name: RestartBot
+env:
+  IMAGE_REPOSITORY: ghcr.io/asyncti4/ti4-map-generator-bot
 concurrency:
   group: "Start Bot"
 jobs:
@@ -17,29 +19,43 @@ jobs:
         REPO_DISPATCH_TOKEN: ${{ secrets.REPOSITORY_DISPATCH_TOKEN }}
         TI4_ULTIMATE_STATISTICS_API_KEY: ${{ secrets.TI4_ULTIMATE_STATISTICS_API_KEY }}
         MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY: ${{ secrets.MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY }}
+        DISCORD_REDIRECT_URI: ${{ secrets.DISCORD_REDIRECT_URI }}
+        DISCORD_CLIENT_ID: ${{ secrets.DISCORD_CLIENT_ID }}
+        DISCORD_CLIENT_SECRET: ${{ secrets.DISCORD_CLIENT_SECRET }}
+        ROLLBAR_ACCESS_TOKEN: ${{ secrets.ROLLBAR_ACCESS_TOKEN }}
+        ROLLBAR_ENVIRONMENT: production
+        ROLLBAR_CODE_VERSION: ${{ github.sha }}
       with:
         host: ${{ secrets.HOSTINGER_SSH_HOST }}
         username: ${{ secrets.HOSTINGER_SSH_USER }}
         password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
         port: ${{ secrets.HOSTINGER_SSH_PORT }}
-        envs: AWS_KEY, AWS_SECRET, DISCORD_BOT_TOKEN, DISCORD_BOT_USERID, REPO_DISPATCH_TOKEN, TI4_ULTIMATE_STATISTICS_API_KEY, MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY
+        command_timeout: 30m
+        envs: AWS_KEY, AWS_SECRET, DISCORD_BOT_TOKEN, DISCORD_BOT_USERID, REPO_DISPATCH_TOKEN, TI4_ULTIMATE_STATISTICS_API_KEY, MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY, DISCORD_REDIRECT_URI, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, ROLLBAR_ACCESS_TOKEN, ROLLBAR_ENVIRONMENT, ROLLBAR_CODE_VERSION
         script: |
           set -eu
           
           cd ${{ vars.HOST_TI4_REPO_DIR }}
+          echo "Pulling deployment config from GitHub..."
+          git pull --ff-only
+          export HOST_TI4_SAVES_DIR="${{ vars.HOST_TI4_SAVES_DIR }}"
+          export HOST_TI4_REPO_DIR="${{ vars.HOST_TI4_REPO_DIR }}"
+          export GUILDID_LIST="${{ vars.GUILDID_LIST }}"
+          export COMPOSE_PROJECT_NAME="ti4-bot"
+          export IMAGE_REPOSITORY="${{ env.IMAGE_REPOSITORY }}"
+          export IMAGE_TAG="master"
+          compose_file="docker-compose.production.yml"
           
-          echo "Building docker image..."
+          echo "Pulling docker image..."
           docker version
-          docker build -t tibot .
+          docker compose -f "$compose_file" pull tibot
           
-          echo "Restarting TIBot... giving 600 seconds to shutdown"
-          docker stop $(docker ps -q) --time 600
-          
-          echo "Starting Container..."
-          docker run -v ${{ vars.HOST_TI4_SAVES_DIR }}:/opt/STORAGE -p 8081:8081 -d --restart unless-stopped -m 7g -e TI4_ULTIMATE_STATISTICS_API_KEY=$TI4_ULTIMATE_STATISTICS_API_KEY -e MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY=$MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY -e REPO_DISPATCH_TOKEN=$REPO_DISPATCH_TOKEN -e AWS_ACCESS_KEY_ID=$AWS_KEY -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET tibot $DISCORD_BOT_TOKEN $DISCORD_BOT_USERID ${{ vars.GUILDID_LIST }}
+          docker compose -f "$compose_file" up -d traefik
+
+          echo "Rolling out one new TIBot container..."
+          COMPOSE_FILE="$compose_file" ROLLOUT_TIMEOUT_SECONDS=540 bash scripts/deploy_tibot_single_instance.sh
           echo "Cleaning up docker stuff..."
           
-          docker rm $(docker ps --filter status=exited -q) || true
-          docker rmi -f $(docker images --filter "dangling=true" -q) || true
+          docker image prune --force --filter until=48h
           
           echo "DONE!"

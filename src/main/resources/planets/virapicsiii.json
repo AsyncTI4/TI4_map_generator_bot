@@ -1,1 +1,26 @@
-{"id":"virapicsiii","tileId":"103","name":"Vira Pics III","aliases":["vira","virapics","virapics3","virapicsiii"],"resources":2,"influence":3,"planetTypes":["CULTURAL","HAZARDOUS"],"planetLayout":{"unitHolderName":"virapicsiii","resourcesLocation":"BottomLeft","centerPosition":{"x":170.0,"y":150.0}},"source":"thunders_edge"}
+{
+    "id": "virapicsiii",
+    "tileId": "103",
+    "name": "Vira Pics III",
+    "aliases": [
+        "vira",
+        "virapics",
+        "virapics3",
+        "virapicsiii"
+    ],
+    "resources": 2,
+    "influence": 3,
+    "planetTypes": [
+        "CULTURAL",
+        "HAZARDOUS"
+    ],
+    "planetLayout": {
+        "unitHolderName": "virapicsiii",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 173,
+            "y": 149
+        }
+    },
+    "source": "thunders_edge"
+}

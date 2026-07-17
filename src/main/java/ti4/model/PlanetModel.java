@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.sticker.Sticker;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.JdaService;
 import ti4.helpers.Stickers;
 import ti4.image.TileHelper;
 import ti4.image.UnitTokenPosition;
@@ -23,7 +24,6 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
-import ti4.spring.jda.JdaService;
 
 @Data
 public class PlanetModel implements ModelInterface, EmbeddableModel {
@@ -36,6 +36,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private Boolean shrinkNamePNAttach;
     private List<String> aliases = new ArrayList<>();
     private Point positionInTile;
+    private Float radius;
     private int resources;
     private int influence;
     private String factionHomeworld;
@@ -45,6 +46,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private List<TechSpecialtyModel.TechSpecialty> techSpecialties;
     private String legendaryAbilityName;
     private String legendaryAbilityText;
+    private String legendaryNotes;
     private String legendaryAbilityFlavourText;
     private String basicAbilityText;
     private String flavourText;
@@ -92,7 +94,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public String getLegendaryNameRepresentation() {
-        return MiscEmojis.LegendaryPlanet + " __" + legendaryAbilityName + "__";
+        return MiscEmojis.LegendaryPlanet + " _" + legendaryAbilityName + "_";
     }
 
     public boolean getShrinkNamePNAttach() {
@@ -106,6 +108,19 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
             return planetLayout.getCenterPosition();
         }
         return null;
+    }
+
+    public float getRadius() {
+        if (radius != null) {
+            return radius;
+        }
+        if (planetLayout != null && planetLayout.getPlanetRadius() != null) {
+            return 1.0f * planetLayout.getPlanetRadius();
+        }
+        if (legendaryAbilityName != null) {
+            return 95.0f;
+        }
+        return 55.0f;
     }
 
     @Deprecated
@@ -129,6 +144,10 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public String getNameNullSafe() {
         return Optional.ofNullable(name).orElse("");
+    }
+
+    public String getNameRepresentation() {
+        return getEmoji() + " _" + name + "_ " + getPlanetTypeEmoji();
     }
 
     @JsonIgnore
@@ -158,8 +177,14 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (tile != null) sb.append("\nSystem: ").append(tile.getName());
         eb.setDescription(sb.toString());
         if (basicAbilityText != null) eb.addField("Ability:", basicAbilityText, false);
-        if (legendaryAbilityName != null)
+        if ((legendaryAbilityName != null) && (legendaryNotes != null)) {
+            eb.addField(
+                    MiscEmojis.LegendaryPlanet + legendaryAbilityName,
+                    legendaryAbilityText + "\n-# [" + legendaryNotes + "]",
+                    false);
+        } else if (legendaryAbilityName != null) {
             eb.addField(MiscEmojis.LegendaryPlanet + legendaryAbilityName, legendaryAbilityText, false);
+        }
         if (legendaryAbilityFlavourText != null) eb.addField("", legendaryAbilityFlavourText, false);
         if (flavourText != null) eb.addField("", flavourText, false);
 
@@ -184,6 +209,9 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         eb.setColor(Color.black);
 
         eb.setDescription(legendaryAbilityText);
+        if (legendaryNotes != null) {
+            eb.setDescription(legendaryAbilityText + "\n-# [" + legendaryNotes + "]");
+        }
         if (getStickerOrEmojiURL() != null) eb.setThumbnail(getStickerOrEmojiURL());
         return eb.build();
     }
@@ -288,9 +316,9 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
-        sb.append(name).append(" (").append(resources).append("/").append(influence);
-        if (!getTechSpecialtyStringRepresentation().isBlank())
-            sb.append(" ").append(getTechSpecialtyStringRepresentation());
+        sb.append(name).append(" (").append(resources).append('/').append(influence);
+        String techSpecialtyStringRepresentation = getTechSpecialtyStringRepresentation();
+        if (!techSpecialtyStringRepresentation.isBlank()) sb.append(' ').append(techSpecialtyStringRepresentation);
         sb.append(")");
         return sb.toString();
     }

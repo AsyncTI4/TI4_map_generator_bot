@@ -9,13 +9,13 @@ import java.util.function.Consumer;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MahactKingDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
@@ -23,7 +23,7 @@ import ti4.service.draft.DraftButtonService;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
 import ti4.service.draft.DraftableType;
-import ti4.service.draft.PlayerSetupService.PlayerSetupState;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.emoji.TI4Emoji;
 
 public class MahactKingDraftable extends SinglePickDraftable {
@@ -90,8 +90,8 @@ public class MahactKingDraftable extends SinglePickDraftable {
     }
 
     public static FactionModel getFactionByChoice(DraftChoice choice) {
-        if (choice == null || choice.getChoiceKey() == null) return null;
-        return getFactionByChoice(choice.getChoiceKey());
+        if (choice == null || choice.choiceKey() == null) return null;
+        return getFactionByChoice(choice.choiceKey());
     }
 
     public static FactionModel getFactionByChoice(String choiceKey) {
@@ -154,7 +154,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
                         draftManager.getPlayerStates().get(pId).getPicks().get(TYPE);
                 if (playerChoices != null) {
                     for (DraftChoice choice : playerChoices) {
-                        informFactions.remove(choice.getChoiceKey());
+                        informFactions.remove(choice.choiceKey());
                     }
                 }
             }
@@ -170,8 +170,8 @@ public class MahactKingDraftable extends SinglePickDraftable {
                         draftManager.getPlayerStates().get(pId).getPicks().get(TYPE);
                 if (playerChoices != null) {
                     for (DraftChoice choice : playerChoices) {
-                        if (!informFactions.contains(choice.getChoiceKey())) {
-                            informFactions.add(choice.getChoiceKey());
+                        if (!informFactions.contains(choice.choiceKey())) {
+                            informFactions.add(choice.choiceKey());
                         }
                     }
                 }
@@ -212,7 +212,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
 
         List<DraftChoice> playerPicks = draftManager.getPlayerPicks(playerUserId, TYPE);
         if (!playerPicks.isEmpty()) {
-            String factionAlias = playerPicks.getFirst().getChoiceKey();
+            String factionAlias = playerPicks.getFirst().choiceKey();
             playerSetupState.setFaction(factionAlias);
         }
 
@@ -307,7 +307,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
                     factions.stream().map(FactionModel::fancyEmbed).toList();
             for (MessageEmbed e : embeds) {
                 String message = "";
-                if (first) message = player.getRepresentationUnfogged() + " Here's an overview of the factions:";
+                if (first) message = player.getRepresentationUnfogged() + ", here is an overview of the factions:";
                 MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
                 first = false;
             }

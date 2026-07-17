@@ -1,0 +1,171 @@
+[
+    {
+        "alias": "bedreamdd",
+        "name": "Liturgy II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "RR",
+        "faction": "dream",
+        "baseUpgrade": "dd2",
+        "source": "beans",
+        "text": "At the end of a tactical action in this unit's system, you may place or move 1 nexus token into any system that contains your units."
+    },
+    {
+        "alias": "bedreamneg",
+        "name": "Non-Euclidean Geometries",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BB",
+        "faction": "dream",
+        "source": "beans",
+        "text": "During your tactical actions, apply +1 to the move value of any ship that starts its movement in a system that contains 1 or more of oyur nexus tokens."
+    },
+    {
+        "alias": "becrystda",
+        "name": "Defensive Architecture",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "faction": "crystellum",
+        "source": "beans",
+        "text": "After 1 or more hits are produced against your units during space combat, you may exhaust this card to cancel 1 of those hits. If you do, produce 1 hit and assign it to 1 of your opponent's ships."
+    },
+    {
+        "alias": "becrystrd",
+        "name": "Resonance Drive",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "B",
+        "faction": "crystellum",
+        "source": "beans",
+        "text": "During movement, apply +1 to the move value of your ships that are transporting a number of units equal to their capacity value."
+    },
+    {
+        "alias": "becrystmb",
+        "name": "Molecular Binding",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "crystellum",
+        "source": "beans",
+        "text": "At the start of your turn, you may replace 1 of your fighters on the game board with 1 destroyer from your reinforcements, or 2 infantry on any planet you control with 1 mech from your reinforcements."
+    },
+    {
+        "alias": "beasheninf",
+        "name": "Cinderborn II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "ashen",
+        "baseUpgrade": "inf2",
+        "source": "beans",
+        "text": "When this unit would be destroyed, roll 1 die. On a 6 or higher, you may produce 1 hit. If you do, place this unit on this card. At the start of your next turn, place each unit that is on this card on planets you control in your home system."
+    },
+    {
+        "alias": "beashendn",
+        "name": "Ashfall Engine II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "BBY",
+        "faction": "ashen",
+        "baseUpgrade": "dn2",
+        "source": "beans",
+        "text": "This unit cannot be destroyed by \"Direct Hit\" action cards. During combat, when this unit would be destroyed or uses its SUSTAIN DAMAGE ability, you may use its BOMBARDMENT ability against a planet in its system."
+    },
+    {
+        "alias": "beironmf",
+        "name": "Riptide II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GRB",
+        "faction": "iron",
+        "source": "beans",
+        "text": "When this unit is destroyed, place 1 infantry from your reinforcements on its planet. If it was in the space area, place 1 fighter instead. This unit may move without being transported. Mechs in excess of your capacity count against your fleet limit."
+    },
+    {
+        "alias": "beironats",
+        "name": "Advanced Targeting Systems",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "faction": "iron",
+        "source": "beans",
+        "text": "At the start of the first round of ground combat, you may exhaust this card; for the remainder of this combat round, your mechs roll 1 additional combat die."
+    },
+    {
+        "alias": "betaqr",
+        "name": "Quantum Restructuring",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "ta",
+        "source": "beans",
+        "text": "ACTION: Exhaust this card to choose a planet you control with a design. Place 1 structure from your reinforcements on that planet."
+    },
+    {
+        "alias": "betaro",
+        "name": "Resource Optimization",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGG",
+        "faction": "ta",
+        "source": "beans",
+        "text": "At the end of your turn, you may exhaust this card and 1 planet you control to ready 1 other planet you control. If that planet has an ability card, you may ready it as well."
+    },
+    {
+        "alias": "benetrunnersdm",
+        "name": "Data Mining",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "netrunners",
+        "source": "beans",
+        "text": "At the start of the status phase, gain 1 trade good for every 2 other player's control tokens on your faction sheet."
+    },
+    {
+        "alias": "benetrunnerssd",
+        "name": "Siphon II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "netrunners",
+        "baseUpgrade": "sd2",
+        "source": "beans",
+        "text": "This unit's PRODUCTION value is equal to 4 more than this planet's resource value. When using this unit's PRODUCTION ability, discount the combined cost of the units produced by 1 for every 2 other player's control tokens on your faction sheet. Up to 3 fighters in this system do not count against capacity."
+    },
+    {
+        "alias": "benataudo",
+        "name": "Divine Order",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "G",
+        "faction": "natau",
+        "source": "beans",
+        "text": "During the agenda phase, after the speaker votes on an agenda: You may exhaust this card to treat your votes as if they were placed on any other outcome."
+    },
+    {
+        "alias": "benataure",
+        "name": "Ritual Engine",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RRR",
+        "faction": "natau",
+        "source": "beans",
+        "text": "During the first round of combat, choose one of your non-fighter ships in the active system to roll X amount of extra combat dice, where X is the number of unique ship types your opponent has in the combat."
+    }
+]

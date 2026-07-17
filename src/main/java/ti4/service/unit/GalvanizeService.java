@@ -2,32 +2,36 @@ package ti4.service.unit;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.regex.RegexService;
 
+@UtilityClass
 public class GalvanizeService {
 
     @ButtonHandler("getToggleGalvanizeTiles")
     public static void postToggleGalvanizeTiles(Game game, Player player) {
         List<Button> buttons = ButtonHelper.getTilesWithUnitsForAction(player, game, "toggleGalvanize", true);
         String message = player.getRepresentationUnfogged()
-                + " Use the buttons to select the tile in which you wish to modify units. ";
+                + ", please choose the system containing the unit you with to galvanize. ";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
@@ -42,16 +46,16 @@ public class GalvanizeService {
     }
 
     public static List<Button> getToggleGalvanizeButtons(Player player, Game game, Tile tile) {
-        String finChecker = player.getFinsFactionCheckerPrefix();
+        String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
         String pos = tile.getPosition() + "_";
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             String uhName = unitHolder.getName();
             String uhRepresentation;
             if ("space".equalsIgnoreCase(uhName)) {
-                uhRepresentation = " in Space " + tile.getPosition();
+                uhRepresentation = " In Space " + tile.getPosition();
             } else {
-                uhRepresentation = " on " + Helper.getPlanetRepresentation(uhName, game);
+                uhRepresentation = " On " + Helper.getPlanetRepresentation(uhName, game);
             }
             for (UnitKey unit : unitHolder.getUnitsByState().keySet()) {
                 int total = unitHolder.getUnitCount(unit);
@@ -64,17 +68,17 @@ public class GalvanizeService {
                 String unitIdPart = pos + unit.asyncID() + "_" + uhName;
                 if (ungalvanized > 0)
                     buttons.add(Buttons.green(
-                            finChecker + "galvanize_" + unitIdPart,
+                            factionChecker + "galvanize_" + unitIdPart,
                             "Galvanize 1 " + unit.unitName() + uhRepresentation,
                             unit.unitEmoji()));
                 if (galvanized > 0)
                     buttons.add(Buttons.red(
-                            finChecker + "ungalvanize_" + unitIdPart,
+                            factionChecker + "ungalvanize_" + unitIdPart,
                             "Ungalvanize 1 " + unit.unitName() + uhRepresentation,
                             unit.unitEmoji()));
             }
         }
-        buttons.add(Buttons.blue("deleteButtons", "Done galvanizing units"));
+        buttons.add(Buttons.blue("deleteButtons", "Done Galvanizing Units"));
         return buttons;
     }
 
@@ -116,7 +120,7 @@ public class GalvanizeService {
         if (add) uh.addGalvanizedUnit(unit, 1);
         if (!add) uh.removeGalvanizedUnit(unit, 1);
         refreshGalvanizeButtons(event, game, player, tile);
-        String descr = unit.getUnitType().humanReadableName() + grammar + uhName;
+        String descr = unit.unitType().humanReadableName() + grammar + uhName;
         String addRemove = add ? " galvanized " : " removed galvanize from ";
         String msg = player.getRepresentation() + addRemove + descr + " in tile "
                 + tile.getRepresentationForButtons(game, player);
@@ -129,6 +133,6 @@ public class GalvanizeService {
         if (systemButtons.size() > 25) systemButtons = systemButtons.subList(0, 25);
         event.getMessage()
                 .editMessageComponents(ActionRow.partitionOf(systemButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

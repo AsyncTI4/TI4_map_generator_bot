@@ -1,21 +1,27 @@
 package ti4.service;
 
-import java.awt.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.*;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 
@@ -117,11 +123,8 @@ public class VeiledHeartService {
             veiledCardsByType.put(cardType, new ArrayList<>());
         }
 
-        getVeiledCards(player).forEach(card -> {
-            VeiledCardType.fromCard(card).ifPresent(type -> {
-                veiledCardsByType.get(type).add(card);
-            });
-        });
+        getVeiledCards(player).forEach(card -> VeiledCardType.fromCard(card)
+                .ifPresent(type -> veiledCardsByType.get(type).add(card)));
         return veiledCardsByType;
     }
 
@@ -211,13 +214,13 @@ public class VeiledHeartService {
     public static void doAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
         String msg;
         switch (action) {
-            case VeiledCardAction.DRAW -> {
+            case DRAW -> {
                 setStoredValue(player, getStoredValue(player) + card + "_");
                 msg = player.getRepresentation() + " has secretly drawn a veiled "
                         + type.toString().toLowerCase()
                         + ". They may put it into play with a button in their cards info.";
             }
-            case VeiledCardAction.DISCARD -> {
+            case DISCARD -> {
                 setStoredValue(player, getStoredValue(player).replace(card + "_", ""));
                 msg = player.getRepresentation() + " has secretly discarded a veiled "
                         + type.toString().toLowerCase() + ".";

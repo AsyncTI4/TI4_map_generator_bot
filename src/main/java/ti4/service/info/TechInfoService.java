@@ -6,19 +6,19 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.buttons.Buttons;
-import ti4.commands.CommandHelper;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.commands.CommandHelper;
+import ti4.game.Player;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
+import ti4.service.franken.FrankenAlternateTextService;
 
 @UtilityClass
 public class TechInfoService {
 
-    public static void sendTechInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + " Somebody" + CommandHelper.getHeaderText(event);
+    public static void sendTechInfo(Player player, GenericInteractionCreateEvent event) {
+        String headerText = player.getRepresentationNoPing() + " Somebody" + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendTechInfo(player);
     }
@@ -43,7 +43,8 @@ public class TechInfoService {
                 .map(Mapper::getTech)
                 .sorted(TechnologyModel.sortByTechRequirements)
                 .toList()) {
-            MessageEmbed representationEmbed = techModel.getRepresentationEmbed();
+            MessageEmbed representationEmbed =
+                    FrankenAlternateTextService.getTechnologyEmbed(player.getGame(), techModel, false, false);
             messageEmbeds.add(representationEmbed);
         }
         return messageEmbeds;
@@ -56,7 +57,8 @@ public class TechInfoService {
                 .map(Mapper::getTech)
                 .sorted(TechnologyModel.sortByTechRequirements)
                 .toList()) {
-            MessageEmbed representationEmbed = techModel.getRepresentationEmbed(false, true);
+            MessageEmbed representationEmbed =
+                    FrankenAlternateTextService.getTechnologyEmbed(player.getGame(), techModel, false, true);
             messageEmbeds.add(representationEmbed);
         }
         return messageEmbeds;

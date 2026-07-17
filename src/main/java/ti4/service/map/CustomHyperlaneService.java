@@ -17,22 +17,26 @@ import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.callbacks.IDeferrableCallback;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
-import ti4.buttons.Buttons;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.ModalHandler;
+import ti4.game.Game;
+import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.SortHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.listeners.annotations.ModalHandler;
-import ti4.map.Game;
-import ti4.map.Tile;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
 @UtilityClass
 public class CustomHyperlaneService {
+
     private static final String HYPERLANE_TILEID = "hl";
 
     private static final List<Button> HYPERLANE_BUTTONS = Arrays.asList(
@@ -54,7 +58,7 @@ public class CustomHyperlaneService {
         offerManageHyperlaneButtons(game, event, null);
     }
 
-    @ButtonHandler("customHyperlanePagination")
+    @ButtonHandler(value = "customHyperlanePagination", save = false)
     public static void offerManageHyperlaneButtons(ButtonInteractionEvent event, String buttonID, Game game) {
         offerManageHyperlaneButtons(game, event, buttonID);
     }
@@ -79,12 +83,12 @@ public class CustomHyperlaneService {
             event.getMessageChannel()
                     .sendMessage(sb.toString())
                     .setComponents(buttons)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
-            ((ButtonInteractionEvent) event)
+            ((IDeferrableCallback) event)
                     .getHook()
                     .editOriginalComponents(buttons)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -109,30 +113,30 @@ public class CustomHyperlaneService {
         return hyperlaneTileButtons;
     }
 
-    @ButtonHandler("customHyperlaneRefresh")
+    @ButtonHandler(value = "customHyperlaneRefresh", save = false)
     public static void refreshHyperlaneButtons(ButtonInteractionEvent event, Game game) {
         offerManageHyperlaneButtons(game, event, null);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    @ButtonHandler("customHyperlaneMore")
+    @ButtonHandler(value = "customHyperlaneMore", save = false)
     public static void moreHyperlaneButtons(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", HYPERLANE_MORE_BUTTONS);
     }
 
-    @ButtonHandler("customHyperlaneExport")
+    @ButtonHandler(value = "customHyperlaneExport", save = false)
     public static void exportHyperlaneData(ButtonInteractionEvent event, Game game) {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : game.getCustomHyperlaneData().entrySet()) {
             sb.append(entry.getKey())
                     .append(",")
                     .append(encodeMatrix(entry.getValue()))
-                    .append(" ");
+                    .append(' ');
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
 
-    @ButtonHandler("customHyperlaneImport~MDL")
+    @ButtonHandler(value = "customHyperlaneImport~MDL", save = false)
     public static void importHyperlaneData(ButtonInteractionEvent event) {
         TextInput.Builder data = TextInput.create(Constants.SETTING_VALUE, TextInputStyle.PARAGRAPH);
 
@@ -140,7 +144,7 @@ public class CustomHyperlaneService {
                 .addComponents(Label.of("Hyperlane Data", data.build()))
                 .build();
 
-        event.replyModal(importDataModal).queue();
+        event.replyModal(importDataModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("customHyperlaneImportSave")
@@ -198,7 +202,7 @@ public class CustomHyperlaneService {
                 .addComponents(Label.of("Hyperlane Matrix (clear to delete)", data.build()))
                 .build();
 
-        event.replyModal(customHyperlaneModal).queue();
+        event.replyModal(customHyperlaneModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("customHyperlaneSave_")
@@ -228,7 +232,7 @@ public class CustomHyperlaneService {
         game.getCustomHyperlaneData().put(position, normalizeMatrix(hyperlaneData));
     }
 
-    @ButtonHandler("customHyperlaneTransform~MDL")
+    @ButtonHandler(value = "customHyperlaneTransform~MDL", save = false)
     public static void transformHyperlane(ButtonInteractionEvent event) {
         TextInput.Builder data1 = TextInput.create("staticToCustom", TextInputStyle.SHORT)
                 .setPlaceholder("Comma separated positions or ALL")
@@ -241,7 +245,7 @@ public class CustomHyperlaneService {
                 .addComponents(Label.of("Static -> Custom", data1.build()), Label.of("Custom -> Static", data2.build()))
                 .build();
 
-        event.replyModal(modal).queue();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("customHyperlaneTransformExecute")
@@ -265,12 +269,12 @@ public class CustomHyperlaneService {
                     if (!StringUtils.isBlank(data)) {
                         AddTileService.addTile(game, new Tile(HYPERLANE_TILEID, position));
                         game.getCustomHyperlaneData().put(position, data);
-                        success.append(position).append(" ");
+                        success.append(position).append(' ');
                     } else {
-                        failed.append(position).append(" ");
+                        failed.append(position).append(' ');
                     }
                 } else {
-                    failed.append(position).append(" ");
+                    failed.append(position).append(' ');
                 }
             }
         }
@@ -287,9 +291,9 @@ public class CustomHyperlaneService {
                 if (staticHyperlaneTileId != null) {
                     game.getCustomHyperlaneData().remove(position);
                     AddTileService.addTile(game, new Tile(staticHyperlaneTileId, position));
-                    success.append(position).append(" ");
+                    success.append(position).append(' ');
                 } else {
-                    failed.append(position).append(" ");
+                    failed.append(position).append(' ');
                 }
             }
         }
@@ -310,6 +314,38 @@ public class CustomHyperlaneService {
                 && tile.getTileModel() != null
                 && tile.getTileModel().isHyperlane()
                 && !isCustomHyperlaneTile(tile);
+    }
+
+    /** Rotates a 6x6 hyperlane connection matrix string by 60 degrees: [i][j] -> [(i+1)%6][(j+1)%6]. */
+    public static String rotateMatrix60(String matrix) {
+        if (matrix == null) return null;
+        String[] rows = matrix.split(";");
+        int size = 6;
+        int[][] mat = new int[size][size];
+
+        for (int i = 0; i < size; i++) {
+            String[] cols = rows[i].split(",");
+            for (int j = 0; j < size; j++) {
+                mat[i][j] = Integer.parseInt(cols[j].trim());
+            }
+        }
+
+        int[][] rotated = new int[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                rotated[(i + 1) % size][(j + 1) % size] = mat[i][j];
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size; i++) {
+            if (i > 0) sb.append(";");
+            for (int j = 0; j < size; j++) {
+                if (j > 0) sb.append(",");
+                sb.append(rotated[i][j]);
+            }
+        }
+        return sb.toString();
     }
 
     public static String encodeMatrix(String matrix) {

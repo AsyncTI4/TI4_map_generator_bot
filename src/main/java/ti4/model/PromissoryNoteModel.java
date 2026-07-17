@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -8,12 +8,14 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
+import ti4.draft.DraftCategory;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.image.Mapper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.franken.FrankenAlternateTextService;
 
 @Data
 public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNoteModel>, EmbeddableModel {
@@ -28,6 +30,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     private String attachment;
     private ComponentSource source;
     private String text;
+    private String notes;
     private String homebrewReplacesID;
     private String imageURL;
     private List<String> searchTags = new ArrayList<>();
@@ -47,21 +50,21 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     @Override
     public PromissoryNoteModel duplicateAndSetColor(ColorModel newColor) {
         PromissoryNoteModel pn = new PromissoryNoteModel();
-        pn.setAlias(alias.replace("<color>", newColor.getName()));
-        pn.setName(name);
-        pn.setShortName(shortName);
-        pn.setShrinkName(shrinkName);
-        pn.setFaction(faction);
-        pn.setColor(newColor.getName());
-        pn.setPlayArea(playArea);
-        pn.setPlayImmediately(playImmediately);
-        pn.setAttachment(attachment);
-        pn.setSource(source);
+        pn.alias = alias.replace("<color>", newColor.getName());
+        pn.name = name;
+        pn.shortName = shortName;
+        pn.shrinkName = shrinkName;
+        pn.faction = faction;
+        pn.color = newColor.getName();
+        pn.playArea = playArea;
+        pn.playImmediately = playImmediately;
+        pn.attachment = attachment;
+        pn.source = source;
         String newText = text.replace("<color>", "<" + newColor.getName() + ">");
-        pn.setText(newText);
-        pn.setHomebrewReplacesID(homebrewReplacesID);
-        pn.setSearchTags(new ArrayList<>(searchTags));
-        pn.setSourcePNModel(this);
+        pn.text = newText;
+        pn.homebrewReplacesID = homebrewReplacesID;
+        pn.searchTags = new ArrayList<>(searchTags);
+        pn.sourcePNModel = this;
         return pn;
     }
 
@@ -69,7 +72,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         return alias != null && name != null && (faction != null || color != null) && text != null && source != null;
     }
 
-    public String getID() {
+    public String getId() {
         return alias;
     }
 
@@ -161,12 +164,15 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
 
         // DESCRIPTION
         eb.setDescription(text);
+        if (notes != null) {
+            eb.setDescription(text + "\n-# [" + notes + "]");
+        }
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
         if (includeHelpfulText) {
             if (!StringUtils.isBlank(getAttachment().orElse("")))
-                footer.append("Attachment: ").append(getAttachment().orElse("")).append("\n");
+                footer.append("Attachment: ").append(getAttachment().orElse("")).append('\n');
             if (getPlayArea()) {
                 footer.append("Play area card. ");
                 if (isPlayedDirectlyToPlayArea()) {
@@ -174,7 +180,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
                 } else {
                     footer.append("Must be played from hand to enter play area.");
                 }
-                footer.append("\n");
+                footer.append('\n');
             }
         }
         if (includeID) {
@@ -182,7 +188,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
                     .append(alias)
                     .append("    Source: ")
                     .append(source)
-                    .append("\n");
+                    .append('\n');
         }
         eb.setFooter(footer.toString());
 
@@ -195,7 +201,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         if (!StringUtils.isBlank(getFaction().orElse("")))
             sb.append(FactionEmojis.getFactionIcon(getFaction().get()));
         sb.append(CardEmojis.PN);
-        sb.append(" ").append(name);
+        sb.append(' ').append(name);
         if (!StringUtils.isBlank(getColor().orElse(""))) {
             sb.append(" (");
             if ("<color>".equals(color)) {
@@ -210,7 +216,9 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     }
 
     public String getTextFormatted(Game game) {
-        String formattedText = text;
+        boolean useAlternateText = FrankenAlternateTextService.hasAlternateText(game, DraftCategory.PN, alias);
+        String formattedText =
+                useAlternateText ? FrankenAlternateTextService.getAlternateText(DraftCategory.PN, alias) : text;
         formattedText = formattedText.replace("\n", "\n> ");
         StringBuilder replaceText = new StringBuilder();
         Player pnOwner = game.getPNOwner(alias);
@@ -218,6 +226,9 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
             if (!game.isFowMode()) replaceText.append(pnOwner.getFactionEmoji()); // add Owner's Faction Emoji
             replaceText.append(pnOwner.getColor());
             formattedText = formattedText.replaceAll("<" + pnOwner.getColor() + ">", replaceText.toString());
+        }
+        if (notes != null && !useAlternateText) {
+            formattedText += "\n> -# [" + notes + "]";
         }
         return formattedText;
     }

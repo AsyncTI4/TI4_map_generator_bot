@@ -9,9 +9,9 @@ import java.nio.file.Path;
 import javax.annotation.Nullable;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
 
-public class Storage {
+public final class Storage {
 
     public static final String ENV_VAR_RESOURCE_PATH = "RESOURCE_PATH";
     private static final String ENV_VAR_DB_PATH = "DB_PATH";
@@ -38,6 +38,7 @@ public class Storage {
     private static Font TI_FONT_30;
     private static Font TI_FONT_32;
     private static Font TI_FONT_35;
+    private static Font TI_FONT_36;
     private static Font TI_FONT_40;
     private static Font TI_FONT_48;
     private static Font TI_FONT_50;
@@ -162,6 +163,14 @@ public class Storage {
         }
         TI_FONT_35 = getFont(35.0f);
         return TI_FONT_35;
+    }
+
+    public static Font getFont36() {
+        if (TI_FONT_36 != null) {
+            return TI_FONT_36;
+        }
+        TI_FONT_36 = getFont(36.0f);
+        return TI_FONT_36;
     }
 
     public static Font getFont40() {

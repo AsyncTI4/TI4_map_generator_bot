@@ -1,0 +1,86 @@
+[
+    {
+        "alias": "dreambt",
+        "name": "Dream-Space Convergence",
+        "shortName": "Dream-Space\nConvergence",
+        "faction": "dream",
+        "synergy": [
+            "WARFARE",
+            "BIOTIC"
+        ],
+        "text": "ACTION: At the start of your turn, you may exhaust this card to move 1 nexus token into a system that contains a planet you control. \n\nWhen you win a combat as the defender in a system that contains a nexus token, you may remove your command token from that system and return it to your reinforcements.",
+        "source": "beans"
+    },
+    {
+        "alias": "crystellumbt",
+        "name": "Defensive Architecture",
+        "shortName": "Defensive\nArchitecture",
+        "faction": "crystellum",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "At the start of the first round of space combat: \n\nFor each unit in the active system that is at capacity, you may give one other non-fighter ship in the same system SUSTAIN DAMAGE until the end of that combat.",
+        "source": "beans"
+    },
+    {
+        "alias": "ashenbt",
+        "name": "From Fire, Resolve",
+        "shortName": "From Fire,\nResolve",
+        "faction": "ashen",
+        "synergy": [
+            "WARFARE",
+            "PROPULSION"
+        ],
+        "text": "When you would roll dice as part of your infantry's printed text ability, on a 5 or lower, you may exhaust this card to treat the result of that die as a 10. \n\nWhen you roll for a unit's BOMBARDMENT ability: \n\nYou may damage that unit to reroll any number of those dice.",
+        "source": "beans"
+    },
+    {
+        "alias": "ironbt",
+        "name": "Foundry Network",
+        "shortName": "Foundry\nNetwork",
+        "faction": "iron",
+        "synergy": [
+            "WARFARE",
+            "BIOTIC"
+        ],
+        "text": "When you produce 1 or more mechs, you may place those units with any of your space docks. \n\nWhen you explore a planet, you may treat that planet as containing 1 of your mechs.",
+        "source": "beans"
+    },
+    {
+        "alias": "tabt",
+        "name": "Adaptive Economy",
+        "shortName": "Adaptive\nEconomy",
+        "faction": "ta",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "At the end of your turn, you may exhaust this card or spend 1 token from your strategy pool to remove 1 design from a non-home planet and attach it to a different non-home planet in an adjacent system that does not have a design attached to it. Then, place 2 infantry from your reinforcements on that planet and ready it.",
+        "source": "beans"
+    },
+    {
+        "alias": "netrunnersbt",
+        "name": "Data Breach",
+        "shortName": "Data\nBreach",
+        "faction": "netrunners",
+        "synergy": [
+            "CYBERNETIC",
+            "BIOTIC"
+        ],
+        "text": "When researching a technology owned by a player whose control token is on your faction sheet: \n\nFor every 2 of that player's control token on your faction sheet, you may ignore 1 of that technologies prerequisites.",
+        "source": "beans"
+    },
+    {
+        "alias": "nataubt",
+        "name": "Tether",
+        "shortName": "Tether",
+        "faction": "natau",
+        "synergy": [
+            "PROPULSION",
+            "BIOTIC"
+        ],
+        "text": "You may retreat to any system that contains one of your command tokens and no other player's ships. \n\nYou may exhaust this card at any time to use the exhaust effect of 1 doctrine in your reinforcements.",
+        "source": "beans"
+    }
+]

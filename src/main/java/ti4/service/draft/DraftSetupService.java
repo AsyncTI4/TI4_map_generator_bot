@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.game.Game;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
-import ti4.map.Game;
-import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.draft.draftables.FactionDraftable;
@@ -30,7 +30,7 @@ public class DraftSetupService {
             TIGLHelper.sendTIGLSetupText(game);
         }
 
-        DraftSpec specs = DraftSpec.CreateFromMiltySettings(settings);
+        DraftSpec specs = DraftSpec.createFromMiltySettings(settings);
 
         if (specs.getTemplate().isNucleusTemplate()) {
             return "Use the new settings menu to start a Nucleus draft!";
@@ -39,7 +39,7 @@ public class DraftSetupService {
         }
     }
 
-    public String startMiltyFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
+    private String startMiltyFromSpecs(GenericInteractionCreateEvent event, DraftSpec specs) {
         Game game = specs.game;
 
         if (specs.presetSlices != null) {
@@ -50,8 +50,10 @@ public class DraftSetupService {
         // Draft Manager Setup
         // --------------------------------------------------------------
         List<ComponentSource> sources = new ArrayList<>(specs.tileSources);
-        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+        if (game.isDiscordantStarsMode()) {
             sources.add(ComponentSource.ds);
+        }
+        if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
@@ -131,7 +133,8 @@ public class DraftSetupService {
                 } else {
                     draftManager.tryStartDraft();
                     game.setPhaseOfGame("miltydraft");
-                    GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
+                    // TODO: We should be locking since we're saving
+                    GameManager.save(game, "Milty");
                     if (game.isThundersEdge()) {
                         ThundersEdgeRulesService.alertTabletalkWithRulesAtStartOfDraft(game);
                     }
@@ -162,8 +165,10 @@ public class DraftSetupService {
         }
 
         List<ComponentSource> tileSources = new ArrayList<>(sourceSettings.getTileSources());
-        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+        if (game.isDiscordantStarsMode()) {
             tileSources.add(ComponentSource.ds);
+        }
+        if (game.isUnchartedSpaceStuff()) {
             tileSources.add(ComponentSource.uncharted_space);
         }
         if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
@@ -191,16 +196,6 @@ public class DraftSetupService {
         }
         orchestrator.applySetupMenuChoices(event, settings);
         draftManager.setOrchestrator(orchestrator);
-
-        // TODO: Support this in the Nucleus generator, by factoring in to the nucleus generation
-        // if (specs.presetSlices != null) {
-        //     SliceDraftable sliceDraftable = new SliceDraftable();
-        //     draftManager.addDraftable(sliceDraftable);
-        //     sliceDraftable.initialize(specs.presetSlices);
-        //     draftManager.tryStartDraft();
-        // }
-
-        // TODO: Support presetting the Nucleus in the Settings object, maybe via modal w/ TTS string
 
         game.setPhaseOfGame("miltydraft");
         draftManager.tryStartDraft();

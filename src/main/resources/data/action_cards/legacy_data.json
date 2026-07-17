@@ -97,6 +97,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player who voted for or predicted the resolved outcome gains 2 trade goods.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "As he signed the last of the costly trade deals, Mot Nesretep sank back into his chair. It was a gamble with the fate of the galaxy at stake, but his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
         "source": "deprecated"
     },
@@ -248,8 +249,8 @@
         "alias": "shrapnel_turrets2",
         "name": "Shrapnel Turrets",
         "phase": "Action",
-        "window": "Before you roll dice for ANTI-FIGHTER BARRAGE",
-        "text": "Each of your non-fighter ships in the active system that do not have ANTI-FIGHTER BARRAGE gain ANTI-FIGHTER BARRAGE 9(x2) until the end of the combat.",
+        "window": "At the start of a space combat",
+        "text": "Choose any number of your ships that have a capacity value. Each of those ships gain ANTI-FIGHTER BARRAGE 8 (x2) during this combat.",
         "automationID": "shrapnel_turrets",
         "flavorText": "Mendosa grinned widely. \"Ye say we're out of munitions, yet look at all this junk lyin' around. Get it movin' fast enough, and it'll shred them up just fine.\"",
         "source": "deprecated"
@@ -405,6 +406,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, either draw 2 secret objectives or gain the speaker token.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Today's session would be pivotal - the Keleres proclamation was to be signed into full effect. Qanoj smiled. A new chapter in his career would begin today.",
         "source": "deprecated"
     },
@@ -413,7 +415,8 @@
         "name": "Strategic Withdrawal",
         "phase": "Action",
         "window": "After you move ships into a system other than the active system",
-        "text": "Remove any of your command tokens from that system. [Note: 'Into' specifically refers to a destination system, not systems you move 'through'.]",
+        "text": "Remove any of your command tokens from that system.",
+        "notes": "\"Into\" specifically refers to a destination system, not systems you move \"through\".",
         "flavorText": "The skirmish was merely a ploy to draw them out. The Memoria was already far out of reach, rendezvousing with the rear fleet, poised to strike at their true target.",
         "source": "deprecated"
     },
@@ -467,7 +470,8 @@
         "name": "Grand Operation",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 system that does not contain other players' units. Move 1 or more of your ships in adjacent systems that do not contain 1 of your command tokens into the chosen system. [Note: You can transport ground forces during this movement.]",
+        "text": "Choose 1 system that does not contain other players' units. Move 1 or more of your ships in adjacent systems that do not contain 1 of your command tokens into the chosen system.",
+        "notes": "You may transport ground forces during this movement.",
         "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair as he finished for her, \"A logistical nightmare? I recommend you get to it then.\"",
         "source": "deprecated"
     },
@@ -476,7 +480,8 @@
         "name": "Continuous Barrage",
         "phase": "Action",
         "window": "At the end of a round of space combat",
-        "text": "Your units in the active system use their ANTI-FIGHTER BARRAGE abilities against your opponent's units. [Note: This AFB still only targets fighters.]",
+        "text": "Your units in the active system use their ANTI-FIGHTER BARRAGE abilities against your opponent's units.",
+        "notes": "This AFB still only targets fighters.",
         "flavorText": "Mirik pounded his fist on his command chair. \"We've locked onto the squadron's rendezvous point. Fire! Fire until not but dust remains!\"",
         "source": "deprecated"
     },
@@ -503,7 +508,8 @@
         "name": "Custodian Support",
         "phase": "Action",
         "window": "Action",
-        "text": "Pass. Then, you may immediately score 1 of your unscored secret objectives if you fulfill its requirements and you were the first player to pass during this game round; otherwise, gain 2 commodities. [Note: You cannot play this card if you would not otherwise be eligible to pass.]",
+        "text": "Pass. Then, you may immediately score 1 of your unscored secret objectives if you fulfill its requirements and you were the first player to pass during this game round; otherwise, gain 2 commodities.",
+        "notes": "You cannot play this card if you would not otherwise be eligible to pass.",
         "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, disguised under the pretense of tradition.",
         "source": "deprecated"
     },
@@ -549,6 +555,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each other player that did not vote for that outcome must give you 1 promissory note from their hand.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Gil was an emissary to the Civita Planetar. His career had made him well-connected, with comrades in hundreds of bureaucracies and favors owed in many more.",
         "source": "deprecated"
     },
@@ -648,6 +655,7 @@
         "name": "Concise Legal Text",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
+        "playTiming": "AGENDA_WHEN",
         "text": "Ready up to 3 planets you control. Until the \"Resolve Outcome\" step, players cannot resolve abilities.",
         "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
         "source": "deprecated"
@@ -712,6 +720,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome destroys 3 of their infantry on the game board.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "The past flooded Ahk-Syl Siven's thoughts upon seeing the Mahact, and the memory of his essence being rewritten on a subatomic level surged involuntarily to the forefront of his consciousness.",
         "source": "deprecated"
     },
@@ -765,7 +774,8 @@
         "name": "Boarding Torpedoes",
         "phase": "Action",
         "window": "When a hit is assigned to your opponent's non-fighter ship that has a cost of 4 or less",
-        "text": "Replace that ship with a matching ship from your reinforcements. [Note: SUSTAIN DAMAGE is before the assignment of hits. If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
+        "text": "Replace that ship with a matching ship from your reinforcements.",
+        "notes": "SUSTAIN DAMAGE is before the assignment of hits. If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.",
         "flavorText": "\"Brother,\" the officer cried, \"our ships are breaking up! If we retreat now...\" Milor glared at him. \"No! Launch the remaining fighters and board the enemy in the lifepods. In Darien's name, we fight to the last!\"",
         "source": "deprecated"
     },
@@ -831,6 +841,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each other player that did not vote for that outcome must give you 1 promissory note from their hand.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "Gil's career at the Civita Planetar was prolific, with friends in hundreds of bureaucracies and favors owed in many more.",
         "source": "deprecated"
     },
@@ -857,7 +868,8 @@
         "name": "Smuggler Routes",
         "phase": "Action",
         "window": "Action",
-        "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this action. [Note: You can transport units during this movement.]",
+        "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this action.",
+        "notes": "You can transport units during this movement.",
         "flavorText": "Greg closed his book, a tale of the Passage of Tears, with a sigh. As he looked to the sky and imagined the space beyond—a place he had never been—he quietly sang in tune with the Symphony, \"I wanna be where the Mentak are. I wanna see—wanna see 'em raidin'.\"",
         "source": "deprecated"
     },
@@ -913,6 +925,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome reveals 1 random action card from their hand; take 1 of those cards and discard the rest.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "As they placed the noose around her neck, Menda wailed. Suffi, who was next in line, gave her a confident smile. \"First time?\"",
         "source": "deprecated"
     },
@@ -966,7 +979,8 @@
         "name": "Early Voting",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "Choose another player. That player votes first on this agenda. If you and that player cast votes for the same outcome of this agenda, cast 5 additional votes for that outcome. [Note: This ability works like Argent Zeal. Argent votes before the chosen player.]",
+        "text": "Choose another player. That player votes first on this agenda. If you and that player cast votes for the same outcome of this agenda, cast 5 additional votes for that outcome.",
+        "notes": "This ability works like Argent ZEAL. Argent votes before the chosen player.",
         "flavorText": "Ciel slowly covered his mouth in horror as he realized his mistake. \"Damn these galactic time zones!\"",
         "source": "deprecated"
     },
@@ -1029,17 +1043,9 @@
         "name": "Special Considerations",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
+        "playTiming": "AGENDA_WHEN",
         "text": "Game effects cannot prevent you from playing this card or voting on this agenda. Ready up to 3 planets you control.",
         "flavorText": "\"It is our right to determine the future of this artifact,\" Mathis said calmly, flashing his imperial seal in a practiced motion. \"Are we not owed such respect?\"",
-        "source": "deprecated"
-    },
-    {
-        "alias": "rendezvous",
-        "name": "Rendezvous",
-        "phase": "Action",
-        "window": "After the \"Movement\" step of your tactical action in a system that does not contain other players' units",
-        "text": "Remove your command token from that system and end your turn.",
-        "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair and finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
         "source": "deprecated"
     },
     {
@@ -1052,20 +1058,12 @@
         "source": "deprecated"
     },
     {
-        "alias": "strategic_assistance",
-        "name": "Strategic Aid",
-        "phase": "Action",
-        "window": "When you perform a strategic action",
-        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
-        "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
-        "source": "deprecated"
-    },
-    {
         "alias": "miraculous_escape",
         "name": "Miraculous Escape",
         "phase": "Any",
         "window": "When 1 of your units would be destroyed",
-        "text": "That unit is not destroyed instead. [Note: Combat hits are assigned simultaneously, and thus excess hits will not destroy this unit.]",
+        "text": "That unit is not destroyed instead.",
+        "notes": "Combat hits are assigned simultaneously, and thus excess hits will not destroy this unit.",
         "flavorText": "The Memoria was known for miraculously surviving perilous situations, but Omar could not believe that it had managed to escape the Van Hauge. He was certain now - this 'Nomad' was not playing by the rules.",
         "source": "deprecated"
     },
@@ -1315,7 +1313,9 @@
         "name": "Settlement",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 infantry from your reinforcements into coexistence on any non-home planets controlled by players that voted for that outcome. [Note: You can commit to the same or different planets, like Yin Hero.]",
+        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 infantry from your reinforcements into coexistence on any non-home planets controlled by players that voted for that outcome.",
+        "playTiming": "AGENDA_AFTER",
+        "notes": "You may commit to the same or different planets, like Yin Hero.",
         "flavorText": "\"We will win this war, Rickar, based on how we adapt to it,\" Claire said sternly. \"Humanity has honed its differences into strength. Your people must do the same.\"",
         "source": "deprecated"
     },
@@ -1334,6 +1334,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, produce up to 2 units that each have a cost of 4 or less in a system that contains 1 of your space docks.",
+        "playTiming": "AGENDA_AFTER",
         "flavorText": "\"We groveled before the Lazax for liberation,\" Magmus declared, his voice rising from a gravelly rumble to a roar. \"Now we demand it!\"",
         "source": "deprecated"
     },
@@ -1342,7 +1343,8 @@
         "name": "False Manifest",
         "phase": "Action",
         "window": "When another player gains 3 or more trade goods",
-        "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods. [Note: This works at any time such a quantity could be Pillaged. The additional trade good gained does not open another Pillage window.]",
+        "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods.",
+        "notes": "This works at any time such a quantity could be PILLAGE'd. The additional trade good gained does not open another PILLAGE window.",
         "flavorText": "The deal was too good to be true. Every seal was genuine, every signature correct. Only Suffi and the cargo were amiss.",
         "source": "deprecated"
     },
@@ -1450,7 +1452,8 @@
         "name": "Rapid Fulfillment",
         "phase": "Action",
         "window": "After a player activates a system that contains your units",
-        "text": "You may resolve a transaction with any player; action cards can be traded as part of this transaction. Then, produce up to 2 ships in that system that have a combined cost of 3 or less. [Note: This transaction does not require you to be neighbors or count towards your transaction limit.]",
+        "text": "You may resolve a transaction with any player; action cards can be traded as part of this transaction. Then, produce up to 2 ships in that system that have a combined cost of 3 or less.",
+        "notes": "This transaction does not require you to be neighbors or count towards your transaction limit.",
         "flavorText": "\"Money can't buy true happiness, huh?\" Tai said smugly as he appraised their new ship.",
         "source": "deprecated"
     },
@@ -1485,9 +1488,269 @@
         "alias": "corruption_acd2",
         "name": "Corruption",
         "phase": "Any",
-        "window": "When a public objective is revealed",
+        "window": "After a public objective is revealed",
         "text": "Look at the top 2 cards of the deck that matches that objective; you may replace that objective with 1 of those cards. Then, shuffle that deck.",
         "flavorText": "Just as the charges went public, over half of the Council's staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "scavenged_fleet",
+        "name": "Scavenged Fleet",
+        "phase": "Any",
+        "window": "After 1 or more of a player's ships are destroyed",
+        "text": "Place matching neutral ships in a non-home system that contains no non-neutral ships.",
+        "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "weirdway1",
+        "name": "Weirdway",
+        "phase": "Action",
+        "window": "After you activate a non-home system",
+        "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
+        "flavorText": "\"Oy, Captain, best ye lock in,\" the wily pilot chuckled. \"I learned this little maneuver in me scavenging days.\" Before Mendosa could protest, the ship began to groan under the strain.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "weirdway2",
+        "name": "Weirdway",
+        "phase": "Action",
+        "window": "After you activate a non-home system",
+        "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
+        "flavorText": "Alerts flashed as they screamed ahead. \"Wait for the computer to chart, Douglas!\" Mendosa barked. The pilot laughed and pointed to his head. \"Oy, they call me Doug, sir—Deft Doug if ye like. I've got a keen eye for charting, and a good nose too.\" Then, it was dark.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "weirdway3",
+        "name": "Weirdway",
+        "phase": "Action",
+        "window": "After you activate a non-home system",
+        "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
+        "flavorText": "The ship's power flickered off, but the strain remained. The pilot had flung them into the void, trusting his intuition, and Mendosa was not eager to discover what awaited them on the other end.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "weirdway4",
+        "name": "Weirdway",
+        "phase": "Action",
+        "window": "After you activate a non-home system",
+        "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
+        "flavorText": "Somehow they were alive and ahead of schedule. Deft Doug's hoots turned to yowls as Mendosa rapped him on the head. \"Better to call ye Deaf Doug. Ye won't be 'eyeballing' our routes ever again!\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "relay_assembly1",
+        "name": "Relay Assembly",
+        "phase": "Action",
+        "window": "After you produce a ship",
+        "text": "Produce 1 ship of that type in any number of  systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "Each forge was an exact copy. Inside, thousands of drones worked in unison with counterparts across the stars.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "relay_assembly2",
+        "name": "Relay Assembly",
+        "phase": "Action",
+        "window": "After you produce a ship",
+        "text": "Produce 1 ship of that type in any number of  systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "Each forge was an exact copy. Inside, thousands of drones worked in unison with counterparts across the stars.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "relay_assembly3",
+        "name": "Relay Assembly",
+        "phase": "Action",
+        "window": "After you produce a ship",
+        "text": "Produce 1 ship of that type in any number of  systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "Each forge was an exact copy. Inside, thousands of drones worked in unison with counterparts across the stars.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "relay_assembly4",
+        "name": "Relay Assembly",
+        "phase": "Action",
+        "window": "After you produce a ship",
+        "text": "Produce 1 ship of that type in any number of  systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "Each forge was an exact copy. Inside, thousands of drones worked in unison with counterparts across the stars.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "efficiency_initiative",
+        "name": "Efficiency Initiative",
+        "phase": "Action",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the total PRODUCTION value of those units by up to 3 to gain an equal number of commodities and trade goods.",
+        "notes": "These trade goods are available to be spent during this PRODUCTION.",
+        "flavorText": "I48S surveyed the new installation, noting several blocking routines. The new processes increased output by nearly 11%—and with a little work, he was sure the enhancers could achieve another 4%.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "rogues",
+        "name": "Rogues",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Place 3 neutral fighters in a non-home anomaly; space combat is resolved in that system if it contains non-neutral ships.",
+        "flavorText": "\"Them void-rats cost an arm and a leg,\" Ipswitch said with disgust. \"Ah, well. Not my arm or my leg.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "invasion",
+        "name": "Invasion",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Put The Fracture into play if it is not already. Then, move 1 ingress token into a non-home system outside of The Fracture that contains no ships and place 2 neutral cruisers in that system.",
+        "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as a fleet of unmarked ships poured forth from the void, raining destruction upon the unsuspecting convoy.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "efficiency1",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by 3.",
+        "flavorText": "I48S surveyed the new installation, noting several blocking routines. The new processes increased output by nearly 11%—and with a little work, he was sure the enhancers could achieve another 4%.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "efficiency2",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by 3.",
+        "flavorText": "I48S traced the bottleneck to a single, catastrophically obsolete employee. Their termination shocked the other linemen, but he assured them they would be properly recycled.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "efficiency3",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by 3.",
+        "flavorText": "Dart nearly fell over as they crested the lip of the ancient crater to find three massive, entangled ships jutting from the earth below. Tai gave a self-satisfied hmph.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "efficiency4",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by 3.",
+        "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "strategic_assistance",
+        "name": "Strategic Aid",
+        "phase": "Action",
+        "window": "When you perform a strategic action",
+        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
+        "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "collusion",
+        "name": "Collusion",
+        "phase": "Action",
+        "window": "After you resolve the primary ability of your strategy card",
+        "text": "Remove 1 of another player's command tokens from the game board and place it in their strategy pool. Then, gain 1 command token.",
+        "flavorText": "Gambit? The magi laughed. Hardly.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "relay_assembly",
+        "name": "Relay Assembly",
+        "phase": "Action",
+        "window": "After you produce a ship",
+        "text": "Produce up to 2 ships of that type in a system that contains 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "From Umbat's hearthworld to distant suns, the shadow of his armada lengthened—stoked by their fury. His engineers broke into celebration as he called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "blackmail",
+        "name": "Blackmail",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome gives you 1 promissory note from their hand.",
+        "playTiming": "AGENDA_AFTER",
+        "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother,\" they said in unison.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "oracle",
+        "name": "Oracle",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Look at each unrevealed public objective and the top 5 cards of the secret objective deck. Then, shuffle the secret objective deck.",
+        "flavorText": "The Memoria loomed above Mecatol Rex, as it must. \"It is wrong,\" the Nomad said softly. \"Infinity before me, yet every choice I make collapses it. Foreknowledge diverts me onto a finite path and traps me in those deadly corridors.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "survey1",
+        "name": "Survey",
+        "phase": "Action",
+        "window": "At the end of your turn",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
+        "automationID": "survey",
+        "flavorText": "As Tai announced that the expedition would continue despite safety concerns, a cadet gave an audible groan—followed by a yelp as Dart grabbed him by his Naaz. \"Any more backtalk from you and you'll get a clout in the ear!\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "survey2",
+        "name": "Survey",
+        "phase": "Action",
+        "window": "At the end of your turn",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
+        "automationID": "survey",
+        "flavorText": "One of the cadets nearly fell over as they crested the lip of the ancient crater, revealing three massive, entangled ships jutting from the earth below. Tai gave a self-satisfied hmph.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "survey3",
+        "name": "Survey",
+        "phase": "Action",
+        "window": "At the end of your turn",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
+        "automationID": "survey",
+        "flavorText": "\"Careful!\" Tai cried as he heard what was undoubtedly a priceless relic shatter in the room next door. \"Who trained these fools?\" he grumbled. Dart didn't have the heart to remind him that they had.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "survey4",
+        "name": "Survey",
+        "phase": "Action",
+        "window": "At the end of your turn",
+        "text": "Explore 1 planet you control; when you would resolve that exploration card, you may resolve any card from its discard pile instead.",
+        "automationID": "survey",
+        "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—as Dart ran.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "final_mission",
+        "name": "Final Mission",
+        "phase": "Action",
+        "window": "After 1 of your non-fighter ships is destroyed",
+        "text": "Choose 1 planet in that unit's system. Destroy 1 ground force and 1 PDS on that planet.",
+        "notes": "You are not required to destroy both to play this card.",
+        "flavorText": "The Exotrireme became a guided missile in its death-throes, transforming the Sol base into a burning crater of steel and death.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "void_path",
+        "name": "Void Path",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "Choose 1 system that does not contain planets. You treat that system as if it contains an alpha, beta, and gamma wormhole during this tactical action.",
+        "flavorText": "\"As we lack the form of your world, you will lack that of ours,\" Taivra said without tone. \"Let us hope you are better prepared for your first pilgrimage than we were for ours.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "swindle",
+        "name": "Swindle",
+        "phase": "Action",
+        "window": "When another player gains 2 or more trade goods",
+        "text": "Take 2 of those trade goods and gain 1 trade good.",
+        "notes": "Gaining trade goods includes any time your number of trade goods go up, other than converting your own commodities. This includes from transactions.",
+        "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
         "source": "deprecated"
     }
 ]

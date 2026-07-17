@@ -19,22 +19,23 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.service.async.ReserveGameNumberService;
 import ti4.service.game.CreateGameService;
 import ti4.service.game.HomebrewService;
 import ti4.service.option.FOWOptionService.FOWOption;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class CreateFoWGameService {
@@ -43,10 +44,10 @@ public class CreateFoWGameService {
     private static final int MAX_ROLE_COUNT = 250;
 
     private static final long PERMISSIONS =
-            Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+            Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
     @ButtonHandler("createFoWGameChannels")
-    public static void createFoWGameChannels(ButtonInteractionEvent event) {
+    public static synchronized void createFoWGameChannels(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToEventChannel(
                 event, event.getUser().getEffectiveName() + " pressed the [Create FoW Game] button.");
 
@@ -124,7 +125,7 @@ public class CreateFoWGameService {
         Guild guild = findFoWGuildWithSpace(event.getGuild(), members.size() + 1);
         if (guild == null) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "All FoW Servers are full. Can not host a new game - please contact @Bothelper.");
+                    event, "All FoW Servers are full. Cannot host a new game - please contact @Bothelper.");
             return;
         }
 
@@ -152,10 +153,10 @@ public class CreateFoWGameService {
                 .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
         // game
 
-        guild.addRoleToMember(gameOwner, roleGM).queue();
+        guild.addRoleToMember(gameOwner, roleGM).queue(Consumers.nop(), BotLogger::catchRestError);
         // ADD PLAYERS TO ROLE
         for (Member member : members) {
-            guild.addRoleToMember(member, role).queue();
+            guild.addRoleToMember(member, role).queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         // CREATE GAME
@@ -174,6 +175,7 @@ public class CreateFoWGameService {
         // CREATE CATEGORY
         Role everyone = guild.getRolesByName("@everyone", true).getFirst();
         long permission2 = Permission.MESSAGE_MANAGE.getRawValue()
+                | Permission.PIN_MESSAGES.getRawValue()
                 | Permission.VIEW_CHANNEL.getRawValue()
                 | Permission.MANAGE_PERMISSIONS.getRawValue()
                 | Permission.MANAGE_THREADS.getRawValue();
@@ -236,7 +238,7 @@ public class CreateFoWGameService {
             ThreadChannelManager manager = thread.getManager()
                     .setName(StringUtils.left(newGame.getName().toUpperCase() + "-LAUNCHED - " + thread.getName(), 100))
                     .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
-            manager.queue();
+            manager.queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -292,7 +294,6 @@ public class CreateFoWGameService {
 
         // GET ALL FOW ROLES FROM ALL GUILDS
         for (Guild guild : guilds) {
-            System.out.println(guild.getName());
             List<Role> fowRoles = guild.getRoles().stream()
                     .filter(r -> r.getName().startsWith("fow"))
                     .toList();

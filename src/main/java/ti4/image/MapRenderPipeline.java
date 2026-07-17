@@ -12,11 +12,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.executors.CircuitBreaker;
 import ti4.executors.ExecutionHistoryManager;
+import ti4.executors.ExecutorUtility;
+import ti4.executors.ShutdownResult;
+import ti4.game.Game;
 import ti4.helpers.DisplayType;
 import ti4.helpers.TimedRunnable;
-import ti4.map.Game;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass
@@ -24,14 +26,17 @@ public class MapRenderPipeline {
 
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
     private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 10;
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(
+            2, Thread.ofPlatform().name("ti4-map-renderer-", 0).factory());
 
     private static void render(RenderEvent renderEvent) {
         if (CircuitBreaker.isOpen()) {
             return;
         }
-        var timedRunnable = new TimedRunnable(
-                "Render event task for " + renderEvent.game.getName(), EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
+
+        String gameName = renderEvent.game.getName();
+        var timedRunnable =
+                new TimedRunnable("Render event task for " + gameName, EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
                     try (var mapGenerator =
                             new MapGenerator(renderEvent.game, renderEvent.displayType, renderEvent.event)) {
                         mapGenerator.draw();
@@ -61,7 +66,9 @@ public class MapRenderPipeline {
 
     public static void renderToWebsiteOnly(Game game, @Nullable GenericInteractionCreateEvent event) {
         if (GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) {
+                GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(),
+                Boolean.class,
+                Boolean.FALSE)) {
             queue(game, event, null, null, false, true);
         }
     }
@@ -92,18 +99,12 @@ public class MapRenderPipeline {
         render(new RenderEvent(game, event, displayType, callback, uploadToDiscord, uploadToWebsite));
     }
 
-    public static boolean shutdown() {
-        EXECUTOR_SERVICE.shutdownNow();
-        try {
-            return EXECUTOR_SERVICE.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            BotLogger.error("MapRenderPipeline shutdown interrupted.", e);
-            Thread.currentThread().interrupt();
-            return false;
-        }
+    public static ShutdownResult shutdown() {
+        return ExecutorUtility.shutdownAndAwaitTermination(
+                EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
-    record RenderEvent(
+    private record RenderEvent(
             Game game,
             GenericInteractionCreateEvent event,
             DisplayType displayType,

@@ -8,14 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import ti4.game.Game;
 import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.testUtils.BaseTi4Test;
 
-public class DraftSaveServiceTest extends BaseTi4Test {
+class DraftSaveServiceTest extends BaseTi4Test {
     @Test
-    public void testSaveAndLoad() {
-        beforeAll();
+    void testSaveAndLoad() {
         Game game = createTestGame(6);
         DraftManager draftManager = new DraftManager(game);
         draftManager.setPlayers(game.getPlayerIDs().stream().toList());
@@ -75,8 +74,8 @@ public class DraftSaveServiceTest extends BaseTi4Test {
                 List<DraftChoice> loadedDraftable =
                         loadedManager.getDraftable(draftable.getType()).getAllDraftChoices();
                 assertArrayEquals(
-                        originalChoices.stream().map(DraftChoice::getChoiceKey).toArray(),
-                        loadedDraftable.stream().map(DraftChoice::getChoiceKey).toArray(),
+                        originalChoices.stream().map(DraftChoice::choiceKey).toArray(),
+                        loadedDraftable.stream().map(DraftChoice::choiceKey).toArray(),
                         "Mismatch in choice keys for draftable type: "
                                 + draftable.getClass().getSimpleName());
 
@@ -85,10 +84,10 @@ public class DraftSaveServiceTest extends BaseTi4Test {
                     List<DraftChoice> loadedPlayerChoices = loadedManager.getPlayerPicks(userId, draftable.getType());
                     assertArrayEquals(
                             originalPlayerChoices.stream()
-                                    .map(DraftChoice::getChoiceKey)
+                                    .map(DraftChoice::choiceKey)
                                     .toArray(),
                             loadedPlayerChoices.stream()
-                                    .map(DraftChoice::getChoiceKey)
+                                    .map(DraftChoice::choiceKey)
                                     .toArray(),
                             "Mismatch in player " + userId + " choice keys for draftable type: "
                                     + draftable.getClass().getSimpleName());
@@ -98,8 +97,7 @@ public class DraftSaveServiceTest extends BaseTi4Test {
     }
 
     @Test
-    public void testSaveFormatUnchanged() {
-        beforeAll();
+    void testSaveFormatUnchanged() {
         String draftSave = TestData.getTestFile(TestData.FINISHED_6P_DRAFT_FILE);
         assertNotNull(draftSave, "Test data for finished 6p draft is missing or empty");
         Game game = createTestGame(6);
@@ -118,7 +116,7 @@ public class DraftSaveServiceTest extends BaseTi4Test {
                 "Mismatch in save data when you save, then load, then save again a draft manager");
     }
 
-    private Draftable getDraftableWithTestData(String className) {
+    private static Draftable getDraftableWithTestData(String className) {
         return switch (className) {
             case "FactionDraftable" -> TestData.createFactionDraftable();
             case "SeatDraftable" -> TestData.createSeatDraftable();
@@ -131,14 +129,14 @@ public class DraftSaveServiceTest extends BaseTi4Test {
         };
     }
 
-    private DraftOrchestrator getOrchestratorWithTestData(String className) {
+    private static DraftOrchestrator getOrchestratorWithTestData(String className) {
         return switch (className) {
             case "PublicSnakeDraftOrchestrator" -> TestData.createPublicSnakeDraftOrchestrator();
             default -> null;
         };
     }
 
-    private Game createTestGame(int playerCount) {
+    private static Game createTestGame(int playerCount) {
         Game game = new Game();
         game.setName("testGame");
         for (int i = 0; i < playerCount; i++) {

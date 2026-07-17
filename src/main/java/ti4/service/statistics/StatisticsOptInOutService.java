@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.website.UltimateStatisticsWebsiteHelper;
 
-public class StatisticsOptInOutService {
+public final class StatisticsOptInOutService {
 
     public static void optOut(SlashCommandInteractionEvent event) {
         var statisticsOpIn = new StatisticOptIn();
@@ -29,6 +29,6 @@ public class StatisticsOptInOutService {
     }
 
     private static boolean getOption(SlashCommandInteractionEvent event, String optionName) {
-        return event.getOption(optionName, false, OptionMapping::getAsBoolean);
+        return event.getOption(optionName, Boolean.FALSE, OptionMapping::getAsBoolean);
     }
 }

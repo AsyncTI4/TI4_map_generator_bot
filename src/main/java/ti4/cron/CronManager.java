@@ -5,18 +5,19 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
+import ti4.executors.ExecutorUtility;
+import ti4.executors.ShutdownResult;
 import ti4.helpers.TimedRunnable;
 
 @UtilityClass
 public class CronManager {
 
-    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
+    private static final ScheduledThreadPoolExecutor SCHEDULER = new ScheduledThreadPoolExecutor(1);
     private static final Map<String, Runnable> CRONS = new ConcurrentHashMap<>();
-    private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
+    private static final int SHUTDOWN_TIMEOUT_SECONDS = 30;
 
     public static void schedulePeriodically(
             Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
@@ -63,15 +64,7 @@ public class CronManager {
         return CRONS.keySet();
     }
 
-    public static void shutdown() {
-        SCHEDULER.shutdown();
-        try {
-            if (!SCHEDULER.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-                SCHEDULER.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            SCHEDULER.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
+    public static ShutdownResult shutdown() {
+        return ExecutorUtility.shutdownAndAwaitTermination(SCHEDULER, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 }

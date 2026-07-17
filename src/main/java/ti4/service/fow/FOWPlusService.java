@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nullable;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
@@ -16,8 +17,15 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
-import ti4.buttons.Buttons;
-import ti4.commands.tokens.AddTokenCommand;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.commands.tokens.AddTokenCommand;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.ModalHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.Constants;
@@ -26,12 +34,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.PositionMapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.listeners.annotations.ModalHandler;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
@@ -42,6 +45,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
+import ti4.spring.service.gameevent.GameEventDraft;
 
 /*
  To activate FoW+ mode use /game weird_game_setup fow_plus:True
@@ -55,7 +59,7 @@ import ti4.service.unit.RemoveUnitService.RemovedUnit;
  * To remove a token from the board, you need to see it
  * Prevents looking at explore/relic decks
 */
-public class FOWPlusService {
+public final class FOWPlusService {
     private static final String FOWPLUS_TAG = "FoW+";
     private static final String VOID_TILEID = "-1";
 
@@ -67,7 +71,7 @@ public class FOWPlusService {
     private static final String FOWPLUS_EXPLORE_SPOOR = "fowplus_spoor";
     private static final String FOWPLUS_EXPLORE_SACRIFICE = "fowplus_sacrifice";
 
-    public static final List<Pair<FOWOption, Boolean>> FORCED_FOWPLUS_OPTIONS = Arrays.asList(
+    public static final List<Pair<FOWOption, Boolean>> FORCED_FOWPLUS_OPTIONS = List.of(
             Pair.of(FOWOption.ALLOW_AGENDA_COMMS, false),
             Pair.of(FOWOption.HIDE_TOTAL_VOTES, true),
             Pair.of(FOWOption.HIDE_VOTE_ORDER, true),
@@ -112,11 +116,10 @@ public class FOWPlusService {
         }
     }
 
-    // Only allow activating positions player can see
-    public static boolean canActivatePosition(String position, Player player, Game game) {
-        return !isActive(game)
-                || FoWHelper.getTilePositionsToShow(game, player).contains(position)
-                || game.isWarfareAction();
+    public static boolean canActivatePosition(String position, Player player, Game game, Set<String> visiblePositions) {
+        if (!isActive(game) || game.isWarfareAction()) return true;
+        if (visiblePositions != null) return visiblePositions.contains(position);
+        return FoWHelper.getTilePositionsToShow(game, player).contains(position);
     }
 
     // Hide all 0b tiles from FoW map
@@ -134,7 +137,7 @@ public class FOWPlusService {
         return new Tile(VOID_TILEID, position);
     }
 
-    @ButtonHandler("blindTileSelection~MDL")
+    @ButtonHandler(value = "blindTileSelection~MDL", save = false)
     public static void offerBlindActivation(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         TextInput position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
                 .setRequired(true)
@@ -144,12 +147,12 @@ public class FOWPlusService {
                 .addComponents(Label.of("Position to activate", position))
                 .build();
 
-        event.replyModal(blindActivationModal).queue();
+        event.replyModal(blindActivationModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("blindActivation_")
     public static void doBlindActivation(ModalInteractionEvent event, Player player, Game game) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String factionChecker = player.factionButtonChecker();
         String origMessageId = event.getModalId().replace("blindActivation_", "");
         String position = event.getValue(Constants.POSITION).getAsString().trim();
 
@@ -166,17 +169,17 @@ public class FOWPlusService {
 
         List<Button> chooseTileButtons = new ArrayList<>();
         chooseTileButtons.add(Buttons.green(
-                finChecker + "ringTile_" + targetPosition, tile.getRepresentationForButtons(game, player)));
+                factionChecker + "ringTile_" + targetPosition, tile.getRepresentationForButtons(game, player)));
         chooseTileButtons.add(Buttons.red("ChooseDifferentDestination", "Get a Different Ring"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Please choose the system that you wish to activate.", chooseTileButtons);
 
-        event.getMessageChannel().deleteMessageById(origMessageId).queue();
+        event.getMessageChannel().deleteMessageById(origMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    // Remove ring buttons player has no tiles they can activate
-    public static void filterRingButtons(List<Button> ringButtons, Player player, Game game) {
-        Set<String> visiblePositions = FoWHelper.getTilePositionsToShow(game, player);
+    public static void filterRingButtons(
+            List<Button> ringButtons, Player player, Game game, @Nullable Set<String> visiblePositions) {
+        if (visiblePositions == null) visiblePositions = FoWHelper.getTilePositionsToShow(game, player);
         Tile centerTile = game.getTileByPosition("000");
         if (!visiblePositions.contains("000")
                 || centerTile != null
@@ -192,11 +195,11 @@ public class FOWPlusService {
         for (Button button : new ArrayList<>(ringButtons)) {
             if (button.getLabel().startsWith("Ring #")) {
                 String ring = button.getLabel().replace("Ring #", "");
-                int availableTiles = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_left")
-                                .size()
-                        + ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_right")
-                                .size()
-                        - 2;
+                int leftSize = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_left", visiblePositions)
+                        .size();
+                int rightSize = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_right", visiblePositions)
+                        .size();
+                int availableTiles = Math.max(0, leftSize - 2) + Math.max(0, rightSize - 2);
                 if (availableTiles == 0) {
                     ringButtons.remove(button);
                 }
@@ -227,6 +230,7 @@ public class FOWPlusService {
         String message = player.getRepresentationUnfoggedNoPing() + " lost " + valueOfUnitsLost + " resources ";
         message += unitEmojis + " to The Void round " + game.getRound() + " turn " + player.getInRoundTurnCount() + ".";
         GMService.logPlayerActivity(game, player, message, null, true);
+        GameEventDraft.stageMovement(game, game.getActiveSystem(), unitsGoingToVoid);
         game.getTacticalActionDisplacement().clear();
     }
 
@@ -317,7 +321,8 @@ public class FOWPlusService {
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged() + ", use the button to gain one command token.",
                         Buttons.green(
-                                player.finChecker() + "redistributeCCButtons_deleteThisMessage", "Gain Command Token"));
+                                player.factionButtonChecker() + "redistributeCCButtons_deleteThisMessage",
+                                "Gain Command Token"));
                 break;
 
             case FOWPLUS_EXPLORE_FRACTURE:
@@ -407,6 +412,6 @@ public class FOWPlusService {
         }
 
         FoWHelper.pingSystem(game, currentPos, "Gravity phenomenon detected.");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

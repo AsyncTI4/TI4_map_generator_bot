@@ -1,21 +1,21 @@
 package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import ti4.game.Game;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.model.MapTemplateModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.emoji.TileEmojis;
+import tools.jackson.databind.JsonNode;
 
 @Getter
 @JsonIgnoreProperties("messageId")
@@ -62,7 +62,7 @@ public class MantisTileDraftableSettings extends SettingsMenu {
         // Load JSON if applicable
         if (json == null
                 || !json.has("menuId")
-                || !MENU_ID.equals(json.get("menuId").asText(""))) {
+                || !MENU_ID.equals(json.get("menuId").asString(""))) {
             return;
         }
 
@@ -91,8 +91,7 @@ public class MantisTileDraftableSettings extends SettingsMenu {
             Map<String, MapTemplateModel> allowed = Mapper.getMapTemplatesForPlayerCount(players).stream()
                     .filter(t -> !t.isNucleusTemplate())
                     .collect(Collectors.toMap(MapTemplateModel::getAlias, x -> x));
-            MapTemplateModel defaultTemplate = null;
-            defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
+            MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
             if (defaultTemplate != null) {
                 mapTemplate.setAllValues(allowed, defaultTemplate.getAlias());
             }

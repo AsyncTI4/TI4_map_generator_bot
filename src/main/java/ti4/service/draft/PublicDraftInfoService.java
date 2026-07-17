@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
@@ -21,13 +22,12 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.JdaService;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.MessageHelper.MessageFunction;
-import ti4.message.logging.BotLogger;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class PublicDraftInfoService {
@@ -109,7 +109,7 @@ public class PublicDraftInfoService {
 
         MessageChannel channel = game.getMainGameChannel();
         if (channel == null) return;
-        MessageFunction clearOldFunc = clearOldPingsAndButtonsFunc(true, clearMessageHeaders, clearAttachments);
+        Consumer<Message> clearOldFunc = clearOldPingsAndButtonsFunc(true, clearMessageHeaders, clearAttachments);
         MessageHelper.splitAndSentWithAction(msg, channel, buttons, clearOldFunc);
     }
 
@@ -121,12 +121,12 @@ public class PublicDraftInfoService {
         for (DraftChoice choice : allDraftChoices) {
             // Skip this choice if someone already has it.
             if (!draftManager
-                    .getPlayersWithChoiceKey(draftable.getType(), choice.getChoiceKey())
+                    .getPlayersWithChoiceKey(draftable.getType(), choice.choiceKey())
                     .isEmpty()) {
                 continue;
             }
 
-            buttons.add(choice.getButton());
+            buttons.add(choice.button());
         }
 
         // Append custom buttons
@@ -142,6 +142,7 @@ public class PublicDraftInfoService {
         Game game = draftManager.getGame();
         List<Draftable> draftables = draftManager.getDraftables();
         int padding = String.format("%s", playerOrder.size()).length() + 1;
+        List<String> skippedPlayerIds = new ArrayList<>();
 
         Map<DraftableType, DraftChoice> defaultChoices = draftables.stream()
                 .collect(HashMap::new, (m, d) -> m.put(d.getType(), d.getNothingPickedChoice()), Map::putAll);
@@ -151,8 +152,10 @@ public class PublicDraftInfoService {
         for (String userId : playerOrder) {
             Player player = game.getPlayer(userId);
             PlayerDraftState picks = draftManager.getPlayerStates().get(userId);
-            if (player == null || picks == null)
-                throw new IllegalStateException("Player or picks missing for playerID " + userId);
+            if (player == null || picks == null) {
+                skippedPlayerIds.add(userId);
+                continue;
+            }
 
             sb.append("\n> `").append(Helper.leftpad(pickNum + ".", padding)).append("` ");
             StringBuilder bulletSummary = new StringBuilder();
@@ -161,16 +164,16 @@ public class PublicDraftInfoService {
                 if (picks.getPicks().containsKey(draftable.getType())) {
                     List<DraftChoice> draftablePicks = picks.getPicks().get(draftable.getType());
                     for (DraftChoice choice : draftablePicks) {
-                        if (choice.getIdentifyingEmoji() != null) {
-                            sb.append(choice.getIdentifyingEmoji());
+                        if (choice.identifyingEmoji() != null) {
+                            sb.append(choice.identifyingEmoji());
                         } else {
-                            longChoiceNames.add(choice.getFormattedName());
+                            longChoiceNames.add(choice.formattedName());
                         }
                     }
                 } else if (defaultChoices.containsKey(draftable.getType())) {
                     DraftChoice noChoice = defaultChoices.get(draftable.getType());
-                    if (noChoice.getIdentifyingEmoji() != null) {
-                        sb.append(noChoice.getIdentifyingEmoji());
+                    if (noChoice.identifyingEmoji() != null) {
+                        sb.append(noChoice.identifyingEmoji());
                     }
                     // Skip adding anything if no default emoji
                 }
@@ -195,6 +198,13 @@ public class PublicDraftInfoService {
             if (userId.equals(nextPlayer)) sb.append("*");
 
             pickNum++;
+        }
+
+        if (!skippedPlayerIds.isEmpty()) {
+            BotLogger.warning("Skipping stale public draft summary entries for game `"
+                    + game.getName()
+                    + "`: "
+                    + String.join(", ", skippedPlayerIds));
         }
         return sb.toString();
     }
@@ -261,7 +271,8 @@ public class PublicDraftInfoService {
                             if (atch.getFileName().contains(uniqueKey)) {
                                 keyDone = uniqueKey;
                                 FileUpload draftableImage = entry.getValue();
-                                msg.editMessageAttachments(draftableImage).queue();
+                                msg.editMessageAttachments(draftableImage)
+                                        .queue(Consumers.nop(), BotLogger::catchRestError);
                                 break;
                             }
                         }
@@ -301,21 +312,21 @@ public class PublicDraftInfoService {
             List<String> clearMessageHeaders,
             List<String> clearAttachments) {
         boolean removePings = clearFirstPing;
-        HashSet<String> removeHeaders = new HashSet<>(clearMessageHeaders != null ? clearMessageHeaders : List.of());
-        HashSet<String> removeAttachments = new HashSet<>(clearAttachments != null ? clearAttachments : List.of());
-        HashSet<String> seenHeader = new HashSet<>();
-        HashSet<String> seenAttachment = new HashSet<>();
+        Iterable<String> removeHeaders = new HashSet<>(clearMessageHeaders != null ? clearMessageHeaders : List.of());
+        Iterable<String> removeAttachments = new HashSet<>(clearAttachments != null ? clearAttachments : List.of());
+        Set<String> seenHeader = new HashSet<>();
+        Set<String> seenAttachment = new HashSet<>();
         for (Message msg : hist.getRetrievedHistory()) {
             String msgTxt = msg.getContentRaw();
             if (msgTxt.contains("is up to draft")) {
-                if (removePings) msg.delete().queue();
+                if (removePings) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removePings = true;
             }
 
             for (String header : removeHeaders) {
                 if (msgTxt.startsWith(header)) {
                     if (seenHeader.contains(header)) {
-                        msg.delete().queue();
+                        msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                     } else {
                         seenHeader.add(header);
                     }
@@ -325,7 +336,7 @@ public class PublicDraftInfoService {
 
             if (msgTxt.contains(SUMMARY_START)) {
                 if (seenHeader.contains(SUMMARY_START)) {
-                    msg.delete().queue();
+                    msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 } else {
                     seenHeader.add(SUMMARY_START);
                 }
@@ -335,7 +346,7 @@ public class PublicDraftInfoService {
                 for (String attachName : removeAttachments) {
                     if (atch.getFileName().contains(attachName)) {
                         if (seenAttachment.contains(attachName)) {
-                            msg.delete().queue();
+                            msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                         } else {
                             seenAttachment.add(attachName);
                         }
@@ -346,7 +357,7 @@ public class PublicDraftInfoService {
         }
     }
 
-    private MessageFunction clearOldPingsAndButtonsFunc(
+    private Consumer<Message> clearOldPingsAndButtonsFunc(
             boolean clearFirstPing, List<String> clearMessageHeaders, List<String> clearAttachments) {
         return msg -> msg.getChannel()
                 .getHistoryBefore(msg, 100)

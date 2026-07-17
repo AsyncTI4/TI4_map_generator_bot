@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "th4",
+    "name": "Myrr Serash - Myrr",
+    "aliases": [
+        "th4",
+        "myrr",
+        "myrrserash"
+    ],
+    "imagePath": "th4_myrrhs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "myrrserash"
+    ],
+    "source": "theodisi"
+}

@@ -6,15 +6,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -63,7 +65,7 @@ public class ShowActionCardsService {
                 showFullText ? null : Buttons.green("ACShowDiscardFullText", "Show Full Text"));
     }
 
-    public static String getActionCardDiscardPileText(Game game, boolean showFullText) {
+    private static String getActionCardDiscardPileText(Game game, boolean showFullText) {
         List<Entry<String, Integer>> discards = game.getDiscardActionCards().entrySet().stream()
                 .filter(x -> game.getDiscardACStatus().get(x.getKey()) == null)
                 .toList();
@@ -76,7 +78,7 @@ public class ShowActionCardsService {
                 .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.purged)
                 .toList();
         if (!purged.isEmpty()) {
-            String title = "PURGED Action cards";
+            String title = "Purged action cards";
             return acDiscardText(showFullText, purged, title, game);
         }
         return null;
@@ -87,7 +89,7 @@ public class ShowActionCardsService {
                 .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.ralnelbt)
                 .toList();
         if (!dataSkimmer.isEmpty()) {
-            String title = "Action cards on " + FactionEmojis.Ralnel + " Data Skimmer";
+            String title = "Action cards on " + FactionEmojis.Ralnel + " _Data Skimmer_";
             return acDiscardText(showFullText, dataSkimmer, title, game);
         }
         return null;
@@ -98,7 +100,7 @@ public class ShowActionCardsService {
                 .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.garbozia)
                 .toList();
         if (!garbozia.isEmpty()) {
-            String title = "Action cards on " + MiscEmojis.LegendaryPlanet + " Garbozia";
+            String title = "Action cards on " + MiscEmojis.LegendaryPlanet + " _Dok 'N Pic's Salvage Yard_";
             return acDiscardText(showFullText, garbozia, title, game);
         }
         return null;
@@ -107,7 +109,7 @@ public class ShowActionCardsService {
     public static String acDiscardText(
             boolean fullText, List<Entry<String, Integer>> discards, String title, Game game) {
         if (fullText) return actionCardListFullText(discards, title, game);
-        return discardListCondensed(discards, title);
+        return discardListCondensed(discards, title, game);
     }
 
     private static String actionCardListFullText(List<Map.Entry<String, Integer>> discards, String title, Game game) {
@@ -131,18 +133,22 @@ public class ShowActionCardsService {
             List<String> ids = acEntryList.getValue().stream()
                     .map(i -> "`(" + i.getValue() + ")`")
                     .toList();
-            sb.append("\n").append(index).append("\\. ");
+            sb.append('\n').append(index).append("\\. ");
             index++;
-            sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
+            sb.repeat(Objects.requireNonNull(CardEmojis.getACEmoji(game).toString()), ids.size());
             sb.append(" _").append(acEntryList.getKey()).append("_ ");
             sb.append(String.join(", ", ids)).append("\n> ");
-            sb.append(Mapper.getActionCard(acEntryList.getValue().getFirst().getKey())
-                    .getRepresentationJustText());
+            ActionCardModel model =
+                    Mapper.getActionCard(acEntryList.getValue().getFirst().getKey());
+            sb.append(model.getRepresentationJustText(game));
+            if (model.getNotes() != null) {
+                sb.append("\n> -# [").append(model.getNotes()).append("]");
+            }
         }
         return sb.toString();
     }
 
-    private static String discardListCondensed(List<Map.Entry<String, Integer>> discards, String title) {
+    private static String discardListCondensed(List<Map.Entry<String, Integer>> discards, String title, Game game) {
         // Set up the entry list
         List<Map.Entry<String, Integer>> aclist = new ArrayList<>(discards);
         Collections.reverse(aclist);
@@ -162,9 +168,9 @@ public class ShowActionCardsService {
             List<String> ids = acEntryList.getValue().stream()
                     .map(i -> "`(" + i.getValue() + ")`")
                     .toList();
-            sb.append("\n").append(index).append("\\. ");
+            sb.append('\n').append(index).append("\\. ");
             index++;
-            sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
+            sb.repeat(Objects.requireNonNull(CardEmojis.getACEmoji(game).toString()), ids.size());
             sb.append(" _").append(acEntryList.getKey()).append("_");
             sb.append(String.join(", ", ids));
         }
@@ -184,7 +190,7 @@ public class ShowActionCardsService {
                 String name = Mapper.getActionCard(ac).getName();
                 cardsByName.computeIfAbsent(name, key -> new ArrayList<>()).addFirst(ac);
             } else {
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Null AC with id " + ac);
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Null action card with id `" + ac + "`.");
             }
         });
 
@@ -194,11 +200,17 @@ public class ShowActionCardsService {
         StringBuilder sb = new StringBuilder("**__").append(title).append(":__**");
         int index = 1;
         for (Map.Entry<String, List<String>> entry : displayOrder) {
-            sb.append("\n").append(index).append("\\. ");
+            sb.append('\n').append(index).append("\\. ");
             index++;
-            sb.append(CardEmojis.ActionCard.toString().repeat(entry.getValue().size()));
+            sb.repeat(
+                    Objects.requireNonNull(CardEmojis.getACEmoji(game).toString()),
+                    entry.getValue().size());
             sb.append(" _").append(entry.getKey()).append("_\n> ");
-            sb.append(Mapper.getActionCard(entry.getValue().getFirst()).getRepresentationJustText());
+            ActionCardModel model = Mapper.getActionCard(entry.getValue().getFirst());
+            sb.append(model.getRepresentationJustText(game));
+            if (model.getNotes() != null) {
+                sb.append("\n> -# [").append(model.getNotes()).append("]");
+            }
         }
         return sb.toString();
     }

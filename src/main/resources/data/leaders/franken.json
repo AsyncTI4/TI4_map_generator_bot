@@ -1,0 +1,15 @@
+[
+    {
+        "id": "mahactcommander_y",
+        "faction": "mahact",
+        "type": "commander",
+        "name": "Il Na Viroset Y",
+        "shortName": "Il Na Viroset Y",
+        "title": "Archon of Virtue",
+        "abilityWindow": "During your tactical actions:",
+        "abilityText": "You can activate systems that contain your command tokens. If you do, return both command tokens to your reinforcements and end your turn.",
+        "notes": "This is not really a tactical action and does not trigger any on activation effects. It's really a component action in effect, and the bot treats it as such. You can find it under component actions.",
+        "unlockCondition": "Have an owner token from 3 other players on your Primacy ability.",
+        "source": "franken"
+    }
+]

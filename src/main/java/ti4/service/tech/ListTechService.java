@@ -8,7 +8,12 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -17,10 +22,6 @@ import ti4.helpers.RegexHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
@@ -66,26 +67,27 @@ public class ListTechService {
             TechnologyModel model = Mapper.getTech(tech);
 
             String error = null;
-            boolean scepter = player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter");
+            boolean scepter = player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar");
             if (player.getStrategicCC() < 1 && !scepter) {
                 error = player.getRepresentation()
-                        + " You seem to have misplaced your strategy tokens, and cannot use the Entropic Scar anomaly.";
+                        + ", you seem to have misplaced your strategy tokens, and cannot use the Entropic Scar anomaly.";
             } else if (model == null) {
                 error = "Could not find tech: " + tech;
             } else if (player.hasTech(tech)) {
-                error = player.getRepresentation() + " You already have " + model.getName();
+                error = player.getRepresentation() + ", you already have " + model.getName();
             } else {
-                String msg = player.getRepresentation() + " You gained " + model.getNameRepresentation()
+                String msg = player.getRepresentation() + ", you gained " + model.getNameRepresentation()
                         + " using the Entropic Scar anomaly.";
                 if (scepter) {
-                    msg += "\n> Exhausted the " + RelicHelper.sillySpelling();
+                    msg += " Exhausted the _" + RelicHelper.sillySpelling() + "_.";
                 } else {
-                    msg += "\n> Reduced Strategy CCs by 1 (" + player.getStrategicCC();
+                    msg += " Spent 1 token from their strategy pool (" + player.getStrategicCC();
                     player.setStrategicCC(player.getStrategicCC() - 1);
-                    msg += "->" + player.getStrategicCC() + ")";
+                    msg += "->" + player.getStrategicCC() + ").";
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
                 }
                 player.addTech(tech);
+                ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 ButtonHelper.deleteMessage(event);
             }
@@ -105,7 +107,7 @@ public class ListTechService {
             List<TechnologyType> techTypes,
             boolean first) {
         game.setComponentAction(!sc);
-        String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
+        String finsFactionCheckerPrefix = player.factionButtonChecker();
         game.setComponentAction(!sc);
         String techPrefix = finsFactionCheckerPrefix + "getAllTechOfType_";
         String techSuffix = dwsBt ? "_dwsbt" : "";
@@ -115,7 +117,6 @@ public class ListTechService {
             StrategyCardModel scModel =
                     game.getStrategyCardModelByName("technology").orElse(null);
             if (!used
-                    && !dwsBt
                     && scModel != null
                     && scModel.usesAutomationForSCID("pok7technology")
                     && !player.getFollowedSCs().contains(scModel.getInitiative())) {
@@ -161,7 +162,7 @@ public class ListTechService {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
 
-    @ButtonHandler("getAllTechOfType_")
+    @ButtonHandler(value = "getAllTechOfType_", save = false)
     public static void getAllTechOfType(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         getAllTechOfType(event, player, buttonID, game, event.getMessageChannel());
     }
@@ -191,10 +192,10 @@ public class ListTechService {
             buttons.addAll(getTechButtons(techs, player, payType));
         }
 
-        if (game.isComponentAction()) {
-            buttons.add(Buttons.gray("acquireATech", "Get Other Technology"));
-        } else if (dwsBt) {
+        if (dwsBt) {
             buttons.add(Buttons.gray("acquireATechWithDwsBt_second", "Get Other Technology"));
+        } else if (game.isComponentAction()) {
+            buttons.add(Buttons.gray("acquireATech", "Get Other Technology"));
         } else {
             buttons.add(Buttons.gray("acquireATechWithSC_second", "Get Other Technology"));
         }
@@ -207,6 +208,10 @@ public class ListTechService {
             message +=
                     " The buttons shown correspond to technologies that the bot believes you meet the prerequisites for."
                             + " To get a technology that isn't shown, please use the \"Get Other Technology\" button.";
+        }
+        if (player.hasAbility("doctrine_knowledge")) {
+            message +=
+                    "\n\n**REMINDER**: You have the _Knowledge_ doctrine and therefore may ignore 1 prerequisite on techs owned by your neighbors. This is not automated, and you must use the \"Get Other Technology\" button.";
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
     }
@@ -233,7 +238,7 @@ public class ListTechService {
             for (UnitKey uk :
                     player.getNomboxTile().getSpaceUnitHolder().getUnits().keySet()) {
                 if (player.getNomboxTile().getSpaceUnitHolder().getUnitCount(uk) <= 0) continue;
-                if (unit.startsWith(uk.getUnitType().getValue())) return true;
+                if (unit.startsWith(uk.unitType().getValue())) return true;
             }
         }
         Set<TechnologyType> synergies = player.getSynergies();
@@ -321,6 +326,10 @@ public class ListTechService {
         if (player.hasRelicReady("prophetstears") || player.hasRelicReady("absol_prophetstears")) {
             wilds++;
         }
+        if (player.hasUnlockedBreakthrough("netrunnersbt")) {
+            int dataBreachDiscount = NetrunnersBreakthroughHandler.getDataBreachDiscount(player, tech);
+            wilds += Math.clamp(dataBreachDiscount, 0, requirements.length());
+        }
 
         // All sources of pre-requisites below can also apply via synergy.
         // - Replace all synergies that the player has with a simple "X"
@@ -370,7 +379,7 @@ public class ListTechService {
 
         techs.sort(TechnologyModel.sortByTechRequirements);
 
-        String idPrefix = player.finChecker()
+        String idPrefix = player.factionButtonChecker()
                 + switch (buttonPrefixType.toLowerCase()) {
                     case "normal", "res", "nekro", "nopay", "free", "inf", "shareknowledge", "dwsbt" -> "getTech_";
                     default -> "swapTechs__" + buttonPrefixType + "__";
@@ -435,6 +444,7 @@ public class ListTechService {
                 .filter(tech -> !player.hasTech(tech.getAlias()) || deepwroughthero)
                 .filter(tech -> tech.getFaction().isEmpty()
                         || "".equalsIgnoreCase(tech.getFaction().get())
+                        || (deepwroughthero && player.hasTech(tech.getAlias()))
                         || player.getNotResearchedFactionTechs().contains(tech.getAlias()))
                 .toList();
 

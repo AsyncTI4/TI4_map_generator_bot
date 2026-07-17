@@ -2,7 +2,8 @@ package ti4.cron;
 
 import java.time.ZoneId;
 import lombok.experimental.UtilityClass;
-import ti4.message.logging.BotLogger;
+import ti4.logging.BotLogger;
+import ti4.spring.service.deploy.ActiveLeaseService;
 import ti4.website.GameStatisticsUploadService;
 
 @UtilityClass
@@ -18,6 +19,7 @@ public class UploadStatsCron {
     }
 
     private static void uploadStats() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running UploadStatsCron.");
         try {
             GameStatisticsUploadService.uploadAllStats();

@@ -4,6 +4,7 @@
         "name": "Ancient Burial Sites",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
+        "playTiming": "AGENDA_WHEN",
         "text": "Choose 1 player. Exhaust each cultural planet owned by that player.",
         "automationID": "abs",
         "source": "project_pi"
@@ -23,6 +24,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 1 space dock or 1 PDS from your reinforcements on a planet you control.",
+        "playTiming": "AGENDA_AFTER",
         "source": "project_pi"
     },
     {
@@ -92,7 +94,8 @@
         "name": "Lucky Shot",
         "phase": "Action",
         "window": "Action",
-        "text": "Destroy another player's dreadnought, cruiser, or destroyer in a system that contains a planet you control. [Note: This card cannot be played to no effect]",
+        "text": "Destroy another player's dreadnought, cruiser, or destroyer in a system that contains a planet you control.",
+        "notes": "This card cannot be played to no effect.",
         "automationID": "lucky",
         "source": "project_pi"
     },

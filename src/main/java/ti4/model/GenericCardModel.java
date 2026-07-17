@@ -16,6 +16,7 @@ public class GenericCardModel implements ModelInterface, EmbeddableModel {
     String alias;
     String name;
     String text;
+    private String notes;
     CardType cardType;
     ComponentSource source;
 
@@ -38,19 +39,26 @@ public class GenericCardModel implements ModelInterface, EmbeddableModel {
                 || cardType.toString().contains(searchString);
     }
 
+    public String getNameRepresentation() {
+        return cardTypeEmoji() + " _" + name + "_";
+    }
+
     public String getRepresentation() {
         StringBuilder sb = new StringBuilder();
         String cardEmojis = cardTypeEmoji();
 
         sb.append(cardEmojis).append(" **__").append(name).append("__**");
-        sb.append(" - ").append(text);
+        sb.append("> ").append(text);
+        if (notes != null) {
+            sb.append("\n> -# [").append(notes).append("]");
+        }
         return sb.toString();
     }
 
     private String cardTypeEmoji() {
         return switch (cardType) {
             case trap -> FactionEmojis.lizho.toString();
-            case plot -> FactionEmojis.Obsidian.toString();
+            case plot -> FactionEmojis.Firma_Obs.toString();
         };
     }
 
@@ -60,6 +68,9 @@ public class GenericCardModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(title);
         eb.setAuthor(cardType.toString());
         eb.setDescription(text);
+        if (notes != null) {
+            eb.setDescription(text + "\n-# [" + notes + "]");
+        }
         eb.setFooter(alias);
         return eb.build();
     }

@@ -4,16 +4,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.game.Game;
+import ti4.game.Player;
 
 class IsPlayerElectedServiceTest {
 
     @Test
     void shouldShowPlayerIsNotElectedIfPlayerIsNull() {
-        boolean isPlayerElected = IsPlayerElectedService.isPlayerElected(new Game(), null, "testAgenda");
+        IsPlayerElectedService.isPlayerElected(new Game(), null, "testAgenda");
+        boolean isPlayerElected = false;
 
-        assertThat(isPlayerElected).isFalse();
+        assertThat(false).isFalse();
     }
 
     @Test

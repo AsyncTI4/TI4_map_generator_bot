@@ -9,18 +9,18 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 
 @UtilityClass
@@ -43,11 +43,11 @@ public class RemoveUnitService {
         }
 
         public RemovedUnit withColorID(String colorID) {
-            return new RemovedUnit(Units.getUnitKey(unitKey.getUnitType(), colorID), tile, uh, states);
+            return new RemovedUnit(Units.getUnitKey(unitKey.unitType(), colorID), tile, uh, states);
         }
 
         public Player getPlayer(Game game) {
-            return game.getPlayerFromColorOrFaction(unitKey().getColorID());
+            return game.getPlayerFromColorOrFaction(unitKey().colorID());
         }
     }
 
@@ -78,7 +78,7 @@ public class RemoveUnitService {
             GenericInteractionCreateEvent event, Game game, Player player, Tile tile, UnitHolder unitHolder) {
         List<RemovedUnit> removed = new ArrayList<>();
         for (UnitKey uk : Set.copyOf(unitHolder.getUnitsByStateForPlayer(player).keySet())) {
-            if (uk.getUnitType() == UnitType.Pds || uk.getUnitType() == UnitType.Spacedock) {
+            if (uk.unitType() == UnitType.Pds || uk.unitType() == UnitType.Spacedock) {
                 continue;
             }
             ParsedUnit u = new ParsedUnit(uk, unitHolder.getUnitCount(uk), unitHolder.getName());
@@ -162,7 +162,8 @@ public class RemoveUnitService {
             Game game,
             ParsedUnit parsedUnit,
             boolean prioritizeDamagedUnits) {
-        return removeUnit(event, tile, game, parsedUnit, UnitState.dmg);
+        UnitState preferredState = prioritizeDamagedUnits ? UnitState.dmg : UnitState.none;
+        return removeUnit(event, tile, game, parsedUnit, preferredState);
     }
 
     public static List<RemovedUnit> removeUnit(
@@ -178,15 +179,15 @@ public class RemoveUnitService {
             return Collections.emptyList();
         }
 
-        int toRemoveCount = parsedUnit.getCount();
+        int toRemoveCount = parsedUnit.count();
         List<RemovedUnit> allUnitsRemoved = new ArrayList<>();
         for (UnitHolder unitHolder : unitHoldersToRemoveFrom) {
             List<Integer> unitsRemovedCount =
-                    unitHolder.removeUnit(parsedUnit.getUnitKey(), toRemoveCount, preferredState);
+                    unitHolder.removeUnit(parsedUnit.unitKey(), toRemoveCount, preferredState);
 
-            int tot = unitsRemovedCount.stream().mapToInt(i -> i).sum();
+            int tot = unitsRemovedCount.stream().mapToInt(Integer::intValue).sum();
             if (tot > 0) {
-                allUnitsRemoved.add(new RemovedUnit(parsedUnit.getUnitKey(), tile, unitHolder, unitsRemovedCount));
+                allUnitsRemoved.add(new RemovedUnit(parsedUnit.unitKey(), tile, unitHolder, unitsRemovedCount));
                 toRemoveCount -= tot;
             }
 
@@ -207,13 +208,13 @@ public class RemoveUnitService {
     }
 
     private static List<UnitHolder> getUnitHoldersToRemoveFrom(Tile tile, ParsedUnit parsedUnit) {
-        if (!parsedUnit.getLocation().equals(Constants.SPACE)) { // We are removing from a specific planet.
-            var planet = tile.getUnitHolders().get(parsedUnit.getLocation());
+        if (!Constants.SPACE.equals(parsedUnit.location())) { // We are removing from a specific planet.
+            var planet = tile.getUnitHolders().get(parsedUnit.location());
             return planet == null ? Collections.emptyList() : List.of(planet);
         }
         // Otherwise, the location was not specified, so we check everywhere
         return tile.getUnitHolders().values().stream()
-                .filter(unitHolderTemp -> countUnitsInHolder(unitHolderTemp, parsedUnit.getUnitKey()) > 0)
+                .filter(unitHolderTemp -> countUnitsInHolder(unitHolderTemp, parsedUnit.unitKey()) > 0)
                 .toList();
     }
 
@@ -226,7 +227,7 @@ public class RemoveUnitService {
             BotLogger.warning(
                     new LogOrigin(event),
                     event.getId() + " found a null UnitHolder with the following info: " + tile.getRepresentation()
-                            + " " + parsedUnit.getLocation());
+                            + " " + parsedUnit.location());
         } else if (event != null) {
             MessageHelper.replyToMessage(event, "Unable to determine where the units are being removed from.");
         }

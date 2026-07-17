@@ -2,13 +2,14 @@ package ti4.service.milty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
+import ti4.game.Game;
 import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.PlayerFactionSettings;
 import ti4.helpers.settingsFramework.menus.SliceGenerationSettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
-import ti4.map.Game;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source;
 
@@ -18,6 +19,7 @@ public class MiltyDraftSpec {
     public List<String> playerIDs, bannedFactions, priorityFactions, playerDraftOrder;
     public MapTemplateModel template;
     public List<Source.ComponentSource> tileSources, factionSources;
+    public Map<Source.ComponentSource, int[]> sourceConstraints;
     public Integer numSlices, numFactions;
 
     // slice generation settings
@@ -51,15 +53,22 @@ public class MiltyDraftSpec {
 
         // Load Game Specifications
         GameSettings gameSettings = settings.getGameSettings();
-        specs.setTemplate(gameSettings.getMapTemplate().getValue());
+        specs.template = gameSettings.getMapTemplate().getValue();
 
         // Load Slice Generation Specifications
         SliceGenerationSettings sliceSettings = settings.getSliceSettings();
         specs.numFactions = sliceSettings.getNumFactions().getVal();
         specs.numSlices = sliceSettings.getNumSlices().getVal();
+        if (game.isBaseGameMode() && !game.isThundersEdge()) {
+            specs.numSlices =
+                    Math.min(6, settings.getSliceSettings().getNumSlices().getVal());
+        }
         specs.anomaliesCanTouch = false;
         specs.extraWHs = sliceSettings.getExtraWorms().isVal();
         specs.minLegend = sliceSettings.getNumLegends().getValLow();
+        if (game.isBaseGameMode() && !game.isThundersEdge()) {
+            specs.minLegend = 0;
+        }
         specs.maxLegend = sliceSettings.getNumLegends().getValHigh();
         specs.minTot = sliceSettings.getTotalValue().getValLow();
         specs.maxTot = sliceSettings.getTotalValue().getValHigh();
@@ -68,7 +77,7 @@ public class MiltyDraftSpec {
         PlayerFactionSettings pfSettings = settings.getPlayerSettings();
         specs.bannedFactions.addAll(pfSettings.getBanFactions().getKeys());
         specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
-        specs.setPlayerIDs(new ArrayList<>(pfSettings.getGamePlayers().getKeys()));
+        specs.playerIDs = new ArrayList<>(pfSettings.getGamePlayers().getKeys());
         if (pfSettings.getPresetDraftOrder().isVal()) {
             specs.playerDraftOrder = new ArrayList<>(game.getPlayers().keySet());
         }
@@ -76,8 +85,9 @@ public class MiltyDraftSpec {
 
         // Load Sources Specifications
         SourceSettings sources = settings.getSourceSettings();
-        specs.setTileSources(sources.getTileSources());
-        specs.setFactionSources(sources.getFactionSources());
+        specs.tileSources = sources.getTileSources();
+        specs.factionSources = sources.getFactionSources();
+        specs.sourceConstraints = pfSettings.getFactionSourceSettings().getConstraintMap();
 
         if (sliceSettings.getParsedSlices() != null) {
             specs.presetSlices = sliceSettings.getParsedSlices();

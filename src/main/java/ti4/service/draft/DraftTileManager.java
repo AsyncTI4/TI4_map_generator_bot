@@ -11,11 +11,11 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.Data;
 import org.apache.commons.collections4.ListUtils;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.image.TileHelper;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
@@ -38,7 +38,7 @@ public class DraftTileManager {
             "corner", "lane", "mecatol", "blank", "border", "fow", "anomaly", "deltawh", "seed", "mr", "mallice",
             "ethan", "prison", "kwon", "home", "hs", "red", "blue", "green", "gray", "gate", "setup");
 
-    public void addDraftTile(MiltyDraftTile draftTile) {
+    private void addDraftTile(MiltyDraftTile draftTile) {
         TierList draftTileTier = draftTile.getTierList();
         switch (draftTileTier) {
             case high, mid, low -> blue.add(draftTile);
@@ -109,7 +109,7 @@ public class DraftTileManager {
      * set.
      * @return A map of tiers to the tiles in that tier.
      */
-    public Map<TierList, List<MiltyDraftTile>> getTilesByTier() {
+    private Map<TierList, List<MiltyDraftTile>> getTilesByTier() {
         if (!tilesByTier.isEmpty()) {
             return tilesByTier;
         }
@@ -185,8 +185,10 @@ public class DraftTileManager {
                 ComponentSource.codex3,
                 ComponentSource.codex4,
                 ComponentSource.pok));
-        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+        if (game.isDiscordantStarsMode()) {
             sources.add(ComponentSource.ds);
+        }
+        if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
         return sources;
@@ -204,7 +206,7 @@ public class DraftTileManager {
         return DISALLOWED_TERMS.stream().anyMatch(term -> id.contains(term) || path.contains(term));
     }
 
-    public static MiltyDraftTile getDraftTileFromModel(TileModel tileModel) {
+    private static MiltyDraftTile getDraftTileFromModel(TileModel tileModel) {
         String tileID = tileModel.getId();
         if (tiles.containsKey(tileID)) return tiles.get(tileID);
 

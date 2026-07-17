@@ -1,0 +1,16 @@
+{
+    "tileBack": "green",
+    "id": "th12",
+    "name": "Aeterna - Aeterna",
+    "aliases": [
+        "th12",
+        "aeterna"
+    ],
+    "imagePath": "th12_aeternahs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "aeterna"
+    ],
+    "source": "theodisi"
+}

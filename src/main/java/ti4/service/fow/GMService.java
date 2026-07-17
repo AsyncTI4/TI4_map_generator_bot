@@ -13,24 +13,29 @@ import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
-import ti4.buttons.Buttons;
-import ti4.helpers.AgendaHelper;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.ModalHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.helpers.AgendaWhensAftersHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadGetter;
+import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.listeners.annotations.ModalHandler;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
 import ti4.service.actioncard.SabotageService;
@@ -39,7 +44,7 @@ import ti4.service.explore.ExploreService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
-public class GMService {
+public final class GMService {
 
     private static final List<Button> GMBUTTONS = Arrays.asList(
             Buttons.REFRESH_MAP,
@@ -90,10 +95,6 @@ public class GMService {
         return channels.isEmpty() ? game.getMainGameChannel() : channels.getFirst();
     }
 
-    public static void sendMessageToGMChannel(Game game, String msg) {
-        sendMessageToGMChannel(game, msg, false);
-    }
-
     public static void sendMessageToGMChannel(Game game, String msg, boolean ping) {
         if (ping) {
             msg += " - " + gmPing(game);
@@ -139,6 +140,36 @@ public class GMService {
                 });
     }
 
+    /** Posts a message to the FoW activity-log thread (inside the GM channel). No-op outside FoW. */
+    public static void postToActivityThread(Game game, String message) {
+        if (!game.isFowMode()) return;
+        ThreadGetter.getThreadInChannel(
+                getGMChannel(game),
+                game.getName() + ACTIVITY_LOG_THREAD,
+                true,
+                false,
+                threadChannel -> MessageHelper.sendMessageToChannel(threadChannel, message));
+    }
+
+    /**
+     * Renders the full (unfogged) map and posts it into the FoW activity-log thread. The thread lives
+     * in the GM-only channel, so the unfogged view leaks nothing. A null render event keeps the map
+     * unfogged (see {@code MapGenerator.isFowModeActive}). No-op outside FoW.
+     */
+    public static void refreshMapInActivityThread(Game game) {
+        if (!game.isFowMode()) return;
+        MapRenderPipeline.queue(
+                game,
+                (GenericInteractionCreateEvent) null,
+                DisplayType.all,
+                fileUpload -> ThreadGetter.getThreadInChannel(
+                        getGMChannel(game),
+                        game.getName() + ACTIVITY_LOG_THREAD,
+                        true,
+                        false,
+                        threadChannel -> MessageHelper.sendFileUploadToChannel(threadChannel, fileUpload)));
+    }
+
     private static void jumpToLatestMessage(Player player, Consumer<String> callback) {
         MessageChannel privateChannel = player != null ? player.getPrivateChannel() : null;
         if (privateChannel != null) {
@@ -153,13 +184,13 @@ public class GMService {
         }
     }
 
-    @ButtonHandler("gmRefresh")
+    @ButtonHandler(value = "gmRefresh", save = false)
     public static void refreshGMButtons(ButtonInteractionEvent event, Game game) {
         showGMButtons(game);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    @ButtonHandler("gmShowGameAs_")
+    @ButtonHandler(value = "gmShowGameAs_", save = false)
     public static void showGameAs(ButtonInteractionEvent event, String buttonID, Game game) {
         String faction = buttonID.replace("gmShowGameAs_", "");
         if (!faction.isEmpty()) {
@@ -180,7 +211,7 @@ public class GMService {
         }
     }
 
-    @ButtonHandler("gmCheckPlayerHands_")
+    @ButtonHandler(value = "gmCheckPlayerHands_", save = false)
     public static void checkPlayerHands(ButtonInteractionEvent event, String buttonID, Game game) {
         String option = buttonID.replace("gmCheckPlayerHands_", "");
         switch (option) {
@@ -211,19 +242,19 @@ public class GMService {
                 StringBuilder sbAfters = new StringBuilder("Following players have \"after\"s in hand:\n");
 
                 for (Player player : game.getRealPlayers()) {
-                    List<String> whens = AgendaHelper.getPossibleWhenNames(player);
+                    List<String> whens = AgendaWhensAftersHelper.getPossibleWhenNames(player);
                     if (!whens.isEmpty()) {
                         sbWhens.append("> ")
                                 .append(player.getRepresentationUnfoggedNoPing())
                                 .append(": ");
-                        sbWhens.append(String.join(", ", whens)).append("\n");
+                        sbWhens.append(String.join(", ", whens)).append('\n');
                     }
-                    List<String> afters = AgendaHelper.getPossibleAfterNames(player);
+                    List<String> afters = AgendaWhensAftersHelper.getPossibleAfterNames(player);
                     if (!afters.isEmpty()) {
                         sbAfters.append("> ")
                                 .append(player.getRepresentationUnfoggedNoPing())
                                 .append(": ");
-                        sbAfters.append(String.join(", ", afters)).append("\n");
+                        sbAfters.append(String.join(", ", afters)).append('\n');
                     }
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), sbWhens.toString());
@@ -238,7 +269,7 @@ public class GMService {
                             .append(player.getRepresentationUnfoggedNoPing())
                             .append(" Unscored")
                             .append(unscored)
-                            .append("\n");
+                            .append('\n');
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), sos.toString());
             }
@@ -248,10 +279,10 @@ public class GMService {
                     acs.append("__")
                             .append(player.getRepresentationUnfoggedNoPing())
                             .append("__\n");
-                    player.getActionCards().entrySet().stream().forEach(entry -> acs.append("> ")
-                            .append(Mapper.getActionCard(entry.getKey()).getNameRepresentation())
+                    player.getActionCards().forEach((key, value) -> acs.append("> ")
+                            .append(Mapper.getActionCard(key).getNameRepresentation())
                             .append(" (")
-                            .append(entry.getValue())
+                            .append(value)
                             .append(")\n"));
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), acs.toString());
@@ -262,10 +293,10 @@ public class GMService {
                     pns.append("__")
                             .append(player.getRepresentationUnfoggedNoPing())
                             .append("__\n");
-                    player.getPromissoryNotes().entrySet().stream().forEach(entry -> pns.append("> ")
-                            .append(Mapper.getPromissoryNote(entry.getKey()).getNameRepresentation())
+                    player.getPromissoryNotes().forEach((key, value) -> pns.append("> ")
+                            .append(Mapper.getPromissoryNote(key).getNameRepresentation())
                             .append(" (")
-                            .append(entry.getValue())
+                            .append(value)
                             .append(")\n"));
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), pns.toString());
@@ -276,7 +307,7 @@ public class GMService {
         }
     }
 
-    @ButtonHandler("gmWhoCanSee~MDL")
+    @ButtonHandler(value = "gmWhoCanSee~MDL", save = false)
     public static void whoCanSeePosition(ButtonInteractionEvent event) {
         TextInput position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
                 .setPlaceholder("000")
@@ -285,7 +316,7 @@ public class GMService {
         Modal modal = Modal.create("gmWhoCanSeeResolve", "Who Can See Position")
                 .addComponents(Label.of("Position", position))
                 .build();
-        event.replyModal(modal).queue();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("gmWhoCanSeeResolve")
@@ -299,7 +330,7 @@ public class GMService {
         StringBuilder sb = new StringBuilder("Following players can see system **");
         sb.append(position).append("**:\n");
         for (Player player : FoWHelper.getAdjacentPlayers(game, position, false)) {
-            sb.append("> ").append(player.getRepresentationUnfoggedNoPing()).append("\n");
+            sb.append("> ").append(player.getRepresentationUnfoggedNoPing()).append('\n');
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
@@ -312,7 +343,7 @@ public class GMService {
                 if (ac.startsWith(acId)) {
                     sb.append("> ")
                             .append(player.getRepresentationUnfoggedNoPing())
-                            .append("\n");
+                            .append('\n');
                     break;
                 }
             }
@@ -357,7 +388,7 @@ public class GMService {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " GM has forced you to pass on \"when\"s.");
-        AgendaHelper.declineToQueueAWhen(game, event, player);
+        AgendaWhensAftersHelper.declineToQueueAWhen(game, event, player);
     }
 
     @ButtonHandler("declineToQueueAnAfterFowGM_")
@@ -367,7 +398,7 @@ public class GMService {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " GM has forced you to pass on \"after\"s.");
-        AgendaHelper.declineToQueueAnAfter(game, event, player);
+        AgendaWhensAftersHelper.declineToQueueAnAfter(game, event, player);
     }
 
     @ButtonHandler("fowCreateChannelFor_")
@@ -386,6 +417,6 @@ public class GMService {
                 event.getChannel(),
                 "Created private channel for " + player.getUserName() + ": "
                         + player.getPrivateChannel().getAsMention());
-        ButtonHelper.deleteTheOneButton(event, buttonID, false);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
     }
 }

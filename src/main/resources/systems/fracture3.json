@@ -2,7 +2,9 @@
     "id": "fracture3",
     "name": "Fracture Void Left",
     "aliases": [
-        "fracture3"
+        "fracture3",
+        "frac3",
+        "fracleftvoid"
     ],
     "imagePath": "fracture3.png",
     "shipPositionsType": "TYPE08",

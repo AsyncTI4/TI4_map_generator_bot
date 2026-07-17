@@ -13,7 +13,7 @@
         "ZETA"
     ],
     "shipPositionsType": "TYPE05",
-    "tileBack": "red",
+    "tileBack": "fracture",
     "isAsteroidField": true,
     "source": "other"
 }

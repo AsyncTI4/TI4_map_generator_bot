@@ -4,10 +4,10 @@ import java.util.Calendar;
 
 /**
  * The CalendarHelper class provides methods to check if the current date is near specific holidays.
- *
+ * <p>
  * Note: The isBetween method is a private helper method used to determine if the current date falls within a specified range.
  */
-public class CalendarHelper {
+public final class CalendarHelper {
 
     /**
      * @param startMonth 0 indexed month #
@@ -47,8 +47,6 @@ public class CalendarHelper {
         Calendar endDate = Calendar.getInstance();
         endDate.set(endYear, endMonth, endDay);
 
-        // BotLogger.info("Checking Dates:\n" + startDate.getTime() + "\n" + checkDate.getTime() + "\n" +
-        // endDate.getTime());
         return checkDate.after(startDate) && checkDate.before(endDate);
     }
 

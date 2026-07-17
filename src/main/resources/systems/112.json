@@ -1,9 +1,19 @@
 {
     "id": "112",
     "name": "Mecatol Rex",
-    "aliases": ["te05", "mrte", "mr", "mecatol", "mecatolrex", "rex", "mechatolrex"],
+    "aliases": [
+        "te05",
+        "mrte",
+        "mr",
+        "mecatol",
+        "mecatolrex",
+        "rex",
+        "mechatolrex"
+    ],
     "imagePath": "112_Mecatol.png",
-    "planets": ["mrte"],
+    "planets": [
+        "mrte"
+    ],
     "shipPositionsType": "TYPE04",
     "tileBack": "black",
     "source": "thunders_edge"

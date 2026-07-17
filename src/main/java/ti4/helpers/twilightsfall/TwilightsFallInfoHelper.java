@@ -5,13 +5,14 @@ import java.util.Objects;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
+import ti4.model.AbilityModel;
 import ti4.model.FactionModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TileEmojis;
 
-public class TwilightsFallInfoHelper {
+public final class TwilightsFallInfoHelper {
 
     /**
      * Get the string representation of the setup info a faction's reference card
@@ -32,7 +33,7 @@ public class TwilightsFallInfoHelper {
         StringBuilder setupInfo = new StringBuilder();
 
         // Display name
-        setupInfo.append(faction.getFactionEmoji()).append(" ");
+        setupInfo.append(faction.getFactionEmoji()).append(' ');
         if (keleres) {
             setupInfo.append("The Council Keleres");
         } else {
@@ -44,7 +45,7 @@ public class TwilightsFallInfoHelper {
         if (includeUnits) {
             setupInfo
                     .append("> Starting Units: ")
-                    .append(Helper.getUnitListEmojis(faction.getStartingFleet()))
+                    .append(Helper.getOrderedUnitListEmojis(faction.getStartingFleet(), true))
                     .append(System.lineSeparator());
         }
 
@@ -93,6 +94,22 @@ public class TwilightsFallInfoHelper {
         for (String ability : legendaryAbilities) {
             homeInfo.append("> ").append(ability).append(System.lineSeparator());
         }
+        if (homeTile.getAliases().contains("creussgate")) {
+            AbilityModel ability = Mapper.getAbility("echo_of_sacrifice");
+            homeInfo.append("> **")
+                    .append(ability.getName())
+                    .append("**: ")
+                    .append(ability.getPermanentEffect().orElse("(missing ability text)"))
+                    .append(System.lineSeparator());
+        }
+        if (homeTile.getAliases().contains("crimsongate")) {
+            AbilityModel ability = Mapper.getAbility("echo_of_divergence");
+            homeInfo.append("> **")
+                    .append(ability.getName())
+                    .append("**: ")
+                    .append(ability.getPermanentEffect().orElse("(missing ability text)"))
+                    .append(System.lineSeparator());
+        }
 
         return homeInfo.toString();
     }
@@ -129,13 +146,13 @@ public class TwilightsFallInfoHelper {
         StringBuilder sb = new StringBuilder();
         sb.append(planet.getName());
         sb.append(" (");
-        sb.append(planet.getResources()).append("/").append(planet.getInfluence());
+        sb.append(planet.getResources()).append('/').append(planet.getInfluence());
         if (planet.isLegendary()) {
-            sb.append("/").append(MiscEmojis.LegendaryPlanet);
+            sb.append('/').append(MiscEmojis.LegendaryPlanet);
         }
         if (planet.getTechSpecialties() != null) {
             for (var spec : planet.getTechSpecialties()) {
-                sb.append("/").append(spec.getEmoji());
+                sb.append('/').append(spec.getEmoji());
             }
         }
         sb.append(") ");

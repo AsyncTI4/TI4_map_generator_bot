@@ -1,22 +1,22 @@
 package ti4.service.map;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.image.TileHelper;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
@@ -31,11 +31,11 @@ public class AddTileService {
     }
 
     public static void addCustodianToken(Tile tile, Game game) {
-        if (!tile.isMecatol() || game.isLiberationC4Mode()) {
+        if (!tile.isMecatol(game) || game.isLiberationC4Mode()) {
             return;
         }
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
-        for (String mecatol : Constants.MECATOLS) {
+        for (String mecatol : game.mecatols()) {
             UnitHolder unitHolder = unitHolders.get(mecatol);
             if (unitHolder instanceof Planet && mecatol.equals(unitHolder.getName())) {
                 unitHolder.addToken(Constants.CUSTODIAN_TOKEN_PNG);
@@ -44,7 +44,8 @@ public class AddTileService {
     }
 
     public static Set<ComponentSource> getSources(SlashCommandInteractionEvent event, Game game) {
-        return getSources(game, event.getOption(Constants.INCLUDE_ERONOUS_TILES, false, OptionMapping::getAsBoolean));
+        return getSources(
+                game, event.getOption(Constants.INCLUDE_ERONOUS_TILES, Boolean.FALSE, OptionMapping::getAsBoolean));
     }
 
     // This should be changed to support multiple sources and not just Eronous
@@ -58,6 +59,8 @@ public class AddTileService {
         sources.add(ComponentSource.pok);
         if (game.isDiscordantStarsMode()) {
             sources.add(ComponentSource.ds);
+        }
+        if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
         }
         if (eronousTiles) {
@@ -74,13 +77,11 @@ public class AddTileService {
         List<TileModel> availableTiles = new ArrayList<>();
         switch (type) {
             case BR:
-                List<Supplier<List<TileModel>>> tileFinders = new Random().nextBoolean()
-                        ? List.of(
-                                () -> findBlueTiles(sources, existingTileModels, drawnTiles),
-                                () -> findRedTiles(sources, existingTileModels, drawnTiles))
-                        : List.of(
-                                () -> findRedTiles(sources, existingTileModels, drawnTiles),
-                                () -> findBlueTiles(sources, existingTileModels, drawnTiles));
+                List<Supplier<List<TileModel>>> tileFinders = new ArrayList<>(List.of(
+                        () -> findBlueTiles(sources, existingTileModels, drawnTiles),
+                        () -> findRedTiles(sources, existingTileModels, drawnTiles)));
+
+                Collections.shuffle(tileFinders);
 
                 for (Supplier<List<TileModel>> tileFinder : tileFinders) {
                     availableTiles = tileFinder.get();

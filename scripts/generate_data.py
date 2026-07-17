@@ -11,6 +11,15 @@ import argparse
 
 # Configuration for different data types
 CONFIGS = {
+    "action_cards": {
+        "input_folder": "src/main/resources/data/action_cards",
+        "output_file": "actionCards.ts",
+        "type_import": "ActionCard",
+        "export_name": "actionCards",
+        "sort_key": "alias",
+        "is_array_data": True,
+        "blacklist": [],
+    },
     "attachments": {
         "input_folder": "src/main/resources/data/attachments",
         "output_file": "attachments.ts",

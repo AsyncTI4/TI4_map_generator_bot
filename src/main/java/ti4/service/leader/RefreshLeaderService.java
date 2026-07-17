@@ -1,10 +1,11 @@
 package ti4.service.leader;
 
 import lombok.experimental.UtilityClass;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelperAbilities;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Player;
+import ti4.helpers.StringHelper;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -24,9 +25,8 @@ public class RefreshLeaderService {
 
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " you gained " + tgCount + " trade good"
-                            + (tgCount == 1 ? "" : "s") + " (" + (tg - tgCount) + "->" + tg + ") from " + leaderName
-                            + " being readied.");
+                    player.getRepresentationUnfogged() + " you gained " + StringHelper.pluralize(tgCount, "trade good")
+                            + " (" + (tg - tgCount) + "->" + tg + ") from " + leaderName + " being readied.");
             ButtonHelperAbilities.pillageCheck(player, game);
             playerLeader.setTgCount(0);
         }

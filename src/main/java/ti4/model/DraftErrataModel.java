@@ -1,80 +1,90 @@
 package ti4.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class DraftErrataModel implements ModelInterface {
+    private DraftCategory itemCategory;
+    private String itemId;
+    private List<String> additionalComponents;
+    private List<String> optionalSwaps;
+    private Boolean undraftable;
+    private String alternateText;
+    private Boolean alwaysAddToPool;
+    private ComponentSource source;
+
+    public static DraftErrataModel blank() {
+        return new DraftErrataModel(null, "", List.of(), List.of(), false, null, false, null);
+    }
+
     @Override
     public boolean isValid() {
-        return ItemCategory != null && ItemId != null && source != null;
+        return itemCategory != null && itemId != null && source != null;
     }
 
     @Override
     public String getAlias() {
-        return ItemCategory.toString() + ":" + ItemId;
+        return itemCategory.toString() + ":" + itemId;
     }
 
-    // The type of item to be drafted
-    public DraftItem.Category ItemCategory;
-
-    // The system ID of the item. Only convert this to player-readable text when necessary
-    public String ItemId;
-
-    public DraftErrataModel[] AdditionalComponents;
-    public DraftErrataModel[] OptionalSwaps;
-    public boolean Undraftable;
-    public String alternateText;
-
-    public boolean AlwaysAddToPool;
-
-    private ComponentSource source;
-
-    public DraftErrataModel(String alias) {
-        String[] split = alias.split(":");
-        ItemCategory = DraftItem.Category.valueOf(split[0]);
-        ItemId = split[1];
-    }
-
-    public DraftErrataModel() {}
-
-    public static void filterUndraftablesAndShuffle(List<DraftItem> items, DraftItem.Category listCategory) {
-        Map<String, DraftErrataModel> frankenErrata = Mapper.getFrankenErrata();
-        items.removeIf((DraftItem item) ->
-                frankenErrata.containsKey(item.getAlias()) && frankenErrata.get(item.getAlias()).Undraftable);
-        items.addAll(DraftItem.getAlwaysIncludeItems(listCategory));
-        Set<DraftItem> itemsSet = Set.copyOf(items); // Remove duplicates
-        items.clear();
-        items.addAll(itemsSet);
-        Collections.shuffle(items);
-    }
-
-    @JsonIgnore
     public String getAlternateText() {
         return Optional.ofNullable(alternateText).orElse("");
     }
 
-    @JsonIgnore
     public List<DraftErrataModel> getAdditionalComponents() {
-        return List.of(AdditionalComponents);
+        if (additionalComponents == null) return List.of();
+        return additionalComponents.stream()
+                .map(Mapper::getFrankenErrata)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
-    @JsonIgnore
     public List<DraftErrataModel> getOptionalSwaps() {
-        return List.of(OptionalSwaps);
+        if (optionalSwaps == null) {
+            return List.of();
+        }
+        return optionalSwaps.stream()
+                .map(Mapper::getFrankenErrata)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
-    public ComponentSource getSource() {
-        return source;
+    public boolean isAlwaysAddToPool() {
+        return alwaysAddToPool != null && alwaysAddToPool;
     }
 
-    public boolean searchSource(ComponentSource searchSource) {
-        return (searchSource == null || (source != null && source == searchSource));
+    private boolean isUndraftable() {
+        return undraftable != null && undraftable;
+    }
+
+    public static void filterUndraftablesAndShuffle(List<DraftItem> items, DraftCategory listCategory) {
+        filterUndraftablesAndShuffle(items, listCategory, false);
+    }
+
+    public static void filterUndraftablesAndShuffle(List<DraftItem> items, DraftCategory listCategory, boolean tf) {
+        Map<String, DraftErrataModel> frankenErrata = Mapper.getFrankenErrata();
+        items.removeIf((DraftItem item) -> frankenErrata.containsKey(item.getAlias())
+                && frankenErrata.get(item.getAlias()).isUndraftable());
+        if (!tf) {
+            items.addAll(DraftItem.getAlwaysIncludeItems(listCategory));
+        }
+        Set<DraftItem> itemsSet = Set.copyOf(items); // Remove duplicates
+        items.clear();
+        items.addAll(itemsSet);
+        Collections.shuffle(items);
     }
 }

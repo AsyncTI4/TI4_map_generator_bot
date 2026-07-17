@@ -1,9 +1,9 @@
 package ti4.service.tactical;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
 
 public final class MoveContext {
     public final Player player;

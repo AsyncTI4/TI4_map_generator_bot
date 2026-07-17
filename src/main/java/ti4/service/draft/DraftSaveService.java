@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.StringHelper;
 
@@ -12,6 +13,7 @@ import ti4.helpers.StringHelper;
 public class DraftSaveService {
     public static final String KEY_SEPARATOR = ":";
     public static final String DATA_SEPARATOR = "|";
+    public static final String DATA_SEPARATOR_QUOTED = Pattern.quote(DATA_SEPARATOR);
     public static final char ENCODED_DATA_SEPARATOR = '&';
     public static final String PLAYER_DATA = "p";
     public static final String ORCHESTRATOR_DATA = "o";
@@ -69,16 +71,16 @@ public class DraftSaveService {
             for (var draftableTypes : sortedTypes) {
                 List<DraftChoice> choiceListValues = state.getPicks().get(draftableTypes);
                 var sortedPicks = choiceListValues.stream()
-                        .sorted(Comparator.comparing(DraftChoice::getChoiceKey))
+                        .sorted(Comparator.comparing(DraftChoice::choiceKey))
                         .toList();
                 for (DraftChoice choice : sortedPicks) {
                     lines.add(PLAYER_PICK_DATA
                             + KEY_SEPARATOR
                             + shortId
                             + DATA_SEPARATOR
-                            + choice.getType()
+                            + choice.type()
                             + DATA_SEPARATOR
-                            + choice.getChoiceKey());
+                            + choice.choiceKey());
                 }
             }
         }

@@ -4,9 +4,11 @@ import java.awt.image.BufferedImage;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
@@ -21,15 +23,17 @@ import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
-import ti4.buttons.Buttons;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.ModalHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.TransactionGenerator;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.listeners.annotations.ModalHandler;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.UnitHolder;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -45,11 +49,52 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.relic.SendRelicService;
 import ti4.service.transaction.SendPromissoryService;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 
+@UtilityClass
 public class TransactionHelper {
+
+    private static final List<String> shadyOrganizations = List.of(
+            "the Trade Adjustment Bureau",
+            "the Revenue Rebalancing Division",
+            "the Asset Discovery Group",
+            "the Interstellar Tariff Commission",
+            "the Bureau of \"Fair\" Exchange",
+            "the Celestial Tax Authority",
+            "Hostile Acquisitions United",
+            "Liquidation Services",
+            "Yoink Industries",
+            "Mentax LLC",
+            "Loot & Scoot LLC",
+            "Third-Party Logistics (Uninvited)",
+            "an Unscheduled Audit Team",
+            "Cargo Inspection Services",
+            "the Department of Spontaneous Fees",
+            "Transaction Integrity Consultants",
+            "Surprise Donation Coordinators",
+            "Finders Keepers Ltd.",
+            "a Totally Legitimate Business",
+            "the Bureau of Unsolicited Redistribution",
+            "the Internal Robbery Service",
+            "Audits Without Borders",
+            "Robinhood and Crew",
+            "Alternative Investment Strategies LLC",
+            "the Peg Leg Medical Care Society",
+            "Eye Patch Distribution Services",
+            "P.I.L.L.A.G.E (Proximity Induced Liquidity Loss & Asset Garnishment Entity)",
+            "Deviants Within Borders",
+            "the Suffi An Fan Club",
+            "the Fifth Moon Fund",
+            "Dane's Torment Engine LLC");
 
     private static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
+        GameEventService.commit(
+                game,
+                GameEventType.TRANSACTION,
+                p1,
+                Map.of("from", p1.getFaction(), "to", p2.getFaction(), "items", transactionItems));
         List<Player> players = new ArrayList<>();
         players.add(p1);
         players.add(p2);
@@ -165,6 +210,8 @@ public class TransactionHelper {
             SecretObjectiveInfoService.sendSecretObjectiveInfo(game, p2, event);
         }
 
+        ButtonHelperFactionSpecific.checkViabilityTradeConvoys(game, p1, p2);
+
         // Send Summary to Player's CardsInfo threads
         MessageHelper.sendMessageToChannel(
                 p1.getCardsInfoThread(), p1.getRepresentationUnfogged() + " " + privateSummary);
@@ -174,13 +221,16 @@ public class TransactionHelper {
         p1.clearTransactionItemsWithPlayer(p2);
         if (!debtOnly) {
             if ((p1.hasAbility("pillage")
+                            && !game.isTwilightsFallMode()
                             && !game.getStoredValue("willPillageOwnTransactions" + p1.getFaction())
                                     .isEmpty())
                     || (p2.hasAbility("pillage")
+                            && !game.isTwilightsFallMode()
                             && !game.getStoredValue("willPillageOwnTransactions" + p2.getFaction())
                                     .isEmpty())) {
 
             } else {
+                ButtonHelperActionCards.lieInWaitCheck(p1, p2, game);
                 ButtonHelperAbilities.pillageCheck(p1, game);
                 ButtonHelperAbilities.pillageCheck(p2, game);
             }
@@ -197,7 +247,7 @@ public class TransactionHelper {
         players.add(p2);
         for (Player player : players) {
             if (!trans.isEmpty()) {
-                trans.append("\n");
+                trans.append('\n');
             }
             trans.append("> ")
                     .append(player.getRepresentation(false, false, true))
@@ -238,11 +288,19 @@ public class TransactionHelper {
                     }
                     case "SendDebt" -> {
                         amountToTransact = Integer.parseInt(furtherDetail);
-                        trans.append("Send ").append(amountToTransact).append(" debt tokens");
+                        trans.append("Send ")
+                                .append(amountToTransact)
+                                .append(" debt token")
+                                .append(amountToTransact == 1 ? "" : "s")
+                                .append(", for their \"Debt Account\" pool");
                     }
                     case "ClearDebt" -> {
                         amountToTransact = Integer.parseInt(furtherDetail);
-                        trans.append("Clear ").append(amountToTransact).append(" debt tokens");
+                        trans.append("Clear ")
+                                .append(amountToTransact)
+                                .append(" debt token")
+                                .append(amountToTransact == 1 ? "" : "s")
+                                .append(", from their \"Debt Account\" pool");
                     }
                     case "shipOrders" ->
                         trans.append(Mapper.getRelic(furtherDetail).getName()).append(FactionEmojis.axis);
@@ -252,8 +310,8 @@ public class TransactionHelper {
                         switch (furtherDetail) {
                             case "generic" ->
                                 trans.append(amountToTransact)
-                                        .append(" ")
-                                        .append(CardEmojis.ActionCard)
+                                        .append(' ')
+                                        .append(CardEmojis.getACEmoji(game))
                                         .append(" to be specified by player");
                             default -> {
                                 int acNum = Integer.parseInt(furtherDetail);
@@ -267,7 +325,7 @@ public class TransactionHelper {
                                         acID = ac.getKey();
                                     }
                                 }
-                                trans.append(CardEmojis.ActionCard);
+                                trans.append(CardEmojis.getACEmoji(game));
                                 if (!hidePrivateCardText) {
                                     trans.append(" _")
                                             .append(Mapper.getActionCard(acID).getName())
@@ -281,7 +339,7 @@ public class TransactionHelper {
                             case "generic" -> {
                                 if (!hidePrivateCardText) {
                                     trans.append(amountToTransact)
-                                            .append(" ")
+                                            .append(' ')
                                             .append(CardEmojis.PN)
                                             .append(" to be specified by player");
                                 } else {
@@ -305,7 +363,7 @@ public class TransactionHelper {
                                 trans.append(CardEmojis.PN);
                                 if (!hidePrivateCardText) {
                                     if (Mapper.getPromissoryNote(id) != null) {
-                                        trans.append(" ")
+                                        trans.append(' ')
                                                 .append(StringUtils.capitalize(Mapper.getPromissoryNote(id)
                                                         .getColor()
                                                         .orElse("")))
@@ -314,7 +372,7 @@ public class TransactionHelper {
                                                         .getName())
                                                 .append("_");
                                     } else {
-                                        trans.append(" ")
+                                        trans.append(' ')
                                                 .append("null pn info for ")
                                                 .append(id);
                                     }
@@ -326,7 +384,7 @@ public class TransactionHelper {
                         switch (furtherDetail) {
                             case "generic" ->
                                 trans.append(amountToTransact)
-                                        .append(" ")
+                                        .append(' ')
                                         .append(CardEmojis.SecretObjective)
                                         .append(" to be specified by player");
                             default -> {
@@ -342,9 +400,7 @@ public class TransactionHelper {
                         }
                     }
                     case "Frags" ->
-                        trans.append(ExploreEmojis.getFragEmoji(furtherDetail)
-                                .toString()
-                                .repeat(amountToTransact));
+                        trans.repeat(ExploreEmojis.getFragEmoji(furtherDetail).toString(), amountToTransact);
                     case "Technology" ->
                         trans.append(Mapper.getTech(furtherDetail).getRepresentation(false));
                     case "Planets", "AlliancePlanets", "dmz" ->
@@ -360,9 +416,9 @@ public class TransactionHelper {
                             trans.append(furtherDetail.replace("fin777", " "));
                         }
                     }
-                    default -> trans.append(" some odd thing: `").append(item).append("`");
+                    default -> trans.append(" some odd thing: `").append(item).append('`');
                 }
-                trans.append("\n");
+                trans.append('\n');
             }
             if (sendingNothing) {
                 String nothing = game.getStoredValue(player.getFaction() + "NothingMessage");
@@ -370,7 +426,7 @@ public class TransactionHelper {
                     nothing = getNothingMessage();
                     game.setStoredValue(player.getFaction() + "NothingMessage", nothing);
                 }
-                trans.append("> - ").append(nothing).append("\n");
+                trans.append("> - ").append(nothing).append('\n');
             }
         }
 
@@ -385,8 +441,8 @@ public class TransactionHelper {
             "Nothing",
             "Nothing But Respect And Good Will",
             "Some Pocket Lint",
-            "Sunshine and Rainbows",
-            "A Sense of Pride and Accomplishment",
+            "Sunshine And Rainbows",
+            "A Sense Of Pride And Accomplishment",
             "A Crisp High Five",
             "A Well Written Thank-You Note",
             "Heartfelt Thanks",
@@ -403,122 +459,120 @@ public class TransactionHelper {
             "$1000 In Monopoly Money",
             "Forgiveness For Past Mistakes",
             "A Lucky Rock",
-            "A Warm Cup of Tea",
+            "A Warm Cup Of Tea",
             "A Poorly Drawn But Deeply Meaningful Picture",
             "An Unexpected Hug",
             "A Magic Trick",
-            "A Pair of Comfy Socks",
-            "A Whiff of Fresh Cookies",
+            "A Pair Of Comfy Socks",
+            "A Whiff Of Fresh Cookies",
             "A Charming Smile",
-            "A Promise to Call Later",
+            "A Promise To Call Later",
             "A Supportive Cheer",
             "A Playful Joke",
-            "A Chance to See A Beautiful Sunset",
+            "A Chance To See A Beautiful Sunset",
             "A Treasure Map",
             "A Song",
             "A Book Recommendation",
             "A Cozy Blanket",
             "A Cheery Greeting",
-            "A Bucket of Joy",
+            "A Bucket Of Joy",
             "A Gentle Reminder",
             "A Heartwarming Story",
-            "A Whisper of Kindness",
+            "A Whisper Of Kindness",
             "An Expired Gift Certificate",
-            "A Free Trial CD for AOL",
+            "A Free Trial CD For AOL",
             "Compost For Your Garden",
             "A Tupperware Party Invitation",
-            "A Picture of a Sandwich",
+            "A Picture Of A Sandwich",
             "Thoughtful Advice About Your Current Situation",
             "Zip; Zilch; Nada",
-            "Approximately "
-                    + String.format(
-                            "%,d",
-                            5 * ThreadLocalRandom.current().nextInt(200, 2000)
-                                    + ThreadLocalRandom.current().nextInt(1, 5))
-                    + " Unique Snow Globes",
-            "Forgiveness For Future Mistakes (Terms and Conditions Apply)",
+            String.format(
+                    "Approximately %,d Unique Snow Globes",
+                    5 * ThreadLocalRandom.current().nextInt(200, 2000)
+                            + ThreadLocalRandom.current().nextInt(1, 5)),
+            "Forgiveness For Future Mistakes (Terms And Conditions Apply)",
             "A Token Labelled \"Traid Gud\"",
-            "A Hill of Beans",
-            "This Small Portrait of Benjamin Franklin, Done in Oil Paints",
-            "Favourable Timing on Bureaucracy",
+            "A Hill Of Beans",
+            "This Small Portrait Of Benjamin Franklin, Done In Oil Paints",
+            "Favourable Timing On Bureaucracy",
             "A Comfortable Sinecure, When I'm Galactic Emperor",
-            "This Box of One Dozen Starving, Crazed Weasels",
-            "A jpeg Depicting a Cartoon Monkey",
+            "This Box Of One Dozen Starving, Crazed Weasels",
+            "A jpeg Depicting A Cartoon Monkey",
             "A Somewhat Rare Beanie Baby",
-            "Some Good News About Our Lord and Saviour, Harrugh Gefhara",
-            "No Spoilers for that TV Show You're Watching",
-            "Payment in Exposure",
-            "A VHS Recording of an Episode of _Bill Nye The Science Guy_",
-            "A Short But Comprehensive Lecture on Medieval Siege Weaponry",
-            "An _E.T. the Extra-Terrestrial_ Cartridge for the Atari 2600",
+            "Some Good News About Our Lord And Saviour, Harrugh Gefhara",
+            "No Spoilers For That TV Show You're Watching",
+            "Payment In Exposure",
+            "A VHS Recording Of An Episode Of _Bill Nye The Science Guy_",
+            "A Short But Comprehensive Lecture On Medieval Siege Weaponry",
+            "An _E.T. the Extra-Terrestrial_ Cartridge For The Atari 2600",
             "A Nice Solid Thumbs Up",
-            "A Handful of Dog Treats",
+            "A Handful Of Dog Treats",
             "One (1) Peppercorn",
             "Poutine",
             "The Deputy Speakership",
-            "Half a Slice of Pizza, With or Without Pineapple",
+            "Half A Slice Of Pizza, With Or Without Pineapple",
             "The Wi-Fi Password",
             "A Second-Hand Toothbrush",
-            "A Lamp That Might Contain a Genie, But Probably Doesn't",
-            "An Acoustic Rendition of _Wonderwall_",
-            "As Many Spiders as You Desire",
+            "A Lamp That Might Contain A Genie, But Probably Doesn't",
+            "An Acoustic Rendition Of _Wonderwall_",
+            "As Many Spiders As You Desire",
             "Fruit Salad (yummy, yummy)",
             "One Chocolate Chip Muffin Amongst Eleven Raisin Muffins",
-            "Invoking the A̴̰̽̑ͅn̶͙͝ĉ̸̤̜̽i̶̯̯͋ě̶͓̜͑n̶̤̩̉t̸̯̎͊͜ ̷́ͅP̶̘̀a̸̧̔̅c̶̣̋̔t̷̺̪͛͋",
-            "Some Perfunctory Laughter at Your Next Attempt at a Joke",
-            "The Front Half of Our Pantomime Horse",
+            "Invoking The A̴̰̽̑ͅn̶͙͝ĉ̸̤̜̽i̶̯̯͋ě̶͓̜͑n̶̤̩̉t̸̯̎͊͜ ̷́ͅP̶̘̀a̸̧̔̅c̶̣̋̔t̷̺̪͛͋",
+            "Some Perfunctory Laughter At Your Next Attempt At A Joke",
+            "The Front Half Of Our Pantomime Horse",
             "~~False~~ Reassurances",
             "A Big Mouth Billy Bass",
             "More Cowbell",
             "Some Subpar Macaroni Art",
             "A Chocolate Teapot",
             "Some Week-Old Sushi",
-            "My Second Finest Bottle of Wine Drink™",
-            "A Riddle, Wrapped in a Mystery, Inside an Enigma, Coated in Chocolate",
-            "A Brand-New Luxury Car, Missing Only Fuel, Tires and Car",
-            "Either \"Peace\" or \"Peas\"; the Ambassador Failed to Elaborate",
-            "A Year's Supply of Brussels Sprouts",
+            "My Second Finest Bottle Of Wine Drink™",
+            "A Riddle, Wrapped In A Mystery, Inside An Enigma, Coated In Chocolate",
+            "A Brand-New Luxury Car, Missing Only Fuel, Tires And Car",
+            "Either \"Peace\" Or \"Peas\"; The Ambassador Failed To Elaborate",
+            "A Year's Supply Of Brussels Sprouts",
             "A Nintendo Power Glove; ***Now You're Playing With Power***",
             "A Wooden Spoon",
-            "An Ingot of Pyrite",
+            "An Ingot Of Pyrite",
             "A White Elephant",
             "Ennui",
             "A Smurf TV Tray",
             "A Creepy Doll",
-            "A Ziploc Bag of Ranch Dressing",
-            "Nothing. And Furthermore, Carthage Must be Destroyed!",
-            "All of the Goulash",
+            "A Ziploc Bag Of Ranch Dressing",
+            "Nothing. And Furthermore, Carthage Must Be Destroyed!",
+            "All The Goulash",
             "Waldo's Location",
-            "A Billet of Ea-nāṣir's Finest Copper",
-            "All the Silver in Fort Knox",
-            "A Controlling Share of The Bereg Jet Ski Company",
-            "A Handful of Specially Marked Cereal Boxtops",
+            "A Billet Of Ea-nāṣir's Finest Copper",
+            "All The Silver In Fort Knox",
+            "A Controlling Share Of The Bereg Jet Ski Company",
+            "A Handful Of Specially Marked Cereal Boxtops",
             "An Aperture Science Thing We Don't Know What It Does",
-            "Nothing, Because I'm a Cheapskate",
+            "Nothing, Because I'm A Cheapskate",
             "A Brick, Delivery Speed TBD",
             "An Inanimate Carbon Rod",
-            "A Set of Left-Handed Sarween Tools",
+            "A Set Of Left-Handed Sarween Tools",
             "A Bridge That's For Sale",
-            "In return for this small, helpful deed // A limerick is what I shall cede // It won't cost me a dime // If I trade you this rhyme // To brighten your day, yes indeed!",
+            "In return for this small, helpful deed // A limerick is what I shall cede // It won't cost me a dime // If I trade you this rhyme // For that thing that I want, yes indeed!",
             "The Chameleon's Dish",
-            "The Sound of One Hand Clapping",
+            "The Sound Of One Hand Clapping",
             "An Unpaired Sock",
             "\"101 Ways To Make Toast\"",
             "A Chess Set With 31 Missing Pieces",
             "Your Horoscope Reading",
             "Just Deserts",
-            "Surprise and Delight",
+            "Surprise And Delight",
             "`//Could somebody get ChatGPT to generate a few more messages - Dev`",
             "Some Free Candy, From My Windowless Van",
-            "A Phial of Dihydrogen Monoxide",
-            "A Gizmo, a Doohickey, or Perhaps Even a Whatchamacallit",
+            "A Phial Of Dihydrogen Monoxide",
+            "A Gizmo, A Doohickey, Or Perhaps Even A Whatchamacallit",
             "Nothing (Don't Spend It All At Once)",
-            "Industrial Quantities of Glitter",
+            "Industrial Quantities Of Glitter",
             "Potent Potables",
             "A Succulent Chinese Meal?",
-            "The Cheap Plastic Imitation of the Amulet of Yendor",
+            "The Cheap Plastic Imitation Of The Amulet Of Yendor",
             "A Millstone",
-            "Behind Door #" + ThreadLocalRandom.current().nextInt(1, 3) + ": A Goat!",
+            "Behind Door #" + ThreadLocalRandom.current().nextInt(1, 4) + ": A Goat!",
             "A Runcible Spoon",
             "_Nullam Rem Natam_",
             "A Jubba Cloak",
@@ -529,10 +583,100 @@ public class TransactionHelper {
             "Artisanal, Hand-Crafted Nothing",
             "Reticulating Splines",
             "ADDITIONAL PYLONS",
-            "A State-of-the-Art Turbo Encabulator");
+            "A State-of-the-Art Turbo Encabulator",
+            "Help! I'm Trapped In A Transaction Factory!",
+            "Emotional Support For The Throne",
+            "My Frayed Agreement",
+            "A Rock-Shaped Rock",
+            "Not Attacking You Through The Samekh Wormhole",
+            "A Thneed",
+            "Smashing That Like Button",
+            "A Sickle Of Leather",
+            "A Fish's Bicycle",
+            "One Red Paperclip",
+            "ACME Bird Seed",
+            "Your Choice Of Mountain Dew Or Crab Juice",
+            // generates a Sidereal Confluence trade offer in the form of
+            // "Two Food/Life Support Cubes And One Biotechnology Cube"
+            String.format(String.format(
+                    String.format(
+                            "%s And %s",
+                            switch (Math.min(
+                                    ThreadLocalRandom.current().nextInt(5),
+                                    ThreadLocalRandom.current().nextInt(5))) {
+                                case 0 -> "One %s Cube";
+                                case 1 -> "Two %s Cubes";
+                                case 2 -> "Three %s Cubes";
+                                case 3 -> "Four %s Cubes";
+                                default -> "Five %s Cubes";
+                            },
+                            switch (Math.min(
+                                    ThreadLocalRandom.current().nextInt(5),
+                                    ThreadLocalRandom.current().nextInt(5))) {
+                                case 0 -> "One %s Cube";
+                                case 1 -> "Two %s Cubes";
+                                case 2 -> "Three %s Cubes";
+                                case 3 -> "Four %s Cubes";
+                                default -> "Five %s Cubes";
+                            }),
+                    switch (ThreadLocalRandom.current().nextInt(3)) {
+                        case 0 -> "Food/Life Support";
+                        case 1 -> "Culture";
+                        default -> "Industry";
+                    },
+                    switch (ThreadLocalRandom.current().nextInt(3)) {
+                        case 0 -> "Information";
+                        case 1 -> "Biotechnology";
+                        default -> "Power/Electrical";
+                    })),
+            "The Golden Skull of Rauhl",
+            "This Defective Postage Stamp, Which Has The Aeroplane Printed Upside-Down",
+            "A Flanian Pobble Bead",
+            "A Red Herring",
+            "∅", // empty set
+            switch (ThreadLocalRandom.current().nextInt(0, 30)) {
+                case 0 -> "Asgjë (As They Would Say In Albania)";
+                case 1 -> "Нищо (As They Would Say In Bulgaria)";
+                case 2 -> "Ništa (As They Would Say In Croatia)";
+                case 3 -> "Intet (As They Would Say In Denmark)";
+                case 4 -> "Niets (As They Would Say In The Netherlands)";
+                case 5 -> "Mitte Midagi (As They Would Say In Estonia)";
+                case 6 -> "Rien (As They Would Say In France)";
+                case 7 -> "არაფერი (As They Would Say In Georgia)";
+                case 8 -> "Nichts (As They Would Say In Germany)";
+                case 9 -> "Τίποτα (As They Would Say In Greece)";
+                case 10 -> "ʻAʻOhe Mea (As They Would Say In Hawaii)";
+                case 11 -> "कुछ नहीं (As They Would Say In India)";
+                case 12 -> "Ekkert (As They Would Say In Iceland)";
+                case 13 -> "Niente (As They Would Say In Italy)";
+                case 14 -> "아무것도 아님 (As They Would Say In Korea)";
+                case 15 -> "Nekas (As They Would Say In Latvia)";
+                case 16 -> "Nieko (As They Would Say In Lithuania)";
+                case 17 -> "Näischt (As They Would Say In Luxembourg)";
+                case 18 -> "Ништо (As They Would Say In Macedonia)";
+                case 19 -> "Kaore He Mea (As They Would Say In New Zealand)";
+                case 20 -> "Юу Ч Биш (As They Would Say In Mongolia)";
+                case 21 -> "केही छैन (As They Would Say In Nepal)";
+                case 22 -> "Ikke Noe (As They Would Say In Norway)";
+                case 23 -> "Chan Eil Dad (As They Would Say In Scotland)";
+                case 24 -> "Ништа (As They Would Say In Serbia)";
+                case 25 -> "Hakuna Kitu (As They Would Say In Tanzania)";
+                case 26 -> "Ingenting (As They Would Say In Sweden)";
+                case 27 -> "Нічого (As They Would Say In Ukraine)";
+                case 28 -> "Không Có Gì (As They Would Say In Vietnam)";
+                default -> "Dim Byd (As They Would Say In Wales)";
+            },
+            "An Air Freshener To Hang On Your Dreadnought's Rear View Mirror",
+            "A Participation Trophy",
+            "Second-Hand Nothing",
+            "A Promissory Vibe",
+            "[Nothing](<https://youtu.be/dQw4w9WgXcQ>)",
+            "||Surprise Nothing||",
+            "A Witty Pop Culture Reference",
+            "Hwat's This‽ A Transaction Proposal Woefully Underpopulated By Bees‽ My Briefcase Full Of Bees Ought To Put A Stop To That!");
 
     public static String getNothingMessage() {
-        if (RandomHelper.isOneInX(1000000)) {
+        if (RandomHelper.isOneInX(1_000_000)) {
             return "The joy of sharing a one in a million empty transaction offer message";
         }
 
@@ -548,18 +692,19 @@ public class TransactionHelper {
         transaction(null, player, game, "");
     }
 
-    @ButtonHandler(value = "transact_BMD", save = true) // deprecated
-    @ButtonHandler(value = "transaction_BMD", save = true)
+    @ButtonHandler("transaction_BMD")
     @ButtonHandler(value = "transaction", save = false)
     private static void transaction(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         if (buttonID.endsWith("_BMD")) {
-            game.setStoredValue("blackmarketdealing", player.getFaction());
+            player.setStoredValue("bmd", "y");
             ButtonHelper.deleteMessage(event);
         }
 
         List<Button> buttons = getPlayersToTransact(game, player);
         String message = player.getRepresentation() + ", please choose which player you wish to transact with.";
-        if (game.isHiddenAgendaMode() && game.getPhaseOfGame().toLowerCase().contains("agenda")) {
+        if (game.isHiddenAgendaMode()
+                && game.getPhaseOfGame().toLowerCase().contains("agenda")
+                && game.getStoredValue("executiveOrder").isEmpty()) {
             message = player.getRepresentation()
                     + ", this game is in Hidden Agenda mode, which does not allow transactions in the Agenda Phase.";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
@@ -846,6 +991,7 @@ public class TransactionHelper {
 
                 boolean blackmarket =
                         List.of(p1.getFaction(), p2.getFaction()).contains(game.getStoredValue("blackmarketdealing"));
+                blackmarket |= p1.hasStoredValue("bmd") || p2.hasStoredValue("bmd");
                 for (String relic : (blackmarket ? p1.getActualRelics() : p1.getTradableRelics())) {
                     String name = Mapper.getRelic(relic).getName();
                     stuffToTransButtons.add(Buttons.gray(prefix + "_" + relic, name, ExploreEmojis.Relic));
@@ -856,7 +1002,7 @@ public class TransactionHelper {
                 if (player == p1) {
                     other = p2.getFaction();
                 }
-                event.getMessage().delete().queue();
+                event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 String modalId = "finishDealDetails_" + other;
                 String fieldID = "details";
                 TextInput summary = TextInput.create(fieldID, TextInputStyle.PARAGRAPH)
@@ -868,7 +1014,7 @@ public class TransactionHelper {
                         .addComponents(Label.of("Edit deal details", summary))
                         .build();
 
-                event.replyModal(modal).queue();
+                event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
                 return;
             }
             case "DetailsInvert" -> {
@@ -876,7 +1022,7 @@ public class TransactionHelper {
                 if (player == p2) {
                     other = p1.getFaction();
                 }
-                event.getMessage().delete().queue();
+                event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 String modalId = "finishDealDetailsInvert_" + other;
                 String fieldID = "details";
                 TextInput summary = TextInput.create(fieldID, TextInputStyle.PARAGRAPH)
@@ -886,16 +1032,16 @@ public class TransactionHelper {
                 Modal modal = Modal.create(modalId, "Deal Details")
                         .addComponents(Label.of("Edit deal details", summary))
                         .build();
-                event.replyModal(modal).queue();
+                event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
                 return;
             }
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, stuffToTransButtons);
     }
 
     // Left for future reference.
-    private static Modal buildTransactionModel(Player p1, Player p2, Game game) {
+    private static Modal buildTransactionModel(Player p1, Player p2) {
         Modal.Builder modal = Modal.create("transactionModelFinish_" + p1.getFaction(), "Traction");
         List<Player> players = new ArrayList<>();
         players.add(p1);
@@ -955,7 +1101,7 @@ public class TransactionHelper {
     }
 
     @ModalHandler("finishTrackRecord_")
-    public static void finishTrackRecord(ModalInteractionEvent event, Game game, Player player, String modalID) {
+    public static void finishTrackRecord(ModalInteractionEvent event, String modalID) {
         ModalMapping mapping = event.getValue("record");
         String thoughts = mapping.getAsString();
         String userId = modalID.split("_")[1];
@@ -1032,7 +1178,6 @@ public class TransactionHelper {
 
         if (("tgs".equalsIgnoreCase(item) || "Comms".equalsIgnoreCase(item))
                 && p2.getDebtTokenCount(p1.getColor()) > 0
-                && !p2.hasAbility("binding_debts")
                 && userSettings.isPrefersAutoDebtClearance()
                 && !p2.hasAbility("data_recovery")) {
             int amount = Math.min(p2.getDebtTokenCount(p1.getColor()), Integer.parseInt(extraDetail));
@@ -1053,7 +1198,7 @@ public class TransactionHelper {
                     + buildTransactionOffer(player, opposing, game, false)
                     + "### Click something else that you wish to __offer to__ " + p2.getRepresentation(false, false);
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, p1, p2));
     }
@@ -1077,7 +1222,7 @@ public class TransactionHelper {
                     + buildTransactionOffer(player, opposing, game, false)
                     + "### Click something that you wish to __offer to__ " + p2.getRepresentation(false, false);
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, p1, p2));
     }
@@ -1098,26 +1243,36 @@ public class TransactionHelper {
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " sent a transaction offer to " + p2.getRepresentationNoPing()
                         + ".");
-        if (game.getTableTalkChannel() != null) {
+        String pillageNotice = buildPillageNotice(game, player, p2);
+        String privateOfferText = buildTradeOfferText(player, p2, game, false, pillageNotice);
+        TextChannel tableTalkChannel = game.getTableTalkChannel();
+        if (tableTalkChannel != null) {
+            String publicOfferText = buildTradeOfferText(player, p2, game, true, pillageNotice);
             boolean sentMeme = false;
-            String publicOfferText = buildTransactionOffer(player, p2, game, true);
             if (sendMemeInsteadOfText(event, game)) {
                 BufferedImage tradeOfferMeme = TransactionGenerator.drawTradeOfferMeme(game, player, p2);
                 if (tradeOfferMeme != null) {
                     FileUpload upload = FileUploadService.createFileUpload(tradeOfferMeme, "trade_offer");
                     upload.setDescription(publicOfferText);
-                    MessageHelper.sendFileUploadToChannel(game.getTableTalkChannel(), upload);
+                    MessageHelper.sendFileUploadToChannel(tableTalkChannel, upload);
                     sentMeme = true;
                 }
             }
             if (!sentMeme) {
                 String offerMessage = "Trade offer from " + player.getRepresentationNoPing() + " to "
                         + p2.getRepresentationNoPing() + ":\n" + publicOfferText;
-                MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), offerMessage);
+                MessageHelper.sendMessageToChannel(tableTalkChannel, offerMessage);
             }
         }
 
         String bmdSuffix = "";
+        if (player.hasStoredValue("bmd")) {
+            bmdSuffix = "_BMD_" + player.getFaction();
+            player.removeStoredValue("bmd");
+        } else if (p2.hasStoredValue("bmd")) {
+            bmdSuffix = "_BMD_" + p2.getFaction();
+            p2.removeStoredValue("bmd");
+        }
         for (Player bmdPlayer : List.of(player, p2)) {
             if (game.getStoredValue("blackmarketdealing").equals(bmdPlayer.getFaction())) {
                 bmdSuffix = "_BMD_" + bmdPlayer.getFaction();
@@ -1131,10 +1286,10 @@ public class TransactionHelper {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentationNoPing() + " you sent a transaction offer to " + p2.getRepresentationNoPing()
-                        + ":\n" + buildTransactionOffer(player, p2, game, false),
+                        + ":\n" + privateOfferText,
                 buttons);
 
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
 
         int offerNumber = 1;
         String key = "offerFrom" + player.getFaction() + "To" + p2.getFaction();
@@ -1147,18 +1302,105 @@ public class TransactionHelper {
         buttons.add(Buttons.green("acceptOffer_" + player.getFaction() + "_" + offerNumber, "Accept"));
         buttons.add(Buttons.red("rejectOffer_" + player.getFaction() + bmdSuffix, "Reject"));
         buttons.add(Buttons.red("resetOffer_" + player.getFaction() + bmdSuffix, "Reject and CounterOffer"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                p2.getCardsInfoThread(),
-                p2.getRepresentation() + " you have received a transaction offer from "
-                        + player.getRepresentationNoPing() + ":\n" + buildTransactionOffer(player, p2, game, false),
-                buttons);
+        String p2OfferMsg = p2.getRepresentation() + " you have received a transaction offer from "
+                + player.getRepresentationNoPing() + ":\n" + privateOfferText;
+        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), p2OfferMsg, buttons);
         checkTransactionLegality(game, p2, player);
     }
 
+    private static String buildTradeOfferText(
+            Player p1, Player p2, Game game, boolean hidePrivateCardText, String pillageNotice) {
+        String offerText = buildTransactionOffer(p1, p2, game, hidePrivateCardText);
+        if (pillageNotice.isEmpty()) {
+            return offerText;
+        }
+        return offerText + "\n" + pillageNotice;
+    }
+
+    private static String buildPillageNotice(Game game, Player p1, Player p2) {
+        if (game.isFowMode()) return "";
+
+        int p1TgAfter = p1.getTg();
+        int p2TgAfter = p2.getTg();
+        boolean debtOnlyTransaction = true;
+        // compute TGs after transaction is complete
+        for (String item : p1.getTransactionItemsWithPlayer(p2)) {
+            String[] parts = item.split("_");
+            if (parts.length < 4) continue;
+            String type = parts[2];
+            if (!"SendDebt".equals(type) && !"ClearDebt".equals(type)) {
+                debtOnlyTransaction = false;
+            }
+            String detail = item.replace(parts[0] + "_" + parts[1] + "_" + type + "_", "");
+            try {
+                if ("TGs".equals(type)) {
+                    int amount = Integer.parseInt(detail);
+                    if (item.contains("sending" + p1.getFaction())) {
+                        p1TgAfter -= amount;
+                        p2TgAfter += amount;
+                    } else {
+                        p2TgAfter -= amount;
+                        p1TgAfter += amount;
+                    }
+                } else if ("Comms".equals(type)) {
+                    int amount = Integer.parseInt(detail);
+                    if (item.contains("sending" + p1.getFaction())) {
+                        if (!p1.isPlayerMemberOfAlliance(p2)) p2TgAfter += amount;
+                    } else {
+                        if (!p2.isPlayerMemberOfAlliance(p1)) p1TgAfter += amount;
+                    }
+                }
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        if (debtOnlyTransaction) return "";
+
+        Map<String, List<String>> pillagersToPillaged = new LinkedHashMap<>();
+        getPillagers(game, p1, p1TgAfter, pillagersToPillaged);
+        getPillagers(game, p2, p2TgAfter, pillagersToPillaged);
+
+        if (pillagersToPillaged.isEmpty()) return "";
+
+        StringBuilder notice = new StringBuilder();
+        notice.append("> This is a surcharge notice from **")
+                .append(getRandomPillageSource())
+                .append("**:");
+        for (Map.Entry<String, List<String>> pillagerToPillaged : pillagersToPillaged.entrySet()) {
+            notice.append("\n> • ")
+                    .append(MiscEmojis.tg)
+                    .append(" possibly pillaged from ")
+                    .append(String.join(" and ", pillagerToPillaged.getValue()))
+                    .append(" by ")
+                    .append(pillagerToPillaged.getKey());
+        }
+        return notice.toString();
+    }
+
+    private static void getPillagers(
+            Game game, Player player, int playerTradeGoodCount, Map<String, List<String>> pillagersToPillaged) {
+        if (!ButtonHelperAbilities.canBePillaged(player, game, playerTradeGoodCount)) {
+            return;
+        }
+        String playerRepresentation = player.getRepresentation(false, false, true);
+        for (Player neighbor : player.getNeighbouringPlayers(true)) {
+            if (!neighbor.hasAbility("pillage")) {
+                continue;
+            }
+            String neighborRepresentation = neighbor.getRepresentation(false, false, true);
+            pillagersToPillaged
+                    .computeIfAbsent(neighborRepresentation, _ -> new ArrayList<>())
+                    .add(playerRepresentation);
+        }
+    }
+
+    private static String getRandomPillageSource() {
+        int randomIndex = ThreadLocalRandom.current().nextInt(0, shadyOrganizations.size());
+        return shadyOrganizations.get(randomIndex);
+    }
+
     @ButtonHandler("transact_")
-    public static void resolveSpecificTransButtonsOld(
-            Game game, Player p1, String buttonID, ButtonInteractionEvent event) {
-        String finChecker = "FFCC_" + p1.getFaction() + "_";
+    static void resolveSpecificTransButtonsOld(Game game, Player p1, String buttonID, ButtonInteractionEvent event) {
+        String factionChecker = "FFCC_" + p1.getFaction() + "_";
 
         List<Button> stuffToTransButtons = new ArrayList<>();
         buttonID = buttonID.replace("transact_", "");
@@ -1173,7 +1415,7 @@ public class TransactionHelper {
             case "TGs" -> {
                 String message = "Please choose the number of trade goods you wish to send.";
                 for (int x = 1; x < p1.getTg() + 1 && x < 21; x++) {
-                    Button transact = Buttons.green(finChecker + "send_TGs_" + p2.getFaction() + "_" + x, "" + x);
+                    Button transact = Buttons.green(factionChecker + "send_TGs_" + p2.getFaction() + "_" + x, "" + x);
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
@@ -1181,7 +1423,7 @@ public class TransactionHelper {
             case "Comms" -> {
                 String message = "Please choose the number of commodities you wish to send.";
                 for (int x = 1; x < p1.getCommodities() + 1; x++) {
-                    Button transact = Buttons.green(finChecker + "send_Comms_" + p2.getFaction() + "_" + x, "" + x);
+                    Button transact = Buttons.green(factionChecker + "send_Comms_" + p2.getFaction() + "_" + x, "" + x);
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
@@ -1189,7 +1431,8 @@ public class TransactionHelper {
             case "ClearDebt" -> {
                 String message = "Please choose the amount of debt you wish to clear.";
                 for (int x = 1; x < p1.getDebtTokenCount(p2.getColor()) + 1; x++) {
-                    Button transact = Buttons.green(finChecker + "send_ClearDebt_" + p2.getFaction() + "_" + x, "" + x);
+                    Button transact =
+                            Buttons.green(factionChecker + "send_ClearDebt_" + p2.getFaction() + "_" + x, "" + x);
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
@@ -1197,7 +1440,8 @@ public class TransactionHelper {
             case "SendDebt" -> {
                 String message = "Please choose the amount of debt you wish to send.";
                 for (int x = 1; x < 6; x++) {
-                    Button transact = Buttons.green(finChecker + "send_SendDebt_" + p2.getFaction() + "_" + x, "" + x);
+                    Button transact =
+                            Buttons.green(factionChecker + "send_SendDebt_" + p2.getFaction() + "_" + x, "" + x);
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
@@ -1206,7 +1450,7 @@ public class TransactionHelper {
                 String message = "Please choose the _Axis Order_ you wish to send.";
                 for (String shipOrder : ButtonHelper.getPlayersShipOrders(p1)) {
                     Button transact = Buttons.green(
-                            finChecker + "send_shipOrders_" + p2.getFaction() + "_" + shipOrder,
+                            factionChecker + "send_shipOrders_" + p2.getFaction() + "_" + shipOrder,
                             Mapper.getRelic(shipOrder).getName());
                     stuffToTransButtons.add(transact);
                 }
@@ -1216,7 +1460,7 @@ public class TransactionHelper {
                 String message = "Please choose the _Star Chart_ you wish to send.";
                 for (String starChart : ButtonHelper.getPlayersStarCharts(p1)) {
                     Button transact = Buttons.green(
-                            finChecker + "send_starCharts_" + p2.getFaction() + "_" + starChart,
+                            factionChecker + "send_starCharts_" + p2.getFaction() + "_" + starChart,
                             Mapper.getRelic(starChart).getName());
                     stuffToTransButtons.add(transact);
                 }
@@ -1241,7 +1485,7 @@ public class TransactionHelper {
                         + ", please choose the __green__ button that indicates the action card you wish to send.";
                 for (String acShortHand : p1.getActionCards().keySet()) {
                     Button transact = Buttons.green(
-                            finChecker + "send_ACs_" + p2.getFaction() + "_"
+                            factionChecker + "send_ACs_" + p2.getFaction() + "_"
                                     + p1.getActionCards().get(acShortHand),
                             Mapper.getActionCard(acShortHand).getName());
                     stuffToTransButtons.add(transact);
@@ -1267,11 +1511,11 @@ public class TransactionHelper {
                     Integer intID = p1.getPromissoryNotes().get(pnShortHand);
                     if (game.isFowMode()) {
                         transact = Buttons.green(
-                                finChecker + "send_PNs_" + p2.getFaction() + "_" + intID,
+                                factionChecker + "send_PNs_" + p2.getFaction() + "_" + intID,
                                 owner.getColor() + " " + promissoryNote.getName());
                     } else {
                         transact = Buttons.green(
-                                finChecker + "send_PNs_" + p2.getFaction() + "_" + intID,
+                                factionChecker + "send_PNs_" + p2.getFaction() + "_" + intID,
                                 promissoryNote.getName(),
                                 owner.getFactionEmoji());
                     }
@@ -1292,7 +1536,7 @@ public class TransactionHelper {
                 String message = p1.getRepresentation();
                 message += " Click the __green__ button that indicates the unscored secret objective you wish to send.";
 
-                String prefix = finChecker + "send_SOs_" + p2.getFaction() + "_";
+                String prefix = factionChecker + "send_SOs_" + p2.getFaction() + "_";
                 for (String soID : p1.getSecretsUnscored().keySet()) {
                     String name = Mapper.getSecretObjective(soID).getName();
                     Integer intID = p1.getSecretsUnscored().get(soID);
@@ -1305,7 +1549,7 @@ public class TransactionHelper {
                 for (String tech : p1.getTechs()) {
                     if (resolveAgeOfCommerceTechCheck(p1, p2, tech, game)) {
                         Button transact = Buttons.gray(
-                                finChecker + "send_Technology_" + p2.getFaction() + "_" + tech,
+                                factionChecker + "send_Technology_" + p2.getFaction() + "_" + tech,
                                 Mapper.getTech(tech).getName());
                         stuffToTransButtons.add(transact);
                     }
@@ -1318,7 +1562,7 @@ public class TransactionHelper {
                 if (p1.getCrf() > 0) {
                     for (int x = 1; x < p1.getCrf() + 1; x++) {
                         Button transact = Buttons.blue(
-                                finChecker + "send_Frags_" + p2.getFaction() + "_CRF" + x,
+                                factionChecker + "send_Frags_" + p2.getFaction() + "_CRF" + x,
                                 "Cultural Fragments (" + x + ")");
                         stuffToTransButtons.add(transact);
                     }
@@ -1326,7 +1570,7 @@ public class TransactionHelper {
                 if (p1.getIrf() > 0) {
                     for (int x = 1; x < p1.getIrf() + 1; x++) {
                         Button transact = Buttons.green(
-                                finChecker + "send_Frags_" + p2.getFaction() + "_IRF" + x,
+                                factionChecker + "send_Frags_" + p2.getFaction() + "_IRF" + x,
                                 "Industrial Fragments (" + x + ")");
                         stuffToTransButtons.add(transact);
                     }
@@ -1334,7 +1578,7 @@ public class TransactionHelper {
                 if (p1.getHrf() > 0) {
                     for (int x = 1; x < p1.getHrf() + 1; x++) {
                         Button transact = Buttons.red(
-                                finChecker + "send_Frags_" + p2.getFaction() + "_HRF" + x,
+                                factionChecker + "send_Frags_" + p2.getFaction() + "_HRF" + x,
                                 "Hazardous Fragments (" + x + ")");
                         stuffToTransButtons.add(transact);
                     }
@@ -1343,7 +1587,7 @@ public class TransactionHelper {
                 if (p1.getUrf() > 0) {
                     for (int x = 1; x < p1.getUrf() + 1; x++) {
                         Button transact = Buttons.gray(
-                                finChecker + "send_Frags_" + p2.getFaction() + "_URF" + x,
+                                factionChecker + "send_Frags_" + p2.getFaction() + "_URF" + x,
                                 "Frontier Fragments (" + x + ")");
                         stuffToTransButtons.add(transact);
                     }
@@ -1364,7 +1608,7 @@ public class TransactionHelper {
 
     private static void resolveSpecificTransButtonPress(
             Game game, Player p1, String buttonID, ButtonInteractionEvent event, boolean oldWay) {
-        String finChecker = "FFCC_" + p1.getFaction() + "_";
+        String factionChecker = "FFCC_" + p1.getFaction() + "_";
         buttonID = buttonID.replace("send_", "");
         List<Button> goAgainButtons = new ArrayList<>();
 
@@ -1373,7 +1617,7 @@ public class TransactionHelper {
         String factionToTrans = buttonID.substring(0, buttonID.indexOf('_'));
         String amountToTrans = buttonID.substring(buttonID.indexOf('_') + 1);
         Player p2 = game.getPlayerFromColorOrFaction(factionToTrans);
-        if (p1 == null || p2 == null) return;
+        if (p2 == null) return;
 
         String message2 = "";
         String ident = p1.getRepresentation();
@@ -1384,15 +1628,12 @@ public class TransactionHelper {
                 tgAmount = Math.min(p1.getTg(), tgAmount);
                 p1.setTg(p1.getTg() - tgAmount);
                 p2.setTg(p2.getTg() + tgAmount);
-                message2 = ident + " sent " + tgAmount + " trade good" + (tgAmount == 1 ? "" : "s") + " to " + ident2
-                        + ".";
-                if (!p2.hasAbility("binding_debts")
-                        && p2.getDebtTokenCount(p1.getColor()) > 0
-                        && !p2.hasAbility("data_recovery")
-                        && oldWay) {
+                message2 = ident + " sent " + StringHelper.pluralize(tgAmount, "trade good") + " to " + ident2 + ".";
+                if (p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("data_recovery") && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
                     p2.clearDebt(p1, amount);
-                    message2 += "\n" + ident2 + " cleared " + amount + " debt tokens owned by " + ident + ".";
+                    message2 += "\n" + ident2 + " cleared " + StringHelper.pluralize(amount, "debt token")
+                            + " owned by " + ident + ", from their \"Debt Account\" pool.";
                 }
             }
             case "Comms" -> {
@@ -1408,17 +1649,24 @@ public class TransactionHelper {
                     targetTG += tgAmount;
                     p2.setCommodities(targetTG);
                 }
+                if (Integer.parseInt(amountToTrans) > tgAmount
+                        && p1.getTg() + 1 > Integer.parseInt(amountToTrans) - tgAmount) {
+                    p1.setTg(p1.getTg() - (Integer.parseInt(amountToTrans) - tgAmount));
+                    p2.setTg(p2.getTg() + (Integer.parseInt(amountToTrans) - tgAmount));
+                    MessageHelper.sendMessageToChannel(
+                            p1.getCorrectChannel(),
+                            ident + " sent " + (Integer.parseInt(amountToTrans) - tgAmount) + " trade good"
+                                    + ((Integer.parseInt(amountToTrans) - tgAmount) == 1 ? "" : "s") + " to " + ident2
+                                    + " because they didn't have enough commodities to cover the full amount.");
+                }
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, tgAmount);
                 message2 = ident + " sent " + tgAmount + " commodit" + (tgAmount == 1 ? "y" : "ies") + " to " + ident2
                         + ".";
-                if (!p2.hasAbility("binding_debts")
-                        && p2.getDebtTokenCount(p1.getColor()) > 0
-                        && !p2.hasAbility("data_recovery")
-                        && oldWay) {
+                if (p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("data_recovery") && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
                     p2.clearDebt(p1, amount);
-                    message2 += "\n" + ident2 + " cleared " + amount + " debt token" + (amount == 1 ? "" : "s")
-                            + " owned by " + ident + ".";
+                    message2 += "\n" + ident2 + " cleared " + StringHelper.pluralize(amount, "debt token")
+                            + " owned by " + ident + ", from their \"Debt Account\" pool.";
                 }
             }
             case "WashComms" -> {
@@ -1446,10 +1694,10 @@ public class TransactionHelper {
                 String id2 = p2.getFactionEmojiOrColor();
                 int deltaP1 = oldP1Comms - newP1Comms;
                 int deltaP2 = oldP2Comms - newP2Comms;
-                message2 = ident + " washed their " + deltaP1 + " commodit" + (deltaP1 == 1 ? "" : "s") + " with " + id2
+                message2 = ident + " washed their " + StringHelper.pluralize(deltaP1, "commodit") + " with " + id2
                         + "; "
                         + id1 + " trade goods went from " + oldP1Tg + " to " + p1.getTg() + ".\n"
-                        + ident2 + " washed their " + deltaP2 + " commodit" + (deltaP2 == 1 ? "" : "s") + " with " + id1
+                        + ident2 + " washed their " + StringHelper.pluralize(deltaP2, "commodit") + " with " + id1
                         + "; "
                         + id2 + " trade goods went from " + oldP2tg + " to " + p2.getTg() + ".";
             }
@@ -1469,13 +1717,15 @@ public class TransactionHelper {
             }
             case "SendDebt" -> {
                 message2 = ident + " sent " + amountToTrans + " debt token"
-                        + (Integer.parseInt(amountToTrans) == 1 ? "" : "s") + " to " + ident2 + ".";
+                        + (Integer.parseInt(amountToTrans) == 1 ? "" : "s") + " to " + ident2
+                        + ", for their \"Debt Account\" pool.";
                 p2.addDebtTokens(p1.getColor(), Integer.parseInt(amountToTrans));
                 CommanderUnlockCheckService.checkPlayer(p2, "vaden");
             }
             case "ClearDebt" -> {
                 message2 = ident + " cleared " + amountToTrans + " debt token"
-                        + (Integer.parseInt(amountToTrans) == 1 ? "" : "s") + " of " + ident2 + ".";
+                        + (Integer.parseInt(amountToTrans) == 1 ? "" : "s") + " of " + ident2
+                        + ", from their \"Debt Account\" pool.";
                 p1.removeDebtTokens(p2.getColor(), Integer.parseInt(amountToTrans));
             }
             case "ACs" -> {
@@ -1501,6 +1751,7 @@ public class TransactionHelper {
 
                 boolean blackMarket =
                         List.of(p1.getFaction(), p2.getFaction()).contains(game.getStoredValue("blackmarketdealing"));
+                blackMarket |= p1.hasStoredValue("bmd") || p2.hasStoredValue("bmd");
                 if (!p1.hasAbility("arbiters") && !p2.hasAbility("arbiters") && !blackMarket) {
                     if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);
@@ -1575,7 +1826,9 @@ public class TransactionHelper {
                     SecretObjectiveInfoService.sendSecretObjectiveInfo(game, p2, event);
                 }
 
-                String msg = p1.getRepresentation() + " sent a secret objective to " + p2.getRepresentation();
+                String msg = p1.getRepresentation() + " sent "
+                        + (RandomHelper.isOneInX(20) ? "||a secret objective||" : "a secret objective") + " to "
+                        + p2.getRepresentation() + ".";
                 MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), msg);
                 if (game.isFowMode()) MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
             }
@@ -1602,19 +1855,18 @@ public class TransactionHelper {
             }
             case "Relics" -> SendRelicService.handleSendRelic(event, game, p1, p2, amountToTrans);
         }
-        Button button = Buttons.gray(finChecker + "transactWith_" + p2.getColor(), "Send something else to player?");
+        Button button =
+                Buttons.gray(factionChecker + "transactWith_" + p2.getColor(), "Send something else to player?");
         Button done = Buttons.gray("finishTransaction_" + p2.getColor(), "Done With This Transaction");
 
         goAgainButtons.add(button);
         goAgainButtons.add(Buttons.green("demandSomething_" + p2.getColor(), "Expect Something in Return"));
         goAgainButtons.add(done);
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);
-            if (oldWay) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        p1.getPrivateChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
+            if (!message2.isEmpty()) {
+                MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), message2);
+                MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), "**🤝 Transaction:** " + message2);
             }
-            MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), "**🤝 Transaction:** " + message2);
         } else {
             TextChannel channel = game.getMainGameChannel();
             if ("pbd1000".equalsIgnoreCase(game.getName())) {
@@ -1625,17 +1877,16 @@ public class TransactionHelper {
                             || message2.toLowerCase().contains("support"))) {
                 MessageHelper.sendMessageToChannel(channel, message2);
             }
-            if (oldWay) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        game.getMainGameChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
-            }
+        }
+        if (oldWay) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    p1.getCardsInfoThread(),
+                    ident + ", use these buttons to complete the transaction.",
+                    goAgainButtons);
         }
     }
 
     private static boolean canTheseTwoTransact(Game game, Player player, Player player2) {
-        // if(game.getRealPlayers().size() > 26){
-        //     return true;
-        // }
         if (IsPlayerElectedService.isPlayerElected(game, player2, "tf-censure")
                 || IsPlayerElectedService.isPlayerElected(game, player, "tf-censure")) {
             return false;
@@ -1650,17 +1901,19 @@ public class TransactionHelper {
                 || player2.hasAbility("guild_ships")
                 || player.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")
                 || player2.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")
+                || player.getPromissoryNotesInPlayArea().contains("viability_trade_convoys")
+                || player2.getPromissoryNotesInPlayArea().contains("viability_trade_convoys")
                 || player2.getNeighbouringPlayers(false).contains(player)
                 || player.getNeighbouringPlayers(false).contains(player2);
     }
 
     public static void checkTransactionLegality(Game game, Player player, Player player2) {
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentationUnfogged()).append(", this is a friendly reminder that ");
+        sb.append("## ").append(player.getRepresentationUnfogged()).append(", this is a friendly reminder that ");
         if (!canTheseTwoTransact(game, player, player2)) {
-            sb.append("you are not neighbors with ")
+            sb.append("you cannot transact with ")
                     .append(player2.getRepresentation(false, false))
-                    .append(".");
+                    .append(". (probably due to no neighborship)");
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
         }
         if (player.hasAbility("policy_the_people_control") && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
@@ -1680,29 +1933,29 @@ public class TransactionHelper {
 
     private static List<Button> getPlayersToTransact(Game game, Player p) {
         List<Button> playerButtons = new ArrayList<>();
-        String finChecker = "FFCC_" + p.getFaction() + "_";
+        String factionChecker = "FFCC_" + p.getFaction() + "_";
         for (Player player : game.getPlayers().values()) {
             if (player.isRealPlayer()) {
                 if (player.getFaction().equalsIgnoreCase(p.getFaction())) {
                     continue;
                 }
                 String faction = player.getFaction();
-                if (faction != null && Mapper.isValidFaction(faction)) {
+                if (Mapper.isValidFaction(faction)) {
                     Button button;
                     if (!game.isFowMode()) {
                         String label = player.getUserName();
                         if (p.isNeighboursWith(player)) {
-                            button = Buttons.green(finChecker + "transactWith_" + faction, label);
+                            button = Buttons.green(factionChecker + "transactWith_" + faction, label);
                         } else if (canTheseTwoTransact(game, p, player)) {
-                            button = Buttons.blue(finChecker + "transactWith_" + faction, label);
+                            button = Buttons.blue(factionChecker + "transactWith_" + faction, label);
                         } else {
-                            button = Buttons.gray(finChecker + "transactWith_" + faction, label);
+                            button = Buttons.gray(factionChecker + "transactWith_" + faction, label);
                         }
 
                         String factionEmojiString = player.getFactionEmoji();
                         button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                     } else {
-                        button = Buttons.gray(finChecker + "transactWith_" + player.getColor(), player.getColor());
+                        button = Buttons.gray(factionChecker + "transactWith_" + player.getColor(), player.getColor());
                     }
                     playerButtons.add(button);
                 }
@@ -1714,6 +1967,12 @@ public class TransactionHelper {
     private static List<Button> getStuffToTransButtonsNew(Game game, Player player, Player p1, Player p2) {
         boolean blackMarket =
                 List.of(p1.getFaction(), p2.getFaction()).contains(game.getStoredValue("blackmarketdealing"));
+        blackMarket |= p1.hasStoredValue("bmd") || p2.hasStoredValue("bmd");
+        blackMarket &= !game.isTwilightsFallMode();
+
+        boolean graft = p1.hasStoredValue("bmd") || p2.hasStoredValue("bmd");
+        graft &= game.isTwilightsFallMode();
+
         List<Button> stuffToTransButtons = new ArrayList<>();
         if (p1.getTg() > 0) {
             stuffToTransButtons.add(
@@ -1760,7 +2019,8 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction(), "Promissory Notes"));
         }
-        if (blackMarket && p1.getSecretsUnscored().size() > 0) {
+        if ((blackMarket || p1.hasUnlockedBreakthrough("zooidbt") || p2.hasUnlockedBreakthrough("zooidbt"))
+                && !p1.getSecretsUnscored().isEmpty()) {
             stuffToTransButtons.add(
                     Buttons.gray("newTransact_SOs_" + p1.getFaction() + "_" + p2.getFaction(), "Secret Objectives"));
         }
@@ -1768,7 +2028,7 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction(), "Fragments"));
         }
-        if ((blackMarket && !p1.getActualRelics().isEmpty())
+        if (((blackMarket || graft) && !p1.getActualRelics().isEmpty())
                 || !p1.getTradableRelics().isEmpty()) {
             stuffToTransButtons.add(
                     Buttons.gray("newTransact_Relics_" + p1.getFaction() + "_" + p2.getFaction(), "Relics"));
@@ -1879,17 +2139,18 @@ public class TransactionHelper {
     }
 
     private static List<Button> getStuffToTransButtonsOld(Game game, Player p1, Player p2) {
-        String finChecker = "FFCC_" + p1.getFaction() + "_";
+        String factionChecker = "FFCC_" + p1.getFaction() + "_";
         List<Button> stuffToTransButtons = new ArrayList<>();
         if (p1.getTg() > 0) {
-            stuffToTransButtons.add(Buttons.green(finChecker + "transact_TGs_" + p2.getFaction(), "Trade Goods"));
+            stuffToTransButtons.add(Buttons.green(factionChecker + "transact_TGs_" + p2.getFaction(), "Trade Goods"));
         }
         if (p1.getDebtTokenCount(p2.getColor()) > 0) {
-            stuffToTransButtons.add(Buttons.blue(finChecker + "transact_ClearDebt_" + p2.getFaction(), "Clear Debt"));
+            stuffToTransButtons.add(
+                    Buttons.blue(factionChecker + "transact_ClearDebt_" + p2.getFaction(), "Clear Debt"));
         }
-        stuffToTransButtons.add(Buttons.red(finChecker + "transact_SendDebt_" + p2.getFaction(), "Send Debt"));
+        stuffToTransButtons.add(Buttons.red(factionChecker + "transact_SendDebt_" + p2.getFaction(), "Send Debt"));
         if (p1.getCommodities() > 0 && !p1.hasAbility("military_industrial_complex")) {
-            stuffToTransButtons.add(Buttons.green(finChecker + "transact_Comms_" + p2.getFaction(), "Comms"));
+            stuffToTransButtons.add(Buttons.green(factionChecker + "transact_Comms_" + p2.getFaction(), "Comms"));
         }
 
         if (!game.isFowMode()
@@ -1897,46 +2158,51 @@ public class TransactionHelper {
                 && !p1.hasAbility("military_industrial_complex")
                 && !p1.getAllianceMembers().contains(p2.getFaction())) {
             stuffToTransButtons.add(Buttons.gray(
-                    finChecker + "send_WashComms_" + p2.getFaction() + "_0", "Wash Both Players' Commodities"));
+                    factionChecker + "send_WashComms_" + p2.getFaction() + "_0", "Wash Both Players' Commodities"));
         }
         if (!ButtonHelper.getPlayersShipOrders(p1).isEmpty()) {
-            stuffToTransButtons.add(Buttons.gray(finChecker + "transact_shipOrders_" + p2.getFaction(), "Axis Orders"));
+            stuffToTransButtons.add(
+                    Buttons.gray(factionChecker + "transact_shipOrders_" + p2.getFaction(), "Axis Orders"));
         }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 0) {
-            stuffToTransButtons.add(Buttons.gray(finChecker + "transact_starCharts_" + p2.getFaction(), "Star Charts"));
+            stuffToTransButtons.add(
+                    Buttons.gray(factionChecker + "transact_starCharts_" + p2.getFaction(), "Star Charts"));
         }
         if ((p1.hasAbility("arbiters")
                         || (!game.isFowMode() && p2.hasAbility("arbiters"))
                         || p1.hasTech("tf-guildships")
                         || (!game.isFowMode() && p2.hasTech("tf-guildships")))
                 && p1.getAcCount() > 0) {
-            stuffToTransButtons.add(Buttons.green(finChecker + "transact_ACs_" + p2.getFaction(), "Action Cards"));
+            stuffToTransButtons.add(Buttons.green(factionChecker + "transact_ACs_" + p2.getFaction(), "Action Cards"));
         }
         if (p1.getPnCount() > 0) {
-            stuffToTransButtons.add(Buttons.green(finChecker + "transact_PNs_" + p2.getFaction(), "Promissory Notes"));
+            stuffToTransButtons.add(
+                    Buttons.green(factionChecker + "transact_PNs_" + p2.getFaction(), "Promissory Notes"));
         }
         if (!p1.getFragments().isEmpty()) {
-            stuffToTransButtons.add(Buttons.green(finChecker + "transact_Frags_" + p2.getFaction(), "Fragments"));
+            stuffToTransButtons.add(Buttons.green(factionChecker + "transact_Frags_" + p2.getFaction(), "Fragments"));
         }
         if (!ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game)
                 .isEmpty()) {
-            stuffToTransButtons.add(
-                    Buttons.green(finChecker + "transact_Planets_" + p2.getFaction(), "Planets", FactionEmojis.Hacan));
+            stuffToTransButtons.add(Buttons.green(
+                    factionChecker + "transact_Planets_" + p2.getFaction(), "Planets", FactionEmojis.Hacan));
         }
         if (game.isAgeOfCommerceMode()) {
-            stuffToTransButtons.add(Buttons.green(finChecker + "transact_Technology_" + p2.getFaction(), "Technology"));
+            stuffToTransButtons.add(
+                    Buttons.green(factionChecker + "transact_Technology_" + p2.getFaction(), "Technology"));
         }
         if (!ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game)
                 .isEmpty()) {
             stuffToTransButtons.add(Buttons.green(
-                    finChecker + "transact_AlliancePlanets_" + p2.getFaction(),
+                    factionChecker + "transact_AlliancePlanets_" + p2.getFaction(),
                     "Alliance Planets",
                     p2.getFactionEmoji()));
         }
         if (game.getPhaseOfGame().toLowerCase().contains("agenda")
                 && !"no".equalsIgnoreCase(ButtonHelper.playerHasDMZPlanet(p1, game))) {
             Button transact = Buttons.gray(
-                    finChecker + "resolveDMZTrade_" + ButtonHelper.playerHasDMZPlanet(p1, game) + "_" + p2.getFaction(),
+                    factionChecker + "resolveDMZTrade_" + ButtonHelper.playerHasDMZPlanet(p1, game) + "_"
+                            + p2.getFaction(),
                     "Trade "
                             + Mapper.getPlanet(ButtonHelper.playerHasDMZPlanet(p1, game))
                                     .getName() + " (DMZ)");
@@ -1950,11 +2216,11 @@ public class TransactionHelper {
             String prevBlackMarketFaction = buttonID.substring(buttonID.indexOf("_BMD_") + 5);
             Player bmdPlayer = game.getPlayerFromColorOrFaction(prevBlackMarketFaction);
             if (bmdPlayer != null) {
-                String msg = "The previous offer you made using Black Market Dealing was rejected, rescinded, ";
+                String msg = "The previous offer you made using _Black Market Dealing_ was rejected, rescinded, ";
                 msg += "or is being counter offered. Therefore, the next transaction offer you make will be ";
-                msg += "allowed to use Black Market Dealing again.";
+                msg += "allowed to use _Black Market Dealing_ again.";
                 MessageHelper.sendMessageToChannel(bmdPlayer.getCardsInfoThread(), msg);
-                game.setStoredValue("blackmarketdealing", prevBlackMarketFaction);
+                bmdPlayer.setStoredValue("bmd", "y");
             }
         }
     }
@@ -2018,6 +2284,7 @@ public class TransactionHelper {
         ButtonHelperAbilities.pillageCheck(player2, game);
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         CommanderUnlockCheckService.checkPlayer(player2, "hacan");
+        ButtonHelperFactionSpecific.checkViabilityTradeConvoys(game, player, player2);
         ButtonHelper.deleteMessage(event);
     }
 

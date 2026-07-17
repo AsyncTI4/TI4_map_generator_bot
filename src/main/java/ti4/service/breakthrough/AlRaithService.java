@@ -2,20 +2,20 @@ package ti4.service.breakthrough;
 
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.thundersedge.TeHelperTechs;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class AlRaithService {
+public final class AlRaithService {
 
     // Cabal Breakthrough
     public static void serveBeginCabalBreakthroughButtons(ButtonInteractionEvent event, Game game, Player player) {
         Button startCabalBreakthrough =
-                Buttons.red(player.finChecker() + "beginCabalBreakthroughMove", "Move Ingress Tokens");
+                Buttons.red(player.factionButtonChecker() + "beginCabalBreakthroughMove", "Move Ingress Tokens");
         String message =
                 "After you finish setting the ingress tokens on the map, click this button to move up to 2 of them into systems that contain gravity rifts.";
         MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, startCabalBreakthrough);
@@ -44,10 +44,5 @@ public class AlRaithService {
         TeHelperTechs.initializePlanesplitterStep1(game, player);
         TeHelperTechs.initializePlanesplitterStep1(game, player);
         ButtonHelper.deleteMessage(event);
-
-        // List<Button> buttons = new ArrayList<>();
-        // for (int i = 0; i < Math.min(3, totalIngress); i++) {
-
-        // }
     }
 }

@@ -2,20 +2,24 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Player;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.StatisticOptIn;
 import ti4.settings.users.UserSettingsManager;
 import ti4.website.UltimateStatisticsWebsiteHelper;
 
+@UtilityClass
 public class PlayerTitleHelper {
 
     public static void offerEveryoneTitlePossibilities(Game game) {
@@ -26,7 +30,7 @@ public class PlayerTitleHelper {
                     + " Feel free to not. If you choose to, it's a 2 button process. First select the title, then the player you wish to bestow it upon.\n\n"
                     + "If you don't see buttons for titles, try exiting Discord and reopening it.";
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("bestowTitleStep1_Life Of The Table", "Life Of The Table"));
+            // buttons.add(Buttons.green("bestowTitleStep1_Life Of The Table", "Life Of The Table"));
             buttons.add(Buttons.green("bestowTitleStep1_Fun To Be Around", "Fun To Be Around"));
             buttons.add(Buttons.green("bestowTitleStep1_Trustworthy To A Fault", "Trustworthy To A Fault"));
             buttons.add(Buttons.green("bestowTitleStep1_You Made The Game Better", "You Made The Game Better"));
@@ -41,10 +45,11 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.blue("bestowTitleStep1_A Great Hollywooder", "A Great Hollywooder"));
             buttons.add(Buttons.blue("bestowTitleStep1_A Worthy Opponent", "A Worthy Opponent"));
             buttons.add(Buttons.blue("bestowTitleStep1_A Brilliant Tactician", "A Brilliant Tactician"));
-            buttons.add(Buttons.blue("bestowTitleStep1_A Master Diplomat", "A Master Diplomat"));
+            // buttons.add(Buttons.blue("bestowTitleStep1_A Master Diplomat", "A Master Diplomat"));
             buttons.add(Buttons.blue("bestowTitleStep1_Hard To Kill", "Hard To Kill"));
             buttons.add(Buttons.blue("bestowTitleStep1_Shard Fumbler", "Shard Fumbler"));
             buttons.add(Buttons.blue("bestowTitleStep1_Rules Master", "Rules Master"));
+            buttons.add(Buttons.blue("bestowTitleStep1_Loose Cannon", "Loose Cannon"));
             buttons.add(Buttons.gray("bestowTitleStep1_Observer", "Observer"));
 
             buttons.add(Buttons.red("bestowTitleStep1_A Sneaky One", "A Sneaky One"));
@@ -55,7 +60,7 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.red("bestowTitleStep1_A Warlord", "A Warlord"));
             buttons.add(Buttons.red("bestowTitleStep1_Word Breaker", "Word Breaker"));
             buttons.add(Buttons.red("bestowTitleStep1_One To Be Feared", "One To Be Feared"));
-            buttons.add(Buttons.red("bestowTitleStep1_Spice Bringer", "Spice Bringer"));
+            // buttons.add(Buttons.red("bestowTitleStep1_Spice Bringer", "Spice Bringer"));
 
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Titles here", buttons);
@@ -288,7 +293,7 @@ public class PlayerTitleHelper {
         event.getMessage()
                 .editMessage(msg)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(getOptInButtons(game, player)))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("setOptInStats_")

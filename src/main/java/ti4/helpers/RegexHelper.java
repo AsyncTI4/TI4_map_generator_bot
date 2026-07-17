@@ -6,14 +6,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Player;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Player;
 import ti4.service.fow.FOWPlusService;
 
 @UtilityClass
@@ -42,8 +42,7 @@ public class RegexHelper {
     public static String breakthroughRegex(Game game) {
         Set<String> bts = new HashSet<>();
         for (Player p : game.getRealPlayers()) {
-            String bt = p.getBreakthroughID();
-            if (Mapper.isValidBreakthrough(bt)) bts.add(bt);
+            for (String bt : p.getBreakthroughIDs()) if (Mapper.isValidBreakthrough(bt)) bts.add(bt);
         }
         return regexBuilder("breakthrough", bts);
     }
@@ -279,8 +278,7 @@ public class RegexHelper {
         } else {
             allACs.addAll(Mapper.getActionCards().keySet());
         }
-        allACs.addAll(
-                player.getActionCards().values().stream().map(Object::toString).toList());
+        allACs.addAll(player.getActionCards().keySet());
         return regexBuilder("ac", allACs);
     }
 

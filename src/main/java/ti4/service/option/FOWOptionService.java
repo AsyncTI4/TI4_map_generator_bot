@@ -3,13 +3,16 @@ package ti4.service.option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.buttons.Buttons;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.logging.BotLogger;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 
@@ -66,7 +69,10 @@ public class FOWOptionService {
         RIFTSET_MODE(null, "RiftSet Mode", "For Eronous to run fow300", false);
 
         private final FOWOptionCategory category;
+
+        @Getter
         private final String title;
+
         private final String description;
         private final boolean visible;
 
@@ -83,10 +89,6 @@ public class FOWOptionService {
 
         FOWOptionCategory getCategory() {
             return category;
-        }
-
-        public String getTitle() {
-            return title;
         }
 
         String getDescription() {
@@ -145,7 +147,7 @@ public class FOWOptionService {
                     .append(" **")
                     .append(option.getTitle())
                     .append("**\n");
-            sb.append("-# ").append(option.getDescription()).append("\n");
+            sb.append("-# ").append(option.getDescription()).append('\n');
 
             if (FOWPlusService.isActive(game)
                     && FOWPlusService.FORCED_FOWPLUS_OPTIONS.stream().anyMatch(p -> p.getLeft() == option)) {
@@ -168,9 +170,12 @@ public class FOWOptionService {
             GMService.getGMChannel(game)
                     .sendMessage(sb.toString())
                     .addComponents(rows)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
-            event.getHook().editOriginal(sb.toString()).setComponents(rows).queue();
+            event.getHook()
+                    .editOriginal(sb.toString())
+                    .setComponents(rows)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 

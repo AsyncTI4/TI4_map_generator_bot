@@ -8,10 +8,10 @@ import ti4.service.tactical.PostMovementButtonContext;
 
 public final class RaghsCallButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
-        return ctx.player.getPromissoryNotes().containsKey("ragh");
+        return ctx.player().getPromissoryNotes().containsKey("ragh");
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
-        return ButtonHelperFactionSpecific.getRaghsCallButtons(ctx.player, ctx.game, ctx.tile);
+        return ButtonHelperFactionSpecific.getRaghsCallButtons(ctx.player(), ctx.game(), ctx.tile());
     }
 }

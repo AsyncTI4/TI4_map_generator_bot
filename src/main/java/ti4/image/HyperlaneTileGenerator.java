@@ -19,14 +19,13 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import ti4.ResourceHelper;
-import ti4.map.Game;
-import ti4.map.Tile;
+import ti4.game.Game;
+import ti4.game.Tile;
 import ti4.service.map.CustomHyperlaneService;
 
-class HyperlaneTileGenerator {
+final class HyperlaneTileGenerator {
 
     private static final float CENTER_X = TILE_WIDTH / 2.0f;
     private static final float CENTER_Y = TILE_HEIGHT / 2.0f;
@@ -150,7 +149,7 @@ class HyperlaneTileGenerator {
         // Use canonical matrix as cache key
         String cacheKey = canonical.matrix == null ? "null" : canonical.matrix;
 
-        BufferedImage overlay = HYPERLANE_CACHE.computeIfAbsent(cacheKey, k -> {
+        BufferedImage overlay = HYPERLANE_CACHE.computeIfAbsent(cacheKey, _ -> {
             BufferedImage img = new BufferedImage(TILE_WIDTH, TILE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = img.createGraphics();
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -225,13 +224,17 @@ class HyperlaneTileGenerator {
         String tilePath = tile.getTilePath();
         int transform = -1;
         if (matrix != null) {
-            Random rand = new Random(matrix.hashCode());
-            String randomTile = RANDOM_BACKGROUNDS.get(rand.nextInt(RANDOM_BACKGROUNDS.size()));
-            tilePath = ResourceHelper.getInstance().getTileFile(randomTile);
-            if (tilePath == null) {
-                tilePath = tile.getTilePath();
+            // Use matrix hashCode as seed for determinism: same matrix always yields same background/transform
+            long seed = matrix.hashCode();
+            int tileIndex = Math.floorMod(seed, RANDOM_BACKGROUNDS.size());
+            String randomTile = RANDOM_BACKGROUNDS.get(tileIndex);
+            String randomTilePath = ResourceHelper.getInstance().getTileFile(randomTile);
+            if (randomTilePath != null) {
+                tilePath = randomTilePath;
             }
-            transform = rand.nextInt(4); // 0, 1, 2, or 3
+            transform = Math.floorMod(
+                    seed * 6364136223846793005L + 1442695040888963407L,
+                    4); // LCG step (Knuth MMIX constants) for independent transform selection; 0, 1, 2, or 3
         }
 
         BufferedImage original = ImageHelper.read(tilePath);
@@ -280,48 +283,13 @@ class HyperlaneTileGenerator {
         int minRotation = 0;
         String current = matrix;
         for (int rot = 1; rot < 6; rot++) {
-            current = rotateMatrix60(current);
+            current = CustomHyperlaneService.rotateMatrix60(current);
             if (current.compareTo(minMatrix) < 0) {
                 minMatrix = current;
                 minRotation = rot * 60;
             }
         }
         return new MatrixRotationResult(minMatrix, minRotation);
-    }
-
-    // Rotates a 6x6 matrix string by 60 degrees
-    private static String rotateMatrix60(String matrix) {
-        if (matrix == null) return null;
-        String[] rows = matrix.split(";");
-        int size = 6;
-        int[][] mat = new int[size][size];
-
-        // Parse matrix string to int array
-        for (int i = 0; i < size; i++) {
-            String[] cols = rows[i].split(",");
-            for (int j = 0; j < size; j++) {
-                mat[i][j] = Integer.parseInt(cols[j].trim());
-            }
-        }
-
-        // Rotate: [i][j] -> [(i+1)%6][(j+1)%6]
-        int[][] rotated = new int[size][size];
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                rotated[(i + 1) % size][(j + 1) % size] = mat[i][j];
-            }
-        }
-
-        // Convert back to string
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < size; i++) {
-            if (i > 0) sb.append(";");
-            for (int j = 0; j < size; j++) {
-                if (j > 0) sb.append(",");
-                sb.append(rotated[i][j]);
-            }
-        }
-        return sb.toString();
     }
 
     // Connection rules to angles with shape cache
@@ -348,14 +316,9 @@ class HyperlaneTileGenerator {
         }
     }
 
+    /**
+     * @param rotation in degrees, 0, 60, ..., 300
+     */
     // Helper class to hold canonical matrix and rotation
-    private static class MatrixRotationResult {
-        final String matrix;
-        final int rotation; // in degrees, 0, 60, ..., 300
-
-        MatrixRotationResult(String matrix, int rotation) {
-            this.matrix = matrix;
-            this.rotation = rotation;
-        }
-    }
+    private record MatrixRotationResult(String matrix, int rotation) {}
 }

@@ -1,7 +1,6 @@
 package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,15 +8,16 @@ import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
 import ti4.service.emoji.MiscEmojis;
+import tools.jackson.databind.JsonNode;
 
 // This is a sub-menu
 @Getter
@@ -37,7 +37,7 @@ public class MiltySliceDraftableSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public MiltySliceDraftableSettings(Game game, JsonNode json, SettingsMenu parent) {
+    MiltySliceDraftableSettings(JsonNode json, SettingsMenu parent) {
         super(MENU_ID, "Draft settings", "Advanced settings to fine-tune how rich the galaxy will be", parent);
 
         // Initialize Settings to default values
@@ -56,14 +56,14 @@ public class MiltySliceDraftableSettings extends SettingsMenu {
 
         // Other Initialization
         minimumRes.setExtraInfo(
-                "(this value does not account for flexibly spent planets (you may be used to those appearing as +0.5))");
+                "(this value does not account for flexibly spent planets - you may be used to those appearing as +0.5)");
         minimumInf.setExtraInfo(
-                "(this value does not account for flexibly spent planets (you may be used to those appearing as +0.5))");
+                "(this value does not account for flexibly spent planets - you may be used to those appearing as +0.5)");
 
         // Verify this is the correct JSON node and continue initialization
         if (json != null
                 && json.has("menuId")
-                && MENU_ID.equals(json.get("menuId").asText(""))) {
+                && MENU_ID.equals(json.get("menuId").asString(""))) {
             minimumRes.initialize(json.get("minimumRes"));
             minimumInf.initialize(json.get("minimumInf"));
             totalValue.initialize(json.get("totalValue"));

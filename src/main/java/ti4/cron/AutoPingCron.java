@@ -1,6 +1,6 @@
 package ti4.cron;
 
-import static java.util.function.Predicate.not;
+import static java.util.function.Predicate.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -9,17 +9,18 @@ import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.ManagedGame;
 import ti4.helpers.AgendaHelper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedGame;
+import ti4.logging.BotLogger;
+import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass
 public class AutoPingCron {
@@ -27,6 +28,7 @@ public class AutoPingCron {
     private static final long ONE_HOUR_IN_MILLISECONDS = Duration.ofHours(1).toMillis();
     private static final long TEN_MINUTES_IN_MILLISECONDS =
             Duration.ofMinutes(10).toMillis();
+    private static final long REPLACEMENT_REMINDER_AFTER_HOURS = 120;
     private static final int DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS = 8;
     private static final int PING_NUMBER_TO_GIVE_UP_ON = 50;
     private static final List<String> PING_MESSAGES = List.of(
@@ -36,7 +38,7 @@ public class AutoPingCron {
             " this is a sternly worded letter from the bot regarding your noted absence.",
             " this is a firm request from the bot that you do something to end this situation.",
             " Half dozen times the charm they say.",
-            " I may write whatever I want here, not like you've checked in to read any of it anyways.",
+            " I can write whatever I want here, not like you've checked in to read any of it anyways.",
             " You should end turn soon, there might be a bear on the loose, and you know which friend gets eaten by the bear.",
             " There's a rumor going around that some game is looking for a replacement player. Not that the bot would know anything about that (who are we kidding, the bot knows everything, it just acts dumb sometimes to fool you into a state of compliance).",
             " Do you ever wonder what we're doing here? Such a short time here on earth, and here we are, spending some of it waiting for a TI4 game to move. Well, at least some of us probably are.",
@@ -82,13 +84,14 @@ public class AutoPingCron {
             " You ever read Malazan? You should check it out, since, you know, you have all this free time from not playing async.",
             " When people talk about a slow burn, I think they were expecting around 4 pings in between turns, not 40.",
             " ||Can I do spoiler tag pings? Guess you'll never know.||",
-            " They say money can't buy happiness, but I hear that trade goods may buy a war sun, which is basically the same thing.");
+            " They say money can't buy happiness, but I hear that trade goods can buy a war sun, which is basically the same thing.");
 
     public static void register() {
         CronManager.schedulePeriodically(AutoPingCron.class, AutoPingCron::autoPingGames, 5, 10, TimeUnit.MINUTES);
     }
 
     private static void autoPingGames() {
+        if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
         BotLogger.logCron("Running AutoPingCron.");
 
         removeEndedGamesFromAutoPingMetadata();
@@ -172,6 +175,8 @@ public class AutoPingCron {
                 }
             }
         }
+
+        sendReplacementReminder(game, spacer, pingNumber);
     }
 
     private static boolean hoursHavePassed(long milliSinceLastPing, int numberOfHours) {
@@ -191,7 +196,7 @@ public class AutoPingCron {
             return;
         }
         String realIdentity = player.getRepresentationUnfogged();
-        String pingMessage = getPingMessage(realIdentity, milliSinceLastPing, pingNumber, quickPing);
+        String pingMessage = getPingMessage(game, realIdentity, milliSinceLastPing, pingNumber, quickPing);
         if (game.isFowMode()) {
             MessageHelper.sendPrivateMessageToPlayer(player, game, pingMessage);
             MessageHelper.sendMessageToChannel(
@@ -209,19 +214,31 @@ public class AutoPingCron {
             buttons.add(Buttons.gray("deleteButtons", "Delete These Buttons"));
             MessageHelper.sendMessageToChannelWithButtons(
                     gameChannel,
-                    realIdentity + ", if the game is not waiting on you, you may disable the"
+                    player.getRepresentationNoPing() + ", if the game is not waiting on you, you may disable the"
                             + " auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
                     buttons);
         }
     }
 
     private static String getPingMessage(
-            String playerPing, long milliSinceLastPing, int pingNumber, boolean quickPing) {
+            Game game, String playerPing, long milliSinceLastPing, int pingNumber, boolean quickPing) {
         if (quickPing && tenMinutesHavePassed(milliSinceLastPing)) {
             return playerPing
                     + " this is a quick nudge in case you forgot to end turn. Please forgive the impertinence.";
         }
-        return getPingMessage(playerPing, pingNumber);
+        return getPingMessage(game, playerPing, pingNumber);
+    }
+
+    private static void sendReplacementReminder(Game game, int hoursBetweenPings, int pingNumber) {
+        long hoursPassed = (long) hoursBetweenPings * pingNumber;
+        boolean shouldSendReminder = hoursPassed >= REPLACEMENT_REMINDER_AFTER_HOURS
+                && ((long) hoursBetweenPings * (pingNumber - 1)) < REPLACEMENT_REMINDER_AFTER_HOURS;
+        if (!shouldSendReminder) return;
+        MessageHelper.sendMessageToChannel(
+                game.getMainGameChannel(),
+                game.getPing() + ", has your game unexpectedly stalled? If you'd like to start the replacement process,"
+                        + " ping `@Bothelper`. If the remaining players agree to abandon the game, please run the `/game end` command."
+                        + " Note that this will not increase your completed game count.");
     }
 
     private static void agendaPhasePing(Game game, long milliSinceLastPing) {
@@ -271,15 +288,11 @@ public class AutoPingCron {
 
     private static void statusHomeworkPing(Game game, long milliSinceLastPing) {
         if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS / 2 * game.getAutoPingSpacer())) {
+
             StringBuilder msg = new StringBuilder();
             for (Player player : game.getRealPlayers()) {
-                if (!game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
-                    if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannel(
-                                player.getCorrectChannel(),
-                                player.getRepresentationUnfogged()
-                                        + ", please draw action cards and allocate command tokens.");
-                    }
+                if (game.getStoredValue("statusHomeworkReactionFor" + player.getFaction() + "Round" + game.getRound())
+                        .isEmpty()) {
                     msg.append(player.getRepresentation()).append(", ");
                 } else if (game.isFowMode()
                         && game.getStoredValue("fowStatusDone") != null
@@ -289,10 +302,13 @@ public class AutoPingCron {
                             player.getRepresentationUnfogged() + ", please click \"Ready for "
                                     + (game.isCustodiansScored() ? "Agenda" : "Strategy") + " Phase\".");
                 }
+                if (game.isFowMode() && !game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(), player.getRepresentationUnfogged() + ", please draw ACs.");
+                }
             }
             if (!game.isFowMode() && !msg.isEmpty()) {
-                MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(), msg + "please draw action cards and allocate command tokens.\n");
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), msg + "please allocate command tokens.\n");
             }
             AutoPingMetadataManager.addPing(game.getName());
         }
@@ -312,7 +328,7 @@ public class AutoPingCron {
         return pingIntervalInHours;
     }
 
-    private static String getPingMessage(String realIdentity, int pingNumber) {
+    private static String getPingMessage(Game game, String realIdentity, int pingNumber) {
         if (pingNumber > PING_MESSAGES.size()) {
             return realIdentity + ", rumors of the bot running out of stamina are greatly exaggerated."
                     + " The bot will win this stare-down, it is simply a matter of time.";
@@ -330,18 +346,27 @@ public class AutoPingCron {
 
             if (!game.getStoredValue("queuedWhens").contains(p2.getFaction())
                     && !game.getStoredValue("declinedWhens").contains(p2.getFaction())) {
+                List<Button> buttons = new ArrayList<>();
+
+                buttons.add(Buttons.gray("queueAWhen", "Play A \"When\""));
+                buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"When\"s"));
                 MessageHelper.sendMessageToChannel(
                         p2.getCardsInfoThread(),
-                        p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"when\"s.");
+                        p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"when\"s.",
+                        buttons);
                 continue;
             }
             if (!game.getStoredValue("queuedAfters").contains(p2.getFaction())
                     && !game.getStoredValue("declinedAfters").contains(p2.getFaction())
                     && !game.getStoredValue("queuedWhens").contains(p2.getFaction())) {
+                List<Button> buttons = new ArrayList<>();
+
+                buttons.add(Buttons.gray("queueAnAfter", "Play An \"After\""));
+                buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
                 MessageHelper.sendMessageToChannel(
                         p2.getCardsInfoThread(),
-                        p2.getRepresentation(true, true)
-                                + ", this is a reminder to play (or pass on) your \"after\"s.");
+                        p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"after\"s.",
+                        buttons);
             }
             if (game.isHiddenAgendaMode() || game.isOmegaPhaseMode()) {
                 if (AgendaHelper.getPlayersWhoNeedToPreVoted(game).contains(p2)) {

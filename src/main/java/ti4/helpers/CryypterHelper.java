@@ -12,17 +12,19 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import org.apache.commons.lang3.math.NumberUtils;
-import ti4.buttons.Buttons;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Space;
+import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.Game;
-import ti4.map.Leader;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Space;
-import ti4.map.Tile;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
@@ -37,7 +39,7 @@ import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.unit.CheckUnitContainmentService;
 
-public class CryypterHelper {
+public final class CryypterHelper {
     // Revised Politics SC
     public static List<Button> getCryypterSC3Buttons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
@@ -52,36 +54,8 @@ public class CryypterHelper {
     }
 
     private static void drawXPickYActionCards(Game game, Player player, int draw, boolean addScheming) {
-        if (draw > 10) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    "You probably shouldn't need to ever draw more than 10 cards, double check what you're doing please.");
-            return;
-        }
-        String message = player.getRepresentation() + " drew " + draw + " action card" + (draw == 1 ? "" : "s") + ".";
-        if (addScheming && player.hasAbility("scheming")) {
-            draw++;
-            message = player.getRepresentation() + " drew " + draw + " action card" + (draw == 1 ? "" : "s")
-                    + " (**Scheming** increases this from the normal " + (draw - 1) + " action card"
-                    + (draw == 2 ? "" : "s") + ").";
-        }
-
-        for (int i = 0; i < draw; i++) {
-            game.drawActionCard(player.getUserID());
-        }
-        ActionCardHelper.sendActionCardInfo(game, player);
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + " use buttons to discard 1 of the " + draw + " cards just drawn.",
-                ActionCardHelper.getDiscardActionCardButtons(player, false));
-
-        ButtonHelper.checkACLimit(game, player);
-        if (addScheming && player.hasAbility("scheming")) ActionCardHelper.sendDiscardActionCardButtons(player, false);
-        if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
-            CommanderUnlockCheckService.checkPlayer(player, "yssaril");
-        }
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        ActionCardHelper.drawActionCards(player, draw);
+        ActionCardHelper.sendACDiscardButtons(player);
     }
 
     // VotC Setup
@@ -99,10 +73,6 @@ public class CryypterHelper {
 
     // Envoys
     public static void checkEnvoyUnlocks(Game game) {
-        // if (!game.isVotcMode())
-        // {
-        //    return;
-        // }
         for (Player player : game.getRealPlayers()) {
             Leader envoy = player.getLeaderByType("envoy").orElse(null);
             if (envoy != null && envoy.isLocked()) {
@@ -168,8 +138,7 @@ public class CryypterHelper {
                         msg = voter.getRepresentation(false, true)
                                 + " has the option to give 1 promissory note or 2 trade goods to ignore the effect of Mentak Envoy.";
                         List<Button> conclusionButtons = new ArrayList<>();
-                        String buttonID =
-                                voter.getFinsFactionCheckerPrefix() + "resolveMentakEnvoy_" + p2.getFaction() + "_";
+                        String buttonID = voter.factionButtonChecker() + "resolveMentakEnvoy_" + p2.getFaction() + "_";
                         Button accept = Buttons.blue(buttonID + "accept", "Vote For Chosen Outcome");
                         conclusionButtons.add(accept);
                         if (hasPNs) {
@@ -217,7 +186,7 @@ public class CryypterHelper {
                     event.getChannel(),
                     player.getRepresentation() + " has given 2 trade goods and may vote in any manner that they wish.");
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void checkForAssigningYssarilEnvoy(
@@ -261,16 +230,15 @@ public class CryypterHelper {
                 + " has the option to accept or ignore the effect of the Yssaril Envoy.";
         List<Button> conclusionButtons = new ArrayList<>();
         Button accept = Buttons.blue(
-                targetPlayer.getFinsFactionCheckerPrefix() + "resolveYssarilEnvoy_accept_" + acID,
+                targetPlayer.factionButtonChecker() + "resolveYssarilEnvoy_accept_" + acID,
                 "Copy " + Mapper.getActionCard(acID).getName());
         conclusionButtons.add(accept);
 
-        Button decline =
-                Buttons.red(targetPlayer.getFinsFactionCheckerPrefix() + "resolveYssarilEnvoy_decline", "Decline");
+        Button decline = Buttons.red(targetPlayer.factionButtonChecker() + "resolveYssarilEnvoy_decline", "Decline");
         conclusionButtons.add(decline);
 
         MessageHelper.sendMessageToChannelWithButtons(targetPlayer.getCorrectChannel(), msg, conclusionButtons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("resolveYssarilEnvoy_")
@@ -289,7 +257,7 @@ public class CryypterHelper {
                     event, game, player, buttonID.replace("resolveYssarilEnvoy_" + choice + "_", ""), -1, null);
         }
 
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static void envoyExhaustCheck(Game game, Player player, String envoyID) {
@@ -332,7 +300,7 @@ public class CryypterHelper {
                         leaderModel.getName() + " (" + factionModel.getShortName() + " " + leaderModel.getType() + ")";
                 if (play) {
                     buttons.add(Buttons.gray(
-                            player.getFinsFactionCheckerPrefix() + "play_after_" + buttonID,
+                            player.factionButtonChecker() + "play_after_" + buttonID,
                             "Play " + buttonLabel,
                             factionModel.getFactionEmoji()));
                 } else {
@@ -350,7 +318,7 @@ public class CryypterHelper {
     }
 
     public static void handleWinningRiders(Game game, String winningOutcome) {
-        // AgendaHelper.placeRider()
+        // AgendaRiderHelper.placeRider()
         // format of stored votes and outcomes (identifier can be either color or name): [faction
         // identifier]_[number];[faction identifier]_[rider name]
         if (game.isVotcMode()) {
@@ -418,7 +386,7 @@ public class CryypterHelper {
                         if (entry.getValue() > 1
                                 && planet.getTokenList().stream().noneMatch(token -> token.contains("dmz"))) {
                             Button button = Buttons.green(
-                                    envoyPlayer.getFinsFactionCheckerPrefix() + "placeOneNDone_skipbuild_infantry_"
+                                    envoyPlayer.factionButtonChecker() + "placeOneNDone_skipbuild_infantry_"
                                             + planet.getName(),
                                     Helper.getPlanetRepresentation(planet.getName(), game));
 
@@ -503,7 +471,7 @@ public class CryypterHelper {
 
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green(
-                            envoyPlayer.getFinsFactionCheckerPrefix() + "relic_look_top", "Look at top of Relic Deck"));
+                            envoyPlayer.factionButtonChecker() + "relic_look_top", "Look at top of Relic Deck"));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
 
@@ -588,33 +556,37 @@ public class CryypterHelper {
                                 message2.append(" " + ExploreEmojis.HFrag);
                             case "irf1", "irf2", "irf3", "irf4", "irf5" -> message2.append(" " + ExploreEmojis.IFrag);
                             case "urf1", "urf2", "urf3" -> message2.append(" " + ExploreEmojis.UFrag);
-                            default -> message2.append(" ").append(fragid);
+                            default -> message2.append(' ').append(fragid);
                         }
                     }
                     CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
                     message2.append(" relic fragments.");
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2.toString());
                 } else {
-                    String finChecker = player.getFinsFactionCheckerPrefix();
+                    String factionChecker = player.factionButtonChecker();
                     List<Button> purgeFragButtons = new ArrayList<>();
                     if (player.getCrf() > 0) {
-                        Button transact = Buttons.blue(finChecker + "purge_Frags_CRF_1", "Purge 1 Cultural Fragment");
+                        Button transact =
+                                Buttons.blue(factionChecker + "purge_Frags_CRF_1", "Purge 1 Cultural Fragment");
                         purgeFragButtons.add(transact);
                     }
                     if (player.getIrf() > 0) {
                         Button transact =
-                                Buttons.green(finChecker + "purge_Frags_IRF_1", "Purge 1 Industrial Fragment");
+                                Buttons.green(factionChecker + "purge_Frags_IRF_1", "Purge 1 Industrial Fragment");
                         purgeFragButtons.add(transact);
                     }
                     if (player.getHrf() > 0) {
-                        Button transact = Buttons.red(finChecker + "purge_Frags_HRF_1", "Purge 1 Hazardous Fragment");
+                        Button transact =
+                                Buttons.red(factionChecker + "purge_Frags_HRF_1", "Purge 1 Hazardous Fragment");
                         purgeFragButtons.add(transact);
                     }
                     if (player.getUrf() > 0) {
-                        Button transact = Buttons.gray(finChecker + "purge_Frags_URF_1", "Purge 1 Frontier Fragment");
+                        Button transact =
+                                Buttons.gray(factionChecker + "purge_Frags_URF_1", "Purge 1 Frontier Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    Button transact2 = Buttons.red(finChecker + "drawRelicFromFrag", "Finish Purging and Draw Relic");
+                    Button transact2 =
+                            Buttons.red(factionChecker + "drawRelicFromFrag", "Finish Purging and Draw Relic");
                     purgeFragButtons.add(transact2);
 
                     MessageHelper.sendMessageToChannelWithButtons(
@@ -625,7 +597,7 @@ public class CryypterHelper {
                 break;
             case "Bottom":
                 ButtonHelperCommanders.uydaiCommanderBottom(
-                        player, game, player.getFinsFactionCheckerPrefix() + "uydaiCommanderBottom_relic", event);
+                        player, game, player.factionButtonChecker() + "uydaiCommanderBottom_relic", event);
                 break;
             default:
                 break;
@@ -657,7 +629,7 @@ public class CryypterHelper {
         buttons.add(Buttons.blue("handleCreussEnvoy_" + tilePos + "_gamma", "Gamma", MiscEmojis.CreussGamma));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), player.getRepresentationUnfogged() + message, buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("handleCreussEnvoy_")
@@ -677,7 +649,7 @@ public class CryypterHelper {
         }
         msg += ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static String handleCovert(String target) {
@@ -728,8 +700,4 @@ public class CryypterHelper {
     }
 
     // AgendaHelper.getWinningRiders(), currently line 1832
-    // public static void handleVotCRiders()
-    // {
-    //
-    // }
 }

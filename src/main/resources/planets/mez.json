@@ -1,1 +1,42 @@
-{"id":"mez","tileId":"93","name":"Mez Lo Orz Fei Zsha","shortName":"Mez Lo","shrinkNamePNAttach":true,"aliases":["mezloorzfeizsha","mez","lo","orz","fei","zsha","mez","lo","orz","fei","mez","lo","orz","mez","lo","mez","mezlo","mezloorz"],"resources":2,"influence":1,"factionHomeworld":"ralnel","planetTypes":["FACTION"],"planetLayout":{"unitHolderName":"mez","resourcesLocation":"TopLeft","centerPosition":{"x":135.0,"y":85.0}},"source":"thunders_edge"}
+{
+    "id": "mez",
+    "tileId": "93",
+    "name": "Mez Lo Orz Fei Zsha",
+    "shortName": "Mez Lo",
+    "shrinkNamePNAttach": true,
+    "aliases": [
+        "mezloorzfeizsha",
+        "mez",
+        "lo",
+        "orz",
+        "fei",
+        "zsha",
+        "mez",
+        "lo",
+        "orz",
+        "fei",
+        "mez",
+        "lo",
+        "orz",
+        "mez",
+        "lo",
+        "mez",
+        "mezlo",
+        "mezloorz"
+    ],
+    "resources": 2,
+    "influence": 1,
+    "factionHomeworld": "ralnel",
+    "planetTypes": [
+        "FACTION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "mez",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 134,
+            "y": 85
+        }
+    },
+    "source": "thunders_edge"
+}

@@ -1,0 +1,37 @@
+[
+    {
+        "alias": "mutated_enervate",
+        "name": "Mutated Enervate",
+        "text": "This plot card has no effect.",
+        "cardType": "plot",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "mutated_siphon",
+        "name": "Mutated Siphon",
+        "text": "This plot card has no effect.",
+        "cardType": "plot",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "mutated_seethe",
+        "name": "Mutated Seethe",
+        "text": "This plot card has no effect.",
+        "cardType": "plot",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "mutated_assail",
+        "name": "Mutated Assail",
+        "text": "This plot card has no effect.",
+        "cardType": "plot",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "mutated_extract",
+        "name": "Mutated Extract",
+        "text": "This plot card has no effect.",
+        "cardType": "plot",
+        "source": "thunders_edge"
+    }
+]

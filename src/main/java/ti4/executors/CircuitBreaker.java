@@ -2,31 +2,42 @@ package ti4.executors;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.cron.CronManager;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 
+@UtilityClass
 public class CircuitBreaker {
 
-    private static final int CIRCUIT_BREAK_THRESHOLD = 10;
-    private static final int MINUTES_TO_WAIT_BEFORE_CLOSING = 5;
+    private static final int CIRCUIT_BREAK_THRESHOLD = 15;
+    private static final int MINUTES_TO_WAIT_BEFORE_CLOSING = 3;
     private static final int MINUTES_TO_WAIT_BEFORE_RESETTING_THRESHOLD = 1;
 
     private static int thresholdCount;
+    private static final Set<String> openReasons = new HashSet<>();
 
     @Getter
     private static boolean open;
 
     private static LocalDateTime closeDateTime;
 
-    static synchronized boolean incrementThresholdCount() {
+    public static synchronized boolean incrementThresholdCount(String reason) {
         if (open) {
             return false;
         }
+        if (openReasons.contains(reason)) {
+            return false;
+        }
         thresholdCount++;
+        if (reason != null && !reason.isBlank()) {
+            openReasons.add(reason);
+        }
         if (thresholdCount == 1) {
             CronManager.scheduleOnce(
                     CircuitBreaker.class,
@@ -41,7 +52,9 @@ public class CircuitBreaker {
             closeDateTime = LocalDateTime.now().plusMinutes(MINUTES_TO_WAIT_BEFORE_CLOSING);
             BotLogger.error(
                     "Excess errors or timeouts have caused the circuit breaker to open. The bot will not accept commands for "
-                            + MINUTES_TO_WAIT_BEFORE_CLOSING + " minutes.");
+                            + MINUTES_TO_WAIT_BEFORE_CLOSING + " minutes."
+                            + formatOpenReasons());
+            openReasons.clear();
         }
         return true;
     }
@@ -49,6 +62,7 @@ public class CircuitBreaker {
     public static synchronized void openForSeconds(long seconds) {
         open = true;
         thresholdCount = 0;
+        openReasons.clear();
         closeDateTime = LocalDateTime.now().plusSeconds(seconds);
         CronManager.scheduleOnce(CircuitBreaker.class, CircuitBreaker::reset, seconds, TimeUnit.SECONDS);
         BotLogger.info("Circuit breaker manually opened for " + seconds + " seconds.");
@@ -57,10 +71,12 @@ public class CircuitBreaker {
     private static synchronized void reset() {
         thresholdCount = 0;
         open = false;
+        openReasons.clear();
     }
 
     private static synchronized void resetThreshold() {
         thresholdCount = 0;
+        openReasons.clear();
     }
 
     public static boolean checkIsOpenAndPostWarningIfTrue(MessageChannel messageChannel) {
@@ -79,5 +95,13 @@ public class CircuitBreaker {
         return Duration.between(LocalDateTime.now(), closeDateTime).isNegative()
                 ? Duration.ZERO
                 : Duration.between(LocalDateTime.now(), closeDateTime);
+    }
+
+    private static String formatOpenReasons() {
+        if (openReasons.isEmpty()) {
+            return "";
+        }
+        String formattedReasons = String.join("\n - ", openReasons);
+        return "\nCircuit breaker reasons:\n - " + formattedReasons;
     }
 }

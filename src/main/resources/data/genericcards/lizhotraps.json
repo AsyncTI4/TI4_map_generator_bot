@@ -24,14 +24,16 @@
         "alias": "dshc_4_lizho",
         "cardType": "trap",
         "name": "Gravitic Inhibitor",
-        "text": "While this card is attached, you may reveal this card after a player activates this system, Until the end of this tactical action, that player cannot move more ships than 1 fewer than their fleet supply limit. At the end of this tactical action, return this card to your reinforcements. [Note: transported fighters do not count towards the limit for the purposes of this card]",
+        "text": "While this card is attached, you may reveal this card after a player activates this system, Until the end of this tactical action, that player cannot move more ships than 1 fewer than their fleet supply limit. At the end of this tactical action, return this card to your reinforcements.",
+        "notes": "Transported fighters do not count towards the limit for the purposes of this card.",
         "source": "ds"
     },
     {
         "alias": "dshc_5_lizho",
         "cardType": "trap",
         "name": "Saboteurs",
-        "text": "[Note: no longer allowed/has been revoked] While this card is attached, you may reveal this card any time. Choose 1 non-carrier unit in this system. If it is not damaged and has the SUSTAIN DAMAGE ability, that unit becomes damaged. Otherwise destroy that unit. Then, return this card to your reinforcements.",
+        "text": "While this card is attached, you may reveal this card any time. Choose 1 non-carrier unit in this system. If it is not damaged and has the SUSTAIN DAMAGE ability, that unit becomes damaged. Otherwise destroy that unit. Then, return this card to your reinforcements.",
+        "notes": "Revoked",
         "source": "ds"
     },
     {
