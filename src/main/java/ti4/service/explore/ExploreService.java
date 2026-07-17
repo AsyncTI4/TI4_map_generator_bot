@@ -88,6 +88,7 @@ public class ExploreService {
                     event.getMessageChannel(), "You do not control this planet, thus cannot explore it.");
             return;
         }
+        game.removeStoredValue("revArcanumAgentExploreOptions_" + player.getFaction());
         boolean kolleccbt = drawColor.endsWith("kolleccbt");
         if (kolleccbt) {
             drawColor = drawColor.replace("kolleccbt", "");
