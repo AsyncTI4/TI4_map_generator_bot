@@ -207,23 +207,6 @@ public class VeiledHeartService {
                 buttons);
     }
 
-    private static void sendManipulate(VeiledCardAction action, VeiledCardType type, Player player) {
-        String buttonIdPrefix = "veiled_" + action + "_" + type + "_";
-        List<Button> buttons = new ArrayList<>(getVeiledCards(type, player)
-                .map(card -> type.toButton(buttonIdPrefix + card, getRepresentation(type, card)))
-                .toList());
-        if (buttons.isEmpty()) {
-            return;
-        }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                player.getRepresentation() + " select a veiled "
-                        + type.toString().toLowerCase() + " to "
-                        + action.toString().toLowerCase() + ":",
-                buttons);
-    }
-
     @ButtonHandler("veiled")
     public static void veiledButton(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String[] splitID = buttonID.split("_");
