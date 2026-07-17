@@ -117,6 +117,20 @@ public class VeiledHeartService {
         return getVeiledCards(player).filter(type::matches);
     }
 
+    private static List<String> getVeiledCards(Game game, VeiledCardType type) {
+        List<String> veiledCards = new ArrayList<>();
+        for (Player player : game.getRealPlayers()) {
+            veiledCards.addAll(getVeiledCards(type, player).toList());
+        }
+        return veiledCards;
+    }
+
+    public static int countVeiledCards(Game game, String typeStr) {
+        return VeiledCardType.fromString(typeStr)
+                .map(type -> getVeiledCards(game, type).size())
+                .orElse(0);
+    }
+
     private static Map<VeiledCardType, List<String>> getVeiledCardsByType(Player player) {
         Map<VeiledCardType, List<String>> veiledCardsByType = new HashMap<>();
         for (VeiledCardType cardType : VeiledCardType.values()) {

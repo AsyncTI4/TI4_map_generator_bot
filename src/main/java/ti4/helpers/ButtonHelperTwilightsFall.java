@@ -1309,7 +1309,26 @@ public final class ButtonHelperTwilightsFall {
                 embeds.add(Mapper.getUnit(card).getRepresentationEmbed());
             }
         }
-        String threadName = String.format("These %d cards are left in the %s deck:", cards.size(), type);
+        String message = String.format("These %d cards are left in the %s deck:", cards.size(), type);
+        if (game.isVeiledHeartMode()) {
+            int veiledCount = VeiledHeartService.countVeiledCards(game, type);
+            if (veiledCount > 0) {
+                int deckCount = cards.size() - veiledCount;
+                if (deckCount > 0) {
+                    message = """
+                            There are %d cards left in the %s deck.
+                            However, there are also %d veiled %s cards among players.
+                            So, the %d cards in the deck could be any of these %d cards:""";
+                    message = String.format(message, deckCount, type, veiledCount, type, deckCount, cards.size());
+                } else {
+                    message = String.format(
+                            "The %s deck is empty. These are the %d veiled %s cards among players:",
+                            type, veiledCount, type);
+                }
+            }
+        }
+        String threadName = "Remaining cards of type: " + type;
+        MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);
         MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, embeds);
     }
 
