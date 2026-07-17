@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
@@ -33,6 +35,30 @@ import ti4.service.rules.ThundersEdgeRulesService;
 
 @UtilityClass
 public class MiltyService {
+    private static final int AGE_OF_EXPLORATION_RED_ROLL_MAX = 4;
+    private static final int TRUE_RANDOM_GALAXY_MAX_ATTEMPTS = 200;
+
+    private record RandomGalacticEvent(String alias, String name, Consumer<Game> enable) {}
+
+    private static final List<RandomGalacticEvent> RANDOM_GALACTIC_EVENTS = List.of(
+            new RandomGalacticEvent("age_commerce", "Age of Commerce", game -> game.setAgeOfCommerceMode(true)),
+            new RandomGalacticEvent("call_of_the_void", "Call of the Void", game -> game.setCallOfTheVoidMode(true)),
+            new RandomGalacticEvent("hidden_agenda", "Hidden Agenda", game -> game.setHiddenAgendaMode(true)),
+            new RandomGalacticEvent(
+                    "age_exploration", "Age of Exploration", game -> game.setAgeOfExplorationMode(true)),
+            new RandomGalacticEvent(
+                    "civilized_society", "Civilized Society", game -> game.setCivilizedSocietyMode(true)),
+            new RandomGalacticEvent("total_war", "Total War", game -> game.setTotalWarMode(true)),
+            new RandomGalacticEvent("wild_wild_galaxy", "Wild, Wild Galaxy", game -> game.setWildWildGalaxyMode(true)),
+            new RandomGalacticEvent("weird_wormholes", "Weird Wormholes", game -> game.setWeirdWormholesMode(true)),
+            new RandomGalacticEvent(
+                    "cosmic_phenomenae", "Cosmic Phenomenae", game -> game.setCosmicPhenomenaeMode(true)),
+            new RandomGalacticEvent(
+                    "zealous_orthodoxy", "Zealous Orthodoxy", game -> game.setZealousOrthodoxyMode(true)),
+            new RandomGalacticEvent(
+                    "advent_war_sun", "Advent of the War Sun", game -> game.setAdventOfTheWarsunMode(true)),
+            new RandomGalacticEvent(
+                    "cowabunga", "Conventions of War Abandoned", game -> game.setConventionsOfWarAbandonedMode(true)));
 
     public static void offerKeleresSetupButtons(MiltyDraftManager manager, Player player) {
         List<String> flavors = List.of("mentak", "xxcha", "argent");
@@ -91,10 +117,19 @@ public class MiltyService {
         specs.setNumFactions(playerCount);
         specs.setPlayerDraftOrder(null);
 
-        return randomSetupFromSpecs(event, specs);
+        return randomSetupFromSpecs(
+                event,
+                specs,
+                settings.getRandomGalacticEvents().getVal(),
+                settings.getTrueRandomGalaxy().isVal());
     }
 
     public static String randomSetupFromSpecs(GenericInteractionCreateEvent event, MiltyDraftSpec specs) {
+        return randomSetupFromSpecs(event, specs, 0, false);
+    }
+
+    private static String randomSetupFromSpecs(
+            GenericInteractionCreateEvent event, MiltyDraftSpec specs, int randomEventCount, boolean trueRandomGalaxy) {
         Game game = specs.game;
 
         if (specs.presetSlices != null && specs.presetSlices.size() < specs.playerIDs.size()) {
@@ -140,20 +175,33 @@ public class MiltyService {
 
         int redTiles = draftManager.getRed().size();
         int blueTiles = draftManager.getBlue().size();
-        int maxSlices = Math.min(redTiles / 2, blueTiles / 3);
-        if (specs.numSlices > maxSlices) {
-            String msg = "Random setup in this bot does not support " + specs.numSlices
-                    + " slices. You can enable DS to allow building additional slices";
-            msg += "\n> The options you have selected enable a maximum of `" + maxSlices + "` slices. [" + blueTiles
-                    + "blue/" + redTiles + "red]";
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-            return "Could not start random setup, fix the error and try again";
+        if (trueRandomGalaxy) {
+            int neededTiles = specs.numSlices * (specs.template.bluePerPlayer() + specs.template.redPerPlayer());
+            if (redTiles + blueTiles < neededTiles) {
+                String msg = "True random galaxy setup needs **" + neededTiles + "** tiles, but only **"
+                        + (redTiles + blueTiles) + "** are available with the selected sources.";
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+                return "Could not start random setup, fix the error and try again";
+            }
+        } else {
+            int maxSlices = Math.min(redTiles / 2, blueTiles / 3);
+            if (specs.numSlices > maxSlices) {
+                String msg = "Random setup in this bot does not support " + specs.numSlices
+                        + " slices. You can enable DS to allow building additional slices";
+                msg += "\n> The options you have selected enable a maximum of `" + maxSlices + "` slices. [" + blueTiles
+                        + "blue/" + redTiles + "red]";
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+                return "Could not start random setup, fix the error and try again";
+            }
         }
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 "## Generating random setup\n - Also clearing out any tiles that may have already been on the map "
-                        + "so setup can fill in tiles properly.");
+                        + "so setup can fill in tiles properly."
+                        + (trueRandomGalaxy
+                                ? "\n - True Random Galaxy is enabled, so tile slots will roll red/blue independently."
+                                : ""));
         game.clearTileMap();
         try {
             MiltyDraftHelper.buildPartialMap(game, event);
@@ -166,7 +214,9 @@ public class MiltyService {
         }
 
         boolean slicesCreated = true;
-        if (specs.presetSlices != null) {
+        if (trueRandomGalaxy) {
+            slicesCreated = generateTrueRandomGalaxySlices(draftManager, specs);
+        } else if (specs.presetSlices != null) {
             specs.presetSlices.forEach(draftManager::addSlice);
         } else {
             slicesCreated = GenerateSlicesService.generateSlices(event, draftManager, specs);
@@ -181,8 +231,122 @@ public class MiltyService {
                 event.getMessageChannel(),
                 game.getPing() + " random setup generated. Applying factions, speaker order, and map now.");
         FinishDraftService.finishDraft(event, draftManager, game);
+        applyRandomGalacticEvents(event, game, randomEventCount);
         game.updateActivePlayer(null);
         return null;
+    }
+
+    private static boolean generateTrueRandomGalaxySlices(MiltyDraftManager draftManager, MiltyDraftSpec specs) {
+        for (int attempt = 0; attempt < TRUE_RANDOM_GALAXY_MAX_ATTEMPTS; attempt++) {
+            List<MiltyDraftTile> blue = new ArrayList<>(draftManager.getBlue());
+            List<MiltyDraftTile> red = new ArrayList<>(draftManager.getRed());
+            Collections.shuffle(blue);
+            Collections.shuffle(red);
+            draftManager.clearSlices();
+
+            boolean success = true;
+            for (int sliceIndex = 0; sliceIndex < specs.numSlices; sliceIndex++) {
+                MiltyDraftSlice slice = new MiltyDraftSlice();
+                slice.setName(Character.toString('A' + sliceIndex));
+                List<MiltyDraftTile> tiles = new ArrayList<>();
+                int tilesInSlice = specs.template.bluePerPlayer() + specs.template.redPerPlayer();
+                for (int tileIndex = 0; tileIndex < tilesInSlice; tileIndex++) {
+                    MiltyDraftTile tile = drawAgeOfExplorationTile(blue, red);
+                    if (tile == null) {
+                        success = false;
+                        break;
+                    }
+                    tiles.add(tile);
+                }
+                if (!success) {
+                    break;
+                }
+                slice.setTiles(tiles);
+                if (!trueRandomSliceIsValid(specs, slice)) {
+                    success = false;
+                    break;
+                }
+                draftManager.addSlice(slice);
+            }
+            if (success && draftManager.getSlices().size() == specs.numSlices) {
+                return true;
+            }
+        }
+        draftManager.clearSlices();
+        return false;
+    }
+
+    private static MiltyDraftTile drawAgeOfExplorationTile(List<MiltyDraftTile> blue, List<MiltyDraftTile> red) {
+        boolean rollRed = ThreadLocalRandom.current().nextInt(1, 11) <= AGE_OF_EXPLORATION_RED_ROLL_MAX;
+        List<MiltyDraftTile> preferred = rollRed ? red : blue;
+        List<MiltyDraftTile> fallback = rollRed ? blue : red;
+        if (!preferred.isEmpty()) {
+            return preferred.removeLast();
+        }
+        if (!fallback.isEmpty()) {
+            return fallback.removeLast();
+        }
+        return null;
+    }
+
+    private static boolean trueRandomSliceIsValid(MiltyDraftSpec specs, MiltyDraftSlice slice) {
+        if (specs.anomaliesCanTouch) {
+            return true;
+        }
+
+        List<List<Boolean>> adjMatrix = getAdjMatrix(specs.template);
+        List<Integer> anomalyIndexes = new ArrayList<>();
+        for (int i = 0; i < slice.getTiles().size(); i++) {
+            if (slice.getTiles().get(i).getTierList() == TierList.anomaly) {
+                anomalyIndexes.add(i + 1);
+            }
+        }
+        for (int x : anomalyIndexes) {
+            for (int y : anomalyIndexes) {
+                if (x != y
+                        && x < adjMatrix.size()
+                        && y < adjMatrix.get(x).size()
+                        && adjMatrix.get(x).get(y)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static List<List<Boolean>> getAdjMatrix(ti4.model.MapTemplateModel template) {
+        List<List<Boolean>> adjMatrix = new ArrayList<>();
+        List<String> tilePositions = template.emulatedTiles();
+        for (String pos1 : tilePositions) {
+            List<Boolean> row = new ArrayList<>();
+            List<String> adj = PositionMapper.getAdjacentTilePositions(pos1);
+            for (String pos2 : tilePositions) {
+                row.add(adj.contains(pos2));
+            }
+            adjMatrix.add(row);
+        }
+        return adjMatrix;
+    }
+
+    private static void applyRandomGalacticEvents(
+            GenericInteractionCreateEvent event, Game game, int randomEventCount) {
+        if (randomEventCount <= 0) {
+            return;
+        }
+
+        List<RandomGalacticEvent> events = new ArrayList<>(RANDOM_GALACTIC_EVENTS);
+        Collections.shuffle(events);
+        List<RandomGalacticEvent> selected =
+                events.stream().limit(Math.min(randomEventCount, events.size())).toList();
+        for (RandomGalacticEvent selectedEvent : selected) {
+            selectedEvent.enable().accept(game);
+        }
+
+        String appliedEvents = selected.stream().map(RandomGalacticEvent::name).collect(Collectors.joining(", "));
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                "## Random Galactic Events Applied\n" + appliedEvents
+                        + "\n-# Events that require substantial manual setup are excluded from this random pool.");
     }
 
     private static void assignRandomPicks(MiltyDraftManager draftManager, MiltyDraftSpec specs) {
