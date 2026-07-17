@@ -47,6 +47,9 @@ public class BombardmentService {
             int galvanizedCount = entry.getKey()
                     .getValue()
                     .getGalvanizedUnitCount(entry.getKey().getKey().getUnitType(), player.getColorID());
+            if (entry.getKey().getValue().getName().equalsIgnoreCase(planet)) {
+                continue;
+            }
             for (int x = 0; x < entry.getValue(); x++) {
                 String asyncId = entry.getKey().getKey().getAsyncId();
                 assignments.add(new BombardmentAssignment(
