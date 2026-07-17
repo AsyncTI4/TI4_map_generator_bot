@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
@@ -171,6 +172,14 @@ public class VeiledHeartService {
         };
     }
 
+    private static MessageEmbed getRepresentationEmbed(VeiledCardType type, String card) {
+        return switch (type) {
+            case ABILITY -> Mapper.getTech(card).getRepresentationEmbed();
+            case UNIT -> Mapper.getUnit(card).getRepresentationEmbed();
+            case GENOME, PARADIGM -> Mapper.getLeader(card).getRepresentationEmbed(false, true, false, false, true);
+        };
+    }
+
     public static void sendVeiledButtons(VeiledCardAction action, Player player) {
         for (VeiledCardType type : VeiledCardType.values()) {
             sendVeiledButtons(action, type, player);
@@ -182,6 +191,23 @@ public class VeiledHeartService {
     }
 
     private static void sendVeiledButtons(VeiledCardAction action, VeiledCardType type, Player player) {
+        String buttonIdPrefix = "veiled_" + action + "_" + type + "_";
+        List<Button> buttons = new ArrayList<>(getVeiledCards(type, player)
+                .map(card -> type.toButton(buttonIdPrefix + card, getRepresentation(type, card)))
+                .toList());
+        if (buttons.isEmpty()) {
+            return;
+        }
+        buttons.add(Buttons.red("deleteButtons", "Done"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentation() + " select a veiled "
+                        + type.toString().toLowerCase() + " to "
+                        + action.toString().toLowerCase() + ":",
+                buttons);
+    }
+
+    private static void sendManipulate(VeiledCardAction action, VeiledCardType type, Player player) {
         String buttonIdPrefix = "veiled_" + action + "_" + type + "_";
         List<Button> buttons = new ArrayList<>(getVeiledCards(type, player)
                 .map(card -> type.toButton(buttonIdPrefix + card, getRepresentation(type, card)))
@@ -230,6 +256,12 @@ public class VeiledHeartService {
     public static void doAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
         String msg;
         switch (action) {
+            case SPLICE -> {
+                setStoredValue(player, getStoredValue(player) + card + "_");
+                msg = player.getRepresentation() + " has spliced a veiled "
+                        + type.toString().toLowerCase()
+                        + ". They may put it into play with a button in their `#cards-info` thread.";
+            }
             case DRAW -> {
                 setStoredValue(player, getStoredValue(player) + card + "_");
                 msg = player.getRepresentation() + " has secretly drawn a veiled "
@@ -261,6 +293,27 @@ public class VeiledHeartService {
                 activePlayer.getRepresentation() + " made " + targetPlayer.getRepresentation() + " "
                         + action.toString().toLowerCase() + " a veiled "
                         + type.toString().toLowerCase() + "!");
+    }
+
+    public static void doManipulate(String typeStr, Player activePlayer, String card, Player targetPlayer) {
+        VeiledCardType.fromString(typeStr).ifPresent(type -> {
+            setStoredValue(targetPlayer, getStoredValue(targetPlayer) + card + "_");
+
+            String msgPublic = String.format(
+                    "%s has been forced to splice a veiled %s. They may put it into play with a button in their `#cards-info` thread.",
+                    targetPlayer.getRepresentation(), type.toString().toLowerCase());
+            String msgForActivePlayer = String.format(
+                    "You have forced %s to splice the veiled %s _'%s'_.",
+                    targetPlayer.getRepresentation(), type.toString().toLowerCase(), getRepresentation(type, card));
+            String msgForTargetPlayer = String.format(
+                    "%s has forced you to splice the veiled %s _'%s'_:",
+                    activePlayer.getRepresentation(), type.toString().toLowerCase(), getRepresentation(type, card));
+
+            MessageHelper.sendMessageToChannel(activePlayer.getCorrectChannel(), msgPublic);
+            MessageHelper.sendMessageToChannel(activePlayer.getCardsInfoThread(), msgForActivePlayer);
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    targetPlayer.getCardsInfoThread(), msgForTargetPlayer, getRepresentationEmbed(type, card));
+        });
     }
 
     public static int veiledField(Graphics graphics, int x, int y, VeiledCardType type, int deltaX, Player player) {
