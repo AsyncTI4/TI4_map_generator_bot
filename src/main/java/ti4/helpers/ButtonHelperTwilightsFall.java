@@ -566,7 +566,10 @@ public final class ButtonHelperTwilightsFall {
     @ButtonHandler("confirmSpliceStart")
     public static void confirmSpliceStart(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
-        sendPlayerSpliceOptions(game, getParticipantsList(game).getFirst());
+        List<Player> participants = getParticipantsList(game);
+        if (!participants.isEmpty()) {
+            sendPlayerSpliceOptions(game, participants.getFirst());
+        }
     }
 
     public static void reverseSpliceOrder(Game game) {
