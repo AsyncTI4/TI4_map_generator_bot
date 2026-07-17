@@ -1412,6 +1412,7 @@ public final class ButtonHelperTwilightsFall {
 
         if (game.isVeiledHeartMode()) {
             VeiledHeartService.sendVeiledButtons(VeiledHeartService.VeiledCardAction.DISCARD, type, player);
+            return;
         }
 
         List<Button> buttons = new ArrayList<>();
