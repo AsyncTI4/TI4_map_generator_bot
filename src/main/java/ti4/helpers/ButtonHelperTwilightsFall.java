@@ -514,33 +514,61 @@ public final class ButtonHelperTwilightsFall {
                             + getSpliceOrderString(participants));
         }
 
-        sendPlayerSpliceOptions(game, startPlayer);
-        for (Player player2 : getParticipantsList(game)) {
-            if (player2 == startPlayer || game.isFowMode() || game.isVeiledHeartMode()) {
-                continue;
+        if (game.isVeiledHeartMode()) {
+            if (playPreSpliceAcs(event, game, participants)) {
+                String message =
+                        "Once all start-of-splice shenanigans (Reverse, Manipulate) have been resolved or canceled, click here to start the splice proper:";
+                Button button = Buttons.green("confirmSpliceStart", "Confirm Splice Start");
+                MessageHelper.sendMessageToChannelWithButton(game.getMainGameChannel(), message, button);
+            } else {
+                sendPlayerSpliceOptions(game, startPlayer);
             }
-            game.setStoredValue(player2.getFaction() + "splicequeue", "");
-            String msg = player2.getRepresentationUnfogged()
-                    + " in order to speed up the splice, you can now offer the bot a ranked list of your desired"
-                    + " splice cards, which it will pick for you when it's your turn to pick. If you do not wish to, that is fine, just decline.";
-            MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), msg);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player2.getCardsInfoThread(),
-                    getQueueSpliceMessage(game, player2),
-                    getQueueSplicePickButtons(game, player2));
+        } else {
+            sendPlayerSpliceOptions(game, startPlayer);
+            for (Player player2 : getParticipantsList(game)) {
+                if (player2 == startPlayer || game.isFowMode()) {
+                    continue;
+                }
+                game.setStoredValue(player2.getFaction() + "splicequeue", "");
+                String msg = player2.getRepresentationUnfogged()
+                        + " in order to speed up the splice, you can now offer the bot a ranked list of your desired"
+                        + " splice cards, which it will pick for you when it's your turn to pick. If you do not wish to, that is fine, just decline.";
+                MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), msg);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player2.getCardsInfoThread(),
+                        getQueueSpliceMessage(game, player2),
+                        getQueueSplicePickButtons(game, player2));
+            }
+            playPreSpliceAcs(event, game, participants);
         }
+    }
+
+    private static boolean playPreSpliceAcs(GenericInteractionCreateEvent event, Game game, List<Player> participants) {
+        boolean wasPlayed = false;
         for (Player player2 : game.getRealPlayers()) {
             if (game.getStoredValue("Reverse Splice") != null
                     && game.getStoredValue("Reverse Splice").contains(player2.getFaction())
                     && player2.getPlayableActionCards().contains("tf-reverse")) {
                 ActionCardHelper.playAC(event, game, player2, "tf-reverse", game.getMainGameChannel());
+                wasPlayed = true;
             }
             if (game.getStoredValue("Manipulate Splice") != null
                     && game.getStoredValue("Manipulate Splice").contains(player2.getFaction())
                     && player2.getPlayableActionCards().contains("tf-manipulate")
                     && !participants.contains(player2)) {
                 ActionCardHelper.playAC(event, game, player2, "tf-manipulate", game.getMainGameChannel());
+                wasPlayed = true;
             }
+        }
+        return wasPlayed;
+    }
+
+    @ButtonHandler("confirmSpliceStart")
+    public static void confirmSpliceStart(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        List<Player> participants = getParticipantsList(game);
+        if (!participants.isEmpty()) {
+            sendPlayerSpliceOptions(game, participants.getFirst());
         }
     }
 
