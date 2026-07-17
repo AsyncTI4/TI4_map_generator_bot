@@ -151,7 +151,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "This unit can only produce dreadnoughts or untis of the same type as those it is transporting."
+     "ability": "This unit can only produce dreadnoughts or untis of the same type as those it is transporting."
   },
   {
     "id": "myrr_dreadnought2",
@@ -324,7 +324,7 @@
     "bombardHitsOn": 4,
     "bombardDieCount": 2,
     "isGroundForce": true,
-    "ability": "When this unit produces a hit you may damage this unit to place infantry with this unit up to the number of hits produced."
+    "ability": "When this unit produces a hit, you may damage this unit to place infantry with this unit up to the number of hits produced."
   },
   {
     "id": "arcanum_flagship",
@@ -342,7 +342,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "At the start of comabt in this system, select 1 color of technology. This unit rolls additional combat dice equal to the number of technologies you own in that color."
+    "ability": "At the start of combat in this system, select 1 technology color. This unit rolls additional combat dice equal to the number of technologies you own of that color."
   },
   {
     "id": "arcanum_mech",
@@ -381,7 +381,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "During your tactical actions this unit rolls extra combat and unit ability dice equal to the number of ground forces it is transporting."
+    "ability": "During your tactical actions, this unit rolls additional combat and unit ability dice equal to the number of ground forces it transported."
   },
   {
     "id": "xytheris_mech",
@@ -456,7 +456,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "If this unit's system contains no planets you may treat this unit's system as adjacent to all non-fracture systems that contain no planets. During movement, this ship may move before or after your other ships."
+    "ability": "If this unit's system contains no planets, you may treat this unit's system as adjacent to all non-fracture systems that contain no planets. During movement, this ship may move before or after your other ships."
   },
   {
     "id": "oblivion_mech",
@@ -471,7 +471,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "DEPLOY: When you purge 1 or more components place 1 mech from your reinforcements on a planet you control."
+    "ability": "DEPLOY: When you purge 1 or more components, place 1 mech from your reinforcements on a planet you control."
   },
   {
     "id": "revenant_flagship",
@@ -504,7 +504,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "DEPLOY: When you exhaust an agent, or unlock/purge a leader, place 1 mech on a planet you control."
+    "ability": "DEPLOY: When you exhaust an agent, unlock a leader, or purge a leader, place 1 mech on a planet you control."
   },
   {
     "id": "thrones_flagship",
@@ -563,7 +563,7 @@
     "bombardHitsOn": 5,
     "bombardDieCount": 2,
     "isShip": true,
-    "ability": "The Aurelion Station token is also a ship that can be produced. While you control this unit gain the Aurelion planet card."
+    "ability": "The Aurelion Station token is also a ship that can be produced. While you control this unit, gain the Aurelion station card."
   },
   {
     "id": "aeterna_flagship",
@@ -608,7 +608,7 @@
     "faction": "aeterna",
     "productionValue": 6,
     "isStructure": true,
-    "ability": "Once per action, if a unit in a system containing or adjacent to this unit is destroyed, gain 1 commodity, or produce 1 unit of the same type in this system if able. Up to 4 fighters in this unit's system do not count against capacity."
+    "ability": "Once per action, if a unit in a system containing or adjacent to this unit is destroyed, gain 1 commodity or produce 1 unit of the same type in this system, if able. Up to 4 fighters in this unit's system do not count against capacity."
   },
   {
     "id": "aeterna_spacedock2",
@@ -621,7 +621,7 @@
     "faction": "aeterna",
     "productionValue": 8,
     "isStructure": true,
-    "ability": "Once per action, if a unit in a system containing or adjacent to this unit is destroyed, gain 1 commodity and produce 1 unit of the same type in this system if able. Up to 8 fighter in this unit's system do not count against capacity."
+    "ability": "Once per action, if a unit in a system containing or adjacent to this unit is destroyed, gain 1 commodity and produce 1 unit of the same type in this system, if able. Up to 8 fighters in this unit's system do not count against capacity."
   },
   {
     "id": "ponthous_flagship",
@@ -654,7 +654,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "When this unit is destroyed during ground combat you may pay 1 resource to place 2 infantry on this unit's planet."
+    "ability": "When this unit is destroyed during ground combat, you may pay 1 resource to place 2 infantry on this unit's planet."
   },
   {
     "id": "ponthous_destroyer",
@@ -693,6 +693,6 @@
     "afbHitsOn": 6,
     "afbDieCount": 3,
     "isShip": true,
-    "ability": "This unit can only transport ground forces. When your opponent's units produce hits with ANTI-FIGHTER BARRAGE in this unit's system cancel 1 of those hits."
+    "ability": "This unit can only transport ground forces. When your opponent's units produce hits with ANTI-FIGHTER BARRAGE in this unit's system, cancel 1 of those hits."
   }
 ]
