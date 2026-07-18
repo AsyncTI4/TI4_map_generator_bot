@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -258,7 +259,16 @@ public final class BreakthroughCommandHelper {
             if ("revenantbt".equalsIgnoreCase(bt.getID())) {
                 RevenantBreakthroughHandler.gainAttachedAgent(game, player);
             }
-
+            if ("xytherisbt".equalsIgnoreCase(bt.getID())) {
+                player.setUnitCap("pd", player.getUnitCap("pd") + 4);
+                MessageHelper.sendMessageToChannel(
+                        game.getActionsChannel(),
+                        player.getRepresentation() + ", your PDS unit cap has been increased to "
+                                + player.getUnitCap("pd"));
+            }
+            if (player.hasBreakthrough("arcanumbt")) {
+                ArcanumBreakthroughHandler.offerArcanumBTFlipOnGain(game, player);
+            }
             if (!FractureService.isFractureInPlay(game) && !game.isNoFractureMode())
                 serveRollFractureButtons(player, btID);
             if ("muaatbt".equals(bt.getAlias())) StellarGenesisService.serveAvernusButtons(game, player);

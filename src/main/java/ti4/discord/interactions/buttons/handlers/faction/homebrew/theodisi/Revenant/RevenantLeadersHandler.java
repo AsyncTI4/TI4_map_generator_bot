@@ -21,6 +21,7 @@ import ti4.helpers.NewStuffHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.service.emoji.ExploreEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.ExhaustLeaderService;
 
@@ -32,7 +33,6 @@ public class RevenantLeadersHandler {
     private static final String REVARCAGENT_EXPLORE_OPTIONS = "revArcanumAgentExploreOptions_";
     private static final String REVARCAGENT_PLANET = "useRevArcanumAgentPlanet_";
     private static final String REVARCAGENT_WINDOW = "revArcanumAgentWindow_";
-    private static final String REVARCAGENT_TRAIT = "useRevArcanumAgentTrait_";
     private static final Set<String> EXPLORATION_TRAITS =
             Set.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL);
     // Revenant of Oblivion
@@ -177,48 +177,26 @@ public class RevenantLeadersHandler {
             return;
         }
 
-        game.setStoredValue(key, planetName);
+        game.removeStoredValue(key);
         List<Button> traitButtons = List.of(
-                Buttons.green(
-                        player.factionButtonChecker() + REVARCAGENT_TRAIT + planetName + "|cultural",
-                        "Explore as Cultural"),
-                Buttons.green(
-                        player.factionButtonChecker() + REVARCAGENT_TRAIT + planetName + "|hazardous",
-                        "Explore as Hazardous"),
-                Buttons.green(
-                        player.factionButtonChecker() + REVARCAGENT_TRAIT + planetName + "|industrial",
-                        "Explore as Industrial"));
+                Buttons.gray(
+                        player.factionButtonChecker() + "movedNExplored_filler_" + planetName + "_cultural",
+                        "Explore as Cultural",
+                        ExploreEmojis.Cultural),
+                Buttons.gray(
+                        player.factionButtonChecker() + "movedNExplored_filler_" + planetName + "_hazardous",
+                        "Explore as Hazardous",
+                        ExploreEmojis.Hazardous),
+                Buttons.gray(
+                        player.factionButtonChecker() + "movedNExplored_filler_" + planetName + "_industrial",
+                        "Explore as Industrial",
+                        ExploreEmojis.Industrial));
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),
                 player.getRepresentation() + ", choose how to explore " + planet.getRepresentation(game)
                         + " with _Runebearer Lothos_.",
                 traitButtons);
         ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(REVARCAGENT_TRAIT)
-    public static void resolveRevArcanumAgentTrait(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] payload = buttonID.substring(REVARCAGENT_TRAIT.length()).split("\\|", 2);
-        if (payload.length != 2
-                || !EXPLORATION_TRAITS.contains(payload[1])
-                || !payload[0].equals(game.getStoredValue(REVARCAGENT_WINDOW + player.getFaction()))) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        String planetName = payload[0];
-        Planet planet = game.getUnitHolderFromPlanet(planetName);
-        if (planet == null || !player.getPlanetsAllianceMode().contains(planetName)) {
-            game.removeStoredValue(REVARCAGENT_WINDOW + player.getFaction());
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        game.removeStoredValue(REVARCAGENT_WINDOW + player.getFaction());
-        ButtonHelper.deleteMessage(event);
-        ExploreService.explorePlanet(
-                event, game.getTileFromPlanet(planetName), planetName, payload[1], player, false, game, 1, false);
     }
 
     // Revenant of Oblivion
