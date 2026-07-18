@@ -525,6 +525,13 @@ public class PlayHeroService {
             case "sanctionhero" -> {
                 boolean singleDock = false;
                 Tile tile = player.getHomeSystemTile();
+                if (tile == null) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(),
+                            player.getRepresentationUnfogged()
+                                    + ", you do not have a home system tile to produce units in. You cannot use this hero");
+                    return;
+                }
                 List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "warfare", "place");
                 int productionValue = Helper.getProductionValue(player, game, tile, singleDock);
 

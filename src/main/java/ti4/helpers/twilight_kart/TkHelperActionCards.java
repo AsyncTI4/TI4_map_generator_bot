@@ -522,6 +522,18 @@ public class TkHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("ordainDiscard_")
+    private static void ordainDiscard(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Player victim = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String tech = buttonID.split("_")[2];
+        victim.removeTech(tech);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " discarded " + victim.getRepresentation() + "'s ability: "
+                        + Mapper.getTech(tech).getName());
+    }
+
     @ButtonHandler("resolveRaze_")
     private static void resolveRaze(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         game.setStoredValue("BlitzFaction", player.getFaction());
