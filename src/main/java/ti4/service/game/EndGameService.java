@@ -42,6 +42,7 @@ import ti4.spring.api.image.GameImageService;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.website.Ti4StatsWebsiteHelper;
 
 @UtilityClass
 public class EndGameService {
@@ -213,6 +214,7 @@ public class EndGameService {
 
         writeChronicle(game, event, publish);
         WinningPathPersistenceService.addGame(game);
+        Ti4StatsWebsiteHelper.sendGameStats(game);
     }
 
     private static void writeChronicle(Game game, GenericInteractionCreateEvent event, boolean publish) {
