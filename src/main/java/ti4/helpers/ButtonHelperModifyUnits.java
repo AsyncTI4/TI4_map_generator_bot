@@ -739,6 +739,7 @@ public final class ButtonHelperModifyUnits {
                 "dreadnought",
                 "flagship",
                 "celagrom",
+                "aurelion",
                 "lady",
                 "warsun"));
         if (spaceCannonOffence) {
@@ -751,6 +752,7 @@ public final class ButtonHelperModifyUnits {
                     "dreadnought",
                     "flagship",
                     "celagrom",
+                    "aurelion",
                     "lady",
                     "warsun"));
             for (Player p2 : game.getRealPlayers()) {
@@ -766,6 +768,7 @@ public final class ButtonHelperModifyUnits {
                             "carrier",
                             "flagship",
                             "celagrom",
+                            "aurelion",
                             "lady",
                             "warsun",
                             "fighter"));

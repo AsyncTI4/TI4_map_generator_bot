@@ -10,6 +10,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -240,6 +241,9 @@ public class AddUnitService {
 
         if (player.hasUnit("ta_flagship") && unitKey.unitType() == UnitType.Flagship) {
             TaUnitHandler.offerWorldshaperOnFlagshipPlacement(event, game, unitKey, location, tile);
+        }
+        if (unitKey.unitType() == UnitType.Aurelion) {
+            ThronesUnitHandler.syncAurelionStation(game, player);
         }
 
         CommanderUnlockCheckService.checkPlayer(player, "myrr", "natau", "oblivion", "revenantponthous", "thrones");

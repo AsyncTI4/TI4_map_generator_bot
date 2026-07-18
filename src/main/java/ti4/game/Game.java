@@ -3973,6 +3973,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         planets.put("ocean5", new Planet("ocean5", new Point(0, 0)));
         planets.put("triad", new Planet("triad", new Point(0, 0)));
         planets.put("grove", new Planet("grove", new Point(0, 0)));
+        planets.put("aurelionstation", new Planet("aurelionstation", new Point(0, 0)));
         return planets.keySet();
     }
 

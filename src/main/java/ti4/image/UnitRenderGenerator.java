@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -757,6 +758,16 @@ class UnitRenderGenerator {
             String name = "units_ds_ghemina_celagrom_wht.png";
             String spoopyPath = resourceHelper.getDecalFile(name);
             spoopy = ImageHelper.read(spoopyPath);
+        }
+        if (unitKey.unitType() == UnitType.Aurelion) {
+            // Match the flagship-sized transparent decal used by Celagrom.
+            spoopy = new BufferedImage(81, 80, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D graphics = spoopy.createGraphics();
+            graphics.rotate(Math.PI / 4, 40, 40);
+            graphics.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+            DrawingUtil.superDrawString(
+                    graphics, "Aurelion", -1, 45, Color.WHITE, null, null, new BasicStroke(1), Color.BLACK);
+            graphics.dispose();
         }
         if (unitKey.unitType() == UnitType.Flagship && player.ownsUnit("ghemina_flagship_lord")) {
             String name = "units_ds_ghemina_lord_wht.png";
