@@ -19,6 +19,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -223,6 +224,11 @@ public class PlayerTechService {
                 return;
             }
         }
+        if ("tharcanumbg".equals(tech) && !ArcanumTechHandler.canUseSealOfRevelation(game)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "No eligible purged exploration card is available to shuffle back in.");
+            return;
+        }
         String exhaustMessage = player.getRepresentation(false, false) + " exhausted technology "
                 + techModel.getRepresentation(false) + ".";
         game.setStoredValue(
@@ -248,6 +254,10 @@ public class PlayerTechService {
         }
 
         switch (tech) {
+            case "tharcanumbg" -> {
+                ArcanumTechHandler.resolveSealOfRevelation(event, game, player);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
             case "bs" -> { // Bio-stims
                 ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(game, event, player, false);
                 deleteTheOneButtonIfButtonEvent(event);

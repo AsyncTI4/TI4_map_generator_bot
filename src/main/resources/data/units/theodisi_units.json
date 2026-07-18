@@ -425,6 +425,8 @@
     "baseType": "destroyer",
     "asyncId": "dd",
     "name": "Stingers II",
+    "upgradesFromUnitId": "xytheris_destroyer",
+    "requiredTechId": "thxytherisdd",
     "source": "theodisi",
     "faction": "xytheris",
     "moveValue": 2,

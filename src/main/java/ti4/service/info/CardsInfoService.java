@@ -407,6 +407,12 @@ public class CardsInfoService {
             omenDice = new StringBuilder(omenDice.toString().trim());
             buttons.add(Buttons.gray("getOmenDice", "Use an omen die (" + omenDice + ")", FactionEmojis.mykomentori));
         }
+        if (player.hasLeader("xytherisagent")) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "useMyrixAgent",
+                    "Use Myrix on Another Player",
+                    FactionEmojis.xytheris));
+        }
         buttons.add(Buttons.gray("offerPlayerPref", "Player Settings"));
         buttons.add(Buttons.gray("searchMyGames", "List My Games"));
         buttons.add(Buttons.green("showObjInfo_both", "Scoring Info"));

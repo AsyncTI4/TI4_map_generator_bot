@@ -15,7 +15,6 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.luminous.opa.OpaAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesStartingTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
@@ -532,9 +531,6 @@ public class PlayerSetupService {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " added the 5 _Moon Phase_ cards to their play area.");
-        }
-        if (player.hasBreakthrough("arcanumbt")) {
-            ArcanumBreakthroughHandler.offerArcanumBTFlipOnGain(game, player);
         }
         CardsInfoService.sendVariousAdditionalButtons(game, player);
 

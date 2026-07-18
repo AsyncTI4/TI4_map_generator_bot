@@ -12,6 +12,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -237,6 +238,7 @@ public class TacticalActionService {
             IronLeadersHandler.updateIronHeroEligibility(game, player, tile);
         }
         ArcanumBreakthroughHandler.movePowerWordWishUnitsToActiveSystem(game, player, tile);
+        XytherisLeadersHandler.moveMyrixAgentShipToActiveSystem(game, player, tile);
         boolean unitsWereMoved = moveUnitsIntoActiveSystem(event, game, tile);
         Tile updatedTile = game.getTileByPosition(tile.getPosition());
         spendAndPlaceTokenIfNecessary(event, game, player, updatedTile);
