@@ -3,9 +3,12 @@ package ti4.service.statistics;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.Getter;
@@ -65,7 +68,29 @@ public class ActionCardStatsService {
 
         game.getDiscardActionCards()
                 .forEach((acID, ignored) -> incrementActionCardPlayCount(actionCardsPlayedCounts, acID));
-        accumulateActionCardPlayToWinCorrelation(game, playToWinCorrelationCounts);
+
+        Set<ActionCardPlay> sabotagedPlays =
+                findSabotagedPlays(game.getGameStats().getActionCardPlays());
+        accumulateActionCardPlayToWinCorrelation(game, sabotagedPlays, playToWinCorrelationCounts);
+    }
+
+    // A Sabotage is recorded after the play it cancels, with the canceled card's name as its
+    // target, so each Sabotage matches the nearest earlier not-yet-matched play of that card.
+    private static Set<ActionCardPlay> findSabotagedPlays(List<ActionCardPlay> actionCardPlays) {
+        Set<ActionCardPlay> sabotagedPlays = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (int i = 0; i < actionCardPlays.size(); i++) {
+            ActionCardPlay sabotage = actionCardPlays.get(i);
+            if (!GameStats.SABOTAGE.equals(sabotage.getActionCard()) || sabotage.getTarget() == null) {
+                continue;
+            }
+            for (int j = i - 1; j >= 0; j--) {
+                ActionCardPlay candidate = actionCardPlays.get(j);
+                if (sabotage.getTarget().equals(candidate.getActionCard()) && sabotagedPlays.add(candidate)) {
+                    break;
+                }
+            }
+        }
+        return sabotagedPlays;
     }
 
     private static void incrementActionCardPlayCount(
@@ -85,6 +110,7 @@ public class ActionCardStatsService {
         appendActionCardPlayAndSabotageStats(message, actionCardsPlayedCounts, sabotageCounts);
         message.append("\n**Action card play-to-win correlation**\n");
         appendTrackingStartNote(message);
+        message.append("_Plays that were Sabotaged are not counted._\n");
         appendPlayToWinCorrelationStats(message, playToWinCorrelationCounts);
         message.append("\n**Overrule targets**\n");
         appendTrackingStartNote(message);
@@ -109,17 +135,18 @@ public class ActionCardStatsService {
         actionCardNames.addAll(sabotageCounts.keySet());
 
         actionCardNames.stream()
-                .sorted(Comparator.comparingInt(
-                                (String actionCardName) -> actionCardsPlayedCounts.getOrDefault(actionCardName, 0))
+                .sorted(Comparator.comparingDouble((String actionCardName) -> getSabotageRate(
+                                actionCardsPlayedCounts.getOrDefault(actionCardName, 0),
+                                sabotageCounts.getOrDefault(actionCardName, 0)))
                         .reversed()
                         .thenComparing(
-                                actionCardName -> sabotageCounts.getOrDefault(actionCardName, 0),
+                                actionCardName -> actionCardsPlayedCounts.getOrDefault(actionCardName, 0),
                                 Comparator.reverseOrder())
                         .thenComparing(actionCardName -> actionCardName))
                 .forEach(actionCardName -> {
                     int playCount = actionCardsPlayedCounts.getOrDefault(actionCardName, 0);
                     int sabotageCount = sabotageCounts.getOrDefault(actionCardName, 0);
-                    double sabotageRate = playCount == 0 ? 0 : (double) sabotageCount / playCount;
+                    double sabotageRate = getSabotageRate(playCount, sabotageCount);
                     message.append("- ")
                             .append(actionCardName)
                             .append(": ")
@@ -130,6 +157,10 @@ public class ActionCardStatsService {
                             .append(formatSabotageRate(sabotageRate))
                             .append(")\n");
                 });
+    }
+
+    private static double getSabotageRate(int playCount, int sabotageCount) {
+        return playCount == 0 ? 0 : (double) sabotageCount / playCount;
     }
 
     private static String formatSabotageRate(double sabotageRate) {
@@ -158,7 +189,9 @@ public class ActionCardStatsService {
     }
 
     private static void accumulateActionCardPlayToWinCorrelation(
-            Game game, Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
+            Game game,
+            Set<ActionCardPlay> sabotagedPlays,
+            Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
         Player winner = game.getWinner().orElse(null);
         if (winner == null) {
             return;
@@ -166,7 +199,7 @@ public class ActionCardStatsService {
 
         String winningPlayerId = StringUtils.defaultIfBlank(winner.getStatsTrackedUserID(), winner.getUserID());
         for (ActionCardPlay actionCardPlay : game.getGameStats().getActionCardPlays()) {
-            if (StringUtils.isBlank(actionCardPlay.getPlayerId())) {
+            if (StringUtils.isBlank(actionCardPlay.getPlayerId()) || sabotagedPlays.contains(actionCardPlay)) {
                 continue;
             }
 
