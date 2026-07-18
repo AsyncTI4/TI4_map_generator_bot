@@ -23,21 +23,17 @@ public class KeepThreadAlive extends Subcommand {
 
     KeepThreadAlive() {
         super("keep_thread_alive", "Keep a thread open and active. Omit options to list kept threads.");
-        addOptions(new OptionData(OptionType.CHANNEL, THREAD, "Thread or forum post to keep alive", false)
+        addOptions(new OptionData(OptionType.CHANNEL, THREAD, "Thread or forum post to keep alive")
+                .setRequired(true)
                 .setChannelTypes(ChannelType.GUILD_PUBLIC_THREAD, ChannelType.GUILD_PRIVATE_THREAD));
         addOptions(new OptionData(
-                OptionType.BOOLEAN, PIN, "Also keep the post pinned (forum posts only). Default: False", false));
-        addOptions(new OptionData(OptionType.STRING, REMOVE, "Remove from the list instead", false)
-                .addChoices(removeOpts));
+                OptionType.BOOLEAN, PIN, "Also keep the post pinned (forum posts only). Default: False"));
+        addOptions(new OptionData(OptionType.STRING, REMOVE, "Remove from the list instead").addChoices(removeOpts));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping threadOption = event.getOption(THREAD);
-        if (threadOption == null) {
-            MessageHelper.sendMessageToEventChannel(event, KeepThreadAliveService.summarize());
-            return;
-        }
         if (!threadOption.getAsChannel().getType().isThread()) {
             MessageHelper.sendMessageToEventChannel(event, "That channel is not a thread.");
             return;
