@@ -78,6 +78,7 @@ import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.website.Ti4StatsWebsiteHelper;
 
 @UtilityClass
 public class StartPhaseService {
@@ -252,6 +253,7 @@ public class StartPhaseService {
         }
         int round = game.getRound();
         if (game.isHasHadAStatusPhase()) {
+            Ti4StatsWebsiteHelper.sendGameStats(game);
             round++;
             game.setRound(round);
             GameEventService.commit(game, GameEventType.ROUND_STARTED, null, Map.of("round", round));
