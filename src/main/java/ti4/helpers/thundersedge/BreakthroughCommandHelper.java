@@ -18,6 +18,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -268,6 +269,10 @@ public final class BreakthroughCommandHelper {
             }
             if (player.hasBreakthrough("arcanumbt")) {
                 ArcanumBreakthroughHandler.offerArcanumBTFlipOnGain(game, player);
+            }
+            if ("thronesbt".equalsIgnoreCase(bt.getID())) {
+                player.addOwnedUnitByID("thrones_aurelion");
+                ThronesUnitHandler.offerAurelionPlacement(game, player);
             }
             if (!FractureService.isFractureInPlay(game) && !game.isNoFractureMode())
                 serveRollFractureButtons(player, btID);

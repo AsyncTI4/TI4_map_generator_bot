@@ -18,6 +18,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -128,6 +129,9 @@ public class CardsInfoService {
         if (player.hasSpaceStation()) {
             buttons.add(Buttons.gray(
                     "startTradeStationConvert", "Convert Commodities With Space Station", MiscEmojis.comm));
+        }
+        if (player.hasPlanet("aurelionstation") && !player.getExhaustedPlanets().contains("aurelionstation")) {
+            buttons.add(ThronesUnitHandler.getAurelionCommodityConversionButton(player));
         }
         if (player.getPlanets().contains("conviction")
                 && !player.getExhaustedPlanetsAbilities().contains("conviction")) {

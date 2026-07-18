@@ -2346,6 +2346,11 @@ public final class Helper {
                             checker + placePrefix + "_celagrom_" + tp, "Produce The Celagrom", UnitEmojis.flagship);
                     unitButtons.add(wsButton);
                 }
+                if (player.ownsUnit("thrones_aurelion") && resourcelimit > 5) {
+                    Button wsButton = Buttons.green(
+                            checker + placePrefix + "_aurelion_" + tp, "Produce Aurelion", UnitEmojis.flagship);
+                    unitButtons.add(wsButton);
+                }
                 Button fsButton = Buttons.green(
                         checker + placePrefix + "_flagship_" + tp, "Produce Flagship" + remaining, UnitEmojis.flagship);
                 if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
