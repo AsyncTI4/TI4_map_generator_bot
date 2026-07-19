@@ -53,9 +53,15 @@ public class ActionCardStatsService {
         Map<String, Integer> overruleCounts = new HashMap<>();
         Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts = new HashMap<>();
 
+        // A discarded card that isn't in the selected deck means the game is mislabeled (e.g. it
+        // changed decks mid-game), which would pollute the stats with off-deck cards.
+        Set<String> deckCardIds = new HashSet<>(acDeck.getCardIDs());
+
         ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getStandardCompetitiveGamesFilter()
-                        .and(game -> acDeckId.equals(game.getAcDeckID())),
+                        .and(game -> acDeckId.equals(game.getAcDeckID()))
+                        .and(game -> deckCardIds.containsAll(
+                                game.getDiscardActionCards().keySet())),
                 game -> accumulateActionCardStats(
                         game, cancelCounts, actionCardsPlayedCounts, overruleCounts, playToWinCorrelationCounts),
                 ExecutionLockType.READ);
@@ -333,7 +339,7 @@ public class ActionCardStatsService {
                                             entry.getValue().getWins(), expectedDrawsPerCard.get(entry.getKey()));
                                     return impactScore != null
                                             ? impactScore
-                                            : (double) entry.getValue().getWins();
+                                            : entry.getValue().getWins();
                                 },
                                 Comparator.reverseOrder())
                         .thenComparing(entry -> entry.getValue().getTotal(), Comparator.reverseOrder())
@@ -349,11 +355,19 @@ public class ActionCardStatsService {
                             .append(" plays (")
                             .append(String.format("%.1f%%", count.getWinRate() * 100))
                             .append(")");
-                    Double impactScore = getImpactScore(count.getWins(), expectedDrawsPerCard.get(entry.getKey()));
+                    Integer expectedDraws = expectedDrawsPerCard.get(entry.getKey());
+                    Double impactScore = getImpactScore(count.getWins(), expectedDraws);
                     if (impactScore != null) {
                         message.append(", ")
                                 .append(String.format("%.1f", impactScore))
                                 .append(" Impact Score (wins vs ~draws)");
+                    }
+                    Double uncancelledImpactScore = getImpactScore(
+                            count.getWins(), expectedDraws - count.getCanceledPlays());
+                    if (uncancelledImpactScore != null) {
+                        message.append(", ")
+                                .append(String.format("%.1f", uncancelledImpactScore))
+                                .append(" Uncancelled Impact Score");
                     }
                     message.append('\n');
                 });
@@ -383,6 +397,10 @@ public class ActionCardStatsService {
 
         double getWinRate() {
             return total == 0 ? 0 : (double) wins / total;
+        }
+
+        int getCanceledPlays() {
+            return playsIncludingCanceled - total;
         }
     }
 }
