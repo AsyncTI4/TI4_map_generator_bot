@@ -1353,6 +1353,11 @@ public final class ButtonHelperSCs {
         return contains;
     }
 
+    // TODO FoW leak: the scepterE/thardentiag branches below post player.getRepresentationUnfogged() to the
+    // shared SC-follow channel unconditionally (no isFowMode() guard), and the closing reaction always uses the
+    // real player.getFactionEmoji() instead of Helper.getPlayerReactionEmoji()'s fog-safe randomized emoji.
+    // These buttons are offered in FoW games too (see PlayStrategyCardService), so this is reachable. Needs the
+    // same private-channel treatment already applied to MindsieveService/StoneEmbraceService.
     @ButtonHandler("scepterE_follow_")
     @ButtonHandler("mahactA_follow_")
     @ButtonHandler("thardentiag_follow_")

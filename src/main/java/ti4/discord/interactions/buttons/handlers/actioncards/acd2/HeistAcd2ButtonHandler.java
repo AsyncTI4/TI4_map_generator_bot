@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -25,10 +26,12 @@ class HeistAcd2ButtonHandler {
             if (p2 == player) {
                 continue;
             }
-            buttons.add(Buttons.gray(
-                    player.factionButtonChecker() + "heistStep2_" + p2.getFaction() + "_2",
-                    p2.getColor(),
-                    p2.getFactionEmoji()));
+            String id = player.factionButtonChecker() + "heistStep2_" + p2.getFaction() + "_2";
+            if (game.isFowMode()) {
+                buttons.add(Buttons.gray(id, p2.getColor()));
+            } else {
+                buttons.add(Buttons.gray(id, p2.getColor()).withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
+            }
         }
         buttons.add(Buttons.red("deleteButtons", "Decline"));
 
