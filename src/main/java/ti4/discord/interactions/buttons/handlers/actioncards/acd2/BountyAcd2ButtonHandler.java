@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -30,10 +31,12 @@ class BountyAcd2ButtonHandler {
             if (p2 == player) {
                 continue;
             }
-            buttons.add(Buttons.gray(
-                    player.factionButtonChecker() + "bountyStep2_" + p2.getFaction(),
-                    p2.getColor(),
-                    p2.getFactionEmoji()));
+            String id = player.factionButtonChecker() + "bountyStep2_" + p2.getFaction();
+            if (game.isFowMode()) {
+                buttons.add(Buttons.gray(id, p2.getColor()));
+            } else {
+                buttons.add(Buttons.gray(id, p2.getColor()).withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
+            }
         }
         buttons.add(Buttons.red("deleteButtons", "Decline Capture"));
 

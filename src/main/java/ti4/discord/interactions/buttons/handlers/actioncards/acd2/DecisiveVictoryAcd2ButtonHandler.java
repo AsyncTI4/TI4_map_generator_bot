@@ -28,9 +28,9 @@ class DecisiveVictoryAcd2ButtonHandler {
 
         RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
         MessageHelper.sendMessageToChannel(
-                game.getActionsChannel(),
+                player.getCorrectChannel(),
                 player.getFactionEmojiOrColor() + " resolved _Decisive Victory_ and removed their command token from "
-                        + tile.getRepresentationForButtons() + ".");
+                        + tile.getRepresentationForButtons(game, player) + ".");
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }
