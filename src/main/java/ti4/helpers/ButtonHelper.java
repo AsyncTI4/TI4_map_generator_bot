@@ -110,6 +110,7 @@ import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
+import ti4.service.VeiledHeartService;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.ValefarZService;
@@ -5435,6 +5436,7 @@ public class ButtonHelper {
                 count++;
             }
         }
+        count += VeiledHeartService.countVeiledCards(VeiledHeartService.VeiledCardType.UNIT, player);
         return count;
     }
 
