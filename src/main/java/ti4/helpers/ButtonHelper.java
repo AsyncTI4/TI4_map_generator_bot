@@ -1723,19 +1723,6 @@ public class ButtonHelper {
             }
         }
 
-        if (player.hasAbility("void_tap")
-                && (activeSystem.getPlanetUnitHolders().isEmpty()
-                        || doesPlayerHaveFSHere("eidolon_flagship", player, activeSystem))) {
-            int cTG = player.getTg();
-            player.setTg(cTG + 1);
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " gained 1 trade good (" + cTG + "->" + player.getTg()
-                            + ") for **Void Tap**.");
-            ButtonHelperAgents.resolveArtunoCheck(player, 1);
-            ButtonHelperAbilities.pillageCheck(player, game);
-        }
-
         for (Player nonActivePlayer : game.getPlayers().values()) {
             if (!nonActivePlayer.isRealPlayer()
                     || nonActivePlayer.isPlayerMemberOfAlliance(player)

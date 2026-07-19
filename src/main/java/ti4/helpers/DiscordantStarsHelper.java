@@ -192,32 +192,6 @@ public final class DiscordantStarsHelper {
         }
     }
 
-    public static void checkSaeraMech(Game activeMap) {
-        for (Player player : activeMap.getPlayers().values()) {
-            String tokenToAdd = Constants.OLRADIN_MECH_INF_PNG;
-
-            if (!player.ownsUnit("saera_mech")) {
-                continue;
-            }
-
-            for (Tile tile : activeMap.getTileMap().values()) {
-                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                    if (unitHolder instanceof Planet planet) {
-                        if (player.getPlanets().contains(planet.getName())) {
-                            if (planet.getUnitCount(UnitType.Mech, player) < 1
-                                    && planet.getTokenList().contains(Constants.OLRADIN_MECH_INF_PNG)) {
-                                planet.removeToken(Constants.OLRADIN_MECH_INF_PNG);
-                            } else if (planet.getUnitCount(UnitType.Mech, player) > 0
-                                    && !planet.getTokenList().contains(Constants.OLRADIN_MECH_INF_PNG)) {
-                                planet.addToken(tokenToAdd);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     private static boolean oneMechCheck(String planetName, Game activeMap, Player player) {
         Tile tile = activeMap.getTile(AliasHandler.resolveTile(planetName));
         if (tile == null) return false;

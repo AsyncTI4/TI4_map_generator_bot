@@ -18,7 +18,6 @@ class TransientGameInfoUpdater {
             DiscordantStarsHelper.checkGardenWorlds(game);
             DiscordantStarsHelper.checkTFTerraform(game);
             DiscordantStarsHelper.checkSigil(game);
-            DiscordantStarsHelper.checkSaeraMech(game);
             DiscordantStarsHelper.checkOlradinMech(game);
             DiscordantStarsHelper.checkUltimateAuthority(game);
             TeHelperGeneral.checkTransientInfo(game);
