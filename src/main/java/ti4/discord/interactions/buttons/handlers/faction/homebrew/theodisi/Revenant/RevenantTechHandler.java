@@ -72,7 +72,10 @@ public class RevenantTechHandler {
         String cancellationMessage = player.getRepresentationUnfogged() + " canceled " + canceledHits + " hit"
                 + (canceledHits == 1 ? "" : "s") + " with _Eternal Aegis_.";
         if (remainingHits == 0) {
-            event.getMessage().editMessage(cancellationMessage).setComponents(List.of()).queue();
+            event.getMessage()
+                    .editMessage(cancellationMessage)
+                    .setComponents(List.of())
+                    .queue();
             return;
         }
 
@@ -87,8 +90,7 @@ public class RevenantTechHandler {
                     "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
                     "Manually Assign Hit" + (remainingHits == 1 ? "" : "s")));
             buttons.add(Buttons.gray(
-                    factionChecker + "cancelGroundHits_" + tile.getPosition() + "_" + remainingHits,
-                    "Cancel a Hit"));
+                    factionChecker + "cancelGroundHits_" + tile.getPosition() + "_" + remainingHits, "Cancel a Hit"));
             assignmentMessage = cancellationMessage + "\n" + player.getRepresentation() + " may autoassign "
                     + remainingHits + " hit" + (remainingHits == 1 ? "" : "s") + ".";
         } else {
@@ -99,8 +101,7 @@ public class RevenantTechHandler {
                     "getDamageButtons_" + tile.getPosition() + "deleteThis_spacecombat",
                     "Manually Assign Hit" + (remainingHits == 1 ? "" : "s")));
             buttons.add(Buttons.gray(
-                    factionChecker + "cancelSpaceHits_" + tile.getPosition() + "_" + remainingHits,
-                    "Cancel a Hit"));
+                    factionChecker + "cancelSpaceHits_" + tile.getPosition() + "_" + remainingHits, "Cancel a Hit"));
             assignmentMessage = cancellationMessage + "\n" + player.getRepresentationNoPing()
                     + ", you may automatically assign " + (remainingHits == 1 ? "the hit" : "the hits") + ". "
                     + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, remainingHits, event, true);
@@ -113,7 +114,7 @@ public class RevenantTechHandler {
 
     private static int getEternalAegisCancellationCount(Player player) {
         return (int) player.getLeaders().stream()
-                .filter(leader -> !leader.isLocked() && !leader.isExhausted() && !leader.isActive())
+                .filter(leader -> !leader.isLocked() && !leader.isExhausted())
                 .map(Leader::getType)
                 .filter(type -> type != null && !type.isBlank())
                 .distinct()

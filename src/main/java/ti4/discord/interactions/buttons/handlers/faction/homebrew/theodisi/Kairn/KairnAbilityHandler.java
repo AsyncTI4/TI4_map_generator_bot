@@ -16,6 +16,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -40,6 +41,9 @@ public class KairnAbilityHandler {
                 || player == null
                 || !player.hasAbility(COLONY_OUTPOSTS)
                 || player.getStrategicCC() < 1
+                || !player.getUserID().equals(game.getActivePlayerID())
+                || game.getStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED)
+                        .isEmpty()
                 || game.getStoredValue(player.getFaction() + "planetsExplored").isEmpty()) {
             ButtonHelper.deleteMessage(event);
             return;
@@ -95,6 +99,9 @@ public class KairnAbilityHandler {
         String exploredPlanets = game.getStoredValue(player.getFaction() + "planetsExplored");
         if (!player.hasAbility(COLONY_OUTPOSTS)
                 || player.getStrategicCC() < 1
+                || !player.getUserID().equals(game.getActivePlayerID())
+                || game.getStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED)
+                        .isEmpty()
                 || planet == null
                 || !exploredPlanets.contains(planetName + "*")
                 || !planet.getPlanetTypes().contains(trait)

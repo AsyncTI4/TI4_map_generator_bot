@@ -2,7 +2,6 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Pont
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -18,8 +17,10 @@ public class PonthousAbilityHandler {
     private static final String USE_PONTHOUS = "usePonthousLegendaryAbility_";
     private static final String PONTHOUS = "ponthous";
     private static final String PONTHOUS_BOTH = "attachment_ponthousboth.png";
-    private static final String PONTHOUS_RES = "attachment_ponthousres.png";
-    private static final String PONTHOUS_INF = "attachment_ponthousinf.png";
+    private static final String PONTHOUS_RES = "attachment_positiveres3.png";
+    private static final String PONTHOUS_INF = "attachment_positiveinf3.png";
+    private static final String LEGACY_PONTHOUS_RES = "attachment_ponthousres.png";
+    private static final String LEGACY_PONTHOUS_INF = "attachment_ponthousinf.png";
 
     public static List<Button> offerFracturedSouls(Player player) {
         List<Button> buttons = new ArrayList<>();
@@ -50,6 +51,7 @@ public class PonthousAbilityHandler {
             return;
         }
 
+        player.refreshPlanet(PONTHOUS);
         ButtonHelper.deleteMessage(event);
     }
 

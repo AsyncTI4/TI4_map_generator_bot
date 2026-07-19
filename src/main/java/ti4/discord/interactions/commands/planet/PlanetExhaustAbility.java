@@ -180,9 +180,11 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.addAll(getNewPrismLoseTechOptions(player));
             }
             case "ponthous" -> {
-                output = player.getRepresentation()
-                        + " please tell the bot wether you exhausted Ponthous for its Resources (+) or Influence (-):";
-                buttons.addAll(PonthousAbilityHandler.offerFracturedSouls(player));
+                if (!"setup".equals(game.getPhaseOfGame())) {
+                    output = player.getRepresentation()
+                            + " please tell the bot wether you exhausted Ponthous for its Resources (+) or Influence (-):";
+                    buttons.addAll(PonthousAbilityHandler.offerFracturedSouls(player));
+                }
             }
             case "echo" -> {
                 output =

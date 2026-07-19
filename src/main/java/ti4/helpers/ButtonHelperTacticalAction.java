@@ -146,7 +146,10 @@ public final class ButtonHelperTacticalAction {
                                 + ", you have _Surveyor's Lens_ and as such may exhaust it to explore a planet in the active system:",
                         KairnTechHandler.getSurveyorsLensButton(player));
             }
-            if (player.hasAbility("colony_outposts") && player.getStrategicCC() > 0 && !game.getStoredValue(player.getFaction() + "planetsExplored").isEmpty()) {
+            if (player.hasAbility("colony_outposts")
+                    && player.getStrategicCC() > 0
+                    && !game.getStoredValue(player.getFaction() + "planetsExplored")
+                            .isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButton(
                         player.getCorrectChannel(),
                         player.getRepresentation()
