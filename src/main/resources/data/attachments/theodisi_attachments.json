@@ -22,5 +22,30 @@
         "name": "Archaeological Outpost",
         "imagePath": "attachment_kairnoutpost.png",
         "source": "theodisi"
+    },
+    {
+        "id": "ponthousboth",
+        "name": "Ponthous +/-",
+        "imagePath": "attachment_ponthousboth.png",
+        "resourcesModifier": 3,
+        "influenceModifier": 3,
+        "isFakeAttachment": true,
+        "source": "theodisi"
+    },
+    {
+        "id": "ponthousres",
+        "name": "Ponthous +",
+        "imagePath": "attachment_positiveres3.png",
+        "resourcesModifier": 3,
+        "isFakeAttachment": true,
+        "source": "theodisi"
+    },
+    {
+        "id": "ponthousinf",
+        "name": "Ponthous -",
+        "imagePath": "attachment_positiveinf3.png",
+        "influenceModifier": 3,
+        "isFakeAttachment": true,
+        "source": "theodisi"
     }
 ]

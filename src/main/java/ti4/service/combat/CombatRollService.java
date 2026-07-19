@@ -35,6 +35,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
@@ -633,6 +634,10 @@ public class CombatRollService {
                                     CrystellumUnitHandler.offerRefractumButtonIfRelevant(
                                             buttons, opponent, game, tile, combatOnHolder, h);
                                 }
+                                if (round2 == 1 && opponent.hasTech("threvenantr")) {
+                                    RevenantTechHandler.addEternalAegisButton(
+                                            buttons, game, opponent, player, tile, combatOnHolder, h);
+                                }
                             }
                             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                             if (opponent.hasTech("vpw")) {
@@ -723,6 +728,11 @@ public class CombatRollService {
                             buttons.add(Buttons.gray(
                                     factionChecker + "cancelSpaceHits_" + tile.getPosition() + "_" + h,
                                     "Cancel a Hit"));
+                        }
+
+                        if (round2 == 1 && opponent.hasTech("threvenantr")) {
+                            RevenantTechHandler.addEternalAegisButton(
+                                    buttons, game, opponent, player, tile, combatOnHolder, h);
                         }
 
                         String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign "

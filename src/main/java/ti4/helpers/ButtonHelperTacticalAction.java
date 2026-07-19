@@ -146,6 +146,16 @@ public final class ButtonHelperTacticalAction {
                                 + ", you have _Surveyor's Lens_ and as such may exhaust it to explore a planet in the active system:",
                         KairnTechHandler.getSurveyorsLensButton(player));
             }
+            if (player.hasAbility("colony_outposts")
+                    && player.getStrategicCC() > 0
+                    && !game.getStoredValue(player.getFaction() + "planetsExplored")
+                            .isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButton(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", you have _Colony Outposts_ and explored a planet during this tactical action.\nYou may spend a strategy token to find an attachment in that planet's exploration deck and attach it to that planet:",
+                        KairnAbilityHandler.offerColonyOutposts(player));
+            }
             if (!game.isAbsolMode()
                     && player.getRelics().contains("emphidia")
                     && !player.getExhaustedRelics().contains("emphidia")) {
