@@ -65,7 +65,12 @@ public class AddPlanetService {
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
         player.addPlanet(planet);
         EronousPlanetService.resolveCantrisPO(game, planet, player);
-        player.exhaustPlanet(planet);
+        if (setup && "ponthous".equalsIgnoreCase(planet)) {
+            // Setup exhausts Ponthous without opening its optional ready-planet window.
+            player.getExhaustedPlanets().add(planet);
+        } else {
+            player.exhaustPlanet(planet);
+        }
         if ("mirage".equals(planet) || "avernus".equals(planet) || "thundersedge".equals(planet)) {
             game.clearPlanetsCache();
         }
