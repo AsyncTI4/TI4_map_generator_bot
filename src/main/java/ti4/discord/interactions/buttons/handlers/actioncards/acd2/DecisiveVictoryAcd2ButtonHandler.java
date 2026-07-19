@@ -1,7 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.actioncards.acd2;
 
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -28,11 +27,8 @@ class DecisiveVictoryAcd2ButtonHandler {
         }
 
         RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
-        // TODO: in normal (non-FoW) games this still goes to the shared actions channel (unchanged,
-        // matching prior behavior) - only routing privately for FoW mode here.
-        MessageChannel resolutionChannel = game.isFowMode() ? player.getCorrectChannel() : game.getActionsChannel();
         MessageHelper.sendMessageToChannel(
-                resolutionChannel,
+                player.getCorrectChannel(),
                 player.getFactionEmojiOrColor() + " resolved _Decisive Victory_ and removed their command token from "
                         + tile.getRepresentationForButtons(game, player) + ".");
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
