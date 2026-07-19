@@ -33,7 +33,7 @@ import ti4.model.DeckModel;
 @UtilityClass
 public class ActionCardStatsService {
     private static final LocalDate PLAYER_TRACKING_START_DATE = LocalDate.of(2026, 5, 23);
-    private static final String DEFAULT_AC_DECK_ID = "action_cards_pok";
+    private static final String DEFAULT_AC_DECK_ID = "action_cards_te";
 
     public static void queueReply(SlashCommandInteractionEvent event) {
         StatisticsPipeline.queue(event, () -> showActionCardStats(event));
