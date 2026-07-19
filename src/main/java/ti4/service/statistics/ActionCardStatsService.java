@@ -355,22 +355,22 @@ public class ActionCardStatsService {
                             .append(" plays (")
                             .append(String.format("%.1f%%", count.getWinRate() * 100))
                             .append(")");
-Integer expectedDraws = expectedDrawsPerCard.get(entry.getKey());
-Double impactScore = getImpactScore(count.getWins(), expectedDraws);
-if (impactScore != null) {
-    message.append(", ")
-            .append(String.format("%.1f", impactScore))
-            .append(" Impact Score (wins vs ~draws)");
-}
-if (expectedDraws != null) {
-    Double uncancelledImpactScore =
-            getImpactScore(count.getWins(), expectedDraws - count.getCanceledPlays());
-    if (uncancelledImpactScore != null) {
-        message.append(", ")
-                .append(String.format("%.1f", uncancelledImpactScore))
-                .append(" Uncancelled Impact Score");
-    }
-}
+                    Integer expectedDraws = expectedDrawsPerCard.get(entry.getKey());
+                    Double impactScore = getImpactScore(count.getWins(), expectedDraws);
+                    if (impactScore != null) {
+                        message.append(", ")
+                                .append(String.format("%.1f", impactScore))
+                                .append(" Impact Score (wins vs ~draws)");
+                    }
+                    if (expectedDraws != null) {
+                        Double uncancelledImpactScore =
+                                getImpactScore(count.getWins(), expectedDraws - count.getCanceledPlays());
+                        if (uncancelledImpactScore != null) {
+                            message.append(", ")
+                                    .append(String.format("%.1f", uncancelledImpactScore))
+                                    .append(" Uncancelled Impact Score");
+                        }
+                    }
                     message.append('\n');
                 });
     }
