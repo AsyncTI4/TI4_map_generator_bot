@@ -66,12 +66,20 @@ public class StoneEmbraceService {
                 .ifPresent(scMessage ->
                         ReactionService.addReaction(player, false, null, null, scMessage.messageId(), game));
         player.exhaustPlanet(planet);
-        MessageChannel scChannel = ButtonHelper.getSCFollowChannel(game, player, sc);
-        String msg = player.getRepresentationUnfogged() + " exhausted the planet of "
-                + Helper.getPlanetRepresentation(planet, game) + " via Stone's embrace"
-                + " to perform the secondary ability of **" + scModel.getName()
-                + "** without spending a command token.";
-        MessageHelper.sendMessageToChannel(scChannel, msg);
+        if (game.isFowMode()) {
+            String privateMsg = player.getRepresentationUnfogged() + " exhausted the planet of "
+                    + Helper.getPlanetRepresentation(planet, game) + " via Stone's embrace"
+                    + " to perform the secondary ability of **" + scModel.getName()
+                    + "** without spending a command token.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), privateMsg);
+        } else {
+            MessageChannel scChannel = ButtonHelper.getSCFollowChannel(game, player, sc);
+            String publicMsg = player.getRepresentationUnfogged() + " exhausted the planet of "
+                    + Helper.getPlanetRepresentation(planet, game) + " via Stone's embrace"
+                    + " to perform the secondary ability of **" + scModel.getName()
+                    + "** without spending a command token.";
+            MessageHelper.sendMessageToChannel(scChannel, publicMsg);
+        }
         ButtonHelper.deleteMessage(event);
     }
 }

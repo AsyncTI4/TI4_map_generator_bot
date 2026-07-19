@@ -200,7 +200,9 @@ public class TkHelperActionCards {
                     String label = Helper.getPlanetRepresentation(p.getName(), game);
                     for (Player p2 : game.getRealPlayers()) {
                         if (p2.hasPlanet(p.getName())) {
-                            return Buttons.red(id, label, p2.getFactionEmoji());
+                            return game.isFowMode()
+                                    ? Buttons.red(id, label)
+                                    : Buttons.red(id, label, p2.getFactionEmoji());
                         }
                     }
                     return Buttons.gray(id, label);
@@ -479,7 +481,11 @@ public class TkHelperActionCards {
             if (count > 0) {
                 String id = player.factionButtonChecker() + "ordainDiscardOne_" + planetName + "_" + p2.getColor();
                 String label = "Discard " + p2.getColorDisplayName() + " ability (" + count + " available)";
-                buttons.add(Buttons.red(id, label, p2.getFactionEmoji()));
+                if (game.isFowMode()) {
+                    buttons.add(Buttons.red(id, label));
+                } else {
+                    buttons.add(Buttons.red(id, label, p2.getFactionEmoji()));
+                }
             }
         }
         if (buttons.isEmpty()) {

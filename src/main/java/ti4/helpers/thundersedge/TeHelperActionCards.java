@@ -371,7 +371,9 @@ public class TeHelperActionCards {
                     String label = Helper.getPlanetRepresentation(p.getName(), game);
                     for (Player p2 : game.getRealPlayers()) {
                         if (p2.hasPlanet(p.getName())) {
-                            return Buttons.red(id, label, p2.getFactionEmoji());
+                            return game.isFowMode()
+                                    ? Buttons.red(id, label)
+                                    : Buttons.red(id, label, p2.getFactionEmoji());
                         }
                     }
                     return Buttons.gray(id, label);
@@ -551,12 +553,20 @@ public class TeHelperActionCards {
 
             String id = "resolveBrillianceUnlock_" + p.getFaction();
             if (lockedCount == 1) {
-                String label = "Unlock " + p.getBreakthroughModel().getName();
-                buttons.add(Buttons.gray(id, label, p.getFactionEmoji()));
+                if (game.isFowMode()) {
+                    buttons.add(Buttons.gray(id, "Unlock 1 Breakthrough (" + p.getColor() + ")"));
+                } else {
+                    String label = "Unlock " + p.getBreakthroughModel().getName();
+                    buttons.add(Buttons.gray(id, label, p.getFactionEmoji()));
+                }
             } else if (lockedCount > 1) {
-                String label =
-                        "Unlock " + lockedCount + " " + p.getFactionModel().getShortName() + " Breakthroughs";
-                buttons.add(Buttons.gray(id, label, p.getFactionEmoji()));
+                if (game.isFowMode()) {
+                    buttons.add(Buttons.gray(id, "Unlock " + lockedCount + " " + p.getColor() + " Breakthroughs"));
+                } else {
+                    String label =
+                            "Unlock " + lockedCount + " " + p.getFactionModel().getShortName() + " Breakthroughs";
+                    buttons.add(Buttons.gray(id, label, p.getFactionEmoji()));
+                }
             }
         }
 
