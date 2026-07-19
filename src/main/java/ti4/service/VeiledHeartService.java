@@ -126,6 +126,10 @@ public class VeiledHeartService {
         return veiledCards;
     }
 
+    public static int countVeiledCards(VeiledCardType type, Player player) {
+        return (int) getVeiledCards(type, player).count();
+    }
+
     public static int countVeiledCards(Game game, String typeStr) {
         return VeiledCardType.fromString(typeStr)
                 .map(type -> getVeiledCards(game, type).size())

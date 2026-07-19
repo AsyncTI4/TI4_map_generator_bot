@@ -110,11 +110,16 @@ public class SliceGenerationSettings extends SettingsMenu {
     @Override
     public List<SettingInterface> settings() {
         List<SettingInterface> ls = new ArrayList<>();
-        ls.add(numFactions);
+        boolean randomSetup = parent instanceof MiltySettings ms && ms.isRandomSetup();
+        if (!randomSetup) {
+            ls.add(numFactions);
+        }
         if (presetSlices != null) {
             return ls;
         }
-        ls.add(numSlices);
+        if (!randomSetup) {
+            ls.add(numSlices);
+        }
         ls.add(minimumRes);
         ls.add(minimumInf);
         ls.add(totalValue);
