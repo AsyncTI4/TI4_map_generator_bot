@@ -74,6 +74,19 @@ public class GameStatisticsFilterer {
         return getGamesFilter(event, true);
     }
 
+    // 6-player, 10-victory-point, non-fog, non-Galactic-Event, non-Scenario games with winners.
+    public static Predicate<Game> getStandardCompetitiveGamesFilter() {
+        Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(6, game);
+        return playerCountPredicate
+                .and(game -> filterOnVictoryPointGoal(10, game))
+                .and(game -> filterOnFogType(Boolean.FALSE, game))
+                .and(game -> filterOnGalacticEvent(Boolean.FALSE, game))
+                .and(game -> filterOnScenario(Boolean.FALSE, game))
+                .and(game -> filterOnHasWinner(Boolean.TRUE, game))
+                .and(GameStatisticsFilterer::filterAbortedGames)
+                .and(GameStatisticsFilterer::filterEarlyRounds);
+    }
+
     public static Predicate<Game> getGamesFilter(SlashCommandInteractionEvent event) {
         return getGamesFilter(event, null);
     }
