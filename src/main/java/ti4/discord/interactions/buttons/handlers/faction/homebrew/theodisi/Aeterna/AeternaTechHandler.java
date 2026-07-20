@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -24,7 +22,6 @@ import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
-import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
@@ -43,88 +40,84 @@ public class AeternaTechHandler {
         }
 
         String keyPrefix = player.getFaction() + "thanatocyteLattice" + tile.getPosition() + unitHolderName;
-        new ArrayList<>(game.getStoredValueMap().keySet()).stream()
-                .filter(key -> key.startsWith(keyPrefix))
-                .forEach(game::removeStoredValue);
+        new ArrayList<>(game.getStoredValueMap().keySet())
+                .stream().filter(key -> key.startsWith(keyPrefix)).forEach(game::removeStoredValue);
     }
-    
+
     public static void offerThanatocyteLattice(
             GenericInteractionCreateEvent event, Game game, List<RemovedUnit> destroyedUnits) {
         if (event == null || game == null || destroyedUnits == null || destroyedUnits.isEmpty()) {
             return;
         }
-    
+
         var combat = StartCombatService.getCurrentCombat(game);
         if (combat == null || combat.tilePosition() == null || combat.unitHolderName() == null) {
             return;
         }
-    
+
         Tile tile = game.getTileByPosition(combat.tilePosition());
         UnitHolder combatHolder = tile == null ? null : tile.getUnitHolders().get(combat.unitHolderName());
         if (combatHolder == null) {
             return;
         }
-    
+
         Set<UnitType> destroyedShipTypes = new LinkedHashSet<>();
         for (RemovedUnit destroyedUnit : destroyedUnits) {
             if (destroyedUnit.tile() != tile || destroyedUnit.uh() != combatHolder) {
                 continue;
             }
-    
+
             Player destroyedUnitOwner = destroyedUnit.getPlayer(game);
-            UnitModel destroyedUnitModel = destroyedUnitOwner == null
-                    ? null
-                    : destroyedUnitOwner.getUnitFromUnitKey(destroyedUnit.unitKey());
-    
-            if (destroyedUnit.getTotalRemoved() > 0
-                    && destroyedUnitModel != null
-                    && destroyedUnitModel.getIsShip()) {
+            UnitModel destroyedUnitModel =
+                    destroyedUnitOwner == null ? null : destroyedUnitOwner.getUnitFromUnitKey(destroyedUnit.unitKey());
+
+            if (destroyedUnit.getTotalRemoved() > 0 && destroyedUnitModel != null && destroyedUnitModel.getIsShip()) {
                 destroyedShipTypes.add(destroyedUnit.unitKey().unitType());
             }
         }
-    
+
         if (destroyedShipTypes.isEmpty()) {
             return;
         }
-    
+
         for (String faction : combat.factions()) {
             Player player = game.getPlayerFromColorOrFaction(faction);
             if (player == null || !player.hasTech(LATTICE)) {
                 continue;
             }
-    
+
             String usageKey = player.getFaction()
                     + "thanatocyteLattice"
                     + tile.getPosition()
                     + combatHolder.getName()
                     + combat.round();
-    
+
             if (!game.getStoredValue(usageKey).isBlank()) {
                 continue;
             }
-    
-            boolean hasEligibleOpponentShip = combatHolder.getUnitKeys().stream().anyMatch(unitKey -> {
-                Player unitOwner = game.getPlayerFromColorOrFaction(unitKey.colorID());
-                UnitModel unitModel =
-                        unitOwner == null ? null : unitOwner.getUnitFromUnitKey(unitKey);
-    
-                return unitOwner != null
-                        && unitOwner != player
-                        && combat.factions().contains(unitOwner.getFaction())
-                        && unitModel != null
-                        && unitModel.getIsShip()
-                        && destroyedShipTypes.contains(unitKey.unitType());
-            });
-    
+
+            boolean hasEligibleOpponentShip = combatHolder.getUnitKeys().stream()
+                    .anyMatch(unitKey -> {
+                        Player unitOwner = game.getPlayerFromColorOrFaction(unitKey.colorID());
+                        UnitModel unitModel = unitOwner == null ? null : unitOwner.getUnitFromUnitKey(unitKey);
+
+                        return unitOwner != null
+                                && unitOwner != player
+                                && combat.factions().contains(unitOwner.getFaction())
+                                && unitModel != null
+                                && unitModel.getIsShip()
+                                && destroyedShipTypes.contains(unitKey.unitType());
+                    });
+
             if (!hasEligibleOpponentShip) {
                 continue;
             }
-    
+
             long destroyedTypeMask = 0;
             for (UnitType type : destroyedShipTypes) {
                 destroyedTypeMask |= 1L << type.ordinal();
             }
-    
+
             String buttonID = player.factionButtonChecker()
                     + USE_LATTICE
                     + tile.getPosition()
@@ -134,7 +127,7 @@ public class AeternaTechHandler {
                     + Long.toString(destroyedTypeMask, 36)
                     + "_"
                     + combat.round();
-    
+
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
                     player.getRepresentation()
@@ -147,7 +140,8 @@ public class AeternaTechHandler {
     }
 
     @ButtonHandler(USE_LATTICE)
-    public static void selectThanatocyteLatticeTarget(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+    public static void selectThanatocyteLatticeTarget(
+            ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         String[] parts = buttonID.substring(USE_LATTICE.length()).split("_", 4);
         if (parts.length != 4 || !player.hasTech(LATTICE)) {
             ButtonHelper.deleteMessage(event);
@@ -171,7 +165,8 @@ public class AeternaTechHandler {
             return;
         }
 
-        String usageKey = player.getFaction() + "thanatocyteLattice" + tile.getPosition() + combatHolder.getName() + combatRound;
+        String usageKey =
+                player.getFaction() + "thanatocyteLattice" + tile.getPosition() + combatHolder.getName() + combatRound;
 
         if (!game.getStoredValue(usageKey).isBlank()) {
             ButtonHelper.deleteMessage(event);
@@ -185,27 +180,33 @@ public class AeternaTechHandler {
             Player targetPlayer = game.getPlayerFromColorOrFaction(unitKey.colorID());
             UnitModel unitModel = targetPlayer == null ? null : targetPlayer.getUnitFromUnitKey(unitKey);
 
-            boolean destroyedTypeMatches = (destroyedTypeMask & (1L << unitKey.unitType().ordinal())) != 0;
-            if (targetPlayer == null || targetPlayer == player || unitModel == null || !unitModel.getIsShip() || !destroyedTypeMatches || !addedTargets.add(targetPlayer.getColorID() + unitKey.unitType().value)) {
+            boolean destroyedTypeMatches =
+                    (destroyedTypeMask & (1L << unitKey.unitType().ordinal())) != 0;
+            if (targetPlayer == null
+                    || targetPlayer == player
+                    || unitModel == null
+                    || !unitModel.getIsShip()
+                    || !destroyedTypeMatches
+                    || !addedTargets.add(targetPlayer.getColorID() + unitKey.unitType().value)) {
                 continue;
             }
 
             buttons.add(Buttons.red(
-                player.factionButtonChecker()
-                    + SELECT_LATTICE_SHIP
-                    + tile.getPosition()
-                    + "_"
-                    + combatHolder.getName()
-                    + "_"
-                    + targetPlayer.getColorID()
-                    + "_"
-                    + unitKey.unitType().value
-                    + "_"
-                    + combatRound,
-                "Assign hit to "
-                    + targetPlayer.getFactionNameOrColor()
-                    + " "
-                    + unitKey.unitType().humanReadableName()));
+                    player.factionButtonChecker()
+                            + SELECT_LATTICE_SHIP
+                            + tile.getPosition()
+                            + "_"
+                            + combatHolder.getName()
+                            + "_"
+                            + targetPlayer.getColorID()
+                            + "_"
+                            + unitKey.unitType().value
+                            + "_"
+                            + combatRound,
+                    "Assign hit to "
+                            + targetPlayer.getFactionNameOrColor()
+                            + " "
+                            + unitKey.unitType().humanReadableName()));
         }
 
         if (buttons.isEmpty()) {
@@ -216,13 +217,14 @@ public class AeternaTechHandler {
         buttons.add(Buttons.gray("deleteButtons", "Decline"));
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
-            event.getMessageChannel(),
-            player.getRepresentation() + ", choose the opposing ship type to assign the hit to:",
-            buttons);
+                event.getMessageChannel(),
+                player.getRepresentation() + ", choose the opposing ship type to assign the hit to:",
+                buttons);
     }
 
     @ButtonHandler(SELECT_LATTICE_SHIP)
-    public static void offerThanatocyteLatticeHitResolution(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+    public static void offerThanatocyteLatticeHitResolution(
+            ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         String[] parts = buttonID.substring(SELECT_LATTICE_SHIP.length()).split("_", 5);
         if (parts.length != 5 || !player.hasTech(LATTICE)) {
             ButtonHelper.deleteMessage(event);
@@ -248,10 +250,10 @@ public class AeternaTechHandler {
         }
 
         UnitKey targetUnitKey = combatHolder.getUnitKeys().stream()
-            .filter(unitKey -> targetPlayer.unitBelongsToPlayer(unitKey))
-            .filter(unitKey -> unitKey.unitType() == unitType)
-            .findFirst()
-            .orElse(null);
+                .filter(unitKey -> targetPlayer.unitBelongsToPlayer(unitKey))
+                .filter(unitKey -> unitKey.unitType() == unitType)
+                .findFirst()
+                .orElse(null);
 
         UnitModel targetUnitModel = targetUnitKey == null ? null : targetPlayer.getUnitFromUnitKey(targetUnitKey);
 
@@ -260,12 +262,9 @@ public class AeternaTechHandler {
             return;
         }
 
-        String usageKey = player.getFaction()
-            + "thanatocyteLattice"
-            + tile.getPosition()
-            + combatHolder.getName()
-            + combatRound;
-        
+        String usageKey =
+                player.getFaction() + "thanatocyteLattice" + tile.getPosition() + combatHolder.getName() + combatRound;
+
         if (!game.getStoredValue(usageKey).isBlank()) {
             ButtonHelper.deleteMessage(event);
             return;
@@ -281,20 +280,20 @@ public class AeternaTechHandler {
             }
 
             String idBase = targetPlayer.factionButtonChecker()
-                + RESOLVE_LATTICE_HIT
-                + tile.getPosition()
-                + "_"
-                + combatHolder.getName()
-                + "_"
-                + targetPlayer.getColorID()
-                + "_"
-                + unitType.value
-                + "_"
-                + state.name()
-                + "_"
-                + player.getColorID()
-                + "_"
-                + combatRound;
+                    + RESOLVE_LATTICE_HIT
+                    + tile.getPosition()
+                    + "_"
+                    + combatHolder.getName()
+                    + "_"
+                    + targetPlayer.getColorID()
+                    + "_"
+                    + unitType.value
+                    + "_"
+                    + state.name()
+                    + "_"
+                    + player.getColorID()
+                    + "_"
+                    + combatRound;
 
             if (!state.isDamaged() && ButtonHelper.unitCanSustainDamage(game, targetPlayer, tile, targetUnitModel)) {
                 buttons.add(Buttons.gray(idBase + "_sustain", "Sustain " + unitType.humanReadableName()));
@@ -304,12 +303,12 @@ public class AeternaTechHandler {
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
-            game.isFowMode() ? targetPlayer.getCorrectChannel() : event.getMessageChannel(),
-            targetPlayer.getRepresentation()
-                + ", resolve the  _Thanatocyte Lattice_ hit assigned to your "
-                + unitType.humanReadableName()
-                + ":",
-            buttons);
+                game.isFowMode() ? targetPlayer.getCorrectChannel() : event.getMessageChannel(),
+                targetPlayer.getRepresentation()
+                        + ", resolve the  _Thanatocyte Lattice_ hit assigned to your "
+                        + unitType.humanReadableName()
+                        + ":",
+                buttons);
     }
 
     @ButtonHandler(RESOLVE_LATTICE_HIT)
@@ -320,14 +319,14 @@ public class AeternaTechHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-    
+
         Tile tile = game.getTileByPosition(parts[0]);
         UnitHolder combatHolder = tile == null ? null : tile.getUnitHolders().get(parts[1]);
         Player targetPlayer = game.getPlayerFromColorOrFaction(parts[2]);
         UnitType unitType = Units.findUnitType(parts[3]);
         UnitState state = Units.findUnitState(parts[4]);
         Player sourcePlayer = game.getPlayerFromColorOrFaction(parts[5]);
-    
+
         int combatRound;
         try {
             combatRound = Integer.parseInt(parts[6]);
@@ -335,7 +334,7 @@ public class AeternaTechHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-    
+
         boolean sustain = "sustain".equals(parts[7]);
         if (combatHolder == null
                 || targetPlayer != player
@@ -346,7 +345,7 @@ public class AeternaTechHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-    
+
         var combat = StartCombatService.getCurrentCombat(game);
         if (combat == null
                 || !tile.getPosition().equals(combat.tilePosition())
@@ -357,45 +356,44 @@ public class AeternaTechHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-    
+
         String usageKey = sourcePlayer.getFaction()
                 + "thanatocyteLattice"
                 + tile.getPosition()
                 + combatHolder.getName()
                 + combatRound;
-    
+
         if (!"used".equals(game.getStoredValue(usageKey))) {
             ButtonHelper.deleteMessage(event);
             return;
         }
-    
+
         UnitKey targetUnitKey = combatHolder.getUnitKeys().stream()
                 .filter(unitKey -> targetPlayer.unitBelongsToPlayer(unitKey))
                 .filter(unitKey -> unitKey.unitType() == unitType)
                 .findFirst()
                 .orElse(null);
-    
-        UnitModel targetUnitModel =
-                targetUnitKey == null ? null : targetPlayer.getUnitFromUnitKey(targetUnitKey);
-    
+
+        UnitModel targetUnitModel = targetUnitKey == null ? null : targetPlayer.getUnitFromUnitKey(targetUnitKey);
+
         if (targetUnitModel == null || combatHolder.getUnitCountForState(targetUnitKey, state) < 1) {
             ButtonHelper.deleteMessage(event);
             return;
         }
-    
+
         if (sustain) {
             if (state.isDamaged() || !ButtonHelper.unitCanSustainDamage(game, targetPlayer, tile, targetUnitModel)) {
                 ButtonHelper.deleteMessage(event);
                 return;
             }
-    
+
             combatHolder.addDamagedUnit(targetUnitKey, 1);
             CommanderUnlockCheckService.checkPlayer(targetPlayer, "ponthous");
         } else {
             DestroyUnitService.destroyUnit(
                     event, tile, game, new ParsedUnit(targetUnitKey, 1, combatHolder.getName()), true, state);
         }
-    
+
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),

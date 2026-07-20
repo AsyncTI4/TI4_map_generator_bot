@@ -1941,10 +1941,12 @@ public class CombatRollService {
         if (totalHits > 0 && rollType != CombatRollType.combatround && player.hasTech("tf-shardsaturation")) {
             totalHits++;
         }
-        if (totalHits > 0 && rollType != CombatRollType.combatround && game.playerHasLeaderUnlockedOrAlliance(player, "xytheriscommander")) {
+        if (totalHits > 0
+                && rollType != CombatRollType.combatround
+                && game.playerHasLeaderUnlockedOrAlliance(player, "xytheriscommander")) {
             totalHits++;
             result += "\n" + player.getFactionEmoji()
-                + " produced 1 additional hit from _Zythix_ the Xytheris Commander.";
+                    + " produced 1 additional hit from _Zythrix_ the Xytheris Commander.";
         }
         result += CombatMessageHelper.displayHitResults(totalHits, useDoubleBoomEmoji);
 
