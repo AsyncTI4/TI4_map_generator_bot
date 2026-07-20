@@ -93,30 +93,6 @@ public final class DiscordantStarsHelper {
         }
     }
 
-    public static void checkTombWorlds(Game game) {
-        Player player = Helper.getPlayerFromAbility(game, "tomb_worlds");
-        if (player == null) {
-            return;
-        }
-
-        for (Tile tile : game.getTileMap().values()) {
-            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                if (unitHolder instanceof Planet planet) {
-                    if (player.getPlanets().contains(planet.getName())) {
-                        if (planet.getUnitCount(UnitType.Spacedock, player) < 1
-                                && planet.getTokenList().contains("attachment_positiveinf2.png")) {
-                            planet.removeToken("attachment_positiveinf2.png");
-                        } else if (planet.getUnitCount(UnitType.Spacedock, player) > 0) {
-                            planet.addToken("attachment_positiveinf2.png");
-                        }
-                    } else if (planet.getTokenList().contains("attachment_positiveinf2.png")) {
-                        planet.removeToken("attachment_positiveinf2.png");
-                    }
-                }
-            }
-        }
-    }
-
     public static void checkSigil(Game game) { // Edyn Mech adds Sigil tokens under them
         Player player = Helper.getPlayerFromUnit(game, "edyn_mech");
         if (player == null) {

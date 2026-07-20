@@ -288,8 +288,9 @@ public class DataMigrationManager {
                 }
             }
             player.setCommoditiesBase(replacement.getCommodities());
-            if (player.getCommodities() > player.getCommoditiesTotal()) {
-                player.setCommodities(player.getCommoditiesTotal());
+            int commoditiesTotal = player.getCommoditiesTotal();
+            if (player.getCommodities() > commoditiesTotal) {
+                player.setCommodities(commoditiesTotal);
             }
 
             BotLogger.info("Migration removeEronousFactions: in game " + game.getName() + ", swapped "

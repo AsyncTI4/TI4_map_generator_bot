@@ -90,7 +90,6 @@ public class CheckDistanceHelper {
                             || (tile.isNebula(game)
                                     && player != null
                                     && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
-                                    && !player.hasAbility("celestial_being")
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !player.hasAbility("voidborn")
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
@@ -98,7 +97,6 @@ public class CheckDistanceHelper {
                             || (tile.isSupernova()
                                     && player != null
                                     && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
-                                    && !player.hasAbility("celestial_being")
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !player.hasAbility("gashlai_physiology")
@@ -116,7 +114,6 @@ public class CheckDistanceHelper {
                             || (tile.isAsteroidField()
                                     && player != null
                                     && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
-                                    && !player.hasAbility("celestial_being")
                                     && !player.hasTech("amd")
                                     && !player.hasTech("wavelength")
                                     && !player.getRelics().contains("circletofthevoid")
