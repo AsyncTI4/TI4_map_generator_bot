@@ -97,6 +97,12 @@ public class CardsInfoService {
                     "Use Runebearer Lothos on Another Player",
                     FactionEmojis.revenant));
         }
+        if (player.hasUnexhaustedLeader("oblivionagent")) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "useOblivionAgent_other",
+                    "Use Avaris the Seer on someone else",
+                    FactionEmojis.oblivion));
+        }
         if (player.hasUnexhaustedLeader("ashenagent")) {
             buttons.add(AshenLeadersHandler.getAshTenderCardsInfoButton(player));
         }

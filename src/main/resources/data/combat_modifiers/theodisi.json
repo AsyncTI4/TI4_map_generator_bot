@@ -1,0 +1,17 @@
+[
+    {
+        "alias": "survivalists_extra_die_when_damaged",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "damaged_units",
+        "persistenceType": "ALWAYS",
+        "scope": "_ship_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "ability",
+                "alias": "survivalists"
+            }
+        ]
+    }
+]
