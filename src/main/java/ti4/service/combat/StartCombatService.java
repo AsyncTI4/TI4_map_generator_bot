@@ -29,7 +29,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamBut
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
@@ -324,6 +324,8 @@ public class StartCombatService {
         game.setStoredValue(combatName2, "");
         combatName2 = COMBAT_ROUND_TRACKER + player2.getFaction() + tile.getPosition() + unitHolderName;
         game.setStoredValue(combatName2, "");
+        AeternaTechHandler.resetThanatocyteLatticeForCombat(game, player1, tile, unitHolderName);
+        AeternaTechHandler.resetThanatocyteLatticeForCombat(game, player2, tile, unitHolderName);
         if (player1.hasAbility("refraction") || player2.hasAbility("refraction")) {
             CrystellumAbilityHandler.resetRefractionForCombat(game, player1, tile);
             CrystellumAbilityHandler.resetRefractionForCombat(game, player2, tile);
