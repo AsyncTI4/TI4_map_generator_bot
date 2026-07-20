@@ -33,7 +33,6 @@ import ti4.service.rules.ThundersEdgeRulesService;
 
 @UtilityClass
 public class MiltyService {
-
     public static void offerKeleresSetupButtons(MiltyDraftManager manager, Player player) {
         List<String> flavors = List.of("mentak", "xxcha", "argent");
         List<Button> keleresPresets = new ArrayList<>();
@@ -227,7 +226,7 @@ public class MiltyService {
         return null;
     }
 
-    private static void initDraftOrder(MiltyDraftManager draftManager, List<String> playerIDs, boolean staticOrder) {
+    static void initDraftOrder(MiltyDraftManager draftManager, List<String> playerIDs, boolean staticOrder) {
         List<String> players = new ArrayList<>(playerIDs);
         if (!staticOrder) {
             Collections.shuffle(players);
@@ -251,7 +250,7 @@ public class MiltyService {
      * - Per-source constraints cap/guarantee the remaining slots per expansion.
      * - If constraints is null/empty, falls back to the original unconstrained shuffle.
      */
-    private static List<String> createFactionDraft(
+    static List<String> createFactionDraft(
             int factionCount,
             List<String> factions,
             List<String> firstFactions,
@@ -333,7 +332,7 @@ public class MiltyService {
         return output.subList(0, Math.min(factionCount, output.size()));
     }
 
-    private static ComponentSource logicalFactionSource(ComponentSource source) {
+    static ComponentSource logicalFactionSource(ComponentSource source) {
         return switch (source) {
             case codex1, codex2, codex3, codex4 -> ComponentSource.pok;
             default -> source;
@@ -342,6 +341,7 @@ public class MiltyService {
 
     public static void miltySetup(GenericInteractionCreateEvent event, Game game) {
         MiltySettings menu = game.initializeMiltySettings();
+        menu.setRandomSetup(false);
         // TODO: Settings should use a flag for nucleus generation.
         // But for now, trying to keep our settings changes minimal.
         if (event instanceof ButtonInteractionEvent buttonEvent) {

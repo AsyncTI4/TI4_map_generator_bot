@@ -34,10 +34,27 @@ public class MoveUnitService {
             Tile dest,
             String uhDest,
             boolean dmg) {
+        Player player = game.getPlayerFromColorOrFaction(color);
+        boolean stationWasExhausted =
+                player != null && player.getExhaustedPlanets().contains("aurelionstation");
+        boolean stationAbilityWasExhausted =
+                player != null && player.getExhaustedPlanetsAbilities().contains("aurelionstation");
         List<RemovedUnit> removed = RemoveUnitService.removeUnits(event, tile, game, color, unitList, dmg);
         List<RemovedUnit> toAdd =
                 removed.stream().map(r -> r.onUnitHolder(dest, uhDest)).toList();
         AddUnitService.addUnits(event, game, toAdd);
+
+        // Moving Aurelion briefly removes its attached station card; retain its prior exhausted state.
+        if (player != null
+                && removed.stream().anyMatch(unit -> unit.unitKey().unitType() == UnitType.Aurelion)
+                && player.hasPlanet("aurelionstation")) {
+            if (stationWasExhausted) {
+                player.exhaustPlanet("aurelionstation");
+            }
+            if (stationAbilityWasExhausted) {
+                player.exhaustPlanetAbility("aurelionstation");
+            }
+        }
     }
 
     public void replaceUnit(

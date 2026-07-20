@@ -471,7 +471,7 @@ public final class ButtonHelperModifyUnits {
         }
         if (!doesPlayerHaveGfOnPlanet(unitHolder, player)) {
             Player opponent = game.getActivePlayer();
-            if (opponent == player) {
+            if (opponent == player || !FoWHelper.playerHasUnitsOnPlanet(opponent, unitHolder)) {
                 for (Player p : game.getRealPlayersNNeutral()) {
                     if (p != player && FoWHelper.playerHasUnitsOnPlanet(p, unitHolder)) {
                         opponent = p;
@@ -479,34 +479,37 @@ public final class ButtonHelperModifyUnits {
                     }
                 }
             }
-            if (opponent.hasTech("dxa") && opponent != player) {
-                String msg3 = opponent.getRepresentation()
-                        + " you may have an opportunity to use _Dacxive Animators_ on "
-                        + Helper.getPlanetRepresentation(planet, game)
-                        + ". Click to confirm a combat occurred and to add 1 infantry or delete these buttons.";
-                MessageHelper.sendMessageToChannelWithButtons(
-                        opponent.getCorrectChannel(), msg3, ButtonHelper.getDacxiveButtons(planet, opponent));
-            }
-            if (opponent != player && opponent.isActivePlayer()) {
-                Player otherOpponent = null;
-                for (Player p : game.getRealPlayersNNeutral()) {
-                    if (p != player && p != opponent && FoWHelper.playerHasUnitsOnPlanet(p, unitHolder)) {
-                        otherOpponent = p;
-                        break;
-                    }
-                }
-                if (otherOpponent != null) {
-                    String msg4 = opponent.getRepresentation()
-                            + " you may have an opportunity to claim the planet of "
+            if (opponent != player && FoWHelper.playerHasUnitsOnPlanet(opponent, unitHolder)) {
+                if (opponent.hasTech("dxa")) {
+                    String msg3 = opponent.getRepresentation()
+                            + " you may have an opportunity to use _Dacxive Animators_ on "
                             + Helper.getPlanetRepresentation(planet, game)
-                            + " or fight the coexisters. Click a button to decide.";
-                    List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.green(
-                            opponent.factionButtonChecker() + "claimPlanet_" + unitHolder.getName(), "Claim Planet"));
-                    buttons.add(Buttons.red(
-                            opponent.factionButtonChecker() + "startCombatOn_" + unitHolder.getName(),
-                            "Fight Coexisters"));
-                    MessageHelper.sendMessageToChannelWithButtons(opponent.getCorrectChannel(), msg4, buttons);
+                            + ". Click to confirm a combat occurred and to add 1 infantry or delete these buttons.";
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            opponent.getCorrectChannel(), msg3, ButtonHelper.getDacxiveButtons(planet, opponent));
+                }
+                if (opponent.isActivePlayer()) {
+                    Player otherOpponent = null;
+                    for (Player p : game.getRealPlayersNNeutral()) {
+                        if (p != player && p != opponent && FoWHelper.playerHasUnitsOnPlanet(p, unitHolder)) {
+                            otherOpponent = p;
+                            break;
+                        }
+                    }
+                    if (otherOpponent != null) {
+                        String msg4 = opponent.getRepresentation()
+                                + " you may have an opportunity to claim the planet of "
+                                + Helper.getPlanetRepresentation(planet, game)
+                                + " or fight the coexisters. Click a button to decide.";
+                        List<Button> buttons = new ArrayList<>();
+                        buttons.add(Buttons.green(
+                                opponent.factionButtonChecker() + "claimPlanet_" + unitHolder.getName(),
+                                "Claim Planet"));
+                        buttons.add(Buttons.red(
+                                opponent.factionButtonChecker() + "startCombatOn_" + unitHolder.getName(),
+                                "Fight Coexisters"));
+                        MessageHelper.sendMessageToChannelWithButtons(opponent.getCorrectChannel(), msg4, buttons);
+                    }
                 }
             }
         }
@@ -735,6 +738,9 @@ public final class ButtonHelperModifyUnits {
                 "carrier",
                 "dreadnought",
                 "flagship",
+                "celagrom",
+                "aurelion",
+                "lady",
                 "warsun"));
         if (spaceCannonOffence) {
             assignHitOrder = new ArrayList<>(List.of(
@@ -745,6 +751,9 @@ public final class ButtonHelperModifyUnits {
                     "carrier",
                     "dreadnought",
                     "flagship",
+                    "celagrom",
+                    "aurelion",
+                    "lady",
                     "warsun"));
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
@@ -758,6 +767,9 @@ public final class ButtonHelperModifyUnits {
                             "dreadnought",
                             "carrier",
                             "flagship",
+                            "celagrom",
+                            "aurelion",
+                            "lady",
                             "warsun",
                             "fighter"));
                     if (!justSummarizing) {

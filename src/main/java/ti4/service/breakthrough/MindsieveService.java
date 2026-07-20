@@ -99,12 +99,20 @@ public class MindsieveService {
                             .ifPresent(scMessage ->
                                     ReactionService.addReaction(naalu, false, null, null, scMessage.messageId(), game));
 
-                    MessageChannel scChannel = ButtonHelper.getSCFollowChannel(game, naalu, sc);
-                    String msg = naalu.getRepresentationUnfogged() + " sent a promissory note to "
-                            + primary.getRepresentationUnfogged() + " via " + mindsieve()
-                            + " to perform the secondary ability of **" + scModel.getName()
-                            + "** without spending a command token.";
-                    MessageHelper.sendMessageToChannel(scChannel, msg);
+                    if (game.isFowMode()) {
+                        String privateMsg = naalu.getRepresentationUnfogged() + " sent a promissory note to "
+                                + primary.getColorIfCanSeeStats(naalu) + " via " + mindsieve()
+                                + " to perform the secondary ability of **" + scModel.getName()
+                                + "** without spending a command token.";
+                        MessageHelper.sendMessageToChannel(naalu.getCorrectChannel(), privateMsg);
+                    } else {
+                        MessageChannel scChannel = ButtonHelper.getSCFollowChannel(game, naalu, sc);
+                        String publicMsg = naalu.getRepresentationUnfogged() + " sent a promissory note to "
+                                + primary.getRepresentationUnfogged() + " via " + mindsieve()
+                                + " to perform the secondary ability of **" + scModel.getName()
+                                + "** without spending a command token.";
+                        MessageHelper.sendMessageToChannel(scChannel, publicMsg);
+                    }
                     ButtonHelper.deleteMessage(event);
                 },
                 e -> {

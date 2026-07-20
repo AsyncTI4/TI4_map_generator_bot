@@ -17,10 +17,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.Na
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -146,6 +145,16 @@ public final class ButtonHelperTacticalAction {
                         player.getRepresentation()
                                 + ", you have _Surveyor's Lens_ and as such may exhaust it to explore a planet in the active system:",
                         KairnTechHandler.getSurveyorsLensButton(player));
+            }
+            if (player.hasAbility("colony_outposts")
+                    && player.getStrategicCC() > 0
+                    && !game.getStoredValue(player.getFaction() + "planetsExplored")
+                            .isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButton(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", you have _Colony Outposts_ and explored a planet during this tactical action.\nYou may spend a strategy token to find an attachment in that planet's exploration deck and attach it to that planet:",
+                        KairnAbilityHandler.offerColonyOutposts(player));
             }
             if (!game.isAbsolMode()
                     && player.getRelics().contains("emphidia")
@@ -455,6 +464,7 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("ardentiaSubjugate");
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
+        XytherisLeadersHandler.clearMyrixAgentEffects(game);
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         ArdentiaUnitHandler.clearIronClawDeployUsed(game);
@@ -595,6 +605,7 @@ public final class ButtonHelperTacticalAction {
             return;
         }
         game.setActiveSystem(pos);
+        XytherisLeadersHandler.offerMyrixAgentButtons(game, player, tile);
         game.setStoredValue("possiblyUsedRift", "");
         game.setStoredValue("lastActiveSystem", pos);
         List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);

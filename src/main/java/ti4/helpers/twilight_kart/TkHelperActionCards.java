@@ -200,7 +200,9 @@ public class TkHelperActionCards {
                     String label = Helper.getPlanetRepresentation(p.getName(), game);
                     for (Player p2 : game.getRealPlayers()) {
                         if (p2.hasPlanet(p.getName())) {
-                            return Buttons.red(id, label, p2.getFactionEmoji());
+                            return game.isFowMode()
+                                    ? Buttons.red(id, label)
+                                    : Buttons.red(id, label, p2.getFactionEmoji());
                         }
                     }
                     return Buttons.gray(id, label);
@@ -479,7 +481,11 @@ public class TkHelperActionCards {
             if (count > 0) {
                 String id = player.factionButtonChecker() + "ordainDiscardOne_" + planetName + "_" + p2.getColor();
                 String label = "Discard " + p2.getColorDisplayName() + " ability (" + count + " available)";
-                buttons.add(Buttons.red(id, label, p2.getFactionEmoji()));
+                if (game.isFowMode()) {
+                    buttons.add(Buttons.red(id, label));
+                } else {
+                    buttons.add(Buttons.red(id, label, p2.getFactionEmoji()));
+                }
             }
         }
         if (buttons.isEmpty()) {
@@ -520,6 +526,18 @@ public class TkHelperActionCards {
         msg += victim.getRepresentation() + "'s abilities. You may still decline to discard, if you so wish:";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("ordainDiscard_")
+    private static void ordainDiscard(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Player victim = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String tech = buttonID.split("_")[2];
+        victim.removeTech(tech);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " discarded " + victim.getRepresentation() + "'s ability: "
+                        + Mapper.getTech(tech).getName());
     }
 
     @ButtonHandler("resolveRaze_")

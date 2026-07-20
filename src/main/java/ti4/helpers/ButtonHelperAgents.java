@@ -807,9 +807,18 @@ public final class ButtonHelperAgents {
                 p2 = game.getPlayerFromColorOrFaction(rest.split("_")[1]);
             }
             List<Button> buttons = ButtonHelper.getGainCCButtons(p2);
-            String message2 = p2.getRepresentation() + ", your current command tokens are " + p2.getCCRepresentation()
-                    + ". Use buttons to gain command tokens.";
-            MessageHelper.sendMessageToChannelWithButtons(channel, message2, buttons);
+            // TODO: this also appears to route to the exhausting player's channel instead of p2's own
+            // channel in normal (non-FoW) games - likely a bug there too, but keeping this fix scoped to
+            // FoW mode only for now.
+            if (game.isFowMode()) {
+                String message2 = p2.getRepresentationUnfogged() + ", your current command tokens are "
+                        + p2.getCCRepresentation() + ". Use buttons to gain command tokens.";
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message2, buttons);
+            } else {
+                String message2 = p2.getRepresentation() + ", your current command tokens are "
+                        + p2.getCCRepresentation() + ". Use buttons to gain command tokens.";
+                MessageHelper.sendMessageToChannelWithButtons(channel, message2, buttons);
+            }
             game.setStoredValue("originalCCsFor" + p2.getFaction(), p2.getCCRepresentation());
         }
         if ("keleresagent".equalsIgnoreCase(agent)) {
@@ -1017,8 +1026,13 @@ public final class ButtonHelperAgents {
             String faction = posNFaction.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 == null) return;
+            MessageChannel yinChannel = event.getMessageChannel();
+            if (game.isFowMode()) {
+                yinChannel = p2.getPrivateChannel();
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sent buttons to the chosen player");
+            }
             MessageHelper.sendMessageToChannelWithButtons(
-                    event.getMessageChannel(),
+                    yinChannel,
                     p2.getRepresentationUnfogged() + ", use buttons to resolve " + ssruuClever
                             + "Brother Milor, the Yin" + ssruuSlash + " agent.",
                     getYinAgentButtons(p2, game, pos));
@@ -1202,12 +1216,25 @@ public final class ButtonHelperAgents {
                 successMessage = player.getRepresentation() + " drew 2 action cards (Scheming).";
 
             String successMessage2 = p2.getRepresentation() + " drew 1 action card";
-            if (p2.hasAbility("scheming")) successMessage = p2.getRepresentation() + " drew 2 action cards (Scheming)";
+            // TODO: this branch also has a variable-name bug in normal (non-FoW) games - p2's
+            // Yssaril-exclusive "Scheming" ability leaks into the attacker's own message there too.
+            // Only fixing the FoW-mode case here.
+            if (p2.hasAbility("scheming")) {
+                if (game.isFowMode()) {
+                    successMessage2 = p2.getRepresentation() + " drew 2 action cards (Scheming) via _Hyper Genome_";
+                } else {
+                    successMessage = p2.getRepresentation() + " drew 2 action cards (Scheming)";
+                }
+            } else if (game.isFowMode()) {
+                successMessage2 += " via _Hyper Genome_";
+            }
 
             if (p2.getTg() > 0) {
                 p2.setTg(p2.getTg() - 1);
                 player.gainTG(1, true);
-                successMessage2 += " and gave 1 TG to " + player.getFactionEmojiOrColor() + ".";
+                successMessage2 += game.isFowMode()
+                        ? " and gave 1 TG."
+                        : " and gave 1 TG to " + player.getFactionEmojiOrColor() + ".";
                 successMessage += " and took 1 TG from " + p2.getFactionEmojiOrColor() + ".";
             } else {
                 successMessage += ".";

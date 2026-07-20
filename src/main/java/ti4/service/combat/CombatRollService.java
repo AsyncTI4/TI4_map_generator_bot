@@ -35,6 +35,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
@@ -632,6 +634,10 @@ public class CombatRollService {
                                     CrystellumUnitHandler.offerRefractumButtonIfRelevant(
                                             buttons, opponent, game, tile, combatOnHolder, h);
                                 }
+                                if (round2 == 1 && opponent.hasTech("threvenantr")) {
+                                    RevenantTechHandler.addEternalAegisButton(
+                                            buttons, game, opponent, player, tile, combatOnHolder, h);
+                                }
                             }
                             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                             if (opponent.hasTech("vpw")) {
@@ -722,6 +728,11 @@ public class CombatRollService {
                             buttons.add(Buttons.gray(
                                     factionChecker + "cancelSpaceHits_" + tile.getPosition() + "_" + h,
                                     "Cancel a Hit"));
+                        }
+
+                        if (round2 == 1 && opponent.hasTech("threvenantr")) {
+                            RevenantTechHandler.addEternalAegisButton(
+                                    buttons, game, opponent, player, tile, combatOnHolder, h);
                         }
 
                         String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign "
@@ -2280,6 +2291,8 @@ public class CombatRollService {
                 }
             }
         }
+        XytherisAbilityHandler.getBestHiveEchoUnit(tile, player, CombatRollType.AFB)
+                .ifPresent(unit -> output.putIfAbsent(unit, 1));
         if (player.hasUnit("iron_flagship")) {
             IronUnitsHandler.getIronFlagshipAfbUnits(player, tile)
                     .forEach((model, count) -> output.put(new ImmutablePair<>(model, spaceHolder), count));
@@ -2361,6 +2374,8 @@ public class CombatRollService {
                 .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount(player) > 0)
                 .collect(Collectors.toMap(
                         entry -> new ImmutablePair<>(entry.getKey(), spaceHolder), Map.Entry::getValue)));
+        XytherisAbilityHandler.getBestHiveEchoUnit(tile, player, CombatRollType.bombardment)
+                .ifPresent(unit -> output.putIfAbsent(unit, 1));
         Map<UnitModel, Integer> flatOutput = new HashMap<>();
         output.forEach((k, v) -> flatOutput.merge(k.getLeft(), v, Integer::sum));
         checkBadUnits(player, event, unitsByAsyncId, flatOutput);
@@ -2466,7 +2481,6 @@ public class CombatRollService {
                 }
             }
         }
-
         // Check for space cannon die on planets
 
         for (UnitHolder unitHolder : unitHolders) {
@@ -2588,6 +2602,8 @@ public class CombatRollService {
                 }
             }
         }
+        XytherisAbilityHandler.getBestHiveEchoUnit(tile, player, CombatRollType.SpaceCannonOffence)
+                .ifPresent(unit -> output.putIfAbsent(unit, 1));
         if (game.playerHasLeaderUnlockedOrAlliance(player, "netrunnerscommander")) {
             NetrunnersLeadersHandler.getCommanderSpaceCannonUnits(game, player, tile)
                     .forEach((model, count) ->

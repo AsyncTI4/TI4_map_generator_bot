@@ -59,6 +59,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
@@ -107,6 +110,7 @@ import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
+import ti4.service.VeiledHeartService;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.ValefarZService;
@@ -4160,6 +4164,11 @@ public class ButtonHelper {
                     totalPdsInSystem += entry.getValue();
                 }
             }
+            if ("space".equalsIgnoreCase(capChecker.getName())) {
+                for (UnitKey unitKey : capChecker.getUnitKeysForPlayer(player)) {
+                    capacity += XytherisLeadersHandler.getMyrixAgentBonus(game, player, tile, capChecker, unitKey);
+                }
+            }
             if (player.getPlanets().contains(capChecker.getName())) {
                 for (String token : capChecker.getTokenList()) {
                     if (token.contains("facilitynavalbase")) {
@@ -4207,6 +4216,7 @@ public class ButtonHelper {
             fightersIgnored += 3 * totalPdsInSystem;
         }
         int ignoredFs = 0;
+        int xytherisPdsInSpace = 0;
 
         UnitHolder spaceHolder = tile.getSpaceUnitHolder();
         List<String> unitTypesCounted = new ArrayList<>();
@@ -4215,7 +4225,11 @@ public class ButtonHelper {
             UnitModel unit = entry.getKey();
             if (entry.getValue() <= 0) continue;
             if (!unitTypesCounted.contains(unit.getBaseType())) {
-                if ("fighter".equalsIgnoreCase(unit.getBaseType())
+                boolean xytherisPds = unit.getUnitType() == UnitType.Pds
+                        && player.hasUnlockedBreakthrough("xytherisbt")
+                        && player.hasUpgradedUnit("pds2");
+                if (xytherisPds
+                        || "fighter".equalsIgnoreCase(unit.getBaseType())
                         || "infantry".equalsIgnoreCase(unit.getBaseType())
                         || "mech".equalsIgnoreCase(unit.getBaseType())) {
                     if ("fighter".equalsIgnoreCase(unit.getBaseType()) && player.hasFF2Tech()) {
@@ -4232,6 +4246,9 @@ public class ButtonHelper {
                     }
                     if ("mech".equalsIgnoreCase(unit.getBaseType()) && player.hasAbility("evolved_warforms")) {
                         evolvedWarformsMechsInSpace += entry.getValue();
+                    }
+                    if (xytherisPds) {
+                        xytherisPdsInSpace += entry.getValue();
                     }
                     if ("fighter".equalsIgnoreCase(unit.getBaseType())) {
                         ignoredFs = Math.min(fightersIgnored, entry.getValue());
@@ -4320,6 +4337,15 @@ public class ButtonHelper {
             }
 
             if (overflow > 0) {
+                int pdsOverflow = Math.min(overflow, xytherisPdsInSpace);
+                if (pdsOverflow > 0) {
+                    numInfNFightersNMechs -= pdsOverflow;
+                    numOfCapitalShips += pdsOverflow * 2;
+                    overflow -= pdsOverflow;
+                }
+            }
+
+            if (overflow > 0) {
                 capacityViolated = true;
             } else {
                 if (numFighter2sFleet + numRiptide2sFleet + numOfCapitalShips > fleetCap) {
@@ -4364,7 +4390,8 @@ public class ButtonHelper {
         }
         if (spaceHolder.getUnitCount(UnitType.Pds, player) > 0) {
             if (!(player.hasAnyUnit("mirveda_pds", "mirveda_pds2", "tk-keshnu")
-                    || player.hasAbility("miniaturization"))) {
+                    || player.hasAbility("miniaturization")
+                    || (player.hasUnlockedBreakthrough("xytherisbt") && player.hasUpgradedUnit("pds2")))) {
                 structuresViolated = true;
             }
         }
@@ -5409,6 +5436,7 @@ public class ButtonHelper {
                 count++;
             }
         }
+        count += VeiledHeartService.countVeiledCards(VeiledHeartService.VeiledCardType.UNIT, player);
         return count;
     }
 
@@ -6028,6 +6056,7 @@ public class ButtonHelper {
                 }
             }
         }
+        RevenantLeadersHandler.addRevArcanumAgentButtons(buttons, game, player, planet);
         return buttons;
     }
 
@@ -7783,6 +7812,22 @@ public class ButtonHelper {
                         }
                     }
                 }
+            }
+        }
+        Tile activeTile = game.getTileByPosition(tilePos);
+        for (Player hiveEchoPlayer : game.getRealPlayers()) {
+            if (playersWithPds2.contains(hiveEchoPlayer)
+                    || XytherisAbilityHandler.getBestHiveEchoUnit(
+                                    activeTile, hiveEchoPlayer, CombatRollType.SpaceCannonOffence)
+                            .isEmpty()) {
+                continue;
+            }
+            if (hiveEchoPlayer == player || player.getAllianceMembers().contains(hiveEchoPlayer.getFaction())) {
+                if (FoWHelper.otherPlayersHaveShipsInSystem(player, activeTile, game)) {
+                    playersWithPds2.add(hiveEchoPlayer);
+                }
+            } else {
+                playersWithPds2.add(hiveEchoPlayer);
             }
         }
         if (game.getRealPlayers().stream()

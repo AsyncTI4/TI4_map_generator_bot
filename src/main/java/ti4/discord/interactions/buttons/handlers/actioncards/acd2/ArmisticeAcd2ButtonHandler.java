@@ -41,16 +41,17 @@ class ArmisticeAcd2ButtonHandler {
             RemoveCommandCounterService.fromTile(target.getColor(), tile, game);
             target.setTacticalCC(target.getTacticalCC() + 1);
             MessageHelper.sendMessageToChannel(
-                    game.getActionsChannel(),
+                    player.getCorrectChannel(),
                     player.getFactionEmojiOrColor() + " resolved _Armistice_ and removed "
                             + target.getFactionEmojiOrColor()
-                            + "'s command token from " + tile.getRepresentationForButtons() + ".");
+                            + "'s command token from " + tile.getRepresentationForButtons(game, player) + ".");
         } else {
             MessageHelper.sendMessageToChannel(
-                    game.getActionsChannel(),
+                    player.getCorrectChannel(),
                     player.getFactionEmojiOrColor() + " resolved _Armistice_. "
                             + target.getFactionEmojiOrColor()
-                            + " had no command token in " + tile.getRepresentationForButtons() + " to remove.");
+                            + " had no command token in " + tile.getRepresentationForButtons(game, player)
+                            + " to remove.");
         }
 
         List<Button> conclusionButtons = new ArrayList<>();

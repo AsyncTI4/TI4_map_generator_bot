@@ -81,7 +81,6 @@
       "CYBERNETIC"
     ],
     "text": "When you gain this breakthrough and each time you score a secret objective, you may draw 1 random unused agent and attach it to this card. This card has the ability text of each agent attached to it. Once per game round, when you would exhaust this card, you may purge 1 agent attached to this card instead.",
-    "notes": "Due to how some agents are wired in async, the agent purge option is always available in cards info. Use it instead of exhausting an agent when you normally would if you plan to purge one.",
     "source": "theodisi"
   },
   {
@@ -168,4 +167,4 @@
     "text": "When you gain this breakthrough choose a side for it to start on. When you research a cybernetic or biotic technology, flip this card over. When you activate a system, apply +1 to the capacity value of 2 units until the end of that tactical action. When you use PRODUCTION, apply -1 to the combined cost of those produced units.",
     "source": "theodisi"
   }
-] 
+]

@@ -5,13 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
-import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.components.replacer.ComponentReplacer;
-import net.dv8tion.jda.api.components.tree.MessageComponentTree;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -21,7 +16,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.UnusedAgentHelper;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
-import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.Source.ComponentSource;
@@ -31,8 +25,8 @@ public class RevenantBreakthroughHandler {
     private static final String REVENANT_RISING = "revenantbt";
     private static final String ATTACHED_AGENTS = "revenantRisingAgents_";
     private static final String PURGE_ROUND = "revenantRisingPurgeRound_";
-    private static final String PURGE_ENTRY_MESSAGE = "revenantRisingPurgeEntryMessage_";
-    private static final String OPEN_PURGE_MENU = "revenantRisingPurgeAgent";
+    private static final String OFFER_PURGE = "revenantRisingOfferPurge_";
+    private static final String DECLINE_PURGE = "revenantRisingDeclinePurge";
     private static final String PURGE_AGENT = "revenantRisingPurge_";
 
     public static void gainAttachedAgent(Game game, Player player) {
@@ -70,22 +64,28 @@ public class RevenantBreakthroughHandler {
         }
     }
 
-    public static Button getPurgeAgentButton(Player player) {
-        return Buttons.red(player.factionButtonChecker() + OPEN_PURGE_MENU, "Purge Revenant Rising Agent");
-    }
-
-    public static boolean canPurgeAgent(Game game, Player player) {
-        return game != null
-                && player != null
-                && player.hasUnlockedBreakthrough(REVENANT_RISING)
-                && !hasUsedPurgeThisRound(game, player)
-                && !getAttachedAgents(game, player).isEmpty();
-    }
-
     public static void exhaustRevenantRisingForAttachedAgent(Game game, Player player, Leader exhaustedLeader) {
         if (!isReadyRevenantRisingAttachedAgent(game, player, exhaustedLeader)) return;
 
         BreakthroughCommandHelper.exhaustBreakthrough(player, REVENANT_RISING);
+        if (player.getCardsInfoThread() == null
+                || hasUsedPurgeThisRound(game, player)
+                || getPurgeableAttachedAgents(game, player, exhaustedLeader.getId())
+                        .isEmpty()) {
+            return;
+        }
+
+        List<Button> buttons = List.of(
+                Buttons.red(
+                        player.factionButtonChecker() + OFFER_PURGE + exhaustedLeader.getId(),
+                        "Purge an Attached Agent"),
+                Buttons.gray(player.factionButtonChecker() + DECLINE_PURGE, "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentation()
+                        + ", instead of exhausting _Revenant Rising_, you may purge another attached agent."
+                        + " This will ready _Revenant Rising_.",
+                buttons);
     }
 
     public static boolean isReadyRevenantRisingAttachedAgent(Game game, Player player, Leader leader) {
@@ -97,32 +97,33 @@ public class RevenantBreakthroughHandler {
                 && getAttachedAgents(game, player).contains(leader.getId());
     }
 
-    @ButtonHandler(OPEN_PURGE_MENU)
-    public static void offerPurgeAgentButtons(ButtonInteractionEvent event, Game game, Player player) {
-        if (!canPurgeAgent(game, player)) {
+    @ButtonHandler(OFFER_PURGE)
+    public static void offerPurgeAgentButtons(ButtonInteractionEvent event, Game game, Player player, String buttonId) {
+        String exhaustedAgentId = buttonId.substring(OFFER_PURGE.length());
+        if (!canPurgeAttachedAgent(game, player, exhaustedAgentId)) {
+            ButtonHelper.deleteMessage(event);
             return;
         }
 
-        if (player.getCardsInfoThread() != null
-                && player.getCardsInfoThread()
-                        .getId()
-                        .equals(event.getMessageChannel().getId())) {
-            game.setStoredValue(PURGE_ENTRY_MESSAGE + player.getFaction(), event.getMessageId());
-        }
-
         List<Button> buttons = new ArrayList<>();
-        for (String attachedAgentId : getAttachedAgents(game, player)) {
+        for (String attachedAgentId : getPurgeableAttachedAgents(game, player, exhaustedAgentId)) {
             LeaderModel attachedAgent = Mapper.getLeader(attachedAgentId);
             String agentName = attachedAgent == null ? attachedAgentId : attachedAgent.getName();
-            buttons.add(
-                    Buttons.red(player.factionButtonChecker() + PURGE_AGENT + attachedAgentId, "Purge " + agentName));
+            buttons.add(Buttons.red(
+                    player.factionButtonChecker() + PURGE_AGENT + exhaustedAgentId + "|" + attachedAgentId,
+                    "Purge " + agentName));
         }
-        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Cancel"));
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", choose an agent attached to _Revenant Rising_ to purge.",
                 buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(DECLINE_PURGE)
+    public static void declinePurge(ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler(PURGE_AGENT)
@@ -132,8 +133,16 @@ public class RevenantBreakthroughHandler {
             return;
         }
 
-        String agentId = buttonId.substring(PURGE_AGENT.length());
-        if (!canPurgeAgent(game, player)) {
+        String[] agentIds = buttonId.substring(PURGE_AGENT.length()).split("\\|", 2);
+        if (agentIds.length != 2) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String exhaustedAgentId = agentIds[0];
+        String agentId = agentIds[1];
+        if (!canPurgeAttachedAgent(game, player, exhaustedAgentId)
+                || !getPurgeableAttachedAgents(game, player, exhaustedAgentId).contains(agentId)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -155,41 +164,28 @@ public class RevenantBreakthroughHandler {
         LeaderModel purgedAgent = Mapper.getLeader(agentId);
         String purgedName = purgedAgent == null ? agentId : purgedAgent.getName();
         String result = player.getRepresentation() + " chose to purge _" + purgedName
-                + "_ instead of exhausting it for its effect.";
-        removePurgeAgentCardsInfoButton(game, player);
+                + "_ instead of exhausting _Revenant Rising_.";
+        BreakthroughCommandHelper.readyBreakthrough(player, REVENANT_RISING);
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), result);
         ButtonHelper.deleteMessage(event);
     }
 
-    private static void removePurgeAgentCardsInfoButton(Game game, Player player) {
-        String messageId = game.getStoredValue(PURGE_ENTRY_MESSAGE + player.getFaction());
-        game.removeStoredValue(PURGE_ENTRY_MESSAGE + player.getFaction());
-        if (messageId.isBlank() || player.getCardsInfoThread() == null) {
-            return;
-        }
+    private static boolean canPurgeAttachedAgent(Game game, Player player, String exhaustedAgentId) {
+        return game != null
+                && player != null
+                && player.hasUnlockedBreakthrough(REVENANT_RISING)
+                && !player.hasReadyBreakthrough(REVENANT_RISING)
+                && !hasUsedPurgeThisRound(game, player)
+                && getAttachedAgents(game, player).contains(exhaustedAgentId)
+                && player.getLeader(exhaustedAgentId).map(Leader::isExhausted).orElse(false)
+                && !getPurgeableAttachedAgents(game, player, exhaustedAgentId).isEmpty();
+    }
 
-        String purgeButtonId = player.factionButtonChecker() + OPEN_PURGE_MENU;
-        player.getCardsInfoThread()
-                .retrieveMessageById(messageId)
-                .queue(
-                        message -> {
-                            MessageComponentTree updatedTree = message.getComponentTree()
-                                    .replace(ComponentReplacer.of(
-                                            ActionRow.class,
-                                            row -> row.getComponents().stream()
-                                                    .anyMatch(component -> component instanceof Button button
-                                                            && purgeButtonId.equals(button.getCustomId())),
-                                            row -> {
-                                                List<ActionRowChildComponentUnion> kept = row.getComponents().stream()
-                                                        .filter(component -> !(component instanceof Button button
-                                                                && purgeButtonId.equals(button.getCustomId())))
-                                                        .toList();
-                                                return kept.isEmpty() ? null : ActionRow.of(kept);
-                                            }));
-                            message.editMessageComponents(updatedTree)
-                                    .queue(Consumers.nop(), BotLogger::catchRestError);
-                        },
-                        BotLogger::catchRestError);
+    private static List<String> getPurgeableAttachedAgents(Game game, Player player, String exhaustedAgentId) {
+        return getAttachedAgents(game, player).stream()
+                .filter(agentId -> !agentId.equals(exhaustedAgentId))
+                .filter(agentId -> player.getLeader(agentId).isPresent())
+                .toList();
     }
 
     private static boolean hasUsedPurgeThisRound(Game game, Player player) {

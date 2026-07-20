@@ -14,6 +14,7 @@ import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
@@ -76,6 +77,9 @@ public class ComponentActionHelper {
                     && game.isConventionsOfWarAbandonedMode()
                     && !ButtonHelper.getButtonsForConventions(p1, game).isEmpty();
             if (techText.contains("ACTION") || detAgeOfExp || x89Conventions) {
+                if ("tharcanumbg".equalsIgnoreCase(tech) && !ArcanumTechHandler.canUseSealOfRevelation(game)) {
+                    continue;
+                }
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
                     continue;
                 }

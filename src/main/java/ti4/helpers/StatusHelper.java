@@ -756,7 +756,9 @@ public final class StatusHelper {
     private static void sendEntropicScarButtons(Game game) {
         Map<Player, Integer> scars = new HashMap<>();
         for (Tile t : game.getTileMap().values()) {
-            if (t.isScar()) {
+            boolean isAurelionSystem = t.getSpaceUnitHolder().getUnitKeys().stream()
+                    .anyMatch(unitKey -> unitKey.unitType() == UnitType.Aurelion);
+            if (t.isScar() || isAurelionSystem) {
                 for (Player p : game.getRealPlayers()) {
                     if (Tile.tileHasPlayerShips(p).test(t)) {
                         scars.put(p, scars.getOrDefault(p, 0) + 1);

@@ -3115,6 +3115,9 @@ public final class AgendaHelper {
         if (game.getStoredValue(key).isEmpty()) {
             game.setStoredValue(key, "top");
         } else {
+            if (game.getStoredValue(key).contains("_")) {
+                game.setStoredValue(key, game.getStoredValue(key).split("_")[1]);
+            }
             game.setStoredValue(key, game.getStoredValue(key) + "_top");
         }
 
@@ -3167,6 +3170,9 @@ public final class AgendaHelper {
         if (game.getStoredValue(key).isEmpty()) {
             game.setStoredValue(key, "bottom");
         } else {
+            if (game.getStoredValue(key).contains("_")) {
+                game.setStoredValue(key, game.getStoredValue(key).split("_")[1]);
+            }
             game.setStoredValue(key, game.getStoredValue(key) + "_bottom");
         }
 
