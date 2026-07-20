@@ -59,10 +59,7 @@ public class GameWebDataController {
                     .body("Authentication required to view Fog of War games");
         }
 
-        boolean isGm = userId.equals(game.getOwnerID())
-                || game.getPlayersWithGMRole().stream().anyMatch(p -> userId.equals(p.getUserID()));
-
-        if (isGm) {
+        if (isGm(game, userId)) {
             if (asPlayer == null || asPlayer.isBlank()) {
                 return withViewerIsGmHeader(gameWebDataService.getOrCompute(gameName), true);
             }
@@ -93,6 +90,11 @@ public class GameWebDataController {
                 .body(body);
     }
 
+    private boolean isGm(Game game, String userId) {
+        return userId.equals(game.getOwnerID())
+                || game.getPlayersWithGMRole().stream().anyMatch(p -> userId.equals(p.getUserID()));
+    }
+
     private Player resolvePlayer(Game game, String idOrFaction) {
         Player byUserId = game.getPlayer(idOrFaction);
         if (byUserId != null) {
@@ -121,6 +123,11 @@ public class GameWebDataController {
         return ResponseEntity.ok(WebGameState.fromGame(game));
     }
 
+    /**
+     * The event log's compact-map-state snapshots and movement/retreat diffs are built from the
+     * full, unfiltered game state - there's no fogged variant of "what changed," so this stays
+     * blocked for FoW games except for the GM/owner, who already sees the unfiltered view.
+     */
     @GetMapping(value = "/events", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<GameEventDto>> getEvents() {
         Game game = RequestContext.getGame();
@@ -128,7 +135,10 @@ public class GameWebDataController {
             return ResponseEntity.notFound().build();
         }
         if (game.isFowMode()) {
-            return ResponseEntity.notFound().build();
+            String userId = getOptionalUserId();
+            if (userId == null || !isGm(game, userId)) {
+                return ResponseEntity.notFound().build();
+            }
         }
         return ResponseEntity.ok(gameEventService.getEvents(game));
     }

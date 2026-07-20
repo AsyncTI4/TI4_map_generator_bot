@@ -123,10 +123,10 @@ public class WebScoreBreakdown {
 
     /**
      * Minimal score breakdown for a viewer who can't see this player's stats. Scored entries are
-     * kept (public knowledge - visible via scored objective/relic tokens on the physical board);
-     * QUALIFIES/POTENTIAL/UNSCORED entries are dropped since they reveal hand/resource information
-     * that requires seeing the player's home system. Total VP stays visible - it's the score track
-     * position, public regardless of fog.
+     * kept (public knowledge - visible via scored objective/relic tokens); QUALIFIES/POTENTIAL/
+     * UNSCORED entries are dropped since they reveal hand/resource information that requires
+     * seeing the player's home system. Total VP stays visible - it's the score track position,
+     * public regardless of fog.
      */
     public static WebScoreBreakdown redacted(Player player, Game game) {
         WebScoreBreakdown full = fromPlayer(player, game);

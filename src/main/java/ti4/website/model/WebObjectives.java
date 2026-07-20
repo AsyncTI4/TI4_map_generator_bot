@@ -17,8 +17,8 @@ import ti4.service.info.ListPlayerInfoService;
 
 /*
  * Note on FoW: {@code scoredFactions} intentionally stays untouched by redaction - whether a
- * faction has scored an objective is public knowledge (visible via the scored token on the
- * physical board). Numeric {@code factionProgress} is private (derived from hand/resources), so
+ * faction has scored an objective is public knowledge (visible via the scored token). Numeric
+ * {@code factionProgress} is private (derived from hand/resources), so
  * {@link #redactFactionProgress} strips it down to only the viewer's own entry.
  */
 

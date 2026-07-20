@@ -133,7 +133,7 @@ public class GameWebDataService {
      * Mirrors MapGenerator's private-FoW rendering: a player area is only included at all if the
      * viewer can see that player's stats (FoWHelper#canSeeStatsOfPlayer). Score breakdowns are kept
      * for everyone but trimmed to SCORED entries only for hidden players - scored objectives/relics
-     * are visible on the physical board regardless of fog, unlike hand/resource stats.
+     * stay visible regardless of fog, unlike hand/resource stats.
      */
     private static void applyStatRedaction(Map<String, Object> webData, Game game, Player viewer) {
         List<WebPlayerArea> playerDataList = new ArrayList<>();
