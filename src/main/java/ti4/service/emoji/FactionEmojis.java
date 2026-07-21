@@ -220,11 +220,6 @@ public enum FactionEmojis implements TI4Emoji {
     franken_zor_thul_matriarchate, //
 
     // Other (random homebrew)
-    canto,
-    eidolon,
-    mechi,
-    saera,
-    shadows, // Eronous
     Lazax,
     RandomFaction,
     AdminsFaction,
@@ -358,11 +353,6 @@ public enum FactionEmojis implements TI4Emoji {
             case "xytheris" -> xytheris;
             case "admins" -> AdminsFaction;
             case "qulane" -> Qulane;
-            case "canto" -> canto;
-            case "eidolon" -> eidolon;
-            case "mechi" -> mechi;
-            case "saera" -> saera;
-            case "shadows" -> shadows;
             case "redtf" -> redtf;
             case "greentf" -> greentf;
             case "blacktf" -> blacktf;

@@ -2515,12 +2515,10 @@ public final class ButtonHelperAgents {
             if ((tile.isAsteroidField()
                             && !player.getTechs().contains("amd")
                             && !player.getTechs().contains("wavelength")
-                            && !player.getRelics().contains("circletofthevoid")
-                            && !player.hasAbility("celestial_being"))
+                            && !player.getRelics().contains("circletofthevoid"))
                     || (tile.isSupernova()
                             && !player.hasTech("mr")
-                            && !player.getRelics().contains("circletofthevoid")
-                            && !player.hasAbility("celestial_being"))
+                            && !player.getRelics().contains("circletofthevoid"))
                     || (!buttonID.contains("combat") && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game))) {
                 continue;
             }

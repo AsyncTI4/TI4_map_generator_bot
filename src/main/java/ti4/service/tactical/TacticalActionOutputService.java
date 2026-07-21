@@ -358,7 +358,6 @@ public class TacticalActionOutputService {
         if (tile.isNebula(game)
                 && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                 && !player.hasAbility("voidborn")
-                && !player.hasAbility("celestial_being")
                 && !player.hasTech("absol_amd")
                 && !player.getRelics().contains("circletofthevoid")) {
             baseMoveValue = 1;
