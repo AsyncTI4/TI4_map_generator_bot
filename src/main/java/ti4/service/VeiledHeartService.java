@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -160,11 +161,32 @@ public class VeiledHeartService {
 
     public static List<Button> getVeiledDiscardButtonsForGenophage(Player activePlayer, Player targetPlayer) {
         List<Button> buttons = new ArrayList<>();
-        String buttonIdFormat = "veiled_discard_genome_%d_" + targetPlayer.getFaction();
-        long cardCount = getVeiledCards(VeiledCardType.GENOME, targetPlayer).count();
-        for (long i = 0; i < cardCount; i++) {
-            buttons.add(Buttons.gray(String.format(buttonIdFormat, i), "Veiled Genome " + (i + 1)));
+        String buttonIdFormat = "veiled_discard_genome_%s_" + targetPlayer.getFaction();
+        List<String> veiledGenomes = new ArrayList<>(
+                getVeiledCards(VeiledCardType.GENOME, targetPlayer).toList());
+
+        if (veiledGenomes.isEmpty()) {
+            return buttons;
         }
+        if (veiledGenomes.size() == 1) {
+            String veiledGenome = veiledGenomes.getFirst();
+            buttons.add(Buttons.gray(String.format(buttonIdFormat, veiledGenome), "Veiled Genome"));
+            return buttons;
+        }
+
+        Collections.shuffle(veiledGenomes);
+
+        StringBuilder msgForTarget = new StringBuilder(
+                "Buttons to discard one of your veiled genomes were sent to " + activePlayer.getRepresentation()
+                        + ". If you want them to know which number is referring to which genome (because of some deal you made, or whatever), you may share any of the following information:");
+        int i = 1;
+        for (String veiledGenome : veiledGenomes) {
+            buttons.add(Buttons.gray(String.format(buttonIdFormat, veiledGenome), "Veiled Genome " + i));
+            msgForTarget.append(
+                    String.format("\nVeiled Genome %d: %s", i, getRepresentation(VeiledCardType.GENOME, veiledGenome)));
+            i++;
+        }
+        MessageHelper.sendMessageToChannel(targetPlayer.getCardsInfoThread(), msgForTarget.toString());
         return buttons;
     }
 
@@ -230,7 +252,7 @@ public class VeiledHeartService {
                             } else if (targetPlayer == null) {
                                 doAction(action, type, player, card);
                             } else {
-                                doAction(action, type, player, Integer.parseInt(card), targetPlayer);
+                                doAction(action, type, player, card, targetPlayer);
                             }
                         }));
         ButtonHelper.deleteMessage(event);
@@ -269,17 +291,19 @@ public class VeiledHeartService {
     }
 
     public static void doAction(
-            VeiledCardAction action, VeiledCardType type, Player activePlayer, int cardIndex, Player targetPlayer) {
-        List<String> cards = getVeiledCards(type, targetPlayer).toList();
-        if (cards.size() <= cardIndex) {
-            return;
-        }
-        doAction(action, type, targetPlayer, cards.get(cardIndex));
+            VeiledCardAction action, VeiledCardType type, Player activePlayer, String card, Player targetPlayer) {
+        doAction(action, type, targetPlayer, card);
         MessageHelper.sendMessageToChannel(
                 activePlayer.getCorrectChannel(),
                 activePlayer.getRepresentation() + " made " + targetPlayer.getRepresentation() + " "
                         + action.toString().toLowerCase() + " a veiled "
                         + type.toString().toLowerCase() + "!");
+        MessageHelper.sendMessageToChannelWithEmbed(
+                targetPlayer.getCardsInfoThread(),
+                activePlayer.getRepresentation() + " made you "
+                        + action.toString().toLowerCase() + " the following veiled "
+                        + type.toString().toLowerCase() + ": " + getRepresentation(type, card),
+                getRepresentationEmbed(type, card));
     }
 
     public static void doManipulate(String typeStr, Player activePlayer, String card, Player targetPlayer) {
