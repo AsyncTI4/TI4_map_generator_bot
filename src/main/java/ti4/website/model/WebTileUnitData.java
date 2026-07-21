@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.Data;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -12,6 +13,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PdsCoverage;
 import ti4.helpers.PdsCoverageHelper;
@@ -33,6 +35,13 @@ public final class WebTileUnitData {
     // Connection matrix (6x6 binary, "i,j,...;..." rows) for hyperlane tiles; null if not a
     // hyperlane or no connection data is configured. See CustomHyperlaneService for the format.
     private String hyperlaneMatrix;
+    // True if this position is outside the viewer's current vision and the tile/unit data above
+    // is a remembered "ghost" snapshot rather than the live tile (see #markGhostTiles). Always
+    // false in the unfiltered (GM/non-FoW) view.
+    private boolean isGhost;
+    // The viewer's last-seen label for this position (e.g. "Rnd 4"), same string shown on the
+    // Discord PNG fog overlay (Player#getFogLabels). Null unless isGhost is true.
+    private String fogLabel;
 
     private WebTileUnitData() {
         space = new HashMap<>();
@@ -43,10 +52,105 @@ public final class WebTileUnitData {
         pds = null; // Only populated if there is PDS coverage
     }
 
+    // Marks a player the viewer can't identify: the real color is kept so the frontend can still
+    // render it, but the faction behind it is withheld. Shared with WebLaw#redactElectedFaction.
+    public static final String UNKNOWN_FACTION_PREFIX = "fow:";
+
     public static Map<String, WebTileUnitData> fromGame(Game game) {
+        return fromTileMap(game, game.getTileMap());
+    }
+
+    /**
+     * Redacts control-token/CC faction identity in place for players the viewer can't identify
+     * (FoWHelper#canSeeStatsOfPlayer), substituting "fow:&lt;color&gt;" so the frontend can still
+     * render the colored token without the faction seal - matching how DrawingUtil#drawControlToken
+     * always draws the real-colored base token on Discord but skips the faction icon overlay.
+     */
+    public static void redactControlIdentities(Map<String, WebTileUnitData> tileUnitData, Game game, Player viewer) {
+        for (WebTileUnitData tileData : tileUnitData.values()) {
+            for (WebTilePlanet planet : tileData.planets.values()) {
+                if (planet.getControlledBy() != null) {
+                    planet.setControlledBy(obscureIfHidden(game, viewer, planet.getControlledBy()));
+                }
+            }
+            tileData.ccs.replaceAll(faction -> obscureIfHidden(game, viewer, faction));
+        }
+    }
+
+    /**
+     * Flags positions outside the viewer's current vision as ghost tiles and stamps them with the
+     * viewer's remembered last-seen label, mirroring the greyed-out "Rnd N" fog tile the Discord PNG
+     * draws (TileGenerator#createTileImage, Player#getFogLabels). The tile/unit data at these
+     * positions is already the remembered snapshot (see GameWebDataService#buildFogSubstitutedTileMap)
+     * - this only adds the metadata the frontend needs to render it distinctly from a live tile.
+     */
+    public static void markGhostTiles(
+            Map<String, WebTileUnitData> tileUnitData, Set<String> visiblePositions, Player viewer) {
+        Map<String, String> fogLabels = viewer.getFogLabels();
+        for (Map.Entry<String, WebTileUnitData> entry : tileUnitData.entrySet()) {
+            if (visiblePositions.contains(entry.getKey())) {
+                continue;
+            }
+            WebTileUnitData tileData = entry.getValue();
+            tileData.isGhost = true;
+            tileData.fogLabel = fogLabels.get(entry.getKey());
+        }
+    }
+
+    private static String obscureIfHidden(Game game, Player viewer, String faction) {
+        Player player = game.getPlayerFromColorOrFaction(faction);
+        if (player == null || player.isNeutral() || FoWHelper.canSeeStatsOfPlayer(game, player, viewer)) {
+            return faction;
+        }
+        return UNKNOWN_FACTION_PREFIX + player.getColor();
+    }
+
+    /**
+     * Strips production entries for players the viewer can't identify - unlike control
+     * tokens/units, there's no meaningful "unidentified" placeholder for this number, so
+     * unidentified entries are removed outright rather than obscured.
+     */
+    public static void redactProduction(Map<String, WebTileUnitData> tileUnitData, Game game, Player viewer) {
+        for (WebTileUnitData tileData : tileUnitData.values()) {
+            tileData.production.keySet().removeIf(color -> !canSeeStatsByColor(game, viewer, color));
+        }
+    }
+
+    private static boolean canSeeStatsByColor(Game game, Player viewer, String color) {
+        Player player = game.getPlayerFromColorOrFaction(color);
+        return player == null || player.isNeutral() || FoWHelper.canSeeStatsOfPlayer(game, player, viewer);
+    }
+
+    /**
+     * Redacts unit/token faction identity in place for players the viewer can't identify, the same
+     * way {@link #redactControlIdentities} does for control tokens/CC: the real faction key is
+     * replaced with "fow:&lt;color&gt;" so the frontend can still render the correct unit color
+     * without exposing which faction it belongs to (which would otherwise also leak faction-specific
+     * unit upgrades/tech via the unit tooltip).
+     */
+    public static void redactUnitIdentities(Map<String, WebTileUnitData> tileUnitData, Game game, Player viewer) {
+        for (WebTileUnitData tileData : tileUnitData.values()) {
+            tileData.space = obscureEntityFactionKeys(tileData.space, game, viewer);
+            for (WebTilePlanet planet : tileData.planets.values()) {
+                planet.setEntities(obscureEntityFactionKeys(planet.getEntities(), game, viewer));
+            }
+        }
+    }
+
+    private static Map<String, List<WebEntityData>> obscureEntityFactionKeys(
+            Map<String, List<WebEntityData>> entities, Game game, Player viewer) {
+        Map<String, List<WebEntityData>> result = new HashMap<>();
+        for (Map.Entry<String, List<WebEntityData>> entry : entities.entrySet()) {
+            String obscured = obscureIfHidden(game, viewer, entry.getKey());
+            result.computeIfAbsent(obscured, _ -> new ArrayList<>()).addAll(entry.getValue());
+        }
+        return result;
+    }
+
+    public static Map<String, WebTileUnitData> fromTileMap(Game game, Map<String, Tile> tileMap) {
         Map<String, WebTileUnitData> tileUnitData = new HashMap<>();
 
-        for (Map.Entry<String, Tile> entry : game.getTileMap().entrySet()) {
+        for (Map.Entry<String, Tile> entry : tileMap.entrySet()) {
             String position = entry.getKey();
             Tile tile = entry.getValue();
 
@@ -117,17 +221,25 @@ public final class WebTileUnitData {
                     }
                     planetData.setControlledBy(controllingFaction);
 
+                    // Exhausted status is visible to everyone with vision of this tile regardless
+                    // of faction identification (it doesn't reveal who controls the planet, only
+                    // that a visible planet is exhausted), so it's set here unconditionally rather
+                    // than sourced from the viewer-filtered per-player WebPlayerArea data.
+                    Player controllingPlayer = game.getPlayerFromColorOrFaction(controllingFaction);
+                    planetData.setExhausted(controllingPlayer != null
+                            && controllingPlayer.getExhaustedPlanets().contains(holderName));
+
                     // Update metadata (commodities, shields)
                     updatePlanetMetadata(game, planet, planetData);
                 }
             }
         }
 
-        // Calculate production and capacity for each player
-        for (Player player : game.getRealPlayers()) {
+        // Calculate production for each player, including the neutral (Dicecord) player so e.g. a
+        // neutral space dock's production still shows up.
+        for (Player player : game.getRealPlayersNNeutral()) {
             String color = player.getColor();
 
-            // Calculate production value for this player in this tile
             int productionValue = Helper.getProductionValue(player, game, tile, false);
             if (productionValue > 0) {
                 tileData.production.put(color, productionValue);

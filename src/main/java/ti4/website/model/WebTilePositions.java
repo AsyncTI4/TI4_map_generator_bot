@@ -12,11 +12,15 @@ public class WebTilePositions {
     private List<String> tilePositions;
 
     public static WebTilePositions fromGame(Game game) {
+        return fromTileMap(game.getTileMap());
+    }
+
+    public static WebTilePositions fromTileMap(Map<String, Tile> tileMap) {
         WebTilePositions webTilePositions = new WebTilePositions();
 
         List<String> tilePositions = new ArrayList<>();
 
-        for (Map.Entry<String, Tile> entry : game.getTileMap().entrySet()) {
+        for (Map.Entry<String, Tile> entry : tileMap.entrySet()) {
             String position = entry.getKey();
             Tile tile = entry.getValue();
 

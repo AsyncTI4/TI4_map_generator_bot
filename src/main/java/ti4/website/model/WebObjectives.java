@@ -15,6 +15,13 @@ import ti4.image.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.service.info.ListPlayerInfoService;
 
+/*
+ * Note on FoW: {@code scoredFactions} intentionally stays untouched by redaction - whether a
+ * faction has scored an objective is public knowledge (visible via the scored token on the
+ * physical board). Numeric {@code factionProgress} is private (derived from hand/resources), so
+ * {@link #redactFactionProgress} strips it down to only the viewer's own entry.
+ */
+
 @Data
 public class WebObjectives {
 
@@ -59,6 +66,22 @@ public class WebObjectives {
     private List<ObjectiveInfo> stage2Objectives;
     private List<ObjectiveInfo> customObjectives;
     private List<ObjectiveInfo> allObjectives;
+
+    /**
+     * Strips numeric factionProgress down to just {@code viewer}'s own entry. allObjectives holds
+     * the same ObjectiveInfo instances referenced by the stage1/stage2/custom lists, so mutating
+     * through it updates all of them.
+     */
+    public static void redactFactionProgress(WebObjectives objectives, Player viewer) {
+        String ownFaction = viewer.getFaction();
+        for (ObjectiveInfo info : objectives.allObjectives) {
+            Integer ownProgress = info.factionProgress.get(ownFaction);
+            info.factionProgress.clear();
+            if (ownProgress != null) {
+                info.factionProgress.put(ownFaction, ownProgress);
+            }
+        }
+    }
 
     public static WebObjectives fromGame(Game game) {
         WebObjectives webObjectives = new WebObjectives();
