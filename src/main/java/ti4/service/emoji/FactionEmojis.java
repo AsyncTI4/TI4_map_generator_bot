@@ -351,6 +351,15 @@ public enum FactionEmojis implements TI4Emoji {
             case "verydith" -> verydith;
             case "veylor" -> veylor;
             case "xytheris" -> xytheris;
+            case "diaspora" -> Arborec;
+            case "hlr" -> L1Z1X;
+            case "clade" -> Naalu;
+            case "archon" -> Xxcha;
+            case "moyin" -> Yin;
+            case "veilstrike" -> Yssaril;
+            case "convocation" -> Argent;
+            case "weaveway" -> Empyrean;
+            case "initiative" -> Keleres;
             case "admins" -> AdminsFaction;
             case "qulane" -> Qulane;
             case "redtf" -> redtf;
