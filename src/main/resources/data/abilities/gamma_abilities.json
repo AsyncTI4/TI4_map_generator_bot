@@ -42,6 +42,14 @@
         "source": "gamma"
     },
     {
+        "id": "legacy_systems",
+        "name": "Legacy Systems",
+        "faction": "hlr",
+        "window": "During setup",
+        "windowEffect": "gain up to 1 technology of each color from among the other players' starting technologies.",
+        "source": "gamma"
+    },
+    {
         "id": "cognitive_hazard",
         "name": "Cognitive Hazard",
         "faction": "clade",

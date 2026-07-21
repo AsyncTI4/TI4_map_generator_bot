@@ -61,8 +61,8 @@
         ],
         "abilities": [
           "cranial_modules",
-          "ghost_prototypes"
-
+          "ghost_prototypes",
+          "legacy_systems"
         ],
         "leaders": [
             "hlragent",
