@@ -127,6 +127,7 @@ public class GameWebDataService {
         Map<String, WebTileUnitData> tileUnitData = (Map<String, WebTileUnitData>) webData.get("tileUnitData");
         WebTileUnitData.redactControlIdentities(tileUnitData, game, viewer);
         WebTileUnitData.redactUnitIdentities(tileUnitData, game, viewer);
+        WebTileUnitData.redactProduction(tileUnitData, game, viewer);
     }
 
     /**
@@ -139,7 +140,10 @@ public class GameWebDataService {
         List<WebPlayerArea> playerDataList = new ArrayList<>();
         Map<String, WebScoreBreakdown> scoreBreakdowns = new HashMap<>();
         for (Player player : game.getRealPlayersNNeutral()) {
-            boolean canSeeStats = FoWHelper.canSeeStatsOfPlayer(game, player, viewer);
+            // The neutral (Dicecord) player represents public neutral forces, not a hidden real
+            // opponent, and FoWHelper#canSeeStatsOfPlayer always returns false for it (it isn't a
+            // "real player") - so it's always included here rather than treated as unidentified.
+            boolean canSeeStats = player.isNeutral() || FoWHelper.canSeeStatsOfPlayer(game, player, viewer);
             if (canSeeStats) {
                 playerDataList.add(WebPlayerArea.fromPlayer(player, game));
             }

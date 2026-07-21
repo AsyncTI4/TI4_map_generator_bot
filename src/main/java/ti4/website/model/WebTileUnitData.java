@@ -118,7 +118,7 @@ public final class WebTileUnitData {
 
     private static boolean canSeeStatsByColor(Game game, Player viewer, String color) {
         Player player = game.getPlayerFromColorOrFaction(color);
-        return player == null || player.isNeutral() || FoWHelper.canSeeStatsOfPlayer(game, player, viewer);
+        return player == null || FoWHelper.canSeeStatsOfPlayer(game, player, viewer);
     }
 
     /**
@@ -235,9 +235,8 @@ public final class WebTileUnitData {
             }
         }
 
-        // Calculate production for each player, including the neutral (Dicecord) player so e.g. a
-        // neutral space dock's production still shows up.
-        for (Player player : game.getRealPlayersNNeutral()) {
+        // Calculate production for each player
+        for (Player player : game.getRealPlayers()) {
             String color = player.getColor();
 
             int productionValue = Helper.getProductionValue(player, game, tile, false);
