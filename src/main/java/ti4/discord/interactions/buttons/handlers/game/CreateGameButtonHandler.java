@@ -386,8 +386,28 @@ public class CreateGameButtonHandler {
             return;
         }
 
+        removeLaunchedMembersFromMatchmakingQueue(members, gameName, event);
+
         MessageHelper.sendMessageToEventChannel(event, "Message for posterity:\n\n" + buttonMessage);
         GameManager.save(game, "Created game channels");
+    }
+
+    private static void removeLaunchedMembersFromMatchmakingQueue(
+            List<Member> members, String gameName, ButtonInteractionEvent event) {
+        List<Member> removed = new ArrayList<>();
+        for (Member member : members) {
+            if (MatchmakerService.get().leaveQueue(member.getId())) {
+                removed.add(member);
+                BotLogger.info("Removed user " + member.getId() + " from the matchmaking queue because they are in"
+                        + " newly launched game " + gameName + ".");
+            }
+        }
+        if (removed.isEmpty()) return;
+        String mentions = removed.stream().map(Member::getAsMention).collect(Collectors.joining(" & "));
+        MessageHelper.sendMessageToEventChannel(
+                event,
+                mentions + (removed.size() == 1 ? " was" : " were")
+                        + " removed from the matchmaking queue because they are in this newly launched game.");
     }
 
     private static void resetPbdNumber(String gameName) {

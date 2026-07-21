@@ -33,6 +33,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
@@ -1941,6 +1942,13 @@ public class CombatRollService {
         if (totalHits > 0 && rollType != CombatRollType.combatround && player.hasTech("tf-shardsaturation")) {
             totalHits++;
         }
+        if (totalHits > 0
+                && rollType != CombatRollType.combatround
+                && game.playerHasLeaderUnlockedOrAlliance(player, "xytheriscommander")) {
+            totalHits++;
+            result += "\n" + player.getFactionEmoji()
+                    + " produced 1 additional hit from _Zythrix_ the Xytheris Commander.";
+        }
         result += CombatMessageHelper.displayHitResults(totalHits, useDoubleBoomEmoji);
 
         if (totalHits > 0 && usesX89c4) {
@@ -2428,6 +2436,12 @@ public class CombatRollService {
             planetFakeUnit.setFaction(player.getFaction());
             unitsOnPlanet.put(planetFakeUnit, 1);
         }
+        if (player.hasUnlockedBreakthrough("aeternabt")) {
+            UnitModel twilightCannon = AeternaBreakthroughHandler.getTwilightDefenseCannon(player, planet, true);
+            if (twilightCannon != null) {
+                unitsOnPlanet.put(twilightCannon, 1);
+            }
+        }
 
         Map<UnitModel, Integer> output = new HashMap<>(unitsOnPlanet.entrySet().stream()
                 .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount(player) > 0)
@@ -2479,6 +2493,15 @@ public class CombatRollService {
                         unitsOnAdjacentTiles.merge(
                                 new ImmutablePair<>(model, unitHolder), entry.getValue(), Integer::sum);
                 }
+                if (unitHolder instanceof Planet planet) {
+                    if (player.hasUnlockedBreakthrough("aeternabt")) {
+                        UnitModel twilightCannon =
+                                AeternaBreakthroughHandler.getTwilightDefenseCannon(player, planet, true);
+                        if (twilightCannon != null) {
+                            unitsOnAdjacentTiles.put(new ImmutablePair<>(twilightCannon, unitHolder), 1);
+                        }
+                    }
+                }
             }
         }
         // Check for space cannon die on planets
@@ -2503,6 +2526,13 @@ public class CombatRollService {
                     planetFakeUnit.setBaseType("pds");
                     planetFakeUnit.setFaction(player.getFaction());
                     unitsOnTile.put(new ImmutablePair<>(planetFakeUnit, unitHolder), 1);
+                }
+                if (player.hasUnlockedBreakthrough("aeternabt")) {
+                    UnitModel twilightCannon =
+                            AeternaBreakthroughHandler.getTwilightDefenseCannon(player, planet, true);
+                    if (twilightCannon != null) {
+                        unitsOnTile.put(new ImmutablePair<>(twilightCannon, unitHolder), 1);
+                    }
                 }
                 boolean spaceStation =
                         (player.hasUnlockedBreakthrough("gledgebt") || player.hasTech("tf-mantlecracking"))
