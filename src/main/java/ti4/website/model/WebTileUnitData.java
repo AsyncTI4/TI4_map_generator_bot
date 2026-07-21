@@ -19,6 +19,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
 import ti4.image.TileGenerator;
+import ti4.service.map.CustomHyperlaneService;
 import ti4.website.WebPdsCoverage;
 
 @Data
@@ -29,6 +30,9 @@ public final class WebTileUnitData {
     private boolean isAnomaly;
     private Map<String, Integer> production;
     private Map<String, WebPdsCoverage> pds; // PDS coverage data per faction
+    // Connection matrix (6x6 binary, "i,j,...;..." rows) for hyperlane tiles; null if not a
+    // hyperlane or no connection data is configured. See CustomHyperlaneService for the format.
+    private String hyperlaneMatrix;
 
     private WebTileUnitData() {
         space = new HashMap<>();
@@ -69,6 +73,9 @@ public final class WebTileUnitData {
 
         // Set anomaly status
         tileData.isAnomaly = tile.isAnomaly(game, null);
+
+        // Hyperlane connection matrix, if applicable
+        tileData.hyperlaneMatrix = CustomHyperlaneService.getHyperlaneDataForTile(tile, game);
 
         // Extract command tokens from space
         UnitHolder spaceHolder = tile.getUnitHolders().get(Constants.SPACE);
