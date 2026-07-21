@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.spring.context.RequestContext;
@@ -27,6 +28,29 @@ public class GameWebDataController {
 
     private final GameWebDataService gameWebDataService;
     private final GameEventService gameEventService;
+
+    /**
+     * TEMPORARY: while the new FoW web UI is in limited testing, production access is restricted to
+     * FoW server staff. Deliberately scoped to that server's own roles rather than JdaService's
+     * bothelperRoles, which spans every Async and community server plus all admins/developers -
+     * far wider than this gate is meant to be. Applies to GMs too: most hold one of these anyway,
+     * and exempting them would leave nearly every FoW game reachable. Remove this and its two call
+     * sites to open the UI up.
+     */
+    private static final String[] FOW_WEB_UI_TESTER_ROLE_IDS = {
+        "1088532690803884052", // FoW Server
+        "1063464689218105354", // FoW Server Game Supervisor
+        "1429853811891241128", // FoW Server Chapter 2 Bothelper
+        "1429853811891241129", // FoW Server Chapter 2 Game Supervisor
+    };
+
+    private static final String FOW_WEB_UI_RESTRICTED_MESSAGE =
+            "The new Fog of War web UI is in limited testing and is currently restricted to Fog of War server staff.";
+
+    private boolean canUseFowWebUi(String userId) {
+        // Only gated on production; local/dev bots keep working without the role.
+        return !JdaService.isProduction() || JdaService.hasAnyRole(userId, FOW_WEB_UI_TESTER_ROLE_IDS);
+    }
 
     @GetMapping(value = "/web-data", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> get(@PathVariable String gameName) {
@@ -57,6 +81,10 @@ public class GameWebDataController {
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Authentication required to view Fog of War games");
+        }
+
+        if (!canUseFowWebUi(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(FOW_WEB_UI_RESTRICTED_MESSAGE);
         }
 
         if (isGm(game, userId)) {
@@ -136,7 +164,7 @@ public class GameWebDataController {
         }
         if (game.isFowMode()) {
             String userId = getOptionalUserId();
-            if (userId == null || !isGm(game, userId)) {
+            if (userId == null || !isGm(game, userId) || !canUseFowWebUi(userId)) {
                 return ResponseEntity.notFound().build();
             }
         }
