@@ -2,7 +2,7 @@
     {
         "alias": "diaspora",
         "factionName": "Diaspora Arborec",
-        "homeSystem": "gg1",
+        "homeSystem": "05",
         "startingFleet": "3 cr, 2 inf n, 1 mech n, 2 pds n",
         "commodities": 3,
         "factionTech": [
@@ -13,7 +13,7 @@
             "dxa"
         ],
         "homePlanets": [
-            "Nesphar γ"
+            "nestphar"
         ],
         "abilities": [
             "fruiting_bodies",
@@ -46,7 +46,7 @@
     {
         "alias": "hlr",
         "factionName": "The H4L1R infocrypt Subnet",
-        "homeSystem": "gg2",
+        "homeSystem": "06",
         "startingFleet": "1 dd, 1 cv, 2 ff, 4 inf n, sd n",
         "commodities": 2,
         "factionTech": [
@@ -57,7 +57,7 @@
 
       ],
         "homePlanets": [
-            "0.0.0 γ"
+            "0.0.0"
         ],
         "abilities": [
           "cranial_modules",
@@ -90,7 +90,7 @@
     {
         "alias": "clade",
         "factionName": "The Neurovoid Clade",
-        "homeSystem": "gg3",
+        "homeSystem": "09",
         "startingFleet": "1 dd, 2 cv, 3 ff, 3 inf m, sd d",
         "commodities": 3,
         "factionTech": [
@@ -101,8 +101,8 @@
             "st"
         ],
         "homePlanets": [
-            "maaluuk γ",
-            "druaa γ"
+            "maaluuk",
+            "druaa"
         ],
         "abilities": [
             "cognitive_hazard",
@@ -135,7 +135,7 @@
     {
         "alias": "archon",
         "factionName": "The Archon War Machine",
-        "homeSystem": "gg4",
+        "homeSystem": "14",
         "startingFleet": "2 cr, 1 cv, 3 ff, 2 inf t, 2 inf r, sd r",
         "commodities":2,
         "factionTech": [
@@ -146,8 +146,8 @@
             "ps"
         ],
         "homePlanets": [
-            "archon ren γ",
-            "archon tau γ"
+            "archonren",
+            "archontau"
         ],
         "abilities": [
             "convocation_accords",
@@ -181,7 +181,7 @@
     {
         "alias": "moyin",
         "factionName": "The Moyin Covenant",
-        "homeSystem": "gg5",
+        "homeSystem": "03",
         "startingFleet": "1 cr, 1 cv, 3 inf d, sd d, pds d",
         "commodities": 2,
         "factionTech": [
@@ -192,7 +192,7 @@
             "da"
         ],
         "homePlanets": [
-            "darian γ"
+            "darien"
         ],
         "abilities": [
             "genetic_experimentation",
@@ -225,7 +225,7 @@
     {
         "alias": "veilstrike",
         "factionName": "The Veilstrike Agitator Cells",
-        "homeSystem": "gg6",
+        "homeSystem": "15",
         "startingFleet": "1 dd, 2 cv, 3 ff, 3 inf x, sd x",
         "commodities": 3,
         "factionTech": [
@@ -236,8 +236,8 @@
             "nm"
         ],
         "homePlanets": [
-            "retillion γ",
-            "shalloq γ"
+            "retillion",
+            "shalloq"
         ],
         "abilities": [
             "propaganda_engines",
@@ -270,7 +270,7 @@
     {
         "alias": "convocation",
         "factionName": "The Midnight Convocation",
-        "homeSystem": "gg7",
+        "homeSystem": "58",
         "startingFleet": "2 dd, 1 cv, 4 ff, 4 inf v, sd y",
         "commodities": 2,
         "factionTech": [
@@ -281,9 +281,9 @@
             "st"
         ],
         "homePlanets": [
-            "ylir γ",
-            "valk γ",
-            "avar γ"
+            "ylir",
+            "valk",
+            "avar"
         ],
         "abilities": [
             "guardians_of_profane_ground",
@@ -315,7 +315,7 @@
     {
         "alias": "weaveway",
         "factionName": "The Araenean Weaveway",
-        "homeSystem": "gg8",
+        "homeSystem": "56",
         "startingFleet": "2 cr, 1 cv, 4 inf d, sd",
         "commodities": 2,
         "factionTech": [
@@ -327,7 +327,7 @@
             "aida"
         ],
         "homePlanets": [
-            "the dark γ"
+            "thedark"
         ],
         "abilities": [
           "hyperdimensional",
@@ -360,7 +360,7 @@
     {
         "alias": "initiative",
         "factionName": "The Keleres Initiative",
-        "homeSystem": "gg9",
+        "homeSystem": "02",
         "startingFleet": "2 cr, 1 cv, 2 ff, 3 inf d, sd d, pds z",
         "commodities": 4,
         "factionTech": [
@@ -372,7 +372,7 @@
             "sdn"
         ],
         "homePlanets": [
-            "moll primus γ"
+            "mollprimus"
         ],
         "abilities": [
             "winnaran_archive_access",

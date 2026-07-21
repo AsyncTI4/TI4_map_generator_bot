@@ -75,7 +75,7 @@
         ],
         "requirements": "YRRR",
         "faction": "archon",
-        "baseUpgrade": "ws2",
+        "baseUpgrade": "ws",
         "source": "gamma",
         "text": "Other players' units in this system lose PLANETARY SHIELD. You may use this unit's SPACE CANNON ability after each round of combat in this system. You may use this units BOMBARDMENT and SPACE CANNON ability in systems that are adjacent to this unit."
     },
@@ -98,7 +98,6 @@
         ],
         "requirements": "BYR",
         "faction": "moyin",
-        "baseUpgrade": "mf2",
         "source": "gamma",
         "text": "When this unit would be destroyed, you may instead place it on a different planet in a different system you control."
     },

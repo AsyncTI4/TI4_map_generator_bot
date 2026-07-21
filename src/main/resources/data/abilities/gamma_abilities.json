@@ -70,10 +70,8 @@
         "id": "convocation_accords",
         "name": "Convocation Accords",
         "faction": "archon",
-        "window1": "at the start of the strategy phase",
-        "windowEffect1": "place two into your play area.",
-        "window2": "when a decree is violated,",
-        "windowEffect2": "you may remove it from play to place one of your command tokens from your reinforcements on the active player's faction sheet.",
+        "window": "",
+        "windowEffect": "At the start of the strategy phase, place two into your play area. When a decree is violated, you may remove it from play to place one of your command tokens from your reinforcements on the active player's faction sheet.",
         "permanentEffect": "While 1 of your command tokens is one a player's factions sheet, that player is an outlaw.'",
         "source": "gamma"
     },
@@ -170,10 +168,8 @@
         "id": "threads_out_of_the_dark",
         "name": "Threads out of the Dark",
         "faction": "weaveway",
-        "window1": "During setup",
-        "windowEffect1": "Take your additional faction components and place your WEAVEWAY NODE cards in your play area.",
-        "window2":"At the start of another player's turn,",
-        "windowEffect2": "you may place one of your WEAVEWAY ANchor cards from your reinforcements into their play area",
+        "window": "",
+        "windowEffect": "During setup, take your additional faction components and place your WEAVEWAY NODE cards in your play area. At the start of another player's turn, you may place one of your WEAVEWAY Anchor cards from your reinforcements into their play area.",
         "source": "gamma"
     },
     {
