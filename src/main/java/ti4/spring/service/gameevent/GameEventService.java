@@ -33,10 +33,7 @@ public class GameEventService {
             @Nullable String movementState) {
         try {
             if (DatabasePersistenceGate.isDisabled()) return;
-            String serializedPayload = JsonMapperManager.basic().writeValueAsString(payload);
-            String serializedMapState = CompactMapState.serialize(game);
-            SpringContext.getBean(GameEventService.class)
-                    .commitEvent(game, archetype, player, serializedPayload, serializedMapState, movementState);
+            SpringContext.getBean(GameEventService.class).commitEvent(game, archetype, player, payload, movementState);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to commit game event.", e);
         }
@@ -47,14 +44,15 @@ public class GameEventService {
             Game game,
             String archetype,
             @Nullable Player player,
-            String serializedPayload,
-            String serializedMapState,
+            Map<String, Object> payload,
             @Nullable String movementState) {
         long counter = game.getEventSequenceCounter();
         // Undo restores an older counter; rows above it are future events and must not survive the next append.
         gameEventRepository.deleteByGameNameAndSeqGreaterThan(game.getName(), counter);
         long seq = counter + 1;
         String faction = player == null ? null : player.getFaction();
+        String serializedPayload = JsonMapperManager.basic().writeValueAsString(payload);
+        String serializedMapState = CompactMapState.serialize(game);
         String previousMapState = gameEventRepository
                 .findFirstByGameNameAndSeqLessThanEqualAndMapStateIsNotNullOrderBySeqDesc(game.getName(), counter)
                 .map(GameEventEntity::getMapState)
