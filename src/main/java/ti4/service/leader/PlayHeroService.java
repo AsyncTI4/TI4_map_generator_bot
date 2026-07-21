@@ -21,6 +21,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLea
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanHeroHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -239,6 +240,7 @@ public class PlayHeroService {
                     ButtonHelperRelics.offerTitansHeroButtons(player, game, event);
                 }
             }
+            case "vyserixhero" -> VyserixLeaderHandler.offerHeroAttachmentButtons(event, game, player);
             case "onyxxahero" -> OnyxxaLeaderHandler.postHeroMoveShipButtons(game, player);
             case "xanhero" -> XanHeroHandler.postInitialButtons(game, player);
             case "dreamhero" -> DreamButtonHandler.postDreamHeroButtons(game, player);
