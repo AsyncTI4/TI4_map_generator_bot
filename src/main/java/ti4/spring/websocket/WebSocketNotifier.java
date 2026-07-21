@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import ti4.game.Game;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
+import ti4.service.statistics.SREStats;
 import ti4.spring.api.webdata.GameWebDataService;
 import ti4.spring.context.SpringContext;
 import tools.jackson.databind.JsonNode;
@@ -52,10 +53,13 @@ public class WebSocketNotifier {
 
     /** Static entry point for non-Spring callers (GameManager, GameUndoService). Never throws. */
     public static void notifyGameStateChange(Game game) {
+        long publishStart = System.nanoTime();
         try {
             SpringContext.getBean(WebSocketNotifier.class).notifyGameStateChanged(game);
         } catch (Exception ignored) {
             // Spring context may not be up during warmup; state streams on the next save.
+        } finally {
+            SREStats.recordWebSocketPublishNanos(System.nanoTime() - publishStart);
         }
     }
 

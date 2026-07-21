@@ -12,6 +12,7 @@ import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.service.persistence.DatabasePersistenceGate;
+import ti4.service.statistics.SREStats;
 import ti4.spring.context.SpringContext;
 import ti4.website.model.CompactMapState;
 
@@ -33,7 +34,23 @@ public class GameEventService {
             @Nullable String movementState) {
         try {
             if (DatabasePersistenceGate.isDisabled()) return;
-            SpringContext.getBean(GameEventService.class).commitEvent(game, archetype, player, payload, movementState);
+            String serializedPayload;
+            String serializedMapState;
+            long serializationStart = System.nanoTime();
+            try {
+                serializedPayload = JsonMapperManager.basic().writeValueAsString(payload);
+                serializedMapState = CompactMapState.serialize(game);
+            } finally {
+                SREStats.recordGameEventSerializationNanos(System.nanoTime() - serializationStart);
+            }
+
+            long commitStart = System.nanoTime();
+            try {
+                SpringContext.getBean(GameEventService.class)
+                        .commitEvent(game, archetype, player, serializedPayload, serializedMapState, movementState);
+            } finally {
+                SREStats.recordGameEventCommitNanos(System.nanoTime() - commitStart);
+            }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to commit game event.", e);
         }
@@ -44,15 +61,14 @@ public class GameEventService {
             Game game,
             String archetype,
             @Nullable Player player,
-            Map<String, Object> payload,
+            String serializedPayload,
+            String serializedMapState,
             @Nullable String movementState) {
         long counter = game.getEventSequenceCounter();
         // Undo restores an older counter; rows above it are future events and must not survive the next append.
         gameEventRepository.deleteByGameNameAndSeqGreaterThan(game.getName(), counter);
         long seq = counter + 1;
         String faction = player == null ? null : player.getFaction();
-        String serializedPayload = JsonMapperManager.basic().writeValueAsString(payload);
-        String serializedMapState = CompactMapState.serialize(game);
         String previousMapState = gameEventRepository
                 .findFirstByGameNameAndSeqLessThanEqualAndMapStateIsNotNullOrderBySeqDesc(game.getName(), counter)
                 .map(GameEventEntity::getMapState)

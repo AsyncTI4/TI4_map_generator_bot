@@ -35,6 +35,7 @@ public class SREStats {
     // New: button runtime metric names
     private static final String BUTTON_PROCESSING_TIMER_NAME = "ti4.bot.button.runtime.processing";
     private static final String BUTTON_PREPROCESSING_TIMER_NAME = "ti4.bot.button.runtime.preprocess";
+    private static final String PERSISTENCE_TIMER_NAME = "ti4.bot.persistence.runtime";
 
     private static final List<Tag> BOT_TAGS = List.of(Tag.of("component", "bot"));
     private static final List<Tag> HTTP_TAGS = List.of(Tag.of("component", "http"));
@@ -42,6 +43,7 @@ public class SREStats {
     private static final List<Tag> ERROR_TAGS = List.of(Tag.of("status", "error"));
     // New: common tags for button interactions
     private static final List<Tag> BUTTON_TAGS = List.of(Tag.of("component", "bot"), Tag.of("interaction", "button"));
+    private static final List<Tag> PERSISTENCE_TAGS = List.of(Tag.of("component", "persistence"));
 
     private static volatile Counter REQUESTS_TOTAL;
     private static volatile Counter ERRORS_TOTAL;
@@ -291,6 +293,28 @@ public class SREStats {
     public static void recordButtonPreprocessingMillis(long millis) {
         if (millis < 0) return;
         buttonPreprocessingTimer().record(Duration.ofMillis(millis));
+    }
+
+    public static void recordGameEventSerializationNanos(long nanos) {
+        recordPersistenceNanos("game_event_serialization", nanos);
+    }
+
+    public static void recordGameEventCommitNanos(long nanos) {
+        recordPersistenceNanos("game_event_commit", nanos);
+    }
+
+    public static void recordWebSocketPublishNanos(long nanos) {
+        recordPersistenceNanos("websocket_publish", nanos);
+    }
+
+    private static void recordPersistenceNanos(String operation, long nanos) {
+        if (nanos < 0) return;
+        Timer.builder(PERSISTENCE_TIMER_NAME)
+                .description("Runtime of synchronous persistence work")
+                .tags(PERSISTENCE_TAGS)
+                .tag("operation", operation)
+                .register(registry())
+                .record(Duration.ofNanos(nanos));
     }
 
     // Request counters
