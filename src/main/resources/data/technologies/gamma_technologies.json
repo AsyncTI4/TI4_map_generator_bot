@@ -1,0 +1,207 @@
+[
+    {
+        "alias": "ggdiag",
+        "name": "Rhizomorphogenesis",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGG",
+        "faction": "diaspora",
+         "source": "gamma",
+        "text": "After another player moves ships into a systems that contains 1 or more of your planets, you may return any number of captured infantry on planet cards in that system to produce those units on those planets without spending resources."
+    },
+    {
+        "alias": "ggdiacr",
+        "name": "Letani Node II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "RYG",
+        "faction": "diaspora",
+        "baseUpgrade": "cr2",
+        "source": "gamma",
+        "text": "Cost 2 Combat 6 Move 2 Capacity 3"
+    },
+    {
+        "alias": "gghlry",
+        "name": "Subnet Logistics",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "hlr",
+        "source": "gamma",
+        "text": "At the start of the strategy phase choose a non-fighter ship unit upgrade technology you own and place this card on top of that card. Matching units you control and neutral units gain +1 combat. During your tactical actions while Subnet Logistics is on top of a Unit Upgrade technology, you may pay influence equal to the cost of that unit to replace another player's matching unit with a neutral of the same type."
+    },
+    {
+        "alias": "gghlrg",
+        "name": "Data Hollow",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "hlr",
+        "source": "gamma",
+        "text": "At the start of the strategy phase, choose a non-fighter ship unit upgrade technology you own and place this card on tip of that card. Matching units you control and neutral units gain +1 movement. While Data Hollow is on top of a unit upgrade technology, you may replace your matching ships with a matching neutral unit of the same type at the end of your tactical actions. Gain a commodity or convert 1 commodity to a trade goods a number of times equal to this unit's cost."
+    },
+    {
+        "alias": "ggcladeg",
+        "name": "Enviropic Stimulants",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGG",
+        "faction": "clade",
+        "source": "gamma",
+        "text": "At the end of your turn, you may exhaust this card to ready 1 legendary planet you control, and its legendary planet ability card. "
+    },
+    {
+        "alias": "ggcladedd",
+        "name": "Neurotoxic Dart II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "RR",
+        "baseUpgrade": "dd2",
+        "faction": "clade",
+        "source": "gamma",
+        "text": "During space combat, when your opponent plays an action card, you may remove this unit to cancel that action card. "
+    },
+    {
+        "alias": "ggarchws",
+        "name": "Sentinel II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YRRR",
+        "faction": "archon",
+        "baseUpgrade": "ws",
+        "source": "gamma",
+        "text": "Other players' units in this system lose PLANETARY SHIELD. You may use this unit's SPACE CANNON ability after each round of combat in this system. You may use this units BOMBARDMENT and SPACE CANNON ability in systems that are adjacent to this unit."
+    },
+    {
+        "alias": "ggarchy",
+        "name": "Graviton Lance",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "archon",
+        "source": "gamma",
+        "text": "When another player assigns a hit produced by your SPACE CANNON rolls to a non-fighter ship, they must destroy 1 fighter in the active system, if able."
+    },
+    {
+        "alias": "ggmoyinm",
+        "name": "Awakened Hulk II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "BYR",
+        "faction": "moyin",
+        "source": "gamma",
+        "text": "When this unit would be destroyed, you may instead place it on a different planet in a different system you control."
+    },
+    {
+        "alias": "ggmoying",
+        "name": "Environmental Genomes",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "moyin",
+        "source": "gamma",
+        "text": "At the end of your turn, you may exhaust this card to ready 1 planet you control that contains 1 or more of your mechs."
+    },
+    {
+        "alias": "ggveilstriker",
+        "name": "Demolition Insurgents",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "R",
+        "faction": "veilstrike",
+        "source": "gamma",
+        "text": "At the start of invasion, you may exhaust this card to destroy one structure on a planet in the active system."
+    },
+    {
+        "alias": "ggveilstrikeg",
+        "name": "Regenerative Plating",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "G",
+        "faction": "veilstrike",
+        "source": "gamma",
+        "text": "At the end of a combat, repair all your units that particpated in that combat."
+    },
+    {
+        "alias": "ggconr",
+        "name": "Quillstorm Ambuscade",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "faction": "convocation",
+        "source": "gamma",
+        "text": "You may exhaust this card at the start of space combat involving one or more of your units. when your units use ANTI-FIGHTER BARAGE during this combat, each hit produced in excess of your opponent's fighters must be assigned to a non-fighter ship.'"
+    },
+    {
+        "alias": "ggconinf",
+        "name": "Midnight Talon II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "convocation",
+        "baseUpgrade": "inf2",
+        "source": "gamma",
+        "text": "During the ANTI-FIGHTER BARRAGE step of a space combat in this system, this unit may use its ANTI-FIGHTER BARRAGE as if it was particpating in combat. After this unit is destroyed, roll 1 die. if the result is 6 or greater, place the unit on this card. At the start of your turn, place each unit that is on this card on a planet you control that is in a system that contrains one of your command tokens."
+    },
+    {
+        "alias": "ggarar",
+        "name": "Web Sensor Threading",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "faction": "weaveway",
+        "source": "gamma",
+        "text": "After another player moves ships into a nebula that contains 1 or more of your ships, you may exhaust this card to look at thier action cards and choose 1 to take."
+    },
+    {
+        "alias": "ggarasd",
+        "name": "Weft Coccon II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "weaveway",
+        "baseUpgrade": "sd2",
+        "source": "gamma",
+        "text": "CAPACITY: 5 PRODUCTION: 7** This unit is placed in the space area instead of on a planet. This unit can retreat as if it were a ship with MOVE 1. If this unit is blockaded, it is destroyed."
+    },
+    {
+        "alias": "gginitr",
+        "name": "Requisision Warrant",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "R",
+        "faction": "initiative",
+        "source": "gamma",
+        "text": "ACTION: Exhaust this card to take up to 2 trade goods or commodities from 1 of your neighbors. That player must also reveal 1 of their unrevealed secret objectives and place it face up in their play area, if able."
+    },
+    {
+        "alias": "gginitpds",
+        "name": "Council Citadel II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "RY",
+        "faction": "initiative",
+        "baseUpgrade": "pds2",
+        "source": "gamma",
+        "text": "SPACE CANNON 4 PLANETARY SHIELD** When this unit's SPACE CANNON destroys a player's ship, that player must reveal 1 of their unrevealed secret objectives and place it face up in their play area. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system"
+          
+    }
+]
