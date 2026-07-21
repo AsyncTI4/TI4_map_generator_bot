@@ -1687,6 +1687,9 @@ public final class AgendaHelper {
             if (attachment.contains("council_preserve")) {
                 voteAmount += 5;
             }
+            if (attachment.contains("vox_sentinels")) {
+                voteAmount += 2;
+            }
         }
         if (game.getLaws().containsKey("absol_government")) {
             voteAmount = 1;
@@ -2192,6 +2195,9 @@ public final class AgendaHelper {
             for (String attachment : p.getTokenList()) {
                 if (attachment.contains("council_preserve")) {
                     voteCount += 5;
+                }
+                if (attachment.contains("vox_sentinels")) {
+                    voteCount += 2;
                 }
             }
         }

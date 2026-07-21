@@ -1,6 +1,7 @@
 package ti4.game.persistence;
 
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
 import ti4.game.Game;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.DiscordantStarsHelper;
@@ -20,6 +21,7 @@ class TransientGameInfoUpdater {
             DiscordantStarsHelper.checkSigil(game);
             DiscordantStarsHelper.checkSaeraMech(game);
             DiscordantStarsHelper.checkOlradinMech(game);
+            VeylorUnitHandler.checkVeylorMech(game);
             DiscordantStarsHelper.checkUltimateAuthority(game);
             TeHelperGeneral.checkTransientInfo(game);
         } catch (Exception e) {
