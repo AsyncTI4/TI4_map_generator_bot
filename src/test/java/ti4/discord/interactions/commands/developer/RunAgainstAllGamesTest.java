@@ -1,4 +1,4 @@
-package ti4.game.persistence.migration;
+package ti4.discord.interactions.commands.developer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,7 +20,7 @@ import ti4.image.Mapper;
 import ti4.model.FactionModel;
 import ti4.testUtils.BaseTi4Test;
 
-class DataMigrationManagerTest extends BaseTi4Test {
+class RunAgainstAllGamesTest extends BaseTi4Test {
 
     @Test
     void shouldSwapRemovedEronousFactionToRandomOfficialFaction() throws IOException {
@@ -34,7 +34,7 @@ class DataMigrationManagerTest extends BaseTi4Test {
                     .orElseThrow();
             String swappedUserId = swapped.getUserID();
 
-            Boolean changed = DataMigrationManager.removeEronousFactions_190726_withEnded(game);
+            boolean changed = RunAgainstAllGames.removeEronousFactions(game);
 
             assertThat(changed).isTrue();
             String newFaction = swapped.getFaction();
@@ -71,10 +71,9 @@ class DataMigrationManagerTest extends BaseTi4Test {
             }
 
             // Running again makes no further changes
-            assertThat(DataMigrationManager.removeEronousFactions_190726_withEnded(game))
-                    .isFalse();
+            assertThat(RunAgainstAllGames.removeEronousFactions(game)).isFalse();
 
-            // The migrated game round-trips through save/load
+            // The updated game round-trips through save/load
             GameManager.save(game, "test");
             Game reloaded = harness.load();
             Player reloadedPlayer = reloaded.getPlayer(swappedUserId);
