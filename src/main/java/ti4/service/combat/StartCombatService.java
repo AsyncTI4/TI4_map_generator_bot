@@ -30,6 +30,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
@@ -1425,6 +1426,7 @@ public class StartCombatService {
                     "Mercenaries",
                     FactionEmojis.florzen));
         }
+
         return buttons;
     }
 
@@ -1486,6 +1488,14 @@ public class StartCombatService {
         buttons.add(Buttons.blue(
                 "refreshViewOfSystem_" + pos + "_" + p1.getFaction() + "_" + p2.getFaction() + "_" + groundOrSpace,
                 "Refresh Picture"));
+
+        if (p1.hasReadyBreakthrough("ponthousbt")) {
+            buttons.add(PonthousBreakthroughHandler.getSelfDestructButton(p1, tile, groundOrSpace));
+        }
+        if (p2.hasReadyBreakthrough("ponthousbt")) {
+            buttons.add(PonthousBreakthroughHandler.getSelfDestructButton(p2, tile, groundOrSpace));
+        }
+
         checkAndAddIncomprehensibleFormButton(game, p1, p2, isSpaceCombat, tile, buttons);
 
         if (p1.hasTechReady("sc") || (!game.isFowMode() && p2.hasTechReady("sc"))) {

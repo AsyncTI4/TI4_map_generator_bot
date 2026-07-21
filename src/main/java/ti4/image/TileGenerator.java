@@ -30,6 +30,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -1901,6 +1902,9 @@ public class TileGenerator {
             return false;
         }
         if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains("superweapon_mors"))) {
+            return true;
+        }
+        if (unitHolder instanceof Planet planet && game.getRealPlayers().stream().anyMatch(player -> AeternaBreakthroughHandler.hasTwilightDefenseSystem(player, planet))) {
             return true;
         }
         for (Player player : game.getRealPlayers()) {

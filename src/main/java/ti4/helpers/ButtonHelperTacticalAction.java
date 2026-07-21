@@ -19,6 +19,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUni
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
@@ -218,6 +219,9 @@ public final class ButtonHelperTacticalAction {
         String message3 = "You have "
                 + Helper.getProductionValue(player, game, game.getTileByPosition(pos), false)
                 + " PRODUCTION value in this system.\n";
+        if (player.hasUnit("myrr_dreadnought") || player.hasUnit("myrr_dreadnought2")) {
+            message3 += MyrrUnitsHandler.getReplicatorProductionReminder(player, game.getTileByPosition(pos));
+        }
         if (Helper.getProductionValue(player, game, game.getTileByPosition(pos), false) > 0
                 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message3 = message3
@@ -228,7 +232,7 @@ public final class ButtonHelperTacticalAction {
                 && IsPlayerElectedService.isPlayerElected(game, player, "prophecy")) {
             message3 +=
                     "Reminder that you have _Prophecy of Ixth_ and should produce at least 2 fighters if you wish to keep it. Its removal is not automated.\n";
-        }
+        }      
         MessageHelper.sendMessageToChannel(
                 event.getChannel(), message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, game, true));
 

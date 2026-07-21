@@ -12,6 +12,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -401,6 +402,10 @@ class DeleteButtonsButtonHandler {
                 CommanderUnlockCheckService.checkPlayer(player, "revenantmyrr");
             }
         }
+        if ("Done Producing Units".equalsIgnoreCase(buttonLabel)
+                && "myrrBt".equalsIgnoreCase(buttonID)) {
+            game.removeStoredValue(MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction());
+        }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
             if (player.hasTech("asn")
                     && game.getStoredValue("ASN" + player.getFaction()).isEmpty()
@@ -411,6 +416,10 @@ class DeleteButtonsButtonHandler {
                             || buttonID.contains("lumi7Build")
                             || buttonID.contains("ministerBuild"))) {
                 ButtonHelperFactionSpecific.offerASNButtonsStep1(game, player, buttonID);
+            }
+            if (player.hasReadyBreakthrough("myrrbt")
+                    && !game.getStoredValue("producedUnitCostFor" + player.getFaction()).isEmpty()) {
+                MyrrBreakthroughHandler.offerRemoteWorkforce(event, game, player);
             }
             player.resetSpentThings();
             game.removeStoredValue("producedUnitCostFor" + player.getFaction());
