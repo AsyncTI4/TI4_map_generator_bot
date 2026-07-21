@@ -2,7 +2,6 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Very
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -24,7 +23,7 @@ public class VerydithAbilitiesHandler {
     public static final String USE_MANDATE = "useMandatePresence";
     public static final String MANDATE_SYSTEM = "selectMandateSystem_";
     public static final String MANDATE_TARGET = "selectMandateTarget_";
-    
+
     public static void getMandateButtons(GenericInteractionCreateEvent event, Player player, Game game) {
         String usedMandateThisActionPhase = game.getStoredValue("mandateUsedThisActionPhase_" + player.getFaction());
 
@@ -34,14 +33,14 @@ public class VerydithAbilitiesHandler {
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
-            player.factionButtonChecker() + USE_MANDATE, "Use Mandate of Presence", FactionEmojis.verydith));
+                player.factionButtonChecker() + USE_MANDATE, "Use Mandate of Presence", FactionEmojis.verydith));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
 
         MessageHelper.sendMessageToChannelWithButtons(
-            event.getMessageChannel(),
-            player.getRepresentation()
-                + ", you have _Mandate of Presence_ and may place 1 players command token in a system that contains 1 or more of your units, no legendary planets, and no other player's units:",
-            buttons);
+                event.getMessageChannel(),
+                player.getRepresentation()
+                        + ", you have _Mandate of Presence_ and may place 1 players command token in a system that contains 1 or more of your units, no legendary planets, and no other player's units:",
+                buttons);
     }
 
     @ButtonHandler(USE_MANDATE)
@@ -53,27 +52,33 @@ public class VerydithAbilitiesHandler {
 
         List<Button> eligibleSystems = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile == null || !FoWHelper.playerHasUnitsInSystem(player, tile) || tile.hasLegendary() || FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
+            if (tile == null
+                    || !FoWHelper.playerHasUnitsInSystem(player, tile)
+                    || tile.hasLegendary()
+                    || FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
                 continue;
             }
 
-            eligibleSystems.add(Buttons.green(player.factionButtonChecker() + MANDATE_SYSTEM + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+            eligibleSystems.add(Buttons.green(
+                    player.factionButtonChecker() + MANDATE_SYSTEM + tile.getPosition(),
+                    tile.getRepresentationForButtons(game, player)));
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
-            event.getMessageChannel(),
-            player.getRepresentation()
-                + " please select the system you would like to place another player's command token in:",
-            NewStuffHelper.buttonPagination(eligibleSystems, player.factionButtonChecker() + MANDATE_SYSTEM, 0));
+                event.getMessageChannel(),
+                player.getRepresentation()
+                        + " please select the system you would like to place another player's command token in:",
+                NewStuffHelper.buttonPagination(eligibleSystems, player.factionButtonChecker() + MANDATE_SYSTEM, 0));
     }
 
     @ButtonHandler(MANDATE_SYSTEM)
-    public static void selectMandatePresenceTarget(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void selectMandatePresenceTarget(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (game == null || player == null || !player.hasAbility("mandate_of_presence")) {
             return;
         }
         ButtonHelper.deleteMessage(event);
- 
+
         game.setStoredValue("mandateUsedThisActionPhase_" + player.getFaction(), "true");
 
         String tilePos = buttonID.replace(MANDATE_SYSTEM, "");
@@ -89,14 +94,16 @@ public class VerydithAbilitiesHandler {
                 continue;
             }
 
-            targets.add(Buttons.gray(player.factionButtonChecker() + MANDATE_TARGET + otherPlayer.getColorID() + "|" + tilePos, otherPlayer.getFactionNameOrColor(), otherPlayer.getFactionEmojiOrColor()));
+            targets.add(Buttons.gray(
+                    player.factionButtonChecker() + MANDATE_TARGET + otherPlayer.getColorID() + "|" + tilePos,
+                    otherPlayer.getFactionNameOrColor(),
+                    otherPlayer.getFactionEmojiOrColor()));
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
-            event.getMessageChannel(),
-            player.getRepresentation()
-                + " choose the player whose command token will be placed in the system:",
-            targets);
+                event.getMessageChannel(),
+                player.getRepresentation() + " choose the player whose command token will be placed in the system:",
+                targets);
     }
 
     @ButtonHandler(MANDATE_TARGET)
@@ -127,11 +134,11 @@ public class VerydithAbilitiesHandler {
         ButtonHelper.deleteMessage(event);
 
         MessageHelper.sendMessageToChannel(
-            event.getMessageChannel(),
-            player.getRepresentation()
-                + " used _Mandate of Presence_, to add "
-                + target.getRepresentationNoPing() + "'s"
-                + " command token to "
-                + tile.getRepresentation());
+                event.getMessageChannel(),
+                player.getRepresentation()
+                        + " used _Mandate of Presence_, to add "
+                        + target.getRepresentationNoPing() + "'s"
+                        + " command token to "
+                        + tile.getRepresentation());
     }
 }

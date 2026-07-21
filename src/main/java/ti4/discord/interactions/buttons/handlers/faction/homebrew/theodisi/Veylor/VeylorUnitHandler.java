@@ -13,16 +13,16 @@ import ti4.image.Mapper;
 
 @UtilityClass
 public class VeylorUnitHandler {
-    
+
     // Vox Sentinels
     public static void checkVeylorMech(Game activeMap) {
         for (Player player : activeMap.getPlayers().values()) {
             String tokenToAddOrRemove = Constants.VOX_SENTINELS_PNG;
             if (player.ownsUnit("veylor_mech")) {
                 for (Tile tile : activeMap.getTileMap().values()) {
-                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                    if (unitHolder instanceof Planet planet) {
-                        if (player.getPlanets().contains(planet.getName())) {
+                    for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                        if (unitHolder instanceof Planet planet) {
+                            if (player.getPlanets().contains(planet.getName())) {
                                 if (!oneMechCheck(planet.getName(), activeMap, player)
                                         && ((planet.getTokenList().contains(tokenToAddOrRemove)))) {
                                     planet.removeToken(tokenToAddOrRemove);

@@ -166,8 +166,7 @@ public class ArcanumTechHandler {
     private static void offerPlanetExplorationButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
         Button done = Buttons.red(
-                player.factionButtonChecker() + "finishComponentAction",
-                "Done Resolving Seal of Revelation");
+                player.factionButtonChecker() + "finishComponentAction", "Done Resolving Seal of Revelation");
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButton(
                     event.getMessageChannel(),
