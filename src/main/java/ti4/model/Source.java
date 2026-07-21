@@ -52,6 +52,7 @@ public class Source {
         beans,
         endlesst,
         theodisi,
+        gamma,
 
         // async homebrew
         draft,
@@ -221,6 +222,7 @@ public class Source {
                 case omega_phase -> "Omega Phase [Homebrew]";
                 case voices_of_the_council -> "Voices of the Council [Homebrew]";
                 case theodisi -> "Lost Legacies [Homebrew]";
+                case gamma -> "Gamma Galaxies [Homebrew]";
                 default -> toString();
             };
         }
