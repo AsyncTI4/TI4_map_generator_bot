@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -94,10 +95,24 @@ public class GameWebDataService {
         applyPlayerNameRedaction(webData, game);
         applyExploreDeckRedaction(webData, game);
         applyControlIdentityRedaction(webData, game, viewer);
-        applyObjectiveProgressRedaction(webData, viewer);
+        applyObjectiveProgressRedaction(webData, game, viewer);
         applyLawRedaction(webData, game, viewer);
+        applyStrategyCardRedaction(webData, game, viewer);
+        applyStatTileRedaction(webData, game, viewer);
         applyGhostTileMetadata(webData, viewer, visible);
         return webData;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void applyStrategyCardRedaction(Map<String, Object> webData, Game game, Player viewer) {
+        List<WebStrategyCard> strategyCards = (List<WebStrategyCard>) webData.get("strategyCards");
+        WebStrategyCard.redactPickers(strategyCards, game, viewer);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void applyStatTileRedaction(Map<String, Object> webData, Game game, Player viewer) {
+        Map<String, List<String>> statTilePositions = (Map<String, List<String>>) webData.get("statTilePositions");
+        WebStatTilePositions.redact(statTilePositions, game, viewer);
     }
 
     private static void applyLawRedaction(Map<String, Object> webData, Game game, Player viewer) {
@@ -117,9 +132,10 @@ public class GameWebDataService {
         WebTileUnitData.markGhostTiles(tileUnitData, visible, viewer);
     }
 
-    private static void applyObjectiveProgressRedaction(Map<String, Object> webData, Player viewer) {
+    private static void applyObjectiveProgressRedaction(Map<String, Object> webData, Game game, Player viewer) {
         WebObjectives objectives = (WebObjectives) webData.get("objectives");
         WebObjectives.redactFactionProgress(objectives, viewer);
+        WebObjectives.redactScorers(objectives, game, viewer);
     }
 
     private static void applyControlIdentityRedaction(Map<String, Object> webData, Game game, Player viewer) {
@@ -132,13 +148,18 @@ public class GameWebDataService {
 
     /**
      * Mirrors MapGenerator's private-FoW rendering: a player area is only included at all if the
-     * viewer can see that player's stats (FoWHelper#canSeeStatsOfPlayer). Score breakdowns are kept
-     * for everyone but trimmed to SCORED entries only for hidden players - scored objectives/relics
-     * stay visible regardless of fog, unlike hand/resource stats.
+     * viewer can see that player's stats (FoWHelper#canSeeStatsOfPlayer).
+     *
+     * <p>Hidden players are left out of scoreBreakdowns entirely - keying them by faction would
+     * publish both their identity and which objectives they scored, neither of which survives the
+     * fog. Their score-track position is public though, so their totals go into hiddenPlayerVps as
+     * bare numbers: enough to place an anonymous token on the track, with nothing to tie it to a
+     * faction. Sorted so the order can't be used to correlate a player across requests.
      */
     private static void applyStatRedaction(Map<String, Object> webData, Game game, Player viewer) {
         List<WebPlayerArea> playerDataList = new ArrayList<>();
         Map<String, WebScoreBreakdown> scoreBreakdowns = new HashMap<>();
+        List<Integer> hiddenPlayerVps = new ArrayList<>();
         for (Player player : game.getRealPlayersNNeutral()) {
             // The neutral (Dicecord) player represents public neutral forces, not a hidden real
             // opponent, and FoWHelper#canSeeStatsOfPlayer always returns false for it (it isn't a
@@ -146,15 +167,15 @@ public class GameWebDataService {
             boolean canSeeStats = player.isNeutral() || FoWHelper.canSeeStatsOfPlayer(game, player, viewer);
             if (canSeeStats) {
                 playerDataList.add(WebPlayerArea.fromPlayer(player, game));
+                scoreBreakdowns.put(player.getFaction(), WebScoreBreakdown.fromPlayer(player, game));
+            } else {
+                hiddenPlayerVps.add(player.getTotalVictoryPoints());
             }
-            scoreBreakdowns.put(
-                    player.getFaction(),
-                    canSeeStats
-                            ? WebScoreBreakdown.fromPlayer(player, game)
-                            : WebScoreBreakdown.redacted(player, game));
         }
+        Collections.sort(hiddenPlayerVps);
         webData.put("playerData", playerDataList);
         webData.put("scoreBreakdowns", scoreBreakdowns);
+        webData.put("hiddenPlayerVps", hiddenPlayerVps);
     }
 
     private static void applyPlayerNameRedaction(Map<String, Object> webData, Game game) {

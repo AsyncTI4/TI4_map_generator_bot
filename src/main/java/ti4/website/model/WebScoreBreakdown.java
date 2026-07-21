@@ -22,8 +22,9 @@ import ti4.service.info.ListPlayerInfoService;
 @Data
 public class WebScoreBreakdown {
     private List<ScoreBreakdownEntry> entries;
-    // Total VP is always public (visible on the physical score track regardless of fog), so it's
-    // sent for every player, including ones whose player area/entries are otherwise redacted.
+    // Score-track position, which isn't fogged. Under FoW a hidden player has no breakdown at all
+    // (see GameWebDataService#applyStatRedaction) - their total travels in hiddenPlayerVps instead,
+    // detached from any faction.
     private Integer totalVps;
 
     @Data
@@ -118,23 +119,6 @@ public class WebScoreBreakdown {
         addQualifiesAndPotentialEntries(player, game, breakdown.entries);
         addUnscoredEntries(player, game, breakdown.entries);
 
-        return breakdown;
-    }
-
-    /**
-     * Minimal score breakdown for a viewer who can't see this player's stats. Scored entries are
-     * kept (public knowledge - visible via scored objective/relic tokens); QUALIFIES/POTENTIAL/
-     * UNSCORED entries are dropped since they reveal hand/resource information that requires
-     * seeing the player's home system. Total VP stays visible - it's the score track position,
-     * public regardless of fog.
-     */
-    public static WebScoreBreakdown redacted(Player player, Game game) {
-        WebScoreBreakdown full = fromPlayer(player, game);
-        WebScoreBreakdown breakdown = new WebScoreBreakdown();
-        breakdown.totalVps = full.totalVps;
-        breakdown.entries = full.entries.stream()
-                .filter(entry -> entry.getState() == EntryState.SCORED)
-                .toList();
         return breakdown;
     }
 
