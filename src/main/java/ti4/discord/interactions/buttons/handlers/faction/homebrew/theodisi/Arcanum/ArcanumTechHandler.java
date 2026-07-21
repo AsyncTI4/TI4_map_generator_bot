@@ -18,11 +18,14 @@ import ti4.helpers.NewStuffHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.TechnologyModel;
 
 @UtilityClass
 public class ArcanumTechHandler {
     private static final String SEAL_OF_REVELATION = "tharcanumbg";
     private static final String SHUFFLE_PURGED_EXPLORE = "shuffleSealOfRevelation_";
+    private static final List<String> PRIMORDIAL_TECHS =
+            List.of("tharcanumpmy", "tharcanumpmg", "tharcanumpmr", "tharcanumpmb");
     private static final List<String> EXPLORE_TYPES =
             List.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL, Constants.FRONTIER);
 
@@ -107,12 +110,19 @@ public class ArcanumTechHandler {
             cardsStillInDecksOrDiscards.addAll(game.getExploreDeck(type));
             cardsStillInDecksOrDiscards.addAll(game.getExploreDiscard(type));
         }
+        for (Player otherPlayer : game.getPlayers().values()) {
+            cardsStillInDecksOrDiscards.addAll(otherPlayer.getFragments());
+            cardsStillInDecksOrDiscards.addAll(otherPlayer.getRelics());
+            otherPlayer.getLeaders().forEach(leader -> cardsStillInDecksOrDiscards.add("gain" + leader.getId()));
+        }
 
         return deck.getNewDeck().stream()
                 .filter(exploreId -> !cardsStillInDecksOrDiscards.contains(exploreId))
                 .filter(exploreId -> {
                     ExploreModel explore = Mapper.getExplore(exploreId);
-                    return explore != null && !"token".equalsIgnoreCase(explore.getResolution());
+                    return explore != null
+                            && !"token".equalsIgnoreCase(explore.getResolution())
+                            && !"attach".equalsIgnoreCase(explore.getResolution());
                 })
                 .toList();
     }
@@ -121,13 +131,50 @@ public class ArcanumTechHandler {
         return game != null && !getPurgedExploreIds(game).isEmpty();
     }
 
+    // forbidden Knowledge
+    public static boolean hasFourTechsMatchingPrimordial(Player player) {
+        if (player == null) {
+            return false;
+        }
+
+        TechnologyModel.TechnologyType primordialType = null;
+        for (String primordialTech : PRIMORDIAL_TECHS) {
+            if (!player.hasTech(primordialTech)) {
+                continue;
+            }
+
+            TechnologyModel techModel = Mapper.getTech(primordialTech);
+            if (techModel != null) {
+                primordialType = techModel.getFirstType();
+            }
+            break;
+        }
+        if (primordialType == null) {
+            return false;
+        }
+
+        int matchingTechs = 0;
+        for (String tech : player.getTechs()) {
+            TechnologyModel techModel = Mapper.getTech(tech);
+            if (techModel != null && techModel.getTypes().contains(primordialType)) {
+                matchingTechs++;
+            }
+        }
+        return matchingTechs >= 4;
+    }
+
     private static void offerPlanetExplorationButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
+        Button done = Buttons.red(
+                player.factionButtonChecker() + "finishComponentAction", "Done Resolving Seal of Revelation");
         if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), player.getRepresentation() + " has no eligible planet to explore.");
+            MessageHelper.sendMessageToChannelWithButton(
+                    event.getMessageChannel(),
+                    player.getRepresentation() + " has no eligible planet to explore.",
+                    done);
             return;
         }
+        buttons.add(done);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), player.getRepresentation() + ", choose a planet to explore.", buttons);
     }

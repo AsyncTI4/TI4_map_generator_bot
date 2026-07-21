@@ -1507,6 +1507,7 @@ public final class Constants {
 
     public static final String OLRADIN_MECH_RES_PNG = "attachment_olradin_mech_res.png";
     public static final String OLRADIN_MECH_INF_PNG = "attachment_olradin_mech_inf.png";
+    public static final String VOX_SENTINELS_PNG = "attachment_vox_sentinels.png";
     public static final String EXAMPLES_ONLY = "examples_only";
     public static final String HOW_TO_MOVE_UNITS = "how_to_move_units";
     public static final String IS_ASTEROID_FIELD = "is_asteroid_field";
