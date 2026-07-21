@@ -12,7 +12,6 @@ import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.service.persistence.DatabasePersistenceGate;
-import ti4.service.statistics.SREStats;
 import ti4.spring.context.SpringContext;
 import ti4.website.model.CompactMapState;
 
@@ -34,23 +33,10 @@ public class GameEventService {
             @Nullable String movementState) {
         try {
             if (DatabasePersistenceGate.isDisabled()) return;
-            String serializedPayload;
-            String serializedMapState;
-            long serializationStart = System.nanoTime();
-            try {
-                serializedPayload = JsonMapperManager.basic().writeValueAsString(payload);
-                serializedMapState = CompactMapState.serialize(game);
-            } finally {
-                SREStats.recordGameEventSerializationNanos(System.nanoTime() - serializationStart);
-            }
-
-            long commitStart = System.nanoTime();
-            try {
-                SpringContext.getBean(GameEventService.class)
-                        .commitEvent(game, archetype, player, serializedPayload, serializedMapState, movementState);
-            } finally {
-                SREStats.recordGameEventCommitNanos(System.nanoTime() - commitStart);
-            }
+            String serializedPayload = JsonMapperManager.basic().writeValueAsString(payload);
+            String serializedMapState = CompactMapState.serialize(game);
+            SpringContext.getBean(GameEventService.class)
+                    .commitEvent(game, archetype, player, serializedPayload, serializedMapState, movementState);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to commit game event.", e);
         }
