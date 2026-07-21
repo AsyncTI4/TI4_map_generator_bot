@@ -360,18 +360,6 @@ public final class ButtonHelperTwilightsFallActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("resolveTranspose")
-    public static void resolveTranspose(Game game, Player player, ButtonInteractionEvent event) {
-        List<Button> buttons = new ArrayList<>();
-        for (Player p2 : player.getNeighbouringPlayers(false)) {
-            buttons.add(
-                    Buttons.gray("transposeStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
-        }
-        String msg = player.getRepresentation() + ", please choose the player you wish to _Transpose_ with.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler("resolveCoerce")
     public static void resolveCoerce(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
@@ -465,6 +453,18 @@ public final class ButtonHelperTwilightsFallActionCards {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         coerceStep2(game, p2, null, "spoof_" + player.getFaction());
         coerceStep2(game, p2, null, "spoof_" + player.getFaction());
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveTranspose")
+    public static void resolveTranspose(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : player.getNeighbouringPlayers(false)) {
+            buttons.add(
+                    Buttons.gray("transposeStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
+        }
+        String msg = player.getRepresentation() + ", please choose the player you wish to _Transpose_ with.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
 
