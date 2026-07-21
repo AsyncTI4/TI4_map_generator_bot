@@ -9,15 +9,12 @@ management:
 
 spring:
   datasource:
-    url: "jdbc:sqlite:${DB_PATH:./}/tibot.db"
-    driver-class-name: org.sqlite.JDBC
+    url: "${POSTGRES_JDBC_URL:jdbc:postgresql://localhost:5432/tibot}"
+    username: "${POSTGRES_USER:tibot}"
+    password: "${POSTGRES_PASSWORD:}"
+    driver-class-name: org.postgresql.Driver
     hikari:
-      # SQLite permits only one writer at a time; extra pooled connections increase lock contention.
-      maximum-pool-size: 1
-      connection-init-sql: |
-        PRAGMA journal_mode=WAL;
-        PRAGMA busy_timeout=30000;
-        PRAGMA synchronous=NORMAL;
+      maximum-pool-size: ${POSTGRES_POOL_SIZE:10}
   jpa:
     hibernate:
       ddl-auto: update
