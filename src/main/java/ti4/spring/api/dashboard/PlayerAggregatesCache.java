@@ -3,6 +3,7 @@ package ti4.spring.api.dashboard;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,7 +37,8 @@ class PlayerAggregatesCache {
     @Column(name = "aggregates_version", nullable = false)
     private int aggregatesVersion;
 
-    @Column(name = "aggregates_json", nullable = false, columnDefinition = "TEXT")
+    @Lob
+    @Column(name = "aggregates_json", nullable = false)
     private String aggregatesJson;
 
     @Column(name = "computed_at_epoch_ms", nullable = false)
