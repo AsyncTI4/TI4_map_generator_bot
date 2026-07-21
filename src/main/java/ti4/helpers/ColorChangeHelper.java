@@ -92,6 +92,16 @@ public class ColorChangeHelper {
         }
         player.setPromissoryNotesOwned(ownedPromissoryNotesChanged);
 
+        // Law elections. IsPlayerElectedService matches the recorded election against either the
+        // player's faction or their color, so an election recorded by color silently stops
+        // matching once that color changes - the player quietly loses the law's effect, and the
+        // election can never be matched again since no player holds the old color.
+        for (Map.Entry<String, String> law : game.getLawsInfo().entrySet()) {
+            if (oldColor.equalsIgnoreCase(law.getValue())) {
+                law.setValue(newColor);
+            }
+        }
+
         // Convert all unitholders
         game.getTileMap().values().stream()
                 .flatMap(t -> t.getUnitHolders().values().stream())
