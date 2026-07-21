@@ -1635,7 +1635,8 @@ public final class Helper {
         }
         int cost = calculateCostOfProducedUnits(player, game, true);
         int unitCount = calculateCostOfProducedUnits(player, game, false);
-        String remoteWorkforcePosition = game.getStoredValue(MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction());
+        String remoteWorkforcePosition =
+                game.getStoredValue(MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction());
         boolean remoteWorkforceBuild = player.hasUnlockedBreakthrough("myrrbt")
                 && player.isBreakthroughExhausted("myrrbt")
                 && !remoteWorkforcePosition.isEmpty()
@@ -1810,10 +1811,10 @@ public final class Helper {
                 }
                 if ("fs".equals(unitModel.getAsyncId()) && player.ownsUnit("myrr_flagship")) {
                     productionValueTotal += tile.getPlanetUnitHolders().stream()
-                        .filter(planet -> player.getPlanets().contains(planet.getName()))
-                        .mapToInt(Planet::getResources)
-                        .max()
-                        .orElse(0);
+                            .filter(planet -> player.getPlanets().contains(planet.getName()))
+                            .mapToInt(Planet::getResources)
+                            .max()
+                            .orElse(0);
                 }
                 if ("mech".equalsIgnoreCase(unitModel.getBaseType())
                         && ButtonHelper.isLawInPlay(game, "articles_war")) {
@@ -2200,8 +2201,9 @@ public final class Helper {
         }
         if (player.hasUnlockedBreakthrough("myrrbt")
                 && player.isBreakthroughExhausted("myrrbt")
-                && tile.getPosition().equals(
-                        game.getStoredValue(MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction()))) {
+                && tile.getPosition()
+                        .equals(game.getStoredValue(
+                                MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction()))) {
             productionValueTotal += 2;
         }
         return productionValueTotal;
@@ -2258,8 +2260,8 @@ public final class Helper {
             if (player.hasUnlockedBreakthrough("arcanumbtback")) {
                 cost = Math.max(0, cost - 1);
             }
-            String remoteWorkforcePosition = game.getStoredValue(
-                    MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction());
+            String remoteWorkforcePosition =
+                    game.getStoredValue(MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction());
             if (player.hasUnlockedBreakthrough("myrrbt")
                     && player.isBreakthroughExhausted("myrrbt")
                     && !remoteWorkforcePosition.isEmpty()

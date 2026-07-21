@@ -2,7 +2,6 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aete
 
 import java.util.HashSet;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -16,15 +15,15 @@ import ti4.model.UnitModel;
 
 @UtilityClass
 public class AeternaBreakthroughHandler {
-    
+
     public static boolean hasTwilightDefenseSystem(Player player, Planet planet) {
         if (player == null || planet == null || !player.hasUnlockedBreakthrough("aeternabt")) {
             return false;
         }
 
         return planet.getUnitKeysForPlayer(player).stream()
-            .map(unitKey -> unitKey.unitType())
-            .anyMatch(type -> type == UnitType.Mech || type == UnitType.Spacedock);
+                .map(unitKey -> unitKey.unitType())
+                .anyMatch(type -> type == UnitType.Mech || type == UnitType.Spacedock);
     }
 
     public static boolean hasTwilightDefenseCoverage(Game game, Player player, String tilePosition) {
@@ -32,8 +31,7 @@ public class AeternaBreakthroughHandler {
             return false;
         }
 
-        Set<String> coveredTiles = new HashSet<>(
-            FoWHelper.getAdjacentTiles(game, tilePosition, player, false, true));
+        Set<String> coveredTiles = new HashSet<>(FoWHelper.getAdjacentTiles(game, tilePosition, player, false, true));
         coveredTiles.add(tilePosition);
 
         for (String position : coveredTiles) {

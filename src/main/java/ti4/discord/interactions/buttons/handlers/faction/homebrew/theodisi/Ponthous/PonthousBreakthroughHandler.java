@@ -2,7 +2,6 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Pont
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -29,21 +28,19 @@ public class PonthousBreakthroughHandler {
     private static final String SELF_DESTRUCT = "ponthousSelfDestruct_";
     private static final String SELF_DESTRUCT_SHIP = "ponthousSelfDestructShip_";
     private static final String SELF_DESTRUCT_GROUND_TARGET = "ponthousSelfDestructGroundTarget_";
-    
+
     public static Button getSelfDestructButton(Player player, Tile tile, String combatType) {
         boolean hasEligibleShip = tile.getSpaceUnitHolder().getUnitKeys().stream()
                 .filter(player::unitBelongsToPlayer)
                 .anyMatch(unitKey -> {
                     UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                    return unitModel != null
-                            && unitModel.getIsShip()
-                            && unitKey.unitType() != UnitType.Fighter;
+                    return unitModel != null && unitModel.getIsShip() && unitKey.unitType() != UnitType.Fighter;
                 });
-    
+
         if (!hasEligibleShip) {
             return null;
         }
-    
+
         return Buttons.red(
                 player.factionButtonChecker() + SELF_DESTRUCT + tile.getPosition() + "_" + combatType,
                 "Use Self-Destruct Button",
@@ -51,8 +48,7 @@ public class PonthousBreakthroughHandler {
     }
 
     @ButtonHandler(SELF_DESTRUCT)
-    public static void chooseSelfDestructShip(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void chooseSelfDestructShip(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] parts = buttonID.split("_", 3);
         String position = parts[1];
         String combatType = parts[2];
@@ -65,18 +61,18 @@ public class PonthousBreakthroughHandler {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             return;
         }
-    
+
         List<Button> buttons = new ArrayList<>();
         for (UnitKey unitKey : tile.getSpaceUnitHolder().getUnitKeys()) {
             if (!player.unitBelongsToPlayer(unitKey) || unitKey.unitType() == UnitType.Fighter) {
                 continue;
             }
-    
+
             UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
             if (unitModel == null || !unitModel.getIsShip()) {
                 continue;
             }
-    
+
             int hits = (int) unitModel.getCost();
             buttons.add(Buttons.red(
                     player.factionButtonChecker()
@@ -89,9 +85,9 @@ public class PonthousBreakthroughHandler {
                     "Destroy 1 " + unitKey.humanReadableName() + " (" + hits + " hits)",
                     unitKey.unitEmoji()));
         }
-    
+
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-    
+
         if (!buttons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
@@ -102,8 +98,7 @@ public class PonthousBreakthroughHandler {
     }
 
     @ButtonHandler(SELF_DESTRUCT_SHIP)
-    public static void resolveSelfDestruct(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void resolveSelfDestruct(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] parts = buttonID.split("_", 4);
         resolveSelfDestruct(event, game, player, parts[1], parts[2], parts[3], null);
     }
@@ -186,8 +181,7 @@ public class PonthousBreakthroughHandler {
                 ButtonHelper.deleteMessage(event);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
-                        player.getRepresentation()
-                                + ", choose the ground combat for _Self-Destruct Button_.",
+                        player.getRepresentation() + ", choose the ground combat for _Self-Destruct Button_.",
                         targetButtons);
                 return;
             }
@@ -202,7 +196,6 @@ public class PonthousBreakthroughHandler {
                         player.getRepresentation() + ", no opposing units could be found in that ground combat.");
                 return;
             }
-
         }
         for (UnitKey otherUnit : combatHolder.getUnitKeys()) {
             Player candidate = game.getPlayerFromColorOrFaction(otherUnit.getColor());
@@ -234,30 +227,22 @@ public class PonthousBreakthroughHandler {
                 + " hit"
                 + (hits == 1 ? "" : "s")
                 + ".";
-    
+
         List<Button> hitButtons = new ArrayList<>();
         boolean groundCombat = "ground".equalsIgnoreCase(combatType);
         if (groundCombat) {
             hitButtons.add(Buttons.green(
-                    opponent.factionButtonChecker()
-                            + "autoAssignGroundHits_"
-                            + combatHolder.getName()
-                            + "_"
-                            + hits,
+                    opponent.factionButtonChecker() + "autoAssignGroundHits_" + combatHolder.getName() + "_" + hits,
                     "Auto-assign " + hits + " Hit" + (hits == 1 ? "" : "s")));
             hitButtons.add(Buttons.red(
-                    opponent.factionButtonChecker() + "getDamageButtons_"
-                            + position
-                            + "deleteThis_groundcombat",
+                    opponent.factionButtonChecker() + "getDamageButtons_" + position + "deleteThis_groundcombat",
                     "Manually Assign " + hits + " Hit" + (hits == 1 ? "" : "s")));
         } else {
             hitButtons.add(Buttons.green(
                     opponent.factionButtonChecker() + "autoAssignSpaceHits_" + position + "_" + hits,
                     "Auto-assign " + hits + " Hit" + (hits == 1 ? "" : "s")));
             hitButtons.add(Buttons.red(
-                    opponent.factionButtonChecker() + "getDamageButtons_"
-                            + position
-                            + "deleteThis_spacecombat",
+                    opponent.factionButtonChecker() + "getDamageButtons_" + position + "deleteThis_spacecombat",
                     "Manually Assign " + hits + " Hit" + (hits == 1 ? "" : "s")));
         }
 

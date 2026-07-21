@@ -2495,7 +2495,8 @@ public class CombatRollService {
                 }
                 if (unitHolder instanceof Planet planet) {
                     if (player.hasUnlockedBreakthrough("aeternabt")) {
-                        UnitModel twilightCannon = AeternaBreakthroughHandler.getTwilightDefenseCannon(player, planet, true);
+                        UnitModel twilightCannon =
+                                AeternaBreakthroughHandler.getTwilightDefenseCannon(player, planet, true);
                         if (twilightCannon != null) {
                             unitsOnAdjacentTiles.put(new ImmutablePair<>(twilightCannon, unitHolder), 1);
                         }
@@ -2527,7 +2528,8 @@ public class CombatRollService {
                     unitsOnTile.put(new ImmutablePair<>(planetFakeUnit, unitHolder), 1);
                 }
                 if (player.hasUnlockedBreakthrough("aeternabt")) {
-                    UnitModel twilightCannon = AeternaBreakthroughHandler.getTwilightDefenseCannon(player, planet, true);
+                    UnitModel twilightCannon =
+                            AeternaBreakthroughHandler.getTwilightDefenseCannon(player, planet, true);
                     if (twilightCannon != null) {
                         unitsOnTile.put(new ImmutablePair<>(twilightCannon, unitHolder), 1);
                     }

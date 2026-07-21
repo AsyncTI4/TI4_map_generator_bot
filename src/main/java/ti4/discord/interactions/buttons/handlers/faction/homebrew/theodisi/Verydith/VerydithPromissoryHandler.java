@@ -8,18 +8,18 @@ import ti4.message.MessageHelper;
 
 @UtilityClass
 public class VerydithPromissoryHandler {
-    
+
     public static void returnPactRenewedAtStartOfStatus(Game game) {
         for (Player holder : game.getPlayers().values()) {
             if (!holder.getPromissoryNotesInPlayArea().contains("thpnverydith")) {
                 continue;
             }
-    
+
             Player owner = game.getPNOwner("thpnverydith");
             if (owner == null || !owner.isRealPlayer()) {
                 continue;
             }
-    
+
             holder.removePromissoryNote("thpnverydith");
             owner.setPromissoryNote("thpnverydith");
             PromissoryNoteHelper.sendPromissoryNoteInfo(game, holder, false);

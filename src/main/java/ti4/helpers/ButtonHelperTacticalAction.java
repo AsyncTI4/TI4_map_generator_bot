@@ -232,7 +232,7 @@ public final class ButtonHelperTacticalAction {
                 && IsPlayerElectedService.isPlayerElected(game, player, "prophecy")) {
             message3 +=
                     "Reminder that you have _Prophecy of Ixth_ and should produce at least 2 fighters if you wish to keep it. Its removal is not automated.\n";
-        }      
+        }
         MessageHelper.sendMessageToChannel(
                 event.getChannel(), message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, game, true));
 

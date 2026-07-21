@@ -59,8 +59,7 @@ public class MyrrBreakthroughHandler {
     }
 
     @ButtonHandler("myrrBtProduce_")
-    public static void resolveRemoteWorkforce(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void resolveRemoteWorkforce(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String position = buttonID.replace("myrrBtProduce_", "");
         Tile tile = game.getTileByPosition(position);
 
@@ -97,5 +96,4 @@ public class MyrrBreakthroughHandler {
                         + " (+2 from _Remote Workforce_) and its total cost is reduced by 1.",
                 buttons);
     }
-
 }

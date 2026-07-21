@@ -402,8 +402,7 @@ class DeleteButtonsButtonHandler {
                 CommanderUnlockCheckService.checkPlayer(player, "revenantmyrr");
             }
         }
-        if ("Done Producing Units".equalsIgnoreCase(buttonLabel)
-                && "myrrBt".equalsIgnoreCase(buttonID)) {
+        if ("Done Producing Units".equalsIgnoreCase(buttonLabel) && "myrrBt".equalsIgnoreCase(buttonID)) {
             game.removeStoredValue(MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction());
         }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
@@ -418,7 +417,8 @@ class DeleteButtonsButtonHandler {
                 ButtonHelperFactionSpecific.offerASNButtonsStep1(game, player, buttonID);
             }
             if (player.hasReadyBreakthrough("myrrbt")
-                    && !game.getStoredValue("producedUnitCostFor" + player.getFaction()).isEmpty()) {
+                    && !game.getStoredValue("producedUnitCostFor" + player.getFaction())
+                            .isEmpty()) {
                 MyrrBreakthroughHandler.offerRemoteWorkforce(event, game, player);
             }
             player.resetSpentThings();

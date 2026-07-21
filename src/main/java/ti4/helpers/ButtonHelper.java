@@ -7731,7 +7731,8 @@ public class ButtonHelper {
             playersWithPds2.add(player);
         }
         for (Player twilightPlayer : game.getRealPlayers()) {
-            if (playersWithPds2.contains(twilightPlayer) || !AeternaBreakthroughHandler.hasTwilightDefenseCoverage(game, twilightPlayer, tilePos)) {
+            if (playersWithPds2.contains(twilightPlayer)
+                    || !AeternaBreakthroughHandler.hasTwilightDefenseCoverage(game, twilightPlayer, tilePos)) {
                 continue;
             }
 

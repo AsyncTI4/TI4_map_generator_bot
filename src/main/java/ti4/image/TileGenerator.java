@@ -1904,7 +1904,9 @@ public class TileGenerator {
         if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains("superweapon_mors"))) {
             return true;
         }
-        if (unitHolder instanceof Planet planet && game.getRealPlayers().stream().anyMatch(player -> AeternaBreakthroughHandler.hasTwilightDefenseSystem(player, planet))) {
+        if (unitHolder instanceof Planet planet
+                && game.getRealPlayers().stream()
+                        .anyMatch(player -> AeternaBreakthroughHandler.hasTwilightDefenseSystem(player, planet))) {
             return true;
         }
         for (Player player : game.getRealPlayers()) {
