@@ -4,7 +4,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 interface MatchmakingQueueMemberRepository extends JpaRepository<MatchmakingQueueMember, Long> {
 
@@ -16,9 +18,15 @@ interface MatchmakingQueueMemberRepository extends JpaRepository<MatchmakingQueu
 
     List<MatchmakingQueueMember> findAllByPartyIdIn(Collection<Long> partyIds);
 
-    @Transactional
-    long deleteByPartyId(long partyId);
+    @Modifying
+    @Query("delete from MatchmakingQueueMember member where member.id = :memberId")
+    int deleteMember(@Param("memberId") long memberId);
 
-    @Transactional
-    void deleteAllByPartyIdIn(Collection<Long> partyIds);
+    @Modifying
+    @Query("delete from MatchmakingQueueMember member where member.partyId in :partyIds")
+    int deleteAllForParties(@Param("partyIds") Collection<Long> partyIds);
+
+    @Modifying
+    @Query("delete from MatchmakingQueueMember")
+    int deleteAllMembers();
 }

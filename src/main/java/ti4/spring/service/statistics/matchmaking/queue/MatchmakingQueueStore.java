@@ -31,8 +31,9 @@ public class MatchmakingQueueStore {
         return partyRepository.findById(partyId);
     }
 
+    @Transactional
     void deleteMember(MatchmakingQueueMember member) {
-        memberRepository.delete(member);
+        memberRepository.deleteMember(member.getId());
     }
 
     boolean isUserQueued(String userId) {
@@ -53,6 +54,7 @@ public class MatchmakingQueueStore {
                 .orElse(List.of(userId));
     }
 
+    @Transactional
     void createUnqueuedGroup(List<String> userIds) {
         MatchmakingQueueParty party = new MatchmakingQueueParty();
         party.setQueued(false);
@@ -60,14 +62,12 @@ public class MatchmakingQueueStore {
         saveMembers(userIds, partyId);
     }
 
+    @Transactional
     void markQueued(MatchmakingQueueParty party, String leaderId, boolean tigl) {
-        party.setLeaderId(leaderId);
-        party.setQueued(true);
-        party.setTigl(tigl);
-        party.setQueuedAt(Instant.now());
-        partyRepository.save(party);
+        partyRepository.markQueued(party.getId(), leaderId, tigl, Instant.now());
     }
 
+    @Transactional
     void createSoloQueuedParty(String leaderId, boolean tigl) {
         MatchmakingQueueParty party = new MatchmakingQueueParty();
         party.setQueued(true);
@@ -93,15 +93,14 @@ public class MatchmakingQueueStore {
     @Transactional
     void deleteParties(Collection<Long> partyIds) {
         if (partyIds.isEmpty()) return;
-        memberRepository.deleteAllByPartyIdIn(partyIds);
-        partyRepository.deleteAllById(partyIds);
+        memberRepository.deleteAllForParties(partyIds);
+        partyRepository.deleteAllByIds(partyIds);
     }
 
+    @Transactional
     long clearAll() {
-        long clearedParties = partyRepository.count();
-        memberRepository.deleteAll();
-        partyRepository.deleteAll();
-        return clearedParties;
+        memberRepository.deleteAllMembers();
+        return partyRepository.deleteAllParties();
     }
 
     List<QueuedParty> loadQueuedParties() {

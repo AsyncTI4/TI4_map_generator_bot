@@ -25,7 +25,7 @@ public class TourneyWinnerService {
 
     public void remove(String userId, String tourneyName) {
         if (DatabasePersistenceGate.isDisabled()) return;
-        tournamentWinnerRepository.deleteByUserIdAndTourneyName(userId, tourneyName);
+        tournamentWinnerRepository.deleteWinner(userId, tourneyName);
     }
 
     public String allWinnersToString() {

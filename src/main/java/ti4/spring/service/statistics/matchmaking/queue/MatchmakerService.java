@@ -39,7 +39,6 @@ public class MatchmakerService {
         return queueStore.partyMemberIds(userId);
     }
 
-    @Transactional
     public Optional<String> formGroup(String creatorId, List<String> memberIds) {
         if (DatabasePersistenceGate.isDisabled()) return Optional.of("Queueing is currently disabled.");
 
@@ -62,7 +61,6 @@ public class MatchmakerService {
         return Optional.empty();
     }
 
-    @Transactional
     public Optional<String> queue(String queuerId, boolean tigl) {
         if (DatabasePersistenceGate.isDisabled()) return Optional.of("Queueing is currently disabled.");
 
@@ -90,7 +88,6 @@ public class MatchmakerService {
         return Optional.empty();
     }
 
-    @Transactional
     public boolean leaveQueue(String userId) {
         if (DatabasePersistenceGate.isDisabled()) return false;
 
@@ -102,13 +99,11 @@ public class MatchmakerService {
         return true;
     }
 
-    @Transactional
     public long clearQueue() {
         if (DatabasePersistenceGate.isDisabled()) return 0;
         return queueStore.clearAll();
     }
 
-    @Transactional
     public List<String> removePlayer(String userId) {
         if (DatabasePersistenceGate.isDisabled()) return List.of();
 

@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.game.CreateGameButtonHandler;
 import ti4.service.persistence.DatabasePersistenceGate;
@@ -25,24 +24,21 @@ public class MatchmakingQueueSearchService {
         return SpringContext.getBean(MatchmakingQueueSearchService.class);
     }
 
-    @Transactional
     public void register(String threadId, String messageId, PlayerSearchCriteria criteria) {
         if (DatabasePersistenceGate.isDisabled()) return;
-        MatchmakingQueueSearch search = repository.findByThreadId(threadId).orElseGet(MatchmakingQueueSearch::new);
-        search.setThreadId(threadId);
-        search.setMessageId(messageId);
-        search.setPlayerCounts(join(criteria.playerCounts()));
-        search.setVictoryPointGoals(join(criteria.victoryPointGoals()));
-        search.setExpansions(join(criteria.expansions()));
-        search.setPaces(join(criteria.paces()));
-        search.setRestrictions(join(criteria.restrictions()));
-        search.setTigl(criteria.tigl());
-        search.setTiglRanks(join(criteria.tiglRanks()));
-        search.setCreatedAt(Instant.now());
-        repository.save(search);
+        repository.upsert(
+                threadId,
+                messageId,
+                join(criteria.playerCounts()),
+                join(criteria.victoryPointGoals()),
+                join(criteria.expansions()),
+                join(criteria.paces()),
+                join(criteria.restrictions()),
+                criteria.tigl(),
+                join(criteria.tiglRanks()),
+                Instant.now());
     }
 
-    @Transactional
     public void remove(String threadId) {
         if (DatabasePersistenceGate.isDisabled()) return;
         repository.deleteByThreadId(threadId);

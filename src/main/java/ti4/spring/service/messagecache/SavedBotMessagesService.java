@@ -24,8 +24,7 @@ public class SavedBotMessagesService {
         if (!isImportantMessage(message)) return;
 
         long createdAtEpochMillis = message.getTimeCreated().toInstant().toEpochMilli();
-        var record = new BotDiscordMessageEntity(message.getIdLong(), message.getContentRaw(), createdAtEpochMillis);
-        botDiscordMessageEntityRepository.save(record);
+        botDiscordMessageEntityRepository.upsert(message.getIdLong(), message.getContentRaw(), createdAtEpochMillis);
     }
 
     public static boolean isImportantMessage(Message message) {
@@ -57,13 +56,13 @@ public class SavedBotMessagesService {
             return;
         }
         long cutoff = System.currentTimeMillis() - RETENTION_MILLIS;
-        long deletedRowCount = botDiscordMessageEntityRepository.deleteByCreatedAtEpochMillisLessThan(cutoff);
+        long deletedRowCount = botDiscordMessageEntityRepository.deleteExpired(cutoff);
         BotLogger.info("Deleted " + deletedRowCount + " rows from the `bot_discord_message` table.");
     }
 
     public void remove(long messageId) {
         if (DatabasePersistenceGate.isDisabled()) return;
-        botDiscordMessageEntityRepository.deleteById(messageId);
+        botDiscordMessageEntityRepository.deleteMessage(messageId);
     }
 
     public static SavedBotMessagesService getBean() {
