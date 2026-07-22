@@ -20,6 +20,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperTwilightsFallActionCards;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
@@ -111,6 +112,14 @@ public class VeiledHeartService {
         player.getGame().setStoredValue(getKey(player), value);
     }
 
+    private static void addVeiledCard(Player player, String card) {
+        setStoredValue(player, getStoredValue(player) + card + "_");
+    }
+
+    private static void removeVeiledCard(Player player, String card) {
+        setStoredValue(player, getStoredValue(player).replace(card + "_", ""));
+    }
+
     private static Stream<String> getVeiledCards(Player player) {
         return Arrays.stream(getStoredValue(player).split("_"));
     }
@@ -159,35 +168,58 @@ public class VeiledHeartService {
                 .toList();
     }
 
-    public static List<Button> getVeiledDiscardButtonsForGenophage(Player activePlayer, Player targetPlayer) {
+    private static List<Button> getButtonsForChoosingForeignVeiledCard(
+            VeiledCardType type, Player activePlayer, Player targetPlayer, String buttonIdFormat) {
         List<Button> buttons = new ArrayList<>();
-        String buttonIdFormat = "veiled_discard_genome_%s_" + targetPlayer.getFaction();
-        List<String> veiledGenomes = new ArrayList<>(
-                getVeiledCards(VeiledCardType.GENOME, targetPlayer).toList());
+        List<String> veiledCards =
+                new ArrayList<>(getVeiledCards(type, targetPlayer).toList());
 
-        if (veiledGenomes.isEmpty()) {
+        if (veiledCards.isEmpty()) {
             return buttons;
         }
-        if (veiledGenomes.size() == 1) {
-            String veiledGenome = veiledGenomes.getFirst();
-            buttons.add(Buttons.gray(String.format(buttonIdFormat, veiledGenome), "Veiled Genome"));
+        if (veiledCards.size() == 1) {
+            buttons.add(Buttons.gray(String.format(buttonIdFormat, veiledCards.getFirst()), "Veiled " + type));
             return buttons;
         }
 
-        Collections.shuffle(veiledGenomes);
+        Collections.shuffle(veiledCards);
 
         StringBuilder msgForTarget = new StringBuilder(
-                "Buttons to discard one of your veiled genomes were sent to " + activePlayer.getRepresentation()
-                        + ". If you want them to know which number is referring to which genome (because of some deal you made, or whatever), you may share any of the following information:");
+                "Buttons to choose one of your veiled cards were sent to " + activePlayer.getRepresentation()
+                        + ". If you want them to know which number is referring to which card (because of some deal you made, or whatever), you may share any of the following information:");
         int i = 1;
-        for (String veiledGenome : veiledGenomes) {
-            buttons.add(Buttons.gray(String.format(buttonIdFormat, veiledGenome), "Veiled Genome " + i));
-            msgForTarget.append(
-                    String.format("\nVeiled Genome %d: %s", i, getRepresentation(VeiledCardType.GENOME, veiledGenome)));
+        for (String veiledCard : veiledCards) {
+            buttons.add(Buttons.red(String.format(buttonIdFormat, veiledCard), "Veiled " + type + " " + i));
+            msgForTarget.append(String.format("\nVeiled %s %d: %s", type, i, getRepresentation(type, veiledCard)));
             i++;
         }
         MessageHelper.sendMessageToChannel(targetPlayer.getCardsInfoThread(), msgForTarget.toString());
         return buttons;
+    }
+
+    public static List<Button> getVeiledDiscardButtonsForGenophage(Player activePlayer, Player targetPlayer) {
+        return getButtonsForChoosingForeignVeiledCard(
+                VeiledCardType.GENOME,
+                activePlayer,
+                targetPlayer,
+                "veiled_discard_genome_%s_" + targetPlayer.getFaction());
+    }
+
+    public static List<Button> getVeiledGiveButtonsForTranspose(Player activePlayer, Player targetPlayer) {
+        return getVeiledCards(VeiledCardType.ABILITY, activePlayer)
+                .map(veiledAbility -> Buttons.red(
+                        "transposeStep3_" + targetPlayer.getFaction() + "_" + veiledAbility,
+                        getRepresentation(VeiledCardType.ABILITY, veiledAbility)))
+                .toList();
+    }
+
+    public static List<Button> getVeiledTakeButtonsForTranspose(
+            Player activePlayer, Player targetPlayer, String abilityToGive) {
+        return getButtonsForChoosingForeignVeiledCard(
+                VeiledCardType.ABILITY,
+                activePlayer,
+                targetPlayer,
+                "transposeStep4_" + targetPlayer.getFaction() + "_" + abilityToGive + "_%s");
     }
 
     private static String getRepresentation(VeiledCardType type, String card) {
@@ -258,30 +290,33 @@ public class VeiledHeartService {
         ButtonHelper.deleteMessage(event);
     }
 
+    private static void doSilentAction(VeiledCardAction action, Player player, String card) {
+        switch (action) {
+            case SPLICE, DRAW -> addVeiledCard(player, card);
+            case DISCARD -> removeVeiledCard(player, card);
+        }
+    }
+
     public static void doAction(VeiledCardAction action, String typeStr, Player player, String card) {
         VeiledCardType.fromString(typeStr).ifPresent(type -> doAction(action, type, player, card));
     }
 
     public static void doAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
+        doSilentAction(action, player, card);
+
         String msg;
         switch (action) {
-            case SPLICE -> {
-                setStoredValue(player, getStoredValue(player) + card + "_");
+            case SPLICE ->
                 msg = player.getRepresentation() + " has spliced a veiled "
                         + type.toString().toLowerCase()
                         + ". They may put it into play with a button in their `#cards-info` thread.";
-            }
-            case DRAW -> {
-                setStoredValue(player, getStoredValue(player) + card + "_");
+            case DRAW ->
                 msg = player.getRepresentation() + " has secretly drawn a veiled "
                         + type.toString().toLowerCase()
                         + ". They may put it into play with a button in their `#cards-info` thread.";
-            }
-            case DISCARD -> {
-                setStoredValue(player, getStoredValue(player).replace(card + "_", ""));
+            case DISCARD ->
                 msg = player.getRepresentation() + " has secretly discarded a veiled "
                         + type.toString().toLowerCase() + ".";
-            }
             default ->
                 msg = player.getRepresentation() + " tried to "
                         + action.toString().toLowerCase() + " a veiled "
@@ -325,6 +360,78 @@ public class VeiledHeartService {
             MessageHelper.sendMessageToChannelWithEmbed(
                     targetPlayer.getCardsInfoThread(), msgForTargetPlayer, getRepresentationEmbed(type, card));
         });
+    }
+
+    public static void doTranspose(
+            Player activePlayer, Player targetPlayer, String abilityToGive, String abilityToTake) {
+        VeiledCardType type = VeiledCardType.ABILITY;
+        boolean givingVeiled = !activePlayer.hasTech(abilityToGive);
+        boolean takingVeiled = !targetPlayer.hasTech(abilityToTake);
+
+        activePlayer.removeTech(abilityToGive);
+        removeVeiledCard(activePlayer, abilityToGive);
+        addVeiledCard(targetPlayer, abilityToGive);
+
+        targetPlayer.removeTech(abilityToTake);
+        removeVeiledCard(targetPlayer, abilityToTake);
+        addVeiledCard(activePlayer, abilityToTake);
+
+        String msgPublic = String.format(
+                "%s has used _Transpose_ to give %s to %s and to take %s from %s in return.\n",
+                activePlayer.getRepresentation(),
+                givingVeiled ? "a veiled ability" : ("the ability _'" + getRepresentation(type, abilityToGive) + "'_"),
+                targetPlayer.getRepresentation(),
+                takingVeiled ? "a veiled ability" : ("the ability _'" + getRepresentation(type, abilityToTake) + "'_"),
+                targetPlayer.getRepresentation());
+        if (givingVeiled && takingVeiled) {
+            msgPublic +=
+                    "Both abilities remain veiled. and may be put into play by each of their respective new owners, using a button in their `#cards-info` thread.";
+        } else if (givingVeiled) {
+            msgPublic += String.format(
+                    "The veiled ability %s gave to %s remains veiled. Also, because taking abilities counts as gaining them, the _'%s'_ ability %s took from %s has been turned face-down as if it had just been drawn.",
+                    activePlayer.getRepresentation(),
+                    targetPlayer.getRepresentation(),
+                    getRepresentation(type, abilityToTake),
+                    activePlayer.getRepresentation(),
+                    targetPlayer.getRepresentation());
+        } else if (takingVeiled) {
+            msgPublic += String.format(
+                    "The veiled ability %s took from %s remains veiled. Also, because being given abilities counts as gaining them, the _'%s'_ ability %s gave to %s has been turned face-down as if it had just been drawn.",
+                    activePlayer.getRepresentation(),
+                    targetPlayer.getRepresentation(),
+                    getRepresentation(type, abilityToGive),
+                    activePlayer.getRepresentation(),
+                    targetPlayer.getRepresentation());
+        } else {
+            msgPublic +=
+                    "Because taking abilities counts as gaining them, both abilities have been turned face-down as if they had just been drawn.";
+        }
+        msgPublic +=
+                "\nEach involved player may put their new ability into play using a button in their `#cards-info` thread.";
+
+        String msgForActivePlayer = String.format(
+                "Using _Transpose_, you've given _'%s'_ to %s and have taken _'%s'_ in return:",
+                getRepresentation(type, abilityToGive),
+                targetPlayer.getRepresentation(),
+                getRepresentation(type, abilityToTake));
+        String msgForTargetPlayer = String.format(
+                "%s used _Transpose_ to take _'%s'_ from you! However, they did give you _'%s'_ in return:",
+                activePlayer.getRepresentation(),
+                getRepresentation(type, abilityToTake),
+                getRepresentation(type, abilityToGive));
+
+        MessageHelper.sendMessageToChannel(activePlayer.getCorrectChannel(), msgPublic);
+        MessageHelper.sendMessageToChannelWithEmbed(
+                activePlayer.getCardsInfoThread(), msgForActivePlayer, getRepresentationEmbed(type, abilityToTake));
+        MessageHelper.sendMessageToChannelWithEmbed(
+                targetPlayer.getCardsInfoThread(), msgForTargetPlayer, getRepresentationEmbed(type, abilityToGive));
+
+        if (!givingVeiled) {
+            ButtonHelperTwilightsFallActionCards.checkForSingularityTransfer(activePlayer, targetPlayer, abilityToGive);
+        }
+        if (!takingVeiled) {
+            ButtonHelperTwilightsFallActionCards.checkForSingularityTransfer(targetPlayer, activePlayer, abilityToTake);
+        }
     }
 
     public static int veiledField(Graphics graphics, int x, int y, VeiledCardType type, int deltaX, Player player) {

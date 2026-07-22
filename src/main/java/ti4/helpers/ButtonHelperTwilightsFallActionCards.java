@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -479,8 +480,18 @@ public final class ButtonHelperTwilightsFallActionCards {
             }
             buttons.add(Buttons.gray("transposeStep3_" + p2.getFaction() + "_" + ability, tech.getName()));
         }
-        String msg = player.getRepresentation() + ", please choose the ability you wish to lose.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+        String msg = player.getRepresentation() + ", please choose the ability you wish to give to "
+                + p2.getRepresentation();
+        MessageChannel channel = player.getCorrectChannel();
+        if (game.isVeiledHeartMode()) {
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    player.getRepresentation() + " is choosing which ability to give to " + p2.getRepresentation());
+            msg += " (The red buttons are for veiled abilities.)";
+            channel = player.getCardsInfoThread();
+            buttons.addAll(VeiledHeartService.getVeiledGiveButtonsForTranspose(player, p2));
+        }
+        MessageHelper.sendMessageToChannel(channel, msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -505,6 +516,9 @@ public final class ButtonHelperTwilightsFallActionCards {
             buttons.add(
                     Buttons.gray("transposeStep4_" + p2.getFaction() + "_" + ability1 + "_" + ability, tech.getName()));
         }
+        if (game.isVeiledHeartMode() && !p2.hasTech("tf-biosyntheticsynergy")) {
+            buttons.addAll(VeiledHeartService.getVeiledTakeButtonsForTranspose(player, p2, ability1));
+        }
         String msg = player.getRepresentation() + ", please choose the ability you wish to steal.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
@@ -512,11 +526,19 @@ public final class ButtonHelperTwilightsFallActionCards {
 
     @ButtonHandler("transposeStep4")
     public static void transposeStep4(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        ButtonHelper.deleteMessage(event);
+
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String ability1 = buttonID.split("_")[2];
         String ability2 = buttonID.split("_")[3];
         TechnologyModel tech1 = Mapper.getTech(ability1);
         TechnologyModel tech2 = Mapper.getTech(ability2);
+
+        if (game.isVeiledHeartMode()) {
+            VeiledHeartService.doTranspose(player, p2, ability1, ability2);
+            return;
+        }
+
         player.removeTech(ability1);
         p2.removeTech(ability2);
         player.addTech(ability2);
@@ -529,34 +551,26 @@ public final class ButtonHelperTwilightsFallActionCards {
                 + (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.getFactionNameOrColor()) + ".";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        ButtonHelper.deleteMessage(event);
 
-        if (ability1.contains("tf-singularity")) {
-            List<Button> transferButtons = getTransferSingularityButtons(game, player, p2);
+        checkForSingularityTransfer(player, p2, ability1);
+        checkForSingularityTransfer(p2, player, ability2);
+    }
+
+    public static void checkForSingularityTransfer(Player sender, Player recipient, String ability) {
+        if (ability.contains("tf-singularity")) {
+            List<Button> transferButtons = getTransferSingularityButtons(sender, recipient);
             if (!transferButtons.isEmpty()) {
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
+                        sender.getCorrectChannel(),
+                        sender.getRepresentation()
                                 + ", since you lost a singularity ability, you may also have to transfer whatever it was copying to "
-                                + p2.getFactionNameOrColor() + ".",
-                        transferButtons);
-            }
-        }
-
-        if (ability2.contains("tf-singularity")) {
-            List<Button> transferButtons = getTransferSingularityButtons(game, p2, player);
-            if (!transferButtons.isEmpty()) {
-                MessageHelper.sendMessageToChannel(
-                        p2.getCorrectChannel(),
-                        p2.getRepresentation()
-                                + ", since you lost a singularity ability, you may also have to transfer whatever it was copying to "
-                                + player.getFactionNameOrColor() + ".",
+                                + recipient.getFactionNameOrColor() + ".",
                         transferButtons);
             }
         }
     }
 
-    private static List<Button> getTransferSingularityButtons(Game game, Player target, Player recipient) {
+    private static List<Button> getTransferSingularityButtons(Player target, Player recipient) {
         List<Button> buttons = new ArrayList<>();
         for (String ability : target.getTechs()) {
             TechnologyModel tech = Mapper.getTech(ability);
