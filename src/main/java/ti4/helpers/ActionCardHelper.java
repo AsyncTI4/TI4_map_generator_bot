@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -750,6 +751,7 @@ public class ActionCardHelper {
                 }
             } else if (player.hasAbility("cybernetic_madness")) {
                 game.purgedActionCard(player.getUserID(), acIndex);
+                OblivionUnitHandler.doOblivionMechCheck(game, player);
             } else {
                 game.discardActionCard(player.getUserID(), acIndex);
             }

@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.game.Game;
@@ -109,10 +110,6 @@ public class PlayStrategyCardService {
                     return;
                 }
             }
-        }
-
-        if (player.hasAbility("mandate_of_presence") && !isOverrule) {
-            VerydithAbilitiesHandler.getMandateButtons(event, player, game);
         }
 
         game.setStoredValue(
@@ -512,6 +509,12 @@ public class PlayStrategyCardService {
                     }
                 }
             }
+        }
+        if (player.hasAbility("mandate_of_presence") && !isOverrule) {
+            VerydithAbilitiesHandler.getMandateButtons(event, player, game);
+        }
+        if (player.hasPlayablePromissoryInHand("thpnverydith")) {
+            VerydithPromissoryHandler.usePactRenewed(player);
         }
 
         if (player.isNpc()) {

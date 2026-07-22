@@ -17,6 +17,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -78,6 +79,9 @@ public class ComponentActionHelper {
                     && !ButtonHelper.getButtonsForConventions(p1, game).isEmpty();
             if (techText.contains("ACTION") || detAgeOfExp || x89Conventions) {
                 if ("tharcanumbg".equalsIgnoreCase(tech) && !ArcanumTechHandler.canUseSealOfRevelation(game)) {
+                    continue;
+                }
+                if ("thobliviong".equalsIgnoreCase(tech) && !OblivionTechHandler.canUseMirroredMemories(game, p1)) {
                     continue;
                 }
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
@@ -1159,6 +1163,7 @@ public class ComponentActionHelper {
             player.removeExhaustedRelic(relicID);
             if (!"nanoforge".equals(relicID)) {
                 DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+                OblivionUnitHandler.doOblivionMechCheck(game, player);
             }
         }
 
