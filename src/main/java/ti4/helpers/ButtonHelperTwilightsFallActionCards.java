@@ -160,7 +160,7 @@ public final class ButtonHelperTwilightsFallActionCards {
         if (game.isVeiledHeartMode()) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
-                    player.getRepresentation() + " is choosing which card each participating player will take.");
+                    player.getRepresentationNoPing() + " is choosing which card each participating player will take.");
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
@@ -385,12 +385,13 @@ public final class ButtonHelperTwilightsFallActionCards {
                     p2.factionButtonChecker() + "coerceStep3_" + player.getFaction() + "_" + ability, tech.getName()));
         }
         String msg = p2.getRepresentationUnfogged() + ", please choose the ability you wish to give to "
-                + (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.getRepresentation()) + ".";
+                + (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.getRepresentationNoPing()) + ".";
         MessageChannel channel = p2.getCorrectChannel();
         if (game.isVeiledHeartMode()) {
             MessageHelper.sendMessageToChannel(
                     channel,
-                    p2.getRepresentation() + " is choosing which ability to give to " + player.getRepresentation());
+                    p2.getRepresentationNoPing() + " is choosing which ability to give to "
+                            + player.getRepresentationNoPing());
             msg += " (The red buttons are for veiled abilities.)";
             channel = p2.getCardsInfoThread();
             buttons.addAll(VeiledHeartService.getVeiledGiveButtonsForCoerce(p2, player));
@@ -497,7 +498,7 @@ public final class ButtonHelperTwilightsFallActionCards {
             buttons.add(Buttons.gray("transposeStep3_" + p2.getFaction() + "_" + ability, tech.getName()));
         }
         String msg = player.getRepresentation() + ", please choose the ability you wish to give to "
-                + p2.getRepresentation();
+                + p2.getRepresentationNoPing();
         MessageChannel channel = player.getCorrectChannel();
         if (game.isVeiledHeartMode()) {
             MessageHelper.sendMessageToChannel(

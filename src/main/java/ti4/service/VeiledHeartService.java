@@ -199,7 +199,7 @@ public class VeiledHeartService {
         Collections.shuffle(veiledCards);
 
         StringBuilder msgForTarget = new StringBuilder(
-                "Buttons to choose one of your veiled cards were sent to " + activePlayer.getRepresentation()
+                "Buttons to choose one of your veiled cards were sent to " + activePlayer.getRepresentationNoPing()
                         + ". If you want them to know which number is referring to which card (because of some deal you made, or whatever), you may share any of the following information:");
         int i = 1;
         for (String veiledCard : veiledCards) {
@@ -423,7 +423,7 @@ public class VeiledHeartService {
                         + type.toString().toLowerCase() + "!");
         MessageHelper.sendMessageToChannelWithEmbed(
                 targetPlayer.getCardsInfoThread(),
-                activePlayer.getRepresentation() + " made you "
+                activePlayer.getRepresentationNoPing() + " made you "
                         + action.toString().toLowerCase() + " the following veiled "
                         + type.toString().toLowerCase() + ": " + getRepresentation(type, card),
                 getRepresentationEmbed(type, card));
@@ -438,10 +438,14 @@ public class VeiledHeartService {
                     targetPlayer.getRepresentation(), type.toString().toLowerCase());
             String msgForActivePlayer = String.format(
                     "You have forced %s to splice the veiled %s _'%s'_.",
-                    targetPlayer.getRepresentation(), type.toString().toLowerCase(), getRepresentation(type, card));
+                    targetPlayer.getRepresentationNoPing(),
+                    type.toString().toLowerCase(),
+                    getRepresentation(type, card));
             String msgForTargetPlayer = String.format(
                     "%s has forced you to splice the veiled %s _'%s'_:",
-                    activePlayer.getRepresentation(), type.toString().toLowerCase(), getRepresentation(type, card));
+                    activePlayer.getRepresentationNoPing(),
+                    type.toString().toLowerCase(),
+                    getRepresentation(type, card));
 
             MessageHelper.sendMessageToChannel(activePlayer.getCorrectChannel(), msgPublic);
             MessageHelper.sendMessageToChannel(activePlayer.getCardsInfoThread(), msgForActivePlayer);
@@ -472,10 +476,10 @@ public class VeiledHeartService {
         }
         String msgForSender = String.format(
                 "You were _Coerced_ by %s into giving them the _'%s'_ ability.",
-                recipient.getRepresentation(), getRepresentation(type, ability));
+                recipient.getRepresentationNoPing(), getRepresentation(type, ability));
         String msgForRecipient = String.format(
                 "You _Coerced_ %s into giving you the _'%s'_ ability:",
-                sender.getRepresentation(), getRepresentation(type, ability));
+                sender.getRepresentationNoPing(), getRepresentation(type, ability));
 
         MessageHelper.sendMessageToChannel(sender.getCorrectChannel(), msgPublic);
         MessageHelper.sendMessageToChannel(sender.getCardsInfoThread(), msgForSender);
@@ -507,25 +511,25 @@ public class VeiledHeartService {
                 givingVeiled ? "a veiled ability" : ("the ability _'" + getRepresentation(type, abilityToGive) + "'_"),
                 targetPlayer.getRepresentation(),
                 takingVeiled ? "a veiled ability" : ("the ability _'" + getRepresentation(type, abilityToTake) + "'_"),
-                targetPlayer.getRepresentation());
+                targetPlayer.getRepresentationNoPing());
         if (givingVeiled && takingVeiled) {
             msgPublic += "Both abilities remain veiled.";
         } else if (givingVeiled) {
             msgPublic += String.format(
                     "The veiled ability %s gave to %s remains veiled. Also, because taking abilities counts as gaining them, the _'%s'_ ability %s took from %s has been turned face-down as if it had just been drawn.",
-                    activePlayer.getRepresentation(),
-                    targetPlayer.getRepresentation(),
+                    activePlayer.getRepresentationNoPing(),
+                    targetPlayer.getRepresentationNoPing(),
                     getRepresentation(type, abilityToTake),
-                    activePlayer.getRepresentation(),
-                    targetPlayer.getRepresentation());
+                    activePlayer.getRepresentationNoPing(),
+                    targetPlayer.getRepresentationNoPing());
         } else if (takingVeiled) {
             msgPublic += String.format(
                     "The veiled ability %s took from %s remains veiled. Also, because being given abilities counts as gaining them, the _'%s'_ ability %s gave to %s has been turned face-down as if it had just been drawn.",
-                    activePlayer.getRepresentation(),
-                    targetPlayer.getRepresentation(),
+                    activePlayer.getRepresentationNoPing(),
+                    targetPlayer.getRepresentationNoPing(),
                     getRepresentation(type, abilityToGive),
-                    activePlayer.getRepresentation(),
-                    targetPlayer.getRepresentation());
+                    activePlayer.getRepresentationNoPing(),
+                    targetPlayer.getRepresentationNoPing());
         } else {
             msgPublic +=
                     "Because taking abilities counts as gaining them, both abilities have been turned face-down as if they had just been drawn.";
@@ -536,11 +540,11 @@ public class VeiledHeartService {
         String msgForActivePlayer = String.format(
                 "Using _Transpose_, you've given _'%s'_ to %s and have taken _'%s'_ in return:",
                 getRepresentation(type, abilityToGive),
-                targetPlayer.getRepresentation(),
+                targetPlayer.getRepresentationNoPing(),
                 getRepresentation(type, abilityToTake));
         String msgForTargetPlayer = String.format(
                 "%s used _Transpose_ to take _'%s'_ from you! However, they did give you _'%s'_ in return:",
-                activePlayer.getRepresentation(),
+                activePlayer.getRepresentationNoPing(),
                 getRepresentation(type, abilityToTake),
                 getRepresentation(type, abilityToGive));
 
