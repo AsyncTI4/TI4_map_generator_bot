@@ -19,14 +19,20 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTwilightsFallActionCards;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
+import ti4.helpers.Units;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.model.UnitModel;
+import ti4.service.unit.AddUnitService;
+import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
 public class VeiledHeartService {
@@ -155,6 +161,10 @@ public class VeiledHeartService {
         getVeiledCards(player).forEach(card -> VeiledCardType.fromCard(card)
                 .ifPresent(type -> veiledCardsByType.get(type).add(card)));
         return veiledCardsByType;
+    }
+
+    private static boolean hasVeiledCard(Player player, String card) {
+        return getVeiledCards(player).anyMatch(card::equals);
     }
 
     private static boolean hasVeiledCard(VeiledCardType type, Player player) {
@@ -298,10 +308,69 @@ public class VeiledHeartService {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static void doSilentAction(VeiledCardAction action, Player player, String card) {
+    private static void doSilentAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
         switch (action) {
             case SPLICE, DRAW -> addVeiledCard(player, card);
             case DISCARD -> removeVeiledCard(player, card);
+            case UNVEIL -> {
+                switch (type) {
+                    case ABILITY -> player.addTech(card);
+                    case GENOME, PARADIGM -> {
+                        player.addLeader(card);
+                        player.getLeaderByID(card).ifPresent(leader -> leader.setLocked(false));
+                    }
+                    case UNIT -> {
+                        UnitModel unitModel = Mapper.getUnit(card);
+                        String asyncId = unitModel.getAsyncId();
+                        if (!"fs".equalsIgnoreCase(asyncId) && !"mf".equalsIgnoreCase(asyncId)) {
+                            List<UnitModel> unitsToRemove = player.getUnitsByAsyncID(asyncId).stream()
+                                    .filter(unit -> unit.getFaction().isEmpty()
+                                            || unit.getUpgradesFromUnitId().isEmpty())
+                                    .toList();
+                            for (UnitModel u : unitsToRemove) {
+                                if (u.getAlias().contains("tf-") || u.getAlias().contains("tk-")) {
+                                    List<Button> buttons = new ArrayList<>();
+                                    buttons.add(Buttons.green("keepUnit_" + u.getAlias(), "Keep " + u.getName()));
+                                    buttons.add(Buttons.red("deleteButtons", "Keep the New Unit"));
+                                    MessageHelper.sendMessageToChannel(
+                                            player.getCorrectChannel(),
+                                            player.getRepresentation() + " you automatically lost the "
+                                                    + u.getNameRepresentation()
+                                                    + " unit upgrade. If you would like to keep it and lose the newly acquired unit upgrade, please click the green button.",
+                                            buttons);
+                                }
+                                if ("tf-floatingfactory".equalsIgnoreCase(u.getAlias())) {
+                                    Game game = player.getGame();
+                                    for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(
+                                            game, player, Units.UnitType.Spacedock)) {
+                                        for (UnitHolder uh : tile.getPlanetUnitHolders()) {
+                                            if (uh.getUnitCount(Units.UnitType.Spacedock, player) > 0) {
+                                                RemoveUnitService.removeUnit(
+                                                        null,
+                                                        tile,
+                                                        game,
+                                                        player,
+                                                        uh,
+                                                        Units.UnitType.Spacedock,
+                                                        1,
+                                                        false);
+                                                AddUnitService.addUnits(null, tile, game, player.getColor(), "sd");
+                                            }
+                                        }
+                                    }
+                                    MessageHelper.sendMessageToChannel(
+                                            player.getCorrectChannel(),
+                                            player.getRepresentation()
+                                                    + " has transformed their Spacedocks into Floating Factories, and so their spacedocks have been moved to the space area.");
+                                }
+                                player.removeOwnedUnitByID(u.getId());
+                            }
+                        }
+                        player.addOwnedUnitByID(card);
+                    }
+                }
+                removeVeiledCard(player, card);
+            }
         }
     }
 
@@ -310,7 +379,7 @@ public class VeiledHeartService {
     }
 
     public static void doAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
-        doSilentAction(action, player, card);
+        doSilentAction(action, type, player, card);
 
         String msg;
         switch (action) {
@@ -325,6 +394,13 @@ public class VeiledHeartService {
             case DISCARD ->
                 msg = player.getRepresentation() + " has secretly discarded a veiled "
                         + type.toString().toLowerCase() + ".";
+            case UNVEIL -> {
+                msg = player.getRepresentation() + " has unveiled a "
+                        + type.toString().toLowerCase() + ": " + getRepresentation(type, card);
+                MessageHelper.sendMessageToChannelWithEmbed(
+                        player.getCorrectChannel(), msg, getRepresentationEmbed(type, card));
+                return;
+            }
             default ->
                 msg = player.getRepresentation() + " tried to "
                         + action.toString().toLowerCase() + " a veiled "
@@ -475,6 +551,30 @@ public class VeiledHeartService {
         }
         if (!takingVeiled) {
             ButtonHelperTwilightsFallActionCards.checkForSingularityTransfer(targetPlayer, activePlayer, abilityToTake);
+        }
+    }
+
+    public static void checkForAssigningTelepathic(Game game, Player player) {
+        String card = "tf-telepathic";
+        if (!hasVeiledCard(player, card)) {
+            return;
+        }
+        String msg = player.getRepresentation()
+                + ", you have the option to pre-reveal your veiled _Telepathic_ ability (Zero Token)."
+                + " The end of the strategy phase is an awkward timing window for async, so if you intend to reveal it at the end of this strategy phase, it's best to pre-play it now."
+                + " Feel free to ignore this message if you don't intend to reveal it any time soon.";
+        PrePlayService.sendPrePlayButtons(player, card, msg, "Pre-Reveal Telepathic");
+    }
+
+    public static void resolveTelepathicPreset(Game game, Player player) {
+        String card = "tf-telepathic";
+        if (hasVeiledCard(player, card) && PrePlayService.isAssigned(game, card)) {
+            VeiledHeartService.doAction(
+                    VeiledHeartService.VeiledCardAction.UNVEIL, VeiledCardType.ABILITY, player, card);
+            PrePlayService.unassign(game, card);
+        }
+        if (player.hasTech(card)) {
+            game.setStoredValue("TFTelepathicHolder", player.getFaction());
         }
     }
 
