@@ -127,7 +127,7 @@ public class VeiledHeartService {
     }
 
     private static Stream<String> getVeiledCards(Player player) {
-        return Arrays.stream(getStoredValue(player).split("_"));
+        return Arrays.stream(getStoredValue(player).split("_")).filter(card -> card.length() > 1);
     }
 
     private static Stream<String> getVeiledCards(VeiledCardType type, Player player) {
@@ -140,6 +140,10 @@ public class VeiledHeartService {
             veiledCards.addAll(getVeiledCards(type, player).toList());
         }
         return veiledCards;
+    }
+
+    public static int countVeiledCards(Player player) {
+        return (int) getVeiledCards(player).count();
     }
 
     public static int countVeiledCards(VeiledCardType type, Player player) {
@@ -427,7 +431,7 @@ public class VeiledHeartService {
 
     public static void doManipulate(String typeStr, Player activePlayer, String card, Player targetPlayer) {
         VeiledCardType.fromString(typeStr).ifPresent(type -> {
-            setStoredValue(targetPlayer, getStoredValue(targetPlayer) + card + "_");
+            addVeiledCard(targetPlayer, card);
 
             String msgPublic = String.format(
                     "%s has been forced to splice a veiled %s. They may put it into play with a button in their `#cards-info` thread.",

@@ -17,7 +17,9 @@ public class FrankenUnitService {
     public static void addUnits(
             GenericInteractionCreateEvent event, Player player, List<String> unitIDs, boolean dupes) {
         if (player.getGame().isVeiledHeartMode()) {
-            VeiledHeartService.addVeiledCard(player, String.join("_", unitIDs));
+            for (String unit : unitIDs) {
+                VeiledHeartService.addVeiledCard(player, unit);
+            }
             String msg = "Added veiled cards. Refresh your `#cards-info` thread to find buttons to reveal them.";
             MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
             return;
@@ -67,8 +69,7 @@ public class FrankenUnitService {
         for (String unitID : unitIDs) {
             if (player.getGame().isVeiledHeartMode()) {
                 VeiledHeartService.removeVeiledCard(player, unitID);
-                String msg = "Removed a veiled card.";
-                MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
+                sb.append("> veiled ").append(unitID);
             } else {
                 if (!player.ownsUnit(unitID)) {
                     sb.append("> ").append(unitID).append(" (player did not have this unit)");
