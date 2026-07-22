@@ -205,6 +205,14 @@ public class VeiledHeartService {
                 "veiled_discard_genome_%s_" + targetPlayer.getFaction());
     }
 
+    public static List<Button> getVeiledGiveButtonsForCoerce(Player sender, Player recipient) {
+        return getVeiledCards(VeiledCardType.ABILITY, sender)
+                .map(veiledAbility -> Buttons.red(
+                        sender.factionButtonChecker() + "coerceStep3_" + recipient.getFaction() + "_" + veiledAbility,
+                        getRepresentation(VeiledCardType.ABILITY, veiledAbility)))
+                .toList();
+    }
+
     public static List<Button> getVeiledGiveButtonsForTranspose(Player activePlayer, Player targetPlayer) {
         return getVeiledCards(VeiledCardType.ABILITY, activePlayer)
                 .map(veiledAbility -> Buttons.red(
@@ -362,6 +370,43 @@ public class VeiledHeartService {
         });
     }
 
+    public static void doCoerce(Player sender, Player recipient, String ability) {
+        VeiledCardType type = VeiledCardType.ABILITY;
+        boolean givingVeiled = !sender.hasTech(ability);
+
+        sender.removeTech(ability);
+        removeVeiledCard(sender, ability);
+        addVeiledCard(recipient, ability);
+
+        String msgPublic = String.format(
+                "%s has _Coerced_ %s into giving them %s.\n",
+                recipient.getRepresentation(),
+                sender.getRepresentation(),
+                givingVeiled ? "a veiled ability" : ("the ability _'" + getRepresentation(type, ability) + "'_"));
+        if (givingVeiled) {
+            msgPublic +=
+                    "The ability remains veiled and may be put into play with a button in the `#cards-info` thread.";
+        } else {
+            msgPublic +=
+                    "Because receiving abilities counts as gaining them, the ability has been turned face-down as if it had just been drawn. It may be put into play with a button in the `#cards-info` thread.";
+        }
+        String msgForSender = String.format(
+                "You were _Coerced_ by %s into giving them the _'%s'_ ability.",
+                recipient.getRepresentation(), getRepresentation(type, ability));
+        String msgForRecipient = String.format(
+                "You _Coerced_ %s into giving you the _'%s'_ ability:",
+                sender.getRepresentation(), getRepresentation(type, ability));
+
+        MessageHelper.sendMessageToChannel(sender.getCorrectChannel(), msgPublic);
+        MessageHelper.sendMessageToChannel(sender.getCardsInfoThread(), msgForSender);
+        MessageHelper.sendMessageToChannelWithEmbed(
+                recipient.getCardsInfoThread(), msgForRecipient, getRepresentationEmbed(type, ability));
+
+        if (!givingVeiled) {
+            ButtonHelperTwilightsFallActionCards.checkForSingularityTransfer(sender, recipient, ability);
+        }
+    }
+
     public static void doTranspose(
             Player activePlayer, Player targetPlayer, String abilityToGive, String abilityToTake) {
         VeiledCardType type = VeiledCardType.ABILITY;
@@ -384,8 +429,7 @@ public class VeiledHeartService {
                 takingVeiled ? "a veiled ability" : ("the ability _'" + getRepresentation(type, abilityToTake) + "'_"),
                 targetPlayer.getRepresentation());
         if (givingVeiled && takingVeiled) {
-            msgPublic +=
-                    "Both abilities remain veiled. and may be put into play by each of their respective new owners, using a button in their `#cards-info` thread.";
+            msgPublic += "Both abilities remain veiled.";
         } else if (givingVeiled) {
             msgPublic += String.format(
                     "The veiled ability %s gave to %s remains veiled. Also, because taking abilities counts as gaining them, the _'%s'_ ability %s took from %s has been turned face-down as if it had just been drawn.",

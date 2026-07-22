@@ -386,14 +386,31 @@ public final class ButtonHelperTwilightsFallActionCards {
         }
         String msg = p2.getRepresentationUnfogged() + ", please choose the ability you wish to give to "
                 + (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.getRepresentation()) + ".";
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg, buttons);
+        MessageChannel channel = p2.getCorrectChannel();
+        if (game.isVeiledHeartMode()) {
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    p2.getRepresentation() + " is choosing which ability to give to " + player.getRepresentation());
+            msg += " (The red buttons are for veiled abilities.)";
+            channel = p2.getCardsInfoThread();
+            buttons.addAll(VeiledHeartService.getVeiledGiveButtonsForCoerce(p2, player));
+        }
+        MessageHelper.sendMessageToChannel(channel, msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("coerceStep3")
     public static void coerceStep3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        ButtonHelper.deleteMessage(event);
+
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String ability1 = buttonID.split("_")[2];
+
+        if (game.isVeiledHeartMode()) {
+            VeiledHeartService.doCoerce(player, p2, ability1);
+            return;
+        }
+
         TechnologyModel tech1 = Mapper.getTech(ability1);
         player.removeTech(ability1);
         p2.addTech(ability1);
@@ -403,7 +420,6 @@ public final class ButtonHelperTwilightsFallActionCards {
                 + player.getFactionNameOrColor() + ".";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        ButtonHelper.deleteMessage(event);
     }
 
     public static void resolvePoison(Game game, Player player) {
