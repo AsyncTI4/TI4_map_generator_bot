@@ -70,17 +70,25 @@ public class FrankenLeaderService {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed leaders:\n");
         Game game = player.getGame();
         for (String leaderID : leaderIDs) {
-            if (!player.hasLeader(leaderID)) {
-                sb.append("> ").append(leaderID).append(" (player did not have this leader)");
+            if (player.getGame().isVeiledHeartMode()) {
+                VeiledHeartService.removeVeiledCard(player, leaderID);
+                String msg = "Removed a veiled card.";
+                MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
             } else {
-                Leader leader = new Leader(leaderID);
-                sb.append("> ").append(Helper.getLeaderFullRepresentation(leader));
+                if (!player.hasLeader(leaderID)) {
+                    sb.append("> ").append(leaderID).append(" (player did not have this leader)");
+                } else {
+                    Leader leader = new Leader(leaderID);
+                    sb.append("> ").append(Helper.getLeaderFullRepresentation(leader));
+                }
+                sb.append('\n');
+                player.removeLeader(leaderID);
+                game.setStoredValue(
+                        "savedParadigms",
+                        game.getStoredValue("savedParadigms")
+                                .replace(leaderID, "")
+                                .replace("__", "_"));
             }
-            sb.append('\n');
-            player.removeLeader(leaderID);
-            game.setStoredValue(
-                    "savedParadigms",
-                    game.getStoredValue("savedParadigms").replace(leaderID, "").replace("__", "_"));
         }
         MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }

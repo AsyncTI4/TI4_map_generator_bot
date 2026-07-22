@@ -65,21 +65,27 @@ public class FrankenUnitService {
     public static void removeUnits(GenericInteractionCreateEvent event, Player player, List<String> unitIDs) {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed units:\n");
         for (String unitID : unitIDs) {
-            if (!player.ownsUnit(unitID)) {
-                sb.append("> ").append(unitID).append(" (player did not have this unit)");
+            if (player.getGame().isVeiledHeartMode()) {
+                VeiledHeartService.removeVeiledCard(player, unitID);
+                String msg = "Removed a veiled card.";
+                MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
             } else {
-                sb.append("> ").append(unitID);
-            }
-            sb.append('\n');
-            player.removeOwnedUnitByID(unitID);
-            UnitModel u = Mapper.getUnit(unitID);
-            if (u.getUnitType() != UnitType.Flagship && u.getUnitType() != UnitType.Mech) {
-                String replacementUnit = u.getBaseType();
-                player.addOwnedUnitByID(replacementUnit);
-            }
+                if (!player.ownsUnit(unitID)) {
+                    sb.append("> ").append(unitID).append(" (player did not have this unit)");
+                } else {
+                    sb.append("> ").append(unitID);
+                }
+                sb.append('\n');
+                player.removeOwnedUnitByID(unitID);
+                UnitModel u = Mapper.getUnit(unitID);
+                if (u.getUnitType() != UnitType.Flagship && u.getUnitType() != UnitType.Mech) {
+                    String replacementUnit = u.getBaseType();
+                    player.addOwnedUnitByID(replacementUnit);
+                }
 
-            if ("naaz_mech".equalsIgnoreCase(unitID)) {
-                player.removeOwnedUnitByID("naaz_mech_space");
+                if ("naaz_mech".equalsIgnoreCase(unitID)) {
+                    player.removeOwnedUnitByID("naaz_mech_space");
+                }
             }
         }
         MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
