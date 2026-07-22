@@ -784,28 +784,6 @@ public final class ButtonHelperTwilightsFallActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("resolveIrradiate")
-    public static void resolveIrradiate(Game game, Player player, ButtonInteractionEvent event) {
-        List<Button> buttons = new ArrayList<>();
-        List<String> units = new ArrayList<>(Arrays.asList(
-                "mech",
-                "warsun",
-                "dreadnought",
-                "carrier",
-                "fighter",
-                "infantry",
-                "cruiser",
-                "spacedock",
-                "destroyer",
-                "pds"));
-        for (String unit : units) {
-            buttons.add(Buttons.gray("irradiateStep2_" + unit, StringUtils.capitalize(unit)));
-        }
-        String msg = player.getRepresentation() + ", please choose the unit type you wish to search for.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler("resolveIgnis")
     public static void resolveIgnis(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
@@ -834,6 +812,28 @@ public final class ButtonHelperTwilightsFallActionCards {
         List<Button> buttons = ButtonHelperModifyUnits.getOpposingUnitsToHit(player, game, tile, true);
 
         String msg = player.getRepresentation() + ", please choose the enemy unit you wish to destroy.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveIrradiate")
+    public static void resolveIrradiate(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        List<String> units = new ArrayList<>(Arrays.asList(
+                "mech",
+                "warsun",
+                "dreadnought",
+                "carrier",
+                "fighter",
+                "infantry",
+                "cruiser",
+                "spacedock",
+                "destroyer",
+                "pds"));
+        for (String unit : units) {
+            buttons.add(Buttons.gray("irradiateStep2_" + unit, StringUtils.capitalize(unit)));
+        }
+        String msg = player.getRepresentation() + ", please choose the unit type you wish to search for.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
