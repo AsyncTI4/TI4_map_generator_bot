@@ -13,6 +13,7 @@ import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.service.VeiledHeartService;
 import ti4.service.leader.HeroUnlockCheckService;
 
 @UtilityClass
@@ -20,13 +21,9 @@ public class FrankenLeaderService {
 
     public static void addLeaders(GenericInteractionCreateEvent event, Player player, List<String> leaderIDs) {
         if (player.getGame().isVeiledHeartMode()) {
-            String msg = "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it";
+            VeiledHeartService.addVeiledCard(player, String.join("_", leaderIDs));
+            String msg = "Added veiled cards. Refresh your `#cards-info` thread to find buttons to reveal them.";
             MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
-
-            String key = "veiledCards" + player.getFaction();
-            String val = player.getGame().getStoredValue(key);
-            val += "_" + String.join("_", leaderIDs);
-            player.getGame().setStoredValue(key, val + "_");
             return;
         }
 
@@ -73,17 +70,25 @@ public class FrankenLeaderService {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed leaders:\n");
         Game game = player.getGame();
         for (String leaderID : leaderIDs) {
-            if (!player.hasLeader(leaderID)) {
-                sb.append("> ").append(leaderID).append(" (player did not have this leader)");
+            if (player.getGame().isVeiledHeartMode()) {
+                VeiledHeartService.removeVeiledCard(player, leaderID);
+                String msg = "Removed a veiled card.";
+                MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
             } else {
-                Leader leader = new Leader(leaderID);
-                sb.append("> ").append(Helper.getLeaderFullRepresentation(leader));
+                if (!player.hasLeader(leaderID)) {
+                    sb.append("> ").append(leaderID).append(" (player did not have this leader)");
+                } else {
+                    Leader leader = new Leader(leaderID);
+                    sb.append("> ").append(Helper.getLeaderFullRepresentation(leader));
+                }
+                sb.append('\n');
+                player.removeLeader(leaderID);
+                game.setStoredValue(
+                        "savedParadigms",
+                        game.getStoredValue("savedParadigms")
+                                .replace(leaderID, "")
+                                .replace("__", "_"));
             }
-            sb.append('\n');
-            player.removeLeader(leaderID);
-            game.setStoredValue(
-                    "savedParadigms",
-                    game.getStoredValue("savedParadigms").replace(leaderID, "").replace("__", "_"));
         }
         MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }

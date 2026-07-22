@@ -9,6 +9,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.VeiledHeartService;
 
 @UtilityClass
 public class FrankenUnitService {
@@ -16,13 +17,9 @@ public class FrankenUnitService {
     public static void addUnits(
             GenericInteractionCreateEvent event, Player player, List<String> unitIDs, boolean dupes) {
         if (player.getGame().isVeiledHeartMode()) {
-            String msg = "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it";
+            VeiledHeartService.addVeiledCard(player, String.join("_", unitIDs));
+            String msg = "Added veiled cards. Refresh your `#cards-info` thread to find buttons to reveal them.";
             MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
-
-            String key = "veiledCards" + player.getFaction();
-            String val = player.getGame().getStoredValue(key);
-            val += "_" + String.join("_", unitIDs);
-            player.getGame().setStoredValue(key, val + "_");
             return;
         }
 
@@ -68,21 +65,27 @@ public class FrankenUnitService {
     public static void removeUnits(GenericInteractionCreateEvent event, Player player, List<String> unitIDs) {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed units:\n");
         for (String unitID : unitIDs) {
-            if (!player.ownsUnit(unitID)) {
-                sb.append("> ").append(unitID).append(" (player did not have this unit)");
+            if (player.getGame().isVeiledHeartMode()) {
+                VeiledHeartService.removeVeiledCard(player, unitID);
+                String msg = "Removed a veiled card.";
+                MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
             } else {
-                sb.append("> ").append(unitID);
-            }
-            sb.append('\n');
-            player.removeOwnedUnitByID(unitID);
-            UnitModel u = Mapper.getUnit(unitID);
-            if (u.getUnitType() != UnitType.Flagship && u.getUnitType() != UnitType.Mech) {
-                String replacementUnit = u.getBaseType();
-                player.addOwnedUnitByID(replacementUnit);
-            }
+                if (!player.ownsUnit(unitID)) {
+                    sb.append("> ").append(unitID).append(" (player did not have this unit)");
+                } else {
+                    sb.append("> ").append(unitID);
+                }
+                sb.append('\n');
+                player.removeOwnedUnitByID(unitID);
+                UnitModel u = Mapper.getUnit(unitID);
+                if (u.getUnitType() != UnitType.Flagship && u.getUnitType() != UnitType.Mech) {
+                    String replacementUnit = u.getBaseType();
+                    player.addOwnedUnitByID(replacementUnit);
+                }
 
-            if ("naaz_mech".equalsIgnoreCase(unitID)) {
-                player.removeOwnedUnitByID("naaz_mech_space");
+                if ("naaz_mech".equalsIgnoreCase(unitID)) {
+                    player.removeOwnedUnitByID("naaz_mech_space");
+                }
             }
         }
         MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
