@@ -43,6 +43,7 @@ public class VerydithPromissoryHandler {
             return;
         }
 
+        player.getPromissoryNotes().remove("thpnverydith");
         player.addPromissoryNoteToPlayArea("thpnverydith");
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         ButtonHelper.deleteMessage(event);

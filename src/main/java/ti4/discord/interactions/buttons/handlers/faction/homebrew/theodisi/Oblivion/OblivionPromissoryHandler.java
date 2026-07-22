@@ -18,6 +18,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.PositionMapper;
@@ -30,6 +31,7 @@ public class OblivionPromissoryHandler {
     private static final String SHARD_OF_NOTHINGNESS = "thpnoblivion";
     private static final String DRAWN_RED_TILES = "oblivionPnDrawnRedTiles_";
     private static final String CHOOSE_RED_TILE = "chooseOblivionPnRedTile_";
+    private static final String PLACE_RED_TILE = "placeOblivionPnRedTile_";
 
     public static void offerShardOfNothingnessButtons(Game game, Player player) {
         if (game == null
@@ -127,10 +129,41 @@ public class OblivionPromissoryHandler {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " purged the 2 unchosen red-backed tiles and _Shard of Nothingness_.");
+        String placementMessage =
+                player.getRepresentation() + ", choose 2 systems to place the selected tile adjacent to.";
+        String placementButtonPrefix = player.factionButtonChecker() + PLACE_RED_TILE + chosenTileId + "_";
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", choose 2 systems to place the selected tile adjacent to.",
-                placementButtons);
+                placementMessage,
+                NewStuffHelper.buttonPagination(placementButtons, placementButtonPrefix, 0));
+    }
+
+    @ButtonHandler(PLACE_RED_TILE)
+    public static void placeShardOfNothingnessTile(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String placementData = buttonID.substring(PLACE_RED_TILE.length());
+        int tileIdEnd = placementData.indexOf('_');
+        if (game == null || player == null || tileIdEnd <= 0) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String tileId = placementData.substring(0, tileIdEnd);
+        List<Button> placementButtons = getPlacementButtons(game, player, tileId);
+        String placementMessage =
+                player.getRepresentation() + ", choose 2 systems to place the selected tile adjacent to.";
+        String placementButtonPrefix = player.factionButtonChecker() + PLACE_RED_TILE + tileId + "_";
+        if (NewStuffHelper.checkAndHandlePaginationChange(
+                event,
+                event.getMessageChannel(),
+                placementButtons,
+                placementMessage,
+                placementButtonPrefix,
+                buttonID)) {
+            return;
+        }
+
+        ButtonHelper.starChartStep3(game, player, "starChartsStep3_" + placementData, event);
     }
 
     private static List<Button> getPlacementButtons(Game game, Player player, String tileId) {
@@ -158,8 +191,8 @@ public class OblivionPromissoryHandler {
                 Tile firstSystem = adjacentTiles.getFirst();
                 Tile secondSystem = adjacentTiles.get(1);
                 buttons.add(Buttons.green(
-                        player.factionButtonChecker() + "starChartsStep3_" + tileId + "_" + firstSystem.getPosition()
-                                + "_" + secondSystem.getPosition(),
+                        player.factionButtonChecker() + PLACE_RED_TILE + tileId + "_" + firstSystem.getPosition() + "_"
+                                + secondSystem.getPosition(),
                         "Place adjacent to " + firstSystem.getRepresentationForButtons(game, player) + " and "
                                 + secondSystem.getRepresentationForButtons(game, player)));
             }

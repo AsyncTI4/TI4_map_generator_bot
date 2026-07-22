@@ -89,7 +89,6 @@ class RelicButtonHandler {
     static void drawRelicFromFrag(ButtonInteractionEvent event, Player player, Game game) {
         RelicHelper.drawRelicAndNotify(player, event, game);
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
-        OblivionUnitHandler.doOblivionMechCheck(game, player);
         ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
         ButtonHelper.deleteMessage(event);
     }
