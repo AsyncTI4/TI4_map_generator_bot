@@ -14,6 +14,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionPromissoryHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -694,6 +695,9 @@ public class PromissoryNoteHelper {
         }
         if ("thpnkairn".equalsIgnoreCase(id)) {
             KairnPromissoryHandler.offerArchaeologicalOutpostButtons(event, player, game);
+        }
+        if ("thpnoblivion".equalsIgnoreCase(id)) {
+            OblivionPromissoryHandler.offerShardOfNothingnessButtons(game, player);
         }
         if ("thpnverydith".equalsIgnoreCase(id)) {
             MessageHelper.sendMessageToChannelWithButtons(
