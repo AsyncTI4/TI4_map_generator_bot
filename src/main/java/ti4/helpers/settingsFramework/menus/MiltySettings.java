@@ -11,13 +11,16 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
+import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
+import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.draft.DraftSetupService;
 import ti4.service.emoji.MiltyDraftEmojis;
+import ti4.service.milty.MiltyRandomSetupService;
 import ti4.service.milty.MiltyService;
 import tools.jackson.databind.JsonNode;
 
@@ -28,6 +31,8 @@ public class MiltySettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings
     private final ChoiceSetting<DraftingMode> draftMode;
+    private final IntegerSetting randomGalacticEvents;
+    private final BooleanSetting trueRandomGalaxy;
 
     // Categories
     private final GameSettings gameSettings;
@@ -37,6 +42,8 @@ public class MiltySettings extends SettingsMenu {
     // Bonus Attributes
     @JsonIgnore
     private final Game game;
+
+    private boolean randomSetup;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -51,6 +58,8 @@ public class MiltySettings extends SettingsMenu {
         draftMode.setAllValues(
                 Arrays.stream(DraftingMode.values()).collect(Collectors.toMap(DraftingMode::toString, x -> x)));
         draftMode.setShow(DraftingMode::toString);
+        randomGalacticEvents = new IntegerSetting("RandomEvents", "Random Galactic Events", 0, 0, 3, 1);
+        trueRandomGalaxy = new BooleanSetting("TrueRandomGalaxy", "True Random Galaxy", false);
 
         // TODO: Need a REAL way to set this up
         if (game.getMapTemplateID() != null) {
@@ -70,6 +79,9 @@ public class MiltySettings extends SettingsMenu {
                 && json.has("menuId")
                 && historicIDs.contains(json.get("menuId").asString(""))) {
             draftMode.initialize(json.get("draftMode"));
+            randomGalacticEvents.initialize(json.get("randomGalacticEvents"));
+            trueRandomGalaxy.initialize(json.get("trueRandomGalaxy"));
+            randomSetup = json.has("randomSetup") && json.get("randomSetup").asBoolean(false);
         }
 
         // initialize categories
@@ -101,8 +113,13 @@ public class MiltySettings extends SettingsMenu {
 
     @Override
     protected List<SettingInterface> settings() {
+        List<SettingInterface> implemented = new ArrayList<>();
+        if (randomSetup) {
+            implemented.add(randomGalacticEvents);
+            implemented.add(trueRandomGalaxy);
+        }
         // implemented.add(draftMode);
-        return new ArrayList<>();
+        return implemented;
     }
 
     @Override
@@ -110,7 +127,11 @@ public class MiltySettings extends SettingsMenu {
         List<Button> buttons = new ArrayList<>();
         String prefix = menuAction + "_" + navId() + "_";
 
-        buttons.add(Buttons.green(prefix + "startMilty", "Start Milty Draft!"));
+        if (randomSetup) {
+            buttons.add(Buttons.green(prefix + "startRandomSetup", "Start Random Setup!"));
+        } else {
+            buttons.add(Buttons.green(prefix + "startMilty", "Start Milty Draft!"));
+        }
         return buttons;
     }
 
@@ -119,9 +140,14 @@ public class MiltySettings extends SettingsMenu {
         String error =
                 switch (action) {
                     case "startMilty" -> startDraft(event);
+                    case "startRandomSetup" -> startRandomSetup(event);
                     default -> null;
                 };
         return (error == null ? "success" : error);
+    }
+
+    public void setRandomSetup(boolean randomSetup) {
+        this.randomSetup = randomSetup;
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -169,5 +195,12 @@ public class MiltySettings extends SettingsMenu {
         }
 
         return "This draft mode isn't implemented yet!";
+    }
+
+    private String startRandomSetup(GenericInteractionCreateEvent event) {
+        if (draftMode.getValue() != DraftingMode.milty) {
+            return "Random setup is only implemented for Milty-style setup.";
+        }
+        return MiltyRandomSetupService.randomSetupFromSettings(event, this);
     }
 }

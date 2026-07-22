@@ -76,6 +76,7 @@ public class DataMigrationManager {
 
                 Boolean migrateEndedGames = getMigrationForGamesEnded(entry.getKey());
 
+                BotLogger.info("RUNNING MIGRATION FOR " + entry.getKey());
                 var migratedGames = migrateGames(
                         GameManager.getManagedGames(),
                         entry.getKey(),

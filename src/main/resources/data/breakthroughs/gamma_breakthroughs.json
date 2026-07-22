@@ -1,0 +1,110 @@
+[
+    {
+        "alias": "diasporabt",
+        "name": "Organic Reprocessing",
+        "shortName": "Organic\nReprocessing",
+        "faction": "diaspora",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "After 1 or more of your units uses its PRODUCTION ability, you may return 3 captured infantry on that planet to ready that planet.",
+        "source": "gamma"
+    },
+    {
+        "alias": "hlrbt",
+        "name": "Brain in a Jar",
+        "shortName": "Brain\nin a Jar",
+        "faction": "hlr",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "At the end of your tactical action, you may replace any number of your units in the active system with 2 matching netural units. For each unit replaced, Gain a commodity or convert 1 commodity to a trade good a number of times equal to that units cost.",
+        "source": "gamma"
+    },
+    {
+        "alias": "cladebt",
+        "name": "Out of the mist",
+        "shortName": "Out\nof the mist",
+        "faction": "clade",
+        "synergy": [
+            "PROPULSION",
+            "BIOTIC"
+        ],
+        "text": "When you gain this card, gain the Gamma Irridius planet card and its legendary planet ability card. When you activate or retreat from a system containing a Hallucination token, you may treat all systems containing Hallucication tokens as adjacent.",
+        "source": "gamma"
+    },
+    {
+        "alias": "archonbt",
+        "name": "Retribution Cascade",
+        "shortName": "Retribution\nCascade",
+        "faction": "archon",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "When another player activates a systenm you may return a command token from their faction sheet to its owner's reinforcements and choose a non-faction, non-unit upgrade technology you control. Outlaws treat that technology as blank until the end of this tactical action.'",
+        "source": "gamma"
+    },
+    {
+        "alias": "moyinbt",
+        "name": "Awakening Mutagens",
+        "shortName": "Awwkening\nMutagens",
+        "faction": "moyin",
+        "synergy": [
+            "WARFARE",
+            "BIOTIC"
+        ],
+        "text": "When you gain this breakthrough or score a public objective, place the mech of a random unused faction on this card. Your mechs gain the text and unit abilities of mechs on this card in addition to their own.",
+        "source": "gamma"
+    },
+    {
+        "alias": "veilstrikebt",
+        "name": "Iron Curtain",
+        "shortName": "Iron \nCurtain",
+        "faction": "veilstrike",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "During space combat, you may discard 1 action card to produce 1 hit against enemy ships. During ground combat, you may discard 1 action card to produce 2 hits against enemy ground forces.",
+        "source": "gamma"
+    },
+    {
+        "alias": "convocationbt",
+        "name": "Talon Transfer",
+        "shortName": "Talon \nTransfer",
+        "faction": "convocation",
+        "synergy": [
+            "WARFARE",
+            "BIOTIC"
+        ],
+        "text": "At the end of your tactical action, you may exhaust this card and swap the position of your command token in the active system with another player's command token in an adjacent system'.",
+        "source": "gamma"
+    },
+    {
+        "alias": "weavewaybt",
+        "name": "Fractal Mesh",
+        "shortName": "Fractal\nMesh",
+        "faction": "weaveway",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "ACTION: purge this card and choose a non-nebulae system that contains 1 or more of your ships. The araenean player places 1 weaveway token of their choice in that system, if possible.",
+        "source": "gamma"
+    },
+    {
+        "alias": "initiativebt",
+        "name": "Sirocco DMZ",
+        "shortName": "Sirocco\nDMZ",
+        "faction": "initiative",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "Whenever you activate the Mecatol Rex system, you may place a command token from your reinforcements in that system instead of from your tactic pool.",
+        "source": "gamma"
+    }
+]

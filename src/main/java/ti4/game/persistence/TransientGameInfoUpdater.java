@@ -15,11 +15,9 @@ class TransientGameInfoUpdater {
     static void update(Game game) {
         try {
             ButtonHelperFactionSpecific.checkIihqAttachment(game);
-            DiscordantStarsHelper.checkTombWorlds(game);
             DiscordantStarsHelper.checkGardenWorlds(game);
             DiscordantStarsHelper.checkTFTerraform(game);
             DiscordantStarsHelper.checkSigil(game);
-            DiscordantStarsHelper.checkSaeraMech(game);
             DiscordantStarsHelper.checkOlradinMech(game);
             VeylorUnitHandler.checkVeylorMech(game);
             DiscordantStarsHelper.checkUltimateAuthority(game);

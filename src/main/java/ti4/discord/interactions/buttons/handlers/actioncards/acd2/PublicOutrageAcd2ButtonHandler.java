@@ -91,9 +91,12 @@ public class PublicOutrageAcd2ButtonHandler {
                     .append(" revealed _")
                     .append(acName)
                     .append("_");
+            String voterLabel = game.isFowMode()
+                    ? voter.getColor()
+                    : voter.getFactionModel().getShortName();
             buttons.add(Buttons.green(
                     winningR.factionButtonChecker() + "publicOutrageTake_" + voter.getFaction() + "_" + acNum,
-                    "Take " + voter.getFactionModel().getShortName() + "'s " + acName));
+                    "Take " + voterLabel + "'s " + acName));
         }
 
         if (revealedEntries.isEmpty()) {

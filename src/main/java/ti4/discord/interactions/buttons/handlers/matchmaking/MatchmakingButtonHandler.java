@@ -114,9 +114,7 @@ class MatchmakingButtonHandler {
                     .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
-        Modal modal = isTiglThread(event)
-                ? buildTiglQueueModal(event, SEARCH_FOR_PLAYERS_TIGL_MODAL_ID, "Search for Players")
-                : buildQueueModal(event, SEARCH_FOR_PLAYERS_MODAL_ID, "Search for Players");
+        Modal modal = isTiglThread(event) ? buildTiglSearchModal(event) : buildSearchModal(event);
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
@@ -269,6 +267,90 @@ class MatchmakingButtonHandler {
         return modal.build();
     }
 
+    // A game will have exactly one expansion, player count, victory point goal, and pace, so the
+    // search modal only allows a single selection for each - unlike the queue modal, where multiple
+    // selections mean "any of these is fine".
+    private static Modal buildSearchModal(ButtonInteractionEvent event) {
+        String userId = event.getUser().getId();
+        UserSettings userSettings = UserSettingsManager.get(userId);
+
+        StringSelectMenu expansions = buildSingleSelect(
+                EXPANSIONS_ID,
+                MatchmakingOptions.EXPANSION_OPTIONS,
+                userSettings.getMatchmakingExpansions(),
+                DEFAULT_EXPANSION_OPTIONS);
+        StringSelectMenu playerCounts = buildSingleSelect(
+                PLAYER_COUNTS_ID,
+                PLAYER_COUNT_OPTIONS,
+                userSettings.getMatchmakingPlayerCounts(),
+                DEFAULT_PLAYER_COUNT_OPTIONS);
+        StringSelectMenu victoryPoints = buildSingleSelect(
+                VICTORY_POINTS_ID,
+                VICTORY_POINT_OPTIONS,
+                userSettings.getMatchmakingVictoryPointGoals(),
+                DEFAULT_VICTORY_POINT_OPTIONS);
+        StringSelectMenu paces = buildSingleSelect(
+                PACE_RESTRICTIONS_ID,
+                filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(userId),
+                userSettings.getMatchmakingPaces(),
+                DEFAULT_PACE_OPTIONS);
+        Modal.Builder modal = Modal.create(SEARCH_FOR_PLAYERS_MODAL_ID, "Search for Players")
+                .addComponents(Label.of("Expansion", expansions))
+                .addComponents(Label.of("Player Count", playerCounts))
+                .addComponents(Label.of("Victory Point Goal", victoryPoints))
+                .addComponents(Label.of("Pace", paces));
+
+        List<String> restrictionOptions = groupRestrictionOptions(List.of(userId));
+        if (!restrictionOptions.isEmpty()) {
+            CheckboxGroup restrictions = buildCheckboxGroup(
+                    RESTRICTIONS_ID,
+                    restrictionOptions,
+                    userSettings.getMatchmakingRestrictions(),
+                    userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
+                    false);
+            modal.addComponents(Label.of("Restrictions", restrictions));
+        }
+        return modal.build();
+    }
+
+    private static Modal buildTiglSearchModal(ButtonInteractionEvent event) {
+        String userId = event.getUser().getId();
+        UserSettings userSettings = UserSettingsManager.get(userId);
+
+        StringSelectMenu victoryPoints = buildSingleSelect(
+                VICTORY_POINTS_ID,
+                VICTORY_POINT_OPTIONS,
+                userSettings.getMatchmakingVictoryPointGoals(),
+                DEFAULT_VICTORY_POINT_OPTIONS);
+        StringSelectMenu paces = buildSingleSelect(
+                PACE_RESTRICTIONS_ID,
+                filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(userId),
+                userSettings.getMatchmakingPaces(),
+                DEFAULT_PACE_OPTIONS);
+        CheckboxGroup ranks = buildCheckboxGroup(
+                TIGL_RANKS_ID,
+                MatchmakingOptions.TIGL_RANK_OPTIONS,
+                userSettings.getMatchmakingTiglRanks(),
+                DEFAULT_TIGL_RANK_OPTIONS,
+                true);
+        Modal.Builder modal = Modal.create(SEARCH_FOR_PLAYERS_TIGL_MODAL_ID, "Search for Players")
+                .addComponents(Label.of("Victory Point Goal", victoryPoints))
+                .addComponents(Label.of("Pace", paces))
+                .addComponents(Label.of("Rank", ranks));
+
+        List<String> restrictionOptions = groupRestrictionOptions(List.of(userId));
+        if (!restrictionOptions.isEmpty()) {
+            CheckboxGroup restrictions = buildCheckboxGroup(
+                    RESTRICTIONS_ID,
+                    restrictionOptions,
+                    userSettings.getMatchmakingRestrictions(),
+                    userSettings.hasConfiguredMatchmakingRestrictions() ? List.of() : DEFAULT_RESTRICTION_OPTIONS,
+                    false);
+            modal.addComponents(Label.of("Restrictions", restrictions));
+        }
+        return modal.build();
+    }
+
     @ButtonHandler(value = ADDITIONAL_SETTINGS_BUTTON_ID, save = false)
     public static void offerQueueAdditionalSettingsModal(ButtonInteractionEvent event) {
         UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
@@ -339,7 +421,22 @@ class MatchmakingButtonHandler {
             return;
         }
 
-        replyEphemeral(event, "You have been added to the matchmaking queue.");
+        replyEphemeral(
+                event,
+                "You have been added to the matchmaking queue with the following preferences:\n"
+                        + describeQueuePreferences(userSettings)
+                        + "\nIf these are not what you intended, use the Leave Queue button and queue again.");
+    }
+
+    private static String describeQueuePreferences(UserSettings settings) {
+        String restrictionsText = settings.getMatchmakingRestrictions().isEmpty()
+                ? "None"
+                : String.join(", ", settings.getMatchmakingRestrictions());
+        return "- **Expansions:** " + String.join(", ", settings.getMatchmakingExpansions()) + "\n"
+                + "- **Player counts:** " + String.join(", ", settings.getMatchmakingPlayerCounts()) + "\n"
+                + "- **Victory point goals:** " + String.join(", ", settings.getMatchmakingVictoryPointGoals()) + "\n"
+                + "- **Paces:** " + String.join(", ", settings.getMatchmakingPaces()) + "\n"
+                + "- **Restrictions:** " + restrictionsText + "\n";
     }
 
     @ModalHandler(QUEUE_FOR_TIGL_MODAL_ID)
@@ -581,7 +678,8 @@ class MatchmakingButtonHandler {
         for (String option : options) {
             builder.addOptions(SelectOption.of(option, option));
         }
-        return builder.setDefaultValues(normalizeSelectedValues(selectedValues, options, defaultValues))
+        List<String> normalized = normalizeSelectedValues(selectedValues, options, defaultValues);
+        return builder.setDefaultValues(normalized.isEmpty() ? normalized : List.of(normalized.getFirst()))
                 .setRequiredRange(1, 1)
                 .build();
     }

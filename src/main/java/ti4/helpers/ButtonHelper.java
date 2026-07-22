@@ -110,6 +110,7 @@ import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
+import ti4.service.VeiledHeartService;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.ValefarZService;
@@ -1578,8 +1579,7 @@ public class ButtonHelper {
                 && !player.hasTech("amd")
                 && !player.hasTech("wavelength")
                 && !player.hasTech("absol_amd")
-                && !player.getRelics().contains("circletofthevoid")
-                && !player.hasAbility("celestial_being")) {
+                && !player.getRelics().contains("circletofthevoid")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "## " + player.getRepresentationNoPing()
@@ -1597,8 +1597,7 @@ public class ButtonHelper {
                 && activeSystem.isScar(game)
                 && !player.getRelics().contains("circletofthevoid")
                 && !player.hasUnlockedBreakthrough("nivynbt")
-                && !player.hasTech("tf-singularitypoint")
-                && !player.hasAbility("celestial_being")) {
+                && !player.hasTech("tf-singularitypoint")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) do not work in an entropic scar.");
@@ -1720,19 +1719,6 @@ public class ButtonHelper {
                 msg += "\n-# Note this is optional, and you may remove the frontier manually if you so wish.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
-        }
-
-        if (player.hasAbility("void_tap")
-                && (activeSystem.getPlanetUnitHolders().isEmpty()
-                        || doesPlayerHaveFSHere("eidolon_flagship", player, activeSystem))) {
-            int cTG = player.getTg();
-            player.setTg(cTG + 1);
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " gained 1 trade good (" + cTG + "->" + player.getTg()
-                            + ") for **Void Tap**.");
-            ButtonHelperAgents.resolveArtunoCheck(player, 1);
-            ButtonHelperAbilities.pillageCheck(player, game);
         }
 
         for (Player nonActivePlayer : game.getPlayers().values()) {
@@ -5439,6 +5425,7 @@ public class ButtonHelper {
                 count++;
             }
         }
+        count += VeiledHeartService.countVeiledCards(VeiledHeartService.VeiledCardType.UNIT, player);
         return count;
     }
 
@@ -5722,7 +5709,7 @@ public class ButtonHelper {
 
     public static void resolveFullFrontierExplore(
             Game game, Player player, Tile tile, GenericInteractionCreateEvent event) {
-        if (player.hasAbility("voidsailors") || player.hasAbility("dark_weaver")) {
+        if (player.hasAbility("voidsailors")) {
             String cardID1 = game.drawExplore(Constants.FRONTIER);
             String cardID2 = game.drawExplore(Constants.FRONTIER);
             ExploreModel card1 = Mapper.getExplore(cardID1);

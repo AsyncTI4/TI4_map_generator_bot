@@ -80,7 +80,10 @@ public class EdictResolveButtonHandler {
         game.setStoredValue("edictResolver-" + edict, player.getFaction());
         AgendaModel model = Mapper.getAgenda(edict);
 
-        String message = player.getRepresentationNoPing() + " is resolving the _" + model.getName() + "_ edict.";
+        boolean isOrangeBonusResolution = buttonID.contains("orangetf");
+        String resolverRep =
+                (isOrangeBonusResolution && game.isFowMode()) ? "Someone" : player.getRepresentationNoPing();
+        String message = resolverRep + " is resolving the _" + model.getName() + "_ edict.";
         MessageHelper.sendMessageToChannelWithEmbed(game.getMainGameChannel(), message, model.getRepresentationEmbed());
 
         EdictResolver handler = EDICT_HANDLERS.get(edict.toLowerCase());
@@ -124,7 +127,7 @@ public class EdictResolveButtonHandler {
                 MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg2, proceed);
             } else if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(
-                        game.getMainGameChannel(), "# Radiant Aur will be resolving a second edict after this one.");
+                        game.getMainGameChannel(), "# A second edict will be resolved after this one.");
             }
         }
     }

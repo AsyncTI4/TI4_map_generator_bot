@@ -1257,12 +1257,10 @@ public final class ButtonHelperModifyUnits {
         if ((tile.isAsteroidField()
                         && !player.hasTech("amd")
                         && !player.hasTech("wavelength")
-                        && !player.getRelics().contains("circletofthevoid")
-                        && !player.hasAbility("celestial_being"))
+                        && !player.getRelics().contains("circletofthevoid"))
                 || (tile.isSupernova()
                         && !player.hasTech("mr")
-                        && !player.getRelics().contains("circletofthevoid")
-                        && !player.hasAbility("celestial_being"))
+                        && !player.getRelics().contains("circletofthevoid"))
                 || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
             return false;
         }
