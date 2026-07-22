@@ -112,7 +112,7 @@ public class VeiledHeartService {
         player.getGame().setStoredValue(getKey(player), value);
     }
 
-    private static void addVeiledCard(Player player, String card) {
+    public static void addVeiledCard(Player player, String card) {
         setStoredValue(player, getStoredValue(player) + card + "_");
     }
 

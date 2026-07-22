@@ -859,8 +859,14 @@ public final class ButtonHelperTwilightsFallActionCards {
                         player.removeOwnedUnitByID(u.getId());
                     }
                 }
-                player.addOwnedUnitByID(card);
                 found = Mapper.getUnit(card).getNameRepresentation() + ". It has been automatically gained.";
+                if (game.isVeiledHeartMode()) {
+                    found +=
+                            " (It was gained face-down and may be put into play with a button in the `#cards-info` thread.)";
+                    VeiledHeartService.addVeiledCard(player, card);
+                } else {
+                    player.addOwnedUnitByID(card);
+                }
                 break;
             }
         }
