@@ -965,9 +965,7 @@ public final class ButtonHelperTwilightsFall {
                                 Mapper.getUnit(cardID).getRepresentationEmbed());
                     }
                 } else {
-                    game.setStoredValue(
-                            "veiledCards" + player.getFaction(),
-                            game.getStoredValue("veiledCards" + player.getFaction()) + cardID + "_");
+                    VeiledHeartService.addVeiledCard(player, cardID);
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentationNoPing()
@@ -1603,9 +1601,7 @@ public final class ButtonHelperTwilightsFall {
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(), msg, model.getRepresentationEmbed());
         } else {
-            game.setStoredValue(
-                    "veiledCards" + player.getFaction(),
-                    game.getStoredValue("veiledCards" + player.getFaction()) + drawnCard + "_");
+            VeiledHeartService.addVeiledCard(player, drawnCard);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationNoPing()

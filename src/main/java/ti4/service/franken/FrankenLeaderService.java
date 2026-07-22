@@ -21,7 +21,9 @@ public class FrankenLeaderService {
 
     public static void addLeaders(GenericInteractionCreateEvent event, Player player, List<String> leaderIDs) {
         if (player.getGame().isVeiledHeartMode()) {
-            VeiledHeartService.addVeiledCard(player, String.join("_", leaderIDs));
+            for (String leader : leaderIDs) {
+                VeiledHeartService.addVeiledCard(player, leader);
+            }
             String msg = "Added veiled cards. Refresh your `#cards-info` thread to find buttons to reveal them.";
             MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
             return;
@@ -72,8 +74,7 @@ public class FrankenLeaderService {
         for (String leaderID : leaderIDs) {
             if (player.getGame().isVeiledHeartMode()) {
                 VeiledHeartService.removeVeiledCard(player, leaderID);
-                String msg = "Removed a veiled card.";
-                MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
+                sb.append("> veiled ").append(Helper.getLeaderFullRepresentation(new Leader(leaderID)));
             } else {
                 if (!player.hasLeader(leaderID)) {
                     sb.append("> ").append(leaderID).append(" (player did not have this leader)");
