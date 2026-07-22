@@ -13,6 +13,7 @@ import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.service.VeiledHeartService;
 import ti4.service.leader.HeroUnlockCheckService;
 
 @UtilityClass
@@ -20,13 +21,9 @@ public class FrankenLeaderService {
 
     public static void addLeaders(GenericInteractionCreateEvent event, Player player, List<String> leaderIDs) {
         if (player.getGame().isVeiledHeartMode()) {
-            String msg = "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it";
+            VeiledHeartService.addVeiledCard(player, String.join("_", leaderIDs));
+            String msg = "Added veiled cards. Refresh your `#cards-info` thread to find buttons to reveal them.";
             MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
-
-            String key = "veiledCards" + player.getFaction();
-            String val = player.getGame().getStoredValue(key);
-            val += "_" + String.join("_", leaderIDs);
-            player.getGame().setStoredValue(key, val + "_");
             return;
         }
 

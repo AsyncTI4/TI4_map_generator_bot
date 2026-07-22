@@ -116,7 +116,7 @@ public class VeiledHeartService {
         setStoredValue(player, getStoredValue(player) + card + "_");
     }
 
-    private static void removeVeiledCard(Player player, String card) {
+    public static void removeVeiledCard(Player player, String card) {
         setStoredValue(player, getStoredValue(player).replace(card + "_", ""));
     }
 

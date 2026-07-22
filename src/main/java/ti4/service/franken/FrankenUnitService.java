@@ -9,6 +9,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.VeiledHeartService;
 
 @UtilityClass
 public class FrankenUnitService {
@@ -16,13 +17,9 @@ public class FrankenUnitService {
     public static void addUnits(
             GenericInteractionCreateEvent event, Player player, List<String> unitIDs, boolean dupes) {
         if (player.getGame().isVeiledHeartMode()) {
-            String msg = "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it";
+            VeiledHeartService.addVeiledCard(player, String.join("_", unitIDs));
+            String msg = "Added veiled cards. Refresh your `#cards-info` thread to find buttons to reveal them.";
             MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
-
-            String key = "veiledCards" + player.getFaction();
-            String val = player.getGame().getStoredValue(key);
-            val += "_" + String.join("_", unitIDs);
-            player.getGame().setStoredValue(key, val + "_");
             return;
         }
 
