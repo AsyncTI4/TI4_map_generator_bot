@@ -15,6 +15,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.service.VeiledHeartService;
 
 public class TfConveneResolver implements EdictResolver {
 
@@ -50,12 +51,16 @@ public class TfConveneResolver implements EdictResolver {
             Player tyrant = EdictResolveButtonHandler.getEdictResolver(game);
             game.removeStoredValue("conveneStarter");
             game.setStoredValue("convenePlayers", game.getStoredValue("convenePlayers") + tyrant.getFaction());
-            tyrant.addTech(cardID);
+            String msg = tyrant.getRepresentation() + " has acquired the ability: "
+                    + Mapper.getTech(cardID).getName();
+            if (game.isVeiledHeartMode()) {
+                msg += " (It was turned face-down and may be put into play with a button in the `#cards-info` thread.)";
+                VeiledHeartService.addVeiledCard(tyrant, cardID);
+            } else {
+                tyrant.addTech(cardID);
+            }
             MessageHelper.sendMessageToChannelWithEmbed(
-                    game.getActionsChannel(),
-                    tyrant.getRepresentation() + " has acquired the ability: "
-                            + Mapper.getTech(cardID).getName(),
-                    Mapper.getTech(cardID).getRepresentationEmbed());
+                    game.getActionsChannel(), msg, Mapper.getTech(cardID).getRepresentationEmbed());
         } else {
             List<Button> buttons = new ArrayList<>();
             for (Player p2 : game.getRealPlayers()) {
@@ -102,13 +107,18 @@ public class TfConveneResolver implements EdictResolver {
         String cardID = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[2]);
         game.setStoredValue("convenePlayers", game.getStoredValue("convenePlayers") + p2.getFaction());
-        p2.addTech(cardID);
+
+        String msg = p2.getRepresentation() + " has acquired the ability: "
+                + Mapper.getTech(cardID).getName();
+        if (game.isVeiledHeartMode()) {
+            msg += " (It was turned face-down and may be put into play with a button in the `#cards-info` thread.)";
+            VeiledHeartService.addVeiledCard(p2, cardID);
+        } else {
+            p2.addTech(cardID);
+        }
 
         MessageHelper.sendMessageToChannelWithEmbed(
-                game.getActionsChannel(),
-                p2.getRepresentation() + " has acquired the ability: "
-                        + Mapper.getTech(cardID).getName(),
-                Mapper.getTech(cardID).getRepresentationEmbed());
+                game.getActionsChannel(), msg, Mapper.getTech(cardID).getRepresentationEmbed());
         ButtonHelper.deleteMessage(event);
     }
 }
