@@ -4983,6 +4983,10 @@ public class ButtonHelper {
 
         redTilesToPullFrom.removeAll(
                 game.getTileMap().values().stream().map(Tile::getTileID).toList());
+        String storedPurgedTiles = game.getStoredValue(Constants.PURGED_MAP_TILES);
+        if (!storedPurgedTiles.isBlank()) {
+            redTilesToPullFrom.removeAll(List.of(storedPurgedTiles.split(",")));
+        }
         if (!game.isDiscordantStarsMode() && !game.isUnchartedSpaceStuff()) {
             redTilesToPullFrom.removeAll(redTilesToPullFrom.stream()
                     .filter(tileID -> tileID.contains("d"))

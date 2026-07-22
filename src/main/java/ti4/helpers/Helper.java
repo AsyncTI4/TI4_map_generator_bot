@@ -180,9 +180,16 @@ public final class Helper {
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
         draftManager.init(game);
 
+        Set<String> purgedTileIds = new HashSet<>();
+        String storedPurgedTiles = game.getStoredValue(Constants.PURGED_MAP_TILES);
+        if (!storedPurgedTiles.isBlank()) {
+            Collections.addAll(purgedTileIds, storedPurgedTiles.split(","));
+        }
+
         List<MiltyDraftTile> allTiles = new ArrayList<>(draftManager.getAll())
                 .stream()
                         .filter(tile -> game.getTile(tile.getTile().getTileID()) == null)
+                        .filter(tile -> !purgedTileIds.contains(tile.getTile().getTileID()))
                         .toList();
         return new ArrayList<>(allTiles);
     }
