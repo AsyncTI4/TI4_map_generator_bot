@@ -22,9 +22,10 @@ public class WebStatTilePositions {
      * bottoms out in "is their home system in view") is there to gate.
      */
     public static void redact(Map<String, List<String>> statTilePositions, Game game, Player viewer) {
+        // An unresolvable faction fails closed: dropping its entry is safe, keeping it could leak.
         statTilePositions.keySet().removeIf(faction -> {
             Player player = game.getPlayerFromColorOrFaction(faction);
-            return player != null && !FoWHelper.canSeeStatsOfPlayer(game, player, viewer);
+            return player == null || !FoWHelper.canSeeStatsOfPlayer(game, player, viewer);
         });
     }
 

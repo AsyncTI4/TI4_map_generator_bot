@@ -73,11 +73,9 @@ public class WebObjectives {
     private List<ObjectiveInfo> customObjectives;
     private List<ObjectiveInfo> allObjectives;
 
-    /**
-     * Strips numeric factionProgress down to just {@code viewer}'s own entry. allObjectives holds
-     * the same ObjectiveInfo instances referenced by the stage1/stage2/custom lists, so mutating
-     * through it updates all of them.
-     */
+    // The redactions below mutate through allObjectives, which holds the same ObjectiveInfo
+    // instances referenced by the stage1/stage2/custom lists - so updating it updates all of them.
+
     /**
      * Replaces scorers the viewer can't identify with a count, and drops them from the peeking list.
      * The frontend renders {@code unidentifiedScorerCount} anonymous tokens, which carry no faction
@@ -96,9 +94,11 @@ public class WebObjectives {
     private static boolean canIdentify(Game game, Player viewer, String faction) {
         Player player = game.getPlayerFromColorOrFaction(faction);
         // Neutral forces are public, and canSeeStatsOfPlayer is false for any non-real player.
-        return player == null || player.isNeutral() || FoWHelper.canSeeStatsOfPlayer(game, player, viewer);
+        // An unresolvable faction fails closed - better an extra anonymous token than a leak.
+        return player != null && (player.isNeutral() || FoWHelper.canSeeStatsOfPlayer(game, player, viewer));
     }
 
+    /** Strips numeric factionProgress down to just {@code viewer}'s own entry. */
     public static void redactFactionProgress(WebObjectives objectives, Player viewer) {
         String ownFaction = viewer.getFaction();
         for (ObjectiveInfo info : objectives.allObjectives) {
