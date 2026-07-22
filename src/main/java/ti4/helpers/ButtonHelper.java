@@ -151,7 +151,6 @@ import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.spring.api.image.GameImageService;
 import ti4.spring.context.SpringContext;
-import ti4.website.AsyncTi4WebsiteHelper;
 
 @UtilityClass
 public class ButtonHelper {
@@ -2435,11 +2434,7 @@ public class ButtonHelper {
             List<Button> buttons,
             Game game,
             @Nullable Consumer<Message> onSuccess) {
-        if (!AsyncTi4WebsiteHelper.uploadsEnabled() || game.isFowMode()) {
-            MessageHelper.sendFileToChannelAndAddLinkToButtons(channel, fileUpload, message, buttons, onSuccess);
-        } else {
-            MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, message, buttons, onSuccess);
-        }
+        MessageHelper.sendFileToChannelAndAddLinkToButtons(channel, fileUpload, message, buttons, onSuccess);
     }
 
     public static boolean canMoveOutOfLockedSystems(Player player, Game game) {
