@@ -10,6 +10,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+import ti4.service.abilities.MahactTokenService;
 
 public class AddAllianceMember extends GameStateSubcommand {
 
@@ -80,7 +81,7 @@ public class AddAllianceMember extends GameStateSubcommand {
             }
         }
         if (player.hasAbility("edict")) {
-            player.addMahactCC(otherPlayer.getColor());
+            MahactTokenService.addMahactToken(game, player, otherPlayer.getColor());
             MessageHelper.sendMessageToChannel(
                     otherPlayer.getCorrectChannel(),
                     "Heads up, " + otherPlayer.getRepresentation()
@@ -89,7 +90,7 @@ public class AddAllianceMember extends GameStateSubcommand {
                             + " This is because Dane thought Mahact's commander was too powerful to share.");
         }
         if (otherPlayer.hasAbility("edict")) {
-            otherPlayer.addMahactCC(player.getColor());
+            MahactTokenService.addMahactToken(game, otherPlayer, player.getColor());
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "Heads up, " + player.getRepresentation()

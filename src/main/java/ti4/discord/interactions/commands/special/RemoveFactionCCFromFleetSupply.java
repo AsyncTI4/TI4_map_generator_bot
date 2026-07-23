@@ -4,6 +4,7 @@ import java.util.List;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
+import ti4.service.abilities.MahactTokenService;
 
 class RemoveFactionCCFromFleetSupply extends AddRemoveFactionCCToFromFleet {
 
@@ -14,7 +15,7 @@ class RemoveFactionCCFromFleetSupply extends AddRemoveFactionCCToFromFleet {
     @Override
     void action(List<String> colors, Game game, Player player) {
         for (String color : colors) {
-            player.removeMahactCC(color);
+            MahactTokenService.removeMahactToken(player, color);
         }
     }
 }

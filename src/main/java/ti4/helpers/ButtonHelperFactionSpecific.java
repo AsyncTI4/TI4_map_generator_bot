@@ -1112,7 +1112,7 @@ public final class ButtonHelperFactionSpecific {
 
         String location = player.hasAbility("primacy") ? "Primacy ability" : "fleet pool";
         if (!player.getMahactCC().contains(color)) {
-            player.addMahactCC(color);
+            MahactTokenService.addMahactToken(game, player, color);
             Helper.isCCCountCorrect(game, color);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
