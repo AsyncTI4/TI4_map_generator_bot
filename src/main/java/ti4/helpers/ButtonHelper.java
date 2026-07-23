@@ -3260,7 +3260,7 @@ public class ButtonHelper {
     public static void resolveMahactMechAbilityUse(
             Player mahact, Player target, Game game, Tile tile, ButtonInteractionEvent event) {
         String mechName = mahact.hasUnit("mahact_mech_y") ? "Starlancer Y" : "Starlancer";
-        mahact.removeMahactCC(target.getColor());
+        MahactTokenService.removeMahactToken(mahact, target.getColor());
         if (!game.isNaaluAgent() && !game.isWarfareAction()) {
             if (!game.getStoredValue("absolLux").isEmpty()) {
                 target.setTacticalCC(target.getTacticalCC() + 1);

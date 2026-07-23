@@ -12,9 +12,34 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
+import ti4.service.emoji.FactionEmojis;
 
 @UtilityClass
 public class MahactTokenService {
+    private static final String PRIMACY_DEBT_POOL = "Primacy";
+
+    public void addMahactToken(Game game, Player player, String color) {
+        if (player.getMahactCC().contains(color)) {
+            return;
+        }
+
+        player.addMahactCC(color);
+        if (player.hasAbility("primacy")) {
+            if (game.getDebtPoolIcon(PRIMACY_DEBT_POOL) == null) {
+                game.setDebtPoolIcon(PRIMACY_DEBT_POOL, FactionEmojis.Mahact.emojiString());
+            }
+            player.addDebtTokens(color, 1, PRIMACY_DEBT_POOL);
+        }
+    }
+
+    public void removeMahactToken(Player player, String color) {
+        if (!player.getMahactCC().contains(color)) {
+            return;
+        }
+
+        player.removeMahactCC(color);
+        player.clearAllDebtTokens(color, PRIMACY_DEBT_POOL);
+    }
 
     public void removeFleetCC(Game game, Player player, String reason) {
         String message = player.getRepresentation();
@@ -27,7 +52,7 @@ public class MahactTokenService {
                 Player p2 = game.getPlayerFromColorOrFaction(color);
                 message += " has been forced to lose the " + p2.fogSafeEmoji() + " command token from their fleet pool "
                         + reason + ".";
-                player.getMahactCC().remove(color);
+                removeMahactToken(player, color);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 ButtonHelper.checkFleetInEveryTile(player, game);
             } else {
@@ -82,7 +107,7 @@ public class MahactTokenService {
         boolean delOne = false;
 
         if (player.getMahactCC().contains(color)) {
-            player.removeMahactCC(color);
+            removeMahactToken(player, color);
             Player p2 = game.getPlayerFromColorOrFaction(color);
             msg += "the " + p2.fogSafeEmoji() + " token from their fleet pool.";
             delOne = true;
