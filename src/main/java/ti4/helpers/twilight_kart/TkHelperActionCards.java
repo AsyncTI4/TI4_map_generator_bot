@@ -41,6 +41,7 @@ import ti4.model.LeaderModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
+import ti4.service.VeiledHeartService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
@@ -136,9 +137,7 @@ public class TkHelperActionCards {
             genomes.forEach(player::addLeader);
 
         } else {
-            String veilKey = "veiledCards" + player.getFaction();
-            String veilCards = game.getStoredValue(veilKey) + String.join("_", genomes) + "_";
-            game.setStoredValue(veilKey, veilCards);
+            genomes.forEach(genome -> VeiledHeartService.addVeiledCard(player, genome));
         }
 
         for (String cardID : genomes) {
@@ -150,9 +149,7 @@ public class TkHelperActionCards {
                                 + Mapper.getLeader(cardID).getName(),
                         Mapper.getLeader(cardID).getRepresentationEmbed(true));
             } else {
-                String key = "veiledCards" + player.getFaction();
-                String veiledCards = game.getStoredValue(key);
-                game.setStoredValue(key, veiledCards + cardID + "_");
+                VeiledHeartService.addVeiledCard(player, cardID);
 
                 String msg = player.getRepresentationNoPing() + " has taken a secret card. They ";
                 msg += "may put it into play with a button in their `#cards-info` thread.";
@@ -200,7 +197,9 @@ public class TkHelperActionCards {
                     String label = Helper.getPlanetRepresentation(p.getName(), game);
                     for (Player p2 : game.getRealPlayers()) {
                         if (p2.hasPlanet(p.getName())) {
-                            return Buttons.red(id, label, p2.getFactionEmoji());
+                            return game.isFowMode()
+                                    ? Buttons.red(id, label)
+                                    : Buttons.red(id, label, p2.getFactionEmoji());
                         }
                     }
                     return Buttons.gray(id, label);
@@ -479,7 +478,11 @@ public class TkHelperActionCards {
             if (count > 0) {
                 String id = player.factionButtonChecker() + "ordainDiscardOne_" + planetName + "_" + p2.getColor();
                 String label = "Discard " + p2.getColorDisplayName() + " ability (" + count + " available)";
-                buttons.add(Buttons.red(id, label, p2.getFactionEmoji()));
+                if (game.isFowMode()) {
+                    buttons.add(Buttons.red(id, label));
+                } else {
+                    buttons.add(Buttons.red(id, label, p2.getFactionEmoji()));
+                }
             }
         }
         if (buttons.isEmpty()) {
@@ -520,6 +523,18 @@ public class TkHelperActionCards {
         msg += victim.getRepresentation() + "'s abilities. You may still decline to discard, if you so wish:";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("ordainDiscard_")
+    private static void ordainDiscard(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Player victim = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String tech = buttonID.split("_")[2];
+        victim.removeTech(tech);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " discarded " + victim.getRepresentation() + "'s ability: "
+                        + Mapper.getTech(tech).getName());
     }
 
     @ButtonHandler("resolveRaze_")

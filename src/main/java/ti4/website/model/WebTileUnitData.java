@@ -321,7 +321,8 @@ public final class WebTileUnitData {
                 "ocean4",
                 "ocean5",
                 "triad",
-                "grove");
+                "grove",
+                "aurelionstation");
 
         Map<String, Planet> planetsInfo = game.getPlanetsInfo();
 

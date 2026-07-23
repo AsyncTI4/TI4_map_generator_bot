@@ -23,6 +23,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
@@ -88,6 +90,7 @@ public class ExploreService {
                     event.getMessageChannel(), "You do not control this planet, thus cannot explore it.");
             return;
         }
+        game.removeStoredValue("revArcanumAgentExploreOptions_" + player.getFaction());
         boolean kolleccbt = drawColor.endsWith("kolleccbt");
         if (kolleccbt) {
             drawColor = drawColor.replace("kolleccbt", "");
@@ -442,6 +445,26 @@ public class ExploreService {
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
             return;
         }
+        Planet exploredPlanet = planetName == null ? null : game.getUnitHolderFromPlanet(planetName);
+        boolean isPlanetExplore = !Constants.FRONTIER.equals(drawColor) && exploredPlanet != null;
+        if (isPlanetExplore) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green(
+                    "resolve_explore_" + cardID + "_" + planetName,
+                    "Resolve " + Mapper.getExplore(cardID).getName()));
+
+            RevenantLeadersHandler.addArlirMirroredButton(buttons, game, player, planetName, cardID, drawColor);
+
+            if (buttons.size() > 1) {
+                List<MessageEmbed> embeds = List.of(Mapper.getExplore(cardID).getRepresentationEmbed());
+                MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                        event.getMessageChannel(),
+                        player.getRepresentation() + ", choose how to resolve this exploration.",
+                        embeds,
+                        buttons);
+                return;
+            }
+        }
         resolveExplore(event, cardID, tile, planetName, messageText, player, game);
         if (player.hasTech("pfa")) { // Pre-Fab Arcologies
             PlanetService.refreshPlanet(player, planetName);
@@ -732,6 +755,7 @@ public class ExploreService {
                                                 + ", and discovered the _Gamma Wormhole_.");
                             }
                             DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+                            OblivionUnitHandler.doOblivionMechCheck(game, player);
                         }
                     }
 
@@ -758,6 +782,7 @@ public class ExploreService {
                             }
                         }
                         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+                        OblivionUnitHandler.doOblivionMechCheck(game, player);
                     }
                     game.purgeExplore(ogID);
                 }

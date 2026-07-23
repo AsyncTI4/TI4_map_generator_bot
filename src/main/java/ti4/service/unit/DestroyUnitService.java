@@ -20,6 +20,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.game.Game;
@@ -170,6 +173,9 @@ public class DestroyUnitService {
                         player, numInfantry, units.getFirst().tile());
             }
         }
+        if (combat) {
+            AeternaTechHandler.offerThanatocyteLattice(event, game, units);
+        }
 
         // Would normally gate the hook, but I loop and check for ability in the handler
         CrystellumAbilityHandler.offerFragmentationForBatchIfRelevant(event, game, units, combat);
@@ -256,6 +262,12 @@ public class DestroyUnitService {
                     String message = "> Added " + totalAmount + " infantry to the planet following " + totalAmount
                             + " Nauplius (Cheiran mech) being destroyed.\n";
                     MessageHelper.sendMessageToEventChannel(event, message);
+                }
+                if (player.hasUnit("veylor_mech")) {
+                    VeylorUnitHandler.checkVeylorMech(game);
+                }
+                if (player.hasUnit("tyris_mech")) {
+                    TyrisAbilityHandler.offerCCForDestroyedReverb(player);
                 }
             }
             case Warsun -> {

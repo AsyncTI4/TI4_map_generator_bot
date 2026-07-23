@@ -179,6 +179,7 @@ public final class Constants {
     public static final String UNDO_BUTTON = "undo_button";
     public static final String FAST_SC_FOLLOW = "fast_sc_follow";
     public static final String PURGED_FRAGMENTS = "purged_fragment";
+    public static final String PURGED_MAP_TILES = "purged_map_tiles";
     public static final String DOMINUS_ORB = "dominus_orb";
     public static final String COMPONENT_ACTION = "component_action";
     public static final String JUST_PLAYED_COMPONENT_AC = "just_played_component_ac";
@@ -1511,6 +1512,7 @@ public final class Constants {
 
     public static final String OLRADIN_MECH_RES_PNG = "attachment_olradin_mech_res.png";
     public static final String OLRADIN_MECH_INF_PNG = "attachment_olradin_mech_inf.png";
+    public static final String VOX_SENTINELS_PNG = "attachment_vox_sentinels.png";
     public static final String EXAMPLES_ONLY = "examples_only";
     public static final String HOW_TO_MOVE_UNITS = "how_to_move_units";
     public static final String IS_ASTEROID_FIELD = "is_asteroid_field";

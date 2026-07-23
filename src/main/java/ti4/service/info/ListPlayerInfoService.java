@@ -756,7 +756,8 @@ public class ListPlayerInfoService {
                         Units.UnitType.Flagship,
                         Units.UnitType.Warsun,
                         Units.UnitType.Lady,
-                        Units.UnitType.Celagrom)) {
+                        Units.UnitType.Celagrom,
+                        Units.UnitType.Aurelion)) {
                     if ((tile.isHomeSystem(game) && tile != player.getHomeSystemTile()) || tile.isMecatol(game)) {
                         count++;
                     }

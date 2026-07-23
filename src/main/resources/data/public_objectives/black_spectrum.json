@@ -1,0 +1,245 @@
+[
+    {
+        "alias": "bsp_become_legend",
+        "name": "Become a Legend",
+        "phase": "Status",
+        "text": "Have units in 5 non-home systems that contain legendary planets or anomalies.",
+        "points": 2,
+        "homebrewReplacesID": "become_legend",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_centralize_galactic",
+        "name": "Centralize Galactic Trade",
+        "phase": "Status",
+        "text": "Spend 14 trade goods.",
+        "points": 2,
+        "homebrewReplacesID": "centralize_trade",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_command_armada",
+        "name": "Command an Armada",
+        "phase": "Status",
+        "text": "Have 9 or more non-fighter ships in 1 non-home system.",
+        "points": 2,
+        "homebrewReplacesID": "command_armada",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_control_borderlands",
+        "name": "Control the Borderlands",
+        "phase": "Status",
+        "text": "Have units in 5 non-Fracture systems on the edge of the game board other than your home system.",
+        "points": 2,
+        "homebrewReplacesID": "control_borderlands",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_found_golden",
+        "name": "Found a Golden Age",
+        "phase": "Status",
+        "text": "Spend 20 resources.",
+        "points": 2,
+        "homebrewReplacesID": "golden_age",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_galvanize_people",
+        "name": "Galvanize the People",
+        "phase": "Status",
+        "text": "Spend a total of 8 tokens from your tactic and/or strategy pools.",
+        "points": 2,
+        "homebrewReplacesID": "galvanize",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_hold_vast",
+        "name": "Hold Vast Reserves",
+        "phase": "Status",
+        "text": "Spend 9 influence, 9 resources, and 9 trade goods.",
+        "points": 2,
+        "homebrewReplacesID": "vast_reserves",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_manipulate_galactic",
+        "name": "Manipulate Galactic Law",
+        "phase": "Status",
+        "text": "Spend 20 influence.",
+        "points": 2,
+        "homebrewReplacesID": "manipulate_law",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_master_sciences",
+        "name": "Master the Sciences",
+        "phase": "Status",
+        "text": "Control more readied planets than the combined total of 2 of your neighbors.",
+        "points": 2,
+        "homebrewReplacesID": "master_science",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_patrol_vast",
+        "name": "Patrol Vast Territories",
+        "phase": "Status",
+        "text": "Have units in 5 non-Fracture systems that do not contain planets.",
+        "points": 2,
+        "homebrewReplacesID": "vast_territories",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_reclaim_ancient",
+        "name": "Reclaim Ancient Monuments",
+        "phase": "Status",
+        "text": "Control 4 planets that have attachments.",
+        "points": 2,
+        "homebrewReplacesID": "ancient_monuments",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_revolutionize_warfare",
+        "name": "Revolutionize Warfare",
+        "phase": "Status",
+        "text": "Have more neighbors than each 2 of your neighbors.",
+        "points": 2,
+        "homebrewReplacesID": "revolutionize",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_subdue_galaxy",
+        "name": "Subdue the Galaxy",
+        "phase": "Status",
+        "text": "Control 11 planets outside of The Fracture and your home system.",
+        "points": 2,
+        "homebrewReplacesID": "subdue",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_amass_wealth",
+        "name": "Amass Wealth",
+        "phase": "Status",
+        "text": "Spend 4 influence, 4 resources, and 4 trade goods.",
+        "points": 1,
+        "homebrewReplacesID": "amass_wealth",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_develop_weaponry",
+        "name": "Develop Weaponry",
+        "phase": "Status",
+        "text": "Have more non-fighter ships on the game board than each of 2 of your neighbors.",
+        "points": 1,
+        "homebrewReplacesID": "develop",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_diversify_research",
+        "name": "Diversify Research",
+        "phase": "Status",
+        "text": "Exhaust 3 planets that each have a different trait and 1 additional planet that has a technology specialty.",
+        "points": 1,
+        "homebrewReplacesID": "diversify",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_engineer_marvel",
+        "name": "Engineer a Marvel",
+        "phase": "Status",
+        "text": "Have your flagship or a war sun adjacent to Mecatol Rex or another player's home system.",
+        "points": 1,
+        "homebrewReplacesID": "engineer_marvel",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_erect_monument",
+        "name": "Erect a Monument",
+        "phase": "Status",
+        "text": "Spend 10 resources.",
+        "points": 1,
+        "homebrewReplacesID": "monument",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_expand_borders",
+        "name": "Expand Borders",
+        "phase": "Status",
+        "text": "Control 7 planets outside of The Fracture and your home system.",
+        "points": 1,
+        "homebrewReplacesID": "expand_borders",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_explore_deep",
+        "name": "Explore Deep Space",
+        "phase": "Status",
+        "text": "Have units in 3 non-Fracture systems that do not contain planets.",
+        "points": 1,
+        "homebrewReplacesID": "deep_space",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_intimidate_council",
+        "name": "Intimidate Council",
+        "phase": "Status",
+        "text": "Have ships in 2 non-Fracture systems that are adjacent to Mecatol Rex.",
+        "points": 1,
+        "homebrewReplacesID": "intimidate",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_lead_front",
+        "name": "Lead from the Front",
+        "phase": "Status",
+        "text": "Spend a total of 4 tokens from your tactic and/or strategy pools.",
+        "points": 1,
+        "homebrewReplacesID": "lead",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_make_history",
+        "name": "Make History",
+        "phase": "Status",
+        "text": "Have units in 3 non-home systems that contain legendary planets or anomalies.",
+        "points": 1,
+        "homebrewReplacesID": "make_history",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_negotiate_trade",
+        "name": "Negotiate Trade Routes",
+        "phase": "Status",
+        "text": "Spend 7 trade goods.",
+        "points": 1,
+        "homebrewReplacesID": "trade_routes",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_populate_outer",
+        "name": "Populate the Outer Rim",
+        "phase": "Status",
+        "text": "Have units in 3 non-Fracture systems, other than your home system, that are on the edge of the game board and do not contain other players' units.",
+        "points": 1,
+        "homebrewReplacesID": "outer_rim",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_raise_fleet",
+        "name": "Raise a Fleet",
+        "phase": "Status",
+        "text": "Have 2 or more non-fighter ships in 2 non-home systems and 5 or more non-fighter ships in 1 other system that is not your home system.",
+        "points": 1,
+        "homebrewReplacesID": "raise_fleet",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_sway_council",
+        "name": "Sway the Council",
+        "phase": "Status",
+        "text": "Spend 10 influence.",
+        "points": 1,
+        "homebrewReplacesID": "sway_council",
+        "source": "black_spectrum"
+    }
+]

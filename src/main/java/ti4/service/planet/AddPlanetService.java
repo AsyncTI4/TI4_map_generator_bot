@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixAbilityHandler;
 import ti4.game.Game;
@@ -27,7 +28,6 @@ import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
@@ -64,7 +64,12 @@ public class AddPlanetService {
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
         player.addPlanet(planet);
         EronousPlanetService.resolveCantrisPO(game, planet, player);
-        player.exhaustPlanet(planet);
+        if (setup && "ponthous".equalsIgnoreCase(planet)) {
+            // Setup exhausts Ponthous without opening its optional ready-planet window.
+            player.getExhaustedPlanets().add(planet);
+        } else {
+            player.exhaustPlanet(planet);
+        }
         if ("mirage".equals(planet) || "avernus".equals(planet) || "thundersedge".equals(planet)) {
             game.clearPlanetsCache();
         }
@@ -87,6 +92,9 @@ public class AddPlanetService {
                     event != null ? new LogOrigin(event) : null,
                     "Unitholder found null in addPlanet for planet " + planet);
             unitHolder = game.getUnitHolderFromPlanet(planet);
+        }
+        if ("ponthous".equalsIgnoreCase(planet)) {
+            PonthousAbilityHandler.resetFracturedSouls(game, player);
         }
         if (player.isRealPlayer() && unitHolder.getTokenList().contains("token_freepeople.png")) {
             unitHolder.removeToken("token_freepeople.png");
@@ -523,17 +531,6 @@ public class AddPlanetService {
                     + " agent, to draw 1 action card.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons);
         }
-        if (game.getActivePlayerID() != null
-                && !("".equalsIgnoreCase(game.getActivePlayerID()))
-                && player.hasAbility("enslave")
-                && !setup
-                && tile != null) {
-            UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
-            tile.getUnitHolders().get(planet).addUnit(infKey, 1);
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "Added 1 infantry to " + planet + " due to **Enslave**.");
-        }
-
         if (game.getActivePlayerID() != null
                 && !("".equalsIgnoreCase(game.getActivePlayerID()))
                 && player.hasAbility("scour")

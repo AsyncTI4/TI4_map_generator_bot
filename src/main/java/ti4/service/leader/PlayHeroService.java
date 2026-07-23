@@ -19,7 +19,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanHeroHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -82,6 +85,7 @@ public class PlayHeroService {
         boolean removed = player.removeLeader(leader);
         if (removed && (reason == LeaderRemovalReason.PURGED || reason == LeaderRemovalReason.STATUS_CLEANUP)) {
             DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+            OblivionUnitHandler.doOblivionMechCheck(game, player);
         }
         return removed;
     }
@@ -238,6 +242,7 @@ public class PlayHeroService {
                     ButtonHelperRelics.offerTitansHeroButtons(player, game, event);
                 }
             }
+            case "vyserixhero" -> VyserixLeaderHandler.offerHeroAttachmentButtons(event, game, player);
             case "onyxxahero" -> OnyxxaLeaderHandler.postHeroMoveShipButtons(game, player);
             case "xanhero" -> XanHeroHandler.postInitialButtons(game, player);
             case "dreamhero" -> DreamButtonHandler.postDreamHeroButtons(game, player);
@@ -257,6 +262,7 @@ public class PlayHeroService {
                         "You will unfortunately need to use dicecord's `/roll` command for the SPACE CANNON and BOMBARDMENT of all your units against one system and planet respectively.");
             }
             case "ardentiahero" -> ArdentiaLeadersHandler.startArdentiaHero(event, game, player);
+            case "revenantkairnhero" -> RevenantLeadersHandler.startRevKairnHero(event, game, player);
             case "florzenhero" -> {
                 for (Tile tile : game.getTileMap().values()) {
                     for (UnitHolder uH : tile.getPlanetUnitHolders()) {
@@ -523,6 +529,13 @@ public class PlayHeroService {
             case "sanctionhero" -> {
                 boolean singleDock = false;
                 Tile tile = player.getHomeSystemTile();
+                if (tile == null) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(),
+                            player.getRepresentationUnfogged()
+                                    + ", you do not have a home system tile to produce units in. You cannot use this hero");
+                    return;
+                }
                 List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "warfare", "place");
                 int productionValue = Helper.getProductionValue(player, game, tile, singleDock);
 

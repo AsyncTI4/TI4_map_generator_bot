@@ -1687,6 +1687,9 @@ public final class AgendaHelper {
             if (attachment.contains("council_preserve")) {
                 voteAmount += 5;
             }
+            if (attachment.contains("vox_sentinels")) {
+                voteAmount += 2;
+            }
         }
         if (game.getLaws().containsKey("absol_government")) {
             voteAmount = 1;
@@ -2192,6 +2195,9 @@ public final class AgendaHelper {
             for (String attachment : p.getTokenList()) {
                 if (attachment.contains("council_preserve")) {
                     voteCount += 5;
+                }
+                if (attachment.contains("vox_sentinels")) {
+                    voteCount += 2;
                 }
             }
         }
@@ -3115,6 +3121,9 @@ public final class AgendaHelper {
         if (game.getStoredValue(key).isEmpty()) {
             game.setStoredValue(key, "top");
         } else {
+            if (game.getStoredValue(key).contains("_")) {
+                game.setStoredValue(key, game.getStoredValue(key).split("_")[1]);
+            }
             game.setStoredValue(key, game.getStoredValue(key) + "_top");
         }
 
@@ -3167,6 +3176,9 @@ public final class AgendaHelper {
         if (game.getStoredValue(key).isEmpty()) {
             game.setStoredValue(key, "bottom");
         } else {
+            if (game.getStoredValue(key).contains("_")) {
+                game.setStoredValue(key, game.getStoredValue(key).split("_")[1]);
+            }
             game.setStoredValue(key, game.getStoredValue(key) + "_bottom");
         }
 

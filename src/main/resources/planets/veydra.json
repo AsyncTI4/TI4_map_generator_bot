@@ -9,8 +9,8 @@
         "x": 226.0,
         "y": 200.0
     },
-    "resources": 0,
-    "influence": 3,
+    "resources": 1,
+    "influence": 1,
     "factionHomeworld": "oblivion",
     "planetType": "FACTION",
     "cardImagePath": null,

@@ -35,6 +35,7 @@ public class BothelperCommand implements ParentCommand {
                     new ListSlashCommandsUsed(),
                     new ReserveGame(),
                     new DeleteFOWCommThreads(),
+                    new KeepThreadAlive(),
                     new ManageRoles())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

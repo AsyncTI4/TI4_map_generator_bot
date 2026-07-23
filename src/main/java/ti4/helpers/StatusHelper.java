@@ -15,8 +15,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithPromissoryHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -161,6 +161,7 @@ public final class StatusHelper {
         // On a re-entered scoring phase, commit the previously staged scores instead of letting open() wipe them.
         commitStatusScoringEvent(game);
         game.setPhaseOfGame("statusScoring");
+        VerydithPromissoryHandler.returnPactRenewedAtStartOfStatus(game);
         GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "status"));
         GameEventDraft.open(game);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
@@ -756,7 +757,9 @@ public final class StatusHelper {
     private static void sendEntropicScarButtons(Game game) {
         Map<Player, Integer> scars = new HashMap<>();
         for (Tile t : game.getTileMap().values()) {
-            if (t.isScar()) {
+            boolean isAurelionSystem = t.getSpaceUnitHolder().getUnitKeys().stream()
+                    .anyMatch(unitKey -> unitKey.unitType() == UnitType.Aurelion);
+            if (t.isScar() || isAurelionSystem) {
                 for (Player p : game.getRealPlayers()) {
                     if (Tile.tileHasPlayerShips(p).test(t)) {
                         scars.put(p, scars.getOrDefault(p, 0) + 1);

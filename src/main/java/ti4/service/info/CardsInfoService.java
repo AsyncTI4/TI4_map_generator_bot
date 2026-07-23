@@ -18,7 +18,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -91,6 +92,18 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("ironagent")) {
             buttons.add(IronLeadersHandler.getMasterOfDefenseCardsInfoButton());
         }
+        if (player.hasUnexhaustedLeader("revenantarcanumagent")) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "useRevArcanumAgent_other",
+                    "Use Runebearer Lothos on Another Player",
+                    FactionEmojis.revenant));
+        }
+        if (player.hasUnexhaustedLeader("oblivionagent")) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "useOblivionAgent_other",
+                    "Use Avaris the Seer on someone else",
+                    FactionEmojis.oblivion));
+        }
         if (player.hasUnexhaustedLeader("ashenagent")) {
             buttons.add(AshenLeadersHandler.getAshTenderCardsInfoButton(player));
         }
@@ -106,9 +119,6 @@ public class CardsInfoService {
         }
         if (player.hasTech("becrystmb") && player.isActivePlayer()) {
             buttons.add(CrystellumFactionTechHandler.getMolecularBindingButton(player));
-        }
-        if (RevenantBreakthroughHandler.canPurgeAgent(game, player)) {
-            buttons.add(RevenantBreakthroughHandler.getPurgeAgentButton(player));
         }
         if (player.hasAbility("doctrine") && player.hasAbility("paradigm") && player.hasAbility("natau_decree")) {
             buttons.add(NatauAbilityHandler.getShowDoctrinesButton(player));
@@ -126,6 +136,9 @@ public class CardsInfoService {
         if (player.hasSpaceStation()) {
             buttons.add(Buttons.gray(
                     "startTradeStationConvert", "Convert Commodities With Space Station", MiscEmojis.comm));
+        }
+        if (player.hasPlanet("aurelionstation") && !player.getExhaustedPlanets().contains("aurelionstation")) {
+            buttons.add(ThronesUnitHandler.getAurelionCommodityConversionButton(player));
         }
         if (player.getPlanets().contains("conviction")
                 && !player.getExhaustedPlanetsAbilities().contains("conviction")) {
@@ -404,6 +417,15 @@ public class CardsInfoService {
             }
             omenDice = new StringBuilder(omenDice.toString().trim());
             buttons.add(Buttons.gray("getOmenDice", "Use an omen die (" + omenDice + ")", FactionEmojis.mykomentori));
+        }
+        if (player.hasLeader("xytherisagent")) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "useMyrixAgent",
+                    "Use Myrix on Another Player",
+                    FactionEmojis.xytheris));
+        }
+        if (player.hasUnexhaustedLeader("thronesagent")) {
+            buttons.add(ThronesLeadersHandler.getThronesAgentButton(player));
         }
         buttons.add(Buttons.gray("offerPlayerPref", "Player Settings"));
         buttons.add(Buttons.gray("searchMyGames", "List My Games"));

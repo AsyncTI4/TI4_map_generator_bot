@@ -24,6 +24,7 @@ import ti4.service.emoji.FactionEmojis;
 
 @UtilityClass
 public class ArcanumBreakthroughHandler {
+    private static final String FLIP_ON_GAIN = "flipPowerWordOnGain";
     private static final String POWER_WORD_WISH_FRONT = "arcanumbt";
     private static final String POWER_WORD_WISH_BACK = "arcanumbtback";
     private static final String USE_POWER_WORD_WISH = "usePowerWordWish";
@@ -34,6 +35,40 @@ public class ArcanumBreakthroughHandler {
     private static final String CAPACITY = "capacity";
     private static final String SELECTION_PREFIX = "powerWordWish";
 
+    // Gain Choice
+    public static void offerArcanumBTFlipOnGain(Game game, Player player) {
+        if (game == null || player == null || !player.hasBreakthrough(POWER_WORD_WISH_FRONT)) {
+            return;
+        }
+
+        List<Button> buttons = List.of(
+                Buttons.green(
+                        player.factionButtonChecker() + FLIP_ON_GAIN, "Flip Power Word: Wish", FactionEmojis.arcanum),
+                Buttons.red("deleteButtons", "Decline"));
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                game.getActionsChannel(),
+                player.getRepresentation()
+                        + ", you choose the side this breakthrough starts on. As such, you may press the button below to flip it to its Yellow-Green side:",
+                buttons);
+    }
+
+    @ButtonHandler(FLIP_ON_GAIN)
+    public static void resolvePowerWordFlipOnGain(ButtonInteractionEvent event, Player player, Game game) {
+        if (game == null || player == null || !player.hasBreakthrough(POWER_WORD_WISH_FRONT)) {
+            return;
+        }
+
+        player.changeBreakthrough(POWER_WORD_WISH_FRONT, POWER_WORD_WISH_BACK);
+        MessageHelper.sendMessageToChannelWithEmbed(
+                event.getMessageChannel(),
+                player.getRepresentation() + " flipped _Power Word: Wish_ to its biotic/cybernetic side.",
+                Mapper.getBreakthrough(POWER_WORD_WISH_BACK).getRepresentationEmbed());
+
+        ButtonHelper.deleteMessage(event);
+    }
+
+    // Flip Mechanic
     public static void handlePowerWordWishTechGain(Player player, String techId) {
         if (player == null || techId == null) return;
 
@@ -60,6 +95,7 @@ public class ArcanumBreakthroughHandler {
         }
     }
 
+    // Effects
     public static void offerPowerWordWish(GenericInteractionCreateEvent event, Game game, Player player) {
         if (game == null || player == null) return;
 

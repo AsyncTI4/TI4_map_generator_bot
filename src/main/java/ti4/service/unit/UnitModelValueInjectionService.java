@@ -32,6 +32,23 @@ public class UnitModelValueInjectionService {
                             .isPlanetOnly(false)
                             .isSpaceOnly(false));
         }
+        if (player.hasUnlockedBreakthrough("xytherisbt")
+                && player.hasUpgradedUnit("pds2")
+                && unit.getUnitType() == UnitType.Pds) {
+            return UnitValueInjection.of(
+                    IntegerValueInjection.create()
+                            .combatDieCount(1)
+                            .combatHitsOn(7)
+                            .capacityUsed(1),
+                    null,
+                    BooleanValueInjection.create()
+                            .isGroundForce(true)
+                            .isShip(true)
+                            .isPlanetOnly(false)
+                            .isSpaceOnly(false)
+                            .sustainDamage(true)
+                            .canBeDirectHit(true));
+        }
         return UnitValueInjection.empty();
     }
 

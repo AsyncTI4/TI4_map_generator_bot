@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -314,6 +315,10 @@ public class TacticalActionOutputService {
                 if (player.hasRelic("circletofthevoid")) {
                     output.append(" (Does not roll for rifts due to circlet of the void)");
                 }
+                if (game.playerHasLeaderUnlockedOrAlliance(player, "thronescommander")) {
+                    output.append(
+                            " (Gravity rift move effects are optional due to _Veythros_ the Thrones of Ruin commander. If you do ignore rift, you do not get the +1 to move.)");
+                }
                 game.setStoredValue("possiblyUsedRift", "yes");
             }
             if (player.hasTech("bedreamneg")) {
@@ -358,9 +363,9 @@ public class TacticalActionOutputService {
         if (tile.isNebula(game)
                 && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                 && !player.hasAbility("voidborn")
-                && !player.hasAbility("celestial_being")
                 && !player.hasTech("absol_amd")
-                && !player.getRelics().contains("circletofthevoid")) {
+                && !player.getRelics().contains("circletofthevoid")
+                && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)) {
             baseMoveValue = 1;
         }
         if (skipBonus) return baseMoveValue;

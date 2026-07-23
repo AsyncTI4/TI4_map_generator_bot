@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -179,9 +180,11 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.addAll(getNewPrismLoseTechOptions(player));
             }
             case "ponthous" -> {
-                player.refreshPlanet(planet);
-                output = player.getRepresentation()
-                        + " readied Ponthous with _Fractured Souls_. In async, readying the 3/3 planet is identical in effect.";
+                if (!"setup".equals(game.getPhaseOfGame())) {
+                    output = player.getRepresentation()
+                            + " please tell the bot wether you exhausted Ponthous for its Resources (+) or Influence (-):\nDo this **AFTER** your spend window is complete.";
+                    buttons.addAll(PonthousAbilityHandler.offerFracturedSouls(player));
+                }
             }
             case "echo" -> {
                 output =

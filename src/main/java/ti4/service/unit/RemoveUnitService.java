@@ -9,6 +9,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -199,6 +200,12 @@ public class RemoveUnitService {
         if (toRemoveCount > 0 && event != null) {
             MessageHelper.replyToMessage(event, "Did not find enough units to remove, " + toRemoveCount + " missing.");
         }
+
+        allUnitsRemoved.stream()
+                .filter(removedUnit -> removedUnit.unitKey().unitType() == UnitType.Aurelion)
+                .map(removedUnit -> removedUnit.getPlayer(game))
+                .distinct()
+                .forEach(player -> ThronesUnitHandler.syncAurelionStation(game, player));
 
         tile.getUnitHolders()
                 .values()
