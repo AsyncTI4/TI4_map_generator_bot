@@ -42,6 +42,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalor
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixUnitHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -2303,6 +2304,10 @@ public class CombatRollService {
                 .ifPresent(unit -> output.putIfAbsent(unit, 1));
         if (player.hasUnit("iron_flagship")) {
             IronUnitsHandler.getIronFlagshipAfbUnits(player, tile)
+                    .forEach((model, count) -> output.put(new ImmutablePair<>(model, spaceHolder), count));
+        }
+        if (player.hasUnit("vyserix_flagship")) {
+            VyserixUnitHandler.getVyserixFlagshipAfbUnits(player, tile)
                     .forEach((model, count) -> output.put(new ImmutablePair<>(model, spaceHolder), count));
         }
         Map<UnitModel, Integer> flatOutput = new HashMap<>();
