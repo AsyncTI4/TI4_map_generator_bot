@@ -121,6 +121,14 @@ public class TyrisAbilityHandler {
         ButtonHelper.deleteMessage(event);
     }
 
+    public static void offerCCForDestroyedReverb(Player player) {
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", use buttons to gain 1 command token for each Reverb destroyed, due to its unit ability.",
+                ButtonHelper.getGainCCButtons(player));
+    }
+
     public static void resolveTemporalDisplacementStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {

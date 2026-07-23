@@ -22,6 +22,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.game.Game;
@@ -264,6 +265,9 @@ public class DestroyUnitService {
                 }
                 if (player.hasUnit("veylor_mech")) {
                     VeylorUnitHandler.checkVeylorMech(game);
+                }
+                if (player.hasUnit("tyris_mech")) {
+                    TyrisAbilityHandler.offerCCForDestroyedReverb(player);
                 }
             }
             case Warsun -> {

@@ -53,6 +53,7 @@ public class Source {
         endlesst,
         theodisi,
         gamma,
+        black_spectrum,
 
         // async homebrew
         draft,
@@ -223,6 +224,7 @@ public class Source {
                 case voices_of_the_council -> "Voices of the Council [Homebrew]";
                 case theodisi -> "Lost Legacies [Homebrew]";
                 case gamma -> "Gamma Galaxies [Homebrew]";
+                case black_spectrum -> "Black Spectrum [Homebrew]";
                 default -> toString();
             };
         }
