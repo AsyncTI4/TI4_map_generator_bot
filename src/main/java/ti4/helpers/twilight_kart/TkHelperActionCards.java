@@ -41,6 +41,7 @@ import ti4.model.LeaderModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
+import ti4.service.VeiledHeartService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
@@ -136,9 +137,7 @@ public class TkHelperActionCards {
             genomes.forEach(player::addLeader);
 
         } else {
-            String veilKey = "veiledCards" + player.getFaction();
-            String veilCards = game.getStoredValue(veilKey) + String.join("_", genomes) + "_";
-            game.setStoredValue(veilKey, veilCards);
+            genomes.forEach(genome -> VeiledHeartService.addVeiledCard(player, genome));
         }
 
         for (String cardID : genomes) {
@@ -150,9 +149,7 @@ public class TkHelperActionCards {
                                 + Mapper.getLeader(cardID).getName(),
                         Mapper.getLeader(cardID).getRepresentationEmbed(true));
             } else {
-                String key = "veiledCards" + player.getFaction();
-                String veiledCards = game.getStoredValue(key);
-                game.setStoredValue(key, veiledCards + cardID + "_");
+                VeiledHeartService.addVeiledCard(player, cardID);
 
                 String msg = player.getRepresentationNoPing() + " has taken a secret card. They ";
                 msg += "may put it into play with a button in their `#cards-info` thread.";

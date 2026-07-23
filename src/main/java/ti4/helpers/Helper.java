@@ -46,6 +46,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamBut
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
@@ -180,9 +181,16 @@ public final class Helper {
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
         draftManager.init(game);
 
+        Set<String> purgedTileIds = new HashSet<>();
+        String storedPurgedTiles = game.getStoredValue(Constants.PURGED_MAP_TILES);
+        if (!storedPurgedTiles.isBlank()) {
+            Collections.addAll(purgedTileIds, storedPurgedTiles.split(","));
+        }
+
         List<MiltyDraftTile> allTiles = new ArrayList<>(draftManager.getAll())
                 .stream()
                         .filter(tile -> game.getTile(tile.getTile().getTileID()) == null)
+                        .filter(tile -> !purgedTileIds.contains(tile.getTile().getTileID()))
                         .toList();
         return new ArrayList<>(allTiles);
     }
@@ -2205,6 +2213,9 @@ public final class Helper {
                         .equals(game.getStoredValue(
                                 MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction()))) {
             productionValueTotal += 2;
+        }
+        if (ArcanumTechHandler.hasSigilOfTransmutation(game, player, tile)) {
+            productionValueTotal += 3;
         }
         return productionValueTotal;
     }

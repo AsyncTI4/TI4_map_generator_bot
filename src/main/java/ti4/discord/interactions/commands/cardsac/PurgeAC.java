@@ -4,6 +4,7 @@ import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -44,6 +45,7 @@ class PurgeAC extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such action card ID found, please retry.");
             return;
         }
+        OblivionUnitHandler.doOblivionMechCheck(game, player);
 
         String sb = "Player: " + player.getUserName() + " - " + "Purged Action Card:"
                 + "\n" + Mapper.getActionCard(acID).getRepresentation(game)

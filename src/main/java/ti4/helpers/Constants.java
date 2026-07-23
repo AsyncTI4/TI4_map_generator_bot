@@ -179,6 +179,7 @@ public final class Constants {
     public static final String UNDO_BUTTON = "undo_button";
     public static final String FAST_SC_FOLLOW = "fast_sc_follow";
     public static final String PURGED_FRAGMENTS = "purged_fragment";
+    public static final String PURGED_MAP_TILES = "purged_map_tiles";
     public static final String DOMINUS_ORB = "dominus_orb";
     public static final String COMPONENT_ACTION = "component_action";
     public static final String JUST_PLAYED_COMPONENT_AC = "just_played_component_ac";
