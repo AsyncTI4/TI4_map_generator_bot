@@ -426,8 +426,7 @@ class DeleteButtonsButtonHandler {
             if (player.hasReadyBreakthrough("myrrbt")
                     && myrrProductionContext.length == 2
                     && buttonID.equals(myrrProductionContext[0])) {
-                MyrrBreakthroughHandler.offerRemoteWorkforce(
-                        event, game, player, myrrProductionContext[1]);
+                MyrrBreakthroughHandler.offerRemoteWorkforce(event, game, player, myrrProductionContext[1]);
             }
             game.removeStoredValue(MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction());
             player.resetSpentThings();
