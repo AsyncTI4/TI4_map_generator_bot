@@ -387,6 +387,7 @@ public final class Constants {
     public static final String GENERATE_PAINBOX_MAP = "generate_painbox_map";
     public static final String IMPORT_MAP_JSON = "import_json";
     public static final String EXPORT_MAP_JSON = "export_json";
+    public static final String IMPORT_DECK_CONFIG = "import_deck_config";
     public static final String BLUE_TILES = "blue_tiles";
     public static final String RED_TILES = "red_tiles";
     public static final String HOME_SYSTEMS = "home_systems";

@@ -15,7 +15,8 @@ public class Special2Command implements ParentCommand {
                     new SearchWinningPath(),
                     new SetExpedition(),
                     new Galvanize(),
-                    new LoreCommand())
+                    new LoreCommand(),
+                    new ImportDeckConfig())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

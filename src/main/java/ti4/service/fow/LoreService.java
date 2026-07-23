@@ -1896,6 +1896,9 @@ public final class LoreService {
             LoreEffects.EffectResults results,
             String position,
             Set<MessageChannel> channels) {
+        // In FoW, ping the affected player exactly once — on the first change line they receive — rather
+        // than on every map/player change message.
+        boolean playerPinged = false;
         if (!results.mapChanges().isEmpty()) {
             if (game.isFowMode()) {
                 // Each map change pings the system it affected so all players with visibility are notified.
@@ -1912,7 +1915,11 @@ public final class LoreService {
                     boolean tellTriggeringPlayer =
                             desc.unitColor() == null || desc.unitColor().equalsIgnoreCase(player.getColor());
                     if (tellTriggeringPlayer && privateChannel != null) {
-                        MessageHelper.sendMessageToChannel(privateChannel, changeMsg);
+                        // pingSystem skips them (their color is in the message), so this private notice is
+                        // their heads-up that lore touched their board — ping only on the first one.
+                        String prefix = playerPinged ? "" : player.getRepresentationUnfogged() + " ";
+                        MessageHelper.sendMessageToChannel(privateChannel, prefix + changeMsg);
+                        playerPinged = true;
                     }
                     GMService.postToActivityThread(game, changeMsg);
                 }
@@ -1932,9 +1939,13 @@ public final class LoreService {
             String changeMsg = "**Player changes from lore:**\n" + String.join("\n", results.playerChanges());
             if (game.isFowMode()) {
                 // Sheet info is private in FoW: only the triggering player (private channel) and the GM
-                // (activity thread) see these.
+                // (activity thread) see these. Ping the player so they notice their stats changed.
                 MessageChannel privateChannel = player.getPrivateChannel();
-                if (privateChannel != null) MessageHelper.sendMessageToChannel(privateChannel, changeMsg);
+                if (privateChannel != null) {
+                    String prefix = playerPinged ? "" : player.getRepresentationUnfogged() + " ";
+                    MessageHelper.sendMessageToChannel(privateChannel, prefix + changeMsg);
+                    playerPinged = true;
+                }
                 GMService.postToActivityThread(game, changeMsg);
             } else {
                 for (MessageChannel channel : channels) {
