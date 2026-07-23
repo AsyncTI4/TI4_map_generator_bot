@@ -5,6 +5,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -104,6 +105,7 @@ class RelicButtonHandler {
         String relicId = "dominusorb";
         player.removeRelic(relicId);
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        OblivionUnitHandler.doOblivionMechCheck(game, player);
         player.removeExhaustedRelic(relicId);
         String relicName = Mapper.getRelic(relicId).getName();
         MessageHelper.sendMessageToChannel(
@@ -119,6 +121,7 @@ class RelicButtonHandler {
         String relicId = "eye_of_vogul";
         player.removeRelic(relicId);
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        OblivionUnitHandler.doOblivionMechCheck(game, player);
         player.removeExhaustedRelic(relicId);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), player.getRepresentationNoPing() + " has purged the _Eye of Vogul_.");

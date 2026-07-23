@@ -34,7 +34,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
@@ -2638,6 +2638,10 @@ public class CombatRollService {
             NetrunnersLeadersHandler.getCommanderSpaceCannonUnits(game, player, tile)
                     .forEach((model, count) ->
                             output.merge(new ImmutablePair<>(model, spaceHolder), count, Integer::sum));
+        }
+        UnitModel sigilCannon = ArcanumTechHandler.getSigilOfTransmutationSpaceCannon(game, player, tile);
+        if (sigilCannon != null) {
+            output.put(new ImmutablePair<>(sigilCannon, spaceHolder), 1);
         }
 
         Map<UnitModel, Integer> flatOutput = new HashMap<>();

@@ -19,7 +19,6 @@
     <jda.version>6.4.2</jda.version>
     <trove4j.version>3.0.3</trove4j.version>
     <aws.sdk.version>2.46.19</aws.sdk.version>
-    <hibernate-dialects.version>7.4.0.Final</hibernate-dialects.version>
     <reflections.version>0.10.2</reflections.version>
     <jskills.version>1.1</jskills.version>
     <webp-imageio.version>0.11.0</webp-imageio.version>
@@ -72,13 +71,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.xerial</groupId>
-      <artifactId>sqlite-jdbc</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate.orm</groupId>
-      <artifactId>hibernate-community-dialects</artifactId>
-      <version>${hibernate-dialects.version}</version>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
