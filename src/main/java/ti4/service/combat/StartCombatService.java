@@ -30,7 +30,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
@@ -1532,6 +1533,9 @@ public class StartCombatService {
         for (Player agentHolder : game.getRealPlayers()) {
             String factionChecker = "FFCC_" + agentHolder.getFaction() + "_";
 
+            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("thronesagent")) {
+                buttons.add(ThronesLeadersHandler.getThronesAgentButton(agentHolder));
+            }
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("titansagent")) {
                 buttons.add(Buttons.gray(
                         factionChecker + "exhaustAgent_titansagent",
@@ -1649,6 +1653,11 @@ public class StartCombatService {
                         "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                                 + "Yin Agent",
                         FactionEmojis.Yin));
+            }
+            if ((!game.isFowMode() || agentHolder == p1)
+                    && (isSpaceCombat || !game.isTwilightsFallMode())
+                    && agentHolder.hasUnexhaustedLeader("ponthousagent")) {
+                buttons.add(PonthousLeadersHandler.getPonthousAgentButton(agentHolder, tile));
             }
             if ((!game.isFowMode() || agentHolder == p1)
                     && ButtonHelper.doesPlayerHaveFSHere("mirveda_flagship", agentHolder, tile)

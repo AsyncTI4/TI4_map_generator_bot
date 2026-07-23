@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -91,6 +92,7 @@ public class CheckDistanceHelper {
                                     && player != null
                                     && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.getRelics().contains("circletofthevoid")
+                                    && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
                                     && !player.hasAbility("voidborn")
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !ButtonHelper.isLawInPlay(game, "shared_research"))
@@ -98,6 +100,7 @@ public class CheckDistanceHelper {
                                     && player != null
                                     && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.getRelics().contains("circletofthevoid")
+                                    && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !player.hasAbility("gashlai_physiology")
                                     && !player.hasTech("tf-mr"))
@@ -117,6 +120,7 @@ public class CheckDistanceHelper {
                                     && !player.hasTech("amd")
                                     && !player.hasTech("wavelength")
                                     && !player.getRelics().contains("circletofthevoid")
+                                    && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
                                     && !player.hasTech("absol_amd")
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2))) {
                         continue;

@@ -464,6 +464,12 @@ public final class RiftUnitsHelper {
                     player.getRepresentationNoPing()
                             + " is rifting some units. However, because of _Crucible_, they do not roll.");
         } else {
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "thronescommander")) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationNoPing()
+                                + " reminder that you have _Veythros_ the Thrones of Ruin commander, and may choose to ignore the effects of each anomaly. If you ignored the move bonus, you do not need to roll for rifting.");
+            }
             MessageHelper.sendMessageToChannelWithButtons(
                     channel,
                     player.getRepresentationNoPing()

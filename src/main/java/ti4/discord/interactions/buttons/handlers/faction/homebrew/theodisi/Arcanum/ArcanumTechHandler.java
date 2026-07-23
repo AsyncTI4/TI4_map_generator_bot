@@ -17,6 +17,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -195,6 +196,9 @@ public class ArcanumTechHandler {
 
         int matchingTechs = 0;
         for (String tech : player.getTechs()) {
+            if (PRIMORDIAL_TECHS.contains(tech)) {
+                continue;
+            }
             TechnologyModel techModel = Mapper.getTech(tech);
             if (techModel != null && techModel.getTypes().contains(primordialType)) {
                 matchingTechs++;
@@ -314,6 +318,7 @@ public class ArcanumTechHandler {
                 || !hasFourTechsMatchingPrimordial(player)) {
             return;
         }
+        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
@@ -411,24 +416,30 @@ public class ArcanumTechHandler {
         if (planetButtons.isEmpty()) {
             game.removeStoredValue(INFANTRY_PLACED + player.getFaction() + "_" + round);
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), player.getRepresentation() + " has no eligible planet for the infantry.");
+                    event.getMessageChannel(),
+                    player.getRepresentation() + " has no eligible planet for the infantry.");
             return;
         }
 
-        String message = player.getRepresentation()
-                + ", choose planets to place up to 4 infantry with _Power Word: Miracle_.";
+        String message =
+                player.getRepresentation() + ", choose planets to place up to 4 infantry with _Power Word: Miracle_.";
         String buttonPrefix = player.factionButtonChecker() + PLACE_INFANTRY + round + "_";
-        Button done = Buttons.red(
-                player.factionButtonChecker() + FINISH_INFANTRY + round, "Done Placing Infantry");
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                message,
-                NewStuffHelper.buttonPagination(planetButtons, List.of(done), buttonPrefix, 25, 0, false));
+        Button done = Buttons.red(player.factionButtonChecker() + FINISH_INFANTRY + round, "Done Placing Infantry");
+        List<Button> displayedButtons = planetButtons.size() < 25
+                ? new ArrayList<>(planetButtons)
+                : NewStuffHelper.buttonPagination(planetButtons, List.of(done), buttonPrefix, 25, 0, false);
+        if (planetButtons.size() < 25) {
+            displayedButtons.add(done);
+        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, displayedButtons);
     }
 
     @ButtonHandler(PLACE_INFANTRY)
     public static void placeMiracleInfantry(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (game == null || player == null || !player.hasTech(MIRACLE) || !player.getExhaustedTechs().contains(MIRACLE)) {
+        if (game == null
+                || player == null
+                || !player.hasTech(MIRACLE)
+                || !player.getExhaustedTechs().contains(MIRACLE)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -456,11 +467,10 @@ public class ArcanumTechHandler {
         }
 
         List<Button> planetButtons = getMiracleInfantryButtons(game, player, round);
-        String message = player.getRepresentation()
-                + ", choose planets to place up to 4 infantry with _Power Word: Miracle_.";
+        String message =
+                player.getRepresentation() + ", choose planets to place up to 4 infantry with _Power Word: Miracle_.";
         String buttonPrefix = player.factionButtonChecker() + PLACE_INFANTRY + round + "_";
-        Button done = Buttons.red(
-                player.factionButtonChecker() + FINISH_INFANTRY + round, "Done Placing Infantry");
+        Button done = Buttons.red(player.factionButtonChecker() + FINISH_INFANTRY + round, "Done Placing Infantry");
         String planetName = placementData.substring(separator + 1);
         if (planetName.startsWith("page")) {
             try {
@@ -487,7 +497,8 @@ public class ArcanumTechHandler {
         if (placed >= 4) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    player.getRepresentation() + " has already placed all 4 infantry. Press **Done Placing Infantry** when finished.");
+                    player.getRepresentation()
+                            + " has already placed all 4 infantry. Press **Done Placing Infantry** when finished.");
             return;
         }
         if (planet == null
@@ -498,7 +509,8 @@ public class ArcanumTechHandler {
             return;
         }
 
-        AddUnitService.addUnits(event, game.getTileFromPlanet(planetName), game, player.getColor(), "1 gf " + planetName);
+        AddUnitService.addUnits(
+                event, game.getTileFromPlanet(planetName), game, player.getColor(), "1 gf " + planetName);
         game.setStoredValue(stateKey, String.valueOf(placed + 1));
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
