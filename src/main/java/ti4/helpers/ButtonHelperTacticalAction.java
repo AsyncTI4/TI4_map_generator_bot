@@ -20,6 +20,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
@@ -146,6 +147,12 @@ public final class ButtonHelperTacticalAction {
                         player.getRepresentation()
                                 + ", you have _Surveyor's Lens_ and as such may exhaust it to explore a planet in the active system:",
                         KairnTechHandler.getSurveyorsLensButton(player));
+            }
+            if (player.hasTechReady("ththronesb")) {
+                MessageHelper.sendMessageToChannelWithButton(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + ", you have _Specter Step_ and may resolve it now:",
+                        ThronesTechHandler.getSpecterStepButton(player));
             }
             if (player.hasAbility("colony_outposts")
                     && player.getStrategicCC() > 0

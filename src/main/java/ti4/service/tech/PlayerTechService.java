@@ -618,6 +618,10 @@ public class PlayerTechService {
             case "betaro" -> { // Resource Optimization
                 TaFactionTechHandler.resolveResOp(event, game, player);
             }
+            case "tharcanumpmg" -> { // Power Word: Miracle
+                ArcanumTechHandler.resolvePowerWordMiracle(event, game, player);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
             default ->
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(), "> This technology is not automated. Please resolve manually.");
