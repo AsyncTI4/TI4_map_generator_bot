@@ -206,7 +206,15 @@
         "canal": "community",
         "subcanal": "lil homebrew",
         "credits": "Gamma Galaxies",
-        "description": "New Factions",
+        "description": "Reimagining of existing actions",
+        "data": []
+    },
+    {
+        "source": "black_spectrum",
+        "name": "Black Spectrum",
+        "canal": "community",
+        "subcanal": "lil homebrew",
+        "credits": "Black Spectrum",
         "data": []
     },
     {

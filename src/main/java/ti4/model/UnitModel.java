@@ -100,7 +100,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
                                 "TECH_SPECIALTY",
                                 "LEGENDARY",
                                 "MECATOL_REX",
-                                "EMPTY_NONANOMALY"))
+                                "EMPTY_NONANOMALY",
+                                "EMPTY"))
                         .containsAll(getEligiblePlanetTypes());
     }
 
