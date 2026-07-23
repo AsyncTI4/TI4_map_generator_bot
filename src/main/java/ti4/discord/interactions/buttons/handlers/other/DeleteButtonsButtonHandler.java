@@ -184,6 +184,11 @@ class DeleteButtonsButtonHandler {
                         "currentActionSummary" + player.getFaction(),
                         game.getStoredValue("currentActionSummary" + player.getFaction()) + " Produced units in "
                                 + tile.getRepresentationForButtons() + ".");
+                if (player.hasReadyBreakthrough("myrrbt")
+                        && MyrrBreakthroughHandler.usedUnitProduction(buttonID)
+                        && Helper.getProductionValue(player, game, tile, false) > 0) {
+                    game.setStoredValue(MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction(), buttonID);
+                }
             }
             if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)
                     && player.hasAbility("amalgamation")
@@ -417,10 +422,13 @@ class DeleteButtonsButtonHandler {
                 ButtonHelperFactionSpecific.offerASNButtonsStep1(game, player, buttonID);
             }
             if (player.hasReadyBreakthrough("myrrbt")
+                    && buttonID.equalsIgnoreCase(
+                            game.getStoredValue(MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction()))
                     && !game.getStoredValue("producedUnitCostFor" + player.getFaction())
                             .isEmpty()) {
                 MyrrBreakthroughHandler.offerRemoteWorkforce(event, game, player);
             }
+            game.removeStoredValue(MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction());
             player.resetSpentThings();
             game.removeStoredValue("producedUnitCostFor" + player.getFaction());
             if (player.hasAbility("control_network")) {

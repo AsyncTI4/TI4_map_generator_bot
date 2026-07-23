@@ -21,6 +21,21 @@ public class MyrrBreakthroughHandler {
 
     private static final String BT = "myrrbt";
     public static final String REMOTE_WORKFORCE_KEY = "myrrBtRemoteWorkforce";
+    public static final String PRODUCTION_USED_KEY = "myrrBtProductionUsed";
+
+    public static boolean usedUnitProduction(String productionContext) {
+        return switch (productionContext) {
+            case "tacticalAction",
+                    "warfare",
+                    "construction",
+                    "ministerBuild",
+                    "anarchy7Build",
+                    "lumi7Build",
+                    "obsessivedesigns",
+                    "celdauriHero" -> true;
+            default -> false;
+        };
+    }
 
     public static void offerRemoteWorkforce(ButtonInteractionEvent event, Game game, Player player) {
         if (!player.hasUnlockedBreakthrough(BT)
