@@ -184,10 +184,9 @@ class DeleteButtonsButtonHandler {
                         "currentActionSummary" + player.getFaction(),
                         game.getStoredValue("currentActionSummary" + player.getFaction()) + " Produced units in "
                                 + tile.getRepresentationForButtons() + ".");
-                if (player.hasReadyBreakthrough("myrrbt")
-                        && MyrrBreakthroughHandler.usedUnitProduction(buttonID)
-                        && Helper.getProductionValue(player, game, tile, false) > 0) {
-                    game.setStoredValue(MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction(), buttonID);
+                if (MyrrBreakthroughHandler.usedUnitProduction(buttonID)) {
+                    game.setStoredValue(
+                            MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction(), buttonID + "|" + pos);
                 }
             }
             if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)
@@ -421,12 +420,14 @@ class DeleteButtonsButtonHandler {
                             || buttonID.contains("ministerBuild"))) {
                 ButtonHelperFactionSpecific.offerASNButtonsStep1(game, player, buttonID);
             }
+            String myrrProduction =
+                    game.getStoredValue(MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction());
+            String[] myrrProductionContext = myrrProduction.split("\\|", 2);
             if (player.hasReadyBreakthrough("myrrbt")
-                    && buttonID.equalsIgnoreCase(
-                            game.getStoredValue(MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction()))
-                    && !game.getStoredValue("producedUnitCostFor" + player.getFaction())
-                            .isEmpty()) {
-                MyrrBreakthroughHandler.offerRemoteWorkforce(event, game, player);
+                    && myrrProductionContext.length == 2
+                    && buttonID.equals(myrrProductionContext[0])) {
+                MyrrBreakthroughHandler.offerRemoteWorkforce(
+                        event, game, player, myrrProductionContext[1]);
             }
             game.removeStoredValue(MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction());
             player.resetSpentThings();
