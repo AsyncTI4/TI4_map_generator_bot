@@ -37,7 +37,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
@@ -1949,6 +1949,13 @@ public class CombatRollService {
             totalHits++;
             result += "\n" + player.getFactionEmoji()
                     + " produced 1 additional hit from _Zythrix_ the Xytheris Commander.";
+        }
+        if (totalHits > 0
+                && rollType != CombatRollType.combatround
+                && opponent != player
+                && player.hasPlayablePromissoryInHand("thpnxytheris")
+                && !player.getPromissoryNotesInPlayArea().contains("thpnxytheris")) {
+            XytherisPromissoryHandler.offerXytherisPnButton(game, player, totalHits);
         }
         result += CombatMessageHelper.displayHitResults(totalHits, useDoubleBoomEmoji);
 

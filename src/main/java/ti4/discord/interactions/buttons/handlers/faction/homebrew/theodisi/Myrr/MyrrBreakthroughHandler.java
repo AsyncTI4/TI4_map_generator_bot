@@ -1,7 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -21,28 +20,37 @@ public class MyrrBreakthroughHandler {
 
     private static final String BT = "myrrbt";
     public static final String REMOTE_WORKFORCE_KEY = "myrrBtRemoteWorkforce";
+    public static final String PRODUCTION_USED_KEY = "myrrBtProductionUsed";
 
-    public static void offerRemoteWorkforce(ButtonInteractionEvent event, Game game, Player player) {
-        if (!player.hasUnlockedBreakthrough(BT)
-                || player.isBreakthroughExhausted(BT)
-                || player.getCurrentProducedUnits().isEmpty()) {
+    public static boolean usedUnitProduction(String productionContext) {
+        return switch (productionContext) {
+            case "tacticalAction",
+                    "warfare",
+                    "construction",
+                    "ministerBuild",
+                    "anarchy7Build",
+                    "lumi7Build",
+                    "obsessivedesigns",
+                    "celdauriHero" -> true;
+            default -> false;
+        };
+    }
+
+    public static void offerRemoteWorkforce(
+            ButtonInteractionEvent event, Game game, Player player, String sourcePosition) {
+        if (!player.hasReadyBreakthrough(BT)) {
             return;
         }
 
-        Set<String> producedInSystems = new HashSet<>();
-        for (String producedUnit : player.getCurrentProducedUnits().keySet()) {
-            producedInSystems.add(producedUnit.split("_")[1]);
-        }
-
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (producedInSystems.contains(tile.getPosition())
-                    || Helper.getProductionValue(player, game, tile, false) < 1) {
+        Set<Tile> tiles = ButtonHelper.getTilesOfUnitsWithProduction(player, game);
+        for (Tile tile : tiles) {
+            if (sourcePosition.equals(tile.getPosition())) {
                 continue;
             }
 
             buttons.add(Buttons.green(
-                    player.factionButtonChecker() + "myrrBtProduce_" + tile.getPosition(),
+                    player.factionButtonChecker() + "myrrBtProduce_" + sourcePosition + "_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));
         }
 
@@ -52,7 +60,7 @@ public class MyrrBreakthroughHandler {
 
         buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
+                player.getCardsInfoThread(),
                 player.getRepresentation()
                         + ", you may exhaust _Remote Workforce_ to resolve PRODUCTION in another system.",
                 buttons);
@@ -60,19 +68,16 @@ public class MyrrBreakthroughHandler {
 
     @ButtonHandler("myrrBtProduce_")
     public static void resolveRemoteWorkforce(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String position = buttonID.replace("myrrBtProduce_", "");
+        String[] positions = buttonID.replace("myrrBtProduce_", "").split("_", 2);
+        String sourcePosition = positions[0];
+        String position = positions.length > 1 ? positions[1] : "";
         Tile tile = game.getTileByPosition(position);
-
-        Set<String> producedInSystems = new HashSet<>();
-        for (String producedUnit : player.getCurrentProducedUnits().keySet()) {
-            producedInSystems.add(producedUnit.split("_")[1]);
-        }
 
         if (!player.hasUnlockedBreakthrough(BT)
                 || player.isBreakthroughExhausted(BT)
                 || tile == null
-                || producedInSystems.contains(position)
-                || Helper.getProductionValue(player, game, tile, false) < 1) {
+                || sourcePosition.equals(position)
+                || !ButtonHelper.getTilesOfUnitsWithProduction(player, game).contains(tile)) {
             ButtonHelper.deleteMessage(event);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

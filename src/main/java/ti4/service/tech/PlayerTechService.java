@@ -20,6 +20,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
@@ -747,6 +748,9 @@ public class PlayerTechService {
         GameEventService.commit(
                 game, GameEventType.TECH_RESEARCHED, player, Map.of("techId", techID, "paymentType", paymentType));
         if (techM.isUnitUpgrade()) {
+            if (isResearch) {
+                KryxosAbilityHandler.offerBattleTestedDesigns(event, game, player, techM);
+            }
             AshenLeadersHandler.offerCommanderPlacementButtons(event, game, player, techM);
             if (player.hasUnexhaustedLeader("mirvedaagent") && player.getStrategicCC() > 0) {
                 List<Button> buttons = new ArrayList<>();
