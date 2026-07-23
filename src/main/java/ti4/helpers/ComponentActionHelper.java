@@ -84,6 +84,9 @@ public class ComponentActionHelper {
                 if ("thobliviong".equalsIgnoreCase(tech) && !OblivionTechHandler.canUseMirroredMemories(game, p1)) {
                     continue;
                 }
+                if ("tharcanumpmg".equalsIgnoreCase(tech) && !ArcanumTechHandler.hasFourTechsMatchingPrimordial(p1)) {
+                    continue;
+                }
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
                     continue;
                 }
