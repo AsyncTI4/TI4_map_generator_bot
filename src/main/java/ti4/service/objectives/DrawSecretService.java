@@ -82,6 +82,12 @@ public class DrawSecretService {
                             player.getRepresentation()
                                     + " due to **Plausible Deniability**, you were dealt an extra secret objective. Thus, you must also discard an extra secret objective.");
                 }
+                if (player.hasAbility("multitasking")) {
+                    LunariumAbilityHandler.offerFactionSheetCCButtons(game, player);
+                }
+                if (player.hasUnlockedBreakthrough("lunariumbt")) {
+                    LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, player);
+                }
                 SecretObjectiveInfoService.sendSecretObjectiveInfoWithHeaderText(
                         game,
                         player,
