@@ -5,6 +5,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.service.abilities.MahactTokenService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
@@ -16,7 +17,7 @@ class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
     @Override
     void action(List<String> colors, Game game, Player player) {
         for (String color : colors) {
-            player.addMahactCC(color);
+            MahactTokenService.addMahactToken(game, player, color);
             Helper.isCCCountCorrect(game, color);
         }
         CommanderUnlockCheckService.checkPlayer(player, "mahact");
