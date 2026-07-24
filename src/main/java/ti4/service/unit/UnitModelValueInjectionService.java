@@ -63,6 +63,15 @@ public class UnitModelValueInjectionService {
         return injectedUnit;
     }
 
+    /**
+     * Applies a combat- or action-local value injection to a copied unit model.
+     *
+     * <p>The caller is responsible for storing and clearing the condition that makes this temporary injection apply.
+     */
+    public UnitModel injectTemporaryValues(UnitModel unit, UnitValueInjection values) {
+        return injectValues(unit, values);
+    }
+
     public UnitModel injectValues(UnitModel unit, IntegerValueInjection values) {
         Objects.requireNonNull(unit);
         Objects.requireNonNull(values);

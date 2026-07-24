@@ -641,7 +641,8 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "At the start of combat in this unit's system, you may damage this unit to give up to 2 fighters in this system SUSTAIN DAMAGE until the end of that combat."
+    "ability": "At the start of combat in this unit's system, you may damage this unit to give up to 2 fighters in this system SUSTAIN DAMAGE until the end of that combat.",
+    "notes": "There is no way to show which fighters are sustained, you will have to keep track. However, the manual assign and auto-assign don't offer fighter sustains past when 2 fighters are sustained."
   },
   {
     "id": "ponthous_mech",
