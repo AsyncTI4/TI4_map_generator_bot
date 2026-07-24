@@ -247,6 +247,14 @@ public class VeiledHeartService {
                 "lawsHeroStep3_" + targetPlayer.getFaction() + "_%s");
     }
 
+    public static List<Button> getVeiledStealButtonsForPoisonHero(Player activePlayer, Player targetPlayer) {
+        return getButtonsForChoosingForeignVeiledCard(
+                VeiledCardType.ABILITY,
+                activePlayer,
+                targetPlayer,
+                "poisonHeroStep3_" + targetPlayer.getFaction() + "_%s");
+    }
+
     public static List<Button> getVeiledGiveButtonsForCoerce(Player sender, Player recipient) {
         return getVeiledCards(VeiledCardType.ABILITY, sender)
                 .map(veiledAbility -> Buttons.red(
@@ -499,7 +507,7 @@ public class VeiledHeartService {
         addVeiledCard(recipient, ability);
 
         String msgPublic = String.format(
-                "%s has _Coerced_ %s into giving them %s.\n",
+                "%s made %s give them %s.\n",
                 recipient.getRepresentation(),
                 sender.getRepresentation(),
                 givingVeiled ? "a veiled ability" : ("the ability _'" + getRepresentation(type, ability) + "'_"));
@@ -511,10 +519,10 @@ public class VeiledHeartService {
                     "Because receiving abilities counts as gaining them, the ability has been turned face-down as if it had just been drawn. It may be put into play with a button in the `#cards-info` thread.";
         }
         String msgForSender = String.format(
-                "You were _Coerced_ by %s into giving them the _'%s'_ ability.",
-                recipient.getRepresentationNoPing(), getRepresentation(type, ability));
+                "You were made to give the _'%s'_ ability to %s.",
+                getRepresentation(type, ability), recipient.getRepresentationNoPing());
         String msgForRecipient = String.format(
-                "You _Coerced_ %s into giving you the _'%s'_ ability:",
+                "You made %s give you the _'%s'_ ability:",
                 sender.getRepresentationNoPing(), getRepresentation(type, ability));
 
         MessageHelper.sendMessageToChannel(sender.getCorrectChannel(), msgPublic);

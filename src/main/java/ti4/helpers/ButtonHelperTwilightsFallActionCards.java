@@ -444,6 +444,9 @@ public final class ButtonHelperTwilightsFallActionCards {
             }
             buttons.add(Buttons.gray("poisonHeroStep3_" + p2.getFaction() + "_" + ability, tech.getName()));
         }
+        if (game.isVeiledHeartMode()) {
+            buttons.addAll(VeiledHeartService.getVeiledStealButtonsForPoisonHero(player, p2));
+        }
         String msg = player.getRepresentation() + ", please choose the ability you wish to try to steal.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
@@ -461,8 +464,9 @@ public final class ButtonHelperTwilightsFallActionCards {
         buttons.add(
                 Buttons.gray(p2.factionButtonChecker() + "poisonHeroStep4_" + player.getFaction(), "Give 2 Abilities"));
         String msg = p2.getRepresentation()
-                + ", you have been hit with _Poison of the Nefishh_, and now much choose to either give them the ability they named, or give them 2 of the abilities of you choice.";
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg, buttons);
+                + ", you have been hit with _Poison of the Nefishh_, and must now choose to either give them the ability they named, or give them 2 other abilities of your choice.";
+        MessageHelper.sendMessageToChannel(
+                game.isVeiledHeartMode() ? p2.getCardsInfoThread() : p2.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
 
