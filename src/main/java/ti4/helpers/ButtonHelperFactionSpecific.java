@@ -2140,8 +2140,7 @@ public final class ButtonHelperFactionSpecific {
         return false;
     }
 
-    private static void releaseAllUnits(
-            Player cabal, Game game, Player blockader, GenericInteractionCreateEvent event) {
+    public static void releaseAllUnits(Player cabal, Game game, Player blockader, GenericInteractionCreateEvent event) {
         for (UnitHolder unitHolder : cabal.getNomboxTile().getUnitHolders().values()) {
             Map<UnitKey, Integer> units = unitHolder.getUnits();
             List<UnitKey> unitKeys = new ArrayList<>(units.keySet());
@@ -2155,7 +2154,7 @@ public final class ButtonHelperFactionSpecific {
                             cabal.getCorrectChannel(),
                             cabal.getRepresentationUnfogged() + " released " + amount + " "
                                     + blockader.getFactionEmojiOrColor() + " " + unit
-                                    + " from prison due to a blockade.");
+                                    + " from prison.");
                     if (cabal != blockader) {
                         MessageHelper.sendMessageToChannel(
                                 blockader.getCorrectChannel(),

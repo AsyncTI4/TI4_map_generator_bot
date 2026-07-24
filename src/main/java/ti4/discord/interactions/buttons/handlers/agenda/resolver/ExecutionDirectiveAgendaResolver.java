@@ -30,6 +30,15 @@ public class ExecutionDirectiveAgendaResolver implements AgendaResolver {
                 }
             }
         }
+        if (game.getStoredValue("executiveOrder").equalsIgnoreCase(player2.getFaction())) {
+            for (Player p4 : Helper.getSpeakerOrFullPriorityOrderFromPlayer(player2, game)) {
+                if (p4 != player2) {
+                    game.setStoredValue("executiveOrder", p4.getFaction());
+                    message += " Also passed the Speaker token to " + p4.getRepresentation() + ".";
+                    break;
+                }
+            }
+        }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
     }
 }
