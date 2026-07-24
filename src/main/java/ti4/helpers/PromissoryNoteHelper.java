@@ -706,7 +706,6 @@ public class PromissoryNoteHelper {
                             + ", you may use these buttons to perform the secondary ability of the strategy card you played _Pact Renewed_ for.\n**REMINDER**: You do not spend a command token when doing this.",
                     ButtonHelperHeroes.getSecondaryButtons(game));
         }
-
         // These PNs' text contains "action:" but describe a trigger on another player's action
         List<String> actionTextPNsNotOwnAction = List.of("acq", "bapnconc");
         if (pn.getText().toLowerCase().contains("action:") && !actionTextPNsNotOwnAction.contains(id)) {

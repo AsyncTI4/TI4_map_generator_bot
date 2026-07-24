@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -19,6 +20,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.combat.CombatRollService;
+import ti4.service.combat.CombatRollType;
 import ti4.service.leader.ExhaustLeaderService;
 
 @UtilityClass
@@ -29,7 +32,12 @@ public class XytherisLeadersHandler {
     private static final String AGENT_ID = "xytherisagent";
     private static final String USE_MYRIX_AGENT = "useMyrixAgent";
     private static final String MYRIX_SHIP = "myrixAgentShip_";
+    private static final String HERO_ID = "xytherishero";
+    private static final String HERO_ROLL_KEY = "xytherisHeroRoll_";
+    private static final String USE_HERO_ROLL = "useXytherisHeroRoll_";
+    private static final String DECLINE_HERO_ROLL = "declineXytherisHeroRoll_";
 
+    // Agent
     public void offerMyrixAgentButtons(Game game, Player activPlayer, Tile activeTile) {
         game.setStoredValue(MYRIX_AGENT_WINDOW, activPlayer.getFaction());
 
@@ -173,6 +181,117 @@ public class XytherisLeadersHandler {
         }
     }
 
+    // Hero
+    public static boolean offerHeroUnitAbilityRoll(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player player,
+            Tile tile,
+            UnitHolder holder,
+            CombatRollType rollType) {
+        if (!hasActiveHero(player) || !isUnitAbilityRoll(rollType)) {
+            return false;
+        }
+
+        String context = getHeroRollContext(tile, holder, rollType);
+        String key = HERO_ROLL_KEY + player.getFaction();
+        String currentRoll = game.getStoredValue(key);
+        if (("apply|" + context).equals(currentRoll) || ("decline|" + context).equals(currentRoll)) {
+            return false;
+        }
+        if ("used".equals(currentRoll)) {
+            return false;
+        }
+        if (currentRoll.startsWith("pending|")) {
+            return true;
+        }
+
+        game.setStoredValue(key, "pending|" + context);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged()
+                        + ", you may use _Call of the Queen - The Endless Swarm_ to apply +4 to this "
+                        + rollType
+                        + " roll.",
+                List.of(
+                        Buttons.green(
+                                player.factionButtonChecker() + USE_HERO_ROLL + context,
+                                "Apply +4 with Call of the Queen"),
+                        Buttons.red(player.factionButtonChecker() + DECLINE_HERO_ROLL + context, "Roll Without +4")));
+        return true;
+    }
+
+    public static boolean hasHeroUnitAbilityRollBonus(
+            Game game, Player player, Tile tile, UnitHolder holder, CombatRollType rollType) {
+        return ("apply|" + getHeroRollContext(tile, holder, rollType))
+                .equals(game.getStoredValue(HERO_ROLL_KEY + player.getFaction()));
+    }
+
+    @ButtonHandler(USE_HERO_ROLL)
+    public static void useHeroUnitAbilityRoll(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        resolveHeroUnitAbilityRoll(event, game, player, buttonID, true);
+    }
+
+    @ButtonHandler(DECLINE_HERO_ROLL)
+    public static void declineHeroUnitAbilityRoll(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        resolveHeroUnitAbilityRoll(event, game, player, buttonID, false);
+    }
+
+    public static void clearHeroUnitAbilityRoll(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            game.removeStoredValue(HERO_ROLL_KEY + player.getFaction());
+        }
+    }
+
+    private static void resolveHeroUnitAbilityRoll(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID, boolean applyBonus) {
+        String prefix = applyBonus ? USE_HERO_ROLL : DECLINE_HERO_ROLL;
+        String[] values = buttonID.substring(prefix.length()).split(";", 3);
+        Tile tile = values.length == 3 ? game.getTileByPosition(values[0]) : null;
+        UnitHolder holder = tile == null ? null : tile.getUnitHolders().get(values[1]);
+        CombatRollType rollType;
+        try {
+            rollType = values.length == 3 ? CombatRollType.valueOf(values[2]) : null;
+        } catch (IllegalArgumentException e) {
+            rollType = null;
+        }
+
+        String context = rollType == null || holder == null ? "" : getHeroRollContext(tile, holder, rollType);
+        String key = HERO_ROLL_KEY + player.getFaction();
+        if (!hasActiveHero(player)
+                || !isUnitAbilityRoll(rollType)
+                || !("pending|" + context).equals(game.getStoredValue(key))) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        game.setStoredValue(key, (applyBonus ? "apply|" : "decline|") + context);
+        CombatRollService.secondHalfOfCombatRoll(player, game, event, tile, holder.getName(), rollType, false);
+        if (applyBonus) {
+            game.setStoredValue(key, "used");
+        } else {
+            game.removeStoredValue(key);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static boolean hasActiveHero(Player player) {
+        return player.getLeader(HERO_ID).map(Leader::isActive).orElse(false);
+    }
+
+    private static boolean isUnitAbilityRoll(CombatRollType rollType) {
+        return rollType == CombatRollType.SpaceCannonOffence
+                || rollType == CombatRollType.SpaceCannonDefence
+                || rollType == CombatRollType.AFB
+                || rollType == CombatRollType.bombardment;
+    }
+
+    private static String getHeroRollContext(Tile tile, UnitHolder holder, CombatRollType rollType) {
+        return tile.getPosition() + ";" + holder.getName() + ";" + rollType.name();
+    }
+
+    // Shared Xytheris Ability roll counter
     private static int getUnitAbilityCount(UnitModel unit) {
         return (unit.getSpaceCannonDieCount() > 0 ? 1 : 0)
                 + (unit.getBombardDieCount() > 0 ? 1 : 0)

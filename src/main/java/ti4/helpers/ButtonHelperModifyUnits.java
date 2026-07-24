@@ -23,6 +23,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -579,7 +580,9 @@ public final class ButtonHelperModifyUnits {
             msg = new StringBuilder("The hit" + (hits == 1 ? "" : "s") + " would be assigned in the following way:\n");
         }
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
-        int numSustains = getNumberOfSustainableUnits(player, game, unitHolder, true, spaceCannonOffence);
+        int oldGloryFighterSustains = PonthousUnitHandler.getTemporaryFighterSustainRemaining(game, player, tile);
+        int numSustains = getNumberOfSustainableUnits(player, game, unitHolder, true, spaceCannonOffence)
+                + oldGloryFighterSustains;
         boolean noMechPowers = ButtonHelper.isLawInPlay(game, "articles_war");
         boolean opponentCanDirectHit = true;
         if (!spaceCannonOffence) {
@@ -665,8 +668,10 @@ public final class ButtonHelperModifyUnits {
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
 
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                boolean oldGloryFighter = unitKey.unitType() == UnitType.Fighter && oldGloryFighterSustains > 0;
                 if (unitModel == null
                         || (!unitModel.getSustainDamage()
+                                && !oldGloryFighter
                                 && (metailUsed || unitModel.getUnitType() == UnitType.Fighter))
                         || ((!unitModel.getIsShip()
                                         && !(ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)
@@ -688,7 +693,9 @@ public final class ButtonHelperModifyUnits {
                         ? unitHolder.getUnitDamage().getOrDefault(unitKey, 0)
                         : 0;
                 int totalUnits = unitEntry.getValue() - damagedUnits;
-                if (!unitModel.getSustainDamage() && !metailUsed && totalUnits > 0) {
+                if (oldGloryFighter) {
+                    totalUnits = Math.min(totalUnits, oldGloryFighterSustains);
+                } else if (!unitModel.getSustainDamage() && !metailUsed && totalUnits > 0) {
                     totalUnits = 1;
                     metailUsed = true;
                 }
@@ -713,6 +720,10 @@ public final class ButtonHelperModifyUnits {
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                         tile.addUnitDamage("space", unitKey, min);
+                        if (oldGloryFighter) {
+                            PonthousUnitHandler.consumeTemporaryFighterSustain(game, player, tile, min);
+                            oldGloryFighterSustains -= min;
+                        }
                         for (int x = 0; x < min; x++) {
                             ButtonHelperCommanders.resolveLetnevCommanderCheck(player, game, event);
                         }

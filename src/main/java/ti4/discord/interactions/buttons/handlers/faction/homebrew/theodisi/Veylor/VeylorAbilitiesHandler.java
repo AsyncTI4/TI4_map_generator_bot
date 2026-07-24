@@ -1,6 +1,7 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
@@ -162,6 +163,36 @@ public class VeylorAbilitiesHandler {
             return true;
         }
         return false;
+    }
+
+    public static void returnUnassignedTightSchedulingAgendas(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            String key = TIGHT_SCHEDULING_AGENDAS + player.getFaction();
+            String storedAgendas = game.getStoredValue(key);
+            if (!player.hasAbility(TIGHT_SCHEDULING) || storedAgendas.isEmpty()) {
+                continue;
+            }
+
+            List<String> agendaIds = new ArrayList<>(List.of(storedAgendas.split(",")));
+            Collections.shuffle(agendaIds);
+            List<String> agendasNotReturned = new ArrayList<>();
+            for (String agendaId : agendaIds) {
+                Integer uniqueId = game.getSentAgendas().get(agendaId);
+                if (uniqueId == null || !game.putAgendaBottom(uniqueId)) {
+                    agendasNotReturned.add(agendaId);
+                }
+            }
+
+            if (agendasNotReturned.isEmpty()) {
+                game.removeStoredValue(key);
+                MessageHelper.sendMessageToChannel(
+                        player.getCardsInfoThread(),
+                        player.getRepresentation()
+                                + ", so as not to disrupt the next Agenda Phase, the remaining unassigned agendas you drew with _Tight Scheduling_ have been placed on the bottom of the agenda deck in a random order.");
+            } else {
+                game.setStoredValue(key, String.join(",", agendasNotReturned));
+            }
+        }
     }
 
     @ButtonHandler(TIGHT_SCHEDULING_BOTTOM)
