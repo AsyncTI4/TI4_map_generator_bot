@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.components.separator.Separator;
 import net.dv8tion.jda.api.components.separator.Separator.Spacing;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
@@ -1446,7 +1447,7 @@ public final class ButtonHelperTwilightsFall {
             type = buttonID.split("_")[1];
         }
         List<Button> buttons = new ArrayList<>();
-        List<String> cards = getDeckForSplicing(game, type, 100);
+        List<String> cards = getDeckForSplicing(game, type, 100, false);
         for (String card : cards) {
             buttons.add(Buttons.green(
                     "drawSingularNewSpliceCard_" + type + "_" + card,
@@ -1457,8 +1458,15 @@ public final class ButtonHelperTwilightsFall {
                                             ? Mapper.getLeader(card).getName()
                                             : Mapper.getUnit(card).getName())));
         }
+        MessageChannel channel = player.getCorrectChannel();
+        if (game.isVeiledHeartMode()) {
+            String msg = String.format(
+                    "%s is searching the %s deck for a card to gain.", player.getRepresentationNoPing(), type);
+            MessageHelper.sendMessageToChannel(channel, msg);
+            channel = player.getCardsInfoThread();
+        }
         String msg = player.getRepresentation() + ", use these buttons to draw a card from the splice deck.";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(channel, msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
 
