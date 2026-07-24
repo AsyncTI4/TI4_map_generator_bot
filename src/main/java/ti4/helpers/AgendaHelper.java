@@ -2358,7 +2358,7 @@ public final class AgendaHelper {
         if (waitingForTightScheduling) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
-                    "Resolving agenda with no effect. The next agenda reveal is waiting for Veylor to resolve _Tight Scheduling_.");
+                    game.getPing() + "Resolving agenda with no effect. The next agenda reveal is waiting for Veylor to resolve _Tight Scheduling_.");
             ButtonHelper.deleteMessage(event);
             return;
         }
