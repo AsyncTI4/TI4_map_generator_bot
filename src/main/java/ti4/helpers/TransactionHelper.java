@@ -48,6 +48,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.relic.SendRelicService;
 import ti4.service.transaction.SendPromissoryService;
+import ti4.service.transaction.TransactionItem;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
@@ -89,12 +90,18 @@ public class TransactionHelper {
             "Dane's Torment Engine LLC");
 
     private static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
-        List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
+        List<TransactionItem> transactionItems = p1.getTransactionItemsWithPlayer(p2);
         GameEventService.commit(
                 game,
                 GameEventType.TRANSACTION,
                 p1,
-                Map.of("from", p1.getFaction(), "to", p2.getFaction(), "items", transactionItems));
+                Map.of(
+                        "from",
+                        p1.getFaction(),
+                        "to",
+                        p2.getFaction(),
+                        "items",
+                        hidePrivateCardIdsForPublicEvent(transactionItems)));
         List<Player> players = new ArrayList<>();
         players.add(p1);
         players.add(p2);
@@ -118,19 +125,11 @@ public class TransactionHelper {
             if (sender == p2) {
                 receiver = p1;
             }
-            for (String item : transactionItems) {
-                if (item.contains("sending" + sender.getFaction())
-                        && item.contains("receiving" + receiver.getFaction())) {
-                    String thingToTransact = item.split("_")[2];
-                    String furtherDetail = item.replace(
-                            item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
-                    int amountToTransact = 1;
-                    boolean isGeneralized =
-                            List.of("PNs", "ACs", "SOs").contains(thingToTransact) && furtherDetail.contains("generic");
-                    if (isGeneralized) {
-                        amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
-                        furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
-                    }
+            for (TransactionItem item : transactionItems) {
+                if (item.isSentFromTo(sender.getFaction(), receiver.getFaction())) {
+                    String thingToTransact = item.type();
+                    String furtherDetail = item.detailWithoutQuantity();
+                    int amountToTransact = item.quantity();
                     String spoofedButtonID =
                             "send_" + thingToTransact + "_" + receiver.getFaction() + "_" + furtherDetail;
                     if (!thingToTransact.toLowerCase().contains("debt")) {
@@ -239,8 +238,14 @@ public class TransactionHelper {
         }
     }
 
+    static List<String> hidePrivateCardIdsForPublicEvent(List<TransactionItem> transactionItems) {
+        return transactionItems.stream()
+                .map(item -> item.hidePrivateCardIdForPublicEvent().serialize())
+                .toList();
+    }
+
     private static String buildTransactionOffer(Player p1, Player p2, Game game, boolean hidePrivateCardText) {
-        List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
+        List<TransactionItem> transactionItems = p1.getTransactionItemsWithPlayer(p2);
         StringBuilder trans = new StringBuilder();
         List<Player> players = new ArrayList<>();
         players.add(p1);
@@ -253,22 +258,15 @@ public class TransactionHelper {
                     .append(player.getRepresentation(false, false, true))
                     .append(" gives:\n");
             boolean sendingNothing = true;
-            for (String item : transactionItems) {
-                if (!item.contains("sending" + player.getFaction())) {
+            for (TransactionItem item : transactionItems) {
+                if (!item.isSentBy(player.getFaction())) {
                     continue;
                 }
                 trans.append("> - ");
                 sendingNothing = false;
-                String thingToTransact = item.split("_")[2];
-                String furtherDetail = item.replace(
-                        item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
-                int amountToTransact = 1;
-                boolean isGeneralized =
-                        List.of("PNs", "ACs", "SOs").contains(thingToTransact) && furtherDetail.contains("generic");
-                if ("frags".equalsIgnoreCase(thingToTransact) || isGeneralized) {
-                    amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
-                    furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
-                }
+                String thingToTransact = item.type();
+                String furtherDetail = item.detailWithoutQuantity();
+                int amountToTransact = item.quantity();
                 switch (thingToTransact) {
                     case "TGs" -> {
                         amountToTransact = Integer.parseInt(furtherDetail);
@@ -416,7 +414,10 @@ public class TransactionHelper {
                             trans.append(furtherDetail.replace("fin777", " "));
                         }
                     }
-                    default -> trans.append(" some odd thing: `").append(item).append('`');
+                    default ->
+                        trans.append(" some odd thing: `")
+                                .append(item.serialize())
+                                .append('`');
                 }
                 trans.append('\n');
             }
@@ -1090,9 +1091,13 @@ public class TransactionHelper {
     public static void finishDealDetails(ModalInteractionEvent event, Game game, Player player, String modalID) {
         ModalMapping mapping = event.getValue("details");
         String thoughts = mapping.getAsString();
-        Player opposing = game.getPlayerFromColorOrFaction(modalID.split("_")[1]);
-        player.addTransactionItem("sending" + player.getFaction() + "_receiving" + modalID.split("_")[1] + "_details_"
-                + thoughts.replace("_", "").replace(",", "").replace("\n", "").replace(" ", "fin777"));
+        String receiver = modalID.split("_")[1];
+        Player opposing = game.getPlayerFromColorOrFaction(receiver);
+        player.addTransactionItem(TransactionItem.of(
+                player.getFaction(),
+                receiver,
+                "details",
+                thoughts.replace("_", "").replace(",", "").replace("\n", "").replace(" ", "fin777")));
         String message = "Current transaction offer is:\n"
                 + buildTransactionOffer(player, opposing, game, false)
                 + "### Click something that you wish to __offer to__ " + opposing.getRepresentation(false, false);
@@ -1115,9 +1120,13 @@ public class TransactionHelper {
     public static void finishDealDetailsInvert(ModalInteractionEvent event, Game game, Player player, String modalID) {
         ModalMapping mapping = event.getValue("details");
         String thoughts = mapping.getAsString();
-        Player opposing = game.getPlayerFromColorOrFaction(modalID.split("_")[1]);
-        player.addTransactionItem("sending" + modalID.split("_")[1] + "_receiving" + player.getFaction() + "_details_"
-                + thoughts.replace("_", "").replace(",", "").replace("\n", "").replace(" ", "fin777"));
+        String sender = modalID.split("_")[1];
+        Player opposing = game.getPlayerFromColorOrFaction(sender);
+        player.addTransactionItem(TransactionItem.of(
+                sender,
+                player.getFaction(),
+                "details",
+                thoughts.replace("_", "").replace(",", "").replace("\n", "").replace(" ", "fin777")));
         String message = "Current transaction offer is:\n"
                 + buildTransactionOffer(player, opposing, game, false)
                 + "### Click something that you wish to __request from__ " + opposing.getRepresentation(false, false);
@@ -1154,24 +1163,22 @@ public class TransactionHelper {
             int tgP2Sent = commsOfP1Washed - commsOfP2Washed;
             if (commsOfP1Washed > 0) {
                 player.addTransactionItem(
-                        "sending" + p1.getFaction() + "_receiving" + p2.getFaction() + "_Comms_" + commsOfP1Washed);
+                        TransactionItem.of(p1.getFaction(), p2.getFaction(), "Comms", commsOfP1Washed));
             }
             if (commsOfP2Washed > 0) {
                 player.addTransactionItem(
-                        "sending" + p2.getFaction() + "_receiving" + p1.getFaction() + "_Comms_" + commsOfP2Washed);
+                        TransactionItem.of(p2.getFaction(), p1.getFaction(), "Comms", commsOfP2Washed));
             }
             if (tgP1Sent > 0) {
-                player.addTransactionItem(
-                        "sending" + p1.getFaction() + "_receiving" + p2.getFaction() + "_TGs_" + tgP1Sent);
+                player.addTransactionItem(TransactionItem.of(p1.getFaction(), p2.getFaction(), "TGs", tgP1Sent));
             }
             if (tgP2Sent > 0) {
-                player.addTransactionItem(
-                        "sending" + p2.getFaction() + "_receiving" + p1.getFaction() + "_TGs_" + tgP2Sent);
+                player.addTransactionItem(TransactionItem.of(p2.getFaction(), p1.getFaction(), "TGs", tgP2Sent));
             }
         } else {
-            String itemS = "sending" + sender + "_receiving" + receiver + "_" + item + "_" + extraDetail;
-            if (!player.getTransactionItems().contains(itemS) || !itemS.contains("dmz")) {
-                player.addTransactionItem(itemS);
+            TransactionItem transactionItem = TransactionItem.of(sender, receiver, item, extraDetail);
+            if (!player.getTransactionItems().contains(transactionItem) || !"dmz".equals(transactionItem.type())) {
+                player.addTransactionItem(transactionItem);
             }
         }
         var userSettings = UserSettingsManager.get(player.getUserID());
@@ -1181,7 +1188,7 @@ public class TransactionHelper {
                 && userSettings.isPrefersAutoDebtClearance()
                 && !p2.hasAbility("data_recovery")) {
             int amount = Math.min(p2.getDebtTokenCount(p1.getColor()), Integer.parseInt(extraDetail));
-            String clear = "sending" + receiver + "_receiving" + sender + "_ClearDebt_" + amount;
+            TransactionItem clear = TransactionItem.of(receiver, sender, "ClearDebt", amount);
             if (!player.getTransactionItems().contains(clear)) {
                 player.addTransactionItem(clear);
             }
@@ -1324,18 +1331,15 @@ public class TransactionHelper {
         int p2TgAfter = p2.getTg();
         boolean debtOnlyTransaction = true;
         // compute TGs after transaction is complete
-        for (String item : p1.getTransactionItemsWithPlayer(p2)) {
-            String[] parts = item.split("_");
-            if (parts.length < 4) continue;
-            String type = parts[2];
+        for (TransactionItem item : p1.getTransactionItemsWithPlayer(p2)) {
+            String type = item.type();
             if (!"SendDebt".equals(type) && !"ClearDebt".equals(type)) {
                 debtOnlyTransaction = false;
             }
-            String detail = item.replace(parts[0] + "_" + parts[1] + "_" + type + "_", "");
             try {
                 if ("TGs".equals(type)) {
-                    int amount = Integer.parseInt(detail);
-                    if (item.contains("sending" + p1.getFaction())) {
+                    int amount = Integer.parseInt(item.detail());
+                    if (item.isSentBy(p1.getFaction())) {
                         p1TgAfter -= amount;
                         p2TgAfter += amount;
                     } else {
@@ -1343,8 +1347,8 @@ public class TransactionHelper {
                         p1TgAfter += amount;
                     }
                 } else if ("Comms".equals(type)) {
-                    int amount = Integer.parseInt(detail);
-                    if (item.contains("sending" + p1.getFaction())) {
+                    int amount = Integer.parseInt(item.detail());
+                    if (item.isSentBy(p1.getFaction())) {
                         if (!p1.isPlayerMemberOfAlliance(p2)) p2TgAfter += amount;
                     } else {
                         if (!p2.isPlayerMemberOfAlliance(p1)) p1TgAfter += amount;
