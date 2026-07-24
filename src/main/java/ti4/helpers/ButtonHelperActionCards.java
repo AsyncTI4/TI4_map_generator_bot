@@ -2829,6 +2829,18 @@ public final class ButtonHelperActionCards {
                             hasSpecialUpgrade = true;
                         }
                     }
+                    for (String factionTech : player.getTechs()) {
+                        TechnologyModel fTech = Mapper.getTech(factionTech);
+                        if (fTech != null
+                                && !fTech.getAlias()
+                                        .equalsIgnoreCase(Mapper.getTech(tech).getAlias())
+                                && fTech.isUnitUpgrade()
+                                && fTech.getBaseUpgrade()
+                                        .orElse("bleh")
+                                        .equalsIgnoreCase(Mapper.getTech(tech).getAlias())) {
+                            hasSpecialUpgrade = true;
+                        }
+                    }
                     if (!hasSpecialUpgrade) {
                         techs.add(Buttons.green(
                                 "getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",

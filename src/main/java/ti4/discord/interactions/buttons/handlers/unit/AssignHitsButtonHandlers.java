@@ -60,6 +60,9 @@ class AssignHitsButtonHandlers {
                     ParsedUnit unit = UnitPickerHandlerHelper.parsedUnitFromMatcher(player, matcher);
                     if (remove) {
                         RemoveUnitService.removeUnit(event, tile, game, unit, state);
+                        if (unit.unitKey().unitType() == UnitType.Infantry) {
+                            ButtonHelper.resolveInfantryRemoval(player, amt, tile);
+                        }
                     } else {
                         DestroyUnitService.destroyUnit(event, tile, game, unit, combat, state);
                         IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, holder, assignHitsType);
