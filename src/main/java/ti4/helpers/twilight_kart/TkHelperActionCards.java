@@ -133,29 +133,25 @@ public class TkHelperActionCards {
                 .map(Mapper::getLeader)
                 .map(LeaderModel::getTfRepresentationEmbed)
                 .toList();
-        if (!game.isVeiledHeartMode()) {
-            genomes.forEach(player::addLeader);
+        if (game.isVeiledHeartMode()) {
+            genomes.forEach(genome ->
+                    VeiledHeartService.doAction(
+                            VeiledHeartService.VeiledCardAction.DRAW,
+                            VeiledHeartService.VeiledCardType.GENOME,
+                            player,
+                            genome));
 
         } else {
-            genomes.forEach(genome -> VeiledHeartService.addVeiledCard(player, genome));
-        }
-
-        for (String cardID : genomes) {
-            if (!game.isVeiledHeartMode()) {
+            for (String cardID : genomes) {
                 player.addLeader(cardID);
                 MessageHelper.sendMessageToChannelWithEmbed(
                         player.getCorrectChannel(),
                         player.getRepresentation() + " has acquired the genome: "
                                 + Mapper.getLeader(cardID).getName(),
                         Mapper.getLeader(cardID).getRepresentationEmbed(true));
-            } else {
-                VeiledHeartService.addVeiledCard(player, cardID);
-
-                String msg = player.getRepresentationNoPing() + " has taken a secret card. They ";
-                msg += "may put it into play with a button in their `#cards-info` thread.";
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
+
         Button button = Buttons.red("discardSpliceCard_genome", "Discard 1 Genome", MiscEmojis.tf_genome);
         Button deleteButton = Buttons.DONE_DELETE_BUTTONS;
 

@@ -418,7 +418,7 @@ public class VeiledHeartService {
         VeiledCardAction.fromString(actionStr).ifPresent(action -> doAction(action, player, card));
     }
 
-    private static void doAction(VeiledCardAction action, Player player, String card) {
+    public static void doAction(VeiledCardAction action, Player player, String card) {
         VeiledCardType.fromCard(card).ifPresent(type -> doAction(action, type, player, card));
     }
 
@@ -475,7 +475,7 @@ public class VeiledHeartService {
 
     public static void doManipulate(String typeStr, Player activePlayer, String card, Player targetPlayer) {
         VeiledCardType.fromString(typeStr).ifPresent(type -> {
-            addVeiledCard(targetPlayer, card);
+            doSilentAction(VeiledCardAction.SPLICE, type, targetPlayer, card);
 
             String msgPublic = String.format(
                     "%s has been forced to splice a veiled %s. They may put it into play with a button in their `#cards-info` thread.",

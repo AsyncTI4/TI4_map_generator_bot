@@ -877,7 +877,11 @@ public final class ButtonHelperTwilightsFallActionCards {
                 if (game.isVeiledHeartMode()) {
                     found +=
                             " (It was gained face-down and may be put into play with a button in the `#cards-info` thread.)";
-                    VeiledHeartService.addVeiledCard(player, card);
+                    VeiledHeartService.doSilentAction(
+                            VeiledHeartService.VeiledCardAction.DRAW,
+                            VeiledHeartService.VeiledCardType.UNIT,
+                            player,
+                            card);
                 } else {
                     UnitModel unitModel = Mapper.getUnit(card);
                     String asyncId = unitModel.getAsyncId();

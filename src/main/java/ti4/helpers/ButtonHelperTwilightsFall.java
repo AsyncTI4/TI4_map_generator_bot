@@ -966,11 +966,7 @@ public final class ButtonHelperTwilightsFall {
                                 Mapper.getUnit(cardID).getRepresentationEmbed());
                     }
                 } else {
-                    VeiledHeartService.addVeiledCard(player, cardID);
-                    MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentationNoPing()
-                                    + " has spliced in a secret card. They may put it into play with a button in their `#cards-info` thread.");
+                    VeiledHeartService.doAction(VeiledHeartService.VeiledCardAction.SPLICE, player, cardID);
                 }
                 if (!buttonID.contains("spoof_")) {
                     triggerYellowUnits(game, player);
@@ -1609,11 +1605,11 @@ public final class ButtonHelperTwilightsFall {
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(), msg, model.getRepresentationEmbed());
         } else {
-            VeiledHeartService.addVeiledCard(player, drawnCard);
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationNoPing()
-                            + " has taken a secret card. They may put it into play with a button in their `#cards-info` thread.");
+            VeiledHeartService.doAction(
+                    VeiledHeartService.VeiledCardAction.DRAW,
+                    VeiledHeartService.VeiledCardType.ABILITY,
+                    player,
+                    drawnCard);
         }
     }
 
