@@ -11,9 +11,19 @@ import lombok.Data;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.image.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.service.info.ListPlayerInfoService;
+
+/*
+ * Note on FoW: under fog you learn that *someone* scored an objective, not who. So
+ * {@link #redactScorers} drops unidentified factions out of {@code scoredFactions} entirely and
+ * replaces them with a bare count - sending the real faction strings and hiding them client-side
+ * would leave the answer sitting in the payload. Numeric {@code factionProgress} is private too
+ * (derived from hand/resources), so {@link #redactFactionProgress} strips it down to only the
+ * viewer's own entry.
+ */
 
 @Data
 public class WebObjectives {
@@ -28,6 +38,9 @@ public class WebObjectives {
         private boolean hasRedTape;
         private List<String> scoredFactions;
         private List<String> peekingFactions;
+        // How many scorers were dropped from scoredFactions because the viewer can't identify them
+        // (see #redactScorers). Always 0 in the unfiltered view.
+        private int unidentifiedScorerCount;
         private Map<String, Integer> factionProgress;
         private int progressThreshold;
 
@@ -59,6 +72,43 @@ public class WebObjectives {
     private List<ObjectiveInfo> stage2Objectives;
     private List<ObjectiveInfo> customObjectives;
     private List<ObjectiveInfo> allObjectives;
+
+    // The redactions below mutate through allObjectives, which holds the same ObjectiveInfo
+    // instances referenced by the stage1/stage2/custom lists - so updating it updates all of them.
+
+    /**
+     * Replaces scorers the viewer can't identify with a count, and drops them from the peeking list.
+     * The frontend renders {@code unidentifiedScorerCount} anonymous tokens, which carry no faction
+     * string at all - so there is nothing to correlate across objectives, and nothing recoverable
+     * from the raw payload.
+     */
+    public static void redactScorers(WebObjectives objectives, Game game, Player viewer) {
+        for (ObjectiveInfo info : objectives.allObjectives) {
+            int before = info.scoredFactions.size();
+            info.scoredFactions.removeIf(faction -> !canIdentify(game, viewer, faction));
+            info.unidentifiedScorerCount = before - info.scoredFactions.size();
+            info.peekingFactions.removeIf(faction -> !canIdentify(game, viewer, faction));
+        }
+    }
+
+    private static boolean canIdentify(Game game, Player viewer, String faction) {
+        Player player = game.getPlayerFromColorOrFaction(faction);
+        // Neutral forces are public, and canSeeStatsOfPlayer is false for any non-real player.
+        // An unresolvable faction fails closed - better an extra anonymous token than a leak.
+        return player != null && (player.isNeutral() || FoWHelper.canSeeStatsOfPlayer(game, player, viewer));
+    }
+
+    /** Strips numeric factionProgress down to just {@code viewer}'s own entry. */
+    public static void redactFactionProgress(WebObjectives objectives, Player viewer) {
+        String ownFaction = viewer.getFaction();
+        for (ObjectiveInfo info : objectives.allObjectives) {
+            Integer ownProgress = info.factionProgress.get(ownFaction);
+            info.factionProgress.clear();
+            if (ownProgress != null) {
+                info.factionProgress.put(ownFaction, ownProgress);
+            }
+        }
+    }
 
     public static WebObjectives fromGame(Game game) {
         WebObjectives webObjectives = new WebObjectives();

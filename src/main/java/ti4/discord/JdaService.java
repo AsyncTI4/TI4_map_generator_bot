@@ -493,6 +493,7 @@ public class JdaService {
         adminRoles.add(jda.getRoleById("1487725249398308884")); // Balacasi's server
         adminRoles.add(jda.getRoleById("1500012691224395906")); // BEANS's server
         adminRoles.add(jda.getRoleById("1516450864376578238")); // Stabar's Server
+        adminRoles.add(jda.getRoleById("1527947707518423150")); // niugnip's Server
 
         adminRoles.removeIf(Objects::isNull);
 
@@ -532,6 +533,7 @@ public class JdaService {
         developerRoles.add(jda.getRoleById("1487725369766449173")); // Balacasi's server
         developerRoles.add(jda.getRoleById("1500012939326001263")); // BEANS's server
         developerRoles.add(jda.getRoleById("1516450864376578238")); // Stabar's Server
+        developerRoles.add(jda.getRoleById("1527947972615209041")); // niugnip's Server
 
         developerRoles.removeIf(Objects::isNull);
 
@@ -555,7 +557,7 @@ public class JdaService {
         bothelperRoles.add(jda.getRoleById("1458845770672377993")); // Async Tredenary (Planetary Duck System)
         bothelperRoles.add(jda.getRoleById("1458845518393246036")); // Async Quadrodenary (Dannel's Camp Ground)
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
-        bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
+        bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Supervisor
         bothelperRoles.add(jda.getRoleById("1429853811891241128")); // FoW Server Chapter 2 Bothelper
         bothelperRoles.add(jda.getRoleById("1429853811891241129")); // FoW Server Chapter 2 Game Supervisor
         bothelperRoles.add(jda.getRoleById("1248693989193023519")); // Community Server
@@ -575,6 +577,7 @@ public class JdaService {
         bothelperRoles.add(jda.getRoleById("1487725393673719950")); // Balacasi's server
         bothelperRoles.add(jda.getRoleById("1500013009492246558")); // BEANS's server
         bothelperRoles.add(jda.getRoleById("1516450864376578238")); // Stabar's Server
+        bothelperRoles.add(jda.getRoleById("1527947912108183686")); // niugnip's Server
 
         bothelperRoles.removeIf(Objects::isNull);
     }
@@ -620,6 +623,32 @@ public class JdaService {
 
     public static boolean isProduction() {
         return Constants.ASYNCTI4_HUB_SERVER_ID.equals(guildPrimaryID);
+    }
+
+    /**
+     * Whether a user holds any of the given roles, by user and role ID. Unlike CommandHelper#hasRole
+     * this needs no interaction event, so it also works from the web API where all we have is a
+     * Discord user ID. Reads straight from JDA's cache (see the MemberCachePolicy.ALL /
+     * ChunkingFilter.ALL setup above), so it stays a synchronous lookup rather than a REST call.
+     *
+     * <p>Roles that can't be resolved are skipped, and the result is false if none matched - callers
+     * gating access on a role should fail closed rather than treat "couldn't check" as a pass.
+     */
+    public static boolean hasAnyRole(String userId, String... roleIds) {
+        if (jda == null || userId == null) {
+            return false;
+        }
+        for (String roleId : roleIds) {
+            Role role = roleId == null ? null : jda.getRoleById(roleId);
+            if (role == null) {
+                continue;
+            }
+            Member member = role.getGuild().getMemberById(userId);
+            if (member != null && member.getRoles().contains(role)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean isWhitelistedGuild(Guild guild) {
