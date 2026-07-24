@@ -16,6 +16,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithPromissoryHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -161,6 +162,7 @@ public final class StatusHelper {
         // On a re-entered scoring phase, commit the previously staged scores instead of letting open() wipe them.
         commitStatusScoringEvent(game);
         game.setPhaseOfGame("statusScoring");
+        VeylorAbilitiesHandler.returnUnassignedTightSchedulingAgendas(game);
         VerydithPromissoryHandler.returnPactRenewedAtStartOfStatus(game);
         GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "status"));
         GameEventDraft.open(game);
