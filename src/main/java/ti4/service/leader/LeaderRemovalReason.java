@@ -26,7 +26,8 @@ public enum LeaderRemovalReason {
                     "kolumehero",
                     "qhethero",
                     "nivynhero",
-                    "lunariumhero" -> STATUS_CLEANUP;
+                    "lunariumhero",
+                    "xytherishero" -> STATUS_CLEANUP;
 
             case "arborechero",
                     "argenthero",

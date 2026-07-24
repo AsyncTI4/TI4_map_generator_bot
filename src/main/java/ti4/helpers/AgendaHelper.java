@@ -2350,9 +2350,21 @@ public final class AgendaHelper {
         } else {
             aCount = Integer.parseInt(agendaCount) + 1;
         }
-        Button flipNextAgenda = Buttons.blue("flip_agenda", "Flip Agenda #" + aCount);
         List<Button> resActionRow = new ArrayList<>();
-        resActionRow.add(flipNextAgenda);
+        boolean canRevealNextAgenda =
+                aCount < 3 || game.isAbsolMode() || VeylorLeadersHandler.hasHeroAdditionalAgenda(game, aCount);
+        boolean waitingForTightScheduling =
+                canRevealNextAgenda && VeylorAbilitiesHandler.offerTightSchedulingRevealChoice(game, false);
+        if (waitingForTightScheduling) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Resolving agenda with no effect. The next agenda reveal is waiting for Veylor to resolve _Tight Scheduling_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (canRevealNextAgenda) {
+            resActionRow.add(Buttons.blue("flip_agenda", "Flip Agenda #" + aCount));
+        }
         if (!game.isOmegaPhaseMode()) {
             Button proceedToStrategyPhase = Buttons.green(
                     "proceed_to_strategy", "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)");

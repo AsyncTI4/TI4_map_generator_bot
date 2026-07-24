@@ -477,6 +477,7 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
         XytherisLeadersHandler.clearMyrixAgentEffects(game);
+        XytherisLeadersHandler.clearHeroUnitAbilityRoll(game);
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
         ArcanumTechHandler.clearSigilOfTransmutation(game);
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
