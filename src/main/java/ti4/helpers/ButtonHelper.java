@@ -60,6 +60,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
@@ -3260,7 +3261,7 @@ public class ButtonHelper {
     public static void resolveMahactMechAbilityUse(
             Player mahact, Player target, Game game, Tile tile, ButtonInteractionEvent event) {
         String mechName = mahact.hasUnit("mahact_mech_y") ? "Starlancer Y" : "Starlancer";
-        mahact.removeMahactCC(target.getColor());
+        MahactTokenService.removeMahactToken(mahact, target.getColor());
         if (!game.isNaaluAgent() && !game.isWarfareAction()) {
             if (!game.getStoredValue("absolLux").isEmpty()) {
                 target.setTacticalCC(target.getTacticalCC() + 1);
@@ -6746,6 +6747,9 @@ public class ButtonHelper {
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 if (unitModel == null) continue;
+                if (combat) {
+                    unitModel = PonthousUnitHandler.injectTemporaryFighterSustain(game, player, tile, unitModel);
+                }
                 if (unitModel.getUnitType() == UnitType.Infantry
                         && spaceCombatish
                         && (player.hasUnit("purpletf_mech") || player.hasUnit("naaz_voltron"))) {
@@ -6771,6 +6775,11 @@ public class ButtonHelper {
                 for (UnitState state : UnitState.values()) {
                     if (state.isDamaged() || !canDamage) continue;
                     int max = Math.min(oneButtonPerUnit ? 1 : 2, unitHolder.getUnitCountForState(unitKey, state));
+                    if (unitKey.unitType() == UnitType.Fighter) {
+                        int temporarySustains =
+                                PonthousUnitHandler.getTemporaryFighterSustainRemaining(game, player, tile);
+                        if (temporarySustains > 0) max = Math.min(max, temporarySustains);
+                    }
                     for (int x = 1; x <= max; x++) {
                         buttons.add(buildAssignHitButton(player, tile, unitHolder, state, unitKey, x, true));
                     }

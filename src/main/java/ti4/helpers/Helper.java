@@ -2897,11 +2897,7 @@ public final class Helper {
                 if (player_.hasAbility("multitasking")) {
                     ccCount += LunariumAbilityHandler.getFactionSheetCCs(game, player_);
                 }
-            } else if (player_.hasAbility("primacy")
-                    || player_.hasAbility("edict")
-                    || player_.hasAbility("edict_y")
-                    || player_.hasAbility("imperia")
-                    || player_.hasAbility("imperia_y")) {
+            } else if (player_.hasAbility("edict") || player_.hasAbility("imperia")) {
                 for (String color_ : player_.getMahactCC()) {
                     ColorModel ccColor = Mapper.getColor(color_);
                     if (player.getColor().equalsIgnoreCase(ccColor.getName())) {

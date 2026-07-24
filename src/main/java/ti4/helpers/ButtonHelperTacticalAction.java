@@ -20,6 +20,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
@@ -477,6 +478,8 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
         XytherisLeadersHandler.clearMyrixAgentEffects(game);
+        XytherisLeadersHandler.clearHeroUnitAbilityRoll(game);
+        PonthousUnitHandler.clearOldGlorySustain(game);
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
         ArcanumTechHandler.clearSigilOfTransmutation(game);
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);

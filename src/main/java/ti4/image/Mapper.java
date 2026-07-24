@@ -999,17 +999,18 @@ public class Mapper {
         if (isValidColor(color)) {
             for (PromissoryNoteModel pn : promissoryNotes.values()) {
                 if (pn.getColor().isPresent() && color.equals(pn.getColor().get())) {
-                    if ("agendas_absol".equals(game.getAgendaDeckID())
-                            && pn.getAlias().endsWith("_ps")
-                            && pn.getSource() != ComponentSource.absol) {
-                        continue;
-                    }
-                    if (!"agendas_absol".equals(game.getAgendaDeckID())
-                            && pn.getAlias().endsWith("_ps")
-                            && pn.getSource() == ComponentSource.absol) {
+                    if (pn.getAlias().endsWith("_ps") && "agendas_absol".equals(game.getAgendaDeckID())) {
+                        // Absol's agenda deck is active: only its own Political Secret variant is dealt.
+                        if (pn.getSource() == ComponentSource.absol) {
+                            pnList.add(pn.getAlias());
+                        }
                         continue;
                     }
                     if (pn.getAlias().startsWith("wekkerabsol_") && !"g14".equals(game.getName())) {
+                        continue;
+                    }
+                    if (pn.getHomebrewReplacesID().isPresent()) {
+                        // Any other homebrew replacement PN is opt-in only; nothing has turned it on yet.
                         continue;
                     }
                     pnList.add(pn.getAlias());
