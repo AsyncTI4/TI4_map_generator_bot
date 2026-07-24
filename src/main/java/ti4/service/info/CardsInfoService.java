@@ -18,6 +18,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
@@ -96,6 +97,12 @@ public class CardsInfoService {
                     player.factionButtonChecker() + "useRevArcanumAgent_other",
                     "Use Runebearer Lothos on Another Player",
                     FactionEmojis.revenant));
+        }
+        if (player.hasUnexhaustedLeader("oblivionagent")) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "useOblivionAgent_other",
+                    "Use Avaris the Seer on someone else",
+                    FactionEmojis.oblivion));
         }
         if (player.hasUnexhaustedLeader("ashenagent")) {
             buttons.add(AshenLeadersHandler.getAshTenderCardsInfoButton(player));
@@ -416,6 +423,9 @@ public class CardsInfoService {
                     player.factionButtonChecker() + "useMyrixAgent",
                     "Use Myrix on Another Player",
                     FactionEmojis.xytheris));
+        }
+        if (player.hasUnexhaustedLeader("thronesagent")) {
+            buttons.add(ThronesLeadersHandler.getThronesAgentButton(player));
         }
         buttons.add(Buttons.gray("offerPlayerPref", "Player Settings"));
         buttons.add(Buttons.gray("searchMyGames", "List My Games"));

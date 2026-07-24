@@ -24,6 +24,18 @@
         "source": "balacasi"
     },
     {
+        "alias": "xanbt_omega",
+        "name": "Kinetic Probe Network Ω",
+        "shortName": "Kinetic\nProbe Network Ω",
+        "faction": "xan",
+        "synergy": [
+            "WARFARE",
+            "CYBERNETIC"
+        ],
+        "text": "Once per combat round, you may use the SUSTAIN DAMAGE ability of 1 of your units that is not participating in this combat. You can only use this ability on ships during space combat and on ground forces during ground combat.",
+        "source": "balacasi"
+    },
+    {
         "alias": "kalorabt",
         "name": "Bypass Operations",
         "shortName": "Bypass\nOperations",

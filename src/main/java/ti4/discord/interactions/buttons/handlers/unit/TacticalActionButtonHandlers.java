@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -129,6 +130,7 @@ class TacticalActionButtonHandlers {
 
     @ButtonHandler("ChooseDifferentDestination")
     public static void chooseDifferentDestination(ButtonInteractionEvent event, Player player, Game game) {
+        ArcanumTechHandler.resetSigilOfTransmutationForNewDestination(game, player);
         // start over movement
         if (!game.getTacticalActionDisplacement().isEmpty()) {
             TacticalActionService.reverseAllUnitMovement(event, game, player);

@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -91,6 +92,7 @@ class ButtonHelperExplore {
             message.append(" relic fragments.");
         }
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
+        OblivionUnitHandler.doOblivionMechCheck(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
         if (!game.isFowMode() && event.getMessageChannel() instanceof ThreadChannel) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());

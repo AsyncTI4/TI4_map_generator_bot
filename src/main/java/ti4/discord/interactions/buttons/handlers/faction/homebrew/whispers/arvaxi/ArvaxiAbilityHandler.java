@@ -48,7 +48,8 @@ public class ArvaxiAbilityHandler {
                 player,
                 target,
                 game,
-                "Underhanded Maneuver has been used against you. Please choose which action card to hand over.");
+                target.getRepresentation()
+                        + ", Underhanded Maneuver has been used against you. Please choose which action card to hand over.");
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 "Sent " + target.getColor() + " the buttons for resolving Underhanded Maneuver.");

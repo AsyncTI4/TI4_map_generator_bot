@@ -26,7 +26,7 @@ public class InteractionCountService {
     @Transactional
     public synchronized void incrementSlashCommand(String commandName) {
         try {
-            String today = LocalDate.now().toString();
+            LocalDate today = LocalDate.now();
             int updatedRows = repository.incrementExisting(commandName, today);
             if (updatedRows == 0) {
                 repository.insertCount(commandName, today);
@@ -37,12 +37,12 @@ public class InteractionCountService {
     }
 
     public long getTotalSlashCommandCount(@Nullable LocalDate since) {
-        Long total = since == null ? repository.sumAllCounts() : repository.sumCountsSince(since.toString());
+        Long total = since == null ? repository.sumAllCounts() : repository.sumCountsSince(since);
         return total == null ? 0L : total;
     }
 
     public Map<String, Long> getSlashCommandCounts(@Nullable LocalDate since) {
-        List<Object[]> rows = since == null ? repository.sumAllByName() : repository.sumByNameSince(since.toString());
+        List<Object[]> rows = since == null ? repository.sumAllByName() : repository.sumByNameSince(since);
         Map<String, Long> result = new HashMap<>();
         for (Object[] row : rows) {
             result.put((String) row[0], ((Number) row[1]).longValue());

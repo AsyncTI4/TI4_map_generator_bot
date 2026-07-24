@@ -23,6 +23,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
@@ -754,6 +755,7 @@ public class ExploreService {
                                                 + ", and discovered the _Gamma Wormhole_.");
                             }
                             DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+                            OblivionUnitHandler.doOblivionMechCheck(game, player);
                         }
                     }
 
@@ -780,6 +782,7 @@ public class ExploreService {
                             }
                         }
                         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+                        OblivionUnitHandler.doOblivionMechCheck(game, player);
                     }
                     game.purgeExplore(ogID);
                 }

@@ -47,5 +47,12 @@
         "influenceModifier": 3,
         "isFakeAttachment": true,
         "source": "theodisi"
+    },
+    {
+        "id": "vox_sentinels",
+        "name": "Vox Sentinels",
+        "imagePath": "attachment_vox_sentinels.png",
+        "isFakeAttachment": true,
+        "source": "theodisi"
     }
 ]

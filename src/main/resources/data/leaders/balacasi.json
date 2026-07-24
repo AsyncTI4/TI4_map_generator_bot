@@ -45,6 +45,18 @@
         "source": "balacasi"
     },
     {
+        "id": "xanagent_omega",
+        "faction": "xan",
+        "type": "agent",
+        "name": "Noro Weba Ω",
+        "title": "The Wise",
+        "abilityWindow": "At the start of a combat:",
+        "abilityText": "You may exhaust this card to repair up to 2 units participating in that combat.",
+        "unlockCondition": "Always Unlocked",
+        "flavourText": "Admiral Noro Weba was almost knocked off his feet with the blast, but the hull held. “All batteries fire!” He said as his own forces fired relentlessly into the fray.",
+        "source": "balacasi"
+    },
+    {
         "id": "xancommander",
         "faction": "xan",
         "type": "commander",
@@ -53,6 +65,18 @@
         "abilityWindow": "After you perform a tactical action:",
         "abilityText": "You may move 1 of your structures onto a planet you control in the active system.",
         "unlockCondition": "Cast more votes than any other player on an agenda",
+        "source": "balacasi"
+    },
+    {
+        "id": "xancommander_omega",
+        "faction": "xan",
+        "type": "commander",
+        "name": "Pospician Meraldo Ω",
+        "title": "The Judicial",
+        "abilityWindow": "After you perform a tactical action where you gained control of a planet:",
+        "abilityText": "You may move 1 of your structures from a system that doesn't contain 1 of your command tokens onto 1 of those planets.",
+        "unlockCondition": "Have damaged units with a combined cost of at least 12",
+        "flavourText": "Meraldo smiled as the last of the outer walls were assembled. In less than a week a Citadel had been disassembled, moved and reassembled on a planet light years away from Thar. Very ahead of schedule, he thought, very ahead.",
         "source": "balacasi"
     },
     {

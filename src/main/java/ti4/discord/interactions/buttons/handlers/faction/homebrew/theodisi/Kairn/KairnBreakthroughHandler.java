@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -84,6 +85,7 @@ public class KairnBreakthroughHandler {
         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        OblivionUnitHandler.doOblivionMechCheck(game, player);
         ButtonHelper.deleteMessage(event);
 
         MessageHelper.sendMessageToChannelWithButtons(

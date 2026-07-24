@@ -4,6 +4,7 @@ import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -47,6 +48,7 @@ public class PurgePN extends GameStateSubcommand {
     private static void purgePromissoryFromHand(Game game, Player player, String pn) {
         game.setPurgedPN(pn);
         player.removePromissoryNote(pn);
+        OblivionUnitHandler.doOblivionMechCheck(game, player);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
     }
 }

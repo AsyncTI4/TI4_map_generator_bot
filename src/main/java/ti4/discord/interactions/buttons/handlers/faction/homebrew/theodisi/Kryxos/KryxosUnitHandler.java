@@ -83,6 +83,7 @@ public class KryxosUnitHandler {
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + "flipped _" + currentName + "_ into _" + flippedName + "_.");
+                player.getRepresentationUnfogged() + "flipped _" + currentName + "_ into _" + flippedName
+                        + "_. The researched/gained tech has been returned to your technology deck as well.");
     }
 }

@@ -182,7 +182,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             case "ponthous" -> {
                 if (!"setup".equals(game.getPhaseOfGame())) {
                     output = player.getRepresentation()
-                            + " please tell the bot wether you exhausted Ponthous for its Resources (+) or Influence (-):";
+                            + " please tell the bot wether you exhausted Ponthous for its Resources (+) or Influence (-):\nDo this **AFTER** your spend window is complete.";
                     buttons.addAll(PonthousAbilityHandler.offerFracturedSouls(player));
                 }
             }

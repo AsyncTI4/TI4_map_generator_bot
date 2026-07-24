@@ -1,0 +1,41 @@
+[
+    {
+        "alias": "bsp_firmamentbt",
+        "name": "The Sowing",
+        "shortName": "The Firmament",
+        "synergy": [
+            "CYBERNETIC",
+            "BIOTIC"
+        ],
+        "faction": "firmament",
+        "text": "At the end of the status phase, place 1 trade good from the supply on this card for each secret objective you have scored that another player has also scored. Then, you may place up to three of your trade goods on this card.\n\nFlip this card if you become The Obsidian faction.",
+        "homebrewReplacesID": "firmamentbt",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_obsidianbt",
+        "name": "The Reaping",
+        "shortName": "The Obsidian",
+        "synergy": [
+            "CYBERNETIC",
+            "BIOTIC"
+        ],
+        "faction": "obsidian",
+        "text": "After you win a combat against a puppeted player, place 1 trade good from the supply on this card for each control token of that player on a plot card.\n\nAt the start of the status phase, gain all trade goods on this card, then gain an equal number of trade goods from the supply.",
+        "homebrewReplacesID": "obsidianbt",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_xxchabt",
+        "name": "Archon's Gift",
+        "shortName": "The Xxcha Kingdom",
+        "synergy": [
+            "CYBERNETIC",
+            "BIOTIC"
+        ],
+        "faction": "xxcha",
+        "text": "When you exhaust a planet, you may swap its resource and influence values for that exhaustion.\n\nWhile your units are coexisting on a planet another player controls, you may resolve the secondary ability of that player's strategy card without spending a command token.",
+        "homebrewReplacesID": "xxchabt",
+        "source": "black_spectrum"
+    }
+]

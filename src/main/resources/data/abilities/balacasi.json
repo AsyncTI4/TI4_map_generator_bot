@@ -30,6 +30,13 @@
         "source": "balacasi"
     },
     {
+        "id": "quantum_fabrication_omega",
+        "name": "Quantum Fabrication Ω",
+        "faction": "xan",
+        "permanentEffect": "Once per action, when you place a space dock on a planet in a non-home system you may use its PRODUCTION ability immediately.",
+        "source": "balacasi"
+    },
+    {
         "id": "transformation_protocol",
         "name": "Transformation Protocol",
         "faction": "xan",

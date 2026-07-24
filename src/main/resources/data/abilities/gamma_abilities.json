@@ -1,0 +1,216 @@
+[
+    {
+        "id": "fruiting_bodies",
+        "name": "Fruiting Bodies",
+        "faction": "diaspora",
+        "window": "After you or 1 of your neighbors uses the PRODUCTION ability of 1 or more of their units",
+        "windowEffect": "capture 1 infantry from your reinforcemnts.",
+        "source": "gamma"
+    },
+    {
+        "id": "megaflora",
+        "name": "Megaflora",
+        "faction": "diaspora",
+        "window": "When you capture infantry,",
+        "windowEffect": "Place each captured infantry on the planet card of a planet you control.",
+        "permanentEffect":"While a planet you control has 3 or more captured infantry on its planet card, its resource value is increased by 1.",
+        "source": "gamma"
+    },
+    {
+        "id": "dizurga_emissaries",
+        "name": "Dizurga Emissaries",
+        "faction": "diaspora",
+        "window": "When you exhaust a planet to cast votes",
+        "windowEffect": "you may return any number of captured infantry from its planet card to cast 1 additional vote for each infantry returned.",
+        "source": "gamma"
+    },
+    {
+        "id": "cranial_modules",
+        "name": "Cranial Modules",
+        "faction": "hlr",
+        "window":  "During your tactical actions",
+        "windowEffect": "you may treat non-fighter neutral ships that are not in the fracture as if they were your own. At the end of each turn, if neutral units are in the same space as a player's units, resolve combat.",
+        "source": "gamma"
+    },
+    {
+        "id": "ghost_prototypes",
+        "name": "Ghost Prototypes",
+        "faction": "hlr",
+        "permanentEffect": "When you gain a non-fighter ship unit upgrade, you may immediately place 1 neutral ship of the same type in the space area of a non-home system that doesn't contain another player's units.",
+        "window": "at the start of your turn, you may exhaust a unit upgrade technology",
+        "windowEffect": "place a non-fighter neutral ship of the same type in the space area with your units of another neutral unit.",
+        "source": "gamma"
+    },
+    {
+        "id": "legacy_systems",
+        "name": "Legacy Systems",
+        "faction": "hlr",
+        "window": "During setup",
+        "windowEffect": "gain up to 1 technology of each color from among the other players' starting technologies.",
+        "source": "gamma"
+    },
+    {
+        "id": "cognitive_hazard",
+        "name": "Cognitive Hazard",
+        "faction": "clade",
+        "permanentEffect": "Halluciation Tokens remain hidden until revealed. You may look at Hallucination tokens at any time, and you may reveal a Hallucination token at any time if that system contains another player's units'.",
+        "window": "While revealed",
+        "windowEffect": "other players cannot use the corresponding unit abilities in that system.",
+        "source": "gamma"
+    },
+    {
+        "id": "hypnotic_fugue",
+        "name": "Hypnotic Fugue",
+        "faction": "clade",
+        "window": "At the end of your turn",
+        "permanentEffect": "you may remove 1 of your destroyers to place a Hallucination token face down in that system.",
+        "source": "gamma"
+    },
+    {
+        "id": "quarantine",
+        "name": "Quarantine",
+        "faction": "clade",
+        "window": "At the end of a player's turn,",
+        "windowEffect": "they may remove 1 Hallucination token in a system that contains their ships.",
+        "source": "gamma"
+    },
+    {
+        "id": "convocation_accords",
+        "name": "Convocation Accords",
+        "faction": "archon",
+        "window": "",
+        "windowEffect": "At the start of the strategy phase, place two into your play area. When a decree is violated, you may remove it from play to place one of your command tokens from your reinforcements on the active player's faction sheet.",
+        "permanentEffect": "While 1 of your command tokens is one a player's factions sheet, that player is an outlaw.'",
+        "source": "gamma"
+    },
+    {
+        "id": "righteous_dictat",
+        "name": "Righteous Dictat",
+        "faction": "archon",
+        "permanentEffect": "during combat against outlaws, apply +1 to the result of your units' combat rolls.",
+        "window": "ACTION",
+        "windowEffect": "Purge a decree from your play area to gain 1 of your command tokens from a player's faction sheet.",
+        "source": "gamma"
+    },
+    {
+        "id": "political_decree",
+        "name": "Political Decree",
+        "faction": "archon",
+        "window":  "after you resolve the primary or secondary ability of the 'Politics'' strategy card",
+        "permanentEffect": "you may place a decree into your play area.",
+        "source": "gamma"
+    },
+    {
+        "id": "genetic_experimentation",
+        "name": "Genetic Experimentation",
+        "faction": "moyin",
+        "window": "during setup,",
+        "windowEffect": "place the Twilight Fall genome and ability decks near the game board.",
+        "permanentEffect": "when you would research a technology, you may instead gain 1 random genome.",
+        "source": "gamma"
+    },
+    {
+        "id": "biological_horrors",
+        "name": "Biological Horrors",
+        "faction": "moyin",
+        "window": "When you take control of a planet belonging to another player, ",
+        "windowEffect": "place 1 control tokens on your mech card if it doesn't contain one already.",
+        "permanentEffect": "Your mechs have the text abilities and unit abilities of each faction's mech whose control token is on your mech card, in addition to its own.",
+        "source": "gamma"
+    },
+    {
+        "id": "prohibited_research",
+        "name": "Prohibited Research",
+        "faction": "moyin",
+        "permanentEffect": "You cannot produce or deploy mechs.",
+        "window": "At the start of a ground combat,",
+        "windowEffect": "you may spend 4 resources to replace 1 of your infantry particparting in the combat with a mech from your reinforcements.",
+        "source": "gamma"
+    },
+    {
+        "id": "propaganda_engines",
+        "name": "Propaganda Engines",
+        "faction": "veilstrike",
+        "window": "after you draw 1 or more action cards",
+        "windowEffect": "you may place 1 infantry on a planet you control that contains 1 or more of your ground forces.",
+        "source": "gamma"
+    },
+    {
+        "id": "bartering",
+        "name": "Bartering",
+        "faction": "veilstrike",
+        "permanentEffect": "Once per action, you may discard 1 action card to spend 2 resources or 2 influence.",
+        "source": "gamma"
+    },
+    {
+        "id": "covert_operations",
+        "name": "Covert Operations",
+        "faction": "veilstrike",
+        "permanentEffect": "You cannot play action cards with component actions.",
+        "source": "gamma"
+    },
+    {
+        "id": "guardians_of_profane_ground",
+        "name": "Guardians of Profane Ground",
+        "faction": "convocation",
+        "window": "After an opponent commits ground forces to a planet you control",
+        "windowEffect": "you may place 1 infantry on that planet from your reinforcements for each PDS you control on that planet",
+        "source": "gamma"
+    },
+    {
+        "id": "eternal_vigilance",
+        "name": "Eternal Vigilance",
+        "faction": "convocation",
+        "window": "When another player activates a system that contains at least 1 planet and at least 1 of your ships, if you control every planet in that system",
+        "permanentEffect": "you may move 1 of your non-fighter ships from each adjacent system that does not contain 1 of your command tokens into the active system.",
+        "source": "gamma"
+    },
+    {
+        "id": "hyperdimensional",
+        "name": "Hyperdimensional",
+        "faction": "weaveway",
+        "permanentEffect": "At anytime, you may treat nebulae in systems that do not contain another player's structures as adjacent.",
+        "source": "gamma"
+    },
+    {
+        "id": "threads_out_of_the_dark",
+        "name": "Threads out of the Dark",
+        "faction": "weaveway",
+        "window": "",
+        "windowEffect": "During setup, take your additional faction components and place your WEAVEWAY NODE cards in your play area. At the start of another player's turn, you may place one of your WEAVEWAY Anchor cards from your reinforcements into their play area.",
+        "source": "gamma"
+    },
+    {
+        "id": "the_weaveway",
+        "name": "The Weaveway",
+        "faction": "weaveway",
+        "permanentEffect": "Systems that contain your spacedocks are nebulae. Use an Anaerean nebula token as a reminder. Systems that contain Weaveway tokens are nebbulae.",
+        "source": "gamma"
+    },
+    {
+        "id": "winnaran_archive_access",
+        "name": "Winnaran Archive Access",
+        "faction": "initiative",
+        "window": "When you draw 1 or more secret objectives.",
+        "windowEffect": "draw 1 additional secret objective. Then, choose 1 of your unscored secret objectives, return it to the deck, and shuffle that deck.",
+        "source": "gamma"
+    },
+    {
+        "id": "jurisdiction",
+        "name": "Jurisdiction",
+        "faction": "initiative",
+        "window": "After you resolve the secondary of the 'Imperial strategy card'",
+        "windowEffect": "you do not have to spend a command token to resolve the secondary ability of the 'Imperial' strategy card",
+        "permanentEffect": "You can have 1 additional scored or unscored secret objective.",
+        "source": "gamma"
+    },
+    {
+        "id": "beholden",
+        "name": "Beholden",
+        "faction": "initiative",
+        "window": "during setup",
+        "windowEffect": "purge your 'Support for the Throne' promissory note.",
+        "permanentEffect": "Other players cannot give you their 'Support for the Throne' promissory notes.",
+        "source": "gamma"
+    }
+]

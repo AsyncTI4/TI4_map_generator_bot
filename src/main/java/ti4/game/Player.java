@@ -644,7 +644,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public boolean hasFF2Tech() {
         UnitModel ff = getUnitByType(UnitType.Fighter);
-        return ff.getIsUpgrade() || ownsUnit("florzen_fighter") || ownsUnit("eidolon_fighter");
+        return ff.getIsUpgrade() || ownsUnit("florzen_fighter");
     }
 
     public boolean hasUpgradedUnit(String baseUpgradeID) {

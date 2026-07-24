@@ -1,0 +1,252 @@
+[
+    {
+        "alias": "<color>_bsp_ps",
+        "name": "Political Secret",
+        "color": "<color>",
+        "playArea": false,
+        "text": "When you cast votes:\n\nYou may exhaust up to 3 planets of the [color] player and cast additional votes equal to influence of these planets.\n\nYou can't play this card if you received a promissory note in a transaction with the [color] player during this agenda.\n\nThen, after all players cast their votes, return this card to the [color] player.",
+        "homebrewReplacesID": "<color>_ps",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_tekklar_legion",
+        "name": "Tekklar Legion",
+        "faction": "sardakk",
+        "playArea": false,
+        "text": "At the start of a ground combat against a player other than the N'orr:\n\nApply +1 to the result of each of your units' combat rolls during this combat. If you are the active player, apply an additional +1.\n\nThen, return this card to the N'orr player.",
+        "homebrewReplacesID": "tekklar",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_creuss_iff",
+        "name": "Creuss Iff",
+        "faction": "ghost",
+        "playArea": false,
+        "text": "After you activate a system:\n\nDuring this tactical action, you treat systems that contain a non-delta wormhole as adjacent to each other; game effects cannot prevent you from using this ability. Apply +1 to the move value of each of your ships that starts its movement in a system that contains a wormhole.\n\nThen, return this card to the Creuss player.",
+        "homebrewReplacesID": "iff",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_war_funding",
+        "name": "War Funding",
+        "faction": "letnev",
+        "playArea": false,
+        "text": "After you roll dice during space combat against a player other than the Letnev:\n\nYou may reroll any number of your dice.\n\nThen, return this card to the Letnev player.",
+        "homebrewReplacesID": "war_funding",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_military_support",
+        "name": "Military Support",
+        "faction": "sol",
+        "playArea": false,
+        "text": "When the Sol player performs the primary or secondary ability of a strategy card:\n\nPlace 2 infantry from your reinforcements on any planet you control. \n\nThen, return this card to the Sol player.",
+        "homebrewReplacesID": "ms",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_fires_gashlai",
+        "name": "Fires of the Gashlai",
+        "faction": "muaat",
+        "playArea": false,
+        "text": "When you research the war sun unit upgrade technology:\n\nIgnore all of that technology's prerequisites.\n\nThen, return this card to the Muaat player.",
+        "homebrewReplacesID": "fires",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_spy_net",
+        "name": "Spy Net",
+        "faction": "yssaril",
+        "playArea": false,
+        "text": "At the start of your turn:\n\nThe Yssaril player shows you 2 action cards from their hand. Take 1 of those cards and discard the other.\n\nThen, return this card to the Yssaril player.",
+        "homebrewReplacesID": "spynet",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_political_favor",
+        "name": "Political Favor",
+        "faction": "xxcha",
+        "playArea": false,
+        "text": "After an agenda is revealed:\n\nYou cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, you may produce 1 ship in any system that contains 1 or more of your space docks.Then, return this card to the Xxcha player.",
+        "homebrewReplacesID": "favor",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_promise_protection",
+        "name": "Promise of Protection",
+        "faction": "mentak",
+        "playArea": true,
+        "playImmediately": false,
+        "text": "At the start of a round of space combat against a player other than the Mentak:\n\nThe Mentak player must remove 1 of their cruisers or destroyers from the game board. Then, you place 1 ship of that type from your reinforcements in the active system.\n\nThen, return this card to the Mentak player.",
+        "homebrewReplacesID": "pop",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_ragh_s",
+        "name": "Ragh's Call",
+        "faction": "saar",
+        "playArea": false,
+        "text": "After you gain control of a planet other than Mecatol Rex that is not controlled by the Saar player:\n\nRemove 1 of your space docks from the game board and place it on that planet.\n\nThen, return this card to the Saar player.",
+        "homebrewReplacesID": "ragh",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_gift_prescience",
+        "name": "Gift of Prescience",
+        "faction": "naalu",
+        "playArea": true,
+        "playImmediately": false,
+        "text": "When you receive this card and you are not the Naalu player, place it faceup in your play area.\n\nAt the end of the strategy phase, or after the turn of the highest-initiative player during the action phase, place the Naalu \"0\" token on your strategy card. You are first in the initiative order. The Naalu player cannot use their TELEPATHIC faction ability during this game round.\n\nReturn this card to the Naalu player at the end of the status phase.",
+        "homebrewReplacesID": "gift",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_strike_wing",
+        "name": "Strike Wing Ambuscade",
+        "faction": "argent",
+        "playArea": false,
+        "text": "When 1 or more of your units make a roll for a unit ability against units not controlled by the Argent player:\n\nChoose 1 of those units to roll 1 additional die.\n\nThen, return this card to the Argent player.",
+        "homebrewReplacesID": "ambuscade",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_antivirus",
+        "name": "Antivirus",
+        "faction": "nekro",
+        "playArea": true,
+        "playImmediately": false,
+        "text": "At the start of a combat round against a player other than the Nekro:\n\nYour opponent cannot play action cards during this combat round.\n\nThen, return this card to the Nekro player.",
+        "homebrewReplacesID": "antivirus",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_trade_convoys",
+        "name": "Trade Convoys",
+        "faction": "hacan",
+        "playArea": true,
+        "playImmediately": false,
+        "text": "When 1 or more of your units use PRODUCTION:\n\nYou may reduce the combined PRODUCTION value of these units by up to 3, to a minimum of 0. For each point reduced, gain 1 commodity.\n\nThen, return this card to the Hacan player.",
+        "homebrewReplacesID": "convoys",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "<color>_bsp_sftt",
+        "name": "Support for the Throne",
+        "color": "<color>",
+        "playArea": true,
+        "playImmediately": true,
+        "text": "When you receive this card and you are not the [color] player, place it in your play area.\n\nAfter the Score Objectives step, if this card has no tokens and your Support for the Throne is not in the [color] player's play area, place your control token on this card. Then, if no other player has a token on any Support for the Throne, place an additional token; gain 1 VP for each token on this card.\n\nIf the [color] player is eliminated, or if you activate a system containing their units, lose VPs equal to the number of tokens on this card, discard them, and return this card to the [color] player.",
+        "homebrewReplacesID": "<color>_sftt",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_malevolency",
+        "name": "Malevolency",
+        "faction": "obsidian",
+        "playArea": false,
+        "attachment": false,
+        "text": "At the end of a tactical action:\n\nSpend 1 influence to give this card to your neighbor; you can use this ability even if you are the Obsidian player.\n\nAt the end of the status phase, if this card is in your hand and you are not the Obsidian player, you must reveal it and remove 1 command token from your fleet pool. Then, take it back _x0003_to your hand.",
+        "homebrewReplacesID": "malevolency",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_arborec_alliance",
+        "name": "Arborec Alliance",
+        "faction": "arborec",
+        "playArea": true,
+        "playImmediately": true,
+        "text": "After 1 or more other players place a command token in a system that contains 1 or more of your units with PRODUCTION:\n\nYou may produce 1 unit in that system with the reduced cost of 1.",
+        "homebrewReplacesID": "<color>_an",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_letnev_alliance",
+        "name": "Letnev Alliance",
+        "faction": "letnev",
+        "playArea": true,
+        "playImmediately": true,
+        "text": "At the start of a space combat:\n\nPlace on this card a number of trade goods equal to twice the number of your non-fighter ships in this system. During this combat, each time 1 of your units uses SUSTAIN DAMAGE, you may gain 1 trade good from this card. At the end of the combat, discard all trade goods from this card.",
+        "homebrewReplacesID": "<color>_an",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_muaat_alliance",
+        "name": "Muaat Alliance",
+        "faction": "muaat",
+        "playArea": true,
+        "playImmediately": true,
+        "text": "Your war suns gain +1 capacity for each of your war suns and flagships on the game board and for each supernova that contains your units.\n\nAfter you spend a token from your strategy pool:\nYou may gain 1 trade good.",
+        "homebrewReplacesID": "<color>_an",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_sol_alliance",
+        "name": "Sol Alliance",
+        "faction": "sol",
+        "playArea": true,
+        "playImmediately": true,
+        "text": "During the Move Ships step, your ships may transport infantry from systems containing your command tokens, and you can land infantry on your planets along their movement path.\n\nWhen you are the defender you may resolve 1 additional transaction with 1 neighbor of your choice.",
+        "homebrewReplacesID": "<color>_an",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_ghost_alliance",
+        "name": "Creuss Alliance",
+        "faction": "ghost",
+        "playArea": true,
+        "playImmediately": true,
+        "text": "Game effects cannot allow other players to move ships through a system containing your flagship unless you allow it.\n\nAfter your ships move:\n\nFor each non-fighter ship that moved through 1 or more wormholes, you may place 1 fighter from your reinforcements with that ship.",
+        "homebrewReplacesID": "<color>_an",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_l1z1x_alliance",
+        "name": "L1Z1X Alliance",
+        "faction": "l1z1x",
+        "playArea": true,
+        "playImmediately": true,
+        "text": "Game effects cannot prevent you from using BOMBARDMENT.\n\nAt the start of a space combat, if the number of planets in the active system is equal to or greater than the number of your dreadnoughts, choose 1 of them to roll 1 additional die and to apply +1 to its roll results during this combat.",
+        "homebrewReplacesID": "<color>_an",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_mentak_alliance",
+        "name": "Mentak Alliance",
+        "faction": "mentak",
+        "playArea": true,
+        "playImmediately": true,
+        "text": "After you win a space combat:\n\nYou may force your opponent to give you 1 promissory note and 1 action card from their hand, if able.",
+        "homebrewReplacesID": "<color>_an",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_winnu_alliance",
+        "name": "Winnu Alliance",
+        "faction": "winnu",
+        "playArea": true,
+        "playImmediately": true,
+        "text": "During combat:\n\nApply +2 to the result of your flagship's combat rolls against a player holding the custodians token, if other than the Winnu.Apply +2 to the result of each of your unit's combat rolls in the Mecatol Rex system, your home system, and each system that contains a legendary planet.",
+        "homebrewReplacesID": "<color>_an",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_argent_alliance",
+        "name": "Argent Alliance",
+        "faction": "argent",
+        "playArea": true,
+        "playImmediately": true,
+        "text": "Your units in systems that contain your command tokens and are adjacent to the active system can make rolls for their unit abilities.\n\nWhen 1 or more of your units make a roll for a unit ability:\nYou may choose 1 of those units to roll 1 additional die.",
+        "homebrewReplacesID": "<color>_an",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_xxcha_alliance",
+        "name": "Xxcha Alliance",
+        "faction": "xxcha",
+        "playArea": true,
+        "playImmediately": true,
+        "text": "Each planet you exhaust to cast votes provides 1 additional vote.\n\nGame effects cannot prevent you from voting on an agenda.\n\nAfter a planet is readied during the action phase:\n\nYou may move 1 of your units on that planet into coexistence on a planet in an adjacent system.",
+        "homebrewReplacesID": "<color>_an",
+        "source": "black_spectrum"
+    }
+]

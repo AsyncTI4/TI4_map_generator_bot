@@ -3,13 +3,14 @@ package ti4.discord.interactions.commands.developer;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.commands.Subcommand;
-import ti4.executors.ExecutorServiceManager;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.logging.BotLogger;
@@ -18,7 +19,9 @@ class AnnounceActiveGames extends Subcommand {
 
     private static final String OPTION_MESSAGE = "message";
     private static final int DISCORD_MESSAGE_LIMIT = 2000;
-    private static final int BATCH_SIZE = 100;
+    private static final long SEND_INTERVAL_MILLISECONDS = 250;
+
+    private final AtomicBoolean announcementInProgress = new AtomicBoolean();
 
     AnnounceActiveGames() {
         super("announce", "Send a message to the table talk channel of every active game.");
@@ -42,29 +45,87 @@ class AnnounceActiveGames extends Subcommand {
             return;
         }
 
-        List<TextChannel> channels = GameManager.getManagedGames().stream()
+        List<TextChannel> activeChannels = GameManager.getManagedGames().stream()
                 .filter(ManagedGame::isActive)
                 .map(ManagedGame::getTableTalkChannel)
                 .filter(Objects::nonNull)
                 .toList();
+
+        List<TextChannel> channels = activeChannels.stream()
+                .filter(AnnounceActiveGames::canSendAnnouncement)
+                .toList();
+        int skippedChannels = activeChannels.size() - channels.size();
+
+        if (!announcementInProgress.compareAndSet(false, true)) {
+            event.getHook()
+                    .editOriginal("A developer announcement is already in progress.")
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+
         event.getHook()
-                .editOriginal("Queued announcement for " + channels.size() + " active game channels.")
+                .editOriginal("Broadcasting announcement to " + channels.size()
+                        + " active game channels with a " + SEND_INTERVAL_MILLISECONDS
+                        + " ms interval. Minimum estimated duration: " + formatDuration(channels.size()) + ". Skipped "
+                        + skippedChannels + " channels without send permission.")
                 .queue(Consumers.nop(), BotLogger::catchRestError);
 
-        ExecutorServiceManager.runAsync(
-                "Developer active game announcement", 300, () -> sendAnnouncement(channels, message));
+        sendAnnouncement(channels, message, event.getHook(), skippedChannels, 0, 0, 0);
     }
 
-    private static void sendAnnouncement(List<TextChannel> channels, String message) {
-        for (int i = 0; i < channels.size(); i++) {
-            TextChannel channel = channels.get(i);
-            channel.sendMessage(message)
-                    .queueAfter(
-                            i / BATCH_SIZE,
-                            TimeUnit.SECONDS,
-                            Consumers.nop(),
-                            error -> BotLogger.error(
-                                    "Failed to send developer announcement to " + channel.getName() + ".", error));
+    private void sendAnnouncement(
+            List<TextChannel> channels,
+            String message,
+            InteractionHook hook,
+            int skippedChannels,
+            int index,
+            int sentChannels,
+            int failedChannels) {
+        if (index >= channels.size()) {
+            announcementInProgress.set(false);
+            String result = "Developer announcement complete: " + sentChannels + " sent, " + failedChannels
+                    + " failed, " + skippedChannels + " skipped.";
+            BotLogger.info(result);
+            hook.editOriginal(result).queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
         }
+
+        TextChannel channel = channels.get(index);
+        channel.sendMessage(message)
+                .queueAfter(
+                        SEND_INTERVAL_MILLISECONDS,
+                        TimeUnit.MILLISECONDS,
+                        _ -> sendAnnouncement(
+                                channels, message, hook, skippedChannels, index + 1, sentChannels + 1, failedChannels),
+                        error -> {
+                            BotLogger.error(
+                                    "Failed to send developer announcement to " + channel.getName() + ".", error);
+                            sendAnnouncement(
+                                    channels,
+                                    message,
+                                    hook,
+                                    skippedChannels,
+                                    index + 1,
+                                    sentChannels,
+                                    failedChannels + 1);
+                        });
+    }
+
+    private static boolean canSendAnnouncement(TextChannel channel) {
+        try {
+            if (channel.canTalk()) return true;
+            BotLogger.warning("Skipping developer announcement for " + channel.getAsMention()
+                    + " because the bot cannot send messages there.");
+        } catch (Exception error) {
+            BotLogger.error("Failed to check developer announcement permissions for " + channel.getName() + ".", error);
+        }
+        return false;
+    }
+
+    private static String formatDuration(int channelCount) {
+        long totalSeconds = (channelCount * SEND_INTERVAL_MILLISECONDS + 999) / 1000;
+        long minutes = totalSeconds / 60;
+        long seconds = totalSeconds % 60;
+        return minutes == 0 ? seconds + "s" : minutes + "m " + seconds + "s";
     }
 }

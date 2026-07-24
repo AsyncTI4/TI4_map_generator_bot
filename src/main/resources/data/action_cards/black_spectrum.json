@@ -1,0 +1,128 @@
+[
+    {
+        "alias": "bsp_tactical_bombardment",
+        "name": "Tactical Bombardment",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose a system that contains another player's ready planet and is adjacent to or contains 1 or more of your units that have BOMBARDMENT. Roll for each BOMBARDMENT ability of these units. For each hit, exhaust 1 planet controlled by another player in that system.",
+        "flavorText": "A6's red eyes flickered with activity, and a string of numbers flashed briefly across the screen before he spoke. \"Bombardment complete. All enemy installations have been neutralized.\"",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_direct_hit1",
+        "name": "Direct Hit (1)",
+        "phase": "Action",
+        "window": "After another player's ship or ground force uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
+        "text": "Destroy that unit.",
+        "flavorText": "There it was! An opening! Neekuaq gestured wildly, a rare display for one normally quite reserved. \"Fire the main battery!\"",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_direct_hit2",
+        "name": "Direct Hit (2)",
+        "phase": "Action",
+        "window": "After another player's ship or ground force uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
+        "text": "Destroy that unit.",
+        "flavorText": "The Loncara Ssodu's main battery flared to life, firing a volley directly into the flickering starboard shield of the Letnev dreadnought.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_direct_hit3",
+        "name": "Direct Hit (3)",
+        "phase": "Action",
+        "window": "After another player's ship or ground force uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
+        "text": "Destroy that unit.",
+        "flavorText": "For a moment, it looked as if the dreadnought's shield would hold, but a moment later, the ship began to come apart where the attack had pierced its hull.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_direct_hit4",
+        "name": "Direct Hit (4)",
+        "phase": "Action",
+        "window": "After another player's ship or ground force uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
+        "text": "Destroy that unit.",
+        "flavorText": "Neekuaq watched, satisfied, as the ship was wracked by a series of explosions from within, huge armored plates and other debris hurtling off into the darkness.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_direct_hit",
+        "name": "Direct Hit (US)",
+        "phase": "Action",
+        "window": "After another player's ship or ground force uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
+        "text": "Destroy that unit.",
+        "flavorText": "Sdallari Tvungovot admired the wreckage as they prepared to depart the system. They had truly outdone themselves this time.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_confusing_legal",
+        "name": "Confusing Legal Text",
+        "phase": "Agenda",
+        "window": "When an agenda outcome would be resolved",
+        "text": "You may choose to be treated as either the dissenter or the proponent, if able. The previous dissenter or proponent is treated as having the most votes after you. If you are the elected player, you may also choose 1 player to become the elected player instead.",
+        "flavorText": "Somehow, even after the Council had adjourned, none of them were any closer to understanding the strange and confusing events of the day.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_ghost_squad",
+        "name": "Ghost Squad",
+        "phase": "Action",
+        "window": "After a player commits units to land on a planet you control",
+        "text": "Place 1 infantry on that planet. Then, move any number of ground forces from any planet you control in the active system to any other planet you control in the active system.",
+        "flavorText": "The L1 advance team was expecting to find the outpost abandoned. What they found - unfortunately for them - was Connor.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_hack_election",
+        "name": "Hack Election",
+        "phase": "Agenda",
+        "window": "When an agenda outcome would be resolved",
+        "text": "Switch the number of votes cast between 2 other players that cast at least 1 vote.",
+        "flavorText": "YOUR [NULL ID] STATELY GAME WILL BE FOR NAUGHT<< [VAR:42687] ORDER WILL ARISE FROM [VAR:89001] CHAOS<< IT IS OUR HAND THAT CONTROLS THE OUTCOME",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_bribery",
+        "name": "Bribery",
+        "phase": "Agenda",
+        "window": "After the votes cast on an agenda are tallied",
+        "text": "Spend any number of trade goods. For each trade good spent, add 2 additional votes to your total.",
+        "flavorText": "\"We think that this initiative would spell disaster for the galaxy, not just the Creuss.\" Taivra said, quietly slipping Z'eu an envelope. \"Don't you agree?\"",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_construction_rider",
+        "name": "Construction Rider",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 1 structure on a planet you control.",
+        "flavorText": "The vote was nearly unanimous. The council would provide funding for the restoration. Ciel was furious.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_special_session",
+        "name": "Special Session",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, after the agenda has been fully resolved, ready all your planets and reveal 1 agenda from the top of the deck. Players vote on this agenda.",
+        "flavorText": "\"What is it that you seek?\" Kadryn asked the Council. \"You yourselves cannot even say.\"",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_overrule",
+        "name": "Overrule",
+        "phase": "Action",
+        "window": "Action",
+        "text": "If you have at least 2 victory points more than every other player in the game, perform the primary ability of any strategy card.",
+        "flavorText": "Treilla absentmindedly smiled at the audacity of the newly promoted commander. Making waves like this–he'd likely be dead or demoted within a day or two. Still, she found the posturing...amusing.",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_salvage",
+        "name": "Salvage",
+        "phase": "Action",
+        "window": "At the start of the \"Assign Hits\" step of space combat",
+        "text": "Capture each of your opponent's ship destroyed during this step. Then, gain 1 trade good for each non-fighter ships captured in this way.",
+        "flavorText": "When the Coalition raiders had finally returned to their ships, scarcely a bolt remained to salvage from the destroyed vessel.",
+        "source": "black_spectrum"
+    }
+]

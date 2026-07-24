@@ -1,0 +1,431 @@
+[
+    {
+        "alias": "bsp_sarween_tools",
+        "name": "Sarween Tools",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "When 1 or more of your units use PRODUCTION, reduce the combined cost of the produced units by 1.\n\nDuring your turn, when a space dock in your home system uses PRODUCTION, you may exhaust this card to reduce the combined cost of the produced units by 1 for each of your space docks on a planet in home systems.",
+        "homebrewReplacesID": "st",
+        "initials": "ST",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_integrated_economy",
+        "name": "Integrated Economy",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYY",
+        "text": "When you use the PRODUCTION abilities in your home system, for every 2 of your structures on the game board, you may place 1 of the produced units in adjacent systems that contain your units.\n\nACTION: Exhaust this card and spend 1 command token from your strategy pool to use the PRODUCTION abilities of your units in 1 system. If that system is your home system, gain 1 command token.",
+        "homebrewReplacesID": "ie",
+        "initials": "IE",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_x_89",
+        "name": "X-89 Bacterial Weapon",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGG",
+        "text": "After you destroy 1 or more of another player's ground forces on a planet during a tactical action, you may exhaust this card to destroy all of that player's remaining ground forces on that planet.\n\nWhen 1 or more of your ground forces on a planet would be destroyed, you may exhaust this card; half of those ground forces, rounded up, are not destroyed.",
+        "homebrewReplacesID": "x89c4",
+        "initials": "X8BW",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_neural_motivator",
+        "name": "Neural Motivator",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "The maximum number of action cards you can have in your hand is increased by 2. During the status phase, draw 2 action cards instead of 1.",
+        "homebrewReplacesID": "nm",
+        "initials": "NM",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_self_assembly",
+        "name": "Self-Assembly Routines",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "R",
+        "text": "After 1 of your units is destroyed, you may exhaust this card to capture that unit.\n\nAt the end of a combat round, you may return 1 captured unit to produce a unit of the same type and place it with your units participating in the combat. This effect may only be used once per combat.",
+        "homebrewReplacesID": "sar",
+        "initials": "SAR",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_predictive_intelligence",
+        "name": "Predictive Intelligence",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "text": "At the end of your turn, you may exhaust this card to redistribute your command tokens.\n\nWhen you cast votes during the agenda phase, you may exhaust this card to cast 1 additional vote for each of your structures on the game board. Then, if the outcome you voted for is resolved, ready this card.",
+        "homebrewReplacesID": "pi",
+        "initials": "PI",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_psychoarchaeology",
+        "name": "Psychoarchaeology",
+        "types": [
+            "BIOTIC"
+        ],
+        "text": "When researching technology, you may use technology specialties without exhausting planets, even if they are exhausted.\n\nDuring your turn, you may exhaust this card and a planet with a technology specialty to ready 1 technology you own of a matching color. That technology cannot have more prerequisites than the number of matching specialties on planets you control. This counts as using specialties for SYNERGY and other game effects.",
+        "homebrewReplacesID": "pa",
+        "initials": "P",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_scanlink_drone",
+        "name": "Scanlink Drone Network",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "text": "When you activate a system, you may explore 1 planet in that system that contains 1 or more of your units.\n\nWhen you would explore a planet that contains 2 or more of your structures, you may exhaust this card to draw 1 additional card; choose 1 to resolve and discard the rest.",
+        "homebrewReplacesID": "sdn",
+        "initials": "SDN",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_plasma_scoring",
+        "name": "Plasma Scoring",
+        "types": [
+            "WARFARE"
+        ],
+        "text": "When your units make a roll for a unit ability, you may choose 1 of those units to roll 1 additional die.",
+        "homebrewReplacesID": "ps",
+        "initials": "PS",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_dacxive_animators",
+        "name": "Dacxive Animators",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "G",
+        "text": "When your infantry on a planet is destroyed or after you win a ground combat, you may place 1 infantry on that planet. This effect can be resolved only once per planet in an action.",
+        "homebrewReplacesID": "dxa",
+        "initials": "DA",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_hyper_metabolism",
+        "name": "Hyper Metabolism",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "text": "At the end of your turn, you may exhaust this card to gain 1 command token.\n\nDuring the action phase, this card cannot be readied by any game effect unless you spend 2 influence.",
+        "homebrewReplacesID": "hm",
+        "initials": "HM",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_gravity_drive",
+        "name": "Gravity Drive",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "B",
+        "text": "After you activate a system, you may exhaust this card to apply +1 to the move value of 1 of your ships during this tactical action. Then, after movement, if any ship moved through or out of a system containing a gravity rift, a supernova, or a wormhole, you may spend 1 resource to ready this card.",
+        "homebrewReplacesID": "gd",
+        "initials": "GD",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_fleet_logistics",
+        "name": "Fleet Logistics",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BB",
+        "text": "During each of your turns of the action phase, you may perform 2 actions instead of 1.\n\nACTION: Exhaust this card and choose 1 of your ships in a system that does not contain your command token; spend resources equal to half that ship's cost (rounded up). Then, move that ship to an adjacent system that contains your ships.",
+        "homebrewReplacesID": "fl",
+        "initials": "FL",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_graviton_laser",
+        "name": "Graviton Laser System",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "text": "You may exhaust this card before your units use SPACE CANNON to apply +1 to the result of each die roll; hits produced by those units must be assigned to non-fighter ships, if able.\n\nYour units with PLANETARY SHIELD gain SUSTAIN DAMAGE and may use it to cancel hits produced against your units in the same system.",
+        "homebrewReplacesID": "gls",
+        "initials": "GLS",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_magen_defense",
+        "name": "Magen Defense Grid",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "R",
+        "text": "Your war suns cannot be damaged or destroyed by your opponent's action cards.\n\nYour units apply +1 to their space cannon rolls against units within the same system.\n\nAt the start of ground combat, for each of your units with PLANETARY SHIELD on the planet, produce 1 hit and assign it to 1 of your opponent's ground forces.",
+        "homebrewReplacesID": "md",
+        "initials": "MDG",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_duranium_armor",
+        "name": "Duranium Armor",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "text": "At the end of a combat round, you may spend 1 resource to repair 1 of your units participating in the combat. You do not need to spend a resource if that unit did not use SUSTAIN DAMAGE during this combat round.",
+        "homebrewReplacesID": "da",
+        "initials": "DA",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_transit_diodes",
+        "name": "Transit Diodes",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "text": "You may exhaust this card at the start of your turn; remove up to 4 of your ground forces from the game board and place them on 1 or more planets you control.\n\nYou may exhaust this card before you roll dice during a round of ground combat; remove all of your ground forces in that combat and place them on 1 planet you control that contains a structure.",
+        "homebrewReplacesID": "td",
+        "initials": "TD",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_assault_cannon",
+        "name": "Assault Cannon",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RRR",
+        "text": "At the start of a space combat in a system that contains 3 or more of your non-fighter ships, your opponent must destroy 1 of their non-fighter ships.\n\nAt the start of a space combat round, you may exhaust this card to choose a non-fighter non-ground force unit type in the active system. During this combat round, your units of that type roll twice.",
+        "homebrewReplacesID": "asc",
+        "initials": "AC",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_sling_relay",
+        "name": "Sling Relay",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "B",
+        "text": "ACTION: Exhaust this card to produce 1 ship in any system that contains 1 of your space docks. You may instead place that ship in an adjacent system that contains 1 or more of your units or planets you control; if you do, the cost of that ship is doubled.",
+        "homebrewReplacesID": "sr",
+        "initials": "SR",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_antimass_deflectors",
+        "name": "Antimass Deflectors",
+        "types": [
+            "PROPULSION"
+        ],
+        "text": "Your ships can move into and through asteroid fields.\n\nWhen other players’ units use SPACE CANNON against your units, apply -1 to the result of each die roll.\n\nIf you announce a retreat, your opponent applies -2 to the result of each of their combat rolls during this combat round.",
+        "homebrewReplacesID": "amd",
+        "initials": "AD",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_bioplasmosis",
+        "name": "Bioplasmosis",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "arborec",
+        "text": "When you produce units in a system that is connected to your home system by a path of adjacent systems containing your units, reduce the combined cost of the produced units by 1.\n\nACTION: Exhaust this card to remove any number of ground forces or structures from planets you control and place them on 1 or more planets you control in the same or adjacent systems.",
+        "homebrewReplacesID": "bio",
+        "initials": "B",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_production_biomes",
+        "name": "Production Biomes",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "hacan",
+        "text": "ACTION: Exhaust this card to gain 3 trade goods and choose 1 other player; that player gains 2 trade goods.",
+        "homebrewReplacesID": "pm",
+        "initials": "PB",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_yin_spinner",
+        "name": "Yin Spinner",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "yin",
+        "text": "After you produce units, place up to 2 infantry from your reinforcements on any planet you control or in any space area that contains 1 or more of your ships.\n\nWhen you spend resources to research a technology, you may spend commodities as if they were resources.",
+        "homebrewReplacesID": "yso",
+        "initials": "YS",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_instinct_training",
+        "name": "Instinct Training",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "G",
+        "faction": "xxcha",
+        "text": "You may exhaust this card when another player plays an action card; cancel that action card.",
+        "homebrewReplacesID": "it",
+        "initials": "IT",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_l4_disruptors",
+        "name": "L4 Disruptors",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "letnev",
+        "text": "After you spend 2 or more trade goods, gain 1 trade good.",
+        "homebrewReplacesID": "l4",
+        "initials": "LD",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_impulse_core",
+        "name": "Impulse Core",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "yin",
+        "text": "ACTION: Exhaust this card to choose a system. Destroy up to 3 of your cruisers or destroyers in that system. For each ship destroyed, produce 1 hit against another player's units in 1 adjacent system. That player must assign these hits to non-fighter ships, if able. Then, you may produce a number of infantry in your home system, up to the number of your ships destroyed.",
+        "homebrewReplacesID": "ic",
+        "initials": "IC",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_inheritance_systems",
+        "name": "Inheritance Systems",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "l1z1x",
+        "text": "When you research a technology, you may spend 2 resources and exhaust this card to ignore all of that technology's prerequisites.\n\nAfter an invasion in which you gained control of a planet that contains 1 or more structures of another player, you may exhaust this card to gain 1 non-faction technology owned by that player.",
+        "homebrewReplacesID": "is",
+        "initials": "IS",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_e_res",
+        "name": "E-Res Siphons",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYY",
+        "faction": "jolnar",
+        "text": "After another player activates a system that contains 1 or more of your ships, gain 3 trade goods.",
+        "homebrewReplacesID": "ers",
+        "initials": "ERS",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_spatial_conduit",
+        "name": "Spatial Conduit Cylinders",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBB",
+        "faction": "jolnar",
+        "text": "You may exhaust this card after a player activates a system; treat each of your unit as if they were adjacent to systems that contain your structures during this tactical action.",
+        "homebrewReplacesID": "scc",
+        "initials": "SCC",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_lazax_gate",
+        "name": "Lazax Gate Folding",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBB",
+        "faction": "winnu",
+        "text": "After you activate a system, you may exhaust this card; you treat the Mecatol Rex system as if it is adjacent to each system that contains your structures.\n\nACTION: Exhaust this card to place and commit 2 infantry to Mecatol Rex, place 1 more if you don't have custodians token; resolve an invasion on that planet.",
+        "homebrewReplacesID": "lgf",
+        "initials": "LGF",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_valkyrie_particle",
+        "name": "Valkyrie Particle Weave",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "faction": "sardakk",
+        "text": "After you committed at least 1 ground force to a planet, you may commit 1 ground force from each planet in the active system and each planet in adjacent systems that do not contain 1 of your command tokens.\n\nAfter making combat rolls during a round of ground combat, if your opponent produced 1 or more hits, you produce 1 additional hit.",
+        "homebrewReplacesID": "vpw",
+        "initials": "VPW",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_magmus_reactor",
+        "name": "Magmus Reactor",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "faction": "muaat",
+        "text": "Your ships can move into supernovas. Each supernova that contains 1 or more of your units gains the PRODUCTION 5 ability as if it were 1 of your units.\n\nAfter you place 1 or more units in a system that contains or is adjacent to a supernova, you may gain 1 commodity.",
+        "homebrewReplacesID": "mr",
+        "initials": "MR",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_dimensional_splicer",
+        "name": "Dimensional Splicer",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "R",
+        "faction": "ghost",
+        "text": "At the start of a space combat in a system containing a wormhole and 1 or more of your ships, you may produce hits equal to half the number of wormholes in that system (rounded up). Assign these hits to your opponent's ships in that system.",
+        "homebrewReplacesID": "ds",
+        "initials": "DS",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_hegemonic_trade",
+        "name": "Hegemonic Trade Policy",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "winnu",
+        "text": "When 1 or more of your units use PRODUCTION, you may swap the influence and resource values of 1 planet you control during this use of PRODUCTION.",
+        "homebrewReplacesID": "htp",
+        "initials": "HTP",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_aerie_hololattice",
+        "name": "Aerie Hololattice",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "argent",
+        "text": "Other players cannot move ships through systems that contain your structures, unless you allow it.\n\nEach planet that contains 1 or more of your structures gains the PRODUCTION 1 ability as if it were a unit.\n\nAfter you activate a system, you may exhaust this card; during this tactical action, your units can move out of systems that contain both your structures and your command tokens.",
+        "homebrewReplacesID": "ah",
+        "initials": "AH",
+        "source": "black_spectrum"
+    }
+]

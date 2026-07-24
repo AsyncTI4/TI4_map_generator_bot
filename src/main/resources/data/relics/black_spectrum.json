@@ -1,0 +1,58 @@
+[
+    {
+        "alias": "bsp_prophet_s",
+        "name": "The Prophet's Tears",
+        "text": "When you research a technology, you may exhaust this card to ignore 1 prerequisite and draw 1 action card.\n\nACTION: Exhaust this card to ready 1 technology.",
+        "flavourText": "\"So you're going to drink a vial of murky liquid we found in a stasis vault on a dead world because you think it's the concentrated genetic essence of an entire species' most brilliant minds...and you think I'm being irrational?\"",
+        "homebrewReplacesID": "prophetstears",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_crown_thalnos",
+        "name": "The Crown of Thalnos",
+        "text": "At the start of combat, choose 1 of your units. During this combat, that unit rolls 1 additional die in combat rolls.\n\nDuring each combat round, you may reroll any number of your dice, applying +1 to the results. Produce 1 hit against your units for each unit that rerolls dice but does not produce at least 1 hit.",
+        "flavourText": "A cloud of satellites spewed from the dreadnought's hull, drifting into a halo around the vessel. The battle seemed to pause for one long moment, before the drones' weapons flared, unleashing beams of energy in all directions.",
+        "homebrewReplacesID": "thalnos",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_scepter_emelpar",
+        "name": "Scepter of Emelpar",
+        "text": "When you would spend a token from your strategy pool, you may exhaust this card to spend a token from your reinforcements instead.\n\nACTION: Purge this card to ready your strategy card.",
+        "flavourText": "As the hilt began to fuse with the flesh of her hand, she worried that she should set the scepter aside. But the whispered suggestions in her mind were too valuable and insightful to seriously consider such a rash and illogical act.",
+        "homebrewReplacesID": "emelpar",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_heart_ixth",
+        "name": "Heart of Ixth",
+        "text": "After any die is rolled, you may exhaust this card to add or subtract 1 from its result.\n\nAt the end of your turn, ready this card.",
+        "flavourText": "\"It should be impossible.\" Feng glanced sidelong at his compatriot. The Thundarian merely stared ahead, as if he did not hear. Feng snorted. \"One day I mean to know the source of this so-called power of yours.\"",
+        "homebrewReplacesID": "heartofixth",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_stellar_converter",
+        "name": "Stellar Converter",
+        "text": "ACTION: Choose 1 non-home, non-legendary planet in a system that contains or is adjacent to 1 or more of your units that have BOMBARDMENT; destroy all units on that planet and purge its attachments and its planet card.\n\nThen, gain trade goods equal to the combined resources and influence of the destroyed planet, place the destroyed planet token on it and purge this card.",
+        "flavourText": "A power great enough to envelop a star, such that its energies might be concentrated...and scattered.",
+        "homebrewReplacesID": "stellarconverter",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_lightrail_ordnance",
+        "name": "Lightrail Ordnance",
+        "text": "Your space docks gain SPACE CANNON 5 (x2). You may use your space docks' SPACE CANNON against ships that are adjacent to their systems.\n\nYou may purge this card at any time to destroy 1 of your space docks on the game board. If you do, destroy all ships in its system's space area.",
+        "flavourText": "A single sparkle was the only warning the Yin fleet had before a massive hole had been punched through the hull of the Van Hague.\nThen, searing light.",
+        "homebrewReplacesID": "lightrailordnance",
+        "source": "black_spectrum"
+    },
+    {
+        "alias": "bsp_nano_forge",
+        "name": "Nano-Forge",
+        "text": "ACTION: Ready a non-legendary, non-home planet you control and attach this card to it. Its resource and influence values are increased by 2 and it is a legendary planet. This action cannot be performed once attached.",
+        "flavourText": "Intended to bring prosperity, the forge was twisted into an instrument of war.",
+        "homebrewReplacesID": "nanoforge",
+        "source": "black_spectrum"
+    }
+]

@@ -28,7 +28,6 @@ import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
@@ -532,17 +531,6 @@ public class AddPlanetService {
                     + " agent, to draw 1 action card.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons);
         }
-        if (game.getActivePlayerID() != null
-                && !("".equalsIgnoreCase(game.getActivePlayerID()))
-                && player.hasAbility("enslave")
-                && !setup
-                && tile != null) {
-            UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
-            tile.getUnitHolders().get(planet).addUnit(infKey, 1);
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "Added 1 infantry to " + planet + " due to **Enslave**.");
-        }
-
         if (game.getActivePlayerID() != null
                 && !("".equalsIgnoreCase(game.getActivePlayerID()))
                 && player.hasAbility("scour")

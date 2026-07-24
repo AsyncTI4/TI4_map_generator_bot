@@ -1257,12 +1257,10 @@ public final class ButtonHelperModifyUnits {
         if ((tile.isAsteroidField()
                         && !player.hasTech("amd")
                         && !player.hasTech("wavelength")
-                        && !player.getRelics().contains("circletofthevoid")
-                        && !player.hasAbility("celestial_being"))
+                        && !player.getRelics().contains("circletofthevoid"))
                 || (tile.isSupernova()
                         && !player.hasTech("mr")
-                        && !player.getRelics().contains("circletofthevoid")
-                        && !player.hasAbility("celestial_being"))
+                        && !player.getRelics().contains("circletofthevoid"))
                 || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
             return false;
         }
@@ -1891,6 +1889,12 @@ public final class ButtonHelperModifyUnits {
         String successMessage;
         String playerRep = player.getRepresentationNoPing();
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
+        if ("mf".equalsIgnoreCase(unitID) && "tyris".equalsIgnoreCase(player.getFaction())) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "## " + playerRep
+                            + ", this is a __friendly__ reminder that you cannot produce _Reverb_ (Tyris mechs). Please undo this production.");
+        }
         if ("sd".equalsIgnoreCase(unitID)) {
             if (player.hasUnit("absol_saar_spacedock")
                     || player.hasUnit("saar_spacedock")

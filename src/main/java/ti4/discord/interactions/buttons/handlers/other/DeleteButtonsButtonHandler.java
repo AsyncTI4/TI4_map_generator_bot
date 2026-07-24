@@ -12,6 +12,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -183,6 +184,10 @@ class DeleteButtonsButtonHandler {
                         "currentActionSummary" + player.getFaction(),
                         game.getStoredValue("currentActionSummary" + player.getFaction()) + " Produced units in "
                                 + tile.getRepresentationForButtons() + ".");
+                if (MyrrBreakthroughHandler.usedUnitProduction(buttonID)) {
+                    game.setStoredValue(
+                            MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction(), buttonID + "|" + pos);
+                }
             }
             if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)
                     && player.hasAbility("amalgamation")
@@ -401,6 +406,9 @@ class DeleteButtonsButtonHandler {
                 CommanderUnlockCheckService.checkPlayer(player, "revenantmyrr");
             }
         }
+        if ("Done Producing Units".equalsIgnoreCase(buttonLabel) && "myrrBt".equalsIgnoreCase(buttonID)) {
+            game.removeStoredValue(MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction());
+        }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
             if (player.hasTech("asn")
                     && game.getStoredValue("ASN" + player.getFaction()).isEmpty()
@@ -412,6 +420,15 @@ class DeleteButtonsButtonHandler {
                             || buttonID.contains("ministerBuild"))) {
                 ButtonHelperFactionSpecific.offerASNButtonsStep1(game, player, buttonID);
             }
+            String myrrProduction =
+                    game.getStoredValue(MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction());
+            String[] myrrProductionContext = myrrProduction.split("\\|", 2);
+            if (player.hasReadyBreakthrough("myrrbt")
+                    && myrrProductionContext.length == 2
+                    && buttonID.equals(myrrProductionContext[0])) {
+                MyrrBreakthroughHandler.offerRemoteWorkforce(event, game, player, myrrProductionContext[1]);
+            }
+            game.removeStoredValue(MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction());
             player.resetSpentThings();
             game.removeStoredValue("producedUnitCostFor" + player.getFaction());
             if (player.hasAbility("control_network")) {

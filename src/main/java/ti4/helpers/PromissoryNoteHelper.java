@@ -14,6 +14,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionPromissoryHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -694,6 +695,16 @@ public class PromissoryNoteHelper {
         }
         if ("thpnkairn".equalsIgnoreCase(id)) {
             KairnPromissoryHandler.offerArchaeologicalOutpostButtons(event, player, game);
+        }
+        if ("thpnoblivion".equalsIgnoreCase(id)) {
+            OblivionPromissoryHandler.offerShardOfNothingnessButtons(game, player);
+        }
+        if ("thpnverydith".equalsIgnoreCase(id)) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    game.getActionsChannel(),
+                    player.getRepresentation()
+                            + ", you may use these buttons to perform the secondary ability of the strategy card you played _Pact Renewed_ for.\n**REMINDER**: You do not spend a command token when doing this.",
+                    ButtonHelperHeroes.getSecondaryButtons(game));
         }
 
         // These PNs' text contains "action:" but describe a trigger on another player's action

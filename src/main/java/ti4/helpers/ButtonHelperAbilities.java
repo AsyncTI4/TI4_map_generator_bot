@@ -2204,58 +2204,6 @@ public final class ButtonHelperAbilities {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    @ButtonHandler("addProtocol_")
-    public static void addProtocol(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        String protocol = buttonID.split("_")[1];
-        if (!player.hasAbility("protocol_" + protocol)) {
-            player.addAbility("protocol_" + protocol);
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " gained the _" + capitalize(protocol) + "_ Protocol.");
-            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        } else {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + ", you already had the _" + capitalize(protocol) + "_ Protocol.");
-        }
-    }
-
-    private static List<Button> getAvailableProtocols(Player player) {
-        List<Button> buttons = new ArrayList<>();
-        String protocol = "distribution";
-        if (!player.hasAbility("protocol_" + protocol)) {
-            buttons.add(Buttons.gray("addProtocol_" + protocol, capitalize(protocol)));
-        } else {
-            player.removeAbility("protocol_" + protocol);
-        }
-        protocol = "command";
-        if (!player.hasAbility("protocol_" + protocol)) {
-            buttons.add(Buttons.gray("addProtocol_" + protocol, capitalize(protocol)));
-        } else {
-            player.removeAbility("protocol_" + protocol);
-        }
-        protocol = "excavation";
-        if (!player.hasAbility("protocol_" + protocol)) {
-            buttons.add(Buttons.gray("addProtocol_" + protocol, capitalize(protocol)));
-        } else {
-            player.removeAbility("protocol_" + protocol);
-        }
-        protocol = "espionage";
-        if (!player.hasAbility("protocol_" + protocol)) {
-            buttons.add(Buttons.gray("addProtocol_" + protocol, capitalize(protocol)));
-        } else {
-            player.removeAbility("protocol_" + protocol);
-        }
-        protocol = "conflict";
-        if (!player.hasAbility("protocol_" + protocol)) {
-            buttons.add(Buttons.gray("addProtocol_" + protocol, capitalize(protocol)));
-        } else {
-            player.removeAbility("protocol_" + protocol);
-        }
-
-        return buttons;
-    }
-
     public static void giveKeleresCommsNTg(Game game, GenericInteractionCreateEvent event) {
         if (game.isMinorFactionsMode()) {
             for (Tile tile : game.getTileMap().values()) {
@@ -2307,21 +2255,6 @@ public final class ButtonHelperAbilities {
                 ZephyrionBountyHandler.offerBountyButtons(game, player, false);
             }
             TyrisAbilityHandler.checkFlagshipPhantomEnergy(game, player);
-            if (player.hasAbility("protocols")) {
-                List<Button> buttons = getAvailableProtocols(player);
-                String sb = player.getRepresentationUnfogged() + ", your **Protocols** ability was triggered."
-                        + " You can now select two Protocols that you did not select last round to be your active Protocols, and give your leaders abilities.";
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(),
-                        player.getRepresentation() + ", please choose your first Protocol.",
-                        buttons);
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(),
-                        player.getRepresentation() + ", please choose your second Protocol.",
-                        buttons);
-            }
-
             if (!player.hasAbility("council_patronage") && !player.hasTech("tf-puppetcouncil")) continue;
             ButtonHelperStats.gainTGs(event, game, player, 1, true);
             String sb = player.getRepresentationUnfogged() + " your **Council Patronage** ability was triggered. Your "

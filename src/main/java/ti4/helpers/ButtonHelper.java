@@ -58,10 +58,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
@@ -1579,8 +1579,7 @@ public class ButtonHelper {
                 && !player.hasTech("amd")
                 && !player.hasTech("wavelength")
                 && !player.hasTech("absol_amd")
-                && !player.getRelics().contains("circletofthevoid")
-                && !player.hasAbility("celestial_being")) {
+                && !player.getRelics().contains("circletofthevoid")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "## " + player.getRepresentationNoPing()
@@ -1598,8 +1597,7 @@ public class ButtonHelper {
                 && activeSystem.isScar(game)
                 && !player.getRelics().contains("circletofthevoid")
                 && !player.hasUnlockedBreakthrough("nivynbt")
-                && !player.hasTech("tf-singularitypoint")
-                && !player.hasAbility("celestial_being")) {
+                && !player.hasTech("tf-singularitypoint")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) do not work in an entropic scar.");
@@ -1721,19 +1719,6 @@ public class ButtonHelper {
                 msg += "\n-# Note this is optional, and you may remove the frontier manually if you so wish.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
-        }
-
-        if (player.hasAbility("void_tap")
-                && (activeSystem.getPlanetUnitHolders().isEmpty()
-                        || doesPlayerHaveFSHere("eidolon_flagship", player, activeSystem))) {
-            int cTG = player.getTg();
-            player.setTg(cTG + 1);
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " gained 1 trade good (" + cTG + "->" + player.getTg()
-                            + ") for **Void Tap**.");
-            ButtonHelperAgents.resolveArtunoCheck(player, 1);
-            ButtonHelperAbilities.pillageCheck(player, game);
         }
 
         for (Player nonActivePlayer : game.getPlayers().values()) {
@@ -3275,7 +3260,7 @@ public class ButtonHelper {
     public static void resolveMahactMechAbilityUse(
             Player mahact, Player target, Game game, Tile tile, ButtonInteractionEvent event) {
         String mechName = mahact.hasUnit("mahact_mech_y") ? "Starlancer Y" : "Starlancer";
-        mahact.removeMahactCC(target.getColor());
+        MahactTokenService.removeMahactToken(mahact, target.getColor());
         if (!game.isNaaluAgent() && !game.isWarfareAction()) {
             if (!game.getStoredValue("absolLux").isEmpty()) {
                 target.setTacticalCC(target.getTacticalCC() + 1);
@@ -4984,6 +4969,10 @@ public class ButtonHelper {
 
         redTilesToPullFrom.removeAll(
                 game.getTileMap().values().stream().map(Tile::getTileID).toList());
+        String storedPurgedTiles = game.getStoredValue(Constants.PURGED_MAP_TILES);
+        if (!storedPurgedTiles.isBlank()) {
+            redTilesToPullFrom.removeAll(List.of(storedPurgedTiles.split(",")));
+        }
         if (!game.isDiscordantStarsMode() && !game.isUnchartedSpaceStuff()) {
             redTilesToPullFrom.removeAll(redTilesToPullFrom.stream()
                     .filter(tileID -> tileID.contains("d"))
@@ -5720,7 +5709,7 @@ public class ButtonHelper {
 
     public static void resolveFullFrontierExplore(
             Game game, Player player, Tile tile, GenericInteractionCreateEvent event) {
-        if (player.hasAbility("voidsailors") || player.hasAbility("dark_weaver")) {
+        if (player.hasAbility("voidsailors")) {
             String cardID1 = game.drawExplore(Constants.FRONTIER);
             String cardID2 = game.drawExplore(Constants.FRONTIER);
             ExploreModel card1 = Mapper.getExplore(cardID1);
@@ -7732,6 +7721,25 @@ public class ButtonHelper {
                 && checkNumberNonFighterShipsWithoutSpaceCannon(player, game.getTileByPosition(tilePos)) > 0) {
             playersWithPds2.add(player);
         }
+        Tile activeTile = game.getTileByPosition(tilePos);
+        if (FoWHelper.otherPlayersHaveShipsInSystem(player, activeTile, game)
+                && ArcanumTechHandler.hasSigilOfTransmutation(game, player, activeTile)) {
+            playersWithPds2.add(player);
+        }
+        for (Player twilightPlayer : game.getRealPlayers()) {
+            if (playersWithPds2.contains(twilightPlayer)
+                    || !AeternaBreakthroughHandler.hasTwilightDefenseCoverage(game, twilightPlayer, tilePos)) {
+                continue;
+            }
+
+            if (twilightPlayer == player || player.getAllianceMembers().contains(twilightPlayer.getFaction())) {
+                if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos), game)) {
+                    playersWithPds2.add(twilightPlayer);
+                }
+            } else {
+                playersWithPds2.add(twilightPlayer);
+            }
+        }
         for (String adjTilePos : adjTiles) {
             Tile adjTile = game.getTileByPosition(adjTilePos);
             if (adjTile == null) {
@@ -7814,7 +7822,6 @@ public class ButtonHelper {
                 }
             }
         }
-        Tile activeTile = game.getTileByPosition(tilePos);
         for (Player hiveEchoPlayer : game.getRealPlayers()) {
             if (playersWithPds2.contains(hiveEchoPlayer)
                     || XytherisAbilityHandler.getBestHiveEchoUnit(

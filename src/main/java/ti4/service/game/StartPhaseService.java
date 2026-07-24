@@ -56,6 +56,7 @@ import ti4.model.DeckModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.service.StatusCleanupService;
+import ti4.service.VeiledHeartService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.agenda.IxthianArtifactService;
 import ti4.service.emoji.CardEmojis;
@@ -276,6 +277,9 @@ public class StartPhaseService {
                 game.setStoredValue(
                         "TFTelepathicHolder",
                         game.getStoredValue("TFTelepathicHolder").replace(p2.getFaction(), ""));
+            }
+            if (game.isVeiledHeartMode()) {
+                VeiledHeartService.checkForAssigningTelepathic(game, p2);
             }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round " + round);
@@ -1156,6 +1160,9 @@ public class StartPhaseService {
                         && p2.getPromissoryNotes().containsKey("gift")) {
                     PromissoryNoteHelper.resolvePNPlay("gift", p2, game, event);
                 }
+            }
+            if (game.isVeiledHeartMode()) {
+                VeiledHeartService.resolveTelepathicPreset(game, p2);
             }
             game.removeStoredValue("autoProveEndurance_" + p2.getFaction());
         }

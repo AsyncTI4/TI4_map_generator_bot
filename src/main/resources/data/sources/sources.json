@@ -201,6 +201,23 @@
         "data": []
     },
     {
+        "source": "gamma",
+        "name": "Gamma Galaxies",
+        "canal": "community",
+        "subcanal": "lil homebrew",
+        "credits": "Gamma Galaxies",
+        "description": "Reimagining of existing actions",
+        "data": []
+    },
+    {
+        "source": "black_spectrum",
+        "name": "Black Spectrum",
+        "canal": "community",
+        "subcanal": "lil homebrew",
+        "credits": "Black Spectrum",
+        "data": []
+    },
+    {
         "source": "action_deck_2",
         "name": "Action Card Deck 2",
         "canal": "community",

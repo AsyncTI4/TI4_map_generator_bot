@@ -20,6 +20,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -229,6 +231,12 @@ public class PlayerTechService {
                     event.getMessageChannel(), "No eligible purged exploration card is available to shuffle back in.");
             return;
         }
+        if ("thobliviong".equals(tech) && !OblivionTechHandler.canUseMirroredMemories(game, player)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "No eligible component action card is available in the action card discard pile.");
+            return;
+        }
         String exhaustMessage = player.getRepresentation(false, false) + " exhausted technology "
                 + techModel.getRepresentation(false) + ".";
         game.setStoredValue(
@@ -256,6 +264,10 @@ public class PlayerTechService {
         switch (tech) {
             case "tharcanumbg" -> {
                 ArcanumTechHandler.resolveSealOfRevelation(event, game, player);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
+            case "thobliviong" -> {
+                OblivionTechHandler.offerACPlayFromDiscardButtons(event, player, game);
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "bs" -> { // Bio-stims
@@ -607,6 +619,10 @@ public class PlayerTechService {
             case "betaro" -> { // Resource Optimization
                 TaFactionTechHandler.resolveResOp(event, game, player);
             }
+            case "tharcanumpmg" -> { // Power Word: Miracle
+                ArcanumTechHandler.resolvePowerWordMiracle(event, game, player);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
             default ->
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(), "> This technology is not automated. Please resolve manually.");
@@ -732,6 +748,9 @@ public class PlayerTechService {
         GameEventService.commit(
                 game, GameEventType.TECH_RESEARCHED, player, Map.of("techId", techID, "paymentType", paymentType));
         if (techM.isUnitUpgrade()) {
+            if (isResearch) {
+                KryxosAbilityHandler.offerBattleTestedDesigns(event, game, player, techM);
+            }
             AshenLeadersHandler.offerCommanderPlacementButtons(event, game, player, techM);
             if (player.hasUnexhaustedLeader("mirvedaagent") && player.getStrategicCC() > 0) {
                 List<Button> buttons = new ArrayList<>();

@@ -43,12 +43,11 @@ import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
@@ -182,9 +181,16 @@ public final class Helper {
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
         draftManager.init(game);
 
+        Set<String> purgedTileIds = new HashSet<>();
+        String storedPurgedTiles = game.getStoredValue(Constants.PURGED_MAP_TILES);
+        if (!storedPurgedTiles.isBlank()) {
+            Collections.addAll(purgedTileIds, storedPurgedTiles.split(","));
+        }
+
         List<MiltyDraftTile> allTiles = new ArrayList<>(draftManager.getAll())
                 .stream()
                         .filter(tile -> game.getTile(tile.getTile().getTileID()) == null)
+                        .filter(tile -> !purgedTileIds.contains(tile.getTile().getTileID()))
                         .toList();
         return new ArrayList<>(allTiles);
     }
@@ -1637,6 +1643,14 @@ public final class Helper {
         }
         int cost = calculateCostOfProducedUnits(player, game, true);
         int unitCount = calculateCostOfProducedUnits(player, game, false);
+        String remoteWorkforcePosition =
+                game.getStoredValue(MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction());
+        boolean remoteWorkforceBuild = player.hasUnlockedBreakthrough("myrrbt")
+                && player.isBreakthroughExhausted("myrrbt")
+                && !remoteWorkforcePosition.isEmpty()
+                && !player.getCurrentProducedUnits().isEmpty()
+                && player.getCurrentProducedUnits().keySet().stream()
+                        .allMatch(unit -> remoteWorkforcePosition.equals(unit.split("_")[1]));
         String siphonDiscountMessage = "";
         if (player.ownsUnit("netrunners_spacedock") || player.ownsUnit("netrunners_spacedock2")) {
             siphonDiscountMessage = NetrunnersFactionTechsHandler.getSiphonDiscountMessage(game, player);
@@ -1648,6 +1662,9 @@ public final class Helper {
                 msg.append(controlNetworkMessage);
                 if (player.hasUnlockedBreakthrough("arcanumbtback")) {
                     msg.append("\n-1 from Power Word: Wish");
+                }
+                if (remoteWorkforceBuild) {
+                    msg.append("\n-1 from Remote Workforce");
                 }
                 return msg.toString();
             }
@@ -1738,6 +1755,9 @@ public final class Helper {
         if (player.hasUnlockedBreakthrough("arcanumbtback")) {
             msg.append("\n-1 from Power Word: Wish");
         }
+        if (remoteWorkforceBuild) {
+            msg.append("\n-1 from Remote Workforce");
+        }
         msg.append(siphonDiscountMessage);
         return msg.toString();
     }
@@ -1796,6 +1816,13 @@ public final class Helper {
                 int productionValue = unitModel.getProductionValue();
                 if ("fs".equals(unitModel.getAsyncId()) && player.ownsUnit("ghoti_flagship")) {
                     productionValueTotal += player.getFleetCC();
+                }
+                if ("fs".equals(unitModel.getAsyncId()) && player.ownsUnit("myrr_flagship")) {
+                    productionValueTotal += tile.getPlanetUnitHolders().stream()
+                            .filter(planet -> player.getPlanets().contains(planet.getName()))
+                            .mapToInt(Planet::getResources)
+                            .max()
+                            .orElse(0);
                 }
                 if ("mech".equalsIgnoreCase(unitModel.getBaseType())
                         && ButtonHelper.isLawInPlay(game, "articles_war")) {
@@ -2180,6 +2207,21 @@ public final class Helper {
         if (productionValueTotal > 0 && player.hasAbility("policy_the_environment_plunder")) {
             productionValueTotal -= 2;
         }
+        if (player.hasUnlockedBreakthrough("myrrbt")
+                && player.isBreakthroughExhausted("myrrbt")
+                && tile.getPosition()
+                        .equals(game.getStoredValue(
+                                MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction()))) {
+            productionValueTotal += 2;
+        }
+        if (ArcanumTechHandler.hasSigilOfTransmutation(game, player, tile)) {
+            productionValueTotal += 3;
+        }
+        boolean hasExactlyOneShipInSystem =
+                tile.getSpaceUnitHolder().countPlayersUnitsWithModelCondition(player, unit -> unit.getIsShip()) == 1;
+        if (hasExactlyOneShipInSystem && player.hasAbility("rallying_cry")) {
+            productionValueTotal += 2;
+        }
         return productionValueTotal;
     }
 
@@ -2232,6 +2274,16 @@ public final class Helper {
                 cost = NetrunnersFactionTechsHandler.applySiphonDiscount(game, player, cost);
             }
             if (player.hasUnlockedBreakthrough("arcanumbtback")) {
+                cost = Math.max(0, cost - 1);
+            }
+            String remoteWorkforcePosition =
+                    game.getStoredValue(MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction());
+            if (player.hasUnlockedBreakthrough("myrrbt")
+                    && player.isBreakthroughExhausted("myrrbt")
+                    && !remoteWorkforcePosition.isEmpty()
+                    && !producedUnits.isEmpty()
+                    && producedUnits.keySet().stream()
+                            .allMatch(unit -> remoteWorkforcePosition.equals(unit.split("_")[1]))) {
                 cost = Math.max(0, cost - 1);
             }
             return cost;
@@ -2845,11 +2897,7 @@ public final class Helper {
                 if (player_.hasAbility("multitasking")) {
                     ccCount += LunariumAbilityHandler.getFactionSheetCCs(game, player_);
                 }
-            } else if (player_.hasAbility("primacy")
-                    || player_.hasAbility("edict")
-                    || player_.hasAbility("edict_y")
-                    || player_.hasAbility("imperia")
-                    || player_.hasAbility("imperia_y")) {
+            } else if (player_.hasAbility("edict") || player_.hasAbility("imperia")) {
                 for (String color_ : player_.getMahactCC()) {
                     ColorModel ccColor = Mapper.getColor(color_);
                     if (player.getColor().equalsIgnoreCase(ccColor.getName())) {

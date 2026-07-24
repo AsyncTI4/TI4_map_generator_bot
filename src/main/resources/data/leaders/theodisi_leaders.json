@@ -461,6 +461,7 @@
     "abilityWindow": "At any time:",
     "abilityText": "You may ignore the effects of each anomaly.",
     "unlockCondition": "Have units in 3 systems that contain or are adjacent to anomalies.",
+    "notes": "The default when this is unlocked is to ignore the effect of all anomalies. The commander, however, is a \"may\". As such, you can choose at any time for the effects of an anomaly to apply. Due to this, the \"Travelled through rift\" buttons and \"Nebula defense bonus\" are still present because those are the ones most likely to not be ignored.",
     "source": "theodisi"
   },
   {

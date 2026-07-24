@@ -16,9 +16,11 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
@@ -146,6 +148,12 @@ public final class ButtonHelperTacticalAction {
                                 + ", you have _Surveyor's Lens_ and as such may exhaust it to explore a planet in the active system:",
                         KairnTechHandler.getSurveyorsLensButton(player));
             }
+            if (player.hasTechReady("ththronesb")) {
+                MessageHelper.sendMessageToChannelWithButton(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + ", you have _Specter Step_ and may resolve it now:",
+                        ThronesTechHandler.getSpecterStepButton(player));
+            }
             if (player.hasAbility("colony_outposts")
                     && player.getStrategicCC() > 0
                     && !game.getStoredValue(player.getFaction() + "planetsExplored")
@@ -182,6 +190,7 @@ public final class ButtonHelperTacticalAction {
         }
         ArdentiaTechHandler.clearOverlordMatrixGalvanization(game);
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
+        ArcanumTechHandler.clearSigilOfTransmutation(game);
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
     }
@@ -218,6 +227,9 @@ public final class ButtonHelperTacticalAction {
         String message3 = "You have "
                 + Helper.getProductionValue(player, game, game.getTileByPosition(pos), false)
                 + " PRODUCTION value in this system.\n";
+        if (player.hasUnit("myrr_dreadnought") || player.hasUnit("myrr_dreadnought2")) {
+            message3 += MyrrUnitsHandler.getReplicatorProductionReminder(player, game.getTileByPosition(pos));
+        }
         if (Helper.getProductionValue(player, game, game.getTileByPosition(pos), false) > 0
                 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message3 = message3
@@ -466,6 +478,7 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("ghostagent_active");
         XytherisLeadersHandler.clearMyrixAgentEffects(game);
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
+        ArcanumTechHandler.clearSigilOfTransmutation(game);
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         ArdentiaUnitHandler.clearIronClawDeployUsed(game);
         DreamButtonHandler.clearDreamAgentAnomaly(game);
@@ -605,6 +618,7 @@ public final class ButtonHelperTacticalAction {
             return;
         }
         game.setActiveSystem(pos);
+        ArcanumTechHandler.offerSigilOfTransmutation(event, game, player, tile);
         XytherisLeadersHandler.offerMyrixAgentButtons(game, player, tile);
         game.setStoredValue("possiblyUsedRift", "");
         game.setStoredValue("lastActiveSystem", pos);

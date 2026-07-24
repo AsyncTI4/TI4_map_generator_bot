@@ -811,9 +811,7 @@ public class PlayerAreaGenerator {
         if (game.isVeiledHeartMode()) {
             DrawingUtil.superDrawStringCenteredDefault(
                     graphics,
-                    "Veiled Cards: "
-                            + ((game.getStoredValue("veiledCards" + player.getFaction()) + "spoof").split("_").length
-                                    - 1),
+                    "Veiled Cards: " + VeiledHeartService.countVeiledCards(player),
                     mapWidth - xDeltaFromRightSide - 300,
                     yDelta + 50);
         } else {

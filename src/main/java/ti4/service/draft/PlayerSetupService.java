@@ -409,14 +409,6 @@ public class PlayerSetupService {
                     "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
                             + ", due to the **Teeming** ability.");
         }
-        if (player.hasAbility("machine_cult")) {
-            String unitID = AliasHandler.resolveUnit("mech");
-            player.setUnitCap(unitID, 6);
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    "Set mech unit maximum to 6 for " + player.getRepresentation()
-                            + ", due to their **Machine Cult** ability.");
-        }
         if (player.hasAbility("occupational_hazard")) {
             game.setStoredValue("opaBelterWayResolved", "");
             OpaAbilitiesHandler.offerOccupationalHazardButtons(game, player);

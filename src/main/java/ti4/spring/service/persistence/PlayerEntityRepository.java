@@ -48,7 +48,7 @@ public interface PlayerEntityRepository extends JpaRepository<PlayerEntity, Long
             JOIN FETCH p.game g
             WHERE g.completed IS TRUE
               AND g.allianceMode IS FALSE
-              AND g.playerCount >= 3
+              AND g.playerCount >= 5
               AND g.playerCount <= 8
               AND (:onlyTiglGames IS FALSE OR g.twilightImperiumGlobalLeague IS TRUE)
             """)
