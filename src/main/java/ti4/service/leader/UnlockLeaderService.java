@@ -92,6 +92,12 @@ public class UnlockLeaderService {
             }
         }
 
+        if ("veylorhero".equals(leaderID)) {
+            game.setStoredValue("veylorHeroActive_" + player.getFaction(), "yes");
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(), game.getPing() + ", there will now be a third agenda each agenda phase.");
+        }
+
         if (playerLeader.isExhausted()) {
             MessageHelper.sendMessageToChannel(channel, "Leader is also exhausted");
         }
