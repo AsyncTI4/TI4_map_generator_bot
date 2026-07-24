@@ -348,9 +348,90 @@ public class VeiledHeartService {
         ButtonHelper.deleteMessage(event);
     }
 
+    private static Stream<String> getUnveiledDuplicateUnits(Player player, String asyncId) {
+        return player.getUnitsByAsyncID(asyncId).stream()
+                .map(UnitModel::getAlias)
+                .filter(unit -> unit.contains("tf-") || unit.contains("tk-"));
+    }
+
+    private static Stream<String> getVeiledDuplicateUnits(Player player, String asyncId) {
+        return getVeiledCards(VeiledCardType.UNIT, player)
+                .filter(unit -> asyncId.equalsIgnoreCase(Mapper.getUnit(unit).getAsyncId()));
+    }
+
+    @ButtonHandler("keepVeiledUnit_")
+    public static void keepVeiledUnit(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String unitToKeep = buttonID.split("_")[1];
+        String asyncId = Mapper.getUnit(unitToKeep).getAsyncId().toLowerCase();
+
+        getVeiledDuplicateUnits(player, asyncId)
+                .filter(unit -> !unitToKeep.equals(unit))
+                .forEach(unit -> doAction(VeiledCardAction.DISCARD, VeiledCardType.UNIT, player, unit));
+
+        List<String> unitsToRemove = getUnveiledDuplicateUnits(player, asyncId)
+                .filter(unit -> !unitToKeep.equals(unit))
+                .toList();
+        for (String unit : unitsToRemove) {
+            player.removeOwnedUnitByID(unit);
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(),
+                    player.getFactionNameOrColor() + " has discarded the unit upgrade: "
+                            + Mapper.getUnit(unit).getName(),
+                    Mapper.getUnit(unit).getRepresentationEmbed());
+        }
+        if (!unitsToRemove.isEmpty()) {
+            String replacementUnit = Mapper.getUnit(unitToKeep).getBaseType();
+            player.addOwnedUnitByID(replacementUnit);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static void handleDuplicateUnits(Player player, String newUnit) {
+        String asyncId = Mapper.getUnit(newUnit).getAsyncId().toLowerCase();
+        if ("fs".equals(asyncId) || "mf".equals(asyncId)) {
+            // Duplicates are allowed for flagships & mechs
+            return;
+        }
+
+        List<Button> keepButtons = new ArrayList<>();
+        keepButtons.addAll(getUnveiledDuplicateUnits(player, asyncId)
+                .map(unit -> Buttons.blue(
+                        "keepVeiledUnit_" + unit,
+                        "Keep _" + Mapper.getUnit(unit).getName() + "_ (Unveiled)"))
+                .toList());
+        keepButtons.addAll(getVeiledDuplicateUnits(player, asyncId)
+                .map(unit -> Buttons.red(
+                        "keepVeiledUnit_" + unit,
+                        "Keep _" + Mapper.getUnit(unit).getName() + "_ (Veiled)"))
+                .toList());
+        if (keepButtons.isEmpty()) {
+            // No duplicates found
+            return;
+        }
+
+        String plural = keepButtons.size() > 1 ? "s" : "";
+        String msgPrivate = String.format(
+                "%s, you just gained the veiled unit upgrade _'%s'_, but you already have %s unit upgrade%s of that type. Click one of the buttons below to choose which of these unit upgrades to keep. The other one%s will be discarded.",
+                player.getRepresentation(), Mapper.getUnit(newUnit).getName(), keepButtons.size(), plural, plural);
+        String msgPublic = String.format(
+                "%s has gained a unit upgrade, but they already have %s unit upgrade%s of that type. They are currently choosing which unit upgrade to keep.",
+                player.getFactionNameOrColor(), keepButtons.size(), plural);
+
+        keepButtons.add(Buttons.green(
+                "keepVeiledUnit_" + newUnit, "Keep _" + Mapper.getUnit(newUnit).getName() + "_ (New, Veiled)"));
+
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msgPrivate, keepButtons);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msgPublic);
+    }
+
     public static void doSilentAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
         switch (action) {
-            case SPLICE, DRAW -> addVeiledCard(player, card);
+            case SPLICE, DRAW -> {
+                if (type == VeiledCardType.UNIT) {
+                    handleDuplicateUnits(player, card);
+                }
+                addVeiledCard(player, card);
+            }
             case DISCARD -> removeVeiledCard(player, card);
             case UNVEIL -> {
                 switch (type) {
@@ -427,8 +508,6 @@ public class VeiledHeartService {
     }
 
     public static void doAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
-        doSilentAction(action, type, player, card);
-
         String msg;
         switch (action) {
             case SPLICE ->
@@ -455,6 +534,8 @@ public class VeiledHeartService {
                         + type.toString().toLowerCase() + ", but was unable to.";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+
+        doSilentAction(action, type, player, card);
     }
 
     public static void doAction(
