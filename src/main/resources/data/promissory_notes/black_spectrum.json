@@ -9,7 +9,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_tekklar_legion",
+        "alias": "bsp_tekklar",
         "name": "Tekklar Legion",
         "faction": "sardakk",
         "playArea": false,
@@ -18,7 +18,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_creuss_iff",
+        "alias": "bsp_iff",
         "name": "Creuss Iff",
         "faction": "ghost",
         "playArea": false,
@@ -36,7 +36,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_military_support",
+        "alias": "bsp_ms",
         "name": "Military Support",
         "faction": "sol",
         "playArea": false,
@@ -45,7 +45,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_fires_gashlai",
+        "alias": "bsp_fires",
         "name": "Fires of the Gashlai",
         "faction": "muaat",
         "playArea": false,
@@ -54,7 +54,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_spy_net",
+        "alias": "bsp_spynet",
         "name": "Spy Net",
         "faction": "yssaril",
         "playArea": false,
@@ -63,7 +63,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_political_favor",
+        "alias": "bsp_favor",
         "name": "Political Favor",
         "faction": "xxcha",
         "playArea": false,
@@ -72,7 +72,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_promise_protection",
+        "alias": "bsp_pop",
         "name": "Promise of Protection",
         "faction": "mentak",
         "playArea": true,
@@ -82,7 +82,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_ragh_s",
+        "alias": "bsp_ragh",
         "name": "Ragh's Call",
         "faction": "saar",
         "playArea": false,
@@ -91,7 +91,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_gift_prescience",
+        "alias": "bsp_gift",
         "name": "Gift of Prescience",
         "faction": "naalu",
         "playArea": true,
@@ -101,7 +101,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_strike_wing",
+        "alias": "bsp_ambuscade",
         "name": "Strike Wing Ambuscade",
         "faction": "argent",
         "playArea": false,
@@ -120,7 +120,7 @@
         "source": "black_spectrum"
     },
     {
-        "alias": "bsp_trade_convoys",
+        "alias": "bsp_convoys",
         "name": "Trade Convoys",
         "faction": "hacan",
         "playArea": true,
