@@ -849,23 +849,23 @@ public final class ButtonHelperTwilightsFallActionCards {
         for (String card : unitSpliceDeck) {
             embeds.add(Mapper.getUnit(card).getRepresentationEmbed());
             if (Mapper.getUnit(card).getBaseType().equalsIgnoreCase(unitT)) {
-                UnitModel unitModel = Mapper.getUnit(card);
-                String asyncId = unitModel.getAsyncId();
-                if (!"fs".equalsIgnoreCase(asyncId) && !"mf".equalsIgnoreCase(asyncId)) {
-                    List<UnitModel> unitsToRemove = player.getUnitsByAsyncID(asyncId).stream()
-                            .filter(unit -> unit.getFaction().isEmpty()
-                                    || unit.getUpgradesFromUnitId().isEmpty())
-                            .toList();
-                    for (UnitModel u : unitsToRemove) {
-                        player.removeOwnedUnitByID(u.getId());
-                    }
-                }
                 found = Mapper.getUnit(card).getNameRepresentation() + ". It has been automatically gained.";
                 if (game.isVeiledHeartMode()) {
                     found +=
                             " (It was gained face-down and may be put into play with a button in the `#cards-info` thread.)";
                     VeiledHeartService.addVeiledCard(player, card);
                 } else {
+                    UnitModel unitModel = Mapper.getUnit(card);
+                    String asyncId = unitModel.getAsyncId();
+                    if (!"fs".equalsIgnoreCase(asyncId) && !"mf".equalsIgnoreCase(asyncId)) {
+                        List<UnitModel> unitsToRemove = player.getUnitsByAsyncID(asyncId).stream()
+                                .filter(unit -> unit.getFaction().isEmpty()
+                                        || unit.getUpgradesFromUnitId().isEmpty())
+                                .toList();
+                        for (UnitModel u : unitsToRemove) {
+                            player.removeOwnedUnitByID(u.getId());
+                        }
+                    }
                     player.addOwnedUnitByID(card);
                 }
                 break;
