@@ -239,6 +239,14 @@ public class VeiledHeartService {
                 "veiled_discard_genome_%s_" + targetPlayer.getFaction());
     }
 
+    public static List<Button> getVeiledPurgeButtonsForLawsHero(Player activePlayer, Player targetPlayer) {
+        return getButtonsForChoosingForeignVeiledCard(
+                VeiledCardType.ABILITY,
+                activePlayer,
+                targetPlayer,
+                "lawsHeroStep3_" + targetPlayer.getFaction() + "_%s");
+    }
+
     public static List<Button> getVeiledGiveButtonsForCoerce(Player sender, Player recipient) {
         return getVeiledCards(VeiledCardType.ABILITY, sender)
                 .map(veiledAbility -> Buttons.red(
@@ -332,7 +340,7 @@ public class VeiledHeartService {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static void doSilentAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
+    public static void doSilentAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
         switch (action) {
             case SPLICE, DRAW -> addVeiledCard(player, card);
             case DISCARD -> removeVeiledCard(player, card);

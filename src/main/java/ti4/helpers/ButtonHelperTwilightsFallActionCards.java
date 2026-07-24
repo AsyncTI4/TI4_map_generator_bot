@@ -702,6 +702,9 @@ public final class ButtonHelperTwilightsFallActionCards {
             }
             buttons.add(Buttons.gray("lawsHeroStep3_" + p2.getFaction() + "_" + tech, techM.getName()));
         }
+        if (game.isVeiledHeartMode()) {
+            buttons.addAll(VeiledHeartService.getVeiledPurgeButtonsForLawsHero(player, p2));
+        }
         String msg = player.getRepresentation() + ", please choose the ability that you wish to purge.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
@@ -710,14 +713,31 @@ public final class ButtonHelperTwilightsFallActionCards {
     @ButtonHandler("lawsHeroStep3")
     public static void lawsHeroStep3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        String agent = buttonID.split("_")[2];
-        game.setStoredValue("purgedAbilities", game.getStoredValue("purgedAbilities") + "_" + agent);
-        TechnologyModel lead = Mapper.getTech(agent);
-        p2.removeTech(agent);
-        String leaderRepresentation = lead.getNameRepresentation();
-        String msg = player.getRepresentation() + " has chosen to purge " + leaderRepresentation + " from "
+        String ability = buttonID.split("_")[2];
+        game.setStoredValue("purgedAbilities", game.getStoredValue("purgedAbilities") + "_" + ability);
+        TechnologyModel tech = Mapper.getTech(ability);
+
+        if (p2.hasTech(ability)) {
+            p2.removeTech(ability);
+        } else if (game.isVeiledHeartMode()) {
+            VeiledHeartService.doSilentAction(
+                    VeiledHeartService.VeiledCardAction.DISCARD,
+                    VeiledHeartService.VeiledCardType.ABILITY,
+                    p2,
+                    ability);
+        } else {
+            String msg = "Error: " + player.getFactionNameOrColor() + " attempted to purge " + ability + " from "
+                    + p2.getFactionNameOrColor() + ", but the ability was not found on that player!";
+            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String techRepresentation = tech.getNameRepresentation();
+        String msg = player.getRepresentation() + " has chosen to purge " + techRepresentation + " from "
                 + p2.getFactionNameOrColor() + ".";
-        String msg2 = p2.getRepresentation() + ", you lost " + leaderRepresentation + " to _The Laws Unwritten_ by "
+        String msg2 = p2.getRepresentation() + ", you lost " + techRepresentation + " to _The Laws Unwritten_ by "
                 + player.getFactionNameOrColor() + "; it has been purged.";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
