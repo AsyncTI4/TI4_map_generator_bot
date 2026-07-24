@@ -213,6 +213,9 @@ public class CombatRollService {
                             + ".");
             return 0;
         }
+        if (XytherisLeadersHandler.offerHeroUnitAbilityRoll(event, game, player, tile, combatOnHolder, rollType)) {
+            return 0;
+        }
         Player opponent = null;
 
         Map<Pair<UnitModel, UnitHolder>, Integer> playerUnitsByQuantity =
@@ -1107,6 +1110,11 @@ public class CombatRollService {
                     unitHolder.getName(), Mapper.getUnitKey(AliasHandler.resolveUnit("mf"), player.getColorID()), 1);
         }
         StringBuilder resultBuilder = new StringBuilder(result);
+        boolean xytherisHeroBonus =
+                XytherisLeadersHandler.hasHeroUnitAbilityRollBonus(game, player, activeSystem, unitHolder, rollType);
+        if (xytherisHeroBonus) {
+            resultBuilder.append("Applied +4 to all dice with _Call of the Queen - The Endless Swarm_.\n");
+        }
         boolean metaliVoidCounted = false;
         String highestValueSingleUnitKey = "highestValueSingleUnit" + player.getFaction();
         String storedHighestValueUnit = game.getStoredValue(highestValueSingleUnitKey);
@@ -1199,6 +1207,9 @@ public class CombatRollService {
                     rollType,
                     activeSystem,
                     perUnitHolder);
+            if (xytherisHeroBonus) {
+                modifierToHit += 4;
+            }
             List<NamedCombatModifierModel> availableExtraRolls = extraRolls.stream()
                     .filter(m -> !consumedBestMods.contains(m.getModifier().getAlias()))
                     .collect(Collectors.toList());
