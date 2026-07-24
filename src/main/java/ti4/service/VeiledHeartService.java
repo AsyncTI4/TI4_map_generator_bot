@@ -99,7 +99,27 @@ public class VeiledHeartService {
         DRAW,
         SPLICE,
         SEND,
-        UNVEIL
+        UNVEIL;
+
+        static Optional<VeiledCardAction> fromString(String str) {
+            str = str.toLowerCase();
+            if (str.contains("discard")) {
+                return Optional.of(DISCARD);
+            }
+            if (str.contains("draw")) {
+                return Optional.of(DRAW);
+            }
+            if (str.contains("splice")) {
+                return Optional.of(SPLICE);
+            }
+            if (str.contains("send")) {
+                return Optional.of(SEND);
+            }
+            if (str.contains("unveil")) {
+                return Optional.of(UNVEIL);
+            }
+            return Optional.empty();
+        }
     }
 
     private static String toTitleCase(String s) {
@@ -376,6 +396,14 @@ public class VeiledHeartService {
                 removeVeiledCard(player, card);
             }
         }
+    }
+
+    public static void doAction(String actionStr, Player player, String card) {
+        VeiledCardAction.fromString(actionStr).ifPresent(action -> doAction(action, player, card));
+    }
+
+    private static void doAction(VeiledCardAction action, Player player, String card) {
+        VeiledCardType.fromCard(card).ifPresent(type -> doAction(action, type, player, card));
     }
 
     public static void doAction(VeiledCardAction action, String typeStr, Player player, String card) {
