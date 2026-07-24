@@ -33,6 +33,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamBut
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanAbilityHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -1144,6 +1146,12 @@ public final class AgendaHelper {
                             if (winningR.hasAbility("plausible_deniability")) {
                                 game.drawSecretObjective(winningR.getUserID());
                                 message += " Drew a second secret objective due to **Plausible Deniability**.";
+                            }
+                            if (winningR.hasAbility("multitasking")) {
+                                LunariumAbilityHandler.offerFactionSheetCCButtons(game, winningR);
+                            }
+                            if (winningR.hasUnlockedBreakthrough("lunariumbt")) {
+                                LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, winningR);
                             }
                             SecretObjectiveInfoService.sendSecretObjectiveInfo(game, winningR);
                             MessageHelper.sendMessageToChannel(winningR.getCorrectChannel(), message);

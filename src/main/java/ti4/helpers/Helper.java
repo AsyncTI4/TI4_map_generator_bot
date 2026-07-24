@@ -51,6 +51,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -226,6 +227,12 @@ public final class Helper {
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
                     message += " Drew a second secret objective due to **Plausible Deniability**.";
+                }
+                if (player.hasAbility("multitasking")) {
+                    LunariumAbilityHandler.offerFactionSheetCCButtons(game, player);
+                }
+                if (player.hasUnlockedBreakthrough("lunariumbt")) {
+                    LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, player);
                 }
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
                 game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));

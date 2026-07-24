@@ -6,6 +6,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -173,6 +175,12 @@ class GamePhaseButtonHandler {
         if (player.hasAbility("plausible_deniability")) {
             game.drawSecretObjective(player.getUserID());
             message += ". Drew a second secret objective due to **Plausible Deniability**.";
+        }
+        if (player.hasAbility("multitasking")) {
+            LunariumAbilityHandler.offerFactionSheetCCButtons(game, player);
+        }
+        if (player.hasUnlockedBreakthrough("lunariumbt")) {
+            LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, player);
         }
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
         ReactionService.addReaction(event, game, player, message);
