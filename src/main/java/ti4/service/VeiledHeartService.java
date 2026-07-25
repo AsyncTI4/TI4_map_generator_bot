@@ -526,6 +526,7 @@ public class VeiledHeartService {
                         + type.toString().toLowerCase() + ": " + getRepresentation(type, card);
                 MessageHelper.sendMessageToChannelWithEmbed(
                         player.getCorrectChannel(), msg, getRepresentationEmbed(type, card));
+                doSilentAction(action, type, player, card);
                 return;
             }
             default ->
