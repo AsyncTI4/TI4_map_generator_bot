@@ -263,15 +263,20 @@ public final class ButtonHelperTwilightsFallActionCards {
                 }
             }
         } else {
+            Player activeP = game.getActivePlayer();
+            if (activeP == null) {
+                activeP = player;
+            }
             if (game.isVeiledHeartMode()) {
                 MessageHelper.sendMessageToChannel(
-                        game.getMainGameChannel(), game.getPing() + ", the splice is complete.");
+                        activeP.getCorrectChannel(), activeP.getRepresentation() + ", the splice is complete.");
             } else {
                 List<String> cards = ButtonHelperTwilightsFall.getSpliceCards(game);
                 List<MessageEmbed> embeds = ButtonHelperTwilightsFall.getSpliceEmbeds(game, type, cards, null);
                 MessageHelper.sendMessageToChannelWithEmbeds(
-                        game.getMainGameChannel(),
-                        game.getPing() + ", the splice is complete. The remaining splice cards were as follows",
+                        activeP.getCorrectChannel(),
+                        activeP.getRepresentation()
+                                + ", the splice is complete. The remaining splice cards were as follows",
                         embeds);
             }
             if (!game.getStoredValue("endTurnWhenSpliceEnds").isEmpty()) {

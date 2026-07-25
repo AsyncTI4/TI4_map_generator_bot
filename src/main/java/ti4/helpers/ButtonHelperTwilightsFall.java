@@ -603,7 +603,7 @@ public final class ButtonHelperTwilightsFall {
         } else {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
-                    "The splice order has been reversed. The new order is: " + getSpliceOrderString(participants));
+                    "The splice order has been reversed. The new order is: \n" + getSpliceOrderString(participants));
         }
 
         game.removeStoredValue("reverseSpliceOrder");
@@ -875,7 +875,7 @@ public final class ButtonHelperTwilightsFall {
                         player.getRepresentation() + " has removed a spliced card from the draft.");
             } else {
                 if (!game.isVeiledHeartMode()) {
-                    if (player.hasAbility("tf-forbiddenknowledge")) {
+                    if (player.hasTech("tf-forbiddenknowledge")) {
                         List<Button> buttons2 = new ArrayList<>();
                         buttons2.add(Buttons.red(
                                 "discardSpliceCard_" + type, "Discard 1 " + StringUtils.capitalize(type) + " Card"));
@@ -990,15 +990,20 @@ public final class ButtonHelperTwilightsFall {
                     sendPlayerSpliceOptions(game, participants.getFirst());
                 }
             } else {
+                Player activeP = game.getActivePlayer();
+                if (activeP == null) {
+                    activeP = player;
+                }
                 if (game.isVeiledHeartMode()) {
                     MessageHelper.sendMessageToChannel(
-                            game.getMainGameChannel(), game.getPing() + ", the splice is complete.");
+                            activeP.getCorrectChannel(), activeP.getRepresentation() + ", the splice is complete.");
                 } else {
                     List<String> cards = ButtonHelperTwilightsFall.getSpliceCards(game);
                     List<MessageEmbed> embeds = ButtonHelperTwilightsFall.getSpliceEmbeds(game, type, cards, null);
                     MessageHelper.sendMessageToChannelWithEmbeds(
-                            game.getMainGameChannel(),
-                            game.getPing() + ", the splice is complete. The remaining splice cards were as follows",
+                            activeP.getCorrectChannel(),
+                            activeP.getRepresentation()
+                                    + ", the splice is complete. The remaining splice cards were as follows",
                             embeds);
                 }
                 if (!game.getStoredValue("endTurnWhenSpliceEnds").isEmpty()) {
