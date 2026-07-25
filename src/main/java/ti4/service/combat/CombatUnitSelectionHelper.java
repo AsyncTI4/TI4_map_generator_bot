@@ -45,7 +45,9 @@ public class CombatUnitSelectionHelper {
         UnitModel thunderbirdGroundForce = PonthousPromissoryHandler.getThunderbirdPrototypeGroundForce(
                 context.player().getGame(), context.player(), context.tile());
         if (thunderbirdGroundForce != null) {
-            selectedUnits.putIfAbsent(thunderbirdGroundForce, 1);
+            // This unit can already have an equivalent model in space (for example, through another temporary
+            // effect). It is still a separate selected ground force, so it must contribute one combat die.
+            selectedUnits.merge(thunderbirdGroundForce, 1, Integer::sum);
         }
         return applySpaceRestrictions(context, selectedUnits);
     }

@@ -218,10 +218,6 @@ public class PromissoryNoteHelper {
                 return;
             }
         }
-        if ("thpnponthous".equals(id)) {
-            PonthousPromissoryHandler.offerThunderbirdPrototypeFromPromissoryPlay(event, game, player);
-            return;
-        }
         PromissoryNoteModel pn = Mapper.getPromissoryNote(id);
         String pnName = pn.getName();
         GameEventService.commit(game, GameEventType.CARD_PLAY_PROMISSORY_NOTE, player, Map.of("cardId", id));

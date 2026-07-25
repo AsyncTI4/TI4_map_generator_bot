@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.math.NumberUtils;
 import ti4.discord.interactions.buttons.Buttons;
@@ -15,6 +15,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.Units.UnitKey;
@@ -22,6 +23,10 @@ import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.transaction.SendPromissoryService;
+import ti4.service.unit.UnitModelValueInjectionService;
+import ti4.service.unit.UnitModelValueInjectionService.BooleanValueInjection;
+import ti4.service.unit.UnitModelValueInjectionService.IntegerValueInjection;
+import ti4.service.unit.UnitModelValueInjectionService.UnitValueInjection;
 
 @UtilityClass
 public class PonthousPromissoryHandler {
@@ -30,61 +35,72 @@ public class PonthousPromissoryHandler {
     private static final String SELECT_THUNDERBIRD_GROUND_FORCE = "selectThunderbirdGroundForce_";
     private static final String THUNDERBIRD_PROTOTYPE_STATE = "thunderbirdPrototype_";
 
-    public static Button getThunderbirdPrototypeButton(Game game, Player player, Tile tile) {
-        if (!canPlayThunderbirdPrototype(game, player, tile)) {
-            return null;
-        }
-        return Buttons.green(
-                player.factionButtonChecker() + USE_THUNDERBIRD_PROTOTYPE + tile.getPosition(),
-                "Use Thunderbird Prototype",
-                FactionEmojis.ponthous);
-    }
+    public static void offerThunderbirdPrototypeAtSpaceCombatStart(
+            Game game, Player player1, Player player2, Tile tile, ThreadChannel combatThread) {
+        Player player = hasThunderbirdPrototypeFromAnotherPlayer(game, player1)
+                ? player1
+                : hasThunderbirdPrototypeFromAnotherPlayer(game, player2) ? player2 : null;
+        if (player == null) return;
 
-    public static boolean offerThunderbirdPrototypeFromPromissoryPlay(
-            GenericInteractionCreateEvent event, Game game, Player player) {
-        Tile tile = getThunderbirdCombatTile(game);
-        if (!canPlayThunderbirdPrototype(game, player, tile)) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    player.getRepresentationNoPing()
-                            + ", _Thunderbird Prototype_ requires a space combat and one of your ground forces in that system.");
-            return true;
-        }
-        sendThunderbirdGroundForceButtons(event.getMessageChannel(), game, player, tile);
-        return true;
+        List<Button> buttons = List.of(
+                Buttons.green(
+                        player.factionButtonChecker()
+                                + USE_THUNDERBIRD_PROTOTYPE
+                                + tile.getPosition()
+                                + "|"
+                                + combatThread.getId(),
+                        "Use Thunderbird Prototype",
+                        FactionEmojis.ponthous),
+                Buttons.red(player.factionButtonChecker() + "deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationNoPing()
+                        + ", you may use _Thunderbird Prototype_ to have one of your ground forces participate in this space combat.",
+                buttons);
     }
 
     @ButtonHandler(USE_THUNDERBIRD_PROTOTYPE)
     public static void useThunderbirdPrototype(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        Tile tile = game.getTileByPosition(buttonID.substring(USE_THUNDERBIRD_PROTOTYPE.length()));
+        String[] values = buttonID.substring(USE_THUNDERBIRD_PROTOTYPE.length()).split("\\|", 2);
+        Tile tile = values.length == 2 ? game.getTileByPosition(values[0]) : null;
+        ThreadChannel combatThread = values.length == 2 ? event.getJDA().getThreadChannelById(values[1]) : null;
         if (!canPlayThunderbirdPrototype(game, player, tile)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        sendThunderbirdGroundForceButtons(event.getMessageChannel(), game, player, tile);
+        if (combatThread == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not find the combat thread for Thunderbird Prototype.");
+            return;
+        }
+        sendThunderbirdGroundForceButtons(combatThread, game, player, tile);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler(SELECT_THUNDERBIRD_GROUND_FORCE)
     public static void selectThunderbirdGroundForce(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        Tile activeTile = getThunderbirdCombatTile(game);
-        List<Button> buttons = getEligibleThunderbirdGroundForceButtons(game, player, activeTile);
-        String message = getThunderbirdGroundForceMessage(player);
-        String prefix = player.factionButtonChecker() + SELECT_THUNDERBIRD_GROUND_FORCE;
-        if (NewStuffHelper.checkAndHandlePaginationChange(
-                event, event.getMessageChannel(), buttons, message, prefix, buttonID)) {
-            return;
-        }
-
         String payload = buttonID.substring(SELECT_THUNDERBIRD_GROUND_FORCE.length());
         String[] values = payload.split("\\|", 3);
-        Tile tile = values.length == 3 ? getThunderbirdCombatTile(game) : null;
-        if (tile == null || !tile.getPosition().equals(values[0])) {
+        if (values.length != 3) {
+            Tile activeTile = getThunderbirdCombatTile(game);
+            List<Button> buttons = getEligibleThunderbirdGroundForceButtons(game, player, activeTile);
+            if (NewStuffHelper.checkAndHandlePaginationChange(
+                    event,
+                    event.getMessageChannel(),
+                    buttons,
+                    getThunderbirdGroundForceMessage(player),
+                    player.factionButtonChecker() + SELECT_THUNDERBIRD_GROUND_FORCE,
+                    buttonID)) {
+                return;
+            }
             ButtonHelper.deleteMessage(event);
             return;
         }
+
+        // A combat can be started outside a tactical action, where currentActiveSystem is not guaranteed to
+        // remain populated. The button already carries the exact system in which this combat was started.
+        Tile tile = game.getTileByPosition(values[0]);
         UnitHolder holder = tile == null ? null : tile.getUnitHolders().get(values[1]);
         UnitKey unitKey = holder == null
                 ? null
@@ -143,7 +159,21 @@ public class PonthousPromissoryHandler {
                         .findFirst()
                         .orElse(null);
         UnitModel unit = unitKey == null ? null : player.getPriorityUnitByAsyncID(unitKey.asyncID(), holder);
-        return unit != null && unit.getIsGroundForce() && holder.getUnitCount(unitKey) > 0 ? unit : null;
+        if (unit == null || !unit.getIsGroundForce() || holder.getUnitCount(unitKey) < 1) return null;
+        return UnitModelValueInjectionService.injectTemporaryValues(
+                unit,
+                UnitValueInjection.of(
+                        // The normal Galvanized combat modifier reads the space holder. A Thunderbird unit on a
+                        // planet is deliberately not moved there, so carry its one Galvanized combat die on the
+                        // temporary combat model instead.
+                        Constants.SPACE.equals(holder.getName())
+                                ? null
+                                : IntegerValueInjection.create().combatDieCount(1),
+                        null,
+                        BooleanValueInjection.create()
+                                .isShip(true)
+                                .isPlanetOnly(false)
+                                .isSpaceOnly(false)));
     }
 
     public static void clearThunderbirdPrototype(Game game) {
@@ -180,12 +210,20 @@ public class PonthousPromissoryHandler {
         if (game == null
                 || player == null
                 || tile == null
-                || !player.hasPlayablePromissoryInHand(THUNDERBIRD_PROTOTYPE)
+                || !hasThunderbirdPrototypeFromAnotherPlayer(game, player)
                 || player.getPromissoryNotesInPlayArea().contains(THUNDERBIRD_PROTOTYPE)
                 || getEligibleThunderbirdGroundForceButtons(game, player, tile).isEmpty()) {
             return false;
         }
         return !game.getStoredValue("factionsInCombat").isEmpty();
+    }
+
+    private static boolean hasThunderbirdPrototypeFromAnotherPlayer(Game game, Player player) {
+        Player owner = game == null ? null : game.getPNOwner(THUNDERBIRD_PROTOTYPE);
+        return player != null
+                && owner != null
+                && owner != player
+                && player.hasPlayablePromissoryInHand(THUNDERBIRD_PROTOTYPE);
     }
 
     private static Tile getThunderbirdCombatTile(Game game) {
