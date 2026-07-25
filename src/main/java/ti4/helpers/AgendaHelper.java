@@ -293,10 +293,9 @@ public final class AgendaHelper {
 
         boolean playerPrevotesIsEmpty =
                 game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
-        boolean playerIsNotActivePlayer = "agendaWaiting".equalsIgnoreCase(game.getPhaseOfGame());
-        boolean playerIsPrevoting =
-                !playerPrevotesIsEmpty && (playerIsNotActivePlayer || game.getActivePlayer() != player);
-        if (playerIsPrevoting) {
+        boolean agendaWaitingPhase = "agendaWaiting".equalsIgnoreCase(game.getPhaseOfGame());
+        boolean playerIsPrevoting = !playerPrevotesIsEmpty && game.getActivePlayer() != player;
+        if (playerIsPrevoting || agendaWaitingPhase) {
             if ("0".equalsIgnoreCase(votes)) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),

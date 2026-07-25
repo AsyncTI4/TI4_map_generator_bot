@@ -55,7 +55,11 @@ public class TfConveneResolver implements EdictResolver {
                     + Mapper.getTech(cardID).getName();
             if (game.isVeiledHeartMode()) {
                 msg += " (It was turned face-down and may be put into play with a button in the `#cards-info` thread.)";
-                VeiledHeartService.addVeiledCard(tyrant, cardID);
+                VeiledHeartService.doSilentAction(
+                        VeiledHeartService.VeiledCardAction.DRAW,
+                        VeiledHeartService.VeiledCardType.ABILITY,
+                        tyrant,
+                        cardID);
             } else {
                 tyrant.addTech(cardID);
             }
@@ -112,7 +116,8 @@ public class TfConveneResolver implements EdictResolver {
                 + Mapper.getTech(cardID).getName();
         if (game.isVeiledHeartMode()) {
             msg += " (It was turned face-down and may be put into play with a button in the `#cards-info` thread.)";
-            VeiledHeartService.addVeiledCard(p2, cardID);
+            VeiledHeartService.doSilentAction(
+                    VeiledHeartService.VeiledCardAction.DRAW, VeiledHeartService.VeiledCardType.ABILITY, p2, cardID);
         } else {
             p2.addTech(cardID);
         }

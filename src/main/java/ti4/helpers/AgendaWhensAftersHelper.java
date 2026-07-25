@@ -71,6 +71,11 @@ public final class AgendaWhensAftersHelper {
             game.removeStoredValue("queuedWhensFor" + player.getFaction());
             game.removeStoredValue("queuedAftersFor" + player.getFaction());
             game.removeStoredValue("queuedAftersLockedFor" + player.getFaction());
+            List<String> whens = AgendaWhensAftersHelper.getPossibleWhenNames(player);
+            List<String> afters = AgendaWhensAftersHelper.getPossibleAfterNames(player);
+            if (!game.getStoredValue("executiveOrder").isEmpty() && whens.isEmpty() && afters.isEmpty()) {
+                game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "Yes");
+            }
             if ((!game.getStoredValue("passOnAllWhensNAfters" + player.getFaction())
                                     .isEmpty()
                             || player.isNpc())
