@@ -15,6 +15,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousPromissoryHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -216,6 +217,10 @@ public class PromissoryNoteHelper {
                                 + " It will not work if you play it before then, so I am stopping you here.");
                 return;
             }
+        }
+        if ("thpnponthous".equals(id)) {
+            PonthousPromissoryHandler.offerThunderbirdPrototypeFromPromissoryPlay(event, game, player);
+            return;
         }
         PromissoryNoteModel pn = Mapper.getPromissoryNote(id);
         String pnName = pn.getName();

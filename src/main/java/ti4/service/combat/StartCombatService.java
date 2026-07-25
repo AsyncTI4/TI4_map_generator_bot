@@ -320,6 +320,7 @@ public class StartCombatService {
             channel = game.getMainGameChannel();
         }
         PonthousUnitHandler.clearOldGlorySustain(game);
+        PonthousPromissoryHandler.clearThunderbirdPrototype(game);
         game.setStoredValue("factionsInCombat", player1.getFaction() + "_" + player2.getFaction());
 
         sendStartOfCombatSecretMessages(game, player1, player2, tile, spaceOrGround, unitHolderName);
@@ -1433,6 +1434,10 @@ public class StartCombatService {
         if (oldGloryP1 != null) buttons.add(oldGloryP1);
         Button oldGloryP2 = PonthousUnitHandler.getOldGlorySustainButton(p2, tile);
         if (oldGloryP2 != null) buttons.add(oldGloryP2);
+        for (Player player : game.getRealPlayers()) {
+            Button thunderbird = PonthousPromissoryHandler.getThunderbirdPrototypeButton(game, player, tile);
+            if (thunderbird != null) buttons.add(thunderbird);
+        }
 
         return buttons;
     }

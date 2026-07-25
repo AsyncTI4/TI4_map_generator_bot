@@ -876,6 +876,12 @@ public class CombatRollService {
                 && !player.hasLeaderUnlocked("xytheriscommander")) {
             UnlockLeaderService.unlockLeader("xytheriscommander", game, player);
         }
+        if (rollType != CombatRollType.combatround && h >= 1 && player.hasTech("thxytherisr")) {
+            MessageHelper.sendMessageToChannelWithButton(
+                    event.getMessageChannel(),
+                    player.getRepresentation() + ", you may use _Biomechanical Nutrients_:",
+                    XytherisTechHandler.getBiomechanicalButton(event, game, player, h));
+        }
 
         if (rollType == CombatRollType.bombardment) {
             AshenLeadersHandler.offerCommanderBombardmentButtons(event, game, player, h);

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousPromissoryHandler;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -40,6 +41,11 @@ public class CombatUnitSelectionHelper {
             // Purple TF mechs / Naaz Voltron let those mechs join the space combat from planets in the system.
         } else if (hasPurpleTFMech(context.player())) {
             selectedUnits = includeMechsFromPlanets(context);
+        }
+        UnitModel thunderbirdGroundForce = PonthousPromissoryHandler.getThunderbirdPrototypeGroundForce(
+                context.player().getGame(), context.player(), context.tile());
+        if (thunderbirdGroundForce != null) {
+            selectedUnits.putIfAbsent(thunderbirdGroundForce, 1);
         }
         return applySpaceRestrictions(context, selectedUnits);
     }
