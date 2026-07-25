@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
@@ -23,6 +22,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.CommandCounterHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.RegexHelper;
@@ -142,17 +142,8 @@ public class TeHelperActionCards {
             if (p2 == player || p2.getAcCount() == 0) {
                 continue;
             }
-            if (game.isFowMode()) {
-                buttons.add(
-                        Buttons.gray(player.factionButtonChecker() + "getACFrom_" + p2.getFaction(), p2.getColor()));
-            } else {
-                Button button = Buttons.gray(
-                        player.factionButtonChecker() + "getACFrom_" + p2.getFaction(),
-                        p2.getFactionModel().getShortName());
-                String factionEmojiString = p2.getFactionEmoji();
-                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
-                buttons.add(button);
-            }
+            buttons.add(FoWHelper.fogSafeTargetButton(
+                    player.factionButtonChecker() + "getACFrom_" + p2.getFaction(), "gray", p2));
         }
         String message = player.getRepresentationUnfogged()
                 + ", please tell the bot which two of your neighbors did the transaction.";

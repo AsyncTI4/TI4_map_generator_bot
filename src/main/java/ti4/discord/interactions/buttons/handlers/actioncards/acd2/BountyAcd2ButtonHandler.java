@@ -32,11 +32,7 @@ class BountyAcd2ButtonHandler {
                 continue;
             }
             String id = player.factionButtonChecker() + "bountyStep2_" + p2.getFaction();
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray(id, p2.getColor()));
-            } else {
-                buttons.add(Buttons.gray(id, p2.getColor()).withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
-            }
+            buttons.add(Buttons.gray(id, p2.getColor()).withEmoji(Emoji.fromFormatted(p2.fogSafeEmoji())));
         }
         buttons.add(Buttons.red("deleteButtons", "Decline Capture"));
 

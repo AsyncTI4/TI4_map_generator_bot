@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -30,12 +29,7 @@ class PrisonersOfWarAcd2ButtonHandler {
                 continue;
             }
             String id = player.factionButtonChecker() + "prisonersOfWarTarget_" + target.getFaction();
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray(id, target.getColor()));
-            } else {
-                buttons.add(Buttons.gray(id, target.getFactionModel().getShortName())
-                        .withEmoji(Emoji.fromFormatted(target.getFactionEmoji())));
-            }
+            buttons.add(FoWHelper.fogSafeTargetButton(id, "gray", target));
         }
 
         ButtonHelper.deleteMessage(event);
@@ -83,7 +77,7 @@ class PrisonersOfWarAcd2ButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCardsInfoThread(),
                 target.getRepresentationUnfogged() + ", choose which promissory note to give to "
-                        + (game.isFowMode() ? "your opponent" : player.getFactionEmojiOrColor())
+                        + FoWHelper.factionEmojiOrAnon(game, player, "your opponent")
                         + " for _Prisoners of War_.",
                 buttons);
         MessageHelper.sendMessageToChannel(

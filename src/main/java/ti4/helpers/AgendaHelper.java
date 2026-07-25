@@ -2835,6 +2835,13 @@ public final class AgendaHelper {
         MessageHelper.sendMessageToChannel(channel, getVoteCountMessage(game));
     }
 
+    /** Post the vote count to the main game channel unless the game is in fog mode. */
+    public static void listVoteCountIfUnfogged(Game game) {
+        if (!game.isFowMode()) {
+            listVoteCount(game, game.getMainGameChannel());
+        }
+    }
+
     static String getVoteCountMessage(Game game) {
         List<Player> orderList = getVotingOrder(game);
         int votes = 0;

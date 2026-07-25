@@ -14,10 +14,12 @@ import javax.annotation.Nullable;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -81,6 +83,181 @@ public final class FoWHelper {
             return channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
         }
         return false;
+    }
+
+    /**
+     * Identity-token substitution for the acting player in a broadcast message. Unfogged, returns the
+     * player's standard non-pinging representation; fogged, returns {@code fogPhrase} verbatim — the
+     * caller-supplied placeholder (e.g. {@code ""} to drop the actor, {@code "someone"},
+     * {@code "another player"}, {@code "Player"}). Centralizes the canonical
+     * {@code game.isFowMode() ? "<phrase>" : player.getRepresentationNoPing()} pattern (Form 1) so the
+     * fog-anonymization rule lives in one place (and can later be made per-viewer without touching
+     * every call site).
+     *
+     * <p>Note: this is only for call sites whose unfogged rendering is the standard representation.
+     * Sites that reveal a Discord username or a bare faction emoji when unfogged (e.g.
+     * ActionCardHelper.showAll, or the explore-discovery announcements) do not fit this method and
+     * must be handled separately.
+     */
+    public static String actorOrAnon(Game game, Player player, String fogPhrase) {
+        return game.isFowMode() ? fogPhrase : player.getRepresentationNoPing();
+    }
+
+    /**
+     * Identity substitution for a message that unfogged shows the player's compact
+     * faction-emoji-or-color representation. Unfogged returns {@code getFactionEmojiOrColor()};
+     * fogged returns {@code fogPhrase} verbatim (which the caller chooses — a generic word, or the
+     * player's raw color where the site deliberately reveals color under fog).
+     *
+     * <p>Centralizes the {@code game.isFowMode() ? "<phrase>" : player.getFactionEmojiOrColor()}
+     * message pattern (the single seam for a future per-viewer upgrade).
+     */
+    public static String factionEmojiOrAnon(Game game, Player player, String fogPhrase) {
+        return game.isFowMode() ? fogPhrase : player.getFactionEmojiOrColor();
+    }
+
+    /**
+     * Per-viewer identity substitution. When fogged, returns {@code target.getColorIfCanSeeStats(viewer)}
+     * — the target's color, or {@code "???"} when {@code viewer} is not allowed to see the target's
+     * stats (alliance / promissory-note aware) — otherwise returns {@code unfoggedRendering}. The
+     * unfogged rendering is supplied by the caller because it varies (representation, faction name,
+     * etc.); this centralizes the *fog* half (the per-viewer visibility rule).
+     */
+    public static String identityOrColorIfCanSeeStats(
+            Game game, Player target, Player viewer, String unfoggedRendering) {
+        return game.isFowMode() ? target.getColorIfCanSeeStats(viewer) : unfoggedRendering;
+    }
+
+    /**
+     * Channel-selection rule for public "announcement" messages: when not fogged and the
+     * interaction did not already happen in the Actions channel, route to the public Actions
+     * channel; otherwise keep the message local to the interaction's own channel. Extracted from
+     * the repeated {@code !game.isFowMode() && event.getChannel() != game.getActionsChannel()}
+     * shape in ExploreService.
+     */
+    public static MessageChannel actionsChannelOrLocal(Game game, GenericInteractionCreateEvent event) {
+        return shouldAnnouncePublicly(game, event) ? game.getActionsChannel() : event.getMessageChannel();
+    }
+
+    /**
+     * The shared routing rule behind {@link #actionsChannelOrLocal} and {@link #announcePublicOrLocal}:
+     * announce to the public Actions channel only when the game is not fogged and the interaction did
+     * not already happen in that channel. In a fog game this is always false (the acting player pressed
+     * the button from their own private channel), so the message stays local.
+     */
+    private static boolean shouldAnnouncePublicly(Game game, GenericInteractionCreateEvent event) {
+        return !game.isFowMode() && event.getChannel() != game.getActionsChannel();
+    }
+
+    /**
+     * Announce an event publicly when appropriate, else keep it local. When not fogged and the
+     * interaction did not already happen in the Actions channel, sends {@code publicMessage} to the
+     * public Actions channel; otherwise sends {@code localMessage} to the interaction's own channel.
+     * Use this when the public and local wording differ (e.g. a faction-emoji-prefixed public
+     * announcement vs. a plain local one); when both messages are identical, use
+     * {@link #actionsChannelOrLocal} with a single send instead.
+     */
+    public static void announcePublicOrLocal(
+            Game game, GenericInteractionCreateEvent event, String publicMessage, String localMessage) {
+        if (shouldAnnouncePublicly(game, event)) {
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), publicMessage);
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), localMessage);
+        }
+    }
+
+    /**
+     * Build a target-selection button whose label/emoji does not leak {@code target}'s identity
+     * under fog-of-war. Standardizes the drifted hand-rolled idioms (Form 10): unfogged uses the
+     * faction short-name label plus faction emoji; fogged uses the capitalized color name plus the
+     * neutral color-chip emoji (via {@link Player#fogSafeEmoji()}). {@code style} is one of "gray"
+     * (default), "green", "red", "blue".
+     *
+     * <p>This is a deliberate behavior normalization: the pre-existing hand-rolled blocks used the
+     * raw lowercase color (e.g. "red") in the fog branch, whereas this uses the capitalized color
+     * name (e.g. "Red") via {@link Player#getFactionNameOrColor()}. The emoji comes from
+     * {@code fogSafeEmoji()}, so it shows the faction emoji when unfogged and the color-chip emoji
+     * when fogged — the same convention as the Twilight's Fall action-card buttons.
+     */
+    public static Button fogSafeTargetButton(String buttonId, String style, Player target) {
+        boolean fogged = target.getGame().isFowMode();
+        String label = fogged
+                ? target.getFactionNameOrColor()
+                : target.getFactionModel().getShortName();
+        return styledButton(style, buttonId, label, target.fogSafeEmoji());
+    }
+
+    /**
+     * Per-viewer variant of {@link #fogSafeTargetButton(String, String, Player)}: fogged uses
+     * {@code target.getColorIfCanSeeStats(viewer)} (the target's color, or {@code "???"} when
+     * {@code viewer} may not see the target's stats) with no emoji, so it never leaks color to a
+     * viewer who shouldn't see it; unfogged uses the faction short-name plus faction emoji, as usual.
+     * For target buttons that must respect per-viewer visibility (e.g. Psionic Hammer), not just the
+     * game-wide fog flag.
+     */
+    public static Button fogSafeTargetButton(String buttonId, String style, Player target, Player viewer) {
+        boolean fogged = target.getGame().isFowMode();
+        String label = fogged
+                ? target.getColorIfCanSeeStats(viewer)
+                : target.getFactionModel().getShortName();
+        String emoji = fogged ? null : target.getFactionEmoji();
+        return styledButton(style, buttonId, label, emoji);
+    }
+
+    /** Dispatch a {@link Buttons} factory by {@code style} ("gray" default, "green", "red", "blue"). */
+    private static Button styledButton(String style, String buttonId, String label, String emoji) {
+        return switch (style == null ? "gray" : style) {
+            case "green" -> Buttons.green(buttonId, label, emoji);
+            case "red" -> Buttons.red(buttonId, label, emoji);
+            case "blue" -> Buttons.blue(buttonId, label, emoji);
+            default -> Buttons.gray(buttonId, label, emoji);
+        };
+    }
+
+    /**
+     * Two-party fog notification: send {@code message} to {@code primary}'s channel, and — only in
+     * fog, and only when {@code affected} is a different player — also to {@code affected}'s channel.
+     * In non-fog games {@code getCorrectChannel()} is the shared main channel, so one send already
+     * reaches everyone; the extra fog send routes to the affected player's private channel. Replaces
+     * the recurring {@code send(primary…); if (fowMode && affected != primary) send(affected…);}.
+     */
+    public static void notifyPlayerAndAffectedInFog(Game game, Player primary, Player affected, String message) {
+        notifyPlayerAndAffectedInFog(game, primary, message, affected, message);
+    }
+
+    /**
+     * As {@link #notifyPlayerAndAffectedInFog(Game, Player, Player, String)}, but sends a distinct
+     * (usually anonymized) message to the affected player.
+     */
+    public static void notifyPlayerAndAffectedInFog(
+            Game game, Player primary, String primaryMessage, Player affected, String affectedMessage) {
+        MessageHelper.sendMessageToChannel(primary.getCorrectChannel(), primaryMessage);
+        if (game.isFowMode() && affected != primary) {
+            MessageHelper.sendMessageToChannel(affected.getCorrectChannel(), affectedMessage);
+        }
+    }
+
+    /**
+     * Fog-aware three-way resolution message. When fogged, sends a private second-person message to
+     * each of the two involved players ({@code actorFogMessage} to {@code actor},
+     * {@code affectedFogMessage} to {@code affected}); when not fogged, sends a single third-person
+     * {@code publicMessage} to the actor's channel (which is the shared main channel, so everyone
+     * sees it). Replaces the recurring
+     * {@code if (fowMode) { send(actor, …); send(affected, …); } else { send(actor, publicMsg); }}.
+     */
+    public static void notifyActorAndAffectedElsePublic(
+            Game game,
+            Player actor,
+            String actorFogMessage,
+            Player affected,
+            String affectedFogMessage,
+            String publicMessage) {
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(actor.getCorrectChannel(), actorFogMessage);
+            MessageHelper.sendMessageToChannel(affected.getCorrectChannel(), affectedFogMessage);
+        } else {
+            MessageHelper.sendMessageToChannel(actor.getCorrectChannel(), publicMessage);
+        }
     }
 
     public static boolean canSeeStatsOfFaction(Game game, String faction, Player viewingPlayer) {

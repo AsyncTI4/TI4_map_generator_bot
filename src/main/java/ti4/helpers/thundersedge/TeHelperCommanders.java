@@ -53,7 +53,7 @@ public class TeHelperCommanders {
 
         // Notify the DWS commander holder that their discount was used
         String message = dws.getRepresentation(true, true) + " ";
-        message += game.isFowMode() ? player.getColorIfCanSeeStats(dws) : player.getRepresentation(true, false);
+        message += FoWHelper.identityOrColorIfCanSeeStats(game, player, dws, player.getRepresentation(true, false));
         message += " has used Aello to get a discount on researching.";
         message += " Use these buttons to gain or convert 1 commodity.";
         message += "\n-# You have (" + dws.getCommoditiesRepresentation() + ") commodities.";

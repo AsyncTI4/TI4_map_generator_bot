@@ -1781,7 +1781,7 @@ public final class ButtonHelperAgents {
                     MessageHelper.sendMessageToChannel(
                             event.getChannel(),
                             "Planet has been readied because of Quaxdol Junitas, the Florzen Commander.");
-                    if (!game.isFowMode()) AgendaHelper.listVoteCount(game, game.getMainGameChannel());
+                    AgendaHelper.listVoteCountIfUnfogged(game);
                 }
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                     UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
@@ -1827,7 +1827,7 @@ public final class ButtonHelperAgents {
                     MessageHelper.sendMessageToChannel(
                             event.getChannel(),
                             "Planet has been readied because of Quaxdol Junitas, the Florzen Commander.");
-                    if (!game.isFowMode()) AgendaHelper.listVoteCount(game, game.getMainGameChannel());
+                    AgendaHelper.listVoteCountIfUnfogged(game);
                 }
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                     UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
@@ -2199,11 +2199,8 @@ public final class ButtonHelperAgents {
                 + "Yudri Sukhov, the Vaden" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                 + " agent.";
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFowMode() && vaden != player) {
-            msg = player.getFactionEmojiOrColor() + " has finished resolving";
-            MessageHelper.sendMessageToChannel(vaden.getCorrectChannel(), msg);
-        }
+        FoWHelper.notifyPlayerAndAffectedInFog(
+                game, player, msg, vaden, player.getFactionEmojiOrColor() + " has finished resolving");
     }
 
     private static void resolveKortaliAgentStep2(Player bentor, Game game, String buttonID) {
@@ -2224,10 +2221,7 @@ public final class ButtonHelperAgents {
                 + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Queen Lucreia, the Kortali" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                 + " agent.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFowMode() && bentor != player) {
-            MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), msg);
-        }
+        FoWHelper.notifyPlayerAndAffectedInFog(game, player, bentor, msg);
     }
 
     private static void resolveZealotsAgentStep2(Player zealots, Game game, String buttonID) {
@@ -2290,10 +2284,7 @@ public final class ButtonHelperAgents {
                 + "Sal Sparrow, the Nokar" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                 + " agent. "
                 + "A transaction may be done with transaction buttons.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFowMode() && bentor != player) {
-            MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), msg);
-        }
+        FoWHelper.notifyPlayerAndAffectedInFog(game, player, bentor, msg);
     }
 
     private static void resolveZelianAgentStep2(
@@ -2321,10 +2312,7 @@ public final class ButtonHelperAgents {
                 + tile.getRepresentationForButtons(game, player)
                 + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Zelian A, the Zelian" + (bentor.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFowMode() && bentor != player) {
-            MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), msg);
-        }
+        FoWHelper.notifyPlayerAndAffectedInFog(game, player, bentor, msg);
 
         if (event instanceof ButtonInteractionEvent event2) {
             if (event2.getButton().getLabel().contains("Yourself")) {
@@ -2350,10 +2338,7 @@ public final class ButtonHelperAgents {
         player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         cabalAgentInitiation(game, player);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFowMode() && kyro != player) {
-            MessageHelper.sendMessageToChannel(kyro.getCorrectChannel(), msg);
-        }
+        FoWHelper.notifyPlayerAndAffectedInFog(game, player, kyro, msg);
 
         int infAmount = player.getCommoditiesTotal() - 1;
         List<Button> buttons = new ArrayList<>(
@@ -2463,11 +2448,8 @@ public final class ButtonHelperAgents {
                 + "C.O.O. Mgur, the Bentor" + (bentor.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                 + " agent.";
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFowMode() && bentor != player) {
-            msg = player.getRepresentation() + " has finished resolving.";
-            MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), msg);
-        }
+        FoWHelper.notifyPlayerAndAffectedInFog(
+                game, player, msg, bentor, player.getRepresentation() + " has finished resolving.");
     }
 
     private static void fogAllianceAgentStep1(Game game, Player player) {
