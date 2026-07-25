@@ -56,6 +56,8 @@ import ti4.discord.interactions.buttons.handlers.agenda.resolver.WarrantAgendaRe
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.WormholeReconAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.WormholeResearchAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -171,6 +173,7 @@ class AgendaResolveButtonHandler {
         }
         List<Player> riders = AgendaHelper.getWinningRiders(winner, game, event);
         List<Player> voters = AgendaHelper.getWinningVoters(winner, game);
+        VeylorLeadersHandler.resolveVeylorHeroLosingVote(game, winner);
         TaAbilityHandler.resolveEfficientGovernance(game, winner);
         notifyIndoctrinationTeam(game, voters);
         checkFlorzenUnlock(voters, riders);
@@ -179,8 +182,18 @@ class AgendaResolveButtonHandler {
         int aCount = computeNextAgendaCount(game);
         List<Button> buttons = buildNextButtons(game, aCount);
         String voteMessage = buildVoteMessage(game, aCount);
-        if (!"miscount".equalsIgnoreCase(agID) && !"absol_miscount".equalsIgnoreCase(agID)) {
-            sendNextStepUi(game, event, resMes, voteMessage, buttons);
+        boolean isMiscount = "miscount".equalsIgnoreCase(agID) || "absol_miscount".equalsIgnoreCase(agID);
+        boolean waitingForTightScheduling = !isMiscount
+                && buttons.stream().anyMatch(button -> "flip_agenda".equals(button.getCustomId()))
+                && VeylorAbilitiesHandler.offerTightSchedulingRevealChoice(game, false);
+        if (!isMiscount) {
+            if (waitingForTightScheduling) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        resMes + "\n" + game.getPing() + " Waiting for Veylor to resolve _Tight Scheduling_.");
+            } else {
+                sendNextStepUi(game, event, resMes, voteMessage, buttons);
+            }
         } else {
             handleMiscountRevote(game, winner, event);
         }
@@ -409,7 +422,7 @@ class AgendaResolveButtonHandler {
 
     private static List<Button> buildNextButtons(Game game, int aCount) {
         List<Button> buttons = new ArrayList<>();
-        if (aCount < 3 || game.isAbsolMode()) {
+        if (aCount < 3 || game.isAbsolMode() || VeylorLeadersHandler.hasHeroAdditionalAgenda(game, aCount)) {
             buttons.add(Buttons.blue("flip_agenda", "Flip Agenda #" + aCount));
         }
         RiftSetModeService.includeCrucibleAgendaButton(buttons, game);

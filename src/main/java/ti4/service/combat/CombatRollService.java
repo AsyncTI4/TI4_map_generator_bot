@@ -37,7 +37,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
@@ -211,6 +211,9 @@ public class CombatRollService {
                     event.getMessageChannel(),
                     "Planet needs to be specified to fire SPACE CANNON against ships on tile " + tile.getPosition()
                             + ".");
+            return 0;
+        }
+        if (XytherisLeadersHandler.offerHeroUnitAbilityRoll(event, game, player, tile, combatOnHolder, rollType)) {
             return 0;
         }
         Player opponent = null;
@@ -1107,6 +1110,11 @@ public class CombatRollService {
                     unitHolder.getName(), Mapper.getUnitKey(AliasHandler.resolveUnit("mf"), player.getColorID()), 1);
         }
         StringBuilder resultBuilder = new StringBuilder(result);
+        boolean xytherisHeroBonus =
+                XytherisLeadersHandler.hasHeroUnitAbilityRollBonus(game, player, activeSystem, unitHolder, rollType);
+        if (xytherisHeroBonus) {
+            resultBuilder.append("Applied +4 to all dice with _Call of the Queen - The Endless Swarm_.\n");
+        }
         boolean metaliVoidCounted = false;
         String highestValueSingleUnitKey = "highestValueSingleUnit" + player.getFaction();
         String storedHighestValueUnit = game.getStoredValue(highestValueSingleUnitKey);
@@ -1199,6 +1207,9 @@ public class CombatRollService {
                     rollType,
                     activeSystem,
                     perUnitHolder);
+            if (xytherisHeroBonus) {
+                modifierToHit += 4;
+            }
             List<NamedCombatModifierModel> availableExtraRolls = extraRolls.stream()
                     .filter(m -> !consumedBestMods.contains(m.getModifier().getAlias()))
                     .collect(Collectors.toList());
@@ -1949,6 +1960,13 @@ public class CombatRollService {
             totalHits++;
             result += "\n" + player.getFactionEmoji()
                     + " produced 1 additional hit from _Zythrix_ the Xytheris Commander.";
+        }
+        if (totalHits > 0
+                && rollType != CombatRollType.combatround
+                && opponent != player
+                && player.hasPlayablePromissoryInHand("thpnxytheris")
+                && !player.getPromissoryNotesInPlayArea().contains("thpnxytheris")) {
+            XytherisPromissoryHandler.offerXytherisPnButton(game, player, totalHits);
         }
         result += CombatMessageHelper.displayHitResults(totalHits, useDoubleBoomEmoji);
 

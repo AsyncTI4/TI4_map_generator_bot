@@ -105,7 +105,7 @@ public final class ButtonHelperAbilities {
     @ButtonHandler("autoneticMemoryStep2_")
     public static void autoneticMemoryStep2(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         int count = Integer.parseInt(buttonID.split("_")[1]);
-        ActionCardHelper.drawActionCards(player, count - 1);
+        ActionCardHelper.drawActionCardsNoAutonetic(player, count - 1);
 
         String msg2 = player.getRepresentationNoPing() + " is choosing to resolve their **Autonetic Memory** ability.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);

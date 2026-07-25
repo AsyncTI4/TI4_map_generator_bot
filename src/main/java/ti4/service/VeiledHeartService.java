@@ -99,7 +99,27 @@ public class VeiledHeartService {
         DRAW,
         SPLICE,
         SEND,
-        UNVEIL
+        UNVEIL;
+
+        static Optional<VeiledCardAction> fromString(String str) {
+            str = str.toLowerCase();
+            if (str.contains("discard")) {
+                return Optional.of(DISCARD);
+            }
+            if (str.contains("draw")) {
+                return Optional.of(DRAW);
+            }
+            if (str.contains("splice")) {
+                return Optional.of(SPLICE);
+            }
+            if (str.contains("send")) {
+                return Optional.of(SEND);
+            }
+            if (str.contains("unveil")) {
+                return Optional.of(UNVEIL);
+            }
+            return Optional.empty();
+        }
     }
 
     private static String toTitleCase(String s) {
@@ -219,6 +239,22 @@ public class VeiledHeartService {
                 "veiled_discard_genome_%s_" + targetPlayer.getFaction());
     }
 
+    public static List<Button> getVeiledPurgeButtonsForLawsHero(Player activePlayer, Player targetPlayer) {
+        return getButtonsForChoosingForeignVeiledCard(
+                VeiledCardType.ABILITY,
+                activePlayer,
+                targetPlayer,
+                "lawsHeroStep3_" + targetPlayer.getFaction() + "_%s");
+    }
+
+    public static List<Button> getVeiledStealButtonsForPoisonHero(Player activePlayer, Player targetPlayer) {
+        return getButtonsForChoosingForeignVeiledCard(
+                VeiledCardType.ABILITY,
+                activePlayer,
+                targetPlayer,
+                "poisonHeroStep3_" + targetPlayer.getFaction() + "_%s");
+    }
+
     public static List<Button> getVeiledGiveButtonsForCoerce(Player sender, Player recipient) {
         return getVeiledCards(VeiledCardType.ABILITY, sender)
                 .map(veiledAbility -> Buttons.red(
@@ -312,9 +348,90 @@ public class VeiledHeartService {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static void doSilentAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
+    private static Stream<String> getUnveiledDuplicateUnits(Player player, String asyncId) {
+        return player.getUnitsByAsyncID(asyncId).stream()
+                .map(UnitModel::getAlias)
+                .filter(unit -> unit.contains("tf-") || unit.contains("tk-"));
+    }
+
+    private static Stream<String> getVeiledDuplicateUnits(Player player, String asyncId) {
+        return getVeiledCards(VeiledCardType.UNIT, player)
+                .filter(unit -> asyncId.equalsIgnoreCase(Mapper.getUnit(unit).getAsyncId()));
+    }
+
+    @ButtonHandler("keepVeiledUnit_")
+    public static void keepVeiledUnit(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String unitToKeep = buttonID.split("_")[1];
+        String asyncId = Mapper.getUnit(unitToKeep).getAsyncId().toLowerCase();
+
+        getVeiledDuplicateUnits(player, asyncId)
+                .filter(unit -> !unitToKeep.equals(unit))
+                .forEach(unit -> doAction(VeiledCardAction.DISCARD, VeiledCardType.UNIT, player, unit));
+
+        List<String> unitsToRemove = getUnveiledDuplicateUnits(player, asyncId)
+                .filter(unit -> !unitToKeep.equals(unit))
+                .toList();
+        for (String unit : unitsToRemove) {
+            player.removeOwnedUnitByID(unit);
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(),
+                    player.getFactionNameOrColor() + " has discarded the unit upgrade: "
+                            + Mapper.getUnit(unit).getName(),
+                    Mapper.getUnit(unit).getRepresentationEmbed());
+        }
+        if (!unitsToRemove.isEmpty()) {
+            String replacementUnit = Mapper.getUnit(unitToKeep).getBaseType();
+            player.addOwnedUnitByID(replacementUnit);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static void handleDuplicateUnits(Player player, String newUnit) {
+        String asyncId = Mapper.getUnit(newUnit).getAsyncId().toLowerCase();
+        if ("fs".equals(asyncId) || "mf".equals(asyncId)) {
+            // Duplicates are allowed for flagships & mechs
+            return;
+        }
+
+        List<Button> keepButtons = new ArrayList<>();
+        keepButtons.addAll(getUnveiledDuplicateUnits(player, asyncId)
+                .map(unit -> Buttons.blue(
+                        "keepVeiledUnit_" + unit,
+                        "Keep _" + Mapper.getUnit(unit).getName() + "_ (Unveiled)"))
+                .toList());
+        keepButtons.addAll(getVeiledDuplicateUnits(player, asyncId)
+                .map(unit -> Buttons.red(
+                        "keepVeiledUnit_" + unit,
+                        "Keep _" + Mapper.getUnit(unit).getName() + "_ (Veiled)"))
+                .toList());
+        if (keepButtons.isEmpty()) {
+            // No duplicates found
+            return;
+        }
+
+        String plural = keepButtons.size() > 1 ? "s" : "";
+        String msgPrivate = String.format(
+                "%s, you just gained the veiled unit upgrade _'%s'_, but you already have %s unit upgrade%s of that type. Click one of the buttons below to choose which of these unit upgrades to keep. The other one%s will be discarded.",
+                player.getRepresentation(), Mapper.getUnit(newUnit).getName(), keepButtons.size(), plural, plural);
+        String msgPublic = String.format(
+                "%s has gained a unit upgrade, but they already have %s unit upgrade%s of that type. They are currently choosing which unit upgrade to keep.",
+                player.getFactionNameOrColor(), keepButtons.size(), plural);
+
+        keepButtons.add(Buttons.green(
+                "keepVeiledUnit_" + newUnit, "Keep _" + Mapper.getUnit(newUnit).getName() + "_ (New, Veiled)"));
+
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msgPrivate, keepButtons);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msgPublic);
+    }
+
+    public static void doSilentAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
         switch (action) {
-            case SPLICE, DRAW -> addVeiledCard(player, card);
+            case SPLICE, DRAW -> {
+                if (type == VeiledCardType.UNIT) {
+                    handleDuplicateUnits(player, card);
+                }
+                addVeiledCard(player, card);
+            }
             case DISCARD -> removeVeiledCard(player, card);
             case UNVEIL -> {
                 switch (type) {
@@ -378,13 +495,19 @@ public class VeiledHeartService {
         }
     }
 
+    public static void doAction(String actionStr, Player player, String card) {
+        VeiledCardAction.fromString(actionStr).ifPresent(action -> doAction(action, player, card));
+    }
+
+    public static void doAction(VeiledCardAction action, Player player, String card) {
+        VeiledCardType.fromCard(card).ifPresent(type -> doAction(action, type, player, card));
+    }
+
     public static void doAction(VeiledCardAction action, String typeStr, Player player, String card) {
         VeiledCardType.fromString(typeStr).ifPresent(type -> doAction(action, type, player, card));
     }
 
     public static void doAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
-        doSilentAction(action, type, player, card);
-
         String msg;
         switch (action) {
             case SPLICE ->
@@ -403,6 +526,7 @@ public class VeiledHeartService {
                         + type.toString().toLowerCase() + ": " + getRepresentation(type, card);
                 MessageHelper.sendMessageToChannelWithEmbed(
                         player.getCorrectChannel(), msg, getRepresentationEmbed(type, card));
+                doSilentAction(action, type, player, card);
                 return;
             }
             default ->
@@ -411,6 +535,8 @@ public class VeiledHeartService {
                         + type.toString().toLowerCase() + ", but was unable to.";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+
+        doSilentAction(action, type, player, card);
     }
 
     public static void doAction(
@@ -431,7 +557,7 @@ public class VeiledHeartService {
 
     public static void doManipulate(String typeStr, Player activePlayer, String card, Player targetPlayer) {
         VeiledCardType.fromString(typeStr).ifPresent(type -> {
-            addVeiledCard(targetPlayer, card);
+            doSilentAction(VeiledCardAction.SPLICE, type, targetPlayer, card);
 
             String msgPublic = String.format(
                     "%s has been forced to splice a veiled %s. They may put it into play with a button in their `#cards-info` thread.",
@@ -463,7 +589,7 @@ public class VeiledHeartService {
         addVeiledCard(recipient, ability);
 
         String msgPublic = String.format(
-                "%s has _Coerced_ %s into giving them %s.\n",
+                "%s made %s give them %s.\n",
                 recipient.getRepresentation(),
                 sender.getRepresentation(),
                 givingVeiled ? "a veiled ability" : ("the ability _'" + getRepresentation(type, ability) + "'_"));
@@ -475,10 +601,10 @@ public class VeiledHeartService {
                     "Because receiving abilities counts as gaining them, the ability has been turned face-down as if it had just been drawn. It may be put into play with a button in the `#cards-info` thread.";
         }
         String msgForSender = String.format(
-                "You were _Coerced_ by %s into giving them the _'%s'_ ability.",
-                recipient.getRepresentationNoPing(), getRepresentation(type, ability));
+                "You were made to give the _'%s'_ ability to %s.",
+                getRepresentation(type, ability), recipient.getRepresentationNoPing());
         String msgForRecipient = String.format(
-                "You _Coerced_ %s into giving you the _'%s'_ ability:",
+                "You made %s give you the _'%s'_ ability:",
                 sender.getRepresentationNoPing(), getRepresentation(type, ability));
 
         MessageHelper.sendMessageToChannel(sender.getCorrectChannel(), msgPublic);

@@ -14,6 +14,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
 import ti4.model.ColorModel;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.abilities.MahactTokenService;
 
 @UtilityClass
 public class ColorChangeHelper {
@@ -64,8 +65,8 @@ public class ColorChangeHelper {
             for (String cc : mahactCC) {
                 if (cc.equals(oldColor)) {
                     String replacedCC = cc.replace(oldColor, newColor);
-                    playerInfo.removeMahactCC(cc);
-                    playerInfo.addMahactCC(replacedCC);
+                    MahactTokenService.removeMahactToken(playerInfo, cc);
+                    MahactTokenService.addMahactToken(game, playerInfo, replacedCC);
                 }
             }
 

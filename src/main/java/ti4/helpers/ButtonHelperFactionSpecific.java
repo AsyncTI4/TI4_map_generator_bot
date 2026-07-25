@@ -31,6 +31,8 @@ import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
@@ -1104,7 +1106,7 @@ public final class ButtonHelperFactionSpecific {
 
         String location = player.hasAbility("primacy") ? "Primacy ability" : "fleet pool";
         if (!player.getMahactCC().contains(color)) {
-            player.addMahactCC(color);
+            MahactTokenService.addMahactToken(game, player, color);
             Helper.isCCCountCorrect(game, color);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -2095,8 +2097,7 @@ public final class ButtonHelperFactionSpecific {
         return false;
     }
 
-    private static void releaseAllUnits(
-            Player cabal, Game game, Player blockader, GenericInteractionCreateEvent event) {
+    public static void releaseAllUnits(Player cabal, Game game, Player blockader, GenericInteractionCreateEvent event) {
         for (UnitHolder unitHolder : cabal.getNomboxTile().getUnitHolders().values()) {
             Map<UnitKey, Integer> units = unitHolder.getUnits();
             List<UnitKey> unitKeys = new ArrayList<>(units.keySet());
@@ -2110,7 +2111,7 @@ public final class ButtonHelperFactionSpecific {
                             cabal.getCorrectChannel(),
                             cabal.getRepresentationUnfogged() + " released " + amount + " "
                                     + blockader.getFactionEmojiOrColor() + " " + unit
-                                    + " from prison due to a blockade.");
+                                    + " from prison.");
                     if (cabal != blockader) {
                         MessageHelper.sendMessageToChannel(
                                 blockader.getCorrectChannel(),
@@ -4518,6 +4519,12 @@ public final class ButtonHelperFactionSpecific {
         if (player.hasAbility("plausible_deniability")) {
             game.drawSecretObjective(player.getUserID());
             message += " Drew a second secret objective due to **Plausible Deniability**.";
+        }
+        if (player.hasAbility("multitasking")) {
+            LunariumAbilityHandler.offerFactionSheetCCButtons(game, player);
+        }
+        if (player.hasUnlockedBreakthrough("lunariumbt")) {
+            LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, player);
         }
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
         ReactionService.addReaction(event, game, player, message);

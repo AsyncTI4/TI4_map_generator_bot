@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -59,6 +60,9 @@ class AssignHitsButtonHandlers {
                     ParsedUnit unit = UnitPickerHandlerHelper.parsedUnitFromMatcher(player, matcher);
                     if (remove) {
                         RemoveUnitService.removeUnit(event, tile, game, unit, state);
+                        if (unit.unitKey().unitType() == UnitType.Infantry) {
+                            ButtonHelper.resolveInfantryRemoval(player, amt, tile);
+                        }
                     } else {
                         DestroyUnitService.destroyUnit(event, tile, game, unit, combat, state);
                         IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, holder, assignHitsType);
@@ -198,6 +202,9 @@ class AssignHitsButtonHandlers {
                     UnitHolder holder =
                             planetName != null ? tile.getUnitHolderFromPlanet(planetName) : tile.getSpaceUnitHolder();
                     if (holder != null) holder.addDamagedUnit(Units.getUnitKey(type, player.getColorID()), amt);
+                    if (holder == tile.getSpaceUnitHolder() && type == UnitType.Fighter) {
+                        PonthousUnitHandler.consumeTemporaryFighterSustain(game, player, tile, amt);
+                    }
                     CommanderUnlockCheckService.checkPlayer(player, "ponthous");
 
                     String plural = (amt == 1 || "infantry".equalsIgnoreCase(type.humanReadableName())) ? "" : "s";

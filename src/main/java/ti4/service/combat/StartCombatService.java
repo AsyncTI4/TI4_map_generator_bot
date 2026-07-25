@@ -319,6 +319,7 @@ public class StartCombatService {
         if (!game.isFowMode()) {
             channel = game.getMainGameChannel();
         }
+        PonthousUnitHandler.clearOldGlorySustain(game);
         game.setStoredValue("factionsInCombat", player1.getFaction() + "_" + player2.getFaction());
 
         sendStartOfCombatSecretMessages(game, player1, player2, tile, spaceOrGround, unitHolderName);
@@ -1427,6 +1428,11 @@ public class StartCombatService {
                     "Mercenaries",
                     FactionEmojis.florzen));
         }
+
+        Button oldGloryP1 = PonthousUnitHandler.getOldGlorySustainButton(p1, tile);
+        if (oldGloryP1 != null) buttons.add(oldGloryP1);
+        Button oldGloryP2 = PonthousUnitHandler.getOldGlorySustainButton(p2, tile);
+        if (oldGloryP2 != null) buttons.add(oldGloryP2);
 
         return buttons;
     }
