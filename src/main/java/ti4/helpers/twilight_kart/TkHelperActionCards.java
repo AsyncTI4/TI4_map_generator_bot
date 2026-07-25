@@ -134,12 +134,11 @@ public class TkHelperActionCards {
                 .map(LeaderModel::getTfRepresentationEmbed)
                 .toList();
         if (game.isVeiledHeartMode()) {
-            genomes.forEach(genome ->
-                    VeiledHeartService.doAction(
-                            VeiledHeartService.VeiledCardAction.DRAW,
-                            VeiledHeartService.VeiledCardType.GENOME,
-                            player,
-                            genome));
+            genomes.forEach(genome -> VeiledHeartService.doAction(
+                    VeiledHeartService.VeiledCardAction.DRAW,
+                    VeiledHeartService.VeiledCardType.GENOME,
+                    player,
+                    genome));
 
         } else {
             for (String cardID : genomes) {
