@@ -35,6 +35,47 @@ class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
     private static final int FIRST_TILE_ID = 19;
     private static final int TILES_PER_SLICE = 4;
 
+    /** Mirrors SliceTileWinRateStatisticsService.MINIMUM_OCCURRENCES. */
+    private static final int MINIMUM_OCCURRENCES = 10;
+
+    /** The same board repeated, so per-tile counts clear the sample threshold. */
+    private static List<Game> repeatGame(
+            int count, String winningFaction, Map<String, String> tileOverridesByPosition) {
+        return IntStream.rangeClosed(1, count)
+                .mapToObj(i -> createStandardSliceGame(Integer.toString(i), winningFaction, tileOverridesByPosition))
+                .toList();
+    }
+
+    /**
+     * Twilight's Fall must be excluded explicitly: its setup clears the Thunder's Edge flag, but enabling TE
+     * afterwards does not clear the TF flag, so one game can carry both and would slip past isThundersEdge().
+     */
+    @Test
+    void onlyNonHomebrewThundersEdgeGamesWithoutTwilightsFallAreEligible() {
+        Game thundersEdge = createStandardSliceGame("1", "sol", Map.of());
+        thundersEdge.setThundersEdge(true);
+        assertTrue(SliceTileWinRateStatisticsService.isEligibleGameType(thundersEdge), "plain Thunder's Edge");
+
+        Game bothModes = createStandardSliceGame("2", "sol", Map.of());
+        bothModes.setThundersEdge(true);
+        bothModes.setTwilightsFallMode(true);
+        assertFalse(
+                SliceTileWinRateStatisticsService.isEligibleGameType(bothModes),
+                "a game flagged both Thunder's Edge and Twilight's Fall must be excluded");
+
+        Game twilightsFallOnly = createStandardSliceGame("3", "sol", Map.of());
+        twilightsFallOnly.setTwilightsFallMode(true);
+        assertFalse(SliceTileWinRateStatisticsService.isEligibleGameType(twilightsFallOnly), "Twilight's Fall only");
+
+        Game notThundersEdge = createStandardSliceGame("4", "sol", Map.of());
+        assertFalse(SliceTileWinRateStatisticsService.isEligibleGameType(notThundersEdge), "non-TE game");
+
+        Game homebrew = createStandardSliceGame("5", "sol", Map.of());
+        homebrew.setThundersEdge(true);
+        homebrew.setAbsolMode(true);
+        assertFalse(SliceTileWinRateStatisticsService.isEligibleGameType(homebrew), "homebrew Thunder's Edge game");
+    }
+
     /**
      * The hard-coded slice table has to keep matching tileAdjacencies.properties, which is the real source
      * of truth for the board geometry.
@@ -74,63 +115,90 @@ class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
 
     @Test
     void buildReportRanksTilesAndBreaksDownByFaction() {
-        Game game = createStandardSliceGame("1", "sol", Map.of());
+        String report = SliceTileWinRateStatisticsService.buildReport(repeatGame(MINIMUM_OCCURRENCES, "sol", Map.of()));
 
-        String report = SliceTileWinRateStatisticsService.buildReport(List.of(game));
-
-        assertTrue(report.contains("Games analyzed: 1"), report);
-        assertTrue(report.contains("Slices analyzed: 6"), report);
+        assertTrue(report.contains("Games analyzed: 10"), report);
+        assertTrue(report.contains("Slices analyzed: 60"), report);
         assertTrue(report.contains("Skipped for non-standard layout: 0"), report);
 
-        // Sol's four slice tiles were in the winner's slice; Letnev's were not.
+        // Sol's four slice tiles were in the winner's slice every game; Letnev's never were.
         sliceTileIdsFor("301")
-                .forEach(tileId ->
-                        assertTrue(report.contains("`100%` 1/1 `" + tileId + "`"), "expected 100% for tile " + tileId));
+                .forEach(tileId -> assertTrue(
+                        report.contains("`100%` (10/10) " + tileId + " ("), "expected 100% for tile " + tileId));
         sliceTileIdsFor("310")
-                .forEach(tileId ->
-                        assertTrue(report.contains("`  0%` 0/1 `" + tileId + "`"), "expected 0% for tile " + tileId));
+                .forEach(tileId -> assertTrue(
+                        report.contains("`  0%` (0/10) " + tileId + " ("), "expected 0% for tile " + tileId));
 
         assertTrue(report.contains("Best and worst slice tiles by faction"), report);
         assertTrue(report.contains("Entropic Scar and Legendary tiles by faction"), report);
         assertTrue(
                 report.contains("No Entropic Scar or Legendary tile appeared in any slice."),
-                "no special tiles were placed in this game");
+                "no special tiles were placed in these games");
     }
 
     @Test
     void buildReportBreaksOutEntropicScarAndLegendaryTilesPerFaction() {
-        // Sol wins with no special tile, then loses with Entropic Scar and Primor in slice.
-        Game withoutSpecialTiles = createStandardSliceGame("1", "sol", Map.of());
-        Game withSpecialTiles = createStandardSliceGame("2", "letnev", Map.of("318", "114", "302", "65"));
+        // Entropic Scar and Primor sit in Sol's slice every game, and Sol never wins.
+        List<Game> games = repeatGame(MINIMUM_OCCURRENCES, "letnev", Map.of("318", "114", "302", "65"));
 
-        String report = SliceTileWinRateStatisticsService.buildReport(List.of(withoutSpecialTiles, withSpecialTiles));
+        String report = SliceTileWinRateStatisticsService.buildReport(games);
 
-        assertTrue(report.contains("Games analyzed: 2"), report);
-        assertTrue(report.contains("Slices analyzed: 12"), report);
-        assertTrue(report.contains("`114` " + tileName("114") + ": 0/1 (0%)"), "Entropic Scar line for Sol");
-        assertTrue(report.contains("`65` " + tileName("65") + ": 0/1 (0%)"), "Primor line for Sol");
+        assertTrue(report.contains("`  0%` (0/10) 114 (" + tileName("114") + ")"), "Entropic Scar line for Sol");
+        assertTrue(report.contains("`  0%` (0/10) 65 (" + tileName("65") + ")"), "Primor line for Sol");
         assertFalse(report.contains("without"), "the without metric was dropped");
     }
 
+    /** A tile has to clear MINIMUM_OCCURRENCES in a bucket before it earns a row. */
+    @Test
+    void buildReportSuppressesTilesBelowTheSampleThreshold() {
+        String justUnder =
+                SliceTileWinRateStatisticsService.buildReport(repeatGame(MINIMUM_OCCURRENCES - 1, "sol", Map.of()));
+        assertTrue(justUnder.contains("Games analyzed: 9"), justUnder);
+        assertTrue(justUnder.contains("No tile appeared in at least 10 slices."), justUnder);
+        sliceTileIdsFor("301")
+                .forEach(tileId ->
+                        assertFalse(justUnder.contains(tileId + " ("), "tile " + tileId + " is under-sampled"));
+        assertTrue(
+                justUnder.contains("No faction held an Entropic Scar or Legendary tile in at least 10 slices.")
+                        || justUnder.contains("No Entropic Scar or Legendary tile appeared in any slice."),
+                justUnder);
+
+        String atThreshold =
+                SliceTileWinRateStatisticsService.buildReport(repeatGame(MINIMUM_OCCURRENCES, "sol", Map.of()));
+        assertTrue(atThreshold.contains("`100%` (10/10) 19 ("), "exactly 10 occurrences should qualify");
+    }
+
+    /** Special-tile rows are held to the same threshold as everything else. */
+    @Test
+    void buildReportSuppressesUnderSampledSpecialTiles() {
+        List<Game> games = repeatGame(MINIMUM_OCCURRENCES - 1, "letnev", Map.of("318", "114", "302", "65"));
+
+        String report = SliceTileWinRateStatisticsService.buildReport(games);
+
+        assertFalse(report.contains("114 (" + tileName("114") + ")"), "under-sampled Entropic Scar row");
+        assertFalse(report.contains("65 (" + tileName("65") + ")"), "under-sampled Primor row");
+        assertTrue(
+                report.contains("No faction held an Entropic Scar or Legendary tile in at least 10 slices."), report);
+    }
     /**
      * TileModel.getName() is null for placeholder art (0g, 0b, 0r, -1, fog covers), which used to reach the
      * sort comparator and throw NPE out of String.compareTo.
      */
     @Test
     void buildReportIgnoresBlankAndPlaceholderTilesInSlices() {
-        Game game = createStandardSliceGame("1", "sol", Map.of("318", "0g", "302", "-1", "201", "0border"));
+        List<Game> games = repeatGame(MINIMUM_OCCURRENCES, "sol", Map.of("318", "0g", "302", "-1", "201", "0border"));
 
-        String report = SliceTileWinRateStatisticsService.buildReport(List.of(game));
+        String report = SliceTileWinRateStatisticsService.buildReport(games);
 
-        assertTrue(report.contains("Games analyzed: 1"), report);
+        assertTrue(report.contains("Games analyzed: 10"), report);
         assertTrue(
-                report.contains("Ignored 3 slice position(s) holding a blank or placeholder tile"),
-                "the three placeholders should be reported as ignored");
-        assertFalse(report.contains("`0g`"), "placeholder tiles must not get a win rate row");
-        assertFalse(report.contains("`-1`"), "placeholder tiles must not get a win rate row");
-        assertFalse(report.contains("`0border`"), "placeholder tiles must not get a win rate row");
+                report.contains("Ignored 30 slice position(s) holding a blank or placeholder tile"),
+                "three placeholders per game across ten games");
+        assertFalse(report.contains("0g ("), "placeholder tiles must not get a win rate row");
+        assertFalse(report.contains("-1 ("), "placeholder tiles must not get a win rate row");
+        assertFalse(report.contains("0border ("), "placeholder tiles must not get a win rate row");
         // Sol's one remaining real slice tile is still counted.
-        assertTrue(report.contains("`100%` 1/1 `22`"), report);
+        assertTrue(report.contains("`100%` (10/10) 22 ("), report);
     }
 
     @Test
