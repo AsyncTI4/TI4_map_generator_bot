@@ -241,9 +241,15 @@ public final class FoWHelper {
      * Fog-aware three-way resolution message. When fogged, sends a private second-person message to
      * each of the two involved players ({@code actorFogMessage} to {@code actor},
      * {@code affectedFogMessage} to {@code affected}); when not fogged, sends a single third-person
-     * {@code publicMessage} to the actor's channel (which is the shared main channel, so everyone
-     * sees it). Replaces the recurring
+     * {@code publicMessage} to <b>the actor's channel</b>. Replaces the recurring
      * {@code if (fowMode) { send(actor, …); send(affected, …); } else { send(actor, publicMsg); }}.
+     *
+     * <p><b>Only use this when the original non-fog message went to the actor's channel.</b> The
+     * non-fog send targets {@code actor.getCorrectChannel()}, which is NOT necessarily the main game
+     * channel — in a non-fog game where players have private channels, {@code getCorrectChannel()}
+     * resolves to the actor's private channel (see {@link Player#getCorrectChannel()}). If the site's
+     * non-fog message must reach the <i>affected</i> player or the public main channel instead, keep
+     * explicit routing; this helper would misdeliver it to the actor.
      */
     public static void notifyActorAndAffectedElsePublic(
             Game game,

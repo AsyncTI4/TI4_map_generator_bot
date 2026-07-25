@@ -2379,21 +2379,26 @@ public final class ButtonHelperFactionSpecific {
             if (p2.getSCs().contains(sc) && p2 != player && p2.hasAbility("fine_print")) {
                 SendDebtService.sendDebt(player, p2, 1, Constants.VADEN_DEBT_POOL);
                 CommanderUnlockCheckService.checkPlayer(p2, "vaden");
-                FoWHelper.notifyActorAndAffectedElsePublic(
-                        game,
-                        player,
-                        player.getRepresentationUnfogged() + ", you sent 1 debt token to "
-                                + p2.getFactionEmojiOrColor()
-                                + ", for their \"Shark Loans\" pool, due to their **Fine Print** ability.",
-                        p2,
-                        p2.getRepresentationUnfogged() + ", you collected 1 debt token from "
-                                + player.getFactionEmojiOrColor()
-                                + ", for your \"Shark Loans\" pool, due to your **Fine Print** ability."
-                                + " This is technically optional, done automatically for convenience.",
-                        p2.getRepresentationUnfogged() + ", you collected 1 debt token from "
-                                + player.getRepresentationUnfogged()
-                                + ", for your \"Shark Loans\" pool, due to your **Fine Print** ability."
-                                + " This is technically optional, done automatically for convenience.");
+                if (game.isFowMode()) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged() + ", you sent 1 debt token to "
+                                    + p2.getFactionEmojiOrColor()
+                                    + ", for their \"Shark Loans\" pool, due to their **Fine Print** ability.");
+                    MessageHelper.sendMessageToChannel(
+                            p2.getCorrectChannel(),
+                            p2.getRepresentationUnfogged() + ", you collected 1 debt token from "
+                                    + player.getFactionEmojiOrColor()
+                                    + ", for your \"Shark Loans\" pool, due to your **Fine Print** ability."
+                                    + " This is technically optional, done automatically for convenience.");
+                } else {
+                    MessageHelper.sendMessageToChannel(
+                            p2.getCorrectChannel(),
+                            p2.getRepresentationUnfogged() + ", you collected 1 debt token from "
+                                    + player.getRepresentationUnfogged()
+                                    + ", for your \"Shark Loans\" pool, due to your **Fine Print** ability."
+                                    + " This is technically optional, done automatically for convenience.");
+                }
                 break;
             }
         }

@@ -916,8 +916,12 @@ public final class ButtonHelperAbilities {
                         + pillaged.getPillageCounter() + ".";
             }
             player.setTg(player.getTg() + 1);
-            FoWHelper.notifyActorAndAffectedElsePublic(
-                    game, player, pillagerMessage, pillaged, pillagedMessage, pillagerMessage + "\n" + pillagedMessage);
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pillagerMessage);
+                MessageHelper.sendMessageToChannel(pillaged.getCorrectChannel(), pillagedMessage);
+            } else {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), pillagerMessage + "\n" + pillagedMessage);
+            }
             if (RandomHelper.isOneInX(8)) {
                 int randomJoke = ThreadLocalRandom.current().nextInt(5) + 1;
                 File audioFile = ResourceHelper.getFile("voices/mentak/", "Pillage" + randomJoke + ".mp3");
