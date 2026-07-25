@@ -180,7 +180,6 @@ class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
         assertTrue(
                 report.contains("No faction held an Entropic Scar or Legendary tile in at least 10 slices."), report);
     }
-
     /**
      * TileModel.getName() is null for placeholder art (0g, 0b, 0r, -1, fog covers), which used to reach the
      * sort comparator and throw NPE out of String.compareTo.

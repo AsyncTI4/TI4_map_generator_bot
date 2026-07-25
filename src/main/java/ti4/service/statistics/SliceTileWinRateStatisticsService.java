@@ -337,7 +337,7 @@ public class SliceTileWinRateStatisticsService {
         String name = tileModel == null ? null : tileModel.getNameNullSafe();
         return StringUtils.isBlank(name) ? tileId : name;
     }
-    
+
     private static String tileLabel(String tileId) {
         return tileId + " (" + tileName(tileId) + ")";
     }
