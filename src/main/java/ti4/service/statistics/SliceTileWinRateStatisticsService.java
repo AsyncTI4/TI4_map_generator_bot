@@ -33,6 +33,8 @@ public class SliceTileWinRateStatisticsService {
 
     private static final int TOP_BOTTOM_COUNT = 3;
 
+    private static final int MINIMUM_OCCURRENCES = 10;
+
     static final Map<String, List<String>> SLICE_POSITIONS_BY_HOME = Map.of(
             "301", List.of("318", "302", "201", "101"),
             "304", List.of("303", "305", "203", "102"),
@@ -56,7 +58,8 @@ public class SliceTileWinRateStatisticsService {
         SliceTileWinRateStats stats = new SliceTileWinRateStats();
 
         ConsumeGameUtility.consumeAllGames(
-                GameStatisticsFilterer.getStandardCompetitiveGamesFilter(),
+                GameStatisticsFilterer.getStandardCompetitiveGamesFilter()
+                        .and(SliceTileWinRateStatisticsService::isEligibleGameType),
                 game -> {
                     if (!hasStandardSixPlayerRingLayout(game)) {
                         stats.excludedGames++;
@@ -69,6 +72,10 @@ public class SliceTileWinRateStatisticsService {
 
         MessageHelper.sendMessageToThread(
                 event.getChannel(), "Slice tile win rates", buildReport(gameCount.get(), stats));
+    }
+
+    static boolean isEligibleGameType(Game game) {
+        return game.isThundersEdge() && !game.isTwilightsFallMode() && !game.hasHomebrew();
     }
 
     static String buildReport(List<Game> games) {
@@ -96,8 +103,11 @@ public class SliceTileWinRateStatisticsService {
         StringBuilder sb = new StringBuilder("## __**Slice Tile Win Rates**__\n");
         sb.append("_A slice is the systems adjacent to a player's home, plus the ring-1 system"
                 + " adjacent to `000` nearest to them._\n");
-        sb.append("_6-player, 10-victory-point, non-fog, non-Galactic-Event, non-Scenario, non-homebrew games"
-                + " with winners, on the standard ring layout._\n");
+        sb.append("_6-player, 10-victory-point Thunder's Edge games with winners: no Twilight's Fall, non-fog,"
+                + " non-Galactic-Event, non-Scenario, non-homebrew, on the standard ring layout._\n");
+        sb.append("_Only tiles with at least ")
+                .append(MINIMUM_OCCURRENCES)
+                .append(" appearances in a given bucket are shown._\n");
         sb.append("Games analyzed: ")
                 .append(gameCount)
                 .append(" | Slices analyzed: ")
@@ -216,19 +226,32 @@ public class SliceTileWinRateStatisticsService {
         });
     }
 
+    private static List<Entry<String, WinRateCount>> wellSampled(Map<String, WinRateCount> tiles) {
+        return tiles.entrySet().stream()
+                .filter(entry -> entry.getValue().total >= MINIMUM_OCCURRENCES)
+                .sorted(BY_WIN_RATE_DESC)
+                .toList();
+    }
+
     private static void appendOverallSection(StringBuilder sb, SliceTileWinRateStats stats) {
         sb.append("\n### Slice tile win rates, all factions\n");
-        stats.overallTiles.entrySet().stream()
-                .sorted(BY_WIN_RATE_DESC)
-                .forEach(entry -> appendTileLine(sb, "- ", entry));
+        List<Entry<String, WinRateCount>> ranked = wellSampled(stats.overallTiles);
+        if (ranked.isEmpty()) {
+            sb.append("- No tile appeared in at least ")
+                    .append(MINIMUM_OCCURRENCES)
+                    .append(" slices.\n");
+            return;
+        }
+        ranked.forEach(entry -> appendTileLine(sb, "* ", entry));
     }
 
     private static void appendBestAndWorstByFactionSection(StringBuilder sb, SliceTileWinRateStats stats) {
         sb.append("\n### Best and worst slice tiles by faction\n");
         stats.factionTiles.entrySet().stream().sorted(Entry.comparingByKey()).forEach(factionEntry -> {
-            List<Entry<String, WinRateCount>> ranked = factionEntry.getValue().entrySet().stream()
-                    .sorted(BY_WIN_RATE_DESC)
-                    .toList();
+            List<Entry<String, WinRateCount>> ranked = wellSampled(factionEntry.getValue());
+            if (ranked.isEmpty()) {
+                return;
+            }
 
             sb.append("- ")
                     .append(factionLabel(factionEntry.getKey()))
@@ -237,14 +260,14 @@ public class SliceTileWinRateStatisticsService {
                     .append('\n');
 
             sb.append("  - Best:\n");
-            ranked.stream().limit(TOP_BOTTOM_COUNT).forEach(entry -> appendTileLine(sb, "    - ", entry));
+            ranked.stream().limit(TOP_BOTTOM_COUNT).forEach(entry -> appendTileLine(sb, "    * ", entry));
 
             // Take the tail without letting it overlap the best list.
             int worstFrom = Math.max(TOP_BOTTOM_COUNT, ranked.size() - TOP_BOTTOM_COUNT);
             if (worstFrom < ranked.size()) {
                 sb.append("  - Worst:\n");
                 List<Entry<String, WinRateCount>> worst = ranked.subList(worstFrom, ranked.size());
-                worst.reversed().forEach(entry -> appendTileLine(sb, "    - ", entry));
+                worst.reversed().forEach(entry -> appendTileLine(sb, "    * ", entry));
             }
         });
     }
@@ -260,26 +283,35 @@ public class SliceTileWinRateStatisticsService {
         }
         sb.append("_That faction's win rate when the tile was in their slice._\n");
 
-        stats.factionTiles.entrySet().stream().sorted(Entry.comparingByKey()).forEach(factionEntry -> {
+        boolean anyReported = false;
+        for (Entry<String, Map<String, WinRateCount>> factionEntry : stats.factionTiles.entrySet().stream()
+                .sorted(Entry.comparingByKey())
+                .toList()) {
             List<String> present = specialTileIds.stream()
-                    .filter(factionEntry.getValue()::containsKey)
+                    .filter(tileId -> {
+                        WinRateCount count = factionEntry.getValue().get(tileId);
+                        return count != null && count.total >= MINIMUM_OCCURRENCES;
+                    })
                     .toList();
             if (present.isEmpty()) {
-                return;
+                continue;
             }
+            anyReported = true;
             sb.append("- ")
                     .append(factionLabel(factionEntry.getKey()))
                     .append(" - overall ")
                     .append(stats.factionRecords.get(factionEntry.getKey()))
                     .append('\n');
             for (String tileId : present) {
-                sb.append("  - ")
-                        .append(tileLabel(tileId))
-                        .append(": ")
-                        .append(factionEntry.getValue().get(tileId))
-                        .append('\n');
+                appendTileLine(
+                        sb, "  * ", Map.entry(tileId, factionEntry.getValue().get(tileId)));
             }
-        });
+        }
+        if (!anyReported) {
+            sb.append("- No faction held an Entropic Scar or Legendary tile in at least ")
+                    .append(MINIMUM_OCCURRENCES)
+                    .append(" slices.\n");
+        }
     }
 
     private static void appendTileLine(StringBuilder sb, String indent, Entry<String, WinRateCount> entry) {
@@ -287,11 +319,11 @@ public class SliceTileWinRateStatisticsService {
         sb.append(indent)
                 .append('`')
                 .append(StringUtils.leftPad(Long.toString(count.percent()), 3))
-                .append("%` ")
+                .append("%` (")
                 .append(count.wins)
                 .append('/')
                 .append(count.total)
-                .append(' ')
+                .append(") ")
                 .append(tileLabel(entry.getKey()))
                 .append('\n');
     }
@@ -305,9 +337,9 @@ public class SliceTileWinRateStatisticsService {
         String name = tileModel == null ? null : tileModel.getNameNullSafe();
         return StringUtils.isBlank(name) ? tileId : name;
     }
-
+    
     private static String tileLabel(String tileId) {
-        return "`" + tileId + "` " + tileName(tileId);
+        return tileId + " (" + tileName(tileId) + ")";
     }
 
     private static String factionLabel(String faction) {
