@@ -96,8 +96,8 @@ public class SliceTileWinRateStatisticsService {
         StringBuilder sb = new StringBuilder("## __**Slice Tile Win Rates**__\n");
         sb.append("_A slice is the systems adjacent to a player's home, plus the ring-1 system"
                 + " adjacent to `000` nearest to them._\n");
-        sb.append("_6-player, 10-victory-point, non-fog, non-Galactic-Event, non-Scenario games with winners,"
-                + " on the standard ring layout._\n");
+        sb.append("_6-player, 10-victory-point, non-fog, non-Galactic-Event, non-Scenario, non-homebrew games"
+                + " with winners, on the standard ring layout._\n");
         sb.append("Games analyzed: ")
                 .append(gameCount)
                 .append(" | Slices analyzed: ")
@@ -105,6 +105,11 @@ public class SliceTileWinRateStatisticsService {
                 .append(" | Skipped for non-standard layout: ")
                 .append(stats.excludedGames)
                 .append('\n');
+        if (stats.skippedNonSystemTiles > 0) {
+            sb.append("_Ignored ")
+                    .append(stats.skippedNonSystemTiles)
+                    .append(" slice position(s) holding a blank or placeholder tile rather than a system._\n");
+        }
 
         appendOverallSection(sb, stats);
         appendBestAndWorstByFactionSection(sb, stats);
@@ -141,6 +146,10 @@ public class SliceTileWinRateStatisticsService {
                     continue;
                 }
                 String tileId = tile.getTileID();
+                if (isNotASystem(tileId)) {
+                    stats.skippedNonSystemTiles++;
+                    continue;
+                }
 
                 stats.overallTiles
                         .computeIfAbsent(tileId, _ -> new WinRateCount())
@@ -168,6 +177,11 @@ public class SliceTileWinRateStatisticsService {
 
     private static boolean isBlankish(String value) {
         return StringUtils.isBlank(value) || "null".equalsIgnoreCase(value);
+    }
+
+    private static boolean isNotASystem(String tileId) {
+        TileModel tileModel = TileHelper.getTileById(tileId);
+        return tileModel == null || StringUtils.isBlank(tileModel.getNameNullSafe());
     }
 
     private static boolean hasStandardSixPlayerRingLayout(Game game) {
@@ -282,9 +296,14 @@ public class SliceTileWinRateStatisticsService {
                 .append('\n');
     }
 
+    /**
+     * Never null: this feeds a Comparator, and TileModel.getName() is null for placeholder art, which
+     * would blow up String.compareTo mid-sort.
+     */
     private static String tileName(String tileId) {
         TileModel tileModel = TileHelper.getTileById(tileId);
-        return tileModel == null ? tileId : tileModel.getName();
+        String name = tileModel == null ? null : tileModel.getNameNullSafe();
+        return StringUtils.isBlank(name) ? tileId : name;
     }
 
     private static String tileLabel(String tileId) {
@@ -311,6 +330,7 @@ public class SliceTileWinRateStatisticsService {
 
         int sliceCount;
         int excludedGames;
+        int skippedNonSystemTiles;
     }
 
     private static class WinRateCount {

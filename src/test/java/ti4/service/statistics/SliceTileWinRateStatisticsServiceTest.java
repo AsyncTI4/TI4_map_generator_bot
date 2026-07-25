@@ -112,6 +112,27 @@ class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
         assertFalse(report.contains("without"), "the without metric was dropped");
     }
 
+    /**
+     * TileModel.getName() is null for placeholder art (0g, 0b, 0r, -1, fog covers), which used to reach the
+     * sort comparator and throw NPE out of String.compareTo.
+     */
+    @Test
+    void buildReportIgnoresBlankAndPlaceholderTilesInSlices() {
+        Game game = createStandardSliceGame("1", "sol", Map.of("318", "0g", "302", "-1", "201", "0border"));
+
+        String report = SliceTileWinRateStatisticsService.buildReport(List.of(game));
+
+        assertTrue(report.contains("Games analyzed: 1"), report);
+        assertTrue(
+                report.contains("Ignored 3 slice position(s) holding a blank or placeholder tile"),
+                "the three placeholders should be reported as ignored");
+        assertFalse(report.contains("`0g`"), "placeholder tiles must not get a win rate row");
+        assertFalse(report.contains("`-1`"), "placeholder tiles must not get a win rate row");
+        assertFalse(report.contains("`0border`"), "placeholder tiles must not get a win rate row");
+        // Sol's one remaining real slice tile is still counted.
+        assertTrue(report.contains("`100%` 1/1 `22`"), report);
+    }
+
     @Test
     void buildReportSkipsGamesWhoseHomesAreNotOnTheRingCorners() {
         Game game = createStandardSliceGame("1", "sol", Map.of());
