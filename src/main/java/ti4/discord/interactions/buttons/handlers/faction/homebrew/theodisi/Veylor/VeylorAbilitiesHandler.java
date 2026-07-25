@@ -228,7 +228,8 @@ public class VeylorAbilitiesHandler {
     public static void resolveLobbyistDues(GenericInteractionCreateEvent event, Game game, String winner) {
         for (Player player : AgendaHelper.getLosers(winner, game)) {
             if (player.hasAbility("lobbyist_dues")) {
-                int commoditiesGained = AgendaHelper.getWinningVoters(winner, game).size();
+                int commoditiesGained =
+                        AgendaHelper.getWinningVoters(winner, game).size();
 
                 if (commoditiesGained == 0) {
                     continue;
@@ -237,9 +238,8 @@ public class VeylorAbilitiesHandler {
                 ButtonHelperStats.gainComms(event, game, player, commoditiesGained, false);
 
                 MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation()
-                        + ", you gained " + commoditiesGained + " from _Lobbyist Dues_.");
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + ", you gained " + commoditiesGained + " from _Lobbyist Dues_.");
             }
         }
     }
