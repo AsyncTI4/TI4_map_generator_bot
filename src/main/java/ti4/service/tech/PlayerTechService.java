@@ -21,6 +21,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.Na
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
@@ -746,6 +747,9 @@ public class PlayerTechService {
             CommanderUnlockCheckService.checkPlayer(player, "zealots");
         }
         player.addTech(techID);
+        if (!isResearch) {
+            ArcanumUnitHandler.getRuneboundButtons(player, game, techID);
+        }
         GameEventService.commit(
                 game, GameEventType.TECH_RESEARCHED, player, Map.of("techId", techID, "paymentType", paymentType));
         if (buttonIDComponents.contains("scrollOfAscension")) {

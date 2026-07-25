@@ -70,7 +70,8 @@ public class PonthousPromissoryHandler {
             return;
         }
         if (combatThread == null) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not find the combat thread for Thunderbird Prototype.");
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "Could not find the combat thread for Thunderbird Prototype.");
             return;
         }
         sendThunderbirdGroundForceButtons(combatThread, game, player, tile);

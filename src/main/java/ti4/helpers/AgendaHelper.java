@@ -1210,7 +1210,7 @@ public final class AgendaHelper {
         return riders;
     }
 
-    private static List<Player> getLosers(String winner, Game game) {
+    public static List<Player> getLosers(String winner, Game game) {
         List<Player> losers = new ArrayList<>();
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
 
