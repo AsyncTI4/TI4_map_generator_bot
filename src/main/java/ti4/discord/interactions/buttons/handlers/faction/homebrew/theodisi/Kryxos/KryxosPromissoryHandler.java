@@ -2,15 +2,14 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryx
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.game.Player;
 import ti4.game.Planet;
+import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
@@ -27,7 +26,7 @@ public class KryxosPromissoryHandler {
     private static final String EVOEDICT = "thpnkryxos";
     private static final String USE_EVOEDICT = "useEvolutionaryEdict_";
     private static final String PLACE_EVOEDICT = "placeEvolutionaryEdict_";
-    
+
     public static void getEvolutionaryEdictButton(Player player, TechnologyModel techM) {
         if (player == null
                 || techM == null
@@ -42,16 +41,18 @@ public class KryxosPromissoryHandler {
                 : techM.getRequirements().get().length();
 
         List<Button> buttons = List.of(
-            Buttons.green(player.factionButtonChecker() + USE_EVOEDICT + techM.getAlias(), "Use Evolutionary Edict", FactionEmojis.kryxos),
-            Buttons.red("deleteButtons", "Decline"));
-
-        
+                Buttons.green(
+                        player.factionButtonChecker() + USE_EVOEDICT + techM.getAlias(),
+                        "Use Evolutionary Edict",
+                        FactionEmojis.kryxos),
+                Buttons.red("deleteButtons", "Decline"));
 
         MessageHelper.sendMessageToChannelWithButtons(
-            player.getCardsInfoThread(),
-            player.getRepresentation()
-                + ", you may play _Evolutionary Edict_ to produce a unit in your home system matching the Unit Upgrade you just researched with its cost reduced by " + prereqs + ".",
-            buttons);
+                player.getCardsInfoThread(),
+                player.getRepresentation()
+                        + ", you may play _Evolutionary Edict_ to produce a unit in your home system matching the Unit Upgrade you just researched with its cost reduced by "
+                        + prereqs + ".",
+                buttons);
     }
 
     @ButtonHandler(USE_EVOEDICT)
@@ -101,7 +102,8 @@ public class KryxosPromissoryHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + ", you do not control a planet in your home system to produce that unit on.");
+                    player.getRepresentationUnfogged()
+                            + ", you do not control a planet in your home system to produce that unit on.");
             return;
         }
         MessageHelper.sendMessageToChannelWithButtons(

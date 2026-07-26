@@ -758,7 +758,10 @@ public class PlayerTechService {
             if (isResearch) {
                 KryxosAbilityHandler.offerBattleTestedDesigns(event, game, player, techM);
                 UnitModel upgradedUnit = Mapper.getUnitModelByTechUpgrade(techID);
-                if (player.hasPlayablePromissoryInHand("thpnkryxos") && !player.ownsPromissoryNote("thpnkryxos") && upgradedUnit != null && !upgradedUnit.getIsStructure()) {
+                if (player.hasPlayablePromissoryInHand("thpnkryxos")
+                        && !player.ownsPromissoryNote("thpnkryxos")
+                        && upgradedUnit != null
+                        && !upgradedUnit.getIsStructure()) {
                     KryxosPromissoryHandler.getEvolutionaryEdictButton(player, techM);
                 }
             }
