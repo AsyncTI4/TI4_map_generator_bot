@@ -393,7 +393,6 @@
         "isUpgrade": true,
         "isShip": true,
         "ability": "This unit may move without being transported. Fighters in excess of your ships’ capacity count against your fleet pool.  Once per combat this unit participates in, after 1 of your opponent's units is destroyed, you may discard 1 of your abilities to draw 1 ability.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-maleagant.png?raw=true",
         "source": "twilight_kart"
     },
     {
@@ -485,7 +484,6 @@
         "isUpgrade": true,
         "isStructure": true,
         "ability": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity.\nAfter a player activates this system, they may spend 3 trade goods to draw 1 ability. When another player uses this ability, draw 1 ability.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-visionariaarchive.png?raw=true",
         "source": "twilight_kart"
     },
     {

@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -119,6 +121,12 @@ public class RelicHelper {
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
                     helpMessage.append(" Drew a second secret objective due to **Plausible Deniability**.");
+                }
+                if (player.hasAbility("multitasking")) {
+                    LunariumAbilityHandler.offerFactionSheetCCButtons(game, player);
+                }
+                if (player.hasUnlockedBreakthrough("lunariumbt")) {
+                    LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, player);
                 }
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
             }

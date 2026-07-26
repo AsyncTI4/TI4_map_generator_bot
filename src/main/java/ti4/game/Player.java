@@ -1816,7 +1816,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
         if (hasAbility("puppetsoftheblade") && !game.isFrankenGame()) {
             List<GenericCardModel> allPlots = new ArrayList<>(Mapper.getPlots().values())
-                    .stream().filter(p -> !p.getAlias().startsWith("mutated")).toList();
+                    .stream()
+                            .filter(p -> !p.getAlias().startsWith("mutated"))
+                            .filter(p -> p.getHomebrewReplacesID().isEmpty())
+                            .toList();
             allPlots.forEach(plot -> setPlotCard(plot.getAlias()));
         }
     }

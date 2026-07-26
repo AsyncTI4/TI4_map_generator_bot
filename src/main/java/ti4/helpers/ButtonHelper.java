@@ -55,14 +55,17 @@ import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
@@ -916,6 +919,11 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb);
             }
             ActionCardHelper.serveReverseEngineerButtons(game, player, new ArrayList<>(acs.keySet()));
+
+            // release all of a players captured units
+            for (Player p2 : game.getPlayers().values()) {
+                ButtonHelperFactionSpecific.releaseAllUnits(player, game, p2, event);
+            }
 
             // unscore all of a players SOs
             acs = new LinkedHashMap<>(player.getSecretsScored());
@@ -1897,7 +1905,7 @@ public class ButtonHelper {
                         buttons);
             }
             if (game.playerHasLeaderUnlockedOrAlliance(nonActivePlayer, "arboreccommander")
-                    && Helper.getProductionValue(nonActivePlayer, game, activeSystem, false) > 0) {
+                    && Helper.getProductionValue(nonActivePlayer, game, activeSystem, false, true) > 0) {
                 if (justChecking) {
                     if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(
@@ -7596,7 +7604,7 @@ public class ButtonHelper {
     public static Set<Tile> getTilesOfUnitsWithProduction(Player player, Game game) {
         Set<Tile> tiles = new HashSet<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (Helper.getProductionValue(player, game, tile, false) > 0) {
+            if (Helper.getProductionValue(player, game, tile, false, true) > 0) {
                 tiles.add(tile);
             }
         }

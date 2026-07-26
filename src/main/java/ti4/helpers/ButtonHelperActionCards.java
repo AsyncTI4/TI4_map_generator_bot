@@ -16,6 +16,8 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -1397,6 +1399,12 @@ public final class ButtonHelperActionCards {
         if (player.hasAbility("plausible_deniability")) {
             game.drawSecretObjective(player.getUserID());
             message += ", and then drew a second secret objective due to **Plausible Deniability**";
+        }
+        if (player.hasAbility("multitasking")) {
+            LunariumAbilityHandler.offerFactionSheetCCButtons(game, player);
+        }
+        if (player.hasUnlockedBreakthrough("lunariumbt")) {
+            LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, player);
         }
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
         MessageHelper.sendMessageToChannel(event.getChannel(), message + ".");
@@ -2818,6 +2826,18 @@ public final class ButtonHelperActionCards {
                 if (Mapper.getTech(tech).isUnitUpgrade()) {
                     boolean hasSpecialUpgrade = false;
                     for (String factionTech : player.getNotResearchedFactionTechs()) {
+                        TechnologyModel fTech = Mapper.getTech(factionTech);
+                        if (fTech != null
+                                && !fTech.getAlias()
+                                        .equalsIgnoreCase(Mapper.getTech(tech).getAlias())
+                                && fTech.isUnitUpgrade()
+                                && fTech.getBaseUpgrade()
+                                        .orElse("bleh")
+                                        .equalsIgnoreCase(Mapper.getTech(tech).getAlias())) {
+                            hasSpecialUpgrade = true;
+                        }
+                    }
+                    for (String factionTech : player.getTechs()) {
                         TechnologyModel fTech = Mapper.getTech(factionTech);
                         if (fTech != null
                                 && !fTech.getAlias()
