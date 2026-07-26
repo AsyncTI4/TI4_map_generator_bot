@@ -492,6 +492,12 @@ public class StartCombatService {
             }
         }
 
+        // Ponthous PN
+        if (isSpaceCombat) {
+            PonthousPromissoryHandler.offerThunderbirdPrototypeAtSpaceCombatStart(
+                    game, player1, player2, tile, threadChannel);
+        }
+
         // AFB
         if (isSpaceCombat) {
             sendAFBButtonsToThread(
@@ -1434,11 +1440,6 @@ public class StartCombatService {
         if (oldGloryP1 != null) buttons.add(oldGloryP1);
         Button oldGloryP2 = PonthousUnitHandler.getOldGlorySustainButton(p2, tile);
         if (oldGloryP2 != null) buttons.add(oldGloryP2);
-        for (Player player : game.getRealPlayers()) {
-            Button thunderbird = PonthousPromissoryHandler.getThunderbirdPrototypeButton(game, player, tile);
-            if (thunderbird != null) buttons.add(thunderbird);
-        }
-
         return buttons;
     }
 

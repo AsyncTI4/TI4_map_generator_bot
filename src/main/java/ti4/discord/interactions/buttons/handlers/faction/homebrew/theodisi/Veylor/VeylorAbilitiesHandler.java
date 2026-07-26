@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -14,6 +15,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperStats;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
@@ -219,6 +221,26 @@ public class VeylorAbilitiesHandler {
         } else {
             game.setStoredValue(key, String.join(",", agendas));
             ButtonHelper.deleteTheOneButton(event);
+        }
+    }
+
+    // Lobbyist Dues
+    public static void resolveLobbyistDues(GenericInteractionCreateEvent event, Game game, String winner) {
+        for (Player player : AgendaHelper.getLosers(winner, game)) {
+            if (player.hasAbility("lobbyist_dues")) {
+                int commoditiesGained =
+                        AgendaHelper.getWinningVoters(winner, game).size();
+
+                if (commoditiesGained == 0) {
+                    continue;
+                }
+
+                ButtonHelperStats.gainComms(event, game, player, commoditiesGained, false);
+
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + ", you gained " + commoditiesGained + " from _Lobbyist Dues_.");
+            }
         }
     }
 }

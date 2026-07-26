@@ -19,6 +19,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUni
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesTechHandler;
@@ -193,6 +194,7 @@ public final class ButtonHelperTacticalAction {
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
         ArcanumTechHandler.clearSigilOfTransmutation(game);
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
+        KryxosBreakthroughHandler.clearPrototypeInnovators(game);
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
     }
 
@@ -483,6 +485,7 @@ public final class ButtonHelperTacticalAction {
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
         ArcanumTechHandler.clearSigilOfTransmutation(game);
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
+        KryxosBreakthroughHandler.clearPrototypeInnovators(game);
         ArdentiaUnitHandler.clearIronClawDeployUsed(game);
         DreamButtonHandler.clearDreamAgentAnomaly(game);
         GameEventDraft.clear(game);

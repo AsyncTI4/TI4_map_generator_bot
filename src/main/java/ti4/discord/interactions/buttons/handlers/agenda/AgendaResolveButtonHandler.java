@@ -175,6 +175,7 @@ class AgendaResolveButtonHandler {
         List<Player> voters = AgendaHelper.getWinningVoters(winner, game);
         VeylorLeadersHandler.resolveVeylorHeroLosingVote(game, winner);
         TaAbilityHandler.resolveEfficientGovernance(game, winner);
+        VeylorAbilitiesHandler.resolveLobbyistDues(event, game, winner);
         notifyIndoctrinationTeam(game, voters);
         checkFlorzenUnlock(voters, riders);
         processRiders(game, riders);
