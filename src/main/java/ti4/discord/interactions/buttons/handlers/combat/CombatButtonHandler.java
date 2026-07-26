@@ -305,8 +305,11 @@ class CombatButtonHandler {
     @ButtonHandler("autoAssignSpaceHits_")
     public static void autoAssignSpaceHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
+        if (tile == null) {
+            return;
+        }
         if (PonthousAbilityHandler.requiresManualLastStandAssignment(
-                game, player, tile, tile == null ? null : tile.getSpaceUnitHolder(), event)) {
+                game, player, tile, tile.getSpaceUnitHolder(), event)) {
             MessageHelper.sendMessageToChannelWithButton(
                     event.getMessageChannel(),
                     player.getRepresentationNoPing() + ", assign this hit manually to use _Last Stand_ if needed.",

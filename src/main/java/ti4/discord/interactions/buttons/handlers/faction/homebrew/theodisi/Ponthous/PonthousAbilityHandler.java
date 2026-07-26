@@ -100,7 +100,7 @@ public class PonthousAbilityHandler {
             return false;
         }
 
-        UnitModel unitModel = unitKey == null ? null : player.getUnitFromUnitKey(unitKey);
+        UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
         Map<UnitModel, Integer> participants =
                 CombatRollService.getUnitsInCombat(tile, holder, player, event, CombatRollType.combatround, game);
         if (unitModel == null
