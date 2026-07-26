@@ -19,10 +19,8 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPromissoryHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
@@ -57,6 +55,7 @@ import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.model.UnitModel;
 import ti4.model.metadata.TechSummariesMetadataManager;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -758,6 +757,10 @@ public class PlayerTechService {
         if (techM.isUnitUpgrade()) {
             if (isResearch) {
                 KryxosAbilityHandler.offerBattleTestedDesigns(event, game, player, techM);
+                UnitModel upgradedUnit = Mapper.getUnitModelByTechUpgrade(techID);
+                if (player.hasPlayablePromissoryInHand("thpnkryxos") && !player.ownsPromissoryNote("thpnkryxos") && upgradedUnit != null && !upgradedUnit.getIsStructure()) {
+                    KryxosPromissoryHandler.getEvolutionaryEdictButton(player, techM);
+                }
             }
             AshenLeadersHandler.offerCommanderPlacementButtons(event, game, player, techM);
             if (player.hasUnexhaustedLeader("mirvedaagent") && player.getStrategicCC() > 0) {
