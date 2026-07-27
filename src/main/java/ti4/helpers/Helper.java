@@ -37,6 +37,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
@@ -109,6 +110,21 @@ import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
 
 public final class Helper {
+    private static final List<Point> TOKEN_PLANET_POSITIONS = List.of(
+            new Point(87, 79),
+            new Point(258, 79),
+            new Point(87, 221),
+            new Point(258, 221),
+            new Point(172, 79),
+            new Point(172, 221));
+
+    private static final List<Point> TRIPLE_SYSTEM_TOKEN_PLANET_POSITIONS = List.of(
+            new Point(87, 221),
+            new Point(258, 221),
+            new Point(87, 79),
+            new Point(258, 79),
+            new Point(172, 221),
+            new Point(172, 79));
 
     public static int getCurrentHour() {
         long currentTime = System.currentTimeMillis();
@@ -539,9 +555,76 @@ public final class Helper {
         return tokenPath;
     }
 
+    private static Point getTokenPlanetPosition(Tile tile, String tokenOrPlanetID) {
+        Point defaultPosition = getDefaultTokenPlanetPosition(tile, tokenOrPlanetID);
+        List<String> tokenPlanets = tile.getPlanetUnitHolders().stream()
+                .map(UnitHolder::getName)
+                .filter(Constants.TOKEN_PLANETS::contains)
+                .sorted()
+                .toList();
+
+        if (tokenPlanets.size() <= 1) {
+            return defaultPosition;
+        }
+
+        String tokenPlanetID = getTokenPlanetID(tokenOrPlanetID);
+        if (tokenPlanetID == null) {
+            return defaultPosition;
+        }
+
+        if (Constants.THUNDERSEDGE.equalsIgnoreCase(tokenPlanetID)) {
+            return new Point(Constants.SPACE_CENTER_POSITION);
+        }
+
+        List<String> slottedTokenPlanets = tokenPlanets.stream()
+                .filter(tokenPlanet -> !Constants.THUNDERSEDGE.equalsIgnoreCase(tokenPlanet))
+                .toList();
+
+        int index = slottedTokenPlanets.indexOf(tokenPlanetID);
+        if (index < 0) {
+            return defaultPosition;
+        }
+
+        List<Point> positions = tile.getTileModel().getNumPlanets() == 3
+                ? TRIPLE_SYSTEM_TOKEN_PLANET_POSITIONS
+                : TOKEN_PLANET_POSITIONS;
+        if (index < positions.size()) {
+            return new Point(positions.get(index));
+        }
+
+        double theta = (2 * Math.PI * index) / slottedTokenPlanets.size();
+        int x = Constants.SPACE_CENTER_POSITION.x + (int) Math.round(85 * Math.cos(theta));
+        int y = Constants.SPACE_CENTER_POSITION.y + (int) Math.round(70 * Math.sin(theta));
+        return new Point(x, y);
+    }
+
+    private static Point getDefaultTokenPlanetPosition(Tile tile, String tokenOrPlanetID) {
+        if (Strings.CI.contains(tokenOrPlanetID, Constants.THUNDERSEDGE)) {
+            return new Point(Constants.SPACE_CENTER_POSITION);
+        }
+
+        Point position = new Point(Constants.TOKEN_PLANET_POSITION);
+        if (tile.getTileModel().getNumPlanets() == 3) {
+            position = new Point(Constants.MIRAGE_TRIPLE_POSITION);
+        }
+        return position;
+    }
+
+    private static String getTokenPlanetID(String tokenOrPlanetID) {
+        if (tokenOrPlanetID == null) {
+            return null;
+        }
+
+        TokenModel token = Mapper.getToken(tokenOrPlanetID);
+        if (token != null && token.getTokenPlanetName() != null) {
+            return token.getTokenPlanetName();
+        }
+        return Mapper.getTokenKey(tokenOrPlanetID);
+    }
+
     public static Point getTokenPlanetCenterPosition(Tile tile, String tokenID) {
         TokenModel token = Mapper.getToken(tokenID);
-        PlanetModel planet = token == null ? null : Mapper.getPlanet(token.getTokenPlanetName());
+        PlanetModel planet = token == null ? Mapper.getPlanet(tokenID) : Mapper.getPlanet(token.getTokenPlanetName());
         Integer planetX = null;
         Integer planetY = null;
         if (planet != null
@@ -551,40 +634,26 @@ public final class Helper {
             planetY = planet.getPlanetLayout().getCenterPosition().y;
         }
 
-        String tokenPath = token == null ? null : token.getImagePath();
-        BufferedImage tokenImage = ImageHelper.read(ResourceHelper.getInstance().getAttachmentFile(tokenPath));
+        String tokenPath = token == null ? Mapper.getTokenID(tokenID) : token.getImagePath();
+        BufferedImage tokenImage = ImageHelper.read(
+                tokenPath == null ? null : ResourceHelper.getInstance().getAttachmentFile(tokenPath));
         Integer imageX = null;
         Integer imageY = null;
         if (tokenImage != null) {
-            imageX = (tokenImage.getWidth() / 2);
-            imageY = (tokenImage.getHeight() / 2);
+            imageX = tokenImage.getWidth() / 2;
+            imageY = tokenImage.getHeight() / 2;
         }
 
-        Point initial = new Point(Constants.TOKEN_PLANET_POSITION);
-        if (tokenID.toLowerCase().contains("thundersedge")) {
-            initial = new Point(Constants.SPACE_CENTER_POSITION);
-        }
-        if (tile.getTileModel().getNumPlanets() == 3) {
-            initial = new Point(Constants.MIRAGE_TRIPLE_POSITION);
+        Point tokenPlanetPosition = getTokenPlanetPosition(tile, tokenID);
+        if (imageX != null && imageY != null && planetX != null && planetY != null) {
+            return new Point(tokenPlanetPosition.x - imageX + planetX, tokenPlanetPosition.y - imageY + planetY);
         }
 
-        if (imageX != null && planetX != null) {
-            return new Point(initial.x - imageX + planetX, initial.y - imageY + planetY);
-        }
-
-        return initial;
+        return tokenPlanetPosition;
     }
 
     public static Point getTokenPlanetCenterOfImage(Tile tile, String tokenID) {
-
-        Point initial = new Point(Constants.TOKEN_PLANET_POSITION);
-        if (tokenID.toLowerCase().contains("thundersedge")) {
-            initial = new Point(Constants.SPACE_CENTER_POSITION);
-        }
-        if (tile.getTileModel().getNumPlanets() == 3) {
-            initial = new Point(Constants.MIRAGE_TRIPLE_POSITION);
-        }
-        return initial;
+        return getTokenPlanetPosition(tile, tokenID);
     }
 
     public static void addTokenPlanetToTile(Game game, Tile tile, String planetName) {

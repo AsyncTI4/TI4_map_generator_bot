@@ -17,10 +17,10 @@
         "unitHolderName": "skarnath",
         "resourcesLocation": "BottomLeft",
         "centerPosition": {
-            "x": 50,
-            "y": 46
+            "x": 62,
+            "y": 58
         },
-        "planetRadius": 33
+        "planetRadius": 41
     },
     "contrastColor": "orange",
     "source": "theodisi"
