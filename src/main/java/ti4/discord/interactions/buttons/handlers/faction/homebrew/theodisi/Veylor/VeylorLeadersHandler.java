@@ -96,11 +96,26 @@ public class VeylorLeadersHandler {
     }
 
     // Hero
+    public static boolean isVeylorAgendaPhase(Game game) {
+        if (game == null || !game.getStoredValue("executiveOrder").isEmpty()) {
+            return false;
+        }
+        return switch (game.getPhaseOfGame()) {
+            case "agenda", "agendawaiting", "agendaVoting" -> true;
+            default -> false;
+        };
+    }
+
     public static boolean hasHeroAdditionalAgenda(Game game, int aCount) {
-        return aCount == 3 && game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
+        return isVeylorAgendaPhase(game)
+                && aCount == 3
+                && game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
     }
 
     public static void resolveVeylorHeroLosingVote(Game game, String winner) {
+        if (!isVeylorAgendaPhase(game)) {
+            return;
+        }
         for (Player player : AgendaHelper.getLosingVoters(winner, game)) {
             if (!player.hasLeaderUnlocked("veylorhero")) {
                 continue;
@@ -120,7 +135,12 @@ public class VeylorLeadersHandler {
     }
 
     @ButtonHandler(GAIN_HERO_CC)
-    public static void gainVeylorHeroCommandToken(ButtonInteractionEvent event, Player player, String buttonID) {
+    public static void gainVeylorHeroCommandToken(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!isVeylorAgendaPhase(game) || !player.hasLeaderUnlocked("veylorhero")) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         String pool =
                 switch (buttonID.substring(GAIN_HERO_CC.length())) {
                     case "tactic" -> {
