@@ -225,15 +225,15 @@ public class StartPhaseService {
         // Phase-end lore must fire before the round number increments below, so "end of round N"
         // round gates see the round they close; the matching phase-START fires after setPhaseOfGame.
         LoreService.showPhaseEndLore(game, "strategy");
+        // for (Player player2 : game.getRealPlayers()) {
+        //     if (game.getStoredValue("SpecialSession") != null
+        //             && game.getStoredValue("SpecialSession").contains(player2.getFaction())
+        //             && player2.getPlayableActionCards().contains("special_session")) {
+        //         ActionCardHelper.playAC(event, game, player2, "special session", game.getMainGameChannel());
+        //         return;
+        //     }
+        // }
         game.removeStoredValue("veylorBtExtraAgenda");
-        for (Player player2 : game.getRealPlayers()) {
-            if (game.getStoredValue("SpecialSession") != null
-                    && game.getStoredValue("SpecialSession").contains(player2.getFaction())
-                    && player2.getPlayableActionCards().contains("special_session")) {
-                ActionCardHelper.playAC(event, game, player2, "special session", game.getMainGameChannel());
-                return;
-            }
-        }
 
         for (Player player2 : game.getRealPlayers()) {
             String id = "sigma_machinations";
