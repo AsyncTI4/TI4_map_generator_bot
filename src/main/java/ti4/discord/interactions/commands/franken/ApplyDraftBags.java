@@ -5,7 +5,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.draft.BagDraft;
+import ti4.draft.FrankenDrazDraft;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.service.franken.FrankenDraftBagService;
@@ -31,6 +33,15 @@ class ApplyDraftBags extends GameStateSubcommand {
                     "The draft stage of the FrankenDraft is NOT complete. Please finish the draft or rerun the command with the force option set.";
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
             return;
+        }
+
+        if (force && draft instanceof FrankenDrazDraft frankenDrazDraft) {
+            for (Player player : game.getRealPlayers()) {
+                player.getDraftHand().Contents.addAll(player.getDraftQueue().Contents);
+                player.resetDraftQueue();
+                player.setReadyToPassBag(true);
+            }
+            frankenDrazDraft.expandFactionPackages(game);
         }
 
         FrankenDraftBagService.applyDraftBags(event, game);
