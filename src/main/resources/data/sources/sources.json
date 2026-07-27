@@ -315,5 +315,13 @@
         "subcanal": "personal projs",
         "credits": "pvn",
         "description": "Planetary Stabilisation action available to all players; Ghost Experiment SC and AC"
+    },
+    {
+        "source": "addiction",
+        "name": "TI Addiction",
+        "canal": "community",
+        "subcanal": "personal projs",
+        "credits": "aubreynadler",
+        "description": "Splits Mecatol Rex into a 3-planet system (Mecatol City, Jun, The Polar Castelle) with new legendary abilities"
     }
 ]
