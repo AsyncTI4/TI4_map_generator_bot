@@ -604,7 +604,8 @@ public final class Helper {
             }
         }
 
-        if (tile.getTileModel().getNumPlanets() > 0 && tile.getTileModel().hasWormhole()) {
+        if (tile.getTileModel().getNumPlanets() > 0 && tile.getTileModel().hasWormhole()
+                || tile.getTileModel().getNumPlanets() == 2) {
             double theta = Math.toRadians(index == 0 ? -45 : 0);
             int deltaX = position.x - Constants.SPACE_CENTER_POSITION.x;
             int deltaY = position.y - Constants.SPACE_CENTER_POSITION.y;
