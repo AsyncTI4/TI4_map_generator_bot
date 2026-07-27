@@ -97,14 +97,12 @@ public class VeylorLeadersHandler {
 
     // Hero
     public static boolean hasHeroAdditionalAgenda(Game game, int aCount) {
-        return aCount == 3
-                && game.getRealPlayers().stream().anyMatch(player -> "yes"
-                        .equals(game.getStoredValue("veylorHeroActive_" + player.getFaction())));
+        return aCount == 3 && game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
     }
 
     public static void resolveVeylorHeroLosingVote(Game game, String winner) {
         for (Player player : AgendaHelper.getLosingVoters(winner, game)) {
-            if (!"yes".equals(game.getStoredValue("veylorHeroActive_" + player.getFaction()))) {
+            if (!player.hasLeaderUnlocked("veylorhero")) {
                 continue;
             }
 

@@ -89,7 +89,8 @@ public class VeylorAbilitiesHandler {
 
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + ", choose the next agenda to reveal with _Tight Scheduling_:",
+                    player.getRepresentationUnfogged()
+                            + ", choose the next agenda to reveal with _Tight Scheduling_:\n\n**WARNING**: Wait a few seconds before revealing it as going to fast may cause the agenda to not be revealed.",
                     buttons);
 
             return true;
