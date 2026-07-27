@@ -1,0 +1,43 @@
+{
+  "id": "8100",
+  "name": "Mecatol Rex",
+  "aliases": [
+    "mecatolcity",
+    "mechatolcity",
+    "jun",
+    "castelle",
+    "gul",
+    "polarcastelle",
+    "junsystem",
+    "gulsystem",
+    "mecsystem"
+  ],
+  "imagePath": "Mecatol_Rex_Citadels_tile.png",
+  "shipPositionsType": "TYPE03",
+  "spaceTokenLocations": [
+    {
+      "x": 135.0,
+      "y": 55.0
+    },
+    {
+      "x": 185.0,
+      "y": 110.0
+    },
+    {
+      "x": 130.0,
+      "y": 170.0
+    },
+    {
+      "x": 65.0,
+      "y": 100.0
+    }
+  ],
+  "wormholes": [],
+  "planets": [
+    "mc",
+    "tpc",
+    "jun"
+  ],
+  "source": "addiction",
+  "tileBack": "black"
+}
