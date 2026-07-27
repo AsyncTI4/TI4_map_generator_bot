@@ -14,11 +14,16 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesTechHandler;
@@ -35,6 +40,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperAbilities;
+import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.helpers.thundersedge.TeHelperPromissories;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -488,6 +494,9 @@ public final class ButtonHelperTacticalAction {
         GameEventDraft.clear(game);
 
         game.getTacticalActionDisplacement().clear();
+        for (Tile tile : game.getTileMap().values()) {
+            TeHelperGeneral.addStationsToPlayArea(null, game, tile);
+        }
     }
 
     public static void logTacticalAction(Game game, Player player) {

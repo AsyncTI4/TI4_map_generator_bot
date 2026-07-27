@@ -27,10 +27,15 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
@@ -1621,6 +1626,11 @@ public class StartCombatService {
                         "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                                 + "Letnev Agent",
                         FactionEmojis.Letnev));
+            }
+            if ((!game.isFowMode() || agentHolder == p1)
+                    && agentHolder.ownsPromissoryNote("war_funding")
+                    && "space".equalsIgnoreCase(groundOrSpace)) {
+                buttons.add(Buttons.gray("resolveWarfunding", "Play War Funding", FactionEmojis.Letnev));
             }
             if ((!game.isFowMode() || agentHolder == p1)
                     && agentHolder.hasUnexhaustedLeader("xanagent")

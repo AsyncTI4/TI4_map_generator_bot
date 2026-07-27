@@ -29,15 +29,26 @@ import ti4.contest.replay.core.CombatRollPayload.DieRollSource;
 import ti4.contest.replay.core.CombatRollPayload.RollSegmentType;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraUnitHandler;
@@ -1189,6 +1200,7 @@ public class CombatRollService {
         playerUnits = mergeResult.units();
         Set<String> divergingModels = mergeResult.divergingModels();
         Set<String> consumedBestMods = new HashSet<>();
+        game.removeStoredValue("warFundingRolls" + player.getFaction());
         for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : playerUnits.entrySet()) {
             UnitModel unitModel = entry.getKey().getLeft();
             UnitHolder perUnitHolder = entry.getKey().getRight();
@@ -1322,6 +1334,13 @@ public class CombatRollService {
                     mult = 2;
                 }
                 int hitRolls = DiceHelper.countSuccesses(resultRolls);
+                if (rollType == CombatRollType.combatround && numRolls != hitRolls) {
+                    String key = "warFundingRolls" + player.getFaction();
+                    game.setStoredValue(
+                            key,
+                            game.getStoredValue(key) + ";" + (numRolls - hitRolls) + "_" + (toHit - modifierToHit) + "_"
+                                    + unitModel.getBaseType());
+                }
                 if (unitModel.getUnitType() == UnitType.Flagship
                         && ValefarZService.hasFlagshipAbility(game, player, "jolnar_flagship")) {
                     chanceOfAllHits *= Math.pow(2.0 / (11 - toHit + modifierToHit), numRolls * mult);

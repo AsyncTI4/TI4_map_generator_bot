@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static java.util.Map.entry;
+import static java.util.Map.*;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -1394,6 +1394,7 @@ public final class Constants {
     public static final String ADD_TO_SPLICE = "add_to_splice";
     public static final String GALVANIZE = "galvanize";
     public static final String FIX_COLORS = "fix_colors";
+    public static final String GUILD_AGENTS = "guild_agents";
     public static final String DRAW_RANDOM_UNIT = "draw_random_unit";
     public static final String DRAW_RANDOM_GENOME = "draw_random_genome";
     public static final String DRAW_RANDOM_BLUE_TILE = "draw_random_blue_tile";
