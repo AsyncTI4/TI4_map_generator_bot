@@ -175,6 +175,7 @@ class AgendaResolveButtonHandler {
         List<Player> voters = AgendaHelper.getWinningVoters(winner, game);
         VeylorLeadersHandler.resolveVeylorHeroLosingVote(game, winner);
         TaAbilityHandler.resolveEfficientGovernance(game, winner);
+        VeylorAbilitiesHandler.resolveLobbyistDues(event, game, winner);
         notifyIndoctrinationTeam(game, voters);
         checkFlorzenUnlock(voters, riders);
         processRiders(game, riders);
@@ -422,7 +423,10 @@ class AgendaResolveButtonHandler {
 
     private static List<Button> buildNextButtons(Game game, int aCount) {
         List<Button> buttons = new ArrayList<>();
-        if (aCount < 3 || game.isAbsolMode() || VeylorLeadersHandler.hasHeroAdditionalAgenda(game, aCount)) {
+        boolean heroActive = game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
+        boolean veylorBtExtraAgenda = "yes".equals(game.getStoredValue("veylorBtExtraAgenda"));
+        int agendaLimit = 2 + (heroActive ? 1 : 0) + (veylorBtExtraAgenda ? 1 : 0);
+        if (aCount <= agendaLimit || game.isAbsolMode()) {
             buttons.add(Buttons.blue("flip_agenda", "Flip Agenda #" + aCount));
         }
         RiftSetModeService.includeCrucibleAgendaButton(buttons, game);
