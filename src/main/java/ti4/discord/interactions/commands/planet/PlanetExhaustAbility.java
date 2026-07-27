@@ -91,7 +91,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 NewStuffHelper.resolveGarboziaTE(event, game, player, "garbozia_page0");
                 output = "blank";
             }
-            case "mrte" -> {
+            case "mrte", "mc" -> {
                 channel = player.getCardsInfoThread();
                 output = player.getRepresentation()
                         + ", please choose a secret objective to discard - the bot will automatically draw a replacement:";
