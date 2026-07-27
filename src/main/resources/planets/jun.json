@@ -1,0 +1,105 @@
+{
+  "id": "jun",
+  "tileId": "8100",
+  "name": "Jun",
+  "shortNamePNAttach": "Jun",
+  "shrinkNamePNAttach": true,
+  "aliases": [
+    "jun",
+    "gul",
+    "junsystem",
+    "mecsystem"
+  ],
+  "positionInTile": {
+    "x": 171.0,
+    "y": 149.0
+  },
+  "radius": 114.0,
+  "resources": 1,
+  "influence": 0,
+  "planetType": "MR",
+  "legendaryAbilityName": "Meridian Compound",
+  "legendaryAbilityText": "You may exhaust this card when resolving a strategy card ability to reduce the resource of influence spent resolving that ability by 1 for each player with units in this system\nGain your breakthrough when you gain this card from another player, if you do not already have it.",
+  "unitPositions": {
+    "unitHolderName": "jun",
+    "coordinateMap": {
+      "control": [
+        {
+          "x": 131.0,
+          "y": 143.0
+        }
+      ],
+      "sd": [
+        {
+          "x": 191.0,
+          "y": 178.0
+        }
+      ],
+      "pd": [
+        {
+          "x": 136.0,
+          "y": 170.0
+        },
+        {
+          "x": 153.0,
+          "y": 170.0
+        },
+        {
+          "x": 170.0,
+          "y": 170.0
+        },
+        {
+          "x": 145.0,
+          "y": 181.0
+        },
+        {
+          "x": 163.0,
+          "y": 181.0
+        }
+      ],
+      "mf": [
+        {
+          "x": 128.0,
+          "y": 99.0
+        },
+        {
+          "x": 146.0,
+          "y": 99.0
+        },
+        {
+          "x": 164.0,
+          "y": 99.0
+        },
+        {
+          "x": 121.0,
+          "y": 112.0
+        },
+        {
+          "x": 139.0,
+          "y": 112.0
+        },
+        {
+          "x": 157.0,
+          "y": 112.0
+        },
+        {
+          "x": 175.0,
+          "y": 112.0
+        }
+      ],
+      "tkn_gf": [
+        {
+          "x": 150.0,
+          "y": 140.0
+        },
+        {
+          "x": 117.0,
+          "y": 140.0
+        }
+      ]
+    },
+    "removeUnitCoordinate": true
+  },
+  "flavourText": "*Jun suffered the same brutal fate as most of Mecatol Rex. Hosting massive military bases and supply depots for the Lazax fleets, Jun was an irresistible target.*",
+  "source": "addiction"
+}

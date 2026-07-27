@@ -54,6 +54,7 @@ public class Source {
         theodisi,
         gamma,
         black_spectrum,
+        addiction,
 
         // async homebrew
         draft,
@@ -225,6 +226,7 @@ public class Source {
                 case theodisi -> "Lost Legacies [Homebrew]";
                 case gamma -> "Gamma Galaxies [Homebrew]";
                 case black_spectrum -> "Black Spectrum [Homebrew]";
+                case addiction -> "TI Addiction [Homebrew]";
                 default -> toString();
             };
         }
