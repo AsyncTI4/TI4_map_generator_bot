@@ -90,7 +90,6 @@ import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperAbilities;
-import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
@@ -4043,7 +4042,6 @@ public class ButtonHelper {
 
     public static int[] checkFleetAndCapacity(
             Player player, Game game, Tile tile, boolean ignoreFighters, boolean issuePing) {
-        TeHelperGeneral.addStationsToPlayArea(null, game, tile);
         String tileRepresentation = tile.getRepresentation();
         int[] values = {0, 0, 0, 0};
         if (tileRepresentation == null || "null".equalsIgnoreCase(tileRepresentation)) {
@@ -6906,6 +6904,49 @@ public class ButtonHelper {
                 .editMessage(message.toString())
                 .setComponents(turnButtonListIntoActionRowList(systemButtons))
                 .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("resolveWarfunding")
+    public static void resolveWarfunding(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+
+        if (!player.getPromissoryNotes().keySet().contains("war_funding")) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), player.getRepresentation() + " you don't have war funding.");
+            return;
+        }
+        if (player.getPromissoryNotesOwned().contains("war_funding")) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), player.getRepresentation() + " you cannot resolve war funding.");
+            return;
+        }
+        PromissoryNoteHelper.resolvePNPlay("war_funding", player, game, event);
+        String key = "warFundingRolls" + player.getFaction();
+        String summary = game.getStoredValue(key);
+        String msg = player.getRepresentation() + " your units rerolled their misses and got the following:\n";
+        for (String part : summary.split(";")) {
+            if (!part.contains("_")) {
+                continue;
+            }
+            int numDice = Integer.parseInt(part.split("_")[0]);
+            int hitOn = Integer.parseInt(part.split("_")[1]);
+            String unit = part.split("_")[2];
+            List<Die> resultRolls = DiceHelper.rollDice(hitOn, numDice);
+            int hitRolls = DiceHelper.countSuccesses(resultRolls);
+            String unitRoll = CombatMessageHelper.displayUnitRoll(
+                    player.getUnitByBaseType(unit),
+                    hitOn,
+                    0,
+                    numDice / player.getUnitByBaseType(unit).getCombatDieCount(),
+                    player.getUnitByBaseType(unit).getCombatDieCount(),
+                    numDice % player.getUnitByBaseType(unit).getCombatDieCount(),
+                    resultRolls,
+                    hitRolls,
+                    "space");
+            msg += unitRoll;
+        }
+        msg +=
+                "\nHave your opponent assign hits with the assign hits button present underneath the combat picture, and reroll their dice (if desired) using the roll space combat button.";
+        MessageHelper.sendMessageToChannel(event.getChannel(), msg);
     }
 
     @ButtonHandler("rollThalnos_")

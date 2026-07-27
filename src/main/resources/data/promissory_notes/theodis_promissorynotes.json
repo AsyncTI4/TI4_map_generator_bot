@@ -143,6 +143,7 @@
         "color": "",
         "playArea": false,
         "source": "theodisi",
-        "text": "At the start of space combat select 1 of your ground forces in that system: That unit participates in combat as if it were a ship and you may treat them as Galvanized until the end of the combat. Return this card to the Ponthous player at the end of that combat."
+        "text": "At the start of space combat select 1 of your ground forces in that system: That unit participates in combat as if it were a ship and you may treat them as Galvanized until the end of the combat. Return this card to the Ponthous player at the end of that combat.",
+        "notes": "Bot can't detect end of space combat, so it is returned either when another combat starts or end of turn/tactical action."
     }
 ]

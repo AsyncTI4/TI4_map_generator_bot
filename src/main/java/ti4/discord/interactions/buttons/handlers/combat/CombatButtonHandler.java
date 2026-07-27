@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -303,14 +304,23 @@ class CombatButtonHandler {
 
     @ButtonHandler("autoAssignSpaceHits_")
     public static void autoAssignSpaceHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
+        if (tile == null) {
+            return;
+        }
+        if (PonthousAbilityHandler.requiresManualLastStandAssignment(
+                game, player, tile, tile.getSpaceUnitHolder(), event)) {
+            MessageHelper.sendMessageToChannelWithButton(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing() + ", assign this hit manually to use _Last Stand_ if needed.",
+                    Buttons.red(
+                            player.factionButtonChecker() + "getDamageButtons_" + tile.getPosition() + "_spacecombat",
+                            "Assign Hits"));
+            return;
+        }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 ButtonHelperModifyUnits.autoAssignSpaceCombatHits(
-                        player,
-                        game,
-                        game.getTileByPosition(buttonID.split("_")[1]),
-                        Integer.parseInt(buttonID.split("_")[2]),
-                        event,
-                        false));
+                        player, game, tile, Integer.parseInt(buttonID.split("_")[2]), event, false));
     }
 }

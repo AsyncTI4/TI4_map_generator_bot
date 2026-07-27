@@ -117,7 +117,8 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
         String commandText =
                 "```" + susPrefix + "\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
         if (!event.getCommandString().contains("/rules ask")
-                && !event.getCommandString().contains("/fow whisper")) {
+                && !event.getCommandString().contains("/fow whisper")
+                && !event.getCommandString().contains("/bothelper impersonate")) {
             event.getChannel()
                     .sendMessage(commandText)
                     .queue(

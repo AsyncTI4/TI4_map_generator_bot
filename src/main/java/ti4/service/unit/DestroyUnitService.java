@@ -21,6 +21,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
@@ -265,6 +266,11 @@ public class DestroyUnitService {
                 }
                 if (player.hasUnit("veylor_mech")) {
                     VeylorUnitHandler.checkVeylorMech(game);
+                }
+                if (combat && player.hasUnit("ponthous_mech")) {
+                    for (int i = 0; i < totalAmount; i++) {
+                        PonthousUnitHandler.offerDragoonsButton(event, game, player, unit);
+                    }
                 }
                 if (player.hasUnit("tyris_mech")) {
                     TyrisAbilityHandler.offerCCForDestroyedReverb(player);
