@@ -2335,12 +2335,13 @@ public final class ButtonHelperAgents {
         String msg = player.getFactionEmojiOrColor() + " replenished commodities due to "
                 + (kyro.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Tox, the Kyro"
                 + (kyro.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
-        player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
+        int commoditiesTotal = player.getCommoditiesTotal();
+        player.setCommodities(player.getCommodities() + commoditiesTotal);
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         cabalAgentInitiation(game, player);
         FoWHelper.notifyPlayerAndAffectedInFog(game, player, kyro, msg);
 
-        int infAmount = player.getCommoditiesTotal() - 1;
+        int infAmount = commoditiesTotal - 1;
         List<Button> buttons = new ArrayList<>(
                 Helper.getPlanetPlaceUnitButtons(kyro, game, infAmount + "gf", "placeOneNDone_skipbuild"));
         String message = kyro.getRepresentationUnfogged() + ", please choose the planet you wish to drop " + infAmount
