@@ -392,8 +392,8 @@ public final class DSHelperBreakthroughs {
                         + ". These trade goods have been returned to the supply."
                         + (!originalBid.equalsIgnoreCase(originalBidFlorz)
                                 ? "\nAs the two players did not spend the same number of trade goods, "
-                                        + p1.getRepresentation() + " has sent a random promissory note to "
-                                        + p2.getRepresentation() + "."
+                                        + p2.getRepresentation()
+                                        + " has been given the option to explore a planet or take a random promissory note."
                                 : ""));
         ButtonHelper.deleteMessage(event);
         if (StringUtils.isNumeric(originalBidFlorz) && Integer.parseInt(originalBidFlorz) > 0) {
@@ -403,8 +403,19 @@ public final class DSHelperBreakthroughs {
             p2.setTg(p2.getTg() - Integer.parseInt(originalBid));
         }
         if (!originalBid.equalsIgnoreCase(originalBidFlorz)) {
-            PromissoryNoteHelper.sendRandom(event, game, p1, p2);
+            List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(p2, game);
+            buttons.add(Buttons.red(
+                    p2.getFactionCheckerPrefix() + "florzenBTStep5_" + p1.getFaction(), "Gain Random Promissory Note"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    p2.getCorrectChannel(), p2.getRepresentation() + " Please choose an option", buttons);
         }
+    }
+
+    @ButtonHandler("florzenBTStep5")
+    public static void florzenBTStep5(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        PromissoryNoteHelper.sendRandom(event, game, p2, p1);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("useLanefirBt")

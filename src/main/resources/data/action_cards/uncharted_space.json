@@ -73,8 +73,8 @@
         "alias": "special_session",
         "name": "Special Session",
         "phase": "Agenda",
-        "window": "At the end of the agenda phase, after players ready planets:",
-        "text": "Reveal the top card of the agenda deck and resolve that agenda. Then, players who voted on that agenda may ready up to 3 planets they control.",
+        "window": "After an agenda is revealed:",
+        "text": "Each player must vote on this agenda, if able.",
         "flavorText": "“What is it that you seek?” Kadryn asked the Council. “You yourselves cannot even say.”",
         "source": "ds",
         "actualSource": "uncharted_space"

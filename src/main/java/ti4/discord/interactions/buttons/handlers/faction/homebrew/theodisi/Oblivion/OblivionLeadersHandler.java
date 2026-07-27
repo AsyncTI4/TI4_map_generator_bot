@@ -65,13 +65,6 @@ public class OblivionLeadersHandler {
             return;
         }
 
-        if (target != game.getActivePlayer()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCardsInfoThread(),
-                    "Target player must be active player and it must be the start of their turn.");
-            return;
-        }
-
         Leader agent = player.getLeaderByID(AGENT).orElse(null);
         List<Button> buttons = getFrontierTokenButtons(game, target);
         if (agent == null || buttons.isEmpty()) {
@@ -105,6 +98,7 @@ public class OblivionLeadersHandler {
                 event.getMessageChannel(),
                 player.getRepresentation() + ", please select which system to place a frontier token in:",
                 NewStuffHelper.buttonPagination(buttons, player.factionButtonChecker() + ADD_TOKEN, 0));
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler(ADD_TOKEN)

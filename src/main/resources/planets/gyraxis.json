@@ -17,10 +17,10 @@
         "unitHolderName": "gyraxis",
         "resourcesLocation": "BottomLeft",
         "centerPosition": {
-            "x": 50,
-            "y": 44
+            "x": 62,
+            "y": 56
         },
-        "planetRadius": 34
+        "planetRadius": 43
     },
     "contrastColor": "orange",
     "source": "theodisi"

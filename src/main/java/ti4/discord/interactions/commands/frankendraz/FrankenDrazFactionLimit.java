@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
+import ti4.draft.DraftCategory;
 import ti4.draft.FrankenDrazDraft;
 import ti4.game.Game;
 import ti4.message.MessageHelper;
@@ -31,7 +32,7 @@ class FrankenDrazFactionLimit extends GameStateSubcommand {
             return;
         }
 
-        game.setStoredValue(FrankenDrazDraft.FACTION_LIMIT_KEY, String.valueOf(limit));
+        game.setStoredValue("frankenLimit" + DraftCategory.FACTION, String.valueOf(limit));
         MessageHelper.sendMessageToEventChannel(
                 event, "FrankenDraz faction draft limit set to " + limit + " per player.");
     }

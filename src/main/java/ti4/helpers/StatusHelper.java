@@ -16,6 +16,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
 import ti4.game.Game;
@@ -261,6 +262,13 @@ public final class StatusHelper {
                         player.getCardsInfoThread(),
                         player.getRepresentationUnfogged()
                                 + ", a reminder this is the window to use the _Eerie Predictions_.");
+            }
+            if (player.hasAbility("ignorant_discoveries") && player.getStrategicCC() > 0) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", you may use the button below to resolve _Ignorant Discoveries_. A strategy token will automatically be deducted.",
+                        OblivionAbilityHandler.getIgnorantDiscoveriesButtons(event, player));
             }
         }
         String key2 = "queueToScorePOs";

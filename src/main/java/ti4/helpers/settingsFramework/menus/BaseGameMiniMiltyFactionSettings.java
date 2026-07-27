@@ -55,6 +55,8 @@ public class BaseGameMiniMiltyFactionSettings extends SettingsMenu {
         priFactions.setShow(FactionModel::getAlias);
         priFactions.setExtraInfo("These factions will be included in the draft first!");
 
+        // ListSetting only restores keys that are present in allValues.
+        updateTransientSettings();
         if (!(json == null
                 || !json.has("menuId")
                 || !MENU_ID.equals(json.get("menuId").asString("")))) {
@@ -62,8 +64,6 @@ public class BaseGameMiniMiltyFactionSettings extends SettingsMenu {
             banFactions.initialize(json.get("banFactions"));
             priFactions.initialize(json.get("priFactions"));
         }
-
-        updateTransientSettings();
     }
 
     @Override

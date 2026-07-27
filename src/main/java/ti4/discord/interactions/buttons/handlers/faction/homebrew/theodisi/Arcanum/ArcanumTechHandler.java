@@ -259,6 +259,7 @@ public class ArcanumTechHandler {
         if (!spaceCannonPromptAlreadyAvailable && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
             StartCombatService.sendSpaceCannonButtonsToThread(event.getMessageChannel(), game, player, tile);
         }
+        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
         ButtonHelper.deleteMessage(event);
     }
 

@@ -1,12 +1,15 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous;
 
+import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.math.NumberUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -17,6 +20,8 @@ import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.unit.AddUnitService;
+import ti4.service.unit.RemoveUnitService.RemovedUnit;
 import ti4.service.unit.UnitModelValueInjectionService;
 import ti4.service.unit.UnitModelValueInjectionService.BooleanValueInjection;
 import ti4.service.unit.UnitModelValueInjectionService.UnitValueInjection;
@@ -27,7 +32,10 @@ public class PonthousUnitHandler {
     private static final String PONTHOUS_FLAGSHIP = "ponthous_flagship";
     private static final String OLD_GLORY_SUSTAIN = "ponthousOldGlorySustain_";
     private static final String USE_OLD_GLORY_SUSTAIN = "useOldGlorySustain_";
+    private static final String DRAGOONS = "ponthous_mech";
+    private static final String USE_DRAGOONS = "useDragoonsPlaceInf_";
 
+    // Old Glory
     public static Button getOldGlorySustainButton(Player player, Tile tile) {
         if (!canOfferOldGlorySustain(player, tile)) return null;
         return Buttons.gray(
@@ -119,5 +127,65 @@ public class PonthousUnitHandler {
 
     private static String getOldGlorySustainKey(Player player, Tile tile) {
         return OLD_GLORY_SUSTAIN + player.getFaction() + "_" + tile.getPosition();
+    }
+
+    // Dragoons
+    public static void offerDragoonsButton(
+            GenericInteractionCreateEvent event, Game game, Player player, RemovedUnit unit) {
+        if (player == null
+                || !player.ownsUnit(DRAGOONS)
+                || !(unit.uh() instanceof Planet planet)
+                || !"groundcombat".equalsIgnoreCase(game.getStoredValue(player.getFaction() + "latestAssignHits"))) {
+            return;
+        }
+
+        String planetName = planet.getName();
+
+        List<Button> buttons = List.of(
+                Buttons.green(
+                        player.factionButtonChecker() + USE_DRAGOONS + planetName,
+                        "Pay 1R to Place 2 Inf",
+                        FactionEmojis.ponthous),
+                Buttons.red("deleteButtons", "Decline"));
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentation()
+                        + ", you may pay 1 resource to place 2 infantry on the destroyed mechs planet.",
+                buttons);
+    }
+
+    @ButtonHandler(USE_DRAGOONS)
+    public static void resolveDragoonsInfPlacement(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (game == null || player == null || !player.ownsUnit(DRAGOONS)) {
+            return;
+        }
+
+        if (player.getReadiedPlanets().isEmpty() && player.getTg() == 0) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "You do not have enough resources to pay for _Dragoons_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String planetName = buttonID.replace(USE_DRAGOONS, "");
+        Tile tile = game.getTileFromPlanet(planetName);
+        if (planetName == null || tile == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not locate mechs planet.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "2 inf " + planetName);
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
+        buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentation() + " please pay the 1 resource to place 2 infantry on this planet:",
+                buttons);
+
+        ButtonHelper.deleteMessage(event);
     }
 }
