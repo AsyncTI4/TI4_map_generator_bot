@@ -110,6 +110,8 @@ import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
 
 public final class Helper {
+    private static final int TRIPLE_SYSTEM_TOKEN_PLANET_GAP_OFFSET = 65;
+
     private static final List<Point> TOKEN_PLANET_POSITIONS = List.of(
             new Point(87, 79),
             new Point(258, 79),
@@ -588,14 +590,63 @@ public final class Helper {
         List<Point> positions = tile.getTileModel().getNumPlanets() == 3
                 ? TRIPLE_SYSTEM_TOKEN_PLANET_POSITIONS
                 : TOKEN_PLANET_POSITIONS;
-        if (index < positions.size()) {
-            return new Point(positions.get(index));
+        Point position = tile.getTileModel().getNumPlanets() == 3 && index < 3
+                ? getTripleSystemTokenPlanetPosition(tile, index)
+                : null;
+        if (position == null) {
+            if (index < positions.size()) {
+                position = positions.get(index);
+            } else {
+                double theta = (2 * Math.PI * index) / slottedTokenPlanets.size();
+                int x = Constants.SPACE_CENTER_POSITION.x + (int) Math.round(85 * Math.cos(theta));
+                int y = Constants.SPACE_CENTER_POSITION.y + (int) Math.round(70 * Math.sin(theta));
+                position = new Point(x, y);
+            }
         }
 
-        double theta = (2 * Math.PI * index) / slottedTokenPlanets.size();
-        int x = Constants.SPACE_CENTER_POSITION.x + (int) Math.round(85 * Math.cos(theta));
-        int y = Constants.SPACE_CENTER_POSITION.y + (int) Math.round(70 * Math.sin(theta));
-        return new Point(x, y);
+        if (tile.getTileModel().getNumPlanets() > 0 && tile.getTileModel().hasWormhole()) {
+            double theta = Math.toRadians(index == 0 ? -45 : 0);
+            int deltaX = position.x - Constants.SPACE_CENTER_POSITION.x;
+            int deltaY = position.y - Constants.SPACE_CENTER_POSITION.y;
+            int x = Constants.SPACE_CENTER_POSITION.x
+                    + (int) Math.round(deltaX * Math.cos(theta) - deltaY * Math.sin(theta));
+            int y = Constants.SPACE_CENTER_POSITION.y
+                    + (int) Math.round(deltaX * Math.sin(theta) + deltaY * Math.cos(theta));
+            return new Point(x, y);
+        }
+        return new Point(position);
+    }
+
+    @Nullable
+    private static Point getTripleSystemTokenPlanetPosition(Tile tile, int index) {
+        List<Point> planetPositions = tile.getTileModel().getPlanets().stream()
+                .map(Mapper::getPlanet)
+                .filter(Objects::nonNull)
+                .map(PlanetModel::getPlanetLayout)
+                .filter(Objects::nonNull)
+                .map(planetLayout -> planetLayout.getCenterPosition())
+                .filter(Objects::nonNull)
+                .toList();
+        if (planetPositions.size() != 3) {
+            return null;
+        }
+
+        double centerX =
+                planetPositions.stream().mapToInt(point -> point.x).average().orElseThrow();
+        double centerY =
+                planetPositions.stream().mapToInt(point -> point.y).average().orElseThrow();
+        Point firstPlanet = planetPositions.get(index);
+        Point secondPlanet = planetPositions.get((index + 1) % planetPositions.size());
+        double midpointX = (firstPlanet.x + secondPlanet.x) / 2.0;
+        double midpointY = (firstPlanet.y + secondPlanet.y) / 2.0;
+        double deltaX = midpointX - centerX;
+        double deltaY = midpointY - centerY;
+        double distance = Math.hypot(deltaX, deltaY);
+        if (distance == 0) {
+            return new Point((int) Math.round(midpointX), (int) Math.round(midpointY));
+        }
+        return new Point((int) Math.round(midpointX + deltaX * TRIPLE_SYSTEM_TOKEN_PLANET_GAP_OFFSET / distance), (int)
+                Math.round(midpointY + deltaY * TRIPLE_SYSTEM_TOKEN_PLANET_GAP_OFFSET / distance));
     }
 
     private static Point getDefaultTokenPlanetPosition(Tile tile, String tokenOrPlanetID) {
