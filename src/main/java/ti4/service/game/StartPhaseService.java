@@ -233,6 +233,15 @@ public class StartPhaseService {
         //         return;
         //     }
         // }
+        game.removeStoredValue("veylorBtExtraAgenda");
+        for (Player player2 : game.getRealPlayers()) {
+            if (game.getStoredValue("SpecialSession") != null
+                    && game.getStoredValue("SpecialSession").contains(player2.getFaction())
+                    && player2.getPlayableActionCards().contains("special_session")) {
+                ActionCardHelper.playAC(event, game, player2, "special session", game.getMainGameChannel());
+                return;
+            }
+        }
 
         for (Player player2 : game.getRealPlayers()) {
             String id = "sigma_machinations";

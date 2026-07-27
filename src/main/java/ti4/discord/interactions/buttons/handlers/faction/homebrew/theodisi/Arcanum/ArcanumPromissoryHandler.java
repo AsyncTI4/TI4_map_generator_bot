@@ -136,6 +136,7 @@ public class ArcanumPromissoryHandler {
         player.setStrategicCC(player.getStrategicCC() - 1);
         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "used _Scroll of Ascension_");
         PlayerTechService.addTech(event, game, player, techID);
+        ArcanumUnitHandler.getRuneboundButtons(player, game, techID);
         MessageHelper.sendMessageToChannel(
                 game.getActionsChannel(),
                 player.getRepresentationUnfogged() + " spent 1 command token from their strategy pool to gain "

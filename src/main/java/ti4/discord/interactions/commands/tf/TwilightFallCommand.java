@@ -23,7 +23,8 @@ public class TwilightFallCommand implements ParentCommand {
                     new AddToSplice(),
                     new DoEdictPhase(),
                     new SetupStartingFleet(),
-                    new DiscardVeiledCard())
+                    new DiscardVeiledCard(),
+                    new DoVeiledCardAction())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

@@ -45,6 +45,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
@@ -384,6 +385,8 @@ public class CombatRollService {
             }
             playerUnitsByQuantity = adjustedUnits;
         }
+
+        KryxosBreakthroughHandler.refreshPrototypeInnovators(game, player, tile, playerUnitsByQuantity, rollType);
 
         if (playerUnitsByQuantity.isEmpty()) {
             String fightingOnUnitHolderName = unitHolderName;
@@ -886,6 +889,12 @@ public class CombatRollService {
                 && player.hasLeader("xytheriscommander")
                 && !player.hasLeaderUnlocked("xytheriscommander")) {
             UnlockLeaderService.unlockLeader("xytheriscommander", game, player);
+        }
+        if (rollType != CombatRollType.combatround && h >= 1 && player.hasTech("thxytherisr")) {
+            MessageHelper.sendMessageToChannelWithButton(
+                    event.getMessageChannel(),
+                    player.getRepresentation() + ", you may use _Biomechanical Nutrients_:",
+                    XytherisTechHandler.getBiomechanicalButton(event, game, player, h));
         }
 
         if (rollType == CombatRollType.bombardment) {

@@ -83,6 +83,7 @@ public class GameStatisticsFilterer {
                 .and(game -> filterOnGalacticEvent(Boolean.FALSE, game))
                 .and(game -> filterOnScenario(Boolean.FALSE, game))
                 .and(game -> filterOnHasWinner(Boolean.TRUE, game))
+                .and(game -> filterOnHomebrew(Boolean.FALSE, game))
                 .and(GameStatisticsFilterer::filterAbortedGames)
                 .and(GameStatisticsFilterer::filterEarlyRounds);
     }

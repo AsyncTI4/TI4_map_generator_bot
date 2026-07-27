@@ -64,7 +64,7 @@ public class ArdentiaLeadersHandler {
         buttons.add(Buttons.red(targetPlayer.factionButtonChecker() + AGENT_PAYMENT_DONE, "Done"));
 
         MessageHelper.sendMessageToChannelWithButtons(
-                targetPlayer.getCardsInfoThread(),
+                game.getActionsChannel(),
                 targetPlayer.getRepresentation() + ", please use the buttons below to spend 1 influence:",
                 buttons);
     }
@@ -78,12 +78,12 @@ public class ArdentiaLeadersHandler {
         ButtonHelper.deleteMessage(event);
 
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(), "Use these buttons to gain 1 CC:", ButtonHelper.getGainCCButtons(player));
+                game.getActionsChannel(), "Use these buttons to gain 1 CC:", ButtonHelper.getGainCCButtons(player));
 
         if (player.hasAbility("seize_command")) {
             MessageHelper.sendMessageToChannelWithButton(
-                    player.getCardsInfoThread(),
-                    "You main use _Seize Command_:",
+                    game.getActionsChannel(),
+                    "You may use _Seize Command_:",
                     ArdentiaAbilityHandler.getSeizeCommandButton(player));
         }
     }

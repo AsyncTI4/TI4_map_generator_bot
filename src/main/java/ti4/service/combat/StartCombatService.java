@@ -325,6 +325,7 @@ public class StartCombatService {
             channel = game.getMainGameChannel();
         }
         PonthousUnitHandler.clearOldGlorySustain(game);
+        PonthousPromissoryHandler.clearThunderbirdPrototype(game);
         game.setStoredValue("factionsInCombat", player1.getFaction() + "_" + player2.getFaction());
 
         sendStartOfCombatSecretMessages(game, player1, player2, tile, spaceOrGround, unitHolderName);
@@ -494,6 +495,12 @@ public class StartCombatService {
                             threadChannel, player.getRepresentation() + " may use _The Changer of Ways_.");
                 }
             }
+        }
+
+        // Ponthous PN
+        if (isSpaceCombat) {
+            PonthousPromissoryHandler.offerThunderbirdPrototypeAtSpaceCombatStart(
+                    game, player1, player2, tile, threadChannel);
         }
 
         // AFB
@@ -1438,7 +1445,6 @@ public class StartCombatService {
         if (oldGloryP1 != null) buttons.add(oldGloryP1);
         Button oldGloryP2 = PonthousUnitHandler.getOldGlorySustainButton(p2, tile);
         if (oldGloryP2 != null) buttons.add(oldGloryP2);
-
         return buttons;
     }
 
