@@ -453,12 +453,20 @@ public final class Constants {
     private static final String CRADLE = "cradle";
     private static final String ILLUSION = "illusion";
     private static final String PHANTASM = "phantasm";
+    private static final String CINERON = "cineron";
+    private static final String SKARNATH = "skarnath";
+    private static final String LETHARA = "lethara";
+    private static final String GYRAXIS = "gyraxis";
     public static final List<String> TOKEN_PLANETS = List.of(
             MIRAGE,
             OASIS,
             CRADLE,
             ILLUSION,
             PHANTASM,
+            CINERON,
+            SKARNATH,
+            LETHARA,
+            GYRAXIS,
             AVERNUS,
             THUNDERSEDGE,
             BROKENPLANET1,
