@@ -137,6 +137,13 @@ public class TacticalActionService {
                         player.getCorrectChannel(),
                         player.getRepresentation() + " returned " + borrowedFromName
                                 + "'s command token from their **Seize Command** debt pool to use _Borrowed Authority_.");
+                if (borrowedFrom != null) {
+                    MessageHelper.sendMessageToChannel(
+                            borrowedFrom.getCorrectChannel(),
+                            borrowedFrom.getRepresentationUnfogged() + ", your command token was placed in "
+                                    + tile.getRepresentationForButtons(game, borrowedFrom)
+                                    + " for _Borrowed Authority_.");
+                }
                 if (game.isFowMode()) {
                     FoWHelper.pingSystem(
                             game,

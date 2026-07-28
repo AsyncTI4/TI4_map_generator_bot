@@ -59,8 +59,7 @@ public class ArcanumUnitHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation() + ", you may place " + prereqs
-                        + " infantry on a planet that contains one of your mechs due to researching/gaining "
-                        + tech.getName(),
+                        + " infantry on a planet that contains one of your mechs due to _Rune-Bound Sentinel_.",
                 buttons);
     }
 
