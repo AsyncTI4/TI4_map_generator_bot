@@ -1679,9 +1679,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     private void addPublicObjectiveToDeck(String id) {
-        PublicObjectiveModel obj = Mapper.getPublicObjective(id);
-        if (obj == null) return;
-        if (obj.getPoints() == 1) {
+        if (Mapper.getPublicObjective(id) == null) return;
+        if (isStage1PublicObjective(id)) {
             publicObjectives1.add(id);
             Collections.shuffle(publicObjectives1);
         } else {
@@ -1734,18 +1733,21 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (id.isEmpty()) return false;
 
         revealedPublicObjectives.remove(id);
-        Set<String> po1 = Mapper.getPublicObjectivesStage1().keySet();
-        Set<String> po2 = Mapper.getPublicObjectivesStage2().keySet();
-        if (po1.contains(id)) {
+        if (isStage1PublicObjective(id)) {
             publicObjectives1Peeked.remove(id);
             publicObjectives1.add(id);
             Collections.shuffle(publicObjectives1);
-        } else if (po2.contains(id)) {
+        } else {
             publicObjectives2Peeked.remove(id);
             publicObjectives2.add(id);
             Collections.shuffle(publicObjectives2);
         }
         return true;
+    }
+
+    private boolean isStage1PublicObjective(String id) {
+        DeckModel stage1Deck = Mapper.getDeck(getStage1PublicDeckID());
+        return stage1Deck != null && stage1Deck.getCardIDs().contains(id);
     }
 
     public boolean unrevealPublicObjective(Integer idNumber) {
@@ -1762,9 +1764,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (publicObjective == null) return false;
 
         revealedPublicObjectives.remove(id);
-        if (publicObjective.getPoints() == 1) {
+        if (isStage1PublicObjective(id)) {
             unrevealPublicObjective(id, publicObjectives1Peekable, publicObjectives1Peeked);
-        } else if (publicObjective.getPoints() == 2) {
+        } else {
             unrevealPublicObjective(id, publicObjectives2Peekable, publicObjectives2Peeked);
         }
         return true;

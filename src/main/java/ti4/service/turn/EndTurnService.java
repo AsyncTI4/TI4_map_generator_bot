@@ -18,6 +18,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -64,6 +65,9 @@ public class EndTurnService {
             ButtonHelperTacticalAction.logTacticalAction(game, player);
         }
         game.removeStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED);
+        for (Tile tile : game.getTileMap().values()) {
+            TeHelperGeneral.addStationsToPlayArea(event, game, tile);
+        }
         GameEventService.commit(game, GameEventType.TURN, player, Map.of("passed", false));
         pingNextPlayer(event, game, player);
         CommanderUnlockCheckService.checkPlayer(player, "naaz");

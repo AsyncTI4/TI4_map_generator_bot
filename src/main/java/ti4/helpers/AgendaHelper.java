@@ -614,7 +614,7 @@ public final class AgendaHelper {
         Button manualResolve = Buttons.red("autoresolve_manual", "Resolve it Manually");
         List<Button> resolutions = new ArrayList<>(List.of(autoResolve, manualResolve));
         for (Player player : game.getRealPlayers()) {
-            if (player.hasReadyBreakthrough("veylorbt")) {
+            if (VeylorLeadersHandler.isVeylorAgendaPhase(game) && player.hasReadyBreakthrough("veylorbt")) {
                 resolutions.add(VeylorBreakthroughHandler.offerFilibusterButton(player, game));
             }
         }
@@ -2364,7 +2364,8 @@ public final class AgendaHelper {
             aCount = Integer.parseInt(agendaCount) + 1;
         }
         List<Button> resActionRow = new ArrayList<>();
-        boolean heroActive = game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
+        boolean heroActive = VeylorLeadersHandler.isVeylorAgendaPhase(game)
+                && game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
         boolean veylorBtExtraAgenda = "yes".equals(game.getStoredValue("veylorBtExtraAgenda"));
         int agendaLimit = 2 + (heroActive ? 1 : 0) + (veylorBtExtraAgenda ? 1 : 0);
         boolean canRevealNextAgenda = aCount <= agendaLimit || game.isAbsolMode();

@@ -30,6 +30,9 @@ public class VeylorAbilitiesHandler {
 
     // Tight Scheduling
     public static void offerTightScheduling(Game game) {
+        if (!VeylorLeadersHandler.isVeylorAgendaPhase(game)) {
+            return;
+        }
         for (Player player : game.getRealPlayers()) {
             if (!player.hasAbility(TIGHT_SCHEDULING)
                     || !game.getStoredValue(TIGHT_SCHEDULING_AGENDAS + player.getFaction())
@@ -62,6 +65,9 @@ public class VeylorAbilitiesHandler {
     }
 
     public static boolean offerTightSchedulingRevealChoice(Game game, boolean revealFromBottom) {
+        if (!VeylorLeadersHandler.isVeylorAgendaPhase(game)) {
+            return false;
+        }
         if ("yes".equals(game.getStoredValue(TIGHT_SCHEDULING_BYPASS))) {
             game.removeStoredValue(TIGHT_SCHEDULING_BYPASS);
             return false;
@@ -101,7 +107,7 @@ public class VeylorAbilitiesHandler {
     @ButtonHandler(TIGHT_SCHEDULING_REVEAL)
     public static void revealWithTightScheduling(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!player.hasAbility(TIGHT_SCHEDULING)) {
+        if (!VeylorLeadersHandler.isVeylorAgendaPhase(game) || !player.hasAbility(TIGHT_SCHEDULING)) {
             ButtonHelper.deleteMessage(event);
             return;
         }

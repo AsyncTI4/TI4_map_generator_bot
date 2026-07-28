@@ -118,7 +118,8 @@ public class ArcanumTechHandler {
             ExploreModel explore = Mapper.getExplore(exploreId);
             if (explore != null) {
                 buttons.add(Buttons.green(
-                        player.factionButtonChecker() + SHUFFLE_PURGED_EXPLORE + exploreId, explore.getName()));
+                        player.factionButtonChecker() + SHUFFLE_PURGED_EXPLORE + exploreId,
+                        explore.getName() + " (" + explore.getType() + ")"));
             }
         }
         return buttons;

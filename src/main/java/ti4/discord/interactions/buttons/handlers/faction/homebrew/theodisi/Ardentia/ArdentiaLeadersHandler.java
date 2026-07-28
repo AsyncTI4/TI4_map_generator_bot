@@ -183,6 +183,11 @@ public class ArdentiaLeadersHandler {
 
         String ccId = Mapper.getCCID(target.getColor());
         tilePos.removeCC(ccId);
+        MessageHelper.sendMessageToChannel(
+                target.getCorrectChannel(),
+                target.getRepresentationUnfogged() + ", your command token in "
+                        + tilePos.getRepresentationForButtons(game, target)
+                        + " was returned to your reinforcements by _Echo of Subjugation_.");
         String tgGain = player.gainTG(1, true);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
 

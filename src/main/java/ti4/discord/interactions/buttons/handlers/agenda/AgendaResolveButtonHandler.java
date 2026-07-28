@@ -423,7 +423,8 @@ class AgendaResolveButtonHandler {
 
     private static List<Button> buildNextButtons(Game game, int aCount) {
         List<Button> buttons = new ArrayList<>();
-        boolean heroActive = game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
+        boolean heroActive = VeylorLeadersHandler.isVeylorAgendaPhase(game)
+                && game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
         boolean veylorBtExtraAgenda = "yes".equals(game.getStoredValue("veylorBtExtraAgenda"));
         int agendaLimit = 2 + (heroActive ? 1 : 0) + (veylorBtExtraAgenda ? 1 : 0);
         if (aCount <= agendaLimit || game.isAbsolMode()) {

@@ -665,6 +665,9 @@ public final class ButtonHelperFactionSpecific {
                         + "_ secret objective for 0 VP (but they get to put a Plot card into play).");
         int poIndex = game.addCustomPO("(Plotted) " + soM.getName(), 0);
         game.scorePublicObjective(player.getUserID(), poIndex);
+        if (player.hasUnlockedBreakthrough("revenantbt")) {
+            RevenantBreakthroughHandler.gainAttachedAgent(game, player);
+        }
         HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
         ActionCardHelper.sendPlotCardInfo(game, player);
         ButtonHelper.deleteMessage(event);

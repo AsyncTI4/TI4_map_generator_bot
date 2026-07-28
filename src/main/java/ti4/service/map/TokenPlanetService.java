@@ -23,12 +23,20 @@ public final class TokenPlanetService {
         thundersedge,
         illusion,
         phantasm,
+
+        // Luminous
         brokenplanet1,
         brokenplanet2,
         brokenplanet3,
         brokenplanet4,
         brokenplanet5,
         brokenplanet6,
+
+        // Theodisi
+        cineron,
+        skarnath,
+        lethara,
+        gyraxis,
     }
 
     public static String adsf() {
@@ -40,7 +48,9 @@ public final class TokenPlanetService {
         if (Constants.TOKEN_PLANETS.contains(tokenOrPlanetName)) return true;
 
         TokenModel token = Mapper.getToken(tokenOrPlanetName);
-        return token.getTokenPlanetName() != null && Constants.TOKEN_PLANETS.contains(token.getTokenPlanetName());
+        return token != null
+                && token.getTokenPlanetName() != null
+                && Constants.TOKEN_PLANETS.contains(token.getTokenPlanetName());
     }
 
     public static void moveTokenPlanet(Game game, Player player, Tile destination, String planetName) {
@@ -59,8 +69,10 @@ public final class TokenPlanetService {
         // Move the token over
         addTokenPlanetToTile(game, destination, planetName);
         String tokenID = Mapper.getTokenID(planetName);
-        oldTile.getSpaceUnitHolder().removeToken(tokenID);
-        destination.getSpaceUnitHolder().addToken(tokenID);
+        if (tokenID != null) {
+            oldTile.getSpaceUnitHolder().removeToken(tokenID);
+            destination.getSpaceUnitHolder().addToken(tokenID);
+        }
 
         // Inform the player
         if (player != null) {
@@ -101,8 +113,10 @@ public final class TokenPlanetService {
         Tile tile = game.getTileFromPlanet(planetName);
         if (!isTokenPlanet(planetName) || tile == null) return;
 
-        String tokenPath = Mapper.getTokenPath(planetName);
+        String tokenPath = Mapper.getTokenID(planetName);
         tile.getUnitHolders().remove(planetName);
-        tile.getSpaceUnitHolder().removeToken(tokenPath);
+        if (tokenPath != null) {
+            tile.getSpaceUnitHolder().removeToken(tokenPath);
+        }
     }
 }

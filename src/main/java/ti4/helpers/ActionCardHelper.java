@@ -410,7 +410,6 @@ public class ActionCardHelper {
                 "tf-stasis",
                 "extremeduress",
                 "disgrace",
-                "special_session",
                 "investments",
                 "tf-reverse",
                 "puppetsonastring",
@@ -993,10 +992,10 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("special_session".equals(automationID)) {
-                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveVeto", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
-            }
+            // if ("special_session".equals(automationID)) {
+            //     codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveVeto", buttonLabel));
+            //     MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            // }
 
             if ("war_machine".equals(automationID)) {
                 player.addSpentThing("warmachine");
