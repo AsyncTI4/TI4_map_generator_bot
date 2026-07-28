@@ -40,8 +40,6 @@ import ti4.service.milty.MiltyDraftManager;
 
 public class FrankenDrazDraft extends FrankenDraft {
     public static final String UNLIMITED_KEPT_COMPONENTS_KEY = "frankenDrazUnlimitedKeptComponents";
-    public static final String FACTION_LIMIT_KEY = "frankenDrazFactionLimit";
-
     private static final int DEFAULT_FACTION_LIMIT = 6;
     private static final List<DraftCategory> POST_DRAFT_COMPONENT_CATEGORIES = List.of(
             DraftCategory.ABILITY,
@@ -65,7 +63,7 @@ public class FrankenDrazDraft extends FrankenDraft {
     @Override
     public int getItemLimitForCategory(DraftCategory category) {
         return switch (category) {
-            case FACTION -> getFactionLimit(getOwner());
+            case FACTION -> DEFAULT_FACTION_LIMIT;
             case BLUETILE -> 3;
             case REDTILE -> 2;
             case DRAFTORDER -> 1;
@@ -93,14 +91,6 @@ public class FrankenDrazDraft extends FrankenDraft {
 
     public static boolean hasUnlimitedKeptComponents(Game game) {
         return "true".equals(game.getStoredValue(UNLIMITED_KEPT_COMPONENTS_KEY));
-    }
-
-    public static int getFactionLimit(Game game) {
-        String storedLimit = game.getStoredValue(FACTION_LIMIT_KEY);
-        if (!storedLimit.isEmpty()) {
-            return Integer.parseInt(storedLimit);
-        }
-        return DEFAULT_FACTION_LIMIT;
     }
 
     @Override
@@ -215,7 +205,7 @@ public class FrankenDrazDraft extends FrankenDraft {
     public void sendPostDraftComponentButtons(Player player) {
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
-                "Choose a drafted component category to view. Additional components are added automatically. Optional Swaps will appear in their respective categories when expanded. Home systems and starting fleet must be added manually, as well as any additional or optional components added via these components. Category buttons are present for your convenience.",
+                "Choose a drafted component category to view. Additional components are added automatically. Optional Swaps will appear in their respective categories when expanded.\n\nHome systems and starting fleet adds/swaps must be handled manually, however the mantis/random map build will give you buttons to select your hs and starting fleet. Category buttons are present for your convenience.",
                 getPostDraftCategoryButtons(player));
     }
 
@@ -501,12 +491,13 @@ public class FrankenDrazDraft extends FrankenDraft {
         for (FactionModel faction : getAllFrankenLegalFactions(game)) {
             factions.put(faction.getAlias(), faction);
         }
+        // Frankendraz includes DS and BR by default; the Frankendraft menu excludes either
+        // source by adding its factions to bannedFactions when its disable toggle is selected.
         for (FactionModel faction : getAllFrankenLegalFactions(null)) {
             if (faction.getSource() == ComponentSource.ds || faction.getSource() == ComponentSource.blue_reverie) {
                 factions.put(faction.getAlias(), faction);
             }
         }
-
         String[] bannedFactions = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedFactions"));
         for (String bannedFaction : bannedFactions) {
             factions.remove(bannedFaction);

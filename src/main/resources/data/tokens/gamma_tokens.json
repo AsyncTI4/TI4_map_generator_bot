@@ -1,0 +1,107 @@
+[
+    {
+        "id": "hallucination1",
+        "imagePath": "token_gg_hallucination1.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "hallucination",
+            "hallucination1"
+        ],
+        "source": "gamma"
+    },
+    {
+        "id": "hallucination2",
+        "imagePath": "token_gg_hallucination2.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "hallucination2"
+        ],
+        "source": "gamma"
+    },
+    {
+        "id": "hallucination3",
+        "imagePath": "token_gg_hallucination3.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "hallucination3"
+        ],
+        "source": "gamma"
+    },
+    {
+        "id": "hallucination4",
+        "imagePath": "token_gg_hallucination4.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "hallucination4"
+        ],
+        "source": "gamma"
+    },
+    {
+        "id": "hallucination5",
+        "imagePath": "token_gg_hallucination5.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "hallucination5"
+        ],
+        "source": "gamma"
+    },
+    {
+        "id": "hallucination_back",
+        "imagePath": "token_gg_hallucination_back.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "hallucinationback",
+            "hallucinationhidden"
+        ],
+        "source": "gamma"
+    },
+    {
+        "id": "weaveway_spacedock_marker",
+        "imagePath": "token_gg_weaveway_spacedock.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "weavewayspacedock",
+            "weavewaynebula"
+        ],
+        "source": "gamma"
+    },
+    {
+        "id": "weaveway_back",
+        "imagePath": "token_gg_weaveway_back.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "weavewayback"
+        ],
+        "source": "gamma"
+    },
+    {
+        "id": "weaveway_node1",
+        "imagePath": "token_gg_weaveway_node1.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "weavewaynode1",
+            "weavewayanchor1"
+        ],
+        "source": "gamma"
+    },
+    {
+        "id": "weaveway_node2",
+        "imagePath": "token_gg_weaveway_node2.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "weavewaynode2",
+            "weavewayanchor2"
+        ],
+        "source": "gamma"
+    },
+    {
+        "id": "weaveway_node3",
+        "imagePath": "token_gg_weaveway_node3.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "weavewaynode3",
+            "weavewayanchor3"
+        ],
+        "source": "gamma"
+    }
+]

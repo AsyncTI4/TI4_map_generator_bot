@@ -886,7 +886,8 @@ public final class ButtonHelperTwilightsFall {
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),
                                 player.getRepresentation()
-                                        + " reminder that instead of keeping that card, you can choose to discard it and draw a random one due to your forbidden knowledge ability. If you choose to do so, use the buttons to gain a card and then discard the chosen card.");
+                                        + " reminder that instead of keeping that card, you can choose to discard it and draw a random one due to your forbidden knowledge ability. If you choose to do so, use the buttons to gain a card and then discard the chosen card.",
+                                buttons2);
                     }
                     if ("ability".equalsIgnoreCase(type)) {
                         if (Mapper.getTech(cardID) == null) {
