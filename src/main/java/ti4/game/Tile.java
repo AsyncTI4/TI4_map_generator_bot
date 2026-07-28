@@ -688,7 +688,10 @@ public class Tile {
         if (isAsteroidField() || isSupernova() || isNebula(game) || isGravityRift(game, player) || isScar(game)) {
             return true;
         }
-        if (game != null && ThronesAbilityHandler.tracesOfRuinIsActive(game) && getPlanetUnitHolders().stream().anyMatch(planet -> ThronesAbilityHandler.isThronePlanet(planet.getName()))) {
+        if (game != null
+                && ThronesAbilityHandler.tracesOfRuinIsActive(game)
+                && getPlanetUnitHolders().stream()
+                        .anyMatch(planet -> ThronesAbilityHandler.isThronePlanet(planet.getName()))) {
             return true;
         }
         return hasAnyToken("token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png");

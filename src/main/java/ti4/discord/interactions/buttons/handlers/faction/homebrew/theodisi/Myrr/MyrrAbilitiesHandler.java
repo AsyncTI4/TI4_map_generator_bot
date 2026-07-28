@@ -2,13 +2,12 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr
 
 import java.util.HashMap;
 import java.util.Map;
-
 import lombok.experimental.UtilityClass;
 import ti4.game.Player;
 
 @UtilityClass
 public class MyrrAbilitiesHandler {
-    
+
     public static boolean hasEchoOfTheAnvilDiscount(Player player) {
         if (!player.hasAbility("echo_of_the_anvil")) {
             return false;
@@ -25,7 +24,6 @@ public class MyrrAbilitiesHandler {
             producedByType.merge(unitType, count, Integer::sum);
         }
 
-        return totalProduced >= 2
-                && producedByType.values().stream().anyMatch(count -> count >= 2);
+        return totalProduced >= 2 && producedByType.values().stream().anyMatch(count -> count >= 2);
     }
 }

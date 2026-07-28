@@ -295,8 +295,7 @@ public final class Helper {
                 if (planet.isSpaceStation()) {
                     continue;
                 }
-                if (player.hasAbility("traces_of_ruin")
-                        && ThronesAbilityHandler.isThronePlanet(planet.getName())) {
+                if (player.hasAbility("traces_of_ruin") && ThronesAbilityHandler.isThronePlanet(planet.getName())) {
                     continue;
                 }
                 if (!player.getPlanetsForScoring(false).contains(planet)) {

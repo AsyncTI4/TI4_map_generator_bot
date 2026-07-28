@@ -34,10 +34,8 @@ public class ThronesLeadersHandler {
     private static final String SELECT_TARGET_PREFIX = "thronesAgentUseOn_";
     private static final String SELECT_SHIP_PREFIX = "thronesAgentChooseShip_";
     private static final String PLACE_SHIP_PREFIX = "thronesAgentPlaceShip_";
-    private static final String HERO_ID = "throneshero";
     private static final String CHOOSE_THRONE = "chooseThronePlanet_";
-    private static final List<String> THRONE_PLANETS =
-        List.of("cineron", "gyraxis", "lethara", "skarnath");
+    private static final List<String> THRONE_PLANETS = List.of("cineron", "gyraxis", "lethara", "skarnath");
     private static final String DONE_CHOOSING_THRONE = "doneChoosingThronePlanets";
 
     // Veythros
@@ -263,20 +261,20 @@ public class ThronesLeadersHandler {
     // Seraphane the Eternal
     public static void getUnplacedThronePlanetButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         if (game == null || player == null) {
-                return;
+            return;
         }
 
         List<Button> buttons = new ArrayList<>();
 
         for (String planet : THRONE_PLANETS) {
-                if (game.getTileFromPlanet(planet) != null) {
-                        continue;
-                }
+            if (game.getTileFromPlanet(planet) != null) {
+                continue;
+            }
 
-                buttons.add(Buttons.green(
-                        player.factionButtonChecker() + CHOOSE_THRONE + planet,
-                        "Place " + Mapper.getPlanet(planet).getName(),
-                        FactionEmojis.thrones));
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + CHOOSE_THRONE + planet,
+                    "Place " + Mapper.getPlanet(planet).getName(),
+                    FactionEmojis.thrones));
         }
         buttons.add(Buttons.red(player.factionButtonChecker() + DONE_CHOOSING_THRONE, "Done Choosing Thrones"));
 
@@ -288,15 +286,16 @@ public class ThronesLeadersHandler {
     }
 
     @ButtonHandler(CHOOSE_THRONE)
-    public static void placeChosenThronePlanetInHs(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void placeChosenThronePlanetInHs(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (game == null || player == null) {
-                return;
+            return;
         }
 
         String planet = buttonID.replace(CHOOSE_THRONE, "");
         if (planet == null) {
-                ButtonHelper.deleteMessage(event);
-                return;
+            ButtonHelper.deleteMessage(event);
+            return;
         }
 
         Tile homeSystem = player.getHomeSystemTile();
@@ -317,29 +316,28 @@ public class ThronesLeadersHandler {
         String planetName = Mapper.getPlanet(planet).getName();
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation()
-                        + " placed " + planetName + " in their home system and gained control of it.");
+                player.getRepresentation() + " placed " + planetName
+                        + " in their home system and gained control of it.");
 
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler(DONE_CHOOSING_THRONE)
-    public static void resolveThronesHeroFinalStep(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void resolveThronesHeroFinalStep(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (game == null || player == null) {
-                return;
+            return;
         }
 
         Tile homeSystem = player.getHomeSystemTile();
 
         if (homeSystem != null) {
-                for (Planet planet : homeSystem.getPlanetUnitHolders()) {
-                        player.refreshPlanet(planet.getName());
-                }
+            for (Planet planet : homeSystem.getPlanetUnitHolders()) {
+                player.refreshPlanet(planet.getName());
+            }
         }
 
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                "Readied all planets in your home system.");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Readied all planets in your home system.");
 
         ButtonHelper.deleteMessage(event);
     }

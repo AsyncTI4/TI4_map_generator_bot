@@ -119,7 +119,8 @@ public class PonthousTechHandler {
     public static List<UnitModel> getThunderbirdProtocolGroundForces(Game game, Player player, Tile tile) {
         List<UnitModel> units = new ArrayList<>();
         for (int selection = 1; selection <= 2; selection++) {
-            String[] values = game.getStoredValue(getThunderbirdProtocolStateKey(player, selection)).split("\\|", 5);
+            String[] values = game.getStoredValue(getThunderbirdProtocolStateKey(player, selection))
+                    .split("\\|", 5);
             if (values.length != 5 || tile == null || !tile.getPosition().equals(values[0])) continue;
 
             UnitHolder holder = tile.getUnitHolders().get(values[1]);
@@ -174,7 +175,8 @@ public class PonthousTechHandler {
                 && getThunderbirdProtocolSelectionCount(game, player) < 2
                 && getThunderbirdProtocolAvailableGroundForceCount(game, player, tile)
                         >= 2 - getThunderbirdProtocolSelectionCount(game, player)
-                && !getEligibleThunderbirdProtocolGroundForceButtons(game, player, tile).isEmpty();
+                && !getEligibleThunderbirdProtocolGroundForceButtons(game, player, tile)
+                        .isEmpty();
     }
 
     private static void sendThunderbirdProtocolGroundForceButtons(
@@ -219,7 +221,8 @@ public class PonthousTechHandler {
     private static int getThunderbirdProtocolSelectionCount(Game game, Player player) {
         int count = 0;
         for (int selection = 1; selection <= 2; selection++) {
-            if (!game.getStoredValue(getThunderbirdProtocolStateKey(player, selection)).isBlank()) count++;
+            if (!game.getStoredValue(getThunderbirdProtocolStateKey(player, selection))
+                    .isBlank()) count++;
         }
         return count;
     }
@@ -228,7 +231,8 @@ public class PonthousTechHandler {
             Game game, Player player, Tile tile, UnitHolder holder, UnitKey unitKey) {
         int count = 0;
         for (int selection = 1; selection <= 2; selection++) {
-            String[] values = game.getStoredValue(getThunderbirdProtocolStateKey(player, selection)).split("\\|", 5);
+            String[] values = game.getStoredValue(getThunderbirdProtocolStateKey(player, selection))
+                    .split("\\|", 5);
             if (values.length == 5
                     && tile.getPosition().equals(values[0])
                     && holder.getName().equals(values[1])

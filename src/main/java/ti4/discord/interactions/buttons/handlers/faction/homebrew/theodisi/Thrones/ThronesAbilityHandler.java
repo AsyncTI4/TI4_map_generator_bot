@@ -1,7 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones;
 
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 
