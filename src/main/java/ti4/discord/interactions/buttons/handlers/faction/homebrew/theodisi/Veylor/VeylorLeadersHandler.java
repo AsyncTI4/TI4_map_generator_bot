@@ -113,9 +113,6 @@ public class VeylorLeadersHandler {
     }
 
     public static void resolveVeylorHeroLosingVote(Game game, String winner) {
-        if (!isVeylorAgendaPhase(game)) {
-            return;
-        }
         for (Player player : AgendaHelper.getLosingVoters(winner, game)) {
             if (!player.hasLeaderUnlocked("veylorhero")) {
                 continue;
@@ -137,7 +134,7 @@ public class VeylorLeadersHandler {
     @ButtonHandler(GAIN_HERO_CC)
     public static void gainVeylorHeroCommandToken(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!isVeylorAgendaPhase(game) || !player.hasLeaderUnlocked("veylorhero")) {
+        if (!player.hasLeaderUnlocked("veylorhero")) {
             ButtonHelper.deleteMessage(event);
             return;
         }
