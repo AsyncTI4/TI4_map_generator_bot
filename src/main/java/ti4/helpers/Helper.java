@@ -51,7 +51,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
@@ -291,6 +293,10 @@ public final class Helper {
         if (hs != null) {
             for (Planet planet : hs.getPlanetUnitHolders()) {
                 if (planet.isSpaceStation()) {
+                    continue;
+                }
+                if (player.hasAbility("traces_of_ruin")
+                        && ThronesAbilityHandler.isThronePlanet(planet.getName())) {
                     continue;
                 }
                 if (!player.getPlanetsForScoring(false).contains(planet)) {
@@ -1797,6 +1803,9 @@ public final class Helper {
                 if (remoteWorkforceBuild) {
                     msg.append("\n-1 from Remote Workforce");
                 }
+                if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
+                    msg.append("\n-1 from Echo of the Anvil");
+                }
                 return msg.toString();
             }
         }
@@ -1888,6 +1897,9 @@ public final class Helper {
         }
         if (remoteWorkforceBuild) {
             msg.append("\n-1 from Remote Workforce");
+        }
+        if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
+            msg.append("\n-1 from Echo of the Anvil");
         }
         msg.append(siphonDiscountMessage);
         return msg.toString();
@@ -2422,6 +2434,9 @@ public final class Helper {
                     && !producedUnits.isEmpty()
                     && producedUnits.keySet().stream()
                             .allMatch(unit -> remoteWorkforcePosition.equals(unit.split("_")[1]))) {
+                cost = Math.max(0, cost - 1);
+            }
+            if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
                 cost = Math.max(0, cost - 1);
             }
             return cost;

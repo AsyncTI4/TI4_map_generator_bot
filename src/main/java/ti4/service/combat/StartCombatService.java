@@ -36,6 +36,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
@@ -327,6 +328,7 @@ public class StartCombatService {
         }
         PonthousUnitHandler.clearOldGlorySustain(game);
         PonthousPromissoryHandler.clearThunderbirdPrototype(game);
+        PonthousTechHandler.clearThunderbirdProtocol(game);
         game.setStoredValue("factionsInCombat", player1.getFaction() + "_" + player2.getFaction());
 
         sendStartOfCombatSecretMessages(game, player1, player2, tile, spaceOrGround, unitHolderName);
@@ -1442,10 +1444,15 @@ public class StartCombatService {
                     FactionEmojis.florzen));
         }
 
+        // Ponthous
         Button oldGloryP1 = PonthousUnitHandler.getOldGlorySustainButton(p1, tile);
         if (oldGloryP1 != null) buttons.add(oldGloryP1);
         Button oldGloryP2 = PonthousUnitHandler.getOldGlorySustainButton(p2, tile);
         if (oldGloryP2 != null) buttons.add(oldGloryP2);
+        Button thunderbirdProtocolP1 = PonthousTechHandler.getThunderbirdProtocolButton(game, p1, tile);
+        if (thunderbirdProtocolP1 != null) buttons.add(thunderbirdProtocolP1);
+        Button thunderbirdProtocolP2 = PonthousTechHandler.getThunderbirdProtocolButton(game, p2, tile);
+        if (thunderbirdProtocolP2 != null) buttons.add(thunderbirdProtocolP2);
         return buttons;
     }
 
