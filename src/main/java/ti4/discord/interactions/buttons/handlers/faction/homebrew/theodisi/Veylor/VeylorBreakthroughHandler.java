@@ -18,12 +18,17 @@ import ti4.service.emoji.FactionEmojis;
 public class VeylorBreakthroughHandler {
     private static final String FILIBUSTER = "veylorbt";
     private static final String USE_FILIBUSTER = "useFilibusteredLegislation";
+    private static final String DECLINE_FILIBUSTER = "declineFilibusteredLegislation_";
 
     public static Button offerFilibusterButton(Player player, Game game) {
         return Buttons.blue(
                 player.factionButtonChecker() + USE_FILIBUSTER,
-                "Exhaust Fillibustered Legislation",
+                "Exhaust Filibustered Legislation",
                 FactionEmojis.veylor);
+    }
+
+    public static Button offerDeclineFilibusterButton(Player player, String winner) {
+        return Buttons.red(player.factionButtonChecker() + DECLINE_FILIBUSTER + winner, "Resolve Agenda Normally");
     }
 
     @ButtonHandler(USE_FILIBUSTER)
@@ -48,5 +53,32 @@ public class VeylorBreakthroughHandler {
             buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Readying Planets"));
             MessageHelper.sendMessageToChannelWithButtons(p.getCorrectChannel(), p.getRepresentation() + "", buttons);
         }
+    }
+
+    @ButtonHandler(DECLINE_FILIBUSTER)
+    public static void declineFilibusteredLegislation(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (game == null
+                || player == null
+                || !VeylorLeadersHandler.isVeylorAgendaPhase(game)
+                || !player.hasReadyBreakthrough(FILIBUSTER)) {
+            return;
+        }
+
+        String winner = buttonID.substring(DECLINE_FILIBUSTER.length());
+        if (winner.isBlank()) {
+            return;
+        }
+
+        List<Button> resolutions = List.of(
+                Buttons.blue("agendaResolution_" + winner, "Resolve with Current Winner"),
+                Buttons.red("autoresolve_manual", "Resolve it Manually"));
+        MessageHelper.editMessageWithButtons(
+                event,
+                event.getMessage().getContentRaw()
+                        + "\n"
+                        + player.getRepresentationNoPing()
+                        + " declined to use _Filibustered Legislation_.",
+                resolutions);
     }
 }
