@@ -122,9 +122,6 @@ public final class ButtonHelperAbilities {
     @ButtonHandler("autoneticMemoryStep3a")
     public static void autoneticMemoryStep3a(ButtonInteractionEvent event, Game game, Player player) {
         ActionCardHelper.pickACardFromDiscardStep1(game, player);
-        if (!game.isTwilightsFallMode()) {
-            ActionCardHelper.sendACDiscardButtons(player);
-        }
         ButtonHelper.deleteMessage(event);
     }
 

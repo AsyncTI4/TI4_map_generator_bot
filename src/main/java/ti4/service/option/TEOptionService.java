@@ -2,7 +2,9 @@ package ti4.service.option;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.container.Container;
@@ -16,12 +18,14 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.draft.TwilightsFallFrankenDraft;
 import ti4.game.Game;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
 import ti4.model.Source.ComponentSource;
 import ti4.model.SourceModel;
 import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.franken.FrankenDraftBagService;
 
@@ -100,6 +104,14 @@ public class TEOptionService {
                 game.setTwilightKart(!game.isTwilightKart());
                 if (game.isTwilightKart()) {
                     game.setupTwilightsFallMode(event);
+                    List<Button> buttons = new ArrayList<>();
+                    game.removeStoredValue("bannedUnits");
+                    buttons.add(Buttons.green("twilightDSSetup_pruned", "Just 4 units of each type"));
+                    buttons.add(Buttons.blue("deleteButtons", "All the Units"));
+                    MessageHelper.sendMessageToChannel(
+                            game.getMainGameChannel(),
+                            "Some people find there's too many units and would prefer to prune the deck to just 4 random units of each type (normal deck has 31 units, TK + normal is 60 units, pruned is 43 units)",
+                            buttons);
                 }
             }
             case "twilightds" -> {
@@ -146,6 +158,25 @@ public class TEOptionService {
                 for (int x = 0; x < allCards.size() / 2; x++) {
                     BanService.appendStoredValue(game, "bannedTechs", allCards.get(x));
                     msg += Mapper.getTech(allCards.get(x)).getName() + "\n";
+                }
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+            }
+            case "pruned" -> {
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(), "Chose to just use a pruned deck of units.");
+                List<String> allCards = Mapper.getDeck("twilight_kart_units").getNewShuffledDeck();
+                game.removeStoredValue("bannedUnits");
+                String msg = "The following units have been banned:\n";
+                Map<UnitType, Integer> unitCount = new HashMap<>();
+
+                for (String unit : allCards) {
+                    UnitModel un = Mapper.getUnit(unit);
+                    UnitType type = un.getUnitType();
+                    unitCount.put(type, unitCount.getOrDefault(type, 0) + 1);
+                    if (unitCount.get(type) > 4) {
+                        BanService.appendStoredValue(game, "bannedUnits", unit);
+                        msg += un.getName() + "\n";
+                    }
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
             }

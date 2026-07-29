@@ -2455,15 +2455,13 @@ public class ActionCardHelper {
 
         sendActionCardInfo(game, player, event);
         if (player.hasAbility("autonetic_memory")) {
-            String message;
-            if (player.hasRelic("codex") || player.hasRelic("absol_codex")) {
-                message = player.getRepresentationUnfogged()
-                        + ", if you did not just use _The Codex_ to get that action card,"
-                        + " please discard 1 action card due to your **Cybernetic Madness** ability.";
-            } else {
-                message = player.getRepresentationUnfogged()
-                        + ", please discard 1 action card due to your **Cybernetic Madness** ability.";
+            String message = player.getRepresentationUnfogged()
+                    + ", please discard 1 action card due to your **Cybernetic Madness** ability.";
+            if (game.isTwilightsFallMode()) {
+                message +=
+                        " If you picked this ability before it was edited to have the discard text, my advice is to ignore these buttons and just play it as you picked it.";
             }
+
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(), message, getDiscardActionCardButtons(player, false));
         }
