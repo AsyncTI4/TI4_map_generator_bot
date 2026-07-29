@@ -65,7 +65,7 @@
         "types": [
             "BIOTIC"
         ],
-        "text": "When you would draw 1 or more action cards, you may draw 1 less card to either choose 1 card from the action card discard pile and add it to your hand, or place 1 infantry from your reinforcements on a planet you control.",
+        "text": "When you would draw 1 or more action cards, you may draw 1 less card to either choose 1 card from the action card discard pile and add it to your hand, or place 1 infantry from your reinforcements on a planet you control. If you choose to pick up a card from the discard with this ability, discard 1 action card.",
         "source": "twilight_ds",
         "faction": "cymiae"
     },

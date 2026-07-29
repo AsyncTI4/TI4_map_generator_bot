@@ -21,6 +21,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLea
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanHeroHandler;
@@ -263,6 +264,7 @@ public class PlayHeroService {
             }
             case "ardentiahero" -> ArdentiaLeadersHandler.startArdentiaHero(event, game, player);
             case "revenantkairnhero" -> RevenantLeadersHandler.startRevKairnHero(event, game, player);
+            case "throneshero" -> ThronesLeadersHandler.getUnplacedThronePlanetButtons(event, game, player);
             case "florzenhero" -> {
                 for (Tile tile : game.getTileMap().values()) {
                     for (UnitHolder uH : tile.getPlanetUnitHolders()) {

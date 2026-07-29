@@ -51,7 +51,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
@@ -127,6 +129,14 @@ public final class Helper {
             new Point(258, 79),
             new Point(172, 221),
             new Point(172, 79));
+
+    private static final List<Point> TWO_PLANET_OR_WORMHOLE_TOKEN_PLANET_POSITIONS = List.of(
+            new Point(Constants.TOKEN_PLANET_POSITION),
+            new Point(78, 178),
+            new Point(258, 221),
+            new Point(87, 221),
+            new Point(172, 79),
+            new Point(172, 221));
 
     public static int getCurrentHour() {
         long currentTime = System.currentTimeMillis();
@@ -291,6 +301,9 @@ public final class Helper {
         if (hs != null) {
             for (Planet planet : hs.getPlanetUnitHolders()) {
                 if (planet.isSpaceStation()) {
+                    continue;
+                }
+                if (player.hasAbility("traces_of_ruin") && ThronesAbilityHandler.isThronePlanet(planet.getName())) {
                     continue;
                 }
                 if (!player.getPlanetsForScoring(false).contains(planet)) {
@@ -587,12 +600,14 @@ public final class Helper {
             return defaultPosition;
         }
 
-        List<Point> positions = tile.getTileModel().getNumPlanets() == 3
+        int printedPlanetCount = tile.getTileModel().getNumPlanets();
+        boolean usesTwoPlanetOrWormholeSlots = printedPlanetCount != 3
+                && (printedPlanetCount == 2
+                        || printedPlanetCount > 0 && tile.getTileModel().hasWormhole());
+        List<Point> positions = printedPlanetCount == 3
                 ? TRIPLE_SYSTEM_TOKEN_PLANET_POSITIONS
-                : TOKEN_PLANET_POSITIONS;
-        Point position = tile.getTileModel().getNumPlanets() == 3 && index < 3
-                ? getTripleSystemTokenPlanetPosition(tile, index)
-                : null;
+                : usesTwoPlanetOrWormholeSlots ? TWO_PLANET_OR_WORMHOLE_TOKEN_PLANET_POSITIONS : TOKEN_PLANET_POSITIONS;
+        Point position = printedPlanetCount == 3 && index < 3 ? getTripleSystemTokenPlanetPosition(tile, index) : null;
         if (position == null) {
             if (index < positions.size()) {
                 position = positions.get(index);
@@ -604,17 +619,6 @@ public final class Helper {
             }
         }
 
-        if (tile.getTileModel().getNumPlanets() > 0 && tile.getTileModel().hasWormhole()
-                || tile.getTileModel().getNumPlanets() == 2) {
-            double theta = Math.toRadians(index == 0 ? -45 : 0);
-            int deltaX = position.x - Constants.SPACE_CENTER_POSITION.x;
-            int deltaY = position.y - Constants.SPACE_CENTER_POSITION.y;
-            int x = Constants.SPACE_CENTER_POSITION.x
-                    + (int) Math.round(deltaX * Math.cos(theta) - deltaY * Math.sin(theta));
-            int y = Constants.SPACE_CENTER_POSITION.y
-                    + (int) Math.round(deltaX * Math.sin(theta) + deltaY * Math.cos(theta));
-            return new Point(x, y);
-        }
         return new Point(position);
     }
 
@@ -1797,6 +1801,9 @@ public final class Helper {
                 if (remoteWorkforceBuild) {
                     msg.append("\n-1 from Remote Workforce");
                 }
+                if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
+                    msg.append("\n-1 from Echo of the Anvil");
+                }
                 return msg.toString();
             }
         }
@@ -1888,6 +1895,9 @@ public final class Helper {
         }
         if (remoteWorkforceBuild) {
             msg.append("\n-1 from Remote Workforce");
+        }
+        if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
+            msg.append("\n-1 from Echo of the Anvil");
         }
         msg.append(siphonDiscountMessage);
         return msg.toString();
@@ -2422,6 +2432,9 @@ public final class Helper {
                     && !producedUnits.isEmpty()
                     && producedUnits.keySet().stream()
                             .allMatch(unit -> remoteWorkforcePosition.equals(unit.split("_")[1]))) {
+                cost = Math.max(0, cost - 1);
+            }
+            if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
                 cost = Math.max(0, cost - 1);
             }
             return cost;
