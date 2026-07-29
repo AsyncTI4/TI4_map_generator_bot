@@ -73,7 +73,7 @@ public class OblivionAbilityHandler {
         Button researchTech = Buttons.green(
                 player.factionButtonChecker() + "getAllTechOfType_allTechResearchable_noPay", "Research a Technology");
         String message = player.getRepresentationUnfogged()
-                + ", research 2 technologies for _Ignorant Discoveries_. Ignore the payment messages, these techs are free.";
+                + ", research 2 technologies for _Ignorant Discoveries_:";
         MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, researchTech);
         MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, researchTech);
 
