@@ -16,6 +16,7 @@ public class StatisticsCommand2 implements ParentCommand {
                     new ActionCardStats(),
                     new TwilightsFallSpliceWinRates(),
                     new ExpeditionWinRates(),
+                    new SliceTileWinRates(),
                     new StellarConverterStatistics(),
                     new FactionRecordOfTech(),
                     new FactionRecordOfSCPick(),

@@ -411,7 +411,6 @@ public class ActionCardHelper {
                 "tf-stasis",
                 "extremeduress",
                 "disgrace",
-                "special_session",
                 "investments",
                 "tf-reverse",
                 "puppetsonastring",
@@ -992,10 +991,10 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if ("special_session".equals(automationID)) {
-                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveVeto", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
-            }
+            // if ("special_session".equals(automationID)) {
+            //     codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveVeto", buttonLabel));
+            //     MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            // }
 
             if ("war_machine".equals(automationID)) {
                 player.addSpentThing("warmachine");
@@ -2456,15 +2455,13 @@ public class ActionCardHelper {
 
         sendActionCardInfo(game, player, event);
         if (player.hasAbility("autonetic_memory")) {
-            String message;
-            if (player.hasRelic("codex") || player.hasRelic("absol_codex")) {
-                message = player.getRepresentationUnfogged()
-                        + ", if you did not just use _The Codex_ to get that action card,"
-                        + " please discard 1 action card due to your **Cybernetic Madness** ability.";
-            } else {
-                message = player.getRepresentationUnfogged()
-                        + ", please discard 1 action card due to your **Cybernetic Madness** ability.";
+            String message = player.getRepresentationUnfogged()
+                    + ", please discard 1 action card due to your **Cybernetic Madness** ability.";
+            if (game.isTwilightsFallMode()) {
+                message +=
+                        " If you picked this ability before it was edited to have the discard text, my advice is to ignore these buttons and just play it as you picked it.";
             }
+
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(), message, getDiscardActionCardButtons(player, false));
         }

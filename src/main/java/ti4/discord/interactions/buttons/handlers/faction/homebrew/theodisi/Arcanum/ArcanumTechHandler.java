@@ -118,7 +118,8 @@ public class ArcanumTechHandler {
             ExploreModel explore = Mapper.getExplore(exploreId);
             if (explore != null) {
                 buttons.add(Buttons.green(
-                        player.factionButtonChecker() + SHUFFLE_PURGED_EXPLORE + exploreId, explore.getName()));
+                        player.factionButtonChecker() + SHUFFLE_PURGED_EXPLORE + exploreId,
+                        explore.getName() + " (" + explore.getType() + ")"));
             }
         }
         return buttons;
@@ -259,6 +260,7 @@ public class ArcanumTechHandler {
         if (!spaceCannonPromptAlreadyAvailable && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
             StartCombatService.sendSpaceCannonButtonsToThread(event.getMessageChannel(), game, player, tile);
         }
+        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
         ButtonHelper.deleteMessage(event);
     }
 

@@ -32,7 +32,10 @@ import ti4.discord.interactions.buttons.handlers.actioncards.acd2.SettlementsAcd
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanAbilityHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -291,10 +294,9 @@ public final class AgendaHelper {
 
         boolean playerPrevotesIsEmpty =
                 game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
-        boolean playerIsNotActivePlayer = "agendaWaiting".equalsIgnoreCase(game.getPhaseOfGame());
-        boolean playerIsPrevoting =
-                !playerPrevotesIsEmpty && (playerIsNotActivePlayer || game.getActivePlayer() != player);
-        if (playerIsPrevoting) {
+        boolean agendaWaitingPhase = "agendaWaiting".equalsIgnoreCase(game.getPhaseOfGame());
+        boolean playerIsPrevoting = !playerPrevotesIsEmpty && game.getActivePlayer() != player;
+        if (playerIsPrevoting || agendaWaitingPhase) {
             if ("0".equalsIgnoreCase(votes)) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
@@ -610,7 +612,12 @@ public final class AgendaHelper {
         }
         Button autoResolve = Buttons.blue("agendaResolution_" + winner, "Resolve with Current Winner");
         Button manualResolve = Buttons.red("autoresolve_manual", "Resolve it Manually");
-        List<Button> resolutions = List.of(autoResolve, manualResolve);
+        List<Button> resolutions = new ArrayList<>(List.of(autoResolve, manualResolve));
+        for (Player player : game.getRealPlayers()) {
+            if (VeylorLeadersHandler.isVeylorAgendaPhase(game) && player.hasReadyBreakthrough("veylorbt")) {
+                resolutions.add(VeylorBreakthroughHandler.offerFilibusterButton(player, game));
+            }
+        }
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message.toString(), resolutions);
     }
 
@@ -1145,6 +1152,12 @@ public final class AgendaHelper {
                                 game.drawSecretObjective(winningR.getUserID());
                                 message += " Drew a second secret objective due to **Plausible Deniability**.";
                             }
+                            if (winningR.hasAbility("multitasking")) {
+                                LunariumAbilityHandler.offerFactionSheetCCButtons(game, winningR);
+                            }
+                            if (winningR.hasUnlockedBreakthrough("lunariumbt")) {
+                                LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, winningR);
+                            }
                             SecretObjectiveInfoService.sendSecretObjectiveInfo(game, winningR);
                             MessageHelper.sendMessageToChannel(winningR.getCorrectChannel(), message);
                         }
@@ -1210,7 +1223,7 @@ public final class AgendaHelper {
         return riders;
     }
 
-    private static List<Player> getLosers(String winner, Game game) {
+    public static List<Player> getLosers(String winner, Game game) {
         List<Player> losers = new ArrayList<>();
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
 
@@ -2351,8 +2364,11 @@ public final class AgendaHelper {
             aCount = Integer.parseInt(agendaCount) + 1;
         }
         List<Button> resActionRow = new ArrayList<>();
-        boolean canRevealNextAgenda =
-                aCount < 3 || game.isAbsolMode() || VeylorLeadersHandler.hasHeroAdditionalAgenda(game, aCount);
+        boolean heroActive = VeylorLeadersHandler.isVeylorAgendaPhase(game)
+                && game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
+        boolean veylorBtExtraAgenda = "yes".equals(game.getStoredValue("veylorBtExtraAgenda"));
+        int agendaLimit = 2 + (heroActive ? 1 : 0) + (veylorBtExtraAgenda ? 1 : 0);
+        boolean canRevealNextAgenda = aCount <= agendaLimit || game.isAbsolMode();
         boolean waitingForTightScheduling =
                 canRevealNextAgenda && VeylorAbilitiesHandler.offerTightSchedulingRevealChoice(game, false);
         if (waitingForTightScheduling) {

@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.*;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -60,7 +60,14 @@ class AssignHitsButtonHandlers {
                     ParsedUnit unit = UnitPickerHandlerHelper.parsedUnitFromMatcher(player, matcher);
                     if (remove) {
                         RemoveUnitService.removeUnit(event, tile, game, unit, state);
+                        if (unit.unitKey().unitType() == UnitType.Infantry) {
+                            ButtonHelper.resolveInfantryRemoval(player, amt, tile);
+                        }
                     } else {
+                        if (PonthousAbilityHandler.offerLastStand(
+                                event, game, player, tile, holder, unit.unitKey(), state, assignHitsType)) {
+                            return;
+                        }
                         DestroyUnitService.destroyUnit(event, tile, game, unit, combat, state);
                         IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, holder, assignHitsType);
                     }

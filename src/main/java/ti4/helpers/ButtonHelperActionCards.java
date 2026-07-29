@@ -16,6 +16,8 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -1398,6 +1400,12 @@ public final class ButtonHelperActionCards {
             game.drawSecretObjective(player.getUserID());
             message += ", and then drew a second secret objective due to **Plausible Deniability**";
         }
+        if (player.hasAbility("multitasking")) {
+            LunariumAbilityHandler.offerFactionSheetCCButtons(game, player);
+        }
+        if (player.hasUnlockedBreakthrough("lunariumbt")) {
+            LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, player);
+        }
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
         MessageHelper.sendMessageToChannel(event.getChannel(), message + ".");
         buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
@@ -2220,16 +2228,17 @@ public final class ButtonHelperActionCards {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
-        if (player.getPlayableActionCards().contains("special_session")) {
-            String msg = player.getRepresentation()
-                    + ", you have the option to pre-play _Special Session_."
-                    + " End-of-agenda-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
-                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("resolvePreassignment_SpecialSession", "Pre-play Special Session"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
-        }
+        // if (player.getPlayableActionCards().contains("special_session")) {
+        //     String msg = player.getRepresentation()
+        //             + ", you have the option to pre-play _Special Session_."
+        //             + " End-of-agenda-phase is an awkward timing window for async, so if you intend to play it, it's
+        // best to pre-play it now."
+        //             + " Feel free to ignore this message if you don't intend to play it any time soon.";
+        //     List<Button> buttons = new ArrayList<>();
+        //     buttons.add(Buttons.green("resolvePreassignment_SpecialSession", "Pre-play Special Session"));
+        //     buttons.add(Buttons.red("deleteButtons", "Decline"));
+        //     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        // }
         if (player.getPlayableActionCards().contains("revolution")) {
             String msg = player.getRepresentation()
                     + ", you have the option to pre-play _Revolution_."
@@ -2818,6 +2827,18 @@ public final class ButtonHelperActionCards {
                 if (Mapper.getTech(tech).isUnitUpgrade()) {
                     boolean hasSpecialUpgrade = false;
                     for (String factionTech : player.getNotResearchedFactionTechs()) {
+                        TechnologyModel fTech = Mapper.getTech(factionTech);
+                        if (fTech != null
+                                && !fTech.getAlias()
+                                        .equalsIgnoreCase(Mapper.getTech(tech).getAlias())
+                                && fTech.isUnitUpgrade()
+                                && fTech.getBaseUpgrade()
+                                        .orElse("bleh")
+                                        .equalsIgnoreCase(Mapper.getTech(tech).getAlias())) {
+                            hasSpecialUpgrade = true;
+                        }
+                    }
+                    for (String factionTech : player.getTechs()) {
                         TechnologyModel fTech = Mapper.getTech(factionTech);
                         if (fTech != null
                                 && !fTech.getAlias()

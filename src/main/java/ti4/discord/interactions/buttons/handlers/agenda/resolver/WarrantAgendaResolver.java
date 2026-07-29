@@ -1,6 +1,8 @@
 package ti4.discord.interactions.buttons.handlers.agenda.resolver;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.message.MessageHelper;
@@ -21,6 +23,12 @@ public class WarrantAgendaResolver implements AgendaResolver {
         game.drawSecretObjective(player2.getUserID());
         if (player2.hasAbility("plausible_deniability")) {
             game.drawSecretObjective(player2.getUserID());
+        }
+        if (player2.hasAbility("multitasking")) {
+            LunariumAbilityHandler.offerFactionSheetCCButtons(game, player2);
+        }
+        if (player2.hasUnlockedBreakthrough("lunariumbt")) {
+            LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, player2);
         }
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player2, event);
         MessageHelper.sendMessageToChannel(

@@ -15,7 +15,9 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
 import ti4.game.Game;
@@ -261,6 +263,13 @@ public final class StatusHelper {
                         player.getCardsInfoThread(),
                         player.getRepresentationUnfogged()
                                 + ", a reminder this is the window to use the _Eerie Predictions_.");
+            }
+            if (player.hasAbility("ignorant_discoveries") && player.getStrategicCC() > 0) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", you may use the button below to resolve _Ignorant Discoveries_. A strategy token will automatically be deducted.",
+                        OblivionAbilityHandler.getIgnorantDiscoveriesButtons(event, player));
             }
         }
         String key2 = "queueToScorePOs";
@@ -792,35 +801,39 @@ public final class StatusHelper {
 
             int ccs = player.getStrategicCC();
             int techs = buttons.size() - 1;
-            if (game.isTwilightsFallMode() && techs == 0) {
-                if (player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar")) {
-                    MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentationUnfogged()
-                                    + ", you have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
-                                    + " _Scepter of Emelpar_ has been exhausted and you have been given +2 command tokens in your strategy pool.");
-                    player.setStrategicCC(player.getStrategicCC() + 2);
-                    player.addExhaustedRelic("emelpar");
-                    player.addExhaustedRelic("absol_emelpar");
-                } else if (player.getStrategicCC() > 0) {
-                    MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentationUnfogged()
-                                    + ", you have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
-                                    + " You have been given net +1 command tokens in your strategy pool.");
-                    player.setStrategicCC(player.getStrategicCC() + 1);
-                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, null, "Entropic Scar");
+            for (int i = 0; i < entry.getValue(); i++) {
+                if (game.isTwilightsFallMode() && (techs == 0 || i > techs - 1)) {
+                    if (player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar")) {
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentationUnfogged()
+                                        + ", you have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
+                                        + " _Scepter of Emelpar_ has been exhausted and you have been given +2 command tokens in your strategy pool.");
+                        player.setStrategicCC(player.getStrategicCC() + 2);
+                        player.addExhaustedRelic("emelpar");
+                        player.addExhaustedRelic("absol_emelpar");
+                    } else if (player.getStrategicCC() > 0) {
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentationUnfogged()
+                                        + ", you have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
+                                        + " You have been given net +1 command tokens in your strategy pool.");
+                        player.setStrategicCC(player.getStrategicCC() + 1);
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, null, "Entropic Scar");
+                    }
+                    continue;
                 }
-                continue;
-            }
-            String scarMessage = player.getRepresentationUnfogged()
-                    + " You have ships in an Entropic Scar anomaly. You may use these buttons to spend a token from your strategy pool to gain one of your faction technologies.";
-            scarMessage +=
-                    "You currently have " + StringHelper.pluralize(ccs, "command token") + " in your strategy pool.";
-            if (player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar"))
-                scarMessage += "You also have the _" + RelicHelper.sillySpelling()
-                        + "_ available to exhaust (this will be spent first).";
-            for (int i = 0; i < techs && i < entry.getValue(); i++) {
+                if (i > techs - 1) {
+                    continue;
+                }
+                String scarMessage = player.getRepresentationUnfogged()
+                        + " You have ships in an Entropic Scar anomaly. You may use these buttons to spend a token from your strategy pool to gain one of your faction technologies.";
+                scarMessage += "You currently have " + StringHelper.pluralize(ccs, "command token")
+                        + " in your strategy pool.";
+                if (player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar"))
+                    scarMessage += "You also have the _" + RelicHelper.sillySpelling()
+                            + "_ available to exhaust (this will be spent first).";
+
                 if (i > 0) scarMessage = "Get another one!";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), scarMessage, buttons);
             }

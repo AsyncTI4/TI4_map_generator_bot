@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static java.util.Map.entry;
+import static java.util.Map.*;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -434,8 +434,8 @@ public final class Constants {
     public static final String SETUP8 = "setup8";
     public static final String MALLICE = "mallicelocked";
     public static final String MR = "mr";
-    public static final List<String> MECATOLS = List.of(MR, "nn", "ll", "rexatolmec", "ordinianc4", "mrte");
-    public static final List<String> MECATOL_SYSTEMS = List.of("18", "fin1", "fin2", "rexmec", "112");
+    public static final List<String> MECATOLS = List.of(MR, "nn", "ll", "rexatolmec", "ordinianc4", "mrte", "mc");
+    public static final List<String> MECATOL_SYSTEMS = List.of("18", "fin1", "fin2", "rexmec", "112", "8100");
 
     public static final int SPACE_RADIUS = 115;
     public static final int RADIUS = 45;
@@ -454,12 +454,20 @@ public final class Constants {
     private static final String CRADLE = "cradle";
     private static final String ILLUSION = "illusion";
     private static final String PHANTASM = "phantasm";
+    private static final String CINERON = "cineron";
+    private static final String SKARNATH = "skarnath";
+    private static final String LETHARA = "lethara";
+    private static final String GYRAXIS = "gyraxis";
     public static final List<String> TOKEN_PLANETS = List.of(
             MIRAGE,
             OASIS,
             CRADLE,
             ILLUSION,
             PHANTASM,
+            CINERON,
+            SKARNATH,
+            LETHARA,
+            GYRAXIS,
             AVERNUS,
             THUNDERSEDGE,
             BROKENPLANET1,
@@ -499,6 +507,7 @@ public final class Constants {
     public static final String STELLAR_CONVERTER = "stellar_converter";
     public static final String EXPEDITION_WIN_RATES = "expedition_win_rates";
     public static final String TWILIGHTS_FALL_SPLICE_WIN_RATES = "tf_splice_win_rates";
+    public static final String SLICE_TILE_WIN_RATES = "slice_tile_win_rates";
     public static final String SEND_DEBT = "send_debt";
     public static final String DEBT_COUNT = "debt_count";
     public static final String REMOVE_DEBT = "remove_debt";
@@ -1395,6 +1404,7 @@ public final class Constants {
     public static final String ADD_TO_SPLICE = "add_to_splice";
     public static final String GALVANIZE = "galvanize";
     public static final String FIX_COLORS = "fix_colors";
+    public static final String GUILD_AGENTS = "guild_agents";
     public static final String DRAW_RANDOM_UNIT = "draw_random_unit";
     public static final String DRAW_RANDOM_GENOME = "draw_random_genome";
     public static final String DRAW_RANDOM_BLUE_TILE = "draw_random_blue_tile";
