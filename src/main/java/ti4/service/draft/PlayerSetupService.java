@@ -520,6 +520,11 @@ public class PlayerSetupService {
                             + " added the three \"Factory Lease\" promissory notes to their reinforcements.");
         }
         if (player.hasAbility("cycle_of_reclamation")) {
+            player.addRelic("full_moonphase");
+            player.addRelic("waxing_moonphase");
+            player.addRelic("waning_moonphase");
+            player.addRelic("new_moonphase");
+            player.addRelic("lunar_eclipse_moonphase");
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " added the 5 _Moon Phase_ cards to their play area.");

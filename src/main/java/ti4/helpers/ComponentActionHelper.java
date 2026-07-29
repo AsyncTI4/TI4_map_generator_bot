@@ -14,6 +14,8 @@ import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
@@ -318,8 +320,20 @@ public class ComponentActionHelper {
         }
 
         // Relics
+        if (p1.hasRelicReady("new_moonphase")) {
+            compButtons.add(AeternaAbilityHandler.getNewMoonButton(p1));
+        }
         boolean enigmaticSeen = false;
         for (String relic : p1.getRelics()) {
+            if (List.of(
+                            "full_moonphase",
+                            "waxing_moonphase",
+                            "waning_moonphase",
+                            "new_moonphase",
+                            "lunar_eclipse_moonphase")
+                    .contains(relic)) {
+                continue;
+            }
             RelicModel relicData = Mapper.getRelic(relic);
             if (relicData == null) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that relic.");
@@ -480,6 +494,9 @@ public class ComponentActionHelper {
                     "Purge 1 Fragment for 1 Token",
                     FactionEmojis.Naaz);
             compButtons.add(abilityButton);
+        }
+        if (p1.hasAbility("ritual_of_ascension") && p1.getFragments().size() >= 2) {
+            compButtons.add(ArcanumAbilityHandler.getRitualOfAscensionButton(event, game, p1));
         }
         if (p1.hasAbility("puppetsoftheblade")
                 && p1.getPlotCardsFactions().values().stream().anyMatch(ary -> ary != null && !ary.isEmpty())) {

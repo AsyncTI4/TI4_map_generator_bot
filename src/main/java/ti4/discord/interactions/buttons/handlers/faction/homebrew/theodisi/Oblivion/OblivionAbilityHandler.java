@@ -70,11 +70,11 @@ public class OblivionAbilityHandler {
         }
 
         PlayerTechService.purgeTech(event, player, techID);
-        List<Button> buttons = List.of(Buttons.GET_A_TECH);
-        String message = player.getRepresentationUnfogged()
-                + ", use this button to research a technology for _Ignorant Discoveries_. Ignore the payment messages, these techs are free.";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+        Button researchTech = Buttons.green(
+                player.factionButtonChecker() + "getAllTechOfType_allTechResearchable_noPay", "Research a Technology");
+        String message = player.getRepresentationUnfogged() + ", research 2 technologies for _Ignorant Discoveries_:";
+        MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, researchTech);
+        MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, researchTech);
 
         ButtonHelper.deleteMessage(event);
     }
