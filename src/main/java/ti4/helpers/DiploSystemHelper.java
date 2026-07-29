@@ -21,6 +21,9 @@ public class DiploSystemHelper {
         }
 
         for (Player player_ : game.getPlayers().values()) {
+            if (player_.hasAbility("diplomatic_immunity")) {
+                continue;
+            }
             if (player_ != player
                     && player_.isRealPlayer()
                     && !player.getAllianceMembers().contains(player_.getFaction())) {
