@@ -16,8 +16,10 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.game.Game;
@@ -513,8 +515,20 @@ public class PlayStrategyCardService {
         if (player.hasAbility("mandate_of_presence") && !isOverrule) {
             VerydithAbilitiesHandler.getMandateButtons(event, player, game);
         }
+        if (player.hasRelicReady("lunar_eclipse_moonphase")
+                && AeternaAbilityHandler.canReturnCapturedNeutralUnits(game, player, 2)) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " may use _Lunar Eclipse_ after performing this strategic action.",
+                    List.of(
+                            AeternaAbilityHandler.getLunarEclipseButton(player),
+                            Buttons.red("deleteButtons", "Decline")));
+        }
         if (player.hasPlayablePromissoryInHand("thpnverydith")) {
             VerydithPromissoryHandler.usePactRenewed(player);
+        }
+        if (player.hasTechReady("thverydithg")) {
+            VerydithTechHandler.getBilateralNexusButton(event, player, game);
         }
 
         if (player.isNpc()) {
