@@ -196,12 +196,21 @@ public final class ButtonHelperSCs {
                 && game.getPlayedSCs().contains(scModel.getInitiative())) {
             int scNum = scModel.getInitiative();
             player.addFollowedSC(scNum, event);
+            boolean followsForFree = player.hasAbility("diplomatic_immunity");
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
-            if (player.getStrategicCC() > 0) {
-                ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Diplomacy**");
+            if (!followsForFree) {
+                if (player.getStrategicCC() > 0) {
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Diplomacy**");
+                }
+                String message = deductCC(game, player, scNum);
+                ReactionService.addReaction(event, game, player, message);
+            } else {
+                ReactionService.addReaction(
+                        event,
+                        game,
+                        player,
+                        "is following **Diplomacy** without spending a command token due to _Diplomatic Immunity_.");
             }
-            String message = deductCC(game, player, scNum);
-            ReactionService.addReaction(event, game, player, message);
         }
         if (scModel != null && !player.getFollowedSCs().contains(scModel.getInitiative())) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
@@ -1548,11 +1557,25 @@ public final class ButtonHelperSCs {
         if (!used
                 && !player.getFollowedSCs().contains(scNum)
                 && game.getPlayedSCs().contains(scNum)) {
-
-            String message = deductCC(game, player, scNum);
-            if (message.contains("1 command token has been spent from strategy pool")) {
-                ButtonHelperCommanders.resolveMuaatCommanderCheck(
-                        player, game, event, "followed **" + Helper.getSCName(scNum, game) + "**");
+            StrategyCardModel scModel =
+                    game.getStrategyCardModelByInitiative(scNum).orElse(null);
+            boolean followsDiplomacyForFree = player.hasAbility("diplomatic_immunity")
+                    && scModel != null
+                    && (scModel.usesAutomationForSCID("pok2diplomacy")
+                            || "pok2diplomacy".equalsIgnoreCase(scModel.getId())
+                            || "diplomacy".equalsIgnoreCase(scModel.getId())
+                            || "noctis".equalsIgnoreCase(scModel.getId())
+                            || "diplomacy".equalsIgnoreCase(scModel.getName())
+                            || "noctis".equalsIgnoreCase(scModel.getName()));
+            String message;
+            if (followsDiplomacyForFree) {
+                message = "is following **Diplomacy** without spending a command token due to _Diplomatic Immunity_.";
+            } else {
+                message = deductCC(game, player, scNum);
+                if (message.contains("1 command token has been spent from strategy pool")) {
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(
+                            player, game, event, "followed **" + Helper.getSCName(scNum, game) + "**");
+                }
             }
 
             if (setStatus) {

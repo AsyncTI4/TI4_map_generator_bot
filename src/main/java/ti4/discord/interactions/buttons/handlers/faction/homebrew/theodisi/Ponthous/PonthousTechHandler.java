@@ -213,7 +213,7 @@ public class PonthousTechHandler {
 
     private static String getThunderbirdProtocolGroundForceMessage(Player player) {
         int remaining = 2 - getThunderbirdProtocolSelectionCount(player.getGame(), player);
-        return player.getRepresentationNoPing() + ", choose " + remaining
+        return player.getRepresentationNoPing() + ", please choose " + remaining
                 + " ground force" + (remaining == 1 ? "" : "s")
                 + " to participate in this space combat with _Thunderbird Protocol_.";
     }

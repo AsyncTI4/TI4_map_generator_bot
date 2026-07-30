@@ -125,7 +125,7 @@ public class ArcanumBreakthroughHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", select the individual units receiving _Power Word: Wish_.",
+                player.getRepresentation() + ", please choose the individual units receiving _Power Word: Wish_.",
                 List.of(
                         Buttons.green(player.factionButtonChecker() + WISH_SELECT + MOVE, "Choose 1 Unit: +1 Move"),
                         Buttons.green(
@@ -335,7 +335,7 @@ public class ArcanumBreakthroughHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 channel,
-                player.getRepresentation() + ", choose " + requiredSelections(mode) + " individual "
+                player.getRepresentation() + ", please choose " + requiredSelections(mode) + " individual "
                         + (CAPACITY.equals(mode) ? "ship" : "unit") + (requiredSelections(mode) == 1 ? "" : "s")
                         + " for _Power Word: Wish_.",
                 buttons);

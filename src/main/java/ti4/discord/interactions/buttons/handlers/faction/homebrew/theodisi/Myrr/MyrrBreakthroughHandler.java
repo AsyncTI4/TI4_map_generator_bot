@@ -98,7 +98,7 @@ public class MyrrBreakthroughHandler {
                         + tile.getRepresentationForButtons(game, player)
                         + ". Its total PRODUCTION is "
                         + production
-                        + " (+2 from _Remote Workforce_) and its total cost is reduced by 1.",
+                        + " (+2 from _Remote Workforce_), and its total cost is reduced by 1.",
                 buttons);
     }
 }
