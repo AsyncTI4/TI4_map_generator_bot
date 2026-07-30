@@ -134,7 +134,8 @@
         "playArea": true,
         "playImmediately": false,
         "source": "theodisi",
-        "text": "At the start of a round of combat, place this card face up in your play area: Each time a fighter is destroyed during this combat roll a dice, for each result greater than 5 place that fighter on this card. At the start of your next turn place each fighter in systems that contain your ships. Then, return this card to the Aeterna player."
+        "text": "At the start of a round of combat, place this card face up in your play area: Each time a fighter is destroyed during this combat roll a dice, for each result greater than 5 place that fighter on this card. At the start of your next turn place each fighter in systems that contain your ships. Then, return this card to the Aeterna player.",
+        "notes": "There is no way to see how many fighters are in stasis at the moment. You'll have to keep track/make a note of it yourself."
     },
     {
         "alias": "thpnponthous",

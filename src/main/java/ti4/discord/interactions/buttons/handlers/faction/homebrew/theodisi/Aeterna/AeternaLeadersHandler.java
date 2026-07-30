@@ -36,6 +36,7 @@ public class AeternaLeadersHandler {
     private static final String DESTROY_OPPONENT_SHIP = "gravecallDestroyShip_";
     private static final String SELECT_AGENT_SHIP = "selectAeternaAgentShip_";
     private static final String SELECT_AGENT_SYSTEM = "selectAeternaAgentSystem_";
+    private static final String COMMANDER_USED_ACTION = "aeternaCommanderUsedAction_";
 
     // Commander Unlock
     public static Button offerAeternaCommanderUnlockButton(Player player) {
@@ -196,11 +197,40 @@ public class AeternaLeadersHandler {
 
     // Commander
     @ButtonHandler("gainAeternaCCOnLoss")
-    public static void aeternaCommanderCCGain(ButtonInteractionEvent event, Player player) {
+    public static void aeternaCommanderCCGain(ButtonInteractionEvent event, Game game, Player player) {
+        if (game == null
+                || player == null
+                || !game.playerHasLeaderUnlockedOrAlliance(player, "aeternacommander")
+                || hasUsedAeternaCommanderThisAction(game, player)) {
+            return;
+        }
+        game.setStoredValue(COMMANDER_USED_ACTION + player.getFaction(), "true");
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Gain 1 CC due to _Vorun Kael_:", ButtonHelper.getGainCCButtons(player));
 
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
+    public static boolean hasUsedAeternaCommanderThisAction(Game game, Player player) {
+        return game != null
+                && player != null
+                && "true".equals(game.getStoredValue(COMMANDER_USED_ACTION + player.getFaction()));
+    }
+
+    public static void clearAeternaCommanderActionState(Game game, Player player) {
+        if (game != null && player != null) {
+            game.removeStoredValue(COMMANDER_USED_ACTION + player.getFaction());
+        }
+    }
+
+    public static void clearAeternaCommanderActionState(Game game) {
+        if (game == null) {
+            return;
+        }
+        game.getStoredValueMap().keySet().stream()
+                .filter(key -> key.startsWith(COMMANDER_USED_ACTION))
+                .toList()
+                .forEach(game::removeStoredValue);
     }
 
     // Agent
