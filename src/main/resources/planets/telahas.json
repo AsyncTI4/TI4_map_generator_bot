@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "telahas",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "telahas",
     "tileId": "er50",
     "name": "Telahas",

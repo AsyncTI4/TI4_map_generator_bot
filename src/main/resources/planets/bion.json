@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "bion",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 140,
+            "y": 85
+        }
+    },
     "id": "bion",
     "tileId": "m09",
     "name": "Bion",

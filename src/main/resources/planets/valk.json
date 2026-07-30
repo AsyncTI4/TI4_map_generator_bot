@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "valk",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 86,
+            "y": 138
+        }
+    },
     "id": "valk",
     "tileId": "58",
     "name": "Valk",

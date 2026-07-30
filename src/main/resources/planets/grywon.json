@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "grywon",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "grywon",
     "tileId": "er51",
     "name": "Grywon",

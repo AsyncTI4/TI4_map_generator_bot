@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "biaheo",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 94
+        }
+    },
     "id": "biaheo",
     "tileId": "d17",
     "name": "Biaheo",

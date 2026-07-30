@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "discordia",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 177,
+            "y": 131
+        }
+    },
     "id": "discordia",
     "tileId": "d21",
     "name": "Discordia",

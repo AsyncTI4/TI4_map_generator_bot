@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "eshonia",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "eshonia",
     "tileId": "er02",
     "name": "Eshonia",

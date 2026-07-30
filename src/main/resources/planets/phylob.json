@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "phylob",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "phylob",
     "tileId": "er116b",
     "name": "Phylob",

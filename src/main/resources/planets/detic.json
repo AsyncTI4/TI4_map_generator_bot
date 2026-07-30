@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "detic",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "detic",
     "tileId": "d114",
     "name": "Detic",

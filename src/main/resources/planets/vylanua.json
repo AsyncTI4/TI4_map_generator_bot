@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "vylanua",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "vylanua",
     "tileId": "er123",
     "name": "Vylanua",

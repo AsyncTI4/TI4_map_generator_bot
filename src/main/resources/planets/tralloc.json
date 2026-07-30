@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "tralloc",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "tralloc",
     "tileId": "m02",
     "name": "Tralloc",

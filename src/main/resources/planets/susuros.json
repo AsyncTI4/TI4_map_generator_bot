@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "susuros",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 177,
+            "y": 131
+        }
+    },
     "id": "susuros",
     "tileId": "d34",
     "name": "Susuros",

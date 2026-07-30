@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "albredaan",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 147,
+            "y": 211
+        }
+    },
     "id": "albredaan",
     "tileId": "s07",
     "name": "Albraedaan",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "iynn",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "iynn",
     "tileId": "er94",
     "name": "Iynntani",

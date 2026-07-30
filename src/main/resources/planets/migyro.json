@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "migyro",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "migyro",
     "tileId": "er98",
     "name": "Migyro",

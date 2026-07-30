@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "cyrra",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 231,
+            "y": 228
+        }
+    },
     "id": "cyrra",
     "tileId": "d13",
     "name": "Cyrra",

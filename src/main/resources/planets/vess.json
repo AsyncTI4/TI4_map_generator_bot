@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "vess",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 231,
+            "y": 228
+        }
+    },
     "id": "vess",
     "tileId": "d14",
     "name": "Vess",

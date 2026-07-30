@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "creuss",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 206,
+            "y": 161
+        }
+    },
     "id": "creuss",
     "tileId": "51",
     "name": "Creuss",

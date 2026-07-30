@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "tequran",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 137,
+            "y": 88
+        }
+    },
     "id": "tequran",
     "tileId": "28",
     "name": "Tequ'ran",

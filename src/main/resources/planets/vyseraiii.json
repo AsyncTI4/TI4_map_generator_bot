@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "vyseraiii",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 87,
+            "y": 136
+        }
+    },
     "id": "vyseraiii",
     "tileId": "ba3",
     "name": "Vysera III",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "nix",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 80,
+            "y": 140
+        }
+    },
     "id": "nix",
     "tileId": "er100",
     "name": "Nix",

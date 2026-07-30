@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "mecantor",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 130
+        }
+    },
     "id": "mecantor",
     "tileId": "er96",
     "name": "Mecantor",

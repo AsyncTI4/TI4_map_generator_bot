@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "breakpoint",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "breakpoint",
     "tileId": "er56",
     "name": "Breakpoint",

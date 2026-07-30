@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "meharxull",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 172,
+            "y": 150
+        }
+    },
     "id": "meharxull",
     "tileId": "24",
     "name": "Mehar Xull",

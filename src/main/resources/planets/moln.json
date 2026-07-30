@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "moln",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "moln",
     "tileId": "d112",
     "name": "Moln",

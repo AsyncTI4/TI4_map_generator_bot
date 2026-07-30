@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "thedark",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 173,
+            "y": 135
+        }
+    },
     "id": "thedark",
     "tileId": "56",
     "name": "The Dark",

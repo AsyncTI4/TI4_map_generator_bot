@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "xyon",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 130
+        }
+    },
     "id": "xyon",
     "tileId": "er23",
     "name": "Xyon",

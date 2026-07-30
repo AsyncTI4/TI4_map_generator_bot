@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "stygain",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "stygain",
     "tileId": "er111",
     "name": "Stygain",

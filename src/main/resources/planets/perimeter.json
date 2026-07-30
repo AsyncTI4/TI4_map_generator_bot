@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "perimeter",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 168,
+            "y": 152
+        }
+    },
     "id": "perimeter",
     "tileId": "60",
     "name": "Perimeter",

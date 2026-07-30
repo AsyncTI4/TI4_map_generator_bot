@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "shihalaum",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 177,
+            "y": 131
+        }
+    },
     "id": "shihalaum",
     "tileId": "d32",
     "name": "Shi-Halaum",

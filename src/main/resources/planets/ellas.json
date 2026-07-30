@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ellas",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 231,
+            "y": 207
+        }
+    },
     "id": "ellas",
     "tileId": "d25",
     "name": "Ellas",

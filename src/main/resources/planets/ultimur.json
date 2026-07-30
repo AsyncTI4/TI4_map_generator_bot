@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ultimur",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "ultimur",
     "tileId": "er118",
     "name": "Ultimur",

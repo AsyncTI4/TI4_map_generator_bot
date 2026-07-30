@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "thar",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 226,
+            "y": 200
+        }
+    },
     "id": "thar",
     "tileId": "ba7",
     "name": "Thar",

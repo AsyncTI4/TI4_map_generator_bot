@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "dognui",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 130
+        }
+    },
     "id": "dognui",
     "tileId": "er91",
     "name": "Dognui",

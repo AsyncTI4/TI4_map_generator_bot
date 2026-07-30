@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "vraxil",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 226,
+            "y": 200
+        }
+    },
     "id": "vraxil",
     "tileId": "ba1",
     "name": "Vraxil",

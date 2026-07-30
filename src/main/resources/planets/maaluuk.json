@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "maaluuk",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 134,
+            "y": 86
+        }
+    },
     "id": "maaluuk",
     "tileId": "09",
     "name": "Maaluuk",

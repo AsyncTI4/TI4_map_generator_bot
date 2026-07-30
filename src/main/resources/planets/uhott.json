@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "uhott",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "uhott",
     "tileId": "er55",
     "name": "Uhott",

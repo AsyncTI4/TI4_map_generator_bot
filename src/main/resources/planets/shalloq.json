@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "shalloq",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 223,
+            "y": 200
+        }
+    },
     "id": "shalloq",
     "tileId": "15",
     "name": "Shalloq",

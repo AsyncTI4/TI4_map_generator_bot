@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "altor",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "altor",
     "tileId": "m01",
     "name": "Altor",
