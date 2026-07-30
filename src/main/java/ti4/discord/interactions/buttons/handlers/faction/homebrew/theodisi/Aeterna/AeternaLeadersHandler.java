@@ -267,12 +267,12 @@ public class AeternaLeadersHandler {
         } else {
             String systemPrefix = player.factionButtonChecker() + SELECT_AGENT_SYSTEM + sourceTile.getPosition() + "|"
                     + unit.getBaseType() + "|";
-            List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+            List<Button> systemExtraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
             List<Button> paginatedButtons =
-                    NewStuffHelper.buttonPagination(systemButtons, extraButtons, systemPrefix, 25, 0, false);
+                    NewStuffHelper.buttonPagination(systemButtons, systemExtraButtons, systemPrefix, 25, 0, false);
             if (systemButtons.size() <= 24) {
                 paginatedButtons = new ArrayList<>(systemButtons);
-                paginatedButtons.addAll(extraButtons);
+                paginatedButtons.addAll(systemExtraButtons);
             }
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), systemMessage, paginatedButtons);
         }
