@@ -39,7 +39,7 @@ public class VerydithAbilitiesHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", you have _Mandate of Presence_ and may place 1 players command token in a system that contains 1 or more of your units, no legendary planets, and no other player's units:",
+                        + ", you may use **Mandate of Presence** to place 1 player's command token in a system that contains 1 or more of your units, no legendary planets, and no other player's units.",
                 buttons);
     }
 
@@ -67,7 +67,7 @@ public class VerydithAbilitiesHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + " please select the system you would like to place another player's command token in:",
+                        + ", please choose the system in which to place another player's command token.",
                 NewStuffHelper.buttonPagination(eligibleSystems, player.factionButtonChecker() + MANDATE_SYSTEM, 0));
     }
 
@@ -102,7 +102,7 @@ public class VerydithAbilitiesHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + " choose the player whose command token will be placed in the system:",
+                player.getRepresentation() + ", please choose the player whose command token to place in the system.",
                 targets);
     }
 
@@ -136,7 +136,7 @@ public class VerydithAbilitiesHandler {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + " used _Mandate of Presence_, to add "
+                        + " used **Mandate of Presence** to add "
                         + target.getRepresentationNoPing() + "'s"
                         + " command token to "
                         + tile.getRepresentation());

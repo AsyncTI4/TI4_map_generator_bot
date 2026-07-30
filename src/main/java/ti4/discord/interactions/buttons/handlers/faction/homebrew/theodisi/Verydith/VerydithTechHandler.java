@@ -23,7 +23,7 @@ public class VerydithTechHandler {
 
         MessageHelper.sendMessageToChannelWithButton(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", you may exhaust _Bilateral Nexus_:",
+                player.getRepresentation() + ", you may exhaust _Bilateral Nexus_.",
                 Buttons.green(
                         player.factionButtonChecker() + USE_BN, "Exhaust Bilateral Nexus", FactionEmojis.verydith));
     }
@@ -39,7 +39,7 @@ public class VerydithTechHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", use these buttons to resolve the secondary of your played strategy card using _Bilateral Nexus_. You do not have to spend a command token when you do this, if it does, use /player stats to gain one back.",
+                        + ", please choose the secondary ability to resolve using _Bilateral Nexus_.\n-# You do not spend a command token when doing this. If one is spent, use `/player stats` to gain it back.",
                 ButtonHelperHeroes.getSecondaryButtons(game));
 
         ButtonHelper.deleteMessage(event);

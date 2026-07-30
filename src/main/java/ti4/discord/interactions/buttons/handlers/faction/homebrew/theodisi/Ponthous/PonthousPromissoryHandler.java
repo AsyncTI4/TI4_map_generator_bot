@@ -258,7 +258,7 @@ public class PonthousPromissoryHandler {
 
     private static String getThunderbirdGroundForceMessage(Player player) {
         return player.getRepresentationNoPing()
-                + ", choose the ground force that will participate in this space combat with _Thunderbird Prototype_.";
+                + ", please choose the ground force that will participate in this space combat with _Thunderbird Prototype_.";
     }
 
     private static String getStateKey(Player player) {

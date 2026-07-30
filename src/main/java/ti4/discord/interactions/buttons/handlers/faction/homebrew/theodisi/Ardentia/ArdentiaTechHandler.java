@@ -131,8 +131,8 @@ public class ArdentiaTechHandler {
             return;
         }
 
-        String prompt = player.getRepresentationUnfogged() + ", choose a unit in the active system to galvanize ("
-                + remaining + " remaining).";
+        String prompt = player.getRepresentationUnfogged()
+                + ", please choose a unit in the active system to galvanize (" + remaining + " remaining).";
         for (int index = 0; index < buttons.size(); index += 25) {
             MessageHelper.sendMessageToChannelWithButtons(
                     channel, prompt, buttons.subList(index, Math.min(index + 25, buttons.size())));

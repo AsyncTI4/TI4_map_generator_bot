@@ -17,6 +17,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionLeadersHandler;
@@ -162,6 +163,7 @@ public class StartTurnService {
 
         game.updateActivePlayer(player);
         game.setPhaseOfGame("action");
+        AeternaPromissoryHandler.offerStasisFighterPlacement(event, game, player);
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
         if (NetrunnersPromissoryHandler.shouldOfferSharedNetworkAccessButtons(player, game)) {
             NetrunnersPromissoryHandler.offerSharedNetworkAccessButtons(player, game);

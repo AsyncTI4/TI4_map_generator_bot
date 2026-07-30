@@ -45,7 +45,7 @@ public class KryxosLeadersHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCardsInfoThread(),
                 target.getRepresentationUnfogged()
-                        + ", select the non-faction technology you would like to return for Dravok Veyl:",
+                        + ", please choose the non-faction technology to return for Dravok Veyl, the Kryxos agent.",
                 buttons);
     }
 

@@ -50,7 +50,8 @@ public class ArcanumAbilityHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", choose 1 primordial technology to add with **Primordial Secrets**.",
+                player.getRepresentation()
+                        + ", please choose 1 primordial technology to add with **Primordial Secrets**.",
                 buttons);
     }
 
@@ -103,7 +104,7 @@ public class ArcanumAbilityHandler {
 
     // Ritual of Ascension
     public static Button getRitualOfAscensionButton(GenericInteractionCreateEvent event, Game game, Player player) {
-        return Buttons.green(player.factionButtonChecker() + USE_ROA, "Ritual of Ascension", FactionEmojis.arcanum);
+        return Buttons.green(player.factionButtonChecker() + USE_ROA, "Use Ritual of Ascension", FactionEmojis.arcanum);
     }
 
     @ButtonHandler(USE_ROA)
@@ -118,7 +119,7 @@ public class ArcanumAbilityHandler {
         game.removeStoredValue(RITUAL_FRAGS_PURGED + player.getFaction());
 
         List<Button> frags = getRitualFragmentButtons(player);
-        List<Button> extraButtons = List.of(Buttons.red("donePurgingRitualFrags", "Done Purging Frags"));
+        List<Button> extraButtons = List.of(Buttons.red("donePurgingRitualFrags", "Done Purging Fragments"));
         List<Button> displayedButtons = frags.size() <= 24
                 ? new ArrayList<>(frags)
                 : NewStuffHelper.buttonPagination(
@@ -129,8 +130,7 @@ public class ArcanumAbilityHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation()
-                        + ", please choose which fragments you would like to purge to research a technology:",
+                player.getRepresentation() + ", please choose 2 fragments to purge to research a technology.",
                 displayedButtons);
     }
 
@@ -141,9 +141,8 @@ public class ArcanumAbilityHandler {
         }
 
         List<Button> frags = getRitualFragmentButtons(player);
-        List<Button> extraButtons = List.of(Buttons.red("donePurgingRitualFrags", "Done Purging Frags"));
-        String message = player.getRepresentation()
-                + ", please choose which fragments you would like to purge to research a technology:";
+        List<Button> extraButtons = List.of(Buttons.red("donePurgingRitualFrags", "Done Purging Fragments"));
+        String message = player.getRepresentation() + ", please choose 2 fragments to purge to research a technology.";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event,
                 event.getMessageChannel(),
@@ -185,7 +184,7 @@ public class ArcanumAbilityHandler {
         if (fragment != null) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "Purged " + ExploreEmojis.getFragEmoji(fragment.getType()) + fragment.getName());
+                    "Purged " + ExploreEmojis.getFragEmoji(fragment.getType()) + fragment.getName() + ".");
         }
     }
 
@@ -224,11 +223,11 @@ public class ArcanumAbilityHandler {
         ButtonHelper.deleteMessage(event);
 
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), "Button to research a technology have been sent to your cards info thread.");
+                event.getMessageChannel(), "A technology research button has been sent to your `#cards-info` thread.");
 
         MessageHelper.sendMessageToChannelWithButton(
                 player.getCardsInfoThread(),
-                player.getRepresentation() + ", you may research a technology due to _Ritual of Ascension_:",
+                player.getRepresentation() + ", you may research a technology due to **Ritual of Ascension**.",
                 Buttons.green(
                         player.factionButtonChecker() + "getAllTechOfType_allTechResearchable_noPay",
                         "Research a Technology"));

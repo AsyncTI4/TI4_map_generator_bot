@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
 import ti4.game.Player;
 import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
@@ -23,6 +24,12 @@ public class UnitModelValueInjectionService {
 
     // TODO: Add TF Nomad FS, 3 TF Mechs, TK Xxcha flag, Lightrail
     private UnitValueInjection getPlayerUnitValueInjection(Player player, UnitModel unit) {
+        if ("aeterna_flagship".equals(unit.getId())) {
+            int tokenCount = AeternaUnitsHandler.getCryptTokenCount(player.getGame(), player);
+            if (tokenCount > 0) {
+                return UnitValueInjection.of(IntegerValueInjection.create().capacityValue(2 * tokenCount));
+            }
+        }
         if (player.hasAbility("evolved_warforms") && unit.getUnitType() == UnitType.Mech) {
             return UnitValueInjection.of(
                     IntegerValueInjection.create().moveValue(1),

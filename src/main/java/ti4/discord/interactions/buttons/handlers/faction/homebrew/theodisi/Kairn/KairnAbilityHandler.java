@@ -77,7 +77,7 @@ public class KairnAbilityHandler {
         }
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", choose an exploration deck of a planet you explored:",
+                player.getRepresentation() + ", please choose an exploration deck of a planet you explored.",
                 buttons);
     }
 
@@ -119,7 +119,7 @@ public class KairnAbilityHandler {
         player.setStrategicCC(player.getStrategicCC() - 1);
         List<String> revealedCards = new ArrayList<>();
         StringBuilder message = new StringBuilder(player.getRepresentation())
-                .append(" spent 1 strategy token for _Colony Outposts_ and revealed from the ")
+                .append(" spent 1 strategy token for **Colony Outposts** and revealed from the ")
                 .append(trait)
                 .append(" exploration deck for ")
                 .append(Helper.getPlanetRepresentation(planetName, game))

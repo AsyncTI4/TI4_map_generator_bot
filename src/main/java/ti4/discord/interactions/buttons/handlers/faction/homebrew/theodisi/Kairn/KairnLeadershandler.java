@@ -123,8 +123,8 @@ public class KairnLeadershandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", choose a purged exploration card to place on top of its deck. " + "("
-                        + selected + "/5 chosen)",
+                player.getRepresentation() + ", please choose a purged exploration card to place on top of its deck. "
+                        + "(" + selected + "/5 chosen)",
                 displayedButtons);
     }
 
@@ -145,8 +145,9 @@ public class KairnLeadershandler {
         List<Button> buttons = getPurgedExploreButtons(game, player);
         List<Button> extraButtons = List.of(
                 Buttons.red(player.factionButtonChecker() + FINISH_PURGED_EXPLORES, "Continue to Planet Explores"));
-        String message = player.getRepresentation() + ", choose a purged exploration card to place on top of its deck. "
-                + "(" + selected + "/5 chosen)";
+        String message =
+                player.getRepresentation() + ", please choose a purged exploration card to place on top of its deck. "
+                        + "(" + selected + "/5 chosen)";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event,
                 event.getMessageChannel(),
@@ -213,8 +214,8 @@ public class KairnLeadershandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", choose up to 5 planets you control to explore. " + "(" + selected.size()
-                        + "/5 chosen)",
+                player.getRepresentation() + ", please choose up to 5 planets you control to explore. " + "("
+                        + selected.size() + "/5 chosen)",
                 displayedButtons);
     }
 
@@ -249,7 +250,7 @@ public class KairnLeadershandler {
         List<Button> buttons = getKairnHeroPlanetButtons(game, player, selectedPlanets);
         List<Button> extraButtons = List.of(
                 Buttons.red(player.factionButtonChecker() + FINISH_KAIRN_HERO, "Done Resolving New Ancestral Home"));
-        String message = player.getRepresentation() + ", choose up to 5 planets you control to explore. " + "("
+        String message = player.getRepresentation() + ", please choose up to 5 planets you control to explore. " + "("
                 + selectedPlanets.size() + "/5 chosen)";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event,
@@ -281,7 +282,8 @@ public class KairnLeadershandler {
         if (!exploreButtons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
-                    player.getRepresentation() + ", choose how to explore " + planet.getRepresentation(game) + ".",
+                    player.getRepresentation() + ", please choose how to explore " + planet.getRepresentation(game)
+                            + ".",
                     exploreButtons);
         }
 
@@ -302,7 +304,7 @@ public class KairnLeadershandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                "Use buttons to end turn or do another action.",
+                "Please choose whether to end your turn or take another action.",
                 StartTurnService.getStartOfTurnButtons(player, game, true, event));
 
         ButtonHelper.deleteMessage(event);

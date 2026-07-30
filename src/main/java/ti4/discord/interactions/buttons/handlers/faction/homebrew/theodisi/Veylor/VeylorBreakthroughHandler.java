@@ -46,12 +46,13 @@ public class VeylorBreakthroughHandler {
         AgendaHelper.resolveWithNoEffect(event, game);
 
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), "You may all ready 1 planet because of _Filibustered Legislation_.");
+                event.getMessageChannel(), "All players may ready 1 planet because of _Filibustered Legislation_.");
 
         for (Player p : game.getRealPlayers()) {
             List<Button> buttons = Helper.getPlanetRefreshButtons(p, game);
             buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Readying Planets"));
-            MessageHelper.sendMessageToChannelWithButtons(p.getCorrectChannel(), p.getRepresentation() + "", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    p.getCorrectChannel(), p.getRepresentation() + ", please choose a planet to ready.", buttons);
         }
     }
 
