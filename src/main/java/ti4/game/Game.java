@@ -4174,6 +4174,19 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
 
+        // Grant access to the native commander of each player whose command token is in the revenant lich debt pool.
+        if (player.hasLeaderUnlocked("revenantcommander")) {
+            for (Player otherPlayer : getRealPlayersNDummies()) {
+                if (otherPlayer.equals(player)) continue;
+
+                if (player.getDebtTokenCount(otherPlayer.getColor(), "lich") > 0
+                        && leaderID.contains(otherPlayer.getFaction())
+                        && otherPlayer.hasLeaderUnlocked(leaderID)) {
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 
@@ -4221,6 +4234,25 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 }
             }
         }
+
+        // Add the native commanders of players whose command tokens are in this debt pool.
+        if (player.hasLeaderUnlocked("revenantcommander")) {
+            for (Player otherPlayer : getRealPlayers()) {
+                if (otherPlayer.equals(player) || player.getDebtTokenCount(otherPlayer.getColor(), "lich") < 1) {
+                    continue;
+                }
+
+                Leader commander = otherPlayer.getLeaders().stream()
+                        .filter(leader -> Constants.COMMANDER.equals(leader.getType()))
+                        .filter(leader -> leader.getId().contains(otherPlayer.getFaction()))
+                        .findFirst()
+                        .orElse(null);
+                if (commander != null && !commander.isLocked()) {
+                    leaders.add(commander);
+                }
+            }
+        }
+
         leaders = leaders.stream()
                 .filter(leader -> leader != null && !leader.isLocked())
                 .collect(Collectors.toList());

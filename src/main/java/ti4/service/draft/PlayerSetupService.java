@@ -17,6 +17,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.luminous.opa.O
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesStartingTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -528,6 +529,12 @@ public class PlayerSetupService {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " added the 5 _Moon Phase_ cards to their play area.");
+        }
+        if (player.hasAbility("thrones_of_ruin")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Select the Throne planet you would like to place in your home system:");
+            ThronesAbilityHandler.getUnplacedThronePlanetButtons(event, game, player);
         }
         CardsInfoService.sendVariousAdditionalButtons(game, player);
 

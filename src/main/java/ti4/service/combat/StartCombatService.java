@@ -1453,6 +1453,15 @@ public class StartCombatService {
         if (thunderbirdProtocolP1 != null) buttons.add(thunderbirdProtocolP1);
         Button thunderbirdProtocolP2 = PonthousTechHandler.getThunderbirdProtocolButton(game, p2, tile);
         if (thunderbirdProtocolP2 != null) buttons.add(thunderbirdProtocolP2);
+
+        // Aeterna Hero
+        if (!tile.isHomeSystem() && p1.hasLeaderUnlocked("aeternahero")) {
+            buttons.add(AeternaLeadersHandler.getGravecallButton(game, p1, tile));
+        }
+        if (!tile.isHomeSystem() && p2.hasLeaderUnlocked("aeternahero")) {
+            buttons.add(AeternaLeadersHandler.getGravecallButton(game, p2, tile));
+        }
+
         return buttons;
     }
 
@@ -2224,6 +2233,16 @@ public class StartCombatService {
                     factionChecker + "purgeBastionHero_" + tile.getPosition(),
                     "Purge Bastion Hero",
                     FactionEmojis.Bastion));
+        }
+
+        // Aeterna commander
+        if (game.playerHasLeaderUnlockedOrAlliance(p1, "aeternacommander")) {
+            buttons.add(Buttons.gray(
+                    p1.factionButtonChecker() + "gainAeternaCCOnLoss", "Gain 1 CC (On Loss)", FactionEmojis.aeterna));
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(p2, "aeternacommander")) {
+            buttons.add(Buttons.gray(
+                    p2.factionButtonChecker() + "gainAeternaCCOnLoss", "Gain 1 CC (On Loss)", FactionEmojis.aeterna));
         }
 
         if (game.isLiberationC4Mode()) {

@@ -20,6 +20,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityHandler;
 import ti4.game.Game;
@@ -1269,6 +1270,12 @@ public class StartPhaseService {
                             p2.getRepresentationUnfogged() + ", you have the opportunity to use _Imperial Arbiter_.",
                             buttons);
                     hold.append((hold.isEmpty()) ? "" : " or ").append("_Imperial Arbiter_");
+                }
+                if (p2.hasAbility("allure_of_darkness")) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            p2.getCardsInfoThread(),
+                            p2.getRepresentation() + " please choose the player to place the _Lich_ token on:",
+                            RevenantLeadersHandler.offerLichTokenChoices(p2, game));
                 }
             }
         }
