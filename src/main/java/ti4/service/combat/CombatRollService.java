@@ -527,6 +527,26 @@ public class CombatRollService {
         CombatRollPayload payload = rollResult.payload().withHeader(rollHeader);
         FOWCombatThreadMirroring.mirrorCombatMessage(event, player, game, message);
         int h = rollResult.totalHits();
+        int renegadeCount = opponent.hasUnit("ponthous_destroyer2")
+                ? tile.getSpaceUnitHolder().getUnitCount(UnitType.Destroyer, opponent)
+                : 0;
+        if (rollType == CombatRollType.AFB && h > 0 && opponent != player && renegadeCount > 0) {
+            int canceledHits = Math.min(h, renegadeCount);
+            h -= canceledHits;
+            message = message.replaceFirst(
+                    "\\n\\*\\*Total hits \\d+\\*\\*[^\\n]*\\n", CombatMessageHelper.displayHitResults(h));
+            if (payload.total() != null) {
+                CombatRollPayload.RollTotal total = payload.total();
+                payload = new CombatRollPayload(
+                        payload.header(),
+                        payload.notes(),
+                        payload.modifiers(),
+                        payload.unitRolls(),
+                        new CombatRollPayload.RollTotal(total.diceRolled(), h, total.misses(), total.maximumHits()));
+            }
+            message += "\n_Renegade II_ canceled " + canceledHits + " ANTI-FIGHTER BARRAGE hit"
+                    + (canceledHits == 1 ? "" : "s") + " automatically.";
+        }
         int round;
         String combatName =
                 "combatRoundTracker" + opponent.getFaction() + tile.getPosition() + combatOnHolder.getName();

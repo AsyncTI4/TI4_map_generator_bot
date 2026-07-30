@@ -328,6 +328,13 @@ public class TacticalActionOutputService {
             if (player.hasTech("becrystrd")) {
                 output.append(" (has _Resonance Drive_ for +1 to each ship at capacity. This is not automated.");
             }
+            if (unit.unitType() == UnitType.Destroyer) {
+                if (player.ownsUnit("ponthous_destroyer2")) {
+                    output.append("**REMINDER**: Renegade II can only transport ground forces.");
+                } else if (player.ownsUnit("ponthous_destroyer")) {
+                    output.append("**REMINDER**: Renegade I can only transport infantry.");
+                }
+            }
         }
         if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
             GMService.logPlayerActivity(game, player, output.toString());

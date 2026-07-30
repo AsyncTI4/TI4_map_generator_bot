@@ -601,7 +601,8 @@ public class ComponentActionHelper {
                             "kolumeagent",
                             "crimsonagent",
                             "redcreussagent",
-                            "kryxosagent");
+                            "kryxosagent",
+                            "aeternaagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
                         String message = p1.getRepresentationUnfogged() + ", please choose the user of the agent.";

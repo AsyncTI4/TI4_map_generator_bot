@@ -130,7 +130,8 @@ public class OblivionLeadersHandler {
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                "Frontier token placed in system. The top card of the frontier deck has been sent to your cards info.");
+                "Frontier token has been placed in " + tilePos.getRepresentation()
+                        + ". The top card of the frontier deck has been sent to your cards info.");
 
         resolveAgentStep2(player, game);
     }

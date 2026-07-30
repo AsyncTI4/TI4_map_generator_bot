@@ -22,6 +22,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.ExhaustLeaderService;
 
@@ -574,5 +575,53 @@ public class RevenantLeadersHandler {
             }
         }
         return buttons;
+    }
+
+    // Lich token debt pool handling
+    public static List<Button> offerLichTokenChoices(Player player, Game game) {
+        List<Button> targets = new ArrayList<>();
+        for (Player target : game.getRealPlayersExcludingThis(player)) {
+            if (player.getDebtTokenCount(target.getColor(), "lich") >= 1) {
+                continue;
+            }
+
+            targets.add(Buttons.green(
+                    player.factionButtonChecker() + "selectLichTarget_" + target.getColor(),
+                    target.getFaction(),
+                    FactionEmojis.getFactionIcon(target.getFaction())));
+        }
+
+        return targets;
+    }
+
+    @ButtonHandler("selectLichTarget_")
+    public static void resolveAllureOfDarkness(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (game == null || player == null || !player.hasAbility("allure_of_darkness")) {
+            return;
+        }
+
+        String targetColor = buttonID.replace("selectLichTarget_", "");
+        Player target = game.getPlayerFromColorOrFaction(targetColor);
+        if (target == null) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Could not find player.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        for (Player targets : game.getRealPlayers()) {
+            player.clearAllDebtTokens(targets.getColor(), "lich");
+        }
+
+        game.setDebtPoolIcon("lich", FactionEmojis.revenant.emojiString());
+
+        player.addDebtTokens(targetColor, 1, "lich");
+
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " placed the lich token on " + target.getRepresentation()
+                        + "'s commander.");
+
+        ButtonHelper.deleteMessage(event);
     }
 }
