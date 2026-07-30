@@ -24,6 +24,7 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
     private Boolean isNova;
 
     private Boolean isScar;
+    private Boolean isFowVision;
     private List<String> aliasList;
     private List<Wormhole> wormholes;
     private ComponentSource source;
