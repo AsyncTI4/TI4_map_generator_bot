@@ -89,6 +89,6 @@ public class ArcanumLeadersHandler {
 
     private static String getCommanderFighterMessage(Player player) {
         return player.getRepresentation()
-                + ", you may use **Orthis Lithon, the Rune-Smith** to place 1 fighter in a system that contains 1 or more of your ships.";
+                + ", you may use Orthis Lithon, the Arcanum commander, to place 1 fighter in a system that contains 1 or more of your ships.";
     }
 }

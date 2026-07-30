@@ -37,9 +37,9 @@ public class MyrrUnitsHandler {
             return "";
         }
 
-        return "You have " + replicatorCount + " Replicator"
+        return "-# You have " + replicatorCount + " Replicator"
                 + (replicatorCount == 1 ? "" : "s")
                 + " in this system with a total PRODUCTION of " + replicatorProduction + ". "
-                + "A reminder that these units may only produce dreadnoughts or units of the same type as those it transported.\n";
+                + "These units may only produce dreadnoughts or unit types they transported.\n";
     }
 }

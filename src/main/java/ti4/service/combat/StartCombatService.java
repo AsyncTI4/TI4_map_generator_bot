@@ -32,7 +32,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousPromissoryHandler;
@@ -1530,6 +1532,8 @@ public class StartCombatService {
         if (p2.hasReadyBreakthrough("ponthousbt")) {
             buttons.add(PonthousBreakthroughHandler.getSelfDestructButton(p2, tile, groundOrSpace));
         }
+        AeternaPromissoryHandler.addFuneralServicesButton(game, p1, p2, tile, groundOrSpace, buttons);
+        AeternaPromissoryHandler.addFuneralServicesButton(game, p2, p1, tile, groundOrSpace, buttons);
 
         checkAndAddIncomprehensibleFormButton(game, p1, p2, isSpaceCombat, tile, buttons);
 
@@ -2235,12 +2239,14 @@ public class StartCombatService {
                     FactionEmojis.Bastion));
         }
 
-        // Aeterna commander
-        if (game.playerHasLeaderUnlockedOrAlliance(p1, "aeternacommander")) {
+        // Aeterna
+        if (game.playerHasLeaderUnlockedOrAlliance(p1, "aeternacommander")
+                && !AeternaLeadersHandler.hasUsedAeternaCommanderThisAction(game, p1)) {
             buttons.add(Buttons.gray(
                     p1.factionButtonChecker() + "gainAeternaCCOnLoss", "Gain 1 CC (On Loss)", FactionEmojis.aeterna));
         }
-        if (game.playerHasLeaderUnlockedOrAlliance(p2, "aeternacommander")) {
+        if (game.playerHasLeaderUnlockedOrAlliance(p2, "aeternacommander")
+                && !AeternaLeadersHandler.hasUsedAeternaCommanderThisAction(game, p2)) {
             buttons.add(Buttons.gray(
                     p2.factionButtonChecker() + "gainAeternaCCOnLoss", "Gain 1 CC (On Loss)", FactionEmojis.aeterna));
         }
@@ -2460,6 +2466,9 @@ public class StartCombatService {
                     }
                     if (isGroundCombat) {
                         BastionTechService.addProximaCombatButton(game, p1, p2, tile, unitH, buttons);
+                    }
+                    if (isGroundCombat && !ButtonHelper.isLawInPlay(game, "articles_war")) {
+                        AeternaUnitsHandler.getMausoleumButton(p, otherP, tile, unitH, buttons);
                     }
                 }
                 // Assimilate

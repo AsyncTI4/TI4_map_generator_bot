@@ -76,7 +76,7 @@ public class KairnTechHandler {
         game.removeStoredValue(FRAGMENT_WINDOW + player.getFaction());
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentationUnfogged() + ", choose which planet to explore using _Surveyor's Lens_:",
+                player.getRepresentationUnfogged() + ", please choose the planet to explore using _Surveyor's Lens_.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -112,7 +112,7 @@ public class KairnTechHandler {
         player.exhaustTech(SURVEYORS_LENS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentationUnfogged() + ", choose how to explore " + planet.getRepresentation(game)
+                player.getRepresentationUnfogged() + ", please choose how to explore " + planet.getRepresentation(game)
                         + " using _Surveyor's Lens_.",
                 buttons);
         ButtonHelper.deleteMessage(event);

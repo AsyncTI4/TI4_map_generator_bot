@@ -84,7 +84,7 @@ public class RevenantBreakthroughHandler {
                 player.getCardsInfoThread(),
                 player.getRepresentation()
                         + ", instead of exhausting _Revenant Rising_, you may purge another attached agent."
-                        + " This will ready _Revenant Rising_.",
+                        + " This readies _Revenant Rising_.",
                 buttons);
     }
 
@@ -116,7 +116,7 @@ public class RevenantBreakthroughHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", choose an agent attached to _Revenant Rising_ to purge.",
+                player.getRepresentation() + ", please choose an agent attached to _Revenant Rising_ to purge.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }

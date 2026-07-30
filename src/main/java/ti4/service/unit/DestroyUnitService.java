@@ -21,7 +21,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
@@ -179,8 +181,9 @@ public class DestroyUnitService {
             AeternaTechHandler.offerThanatocyteLattice(event, game, units);
         }
         AeternaAbilityHandler.offerCycleOfReclamationCapture(event, game, units, combat);
-
-        // Would normally gate the hook, but I loop and check for ability in the handler
+        AeternaUnitsHandler.addCryptControlTokenForDestroyedFighters(game, units);
+        AeternaUnitsHandler.offerGraveyardEffectsForDestroyedUnits(event, game, units);
+        AeternaPromissoryHandler.rollForStasisFighters(event, game, units);
         CrystellumAbilityHandler.offerFragmentationForBatchIfRelevant(event, game, units, combat);
 
         // Handle other destroyed units individually

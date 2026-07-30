@@ -122,7 +122,7 @@ public class ArdentiaUnitHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", choose a planet to commit 1 mech and 1 infantry from your reinforcements to for 3 influence.",
+                        + ", please choose a planet on which to place 1 mech and 1 infantry from your reinforcements for 3 influence.",
                 buttons);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }

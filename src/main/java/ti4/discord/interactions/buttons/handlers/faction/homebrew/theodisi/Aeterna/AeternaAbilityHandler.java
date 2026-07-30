@@ -69,7 +69,7 @@ public class AeternaAbilityHandler {
         if (minimumCost == 0
                 || !player.hasRelicReady(relic)
                 || !canReturnCapturedNeutralUnits(game, player, minimumCost)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "This Moon Phase relic cannot be used right now.");
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "This moon phase relic cannot be used right now.");
             return;
         }
 
@@ -157,14 +157,14 @@ public class AeternaAbilityHandler {
             return;
         }
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), "Choose a planet for the structure:", buttons);
+                event.getMessageChannel(), "Please choose a planet on which to place the structure.", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("newMoonChoose")
     public static void chooseNewMoon(ButtonInteractionEvent event, Game game, Player player) {
         if (!player.isActivePlayer() || !player.hasRelicReady(NEW_MOON)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "New Moon may only be used during your action.");
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "_New Moon_ may only be used during your action.");
             return;
         }
 
@@ -175,7 +175,7 @@ public class AeternaAbilityHandler {
         buttons.add(Buttons.green(player.factionButtonChecker() + "newMoonCapture", "Capture 1 Neutral Cruiser"));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), "Choose an effect for _New Moon_:", buttons);
+                event.getMessageChannel(), "Please choose an effect for _New Moon_.", buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -201,7 +201,7 @@ public class AeternaAbilityHandler {
                         "Place " + unitKey.humanReadableName()))
                 .toList();
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), "Choose the captured neutral unit to place:", buttons);
+                event.getMessageChannel(), "Please choose the captured neutral unit to place.", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -219,7 +219,7 @@ public class AeternaAbilityHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                "Choose a system for the neutral unit:",
+                "Please choose a system in which to place the neutral unit.",
                 NewStuffHelper.buttonPagination(
                         buttons, player.factionButtonChecker() + "newMoonSystem_" + unitID + "|", 0));
         ButtonHelper.deleteMessage(event);
@@ -230,7 +230,7 @@ public class AeternaAbilityHandler {
         if (!player.isActivePlayer() || !player.hasRelicReady(NEW_MOON)) return;
         String[] parts = buttonID.substring("newMoonSystem_".length()).split("\\|", 2);
         if (parts.length != 2) return;
-        String message = "Choose a system for the neutral unit:";
+        String message = "Please choose a system in which to place the neutral unit.";
         List<Button> systemButtons = getNewMoonSystemButtons(game, player, parts[0]);
         String buttonPrefix = player.factionButtonChecker() + "newMoonSystem_" + parts[0] + "|";
         if (NewStuffHelper.checkAndHandlePaginationChange(
@@ -279,7 +279,7 @@ public class AeternaAbilityHandler {
                     event, aeterna.getNomboxTile(), game, game.getNeutral().getColor(), "1 destroyer");
             MessageHelper.sendMessageToChannel(
                     aeterna.getCorrectChannel(),
-                    aeterna.getRepresentation() + " captured 1 neutral destroyer with _Cycle of Reclamation_.");
+                    aeterna.getRepresentation() + " captured 1 neutral destroyer with **Cycle of Reclamation**.");
         }
     }
 
@@ -295,8 +295,8 @@ public class AeternaAbilityHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", return captured neutral units worth " + getMoonReturnMinimumCost(relic)
-                        + "+ total cost (currently " + formatCost(paid) + "): ",
+                player.getRepresentation() + ", please choose captured neutral units to return with a combined cost of "
+                        + getMoonReturnMinimumCost(relic) + " or more (currently " + formatCost(paid) + ").",
                 buttons);
     }
 
@@ -305,7 +305,7 @@ public class AeternaAbilityHandler {
             case FULL_MOON -> {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + ", choose the structure to place due to _Full Moon_:",
+                        player.getRepresentation() + ", please choose the structure to place due to _Full Moon_.",
                         List.of(
                                 Buttons.green(
                                         player.factionButtonChecker() + "fullMoonStructure_sd", "Place 1 Space Dock"),
@@ -318,14 +318,15 @@ public class AeternaAbilityHandler {
             case WANING_MOON ->
                 MessageHelper.sendMessageToChannelWithButton(
                         player.getCardsInfoThread(),
-                        player.getRepresentation() + ", research 1 technology due to _Waning Moon_:",
+                        player.getRepresentation() + ", please choose a technology to research due to _Waning Moon_.",
                         Buttons.green(
                                 player.factionButtonChecker() + "getAllTechOfType_allTechResearchable_noPay",
                                 "Research a Technology"));
             case LUNAR_ECLIPSE ->
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + ", gain 1 command token due to _Lunar Eclipse_:",
+                        player.getRepresentation()
+                                + ", please choose where to gain 1 command token due to _Lunar Eclipse_.",
                         ButtonHelper.getGainCCButtons(player));
             default -> {}
         }

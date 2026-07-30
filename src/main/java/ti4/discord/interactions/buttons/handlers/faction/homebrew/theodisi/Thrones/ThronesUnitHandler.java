@@ -76,8 +76,8 @@ public class ThronesUnitHandler {
             return;
         }
 
-        String message =
-                player.getRepresentation() + ", choose a system containing a planet you control to place _Aurelion_.";
+        String message = player.getRepresentation()
+                + ", please choose a system containing a planet you control on which to place an Aurelion.";
         String buttonPrefix = player.factionButtonChecker() + PLACE_AURELION;
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
@@ -91,8 +91,8 @@ public class ThronesUnitHandler {
         }
 
         List<Button> buttons = getAurelionPlacementButtons(game, player);
-        String message =
-                player.getRepresentation() + ", choose a system containing a planet you control to place _Aurelion_.";
+        String message = player.getRepresentation()
+                + ", please choose a system containing a planet you control on which to place an Aurelion.";
         String buttonPrefix = player.factionButtonChecker() + PLACE_AURELION;
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), buttons, message, buttonPrefix, buttonID)) {
