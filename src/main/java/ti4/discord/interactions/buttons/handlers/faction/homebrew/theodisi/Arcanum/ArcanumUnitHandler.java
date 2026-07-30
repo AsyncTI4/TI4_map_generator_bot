@@ -59,7 +59,7 @@ public class ArcanumUnitHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation() + ", you may place " + prereqs
-                        + " infantry on a planet that contains one of your mechs due to _Rune-Bound Sentinel_.",
+                        + " infantry on a planet that contains a Rune-Bound Sentinel (Arcanum mech).",
                 buttons);
     }
 
@@ -92,7 +92,7 @@ public class ArcanumUnitHandler {
         }
 
         if (tech == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve tech name.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve the technology.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -121,6 +121,6 @@ public class ArcanumUnitHandler {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " placed " + prereqs + " infantry on "
-                        + Helper.getPlanetRepresentation(planetName, game) + " using _Rune-Bound Sentinel_.");
+                        + Helper.getPlanetRepresentation(planetName, game) + " using a Rune-Bound Sentinel (Arcanum mech).");
     }
 }

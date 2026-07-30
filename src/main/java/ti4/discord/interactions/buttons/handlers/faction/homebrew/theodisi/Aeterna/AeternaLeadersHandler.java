@@ -44,7 +44,7 @@ public class AeternaLeadersHandler {
             return null;
         }
 
-        return Buttons.green(player.factionButtonChecker() + UNLOCK, "Unlock Vorun Kael", FactionEmojis.aeterna);
+        return Buttons.green(player.factionButtonChecker() + UNLOCK, "Unlock Aeterna Commander", FactionEmojis.aeterna);
     }
 
     @ButtonHandler(UNLOCK)
@@ -65,7 +65,7 @@ public class AeternaLeadersHandler {
     public static Button getGravecallButton(Game game, Player player, Tile tile) {
         return Buttons.gray(
                 player.factionButtonChecker() + PURGE_HERO + tile.getPosition(),
-                "Purge Gravecall",
+                "Use Gravecall",
                 FactionEmojis.aeterna);
     }
 
@@ -187,8 +187,9 @@ public class AeternaLeadersHandler {
     }
 
     private static String getGravecallDestroyMessage(Player player, int requiredCost, float destroyedCost) {
-        return player.getRepresentationNoPing() + ", destroy ships with a total cost of " + requiredCost
-                + " or more for _Gravecall_. Destroyed cost: " + formatCost(destroyedCost) + "/" + requiredCost + ".";
+        return player.getRepresentationNoPing() + ", please choose ships to destroy with a combined cost of "
+                + requiredCost + " or more for _Gravecall_. Destroyed cost: " + formatCost(destroyedCost) + "/"
+                + requiredCost + ".";
     }
 
     private static String formatCost(float cost) {
@@ -206,7 +207,10 @@ public class AeternaLeadersHandler {
         }
         game.setStoredValue(COMMANDER_USED_ACTION + player.getFaction(), "true");
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), "Gain 1 CC due to _Vorun Kael_:", ButtonHelper.getGainCCButtons(player));
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + ", please choose where to gain 1 command token due to "
+                        + "Vorun Kael, the Aeterna commander.",
+                ButtonHelper.getGainCCButtons(player));
 
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
@@ -237,7 +241,8 @@ public class AeternaLeadersHandler {
     public static void startAeternaAgent(Game game, Player player) {
         List<Button> buttons = getAeternaAgentShipButtons(game, player);
         String prefix = player.factionButtonChecker() + SELECT_AGENT_SHIP;
-        String message = player.getRepresentationNoPing() + ", choose a non-fighter ship to destroy for Morwen Deyth:";
+        String message = player.getRepresentationNoPing()
+                + ", please choose a non-fighter ship to destroy for Morwen Deyth, the Aeterna agent.";
 
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -261,7 +266,8 @@ public class AeternaLeadersHandler {
         if (game == null || player == null) return;
 
         List<Button> buttons = getAeternaAgentShipButtons(game, player);
-        String message = player.getRepresentationNoPing() + ", choose a non-fighter ship to destroy for Morwen Deyth:";
+        String message = player.getRepresentationNoPing()
+                + ", please choose a non-fighter ship to destroy for Morwen Deyth, the Aeterna agent.";
         String prefix = player.factionButtonChecker() + SELECT_AGENT_SHIP;
         List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
         if (NewStuffHelper.checkAndHandlePaginationChange(
@@ -287,9 +293,9 @@ public class AeternaLeadersHandler {
 
         List<Button> systemButtons = getAeternaAgentSystemButtons(game, player, sourceTile, unit.getBaseType());
         String resultMessage = player.getRepresentationNoPing() + " destroyed 1 " + unitKey.humanReadableName()
-                + " and gained 2 trade goods from Morwen Deyth.";
-        String systemMessage = player.getRepresentationNoPing() + " may place 1 neutral " + unit.getBaseType()
-                + " in an eligible adjacent system:";
+                + " and gained 2 trade goods from Morwen Deyth, the Aeterna agent.";
+        String systemMessage = player.getRepresentationNoPing() + ", please choose an eligible adjacent system in which"
+                + " to place 1 neutral " + unit.getBaseType() + ".";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), resultMessage);
         if (systemButtons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -320,8 +326,8 @@ public class AeternaLeadersHandler {
         if (sourceTile == null) return;
 
         List<Button> systemButtons = getAeternaAgentSystemButtons(game, player, sourceTile, payload[1]);
-        String systemMessage = player.getRepresentationNoPing() + " may place 1 neutral " + payload[1]
-                + " in an eligible adjacent system:";
+        String systemMessage = player.getRepresentationNoPing() + ", please choose an eligible adjacent system in which"
+                + " to place 1 neutral " + payload[1] + ".";
         String systemPrefix = player.factionButtonChecker() + SELECT_AGENT_SYSTEM + payload[0] + "|" + payload[1] + "|";
         List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
         if (NewStuffHelper.checkAndHandlePaginationChange(
@@ -342,7 +348,8 @@ public class AeternaLeadersHandler {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " placed 1 neutral " + payload[1] + " in "
-                        + destination.getRepresentationForButtons(game, player) + " with Morwen Deyth.");
+                        + destination.getRepresentationForButtons(game, player)
+                        + " with Morwen Deyth, the Aeterna agent.");
         ButtonHelper.deleteMessage(event);
     }
 

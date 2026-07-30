@@ -56,7 +56,7 @@ public class AeternaUnitsHandler {
         combatButtons.add(Buttons.red(
                 player.factionButtonChecker() + MAUSOLEUM_DESTROY + tile.getPosition() + "|" + holder.getName() + "|"
                         + opponent.getFaction(),
-                "Use Walking Mausoleum (End of Round)",
+                "Use Walking Mausoleum",
                 FactionEmojis.aeterna));
     }
 
@@ -106,7 +106,7 @@ public class AeternaUnitsHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + ", choose a Walking Mausoleum to destroy:",
+                player.getRepresentationNoPing() + ", please choose a Walking Mausoleum to destroy.",
                 buttons);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
@@ -153,8 +153,8 @@ public class AeternaUnitsHandler {
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " destroyed 1 Walking Mausoleum and destroyed " + infantryDestroyed
-                        + " of " + opponent.getRepresentationNoPing() + "'s infantry.");
+                player.getRepresentationNoPing() + " destroyed a Walking Mausoleum (Aeterna mech) and "
+                        + infantryDestroyed + " of " + opponent.getRepresentationNoPing() + "'s infantry.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -217,7 +217,7 @@ public class AeternaUnitsHandler {
                                 player.getCorrectChannel(),
                                 player.getRepresentationNoPing() + ", use _Graveyard " + (graveyardII ? "II" : "I")
                                         + "_ at " + getGraveyardLocation(game, player, dockTile, dockHolder)
-                                        + " for the destroyed " + unitType.humanReadableName() + ":",
+                                        + " for the destroyed " + unitType.humanReadableName() + ".",
                                 buttons);
                     }
                 }
@@ -340,7 +340,7 @@ public class AeternaUnitsHandler {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationNoPing() + " could not produce a " + unitType.humanReadableName()
-                            + " with _Graveyard_ because it is not available.");
+                            + " with _Graveyard_ because none are available.");
             return;
         }
 
@@ -360,9 +360,9 @@ public class AeternaUnitsHandler {
                             FactionEmojis.aeterna));
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentationNoPing() + ", choose where _Graveyard_ at "
+                    player.getRepresentationNoPing() + ", please choose where _Graveyard_ at "
                             + getGraveyardLocation(game, player, dockTile, dockHolder) + " produces the "
-                            + unit.getName() + ":",
+                            + unit.getName() + ".",
                     buttons);
             return;
         }

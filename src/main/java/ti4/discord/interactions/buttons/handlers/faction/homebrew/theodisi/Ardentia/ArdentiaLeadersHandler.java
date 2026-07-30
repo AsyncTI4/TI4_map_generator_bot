@@ -40,7 +40,7 @@ public class ArdentiaLeadersHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),
                 player.getRepresentation()
-                        + ", please select the player that will spend 1 influence to gain 1 command token:",
+                        + ", please choose the player who will spend 1 influence to gain 1 command token.",
                 buttons);
     }
 
@@ -65,7 +65,7 @@ public class ArdentiaLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),
-                targetPlayer.getRepresentation() + ", please use the buttons below to spend 1 influence:",
+                targetPlayer.getRepresentation() + ", please choose how to spend 1 influence.",
                 buttons);
     }
 
@@ -78,12 +78,12 @@ public class ArdentiaLeadersHandler {
         ButtonHelper.deleteMessage(event);
 
         MessageHelper.sendMessageToChannelWithButtons(
-                game.getActionsChannel(), "Use these buttons to gain 1 CC:", ButtonHelper.getGainCCButtons(player));
+                game.getActionsChannel(), "Please choose where to gain 1 command token.", ButtonHelper.getGainCCButtons(player));
 
         if (player.hasAbility("seize_command")) {
             MessageHelper.sendMessageToChannelWithButton(
                     game.getActionsChannel(),
-                    "You may use _Seize Command_:",
+                    "You may use **Seize Command**.",
                     ArdentiaAbilityHandler.getSeizeCommandButton(player));
         }
     }
@@ -108,7 +108,7 @@ public class ArdentiaLeadersHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", you may remove a CC from a system containing another player's CC to gain 1 CC and 1 TG per other player's CC removed:",
+                        + ", you may remove another player's command token from a system to gain 1 command token and 1 trade good for each other player's command token removed.",
                 targets);
     }
 
@@ -141,8 +141,8 @@ public class ArdentiaLeadersHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", choose which of " + target.getRepresentationNoPing()
-                        + "'s command token to return to reinforcements:",
+                        + ", please choose which of " + target.getRepresentationNoPing()
+                        + "'s command tokens to return to reinforcements.",
                 tileButtons);
 
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -176,7 +176,7 @@ public class ArdentiaLeadersHandler {
         }
         if (!tilePos.hasPlayerCC(target)) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Selected player does not have a CC in that system.");
+                    event.getMessageChannel(), "The selected player does not have a command token in that system.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -196,7 +196,8 @@ public class ArdentiaLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                "Please gain 1 CC from removing " + target.getRepresentationNoPing() + "'s CC from the chosen system.",
+                "Please choose where to gain 1 command token for removing "
+                        + target.getRepresentationNoPing() + "'s command token from the chosen system.",
                 ButtonHelper.getGainCCButtons(player));
 
         ButtonHelper.deleteMessage(event);

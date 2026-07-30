@@ -81,7 +81,7 @@ public class RevenantLeadersHandler {
     public static void useRevArcanumAgent(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Leader agent = player.getLeader(REVARCAGENT).orElse(null);
         if (agent == null || !player.hasUnexhaustedLeader(REVARCAGENT)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "_Runebearer Lothos_ is no longer available.");
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Runebearer Lothos, the Revenant agent, is no longer available.");
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             return;
         }
@@ -106,7 +106,8 @@ public class RevenantLeadersHandler {
             }
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + ", choose a player to use _Runebearer Lothos_ on.",
+                    player.getRepresentationUnfogged()
+                            + ", please choose a player on whom to use Runebearer Lothos, the Revenant agent.",
                     targetButtons);
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             return;
@@ -156,7 +157,7 @@ public class RevenantLeadersHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),
-                explorer.getRepresentation() + ", choose a planet to explore with _Runebearer Lothos_.",
+                explorer.getRepresentation() + ", please choose a planet to explore with Runebearer Lothos, the Revenant agent.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -194,8 +195,8 @@ public class RevenantLeadersHandler {
                         ExploreEmojis.Industrial));
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),
-                player.getRepresentation() + ", choose how to explore " + planet.getRepresentation(game)
-                        + " with _Runebearer Lothos_.",
+                player.getRepresentation() + ", please choose how to explore " + planet.getRepresentation(game)
+                        + " with Runebearer Lothos, the Revenant agent.",
                 traitButtons);
         ButtonHelper.deleteMessage(event);
     }
@@ -284,7 +285,7 @@ public class RevenantLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", choose 1 exploration card to resolve with _Arlir Mirrored_.",
+                player.getRepresentation() + ", please choose 1 exploration card to resolve with Arlir Mirrored, the Revenant commander.",
                 List.of(originalCard.getRepresentationEmbed(), secondCard.getRepresentationEmbed()),
                 buttons);
 
@@ -326,7 +327,7 @@ public class RevenantLeadersHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", choose up to 1 card from each exploration discard pile to shuffle into its deck.",
+                        + ", please choose up to 1 card from each exploration discard pile to shuffle into its deck.",
                 buttons);
     }
 
@@ -363,7 +364,7 @@ public class RevenantLeadersHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", choose an exploration card from the " + StringUtils.capitalize(trait)
+                player.getRepresentation() + ", please choose an exploration card from the " + StringUtils.capitalize(trait)
                         + " discard pile.",
                 displayedButtons);
 
@@ -402,7 +403,7 @@ public class RevenantLeadersHandler {
         List<Button> buttons = getRevKairnExploreDiscardButtons(game, player, trait, buttonPrefix);
         List<Button> extraButtons =
                 List.of(Buttons.red(player.factionButtonChecker() + BACK_TO_REV_KAIRN_DECKS, "Back to Discard Piles"));
-        String message = player.getRepresentation() + ", choose an exploration card from the "
+        String message = player.getRepresentation() + ", please choose an exploration card from the "
                 + StringUtils.capitalize(trait) + " discard pile.";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), buttons, extraButtons, message, buttonPrefix, buttonID)) {
@@ -477,7 +478,7 @@ public class RevenantLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", choose a trait to explore for _Zairos the First_:",
+                player.getRepresentation() + ", please choose a trait to explore for Zairos the First, the Revenant hero.",
                 buttons);
     }
 
@@ -508,8 +509,8 @@ public class RevenantLeadersHandler {
             return;
         }
 
-        String message = player.getRepresentation() + ", choose a " + StringUtils.capitalize(trait)
-                + " planet to explore for _Zairos the First_.";
+        String message = player.getRepresentation() + ", please choose a " + StringUtils.capitalize(trait)
+                + " planet to explore for Zairos the First, the Revenant hero.";
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
         ButtonHelper.deleteMessage(event);
@@ -535,7 +536,7 @@ public class RevenantLeadersHandler {
             }
         }
 
-        String message = player.getRepresentation() + ", choose a " + StringUtils.capitalize(trait)
+        String message = player.getRepresentation() + ", please choose a " + StringUtils.capitalize(trait)
                 + " planet to explore for _Zairos the First_.";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), buttons, message, buttonPrefix, buttonID)) {

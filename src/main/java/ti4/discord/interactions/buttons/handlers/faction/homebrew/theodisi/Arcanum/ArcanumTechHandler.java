@@ -73,7 +73,7 @@ public class ArcanumTechHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", choose 1 purged exploration card to shuffle into its deck.",
+                player.getRepresentation() + ", please choose 1 purged exploration card to shuffle into its deck.",
                 displayedButtons);
     }
 
@@ -86,7 +86,7 @@ public class ArcanumTechHandler {
 
         List<Button> buttons = getPurgedExploreButtons(game, player);
         String buttonPrefix = player.factionButtonChecker() + SHUFFLE_PURGED_EXPLORE;
-        String message = player.getRepresentation() + ", choose 1 purged exploration card to shuffle into its deck.";
+        String message = player.getRepresentation() + ", please choose 1 purged exploration card to shuffle into its deck.";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), buttons, message, buttonPrefix, buttonID)) {
             return;
@@ -170,7 +170,7 @@ public class ArcanumTechHandler {
         }
         buttons.add(done);
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), player.getRepresentation() + ", choose a planet to explore.", buttons);
+                event.getMessageChannel(), player.getRepresentation() + ", please choose a planet to explore.", buttons);
     }
 
     // Forbidden Knowledge
@@ -226,7 +226,7 @@ public class ArcanumTechHandler {
                 player.getRepresentationUnfogged()
                         + ", you may exhaust _Sigil of Transmutation_ to give "
                         + tile.getRepresentationForButtons(game, player)
-                        + " **SPACE CANNON 5 (x3)** and **PRODUCTION 3** for this tactical action.\n\nThis is technically the wrong timing. In async, this needs to be prompted on system activation so production buttons appear. A reminder that ships **MUST BE MOVED** in order to exhaust this tech.",
+                        + " **SPACE CANNON 5 (x3)** and **PRODUCTION 3** for this tactical action.\n-# Ships must be moved to exhaust this technology.",
                 List.of(
                         Buttons.blue(
                                 player.factionButtonChecker() + USE_SIGIL_OF_TRANSMUTATION,
@@ -330,7 +330,7 @@ public class ArcanumTechHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", use these buttons to resolve _Power Word: Miracle_:",
+                player.getRepresentation() + ", please choose an effect for _Power Word: Miracle_.",
                 buttons);
     }
 
@@ -357,7 +357,7 @@ public class ArcanumTechHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentation() + ", please discard an action card:",
+                player.getRepresentation() + ", please choose an action card to discard.",
                 discardButtons);
     }
 
@@ -397,7 +397,7 @@ public class ArcanumTechHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", use these buttons to gain 1 command token:",
+                player.getRepresentation() + ", please choose where to gain 1 command token.",
                 ButtonHelper.getGainCCButtons(player));
     }
 
@@ -424,7 +424,7 @@ public class ArcanumTechHandler {
         }
 
         String message =
-                player.getRepresentation() + ", choose planets to place up to 4 infantry with _Power Word: Miracle_.";
+                player.getRepresentation() + ", please choose planets on which to place up to 4 infantry with _Power Word: Miracle_.";
         String buttonPrefix = player.factionButtonChecker() + PLACE_INFANTRY + round + "_";
         Button done = Buttons.red(player.factionButtonChecker() + FINISH_INFANTRY + round, "Done Placing Infantry");
         List<Button> displayedButtons = planetButtons.size() < 25
@@ -470,7 +470,7 @@ public class ArcanumTechHandler {
 
         List<Button> planetButtons = getMiracleInfantryButtons(game, player, round);
         String message =
-                player.getRepresentation() + ", choose planets to place up to 4 infantry with _Power Word: Miracle_.";
+                player.getRepresentation() + ", please choose planets on which to place up to 4 infantry with _Power Word: Miracle_.";
         String buttonPrefix = player.factionButtonChecker() + PLACE_INFANTRY + round + "_";
         Button done = Buttons.red(player.factionButtonChecker() + FINISH_INFANTRY + round, "Done Placing Infantry");
         String planetName = placementData.substring(separator + 1);

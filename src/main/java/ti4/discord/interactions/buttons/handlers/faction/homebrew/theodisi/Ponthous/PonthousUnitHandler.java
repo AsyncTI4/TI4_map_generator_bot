@@ -48,7 +48,8 @@ public class PonthousUnitHandler {
     public static void useOldGlorySustain(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.substring(USE_OLD_GLORY_SUSTAIN.length()));
         if (tile == null || !canResolveOldGlorySustain(player, tile)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Old Glory cannot use this ability right now.");
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "The Old Glory (the Ponthous flagship) cannot use this ability right now.");
             return;
         }
 
@@ -68,7 +69,7 @@ public class PonthousUnitHandler {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing()
-                        + " damaged _Old Glory_. "
+                        + " damaged the Old Glory (the Ponthous flagship). "
                         + fightersToGrantSustain
                         + " fighter"
                         + (fightersToGrantSustain == 1 ? " gains" : "s gain")
@@ -151,7 +152,7 @@ public class PonthousUnitHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", you may pay 1 resource to place 2 infantry on the destroyed mechs planet.",
+                        + ", you may pay 1 resource to place 2 infantry on the planet that contained the destroyed mech.",
                 buttons);
     }
 
@@ -172,7 +173,7 @@ public class PonthousUnitHandler {
         String planetName = buttonID.replace(USE_DRAGOONS, "");
         Tile tile = game.getTileFromPlanet(planetName);
         if (planetName == null || tile == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not locate mechs planet.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not locate the mech's planet.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -183,7 +184,7 @@ public class PonthousUnitHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + " please pay the 1 resource to place 2 infantry on this planet:",
+                player.getRepresentation() + ", please choose how to pay 1 resource to place 2 infantry on this planet.",
                 buttons);
 
         ButtonHelper.deleteMessage(event);

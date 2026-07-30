@@ -109,8 +109,8 @@ public class AeternaPromissoryHandler {
 
             MessageHelper.sendMessageToChannel(
                     owner.getCorrectChannel(),
-                    owner.getRepresentationNoPing() + " rolled " + rolls + " for their destroyed fighters; " + successes
-                            + " entered stasis.");
+                    owner.getRepresentationNoPing() + " rolled " + rolls + " for _Funeral Services_; " + successes
+                            + " fighter" + (successes == 1 ? "" : "s") + " entered stasis.");
         }
     }
 
@@ -154,7 +154,8 @@ public class AeternaPromissoryHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationNoPing() + ", place 1 fighter from stasis. You have " + count + " remaining:",
+                player.getRepresentationNoPing() + ", please choose a system in which to place 1 fighter from stasis."
+                        + " You have " + count + " remaining.",
                 buttons);
     }
 

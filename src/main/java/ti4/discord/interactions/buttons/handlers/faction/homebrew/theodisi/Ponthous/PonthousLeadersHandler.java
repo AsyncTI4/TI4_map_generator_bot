@@ -59,7 +59,7 @@ public class PonthousLeadersHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged()
-                        + ", choose the player to use _General Caelyn_, the Ponthous agent, on.",
+                        + ", please choose the player on whom to use General Caelyn, the Ponthous agent.",
                 buttons);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
@@ -84,7 +84,7 @@ public class PonthousLeadersHandler {
         ExhaustLeaderService.exhaustLeader(game, agentOwner, agent);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                agentOwner.getRepresentation() + " exhausted _General Caelyn_, the Ponthous agent, on "
+                agentOwner.getRepresentation() + " exhausted General Caelyn, the Ponthous agent, on "
                         + target.getRepresentation() + ".");
 
         AddUnitService.addUnits(event, tile, game, target.getColor(), "2 fighter, 2 infantry");
@@ -119,7 +119,7 @@ public class PonthousLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", please select the planet you wish to use for _Star-Sacrifice_:",
+                player.getRepresentation() + ", please choose the planet to use for _Star-Sacrifice_.",
                 planets);
     }
 
@@ -166,8 +166,8 @@ public class PonthousLeadersHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 "Destroyed all units on " + planet.getRepresentation(game)
-                        + ", purged all its attachments, and its planet card. Please choose the adjacent system you would like to produce "
-                        + h + " hit" + (h == 1 ? "" : "s") + " in:",
+                        + ", purged all its attachments, and its planet card. Please choose the adjacent system in which to produce "
+                        + h + " hit" + (h == 1 ? "" : "s") + ".",
                 buttons);
 
         ButtonHelper.deleteMessage(event);
@@ -207,7 +207,7 @@ public class PonthousLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                opponent.getRepresentationUnfogged() + ", assign " + hits + " produced hit" + (hits == 1 ? "" : "s")
+                opponent.getRepresentationUnfogged() + ", please assign " + hits + " produced hit" + (hits == 1 ? "" : "s")
                         + ". These hits are produced against your non-fighter ships.",
                 hitButtons);
 

@@ -42,7 +42,7 @@ public class ArdentiaBreakthroughHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", choose the player whose CC you will remove for _Subjugate_:",
+                player.getRepresentation() + ", please choose the player whose command token to remove for _Subjugate_.",
                 targets);
     }
 
@@ -71,8 +71,8 @@ public class ArdentiaBreakthroughHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", choose which of " + target.getRepresentationNoPing()
-                        + "'s command token to return to reinforcements:",
+                        + ", please choose which of " + target.getRepresentationNoPing()
+                        + "'s command tokens to return to reinforcements.",
                 tileButtons);
         ButtonHelper.deleteMessage(event);
     }
@@ -105,7 +105,7 @@ public class ArdentiaBreakthroughHandler {
         }
         if (!tilePos.hasPlayerCC(target)) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Selected player does not have a CC in that system.");
+                    event.getMessageChannel(), "The selected player does not have a command token in that system.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -116,7 +116,7 @@ public class ArdentiaBreakthroughHandler {
                 "Done Paying 3 Influence"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", please use the buttons below to pay 3 influence:",
+                player.getRepresentation() + ", please choose how to pay 3 influence.",
                 paymentButtons);
         ButtonHelper.deleteMessage(event);
     }

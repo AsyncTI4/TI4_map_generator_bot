@@ -47,7 +47,7 @@ public class XytherisLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 activPlayer.getCorrectChannel(),
-                activPlayer.getRepresentationUnfogged() + ", you may exhaust _Myrix, the Wax-Sealed_.",
+                activPlayer.getRepresentationUnfogged() + ", you may exhaust Myrix, the Xytheris agent.",
                 List.of(
                         Buttons.green(activPlayer.factionButtonChecker() + USE_MYRIX_AGENT, "Use Myrix"),
                         Buttons.red(activPlayer.factionButtonChecker() + "deleteButtons", "Decline")));
@@ -62,7 +62,7 @@ public class XytherisLeadersHandler {
                 || target == null
                 || target != game.getActivePlayer()) {
             MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "_Myrix, the Wax-Sealed_ can only be used immediately after a player activates a system.");
+                    event, "Myrix, the Xytheris agent, can only be used immediately after a player activates a system.");
             return;
         }
 
@@ -95,7 +95,7 @@ public class XytherisLeadersHandler {
         game.setStoredValue(MYRIX_AGENT_PENDING, target.getFaction());
         List<Button> buttons = new ArrayList<>(buttonsByUnitLocation.values());
         String prompt = target.getRepresentationUnfogged()
-                + ", choose a ship to gain capacity and PRODUCTION from _Myrix, the Wax-Sealed_.";
+                + ", please choose a ship to gain capacity and PRODUCTION from Myrix, the Xytheris agent.";
         for (int index = 0; index < buttons.size(); index += 25) {
             MessageHelper.sendMessageToChannelWithButtons(
                     target.getCorrectChannel(), prompt, buttons.subList(index, Math.min(index + 25, buttons.size())));
@@ -131,7 +131,7 @@ public class XytherisLeadersHandler {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + " selected " + unit.getUnitEmoji() + " " + unit.getName()
-                        + " for _Myrix, the Wax-Sealed_ (+" + abilityCount
+                        + " for Myrix, the Xytheris agent (+" + abilityCount
                         + " capacity and PRODUCTION; it will move before identical ships).");
         ButtonHelper.deleteMessage(event);
     }

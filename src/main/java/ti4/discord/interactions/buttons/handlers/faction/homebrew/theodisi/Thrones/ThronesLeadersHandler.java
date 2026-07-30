@@ -73,7 +73,7 @@ public class ThronesLeadersHandler {
         MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
                 event,
                 agentOwner.getRepresentationUnfogged()
-                        + ", choose the player whose destroyed ship **Malrik the Defiler** should place.",
+                        + ", please choose the player whose destroyed ship Malrik the Defiler, the Thrones agent, should place.",
                 buttons);
     }
 
@@ -111,7 +111,7 @@ public class ThronesLeadersHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCorrectChannel(),
                 target.getRepresentationUnfogged()
-                        + ", choose which destroyed ship **Malrik the Defiler** should place.",
+                        + ", please choose which destroyed ship Malrik the Defiler, the Thrones agent, should place.",
                 buttons);
         MessageHelper.sendEphemeralMessageToEventChannel(
                 event, "Sent ship-choice buttons to " + target.getRepresentationUnfoggedNoPing() + ".");
@@ -142,7 +142,7 @@ public class ThronesLeadersHandler {
         }
 
         String message = target.getRepresentationUnfogged()
-                + ", choose the space-dock system in which to place your "
+                + ", please choose the space dock system in which to place your "
                 + ship.getName()
                 + ".";
         List<Button> buttons = getDestinationButtons(game, target, agentOwner, ship);
@@ -178,7 +178,7 @@ public class ThronesLeadersHandler {
         }
 
         String message = target.getRepresentationUnfogged()
-                + ", choose the space-dock system in which to place your "
+                + ", please choose the space dock system in which to place your "
                 + ship.getName()
                 + ".";
         List<Button> buttons = getDestinationButtons(game, target, agentOwner, ship);
@@ -281,7 +281,7 @@ public class ThronesLeadersHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", please choose the 2 Throne planets you would like to place in your home system:",
+                        + ", please choose the 2 Throne planets to place in your home system.",
                 buttons);
     }
 

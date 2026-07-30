@@ -49,7 +49,7 @@ public class KryxosAbilityHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
-                        + ", you may exhaust 1 planet for _Battle-Tested Designs_ to ignore 1 prerequisite of "
+                        + ", you may exhaust 1 planet for **Battle-Tested Designs** to ignore 1 prerequisite of "
                         + technology.getName() + ", then produce 1 unit of that type for 1 less.",
                 buttons);
     }
@@ -78,7 +78,7 @@ public class KryxosAbilityHandler {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentation() + " exhausted " + Helper.getPlanetRepresentation(parts[1], game)
-                        + " for _Battle-Tested Designs_, ignoring 1 prerequisite of " + technology.getName() + ".");
+                        + " for **Battle-Tested Designs**, ignoring 1 prerequisite of " + technology.getName() + ".");
 
         List<Button> buttons = getEligibleProductionTiles(game, player).stream()
                 .map(tile -> Buttons.green(
@@ -95,13 +95,13 @@ public class KryxosAbilityHandler {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     player.getRepresentation()
-                            + " has no eligible system in which to produce with _Battle-Tested Designs_.");
+                            + " has no eligible system in which to produce with **Battle-Tested Designs**.");
             return;
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", choose the system in which to resolve _Battle-Tested Designs_:",
+                player.getRepresentation() + ", please choose the system in which to resolve **Battle-Tested Designs**.",
                 buttons);
     }
 
@@ -151,8 +151,8 @@ public class KryxosAbilityHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", choose where to produce the " + upgradedUnit.getBaseType()
-                        + " with _Battle-Tested Designs_. Its cost is reduced by 1.",
+                        + ", please choose where to produce the " + upgradedUnit.getBaseType()
+                        + " with **Battle-Tested Designs**. Its cost is reduced by 1.",
                 buttons);
     }
 
@@ -199,14 +199,14 @@ public class KryxosAbilityHandler {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentation() + " produced 1 " + upgradedUnit.getBaseType()
-                        + " with _Battle-Tested Designs_.");
+                        + " with **Battle-Tested Designs**.");
         List<Button> paymentButtons =
                 new java.util.ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, player, "res"));
         paymentButtons.add(Buttons.red("deleteButtons_battleTestedDesigns", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentationUnfogged() + ", please choose the planets you wish to exhaust to pay a cost of "
-                        + discountedCost + " for _Battle-Tested Designs_ (-1).",
+                player.getRepresentationUnfogged() + ", please choose the planets to exhaust to pay "
+                        + discountedCost + " for **Battle-Tested Designs**.\n-# -1 from Battle-Tested Designs.",
                 paymentButtons);
     }
 

@@ -56,7 +56,7 @@ public class VeylorLeadersHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged()
-                        + ", exhaust any planets you choose, then select **Done Exhausting Planets**. Reminder that you must exhaust all but 3 to unlock it.",
+                        + ", please exhaust any planets you choose, then select Done Exhausting Planets.\n-# You must exhaust all but 3 planets to unlock Cyrala Vey, the Veylor commander.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -134,7 +134,7 @@ public class VeylorLeadersHandler {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
-                            + ", an agenda outcome you voted for was not resolved. Gain 1 command token from _Adoration of the Masses_.",
+                            + ", an agenda outcome you voted for was not resolved. Please choose where to gain 1 command token from Adoration of the Masses, the Veylor hero.",
                     buttons);
         }
     }
@@ -172,7 +172,7 @@ public class VeylorLeadersHandler {
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationUnfogged() + " gained 1 " + pool + " token from _Adoration of the Masses_.");
+                player.getRepresentationUnfogged() + " gained 1 " + pool + " token from Adoration of the Masses, the Veylor hero.");
 
         ButtonHelper.deleteMessage(event);
     }
@@ -212,7 +212,7 @@ public class VeylorLeadersHandler {
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
                     player.getRepresentation()
-                            + ", since the outcome you voted for was not resolved, you may produce 1 ship in a system that contains your ships with cost less than your cast votes due to _Cyrala Vey_.",
+                            + ", since the outcome you voted for was not resolved, you may produce 1 ship in a system that contains your ships with cost less than your cast votes due to Cyrala Vey, the Veylor commander.",
                     displayedButtons);
         }
     }
@@ -235,7 +235,7 @@ public class VeylorLeadersHandler {
                 int votesCast = Integer.parseInt(pageParts[1]);
                 List<Button> systemsWithShips = getVeylorCommanderSystemButtons(player, game, votesCast);
                 String message = player.getRepresentation()
-                        + ", since the outcome you voted for was not resolved, you may produce 1 ship in a system that contains your ships with cost less than your cast votes due to _Cyrala Vey_.";
+                        + ", since the outcome you voted for was not resolved, you may produce 1 ship in a system that contains your ships with cost less than your cast votes due to Cyrala Vey, the Veylor commander.";
                 if (NewStuffHelper.checkAndHandlePaginationChange(
                         event,
                         event.getMessageChannel(),
@@ -283,7 +283,7 @@ public class VeylorLeadersHandler {
         }
 
         String message = "Please choose the ship to produce in " + tile.getRepresentation()
-                + " with cost less than your " + votesCast + " votes cast:";
+                + " with cost less than your " + votesCast + " votes cast.";
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 message,
