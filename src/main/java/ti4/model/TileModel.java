@@ -61,7 +61,6 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private @JsonProperty("isGravityRift") boolean gravityRift;
     private @JsonProperty("isScar") boolean isScar;
     private @JsonProperty("hasEgress") boolean hasEgress;
-
     private String imageURL;
     private ComponentSource source;
     private TileBack tileBack = TileBack.BLACK;
