@@ -50,7 +50,8 @@ public class ArcanumAbilityHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", please choose 1 primordial technology to add with **Primordial Secrets**.",
+                player.getRepresentation()
+                        + ", please choose 1 primordial technology to add with **Primordial Secrets**.",
                 buttons);
     }
 
@@ -129,8 +130,7 @@ public class ArcanumAbilityHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation()
-                        + ", please choose 2 fragments to purge to research a technology.",
+                player.getRepresentation() + ", please choose 2 fragments to purge to research a technology.",
                 displayedButtons);
     }
 
@@ -142,8 +142,7 @@ public class ArcanumAbilityHandler {
 
         List<Button> frags = getRitualFragmentButtons(player);
         List<Button> extraButtons = List.of(Buttons.red("donePurgingRitualFrags", "Done Purging Fragments"));
-        String message = player.getRepresentation()
-                + ", please choose 2 fragments to purge to research a technology.";
+        String message = player.getRepresentation() + ", please choose 2 fragments to purge to research a technology.";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event,
                 event.getMessageChannel(),

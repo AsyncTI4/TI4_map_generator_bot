@@ -78,7 +78,9 @@ public class ArdentiaLeadersHandler {
         ButtonHelper.deleteMessage(event);
 
         MessageHelper.sendMessageToChannelWithButtons(
-                game.getActionsChannel(), "Please choose where to gain 1 command token.", ButtonHelper.getGainCCButtons(player));
+                game.getActionsChannel(),
+                "Please choose where to gain 1 command token.",
+                ButtonHelper.getGainCCButtons(player));
 
         if (player.hasAbility("seize_command")) {
             MessageHelper.sendMessageToChannelWithButton(
@@ -196,8 +198,8 @@ public class ArdentiaLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                "Please choose where to gain 1 command token for removing "
-                        + target.getRepresentationNoPing() + "'s command token from the chosen system.",
+                "Please choose where to gain 1 command token for removing " + target.getRepresentationNoPing()
+                        + "'s command token from the chosen system.",
                 ButtonHelper.getGainCCButtons(player));
 
         ButtonHelper.deleteMessage(event);

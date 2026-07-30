@@ -172,7 +172,8 @@ public class VeylorLeadersHandler {
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationUnfogged() + " gained 1 " + pool + " token from Adoration of the Masses, the Veylor hero.");
+                player.getRepresentationUnfogged() + " gained 1 " + pool
+                        + " token from Adoration of the Masses, the Veylor hero.");
 
         ButtonHelper.deleteMessage(event);
     }

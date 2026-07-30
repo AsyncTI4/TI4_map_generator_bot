@@ -61,7 +61,8 @@ public class KairnBreakthroughHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", please choose 1 relic fragment to purge for _Relic Trading Hub_.",
+                player.getRepresentationUnfogged()
+                        + ", please choose 1 relic fragment to purge for _Relic Trading Hub_.",
                 buttons);
     }
 

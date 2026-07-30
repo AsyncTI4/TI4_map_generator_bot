@@ -81,7 +81,8 @@ public class RevenantLeadersHandler {
     public static void useRevArcanumAgent(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Leader agent = player.getLeader(REVARCAGENT).orElse(null);
         if (agent == null || !player.hasUnexhaustedLeader(REVARCAGENT)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Runebearer Lothos, the Revenant agent, is no longer available.");
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "Runebearer Lothos, the Revenant agent, is no longer available.");
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             return;
         }
@@ -157,7 +158,8 @@ public class RevenantLeadersHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),
-                explorer.getRepresentation() + ", please choose a planet to explore with Runebearer Lothos, the Revenant agent.",
+                explorer.getRepresentation()
+                        + ", please choose a planet to explore with Runebearer Lothos, the Revenant agent.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -285,7 +287,8 @@ public class RevenantLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", please choose 1 exploration card to resolve with Arlir Mirrored, the Revenant commander.",
+                player.getRepresentation()
+                        + ", please choose 1 exploration card to resolve with Arlir Mirrored, the Revenant commander.",
                 List.of(originalCard.getRepresentationEmbed(), secondCard.getRepresentationEmbed()),
                 buttons);
 
@@ -364,8 +367,8 @@ public class RevenantLeadersHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", please choose an exploration card from the " + StringUtils.capitalize(trait)
-                        + " discard pile.",
+                player.getRepresentation() + ", please choose an exploration card from the "
+                        + StringUtils.capitalize(trait) + " discard pile.",
                 displayedButtons);
 
         ButtonHelper.deleteMessage(event);
@@ -478,7 +481,8 @@ public class RevenantLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", please choose a trait to explore for Zairos the First, the Revenant hero.",
+                player.getRepresentation()
+                        + ", please choose a trait to explore for Zairos the First, the Revenant hero.",
                 buttons);
     }
 

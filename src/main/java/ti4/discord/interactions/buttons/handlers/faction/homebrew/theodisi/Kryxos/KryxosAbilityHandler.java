@@ -101,7 +101,8 @@ public class KryxosAbilityHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", please choose the system in which to resolve **Battle-Tested Designs**.",
+                player.getRepresentation()
+                        + ", please choose the system in which to resolve **Battle-Tested Designs**.",
                 buttons);
     }
 
@@ -205,8 +206,8 @@ public class KryxosAbilityHandler {
         paymentButtons.add(Buttons.red("deleteButtons_battleTestedDesigns", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentationUnfogged() + ", please choose the planets to exhaust to pay "
-                        + discountedCost + " for **Battle-Tested Designs**.\n-# -1 from Battle-Tested Designs.",
+                player.getRepresentationUnfogged() + ", please choose the planets to exhaust to pay " + discountedCost
+                        + " for **Battle-Tested Designs**.\n-# -1 from Battle-Tested Designs.",
                 paymentButtons);
     }
 

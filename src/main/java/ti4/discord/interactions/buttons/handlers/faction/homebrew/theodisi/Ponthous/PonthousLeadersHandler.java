@@ -207,8 +207,8 @@ public class PonthousLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                opponent.getRepresentationUnfogged() + ", please assign " + hits + " produced hit" + (hits == 1 ? "" : "s")
-                        + ". These hits are produced against your non-fighter ships.",
+                opponent.getRepresentationUnfogged() + ", please assign " + hits + " produced hit"
+                        + (hits == 1 ? "" : "s") + ". These hits are produced against your non-fighter ships.",
                 hitButtons);
 
         ButtonHelper.deleteMessage(event);

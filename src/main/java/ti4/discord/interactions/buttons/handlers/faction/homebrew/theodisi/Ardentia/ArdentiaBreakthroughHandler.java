@@ -42,7 +42,8 @@ public class ArdentiaBreakthroughHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", please choose the player whose command token to remove for _Subjugate_.",
+                player.getRepresentation()
+                        + ", please choose the player whose command token to remove for _Subjugate_.",
                 targets);
     }
 

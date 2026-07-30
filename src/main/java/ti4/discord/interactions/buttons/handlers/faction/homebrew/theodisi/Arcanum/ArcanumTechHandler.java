@@ -86,7 +86,8 @@ public class ArcanumTechHandler {
 
         List<Button> buttons = getPurgedExploreButtons(game, player);
         String buttonPrefix = player.factionButtonChecker() + SHUFFLE_PURGED_EXPLORE;
-        String message = player.getRepresentation() + ", please choose 1 purged exploration card to shuffle into its deck.";
+        String message =
+                player.getRepresentation() + ", please choose 1 purged exploration card to shuffle into its deck.";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), buttons, message, buttonPrefix, buttonID)) {
             return;
@@ -170,7 +171,9 @@ public class ArcanumTechHandler {
         }
         buttons.add(done);
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), player.getRepresentation() + ", please choose a planet to explore.", buttons);
+                event.getMessageChannel(),
+                player.getRepresentation() + ", please choose a planet to explore.",
+                buttons);
     }
 
     // Forbidden Knowledge
@@ -423,8 +426,8 @@ public class ArcanumTechHandler {
             return;
         }
 
-        String message =
-                player.getRepresentation() + ", please choose planets on which to place up to 4 infantry with _Power Word: Miracle_.";
+        String message = player.getRepresentation()
+                + ", please choose planets on which to place up to 4 infantry with _Power Word: Miracle_.";
         String buttonPrefix = player.factionButtonChecker() + PLACE_INFANTRY + round + "_";
         Button done = Buttons.red(player.factionButtonChecker() + FINISH_INFANTRY + round, "Done Placing Infantry");
         List<Button> displayedButtons = planetButtons.size() < 25
@@ -469,8 +472,8 @@ public class ArcanumTechHandler {
         }
 
         List<Button> planetButtons = getMiracleInfantryButtons(game, player, round);
-        String message =
-                player.getRepresentation() + ", please choose planets on which to place up to 4 infantry with _Power Word: Miracle_.";
+        String message = player.getRepresentation()
+                + ", please choose planets on which to place up to 4 infantry with _Power Word: Miracle_.";
         String buttonPrefix = player.factionButtonChecker() + PLACE_INFANTRY + round + "_";
         Button done = Buttons.red(player.factionButtonChecker() + FINISH_INFANTRY + round, "Done Placing Infantry");
         String planetName = placementData.substring(separator + 1);

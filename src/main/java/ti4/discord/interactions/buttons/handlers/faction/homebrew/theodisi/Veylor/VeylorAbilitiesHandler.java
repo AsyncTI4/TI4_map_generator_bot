@@ -239,7 +239,8 @@ public class VeylorAbilitiesHandler {
 
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + ", you gained " + commoditiesGained + " commodities from **Lobbyist Dues**.");
+                        player.getRepresentation() + ", you gained " + commoditiesGained
+                                + " commodities from **Lobbyist Dues**.");
             }
         }
     }

@@ -121,6 +121,7 @@ public class ArcanumUnitHandler {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " placed " + prereqs + " infantry on "
-                        + Helper.getPlanetRepresentation(planetName, game) + " using a Rune-Bound Sentinel (Arcanum mech).");
+                        + Helper.getPlanetRepresentation(planetName, game)
+                        + " using a Rune-Bound Sentinel (Arcanum mech).");
     }
 }

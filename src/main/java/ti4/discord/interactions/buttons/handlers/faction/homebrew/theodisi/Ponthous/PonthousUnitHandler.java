@@ -184,7 +184,8 @@ public class PonthousUnitHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", please choose how to pay 1 resource to place 2 infantry on this planet.",
+                player.getRepresentation()
+                        + ", please choose how to pay 1 resource to place 2 infantry on this planet.",
                 buttons);
 
         ButtonHelper.deleteMessage(event);

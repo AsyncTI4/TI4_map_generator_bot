@@ -52,8 +52,7 @@ public class ThronesAbilityHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation()
-                        + ", please choose the Throne planet to place in your home system.",
+                player.getRepresentation() + ", please choose the Throne planet to place in your home system.",
                 buttons);
     }
 

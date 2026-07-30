@@ -48,7 +48,9 @@ public class OblivionLeadersHandler {
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(), "Please choose the target for Avaris the Seer, the Oblivion agent.", targetButtons);
+                player.getCardsInfoThread(),
+                "Please choose the target for Avaris the Seer, the Oblivion agent.",
+                targetButtons);
     }
 
     @ButtonHandler(AGENT_TARGET)

@@ -190,8 +190,8 @@ public class AeternaUnitsHandler {
                         }
 
                         UnitType unitType = destroyed.unitKey().unitType();
-                        String payload = dockTile.getPosition() + "|" + dockHolder.getName() + "|" + unitType + "|"
-                                + actionKey;
+                        String payload =
+                                dockTile.getPosition() + "|" + dockHolder.getName() + "|" + unitType + "|" + actionKey;
                         List<Button> buttons = new ArrayList<>();
                         if (graveyardII) {
                             buttons.add(Buttons.green(
@@ -210,9 +210,8 @@ public class AeternaUnitsHandler {
                                         FactionEmojis.aeterna));
                             }
                         }
-                        buttons.add(Buttons.red(
-                                player.factionButtonChecker() + GRAVEYARD_DECLINE + payload,
-                                "Decline"));
+                        buttons.add(
+                                Buttons.red(player.factionButtonChecker() + GRAVEYARD_DECLINE + payload, "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
                                 player.getRepresentationNoPing() + ", use _Graveyard " + (graveyardII ? "II" : "I")
@@ -263,10 +262,7 @@ public class AeternaUnitsHandler {
     @ButtonHandler(GRAVEYARD_DECLINE)
     public static void declineGraveyard(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] payload = buttonID.substring(GRAVEYARD_DECLINE.length()).split("\\|", 4);
-        if (game == null
-                || player == null
-                || payload.length != 4
-                || !payload[3].equals(getCurrentActionKey(game))) {
+        if (game == null || player == null || payload.length != 4 || !payload[3].equals(getCurrentActionKey(game))) {
             return;
         }
         ButtonHelper.deleteMessage(event);
@@ -300,7 +296,8 @@ public class AeternaUnitsHandler {
         }
 
         Tile dockTile = game.getTileByPosition(payload[0]);
-        UnitHolder dockHolder = dockTile == null ? null : dockTile.getUnitHolders().get(payload[1]);
+        UnitHolder dockHolder =
+                dockTile == null ? null : dockTile.getUnitHolders().get(payload[1]);
         UnitType unitType = Units.findUnitType(payload[2]);
         String dockKey = player.getFaction() + "_" + payload[0] + "_" + payload[1];
         if (dockHolder == null

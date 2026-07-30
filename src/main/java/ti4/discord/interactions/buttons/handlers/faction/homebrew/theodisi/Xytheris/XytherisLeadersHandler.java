@@ -62,7 +62,8 @@ public class XytherisLeadersHandler {
                 || target == null
                 || target != game.getActivePlayer()) {
             MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Myrix, the Xytheris agent, can only be used immediately after a player activates a system.");
+                    event,
+                    "Myrix, the Xytheris agent, can only be used immediately after a player activates a system.");
             return;
         }
 

@@ -325,7 +325,8 @@ public class AeternaAbilityHandler {
             case LUNAR_ECLIPSE ->
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + ", please choose where to gain 1 command token due to _Lunar Eclipse_.",
+                        player.getRepresentation()
+                                + ", please choose where to gain 1 command token due to _Lunar Eclipse_.",
                         ButtonHelper.getGainCCButtons(player));
             default -> {}
         }

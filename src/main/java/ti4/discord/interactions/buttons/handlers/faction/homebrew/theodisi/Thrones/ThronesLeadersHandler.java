@@ -280,8 +280,7 @@ public class ThronesLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation()
-                        + ", please choose the 2 Throne planets to place in your home system.",
+                player.getRepresentation() + ", please choose the 2 Throne planets to place in your home system.",
                 buttons);
     }
 
