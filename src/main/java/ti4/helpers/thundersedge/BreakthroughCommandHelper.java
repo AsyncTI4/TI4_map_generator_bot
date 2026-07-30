@@ -249,7 +249,7 @@ public final class BreakthroughCommandHelper {
                                 + " Ingress tokens will be placed in their position on the map, if there were no choices to be made.";
                         FractureService.spawnFracture(null, game);
                         FractureService.spawnIngressTokens(null, game, player, bt.getID());
-                        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
                     AlRaithService.serveBeginCabalBreakthroughButtons(null, game, player);
                 }
