@@ -95,7 +95,9 @@ public class UnlockLeaderService {
         if ("veylorhero".equals(leaderID)) {
             game.setStoredValue("veylorHeroActive_" + player.getFaction(), "yes");
             MessageHelper.sendMessageToChannel(
-                    game.getActionsChannel(), game.getPing() + ", there will now be a third agenda each agenda phase.");
+                    game.getActionsChannel(),
+                    game.getPing() + ", there will now be a third agenda each agenda phase. Congratulations "
+                            + player.getRepresentationNoPing() + ", you are now the senate!");
         }
 
         if (playerLeader.isExhausted()) {

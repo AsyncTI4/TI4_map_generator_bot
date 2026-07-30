@@ -108,7 +108,7 @@ public class KryxosPromissoryHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + ", choose the home-system planet on which to produce your "
+                player.getRepresentationUnfogged() + ", please choose the home system planet on which to produce your "
                         + unit.getBaseType() + ".",
                 buttons);
     }

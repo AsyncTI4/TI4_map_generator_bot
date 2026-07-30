@@ -20,7 +20,9 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionLeaderHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
@@ -1555,6 +1557,27 @@ public final class ButtonHelperAgents {
         }
         if ("ardentiaagent".equalsIgnoreCase(agent)) {
             ArdentiaLeadersHandler.startArdentiaAgentStep1(game, player);
+        }
+        if ("kryxosagent".equalsIgnoreCase(agent)) {
+            if (!rest.contains("_")) {
+                MessageHelper.sendMessageToChannel(
+                        channel, "Kryxos Agent needs a player target before it can resolve.");
+                return;
+            }
+            Player target = game.getPlayerFromColorOrFaction(rest.substring(rest.indexOf('_') + 1));
+            if (target == null) {
+                MessageHelper.sendMessageToChannel(channel, "Could not find the selected Kryxos Agent target.");
+                return;
+            }
+            KryxosLeadersHandler.startKryxosAgent(game, target);
+        }
+        if ("aeternaagent".equalsIgnoreCase(agent)) {
+            Player target = game.getPlayerFromColorOrFaction(rest.substring(rest.indexOf('_') + 1));
+            if (target == null) {
+                MessageHelper.sendMessageToChannel(channel, "Could not find the selected Aeterna Agent target.");
+                return;
+            }
+            AeternaLeadersHandler.startAeternaAgent(game, target);
         }
 
         if (event instanceof ButtonInteractionEvent buttonEvent) {

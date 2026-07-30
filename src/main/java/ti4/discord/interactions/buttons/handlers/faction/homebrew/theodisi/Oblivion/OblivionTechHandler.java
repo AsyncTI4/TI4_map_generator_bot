@@ -46,7 +46,7 @@ public class OblivionTechHandler {
         List<Button> buttons = getDiscardComponentActionButtons(game, player);
         String buttonPrefix = player.factionButtonChecker() + PLAY_DISCARD_COMPONENT_AC;
         String message = player.getRepresentation()
-                + ", choose an action card with a component action to play and purge using _Mirrored Memories_.";
+                + ", please choose an action card with a component action to play and purge using _Mirrored Memories_.";
         List<Button> displayedButtons = buttons.size() <= 25
                 ? buttons
                 : NewStuffHelper.buttonPagination(buttons, null, buttonPrefix, 24, 0, true);
@@ -69,7 +69,7 @@ public class OblivionTechHandler {
         List<Button> buttons = getDiscardComponentActionButtons(game, player);
         String buttonPrefix = player.factionButtonChecker() + PLAY_DISCARD_COMPONENT_AC;
         String message = player.getRepresentation()
-                + ", choose an action card with a component action to play and purge using _Mirrored Memories_.";
+                + ", please choose an action card with a component action to play and purge using _Mirrored Memories_.";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), buttons, message, buttonPrefix, buttonID)) {
             return;

@@ -45,7 +45,7 @@ public class XytherisPromissoryHandler {
                 player.getRepresentation()
                         + ", you produced " + hits + " hit" + (hits == 1 ? "" : "s")
                         + " with a unit ability. You may play _Swarm Spawn_ to place " + hits
-                        + " fighter" + (hits == 1 ? "" : "s") + " in a system containing one of your ships:",
+                        + " fighter" + (hits == 1 ? "" : "s") + " in a system containing one of your ships.",
                 buttons);
     }
 
@@ -79,8 +79,8 @@ public class XytherisPromissoryHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation()
-                        + " played _Swarm Spawn_. Please select the system to place " + h + " fighter"
-                        + (h == 1 ? "" : "s") + " in:",
+                        + " played _Swarm Spawn_. Please choose the system in which to place " + h + " fighter"
+                        + (h == 1 ? "" : "s") + ".",
                 buttons);
 
         ButtonHelper.deleteMessage(event);

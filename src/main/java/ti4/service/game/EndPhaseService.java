@@ -3,6 +3,8 @@ package ti4.service.game;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.StatusHelper;
@@ -13,6 +15,9 @@ public class EndPhaseService {
     public static void EndActionPhase(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
         LoreService.showPhaseLore(game, "status"); // before StatusHelper mutates phaseOfGame: END lore reads "action"
         for (Player player : game.getRealPlayers()) {
+            AeternaLeadersHandler.clearAeternaCommanderActionState(game, player);
+            AeternaUnitsHandler.clearCryptActionState(game, player);
+            AeternaUnitsHandler.clearGraveyardActionState(game, player);
             if (player.hasAbility("mandate_of_presence")) {
                 game.removeStoredValue("mandateUsedThisActionPhase_" + player.getFaction());
             }

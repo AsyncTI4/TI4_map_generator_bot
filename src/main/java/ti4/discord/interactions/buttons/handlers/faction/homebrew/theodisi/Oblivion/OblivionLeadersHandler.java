@@ -48,7 +48,9 @@ public class OblivionLeadersHandler {
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(), "Please choose the target of the agent:", targetButtons);
+                player.getCardsInfoThread(),
+                "Please choose the target for Avaris the Seer, the Oblivion agent.",
+                targetButtons);
     }
 
     @ButtonHandler(AGENT_TARGET)
@@ -76,7 +78,7 @@ public class OblivionLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),
-                player.getRepresentation() + ", please select which system to place a frontier token in:",
+                player.getRepresentation() + ", please choose the system in which to place a frontier token.",
                 NewStuffHelper.buttonPagination(buttons, target.factionButtonChecker() + ADD_TOKEN, 0));
     }
 
@@ -96,7 +98,7 @@ public class OblivionLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", please select which system to place a frontier token in:",
+                player.getRepresentation() + ", please choose the system in which to place a frontier token.",
                 NewStuffHelper.buttonPagination(buttons, player.factionButtonChecker() + ADD_TOKEN, 0));
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
@@ -109,7 +111,7 @@ public class OblivionLeadersHandler {
         }
 
         List<Button> buttons = getFrontierTokenButtons(game, player);
-        String message = player.getRepresentation() + ", please select which system to place a frontier token in:";
+        String message = player.getRepresentation() + ", please choose the system in which to place a frontier token.";
         String buttonPrefix = player.factionButtonChecker() + ADD_TOKEN;
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), buttons, message, buttonPrefix, buttonID)) {
@@ -130,7 +132,8 @@ public class OblivionLeadersHandler {
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                "Frontier token placed in system. The top card of the frontier deck has been sent to your cards info.");
+                "Frontier token has been placed in " + tilePos.getRepresentation()
+                        + ". The top card of the frontier deck has been sent to your `#cards-info` thread.");
 
         resolveAgentStep2(player, game);
     }

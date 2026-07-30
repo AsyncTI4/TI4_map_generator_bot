@@ -59,6 +59,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
@@ -4143,12 +4144,12 @@ public class ButtonHelper {
                     } else if (player.ownsUnit("xan_spacedock2")) {
                         fightersIgnored += 3;
                         fleetCap += 6;
-                    } else if (!player.hasUnit("mykomentori_spacedock") && !player.hasUnit("mykomentori_spacedock2")) {
-                        fightersIgnored += 3;
-                    } else if (player.ownsUnit("aeterna_spacedock")) {
-                        fightersIgnored += 4;
                     } else if (player.ownsUnit("aeterna_spacedock2")) {
                         fightersIgnored += 8;
+                    } else if (player.ownsUnit("aeterna_spacedock")) {
+                        fightersIgnored += 4;
+                    } else if (!player.hasUnit("mykomentori_spacedock") && !player.hasUnit("mykomentori_spacedock2")) {
+                        fightersIgnored += 3;
                     }
                 }
                 if ("pds".equalsIgnoreCase(unit.getBaseType()) && !"space".equalsIgnoreCase(capChecker.getName())) {
@@ -4639,6 +4640,10 @@ public class ButtonHelper {
                     Buttons.green(factionChecker + "dataSkimmer_page0", "Use Data Skimmer", FactionEmojis.Ralnel));
         }
 
+        if (player.hasRelicReady("waning_moonphase")) {
+            passButtons.add(AeternaAbilityHandler.getWaningMoonButton(player));
+        }
+
         if (player.hasReadyBreakthrough("veldyrbt") || player.hasTech("tf-harnessedaurora")) {
             passButtons.add(Buttons.green(
                     factionChecker + "veldyrBTExplore", "Explore Frontier Deck At Home", FactionEmojis.veldyr));
@@ -4708,6 +4713,10 @@ public class ButtonHelper {
 
     public static List<Button> getEndOfTurnAbilities(Player player, Game game) {
         List<Button> endButtons = new ArrayList<>();
+
+        if (player.hasRelicReady("full_moonphase")) {
+            endButtons.add(AeternaAbilityHandler.getFullMoonButton(player));
+        }
 
         // Legendary Planets
         List<String> implementedLegendaryPlanets = List.of(

@@ -55,7 +55,7 @@ public class XytherisTechHandler {
                     tile.getRepresentationForButtons(game, player)));
         }
 
-        String message = "Select the system you would like to place the unit into:";
+        String message = "Please choose the system in which to place the unit.";
         String buttonPrefix = player.factionButtonChecker() + USE_BIOM + h + "_";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), buttons, message, buttonPrefix, buttonID)) {
@@ -100,7 +100,7 @@ public class XytherisTechHandler {
                 .toList();
 
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), "Please select the ship you would like to place in this system:", buttons);
+                event.getMessageChannel(), "Please choose the ship to place in this system.", buttons);
 
         ButtonHelper.deleteMessage(event);
     }

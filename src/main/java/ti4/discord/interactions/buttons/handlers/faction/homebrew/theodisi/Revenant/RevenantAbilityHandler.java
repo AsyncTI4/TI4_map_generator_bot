@@ -48,7 +48,7 @@ public class RevenantAbilityHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", choose 1 Revenant leader set for **Call of the Haunted**.",
+                player.getRepresentation() + ", please choose 1 Revenant leader set for **Call of the Haunted**.",
                 buttons);
     }
 

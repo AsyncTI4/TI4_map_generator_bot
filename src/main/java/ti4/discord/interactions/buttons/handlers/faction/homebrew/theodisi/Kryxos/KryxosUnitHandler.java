@@ -46,7 +46,7 @@ public class KryxosUnitHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
-                        + ", after gaining/researching a technology, you may flip one of your Kryxos units.",
+                        + ", after gaining a technology, you may flip one of your Kryxos units.",
                 buttons);
     }
 
@@ -83,7 +83,7 @@ public class KryxosUnitHandler {
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + "flipped _" + currentName + "_ into _" + flippedName
-                        + "_. The researched/gained tech has been returned to your technology deck as well.");
+                player.getRepresentationUnfogged() + " flipped _" + currentName + "_ into _" + flippedName
+                        + "_. The gained technology has also been returned to your technology deck.");
     }
 }

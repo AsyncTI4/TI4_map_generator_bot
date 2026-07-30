@@ -49,7 +49,7 @@ public class OblivionAbilityHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentation() + ", please choose the tech you would like to purge:",
+                player.getRepresentation() + ", please choose the technology to purge.",
                 buttons);
 
         ButtonHelper.deleteMessage(event);
@@ -64,17 +64,18 @@ public class OblivionAbilityHandler {
 
         String techID = buttonID.replace(PURGE_TECH, "");
         if (!player.hasTech(techID)) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Unable to find owned tech.");
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Unable to find a controlled technology.");
             ButtonHelper.deleteMessage(event);
             return;
         }
 
         PlayerTechService.purgeTech(event, player, techID);
-        List<Button> buttons = List.of(Buttons.GET_A_TECH);
-        String message = player.getRepresentationUnfogged()
-                + ", use this button to research a technology for _Ignorant Discoveries_. Ignore the payment messages, these techs are free.";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+        Button researchTech = Buttons.green(
+                player.factionButtonChecker() + "getAllTechOfType_allTechResearchable_noPay", "Research a Technology");
+        String message =
+                player.getRepresentationUnfogged() + ", please research 2 technologies for **Ignorant Discoveries**.";
+        MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, researchTech);
+        MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, researchTech);
 
         ButtonHelper.deleteMessage(event);
     }

@@ -40,7 +40,7 @@ public class VerydithBreakthroughHandler {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + ", someone else's command token was placed in a system with your planets. Use these buttons to ready 1 of those and explore it using _Unyielding Accord_:",
+                            + ", another player's command token was placed in a system with your planets. Please choose 1 planet to ready and explore with _Unyielding Accord_.",
                     buttons);
         }
     }

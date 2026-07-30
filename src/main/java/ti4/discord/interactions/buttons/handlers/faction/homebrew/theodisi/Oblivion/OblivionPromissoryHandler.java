@@ -75,7 +75,7 @@ public class OblivionPromissoryHandler {
         }
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation() + ", choose 1 red-backed tile to place. The other 2 will be purged.",
+                player.getRepresentation() + ", please choose 1 red-backed tile to place. The other 2 will be purged.",
                 tileEmbeds,
                 buttons);
     }
@@ -130,7 +130,7 @@ public class OblivionPromissoryHandler {
                 player.getCorrectChannel(),
                 player.getRepresentation() + " purged the 2 unchosen red-backed tiles and _Shard of Nothingness_.");
         String placementMessage =
-                player.getRepresentation() + ", choose 2 systems to place the selected tile adjacent to.";
+                player.getRepresentation() + ", please choose 2 systems adjacent to which to place the selected tile.";
         String placementButtonPrefix = player.factionButtonChecker() + PLACE_RED_TILE + chosenTileId + "_";
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
@@ -151,7 +151,7 @@ public class OblivionPromissoryHandler {
         String tileId = placementData.substring(0, tileIdEnd);
         List<Button> placementButtons = getPlacementButtons(game, player, tileId);
         String placementMessage =
-                player.getRepresentation() + ", choose 2 systems to place the selected tile adjacent to.";
+                player.getRepresentation() + ", please choose 2 systems adjacent to which to place the selected tile.";
         String placementButtonPrefix = player.factionButtonChecker() + PLACE_RED_TILE + tileId + "_";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event,
