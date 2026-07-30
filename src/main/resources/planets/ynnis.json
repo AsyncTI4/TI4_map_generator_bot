@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ynnis",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 130
+        }
+    },
     "id": "ynnis",
     "tileId": "er24",
     "name": "Ynnis",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "akhassi",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "akhassi",
     "tileId": "er57",
     "name": "Akhassi",

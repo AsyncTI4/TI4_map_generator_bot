@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "winnu",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 128
+        }
+    },
     "id": "winnu",
     "tileId": "07",
     "name": "Winnu",

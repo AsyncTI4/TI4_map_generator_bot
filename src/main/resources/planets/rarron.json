@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "rarron",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 202,
+            "y": 206
+        }
+    },
     "id": "rarron",
     "tileId": "29",
     "name": "Rarron",

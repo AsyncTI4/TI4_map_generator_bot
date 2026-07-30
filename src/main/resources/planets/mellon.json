@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "mellon",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 137,
+            "y": 88
+        }
+    },
     "id": "mellon",
     "tileId": "30",
     "name": "Mellon",

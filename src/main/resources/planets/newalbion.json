@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "newalbion",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 88
+        }
+    },
     "id": "newalbion",
     "tileId": "27",
     "name": "New Albion",

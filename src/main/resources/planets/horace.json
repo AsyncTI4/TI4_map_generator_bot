@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "horace",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 120,
+            "y": 120
+        }
+    },
     "id": "horace",
     "tileId": "c05",
     "name": "Horace",

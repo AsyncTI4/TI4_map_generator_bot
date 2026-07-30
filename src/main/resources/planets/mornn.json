@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "mornn",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "mornn",
     "tileId": "er99",
     "name": "Mornn",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "zelian",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 231,
+            "y": 207
+        }
+    },
     "id": "zelian",
     "tileId": "d12",
     "name": "Zelian",

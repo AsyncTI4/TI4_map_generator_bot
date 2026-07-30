@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "trykk",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 231,
+            "y": 207
+        }
+    },
     "id": "trykk",
     "tileId": "d20",
     "name": "Trykk",

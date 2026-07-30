@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "luna",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 226,
+            "y": 200
+        }
+    },
     "id": "luna",
     "tileId": "ba6",
     "name": "Luna",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "erodius",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "erodius",
     "tileId": "er20",
     "name": "Erodius",

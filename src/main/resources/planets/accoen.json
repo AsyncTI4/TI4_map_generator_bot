@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "accoen",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 134,
+            "y": 86
+        }
+    },
     "id": "accoen",
     "tileId": "69",
     "name": "Accoen",

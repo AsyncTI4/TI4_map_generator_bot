@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "bereg",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 138,
+            "y": 90
+        }
+    },
     "id": "bereg",
     "tileId": "35",
     "name": "Bereg",

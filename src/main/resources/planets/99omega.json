@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "99omega",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "99omega",
     "tileId": "m21",
     "name": "99-Omega",

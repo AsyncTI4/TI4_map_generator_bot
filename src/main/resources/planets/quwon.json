@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "quwon",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "quwon",
     "tileId": "er63",
     "name": "Quwon",

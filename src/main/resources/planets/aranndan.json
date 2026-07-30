@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "aranndan",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "aranndan",
     "tileId": "er121",
     "name": "Aranndan",

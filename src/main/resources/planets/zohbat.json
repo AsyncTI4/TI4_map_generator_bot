@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "zohbat",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 205,
+            "y": 217
+        }
+    },
     "id": "zohbat",
     "tileId": "30",
     "name": "Zohbat",

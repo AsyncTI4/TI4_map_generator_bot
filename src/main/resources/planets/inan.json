@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "inan",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "inan",
     "tileId": "d105",
     "name": "Inan",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "abyz",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 91
+        }
+    },
     "id": "abyz",
     "tileId": "38",
     "name": "Abyz",

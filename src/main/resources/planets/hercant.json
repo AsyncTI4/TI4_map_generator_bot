@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "hercant",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 87,
+            "y": 136
+        }
+    },
     "id": "hercant",
     "tileId": "16",
     "name": "Hercant",

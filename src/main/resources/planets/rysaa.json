@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "rysaa",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "rysaa",
     "tileId": "d112",
     "name": "Rysaa",

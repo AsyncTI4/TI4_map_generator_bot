@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "mekoii",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "mekoii",
     "tileId": "er53",
     "name": "Meko II",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "hevahold",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "hevahold",
     "tileId": "er64",
     "name": "Hevahold",

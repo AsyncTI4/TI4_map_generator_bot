@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "sanvit",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "sanvit",
     "tileId": "d110",
     "name": "San-Vit",

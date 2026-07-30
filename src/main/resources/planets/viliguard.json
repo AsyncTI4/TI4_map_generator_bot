@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "viliguard",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 220,
+            "y": 235
+        }
+    },
     "id": "viliguard",
     "tileId": "er100",
     "name": "Viliguard",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "bohldhur",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 177,
+            "y": 131
+        }
+    },
     "id": "bohldhur",
     "tileId": "d33",
     "name": "Bohl-Dhur",

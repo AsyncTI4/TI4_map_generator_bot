@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "frincham",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 213,
+            "y": 212
+        }
+    },
     "id": "frincham",
     "tileId": "s06",
     "name": "Frincham",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "mollprimusk",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 128
+        }
+    },
     "id": "mollprimusk",
     "tileId": "94new",
     "name": "Moll Primus Keleres",

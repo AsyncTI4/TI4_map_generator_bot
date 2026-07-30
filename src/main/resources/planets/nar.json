@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "nar",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 134,
+            "y": 85
+        }
+    },
     "id": "nar",
     "tileId": "12",
     "name": "Nar",

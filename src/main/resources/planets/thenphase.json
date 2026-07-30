@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "thenphase",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "thenphase",
     "tileId": "er104",
     "name": "Thenphase",

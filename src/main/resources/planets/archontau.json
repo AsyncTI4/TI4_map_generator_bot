@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "archontau",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 226,
+            "y": 200
+        }
+    },
     "id": "archontau",
     "tileId": "14",
     "name": "Archon Tau",

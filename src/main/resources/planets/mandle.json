@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "mandle",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 80,
+            "y": 140
+        }
+    },
     "id": "mandle",
     "tileId": "d116",
     "name": "Mandle",

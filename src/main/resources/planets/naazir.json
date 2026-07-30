@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "naazir",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 134,
+            "y": 85
+        }
+    },
     "id": "naazir",
     "tileId": "57",
     "name": "Naazir",
