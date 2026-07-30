@@ -624,7 +624,7 @@ public class Tile {
         }
         return getTileModel().isScar();
     }
-    
+
     @JsonIgnore
     public boolean hasEgress() {
         return getTileModel().hasEgress();
