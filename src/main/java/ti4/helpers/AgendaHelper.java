@@ -610,13 +610,23 @@ public final class AgendaHelper {
             message.append(
                     "When shenanigans have concluded, please confirm resolution or discard the result and manually resolve it yourselves.");
         }
-        Button autoResolve = Buttons.blue("agendaResolution_" + winner, "Resolve with Current Winner");
-        Button manualResolve = Buttons.red("autoresolve_manual", "Resolve it Manually");
-        List<Button> resolutions = new ArrayList<>(List.of(autoResolve, manualResolve));
-        for (Player player : game.getRealPlayers()) {
-            if (VeylorLeadersHandler.isVeylorAgendaPhase(game) && player.hasReadyBreakthrough("veylorbt")) {
-                resolutions.add(VeylorBreakthroughHandler.offerFilibusterButton(player, game));
-            }
+        Player filibusterPlayer = game.getRealPlayers().stream()
+                .filter(player ->
+                        VeylorLeadersHandler.isVeylorAgendaPhase(game) && player.hasReadyBreakthrough("veylorbt"))
+                .findFirst()
+                .orElse(null);
+        List<Button> resolutions;
+        if (filibusterPlayer == null) {
+            resolutions = new ArrayList<>(List.of(
+                    Buttons.blue("agendaResolution_" + winner, "Resolve with Current Winner"),
+                    Buttons.red("autoresolve_manual", "Resolve it Manually")));
+        } else {
+            message.append('\n')
+                    .append(filibusterPlayer.getRepresentationNoPing())
+                    .append(" may exhaust _Filibustered Legislation_ before this agenda is resolved.");
+            resolutions = new ArrayList<>(List.of(
+                    VeylorBreakthroughHandler.offerFilibusterButton(filibusterPlayer, game),
+                    VeylorBreakthroughHandler.offerDeclineFilibusterButton(filibusterPlayer, winner)));
         }
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message.toString(), resolutions);
     }
