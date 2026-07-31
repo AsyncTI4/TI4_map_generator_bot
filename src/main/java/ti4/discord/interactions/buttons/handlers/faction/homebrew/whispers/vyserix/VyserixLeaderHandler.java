@@ -27,6 +27,8 @@ public class VyserixLeaderHandler {
             Planet planetInfo = game.getPlanetsInfo().get(planet);
             if (planetInfo == null
                     || planetInfo.isHomePlanet()
+                    || planetInfo.isFake()
+                    || game.getTileFromPlanet(planet) == null
                     || !planetInfo.getTechSpecialities().isEmpty()) {
                 continue;
             }
