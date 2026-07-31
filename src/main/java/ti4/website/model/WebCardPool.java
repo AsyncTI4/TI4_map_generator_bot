@@ -51,6 +51,9 @@ public class WebCardPool {
     private List<String> agendaDiscard;
     private int agendaFullDeckSize;
 
+    // Techs in game
+    private List<String> technologyDeck;
+
     public static WebCardPool fromGame(Game game) {
         WebCardPool cardPool = new WebCardPool();
 
@@ -100,6 +103,8 @@ public class WebCardPool {
         cardPool.agendaDeck = sortedCopy(game.getAgendas());
         cardPool.agendaDiscard = new ArrayList<>(game.getDiscardAgendas().keySet());
         cardPool.agendaFullDeckSize = game.getAgendaFullDeckSize();
+
+        cardPool.technologyDeck = sortedCopy(game.getTechnologyDeck());
 
         return cardPool;
     }
