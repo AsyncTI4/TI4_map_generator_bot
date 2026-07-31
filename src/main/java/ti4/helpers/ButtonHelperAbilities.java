@@ -1994,7 +1994,11 @@ public final class ButtonHelperAbilities {
             return techToGain;
         }
         for (String tech : victim.getTechs()) {
-            if (!nekro.getTechs().contains(tech) && !techToGain.contains(tech) && !"iihq".equalsIgnoreCase(tech)) {
+            if (!nekro.getTechs().contains(tech)
+                    && !techToGain.contains(tech)
+                    && !"iihq".equalsIgnoreCase(tech)
+                    && !"thveylorg".equalsIgnoreCase(tech)
+                    && !"tharcanumpmy".equalsIgnoreCase(tech)) {
                 if (!game.playerHasLeaderUnlockedOrAlliance(victim, "bastioncommander")
                         || !Mapper.getTech(tech).isFactionTech()) {
                     if (game.isTwilightsFallMode()

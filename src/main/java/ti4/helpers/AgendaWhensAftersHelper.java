@@ -341,6 +341,12 @@ public final class AgendaWhensAftersHelper {
                 && !player.getExhaustedPlanetsAbilities().contains(planet)) {
             names.add("Tarrock Ability");
         }
+        String sanctum = "innersanctum";
+        if (player.hasTech("thveylorg")
+                && player.getPlanets().contains(sanctum)
+                && !player.getExhaustedPlanetsAbilities().contains(sanctum)) {
+            names.add("Inner Sanctum Ability");
+        }
 
         if (player.hasLeaderUnlocked("keleresheroodlynn")) {
             names.add("Keleres Hero");
@@ -392,6 +398,12 @@ public final class AgendaWhensAftersHelper {
         if (player.getPlanets().contains(planet)
                 && !player.getExhaustedPlanetsAbilities().contains(planet)) {
             buttons.add(Buttons.red("queueAfter_planet_" + planet, "Tarrock Ability"));
+        }
+        String sanctum = "innersanctum";
+        if (player.hasTech("thveylorg")
+                && player.getPlanets().contains(sanctum)
+                && !player.getExhaustedPlanetsAbilities().contains(sanctum)) {
+            buttons.add(Buttons.red("queueAfter_planet_" + sanctum, "Use Inner Sanctum Ability"));
         }
 
         if (player.getGame().playerHasLeaderUnlockedOrAlliance(player, "atokeracommander")) {
@@ -582,7 +594,7 @@ public final class AgendaWhensAftersHelper {
                                 }
                             }
                             case "pn" -> PromissoryNoteHelper.resolvePNPlay(after, player, game, event);
-                            case "planet" -> PlanetExhaustAbility.doAction(event, player, "tarrock", game, true);
+                            case "planet" -> PlanetExhaustAbility.doAction(event, player, after, game, true);
                             case "tech" -> {
                                 player.exhaustTech("dsedyng");
                                 riderButtons = AgendaRiderHelper.getAgendaButtons(
@@ -996,6 +1008,14 @@ public final class AgendaWhensAftersHelper {
                     afterButtons.add(Buttons.green(
                             factionChecker + "planetAbilityExhaust_" + planet,
                             "Use Tarrock Ability",
+                            player.getFactionEmoji()));
+                }
+                if (player.hasTech("thveylorg")
+                        && player.getPlanets().contains("innersanctum")
+                        && !player.getExhaustedPlanetsAbilities().contains("innersanctum")) {
+                    afterButtons.add(Buttons.green(
+                            factionChecker + "planetAbilityExhaust_innersanctum",
+                            "Use Inner Sanctum Ability",
                             player.getFactionEmoji()));
                 }
             }

@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.game.Game;
@@ -269,6 +270,7 @@ public class TacticalActionOutputService {
 
         StringBuilder output = new StringBuilder();
         int maxBonus = 0;
+        boolean ignoresAnomalies = ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player);
         if (distance > moveValue && distance < 90 && !game.isL1Hero()) {
             output.append(" (distance exceeds move value (")
                     .append(distance)
@@ -308,18 +310,22 @@ public class TacticalActionOutputService {
                 output.append(" (has _Lightning Drives_ for +1 movement if not transporting)");
             }
             if (riftDistance < distance) {
-                // maxBonus += distance - riftDistance; // Don't automatically count rifts, allow the GM to verify
-                output.append(" (gravity rifts along a path could add +")
-                        .append(distance - riftDistance)
-                        .append(" movement if used)");
-                if (player.hasRelic("circletofthevoid")) {
-                    output.append(" (Does not roll for rifts due to circlet of the void)");
+                if (ignoresAnomalies) {
+                    output.append(" (ignores gravity-rift effects due to _Power Word: Plane Shift_)");
+                } else {
+                    // Don't automatically count rifts, allowing the player to verify the chosen path.
+                    output.append(" (gravity rifts along a path could add +")
+                            .append(distance - riftDistance)
+                            .append(" movement if used)");
+                    if (player.hasRelic("circletofthevoid")) {
+                        output.append(" (does not roll for rifts due to Circlet of the Void)");
+                    }
+                    if (game.playerHasLeaderUnlockedOrAlliance(player, "thronescommander")) {
+                        output.append(
+                                " (gravity-rift movement effects are optional due to _Veythros, the Thrones of Ruin commander_; if you ignore the rift, you do not get the +1 movement)");
+                    }
+                    game.setStoredValue("possiblyUsedRift", "yes");
                 }
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "thronescommander")) {
-                    output.append(
-                            " (Gravity rift move effects are optional due to _Veythros_ the Thrones of Ruin commander. If you do ignore rift, you do not get the +1 to move.)");
-                }
-                game.setStoredValue("possiblyUsedRift", "yes");
             }
             if (player.hasTech("bedreamneg")) {
                 output.append(
@@ -342,7 +348,7 @@ public class TacticalActionOutputService {
         if (distance > 90 && player.hasAbility("sundered")) {
             output.append(" (__Warning__: has **Sundered**, and so cannot use wormholes)");
         }
-        if (riftDistance < distance) {
+        if (riftDistance < distance && !ignoresAnomalies) {
             game.setStoredValue("possiblyUsedRift", "yes");
         }
         if (player.hasAbility("celestial_guides")) {
@@ -372,7 +378,8 @@ public class TacticalActionOutputService {
                 && !player.hasAbility("voidborn")
                 && !player.hasTech("absol_amd")
                 && !player.getRelics().contains("circletofthevoid")
-                && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)) {
+                && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
+                && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)) {
             baseMoveValue = 1;
         }
         if (skipBonus) return baseMoveValue;

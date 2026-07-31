@@ -11,12 +11,18 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.CombatModifierModel;
+import ti4.model.NamedCombatModifierModel;
 import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
+import ti4.service.combat.CombatRollType;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -123,5 +129,46 @@ public class ArcanumUnitHandler {
                 player.getRepresentation() + " placed " + prereqs + " infantry on "
                         + Helper.getPlanetRepresentation(planetName, game)
                         + " using a Rune-Bound Sentinel (Arcanum mech).");
+    }
+
+    // Flagship
+    public static List<NamedCombatModifierModel> getAstralCodexExtraRollModifier(
+            Player player, Tile tile, UnitHolder combatOnHolder, CombatRollType rollType) {
+        if (player == null
+                || tile == null
+                || combatOnHolder == null
+                || rollType != CombatRollType.combatround
+                || !Constants.SPACE.equalsIgnoreCase(combatOnHolder.getName())
+                || !ButtonHelper.doesPlayerHaveFSHere("arcanum_flagship", player, tile)) {
+            return List.of();
+        }
+
+        TechnologyType selectedColor = TechnologyType.NONE;
+        int extraDice = 0;
+        for (TechnologyType color : TechnologyType.mainFour) {
+            int techCount = ButtonHelper.getNumberOfCertainTypeOfTech(player, color);
+            if (techCount > extraDice) {
+                selectedColor = color;
+                extraDice = techCount;
+            }
+        }
+
+        if (extraDice == 0) {
+            return List.of();
+        }
+
+        CombatModifierModel modifier = new CombatModifierModel();
+        modifier.setAlias("arcanum_astral_codex");
+        modifier.setType(Constants.COMBAT_EXTRA_ROLLS);
+        modifier.setValue(extraDice);
+        modifier.setPersistenceType("ALWAYS");
+        modifier.setScope("fs");
+        modifier.setRelated(List.of());
+        modifier.setForCombatAbility(CombatRollType.combatround);
+
+        return List.of(new NamedCombatModifierModel(
+                modifier,
+                "_The Astral Codex_: +" + extraDice + " dice from owning " + extraDice + " "
+                        + selectedColor.readableName() + " technology"));
     }
 }

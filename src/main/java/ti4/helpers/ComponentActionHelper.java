@@ -16,6 +16,7 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
@@ -86,7 +87,12 @@ public class ComponentActionHelper {
                 if ("thobliviong".equalsIgnoreCase(tech) && !OblivionTechHandler.canUseMirroredMemories(game, p1)) {
                     continue;
                 }
-                if ("tharcanumpmg".equalsIgnoreCase(tech) && !ArcanumTechHandler.hasFourTechsMatchingPrimordial(p1)) {
+                if (("tharcanumpmg".equalsIgnoreCase(tech) || "tharcanumpmb".equalsIgnoreCase(tech))
+                        && !ArcanumPrimordialTechHandler.hasFourTechsMatchingPrimordial(p1, tech)) {
+                    continue;
+                }
+                if ("tharcanumpmb".equalsIgnoreCase(tech)
+                        && !ArcanumPrimordialTechHandler.canUsePowerWordPlaneShift(game, p1)) {
                     continue;
                 }
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
@@ -161,11 +167,12 @@ public class ComponentActionHelper {
                 }
             }
         }
-        List<String> implementedLegendaryPlanets = new ArrayList<>(List.of("avernus"));
+        List<String> implementedLegendaryPlanets = new ArrayList<>(List.of("avernus", "fabricatestation"));
         for (String planet : implementedLegendaryPlanets) {
             String prettyPlanet = Mapper.getPlanet(planet).getName();
             if (p1.getPlanets().contains(planet)
-                    && !p1.getExhaustedPlanetsAbilities().contains(planet)) {
+                    && !p1.getExhaustedPlanetsAbilities().contains(planet)
+                    && (!"fabricatestation".equals(planet) || p1.hasTech("tharcanumpmy"))) {
                 compButtons.add(Buttons.green(
                         factionChecker + "planetAbilityExhaust_" + planet, "Use " + prettyPlanet + " Ability"));
             }

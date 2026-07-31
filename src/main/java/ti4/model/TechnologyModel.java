@@ -347,6 +347,14 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public String getCondensedReqsEmojis(boolean single) {
         String reqs = getRequirements().orElse("");
+        if (single && "arcanum".equalsIgnoreCase(getFaction().orElse("")) && types.size() == 2) {
+            if (isBioticTech() && isPropulsionTech()) return TechEmojis.BioticPropulsion.toString();
+            if (isBioticTech() && isCyberneticTech()) return TechEmojis.BioticCybernetic.toString();
+            if (isBioticTech() && isWarfareTech()) return TechEmojis.BioticWarfare.toString();
+            if (isCyberneticTech() && isPropulsionTech()) return TechEmojis.CyberneticPropulsion.toString();
+            if (isCyberneticTech() && isWarfareTech()) return TechEmojis.CyberneticWarfare.toString();
+            if (isWarfareTech() && isPropulsionTech()) return TechEmojis.WarfarePropulsion.toString();
+        }
         StringBuilder output = new StringBuilder();
         Set<TechnologyType> types = new HashSet<>(this.types);
         for (TechnologyType type : types) {
@@ -358,6 +366,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                         case "B" -> output.append(TechEmojis.PropulsionTech);
                         case "BB" -> output.append(TechEmojis.Propulsion2);
                         case "BBB" -> output.append(TechEmojis.Propulsion3);
+                        case "BBBB" -> output.append(TechEmojis.Propulsion4);
                     }
                 }
                 case CYBERNETIC -> {
@@ -367,6 +376,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                         case "Y" -> output.append(TechEmojis.CyberneticTech);
                         case "YY" -> output.append(TechEmojis.Cybernetic2);
                         case "YYY" -> output.append(TechEmojis.Cybernetic3);
+                        case "YYYY" -> output.append(TechEmojis.Cybernetic4);
                     }
                 }
                 case BIOTIC -> {
@@ -376,6 +386,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                         case "G" -> output.append(TechEmojis.BioticTech);
                         case "GG" -> output.append(TechEmojis.Biotic2);
                         case "GGG" -> output.append(TechEmojis.Biotic3);
+                        case "GGGG" -> output.append(TechEmojis.Biotic4);
                     }
                 }
                 case WARFARE -> {
@@ -385,6 +396,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                         case "R" -> output.append(TechEmojis.WarfareTech);
                         case "RR" -> output.append(TechEmojis.Warfare2);
                         case "RRR" -> output.append(TechEmojis.Warfare3);
+                        case "RRRR" -> output.append(TechEmojis.Warfare4);
                     }
                 }
                 case UNITUPGRADE -> {
