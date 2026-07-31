@@ -90,7 +90,8 @@ public class PlayHeroService {
         if (removed && reason != LeaderRemovalReason.ATTACHED && player.hasAbility("commanding_presence")) {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", **Commanding Presence** allows you to gain 1 command token after purging "
+                    player.getRepresentation()
+                            + ", **Commanding Presence** allows you to gain 1 command token after purging "
                             + Helper.getLeaderFullRepresentation(leader) + ".",
                     ButtonHelper.getGainCCButtons(player));
         }

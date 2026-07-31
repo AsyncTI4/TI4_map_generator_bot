@@ -2149,7 +2149,13 @@ public class TileGenerator {
     }
 
     private static void drawTheodisiTokenCount(
-            Graphics tileGraphics, String tokenPath, Game game, Tile tile, int drawX, int drawY, BufferedImage tokenImage) {
+            Graphics tileGraphics,
+            String tokenPath,
+            Game game,
+            Tile tile,
+            int drawX,
+            int drawY,
+            BufferedImage tokenImage) {
         int count = tokenPath.contains("token_theodisi_mine")
                 ? XytherisAbilityHandler.getStingOfTheHiveMineCount(game, tile)
                 : tokenPath.contains("token_theodisi_oblivionreflection")

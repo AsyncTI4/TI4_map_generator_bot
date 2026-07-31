@@ -3,12 +3,10 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kair
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -33,7 +31,8 @@ public class KairnUnitHandler {
     }
 
     @ButtonHandler(EXCAVATOR_EXPLORE)
-    public static void resolveExcavatorExplore(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void resolveExcavatorExplore(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (player == null || game == null || !player.ownsUnit("kairn_mech")) {
             return;
         }
@@ -56,7 +55,8 @@ public class KairnUnitHandler {
 
         Set<String> traits = planet.getPlanetTypes();
         if (traits.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This planet does not have an exploration trait.");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "This planet does not have an exploration trait.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -65,19 +65,19 @@ public class KairnUnitHandler {
         for (String trait : traits) {
             multiType.add(Buttons.gray(
                     player.factionButtonChecker() + "movedNExplored_filler_" + planetName + "_" + trait,
-                    "Explore " + Helper.getPlanetRepresentation(planetName, game)
-                    + " As " + StringUtils.capitalize(trait),
+                    "Explore " + Helper.getPlanetRepresentation(planetName, game) + " As "
+                            + StringUtils.capitalize(trait),
                     ExploreEmojis.getTraitEmoji(trait)));
         }
 
         if (multiType.size() == 1) {
-            ExploreService.explorePlanet(event, tile, planetName, traits.iterator().next(), player, true, game, 1, false);
+            ExploreService.explorePlanet(
+                    event, tile, planetName, traits.iterator().next(), player, true, game, 1, false);
         } else {
             MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                player.getRepresentation()
-                    + ", please choose the trait to use when exploring this planet.",
-                multiType);
+                    event.getMessageChannel(),
+                    player.getRepresentation() + ", please choose the trait to use when exploring this planet.",
+                    multiType);
         }
 
         game.setStoredValue(player.getFaction() + "usedExcavatorThisAction", "yes");

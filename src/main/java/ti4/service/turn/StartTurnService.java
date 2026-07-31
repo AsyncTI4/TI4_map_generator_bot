@@ -482,8 +482,7 @@ public class StartTurnService {
         if (!doneActionThisTurn && player.hasUnexhaustedLeader("kairnagent")) {
             startButtons.add(KairnLeadershandler.getKairnAgentButton(player));
         }
-        if (player.hasAbility("sting_of_the_hive")
-                && XytherisAbilityHandler.hasStingOfTheHiveMines(game)) {
+        if (player.hasAbility("sting_of_the_hive") && XytherisAbilityHandler.hasStingOfTheHiveMines(game)) {
             startButtons.add(XytherisAbilityHandler.getStingOfTheHiveMineLedgerButton(player));
         }
         if (player.hasAbility("reflections_of_the_void") && OblivionAbilityHandler.hasReflections(game)) {

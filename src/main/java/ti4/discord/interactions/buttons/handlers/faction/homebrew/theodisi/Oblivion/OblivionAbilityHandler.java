@@ -94,7 +94,8 @@ public class OblivionAbilityHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void offerReflectionPlacement(ButtonInteractionEvent event, Game game, Player player, Tile activeTile) {
+    public static void offerReflectionPlacement(
+            ButtonInteractionEvent event, Game game, Player player, Tile activeTile) {
         if (game == null
                 || player == null
                 || activeTile == null
@@ -148,16 +149,20 @@ public class OblivionAbilityHandler {
                 + ", you may use **Reflections of the Void** to place a reflection token in a system containing a planet you control.";
         String buttonPrefix = player.factionButtonChecker() + PLACE_REFLECTION;
         if (NewStuffHelper.checkAndHandlePaginationChange(
-                event, event.getMessageChannel(), buttons, List.of(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Decline")), message, buttonPrefix, buttonID)) {
+                event,
+                event.getMessageChannel(),
+                buttons,
+                List.of(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Decline")),
+                message,
+                buttonPrefix,
+                buttonID)) {
             return;
         }
 
         Tile tile = game.getTileByPosition(position);
         if (!player.hasAbility(REFLECTIONS_OF_THE_VOID)
                 || tile == null
-                || tile.getPlanetUnitHolders().stream()
-                        .map(Planet::getName)
-                        .noneMatch(player.getPlanets()::contains)
+                || tile.getPlanetUnitHolders().stream().map(Planet::getName).noneMatch(player.getPlanets()::contains)
                 || getAvailableReflectionTokens(game) < 1) {
             ButtonHelper.deleteMessage(event);
             return;
@@ -167,7 +172,8 @@ public class OblivionAbilityHandler {
         int reflectionCount = getReflectionCount(game, tile);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " placed a reflection token in " + tile.getRepresentationForButtons(game, player)
+                player.getRepresentation() + " placed a reflection token in "
+                        + tile.getRepresentationForButtons(game, player)
                         + ". This system now contains " + reflectionCount + " reflection token"
                         + (reflectionCount == 1 ? "." : "s.")
                         + " Multiple reflection tokens use a single map marker with their count displayed on it.");
@@ -199,7 +205,8 @@ public class OblivionAbilityHandler {
     }
 
     @ButtonHandler(PURGE_REFLECTION)
-    public static void purgeReflectionAndExplore(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void purgeReflectionAndExplore(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.replace(PURGE_REFLECTION, ""));
         if (!player.hasAbility(REFLECTIONS_OF_THE_VOID) || tile == null || getReflectionCount(game, tile) < 1) {
             ButtonHelper.deleteMessage(event);
@@ -209,7 +216,8 @@ public class OblivionAbilityHandler {
         removeReflection(game, tile);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " purged a reflection token in " + tile.getRepresentationForButtons(game, player)
+                player.getRepresentation() + " purged a reflection token in "
+                        + tile.getRepresentationForButtons(game, player)
                         + " using **Reflections of the Void** to explore the frontier deck.");
         ExploreService.expFront(event, tile, game, player, true);
         ButtonHelper.deleteMessage(event);
@@ -276,7 +284,8 @@ public class OblivionAbilityHandler {
     }
 
     public static Button getReflectionLedgerButton(Player player) {
-        return Buttons.gray(player.factionButtonChecker() + SHOW_REFLECTIONS, "View Reflection Tokens", FactionEmojis.oblivion);
+        return Buttons.gray(
+                player.factionButtonChecker() + SHOW_REFLECTIONS, "View Reflection Tokens", FactionEmojis.oblivion);
     }
 
     @ButtonHandler(SHOW_REFLECTIONS)

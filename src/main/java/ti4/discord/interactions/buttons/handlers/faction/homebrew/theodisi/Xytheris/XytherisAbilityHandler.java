@@ -8,10 +8,10 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.routing.ButtonHandler;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -164,7 +164,8 @@ public class XytherisAbilityHandler {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     player.getRepresentation() + " used **Sting of the Hive** to place a mine in "
-                            + tile.getRepresentation() + " instead of the produced hit. No hits remain to assign.\n-# This system now contains "
+                            + tile.getRepresentation()
+                            + " instead of the produced hit. No hits remain to assign.\n-# This system now contains "
                             + mineCount + " mine token" + (mineCount == 1 ? "." : "s.")
                             + " Multiple mine tokens use a single map marker with their count displayed on it.");
             return;
@@ -173,9 +174,8 @@ public class XytherisAbilityHandler {
         List<Button> assignmentButtons = new ArrayList<>();
         String message;
         if (rollType == CombatRollType.AFB) {
-            String targetChecker = target.isDummy() || target.isNpc()
-                    ? target.dummyPlayerSpoof()
-                    : target.factionButtonChecker();
+            String targetChecker =
+                    target.isDummy() || target.isNpc() ? target.dummyPlayerSpoof() : target.factionButtonChecker();
             assignmentButtons.add(Buttons.green(
                     targetChecker + "autoAssignAFBHits_" + tile.getPosition() + "_" + remainingHits,
                     "Auto-Assign " + remainingHits + " Hit" + (remainingHits == 1 ? "" : "s")));
@@ -184,15 +184,13 @@ public class XytherisAbilityHandler {
                         targetChecker + "getDamageButtons_" + tile.getPosition() + "_afb",
                         "Manually Assign " + remainingHits + " Hit" + (remainingHits == 1 ? "" : "s")));
                 assignmentButtons.add(Buttons.gray(
-                        targetChecker + "cancelAFBHits_" + tile.getPosition() + "_" + remainingHits,
-                        "Cancel a Hit"));
+                        targetChecker + "cancelAFBHits_" + tile.getPosition() + "_" + remainingHits, "Cancel a Hit"));
             }
             message = target.getRepresentation() + ", you may automatically assign "
                     + (remainingHits == 1 ? "the hit" : "the hits") + " from ANTI-FIGHTER BARRAGE.";
         } else if (rollType == CombatRollType.SpaceCannonOffence) {
-            String targetChecker = target.isDummy() || target.isNpc()
-                    ? target.dummyPlayerSpoof()
-                    : target.factionButtonChecker();
+            String targetChecker =
+                    target.isDummy() || target.isNpc() ? target.dummyPlayerSpoof() : target.factionButtonChecker();
             assignmentButtons.add(Buttons.green(
                     targetChecker + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_" + remainingHits,
                     "Auto-Assign " + remainingHits + " Hit" + (remainingHits == 1 ? "" : "s")));
@@ -207,9 +205,8 @@ public class XytherisAbilityHandler {
             message = target.getRepresentationNoPing() + ", you may automatically assign "
                     + (remainingHits == 1 ? "the hit" : "the hits") + " from SPACE CANNON OFFENCE.";
         } else if (rollType == CombatRollType.SpaceCannonDefence) {
-            String targetChecker = target.isDummy() || target.isNpc()
-                    ? target.dummyPlayerSpoof()
-                    : target.factionButtonChecker();
+            String targetChecker =
+                    target.isDummy() || target.isNpc() ? target.dummyPlayerSpoof() : target.factionButtonChecker();
             assignmentButtons.add(Buttons.green(
                     targetChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + remainingHits,
                     "Auto-Assign " + remainingHits + " Hit" + (remainingHits == 1 ? "" : "s")));
@@ -218,15 +215,14 @@ public class XytherisAbilityHandler {
                         "getDamageButtons_" + tile.getPosition() + "deleteThis_spacecombat",
                         "Manually Assign " + remainingHits + " Hit" + (remainingHits == 1 ? "" : "s")));
                 assignmentButtons.add(Buttons.gray(
-                        targetChecker + "cancelSpaceHits_" + tile.getPosition() + "_" + remainingHits,
-                        "Cancel a Hit"));
+                        targetChecker + "cancelSpaceHits_" + tile.getPosition() + "_" + remainingHits, "Cancel a Hit"));
             }
             message = target.getRepresentationNoPing() + ", you may automatically assign "
                     + (remainingHits == 1 ? "the hit" : "the hits") + " from SPACE CANNON DEFENCE.";
         } else {
             if (target.isDummy() || target.isNpc()) {
-                UnitHolder bombardmentTarget = game.getUnitHolderFromPlanet(
-                        game.getStoredValue("bombardmentTarget" + player.getFaction()));
+                UnitHolder bombardmentTarget =
+                        game.getUnitHolderFromPlanet(game.getStoredValue("bombardmentTarget" + player.getFaction()));
                 if (bombardmentTarget != null) {
                     assignmentButtons.add(Buttons.green(
                             target.dummyPlayerSpoof() + "autoAssignGroundHits_" + bombardmentTarget.getName() + "_"
@@ -270,10 +266,10 @@ public class XytherisAbilityHandler {
             int mines = getStingOfTheHiveMineCount(game, tile);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + ", there "
-                        + (mines == 1 ? "is **1 mine token**" : "are **" + mines + " mine tokens**")
-                        + " in the active system. You may use **Sting of the Hive** to remove any number of them to gain that many commodities or produce that many hits on the active player's ships.",
+                    player.getRepresentationUnfogged()
+                            + ", there "
+                            + (mines == 1 ? "is **1 mine token**" : "are **" + mines + " mine tokens**")
+                            + " in the active system. You may use **Sting of the Hive** to remove any number of them to gain that many commodities or produce that many hits on the active player's ships.",
                     List.of(
                             Buttons.green(
                                     player.factionButtonChecker() + RESOLVE_MINES + tile.getPosition(),
@@ -460,15 +456,15 @@ public class XytherisAbilityHandler {
         if (game == null) {
             return 0;
         }
-        int minesOnMap = game.getTileMap().values()
-                .stream()
+        int minesOnMap = game.getTileMap().values().stream()
                 .mapToInt(tile -> getStingOfTheHiveMineCount(game, tile))
                 .sum();
         return Math.max(0, MAX_MINE_TOKENS - minesOnMap);
     }
 
     public static Button getStingOfTheHiveMineLedgerButton(Player player) {
-        return Buttons.gray(player.factionButtonChecker() + "showStingHiveMines", "View Mine Tokens", FactionEmojis.xytheris);
+        return Buttons.gray(
+                player.factionButtonChecker() + "showStingHiveMines", "View Mine Tokens", FactionEmojis.xytheris);
     }
 
     @ButtonHandler("showStingHiveMines")

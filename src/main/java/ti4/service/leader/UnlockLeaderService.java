@@ -64,7 +64,8 @@ public class UnlockLeaderService {
         if (player.hasAbility("commanding_presence")) {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", **Commanding Presence** allows you to gain 1 command token after unlocking "
+                    player.getRepresentation()
+                            + ", **Commanding Presence** allows you to gain 1 command token after unlocking "
                             + Helper.getLeaderFullRepresentation(playerLeader) + ".",
                     ButtonHelper.getGainCCButtons(player));
         }

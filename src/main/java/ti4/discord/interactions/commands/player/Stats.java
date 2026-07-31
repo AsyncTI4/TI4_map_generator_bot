@@ -200,7 +200,8 @@ class Stats extends GameStateSubcommand {
                         player.getRepresentationUnfogged() + ", you have the opportunity to buy _Axis Orders_.",
                         ButtonHelperAbilities.getBuyableAxisOrders(player, game));
             }
-            if (player.hasAbility("expeditionary_cache") && KairnAbilityHandler.getAvailableExpeditionTokens(game) > 0) {
+            if (player.hasAbility("expeditionary_cache")
+                    && KairnAbilityHandler.getAvailableExpeditionTokens(game) > 0) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
