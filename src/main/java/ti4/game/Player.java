@@ -2632,6 +2632,18 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             }
         }
 
+        if ("thveylorg".equalsIgnoreCase(techID)) {
+            addPlanet("innersanctum");
+            refreshPlanet("innersanctum");
+        }
+
+        if ("tharcanumpmy".equalsIgnoreCase(techID)) {
+            addPlanet("fabricatestation");
+            refreshPlanet("fabricatestation");
+        }
+
+        ArcanumLeadersHandler.offerVeylaTheKeeperButtons(game, this, techID);
+
         // Update Owned Units when Researching a Unit Upgrade
         TechnologyModel techModel = Mapper.getTech(techID);
         if (techID == null) return;
@@ -2681,6 +2693,14 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         // Remove Custodia Vigilia when un-researching IIHQ
         if (techID != null && techID.toLowerCase().contains("iihq")) {
             removeCustodiaVigilia();
+        }
+
+        // Remove inner sanctum
+        if (techID != null && techID.toLowerCase().contains("thveylorg")) {
+            removePlanet("innersanctum");
+        }
+        if (techID != null && techID.toLowerCase().contains("tharcanumpmy")) {
+            removePlanet("fabricatestation");
         }
 
         // Update Owned Units when Researching a Unit Upgrade

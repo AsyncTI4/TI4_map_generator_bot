@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -459,6 +460,7 @@ public class CombatModHelper {
                         && activePlayer != null
                         && !activePlayer.getUserID().equals(player.getUserID())
                         && !activePlayer.getAllianceMembers().contains(player.getFaction())
+                        && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, activePlayer)
                         && !game.getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
                     meetsCondition = true;
                 }
@@ -471,6 +473,7 @@ public class CombatModHelper {
                         && activePlayer != null
                         && !activePlayer.getUserID().equals(player.getUserID())
                         && !activePlayer.getAllianceMembers().contains(player.getFaction())
+                        && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, activePlayer)
                         && !game.getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
                     meetsCondition = true;
                 }

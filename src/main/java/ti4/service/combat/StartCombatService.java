@@ -35,6 +35,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousPromissoryHandler;
@@ -1462,6 +1463,18 @@ public class StartCombatService {
         }
         if (!tile.isHomeSystem() && p2.hasLeaderUnlocked("aeternahero")) {
             buttons.add(AeternaLeadersHandler.getGravecallButton(game, p2, tile));
+        }
+
+        // Arcanum Disintegrate
+        if (p1.hasTech("tharcanumpmr")
+                && ArcanumPrimordialTechHandler.hasFourTechsMatchingPrimordial(p1, "tharcanumpmr")) {
+            buttons.addAll(
+                    ArcanumPrimordialTechHandler.getDisintegrateCombatButtons(p1, p2, tile, tile.getSpaceUnitHolder()));
+        }
+        if (p2.hasTech("tharcanumpmr")
+                && ArcanumPrimordialTechHandler.hasFourTechsMatchingPrimordial(p2, "tharcanumpmr")) {
+            buttons.addAll(
+                    ArcanumPrimordialTechHandler.getDisintegrateCombatButtons(p2, p1, tile, tile.getSpaceUnitHolder()));
         }
 
         return buttons;

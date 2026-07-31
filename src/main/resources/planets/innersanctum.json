@@ -9,7 +9,8 @@
     "resources": 0,
     "influence": 4,
     "planetTypes": [
-        "FAKE"
+        "FAKE",
+        "FACTION"
     ],
     "legendaryAbilityName": "Sabotaged Legislation",
     "legendaryAbilityText": "After an agenda is revealed, you may exhaust this card and predict the outcome of this agenda. If your prediction is correct, each player who voted for the resolved outcome draws 1 action card.",

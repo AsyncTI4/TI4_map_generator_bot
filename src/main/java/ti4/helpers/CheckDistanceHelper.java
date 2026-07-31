@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -93,6 +94,7 @@ public class CheckDistanceHelper {
                                     && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
+                                    && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     && !player.hasAbility("voidborn")
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !ButtonHelper.isLawInPlay(game, "shared_research"))
@@ -101,6 +103,7 @@ public class CheckDistanceHelper {
                                     && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
+                                    && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !player.hasAbility("gashlai_physiology")
                                     && !player.hasTech("tf-mr"))
@@ -121,6 +124,7 @@ public class CheckDistanceHelper {
                                     && !player.hasTech("wavelength")
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
+                                    && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     && !player.hasTech("absol_amd")
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2))) {
                         continue;
@@ -129,7 +133,8 @@ public class CheckDistanceHelper {
                 if (!forMap) {
                     if (tile != null
                             && tile.isGravityRift(game, player)
-                            && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)) {
+                            && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
+                            && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)) {
                         num = -1;
                         if (game.isCosmicPhenomenaeMode()) {
                             num = -2;

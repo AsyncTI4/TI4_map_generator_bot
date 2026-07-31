@@ -220,7 +220,7 @@ public class ListTechService {
         return getTechButtons(techs, player, "normal");
     }
 
-    private static boolean isTechResearchable(TechnologyModel tech, Player player) {
+    public static boolean isTechResearchable(TechnologyModel tech, Player player) {
         Game game = player.getGame();
         String requirements = tech.getRequirements().orElse("");
         int wilds = 0;
