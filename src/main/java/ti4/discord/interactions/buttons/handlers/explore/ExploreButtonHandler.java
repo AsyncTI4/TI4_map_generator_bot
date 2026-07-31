@@ -402,8 +402,17 @@ class ExploreButtonHandler {
         boolean scanlink = bID.startsWith("scanlink_");
         String[] info = bID.split("_");
         Tile tile = game.getTileFromPlanet(info[1]);
-        ExploreService.explorePlanet(
-                event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game, 1, scanlink);
+        if (buttonID.contains("frontier")) {
+            player.setBreakthroughExhausted("bentorbt", true);
+            ExploreService.expFront(event, tile, game, player, true);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing()
+                            + " exhausted their breakthrough to explore the frontier deck instead of a normal explore.");
+        } else {
+            ExploreService.explorePlanet(
+                    event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game, 1, scanlink);
+        }
         if (dsdihmy) {
             player.exhaustPlanet(info[1]);
             MessageHelper.sendMessageToChannel(

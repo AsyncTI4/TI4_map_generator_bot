@@ -1493,10 +1493,6 @@ public class ButtonHelper {
             if ("minister_commerce".equalsIgnoreCase(law) || "absol_minscomm".equalsIgnoreCase(law)) {
                 if (game.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())
                         || game.getLawsInfo().get(law).equalsIgnoreCase(player.getColor())) {
-                    MessageChannel channel = event.getMessageChannel();
-                    if (game.isFowMode()) {
-                        channel = player.getPrivateChannel();
-                    }
                     int numOfNeighbors = player.getNeighbourCount();
                     String message = player.getRepresentationUnfogged()
                             + " _Minister of Commerce_ triggered, so your trade goods have increased due to your "
@@ -1505,10 +1501,22 @@ public class ButtonHelper {
                             + ").";
                     player.setTg(numOfNeighbors + player.getTg());
                     ButtonHelperAgents.resolveArtunoCheck(player, numOfNeighbors);
-                    MessageHelper.sendMessageToChannel(channel, message);
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     ButtonHelperAbilities.pillageCheck(player, game);
                 }
             }
+        }
+        if (player.hasUnlockedBreakthrough("axisbt")) {
+            int numOfNeighbors = ButtonHelper.getNumberOfUnitUpgrades(player);
+            String message = player.getRepresentationUnfogged()
+                    + " _Axis Breakthrough_ triggered, so your trade goods have increased due to your "
+                    + numOfNeighbors
+                    + " unit upgrade technologies (" + player.getTg() + "->" + (player.getTg() + numOfNeighbors)
+                    + ").";
+            player.setTg(numOfNeighbors + player.getTg());
+            ButtonHelperAgents.resolveArtunoCheck(player, numOfNeighbors);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            ButtonHelperAbilities.pillageCheck(player, game);
         }
         if (player.hasAbility("bestow")) {
             int commod = Math.min(player.getCommodities(), 2);
@@ -3865,6 +3873,11 @@ public class ButtonHelper {
         if ("".equalsIgnoreCase(exhaustedMessage)) {
             exhaustedMessage = "Updated";
         }
+        if (event.getMessageChannel() instanceof ThreadChannel) {
+            game.setStoredValue("savedChannelType", "thread");
+        } else {
+            game.setStoredValue("savedChannelType", "channel");
+        }
         game.setSavedChannelID(event.getMessageChannel().getId());
         game.setSavedMessage(exhaustedMessage);
         List<Button> buttons = new ArrayList<>();
@@ -4789,10 +4802,6 @@ public class ButtonHelper {
                     "Use Naaz-Rokha Agents",
                     FactionEmojis.Naaz));
         }
-        if (player.hasUnlockedBreakthrough("mirvedabt")) {
-            endButtons.add(Buttons.green(
-                    player.factionButtonChecker() + "resolveMirvedaBT", "Land 1 PDS", FactionEmojis.mirveda));
-        }
         if (player.hasUnexhaustedLeader("lizhoagent")) {
             endButtons.add(Buttons.green(
                     player.factionButtonChecker() + "exhaustAgent_lizhoagent",
@@ -4844,7 +4853,7 @@ public class ButtonHelper {
             endButtons.add(Buttons.green(
                     player.factionButtonChecker() + "ravenMigration", "Use Migration", FactionEmojis.raven));
         }
-        if (player.hasReadyBreakthrough("axisbt") || player.hasTech("tf-armsbrokerage")) {
+        if (player.hasTech("tf-armsbrokerage")) {
             endButtons.add(Buttons.green(
                     player.factionButtonChecker() + "useAxisBT", "Use Arms Brokerage", FactionEmojis.axis));
         }
@@ -6051,6 +6060,14 @@ public class ButtonHelper {
                     buttons.add(Buttons.gray(buttonId2, buttonLabel2, ExploreEmojis.getTraitEmoji(trait)));
                 }
             }
+        }
+        if (!buttons.isEmpty() && player.hasReadyBreakthrough("bentorbt")) {
+            String trait = "frontier";
+
+            String buttonId = player.factionButtonChecker() + "movedNExplored_filler_" + planetId + "_" + trait;
+            String buttonLabel =
+                    "Explore " + planetRepresentation + " As " + StringUtils.capitalize(trait) + " using Breakthrough.";
+            buttons.add(Buttons.gray(buttonId, buttonLabel, ExploreEmojis.Frontier));
         }
         RevenantLeadersHandler.addRevArcanumAgentButtons(buttons, game, player, planet);
         return buttons;

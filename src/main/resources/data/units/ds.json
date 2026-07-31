@@ -506,6 +506,21 @@
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/ds/corsair_2.jpg?raw=true"
     },
     {
+        "id": "mirveda_fighter3",
+        "baseType": "fighter",
+        "asyncId": "ff",
+        "name": "Eye of the Curator",
+        "source": "ds",
+        "faction": "mirveda",
+        "moveValue": 3,
+        "capacityUsed": 0.5,
+        "cost": 0.5,
+        "combatHitsOn": 8,
+        "combatDieCount": 1,
+        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. Your fighters count as 1/2 a ship for the purposes of capacity and transportation",
+        "isShip": true
+    },
+    {
         "id": "florzen_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
@@ -611,13 +626,10 @@
         "combatDieCount": 1,
         "bombardHitsOn": 5,
         "bombardDieCount": 1,
-        "spaceCannonHitsOn": 5,
-        "spaceCannonDieCount": 1,
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You assign hits produced by this unit’s SPACE CANNON. While you control another flagship, this unit rolls 1 additional combat die.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/ds/flagships/celagrom.webp?raw=true"
+        "ability": "At the start of space combat, you may produce 1 hit and assign it to 1 of your opponent's ships. While you control another flagship, this unit rolls 1 additional combat die."
     },
     {
         "id": "ghemina_flagship_lord",
@@ -1620,7 +1632,7 @@
         "id": "rohdhna_warsun3",
         "baseType": "warsun",
         "asyncId": "ws",
-        "name": "Terrafactory III",
+        "name": "Omni-Forgeworld",
         "source": "ds",
         "faction": "rohdhna",
         "isUpgrade": true,
@@ -1637,7 +1649,7 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other player's units in this system lose PLANETARY SHIELD. This unit is also a station with a resource value of 2. When you would exhaust this station’s planet card, this unit becomes damaged instead."
+        "ability": "Other player's units in this system lose PLANETARY SHIELD. This unit is also a station. When you would exhaust this station’s planet card, this unit becomes damaged instead."
     },
     {
         "id": "rohdhna_flagship",
