@@ -25,6 +25,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperSCs;
+import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -105,6 +106,10 @@ public class AddPlanetService {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", you captured 2 infantry from a Tomb token.");
+        }
+        if (player.ownsUnit("kairn_flagship") && ButtonHelper.doesPlayerHaveFSHere("kairn_flagship", player, tile)) {
+            player.gainCommodities(1);
+            ButtonHelperStats.afterGainCommsChecks(game, player, 1);
         }
 
         int shrineCount = 0;

@@ -552,6 +552,7 @@ public class CombatRollService {
             message += "\n_Renegade II_ canceled " + canceledHits + " ANTI-FIGHTER BARRAGE hit"
                     + (canceledHits == 1 ? "" : "s") + " automatically.";
         }
+        XytherisAbilityHandler.beginStingOfTheHiveRoll(game, player, tile, rollType, h);
         int round;
         String combatName =
                 "combatRoundTracker" + opponent.getFaction() + tile.getPosition() + combatOnHolder.getName();
@@ -821,6 +822,13 @@ public class CombatRollService {
                             opponent.factionButtonChecker() + "cancelAFBHits_" + tile.getPosition() + "_" + h,
                             "Cancel a Hit"));
                 }
+                Button stingOfTheHiveButton = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButton(
+                        game, player, tile, rollType, opponent, h);
+                if (stingOfTheHiveButton != null) {
+                    buttons.add(stingOfTheHiveButton);
+                    msg2 += "\n-# Wait for " + player.getRepresentationNoPing()
+                            + " to decide whether to place a mine before assigning hits.";
+                }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
             }
         } else {
@@ -900,10 +908,33 @@ public class CombatRollService {
                     "Manually Assign Hit" + (h == 1 ? "" : "s")));
             buttons.add(Buttons.gray(
                     factionChecker + "cancelPdsOffenseHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
+            Button stingOfTheHiveButton = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButton(
+                    game, player, tile, rollType, opponent, h);
+            if (stingOfTheHiveButton != null) {
+                buttons.add(stingOfTheHiveButton);
+            }
             String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign "
                     + (h == 1 ? "the hit" : "hits") + "."
                     + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true, true);
+            if (stingOfTheHiveButton != null) {
+                msg2 += "\n-# Wait for " + player.getRepresentationNoPing()
+                        + " to decide whether to place a mine before assigning hits.";
+            }
             MessageHelper.sendMessageToChannelWithButtons(channel, msg2, buttons);
+        }
+
+        if (rollType == CombatRollType.SpaceCannonDefence && h > 0 && opponent != player) {
+            Button stingOfTheHiveButton = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButton(
+                    game, player, tile, rollType, opponent, h);
+            if (stingOfTheHiveButton != null) {
+                MessageHelper.sendMessageToChannelWithButton(
+                        event.getMessageChannel(),
+                        player.getRepresentation()
+                                + ", you may use **Sting of the Hive** to place a mine instead of 1 SPACE CANNON DEFENCE hit.\n-# "
+                                + opponent.getRepresentationNoPing()
+                                + " should wait to assign hits until you have decided:",
+                        stingOfTheHiveButton);
+            }
         }
 
         if (rollType == CombatRollType.AFB && player.hasUnlockedBreakthrough("vyserixbt")) {
@@ -940,11 +971,23 @@ public class CombatRollService {
                         if (!bombardPlanet.isEmpty()
                                 && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(bombardPlanet))) {
                             if (p2.isRealPlayer()) {
+                                List<Button> targetButtons = new ArrayList<>(buttons);
+                                Button stingOfTheHiveButton =
+                                        XytherisAbilityHandler.getStingOfTheHiveHitReplacementButton(
+                                                game, player, tile, rollType, p2, h);
+                                if (stingOfTheHiveButton != null) {
+                                    targetButtons.add(stingOfTheHiveButton);
+                                }
+                                String assignmentMessage = p2.getRepresentation()
+                                        + ", please assign the BOMBARDMENT hit" + (h == 1 ? "" : "s") + ".";
+                                if (stingOfTheHiveButton != null) {
+                                    assignmentMessage += "\n-# Wait for " + player.getRepresentationNoPing()
+                                            + " to decide whether to place a mine before assigning hits.";
+                                }
                                 MessageHelper.sendMessageToChannelWithButtons(
                                         game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
-                                        p2.getRepresentation() + ", please assign the BOMBARDMENT hit"
-                                                + (h == 1 ? "" : "s") + ".",
-                                        buttons);
+                                        assignmentMessage,
+                                        targetButtons);
                             } else {
                                 List<Button> buttons2 = new ArrayList<>();
                                 buttons2.add(Buttons.green(
@@ -952,10 +995,22 @@ public class CombatRollService {
                                                 + game.getUnitHolderFromPlanet(bombardPlanet)
                                                         .getName() + "_" + h,
                                         "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
+                                Button stingOfTheHiveButton =
+                                        XytherisAbilityHandler.getStingOfTheHiveHitReplacementButton(
+                                                game, player, tile, rollType, p2, h);
+                                if (stingOfTheHiveButton != null) {
+                                    buttons2.add(stingOfTheHiveButton);
+                                }
+                                String assignmentMessage =
+                                        player.getRepresentation() + ", please assign the BOMBARDMENT hit"
+                                                + (h == 1 ? "" : "s") + " for the dummy player.";
+                                if (stingOfTheHiveButton != null) {
+                                    assignmentMessage += "\n-# Wait for " + player.getRepresentationNoPing()
+                                            + " to decide whether to place a mine before assigning hits.";
+                                }
                                 MessageHelper.sendMessageToChannelWithButtons(
                                         game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
-                                        player.getRepresentation() + ", please assign the BOMBARDMENT hit"
-                                                + (h == 1 ? "" : "s") + " for the dummy player.",
+                                        assignmentMessage,
                                         buttons2);
                             }
                         }

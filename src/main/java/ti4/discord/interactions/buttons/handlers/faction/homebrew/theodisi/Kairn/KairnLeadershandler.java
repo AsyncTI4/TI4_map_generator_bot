@@ -8,21 +8,28 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
+import ti4.game.Leader;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.turn.StartTurnService;
 
 @UtilityClass
 public class KairnLeadershandler {
+    public static final String KAIRN_AGENT_START_TURN_KEY = "kairnAgentStartTurn";
     private static final List<String> EXPLORE_TYPES =
             List.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL, Constants.FRONTIER);
     private static final String ADD_PURGED_TO_TOP = "addPurgedExploreToTopKairn_";
@@ -31,6 +38,9 @@ public class KairnLeadershandler {
     private static final String KAIRN_HERO_PLANETS = "kairnHeroPlanets_";
     private static final String CHOOSE_KAIRN_HERO_PLANET = "chooseKairnHeroPlanet_";
     private static final String FINISH_KAIRN_HERO = "finishKairnHero";
+    private static final String EXPLORE_COMMANDER_PLANET = "explorePlanetWithKairnCommander_";
+    private static final String USE_KAIRN_AGENT = "useKairnAgent";
+    private static final String SELECT_KAIRN_AGENT_EXPLORE = "selectKairnAgentExplore_";
 
     // Hero
     private static List<Button> getPurgedExploreButtons(Game game, Player player) {
@@ -308,5 +318,171 @@ public class KairnLeadershandler {
                 StartTurnService.getStartOfTurnButtons(player, game, true, event));
 
         ButtonHelper.deleteMessage(event);
+    }
+
+    // Commander
+    public static List<Button> offerSerelVennButtons(Player player, Game game) {
+        List<Button> eligiblePlanets = new ArrayList<>();
+        for (String planetName : player.getPlanets()) {
+            if (ButtonHelper.isPlanetLegendaryOrHome(planetName, game, false, player)) {
+                continue;
+            }
+
+            Planet planet = game.getPlanetsInfo().get(planetName);
+            if (planet == null || planet.isFake()) {
+                continue;
+            }
+
+            eligiblePlanets.add(Buttons.green(
+                    player.factionButtonChecker() + EXPLORE_COMMANDER_PLANET + planetName,
+                    Helper.getPlanetRepresentation(planetName, game)));
+        }
+
+        return eligiblePlanets;
+    }
+
+    @ButtonHandler(EXPLORE_COMMANDER_PLANET)
+    public static void exploreChosenKairnPlanet(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (player == null || game == null) {
+            return;
+        }
+
+        String planetName = buttonID.replace(EXPLORE_COMMANDER_PLANET, "");
+        Planet planet = game.getPlanetsInfo().get(planetName);
+        if (planet == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve planet name.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        for (String trait : List.of("cultural", "hazardous", "industrial")) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "movedNExplored_filler_" + planetName + "_" + trait,
+                    "Explore " + Helper.getPlanetRepresentation(planetName, game) + " As "
+                            + StringUtils.capitalize(trait),
+                    ExploreEmojis.getTraitEmoji(trait)));
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentation() + ", please choose an exploration trait for "
+                        + Helper.getPlanetRepresentation(planetName, game) + ".",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    // Agent
+    public static Button getKairnAgentButton(Player player) {
+        return Buttons.gray(player.factionButtonChecker() + USE_KAIRN_AGENT, "Use Kairn Agent", FactionEmojis.kairn);
+    }
+
+    public static Button getKairnAgentCardsInfoButton(Player player) {
+        return Buttons.gray(
+                player.factionButtonChecker() + USE_KAIRN_AGENT,
+                "Use Kairn Agent on Another Player",
+                FactionEmojis.kairn);
+    }
+
+    @ButtonHandler(USE_KAIRN_AGENT)
+    public static void useKairnAgent(ButtonInteractionEvent event, Game game, Player player) {
+        Player target = game.getActivePlayer();
+        if (target == null
+                || !player.hasUnexhaustedLeader("kairnagent")
+                || getKairnAgentExploreButtons(game, player, target).isEmpty()) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "Draven Callas, the Kairn agent, cannot be used right now.");
+            return;
+        }
+
+        Leader agent = player.getLeader("kairnagent").orElse(null);
+        if (agent == null) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        ExhaustLeaderService.exhaustLeader(game, player, agent);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
+        showKairnAgentExploreChoices(event, game, player, target);
+    }
+
+    @ButtonHandler(SELECT_KAIRN_AGENT_EXPLORE)
+    public static void selectKairnAgentExplore(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String payload = buttonID.substring(SELECT_KAIRN_AGENT_EXPLORE.length());
+        String[] values = payload.split("\\|", 2);
+        Player target = values.length == 2 ? game.getPlayerFromColorOrFaction(values[0]) : null;
+        if (target == null || !player.hasLeader("kairnagent")) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<Button> buttons = getKairnAgentExploreButtons(game, player, target);
+        String message = getKairnAgentExploreMessage(player, target);
+        String buttonPrefix = player.factionButtonChecker() + SELECT_KAIRN_AGENT_EXPLORE + target.getFaction() + "|";
+        if (NewStuffHelper.checkAndHandlePaginationChange(
+                event, event.getMessageChannel(), buttons, message, buttonPrefix, buttonID)) {
+            return;
+        }
+
+        String exploreId = values[1];
+        ExploreModel explore = Mapper.getExplore(exploreId);
+        if (explore == null || !game.getAllExploreDiscard().remove(exploreId)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        game.getAllExplores().add(0, exploreId);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing() + " used Draven Callas, the Kairn agent, to place _"
+                        + explore.getName()
+                        + "_ on top of the " + explore.getType() + " exploration deck for "
+                        + target.getRepresentationNoPing() + ".");
+    }
+
+    private static void showKairnAgentExploreChoices(
+            ButtonInteractionEvent event, Game game, Player player, Player target) {
+        List<Button> buttons = getKairnAgentExploreButtons(game, player, target);
+        String buttonPrefix = player.factionButtonChecker() + SELECT_KAIRN_AGENT_EXPLORE + target.getFaction() + "|";
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                getKairnAgentExploreMessage(player, target),
+                NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
+    }
+
+    private static String getKairnAgentExploreMessage(Player player, Player target) {
+        return player.getRepresentation()
+                + " used Draven Callas, the Kairn agent, on "
+                + target.getRepresentationNoPing()
+                + ". Please choose an exploration card from a matching discard pile to place on top of its deck.";
+    }
+
+    private static List<Button> getKairnAgentExploreButtons(Game game, Player player, Player target) {
+        List<Button> buttons = new ArrayList<>();
+        String prefix = player.factionButtonChecker() + SELECT_KAIRN_AGENT_EXPLORE + target.getFaction() + "|";
+        for (String trait : getKairnAgentEligibleTraits(game, target)) {
+            for (String exploreId : game.getExploreDiscard(trait)) {
+                ExploreModel explore = Mapper.getExplore(exploreId);
+                if (explore != null) {
+                    buttons.add(
+                            Buttons.gray(prefix + exploreId, explore.getName(), ExploreEmojis.getTraitEmoji(trait)));
+                }
+            }
+        }
+        return buttons;
+    }
+
+    private static Set<String> getKairnAgentEligibleTraits(Game game, Player target) {
+        Set<String> traits = new HashSet<>();
+        for (String planetName : target.getPlanets()) {
+            Planet planet = game.getPlanetsInfo().get(planetName);
+            if (planet != null) {
+                traits.addAll(planet.getPlanetTypes());
+            }
+        }
+        traits.retainAll(Set.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL));
+        return traits;
     }
 }

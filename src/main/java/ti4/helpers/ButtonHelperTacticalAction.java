@@ -27,10 +27,13 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arden
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
@@ -77,6 +80,8 @@ public final class ButtonHelperTacticalAction {
 
     public static void endOfTacticalActionThings(Player player, Game game, ButtonInteractionEvent event) {
         logTacticalAction(game, player);
+        XytherisAbilityHandler.clearStingOfTheHiveRollState(game);
+        OblivionAbilityHandler.offerReflectionExplore(event, game);
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
             if (player.hasUnit("lunarium_carrier2")) {
                 LunariumAbilityHandler.resolveCrypticHaulerIIFighters(
@@ -174,6 +179,30 @@ public final class ButtonHelperTacticalAction {
                         player.getRepresentation()
                                 + ", you have _Colony Outposts_ and explored a planet during this tactical action.\nYou may spend a strategy token to find an attachment in that planet's exploration deck and attach it to that planet:",
                         KairnAbilityHandler.offerColonyOutposts(player));
+            }
+            if (player.ownsUnit("kairn_mech")) {
+                Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
+                if (activeSystem != null) {
+                    List<Button> excavatorPlanets = new ArrayList<>();
+                    for (Planet planet : activeSystem.getPlanetUnitHolders()) {
+                        if (planet.getUnitCount(UnitType.Mech, player) == 2) {
+                            if (planet.getPlanetTypes().isEmpty()) {
+                                continue;
+                            }
+                            excavatorPlanets.add(KairnUnitHandler.getExcavatorButtons(player, game, planet));
+                        }
+                    }
+
+                    if (!excavatorPlanets.isEmpty()
+                            && !"yes".equals(game.getStoredValue(player.getFaction() + "usedExcavatorThisAction"))) {
+                        excavatorPlanets.add(Buttons.red("deleteButtons", "Decline"));
+                        MessageHelper.sendMessageToChannelWithButtons(
+                                player.getCorrectChannel(),
+                                player.getRepresentation()
+                                        + ", you may explore one of these planets because it contains exactly 2 Excavators (Kairn mechs).",
+                                excavatorPlanets);
+                    }
+                }
             }
             if (!game.isAbsolMode()
                     && player.getRelics().contains("emphidia")
@@ -416,6 +445,8 @@ public final class ButtonHelperTacticalAction {
             if (!game.isFowMode()) {
                 ButtonHelper.updateMap(game, event, "Post Movement For " + player.getFactionEmoji());
             }
+            XytherisAbilityHandler.offerStingOfTheHiveAfterMovement(event, game, tile);
+            OblivionAbilityHandler.offerReflectionPlacement(event, game, player, tile);
         }
     }
 
@@ -494,11 +525,13 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("ghostagent_active");
         XytherisLeadersHandler.clearMyrixAgentEffects(game);
         XytherisLeadersHandler.clearHeroUnitAbilityRoll(game);
+        XytherisAbilityHandler.clearStingOfTheHiveRollState(game);
         PonthousUnitHandler.clearOldGlorySustain(game);
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
         ArcanumPrimordialTechHandler.clearPowerWordPlaneShift(game);
         ArcanumTechHandler.clearSigilOfTransmutation(game);
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
+        KairnUnitHandler.clearExcavatorMechExplore(game);
         KryxosBreakthroughHandler.clearPrototypeInnovators(game);
         ArdentiaUnitHandler.clearIronClawDeployUsed(game);
         DreamButtonHandler.clearDreamAgentAnomaly(game);

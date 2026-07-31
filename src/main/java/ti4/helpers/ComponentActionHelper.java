@@ -609,6 +609,7 @@ public class ComponentActionHelper {
                             "crimsonagent",
                             "redcreussagent",
                             "kryxosagent",
+                            "ardentiaagent",
                             "aeternaagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);

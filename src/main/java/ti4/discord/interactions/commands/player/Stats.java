@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -198,6 +199,14 @@ class Stats extends GameStateSubcommand {
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged() + ", you have the opportunity to buy _Axis Orders_.",
                         ButtonHelperAbilities.getBuyableAxisOrders(player, game));
+            }
+            if (player.hasAbility("expeditionary_cache")
+                    && KairnAbilityHandler.getAvailableExpeditionTokens(game) > 0) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + ", you may place expedition tokens using **Expeditionary Cache**.",
+                        KairnAbilityHandler.getExpeditionaryCacheButtons(player, game));
             }
             CommanderUnlockCheckService.checkPlayer(player, "mykomentori");
         }

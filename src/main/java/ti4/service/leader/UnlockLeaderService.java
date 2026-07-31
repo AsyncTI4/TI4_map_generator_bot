@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
@@ -59,6 +60,14 @@ public class UnlockLeaderService {
             MessageHelper.sendMessageToChannel(
                     channel, LeaderEmojis.getLeaderEmoji(playerLeader).toString());
             MessageHelper.sendMessageToChannel(channel, message);
+        }
+        if (player.hasAbility("commanding_presence")) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", **Commanding Presence** allows you to gain 1 command token after unlocking "
+                            + Helper.getLeaderFullRepresentation(playerLeader) + ".",
+                    ButtonHelper.getGainCCButtons(player));
         }
 
         if (leaderID.contains("bentorcommander")) {

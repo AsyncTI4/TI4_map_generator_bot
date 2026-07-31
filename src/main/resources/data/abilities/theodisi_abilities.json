@@ -135,7 +135,7 @@
         "id": "sting_of_the_hive",
         "name": "Sting of the Hive",
         "faction": "xytheris",
-        "permanentEffect": "When you produce a hit with a unit ability, you may place 1 mine token in the active system instead.\n\nAfter movement, if the active system contains 1 or more mine tokens, remove any number of those tokens to either gain 1 commodity or produce hits on the active player's units up to the number of tokens removed.",
+        "permanentEffect": "When you produce a hit with a unit ability, you may place 1 mine token in the active system instead.\n\nAfter movement, if the active system contains 1 or more mine tokens, remove any number of those tokens to gain 1 commodity for each token removed or produce hits on the active player's units up to the number of tokens removed.",
         "source": "theodisi"
     },
     {

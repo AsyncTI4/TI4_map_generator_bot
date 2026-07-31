@@ -17,6 +17,7 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.commandcounter.CommandCounterButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumBreakthroughHandler;
@@ -501,6 +502,14 @@ public final class ButtonHelperSCs {
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
                             + " since you cannot send players commodities due to your faction ability, washing here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong");
+            return;
+        }
+
+        if (player.hasAbility("expeditionary_cache")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", since **Expeditionary Cache** lets you place _Expedition Tokens_, resolving commodity washing here seems likely to be an error. Nothing has been processed. Please use a different route if that is incorrect.");
             return;
         }
 
@@ -1322,6 +1331,9 @@ public final class ButtonHelperSCs {
         }
         Button doneExhausting = Buttons.red("deleteButtons_leadership", "Done Exhausting Planets");
         buttons.add(doneExhausting);
+        if (player.hasPlayablePromissoryInHand("thpnardentia")) {
+            buttons.add(ArdentiaPromissoryHandler.getUsurpersLeaseButton(player));
+        }
         int ccCount = Helper.getCCCount(game, player.getColor());
         int limit = 16;
         if (!game.getStoredValue("ccLimit").isEmpty()) {

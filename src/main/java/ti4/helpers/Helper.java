@@ -1459,6 +1459,14 @@ public final class Helper {
                     found = true;
                 }
             }
+            if (thing.startsWith("usurpersLease_")) {
+                int additionalInfluence = Integer.parseInt(thing.substring("usurpersLease_".length()));
+                msg.append("> Used _The Usurper's Lease_ for ")
+                        .append(additionalInfluence)
+                        .append(" additional influence.\n");
+                inf += additionalInfluence;
+                found = true;
+            }
             if (!found
                     && !thing.contains("tg_")
                     && !thing.contains("boon")

@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -144,6 +145,13 @@ public final class ButtonHelperStats {
             String axis = player.getRepresentationUnfogged() + " you have the opportunity to buy _Axis Orders_.";
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), axis, ButtonHelperAbilities.getBuyableAxisOrders(player, game));
+        }
+        if (player.hasAbility("expeditionary_cache") && KairnAbilityHandler.getAvailableExpeditionTokens(game) > 0) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", you may place expedition tokens using **Expeditionary Cache**.",
+                    KairnAbilityHandler.getExpeditionaryCacheButtons(player, game));
         }
         CommanderUnlockCheckService.checkPlayer(player, "mykomentori");
         Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");

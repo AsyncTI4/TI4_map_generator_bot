@@ -20,7 +20,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -476,6 +478,15 @@ public class StartTurnService {
                 && player.hasRelicReady("waxing_moonphase")
                 && AeternaAbilityHandler.canReturnCapturedNeutralUnits(game, player, 2)) {
             startButtons.add(AeternaAbilityHandler.getWaxingMoonButton(player));
+        }
+        if (!doneActionThisTurn && player.hasUnexhaustedLeader("kairnagent")) {
+            startButtons.add(KairnLeadershandler.getKairnAgentButton(player));
+        }
+        if (player.hasAbility("sting_of_the_hive") && XytherisAbilityHandler.hasStingOfTheHiveMines(game)) {
+            startButtons.add(XytherisAbilityHandler.getStingOfTheHiveMineLedgerButton(player));
+        }
+        if (player.hasAbility("reflections_of_the_void") && OblivionAbilityHandler.hasReflections(game)) {
+            startButtons.add(OblivionAbilityHandler.getReflectionLedgerButton(player));
         }
         boolean hadAnyUnplayedSCs = false;
 
