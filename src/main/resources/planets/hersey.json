@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "hersey",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "hersey",
     "tileId": "er112",
     "name": "Hersey",

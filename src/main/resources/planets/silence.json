@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "silence",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "silence",
     "tileId": "d100",
     "name": "Silence",

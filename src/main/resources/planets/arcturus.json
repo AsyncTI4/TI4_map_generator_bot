@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "arcturus",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "arcturus",
     "tileId": "53",
     "name": "Arcturus",

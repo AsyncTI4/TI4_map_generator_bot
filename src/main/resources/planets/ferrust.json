@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ferrust",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 220,
+            "y": 235
+        }
+    },
     "id": "ferrust",
     "tileId": "er86",
     "name": "Ferrust",

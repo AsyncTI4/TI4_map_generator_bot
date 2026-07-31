@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "cerberus",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "cerberus",
     "tileId": "er109",
     "name": "Cerberus",

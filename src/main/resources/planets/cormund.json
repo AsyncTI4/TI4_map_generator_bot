@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "cormund",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 134,
+            "y": 129
+        }
+    },
     "id": "cormund",
     "tileId": "67",
     "name": "Cormund",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "hospoona",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 225,
+            "y": 220
+        }
+    },
     "id": "hospoona",
     "tileId": "s14",
     "name": "Hospoona",

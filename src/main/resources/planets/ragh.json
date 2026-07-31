@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ragh",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 222,
+            "y": 200
+        }
+    },
     "id": "ragh",
     "tileId": "11",
     "name": "Ragh",

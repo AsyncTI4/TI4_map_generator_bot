@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "qucenn",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 88
+        }
+    },
     "id": "qucenn",
     "tileId": "29",
     "name": "Qucen'n",

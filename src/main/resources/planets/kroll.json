@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "kroll",
+        "resourcesLocation": "TopRight",
+        "centerPosition": {
+            "x": 215,
+            "y": 84
+        }
+    },
     "id": "kroll",
     "tileId": "d13",
     "name": "Kroll",

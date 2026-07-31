@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "aysisrest",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 94
+        }
+    },
     "id": "aysisrest",
     "tileId": "d05",
     "name": "Aysis' Rest",

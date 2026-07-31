@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "orad",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 231,
+            "y": 207
+        }
+    },
     "id": "orad",
     "tileId": "d15",
     "name": "Orad",

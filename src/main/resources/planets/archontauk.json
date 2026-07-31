@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "archontauk",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 226,
+            "y": 200
+        }
+    },
     "id": "archontauk",
     "tileId": "92new",
     "name": "Archon Tau Keleres",

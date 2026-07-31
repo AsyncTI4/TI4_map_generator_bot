@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "casibann",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "casibann",
     "tileId": "er84",
     "name": "Casibann",

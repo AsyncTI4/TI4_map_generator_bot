@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "primor",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 172,
+            "y": 148
+        }
+    },
     "id": "primor",
     "tileId": "65",
     "name": "Primor",

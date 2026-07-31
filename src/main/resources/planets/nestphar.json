@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "nestphar",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 128
+        }
+    },
     "id": "nestphar",
     "tileId": "05",
     "name": "Nestphar",

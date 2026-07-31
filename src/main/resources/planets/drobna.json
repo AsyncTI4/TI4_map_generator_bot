@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "drobna",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 168,
+            "y": 145
+        }
+    },
     "id": "drobna",
     "tileId": "s09",
     "name": "Drobna",

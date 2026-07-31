@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ekko",
+        "resourcesLocation": "TopRight",
+        "centerPosition": {
+            "x": 215,
+            "y": 84
+        }
+    },
     "id": "ekko",
     "tileId": "d03",
     "name": "Ekko",

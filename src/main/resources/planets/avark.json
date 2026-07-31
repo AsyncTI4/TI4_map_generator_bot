@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "avark",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 224,
+            "y": 224
+        }
+    },
     "id": "avark",
     "tileId": "93new",
     "name": "Avar Keleres",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "rylfang",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "rylfang",
     "tileId": "er101",
     "name": "Ryl Fang",

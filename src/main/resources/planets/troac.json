@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "troac",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "troac",
     "tileId": "d106",
     "name": "Troac",

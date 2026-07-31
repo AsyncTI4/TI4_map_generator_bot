@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "qaak",
+        "resourcesLocation": "TopRight",
+        "centerPosition": {
+            "x": 210,
+            "y": 85
+        }
+    },
     "id": "qaak",
     "tileId": "d115",
     "name": "Qaak",

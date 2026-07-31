@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "vespa",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "vespa",
     "tileId": "m32",
     "name": "Vespa",

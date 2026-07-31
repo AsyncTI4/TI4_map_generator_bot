@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "lisisii",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 81
+        }
+    },
     "id": "lisisii",
     "tileId": "11",
     "name": "Lisis II",

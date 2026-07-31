@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "jarrah",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "jarrah",
     "tileId": "c09",
     "name": "Jarrah",

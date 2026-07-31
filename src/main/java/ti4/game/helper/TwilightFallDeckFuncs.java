@@ -94,11 +94,21 @@ public interface TwilightFallDeckFuncs {
         if (deckID == null || deckID.isEmpty()) {
             deckID = "tf_units";
         }
+        Game game = getSelf();
         List<String> allCards = Mapper.getDeck(deckID).getNewShuffledDeck();
         for (Player p : getRealPlayersNNeutral()) {
             for (String unit : p.getUnitsOwned()) {
                 allCards.remove(unit);
             }
+        }
+        List<String> bannedCards = new ArrayList<>();
+        for (String card : allCards) {
+            if (game.getStoredValue("bannedUnits").contains(card)) {
+                bannedCards.add(card);
+            }
+        }
+        for (String card : bannedCards) {
+            allCards.remove(card);
         }
         if (isVeiledHeartMode() && !includeVeiledCards) {
             removeVeiledCards(allCards);

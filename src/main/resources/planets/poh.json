@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "poh",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 94
+        }
+    },
     "id": "poh",
     "tileId": "d15",
     "name": "Poh",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "marshengurn",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 148,
+            "y": 212
+        }
+    },
     "id": "marshengurn",
     "tileId": "s04",
     "name": "Marshen Gurn",

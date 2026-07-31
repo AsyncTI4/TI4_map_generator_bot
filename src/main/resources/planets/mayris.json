@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "mayris",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "mayris",
     "tileId": "er63",
     "name": "Mayris",

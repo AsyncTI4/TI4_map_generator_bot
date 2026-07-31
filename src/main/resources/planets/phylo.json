@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "phylo",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "phylo",
     "tileId": "er116",
     "name": "Phylo",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "tera",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 90,
+            "y": 140
+        }
+    },
     "id": "tera",
     "tileId": "s14",
     "name": "Tera",

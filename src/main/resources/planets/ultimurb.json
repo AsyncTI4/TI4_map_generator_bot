@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ultimurb",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "ultimurb",
     "tileId": "er118b",
     "name": "Ultimurb",

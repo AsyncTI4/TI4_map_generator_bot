@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "wrenterra",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 226,
+            "y": 200
+        }
+    },
     "id": "wrenterra",
     "tileId": "10",
     "name": "Wren Terra",
