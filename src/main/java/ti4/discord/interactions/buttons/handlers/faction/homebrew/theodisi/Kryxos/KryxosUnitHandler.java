@@ -173,7 +173,8 @@ public class KryxosUnitHandler {
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationUnfogged() + " damaged a Warspawn Juggernaut III (Kryxos mech) and placed " + hits
+                player.getRepresentationUnfogged() + " damaged a Warspawn Juggernaut III (Kryxos mech) and placed "
+                        + hits
                         + " infantry with it on " + Helper.getUnitHolderRepresentation(tile, location, game, player)
                         + ".");
     }

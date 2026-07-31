@@ -419,7 +419,8 @@ public class CombatRollService {
             }
 
             playerUnitsByQuantity = adjustedUnits;
-            unitUpgradeRollNote.append("> Seraxis Thule, the Kryxos commander: Unit upgrades receive +1 to their rolls.\n");
+            unitUpgradeRollNote.append(
+                    "> Seraxis Thule, the Kryxos commander: Unit upgrades receive +1 to their rolls.\n");
         }
 
         KryxosBreakthroughHandler.refreshPrototypeInnovators(game, player, tile, playerUnitsByQuantity, rollType);

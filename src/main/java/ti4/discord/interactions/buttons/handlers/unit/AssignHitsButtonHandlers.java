@@ -219,8 +219,8 @@ class AssignHitsButtonHandlers {
                                     ? " on " + holder.getRepresentation(game)
                                     : " in tile " + tile.getRepresentationForButtons(game, player))
                             + ".";
-                    boolean cancelsTwoHits = player.hasTech("nes")
-                            || (player.ownsUnit("kryxos_flagship3") && type == UnitType.Flagship);
+                    boolean cancelsTwoHits =
+                            player.hasTech("nes") || (player.ownsUnit("kryxos_flagship3") && type == UnitType.Flagship);
                     if (cancelsTwoHits) {
                         String sustainSource = player.hasTech("nes")
                                 ? "_Non-Euclidean Shielding_"
