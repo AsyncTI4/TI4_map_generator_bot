@@ -44,6 +44,7 @@ import ti4.service.unit.ParsedUnit;
 public class ArcanumPrimordialTechHandler {
     private static final List<String> PRIMORDIAL_TECHS =
             List.of("tharcanumpmy", "tharcanumpmg", "tharcanumpmr", "tharcanumpmb");
+    // Miracle
     private static final String MIRACLE = "tharcanumpmg";
     private static final String DISCARD_AC = "miracleAcDiscard";
     private static final String GAIN_CC = "miracleGainCC";
@@ -52,15 +53,18 @@ public class ArcanumPrimordialTechHandler {
     private static final String PLACE_INFANTRY = "miraclePlaceInfantry_";
     private static final String FINISH_INFANTRY = "miracleFinishInfantry_";
     private static final String INFANTRY_PLACED = "miracleInfantryPlaced_";
+    // Fabricate
     private static final String FABRICATE_STATION = "fabricatestation";
     private static final String FABRICATE_TECH = "tharcanumpmy";
     private static final String FABRICATE_SELECT_SOURCE = "fabricateStationSource_";
     private static final String FABRICATE_SELECT_SYSTEM = "fabricateStationSystem_";
     private static final String FABRICATE_PLACE_UNIT = "fabricateStationPlace_";
+    // Disintegrate
     private static final String DISINTEGRATE = "tharcanumpmr";
     private static final String DISINTEGRATE_HIT = "arcanumDisintegrateHit_";
     private static final String DISINTEGRATE_DESTROY = "arcanumDisintegrateDestroy_";
     private static final String DISINTEGRATE_DESTROY_UNIT = "arcanumDisintegrateDestroyUnit_";
+    // Plane Shift
     private static final String PLANE_SHIFT = "tharcanumpmb";
     private static final String PLANE_SHIFT_SELECT_SYSTEM = "planeShiftSystem_";
     private static final String PLANE_SHIFT_PENDING = "planeShiftPending";
@@ -503,9 +507,7 @@ public class ArcanumPrimordialTechHandler {
     @ButtonHandler(DISINTEGRATE_HIT)
     public static void produceDisintegrateHit(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         DisintegrateCombat combat = getDisintegrateCombat(game, player, buttonID, DISINTEGRATE_HIT);
-        if (combat == null
-                || !player.hasTech(DISINTEGRATE)
-                || !hasFourTechsMatchingPrimordial(player, DISINTEGRATE)) {
+        if (combat == null || !player.hasTech(DISINTEGRATE) || !hasFourTechsMatchingPrimordial(player, DISINTEGRATE)) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             return;
         }
@@ -773,6 +775,7 @@ public class ArcanumPrimordialTechHandler {
             return;
         }
         if ("choose".equals(selection)) {
+            ButtonHelper.deleteMessage(event);
             sendFabricateSystemButtons(event, game, player, source);
             return;
         }

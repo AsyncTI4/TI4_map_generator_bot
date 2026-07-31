@@ -907,9 +907,7 @@ public final class AgendaHelper {
                         SettlementsAcd2ButtonHandler.resolveWinningSettlements(game, winningR, winner);
                     }
 
-                    if (winningR != null
-                            && winningR.hasTech("thveylorg")
-                            && specificVote.contains("Inner Sanctum")) {
+                    if (winningR != null && winningR.hasTech("thveylorg") && specificVote.contains("Inner Sanctum")) {
                         for (Player voter : getWinningVoters(winner, game)) {
                             ActionCardHelper.drawActionCards(voter, 1);
                         }

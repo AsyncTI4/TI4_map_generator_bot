@@ -121,6 +121,7 @@ public class ArcanumLeadersHandler {
         if (game == null
                 || target == null
                 || "setup".equalsIgnoreCase(game.getPhaseOfGame())
+                || "playerSetup".equalsIgnoreCase(game.getPhaseOfGame())
                 || gainedTech == null
                 || gainedTech.isFactionTech()
                 || !target.hasTech(gainedTechID)
@@ -173,8 +174,7 @@ public class ArcanumLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 agentOwner.getCardsInfoThread(),
-                agentOwner.getRepresentationUnfogged()
-                        + ", choose a player to use _Veyla, the Arcanum agent_ on.",
+                agentOwner.getRepresentationUnfogged() + ", choose a player to use _Veyla, the Arcanum agent_ on.",
                 targetButtons);
     }
 
@@ -271,9 +271,8 @@ public class ArcanumLeadersHandler {
         String returnedTechID = payload[1];
         String selectedTechID = payload[2];
         List<Button> replacementButtons = getVeylaReplacementButtons(game, target, returnedTechID);
-        String message =
-                target.getRepresentation()
-                        + ", choose a non-unit-upgrade technology to gain from _Veyla, the Arcanum agent_.";
+        String message = target.getRepresentation()
+                + ", choose a non-unit-upgrade technology to gain from _Veyla, the Arcanum agent_.";
         String buttonPrefix =
                 target.factionButtonChecker() + GAIN_VEYLA_TECH + target.getFaction() + "|" + returnedTechID + "|";
         if (NewStuffHelper.checkAndHandlePaginationChange(

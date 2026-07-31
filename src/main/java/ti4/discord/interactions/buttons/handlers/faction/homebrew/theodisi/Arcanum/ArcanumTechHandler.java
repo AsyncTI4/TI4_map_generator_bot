@@ -14,7 +14,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.NewStuffHelper;
@@ -210,7 +209,6 @@ public class ArcanumTechHandler {
         if (!spaceCannonPromptAlreadyAvailable && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
             StartCombatService.sendSpaceCannonButtonsToThread(event.getMessageChannel(), game, player, tile);
         }
-        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
         ButtonHelper.deleteMessage(event);
     }
 
