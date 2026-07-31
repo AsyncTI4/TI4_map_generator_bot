@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -13,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -28,16 +28,8 @@ class EspionageAcd2ButtonHandler {
             if (target == player || target.getActionCards().isEmpty()) {
                 continue;
             }
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray(
-                        player.factionButtonChecker() + "espionageTarget_" + target.getFaction(), target.getColor()));
-            } else {
-                Button button = Buttons.gray(
-                        player.factionButtonChecker() + "espionageTarget_" + target.getFaction(),
-                        target.getFactionModel().getShortName());
-                button = button.withEmoji(Emoji.fromFormatted(target.getFactionEmoji()));
-                buttons.add(button);
-            }
+            buttons.add(FoWHelper.fogSafeTargetButton(
+                    player.factionButtonChecker() + "espionageTarget_" + target.getFaction(), "gray", target));
         }
 
         ButtonHelper.deleteMessage(event);
@@ -87,7 +79,7 @@ class EspionageAcd2ButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCardsInfoThread(),
                 target.getRepresentationUnfogged() + ", "
-                        + (game.isFowMode() ? "another player" : player.getFactionEmojiOrColor())
+                        + FoWHelper.factionEmojiOrAnon(game, player, "another player")
                         + " is resolving _Espionage_ against you. You may reveal your action cards so they can take 1,"
                         + " or send them a random promissory note instead.",
                 buttons);

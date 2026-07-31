@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
@@ -496,10 +495,7 @@ public final class ButtonHelperAbilities {
         String msg = player.getFactionEmojiOrColor() + " paid 1 trade good to "
                 + vaden.getFactionEmojiOrColor()
                 + "to clear 2 debt tokens from their \"Shark Loans\" pool via the **Binding Debts** ability.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(vaden.getCorrectChannel(), msg);
-        }
+        FoWHelper.notifyPlayerAndAffectedInFog(game, player, vaden, msg);
     }
 
     private static List<String> getTrapNames() {
@@ -579,15 +575,7 @@ public final class ButtonHelperAbilities {
     public static void setTrapStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray("setTrapStep2_" + p2.getFaction(), p2.getColor()));
-            } else {
-                Button button = Buttons.gray(
-                        "setTrapStep2_" + p2.getFaction(), p2.getFactionModel().getShortName());
-                String factionEmojiString = p2.getFactionEmoji();
-                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
-                buttons.add(button);
-            }
+            buttons.add(FoWHelper.fogSafeTargetButton("setTrapStep2_" + p2.getFaction(), "gray", p2));
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),

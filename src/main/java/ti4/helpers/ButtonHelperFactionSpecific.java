@@ -820,16 +820,8 @@ public final class ButtonHelperFactionSpecific {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray("edynAgendaStuffStep3_" + p2.getFaction() + "_" + pos, p2.getColor()));
-            } else {
-                Button button = Buttons.gray(
-                        "edynAgendaStuffStep3_" + p2.getFaction() + "_" + pos,
-                        p2.getFactionModel().getShortName());
-                String factionEmojiString = p2.getFactionEmoji();
-                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
-                buttons.add(button);
-            }
+            buttons.add(
+                    FoWHelper.fogSafeTargetButton("edynAgendaStuffStep3_" + p2.getFaction() + "_" + pos, "gray", p2));
         }
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(
@@ -1244,21 +1236,16 @@ public final class ButtonHelperFactionSpecific {
         Tile tile = game.getTileByPosition(pos);
         CommandCounterHelper.addCC(event, p2, tile);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", you _Stymie_'d the system: "
-                            + tile.getRepresentationForButtons(game, player) + ".");
-            MessageHelper.sendMessageToChannel(
-                    p2.getCorrectChannel(),
-                    p2.getRepresentationUnfogged() + ", you were _Stymie_'d in system: "
-                            + tile.getRepresentationForButtons(game, p2) + ".");
-        } else {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " has _Stymie_'d " + p2.getRepresentationUnfogged()
-                            + " in the system: " + tile.getRepresentationForButtons(game, player) + ".");
-        }
+        FoWHelper.notifyActorAndAffectedElsePublic(
+                game,
+                player,
+                player.getRepresentationUnfogged() + ", you _Stymie_'d the system: "
+                        + tile.getRepresentationForButtons(game, player) + ".",
+                p2,
+                p2.getRepresentationUnfogged() + ", you were _Stymie_'d in system: "
+                        + tile.getRepresentationForButtons(game, p2) + ".",
+                player.getRepresentationUnfogged() + " has _Stymie_'d " + p2.getRepresentationUnfogged()
+                        + " in the system: " + tile.getRepresentationForButtons(game, player) + ".");
     }
 
     public static void offerASNButtonsStep1(Game game, Player player, String warfareOrTactical) {
@@ -1763,10 +1750,7 @@ public final class ButtonHelperFactionSpecific {
         player.setTg(oldTg + 2);
         String message = player.getRepresentation() + " gained 2 trade goods due to " + FactionEmojis.Hacan
                 + "_Production Biomes_ (" + oldTg + "->" + player.getTg() + ").";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), message);
-        }
+        FoWHelper.notifyPlayerAndAffectedInFog(game, player, hacan, message);
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 2);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -1797,16 +1781,7 @@ public final class ButtonHelperFactionSpecific {
             if (p2 == hacan) {
                 continue;
             }
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray("productionBiomes_" + p2.getFaction(), p2.getColor()));
-            } else {
-                Button button = Buttons.gray(
-                        "productionBiomes_" + p2.getFaction(),
-                        p2.getFactionModel().getShortName());
-                String factionEmojiString = p2.getFactionEmoji();
-                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
-                buttons.add(button);
-            }
+            buttons.add(FoWHelper.fogSafeTargetButton("productionBiomes_" + p2.getFaction(), "gray", p2));
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 hacan.getCorrectChannel(),
@@ -1848,33 +1823,15 @@ public final class ButtonHelperFactionSpecific {
                 continue;
             }
             if (p2.getSCs().size() > 1) {
-                if (game.isFowMode()) {
-                    buttons.add(Buttons.gray("selectBeforeSwapSCs_" + p2.getFaction() + "_" + type, p2.getColor()));
-                } else {
-                    Button button = Buttons.gray(
-                            "selectBeforeSwapSCs_" + p2.getFaction() + "_" + type,
-                            p2.getFactionModel().getShortName());
-                    String factionEmojiString = p2.getFactionEmoji();
-                    button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
-                    buttons.add(button);
-                }
+                buttons.add(FoWHelper.fogSafeTargetButton(
+                        "selectBeforeSwapSCs_" + p2.getFaction() + "_" + type, "gray", p2));
             } else {
-                if (game.isFowMode()) {
-                    buttons.add(Buttons.gray(
-                            "swapSCs_" + p2.getFaction() + "_" + type + "_"
-                                    + p2.getSCs().toArray()[0] + "_"
-                                    + hacan.getSCs().toArray()[0],
-                            p2.getColor()));
-                } else {
-                    Button button = Buttons.gray(
-                            "swapSCs_" + p2.getFaction() + "_" + type + "_"
-                                    + p2.getSCs().toArray()[0] + "_"
-                                    + hacan.getSCs().toArray()[0],
-                            p2.getFactionModel().getShortName());
-                    String factionEmojiString = p2.getFactionEmoji();
-                    button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
-                    buttons.add(button);
-                }
+                buttons.add(FoWHelper.fogSafeTargetButton(
+                        "swapSCs_" + p2.getFaction() + "_" + type + "_"
+                                + p2.getSCs().toArray()[0] + "_"
+                                + hacan.getSCs().toArray()[0],
+                        "gray",
+                        p2));
             }
         }
         return buttons;
