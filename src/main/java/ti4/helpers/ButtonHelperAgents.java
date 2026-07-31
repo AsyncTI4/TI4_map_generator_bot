@@ -1556,7 +1556,12 @@ public final class ButtonHelperAgents {
             TeHelperAgents.postRalNelAgentStep1(game, player);
         }
         if ("ardentiaagent".equalsIgnoreCase(agent)) {
-            ArdentiaLeadersHandler.startArdentiaAgentStep1(game, player);
+            Player target = game.getPlayerFromColorOrFaction(rest.substring(rest.indexOf('_') + 1));
+            if (target == null) {
+                MessageHelper.sendMessageToChannel(channel, "Could not find the selected Ardentia Agent target.");
+                return;
+            }
+            ArdentiaLeadersHandler.startArdentiaAgentStep1(game, target);
         }
         if ("kryxosagent".equalsIgnoreCase(agent)) {
             if (!rest.contains("_")) {

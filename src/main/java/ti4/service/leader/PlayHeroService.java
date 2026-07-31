@@ -87,6 +87,13 @@ public class PlayHeroService {
         rememberFrankenFirmamentHero(player, leader);
         LeaderRemovalReason reason = LeaderRemovalReason.fromHeroId(leader.getId());
         boolean removed = player.removeLeader(leader);
+        if (removed && reason != LeaderRemovalReason.ATTACHED && player.hasAbility("commanding_presence")) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", **Commanding Presence** allows you to gain 1 command token after purging "
+                            + Helper.getLeaderFullRepresentation(leader) + ".",
+                    ButtonHelper.getGainCCButtons(player));
+        }
         if (removed && (reason == LeaderRemovalReason.PURGED || reason == LeaderRemovalReason.STATUS_CLEANUP)) {
             DSHelperBreakthroughs.doLanefirBtCheck(game, player);
             OblivionUnitHandler.doOblivionMechCheck(game, player);

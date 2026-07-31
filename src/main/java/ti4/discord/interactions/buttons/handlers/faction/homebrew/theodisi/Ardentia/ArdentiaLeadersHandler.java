@@ -18,45 +18,13 @@ import ti4.message.MessageHelper;
 
 @UtilityClass
 public class ArdentiaLeadersHandler {
-    private static final String AGENT_TARGET = "ardentiaAgentTarget_";
     private static final String AGENT_PAYMENT_DONE = "ardentiaAgentPaymentDone_";
     private static final String ARDENTIA_HERO_TARGET = "ardentiaHeroTarget_";
     private static final String ARDENTIA_HERO_REMOVE = "ardentiaHeroRemoveCC_";
 
     // Agent
-    public static void startArdentiaAgentStep1(Game game, Player player) {
-        if (game == null || player == null) {
-            return;
-        }
-
-        List<Button> buttons = new ArrayList<>();
-        for (Player target : game.getRealPlayers()) {
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + AGENT_TARGET + target.getFaction(),
-                    target.getFactionNameOrColor(),
-                    target.getFactionEmojiOrColor()));
-        }
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                game.getActionsChannel(),
-                player.getRepresentation()
-                        + ", please choose the player who will spend 1 influence to gain 1 command token.",
-                buttons);
-    }
-
-    @ButtonHandler(AGENT_TARGET)
-    public static void startArdentiaAgentStep2(
-            ButtonInteractionEvent event, Player player, Game game, String buttonID) {
-        if (event == null || player == null || game == null) {
-            return;
-        }
-        ButtonHelper.deleteMessage(event);
-
-        String targetFaction = buttonID.replace(AGENT_TARGET, "");
-        Player targetPlayer = game.getPlayerFromColorOrFaction(targetFaction);
-
-        if (targetPlayer == null) {
-            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Could not find selected player.");
+    public static void startArdentiaAgentStep1(Game game, Player targetPlayer) {
+        if (game == null || targetPlayer == null) {
             return;
         }
 

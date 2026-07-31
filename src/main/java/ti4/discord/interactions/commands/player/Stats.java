@@ -200,11 +200,11 @@ class Stats extends GameStateSubcommand {
                         player.getRepresentationUnfogged() + ", you have the opportunity to buy _Axis Orders_.",
                         ButtonHelperAbilities.getBuyableAxisOrders(player, game));
             }
-            if (player.hasAbility("expeditionary_cache")) {
+            if (player.hasAbility("expeditionary_cache") && KairnAbilityHandler.getAvailableExpeditionTokens(game) > 0) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
-                                + ", you may place _Expedition Tokens_ using **Expeditionary Cache**.",
+                                + ", you may place expedition tokens using **Expeditionary Cache**.",
                         KairnAbilityHandler.getExpeditionaryCacheButtons(player, game));
             }
             CommanderUnlockCheckService.checkPlayer(player, "mykomentori");

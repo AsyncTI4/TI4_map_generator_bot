@@ -37,6 +37,7 @@ public class KairnAbilityHandler {
     private static final String USE_SHARED_DISCOVERIES = "useSharedDiscoveries";
     private static final String REMOVE_EXPEDITION_TOKEN = "removeExpeditionToken_";
     private static final String EXPEDITION_TOKEN = "token_theodisi_kairnexpedition.png";
+    private static final int MAX_EXPEDITION_TOKENS = 5;
 
     // Colony Outposts
     public static Button offerColonyOutposts(Player player) {
@@ -196,6 +197,9 @@ public class KairnAbilityHandler {
 
     // Expeditionary Cache
     public static List<Button> getExpeditionaryCacheButtons(Player player, Game game) {
+        if (player == null || player.getCommodities() < 1 || getAvailableExpeditionTokens(game) < 1) {
+            return List.of();
+        }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
                 player.factionButtonChecker() + USE_EXPEDITIONARY_CACHE,
@@ -211,29 +215,33 @@ public class KairnAbilityHandler {
         if (game == null
                 || player == null
                 || !player.hasAbility("expeditionary_cache")
-                || player.getCommodities() == 0) {
+                || player.getCommodities() == 0
+                || getAvailableExpeditionTokens(game) < 1) {
+            ButtonHelper.deleteMessage(event);
             return;
         }
 
         List<Button> planets = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             for (Planet planet : tile.getPlanetUnitHolders()) {
+                if (planet.getTokenList().contains(EXPEDITION_TOKEN)) {
+                    continue;
+                }
                 planets.add(Buttons.green(
                         player.factionButtonChecker() + PLACE_EXPEDITION_TOKEN + planet.getName(),
-                        "Place On " + Helper.getPlanetRepresentation(planet.getName(), game)));
+                        "Place on " + Helper.getPlanetRepresentation(planet.getName(), game)));
             }
         }
-        planets.add(Buttons.red("deleteButtons", "Done"));
-
         String prefix = player.factionButtonChecker() + PLACE_EXPEDITION_TOKEN;
-
-        List<Button> displayedButtons = NewStuffHelper.buttonPagination(planets, prefix, 0);
+        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Done"));
+        List<Button> displayedButtons = NewStuffHelper.buttonPagination(planets, extraButtons, prefix, 25, 0, false);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", please choose the planets on which to place _Expedition Tokens_ using **Expeditionary Cache**. You may place "
-                        + player.getCommodities() + " more token" + (player.getCommodities() == 1 ? "." : "s."),
+                        + ", please choose the planets on which to place expedition tokens using **Expeditionary Cache**. You may place "
+                        + getExpeditionTokensToPlace(player, game) + " more token"
+                        + (getExpeditionTokensToPlace(player, game) == 1 ? "." : "s."),
                 displayedButtons);
 
         ButtonHelper.deleteMessage(event);
@@ -243,25 +251,31 @@ public class KairnAbilityHandler {
     public static void placeExpeditionTokenOnPlanet(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (game == null || player == null || !player.hasAbility("expeditionary_cache")) {
+            ButtonHelper.deleteMessage(event);
             return;
         }
 
         List<Button> planets = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             for (Planet planet : tile.getPlanetUnitHolders()) {
+                if (planet.getTokenList().contains(EXPEDITION_TOKEN)) {
+                    continue;
+                }
                 planets.add(Buttons.green(
                         player.factionButtonChecker() + PLACE_EXPEDITION_TOKEN + planet.getName(),
-                        "Place On " + Helper.getPlanetRepresentation(planet.getName(), game)));
+                        "Place on " + Helper.getPlanetRepresentation(planet.getName(), game)));
             }
         }
 
         String message = player.getRepresentation()
-                + ", please choose the planets on which to place _Expedition Tokens_ using **Expeditionary Cache**. You may place "
-                + player.getCommodities() + " more token" + (player.getCommodities() == 1 ? "." : "s.");
+                + ", please choose the planets on which to place expedition tokens using **Expeditionary Cache**. You may place "
+                + getExpeditionTokensToPlace(player, game) + " more token"
+                + (getExpeditionTokensToPlace(player, game) == 1 ? "." : "s.");
         String prefix = player.factionButtonChecker() + PLACE_EXPEDITION_TOKEN;
+        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Done"));
 
         if (NewStuffHelper.checkAndHandlePaginationChange(
-                event, event.getMessageChannel(), planets, message, prefix, buttonID)) {
+                event, event.getMessageChannel(), planets, extraButtons, message, prefix, buttonID)) {
             return;
         }
 
@@ -273,19 +287,21 @@ public class KairnAbilityHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getRepresentation() + ", you may place " + player.getCommodities() + " token"
-                        + (player.getCommodities() == 1 ? "." : "s."));
+        if (player.getCommodities() < 1
+                || getAvailableExpeditionTokens(game) < 1
+                || planet.getTokenList().contains(EXPEDITION_TOKEN)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
 
         tile.addToken(EXPEDITION_TOKEN, planetName);
         player.setCommodities(player.getCommodities() - 1);
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                "Placed an _Expedition Token_ on " + planet.getRepresentation(game) + " using **Expeditionary Cache**."
-                        + " Your commodities are now (" + player.getCommodities() + "/" + player.getCommoditiesTotal()
+                player.getRepresentation() + " placed an expedition token on " + planet.getRepresentation(game)
+                        + " using **Expeditionary Cache**. Their commodities are now (" + player.getCommodities() + "/"
+                        + player.getCommoditiesTotal()
                         + ").");
 
         ButtonHelper.deleteMessage(event);
@@ -309,6 +325,7 @@ public class KairnAbilityHandler {
         if (planets.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "There are no expedition tokens on planets in the active system.");
+            ButtonHelper.deleteMessage(event);
             return;
         }
 
@@ -316,7 +333,7 @@ public class KairnAbilityHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", please choose an _Expedition Token_ to remove using **Shared Discoveries**.",
+                        + ", please choose an expedition token to remove using **Shared Discoveries**.",
                 NewStuffHelper.buttonPagination(planets, prefix, 0));
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
     }
@@ -331,7 +348,7 @@ public class KairnAbilityHandler {
 
         List<Button> planets = getSharedDiscoveriesPlanetButtons(game, player);
         String message = player.getRepresentation()
-                + ", please choose an _Expedition Token_ to remove using **Shared Discoveries**.";
+                + ", please choose an expedition token to remove using **Shared Discoveries**.";
         String prefix = player.factionButtonChecker() + REMOVE_EXPEDITION_TOKEN;
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), planets, message, prefix, buttonID)) {
@@ -363,7 +380,7 @@ public class KairnAbilityHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 planetOwner.getCorrectChannel(),
-                planetOwner.getRepresentation() + ", an _Expedition Token_ was removed from "
+                planetOwner.getRepresentation() + ", an expedition token was removed from "
                         + Helper.getPlanetRepresentation(planetName, game)
                         + " due to **Shared Discoveries**. Please choose its exploration trait.",
                 exploreButtons);
@@ -386,5 +403,20 @@ public class KairnAbilityHandler {
             }
         }
         return buttons;
+    }
+
+    public static int getAvailableExpeditionTokens(Game game) {
+        if (game == null) {
+            return 0;
+        }
+        int placed = (int) game.getTileMap().values().stream()
+                .flatMap(tile -> tile.getPlanetUnitHolders().stream())
+                .filter(planet -> planet.getTokenList().contains(EXPEDITION_TOKEN))
+                .count();
+        return Math.max(0, MAX_EXPEDITION_TOKENS - placed);
+    }
+
+    private static int getExpeditionTokensToPlace(Player player, Game game) {
+        return Math.min(player.getCommodities(), getAvailableExpeditionTokens(game));
     }
 }

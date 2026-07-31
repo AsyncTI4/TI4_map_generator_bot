@@ -42,6 +42,9 @@ import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -398,6 +401,7 @@ public class PlayerAreaGenerator {
         xDeltaBottom = honorOrPathTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = crimsonRebellionTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = galvanizeTokens(player, xDeltaBottom, yPlayAreaSecondRow);
+        xDeltaBottom = theodisiTokenSupplies(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = sleeperTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = creussWormholeTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = valefarZTokens(player, xDeltaBottom, yPlayAreaSecondRow);
@@ -797,6 +801,42 @@ public class PlayerAreaGenerator {
                     points, bufferedImage, maxGalvanizeTokens - totGalvanized, xDeltaFromRightSide, yDelta);
         }
         return xDeltaFromRightSide;
+    }
+
+    private int theodisiTokenSupplies(Player player, int xDeltaFromRightSide, int yDelta) {
+        if (player.hasAbility("expeditionary_cache")) {
+            xDeltaFromRightSide = displayTheodisiTokenSupply(
+                    "token_theodisi_kairnexpedition.png",
+                    5,
+                    KairnAbilityHandler.getAvailableExpeditionTokens(game),
+                    xDeltaFromRightSide,
+                    yDelta);
+        }
+        if (player.hasAbility("sting_of_the_hive")) {
+            xDeltaFromRightSide = displayTheodisiTokenSupply(
+                    "token_theodisi_mine.png",
+                    6,
+                    XytherisAbilityHandler.getAvailableStingOfTheHiveMines(game),
+                    xDeltaFromRightSide,
+                    yDelta);
+        }
+        if (player.hasAbility("reflections_of_the_void")) {
+            xDeltaFromRightSide = displayTheodisiTokenSupply(
+                    "token_theodisi_oblivionreflection.png",
+                    3,
+                    OblivionAbilityHandler.getAvailableReflectionTokens(game),
+                    xDeltaFromRightSide,
+                    yDelta);
+        }
+        return xDeltaFromRightSide;
+    }
+
+    private int displayTheodisiTokenSupply(
+            String tokenName, int maxTokens, int tokensRemaining, int xDeltaFromRightSide, int yDelta) {
+        BufferedImage tokenImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile(tokenName));
+        List<Point> points = new ArrayList<>();
+        IntStream.range(0, maxTokens).forEach(i -> points.add(new Point(i * 54, 50 * ((i + 1) % 2))));
+        return displayRemainingFactionTokens(points, tokenImage, tokensRemaining, xDeltaFromRightSide, yDelta);
     }
 
     private int honorOrPathTokens(Player player, int xDeltaFromRightSide, int yDelta) {

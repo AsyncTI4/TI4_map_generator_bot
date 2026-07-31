@@ -30,8 +30,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
@@ -78,6 +80,8 @@ public final class ButtonHelperTacticalAction {
 
     public static void endOfTacticalActionThings(Player player, Game game, ButtonInteractionEvent event) {
         logTacticalAction(game, player);
+        XytherisAbilityHandler.clearStingOfTheHiveRollState(game);
+        OblivionAbilityHandler.offerReflectionExplore(event, game);
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
             if (player.hasUnit("lunarium_carrier2")) {
                 LunariumAbilityHandler.resolveCrypticHaulerIIFighters(
@@ -441,6 +445,8 @@ public final class ButtonHelperTacticalAction {
             if (!game.isFowMode()) {
                 ButtonHelper.updateMap(game, event, "Post Movement For " + player.getFactionEmoji());
             }
+            XytherisAbilityHandler.offerStingOfTheHiveAfterMovement(event, game, tile);
+            OblivionAbilityHandler.offerReflectionPlacement(event, game, player, tile);
         }
     }
 
@@ -519,6 +525,7 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("ghostagent_active");
         XytherisLeadersHandler.clearMyrixAgentEffects(game);
         XytherisLeadersHandler.clearHeroUnitAbilityRoll(game);
+        XytherisAbilityHandler.clearStingOfTheHiveRollState(game);
         PonthousUnitHandler.clearOldGlorySustain(game);
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
         ArcanumPrimordialTechHandler.clearPowerWordPlaneShift(game);
