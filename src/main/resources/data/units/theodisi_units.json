@@ -236,6 +236,7 @@
     "asyncId": "fs",
     "name": "Ultimate Evolution II",
     "upgradesFromUnitId": "kryxos_flagship",
+    "upgradesToUnitId": "kryxos_flagship3",
     "requiredTechId": "thkryxosfs",
     "source": "theodisi",
     "faction": "kryxos",
@@ -257,6 +258,8 @@
     "baseType": "flagship",
     "asyncId": "fs",
     "name": "Ultimate Evolution III",
+    "upgradesFromUnitId": "kryxos_flagship2",
+    "requiredTechId": "thkryxosfs2",
     "source": "theodisi",
     "faction": "kryxos",
     "moveValue": 4,
@@ -296,6 +299,7 @@
     "asyncId": "mf",
     "name": "Warspawn Juggernaut II",
     "upgradesFromUnitId": "kryxos_mech",
+    "upgradesToUnitId": "kryxos_mech3",
     "requiredTechId": "thkryxosmf",
     "source": "theodisi",
     "faction": "kryxos",
@@ -314,6 +318,8 @@
     "baseType": "mech",
     "asyncId": "mf",
     "name": "Warspawn Juggernaut III",
+    "upgradesFromUnitId": "kryxos_mech2",
+    "requiredTechId": "thkryxosmf2",
     "source": "theodisi",
     "faction": "kryxos",
     "capacityUsed": 1,
@@ -324,7 +330,7 @@
     "bombardHitsOn": 4,
     "bombardDieCount": 2,
     "isGroundForce": true,
-    "ability": "When this unit produces a hit, you may damage this unit to place infantry with this unit up to the number of hits produced."
+    "ability": "When this unit produces a hit, you may SUSTAIN DAMAGE to place infantry with this unit up to the number of hits produced."
   },
   {
     "id": "arcanum_flagship",

@@ -129,18 +129,6 @@
     },
     {
         "itemCategory": "ABILITY",
-        "itemId": "cycle_of_reclamation",
-        "additionalComponents": [
-            "ABILITY:new_moon_phase",
-            "ABILITY:waning_moon_phase",
-            "ABILITY:full_moon_phase",
-            "ABILITY:waxing_moon_phase",
-            "ABILITY:lunar_eclipse_phase"
-        ],
-        "source": "theodisi"
-    },
-    {
-        "itemCategory": "ABILITY",
         "itemId": "new_moon_phase",
         "undraftable": true,
         "source": "theodisi"

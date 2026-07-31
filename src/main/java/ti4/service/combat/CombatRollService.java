@@ -47,6 +47,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
@@ -388,6 +389,39 @@ public class CombatRollService {
             playerUnitsByQuantity = adjustedUnits;
         }
 
+        StringBuilder unitUpgradeRollNote = new StringBuilder();
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "kryxoscommander")) {
+            Map<Pair<UnitModel, UnitHolder>, Integer> adjustedUnits = new HashMap<>();
+
+            for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : playerUnitsByQuantity.entrySet()) {
+                UnitModel unit = entry.getKey().getLeft();
+                UnitHolder holder = entry.getKey().getRight();
+
+                // Only the actual upgraded unit model receives the bonus.
+                if (unit.getUpgradesFromUnitId().isEmpty()) {
+                    adjustedUnits.merge(entry.getKey(), entry.getValue(), Integer::sum);
+                    continue;
+                }
+
+                UnitModelValueInjectionService.IntegerValueInjection bonus =
+                        UnitModelValueInjectionService.IntegerValueInjection.create();
+
+                switch (rollType) {
+                    case combatround -> bonus.combatHitsOn(-1);
+                    case AFB -> bonus.afbHitsOn(-1);
+                    case bombardment -> bonus.bombardHitsOn(-1);
+                    case SpaceCannonOffence, SpaceCannonDefence -> bonus.spaceCannonHitsOn(-1);
+                }
+
+                UnitModel upgradedUnit = UnitModelValueInjectionService.injectValues(unit, bonus);
+
+                adjustedUnits.merge(new ImmutablePair<>(upgradedUnit, holder), entry.getValue(), Integer::sum);
+            }
+
+            playerUnitsByQuantity = adjustedUnits;
+            unitUpgradeRollNote.append("> Seraxis Thule, the Kryxos commander: Unit upgrades receive +1 to their rolls.\n");
+        }
+
         KryxosBreakthroughHandler.refreshPrototypeInnovators(game, player, tile, playerUnitsByQuantity, rollType);
 
         if (playerUnitsByQuantity.isEmpty()) {
@@ -517,14 +551,17 @@ public class CombatRollService {
                 combatOnHolder);
         String combatSummary = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
         String message = combatSummary + rollResult.message();
-        if (!powerWordWishCombatNote.isEmpty()) {
+        StringBuilder rollNotes =
+                new StringBuilder().append(powerWordWishCombatNote).append(unitUpgradeRollNote);
+
+        if (!rollNotes.isEmpty()) {
             String modifierHeader = "With modifiers: \n";
             int modifierHeaderIndex = message.indexOf(modifierHeader);
             if (modifierHeaderIndex >= 0) {
                 int insertIndex = modifierHeaderIndex + modifierHeader.length();
-                message = message.substring(0, insertIndex) + powerWordWishCombatNote + message.substring(insertIndex);
+                message = message.substring(0, insertIndex) + rollNotes + message.substring(insertIndex);
             } else {
-                message = combatSummary + modifierHeader + powerWordWishCombatNote + rollResult.message();
+                message = combatSummary + modifierHeader + rollNotes + rollResult.message();
             }
         }
         CombatRollPayload.RollHeader rollHeader =
@@ -1424,6 +1461,26 @@ public class CombatRollService {
                     mult = 2;
                 }
                 int hitRolls = DiceHelper.countSuccesses(resultRolls);
+                if ("kryxos_mech3".equals(unitModel.getId()) && numOfUnit > 0) {
+                    int[] hitsPerMech = new int[numOfUnit];
+                    int nativeRollCount = numOfUnit * numRollsPerUnit;
+                    for (int dieIndex = 0; dieIndex < resultRolls.size(); dieIndex++) {
+                        int mechIndex = dieIndex < nativeRollCount
+                                ? dieIndex / numRollsPerUnit
+                                : (dieIndex - nativeRollCount) % numOfUnit;
+                        if (mechIndex < numOfUnit && resultRolls.get(dieIndex).isSuccess()) {
+                            hitsPerMech[mechIndex]++;
+                        }
+                    }
+                    List<Integer> hitsByMech = new ArrayList<>();
+                    for (int hits : hitsPerMech) {
+                        if (hits > 0) {
+                            hitsByMech.add(hits);
+                        }
+                    }
+                    KryxosUnitHandler.offerWarspawnJuggernautHitButtons(
+                            event, game, player, activeSystem, perUnitHolder, hitsByMech);
+                }
                 if (rollType == CombatRollType.combatround && numRolls != hitRolls) {
                     String key = "warFundingRolls" + player.getFaction();
                     game.setStoredValue(

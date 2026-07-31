@@ -219,8 +219,14 @@ class AssignHitsButtonHandlers {
                                     ? " on " + holder.getRepresentation(game)
                                     : " in tile " + tile.getRepresentationForButtons(game, player))
                             + ".";
-                    if (player.hasTech("nes"))
-                        msg += "\n> These sustains cancel 2 hits due to _Non-Euclidean Shielding_.";
+                    boolean cancelsTwoHits = player.hasTech("nes")
+                            || (player.ownsUnit("kryxos_flagship3") && type == UnitType.Flagship);
+                    if (cancelsTwoHits) {
+                        String sustainSource = player.hasTech("nes")
+                                ? "_Non-Euclidean Shielding_"
+                                : "the Ultimate Evolution III (the Kryxos flagship)";
+                        msg += "\n> These SUSTAIN DAMAGE uses cancel 2 hits due to " + sustainSource + ".";
+                    }
                     String assignHitsType = getAssignHitsType(game, player);
                     if (assignHitsType.contains("combat")) {
                         AshenUnitHandler.offerAshfallEngineOnSustain(event, game, player, tile, holder, type);

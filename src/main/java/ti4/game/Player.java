@@ -2683,7 +2683,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (hasUnlockedBreakthrough("arcanumbt") || hasUnlockedBreakthrough("arcanumbtback")) {
             ArcanumBreakthroughHandler.handlePowerWordWishTechGain(this, techID);
         }
-        if (ownsUnit("kryxos_flagship2") || ownsUnit("kryxos_mech2")) {
+        if ((ownsUnit("kryxos_flagship2") || ownsUnit("kryxos_mech2"))
+                && !KryxosUnitHandler.isKryxosEvolutionResultTech(techID)) {
             KryxosUnitHandler.offerEvolutionButtons(this, game, techID);
         }
     }

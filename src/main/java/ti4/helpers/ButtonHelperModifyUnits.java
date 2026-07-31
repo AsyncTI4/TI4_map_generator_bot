@@ -308,8 +308,10 @@ public final class ButtonHelperModifyUnits {
                 && !ButtonHelper.isLawInPlay(game, "articles_war");
     }
 
-    private static int calculateMinHits(Player player, int hits, int totalUnits) {
-        return player.hasTech("nes") ? Math.min(totalUnits, (hits + 1) / 2) : Math.min(totalUnits, hits);
+    private static int calculateMinHits(Player player, UnitModel unitModel, int hits, int totalUnits) {
+        return ButtonHelper.doesSustainCancelTwoHits(player, unitModel)
+                ? Math.min(totalUnits, (hits + 1) / 2)
+                : Math.min(totalUnits, hits);
     }
 
     public static int autoAssignGroundCombatHits(
@@ -340,7 +342,7 @@ public final class ButtonHelperModifyUnits {
 
                 int damagedUnits = unitHolder.getUnitDamage().getOrDefault(unitEntry.getKey(), 0);
                 int totalUnits = unitEntry.getValue() - damagedUnits;
-                int min = calculateMinHits(player, hits, totalUnits);
+                int min = calculateMinHits(player, unitModel, hits, totalUnits);
 
                 if (unitModel.getSustainDamage() && min > 0) {
                     if (RandomHelper.isOneInX(40)) {
@@ -357,7 +359,7 @@ public final class ButtonHelperModifyUnits {
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                     }
-                    hits -= min * (player.hasTech("nes") ? 2 : 1);
+                    hits -= min * (ButtonHelper.doesSustainCancelTwoHits(player, unitModel) ? 2 : 1);
                     tile.addUnitDamage(planet, unitEntry.getKey(), min);
 
                     for (int x = 0; x < min; x++) {
@@ -634,10 +636,10 @@ public final class ButtonHelperModifyUnits {
                         ? unitHolder.getUnitDamage().getOrDefault(unitKey, 0)
                         : 0;
                 int totalUnits = unitEntry.getValue() - damagedUnits;
-                int min = (player.hasTech("nes")) ? Math.min(totalUnits, (hits + 1) / 2) : Math.min(totalUnits, hits);
+                int min = calculateMinHits(player, unitModel, hits, totalUnits);
 
                 if (min > 0) {
-                    hits -= min * (player.hasTech("nes") ? 2 : 1); // Adjust hits based on technology
+                    hits -= min * (ButtonHelper.doesSustainCancelTwoHits(player, unitModel) ? 2 : 1);
                     repairableUnitsByUnitKey.computeIfPresent(unitKey, (key, value) -> value += min);
 
                     if (!justSummarizing) {
@@ -699,7 +701,7 @@ public final class ButtonHelperModifyUnits {
                     totalUnits = 1;
                     metailUsed = true;
                 }
-                int min = (player.hasTech("nes")) ? Math.min(totalUnits, (hits + 1) / 2) : Math.min(totalUnits, hits);
+                int min = calculateMinHits(player, unitModel, hits, totalUnits);
 
                 String stuffNotToSustain = game.getStoredValue("stuffNotToSustainFor" + player.getFaction());
                 if (stuffNotToSustain.isEmpty()) {
@@ -710,7 +712,7 @@ public final class ButtonHelperModifyUnits {
                 if (min > 0
                         && (!stuffNotToSustain.contains(unitModel.getBaseType().toLowerCase())
                                 || !opponentCanDirectHit)) {
-                    hits -= min * (player.hasTech("nes") ? 2 : 1);
+                    hits -= min * (ButtonHelper.doesSustainCancelTwoHits(player, unitModel) ? 2 : 1);
                     repairableUnitsByUnitKey.computeIfPresent(unitKey, (key, value) -> value += min);
 
                     if (!justSummarizing) {
@@ -819,7 +821,7 @@ public final class ButtonHelperModifyUnits {
                 if (isRemainingSustains) {
                     effectiveUnits -= damagedUnits;
                 }
-                int min = (player.hasTech("nes") && isRemainingSustains)
+                int min = (ButtonHelper.doesSustainCancelTwoHits(player, unitModel) && isRemainingSustains)
                         ? Math.min(effectiveUnits, (hits + 1) / 2)
                         : Math.min(effectiveUnits, hits);
                 if (isNraShenanigans
@@ -859,7 +861,7 @@ public final class ButtonHelperModifyUnits {
                         continue; // Skip to the next unit since these sustains are already handled
                     }
                     hits -= min;
-                    if (player.hasTech("nes")) {
+                    if (ButtonHelper.doesSustainCancelTwoHits(player, unitModel)) {
                         hits -= min;
                     }
 
