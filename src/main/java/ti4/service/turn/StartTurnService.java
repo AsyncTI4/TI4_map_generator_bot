@@ -477,6 +477,9 @@ public class StartTurnService {
                 && AeternaAbilityHandler.canReturnCapturedNeutralUnits(game, player, 2)) {
             startButtons.add(AeternaAbilityHandler.getWaxingMoonButton(player));
         }
+        if (!doneActionThisTurn && player.hasUnexhaustedLeader("kairnagent")) {
+            startButtons.add(KairnLeadershandler.getKairnAgentButton(player));
+        }
         boolean hadAnyUnplayedSCs = false;
 
         if (doneActionThisTurn && (player.hasTech("fl") || TyrisLeaderHandler.isHeroActiveThisRound(game, player))) {

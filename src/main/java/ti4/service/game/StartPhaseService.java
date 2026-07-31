@@ -20,6 +20,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityHandler;
@@ -368,6 +369,16 @@ public class StartPhaseService {
                         game.getActionsChannel(),
                         player2.getRepresentation()
                                 + " **REMINDER**: please finish resolving _Tight Scheduling_. Buttons are in your cards info thread.");
+            }
+            if (game.playerHasLeaderUnlockedOrAlliance(player2, "kairncommander")) {
+                var commanderButtons = KairnLeadershandler.offerSerelVennButtons(player2, game);
+                if (!commanderButtons.isEmpty()) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            event.getMessageChannel(),
+                            player2.getRepresentation()
+                                    + ", due to Serel Venn, the Kairn commander, you may explore 1 non-home, non-legendary planet as any trait.",
+                            commanderButtons);
+                }
             }
         }
         if (!game.getStoredValue("agendaConstitution").isEmpty()) {

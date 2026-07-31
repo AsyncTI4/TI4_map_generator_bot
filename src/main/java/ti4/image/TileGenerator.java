@@ -1851,6 +1851,12 @@ public class TileGenerator {
                             TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2),
                             TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2),
                             null);
+                } else if (tokenPath.contains("token_theodisi_kairnexpedition")) {
+                    tokenImage = ImageHelper.readScaled(tokenPath, 0.5f);
+                    int tokenX = TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2);
+                    int tokenY = TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2);
+                    tileGraphics.drawImage(tokenImage, tokenX, tokenY, null);
+                    rectangles.add(new Rectangle(tokenX, tokenY, tokenImage.getWidth(), tokenImage.getHeight()));
                 } else if (tokenPath.contains(Constants.DMZ_LARGE)) {
                     float scale = 0.3f;
                     if (unitHolder instanceof Planet planetHolder) {

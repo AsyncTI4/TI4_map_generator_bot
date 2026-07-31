@@ -20,6 +20,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.commands.CommandHelper;
@@ -99,6 +101,12 @@ public class CardsInfoService {
                     player.factionButtonChecker() + "useRevArcanumAgent_other",
                     "Use Runebearer Lothos on Another Player",
                     FactionEmojis.revenant));
+        }
+        if (player.hasUnexhaustedLeader("kairnagent")) {
+            buttons.add(KairnLeadershandler.getKairnAgentCardsInfoButton(player));
+        }
+        if (player.hasAbility("shared_discoveries")) {
+            buttons.add(KairnAbilityHandler.getSharedDiscoveriesButton(player));
         }
         if (!"setup".equalsIgnoreCase(game.getPhaseOfGame()) && player.hasUnexhaustedLeader("arcanumagent")) {
             buttons.add(ArcanumLeadersHandler.getVeylaCardsInfoButton(player));

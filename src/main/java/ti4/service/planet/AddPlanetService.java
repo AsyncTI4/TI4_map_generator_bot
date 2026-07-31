@@ -25,9 +25,11 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperSCs;
+import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.PlayerStatsHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
@@ -45,6 +47,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.player.PlayerStatsService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.spring.service.gameevent.GameEventDraft;
@@ -105,6 +108,10 @@ public class AddPlanetService {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", you captured 2 infantry from a Tomb token.");
+        }
+        if (player.ownsUnit("kairn_flagship") && ButtonHelper.doesPlayerHaveFSHere("kairn_flagship", player, tile)) {
+            player.gainCommodities(1);
+            ButtonHelperStats.afterGainCommsChecks(game, player, 1);
         }
 
         int shrineCount = 0;
