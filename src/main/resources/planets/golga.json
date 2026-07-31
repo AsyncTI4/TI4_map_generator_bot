@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "golga",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 94
+        }
+    },
     "id": "golga",
     "tileId": "s06",
     "name": "Golga",

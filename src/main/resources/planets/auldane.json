@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "auldane",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 231,
+            "y": 207
+        }
+    },
     "id": "auldane",
     "tileId": "d16",
     "name": "Auldane",

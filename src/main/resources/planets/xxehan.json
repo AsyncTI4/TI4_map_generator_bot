@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "xxehan",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 202,
+            "y": 207
+        }
+    },
     "id": "xxehan",
     "tileId": "32",
     "name": "Xxehan",

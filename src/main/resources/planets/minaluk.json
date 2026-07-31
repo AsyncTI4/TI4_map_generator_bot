@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "minaluk",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "minaluk",
     "tileId": "qulane",
     "name": "Minaluk",

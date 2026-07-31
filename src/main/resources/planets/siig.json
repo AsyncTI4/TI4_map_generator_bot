@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "siig",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 201,
+            "y": 206
+        }
+    },
     "id": "siig",
     "tileId": "70",
     "name": "Siig",

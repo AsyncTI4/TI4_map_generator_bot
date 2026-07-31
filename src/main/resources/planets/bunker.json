@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "bunker",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "bunker",
     "tileId": "m28",
     "name": "Bunker",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "fria",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 202,
+            "y": 208
+        }
+    },
     "id": "fria",
     "tileId": "38",
     "name": "Fria",

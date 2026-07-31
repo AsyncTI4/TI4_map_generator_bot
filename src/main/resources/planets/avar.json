@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "avar",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 224,
+            "y": 224
+        }
+    },
     "id": "avar",
     "tileId": "58",
     "name": "Avar",

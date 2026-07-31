@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "nokturn",
+        "resourcesLocation": "TopRight",
+        "centerPosition": {
+            "x": 210,
+            "y": 85
+        }
+    },
     "id": "nokturn",
     "tileId": "er100",
     "name": "Nokturn",

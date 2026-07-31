@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "meth",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 210,
+            "y": 210
+        }
+    },
     "id": "meth",
     "tileId": "s01",
     "name": "Meth",

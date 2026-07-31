@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "lockedmallice",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 236,
+            "y": 156
+        }
+    },
     "id": "lockedmallice",
     "tileId": "82a",
     "name": "Locked Mallice",

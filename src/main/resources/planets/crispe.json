@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "crispe",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 95
+        }
+    },
     "id": "crispe",
     "tileId": "s02",
     "name": "Crisp E",

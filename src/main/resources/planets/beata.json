@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "beata",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 231,
+            "y": 207
+        }
+    },
     "id": "beata",
     "tileId": "d23",
     "name": "Beata",

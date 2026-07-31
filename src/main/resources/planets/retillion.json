@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "retillion",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 130,
+            "y": 85
+        }
+    },
     "id": "retillion",
     "tileId": "15",
     "name": "Retillion",

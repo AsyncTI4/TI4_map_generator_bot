@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "limbo",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "limbo",
     "tileId": "er107",
     "name": "Limbo",

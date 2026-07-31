@@ -907,6 +907,17 @@ public final class AgendaHelper {
                         SettlementsAcd2ButtonHandler.resolveWinningSettlements(game, winningR, winner);
                     }
 
+                    if (winningR != null && winningR.hasTech("thveylorg") && specificVote.contains("Inner Sanctum")) {
+                        for (Player voter : getWinningVoters(winner, game)) {
+                            ActionCardHelper.drawActionCards(voter, 1);
+                        }
+                        MessageHelper.sendMessageToChannel(
+                                game.getMainGameChannel(),
+                                winningR.getRepresentationNoPing()
+                                        + " correctly predicted the outcome with _Inner Sanctum_. "
+                                        + "Each player who voted for that outcome drew 1 action card.");
+                    }
+
                     if (winningR != null
                             && (specificVote.contains("Rider")
                                     || (winningR.hasAbility("future_sight")

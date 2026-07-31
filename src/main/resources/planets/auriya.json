@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "auriya",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "auriya",
     "tileId": "m23",
     "name": "Auriya",

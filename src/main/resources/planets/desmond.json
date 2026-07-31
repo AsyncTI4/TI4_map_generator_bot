@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "desmond",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 190,
+            "y": 170
+        }
+    },
     "id": "desmond",
     "tileId": "c07",
     "name": "Desmond",

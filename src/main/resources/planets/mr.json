@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "mr",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 171,
+            "y": 149
+        }
+    },
     "id": "mr",
     "tileId": "18",
     "name": "Mecatol Rex",

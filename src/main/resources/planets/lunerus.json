@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "lunerus",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "lunerus",
     "tileId": "er126",
     "name": "Lunerus",

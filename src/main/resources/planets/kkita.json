@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "kkita",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "kkita",
     "tileId": "er05",
     "name": "Kkita Ul'in",

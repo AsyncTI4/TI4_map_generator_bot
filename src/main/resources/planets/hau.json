@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "hau",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 231,
+            "y": 207
+        }
+    },
     "id": "hau",
     "tileId": "d07",
     "name": "Hau",

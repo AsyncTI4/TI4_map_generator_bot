@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "shigonas",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "shigonas",
     "tileId": "er65",
     "name": "Shigonas",

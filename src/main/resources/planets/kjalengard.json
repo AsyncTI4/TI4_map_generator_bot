@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "kjalengard",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 94
+        }
+    },
     "id": "kjalengard",
     "tileId": "d02",
     "name": "Kjalengard",

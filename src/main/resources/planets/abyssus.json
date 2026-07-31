@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "abyssus",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 177,
+            "y": 131
+        }
+    },
     "id": "abyssus",
     "tileId": "d29",
     "name": "Abyssus",
