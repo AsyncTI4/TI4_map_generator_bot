@@ -207,10 +207,12 @@ public final class DSHelperBreakthroughs {
                 String message2 = p1.getRepresentation()
                         + ", please use these buttons to produce 1 non-fighter ship\n> "
                         + ButtonHelper.getListOfStuffAvailableToSpend(p1, game);
+
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(),
                         p1.getFactionEmoji()
-                                + " is using _Exodus Engineering_ to produce 1 non-fighter ship (they may do this once per combat).");
+                                + " is using _Exodus Engineering_ to produce 1 or 2 non-fighter ships (they may do this once per combat).");
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             }
         }
@@ -261,14 +263,14 @@ public final class DSHelperBreakthroughs {
     }
 
     public static void bentorBTStep1(Game game, Player p1) {
-        for (Player p2 : game.getRealPlayers()) {
+        for (Player p2 : game.getRealPlayersExcludingThis(p1)) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("acceptBentorBT_" + p1.getFaction(), "Explore 1 Planet"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(
                     p2.getCorrectChannel(),
                     p2.getRepresentationUnfogged() + ", " + p1.getFactionNameOrColor()
-                            + " has _Historian Conclave_. This allows to to explore a planet you control. (If you do and you are not them, they will gain 1 commodity.)",
+                            + " has _Historian Conclave_. This allows to to explore a planet you control. (If you do they may be able to coexist on the planet.)",
                     buttons);
         }
         MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "Sent buttons to every player to resolve.");
@@ -281,11 +283,20 @@ public final class DSHelperBreakthroughs {
             MessageHelper.sendMessageToChannel(
                     p2.getCorrectChannel(),
                     p2.getRepresentation() + ", your _Historian Conclave_ offer to " + p1.getFactionNameOrColor()
-                            + " has been accepted. "
-                            + (p2.getCommodities() >= p2.getCommoditiesTotal()
-                                    ? "You would gain 1 commodity, but you are already at maximum commodities."
-                                    : "You have gained 1 commodity."));
-            p2.gainCommodities(1);
+                            + " has been accepted. You may be able to coexist on the explored planet if you have not already done so with someone else.");
+            List<Button> buttons2 = new ArrayList<>();
+            for (String planet : p1.getPlanets()) {
+                if (game.getUnitHolderFromPlanet(planet) != null
+                        && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)
+                        && FoWHelper.playerHasUnitsOnPlanet(p1, game.getUnitHolderFromPlanet(planet))) {
+                    buttons2.add(Buttons.gray(
+                            p2.factionButtonChecker() + "exchangeProgramPart3_" + planet,
+                            Helper.getPlanetRepresentation(planet, game)));
+                }
+            }
+            buttons2.add(Buttons.red("deleteButtons", "Decline"));
+            String msg = p2.getRepresentation() + " you can use these buttons to coexist after the explore.";
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons2);
         }
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(p1, game);
         ButtonHelper.deleteMessage(event);

@@ -218,6 +218,12 @@ public final class BreakthroughCommandHelper {
                     player.removeOwnedUnitByID("rohdhna_warsun2");
                 }
             }
+            if ("mirvedabt".equalsIgnoreCase(bt.getID())) {
+                if (player.hasTech("ff2")) {
+                    player.addOwnedUnitByID("mirveda_fighter3");
+                    player.removeOwnedUnitByID("fighter2");
+                }
+            }
             if ("kortalbt".equalsIgnoreCase(bt.getID())) {
                 if (player.hasTech("dn2")) {
                     player.addOwnedUnitByID("tribune3");

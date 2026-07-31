@@ -79,10 +79,7 @@ public class TacticalActionDisplacementService {
         if (player.hasAbility("miniaturization")) {
             movableFromPlanets.addAll(List.of(UnitType.Spacedock, UnitType.Pds));
         }
-        if (player.hasTech("dsmirvpds")
-                || player.hasUnlockedBreakthrough("mirvedabt")
-                || player.hasUnit("tk-keshnu")
-                || player.hasUnit("mirveda_pds")) {
+        if (player.hasTech("dsmirvpds") || player.hasUnit("tk-keshnu") || player.hasUnit("mirveda_pds")) {
             movableFromPlanets.add(UnitType.Pds);
         }
 
