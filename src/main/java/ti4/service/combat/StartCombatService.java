@@ -32,10 +32,14 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiLeaderHandler;
@@ -327,6 +331,7 @@ public class StartCombatService {
         }
         PonthousUnitHandler.clearOldGlorySustain(game);
         PonthousPromissoryHandler.clearThunderbirdPrototype(game);
+        PonthousTechHandler.clearThunderbirdProtocol(game);
         game.setStoredValue("factionsInCombat", player1.getFaction() + "_" + player2.getFaction());
 
         sendStartOfCombatSecretMessages(game, player1, player2, tile, spaceOrGround, unitHolderName);
@@ -1442,10 +1447,36 @@ public class StartCombatService {
                     FactionEmojis.florzen));
         }
 
+        // Ponthous
         Button oldGloryP1 = PonthousUnitHandler.getOldGlorySustainButton(p1, tile);
         if (oldGloryP1 != null) buttons.add(oldGloryP1);
         Button oldGloryP2 = PonthousUnitHandler.getOldGlorySustainButton(p2, tile);
         if (oldGloryP2 != null) buttons.add(oldGloryP2);
+        Button thunderbirdProtocolP1 = PonthousTechHandler.getThunderbirdProtocolButton(game, p1, tile);
+        if (thunderbirdProtocolP1 != null) buttons.add(thunderbirdProtocolP1);
+        Button thunderbirdProtocolP2 = PonthousTechHandler.getThunderbirdProtocolButton(game, p2, tile);
+        if (thunderbirdProtocolP2 != null) buttons.add(thunderbirdProtocolP2);
+
+        // Aeterna Hero
+        if (!tile.isHomeSystem() && p1.hasLeaderUnlocked("aeternahero")) {
+            buttons.add(AeternaLeadersHandler.getGravecallButton(game, p1, tile));
+        }
+        if (!tile.isHomeSystem() && p2.hasLeaderUnlocked("aeternahero")) {
+            buttons.add(AeternaLeadersHandler.getGravecallButton(game, p2, tile));
+        }
+
+        // Arcanum Disintegrate
+        if (p1.hasTech("tharcanumpmr")
+                && ArcanumPrimordialTechHandler.hasFourTechsMatchingPrimordial(p1, "tharcanumpmr")) {
+            buttons.addAll(
+                    ArcanumPrimordialTechHandler.getDisintegrateCombatButtons(p1, p2, tile, tile.getSpaceUnitHolder()));
+        }
+        if (p2.hasTech("tharcanumpmr")
+                && ArcanumPrimordialTechHandler.hasFourTechsMatchingPrimordial(p2, "tharcanumpmr")) {
+            buttons.addAll(
+                    ArcanumPrimordialTechHandler.getDisintegrateCombatButtons(p2, p1, tile, tile.getSpaceUnitHolder()));
+        }
+
         return buttons;
     }
 
@@ -1514,6 +1545,8 @@ public class StartCombatService {
         if (p2.hasReadyBreakthrough("ponthousbt")) {
             buttons.add(PonthousBreakthroughHandler.getSelfDestructButton(p2, tile, groundOrSpace));
         }
+        AeternaPromissoryHandler.addFuneralServicesButton(game, p1, p2, tile, groundOrSpace, buttons);
+        AeternaPromissoryHandler.addFuneralServicesButton(game, p2, p1, tile, groundOrSpace, buttons);
 
         checkAndAddIncomprehensibleFormButton(game, p1, p2, isSpaceCombat, tile, buttons);
 
@@ -2219,6 +2252,18 @@ public class StartCombatService {
                     FactionEmojis.Bastion));
         }
 
+        // Aeterna
+        if (game.playerHasLeaderUnlockedOrAlliance(p1, "aeternacommander")
+                && !AeternaLeadersHandler.hasUsedAeternaCommanderThisAction(game, p1)) {
+            buttons.add(Buttons.gray(
+                    p1.factionButtonChecker() + "gainAeternaCCOnLoss", "Gain 1 CC (On Loss)", FactionEmojis.aeterna));
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(p2, "aeternacommander")
+                && !AeternaLeadersHandler.hasUsedAeternaCommanderThisAction(game, p2)) {
+            buttons.add(Buttons.gray(
+                    p2.factionButtonChecker() + "gainAeternaCCOnLoss", "Gain 1 CC (On Loss)", FactionEmojis.aeterna));
+        }
+
         if (game.isLiberationC4Mode()) {
             if ("c41".equalsIgnoreCase(tile.getTileID())) {
                 Player sol = game.getPlayerFromColorOrFaction("sol");
@@ -2434,6 +2479,9 @@ public class StartCombatService {
                     }
                     if (isGroundCombat) {
                         BastionTechService.addProximaCombatButton(game, p1, p2, tile, unitH, buttons);
+                    }
+                    if (isGroundCombat && !ButtonHelper.isLawInPlay(game, "articles_war")) {
+                        AeternaUnitsHandler.getMausoleumButton(p, otherP, tile, unitH, buttons);
                     }
                 }
                 // Assimilate

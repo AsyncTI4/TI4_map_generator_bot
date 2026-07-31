@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "groosemihsal",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 148,
+            "y": 213
+        }
+    },
     "id": "groosemihsal",
     "tileId": "s03",
     "name": "Groose Mihsal",

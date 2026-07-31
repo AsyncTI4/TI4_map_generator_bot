@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "krax",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 128
+        }
+    },
     "id": "krax",
     "tileId": "ba2",
     "name": "Krax",

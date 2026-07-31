@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "rokha",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 226,
+            "y": 201
+        }
+    },
     "id": "rokha",
     "tileId": "57",
     "name": "Rokha",

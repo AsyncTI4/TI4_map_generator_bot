@@ -44,6 +44,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
@@ -497,6 +498,10 @@ public class CombatRollService {
             extraRolls.addAll(IronFactionTechsHandler.getAdvancedTargetingSystemsExtraRollModifier(
                     game, player, opponent, tile, combatOnHolder, rollType));
         }
+        if (player.ownsUnit("arcanum_flagship")) {
+            extraRolls.addAll(
+                    ArcanumUnitHandler.getAstralCodexExtraRollModifier(player, tile, combatOnHolder, rollType));
+        }
 
         CombatRollResult rollResult = rollForUnitsWithResult(
                 playerUnitsByQuantity,
@@ -527,6 +532,26 @@ public class CombatRollService {
         CombatRollPayload payload = rollResult.payload().withHeader(rollHeader);
         FOWCombatThreadMirroring.mirrorCombatMessage(event, player, game, message);
         int h = rollResult.totalHits();
+        int renegadeCount = opponent.hasUnit("ponthous_destroyer2")
+                ? tile.getSpaceUnitHolder().getUnitCount(UnitType.Destroyer, opponent)
+                : 0;
+        if (rollType == CombatRollType.AFB && h > 0 && opponent != player && renegadeCount > 0) {
+            int canceledHits = Math.min(h, renegadeCount);
+            h -= canceledHits;
+            message = message.replaceFirst(
+                    "\\n\\*\\*Total hits \\d+\\*\\*[^\\n]*\\n", CombatMessageHelper.displayHitResults(h));
+            if (payload.total() != null) {
+                CombatRollPayload.RollTotal total = payload.total();
+                payload = new CombatRollPayload(
+                        payload.header(),
+                        payload.notes(),
+                        payload.modifiers(),
+                        payload.unitRolls(),
+                        new CombatRollPayload.RollTotal(total.diceRolled(), h, total.misses(), total.maximumHits()));
+            }
+            message += "\n_Renegade II_ canceled " + canceledHits + " ANTI-FIGHTER BARRAGE hit"
+                    + (canceledHits == 1 ? "" : "s") + " automatically.";
+        }
         int round;
         String combatName =
                 "combatRoundTracker" + opponent.getFaction() + tile.getPosition() + combatOnHolder.getName();

@@ -18,6 +18,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.commands.CommandHelper;
@@ -97,6 +99,19 @@ public class CardsInfoService {
                     player.factionButtonChecker() + "useRevArcanumAgent_other",
                     "Use Runebearer Lothos on Another Player",
                     FactionEmojis.revenant));
+        }
+        if (!"setup".equalsIgnoreCase(game.getPhaseOfGame()) && player.hasUnexhaustedLeader("arcanumagent")) {
+            buttons.add(ArcanumLeadersHandler.getVeylaCardsInfoButton(player));
+        }
+        if ("action".equalsIgnoreCase(game.getPhaseOfGame())
+                && player.isActivePlayer()
+                && player.hasTech("tharcanumpmy")
+                && player.getPlanets().contains("fabricatestation")
+                && !player.getExhaustedPlanetsAbilities().contains("fabricatestation")) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "planetAbilityExhaust_fabricatestation",
+                    "Use Fabricate Station Ability",
+                    MiscEmojis.LegendaryPlanet));
         }
         if (player.hasUnexhaustedLeader("oblivionagent")) {
             buttons.add(Buttons.gray(
@@ -426,6 +441,9 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("thronesagent")) {
             buttons.add(ThronesLeadersHandler.getThronesAgentButton(player));
+        }
+        if (player.hasUnit("aeterna_flagship")) {
+            buttons.add(AeternaUnitsHandler.getCryptCapacityInfoButton(player));
         }
         buttons.add(Buttons.gray("offerPlayerPref", "Player Settings"));
         buttons.add(Buttons.gray("searchMyGames", "List My Games"));

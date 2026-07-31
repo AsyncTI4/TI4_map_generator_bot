@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "tchigunn",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 212,
+            "y": 213
+        }
+    },
     "id": "tchigunn",
     "tileId": "s02",
     "name": "Tchi Gunn",

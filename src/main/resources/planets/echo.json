@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "echo",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "echo",
     "tileId": "d101",
     "name": "Echo",

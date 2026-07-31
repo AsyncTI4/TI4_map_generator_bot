@@ -102,6 +102,12 @@ public class PlayerTechService {
         if ("thkairng".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             message += "\nYour commodities are now " + player.getCommoditiesTotal();
         }
+        if ("thveylorg".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
+            message += "\nAdded _Inner Sanctum_ and its planet cards to your play area.";
+        }
+        if ("tharcanumpmy".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
+            message += "\nAdded _Fabricate Station_ and its planet cards to your play area.";
+        }
         CommanderUnlockCheckService.checkPlayer(player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum");
         MessageHelper.sendMessageToEventChannel(event, message);
     }
@@ -236,6 +242,11 @@ public class PlayerTechService {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "No eligible component action card is available in the action card discard pile.");
+            return;
+        }
+        if ("tharcanumpmb".equals(tech) && !ArcanumPrimordialTechHandler.canUsePowerWordPlaneShift(game, player)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "No system without planets is available for _Power Word: Plane Shift_.");
             return;
         }
         String exhaustMessage = player.getRepresentation(false, false) + " exhausted technology "
@@ -621,7 +632,11 @@ public class PlayerTechService {
                 TaFactionTechHandler.resolveResOp(event, game, player);
             }
             case "tharcanumpmg" -> { // Power Word: Miracle
-                ArcanumTechHandler.resolvePowerWordMiracle(event, game, player);
+                ArcanumPrimordialTechHandler.resolvePowerWordMiracle(event, game, player);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
+            case "tharcanumpmb" -> { // Power Word: Plane Shift
+                ArcanumPrimordialTechHandler.resolvePowerWordPlaneShift(event, game, player);
                 deleteTheOneButtonIfButtonEvent(event);
             }
             default ->
@@ -737,6 +752,16 @@ public class PlayerTechService {
             return;
         }
         TechnologyModel techM = Mapper.getTech(techID);
+        if (isResearch
+                && "arcanum".equalsIgnoreCase(techM.getFaction().orElse(""))
+                && !ListTechService.isTechResearchable(techM, player)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " does not meet the prerequisites for "
+                            + techM.getNameRepresentation()
+                            + ".");
+            return;
+        }
         StringBuilder message = new StringBuilder(ident)
                 .append(" acquired the technology ")
                 .append(techM.getRepresentation(false))

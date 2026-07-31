@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "gen",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 94
+        }
+    },
     "id": "gen",
     "tileId": "d12",
     "name": "Gen",

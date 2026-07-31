@@ -16,6 +16,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamBut
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.game.Game;
@@ -76,6 +80,9 @@ public class StartTurnService {
 
         game.removeStoredValue("fortuneSeekers");
         ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
+        AeternaAbilityHandler.clearMoonReturnStoredValues(game);
+        ArcanumAbilityHandler.clearRitualOfAscensionStoredValues(game);
+        KairnLeadershandler.clearKairnHeroStoredValues(game);
         game.setStoredValue(player.getFaction() + "planetsExplored", "");
         game.setStoredValue("lawsDisabled", "no");
         game.removeStoredValue("audioSent");
@@ -156,6 +163,7 @@ public class StartTurnService {
 
         game.updateActivePlayer(player);
         game.setPhaseOfGame("action");
+        AeternaPromissoryHandler.offerStasisFighterPlacement(event, game, player);
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
         if (NetrunnersPromissoryHandler.shouldOfferSharedNetworkAccessButtons(player, game)) {
             NetrunnersPromissoryHandler.offerSharedNetworkAccessButtons(player, game);
@@ -464,6 +472,11 @@ public class StartTurnService {
         String factionChecker = player.factionButtonChecker();
         game.setDominusOrb(false);
         List<Button> startButtons = new ArrayList<>();
+        if (!doneActionThisTurn
+                && player.hasRelicReady("waxing_moonphase")
+                && AeternaAbilityHandler.canReturnCapturedNeutralUnits(game, player, 2)) {
+            startButtons.add(AeternaAbilityHandler.getWaxingMoonButton(player));
+        }
         boolean hadAnyUnplayedSCs = false;
 
         if (doneActionThisTurn && (player.hasTech("fl") || TyrisLeaderHandler.isHeroActiveThisRound(game, player))) {

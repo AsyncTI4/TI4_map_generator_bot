@@ -510,12 +510,7 @@
             "aeterna"
         ],
         "abilities": [
-            "cycle_of_reclamation",
-            "new_moon_phase",
-            "waxing_moon_phase",
-            "full_moon_phase",
-            "waning_moon_phase",
-            "lunar_eclipse_phase"
+            "cycle_of_reclamation"
         ],
         "leaders": [
             "aeternaagent",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "argenum",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "argenum",
     "tileId": "er87",
     "name": "Argenum",

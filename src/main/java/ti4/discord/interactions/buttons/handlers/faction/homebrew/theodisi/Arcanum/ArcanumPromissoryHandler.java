@@ -88,7 +88,7 @@ public class ArcanumPromissoryHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentation() + ", please select the tech you would like to research:",
+                player.getRepresentation() + ", please choose the technology to research.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -111,7 +111,7 @@ public class ArcanumPromissoryHandler {
         List<Button> buttons = List.of(
                 Buttons.green(
                         pnOwner.factionButtonChecker() + GAIN_SCROLL_TECH + techID,
-                        "Spend 1 Strategy Token to gain " + tech.getName()),
+                        "Spend 1 Strategy Token To Gain " + tech.getName()),
                 Buttons.red(pnOwner.factionButtonChecker() + "deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
                 pnOwner.getCardsInfoThread(),
@@ -120,7 +120,7 @@ public class ArcanumPromissoryHandler {
                         + researcher.getRepresentationNoPing()
                         + " researched "
                         + tech.getRepresentation(false)
-                        + " using _Scroll of Ascension_. Spend 1 command token from your strategy pool to gain it?",
+                        + " using _Scroll of Ascension_. You may spend 1 command token from your strategy pool to gain it.",
                 buttons);
     }
 

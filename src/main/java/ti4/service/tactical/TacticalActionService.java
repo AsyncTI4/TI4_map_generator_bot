@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.game.Game;
@@ -137,6 +138,13 @@ public class TacticalActionService {
                         player.getCorrectChannel(),
                         player.getRepresentation() + " returned " + borrowedFromName
                                 + "'s command token from their **Seize Command** debt pool to use _Borrowed Authority_.");
+                if (borrowedFrom != null) {
+                    MessageHelper.sendMessageToChannel(
+                            borrowedFrom.getCorrectChannel(),
+                            borrowedFrom.getRepresentationUnfogged() + ", your command token was placed in "
+                                    + tile.getRepresentationForButtons(game, borrowedFrom)
+                                    + " for _Borrowed Authority_.");
+                }
                 if (game.isFowMode()) {
                     FoWHelper.pingSystem(
                             game,
@@ -431,6 +439,7 @@ public class TacticalActionService {
         return game.isNaaluAgent()
                 || game.isWarfareAction()
                 || game.isL1Hero()
+                || ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                 || (!game.getStoredValue("hiredGunsInPlay").isEmpty() && player != game.getActivePlayer());
     }
 

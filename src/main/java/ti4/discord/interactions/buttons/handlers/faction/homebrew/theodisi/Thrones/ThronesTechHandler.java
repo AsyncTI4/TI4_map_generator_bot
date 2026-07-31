@@ -66,7 +66,7 @@ public class ThronesTechHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", please choose which ship to move using _Specter Step_:",
+                player.getRepresentation() + ", please choose the ship to move using _Specter Step_.",
                 buttons);
     }
 
@@ -120,7 +120,7 @@ public class ThronesTechHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", select the system to move the ship to:",
+                player.getRepresentation() + ", please choose the system to which to move the ship.",
                 adjacentSystems);
     }
 

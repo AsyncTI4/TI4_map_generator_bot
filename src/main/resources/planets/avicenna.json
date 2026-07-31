@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "avicenna",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 177,
+            "y": 131
+        }
+    },
     "id": "avicenna",
     "tileId": "d10",
     "name": "Avicenna",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "station309",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "station309",
     "tileId": "er85",
     "name": "Station 309",

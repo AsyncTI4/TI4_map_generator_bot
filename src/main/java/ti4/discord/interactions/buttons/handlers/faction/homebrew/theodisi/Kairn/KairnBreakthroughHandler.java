@@ -61,7 +61,8 @@ public class KairnBreakthroughHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", choose 1 relic fragment to purge for _Relic Trading Hub_.",
+                player.getRepresentationUnfogged()
+                        + ", please choose 1 relic fragment to purge for _Relic Trading Hub_.",
                 buttons);
     }
 
@@ -91,7 +92,7 @@ public class KairnBreakthroughHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " purged a " + fragmentEmoji(fragmentId)
-                        + fragmentLabel(fragmentId) + ". Choose 1 " + trait
+                        + fragmentLabel(fragmentId) + ". Please choose 1 " + trait
                         + " planet to explore for _Relic Trading Hub_.",
                 getMatchingPlanetButtons(game, player, trait));
     }
@@ -185,7 +186,7 @@ public class KairnBreakthroughHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
-                        + ", choose a differently-colored purged fragment color to gain 2 of for _Relic Trading Hub_:",
+                        + ", please choose a differently-colored purged fragment color to gain 2 of for _Relic Trading Hub_.",
                 buttons);
     }
 

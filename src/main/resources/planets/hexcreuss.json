@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "hexcreuss",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 116
+        }
+    },
     "id": "hexcreuss",
     "tileId": "51h",
     "name": "Creuss (Hexagon)",

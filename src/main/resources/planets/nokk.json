@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "nokk",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 231,
+            "y": 207
+        }
+    },
     "id": "nokk",
     "tileId": "d04",
     "name": "Nokk",

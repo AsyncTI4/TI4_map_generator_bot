@@ -612,22 +612,18 @@ class UnitRenderGenerator {
             UnitType unitType,
             int amt) {
         int imageDmgX, imageDmgY;
+        Point adjustedUnitPos = TileGenerator.offsetTokenPositionForTokenPlanets(unitPos, unitHolder, tile);
 
         if (unitType == UnitType.Infantry || unitType == UnitType.Fighter) {
-            imageDmgX = getCenteredDamageX(unitPos, imagePos, unitImage, galvTag);
-            imageDmgY = getCenteredDamageY(unitPos, imagePos, unitImage, galvTag);
+            imageDmgX = getCenteredDamageX(adjustedUnitPos, imagePos, unitImage, galvTag);
+            imageDmgY = getCenteredDamageY(adjustedUnitPos, imagePos, unitImage, galvTag);
             imageDmgX += 33;
             imageDmgY -= 15;
         } else {
-            imageDmgX = getCenteredDamageX(unitPos, imagePos, unitImage, galvTag);
-            imageDmgY = getCenteredDamageY(unitPos, imagePos, unitImage, galvTag);
+            imageDmgX = getCenteredDamageX(adjustedUnitPos, imagePos, unitImage, galvTag);
+            imageDmgY = getCenteredDamageY(adjustedUnitPos, imagePos, unitImage, galvTag);
             imageDmgX += 5;
             imageDmgY -= 20;
-        }
-
-        if (ctx.isTokenPlanet) {
-            imageDmgX -= TILE_PADDING;
-            imageDmgY -= TILE_PADDING;
         }
 
         imageDmgX += TILE_PADDING;

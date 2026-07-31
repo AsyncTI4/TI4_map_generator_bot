@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "tir",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "tir",
     "tileId": "er52",
     "name": "Tir",

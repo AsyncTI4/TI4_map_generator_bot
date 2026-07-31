@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "jord",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 128
+        }
+    },
     "id": "jord",
     "tileId": "01",
     "name": "Jord",

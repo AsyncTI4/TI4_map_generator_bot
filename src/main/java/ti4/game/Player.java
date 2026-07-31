@@ -51,6 +51,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.utility.DiscordChannelUtility;
@@ -2631,6 +2632,18 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             }
         }
 
+        if ("thveylorg".equalsIgnoreCase(techID)) {
+            addPlanet("innersanctum");
+            refreshPlanet("innersanctum");
+        }
+
+        if ("tharcanumpmy".equalsIgnoreCase(techID)) {
+            addPlanet("fabricatestation");
+            refreshPlanet("fabricatestation");
+        }
+
+        ArcanumLeadersHandler.offerVeylaTheKeeperButtons(game, this, techID);
+
         // Update Owned Units when Researching a Unit Upgrade
         TechnologyModel techModel = Mapper.getTech(techID);
         if (techID == null) return;
@@ -2686,6 +2699,14 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             removeCustodiaVigilia();
         }
 
+        // Remove inner sanctum
+        if (techID != null && techID.toLowerCase().contains("thveylorg")) {
+            removePlanet("innersanctum");
+        }
+        if (techID != null && techID.toLowerCase().contains("tharcanumpmy")) {
+            removePlanet("fabricatestation");
+        }
+
         // Update Owned Units when Researching a Unit Upgrade
         TechnologyModel techModel = Mapper.getTech(techID);
         if (techID == null || techModel == null) return;
@@ -2727,6 +2748,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public void exhaustTech(String tech) {
         if (getTechs().contains(tech) && !getExhaustedTechs().contains(tech)) {
             getExhaustedTechs().add(tech);
+
+            if (game != null && game.playerHasLeaderUnlockedOrAlliance(this, "arcanumcommander")) {
+                ArcanumLeadersHandler.offerArcanumTechExhaustCommanderButtons(this);
+            }
         }
         if (hasReadyBreakthrough("kolumebt")) {
             gainCommodities(1);

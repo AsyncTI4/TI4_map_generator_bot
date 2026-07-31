@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "deathsgate",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "deathsgate",
     "tileId": "er03",
     "name": "Death's Gate",

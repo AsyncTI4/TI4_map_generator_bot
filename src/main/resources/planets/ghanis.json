@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ghanis",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "ghanis",
     "tileId": "er124",
     "name": "Ghanis",

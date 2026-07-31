@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "brilenci",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "brilenci",
     "tileId": "er89",
     "name": "Brilenci",

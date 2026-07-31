@@ -16,6 +16,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
@@ -124,7 +125,7 @@ public class ArcanumBreakthroughHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", select the individual units receiving _Power Word: Wish_.",
+                player.getRepresentation() + ", please choose the individual units receiving _Power Word: Wish_.",
                 List.of(
                         Buttons.green(player.factionButtonChecker() + WISH_SELECT + MOVE, "Choose 1 Unit: +1 Move"),
                         Buttons.green(
@@ -243,6 +244,38 @@ public class ArcanumBreakthroughHandler {
         }
     }
 
+    public static void movePowerWordWishUnitsWithinActiveSystem(
+            Game game, Player player, Tile tile, String fromHolder, String toHolder, UnitType unitType, int amount) {
+        if (game == null || tile == null || amount <= 0 || !hasPowerWordWish(player)) {
+            return;
+        }
+
+        String source = tile.getPosition() + ";" + fromHolder + ";" + unitType;
+        String destination = tile.getPosition() + ";" + toHolder + ";" + unitType;
+        List<String> modes =
+                player.hasUnlockedBreakthrough(POWER_WORD_WISH_FRONT) ? List.of(MOVE, COMBAT) : List.of(CAPACITY);
+        for (String mode : modes) {
+            List<String> selections = getSelections(game, player, mode);
+            int moved = 0;
+            List<String> updatedSelections = new ArrayList<>();
+            for (String selection : selections) {
+                if (moved < amount && source.equals(selection)) {
+                    updatedSelections.add(destination);
+                    moved++;
+                } else {
+                    updatedSelections.add(selection);
+                }
+            }
+            game.setStoredValue(selectionKey(player, mode), String.join(",", updatedSelections));
+        }
+    }
+
+    public static boolean hasPowerWordWish(Player player) {
+        return player != null
+                && (player.hasUnlockedBreakthrough(POWER_WORD_WISH_FRONT)
+                        || player.hasUnlockedBreakthrough(POWER_WORD_WISH_BACK));
+    }
+
     public static int getPowerWordWishCapacityBonus(Game game, Player player, Tile tile) {
         if (!player.hasUnlockedBreakthrough(POWER_WORD_WISH_BACK) || tile == null) return 0;
         UnitHolder space = tile.getUnitHolders().get("space");
@@ -302,7 +335,7 @@ public class ArcanumBreakthroughHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 channel,
-                player.getRepresentation() + ", choose " + requiredSelections(mode) + " individual "
+                player.getRepresentation() + ", please choose " + requiredSelections(mode) + " individual "
                         + (CAPACITY.equals(mode) ? "ship" : "unit") + (requiredSelections(mode) == 1 ? "" : "s")
                         + " for _Power Word: Wish_.",
                 buttons);

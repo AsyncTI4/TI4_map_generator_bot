@@ -18,9 +18,13 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamBut
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanHeroHandler;
@@ -263,6 +267,10 @@ public class PlayHeroService {
             }
             case "ardentiahero" -> ArdentiaLeadersHandler.startArdentiaHero(event, game, player);
             case "revenantkairnhero" -> RevenantLeadersHandler.startRevKairnHero(event, game, player);
+            case "throneshero" -> ThronesLeadersHandler.getUnplacedThronePlanetButtons(event, game, player);
+            case "kairnhero" -> KairnLeadershandler.startKairnHero(event, game, player);
+            case "ponthoushero" -> PonthousLeadersHandler.startPonthousHero(event, game, player);
+            case "arcanumhero" -> ArcanumLeadersHandler.startArcanumHero(event, game, player);
             case "florzenhero" -> {
                 for (Tile tile : game.getTileMap().values()) {
                     for (UnitHolder uH : tile.getPlanetUnitHolders()) {

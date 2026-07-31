@@ -22,6 +22,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.ExhaustLeaderService;
 
@@ -80,7 +81,8 @@ public class RevenantLeadersHandler {
     public static void useRevArcanumAgent(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Leader agent = player.getLeader(REVARCAGENT).orElse(null);
         if (agent == null || !player.hasUnexhaustedLeader(REVARCAGENT)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "_Runebearer Lothos_ is no longer available.");
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "Runebearer Lothos, the Revenant agent, is no longer available.");
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             return;
         }
@@ -105,7 +107,8 @@ public class RevenantLeadersHandler {
             }
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + ", choose a player to use _Runebearer Lothos_ on.",
+                    player.getRepresentationUnfogged()
+                            + ", please choose a player on whom to use Runebearer Lothos, the Revenant agent.",
                     targetButtons);
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             return;
@@ -155,7 +158,8 @@ public class RevenantLeadersHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),
-                explorer.getRepresentation() + ", choose a planet to explore with _Runebearer Lothos_.",
+                explorer.getRepresentation()
+                        + ", please choose a planet to explore with Runebearer Lothos, the Revenant agent.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -193,8 +197,8 @@ public class RevenantLeadersHandler {
                         ExploreEmojis.Industrial));
         MessageHelper.sendMessageToChannelWithButtons(
                 game.getActionsChannel(),
-                player.getRepresentation() + ", choose how to explore " + planet.getRepresentation(game)
-                        + " with _Runebearer Lothos_.",
+                player.getRepresentation() + ", please choose how to explore " + planet.getRepresentation(game)
+                        + " with Runebearer Lothos, the Revenant agent.",
                 traitButtons);
         ButtonHelper.deleteMessage(event);
     }
@@ -283,7 +287,8 @@ public class RevenantLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", choose 1 exploration card to resolve with _Arlir Mirrored_.",
+                player.getRepresentation()
+                        + ", please choose 1 exploration card to resolve with Arlir Mirrored, the Revenant commander.",
                 List.of(originalCard.getRepresentationEmbed(), secondCard.getRepresentationEmbed()),
                 buttons);
 
@@ -325,7 +330,7 @@ public class RevenantLeadersHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", choose up to 1 card from each exploration discard pile to shuffle into its deck.",
+                        + ", please choose up to 1 card from each exploration discard pile to shuffle into its deck.",
                 buttons);
     }
 
@@ -362,8 +367,8 @@ public class RevenantLeadersHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", choose an exploration card from the " + StringUtils.capitalize(trait)
-                        + " discard pile.",
+                player.getRepresentation() + ", please choose an exploration card from the "
+                        + StringUtils.capitalize(trait) + " discard pile.",
                 displayedButtons);
 
         ButtonHelper.deleteMessage(event);
@@ -401,7 +406,7 @@ public class RevenantLeadersHandler {
         List<Button> buttons = getRevKairnExploreDiscardButtons(game, player, trait, buttonPrefix);
         List<Button> extraButtons =
                 List.of(Buttons.red(player.factionButtonChecker() + BACK_TO_REV_KAIRN_DECKS, "Back to Discard Piles"));
-        String message = player.getRepresentation() + ", choose an exploration card from the "
+        String message = player.getRepresentation() + ", please choose an exploration card from the "
                 + StringUtils.capitalize(trait) + " discard pile.";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), buttons, extraButtons, message, buttonPrefix, buttonID)) {
@@ -476,7 +481,8 @@ public class RevenantLeadersHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", choose a trait to explore for _Zairos the First_:",
+                player.getRepresentation()
+                        + ", please choose a trait to explore for Zairos the First, the Revenant hero.",
                 buttons);
     }
 
@@ -507,8 +513,8 @@ public class RevenantLeadersHandler {
             return;
         }
 
-        String message = player.getRepresentation() + ", choose a " + StringUtils.capitalize(trait)
-                + " planet to explore for _Zairos the First_.";
+        String message = player.getRepresentation() + ", please choose a " + StringUtils.capitalize(trait)
+                + " planet to explore for Zairos the First, the Revenant hero.";
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
         ButtonHelper.deleteMessage(event);
@@ -534,7 +540,7 @@ public class RevenantLeadersHandler {
             }
         }
 
-        String message = player.getRepresentation() + ", choose a " + StringUtils.capitalize(trait)
+        String message = player.getRepresentation() + ", please choose a " + StringUtils.capitalize(trait)
                 + " planet to explore for _Zairos the First_.";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), buttons, message, buttonPrefix, buttonID)) {
@@ -574,5 +580,53 @@ public class RevenantLeadersHandler {
             }
         }
         return buttons;
+    }
+
+    // Lich token debt pool handling
+    public static List<Button> offerLichTokenChoices(Player player, Game game) {
+        List<Button> targets = new ArrayList<>();
+        for (Player target : game.getRealPlayersExcludingThis(player)) {
+            if (player.getDebtTokenCount(target.getColor(), "lich") >= 1) {
+                continue;
+            }
+
+            targets.add(Buttons.green(
+                    player.factionButtonChecker() + "selectLichTarget_" + target.getColor(),
+                    target.getFaction(),
+                    FactionEmojis.getFactionIcon(target.getFaction())));
+        }
+
+        return targets;
+    }
+
+    @ButtonHandler("selectLichTarget_")
+    public static void resolveAllureOfDarkness(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (game == null || player == null || !player.hasAbility("allure_of_darkness")) {
+            return;
+        }
+
+        String targetColor = buttonID.replace("selectLichTarget_", "");
+        Player target = game.getPlayerFromColorOrFaction(targetColor);
+        if (target == null) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Could not find player.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        for (Player targets : game.getRealPlayers()) {
+            player.clearAllDebtTokens(targets.getColor(), "lich");
+        }
+
+        game.setDebtPoolIcon("lich", FactionEmojis.revenant.emojiString());
+
+        player.addDebtTokens(targetColor, 1, "lich");
+
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " placed the lich token on " + target.getRepresentation()
+                        + "'s commander.");
+
+        ButtonHelper.deleteMessage(event);
     }
 }

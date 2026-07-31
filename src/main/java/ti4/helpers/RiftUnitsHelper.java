@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -445,6 +446,13 @@ public final class RiftUnitsHelper {
 
     @ButtonHandler("getRiftButtons_")
     public static void offerRiftButtons(Player player, String buttonID, Game game) {
+        if (ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing()
+                            + " ignores gravity-rift effects during this tactical action due to _Power Word: Plane Shift_.");
+            return;
+        }
         String tilePosition = buttonID.replace("getRiftButtons_", "");
         Tile tile = game.getTileByPosition(tilePosition);
         MessageChannel channel = player.getCorrectChannel();

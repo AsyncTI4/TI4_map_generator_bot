@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "keqo",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 226,
+            "y": 200
+        }
+    },
     "id": "keqo",
     "tileId": "ar1",
     "name": "keqo",

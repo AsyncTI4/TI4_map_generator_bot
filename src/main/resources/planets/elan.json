@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "elan",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "elan",
     "tileId": "er88",
     "name": "Elan's Rest",

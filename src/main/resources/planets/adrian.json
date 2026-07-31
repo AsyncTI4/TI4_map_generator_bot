@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "adrian",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "adrian",
     "tileId": "er50",
     "name": "Adrian",

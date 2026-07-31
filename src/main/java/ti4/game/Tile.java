@@ -22,6 +22,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesAbilityHandler;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CalendarHelper;
 import ti4.helpers.CommandCounterHelper;
@@ -625,6 +626,11 @@ public class Tile {
     }
 
     @JsonIgnore
+    public boolean hasEgress() {
+        return getTileModel().hasEgress();
+    }
+
+    @JsonIgnore
     public List<WormholeModel.Wormhole> getWormholes(Game game) {
         Set<WormholeModel.Wormhole> whs = EnumSet.noneOf(WormholeModel.Wormhole.class);
         List<WormholeModel.Wormhole> whs2 = new ArrayList<>(whs);
@@ -685,6 +691,12 @@ public class Tile {
     @JsonIgnore
     public boolean isAnomaly(Game game, Player player) {
         if (isAsteroidField() || isSupernova() || isNebula(game) || isGravityRift(game, player) || isScar(game)) {
+            return true;
+        }
+        if (game != null
+                && ThronesAbilityHandler.tracesOfRuinIsActive(game)
+                && getPlanetUnitHolders().stream()
+                        .anyMatch(planet -> ThronesAbilityHandler.isThronePlanet(planet.getName()))) {
             return true;
         }
         return hasAnyToken("token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png");

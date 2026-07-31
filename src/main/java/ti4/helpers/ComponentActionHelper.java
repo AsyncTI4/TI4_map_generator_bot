@@ -14,6 +14,9 @@ import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
@@ -84,7 +87,12 @@ public class ComponentActionHelper {
                 if ("thobliviong".equalsIgnoreCase(tech) && !OblivionTechHandler.canUseMirroredMemories(game, p1)) {
                     continue;
                 }
-                if ("tharcanumpmg".equalsIgnoreCase(tech) && !ArcanumTechHandler.hasFourTechsMatchingPrimordial(p1)) {
+                if (("tharcanumpmg".equalsIgnoreCase(tech) || "tharcanumpmb".equalsIgnoreCase(tech))
+                        && !ArcanumPrimordialTechHandler.hasFourTechsMatchingPrimordial(p1, tech)) {
+                    continue;
+                }
+                if ("tharcanumpmb".equalsIgnoreCase(tech)
+                        && !ArcanumPrimordialTechHandler.canUsePowerWordPlaneShift(game, p1)) {
                     continue;
                 }
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
@@ -159,11 +167,12 @@ public class ComponentActionHelper {
                 }
             }
         }
-        List<String> implementedLegendaryPlanets = new ArrayList<>(List.of("avernus"));
+        List<String> implementedLegendaryPlanets = new ArrayList<>(List.of("avernus", "fabricatestation"));
         for (String planet : implementedLegendaryPlanets) {
             String prettyPlanet = Mapper.getPlanet(planet).getName();
             if (p1.getPlanets().contains(planet)
-                    && !p1.getExhaustedPlanetsAbilities().contains(planet)) {
+                    && !p1.getExhaustedPlanetsAbilities().contains(planet)
+                    && (!"fabricatestation".equals(planet) || p1.hasTech("tharcanumpmy"))) {
                 compButtons.add(Buttons.green(
                         factionChecker + "planetAbilityExhaust_" + planet, "Use " + prettyPlanet + " Ability"));
             }
@@ -318,8 +327,20 @@ public class ComponentActionHelper {
         }
 
         // Relics
+        if (p1.hasRelicReady("new_moonphase")) {
+            compButtons.add(AeternaAbilityHandler.getNewMoonButton(p1));
+        }
         boolean enigmaticSeen = false;
         for (String relic : p1.getRelics()) {
+            if (List.of(
+                            "full_moonphase",
+                            "waxing_moonphase",
+                            "waning_moonphase",
+                            "new_moonphase",
+                            "lunar_eclipse_moonphase")
+                    .contains(relic)) {
+                continue;
+            }
             RelicModel relicData = Mapper.getRelic(relic);
             if (relicData == null) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that relic.");
@@ -481,6 +502,9 @@ public class ComponentActionHelper {
                     FactionEmojis.Naaz);
             compButtons.add(abilityButton);
         }
+        if (p1.hasAbility("ritual_of_ascension") && p1.getFragments().size() >= 2) {
+            compButtons.add(ArcanumAbilityHandler.getRitualOfAscensionButton(event, game, p1));
+        }
         if (p1.hasAbility("puppetsoftheblade")
                 && p1.getPlotCardsFactions().values().stream().anyMatch(ary -> ary != null && !ary.isEmpty())) {
             Button abilityButton = Buttons.green(
@@ -583,7 +607,9 @@ public class ComponentActionHelper {
                             "bentoragent",
                             "kolumeagent",
                             "crimsonagent",
-                            "redcreussagent");
+                            "redcreussagent",
+                            "kryxosagent",
+                            "aeternaagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
                         String message = p1.getRepresentationUnfogged() + ", please choose the user of the agent.";

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "volgan",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 210
+        }
+    },
     "id": "volgan",
     "tileId": "er120",
     "name": "Volgan",

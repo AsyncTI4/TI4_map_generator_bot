@@ -131,8 +131,8 @@ public class AeternaTechHandler {
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
                     player.getRepresentation()
-                            + ", opposing ships matching a ship destroyed this combat may be assigned 1 hit via "
-                            + "_Thanatocyte Lattice_.",
+                            + ", you may use the _Thanatocyte Lattice_ technology to assign 1 hit to an opposing "
+                            + "ship that matches a ship destroyed during this combat.",
                     List.of(
                             Buttons.red(buttonID, "Use Thanatocyte Lattice"),
                             Buttons.gray("deleteButtons", "Decline")));
@@ -218,7 +218,7 @@ public class AeternaTechHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", choose the opposing ship type to assign the hit to:",
+                player.getRepresentation() + ", please choose the opposing ship type to assign the hit to.",
                 buttons);
     }
 
@@ -305,9 +305,8 @@ public class AeternaTechHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 game.isFowMode() ? targetPlayer.getCorrectChannel() : event.getMessageChannel(),
                 targetPlayer.getRepresentation()
-                        + ", resolve the  _Thanatocyte Lattice_ hit assigned to your "
-                        + unitType.humanReadableName()
-                        + ":",
+                        + ", please resolve the _Thanatocyte Lattice_ hit assigned to your "
+                        + unitType.humanReadableName() + ".",
                 buttons);
     }
 

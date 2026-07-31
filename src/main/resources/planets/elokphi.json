@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "elokphi",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "elokphi",
     "tileId": "er10",
     "name": "Elok Phi",

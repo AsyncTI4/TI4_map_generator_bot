@@ -8,6 +8,7 @@ public enum TechEmojis implements TI4Emoji {
     PropulsionDisabled,
     Propulsion2,
     Propulsion3,
+    Propulsion4,
 
     BioticBiotic,
     BioticPropulsion,
@@ -17,6 +18,7 @@ public enum TechEmojis implements TI4Emoji {
     BioticDisabled,
     Biotic2,
     Biotic3,
+    Biotic4,
 
     CyberneticWarfare,
     CyberneticPropulsion,
@@ -25,6 +27,7 @@ public enum TechEmojis implements TI4Emoji {
     CyberneticDisabled,
     Cybernetic2,
     Cybernetic3,
+    Cybernetic4,
 
     WarfarePropulsion,
     WarfareWarfare,
@@ -32,6 +35,7 @@ public enum TechEmojis implements TI4Emoji {
     WarfareDisabled,
     Warfare2,
     Warfare3,
+    Warfare4,
 
     UnitUpgradeTech,
     UnitTechSkip,

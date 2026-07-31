@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "char",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "char",
     "tileId": "er90",
     "name": "Char",

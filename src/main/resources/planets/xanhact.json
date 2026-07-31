@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "xanhact",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 204,
+            "y": 207
+        }
+    },
     "id": "xanhact",
     "tileId": "73",
     "name": "Xanhact",

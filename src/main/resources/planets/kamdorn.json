@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "kamdorn",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 228,
+            "y": 222
+        }
+    },
     "id": "kamdorn",
     "tileId": "16",
     "name": "Kamdorn",

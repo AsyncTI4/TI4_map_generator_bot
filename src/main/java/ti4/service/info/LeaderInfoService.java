@@ -112,6 +112,27 @@ public class LeaderInfoService {
                     "**Commanders from " + FactionEmojis.Mahact + " Imperia:**",
                     imperiaEmbeds);
         }
+
+        List<MessageEmbed> lichEmbeds = new ArrayList<>();
+        if (player.hasLeaderUnlocked("revenantcommander")) {
+            for (Player otherPlayer : game.getRealPlayers()) {
+                if (otherPlayer.equals(player) || player.getDebtTokenCount(otherPlayer.getColor(), "lich") < 1) {
+                    continue;
+                }
+
+                otherPlayer.getLeaders().stream()
+                        .filter(leader -> Constants.COMMANDER.equals(leader.getType()))
+                        .filter(leader -> leader.getId().contains(otherPlayer.getFaction()))
+                        .findFirst()
+                        .ifPresent(leader -> lichEmbeds.add(leader.getLeaderEmbed(game)));
+            }
+        }
+        if (!lichEmbeds.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithEmbeds(
+                    player.getCardsInfoThread(),
+                    "**Commanders from " + FactionEmojis.revenant + " Allure of Darkness:**",
+                    lichEmbeds);
+        }
     }
 
     private static List<Button> getLeaderButtons() {

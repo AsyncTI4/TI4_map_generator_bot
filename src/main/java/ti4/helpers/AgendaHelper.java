@@ -610,13 +610,23 @@ public final class AgendaHelper {
             message.append(
                     "When shenanigans have concluded, please confirm resolution or discard the result and manually resolve it yourselves.");
         }
-        Button autoResolve = Buttons.blue("agendaResolution_" + winner, "Resolve with Current Winner");
-        Button manualResolve = Buttons.red("autoresolve_manual", "Resolve it Manually");
-        List<Button> resolutions = new ArrayList<>(List.of(autoResolve, manualResolve));
-        for (Player player : game.getRealPlayers()) {
-            if (player.hasReadyBreakthrough("veylorbt")) {
-                resolutions.add(VeylorBreakthroughHandler.offerFilibusterButton(player, game));
-            }
+        Player filibusterPlayer = game.getRealPlayers().stream()
+                .filter(player ->
+                        VeylorLeadersHandler.isVeylorAgendaPhase(game) && player.hasReadyBreakthrough("veylorbt"))
+                .findFirst()
+                .orElse(null);
+        List<Button> resolutions;
+        if (filibusterPlayer == null) {
+            resolutions = new ArrayList<>(List.of(
+                    Buttons.blue("agendaResolution_" + winner, "Resolve with Current Winner"),
+                    Buttons.red("autoresolve_manual", "Resolve it Manually")));
+        } else {
+            message.append('\n')
+                    .append(filibusterPlayer.getRepresentationNoPing())
+                    .append(" may exhaust _Filibustered Legislation_ before this agenda is resolved.");
+            resolutions = new ArrayList<>(List.of(
+                    VeylorBreakthroughHandler.offerFilibusterButton(filibusterPlayer, game),
+                    VeylorBreakthroughHandler.offerDeclineFilibusterButton(filibusterPlayer, winner)));
         }
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message.toString(), resolutions);
     }
@@ -895,6 +905,17 @@ public final class AgendaHelper {
 
                     if (winningR != null && specificVote.contains("Settlements")) {
                         SettlementsAcd2ButtonHandler.resolveWinningSettlements(game, winningR, winner);
+                    }
+
+                    if (winningR != null && winningR.hasTech("thveylorg") && specificVote.contains("Inner Sanctum")) {
+                        for (Player voter : getWinningVoters(winner, game)) {
+                            ActionCardHelper.drawActionCards(voter, 1);
+                        }
+                        MessageHelper.sendMessageToChannel(
+                                game.getMainGameChannel(),
+                                winningR.getRepresentationNoPing()
+                                        + " correctly predicted the outcome with _Inner Sanctum_. "
+                                        + "Each player who voted for that outcome drew 1 action card.");
                     }
 
                     if (winningR != null
@@ -2364,7 +2385,8 @@ public final class AgendaHelper {
             aCount = Integer.parseInt(agendaCount) + 1;
         }
         List<Button> resActionRow = new ArrayList<>();
-        boolean heroActive = game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
+        boolean heroActive = VeylorLeadersHandler.isVeylorAgendaPhase(game)
+                && game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
         boolean veylorBtExtraAgenda = "yes".equals(game.getStoredValue("veylorBtExtraAgenda"));
         int agendaLimit = 2 + (heroActive ? 1 : 0) + (veylorBtExtraAgenda ? 1 : 0);
         boolean canRevealNextAgenda = aCount <= agendaLimit || game.isAbsolMode();

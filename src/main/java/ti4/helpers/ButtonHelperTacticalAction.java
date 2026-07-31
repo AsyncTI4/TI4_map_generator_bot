@@ -17,7 +17,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.Na
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
@@ -198,7 +201,11 @@ public final class ButtonHelperTacticalAction {
         }
         ArdentiaTechHandler.clearOverlordMatrixGalvanization(game);
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
+        ArcanumPrimordialTechHandler.clearPowerWordPlaneShift(game);
         ArcanumTechHandler.clearSigilOfTransmutation(game);
+        AeternaLeadersHandler.clearAeternaCommanderActionState(game);
+        AeternaUnitsHandler.clearCryptActionState(game);
+        AeternaUnitsHandler.clearGraveyardActionState(game);
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         KryxosBreakthroughHandler.clearPrototypeInnovators(game);
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
@@ -489,6 +496,7 @@ public final class ButtonHelperTacticalAction {
         XytherisLeadersHandler.clearHeroUnitAbilityRoll(game);
         PonthousUnitHandler.clearOldGlorySustain(game);
         ArcanumBreakthroughHandler.clearPowerWordWish(game);
+        ArcanumPrimordialTechHandler.clearPowerWordPlaneShift(game);
         ArcanumTechHandler.clearSigilOfTransmutation(game);
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         KryxosBreakthroughHandler.clearPrototypeInnovators(game);

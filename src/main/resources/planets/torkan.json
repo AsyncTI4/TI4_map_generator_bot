@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "torkan",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 203,
+            "y": 208
+        }
+    },
     "id": "torkan",
     "tileId": "28",
     "name": "Torkan",

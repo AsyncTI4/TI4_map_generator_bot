@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "everra",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 141,
+            "y": 127
+        }
+    },
     "id": "everra",
     "tileId": "68",
     "name": "Everra",

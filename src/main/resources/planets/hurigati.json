@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "hurigati",
+        "resourcesLocation": "TopRight",
+        "centerPosition": {
+            "x": 210,
+            "y": 85
+        }
+    },
     "id": "hurigati",
     "tileId": "er86",
     "name": "Hurigati",

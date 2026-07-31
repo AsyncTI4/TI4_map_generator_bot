@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "zhgen",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "zhgen",
     "tileId": "er48",
     "name": "Zhgen",

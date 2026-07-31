@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "vigilum",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "vigilum",
     "tileId": "mp01",
     "name": "Vigilum",

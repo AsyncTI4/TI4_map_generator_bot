@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "lust",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "lust",
     "tileId": "er108",
     "name": "Lust",

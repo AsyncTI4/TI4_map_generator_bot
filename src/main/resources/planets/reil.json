@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "reil",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 226,
+            "y": 200
+        }
+    },
     "id": "reil",
     "tileId": "br5",
     "name": "Reil",

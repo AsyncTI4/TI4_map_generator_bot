@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "fakrenn",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 85
+        }
+    },
     "id": "fakrenn",
     "tileId": "d109",
     "name": "Fakrenn",

@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "malbolge",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 130
+        }
+    },
     "id": "malbolge",
     "tileId": "er114",
     "name": "Malbolge",

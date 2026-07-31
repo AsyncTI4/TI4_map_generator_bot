@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "magrathea",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170,
+            "y": 150
+        }
+    },
     "id": "magrathea",
     "tileId": "sig03",
     "name": "Magrathea",

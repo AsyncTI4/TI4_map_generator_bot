@@ -1,4 +1,12 @@
 {
+    "planetLayout": {
+        "unitHolderName": "ogdun",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 136,
+            "y": 94
+        }
+    },
     "id": "ogdun",
     "tileId": "d24",
     "name": "Ogdun",

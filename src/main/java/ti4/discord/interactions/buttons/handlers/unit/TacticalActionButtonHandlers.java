@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -207,6 +208,18 @@ class TacticalActionButtonHandlers {
                             .map(r -> r.onUnitHolder(addToHolder))
                             .toList();
                     AddUnitService.addUnits(event, game, toAdd);
+                    if (ArcanumBreakthroughHandler.hasPowerWordWish(owner)) {
+                        ArcanumBreakthroughHandler.movePowerWordWishUnitsWithinActiveSystem(
+                                game,
+                                owner,
+                                tile,
+                                removeFromHolder.getName(),
+                                addToHolder.getName(),
+                                type,
+                                removed.stream()
+                                        .mapToInt(RemovedUnit::getTotalRemoved)
+                                        .sum());
+                    }
 
                     List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
 
@@ -266,6 +279,18 @@ class TacticalActionButtonHandlers {
                             .map(r -> r.onUnitHolder(addToHolder))
                             .toList();
                     AddUnitService.addUnits(event, game, toAdd);
+                    if (ArcanumBreakthroughHandler.hasPowerWordWish(owner)) {
+                        ArcanumBreakthroughHandler.movePowerWordWishUnitsWithinActiveSystem(
+                                game,
+                                owner,
+                                tile,
+                                removeFromHolder.getName(),
+                                addToHolder.getName(),
+                                type,
+                                removed.stream()
+                                        .mapToInt(RemovedUnit::getTotalRemoved)
+                                        .sum());
+                    }
 
                     List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
 

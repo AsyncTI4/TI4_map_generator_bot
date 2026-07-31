@@ -1395,6 +1395,37 @@ public class PlayerAreaGenerator {
             }
         }
 
+        if (player.hasLeaderUnlocked("revenantcommander")) {
+            deltaX += 5;
+            Collection<Player> players = game.getRealPlayersNDummies();
+            if (game.isMinorFactionsMode()) {
+                players = game.getRealPlayers();
+            }
+
+            for (Player otherPlayer : players) {
+                if (otherPlayer.equals(player) || player.getDebtTokenCount(otherPlayer.getColor(), "lich") < 1) {
+                    continue;
+                }
+
+                Leader commander = otherPlayer.getLeaders().stream()
+                        .filter(leader -> Constants.COMMANDER.equals(leader.getType()))
+                        .filter(leader -> leader.getId().contains(otherPlayer.getFaction()))
+                        .findFirst()
+                        .orElse(null);
+                if (commander == null) {
+                    continue;
+                }
+
+                String status = commander.isLocked() ? "_exh" : "_rdy";
+                String overlay = "pa_leaders_lich" + status + ".png";
+                drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, Mapper.getLeader(commander.getId()));
+                DrawingUtil.drawPlayerFactionIconImage(graphics, otherPlayer, x + deltaX - 1, y + 108, 42, 42);
+                drawPAImage(x + deltaX, y, overlay);
+                drawPAImage(x + deltaX, y, "pa_leaders_pips_ii" + status + ".png");
+                deltaX += 48;
+            }
+        }
+
         return x + deltaX + 20;
     }
 
