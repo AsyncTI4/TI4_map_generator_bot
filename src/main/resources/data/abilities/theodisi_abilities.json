@@ -59,7 +59,7 @@
         "name": "Factory Lease",
         "faction": "myrr",
         "window": "During setup, gain the Factory Lease promissory notes. At the start of the agenda phase:",
-        "windowEffect": "You may produce 1 unit with a cost of 4 or less in a system containing 1 of your space docks and no other players' ships for each Factory Lease attachment on the game board.",
+        "windowEffect": "You may produce 1 unit other than a war sun in a system containing 1 of your space docks and no other players' ships for each Factory Lease attachment on the game board.",
         "source": "theodisi"
     },
     {

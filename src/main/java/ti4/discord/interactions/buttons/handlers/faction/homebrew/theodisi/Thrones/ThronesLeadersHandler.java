@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
@@ -278,9 +279,19 @@ public class ThronesLeadersHandler {
         }
         buttons.add(Buttons.red(player.factionButtonChecker() + DONE_CHOOSING_THRONE, "Done Choosing Thrones"));
 
-        MessageHelper.sendMessageToChannelWithButtons(
+        List<MessageEmbed> thronesEmbed = new ArrayList<>();
+        for (String planet : THRONE_PLANETS) {
+            if (game.getTileFromPlanet(planet) != null) {
+                continue;
+            }
+
+            thronesEmbed.add(Mapper.getPlanet(planet).getRepresentationEmbed());
+        }
+
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", please choose the 2 Throne planets to place in your home system.",
+                thronesEmbed,
                 buttons);
     }
 

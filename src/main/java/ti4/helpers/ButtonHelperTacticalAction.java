@@ -29,6 +29,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
@@ -237,6 +239,7 @@ public final class ButtonHelperTacticalAction {
         AeternaUnitsHandler.clearGraveyardActionState(game);
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         KryxosBreakthroughHandler.clearPrototypeInnovators(game);
+        MyrrLeadersHandler.clearMyrrAgent(game);
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
     }
 
@@ -447,6 +450,8 @@ public final class ButtonHelperTacticalAction {
             }
             XytherisAbilityHandler.offerStingOfTheHiveAfterMovement(event, game, tile);
             OblivionAbilityHandler.offerReflectionPlacement(event, game, player, tile);
+            MyrrTechHandler.offerSegmentedStructuring(event, game, player, tile);
+            MyrrUnitsHandler.offerIronboundGuardianDeploy(event, game, player, tile);
         }
     }
 
@@ -533,6 +538,8 @@ public final class ButtonHelperTacticalAction {
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         KairnUnitHandler.clearExcavatorMechExplore(game);
         KryxosBreakthroughHandler.clearPrototypeInnovators(game);
+        MyrrLeadersHandler.clearMyrrAgent(game);
+        MyrrTechHandler.clearSegmentedStructuring(game);
         ArdentiaUnitHandler.clearIronClawDeployUsed(game);
         DreamButtonHandler.clearDreamAgentAnomaly(game);
         GameEventDraft.clear(game);
@@ -676,6 +683,7 @@ public final class ButtonHelperTacticalAction {
         game.setActiveSystem(pos);
         ArcanumTechHandler.offerSigilOfTransmutation(event, game, player, tile);
         XytherisLeadersHandler.offerMyrixAgentButtons(game, player, tile);
+        MyrrLeadersHandler.offerMyrrAgent(game, player, tile);
         game.setStoredValue("possiblyUsedRift", "");
         game.setStoredValue("lastActiveSystem", pos);
         List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);

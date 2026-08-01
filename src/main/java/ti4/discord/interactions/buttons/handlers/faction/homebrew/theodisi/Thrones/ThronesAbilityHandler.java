@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
@@ -50,9 +51,19 @@ public class ThronesAbilityHandler {
                     FactionEmojis.thrones));
         }
 
-        MessageHelper.sendMessageToChannelWithButtons(
+        List<MessageEmbed> thronesEmbed = new ArrayList<>();
+        for (String planet : THRONE_PLANETS) {
+            if (game.getTileFromPlanet(planet) != null) {
+                continue;
+            }
+
+            thronesEmbed.add(Mapper.getPlanet(planet).getRepresentationEmbed());
+        }
+
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", please choose the Throne planet to place in your home system.",
+                thronesEmbed,
                 buttons);
     }
 
