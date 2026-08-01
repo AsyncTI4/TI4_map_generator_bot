@@ -1,5 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
@@ -192,6 +193,10 @@ public class KryxosUnitHandler {
     }
 
     @ButtonHandler(FLIP_UNIT)
+    @SuppressFBWarnings(
+            value = "LSC_LITERAL_STRING_COMPARISON",
+            justification =
+                    "The detector incorrectly reports the compiler-generated comparisons for this string switch.")
     public static void resolveFlipUnit(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (event == null || game == null || player == null) {
             return;

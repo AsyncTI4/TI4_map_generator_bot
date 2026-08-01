@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -537,6 +538,10 @@ public final class CryypterHelper {
     }
 
     @ButtonHandler("handleNaazEnvoy_")
+    @SuppressFBWarnings(
+            value = "LSC_LITERAL_STRING_COMPARISON",
+            justification =
+                    "The detector incorrectly reports the compiler-generated comparisons for this string switch.")
     public static void handleNaazEnvoy(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         envoyExhaustCheck(game, player, "naazenvoy");
         String[] fields = buttonID.split("_");
