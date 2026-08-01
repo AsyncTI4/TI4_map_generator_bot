@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.commands.CommandHelper;
@@ -273,6 +274,9 @@ public final class BreakthroughCommandHelper {
             if ("thronesbt".equalsIgnoreCase(bt.getID())) {
                 player.addOwnedUnitByID("thrones_aurelion");
                 ThronesUnitHandler.offerAurelionPlacement(game, player);
+            }
+            if ("oblivionbt".equalsIgnoreCase(bt.getID())) {
+                OblivionBreakthroughHandler.startCallOfTheVoid(game, player);
             }
             if (!FractureService.isFractureInPlay(game) && !game.isNoFractureMode())
                 serveRollFractureButtons(player, btID);

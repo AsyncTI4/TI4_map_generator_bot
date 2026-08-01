@@ -2,10 +2,7 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Obli
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -16,34 +13,30 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
-import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
-import ti4.service.milty.MiltyDraftTile;
 
 @UtilityClass
 public class OblivionPromissoryHandler {
     private static final String SHARD_OF_NOTHINGNESS = "thpnoblivion";
     private static final String DRAWN_RED_TILES = "oblivionPnDrawnRedTiles_";
+    private static final String SELECTED_RED_TILE = "oblivionPnSelectedRedTile_";
     private static final String CHOOSE_RED_TILE = "chooseOblivionPnRedTile_";
     private static final String PLACE_RED_TILE = "placeOblivionPnRedTile_";
 
     public static void offerShardOfNothingnessButtons(Game game, Player player) {
         if (game == null
                 || player == null
-                || !game.getStoredValue(DRAWN_RED_TILES + player.getFaction()).isBlank()) {
+                || !game.getStoredValue(DRAWN_RED_TILES + player.getFaction()).isBlank()
+                || !game.getStoredValue(SELECTED_RED_TILE + player.getFaction()).isBlank()) {
             return;
         }
 
-        List<MiltyDraftTile> unusedRedTiles = new ArrayList<>(Helper.getUnusedTiles(game).stream()
-                .filter(tile -> !tile.getTierList().isBlue())
-                .toList());
-        if (unusedRedTiles.size() < 3) {
+        List<String> drawnTileIds = OblivionTileHelper.drawUnusedTiles(game, 3, null);
+        if (drawnTileIds.size() < 3) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
@@ -51,23 +44,28 @@ public class OblivionPromissoryHandler {
             return;
         }
 
-        Collections.shuffle(unusedRedTiles);
-        List<String> drawnTileIds = unusedRedTiles.stream()
-                .limit(3)
-                .map(tile -> tile.getTile().getTileID())
+        game.setStoredValue(DRAWN_RED_TILES + player.getFaction(), String.join(",", drawnTileIds));
+        game.removeStoredValue(SELECTED_RED_TILE + player.getFaction());
+        sendShardTileChoices(game, player);
+    }
+
+    private static void sendShardTileChoices(Game game, Player player) {
+        List<String> drawnTileIds = getStoredTiles(game, DRAWN_RED_TILES, player);
+        List<String> legalTileIds = drawnTileIds.stream()
+                .filter(tileId -> OblivionTileHelper.hasLegalPlacement(game, tileId))
                 .toList();
-        if (getPlacementButtons(game, player, drawnTileIds.getFirst()).isEmpty()) {
+        if (legalTileIds.isEmpty()) {
+            clearShardState(game, player);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + ", there are no legal locations to place a tile adjacent to 2 systems.");
+                            + ", there are no legal edge positions at which to resolve _Shard of Nothingness_. The promissory note was not purged.");
             return;
         }
-        game.setStoredValue(DRAWN_RED_TILES + player.getFaction(), String.join(",", drawnTileIds));
 
         List<Button> buttons = new ArrayList<>();
         List<MessageEmbed> tileEmbeds = new ArrayList<>();
-        for (String tileId : drawnTileIds) {
+        for (String tileId : legalTileIds) {
             tileEmbeds.add(TileHelper.getTileById(tileId).getRepresentationEmbed(false));
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + CHOOSE_RED_TILE + tileId,
@@ -88,28 +86,90 @@ public class OblivionPromissoryHandler {
         }
 
         String chosenTileId = buttonID.substring(CHOOSE_RED_TILE.length());
-        String drawnTiles = game.getStoredValue(DRAWN_RED_TILES + player.getFaction());
-        List<String> drawnTileIds = Arrays.stream(drawnTiles.split(","))
-                .filter(tileId -> !tileId.isBlank())
-                .toList();
-        if (drawnTileIds.size() != 3 || !drawnTileIds.contains(chosenTileId)) {
+        List<String> drawnTileIds = getStoredTiles(game, DRAWN_RED_TILES, player);
+        if (drawnTileIds.size() != 3
+                || !drawnTileIds.contains(chosenTileId)
+                || !game.getStoredValue(SELECTED_RED_TILE + player.getFaction()).isBlank()) {
             ButtonHelper.deleteMessage(event);
             return;
         }
         List<Button> placementButtons = getPlacementButtons(game, player, chosenTileId);
         if (placementButtons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentation()
+                            + ", that system tile no longer has a legal edge position. Please choose another tile.");
+            return;
+        }
+
+        game.setStoredValue(SELECTED_RED_TILE + player.getFaction(), chosenTileId);
+
+        ButtonHelper.deleteMessage(event);
+        sendShardPlacementButtons(game, player, chosenTileId, placementButtons);
+    }
+
+    @ButtonHandler(PLACE_RED_TILE)
+    public static void placeShardOfNothingnessTile(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String placementData = buttonID.substring(PLACE_RED_TILE.length());
+        int tileIdEnd = placementData.lastIndexOf('_');
+        if (game == null || player == null || tileIdEnd <= 0) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
-        Set<String> purgedTileIds = new HashSet<>();
-        String storedPurgedTiles = game.getStoredValue(Constants.PURGED_MAP_TILES);
-        if (!storedPurgedTiles.isBlank()) {
-            Collections.addAll(purgedTileIds, storedPurgedTiles.split(","));
+        String tileId = placementData.substring(0, tileIdEnd);
+        if (!tileId.equals(game.getStoredValue(SELECTED_RED_TILE + player.getFaction()))) {
+            ButtonHelper.deleteMessage(event);
+            return;
         }
-        drawnTileIds.stream().filter(tileId -> !tileId.equals(chosenTileId)).forEach(purgedTileIds::add);
-        game.setStoredValue(Constants.PURGED_MAP_TILES, String.join(",", purgedTileIds));
-        game.removeStoredValue(DRAWN_RED_TILES + player.getFaction());
+        List<Button> placementButtons = getPlacementButtons(game, player, tileId);
+        if (placementButtons.isEmpty()) {
+            game.removeStoredValue(SELECTED_RED_TILE + player.getFaction());
+            ButtonHelper.deleteMessage(event);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", that system tile no longer has a legal edge position. Please choose another tile.");
+            sendShardTileChoices(game, player);
+            return;
+        }
+
+        String placementMessage =
+                player.getRepresentation() + ", please choose an edge position for the selected system tile.";
+        String placementButtonPrefix = player.factionButtonChecker() + PLACE_RED_TILE + tileId + "_";
+        if (NewStuffHelper.checkAndHandlePaginationChange(
+                event,
+                event.getMessageChannel(),
+                placementButtons,
+                placementMessage,
+                placementButtonPrefix,
+                buttonID)) {
+            return;
+        }
+
+        String position = placementData.substring(tileIdEnd + 1);
+        Tile tile = OblivionTileHelper.placeTile(game, tileId, position);
+        if (tile == null) {
+            ButtonHelper.deleteMessage(event);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", that placement is no longer legal. Please choose another edge position.");
+            List<Button> updatedPlacementButtons = getPlacementButtons(game, player, tileId);
+            if (updatedPlacementButtons.isEmpty()) {
+                game.removeStoredValue(SELECTED_RED_TILE + player.getFaction());
+                sendShardTileChoices(game, player);
+            } else {
+                sendShardPlacementButtons(game, player, tileId, updatedPlacementButtons);
+            }
+            return;
+        }
+
+        List<String> drawnTileIds = getStoredTiles(game, DRAWN_RED_TILES, player);
+        OblivionTileHelper.purgeTiles(
+                game, drawnTileIds.stream().filter(id -> !id.equals(tileId)).toList());
+        clearShardState(game, player);
 
         Player owner = game.getPNOwner(SHARD_OF_NOTHINGNESS);
         game.setPurgedPN(SHARD_OF_NOTHINGNESS);
@@ -128,75 +188,34 @@ public class OblivionPromissoryHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " purged the 2 unchosen red-backed tiles and _Shard of Nothingness_.");
+                player.getRepresentation() + " placed " + tile.getRepresentationForButtons(game, player)
+                        + ", purged the other 2 red-backed tiles, and purged _Shard of Nothingness_.");
+    }
+
+    private static void sendShardPlacementButtons(
+            Game game, Player player, String tileId, List<Button> placementButtons) {
         String placementMessage =
-                player.getRepresentation() + ", please choose 2 systems adjacent to which to place the selected tile.";
-        String placementButtonPrefix = player.factionButtonChecker() + PLACE_RED_TILE + chosenTileId + "_";
+                player.getRepresentation() + ", please choose an edge position for the selected system tile.";
+        String placementButtonPrefix = player.factionButtonChecker() + PLACE_RED_TILE + tileId + "_";
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 placementMessage,
                 NewStuffHelper.buttonPagination(placementButtons, placementButtonPrefix, 0));
     }
 
-    @ButtonHandler(PLACE_RED_TILE)
-    public static void placeShardOfNothingnessTile(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String placementData = buttonID.substring(PLACE_RED_TILE.length());
-        int tileIdEnd = placementData.indexOf('_');
-        if (game == null || player == null || tileIdEnd <= 0) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        String tileId = placementData.substring(0, tileIdEnd);
-        List<Button> placementButtons = getPlacementButtons(game, player, tileId);
-        String placementMessage =
-                player.getRepresentation() + ", please choose 2 systems adjacent to which to place the selected tile.";
-        String placementButtonPrefix = player.factionButtonChecker() + PLACE_RED_TILE + tileId + "_";
-        if (NewStuffHelper.checkAndHandlePaginationChange(
-                event,
-                event.getMessageChannel(),
-                placementButtons,
-                placementMessage,
-                placementButtonPrefix,
-                buttonID)) {
-            return;
-        }
-
-        ButtonHelper.starChartStep3(game, player, "starChartsStep3_" + placementData, event);
+    private static List<Button> getPlacementButtons(Game game, Player player, String tileId) {
+        return OblivionTileHelper.getPlacementButtons(
+                game, player, tileId, player.factionButtonChecker() + PLACE_RED_TILE);
     }
 
-    private static List<Button> getPlacementButtons(Game game, Player player, String tileId) {
-        List<Button> buttons = new ArrayList<>();
-        Set<String> offeredPositions = new HashSet<>();
-        for (Tile tile : game.getTileMap().values()) {
-            for (String position : PositionMapper.getAdjacentTilePositions(tile.getPosition())) {
-                Tile destination = game.getTileByPosition(position);
-                if ((destination != null && !"silver_flame".equals(destination.getTileID()))
-                        || !offeredPositions.add(position)) {
-                    continue;
-                }
+    private static List<String> getStoredTiles(Game game, String key, Player player) {
+        return Arrays.stream(game.getStoredValue(key + player.getFaction()).split(","))
+                .filter(tileId -> !tileId.isBlank())
+                .toList();
+    }
 
-                List<Tile> adjacentTiles = PositionMapper.getAdjacentTilePositions(position).stream()
-                        .map(game::getTileByPosition)
-                        .filter(adjacentTile -> adjacentTile != null
-                                && !"silver_flame".equals(adjacentTile.getTileID())
-                                && (adjacentTile.getTileModel() == null
-                                        || !adjacentTile.getTileModel().isHyperlane()))
-                        .toList();
-                if (adjacentTiles.size() < 2) {
-                    continue;
-                }
-
-                Tile firstSystem = adjacentTiles.getFirst();
-                Tile secondSystem = adjacentTiles.get(1);
-                buttons.add(Buttons.green(
-                        player.factionButtonChecker() + PLACE_RED_TILE + tileId + "_" + firstSystem.getPosition() + "_"
-                                + secondSystem.getPosition(),
-                        "Place adjacent to " + firstSystem.getRepresentationForButtons(game, player) + " and "
-                                + secondSystem.getRepresentationForButtons(game, player)));
-            }
-        }
-        return buttons;
+    private static void clearShardState(Game game, Player player) {
+        game.removeStoredValue(DRAWN_RED_TILES + player.getFaction());
+        game.removeStoredValue(SELECTED_RED_TILE + player.getFaction());
     }
 }
