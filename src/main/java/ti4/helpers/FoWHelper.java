@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -512,6 +513,8 @@ public final class FoWHelper {
                         emptyTiles.stream().map(Tile::getPosition).collect(Collectors.toSet()));
             }
         }
+
+        OblivionUnitHandler.addObsidianMirrorAdjacencies(game, player, position, adjacentPositions);
 
         if (includeTile) {
             adjacentPositions.add(position);

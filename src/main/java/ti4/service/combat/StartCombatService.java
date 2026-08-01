@@ -36,6 +36,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousPromissoryHandler;
@@ -1547,6 +1548,8 @@ public class StartCombatService {
         }
         AeternaPromissoryHandler.addFuneralServicesButton(game, p1, p2, tile, groundOrSpace, buttons);
         AeternaPromissoryHandler.addFuneralServicesButton(game, p2, p1, tile, groundOrSpace, buttons);
+        OblivionTechHandler.addOblivionCannonButton(buttons, game, p1, p2, tile, isSpaceCombat);
+        OblivionTechHandler.addOblivionCannonButton(buttons, game, p2, p1, tile, isSpaceCombat);
 
         checkAndAddIncomprehensibleFormButton(game, p1, p2, isSpaceCombat, tile, buttons);
 

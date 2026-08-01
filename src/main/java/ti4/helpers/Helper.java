@@ -53,6 +53,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
@@ -1937,6 +1938,11 @@ public final class Helper {
     }
 
     public static int getProductionValueOfUnitHolder(Player player, Game game, Tile tile, UnitHolder uH) {
+        return getProductionValueOfUnitHolder(player, game, tile, uH, false);
+    }
+
+    public static int getProductionValueOfUnitHolder(
+            Player player, Game game, Tile tile, UnitHolder uH, boolean unitsOnly) {
         int productionValueTotal = 0;
         boolean cosmicSuper = false;
         if (game.isCosmicPhenomenaeMode()) {
@@ -2019,6 +2025,9 @@ public final class Helper {
                 productionValueTotal += productionValue * uH.getUnits().get(unit);
                 productionValueTotal += XytherisLeadersHandler.getMyrixAgentBonus(game, player, tile, uH, unit);
             }
+        }
+        if (unitsOnly) {
+            return productionValueTotal;
         }
         if (uH instanceof Planet planet) {
             if (TaPromissoryHandler.planetHasAdvancedStructuralEngineering(planet)
@@ -2378,6 +2387,7 @@ public final class Helper {
         if (hasExactlyOneShipInSystem && player.hasAbility("rallying_cry")) {
             productionValueTotal += 2;
         }
+        productionValueTotal += MyrrLeadersHandler.getMyrrAgentProduction(game, player, tile);
         return productionValueTotal;
     }
 
@@ -2527,7 +2537,9 @@ public final class Helper {
         }
         if (!"solbtbuild".equalsIgnoreCase(warfareNOtherstuff)) {
             if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {
-                if (player.hasWarsunTech() && resourcelimit > 9) {
+                if (player.hasWarsunTech()
+                        && resourcelimit > 9
+                        && !"factorylease".equalsIgnoreCase(warfareNOtherstuff)) {
                     remaining = " ("
                             + ButtonHelperFactionSpecific.remainingUnitsOfType(
                                     game, Mapper.getUnitKey(AliasHandler.resolveUnit("warsun"), player.getColorID()))
@@ -2641,6 +2653,7 @@ public final class Helper {
                 UnitEmojis.fighter));
         if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff)
                 && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
+                && !"factorylease".equalsIgnoreCase(warfareNOtherstuff)
                 && unitHolders.size() < 4
                 && !regulated
                 && !"sling".equalsIgnoreCase(warfareNOtherstuff)
@@ -2655,7 +2668,7 @@ public final class Helper {
         }
         boolean greenMechd = false;
         boolean ironMechSpaceAdded = false;
-        if (player.hasTech("tf-desperados")) {
+        if (player.hasTech("tf-desperados") && !"factorylease".equalsIgnoreCase(warfareNOtherstuff)) {
             unitButtons.add(Buttons.blue(
                     player.factionButtonChecker() + "desperadoDestroyer_" + tile.getPosition(),
                     "Place Desperado Destroyer",
@@ -2668,6 +2681,7 @@ public final class Helper {
                 && !"sling".equalsIgnoreCase(warfareNOtherstuff)
                 && !"muaatagent".equalsIgnoreCase(warfareNOtherstuff)
                 && !warfareNOtherstuff.contains("integrated")
+                && !"factorylease".equalsIgnoreCase(warfareNOtherstuff)
                 && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
 
             if (player.hasUnexhaustedLeader("argentagent")) {
@@ -2778,6 +2792,7 @@ public final class Helper {
                 unitButtons.add(inf1Button);
                 if (!"genericBuild".equalsIgnoreCase(warfareNOtherstuff)
                         && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
+                        && !"factorylease".equalsIgnoreCase(warfareNOtherstuff)
                         && !"arboCommander".equalsIgnoreCase(warfareNOtherstuff)
                         && !regulated
                         && unitHolders.size() < 4

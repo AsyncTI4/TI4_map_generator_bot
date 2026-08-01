@@ -1,5 +1,6 @@
 package ti4.discord.interactions.commands.map;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -17,6 +18,10 @@ class AddAdjacencyOverrideList extends GameStateSubcommand {
     }
 
     @Override
+    @SuppressFBWarnings(
+            value = "LSC_LITERAL_STRING_COMPARISON",
+            justification =
+                    "The detector incorrectly reports the compiler-generated comparisons for this string switch.")
     public void execute(SlashCommandInteractionEvent event) {
         String[] adjacencyListOptions = event.getOption(Constants.ADJACENCY_OVERRIDES_LIST)
                 .getAsString()

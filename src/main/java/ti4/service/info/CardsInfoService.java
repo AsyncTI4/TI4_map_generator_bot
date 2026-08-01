@@ -22,6 +22,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
@@ -106,6 +107,9 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("kairnagent")) {
             buttons.add(KairnLeadershandler.getKairnAgentCardsInfoButton(player));
+        }
+        if (player.hasLeader("myrragent")) {
+            buttons.add(MyrrLeadersHandler.getMyrrAgentCardsInfoButton(player));
         }
         if (player.hasAbility("shared_discoveries")) {
             buttons.add(KairnAbilityHandler.getSharedDiscoveriesButton(player));

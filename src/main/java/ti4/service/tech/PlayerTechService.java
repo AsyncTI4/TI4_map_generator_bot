@@ -1112,8 +1112,8 @@ public class PlayerTechService {
 
         List<Button> buttons = new ArrayList<>();
         for (Units.UnitType unit : allowedUnits) {
-            buttons.add(
-                    Buttons.green("endGlimmersRedTech_" + unit.plainName(), unit.plainName(), unit.getUnitTypeEmoji()));
+            String unitName = unit.plainName();
+            buttons.add(Buttons.green("endGlimmersRedTech_" + unitName, unitName, unit.getUnitTypeEmoji()));
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

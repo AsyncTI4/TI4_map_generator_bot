@@ -63,6 +63,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
@@ -5742,7 +5743,10 @@ public class ButtonHelper {
 
     public static void resolveFullFrontierExplore(
             Game game, Player player, Tile tile, GenericInteractionCreateEvent event) {
-        if (player.hasAbility("voidsailors")) {
+        if (player.hasUnlockedBreakthrough("oblivionbt")) {
+            OblivionBreakthroughHandler.offerFrontierExplores(
+                    event, game, player, tile, player.hasAbility("voidsailors") ? 3 : 2);
+        } else if (player.hasAbility("voidsailors")) {
             String cardID1 = game.drawExplore(Constants.FRONTIER);
             String cardID2 = game.drawExplore(Constants.FRONTIER);
             ExploreModel card1 = Mapper.getExplore(cardID1);

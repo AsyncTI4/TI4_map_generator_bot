@@ -10,6 +10,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
 import ti4.game.Game;
@@ -114,6 +115,8 @@ public class AddUnitService {
             Player player =
                     game.getPlayerFromColorOrFaction(parsedUnit.unitKey().colorID());
             handlePostAddUnitPlayerEffects(event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), player);
+            MyrrLeadersHandler.resolveMyrrCommander(
+                    event, game, player, tile, parsedUnit.unitKey(), parsedUnit.location(), parsedUnit.count());
         }
 
         handleFogOfWar(tile, color, game, unitList);
