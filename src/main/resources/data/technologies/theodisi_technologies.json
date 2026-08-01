@@ -122,6 +122,17 @@
     "text": "When you research or gain a technology, you may flip this card instead."
   },
   {
+    "alias": "thkryxosfs2",
+    "name": "Ultimate Evolution III",
+    "types": [
+      "UNITUPGRADE"
+    ],
+    "requirements": "GBY",
+    "faction": "kryxos",
+    "source": "theodisi",
+    "text": "Cost 8, Combat 1(x3), Move 4, Capacity 12\nSUSTAIN DAMAGE, ANTI-FIGHTER BARRAGE 3(x3)\nWhen this unit uses SUSTAIN DAMAGE, cancel an additional hit."
+  },
+  {
     "alias": "thkryxosmf",
     "name": "Warspawn Juggernaut II",
     "types": [
@@ -131,6 +142,17 @@
     "faction": "kryxos",
     "source": "theodisi",
     "text": "When you research or gain a technology, you may flip this card instead."
+  },
+  {
+    "alias": "thkryxosmf2",
+    "name": "Warspawn Juggernaut III",
+    "types": [
+      "UNITUPGRADE"
+    ],
+    "requirements": "BYR",
+    "faction": "kryxos",
+    "source": "theodisi",
+    "text": "Cost 2, Combat 4(x2), BOMBARDMENT 4(x2)\nSUSTAIN DAMAGE\nWhen this unit produces a hit, you may SUSTAIN DAMAGE to place infantry with this unit up to the number of hits produced."
   },
   {
     "alias": "tharcanumbg",

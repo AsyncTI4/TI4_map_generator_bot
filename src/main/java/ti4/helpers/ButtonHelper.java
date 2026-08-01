@@ -2858,7 +2858,7 @@ public class ButtonHelper {
                     int sustain = 0;
                     if (removedUnit.getSustainDamage()) {
                         sustain = 1;
-                        if (player.hasTech("nes")) {
+                        if (doesSustainCancelTwoHits(player, removedUnit)) {
                             sustain = 2;
                         }
                     }
@@ -2871,6 +2871,14 @@ public class ButtonHelper {
             }
         }
         return count;
+    }
+
+    public static boolean doesSustainCancelTwoHits(Player player, UnitModel unitModel) {
+        return player != null
+                && (player.hasTech("nes")
+                        || (player.ownsUnit("kryxos_flagship3")
+                                && unitModel != null
+                                && unitModel.getUnitType() == UnitType.Flagship));
     }
 
     public static int howManyDifferentDebtPlayerHas(Player player) {

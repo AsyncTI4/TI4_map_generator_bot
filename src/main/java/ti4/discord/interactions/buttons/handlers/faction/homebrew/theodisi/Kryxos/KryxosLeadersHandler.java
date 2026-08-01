@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -21,6 +22,7 @@ public class KryxosLeadersHandler {
     private static final String RETURN_TECH = "returnTechForKryxosAgent_";
     private static final String RESEARCH_UNIT_UPGRADE = "researchKryxosAgentUUTech_";
 
+    // Agent
     public static void startKryxosAgent(Game game, Player target) {
         if (game == null || target == null) {
             return;
@@ -110,5 +112,31 @@ public class KryxosLeadersHandler {
 
         ButtonHelper.deleteMessage(event);
         PlayerTechService.getTech(game, player, event, "getTech_" + techId + "__noPay");
+    }
+
+    // Hero
+    public static void startKryxosHero(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (game == null || player == null) {
+            return;
+        }
+
+        int researchCount = player.getTechs().stream()
+                .map(Mapper::getTech)
+                .filter(Objects::nonNull)
+                .filter(TechnologyModel::isUnitUpgrade)
+                .mapToInt(tech -> tech.getRequirements().orElse("").length())
+                .max()
+                .orElse(0);
+
+        Button researchButton = Buttons.green(
+                player.factionButtonChecker() + "getAllTechOfType_allTechResearchable_noPay", "Research a Technology");
+
+        MessageHelper.sendMessageToChannelWithButton(
+                event.getMessageChannel(),
+                player.getRepresentation() + ", you may research up to " + researchCount + " technolog"
+                        + (researchCount == 1 ? "y" : "ies") + " due to Zorath Ultimus, the Kryxos hero."
+                        + "\n-# The unit upgrade technology with the most prerequisites was selected automatically."
+                        + " To select a technology with fewer prerequisites, research fewer technologies.",
+                researchButton);
     }
 }

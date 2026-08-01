@@ -89,7 +89,7 @@ public final class CombatMessageHelper {
             }
         }
 
-        String unitTypeHitsInfo = String.format("hits on **%s**", toHit);
+        String unitTypeHitsInfo = toHit <= 1 ? "always hits" : String.format("hits on **%s**", toHit);
         if (modifier != 0) {
             String modifierToHitString = Integer.toString(modifier);
             if (modifier > 0) {
