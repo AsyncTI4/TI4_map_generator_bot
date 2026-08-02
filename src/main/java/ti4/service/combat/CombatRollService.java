@@ -48,6 +48,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
@@ -525,6 +526,7 @@ public class CombatRollService {
         List<NamedCombatModifierModel> tempOpponentMods = CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
                 opponent, tileModel, combatOnHolder, true, rollType);
         tempMods.addAll(tempOpponentMods);
+        RevenantLeadersHandler.addRevXytherisAgentModifier(tempMods, game, player, rollType);
         if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasAbility("control_network"))) {
             tempMods.addAll(NetrunnersAbilitiesHandler.getPendingControlNetworkSpaceCannonModifier(
                     game, player, tile, combatOnHolder, rollType));
@@ -1194,6 +1196,17 @@ public class CombatRollService {
         payloadBuilder.addModifierDisplays(
                 uniqueList, playerUnitsFlat, player, opponent, game, rollType, activeSystem, unitHolder);
 
+        List<NamedCombatModifierModel> cappedDiceModifiers = mods.stream()
+                .filter(modifier -> modifier.getModifier().getMaxDice() != null)
+                .toList();
+        List<NamedCombatModifierModel> appliedMods = mods.stream()
+                .filter(modifier -> modifier.getModifier().getMaxDice() == null)
+                .toList();
+        Map<NamedCombatModifierModel, Integer> cappedDiceRemaining = new IdentityHashMap<>();
+        for (NamedCombatModifierModel modifier : cappedDiceModifiers) {
+            cappedDiceRemaining.put(modifier, modifier.getModifier().getMaxDice());
+        }
+
         // Actually roll for each unit
         int totalHits = 0;
         int letnevBTBoost = 0;
@@ -1324,12 +1337,38 @@ public class CombatRollService {
             }
         }
         MergeResult mergeResult = mergeAndDetectDivergence(
-                playerUnits, mods, rollType, player, opponent, game, playerUnitsList, activeSystem);
+                playerUnits, appliedMods, rollType, player, opponent, game, playerUnitsList, activeSystem);
         playerUnits = mergeResult.units();
         Set<String> divergingModels = mergeResult.divergingModels();
         Set<String> consumedBestMods = new HashSet<>();
         game.removeStoredValue("warFundingRolls" + player.getFaction());
-        for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : playerUnits.entrySet()) {
+        List<Map.Entry<Pair<UnitModel, UnitHolder>, Integer>> rollingUnits = new ArrayList<>(playerUnits.entrySet());
+        if (!cappedDiceModifiers.isEmpty()) {
+            rollingUnits.sort(Comparator.comparingInt(entry -> {
+                UnitModel unit = entry.getKey().getLeft();
+                int hitsOn = unit.getCombatDieHitsOnForAbility(rollType, player);
+                if (rollType == CombatRollType.combatround) {
+                    hitsOn = CombatStatsService.getCombatRoundProfile(true, unit, player, activeSystem, opponent, false)
+                            .hitsOn();
+                }
+                int modifier = CombatModHelper.getCombinedModifierForUnit(
+                        unit,
+                        entry.getValue(),
+                        appliedMods,
+                        player,
+                        opponent,
+                        game,
+                        playerUnitsList,
+                        rollType,
+                        activeSystem,
+                        entry.getKey().getRight());
+                if (xytherisHeroBonus) {
+                    modifier += 4;
+                }
+                return hitsOn - modifier;
+            }));
+        }
+        for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : rollingUnits) {
             UnitModel unitModel = entry.getKey().getLeft();
             UnitHolder perUnitHolder = entry.getKey().getRight();
             int numOfUnit = entry.getValue();
@@ -1339,7 +1378,7 @@ public class CombatRollService {
             int modifierToHit = CombatModHelper.getCombinedModifierForUnit(
                     unitModel,
                     numOfUnit,
-                    mods,
+                    appliedMods,
                     player,
                     opponent,
                     game,
@@ -1450,13 +1489,56 @@ public class CombatRollService {
                                         : RollSegmentType.GRAVLEASH_REST;
                             default -> RollSegmentType.PRIMARY;
                         };
-                List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
+                List<Die> resultRolls;
+                if (cappedDiceModifiers.isEmpty()) {
+                    resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
+                } else {
+                    int[] cappedModifiersByDie = new int[numRolls];
+                    for (NamedCombatModifierModel cappedModifier : cappedDiceModifiers) {
+                        int remainingDice = cappedDiceRemaining.getOrDefault(cappedModifier, 0);
+                        if (remainingDice < 1
+                                || !cappedModifier
+                                        .getModifier()
+                                        .isInScopeForUnit(unitModel, playerUnitsList, rollType, game, player)) {
+                            continue;
+                        }
+                        int diceToModify = Math.min(remainingDice, numRolls);
+                        int cappedModifierValue = CombatModHelper.getCombinedModifierForUnit(
+                                unitModel,
+                                numOfUnit,
+                                List.of(cappedModifier),
+                                player,
+                                opponent,
+                                game,
+                                playerUnitsList,
+                                rollType,
+                                activeSystem,
+                                perUnitHolder);
+                        for (int dieIndex = 0; dieIndex < diceToModify; dieIndex++) {
+                            cappedModifiersByDie[dieIndex] += cappedModifierValue;
+                        }
+                        cappedDiceRemaining.put(cappedModifier, remainingDice - diceToModify);
+                    }
+                    resultRolls = new ArrayList<>();
+                    for (int cappedModifier : cappedModifiersByDie) {
+                        resultRolls.addAll(DiceHelper.rollDice(Math.max(1, toHit - modifierToHit - cappedModifier), 1));
+                    }
+                }
                 int mult = 1;
 
-                player.setExpectedHitsTimes10(
-                        player.getExpectedHitsTimes10() + (numRolls * mult * (11 - toHit + modifierToHit)));
-                chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numRolls * mult);
-                chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numRolls * mult);
+                if (cappedDiceModifiers.isEmpty()) {
+                    player.setExpectedHitsTimes10(
+                            player.getExpectedHitsTimes10() + (numRolls * mult * (11 - toHit + modifierToHit)));
+                    chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numRolls * mult);
+                    chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numRolls * mult);
+                } else {
+                    for (Die die : resultRolls) {
+                        player.setExpectedHitsTimes10(
+                                player.getExpectedHitsTimes10() + (mult * (11 - die.getThreshold())));
+                        chanceOfAllHits *= (11 - die.getThreshold()) / 10.0;
+                        chanceOfAllMiss *= (die.getThreshold() - 1) / 10.0;
+                    }
+                }
                 maximumHits += numRolls * mult;
                 if (usesX89c4) {
                     mult = 2;

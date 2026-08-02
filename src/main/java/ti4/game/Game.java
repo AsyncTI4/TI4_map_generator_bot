@@ -4155,6 +4155,18 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
+            if ("thpnrevenant".equals(pnID)) {
+                if (!"revenantcommander".equals(leaderID)) {
+                    continue;
+                }
+                Player pnOwner = getPNOwner(pnID);
+                if (pnOwner != null
+                        && !pnOwner.getFaction().equalsIgnoreCase(player.getFaction())
+                        && pnOwner.hasLeaderUnlocked(leaderID)) {
+                    return true;
+                }
+                continue;
+            }
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null
@@ -4177,7 +4189,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         // Grant access to the native commander of each player whose command token is in the revenant lich debt pool.
-        if (player.hasLeaderUnlocked("revenantcommander")) {
+        if (!"revenantcommander".equalsIgnoreCase(leaderID)
+                && playerHasLeaderUnlockedOrAlliance(player, "revenantcommander")) {
             for (Player otherPlayer : getRealPlayersNDummies()) {
                 if (otherPlayer.equals(player)) continue;
 
@@ -4197,6 +4210,17 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         // check if player has any alliances with players that have the commander
         // unlocked
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
+            if ("thpnrevenant".equals(pnID)) {
+                Player pnOwner = getPNOwner(pnID);
+                if (pnOwner != null && !pnOwner.equals(player)) {
+                    Leader commander =
+                            pnOwner.getLeaderByID("revenantcommander").orElse(null);
+                    if (commander != null && pnOwner.hasLeaderUnlocked("revenantcommander")) {
+                        leaders.add(commander);
+                    }
+                }
+                continue;
+            }
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null && !pnOwner.equals(player)) {
@@ -4238,7 +4262,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         // Add the native commanders of players whose command tokens are in this debt pool.
-        if (player.hasLeaderUnlocked("revenantcommander")) {
+        if (playerHasLeaderUnlockedOrAlliance(player, "revenantcommander")) {
             for (Player otherPlayer : getRealPlayers()) {
                 if (otherPlayer.equals(player) || player.getDebtTokenCount(otherPlayer.getColor(), "lich") < 1) {
                     continue;

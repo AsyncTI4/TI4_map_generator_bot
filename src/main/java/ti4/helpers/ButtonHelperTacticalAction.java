@@ -34,6 +34,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
@@ -240,6 +242,7 @@ public final class ButtonHelperTacticalAction {
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         KryxosBreakthroughHandler.clearPrototypeInnovators(game);
         MyrrLeadersHandler.clearMyrrAgent(game);
+        RevenantLeadersHandler.clearRedLeaderTacticalState(game);
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
     }
 
@@ -542,6 +545,8 @@ public final class ButtonHelperTacticalAction {
         MyrrTechHandler.clearSegmentedStructuring(game);
         ArdentiaUnitHandler.clearIronClawDeployUsed(game);
         DreamButtonHandler.clearDreamAgentAnomaly(game);
+        RevenantLeadersHandler.clearRedLeaderTacticalWindow(game);
+        RevenantTechHandler.clearLazarusProduction(game);
         GameEventDraft.clear(game);
 
         game.getTacticalActionDisplacement().clear();
@@ -683,6 +688,7 @@ public final class ButtonHelperTacticalAction {
         game.setActiveSystem(pos);
         ArcanumTechHandler.offerSigilOfTransmutation(event, game, player, tile);
         XytherisLeadersHandler.offerMyrixAgentButtons(game, player, tile);
+        RevenantLeadersHandler.openRevXytherisAgentWindow(game, player);
         MyrrLeadersHandler.offerMyrrAgent(game, player, tile);
         game.setStoredValue("possiblyUsedRift", "");
         game.setStoredValue("lastActiveSystem", pos);

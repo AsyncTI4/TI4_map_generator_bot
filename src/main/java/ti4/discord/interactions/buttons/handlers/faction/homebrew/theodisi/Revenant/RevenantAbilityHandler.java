@@ -82,7 +82,11 @@ public class RevenantAbilityHandler {
         }
 
         for (String leaderId : ALL_OPTIONAL_LEADERS) {
-            player.removeLeader(leaderId);
+            if (!chosenSet.contains(leaderId)) {
+                // Call of the Haunted purges these during setup, so intentionally use the raw removal path and do not
+                // trigger effects that react to a leader being purged during play.
+                player.removeLeader(leaderId);
+            }
         }
         for (String leaderId : chosenSet) {
             player.addLeader(leaderId);

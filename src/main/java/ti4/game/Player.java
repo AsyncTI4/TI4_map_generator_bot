@@ -53,6 +53,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.utility.DiscordChannelUtility;
 import ti4.discord.utility.DiscordErrorUtility;
@@ -2746,8 +2747,13 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (getTechs().contains(tech) && !getExhaustedTechs().contains(tech)) {
             getExhaustedTechs().add(tech);
 
-            if (game != null && game.playerHasLeaderUnlockedOrAlliance(this, "arcanumcommander")) {
-                ArcanumLeadersHandler.offerArcanumTechExhaustCommanderButtons(this);
+            if (game != null) {
+                if (game.playerHasLeaderUnlockedOrAlliance(this, "arcanumcommander")) {
+                    ArcanumLeadersHandler.offerArcanumTechExhaustCommanderButtons(this);
+                }
+                if (hasUnexhaustedLeader("revenantagent")) {
+                    RevenantLeadersHandler.offerRevenantAgentButtons(this, tech);
+                }
             }
         }
     }

@@ -27,6 +27,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Obliv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixLeaderHandler;
@@ -101,6 +103,10 @@ public class PlayHeroService {
         if (removed && (reason == LeaderRemovalReason.PURGED || reason == LeaderRemovalReason.STATUS_CLEANUP)) {
             DSHelperBreakthroughs.doLanefirBtCheck(game, player);
             OblivionUnitHandler.doOblivionMechCheck(game, player);
+        }
+        if (removed && reason == LeaderRemovalReason.PURGED) {
+            RevenantUnitsHandler.doRevenantMechCheck(game, player);
+            RevenantTechHandler.doLazarusPodsLeaderCheck(game);
         }
         return removed;
     }

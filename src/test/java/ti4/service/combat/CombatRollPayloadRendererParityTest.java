@@ -82,6 +82,30 @@ class CombatRollPayloadRendererParityTest extends BaseTi4Test {
     }
 
     @Test
+    void capsMarshalFaelornPonthousCommanderModifierAtTwoBestDice() {
+        Harness harness = new Harness();
+        Player ponthous = harness.player("ponthous");
+        Player sol = harness.player("sol");
+        Tile tile = harness.tile("19");
+        Harness.add(tile, ponthous, UnitType.Dreadnought, 1);
+        Harness.add(tile, ponthous, UnitType.Flagship, 1);
+        Harness.add(tile, ponthous, UnitType.Destroyer, 1);
+        Harness.add(tile, sol, UnitType.Carrier, 1);
+
+        RenderedRoll roll = assertRollBodyParity(harness, ponthous, sol, tile, CombatRollType.combatround, 5, 5, 5, 5);
+
+        assertTrue(roll.productionMessage().contains("Marshal Faelorn"));
+        assertEquals(2, roll.payload().total().displayedTotalHits());
+        assertEquals(
+                List.of(3, 5, 7, 8),
+                roll.payload().unitRolls().stream()
+                        .flatMap(unitRoll -> unitRoll.dice().stream())
+                        .map(CombatRollPayload.DieRoll::threshold)
+                        .sorted()
+                        .toList());
+    }
+
+    @Test
     void rendersSuperchargeSelectedUnitSplit() {
         Harness harness = new Harness();
         Player bluetf = harness.player("bluetf");

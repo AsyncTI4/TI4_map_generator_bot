@@ -22,6 +22,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.game.Game;
@@ -82,6 +83,7 @@ public class StartTurnService {
 
         game.removeStoredValue("fortuneSeekers");
         ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
+        RevenantLeadersHandler.clearRedLeaderTacticalState(game);
         AeternaAbilityHandler.clearMoonReturnStoredValues(game);
         ArcanumAbilityHandler.clearRitualOfAscensionStoredValues(game);
         KairnLeadershandler.clearKairnHeroStoredValues(game);
@@ -464,6 +466,9 @@ public class StartTurnService {
             boolean doneActionThisTurn,
             GenericInteractionCreateEvent event,
             boolean confirmed2ndAction) {
+        if (doneActionThisTurn) {
+            RevenantLeadersHandler.clearPurpleLeaderActionState(game);
+        }
         if (!doneActionThisTurn) {
             for (Player p2 : game.getRealPlayers()) {
                 if (!game.getStoredValue(p2.getFaction() + "graviton").isEmpty()) {
@@ -487,6 +492,9 @@ public class StartTurnService {
         }
         if (player.hasAbility("reflections_of_the_void") && OblivionAbilityHandler.hasReflections(game)) {
             startButtons.add(OblivionAbilityHandler.getReflectionLedgerButton(player));
+        }
+        if (player.hasUnexhaustedLeader("revenantverydithagent")) {
+            startButtons.add(RevenantLeadersHandler.getRevVerydithAgentButton(player));
         }
         boolean hadAnyUnplayedSCs = false;
 
