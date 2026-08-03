@@ -307,96 +307,87 @@ public class TransactionHelper {
                     case "starCharts" ->
                         trans.append(Mapper.getRelic(furtherDetail).getName()).append(SourceEmojis.DiscordantStars);
                     case "ACs" -> {
-                        switch (furtherDetail) {
-                            case "generic" ->
-                                trans.append(amountToTransact)
-                                        .append(' ')
-                                        .append(CardEmojis.getACEmoji(game))
-                                        .append(" to be specified by player");
-                            default -> {
-                                int acNum = Integer.parseInt(furtherDetail);
-                                String acID = null;
-                                if (!player.getActionCards().containsValue(acNum)) {
-                                    continue;
+                        if ("generic".equals(furtherDetail)) {
+                            trans.append(amountToTransact)
+                                    .append(' ')
+                                    .append(CardEmojis.getACEmoji(game))
+                                    .append(" to be specified by player");
+                        } else {
+                            int acNum = Integer.parseInt(furtherDetail);
+                            String acID = null;
+                            if (!player.getActionCards().containsValue(acNum)) {
+                                continue;
+                            }
+                            for (Map.Entry<String, Integer> ac :
+                                    player.getActionCards().entrySet()) {
+                                if (ac.getValue().equals(acNum)) {
+                                    acID = ac.getKey();
                                 }
-                                for (Map.Entry<String, Integer> ac :
-                                        player.getActionCards().entrySet()) {
-                                    if (ac.getValue().equals(acNum)) {
-                                        acID = ac.getKey();
-                                    }
-                                }
-                                trans.append(CardEmojis.getACEmoji(game));
-                                if (!hidePrivateCardText) {
-                                    trans.append(" _")
-                                            .append(Mapper.getActionCard(acID).getName())
-                                            .append("_");
-                                }
+                            }
+                            trans.append(CardEmojis.getACEmoji(game));
+                            if (!hidePrivateCardText) {
+                                trans.append(" _")
+                                        .append(Mapper.getActionCard(acID).getName())
+                                        .append("_");
                             }
                         }
                     }
                     case "PNs" -> {
-                        switch (furtherDetail) {
-                            case "generic" -> {
-                                if (!hidePrivateCardText) {
-                                    trans.append(amountToTransact)
-                                            .append(' ')
-                                            .append(CardEmojis.PN)
-                                            .append(" to be specified by player");
-                                } else {
-                                    trans.append(CardEmojis.PN);
-                                }
-                            }
-                            default -> {
-                                String id = null;
-                                int pnIndex;
-                                try {
-                                    pnIndex = Integer.parseInt(furtherDetail);
-                                    for (Map.Entry<String, Integer> pn :
-                                            player.getPromissoryNotes().entrySet()) {
-                                        if (pn.getValue().equals(pnIndex)) {
-                                            id = pn.getKey();
-                                        }
-                                    }
-                                } catch (NumberFormatException e) {
-                                    id = furtherDetail.replace("fin9", "_");
-                                }
+                        if ("generic".equals(furtherDetail)) {
+                            if (!hidePrivateCardText) {
+                                trans.append(amountToTransact)
+                                        .append(' ')
+                                        .append(CardEmojis.PN)
+                                        .append(" to be specified by player");
+                            } else {
                                 trans.append(CardEmojis.PN);
-                                if (!hidePrivateCardText) {
-                                    if (Mapper.getPromissoryNote(id) != null) {
-                                        trans.append(' ')
-                                                .append(StringUtils.capitalize(Mapper.getPromissoryNote(id)
-                                                        .getColor()
-                                                        .orElse("")))
-                                                .append(" _")
-                                                .append(Mapper.getPromissoryNote(id)
-                                                        .getName())
-                                                .append("_");
-                                    } else {
-                                        trans.append(' ')
-                                                .append("null pn info for ")
-                                                .append(id);
+                            }
+                        } else {
+                            String id = null;
+                            int pnIndex;
+                            try {
+                                pnIndex = Integer.parseInt(furtherDetail);
+                                for (Map.Entry<String, Integer> pn :
+                                        player.getPromissoryNotes().entrySet()) {
+                                    if (pn.getValue().equals(pnIndex)) {
+                                        id = pn.getKey();
                                     }
+                                }
+                            } catch (NumberFormatException e) {
+                                id = furtherDetail.replace("fin9", "_");
+                            }
+                            trans.append(CardEmojis.PN);
+                            if (!hidePrivateCardText) {
+                                if (Mapper.getPromissoryNote(id) != null) {
+                                    trans.append(' ')
+                                            .append(StringUtils.capitalize(Mapper.getPromissoryNote(id)
+                                                    .getColor()
+                                                    .orElse("")))
+                                            .append(" _")
+                                            .append(Mapper.getPromissoryNote(id).getName())
+                                            .append("_");
+                                } else {
+                                    trans.append(' ')
+                                            .append("null pn info for ")
+                                            .append(id);
                                 }
                             }
                         }
                     }
                     case "SOs" -> {
-                        switch (furtherDetail) {
-                            case "generic" ->
-                                trans.append(amountToTransact)
-                                        .append(' ')
-                                        .append(CardEmojis.SecretObjective)
-                                        .append(" to be specified by player");
-                            default -> {
-                                String soID = furtherDetail;
-                                if (!player.getSecretsUnscored().containsKey(soID)) continue;
-                                trans.append(CardEmojis.SecretObjective);
-                                if (!hidePrivateCardText)
-                                    trans.append(" _")
-                                            .append(Mapper.getSecretObjective(soID)
-                                                    .getName())
-                                            .append("_");
-                            }
+                        if ("generic".equals(furtherDetail)) {
+                            trans.append(amountToTransact)
+                                    .append(' ')
+                                    .append(CardEmojis.SecretObjective)
+                                    .append(" to be specified by player");
+                        } else {
+                            String soID = furtherDetail;
+                            if (!player.getSecretsUnscored().containsKey(soID)) continue;
+                            trans.append(CardEmojis.SecretObjective);
+                            if (!hidePrivateCardText)
+                                trans.append(" _")
+                                        .append(Mapper.getSecretObjective(soID).getName())
+                                        .append("_");
                         }
                     }
                     case "Frags" ->
