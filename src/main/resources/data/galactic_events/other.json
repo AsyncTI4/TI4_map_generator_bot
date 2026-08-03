@@ -1,0 +1,35 @@
+[
+    {
+        "alias": "eventful_galaxy",
+        "name": "An Eventful Galaxy",
+        "text": "Before the game begins, shuffle the following event cards and place them in the common play area\nAge of Commerce\nCall to the void\nZealous Orthodoxy\nAge of Exploration\nCosmic Phenomenae\nHidden agenda\nTotal War\nConventions of war abandoned\nWeird Wormholes\nWild wild Galaxy\nThis is the event deck.\nDuring Setup, draw one card from the event deck, it is now an active event.\nAt the start of the status phase, purge the active event drawn from this card and replace it with a new one.",
+        "complexity": 3,
+        "flavorText": "Even the most intuitive leaders don't know what will happen from age to age. The most successful leaders know that they have to adapt to hidden plots or a war breaking out .",
+        "source": "addiction"
+    },
+    {
+        "alias": "galactic_progression",
+        "name": "Age of Conquest",
+        "text": "Before the game begins, purge the following Stage 1 and Stage 2 Objectives: Build defenses, Expand Borders, Diversify Research, Develop Weaponry, Push Boundaries, Sway the council, Erect a Monument, Lead from the Front, Subdue the Galaxy, Revolutionize Warfare.\nDuring the status phase before scoring objectives, starting right of the speaker in counter-clockwise order, each player may advance their counter on the Galactic Progression track. To advance to the next bracket, a player must fulfill the the requirements indicated in the bracket. \nA player can never move backwards. A player can only advance 1 bracket per game phase. If a player advance to the Imperium Rex bracket, they have won the game.\n The warfare strategy card primary user can perform the following action before their strategic action:\nImmediately advance on the galactic progression track if you fulfill it the requirments.",
+        "notes": "Track: Warlord → Foundation → Republic → Empire → Imperium Rex",
+        "complexity": 2,
+        "flavorText": "Elder Qanoj siged. Battle plans are only perfect until the fight starts. Some version of that holds true for peace treaties.",
+        "source": "addiction"
+    },
+    {
+        "alias": "gul_system",
+        "name": "The Gul System, Mecatol Rex",
+        "text": "During setup, replace the Mecatol Rex tile with this event's system tile; THE POLAR CASTELLE and MECATOL CITY are planetary sites. Each of these planetary sites is treted as a planet for all purposes. Each planet and planetary site has a corresponding planet and ability card.\nAny game effect reffering to the 'Mecatol Rex' planet refer to the 'Mecatol City' planetary site instead.\nDuring the 'Commit Ground Forces' step, players can commit ground forces between both planetary sites in this system.",
+        "complexity": 2,
+        "flavorText": "Center of the universe, last remnants of a lost empire, greatest city in the galaxy, blasted wasteland. All of these describe Mecatol Rex, former seat of the Lazax Emperors",
+        "source": "other"
+    },
+    {
+        "alias": "new_dawn",
+        "name": "New Dawn",
+        "text": "During setup, players playing as the Creuss, Empyrean, Firmament, Hacan, Jol-Nar, Keleres, Letnev, Naaz-Rokha, Vuil'Raith, Winnu, Xxcha, Yin, and Yssaril may purge one of their faction technologies to take their faction's *New Dawn* cards.\nPlayers not playing the Firmament or Jol-Nar place the 'I' unit card on their sheet, replacing the default unit. The 'I' unit card is not a technology. The 'II' unit upgrade is a faction technology and is placed in the technology deck.\nJol-Nar and Firmament players purge their War Sun tech and place *War Sun Project* and *The Dragon, Dormant* on their respective faction sheets. *University War Sun* and *The Dragon, Freed* are faction technologies.",
+        "complexity": 1,
+        "flavorText": "The only thing for certain was that the future wasn't.",
+        "source": "newdawn"
+    }
+]
