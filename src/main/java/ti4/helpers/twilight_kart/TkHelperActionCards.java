@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
@@ -37,7 +36,6 @@ import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
-import ti4.model.LeaderModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
@@ -129,17 +127,12 @@ public class TkHelperActionCards {
             return;
         }
 
-        List<MessageEmbed> embeds = genomes.stream()
-                .map(Mapper::getLeader)
-                .map(LeaderModel::getTfRepresentationEmbed)
-                .toList();
         if (game.isVeiledHeartMode()) {
             genomes.forEach(genome -> VeiledHeartService.doAction(
                     VeiledHeartService.VeiledCardAction.DRAW,
                     VeiledHeartService.VeiledCardType.GENOME,
                     player,
                     genome));
-
         } else {
             for (String cardID : genomes) {
                 player.addLeader(cardID);
