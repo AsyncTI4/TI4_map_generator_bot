@@ -138,41 +138,36 @@ public class TransactionHelper {
                     }
                     switch (thingToTransact) {
                         case "ACs" -> {
-                            switch (furtherDetail) {
-                                case "generic" -> {
-                                    for (int x = 0; x < amountToTransact; x++) {
-                                        String buttonID = "transact_ACs_" + receiver.getFaction();
-                                        resolveSpecificTransButtonsOld(game, sender, buttonID, event);
-                                    }
+                            if ("generic".equals(furtherDetail)) {
+                                for (int x = 0; x < amountToTransact; x++) {
+                                    String buttonID = "transact_ACs_" + receiver.getFaction();
+                                    resolveSpecificTransButtonsOld(game, sender, buttonID, event);
                                 }
-                                default -> resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
+                            } else {
+                                resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
                             }
                         }
                         case "PNs" -> {
-                            switch (furtherDetail) {
-                                case "generic" -> {
-                                    List<Button> stuffToTransButtons =
-                                            ButtonHelper.getForcedPNSendButtons(game, receiver, sender);
-                                    String message = sender.getRepresentationUnfogged()
-                                            + ", please choose the promissory note you wish to send.";
-                                    MessageHelper.sendMessageToChannelWithButtons(
-                                            sender.getCardsInfoThread(), message, stuffToTransButtons);
-                                }
-                                default -> resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
+                            if ("generic".equals(furtherDetail)) {
+                                List<Button> stuffToTransButtons =
+                                        ButtonHelper.getForcedPNSendButtons(game, receiver, sender);
+                                String message = sender.getRepresentationUnfogged()
+                                        + ", please choose the promissory note you wish to send.";
+                                MessageHelper.sendMessageToChannelWithButtons(
+                                        sender.getCardsInfoThread(), message, stuffToTransButtons);
+                            } else {
+                                resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
                             }
                         }
                         case "SOs" -> {
-                            switch (furtherDetail) {
-                                case "generic" -> {
-                                    for (int x = 0; x < amountToTransact; x++) {
-                                        String buttonID = "transact_SOs_" + receiver.getFaction();
-                                        resolveSpecificTransButtonsOld(game, sender, buttonID, event);
-                                    }
+                            if ("generic".equals(furtherDetail)) {
+                                for (int x = 0; x < amountToTransact; x++) {
+                                    String buttonID = "transact_SOs_" + receiver.getFaction();
+                                    resolveSpecificTransButtonsOld(game, sender, buttonID, event);
                                 }
-                                default -> {
-                                    secretRefresh = true;
-                                    resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
-                                }
+                            } else {
+                                secretRefresh = true;
+                                resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
                             }
                         }
                         case "Planets" ->
