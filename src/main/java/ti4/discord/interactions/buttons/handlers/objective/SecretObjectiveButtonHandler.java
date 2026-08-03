@@ -162,6 +162,7 @@ class SecretObjectiveButtonHandler {
             return;
         }
 
+        ButtonHelper.resolveSetupColorChecker(game);
         DrawSecretService.dealSOToAll(event, 2, game);
         ButtonHelper.deleteMessage(event);
     }

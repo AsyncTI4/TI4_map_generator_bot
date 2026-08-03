@@ -44,6 +44,10 @@ class SetPreferredSettings extends Subcommand {
                 OptionType.BOOLEAN,
                 "ephemeral_wrong_button_warning",
                 "True to keep the \"wrong button\" warning ephemeral"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                "color_accessibility",
+                "True for red-green colorblind-safe color assignment and extra non-color cues"));
     }
 
     @Override
@@ -94,6 +98,11 @@ class SetPreferredSettings extends Subcommand {
         Integer sabo = event.getOption("sabo_decline_median", null, OptionMapping::getAsInt);
         if (sabo != null) {
             userSettings.setAutoNoSaboInterval(sabo);
+        }
+
+        Boolean colorAccessibility = event.getOption("color_accessibility", null, OptionMapping::getAsBoolean);
+        if (colorAccessibility != null) {
+            userSettings.setPrefersColorAccessibilityCues(colorAccessibility);
         }
         MessageHelper.sendMessageToEventChannel(event, "Successfully set user settings");
         UserSettingsManager.save(userSettings);

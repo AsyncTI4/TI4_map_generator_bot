@@ -1,5 +1,6 @@
 package ti4.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,6 +36,13 @@ class ColorModelTest extends BaseTi4Test {
             checkUnitImages(color);
             checkTokenImages(color);
         }
+    }
+
+    @Test
+    void testHueFallsBackToReferencedBaseColorForSplitColors() {
+        assertEquals("RED", Mapper.getColor("splitred").getHue());
+        assertEquals("GREEN", Mapper.getColor("splitgreen").getHue());
+        assertEquals("ORANGE", Mapper.getColor("splitorange").getHue());
     }
 
     private static boolean isDefault(String emoji) {

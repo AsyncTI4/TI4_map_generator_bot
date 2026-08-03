@@ -39,6 +39,7 @@ public class UserSettings {
     private boolean prefersPassOnWhensAfters;
     private boolean prefersPrePassOnSC = true;
     private Boolean prefersWrongButtonEphemeral;
+    private boolean prefersColorAccessibilityCues;
     private int autoNoSaboInterval;
     private String whisperPref = "No Preference";
     private String supportPref = "No Preference";

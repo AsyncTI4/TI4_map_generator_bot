@@ -7628,11 +7628,29 @@ public class ButtonHelper {
      * Check all colors in the active game and print out errors and possible
      * solutions if any have too low of a luminance variation
      */
-    public static void resolveSetupColorChecker(Game game) {
-        record Collision(Player p1, Player p2, double contrast) {}
+    private record ColorCollision(Player p1, Player p2, double contrast, boolean confusionPair) {}
 
+    private static final String COLOR_CLASH_REMEDY =
+            "-# Consider `/player change_color`, or use `/player change_unit_decal` to give your units a distinct pattern.";
+
+    // Runs once per game (guarded by the "colorClashChecked" stored value) after everyone has
+    // finished individual setup. Flags both low-luminance-contrast pairs and, when the game has a
+    // player who opted into color-accessibility cues, hue pairs commonly confused under red-green
+    // color vision deficiency (see GameColorsService.isCommonRedGreenConfusionPair - a narrow
+    // heuristic, not a full CVD simulation).
+    //
+    // The GM channel (private in FoW games) gets the full per-pair reason. The shared/public
+    // channel only ever gets a generic notice - it never states *why* a pair was flagged, since
+    // doing so would reveal that a player in the game has color-accessibility cues enabled (that's
+    // the only thing that turns the confusion-pair check on). Full per-pair detail instead goes
+    // privately to the two affected players in non-FoW games.
+    public static void resolveSetupColorChecker(Game game) {
+        if (!game.getStoredValue("colorClashChecked").isEmpty()) return;
+        game.setStoredValue("colorClashChecked", "true");
+
+        boolean checkConfusionPairs = GameColorsService.hasColorAccessibilityPlayer(game);
         List<Player> players = game.getRealPlayers();
-        List<Collision> issues = new ArrayList<>();
+        List<ColorCollision> issues = new ArrayList<>();
         for (int i = 0; i < players.size(); i++) {
             Player p1 = players.get(i);
             ColorModel c1 = Mapper.getColor(p1.getColor());
@@ -7641,31 +7659,73 @@ public class ButtonHelper {
                 ColorModel c2 = Mapper.getColor(p2.getColor());
 
                 double contrast = c1.contrastWith(c2);
-                if (contrast < 2.5) {
-                    Collision e1 = new Collision(p1, p2, contrast);
-                    issues.add(e1);
+                boolean confusionPair = checkConfusionPairs && GameColorsService.isCommonRedGreenConfusionPair(c1, c2);
+                if (contrast < 2.5 || confusionPair) {
+                    issues.add(new ColorCollision(p1, p2, contrast, confusionPair));
                 }
             }
         }
 
         if (issues.isEmpty()) return;
 
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(GMService.getGMChannel(game), detailedColorClashMessage(issues));
+            return;
+        }
+
+        StringBuilder generic = new StringBuilder("### Some player colors in this game may be hard to tell apart:\n");
+        for (ColorCollision issue : issues) {
+            generic.append("> ")
+                    .append(issue.p1.getRepresentation(false, false))
+                    .append(" & ")
+                    .append(issue.p2.getRepresentation(false, false))
+                    .append('\n');
+        }
+        generic.append("-# Check your cards-info thread for details.");
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), generic.toString());
+
+        // Deliberately no per-pair reason here (unlike detailedColorClashMessage, which is
+        // GM-only): "commonly confused hues" only ever appears when a player in the game has
+        // color-accessibility cues enabled, so including it here would leak that fact to a
+        // recipient who never opted in themselves.
+        for (ColorCollision issue : issues) {
+            MessageHelper.sendMessageToChannel(
+                    issue.p1.getCardsInfoThread(),
+                    "Your color and " + issue.p2.getRepresentation(false, false) + "'s may be hard to tell apart.\n"
+                            + COLOR_CLASH_REMEDY);
+            MessageHelper.sendMessageToChannel(
+                    issue.p2.getCardsInfoThread(),
+                    "Your color and " + issue.p1.getRepresentation(false, false) + "'s may be hard to tell apart.\n"
+                            + COLOR_CLASH_REMEDY);
+        }
+    }
+
+    private static String detailedColorClashMessage(List<ColorCollision> issues) {
         StringBuilder sb =
-                new StringBuilder("### The following pairs of players have colors with a low contrast value:\n");
-        for (Collision issue : issues) {
+                new StringBuilder("### The following pairs of players have colors that may be hard to tell apart:\n");
+        for (ColorCollision issue : issues) {
             sb.append("> ")
                     .append(issue.p1.getRepresentation(false, false))
                     .append(" & ")
                     .append(issue.p2.getRepresentation(false, false))
-                    .append("  -> ");
-            sb.append("Ratio = 1:").append(issue.contrast);
-            if (issue.contrast < 2) {
-                sb.append("(very bad!)");
-            }
-            sb.append('\n');
+                    .append("  -> ")
+                    .append(colorClashReason(issue))
+                    .append('\n');
         }
+        sb.append(COLOR_CLASH_REMEDY);
+        return sb.toString();
+    }
 
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), sb.toString());
+    private static String colorClashReason(ColorCollision issue) {
+        StringBuilder reason = new StringBuilder();
+        if (issue.confusionPair) {
+            reason.append("commonly confused hues");
+            if (issue.contrast < 2.5) reason.append(", low contrast ratio = 1:").append(issue.contrast);
+        } else {
+            reason.append("low contrast ratio = 1:").append(issue.contrast);
+        }
+        if (issue.contrast < 2) reason.append(" (very bad!)");
+        return reason.toString();
     }
 
     public static String getUnitHolderRep(UnitHolder unitHolder, Tile tile, Game game) {

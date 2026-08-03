@@ -83,6 +83,9 @@ class DashboardSettingsService {
         if (request.prefersAutoDebtClearance() != null) {
             settings.setPrefersAutoDebtClearance(request.prefersAutoDebtClearance());
         }
+        if (request.prefersColorAccessibilityCues() != null) {
+            settings.setPrefersColorAccessibilityCues(request.prefersColorAccessibilityCues());
+        }
         if (request.activityTracking() != null) {
             settings.setActivityTracking(request.activityTracking());
             if (!request.activityTracking()) {
