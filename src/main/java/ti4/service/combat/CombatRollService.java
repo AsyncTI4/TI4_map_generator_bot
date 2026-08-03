@@ -1490,10 +1490,10 @@ public class CombatRollService {
                             default -> RollSegmentType.PRIMARY;
                         };
                 List<Die> resultRolls;
+                int[] cappedModifiersByDie = new int[numRolls];
                 if (cappedDiceModifiers.isEmpty()) {
                     resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
                 } else {
-                    int[] cappedModifiersByDie = new int[numRolls];
                     for (NamedCombatModifierModel cappedModifier : cappedDiceModifiers) {
                         int remainingDice = cappedDiceRemaining.getOrDefault(cappedModifier, 0);
                         if (remainingDice < 1
@@ -1785,6 +1785,17 @@ public class CombatRollService {
                 String holderLabel = divergingModels.contains(unitModel.getId()) && perUnitHolder instanceof Planet p
                         ? "on **" + Helper.getPlanetRepresentationNoResInf(p.getName(), game) + "**"
                         : "";
+                List<Integer> modifiersByDie = List.of();
+                if (!cappedDiceModifiers.isEmpty()) {
+                    int displayModifierToHit = modifierToHit;
+                    modifiersByDie = new ArrayList<>(java.util.Arrays.stream(cappedModifiersByDie)
+                            .map(cappedModifier -> displayModifierToHit + cappedModifier)
+                            .boxed()
+                            .toList());
+                    while (modifiersByDie.size() < resultRolls.size()) {
+                        modifiersByDie.add(displayModifierToHit);
+                    }
+                }
                 String unitRoll = CombatMessageHelper.displayUnitRoll(
                         unitModel,
                         toHit,
@@ -1794,7 +1805,8 @@ public class CombatRollService {
                         extraRollsForUnit,
                         resultRolls,
                         hitRolls,
-                        holderLabel);
+                        holderLabel,
+                        modifiersByDie);
                 resultBuilder.append(unitRoll);
                 payloadBuilder.addUnitRoll(
                         unitModel,
@@ -1806,7 +1818,8 @@ public class CombatRollService {
                         segmentType,
                         resultRolls,
                         hitRolls,
-                        DieRollSource.PRIMARY);
+                        DieRollSource.PRIMARY,
+                        modifiersByDie);
                 List<DiceHelper.Die> resultRolls2 = new ArrayList<>();
                 int numMisses = numRolls - hitRolls;
                 if (player.ownsUnit("tf-justicerrail") && rollType == CombatRollType.SpaceCannonOffence) {
@@ -2378,6 +2391,7 @@ public class CombatRollService {
                         modifier.getAlias(),
                         namedModifier.getName(),
                         modifier.getValue(),
+                        modifier.getMaxDice(),
                         modifier.getType(),
                         modifier.getScope(),
                         resolveScopeDisplay(modifier, units),
@@ -2396,6 +2410,32 @@ public class CombatRollService {
                 List<DiceHelper.Die> resultRolls,
                 int hits,
                 DieRollSource source) {
+            addUnitRoll(
+                    unitModel,
+                    toHit,
+                    modifier,
+                    unitQuantity,
+                    numRollsPerUnit,
+                    extraRolls,
+                    segmentType,
+                    resultRolls,
+                    hits,
+                    source,
+                    List.of());
+        }
+
+        void addUnitRoll(
+                UnitModel unitModel,
+                int toHit,
+                int modifier,
+                int unitQuantity,
+                int numRollsPerUnit,
+                int extraRolls,
+                RollSegmentType segmentType,
+                List<DiceHelper.Die> resultRolls,
+                int hits,
+                DieRollSource source,
+                List<Integer> modifiersByDie) {
             diceRolled += resultRolls.size();
             unitRolls.add(new CombatRollPayload.UnitRoll(
                     unitModel.getId(),
@@ -2410,6 +2450,7 @@ public class CombatRollService {
                     toHit,
                     modifier,
                     toHit - modifier,
+                    modifiersByDie,
                     segmentType,
                     toDieRolls(resultRolls, source),
                     hits));

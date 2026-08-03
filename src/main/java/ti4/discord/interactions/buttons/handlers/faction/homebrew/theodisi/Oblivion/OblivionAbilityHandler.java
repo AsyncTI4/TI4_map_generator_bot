@@ -89,7 +89,6 @@ public class OblivionAbilityHandler {
         String message =
                 player.getRepresentationUnfogged() + ", please research 2 technologies for **Ignorant Discoveries**.";
         MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, researchTech);
-        MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, researchTech);
 
         ButtonHelper.deleteMessage(event);
     }

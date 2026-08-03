@@ -111,6 +111,7 @@ public class RevenantLeadersHandler {
     private static final String REVKRYXOS = "revenantkryxoshero";
     private static final String USE_REVKRYXOS = "useRevenantKryxosHero_";
     private static final String SELECT_REVKRYXOS_TECH = "selectRevenantKryxosTech_";
+    private static final String DECLINE_REVKRYXOS = "declineRevenantKryxosHero";
     private static final String REVKRYXOS_CONTEXT = "revenantKryxosHeroContext_";
     private static final String REVKRYXOS_FIRST_TECH = "revenantKryxosHeroFirstTech_";
 
@@ -199,7 +200,7 @@ public class RevenantLeadersHandler {
                     event, "Koral Vel, the Revenant of Verydith agent, is no longer available.");
             return false;
         }
-        List<Button> buttons = getProduceOneShipInSystemsWithShipsButtons(game, target);
+        List<Button> buttons = getProduceOneUnitInSystemsWithShipsButtons(game, target);
 
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -228,13 +229,13 @@ public class RevenantLeadersHandler {
             return;
         }
         sendRevVerydithSystemButtons(
-                event, game, target, buttonID, getProduceOneShipInSystemsWithShipsButtons(game, target));
+                event, game, target, buttonID, getProduceOneUnitInSystemsWithShipsButtons(game, target));
     }
 
     private static void sendRevVerydithSystemButtons(
             ButtonInteractionEvent event, Game game, Player target, String buttonID, List<Button> buttons) {
         String message = target.getRepresentation()
-                + ", choose a system containing 1 or more of your ships in which to produce 1 ship due to Koral Vel, the Revenant of Verydith agent.";
+                + ", choose a system containing 1 or more of your ships in which to produce 1 unit due to Koral Vel, the Revenant of Verydith agent.";
         String prefix = target.factionButtonChecker() + PAGE_REVVERYDITH_SYSTEMS + target.getFaction() + "_";
         List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
         if (event != null
@@ -250,7 +251,7 @@ public class RevenantLeadersHandler {
         MessageHelper.sendMessageToChannelWithButtons(target.getCorrectChannel(), message, displayedButtons);
     }
 
-    public static List<Button> getProduceOneShipInSystemsWithShipsButtons(Game game, Player target) {
+    public static List<Button> getProduceOneUnitInSystemsWithShipsButtons(Game game, Player target) {
         if (game == null || target == null) {
             return List.of();
         }
@@ -258,7 +259,8 @@ public class RevenantLeadersHandler {
         return game.getTileMap().values().stream()
                 .filter(tile -> FoWHelper.playerHasActualShipsInSystem(target, tile))
                 .map(tile -> Buttons.green(
-                        target.factionButtonChecker() + "produceOneUnitInTile_" + tile.getPosition() + "_sling",
+                        target.factionButtonChecker() + "produceOneUnitInTile_" + tile.getPosition()
+                                + "_revenantVerydith",
                         tile.getRepresentationForButtons(game, target)))
                 .toList();
     }
@@ -393,10 +395,12 @@ public class RevenantLeadersHandler {
         game.setStoredValue(REVTHRONES_PRODUCTION + player.getFaction(), position);
         List<Button> productionButtons =
                 Helper.getPlaceUnitButtons(event, player, game, tile, "revenantThronesHero", "place");
+        int totalProduction = Helper.getProductionValue(player, game, tile, false);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation()
-                        + ", choose the units you wish to produce with Lost Throne of Pride, the Revenant Thrones hero.",
+                        + ", choose the units you wish to produce with Lost Throne of Pride, the Revenant Thrones hero."
+                        + " Total PRODUCTION in this system: " + totalProduction + ".",
                 productionButtons);
         ButtonHelper.deleteMessage(event);
     }
@@ -557,7 +561,8 @@ public class RevenantLeadersHandler {
                 .count();
         var modifier = Mapper.getCombatModifiers().get("plus1_1tacticalaction_all");
         for (int i = 0; i < modifierCount && modifier != null; i++) {
-            modifiers.add(new NamedCombatModifierModel(modifier, "Zexan Myrix, the Revenant of Xytheris agent"));
+            modifiers.add(
+                    new NamedCombatModifierModel(modifier, "+1 from Zexan Myrix, the Revenant of Xytheris agent"));
         }
     }
 
@@ -672,7 +677,8 @@ public class RevenantLeadersHandler {
                 || opponent == null
                 || tile == null
                 || !isSpaceCombat
-                || !player.hasLeaderUnlocked(REVKRYXOS)) {
+                || !player.hasLeaderUnlocked(REVKRYXOS)
+                || !game.getStoredValue(REVKRYXOS_CONTEXT + player.getFaction()).isEmpty()) {
             return;
         }
         buttons.add(Buttons.green(
@@ -711,6 +717,7 @@ public class RevenantLeadersHandler {
                 1,
                 player.getRepresentation()
                         + ", choose a technology matching a unit you control in the active system to research with Pryxos Xiv, the Revenant of Kryxos hero.");
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler(SELECT_REVKRYXOS_TECH)
@@ -795,6 +802,13 @@ public class RevenantLeadersHandler {
                         : "Pryxos Xiv, the Revenant of Kryxos hero, could not be purged.");
     }
 
+    @ButtonHandler(DECLINE_REVKRYXOS)
+    public static void declineRevKryxosHero(ButtonInteractionEvent event, Game game, Player player) {
+        game.removeStoredValue(REVKRYXOS_CONTEXT + player.getFaction());
+        game.removeStoredValue(REVKRYXOS_FIRST_TECH + player.getFaction());
+        ButtonHelper.deleteMessage(event);
+    }
+
     public static void clearRedLeaderTacticalWindow(Game game) {
         if (game == null) {
             return;
@@ -852,7 +866,7 @@ public class RevenantLeadersHandler {
     private static void sendRevKryxosTechButtons(
             ButtonInteractionEvent event, Player player, List<TechnologyModel> technologies, int step, String message) {
         List<Button> buttons = getRevKryxosTechButtons(player, technologies, step);
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.red(player.factionButtonChecker() + DECLINE_REVKRYXOS, "Decline"));
         String prefix = player.factionButtonChecker() + SELECT_REVKRYXOS_TECH + step + "|";
         List<Button> displayedButtons = new ArrayList<>(buttons);
         displayedButtons.addAll(extraButtons);

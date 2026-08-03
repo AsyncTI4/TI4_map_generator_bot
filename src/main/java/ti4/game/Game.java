@@ -4189,12 +4189,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         // Grant access to the native commander of each player whose command token is in the revenant lich debt pool.
-        if (!"revenantcommander".equalsIgnoreCase(leaderID)
-                && playerHasLeaderUnlockedOrAlliance(player, "revenantcommander")) {
+        Player lichPoolOwner = getRevenantCommanderOwner(player);
+        if (!"revenantcommander".equalsIgnoreCase(leaderID) && lichPoolOwner != null) {
             for (Player otherPlayer : getRealPlayersNDummies()) {
-                if (otherPlayer.equals(player)) continue;
+                if (otherPlayer.equals(lichPoolOwner)) continue;
 
-                if (player.getDebtTokenCount(otherPlayer.getColor(), "lich") > 0
+                if (lichPoolOwner.getDebtTokenCount(otherPlayer.getColor(), "lich") > 0
                         && leaderID.contains(otherPlayer.getFaction())
                         && otherPlayer.hasLeaderUnlocked(leaderID)) {
                     return true;
@@ -4203,6 +4203,20 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         return false;
+    }
+
+    public Player getRevenantCommanderOwner(Player player) {
+        if (player == null) {
+            return null;
+        }
+        if (player.hasLeaderUnlocked("revenantcommander")) {
+            return player;
+        }
+        if (!player.getPromissoryNotesInPlayArea().contains("thpnrevenant")) {
+            return null;
+        }
+        Player pnOwner = getPNOwner("thpnrevenant");
+        return pnOwner != null && pnOwner.hasLeaderUnlocked("revenantcommander") ? pnOwner : null;
     }
 
     public List<Leader> playerUnlockedLeadersOrAlliance(Player player) {
@@ -4262,9 +4276,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         // Add the native commanders of players whose command tokens are in this debt pool.
-        if (playerHasLeaderUnlockedOrAlliance(player, "revenantcommander")) {
+        Player lichPoolOwner = getRevenantCommanderOwner(player);
+        if (lichPoolOwner != null) {
             for (Player otherPlayer : getRealPlayers()) {
-                if (otherPlayer.equals(player) || player.getDebtTokenCount(otherPlayer.getColor(), "lich") < 1) {
+                if (otherPlayer.equals(lichPoolOwner)
+                        || lichPoolOwner.getDebtTokenCount(otherPlayer.getColor(), "lich") < 1) {
                     continue;
                 }
 
