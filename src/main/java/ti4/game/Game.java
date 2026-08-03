@@ -970,6 +970,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("AC Deck 2", isAcd2());
         gameModes.put("Omega Phase", isOmegaPhaseMode());
         gameModes.put("Priority Track", hasAnyPriorityTrackMode());
+        gameModes.put("Twilight Kart", isTwilightKart());
 
         for (String tag : getTags()) {
             gameModes.put(tag, true);
