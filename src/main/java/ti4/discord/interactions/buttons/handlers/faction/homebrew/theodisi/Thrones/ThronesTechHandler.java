@@ -11,7 +11,9 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
@@ -21,11 +23,18 @@ import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
 public class ThronesTechHandler {
+    // Specter Step
     private static final String SS = "ththronesb";
     private static final String USE_SS = "useSpecterStep";
     private static final String SELECT_SS_SHIP = "selectShipForSS_";
     private static final String MOVE_SS_SHIP = "moveSpecterStepShip_";
+    // Rift-Touched Bastion
+    private static final String RTB = "ththronesr";
+    private static final String USE_RTB = "useRiftTouchedBastion";
+    private static final String SELECT_RTB_SYSTEM = "selectRiftTouchedBastionSystem_";
+    private static final String RTB_RIFT = "riftTouchedBastionRift_";
 
+    // Specter Step
     public static Button getSpecterStepButton(Player player) {
         return Buttons.green(player.factionButtonChecker() + USE_SS, "Use Specter Step", FactionEmojis.thrones);
     }
@@ -178,5 +187,112 @@ public class ThronesTechHandler {
                 player.getRepresentation() + " moved 1 " + ship.getName() + " from "
                         + source.getRepresentationForButtons(game, player) + " to "
                         + destination.getRepresentationForButtons(game, player) + " with _Specter Step_.");
+    }
+
+    // Rift-Touched Bastion
+    public static void offerRiftTouchedBastion(Game game, Tile activatedTile) {
+        for (Player player : game.getRealPlayers()) {
+            if (!player.hasTechReady(RTB) || !FoWHelper.playerHasUnitsInSystem(player, activatedTile)) {
+                continue;
+            }
+
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", you may exhaust _Rift-Touched Bastion_ to treat a system containing your units as a gravity rift for this tactical action.",
+                    List.of(
+                            Buttons.green(
+                                    player.factionButtonChecker() + USE_RTB,
+                                    "Use Rift-Touched Bastion",
+                                    FactionEmojis.thrones),
+                            Buttons.red("deleteButtons", "Decline")));
+        }
+    }
+
+    @ButtonHandler(USE_RTB)
+    public static void offerRiftTouchedBastionSystems(ButtonInteractionEvent event, Game game, Player player) {
+        if (!player.hasTechReady(RTB)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<Button> buttons = getRiftTouchedBastionSystemButtons(game, player);
+        if (buttons.isEmpty()) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String message = player.getRepresentation()
+                + ", choose a system containing your units to treat as a gravity rift for this tactical action.";
+
+        String prefix = player.factionButtonChecker() + SELECT_RTB_SYSTEM;
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), message, NewStuffHelper.buttonPagination(buttons, prefix, 0));
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
+    @ButtonHandler(SELECT_RTB_SYSTEM)
+    public static void resolveRiftTouchedBastion(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!player.hasTechReady(RTB)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<Button> buttons = getRiftTouchedBastionSystemButtons(game, player);
+        String message = player.getRepresentationNoPing()
+                + ", choose a system containing your units to treat as a gravity rift for this tactical action.";
+        String prefix = player.factionButtonChecker() + SELECT_RTB_SYSTEM;
+
+        if (NewStuffHelper.checkAndHandlePaginationChange(
+                event, event.getMessageChannel(), buttons, message, prefix, buttonID)) {
+            return;
+        }
+
+        String position = buttonID.substring(SELECT_RTB_SYSTEM.length());
+        Tile tile = game.getTileByPosition(position);
+        if (tile == null || !FoWHelper.playerHasUnitsInSystem(player, tile)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        player.exhaustTech(RTB);
+
+        if (!tile.isGravityRift()) {
+            tile.addToken("token_gravityrift.png", Constants.SPACE);
+            game.setStoredValue(RTB_RIFT + player.getFaction(), tile.getPosition());
+        }
+        game.setStoredValue("possiblyUsedRift", "yes");
+
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentation() + " exhausted _Rift-Touched Bastion_. "
+                        + tile.getRepresentationForButtons(game, player)
+                        + " is treated as a gravity rift for this tactical action.");
+
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static List<Button> getRiftTouchedBastionSystemButtons(Game game, Player player) {
+        return game.getTileMap().values().stream()
+                .filter(tile -> FoWHelper.playerHasUnitsInSystem(player, tile))
+                .map(tile -> Buttons.green(
+                        player.factionButtonChecker() + SELECT_RTB_SYSTEM + tile.getPosition(),
+                        tile.getRepresentationForButtons(game, player),
+                        FactionEmojis.thrones))
+                .toList();
+    }
+
+    public static void clearRiftTouchedBastion(Game game) {
+        game.getStoredValueMap().keySet().stream()
+                .filter(key -> key.startsWith(RTB_RIFT))
+                .toList()
+                .forEach(key -> {
+                    Tile tile = game.getTileByPosition(game.getStoredValue(key));
+                    if (tile != null) {
+                        tile.removeToken("token_gravityrift.png", Constants.SPACE);
+                    }
+                    game.removeStoredValue(key);
+                });
     }
 }
