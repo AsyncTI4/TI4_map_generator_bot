@@ -89,6 +89,8 @@ public class Source {
         omega_phase,
         fowplus,
         untangled_space,
+        combosloth,
+        newdawn,
 
         // eronous' stuff
         eronous,

@@ -323,5 +323,21 @@
         "subcanal": "personal projs",
         "credits": "aubreynadler",
         "description": "Splits Mecatol Rex into a 3-planet system (Mecatol City, Jun, The Polar Castelle) with new legendary abilities"
+    },
+    {
+        "source": "combosloth",
+        "name": "Combosloth",
+        "canal": "community",
+        "subcanal": "personal projs",
+        "credits": "combosloth",
+        "description": "New Faction: The Convergence Khronikon"
+    },
+    {
+        "source": "newdawn",
+        "name": "New Dawn",
+        "canal": "community",
+        "subcanal": "personal projs",
+        "credits": "aubreynadler",
+        "description": "Optional alternate unit-upgrade technologies for 13 existing factions, swapped in during setup by purging a faction technology"
     }
 ]

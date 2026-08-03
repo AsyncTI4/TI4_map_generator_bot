@@ -13,23 +13,23 @@
     "mecsystem"
   ],
   "imagePath": "Mecatol_Rex_Citadels_tile.png",
-  "shipPositionsType": "TYPE03",
+  "shipPositionsType": "TYPE06",
   "spaceTokenLocations": [
     {
+      "x": 250.0,
+      "y": 90.0
+    },
+    {
+      "x": 80.0,
+      "y": 10.0
+    },
+    {
       "x": 135.0,
-      "y": 55.0
+      "y": 105.0
     },
     {
-      "x": 185.0,
-      "y": 110.0
-    },
-    {
-      "x": 130.0,
-      "y": 170.0
-    },
-    {
-      "x": 65.0,
-      "y": 100.0
+      "x": 80.0,
+      "y": 185.0
     }
   ],
   "wormholes": [],
