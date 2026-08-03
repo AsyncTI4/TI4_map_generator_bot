@@ -706,12 +706,10 @@ public final class ButtonHelperTwilightsFallActionCards {
     public static void lawsHeroStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        for (String tech : p2.getTechs()) {
-            TechnologyModel techM = Mapper.getTech(tech);
-            if ("wavelength".equalsIgnoreCase(tech) || "antimatter".equalsIgnoreCase(tech)) {
-                continue;
-            }
-            buttons.add(Buttons.gray("lawsHeroStep3_" + p2.getFaction() + "_" + tech, techM.getName()));
+        for (String ability : p2.getTfAbilities()) {
+            buttons.add(Buttons.gray(
+                    "lawsHeroStep3_" + p2.getFaction() + "_" + ability,
+                    Mapper.getTech(ability).getName()));
         }
         if (game.isVeiledHeartMode()) {
             buttons.addAll(VeiledHeartService.getVeiledPurgeButtonsForLawsHero(player, p2));

@@ -3149,12 +3149,9 @@ public final class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message3, buttons2);
         }
         List<Button> buttons3 = new ArrayList<>();
-        for (String tech : p1.getTechs()) {
-            if ("wavelength".equalsIgnoreCase(tech) || "antimatter".equalsIgnoreCase(tech)) {
-                continue;
-            }
+        for (String ability : p1.getTfAbilities()) {
             buttons3.add(
-                    Buttons.blue("discardTech_" + tech, Mapper.getTech(tech).getName()));
+                    Buttons.blue("discardTech_" + ability, Mapper.getTech(ability).getName()));
         }
         for (String leaderID : p1.getLeaderIDs()) {
             if (!leaderID.contains("agent")) {

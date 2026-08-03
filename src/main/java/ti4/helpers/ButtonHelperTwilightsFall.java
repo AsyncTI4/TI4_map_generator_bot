@@ -1317,13 +1317,10 @@ public final class ButtonHelperTwilightsFall {
     public static void startRadicalAdvancement(Game game, Player player, GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<>();
         ButtonHelper.deleteMessage(event);
-        for (String tech : player.getTechs()) {
-            if ("antimatter".equalsIgnoreCase(tech) || "wavelength".equalsIgnoreCase(tech)) {
-                continue;
-            }
+        for (String ability : player.getTfAbilities()) {
             buttons.add(Buttons.red(
-                    "radAdvancementStep2_" + tech,
-                    "Discard " + Mapper.getTech(tech).getName()));
+                    "radAdvancementStep2_" + ability,
+                    "Discard " + Mapper.getTech(ability).getName()));
         }
         String msg = player.getRepresentation() + ", use these buttons to discard an ability card.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
@@ -1371,13 +1368,10 @@ public final class ButtonHelperTwilightsFall {
 
         List<Button> buttons = new ArrayList<>();
         if ("ability".equalsIgnoreCase(type)) {
-            for (String tech : player.getTechs()) {
-                if ("antimatter".equalsIgnoreCase(tech) || "wavelength".equalsIgnoreCase(tech)) {
-                    continue;
-                }
+            for (String ability : player.getTfAbilities()) {
                 buttons.add(Buttons.red(
-                        "discardSpecificSpliceCard_" + type + "_" + tech,
-                        "Discard " + Mapper.getTech(tech).getName()));
+                        "discardSpecificSpliceCard_" + type + "_" + ability,
+                        "Discard " + Mapper.getTech(ability).getName()));
             }
         }
         if ("genome".equalsIgnoreCase(type)) {

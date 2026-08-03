@@ -223,6 +223,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return false;
     }
 
+    public List<String> getTfAbilities() {
+        return getTechs().stream()
+                .filter(tech -> !"antimatter".equalsIgnoreCase(tech) && !"wavelength".equalsIgnoreCase(tech))
+                .toList();
+    }
+
     public int getSingularities() {
         int amount = 0;
         if (hasTech("tf-singularityx")) {
