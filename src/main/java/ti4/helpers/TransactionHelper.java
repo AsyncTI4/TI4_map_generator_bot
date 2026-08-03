@@ -1968,10 +1968,12 @@ public class TransactionHelper {
         boolean blackMarket =
                 List.of(p1.getFaction(), p2.getFaction()).contains(game.getStoredValue("blackmarketdealing"));
         blackMarket |= p1.hasStoredValue("bmd") || p2.hasStoredValue("bmd");
-        blackMarket &= !game.isTwilightsFallMode();
 
-        boolean graft = p1.hasStoredValue("bmd") || p2.hasStoredValue("bmd");
-        graft &= game.isTwilightsFallMode();
+        boolean graft = false;
+        if (game.isTwilightKart()) {
+            graft = blackMarket;
+            blackMarket = false;
+        }
 
         List<Button> stuffToTransButtons = new ArrayList<>();
         if (p1.getTg() > 0) {
