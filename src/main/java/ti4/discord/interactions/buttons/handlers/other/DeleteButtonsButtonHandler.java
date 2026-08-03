@@ -13,6 +13,8 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -404,10 +406,16 @@ class DeleteButtonsButtonHandler {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
                 }
                 CommanderUnlockCheckService.checkPlayer(player, "revenantmyrr");
+                if (game.playerHasLeaderUnlockedOrAlliance(player, "revenantmyrrcommander")) {
+                    RevenantLeadersHandler.offerRevMyrrCommander(game, player, tile);
+                }
             }
         }
         if ("Done Producing Units".equalsIgnoreCase(buttonLabel) && "myrrBt".equalsIgnoreCase(buttonID)) {
             game.removeStoredValue(MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction());
+        }
+        if ("Done Producing Units".equalsIgnoreCase(buttonLabel) && "lazarusPods".equalsIgnoreCase(buttonID)) {
+            RevenantTechHandler.clearLazarusProduction(game, player);
         }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
             if (player.hasTech("asn")

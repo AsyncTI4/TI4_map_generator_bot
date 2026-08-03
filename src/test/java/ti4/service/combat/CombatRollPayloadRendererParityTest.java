@@ -82,6 +82,62 @@ class CombatRollPayloadRendererParityTest extends BaseTi4Test {
     }
 
     @Test
+    void capsMarshalFaelornPonthousCommanderModifierAtTwoBestDice() {
+        Harness harness = new Harness();
+        Player ponthous = harness.player("ponthous");
+        Player sol = harness.player("sol");
+        Tile tile = harness.tile("19");
+        Harness.add(tile, ponthous, UnitType.Dreadnought, 1);
+        Harness.add(tile, ponthous, UnitType.Flagship, 1);
+        Harness.add(tile, ponthous, UnitType.Destroyer, 1);
+        Harness.add(tile, sol, UnitType.Carrier, 1);
+
+        RenderedRoll roll = assertRollBodyParity(harness, ponthous, sol, tile, CombatRollType.combatround, 5, 5, 5, 5);
+
+        assertTrue(roll.productionMessage().contains("Marshal Faelorn"));
+        assertTrue(roll.productionMessage().contains("+2 to up to 2 dice from"));
+        assertTrue(roll.productionMessage().contains("first 1 die (+2 mods)"));
+        assertEquals(2, roll.payload().total().displayedTotalHits());
+        assertEquals(
+                List.of(3, 5, 7, 8),
+                roll.payload().unitRolls().stream()
+                        .flatMap(unitRoll -> unitRoll.dice().stream())
+                        .map(CombatRollPayload.DieRoll::threshold)
+                        .sorted()
+                        .toList());
+    }
+
+    @Test
+    void rendersCappedModifiersOnTheFirstTwoOfThreeDice() {
+        CombatRollPayload.UnitRoll unitRoll = new CombatRollPayload.UnitRoll(
+                "dreadnought",
+                "dn",
+                "dreadnought",
+                "Dreadnought II",
+                "Dreadnought II",
+                ":dreadnought:",
+                1,
+                3,
+                0,
+                5,
+                1,
+                4,
+                List.of(3, 3, 1),
+                CombatRollPayload.RollSegmentType.PRIMARY,
+                List.of(
+                        new CombatRollPayload.DieRoll(2, 2, true, CombatRollPayload.DieRollSource.PRIMARY),
+                        new CombatRollPayload.DieRoll(2, 2, true, CombatRollPayload.DieRollSource.PRIMARY),
+                        new CombatRollPayload.DieRoll(4, 4, true, CombatRollPayload.DieRollSource.PRIMARY)),
+                3);
+        CombatRollPayload payload = new CombatRollPayload(null, List.of(), List.of(), List.of(unitRoll), null);
+
+        String rendered = CombatRollPayloadRenderer.render(payload);
+
+        assertTrue(rendered.contains("hits on **2** for first 2 dice (+3 mods)"));
+        assertTrue(rendered.contains("hits on **4** for remaining 1 die (+1 mods)"));
+    }
+
+    @Test
     void rendersSuperchargeSelectedUnitSplit() {
         Harness harness = new Harness();
         Player bluetf = harness.player("bluetf");

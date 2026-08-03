@@ -36,6 +36,7 @@ public class UnusedCommanderHelper {
                     || ("firmament".equalsIgnoreCase(faction.getAlias())
                             && game.getFactions().contains("obsidian"))
                     || (game.isMinorFactionsMode() && game.getTile(faction.getHomeSystem()) != null)
+                    || Constants.CALL_OF_THE_HAUNTED_LEADERS.contains(commanderName)
                     || (Helper.getPlayerFromLeader(game, commanderName) != null)
                     || commanders.contains(commanderName)
                     || Mapper.getLeader(commanderName) == null

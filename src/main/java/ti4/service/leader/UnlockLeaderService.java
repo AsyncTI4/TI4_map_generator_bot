@@ -2,6 +2,9 @@ package ti4.service.leader;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantUnitsHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -107,6 +110,16 @@ public class UnlockLeaderService {
                     game.getActionsChannel(),
                     game.getPing() + ", there will now be a third agenda each agenda phase. Congratulations "
                             + player.getRepresentationNoPing() + ", you are now the senate!");
+        }
+
+        if ("revenanthero".equals(leaderID)) {
+            RevenantLeadersHandler.offerRevenantHeroChoices(game, player);
+        }
+        if (player.hasUnit("revenant_mech")) {
+            RevenantUnitsHandler.doRevenantMechCheck(game, player);
+        }
+        if (Constants.COMMANDER.equals(playerLeader.getType()) || Constants.HERO.equals(playerLeader.getType())) {
+            RevenantTechHandler.doLazarusPodsLeaderCheck(game);
         }
 
         if (playerLeader.isExhausted()) {

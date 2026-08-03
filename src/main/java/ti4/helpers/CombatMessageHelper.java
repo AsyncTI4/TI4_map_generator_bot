@@ -72,6 +72,30 @@ public final class CombatMessageHelper {
             List<Die> resultRolls,
             int numHit,
             String holderLabel) {
+        return displayUnitRoll(
+                unitModel,
+                toHit,
+                modifier,
+                unitQuantity,
+                numRollsPerUnit,
+                extraRolls,
+                resultRolls,
+                numHit,
+                holderLabel,
+                List.of());
+    }
+
+    public static String displayUnitRoll(
+            UnitModel unitModel,
+            int toHit,
+            int modifier,
+            int unitQuantity,
+            int numRollsPerUnit,
+            int extraRolls,
+            List<Die> resultRolls,
+            int numHit,
+            String holderLabel,
+            List<Integer> modifiersByDie) {
         String hitsSuffix = "";
         if (numHit > 1) {
             hitsSuffix = "s";
@@ -89,8 +113,9 @@ public final class CombatMessageHelper {
             }
         }
 
-        String unitTypeHitsInfo = toHit <= 1 ? "always hits" : String.format("hits on **%s**", toHit);
-        if (modifier != 0) {
+        boolean hasVariableModifiers = hasVariableModifiers(modifier, modifiersByDie, resultRolls.size());
+        String unitTypeHitsInfo = getUnitTypeHitsInfo(toHit, modifier, modifiersByDie, resultRolls.size());
+        if (!hasVariableModifiers && modifier != 0) {
             String modifierToHitString = Integer.toString(modifier);
             if (modifier > 0) {
                 modifierToHitString = "+" + modifierToHitString;
@@ -147,6 +172,38 @@ public final class CombatMessageHelper {
                 unitQuantity, unitEmoji, optionalText, resultRollsString, numHit, hitsSuffix, nice, winnu_sigma);
     }
 
+    private static String getUnitTypeHitsInfo(int toHit, int modifier, List<Integer> modifiersByDie, int rollCount) {
+        if (!hasVariableModifiers(modifier, modifiersByDie, rollCount)) {
+            return toHit <= 1 ? "always hits" : String.format("hits on **%s**", toHit);
+        }
+
+        List<String> groups = new ArrayList<>();
+        int groupStart = 0;
+        while (groupStart < modifiersByDie.size()) {
+            int groupModifier = modifiersByDie.get(groupStart);
+            int groupEnd = groupStart + 1;
+            while (groupEnd < modifiersByDie.size() && modifiersByDie.get(groupEnd) == groupModifier) {
+                groupEnd++;
+            }
+            int groupDice = groupEnd - groupStart;
+            String diceLabel = groupStart == 0
+                    ? "first " + groupDice + (groupDice == 1 ? " die" : " dice")
+                    : "remaining " + groupDice + (groupDice == 1 ? " die" : " dice");
+            String modifierLabel = groupModifier > 0 ? "+" + groupModifier : Integer.toString(groupModifier);
+            int threshold = Math.max(1, toHit - groupModifier);
+            String hitLabel = threshold <= 1 ? "always hits" : "hits on **" + threshold + "**";
+            groups.add(hitLabel + " for " + diceLabel + " (" + modifierLabel + " mods)");
+            groupStart = groupEnd;
+        }
+        return String.join("; ", groups);
+    }
+
+    private static boolean hasVariableModifiers(int modifier, List<Integer> modifiersByDie, int rollCount) {
+        return modifiersByDie != null
+                && modifiersByDie.size() == rollCount
+                && modifiersByDie.stream().anyMatch(perDieModifier -> perDieModifier != modifier);
+    }
+
     public static String displayModifiers(
             String prefixText, Map<UnitModel, Integer> units, List<NamedCombatModifierModel> modifiers) {
         String result = "";
@@ -175,9 +232,29 @@ public final class CombatMessageHelper {
                 }
                 String modifierName = namedModifier.getName();
                 if (StringUtils.isNotBlank(modifierName)) {
-                    modifierMessages.add(modifierName);
+                    if (mod.getMaxDice() != null) {
+                        modifierMessages.add(String.format(
+                                "%s%s to up to %s %s from %s",
+                                plusPrefix,
+                                modifierValue,
+                                mod.getMaxDice(),
+                                mod.getMaxDice() == 1 ? "die" : "dice",
+                                modifierName));
+                    } else {
+                        modifierMessages.add(modifierName);
+                    }
                 } else {
-                    modifierMessages.add(String.format("%s%s for %s", plusPrefix, modifierValue, unitScope));
+                    if (mod.getMaxDice() != null) {
+                        modifierMessages.add(String.format(
+                                "%s%s to up to %s %s for %s",
+                                plusPrefix,
+                                modifierValue,
+                                mod.getMaxDice(),
+                                mod.getMaxDice() == 1 ? "die" : "dice",
+                                unitScope));
+                    } else {
+                        modifierMessages.add(String.format("%s%s for %s", plusPrefix, modifierValue, unitScope));
+                    }
                 }
             }
             result += String.join("\n", modifierMessages).replace("Optional[", "") + "\n";

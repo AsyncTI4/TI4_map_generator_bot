@@ -13,5 +13,80 @@
                 "alias": "survivalists"
             }
         ]
+    },
+    {
+        "alias": "ponthous_commander_plus2_combat",
+        "type": "mods",
+        "value": "+2",
+        "maxDice": 2,
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "ponthouscommander"
+            }
+        ]
+    },
+    {
+        "alias": "ponthous_commander_plus2_afb",
+        "type": "mods",
+        "value": "+2",
+        "maxDice": 2,
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "AFB",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "ponthouscommander"
+            }
+        ]
+    },
+    {
+        "alias": "ponthous_commander_plus2_bombardment",
+        "type": "mods",
+        "value": "+2",
+        "maxDice": 2,
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "bombardment",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "ponthouscommander"
+            }
+        ]
+    },
+    {
+        "alias": "ponthous_commander_plus2_space_cannon_offence",
+        "type": "mods",
+        "value": "+2",
+        "maxDice": 2,
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "SpaceCannonOffence",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "ponthouscommander"
+            }
+        ]
+    },
+    {
+        "alias": "ponthous_commander_plus2_space_cannon_defence",
+        "type": "mods",
+        "value": "+2",
+        "maxDice": 2,
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "SpaceCannonDefence",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "ponthouscommander"
+            }
+        ]
     }
 ]

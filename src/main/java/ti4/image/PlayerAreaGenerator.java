@@ -1435,7 +1435,8 @@ public class PlayerAreaGenerator {
             }
         }
 
-        if (player.hasLeaderUnlocked("revenantcommander")) {
+        Player lichPoolOwner = game.getRevenantCommanderOwner(player);
+        if (lichPoolOwner != null) {
             deltaX += 5;
             Collection<Player> players = game.getRealPlayersNDummies();
             if (game.isMinorFactionsMode()) {
@@ -1443,7 +1444,8 @@ public class PlayerAreaGenerator {
             }
 
             for (Player otherPlayer : players) {
-                if (otherPlayer.equals(player) || player.getDebtTokenCount(otherPlayer.getColor(), "lich") < 1) {
+                if (otherPlayer.equals(lichPoolOwner)
+                        || lichPoolOwner.getDebtTokenCount(otherPlayer.getColor(), "lich") < 1) {
                     continue;
                 }
 

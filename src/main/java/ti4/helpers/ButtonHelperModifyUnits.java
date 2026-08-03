@@ -24,6 +24,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -576,6 +578,7 @@ public final class ButtonHelperModifyUnits {
             boolean spaceCannonOffence) {
         UnitHolder unitHolder = tile.getUnitHolders().get("space");
         int ashenAshfallSustains = 0;
+        boolean sustainedShip = false;
         StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " assigned " + (hits == 1 ? "the hit" : "hits")
                 + " in the following way:\n");
         if (justSummarizing) {
@@ -649,6 +652,7 @@ public final class ButtonHelperModifyUnits {
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                         tile.addUnitDamage("space", unitKey, min);
+                        sustainedShip = true;
                         if ("ashen_dreadnought2".equals(unitModel.getId()) && !spaceCannonOffence) {
                             ashenAshfallSustains += min;
                         }
@@ -722,6 +726,9 @@ public final class ButtonHelperModifyUnits {
                                 .append(unitModel.getUnitEmoji())
                                 .append('\n');
                         tile.addUnitDamage("space", unitKey, min);
+                        if (unitModel.getIsShip()) {
+                            sustainedShip = true;
+                        }
                         if (oldGloryFighter) {
                             PonthousUnitHandler.consumeTemporaryFighterSustain(game, player, tile, min);
                             oldGloryFighterSustains -= min;
@@ -867,6 +874,7 @@ public final class ButtonHelperModifyUnits {
 
                     if (!justSummarizing) {
                         tile.addUnitDamage("space", unitKey, min);
+                        sustainedShip = true;
                         handleLetnevCommanderCheck(player, game, event, min);
                         msg.append("> Sustained ")
                                 .append(min)
@@ -905,6 +913,10 @@ public final class ButtonHelperModifyUnits {
                     }
                 }
             }
+        }
+
+        if (!justSummarizing && !spaceCannonOffence && sustainedShip) {
+            RevenantLeadersHandler.offerRevPonthousCommander(event, game, player, tile);
         }
 
         // Remove floating infantry and mechs if everything else is dead
@@ -1897,6 +1909,9 @@ public final class ButtonHelperModifyUnits {
         String planetName = unitNPlanet.replace(unitLong + "_", "");
         String unitID = AliasHandler.resolveUnit(unitLong.replace("2", ""));
         UnitKey unitKey = Mapper.getUnitKey(unitID, player.getColorID());
+        if (!RevenantTechHandler.canProduceLazarusUnit(event, game, player, unitLong, planetName)) {
+            return;
+        }
         String spaceOrPlanet;
 
         String successMessage;

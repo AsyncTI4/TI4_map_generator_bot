@@ -24,6 +24,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
@@ -102,7 +103,7 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("revenantarcanumagent")) {
             buttons.add(Buttons.gray(
                     player.factionButtonChecker() + "useRevArcanumAgent_other",
-                    "Use Runebearer Lothos on Another Player",
+                    "Use Revenant Arcanum Agent",
                     FactionEmojis.revenant));
         }
         if (player.hasUnexhaustedLeader("kairnagent")) {
@@ -464,6 +465,16 @@ public class CardsInfoService {
         }
         if (player.hasUnit("aeterna_flagship")) {
             buttons.add(AeternaUnitsHandler.getCryptCapacityInfoButton(player));
+        }
+        if (player.hasUnexhaustedLeader("revenantagent")) {
+            buttons.add(RevenantLeadersHandler.getRevenantAgentButton(player));
+        }
+        if (player.hasUnexhaustedLeader("revenantverydithagent")) {
+            buttons.add(RevenantLeadersHandler.getRevVerydithCardsInfoButton(game, player));
+        }
+        RevenantLeadersHandler.addRedLeaderCardsInfoButtons(buttons, player);
+        if (RevenantLeadersHandler.canUseRevThronesHero(game, player)) {
+            buttons.add(RevenantLeadersHandler.getRevThronesHeroButton(player));
         }
         buttons.add(Buttons.gray("offerPlayerPref", "Player Settings"));
         buttons.add(Buttons.gray("searchMyGames", "List My Games"));

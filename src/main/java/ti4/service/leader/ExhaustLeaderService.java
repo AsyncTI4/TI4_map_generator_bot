@@ -2,6 +2,8 @@ package ti4.service.leader;
 
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantUnitsHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -32,6 +34,13 @@ public class ExhaustLeaderService {
                             game, leaderModel, false, true, false, false, game.isTwilightsFallMode()));
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message + leader.getId());
+        }
+
+        if (Constants.AGENT.equals(leader.getType())) {
+            if (player.hasUnit("revenant_mech")) {
+                RevenantUnitsHandler.doRevenantMechCheck(game, player);
+            }
+            RevenantTechHandler.getProduceShipsInSystemsWithShipsButtons(game, player);
         }
 
         if (tgCount != null) {

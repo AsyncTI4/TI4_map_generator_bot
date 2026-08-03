@@ -1316,6 +1316,17 @@ public final class Constants {
     public static final List<String> VERBOSITY_OPTIONS =
             List.of(VERBOSITY_VERBOSE, VERBOSITY_AVERAGE, VERBOSITY_MINIMAL);
 
+    public static final List<String> CALL_OF_THE_HAUNTED_LEADERS = List.of(
+            "revenantverydithagent",
+            "revenantmyrrcommander",
+            "revenantthroneshero",
+            "revenantarcanumagent",
+            "revenantoblivioncommander",
+            "revenantkairnhero",
+            "revenantxytherisagent",
+            "revenantponthouscommander",
+            "revenantkryxoshero");
+
     public static final String BETA_TEST_MODE = "beta_test_mode";
     public static final String CC_LIMIT = "cc_limit";
     public static final String AGE_OF_EXPLORATION_MODE = "age_of_exploration_mode";

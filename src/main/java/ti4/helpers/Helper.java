@@ -54,6 +54,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
@@ -2388,6 +2389,7 @@ public final class Helper {
             productionValueTotal += 2;
         }
         productionValueTotal += MyrrLeadersHandler.getMyrrAgentProduction(game, player, tile);
+        productionValueTotal += RevenantLeadersHandler.getRevThronesProduction(game, player, tile);
         return productionValueTotal;
     }
 
