@@ -65,8 +65,8 @@
         "shortName": "Iron \nCurtain",
         "faction": "veilstrike",
         "synergy": [
-            "BIOTIC",
-            "CYBERNETIC"
+            "WARFARE",
+            "BIOTIC"
         ],
         "text": "During space combat, you may discard 1 action card to produce 1 hit against enemy ships. During ground combat, you may discard 1 action card to produce 2 hits against enemy ground forces.",
         "source": "gamma"
@@ -104,7 +104,7 @@
             "CYBERNETIC",
             "WARFARE"
         ],
-        "text": "Whenever you activate the Mecatol Rex system, you may place a command token from your reinforcements in that system instead of from your tactic pool.",
+        "text": "You may exchange secret objectives as part of transactions.\nWhen you exchange a secret objective as part of a transaction, place one of your infantry into coexistence onto one of that player’s planets of your choice. When you would perform a transaction with a player with a revealed secret objective, keep any revealed secret objectives face up.\nPlayers you are coexisting with can score revealed Secret Objectives in any player's play area as if they were public objectives.",
         "source": "gamma"
     }
 ]

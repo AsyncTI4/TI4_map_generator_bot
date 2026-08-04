@@ -93,6 +93,11 @@ class GameUndoService {
                 BotLogger.error(new LogOrigin(gameToUndo), "Game file for " + gameName + " doesn't exist!");
                 return null;
             }
+            Game savedButtonsGame = null;
+            if (undoIndex != latestUndoIndex - 1) {
+                replaceGameFileWithUndo(gameName, undoIndex + 1, currentGameFile.toPath());
+                savedButtonsGame = GameLoadService.load(gameName);
+            }
 
             replaceGameFileWithUndo(gameName, undoIndex, currentGameFile.toPath());
             Game loadedGame = GameLoadService.load(gameName);
@@ -102,7 +107,11 @@ class GameUndoService {
             }
             WebSocketNotifier.notifyGameStateChange(loadedGame);
 
-            generateSavedButtons(gameToUndo);
+            if (savedButtonsGame != null) {
+                generateSavedButtons(savedButtonsGame);
+            } else {
+                generateSavedButtons(gameToUndo);
+            }
             sendAnyChangedCardsInfo(gameToUndo, loadedGame);
             GameMessageManager.removeAfter(gameName, loadedGame.getLastModifiedDate());
 

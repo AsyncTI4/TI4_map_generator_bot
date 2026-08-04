@@ -2589,7 +2589,7 @@ public class StartCombatService {
             } else {
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + "readyBT_dihmohnbt_" + tile.getPosition(),
-                        "Produce 1 Non-Fighter Ship (Upon Destroy)",
+                        "Produce 1 or 2 Non-Fighter Ships (Upon Destroy)",
                         FactionEmojis.dihmohn));
             }
         }

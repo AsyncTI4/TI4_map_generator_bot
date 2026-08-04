@@ -304,11 +304,9 @@ class DefectorsAcd2ButtonHandler {
         List<Button> buttons = new ArrayList<>();
         for (Player target : targets) {
             String label = game.isFowMode() ? target.getColor() : StringUtils.capitalize(target.getFaction());
-            Button button =
-                    Buttons.blue(player.factionButtonChecker() + "defectorsTarget_" + target.getFaction(), label);
-            if (!game.isFowMode()) {
-                button = button.withEmoji(Emoji.fromFormatted(target.getFactionEmoji()));
-            }
+            Button button = Buttons.blue(
+                            player.factionButtonChecker() + "defectorsTarget_" + target.getFaction(), label)
+                    .withEmoji(Emoji.fromFormatted(target.fogSafeEmoji()));
             buttons.add(button);
         }
         return buttons;

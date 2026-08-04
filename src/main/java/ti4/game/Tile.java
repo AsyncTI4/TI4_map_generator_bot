@@ -627,6 +627,11 @@ public class Tile {
     }
 
     @JsonIgnore
+    public boolean hasEgress() {
+        return getTileModel().hasEgress();
+    }
+
+    @JsonIgnore
     public List<WormholeModel.Wormhole> getWormholes(Game game) {
         Set<WormholeModel.Wormhole> whs = EnumSet.noneOf(WormholeModel.Wormhole.class);
         List<WormholeModel.Wormhole> whs2 = new ArrayList<>(whs);

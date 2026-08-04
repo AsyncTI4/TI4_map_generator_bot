@@ -1596,7 +1596,7 @@ public final class ButtonHelperTwilightsFall {
     }
 
     public static void drawAbilityFromDeck(Game game, Player player) {
-        List<String> deck = game.getAbilitySpliceDeck(true);
+        List<String> deck = game.getAbilitySpliceDeck(false);
         if (deck.isEmpty()) {
             String messageText = "There are no more cards in the ability deck.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), messageText);
@@ -1604,8 +1604,8 @@ public final class ButtonHelperTwilightsFall {
         }
 
         String drawnCard = deck.getFirst();
-        player.addTech(drawnCard);
         if (!game.isVeiledHeartMode()) {
+            player.addTech(drawnCard);
             TechnologyModel model = Mapper.getTech(drawnCard);
             String msg = player.getRepresentation() + " has acquired the ability: " + model.getName();
             MessageHelper.sendMessageToChannelWithEmbed(

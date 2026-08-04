@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -13,6 +12,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
@@ -29,12 +29,7 @@ class IxthianGiftAcd2ButtonHandler {
                 continue;
             }
             String id = player.factionButtonChecker() + "ixthianGiftPlayer_" + p2.getFaction();
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray(id, p2.getColor()));
-            } else {
-                buttons.add(Buttons.gray(id, p2.getFactionModel().getShortName())
-                        .withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
-            }
+            buttons.add(FoWHelper.fogSafeTargetButton(id, "gray", p2));
         }
         ButtonHelper.deleteMessage(event);
         if (buttons.isEmpty()) {

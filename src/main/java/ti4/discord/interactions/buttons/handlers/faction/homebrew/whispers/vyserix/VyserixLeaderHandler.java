@@ -27,6 +27,8 @@ public class VyserixLeaderHandler {
             Planet planetInfo = game.getPlanetsInfo().get(planet);
             if (planetInfo == null
                     || planetInfo.isHomePlanet()
+                    || planetInfo.isFake()
+                    || game.getTileFromPlanet(planet) == null
                     || !planetInfo.getTechSpecialities().isEmpty()) {
                 continue;
             }
@@ -45,7 +47,10 @@ public class VyserixLeaderHandler {
         Tile tile = game.getTileFromPlanet(planet);
         UnitHolder unitHolder = game.getPlanetsInfo().get(planet);
         if (tile == null || unitHolder == null) return;
-        tile.addToken("attachment_vyserixhero.png", planet);
+        tile.addToken("attachment_biotic.png", planet);
+        tile.addToken("attachment_cybernetic.png", planet);
+        tile.addToken("attachment_propulsion.png", planet);
+        tile.addToken("attachment_warfare.png", planet);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " attached _Titles Are Silly_ to "

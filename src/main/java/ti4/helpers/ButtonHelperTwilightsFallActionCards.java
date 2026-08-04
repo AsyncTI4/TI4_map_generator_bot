@@ -178,7 +178,9 @@ public final class ButtonHelperTwilightsFallActionCards {
                 continue;
             }
             buttons.add(Buttons.green(
-                    "manipulateStep2_" + cardID + "_" + p2.getFaction(), p2.getUserName(), p2.fogSafeEmoji()));
+                    "manipulateStep2_" + cardID + "_" + p2.getFaction(),
+                    p2.getFactionNameOrColor(),
+                    p2.fogSafeEmoji()));
         }
         MessageHelper.sendMessageToChannel(
                 game.isVeiledHeartMode() ? player.getCardsInfoThread() : player.getCorrectChannel(),
@@ -390,7 +392,7 @@ public final class ButtonHelperTwilightsFallActionCards {
                     p2.factionButtonChecker() + "coerceStep3_" + player.getFaction() + "_" + ability, tech.getName()));
         }
         String msg = p2.getRepresentationUnfogged() + ", please choose the ability you wish to give to "
-                + (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.getRepresentationNoPing()) + ".";
+                + FoWHelper.identityOrColorIfCanSeeStats(game, player, p2, player.getRepresentationNoPing()) + ".";
         MessageChannel channel = p2.getCorrectChannel();
         if (game.isVeiledHeartMode()) {
             MessageHelper.sendMessageToChannel(
@@ -421,7 +423,7 @@ public final class ButtonHelperTwilightsFallActionCards {
         player.removeTech(ability1);
         p2.addTech(ability1);
         String msg = player.getRepresentation() + " has lost _" + tech1.getName() + "_ to "
-                + (game.isFowMode() ? p2.getColorIfCanSeeStats(player) : p2.getFactionNameOrColor()) + ".";
+                + FoWHelper.identityOrColorIfCanSeeStats(game, p2, player, p2.getFactionNameOrColor()) + ".";
         String msg2 = p2.getRepresentation() + ", you gained _" + tech1.getName() + "_ from "
                 + player.getFactionNameOrColor() + ".";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
@@ -574,7 +576,7 @@ public final class ButtonHelperTwilightsFallActionCards {
                 + tech2.getName() + "_ via a _Transpose_ with " + p2.getFactionNameOrColor() + ".";
         String msg2 = p2.getRepresentationUnfogged() + ", you exchanged _" + tech2.getName() + "_ for _"
                 + tech1.getName() + "_ via a _Transpose_ with "
-                + (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.getFactionNameOrColor()) + ".";
+                + FoWHelper.identityOrColorIfCanSeeStats(game, player, p2, player.getFactionNameOrColor()) + ".";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 

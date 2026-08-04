@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
@@ -191,6 +193,9 @@ public class AddUnitService {
             AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.location(), game);
             if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasLeader("netrunnerscommander"))) {
                 NetrunnersLeadersHandler.checkCommanderUnlock(game, parsedUnit.unitKey());
+            }
+            if (parsedUnit.unitKey() == null) {
+                continue;
             }
             handlePostAddUnitPlayerEffects(event, game, tile, parsedUnit.unitKey(), parsedUnit.location(), player);
             if (!first) {

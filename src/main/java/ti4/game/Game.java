@@ -1080,8 +1080,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return null;
     }
 
-    public TextChannel getSavedChannel() {
+    public MessageChannel getSavedChannel() {
         try {
+            if ("thread".equalsIgnoreCase(getStoredValue("savedChannelType"))) {
+                return JdaService.jda.getThreadChannelById(getSavedChannelID());
+            }
             return JdaService.jda.getTextChannelById(getSavedChannelID());
         } catch (Exception e) {
             return getMainGameChannel();

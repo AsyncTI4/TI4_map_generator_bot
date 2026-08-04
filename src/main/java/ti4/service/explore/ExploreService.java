@@ -112,11 +112,7 @@ public class ExploreService {
                     Please use `/explore draw_and_discard trait` then `/explore use explore_card_id` to manually resolve this exploration.\
 
                     -# (NB: Player chooses a trait, reveals two of that trait and one of each other; reveal four cards total.)""";
-                if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
-                    MessageHelper.sendMessageToChannel(game.getActionsChannel(), reportMessage);
-                } else {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), reportMessage);
-                }
+                MessageHelper.sendMessageToChannel(FoWHelper.actionsChannelOrLocal(game, event), reportMessage);
                 return;
             }
             String cardIDC = game.drawExplore("CULTURAL");
@@ -179,11 +175,7 @@ public class ExploreService {
                     + "Bozgarbia ability and found " + indefiniteArticleC + "_" + exploreNameC + "_, "
                     + indefiniteArticleH + "_" + exploreNameH + "_ and " + indefiniteArticleI + "_" + exploreNameI
                     + "_.";
-            if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(), reportMessage);
-            } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), reportMessage);
-            }
+            MessageHelper.sendMessageToChannel(FoWHelper.actionsChannelOrLocal(game, event), reportMessage);
 
             Button resolveExploreC = Buttons.green(
                     "resolve_explore_" + cardIDC + "_" + planetName + "_distantSuns", exploreModelC.getName());
@@ -291,11 +283,7 @@ public class ExploreService {
                         reportMessage += " Auto-resolving.";
                     }
 
-                    if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
-                        MessageHelper.sendMessageToChannel(game.getActionsChannel(), reportMessage);
-                    } else {
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), reportMessage);
-                    }
+                    MessageHelper.sendMessageToChannel(FoWHelper.actionsChannelOrLocal(game, event), reportMessage);
 
                     if (exploreName1.equals(exploreName2)) {
                         resolveExploreAuto(event, player, cardID1, planetName, game);
@@ -366,13 +354,11 @@ public class ExploreService {
                     + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                     + "Vassa Hagi, the Lanefir" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                     + " agent, and thus may decline this exploration to draw another one instead.";
-            if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
-                String pF = player.getFactionEmoji();
-                MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(), pF + " found a " + name1 + " on " + planetName);
-            } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Found a " + name1 + " on " + planetName);
-            }
+            FoWHelper.announcePublicOrLocal(
+                    game,
+                    event,
+                    player.getFactionEmoji() + " found a " + name1 + " on " + planetName,
+                    "Found a " + name1 + " on " + planetName);
             ExploreModel exploreModel1 = Mapper.getExplore(cardID);
             List<MessageEmbed> embeds = List.of(exploreModel1.getRepresentationEmbed());
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
@@ -388,14 +374,11 @@ public class ExploreService {
             List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
             String message = player.getRepresentationUnfogged()
                     + " You have Augers Breakthrough, and thus may decline this exploration to draw 1 action card instead.";
-            if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
-                String pF = player.getFactionEmoji();
-                MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(), pF + " found a " + name1 + " on " + planetName + ".");
-            } else {
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), "Found a " + name1 + " on " + planetName + ".");
-            }
+            FoWHelper.announcePublicOrLocal(
+                    game,
+                    event,
+                    player.getFactionEmoji() + " found a " + name1 + " on " + planetName + ".",
+                    "Found a " + name1 + " on " + planetName + ".");
             ExploreModel exploreModel1 = Mapper.getExplore(cardID);
             List<MessageEmbed> embeds = List.of(exploreModel1.getRepresentationEmbed());
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
@@ -411,14 +394,11 @@ public class ExploreService {
             List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
             String message = player.getRepresentationUnfogged()
                     + " You have _Scanlink Drone Network_, and thus may decline this exploration to gain 1 trade good.";
-            if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
-                String pF = player.getFactionEmoji();
-                MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(), pF + " found a " + name1 + " on " + planetName + ".");
-            } else {
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), "Found a " + name1 + " on " + planetName + ".");
-            }
+            FoWHelper.announcePublicOrLocal(
+                    game,
+                    event,
+                    player.getFactionEmoji() + " found a " + name1 + " on " + planetName + ".",
+                    "Found a " + name1 + " on " + planetName + ".");
             ExploreModel exploreModel1 = Mapper.getExplore(cardID);
             List<MessageEmbed> embeds = List.of(exploreModel1.getRepresentationEmbed());
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
@@ -434,14 +414,11 @@ public class ExploreService {
             List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
             String message = player.getRepresentationUnfogged()
                     + " You have _Discovery_, and thus may decline this exploration to gain 1 trade good.";
-            if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
-                String pF = player.getFactionEmoji();
-                MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(), pF + " found a " + name1 + " on " + planetName + ".");
-            } else {
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), "Found a " + name1 + " on " + planetName + ".");
-            }
+            FoWHelper.announcePublicOrLocal(
+                    game,
+                    event,
+                    player.getFactionEmoji() + " found a " + name1 + " on " + planetName + ".",
+                    "Found a " + name1 + " on " + planetName + ".");
             ExploreModel exploreModel1 = Mapper.getExplore(cardID);
             List<MessageEmbed> embeds = List.of(exploreModel1.getRepresentationEmbed());
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
@@ -490,7 +467,7 @@ public class ExploreService {
             MessageHelper.sendMessageToChannel(
                     (MessageChannel) event.getChannel(),
                     planetName + " has been readied because of Quaxdol Junitas, the Florzen Commander.");
-            if (!game.isFowMode()) AgendaHelper.listVoteCount(game, game.getMainGameChannel());
+            AgendaHelper.listVoteCountIfUnfogged(game);
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
             Units.UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());

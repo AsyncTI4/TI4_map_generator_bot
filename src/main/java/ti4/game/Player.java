@@ -2673,6 +2673,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             removeOwnedUnitByID("rohdhna_warsun2");
             addOwnedUnitByID("rohdhna_warsun3");
         }
+        if ("ff2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("mirvedabt")) {
+            removeOwnedUnitByID("fighter2");
+            addOwnedUnitByID("mirveda_fighter3");
+        }
         if ("dn2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("kortalibt")) {
             addOwnedUnitByID("tribune3");
             removeOwnedUnitByID("dreadnought2");
@@ -2755,6 +2759,11 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                     RevenantLeadersHandler.offerRevenantAgentButtons(this, tech);
                 }
             }
+        }
+        if (hasReadyBreakthrough("kolumebt")) {
+            gainCommodities(1);
+            MessageHelper.sendMessageToChannel(
+                    getCorrectChannel(), getRepresentationNoPing() + " gained 1 commodity due to Kolume breakthrough.");
         }
     }
 

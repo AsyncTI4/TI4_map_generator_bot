@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -17,6 +16,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.unit.AddUnitService;
@@ -31,15 +31,7 @@ class RefugeesAcd2ButtonHandler {
             if (p2 == player || getRefugeesPlanets(game, p2).isEmpty()) {
                 continue;
             }
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray("resolveRefugeesStep2_" + p2.getFaction(), p2.getColor()));
-            } else {
-                Button button = Buttons.gray(
-                        "resolveRefugeesStep2_" + p2.getFaction(),
-                        p2.getFactionModel().getShortName());
-                String factionEmojiString = p2.getFactionEmoji();
-                buttons.add(button.withEmoji(Emoji.fromFormatted(factionEmojiString)));
-            }
+            buttons.add(FoWHelper.fogSafeTargetButton("resolveRefugeesStep2_" + p2.getFaction(), "gray", p2));
         }
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(

@@ -18,7 +18,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import ti4.contest.replay.core.CombatReplayTrackedEvent;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
@@ -769,7 +768,7 @@ public class ActionCardHelper {
         boolean actionCardIsCancelable = isActionCardCancelable(actionCard) && !twinned && !hasUnyieldingWill;
 
         String pingGame = actionCardIsCancelable ? game.getPing() + ", " : "";
-        String message = pingGame + (game.isFowMode() ? "someone" : player.getRepresentationNoPing());
+        String message = pingGame + FoWHelper.actorOrAnon(game, player, "someone");
         message += fromGarbozia ? " purged " : " played ";
         message += "the action card _" + actionCardTitle + "_";
         message += fromGarbozia ? " using _Dok 'N Pic's Salvage Yard_." : ".";
@@ -961,9 +960,11 @@ public class ActionCardHelper {
                 }
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, acbuttons);
             }
-            String cancelReminder = actionCardIsCancelable ? ", after checking for Sabos" : "";
-            String introMsg = player.getRepresentation() + cancelReminder + ", please use buttons to resolve _"
-                    + actionCardTitle + "_.";
+            String cancelReminder = actionCardIsCancelable ? "after checking for Sabos, " : "";
+            // The body (everything after "<rep>, ") is kept separate so the main-channel sender can
+            // omit the representation entirely under fog instead of stripping it back out afterwards.
+            String introBody = cancelReminder + "please use buttons to resolve _" + actionCardTitle + "_.";
+            String introMsg = player.getRepresentation() + ", " + introBody;
             String targetMsg =
                     " A reminder that you should declare which %s you are targeting now, before other players choose whether they will Sabo.";
 
@@ -1007,12 +1008,12 @@ public class ActionCardHelper {
 
             if ("confounding".equals(automationID)) {
                 codedButtons.add(Buttons.green("autoresolve_manual", buttonLabel));
-                sendResolveMsgToMainChannel(introMsg, codedButtons, player, game);
+                sendResolveMsgToMainChannel(introBody, codedButtons, player, game);
             }
 
             if ("confusing".equals(automationID)) {
                 codedButtons.add(Buttons.green("autoresolve_manual", buttonLabel));
-                sendResolveMsgToMainChannel(introMsg + String.format(targetMsg, "player"), codedButtons, player, game);
+                sendResolveMsgToMainChannel(introBody + String.format(targetMsg, "player"), codedButtons, player, game);
             }
 
             if ("reveal_prototype".equals(automationID)) {
@@ -1918,7 +1919,7 @@ public class ActionCardHelper {
             }
             if ("veto".equals(automationID)) {
                 codedButtons.add(Buttons.blue(player.factionButtonChecker() + "resolveVeto", "Reveal next Agenda"));
-                sendResolveMsgToMainChannel(introMsg, codedButtons, player, game);
+                sendResolveMsgToMainChannel(introBody, codedButtons, player, game);
             }
 
             if ("f_conscription".equals(automationID)) {
@@ -2219,16 +2220,17 @@ public class ActionCardHelper {
         }
     }
 
-    private static void sendResolveMsgToMainChannel(String message, List<Button> buttons, Player player, Game game) {
-        MessageHelper.sendMessageToChannelWithButtons(
-                game.getMainGameChannel(), removeRepresentationIfFOW(message, player, game), buttons);
-    }
-
-    private static String removeRepresentationIfFOW(String message, Player player, Game game) {
-        return game.isFowMode()
-                ? StringUtils.capitalize(
-                        message.replace(player.getRepresentation() + ",", "").trim())
-                : message;
+    /**
+     * Post a resolve prompt to the public main game channel. {@code body} is the message with the
+     * acting player's representation NOT included; under fog the representation is omitted entirely
+     * (body capitalized), otherwise it is prepended. Building the body without the identity — rather
+     * than stripping it out after the fact — means the fog branch cannot leak the actor's identity.
+     */
+    private static void sendResolveMsgToMainChannel(String body, List<Button> buttons, Player player, Game game) {
+        String message = game.isFowMode()
+                ? org.apache.commons.lang3.StringUtils.capitalize(body)
+                : player.getRepresentation() + ", " + body;
+        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message, buttons);
     }
 
     public static String playAC(
