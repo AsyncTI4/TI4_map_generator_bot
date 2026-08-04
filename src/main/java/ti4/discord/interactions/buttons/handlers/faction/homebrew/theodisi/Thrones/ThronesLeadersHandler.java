@@ -35,7 +35,7 @@ public class ThronesLeadersHandler {
     private static final String SELECT_TARGET_PREFIX = "thronesAgentUseOn_";
     private static final String SELECT_SHIP_PREFIX = "thronesAgentChooseShip_";
     private static final String PLACE_SHIP_PREFIX = "thronesAgentPlaceShip_";
-    private static final String CHOOSE_THRONE = "chooseThronePlanet_";
+    private static final String CHOOSE_THRONE = "chooseThronePlanetForHero_";
     private static final List<String> THRONE_PLANETS = List.of("cineron", "gyraxis", "lethara", "skarnath");
     private static final String DONE_CHOOSING_THRONE = "doneChoosingThronePlanets";
 

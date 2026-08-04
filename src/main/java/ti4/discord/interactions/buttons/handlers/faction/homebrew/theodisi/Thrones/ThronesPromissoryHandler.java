@@ -26,7 +26,7 @@ import ti4.service.emoji.FactionEmojis;
 @UtilityClass
 public class ThronesPromissoryHandler {
     private static final Set<String> THRONE_PLANETS = Set.of("cineron", "gyraxis", "lethara", "skarnath");
-    private static final String CHOOSE_THRONE = "chooseThroneForAbility_";
+    private static final String CHOOSE_THRONE = "chooseThroneForPromissory_";
 
     public static void getUnplacedThronePlanetButtonsForPN(
             GenericInteractionCreateEvent event, Game game, Player player) {
