@@ -23,6 +23,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.game.Game;
@@ -495,6 +496,14 @@ public class StartTurnService {
         }
         if (player.hasUnexhaustedLeader("revenantverydithagent")) {
             startButtons.add(RevenantLeadersHandler.getRevVerydithAgentButton(player));
+        }
+        if (player.hasPlanet("skarnath")
+                && !player.getExhaustedPlanetsAbilities().contains("skarnath")) {
+            startButtons.add(ThronesThroneHandler.getSkarnathButton(player));
+        }
+        if (player.hasPlanet("cineron")
+                && !player.getExhaustedPlanetsAbilities().contains("cineron")) {
+            startButtons.add(ThronesThroneHandler.getCineronButton(player));
         }
         boolean hadAnyUnplayedSCs = false;
 

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -16,6 +17,7 @@ import ti4.helpers.AgendaRiderHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
@@ -197,6 +199,28 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                             + " please tell the bot wether you exhausted Ponthous for its Resources (+) or Influence (-):\nDo this **AFTER** your spend window is complete.";
                     buttons.addAll(PonthousAbilityHandler.offerFracturedSouls(player));
                 }
+            }
+            case "lethara" -> {
+                output = player.getRepresentation() + ", you may spend 2 influence to gain 1 CC.";
+                buttons.addAll(ButtonHelper.getExhaustButtonsWithTG(game, player, "inf"));
+                buttons.addAll(ButtonHelper.getGainCCButtons(player));
+                ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
+            }
+            case "skarnath" -> {
+                output = player.getRepresentation()
+                        + ", you may produce 2 different units in a system containing your ships. Their cost is reduced by the number of neighbors that own a unit of both types.";
+                buttons.addAll(ThronesThroneHandler.getSkarnathSystems(player, game));
+            }
+            case "gyraxis" -> {
+                PlanetModel gyraxis = Mapper.getPlanet("gyraxis");
+                output = player.getFactionEmojiOrColor() + " is using " + gyraxis.getLegendaryAbilityName()
+                        + " to add +1 to the move value of up to 1 ship in each system containing their ships.";
+                game.setStoredValue("gyraxisActive", "yes");
+            }
+            case "cineron" -> {
+                output = player.getRepresentation()
+                        + ", choose a unit to destroy and place back on the board galvanized.";
+                buttons.addAll(ThronesThroneHandler.getCineronSystems(player, game));
             }
             case "fabricatestation" -> {
                 ArcanumPrimordialTechHandler.offerFabricateStationProduction(event, game, player);

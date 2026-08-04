@@ -56,6 +56,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
@@ -1814,6 +1815,17 @@ public final class Helper {
                 if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
                     msg.append("\n-1 from Echo of the Anvil");
                 }
+                if (player.hasPlanet("skarnath")
+                        && player.getExhaustedPlanetsAbilities().contains("skarnath")) {
+                    int neighborDiscount =
+                            ThronesThroneHandler.getSkarnathDiscount(game, player, player.getCurrentProducedUnits());
+                    if (neighborDiscount > 0) {
+                        msg.append("\n-")
+                                .append(neighborDiscount)
+                                .append(" from matching neighboring player")
+                                .append(neighborDiscount > 1 ? "s" : "");
+                    }
+                }
                 return msg.toString();
             }
         }
@@ -1908,6 +1920,17 @@ public final class Helper {
         }
         if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
             msg.append("\n-1 from Echo of the Anvil");
+        }
+        if (player.hasPlanet("skarnath")
+                && player.getExhaustedPlanetsAbilities().contains("skarnath")) {
+            int neighborDiscount =
+                    ThronesThroneHandler.getSkarnathDiscount(game, player, player.getCurrentProducedUnits());
+            if (neighborDiscount > 0) {
+                msg.append("\n-")
+                        .append(neighborDiscount)
+                        .append(" from matching neighboring player")
+                        .append(neighborDiscount > 1 ? "s" : "");
+            }
         }
         msg.append(siphonDiscountMessage);
         return msg.toString();
@@ -2443,6 +2466,13 @@ public final class Helper {
             }
             if (player.hasUnlockedBreakthrough("arcanumbtback")) {
                 cost = Math.max(0, cost - 1);
+            }
+            if (player.hasPlanet("skarnath")
+                    && player.getExhaustedPlanetsAbilities().contains("skarnath")) {
+                int neighborDiscount = ThronesThroneHandler.getSkarnathDiscount(game, player, producedUnits);
+                if (neighborDiscount > 0) {
+                    cost = Math.max(0, cost - neighborDiscount);
+                }
             }
             String remoteWorkforcePosition =
                     game.getStoredValue(MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction());

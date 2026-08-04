@@ -167,7 +167,7 @@ public class ComponentActionHelper {
                 }
             }
         }
-        List<String> implementedLegendaryPlanets = new ArrayList<>(List.of("avernus", "fabricatestation"));
+        List<String> implementedLegendaryPlanets = new ArrayList<>(List.of("avernus", "fabricatestation", "lethara"));
         for (String planet : implementedLegendaryPlanets) {
             String prettyPlanet = Mapper.getPlanet(planet).getName();
             if (p1.getPlanets().contains(planet)
