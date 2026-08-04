@@ -1815,11 +1815,15 @@ public final class Helper {
                 if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
                     msg.append("\n-1 from Echo of the Anvil");
                 }
-                if (player.hasPlanet("skarnath") && player.getExhaustedPlanetsAbilities().contains("skarnath")) {
-                    int neighborDiscount = ThronesThroneHandler.getSkarnathDiscount(game, player, player.getCurrentProducedUnits());
+                if (player.hasPlanet("skarnath")
+                        && player.getExhaustedPlanetsAbilities().contains("skarnath")) {
+                    int neighborDiscount =
+                            ThronesThroneHandler.getSkarnathDiscount(game, player, player.getCurrentProducedUnits());
                     if (neighborDiscount > 0) {
-                        msg.append("\n-").append(neighborDiscount).append(" from matching neighboring player")
-                        .append(neighborDiscount > 1 ? "s" : "");
+                        msg.append("\n-")
+                                .append(neighborDiscount)
+                                .append(" from matching neighboring player")
+                                .append(neighborDiscount > 1 ? "s" : "");
                     }
                 }
                 return msg.toString();
@@ -1917,11 +1921,15 @@ public final class Helper {
         if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
             msg.append("\n-1 from Echo of the Anvil");
         }
-        if (player.hasPlanet("skarnath") && player.getExhaustedPlanetsAbilities().contains("skarnath")) {
-            int neighborDiscount = ThronesThroneHandler.getSkarnathDiscount(game, player, player.getCurrentProducedUnits());
+        if (player.hasPlanet("skarnath")
+                && player.getExhaustedPlanetsAbilities().contains("skarnath")) {
+            int neighborDiscount =
+                    ThronesThroneHandler.getSkarnathDiscount(game, player, player.getCurrentProducedUnits());
             if (neighborDiscount > 0) {
-                msg.append("\n-").append(neighborDiscount).append(" from matching neighboring player")
-                .append(neighborDiscount > 1 ? "s" : "");
+                msg.append("\n-")
+                        .append(neighborDiscount)
+                        .append(" from matching neighboring player")
+                        .append(neighborDiscount > 1 ? "s" : "");
             }
         }
         msg.append(siphonDiscountMessage);
