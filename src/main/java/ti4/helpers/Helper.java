@@ -1815,6 +1815,13 @@ public final class Helper {
                 if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
                     msg.append("\n-1 from Echo of the Anvil");
                 }
+                if (player.hasPlanet("skarnath") && player.getExhaustedPlanetsAbilities().contains("skarnath")) {
+                    int neighborDiscount = ThronesThroneHandler.getSkarnathDiscount(game, player, player.getCurrentProducedUnits());
+                    if (neighborDiscount > 0) {
+                        msg.append("\n-").append(neighborDiscount).append(" from matching neighboring player")
+                        .append(neighborDiscount > 1 ? "s" : "");
+                    }
+                }
                 return msg.toString();
             }
         }
@@ -1909,6 +1916,13 @@ public final class Helper {
         }
         if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
             msg.append("\n-1 from Echo of the Anvil");
+        }
+        if (player.hasPlanet("skarnath") && player.getExhaustedPlanetsAbilities().contains("skarnath")) {
+            int neighborDiscount = ThronesThroneHandler.getSkarnathDiscount(game, player, player.getCurrentProducedUnits());
+            if (neighborDiscount > 0) {
+                msg.append("\n-").append(neighborDiscount).append(" from matching neighboring player")
+                .append(neighborDiscount > 1 ? "s" : "");
+            }
         }
         msg.append(siphonDiscountMessage);
         return msg.toString();
@@ -2446,8 +2460,11 @@ public final class Helper {
                 cost = Math.max(0, cost - 1);
             }
             if (player.hasPlanet("skarnath")
-                    && !player.getExhaustedPlanetsAbilities().contains("skarnath")) {
-                cost = Math.max(0, cost - ThronesThroneHandler.getSkarnathDiscount(player, game));
+                    && player.getExhaustedPlanetsAbilities().contains("skarnath")) {
+                int neighborDiscount = ThronesThroneHandler.getSkarnathDiscount(game, player, producedUnits);
+                if (neighborDiscount > 0) {
+                    cost = Math.max(0, cost - neighborDiscount);
+                }
             }
             String remoteWorkforcePosition =
                     game.getStoredValue(MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction());

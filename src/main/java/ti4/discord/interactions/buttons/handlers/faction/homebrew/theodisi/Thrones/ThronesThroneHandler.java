@@ -3,6 +3,9 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thro
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -175,62 +178,29 @@ public class ThronesThroneHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static int getSkarnathDiscount(Player player, Game game) {
-        if (!player.hasPlanet("skarnath")
-                || !player.getExhaustedPlanetsAbilities().contains("skarnath")) {
-            return 0;
-        }
+    public static int getSkarnathDiscount(Game game, Player player, Map<String, Integer> producedUnits) {
+        if (producedUnits == null || producedUnits.isEmpty()) return 0;
 
-        Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
-        if (producedUnits.size() < 2) {
-            return 0;
-        }
-
-        List<String> units = producedUnits.keySet().stream()
+        Set<String> producedAliases = producedUnits.keySet().stream()
                 .map(k -> k.split("_")[0])
-                .distinct()
-                .toList();
-
-        if (units.size() < 2) {
-            return 0;
-        }
-
-        String tilePos = game.getStoredValue("skarnathTargetSystem_" + player.getFaction());
-        if (tilePos.isEmpty()) {
-            return 0;
-        }
-
-        Tile tile = game.getTileByPosition(tilePos);
-        if (tile == null) {
-            return 0;
-        }
-
-        UnitHolder space = tile.getSpaceUnitHolder();
-        if (space == null) {
-            return 0;
-        }
+                .filter(s -> s != null && !s.isBlank())
+                .collect(Collectors.toSet());
+        if (producedAliases.isEmpty()) return 0;
 
         int discount = 0;
-        for (Player other : game.getRealPlayers()) {
-            if (other == player || other.getColorID().equals(player.getColorID())) {
-                continue;
+        for (Player neighbour : player.getNeighbouringPlayers(true)) {
+            boolean neighbourHasAll = true;
+            for (String alias : producedAliases) {
+                int neighbourCount = ButtonHelper.getNumberOfUnitsOnTheBoard(game, neighbour, alias, false);
+                if (neighbourCount < 1) {
+                    neighbourHasAll = false;
+                    break;
+                }
             }
-
-            Map<UnitKey, List<Integer>> otherUnits = space.getUnitsByStateForPlayer(other);
-            if (otherUnits == null || otherUnits.isEmpty()) {
-                continue;
-            }
-
-            boolean hasUnitA =
-                    otherUnits.keySet().stream().anyMatch(uk -> uk.asyncID().equalsIgnoreCase(units.get(0)));
-            boolean hasUnitB =
-                    otherUnits.keySet().stream().anyMatch(uk -> uk.asyncID().equalsIgnoreCase(units.get(1)));
-
-            if (hasUnitA && hasUnitB) {
+            if (neighbourHasAll) {
                 discount++;
             }
         }
-
         return discount;
     }
 }
