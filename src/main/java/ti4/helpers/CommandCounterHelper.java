@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -50,7 +51,8 @@ public final class CommandCounterHelper {
                     player.getGame(), tile.getPosition(), colorMention + " has placed a command token in the system.");
         }
         tile.addCC(ccID);
-        for (Player verydithPlayer : player.getGame().getRealPlayers()) {
+        Game game = player.getGame();
+        for (Player verydithPlayer : game.getRealPlayers()) {
             if (verydithPlayer == player || !verydithPlayer.hasUnlockedBreakthrough("verydithbt")) {
                 continue;
             }
@@ -63,6 +65,7 @@ public final class CommandCounterHelper {
 
             VerydithBreakthroughHandler.offerUnyieldingAccord(event, verydithPlayer, tile);
         }
+        VerydithLeadersHandler.checkVerydithCommander(game);
         if (player.hasLeader("ardentiacommander")) {
             CommanderUnlockCheckService.checkPlayer(player, "ardentia");
         }

@@ -2,7 +2,6 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Very
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -10,9 +9,12 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 
@@ -20,25 +22,55 @@ import ti4.message.MessageHelper;
 public class VerydithLeadersHandler {
     private static final String CHOOSE_PLAYER = "chooseVerydithPlayer_";
     private static final String SELECT_SYSTEM = "selectVerydithHeroSystem_";
-    
+
+    // Commander
+    public static void checkVerydithCommander(Game activeMap) {
+        for (Player player : activeMap.getRealPlayers()) {
+            String tokenToAddOrRemove = Constants.VERYDITH_ATTACHMENT_PNG;
+            if (activeMap.playerHasLeaderUnlockedOrAlliance(player, "verydithcommander")) {
+                for (Tile tile : activeMap.getTileMap().values()) {
+                    for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                        if (unitHolder instanceof Planet planet) {
+                            if (player.getPlanets().contains(planet.getName())) {
+                                for (Player otherPlayer : activeMap.getRealPlayersExcludingThis(player)) {
+                                    if (!tile.hasPlayerCC(otherPlayer)
+                                            && planet.getTokenList().contains(tokenToAddOrRemove)) {
+                                        planet.removeToken(tokenToAddOrRemove);
+                                    } else if (tile.hasPlayerCC(otherPlayer)) {
+                                        planet.addToken(tokenToAddOrRemove);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Hero
     public static void startVerydithHero(GenericInteractionCreateEvent event, Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Player target : game.getRealPlayers()) {
             if (target == player) {
                 continue;
             }
-            buttons.add(Buttons.gray(player.factionButtonChecker() + CHOOSE_PLAYER + target.getColor(), target.getFactionNameOrColor(), target.getFactionEmojiOrColor()));
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + CHOOSE_PLAYER + target.getColor(),
+                    target.getFactionNameOrColor(),
+                    target.getFactionEmojiOrColor()));
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
-            event.getMessageChannel(),
-            player.getRepresentation()
-                    + ", select the player whose command token you would like to place in a system.",
-            buttons);
+                event.getMessageChannel(),
+                player.getRepresentation()
+                        + ", select the player whose command token you would like to place in a system.",
+                buttons);
     }
 
     @ButtonHandler(CHOOSE_PLAYER)
-    public static void selectVerydithHeroSystem(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void selectVerydithHeroSystem(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (game == null || player == null) {
             return;
         }
@@ -60,14 +92,16 @@ public class VerydithLeadersHandler {
                 continue;
             }
 
-            systems.add(Buttons.green(player.factionButtonChecker() + SELECT_SYSTEM + targetPlayer.getColor() + "|" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+            systems.add(Buttons.green(
+                    player.factionButtonChecker() + SELECT_SYSTEM + targetPlayer.getColor() + "|" + tile.getPosition(),
+                    tile.getRepresentationForButtons(game, player)));
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
-            event.getMessageChannel(),
-            player.getRepresentationNoPing()
-                    + ", select the system in which to place one of " + targetPlayer.getFactionNameOrColor() + "'s command tokens.",
-            systems);
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + ", select the system in which to place one of "
+                        + targetPlayer.getFactionNameOrColor() + "'s command tokens.",
+                systems);
     }
 
     @ButtonHandler(SELECT_SYSTEM)
@@ -102,9 +136,9 @@ public class VerydithLeadersHandler {
         tile.addCC(targetCCId);
 
         MessageHelper.sendMessageToChannel(
-            event.getMessageChannel(),
-            player.getRepresentation()
-                    + " added 1 of " + target.getFactionNameOrColor() + "'s command tokens to " + tile.getRepresentation() + " using _Aranth Vel_, the Verydith Hero.");
+                event.getMessageChannel(),
+                player.getRepresentation() + " added 1 of " + target.getFactionNameOrColor() + "'s command tokens to "
+                        + tile.getRepresentation() + " using _Aranth Vel_, the Verydith Hero.");
 
         ButtonHelper.deleteMessage(event);
     }
