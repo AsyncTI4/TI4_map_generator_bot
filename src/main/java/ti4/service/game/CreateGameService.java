@@ -295,11 +295,11 @@ public class CreateGameService {
             if (UserSettings.COLOR_VISION_RED_GREEN.equals(colorVisionPref)) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
-                        "Color accessibility cues are enabled for you in this game: your color will be auto-assigned to avoid common red/green confusion pairs where possible, and `/player change_unit_decal` can give your units a pattern that's distinct per-player, independent of color - useful as a backup, since the automatic checks only cover that common form. Tile-control borders will also render dashed for extra visibility, though the border is still colored per-player, not patterned per-player, so it won't by itself tell two players' borders apart.");
+                        "Color accessibility cues are enabled for you in this game: your color will be auto-assigned to avoid common red/green confusion pairs where possible. Async staff kindly request you also consider `/player change_unit_decal` to give your units a pattern that's distinct per-player, independent of color - useful as a backup, since the automatic checks only cover that common form. Tile-control borders will also render dashed for extra visibility, though the border is still colored per-player, not patterned per-player, so it won't by itself tell two players' borders apart.");
             } else if (UserSettings.COLOR_VISION_OTHER.equals(colorVisionPref)) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
-                        "Color accessibility cues are enabled for you in this game. Our automatic checks only cover common red/green confusion, so they can't guard against your specific form of color vision deficiency - `/player change_unit_decal` is the reliable option, giving your units a pattern that's distinct per-player, independent of color. Tile-control borders will also render dashed for extra visibility, though the border is still colored per-player, not patterned per-player, so it won't by itself tell two players' borders apart.");
+                        "Color accessibility cues are enabled for you in this game. Our automatic checks only cover common red/green confusion, so they can't guard against your specific form of color vision deficiency. Async staff kindly request you consider `/player change_unit_decal`, giving your units a pattern that's distinct per-player, independent of color. Tile-control borders will also render dashed for extra visibility, though the border is still colored per-player, not patterned per-player, so it won't by itself tell two players' borders apart.");
             }
         }
     }

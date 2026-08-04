@@ -179,4 +179,77 @@ class ButtonHelperColorClashTest extends BaseTi4Test {
             messageHelper.verify(() -> MessageHelper.sendMessageToChannel(any(), anyString()), times(1));
         }
     }
+
+    @Test
+    void colorChangeCheckerIsNotGatedByTheOncePerGameFlag() {
+        Game game = new Game();
+        game.setName("test-game");
+        Player p1 = addPlayerWithColor(game, "p1", "black");
+        Player p2 = addPlayerWithColor(game, "p2", "lightgray");
+
+        try (MockedStatic<UserSettingsManager> userSettingsManager = mockStatic(UserSettingsManager.class);
+                MockedStatic<MessageHelper> messageHelper = mockStatic(MessageHelper.class)) {
+            stubUserSettings(userSettingsManager, null);
+
+            // Sets the "colorClashChecked" once-per-game flag, with nothing to report yet.
+            ButtonHelper.resolveSetupColorChecker(game);
+            messageHelper.verifyNoInteractions();
+
+            // A later color change creates a clash - the once-per-game flag must not suppress this.
+            p1.setColor("red");
+            p2.setColor("green");
+            ButtonHelper.resolveColorChangeClashChecker(game, p2);
+
+            // 1 generic public message + 1 private message to each of the 2 affected players = 3.
+            messageHelper.verify(() -> MessageHelper.sendMessageToChannel(any(), anyString()), times(3));
+        }
+    }
+
+    @Test
+    void colorChangeCheckerOnlyReportsPairsInvolvingTheChangedPlayer() {
+        Game game = new Game();
+        game.setName("test-game");
+        addPlayerWithColor(game, "p1", "red");
+        addPlayerWithColor(game, "p2", "green"); // pre-existing clash, untouched by the change below
+        Player p3 = addPlayerWithColor(game, "p3", "black");
+
+        try (MockedStatic<UserSettingsManager> userSettingsManager = mockStatic(UserSettingsManager.class);
+                MockedStatic<MessageHelper> messageHelper = mockStatic(MessageHelper.class)) {
+            stubUserSettings(userSettingsManager, null);
+
+            // p3's new color doesn't clash with anyone (contrast vs red ~3.64, vs green ~5.53), so
+            // nothing should be reported - in particular, the pre-existing p1/p2 clash must not be
+            // re-flagged by this call.
+            p3.setColor("navy");
+            ButtonHelper.resolveColorChangeClashChecker(game, p3);
+
+            messageHelper.verifyNoInteractions();
+        }
+    }
+
+    @Test
+    void colorChangeCheckerRoutesToGmChannelInFowGames() {
+        Game game = new Game();
+        game.setName("test-game");
+        game.setFowMode(true);
+        Player p1 = addPlayerWithColor(game, "p1", "black");
+        Player p2 = addPlayerWithColor(game, "p2", "lightgray");
+        TextChannel gmChannel = mock(TextChannel.class);
+
+        try (MockedStatic<UserSettingsManager> userSettingsManager = mockStatic(UserSettingsManager.class);
+                MockedStatic<MessageHelper> messageHelper = mockStatic(MessageHelper.class);
+                MockedStatic<GMService> gmService = mockStatic(GMService.class)) {
+            stubUserSettings(userSettingsManager, null);
+            gmService.when(() -> GMService.getGMChannel(game)).thenReturn(gmChannel);
+            gmService.when(() -> GMService.gmPing(game)).thenReturn("");
+
+            p1.setColor("red");
+            p2.setColor("green");
+            ButtonHelper.resolveColorChangeClashChecker(game, p2);
+
+            messageHelper.verify(() -> MessageHelper.sendMessageToChannel(eq(gmChannel), anyString()), times(1));
+            // Only one message total (to the GM channel) - nothing else leaked to any other channel.
+            messageHelper.verify(() -> MessageHelper.sendMessageToChannel(any(), anyString()), times(1));
+        }
+    }
 }
