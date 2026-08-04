@@ -40,7 +40,7 @@ class PlayerColorServiceTest extends BaseTi4Test {
     private void enableColorAccessibility(String userId) {
         UserSettings settings = new UserSettings();
         settings.setUserId(userId);
-        settings.setPrefersColorAccessibilityCues(true);
+        settings.setColorVisionPref(UserSettings.COLOR_VISION_RED_GREEN);
         userSettingsManager.when(() -> UserSettingsManager.get(userId)).thenReturn(settings);
     }
 
@@ -120,7 +120,7 @@ class PlayerColorServiceTest extends BaseTi4Test {
 
         UserSettings prefs = new UserSettings();
         prefs.setUserId("p2");
-        prefs.setPrefersColorAccessibilityCues(true);
+        prefs.setColorVisionPref(UserSettings.COLOR_VISION_RED_GREEN);
         prefs.setPreferredColors(List.of("red"));
         userSettingsManager.when(() -> UserSettingsManager.get("p2")).thenReturn(prefs);
 

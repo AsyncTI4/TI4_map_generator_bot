@@ -13,7 +13,7 @@ record DashboardSettingsUpdateRequest(
         Boolean prefersPillageMsg,
         String voltronStyle,
         Boolean prefersAutoDebtClearance,
-        Boolean prefersColorAccessibilityCues,
+        String colorVisionPref,
         Boolean activityTracking,
         Boolean prefersPassOnWhensAfters,
         Boolean prefersPrePassOnSC,

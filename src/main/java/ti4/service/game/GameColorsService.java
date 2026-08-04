@@ -10,6 +10,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.image.Mapper;
 import ti4.model.ColorModel;
+import ti4.settings.users.UserSettings;
 
 @UtilityClass
 public class GameColorsService {
@@ -40,18 +41,34 @@ public class GameColorsService {
     // game creation time, before anyone has picked a faction/color (isRealPlayer() requires both).
     public static boolean hasColorAccessibilityPlayer(Game game) {
         return game.getPlayers().values().stream()
-                .anyMatch(p -> p.getUserSettings().isPrefersColorAccessibilityCues());
+                .anyMatch(p -> !UserSettings.COLOR_VISION_STANDARD.equals(
+                        p.getUserSettings().getColorVisionPref()));
+    }
+
+    // Only true for the red_green mode specifically - this is what gates the red/green
+    // confusion-pair heuristic, which is not applicable to "other" CVD types.
+    public static boolean hasRedGreenAccessibilityPlayer(Game game) {
+        return game.getPlayers().values().stream()
+                .anyMatch(p -> UserSettings.COLOR_VISION_RED_GREEN.equals(
+                        p.getUserSettings().getColorVisionPref()));
+    }
+
+    public static boolean hasOtherAccessibilityPlayer(Game game) {
+        return game.getPlayers().values().stream()
+                .anyMatch(p -> UserSettings.COLOR_VISION_OTHER.equals(
+                        p.getUserSettings().getColorVisionPref()));
     }
 
     /**
      * True if `candidate` shares a hue with an already-used color in this game, or - when the game
-     * has a player who has opted into color-accessibility cues - commonly confuses with one (see
-     * {@link #isCommonRedGreenConfusionPair(ColorModel, ColorModel)}, which also covers gradient
-     * colors via its RGB fallback, unlike a plain hue-string comparison). Used to filter fallback
-     * color candidates during auto-assignment.
+     * has a player who has opted into red-green color-accessibility cues - commonly confuses with
+     * one (see {@link #isCommonRedGreenConfusionPair(ColorModel, ColorModel)}, which also covers
+     * gradient colors via its RGB fallback, unlike a plain hue-string comparison). Used to filter
+     * fallback color candidates during auto-assignment. Not gated on "other" CVD prefs, since we
+     * have no heuristic for which hues those players confuse.
      */
     public static boolean conflictsWithUsedColors(Game game, ColorModel candidate) {
-        boolean checkConfusionPairs = hasColorAccessibilityPlayer(game);
+        boolean checkConfusionPairs = hasRedGreenAccessibilityPlayer(game);
         return getUsedColors(game).stream()
                 .anyMatch(used -> used.getHue().equals(candidate.getHue())
                         || (checkConfusionPairs && isCommonRedGreenConfusionPair(candidate, used)));

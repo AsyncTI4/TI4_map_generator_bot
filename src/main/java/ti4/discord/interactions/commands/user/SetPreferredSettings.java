@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 
 class SetPreferredSettings extends Subcommand {
@@ -44,10 +45,10 @@ class SetPreferredSettings extends Subcommand {
                 OptionType.BOOLEAN,
                 "ephemeral_wrong_button_warning",
                 "True to keep the \"wrong button\" warning ephemeral"));
-        addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                "color_accessibility",
-                "True for red-green colorblind-safe color assignment and extra non-color cues"));
+        addOptions(new OptionData(OptionType.STRING, "color_vision", "Your color vision, for accessibility cues")
+                .addChoice("Standard", UserSettings.COLOR_VISION_STANDARD)
+                .addChoice("Red-green colorblind", UserSettings.COLOR_VISION_RED_GREEN)
+                .addChoice("Other color vision deficiency", UserSettings.COLOR_VISION_OTHER));
     }
 
     @Override
@@ -100,9 +101,9 @@ class SetPreferredSettings extends Subcommand {
             userSettings.setAutoNoSaboInterval(sabo);
         }
 
-        Boolean colorAccessibility = event.getOption("color_accessibility", null, OptionMapping::getAsBoolean);
-        if (colorAccessibility != null) {
-            userSettings.setPrefersColorAccessibilityCues(colorAccessibility);
+        String colorVision = event.getOption("color_vision", null, OptionMapping::getAsString);
+        if (colorVision != null) {
+            userSettings.setColorVisionPref(colorVision);
         }
         MessageHelper.sendMessageToEventChannel(event, "Successfully set user settings");
         UserSettingsManager.save(userSettings);

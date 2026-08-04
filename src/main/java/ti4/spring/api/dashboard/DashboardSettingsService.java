@@ -41,6 +41,8 @@ class DashboardSettingsService {
     private static final Set<String> ALLOWED_META_PREFS =
             Set.of("Dislike Space Risk More", "Dislike Boat Float More", "No Strong Feelings", "No Preference");
     private static final Set<String> ALLOWED_SANDBAG_PREFS = Set.of("bot", "manual", "No Preference");
+    private static final Set<String> ALLOWED_COLOR_VISION_PREFS = Set.of(
+            UserSettings.COLOR_VISION_STANDARD, UserSettings.COLOR_VISION_RED_GREEN, UserSettings.COLOR_VISION_OTHER);
 
     DashboardSettingsResponse getSettings(String userId) {
         return DashboardSettingsResponse.from(UserSettingsManager.get(userId));
@@ -83,8 +85,9 @@ class DashboardSettingsService {
         if (request.prefersAutoDebtClearance() != null) {
             settings.setPrefersAutoDebtClearance(request.prefersAutoDebtClearance());
         }
-        if (request.prefersColorAccessibilityCues() != null) {
-            settings.setPrefersColorAccessibilityCues(request.prefersColorAccessibilityCues());
+        if (request.colorVisionPref() != null) {
+            settings.setColorVisionPref(
+                    normalizeAllowed(request.colorVisionPref(), ALLOWED_COLOR_VISION_PREFS, "color vision preference"));
         }
         if (request.activityTracking() != null) {
             settings.setActivityTracking(request.activityTracking());

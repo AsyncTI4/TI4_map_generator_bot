@@ -31,10 +31,17 @@ class ButtonHelperColorClashTest extends BaseTi4Test {
 
     private static void stubUserSettings(
             MockedStatic<UserSettingsManager> userSettingsManager, String accessibilityUserId) {
+        stubUserSettings(userSettingsManager, accessibilityUserId, UserSettings.COLOR_VISION_RED_GREEN);
+    }
+
+    private static void stubUserSettings(
+            MockedStatic<UserSettingsManager> userSettingsManager, String accessibilityUserId, String colorVisionPref) {
         userSettingsManager.when(() -> UserSettingsManager.get(anyString())).thenAnswer(invocation -> {
             UserSettings settings = new UserSettings();
             settings.setUserId(invocation.getArgument(0));
-            settings.setPrefersColorAccessibilityCues(invocation.getArgument(0).equals(accessibilityUserId));
+            if (invocation.getArgument(0).equals(accessibilityUserId)) {
+                settings.setColorVisionPref(colorVisionPref);
+            }
             return settings;
         });
     }
@@ -42,6 +49,7 @@ class ButtonHelperColorClashTest extends BaseTi4Test {
     @Test
     void sendsNothingWhenNoClashAndNoAccessibilityPlayer() {
         Game game = new Game();
+        game.setName("test-game");
         // Contrast ratio ~8.15 (well above the 2.5 threshold) and not a red-green confusion pair.
         addPlayerWithColor(game, "p1", "black");
         addPlayerWithColor(game, "p2", "lightgray");
@@ -59,6 +67,7 @@ class ButtonHelperColorClashTest extends BaseTi4Test {
     @Test
     void onlySendsOncePerGame() {
         Game game = new Game();
+        game.setName("test-game");
         addPlayerWithColor(game, "p1", "red");
         addPlayerWithColor(game, "p2", "green");
 
@@ -78,6 +87,7 @@ class ButtonHelperColorClashTest extends BaseTi4Test {
     @Test
     void neitherPublicNorPrivateMessagesRevealAccessibilityPreference() {
         Game game = new Game();
+        game.setName("test-game");
         addPlayerWithColor(game, "p1", "red");
         addPlayerWithColor(game, "p2", "green");
 
@@ -98,6 +108,7 @@ class ButtonHelperColorClashTest extends BaseTi4Test {
     @Test
     void fowGamesRouteDetailToGmChannelOnlyAndIncludeTheReason() {
         Game game = new Game();
+        game.setName("test-game");
         game.setFowMode(true);
         addPlayerWithColor(game, "p1", "red");
         addPlayerWithColor(game, "p2", "green");
@@ -108,6 +119,7 @@ class ButtonHelperColorClashTest extends BaseTi4Test {
                 MockedStatic<GMService> gmService = mockStatic(GMService.class)) {
             stubUserSettings(userSettingsManager, "p2");
             gmService.when(() -> GMService.getGMChannel(game)).thenReturn(gmChannel);
+            gmService.when(() -> GMService.gmPing(game)).thenReturn("");
 
             ButtonHelper.resolveSetupColorChecker(game);
 
@@ -117,6 +129,54 @@ class ButtonHelperColorClashTest extends BaseTi4Test {
             // Only one message total (to the GM channel) - nothing else leaked to any other channel.
             messageHelper.verify(() -> MessageHelper.sendMessageToChannel(any(), anyString()), times(1));
             assertThat(textCaptor.getValue()).containsIgnoringCase("commonly confused hues");
+        }
+    }
+
+    @Test
+    void otherCvdPrefSkipsRedGreenLogicAndPostsPlainNoticeInstead() {
+        Game game = new Game();
+        game.setName("test-game");
+        // red/green would normally be flagged as a confusion pair, but "other" doesn't enable that
+        // heuristic - and the pair has good luminance contrast (~8.15), so no low-contrast issue either.
+        addPlayerWithColor(game, "p1", "black");
+        addPlayerWithColor(game, "p2", "lightgray");
+
+        try (MockedStatic<UserSettingsManager> userSettingsManager = mockStatic(UserSettingsManager.class);
+                MockedStatic<MessageHelper> messageHelper = mockStatic(MessageHelper.class)) {
+            stubUserSettings(userSettingsManager, "p2", UserSettings.COLOR_VISION_OTHER);
+
+            ButtonHelper.resolveSetupColorChecker(game);
+
+            ArgumentCaptor<String> textCaptor = ArgumentCaptor.forClass(String.class);
+            messageHelper.verify(
+                    () -> MessageHelper.sendMessageToChannel(eq(game.getActionsChannel()), textCaptor.capture()),
+                    times(1));
+            assertThat(textCaptor.getValue())
+                    .containsIgnoringCase("change_unit_decal")
+                    .doesNotContainIgnoringCase("hard to tell apart");
+        }
+    }
+
+    @Test
+    void otherCvdPrefRoutesToGmChannelInFowGames() {
+        Game game = new Game();
+        game.setName("test-game");
+        game.setFowMode(true);
+        addPlayerWithColor(game, "p1", "black");
+        addPlayerWithColor(game, "p2", "lightgray");
+        TextChannel gmChannel = mock(TextChannel.class);
+
+        try (MockedStatic<UserSettingsManager> userSettingsManager = mockStatic(UserSettingsManager.class);
+                MockedStatic<MessageHelper> messageHelper = mockStatic(MessageHelper.class);
+                MockedStatic<GMService> gmService = mockStatic(GMService.class)) {
+            stubUserSettings(userSettingsManager, "p2", UserSettings.COLOR_VISION_OTHER);
+            gmService.when(() -> GMService.getGMChannel(game)).thenReturn(gmChannel);
+            gmService.when(() -> GMService.gmPing(game)).thenReturn("");
+
+            ButtonHelper.resolveSetupColorChecker(game);
+
+            messageHelper.verify(() -> MessageHelper.sendMessageToChannel(eq(gmChannel), anyString()), times(1));
+            messageHelper.verify(() -> MessageHelper.sendMessageToChannel(any(), anyString()), times(1));
         }
     }
 }

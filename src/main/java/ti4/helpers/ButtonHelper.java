@@ -7633,22 +7633,30 @@ public class ButtonHelper {
     private static final String COLOR_CLASH_REMEDY =
             "-# Consider `/player change_color`, or use `/player change_unit_decal` to give your units a distinct pattern.";
 
+    private static final String OTHER_CVD_NOTICE =
+            "This game includes a player with a form of color vision deficiency that our automatic checks can't account for (they only cover common red-green confusion). Please consider using `/player change_unit_decal` so units are distinguishable by pattern as well as color.";
+
     // Runs once per game (guarded by the "colorClashChecked" stored value) after everyone has
     // finished individual setup. Flags both low-luminance-contrast pairs and, when the game has a
-    // player who opted into color-accessibility cues, hue pairs commonly confused under red-green
-    // color vision deficiency (see GameColorsService.isCommonRedGreenConfusionPair - a narrow
-    // heuristic, not a full CVD simulation).
+    // player who opted into red-green color-accessibility cues, hue pairs commonly confused under
+    // red-green color vision deficiency (see GameColorsService.isCommonRedGreenConfusionPair - a
+    // narrow heuristic, not a full CVD simulation). Separately, when the game has a player who
+    // opted into "other" (non-red-green) CVD cues, posts one plain decal suggestion - there is no
+    // heuristic for which hues that player confuses, so unlike the red-green case this is not a
+    // per-pair check, just a standing reminder for the whole table/GM.
     //
-    // The GM channel (private in FoW games) gets the full per-pair reason. The shared/public
-    // channel only ever gets a generic notice - it never states *why* a pair was flagged, since
-    // doing so would reveal that a player in the game has color-accessibility cues enabled (that's
-    // the only thing that turns the confusion-pair check on). Full per-pair detail instead goes
-    // privately to the two affected players in non-FoW games.
+    // The GM channel (private in FoW games) gets the full per-pair reason for red-green issues. The
+    // shared/public channel only ever gets a generic notice - it never states *why* a pair was
+    // flagged, since doing so would reveal that a player in the game has red-green cues enabled
+    // (that's the only thing that turns the confusion-pair check on). Full per-pair detail instead
+    // goes privately to the two affected players in non-FoW games. The "other" CVD notice is
+    // deliberately NOT private, per design: since there's no per-pair detail to protect, it's posted
+    // plainly to the whole table (or GM in FoW) rather than routed through individual threads.
     public static void resolveSetupColorChecker(Game game) {
         if (!game.getStoredValue("colorClashChecked").isEmpty()) return;
         game.setStoredValue("colorClashChecked", "true");
 
-        boolean checkConfusionPairs = GameColorsService.hasColorAccessibilityPlayer(game);
+        boolean checkConfusionPairs = GameColorsService.hasRedGreenAccessibilityPlayer(game);
         List<Player> players = game.getRealPlayers();
         List<ColorCollision> issues = new ArrayList<>();
         for (int i = 0; i < players.size(); i++) {
@@ -7666,37 +7674,52 @@ public class ButtonHelper {
             }
         }
 
-        if (issues.isEmpty()) return;
+        if (!issues.isEmpty()) {
+            if (game.isFowMode()) {
+                String gmMsg = detailedColorClashMessage(issues);
+                String gmPing = GMService.gmPing(game);
+                if (gmPing != null && !gmPing.isEmpty()) {
+                    gmMsg += "\n" + gmPing;
+                }
+                MessageHelper.sendMessageToChannel(GMService.getGMChannel(game), gmMsg);
+            } else {
+                StringBuilder generic = new StringBuilder(
+                        game.getPing() + "\n### Some player colors in this game may be hard to tell apart:\n");
+                for (ColorCollision issue : issues) {
+                    generic.append("> ")
+                            .append(issue.p1.getRepresentation(false, false))
+                            .append(" & ")
+                            .append(issue.p2.getRepresentation(false, false))
+                            .append('\n');
+                }
+                generic.append("-# Check your cards-info thread for details.");
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), generic.toString());
 
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(GMService.getGMChannel(game), detailedColorClashMessage(issues));
-            return;
+                // Deliberately no per-pair reason here (unlike detailedColorClashMessage, which is
+                // GM-only): "commonly confused hues" only ever appears when a player in the game has
+                // red-green color-accessibility cues enabled, so including it here would leak that
+                // fact to a recipient who never opted in themselves.
+                for (ColorCollision issue : issues) {
+                    MessageHelper.sendMessageToChannel(
+                            issue.p1.getCardsInfoThread(),
+                            issue.p1.getPing() + " Your color and " + issue.p2.getRepresentation(false, false)
+                                    + "'s may be hard to tell apart.\n" + COLOR_CLASH_REMEDY);
+                    MessageHelper.sendMessageToChannel(
+                            issue.p2.getCardsInfoThread(),
+                            issue.p2.getPing() + " Your color and " + issue.p1.getRepresentation(false, false)
+                                    + "'s may be hard to tell apart.\n" + COLOR_CLASH_REMEDY);
+                }
+            }
         }
 
-        StringBuilder generic = new StringBuilder("### Some player colors in this game may be hard to tell apart:\n");
-        for (ColorCollision issue : issues) {
-            generic.append("> ")
-                    .append(issue.p1.getRepresentation(false, false))
-                    .append(" & ")
-                    .append(issue.p2.getRepresentation(false, false))
-                    .append('\n');
-        }
-        generic.append("-# Check your cards-info thread for details.");
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), generic.toString());
-
-        // Deliberately no per-pair reason here (unlike detailedColorClashMessage, which is
-        // GM-only): "commonly confused hues" only ever appears when a player in the game has
-        // color-accessibility cues enabled, so including it here would leak that fact to a
-        // recipient who never opted in themselves.
-        for (ColorCollision issue : issues) {
-            MessageHelper.sendMessageToChannel(
-                    issue.p1.getCardsInfoThread(),
-                    "Your color and " + issue.p2.getRepresentation(false, false) + "'s may be hard to tell apart.\n"
-                            + COLOR_CLASH_REMEDY);
-            MessageHelper.sendMessageToChannel(
-                    issue.p2.getCardsInfoThread(),
-                    "Your color and " + issue.p1.getRepresentation(false, false) + "'s may be hard to tell apart.\n"
-                            + COLOR_CLASH_REMEDY);
+        if (GameColorsService.hasOtherAccessibilityPlayer(game)) {
+            if (game.isFowMode()) {
+                String gmPing = GMService.gmPing(game);
+                String gmMsg = OTHER_CVD_NOTICE + (gmPing == null || gmPing.isEmpty() ? "" : "\n" + gmPing);
+                MessageHelper.sendMessageToChannel(GMService.getGMChannel(game), gmMsg);
+            } else {
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + "\n" + OTHER_CVD_NOTICE);
+            }
         }
     }
 

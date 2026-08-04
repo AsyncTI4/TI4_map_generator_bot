@@ -35,9 +35,13 @@ class GameColorsServiceTest extends BaseTi4Test {
     }
 
     private void enableColorAccessibility(String userId) {
+        enableColorAccessibility(userId, UserSettings.COLOR_VISION_RED_GREEN);
+    }
+
+    private void enableColorAccessibility(String userId, String colorVisionPref) {
         UserSettings settings = new UserSettings();
         settings.setUserId(userId);
-        settings.setPrefersColorAccessibilityCues(true);
+        settings.setColorVisionPref(colorVisionPref);
         userSettingsManager.when(() -> UserSettingsManager.get(userId)).thenReturn(settings);
     }
 
@@ -109,6 +113,29 @@ class GameColorsServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void hasColorAccessibilityPlayerIsTrueForOtherPrefToo() {
+        Game game = new Game();
+        Player p1 = game.addPlayer("p1", "Player One");
+        p1.setColor("red");
+        enableColorAccessibility("p1", UserSettings.COLOR_VISION_OTHER);
+
+        assertThat(GameColorsService.hasColorAccessibilityPlayer(game)).isTrue();
+        assertThat(GameColorsService.hasRedGreenAccessibilityPlayer(game)).isFalse();
+        assertThat(GameColorsService.hasOtherAccessibilityPlayer(game)).isTrue();
+    }
+
+    @Test
+    void hasRedGreenAccessibilityPlayerIsFalseForOtherPref() {
+        Game game = new Game();
+        Player p1 = game.addPlayer("p1", "Player One");
+        p1.setColor("red");
+        enableColorAccessibility("p1");
+
+        assertThat(GameColorsService.hasRedGreenAccessibilityPlayer(game)).isTrue();
+        assertThat(GameColorsService.hasOtherAccessibilityPlayer(game)).isFalse();
+    }
+
+    @Test
     void conflictsWithUsedColorsOnlyChecksExactHueWhenNoAccessibilityPlayerPresent() {
         Game game = new Game();
         Player p1 = game.addPlayer("p1", "Player One");
@@ -148,6 +175,21 @@ class GameColorsServiceTest extends BaseTi4Test {
         enableColorAccessibility("p1");
 
         assertThat(GameColorsService.conflictsWithUsedColors(game, Mapper.getColor("watermelon")))
+                .isTrue();
+    }
+
+    @Test
+    void conflictsWithUsedColorsIgnoresConfusableHuesWhenOnlyOtherAccessibilityPlayerPresent() {
+        // "other" CVD has no red/green heuristic to apply, so it must not enable the confusion-pair
+        // check - only an exact hue match should still conflict.
+        Game game = new Game();
+        Player p1 = game.addPlayer("p1", "Player One");
+        p1.setColor("green");
+        enableColorAccessibility("p1", UserSettings.COLOR_VISION_OTHER);
+
+        assertThat(GameColorsService.conflictsWithUsedColors(game, Mapper.getColor("red")))
+                .isFalse();
+        assertThat(GameColorsService.conflictsWithUsedColors(game, Mapper.getColor("green")))
                 .isTrue();
     }
 }
