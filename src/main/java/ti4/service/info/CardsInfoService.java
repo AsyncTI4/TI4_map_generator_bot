@@ -26,6 +26,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.commands.CommandHelper;
@@ -475,6 +476,10 @@ public class CardsInfoService {
         RevenantLeadersHandler.addRedLeaderCardsInfoButtons(buttons, player);
         if (RevenantLeadersHandler.canUseRevThronesHero(game, player)) {
             buttons.add(RevenantLeadersHandler.getRevThronesHeroButton(player));
+        }
+        if (player.hasPlanet("cineron")
+                && !player.getExhaustedPlanetsAbilities().contains("cineron")) {
+            buttons.add(ThronesThroneHandler.getCineronButton(player));
         }
         buttons.add(Buttons.gray("offerPlayerPref", "Player Settings"));
         buttons.add(Buttons.gray("searchMyGames", "List My Games"));

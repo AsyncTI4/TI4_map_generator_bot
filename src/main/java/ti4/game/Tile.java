@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesAbilityHandler;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.CalendarHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
@@ -697,6 +698,11 @@ public class Tile {
                 && ThronesAbilityHandler.tracesOfRuinIsActive(game)
                 && getPlanetUnitHolders().stream()
                         .anyMatch(planet -> ThronesAbilityHandler.isThronePlanet(planet.getName()))) {
+            return true;
+        }
+        if (game != null
+                && game.getPlayers().values().stream()
+                        .anyMatch(p -> ButtonHelper.doesPlayerHaveFSHere("thrones_flagship", p, this))) {
             return true;
         }
         return hasAnyToken("token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png");

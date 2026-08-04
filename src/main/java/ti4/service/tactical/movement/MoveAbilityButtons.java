@@ -30,5 +30,6 @@ public final class MoveAbilityButtons {
             new GhostMechButton(),
             new NivynMechButton(),
             new WraithEngineButton(),
-            new EkoPlanetAbilityButton());
+            new EkoPlanetAbilityButton(),
+            new GyraxisButton());
 }

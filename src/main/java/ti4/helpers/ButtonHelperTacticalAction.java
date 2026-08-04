@@ -37,6 +37,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponth
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
@@ -242,7 +243,9 @@ public final class ButtonHelperTacticalAction {
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         KryxosBreakthroughHandler.clearPrototypeInnovators(game);
         MyrrLeadersHandler.clearMyrrAgent(game);
+        ThronesUnitHandler.clearGholaRollBonus(game);
         RevenantLeadersHandler.clearRedLeaderTacticalState(game);
+        ThronesTechHandler.clearRiftTouchedBastion(game);
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
     }
 
@@ -531,6 +534,7 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("ardentiaSubjugate");
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
+        game.removeStoredValue("gyraxisActive");
         XytherisLeadersHandler.clearMyrixAgentEffects(game);
         XytherisLeadersHandler.clearHeroUnitAbilityRoll(game);
         XytherisAbilityHandler.clearStingOfTheHiveRollState(game);
@@ -542,11 +546,13 @@ public final class ButtonHelperTacticalAction {
         KairnUnitHandler.clearExcavatorMechExplore(game);
         KryxosBreakthroughHandler.clearPrototypeInnovators(game);
         MyrrLeadersHandler.clearMyrrAgent(game);
+        ThronesUnitHandler.clearGholaRollBonus(game);
         MyrrTechHandler.clearSegmentedStructuring(game);
         ArdentiaUnitHandler.clearIronClawDeployUsed(game);
         DreamButtonHandler.clearDreamAgentAnomaly(game);
         RevenantLeadersHandler.clearRedLeaderTacticalWindow(game);
         RevenantTechHandler.clearLazarusProduction(game);
+        ThronesTechHandler.clearRiftTouchedBastion(game);
         GameEventDraft.clear(game);
 
         game.getTacticalActionDisplacement().clear();
@@ -691,6 +697,7 @@ public final class ButtonHelperTacticalAction {
         RevenantLeadersHandler.openRevXytherisAgentWindow(game, player);
         MyrrLeadersHandler.offerMyrrAgent(game, player, tile);
         game.setStoredValue("possiblyUsedRift", "");
+        ThronesTechHandler.offerRiftTouchedBastion(game, tile);
         game.setStoredValue("lastActiveSystem", pos);
         List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
         if (FOWPlusService.isVoid(game, pos)) {

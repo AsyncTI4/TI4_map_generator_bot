@@ -341,6 +341,11 @@ public class TacticalActionOutputService {
                     output.append("**REMINDER**: Renegade I can only transport infantry.");
                 }
             }
+            if (player.hasPlanet("gyraxis")
+                    && player.getExhaustedPlanetsAbilities().contains("gyraxis")
+                    && "yes".contains(game.getStoredValue("gyraxisActive"))) {
+                output.append("May add +1 move to up to 1 ship being moved from each system containing their ships.");
+            }
         }
         if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
             GMService.logPlayerActivity(game, player, output.toString());
