@@ -98,7 +98,7 @@ class ButtonHelperExplore {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
         }
 
-        if (player.hasTech("dslaner")) {
+        if (player.hasTech("dslaner") && !game.isTwilightsFallMode()) {
             player.setAtsCount(player.getAtsCount() + 1);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), player.getRepresentation() + " put 1 commodity on _ATS Armaments_.");

@@ -838,12 +838,29 @@ public class ExploreService {
                 RelicHelper.drawRelicAndNotify(player, event, game);
             }
             case "ms1", "ms2" -> {
-                int oldComm = player.getCommodities();
-                ButtonHelperStats.replenishComms(event, game, player, true);
-                message = new StringBuilder(
-                        "Replenished Commodities (" + oldComm + "->" + player.getCommodities()
-                                + "). Reminder that this is optional, and that you may instead convert your existing commodities.");
-                MessageHelper.sendMessageToEventChannel(event, message.toString());
+                if (player.getCommodities() == 0) {
+                    int oldComm = player.getCommodities();
+                    ButtonHelperStats.replenishComms(event, game, player, true);
+                    message = new StringBuilder(
+                            "Replenished Commodities (" + oldComm + "->" + player.getCommodities()
+                                    + "). Reminder that this is optional, and that you may instead convert your existing commodities.");
+                    MessageHelper.sendMessageToEventChannel(event, message.toString());
+                } else {
+                    message = new StringBuilder(
+                            "You have " + player.getCommodities()
+                                    + " commodities. You may convert them into trade goods, or replenish your commodities. Reminder that you can transact before resolving this if you have willing neighbors.");
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green(
+                            player.getFactionCheckerPrefix() + "mallice_convert_comm",
+                            "Convert Commodities Into Trade Goods",
+                            MiscEmojis.Wash));
+                    buttons.add(Buttons.blue(
+                            player.getFactionCheckerPrefix() + "resolveHarness",
+                            "Replenish Commodities",
+                            MiscEmojis.comm));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            event.getMessageChannel(), message.toString(), buttons);
+                }
             }
             case Constants.MIRAGE -> {
                 String mirageID = Constants.MIRAGE;

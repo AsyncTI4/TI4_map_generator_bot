@@ -1662,7 +1662,7 @@ public final class ButtonHelperModifyUnits {
 
             UnitModel unitModel = p2.getUnitFromUnitKey(unitKey);
             String unitName = unitKey.unitName();
-            String prettyName = unitKey.humanReadableName();
+            String prettyName = unitKey.getColor() + " " + unitKey.humanReadableName();
             boolean canSustain = ButtonHelper.unitCanSustainDamage(game, player, tile, unitModel);
             for (UnitState state : UnitState.defaultRemoveOrder()) {
                 int amt = unitHolder.getUnitCountForState(unitKey, state);

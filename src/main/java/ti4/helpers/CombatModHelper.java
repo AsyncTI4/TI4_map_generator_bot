@@ -923,6 +923,9 @@ public class CombatModHelper {
                                 .map(Mapper::getTech)
                                 .filter(TechnologyModel::isUnitUpgrade)
                                 .count();
+                        if ("neutral".equalsIgnoreCase(opponent.getFaction())) {
+                            scalingCount = 0;
+                        }
                     }
                 }
                 case Constants.MOD_OPPONENT_FACTION_TECH -> {

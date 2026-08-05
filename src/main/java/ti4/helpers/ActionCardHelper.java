@@ -1913,6 +1913,10 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "riseOfAMessiah", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
+            if ("fire_team".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFireTeam", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
             if ("courageous".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "courageousStarter", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);

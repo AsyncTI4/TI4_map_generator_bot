@@ -6987,6 +6987,38 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(event.getChannel(), msg);
     }
 
+    @ButtonHandler("resolveFireTeam")
+    public static void resolveFireTeam(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+
+        String key = "warFundingRolls" + player.getFaction();
+        String summary = game.getStoredValue(key);
+        String msg = player.getRepresentation() + " your units rerolled their misses and got the following:\n";
+        for (String part : summary.split(";")) {
+            if (!part.contains("_")) {
+                continue;
+            }
+            int numDice = Integer.parseInt(part.split("_")[0]);
+            int hitOn = Integer.parseInt(part.split("_")[1]);
+            String unit = part.split("_")[2];
+            List<Die> resultRolls = DiceHelper.rollDice(hitOn, numDice);
+            int hitRolls = DiceHelper.countSuccesses(resultRolls);
+            String unitRoll = CombatMessageHelper.displayUnitRoll(
+                    player.getUnitByBaseType(unit),
+                    hitOn,
+                    0,
+                    numDice / player.getUnitByBaseType(unit).getCombatDieCount(),
+                    player.getUnitByBaseType(unit).getCombatDieCount(),
+                    numDice % player.getUnitByBaseType(unit).getCombatDieCount(),
+                    resultRolls,
+                    hitRolls,
+                    "space");
+            msg += unitRoll;
+        }
+        msg += "\nHave your opponent assign hits with the assign hits button present underneath the combat picture.";
+        MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("rollThalnos_")
     public static void resolveRollForThalnos(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
