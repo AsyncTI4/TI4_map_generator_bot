@@ -2795,7 +2795,9 @@ public class CombatRollService {
                 continue;
             }
             Tile adjTile = game.getTileByPosition(adjacentTilePosition);
-            if (TeHelperUnits.affectedByQuietus(game, player, adjTile) || adjTile.isScar(game)) {
+            if (TeHelperUnits.affectedByQuietus(game, player, adjTile)
+                    || adjTile.isScar(game)
+                    || ButtonHelper.isTileSmothered(game, adjTile, player)) {
                 continue;
             }
             for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {

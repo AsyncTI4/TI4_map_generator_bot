@@ -281,7 +281,9 @@ public class TacticalActionService {
     private List<Button> buildFinishMovementButtons(
             ButtonInteractionEvent event, Game game, Player player, FinishMovementContext ctx) {
         List<Button> systemButtons;
-        if (!ctx.unitsWereMoved && !ctx.hasGfsInRange) {
+        if (!ctx.unitsWereMoved
+                && !ctx.hasGfsInRange
+                && !ButtonHelper.getTilesOfUnitsWithBombard(player, game).contains(ctx.tile)) {
             systemButtons = getBuildButtons(event, game, player, ctx.tile);
         } else {
             systemButtons = getLandingTroopsButtons(game, player, ctx.tile);
