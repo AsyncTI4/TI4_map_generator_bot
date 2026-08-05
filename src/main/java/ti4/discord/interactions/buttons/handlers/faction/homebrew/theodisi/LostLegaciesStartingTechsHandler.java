@@ -73,7 +73,7 @@ public class LostLegaciesStartingTechsHandler {
         };
     }
 
-    private static void offerArcanumStartingTechs(Game game, Player player) {
+    public static void offerArcanumStartingTechs(Game game, Player player) {
         List<TechnologyModel> techs = eligibleTechnologies(game, player, 0);
         sendTechPrompt(
                 player,
@@ -89,7 +89,7 @@ public class LostLegaciesStartingTechsHandler {
                 false);
     }
 
-    private static void offerAeternaStartingTechs(Game game, Player player) {
+    public static void offerAeternaStartingTechs(Game game, Player player) {
         List<TechnologyModel> techs = eligibleTechnologies(game, player, 0);
         String rule = "You may choose up to **2 technologies with no prerequisites owned by no other player**. "
                 + "All zero-prerequisite technologies are listed, so verify that no other player owns your choice.";
@@ -107,7 +107,7 @@ public class LostLegaciesStartingTechsHandler {
                 true);
     }
 
-    private static void offerRevenantStartingTechs(Game game, Player player) {
+    public static void offerRevenantStartingTechs(Game game, Player player) {
         List<TechnologyModel> techs = eligibleTechnologies(game, player, 1);
         sendTechPrompt(
                 player,

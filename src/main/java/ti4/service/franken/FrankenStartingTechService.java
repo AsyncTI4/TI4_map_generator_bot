@@ -3,6 +3,7 @@ package ti4.service.franken;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesStartingTechsHandler;
 import ti4.game.Player;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -18,6 +19,17 @@ public class FrankenStartingTechService {
         if (startingTech == null) return;
         for (String tech : startingTech) {
             addTech(event, player, tech);
+        }
+
+        // Handle Non-Standard Starting Techs
+        if ("arcanum".equalsIgnoreCase(itemID)) {
+            LostLegaciesStartingTechsHandler.offerArcanumStartingTechs(player.getGame(), player);
+        }
+        if ("aeterna".equalsIgnoreCase(itemID)) {
+            LostLegaciesStartingTechsHandler.offerAeternaStartingTechs(player.getGame(), player);
+        }
+        if ("revenant".equalsIgnoreCase(itemID)) {
+            LostLegaciesStartingTechsHandler.offerRevenantStartingTechs(player.getGame(), player);
         }
     }
 
