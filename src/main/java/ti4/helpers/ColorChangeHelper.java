@@ -20,14 +20,16 @@ import ti4.service.abilities.MahactTokenService;
 public class ColorChangeHelper {
 
     public static boolean isColorAllowedForPlayer(String color, Player player) {
+        return isColorAllowedForPlayer(color, player.getUserID(), player.getGame());
+    }
+
+    public static boolean isColorAllowedForPlayer(String color, String userID, Game game) {
         String colorID = Mapper.getColorID(color);
         return switch (colorID) {
             // Riftset is exclusive to eronous always
-            case "ero" -> Constants.eronousId.equals(player.getUserID());
+            case "ero" -> Constants.eronousId.equals(userID);
             // Lightgray is exclusive to chassit if chassit is in the game
-            case "lgy" ->
-                !player.getGame().getPlayerIDs().contains(Constants.chassitId)
-                        || Constants.chassitId.equals(player.getUserID());
+            case "lgy" -> !game.getPlayerIDs().contains(Constants.chassitId) || Constants.chassitId.equals(userID);
             default -> true;
         };
     }
