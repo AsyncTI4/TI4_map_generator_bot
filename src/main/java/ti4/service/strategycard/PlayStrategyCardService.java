@@ -850,7 +850,7 @@ public class PlayStrategyCardService {
             case "anarchy10" -> getAnarchy10Buttons(sc);
             case "anarchy11" -> getAnarchy11Buttons(sc);
             case "pok7technology" -> getTechnologyButtons(sc);
-            case "pok8imperial" -> getImperialButtons(sc);
+            case "pok8imperial" -> getImperialButtons(sc, game);
 
             // add your own special button resolutions here as additional cases
             // ignis aurora
@@ -859,6 +859,8 @@ public class PlayStrategyCardService {
 
             // cryypter
             case "cryypter_3" -> CryypterHelper.getCryypterSC3Buttons(sc);
+
+            case "evenfall3" -> getEvenFall3Buttons(sc);
 
             // monuments
             case "monuments4construction" -> getMonumentsConstructionButtons(sc, game);
@@ -1057,6 +1059,14 @@ public class PlayStrategyCardService {
         return List.of(followButton, noFollowButton, draw2AC);
     }
 
+    private static List<Button> getEvenFall3Buttons(int sc) {
+        Button primaryButton = Buttons.green("resolveEvenFall3Primary", "Resolve Primary", ExploreEmojis.Relic);
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
+        Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        Button draw2AC = Buttons.gray("sc_ac_draw", "Draw 2 Action Cards", CardEmojis.ActionCard);
+        return List.of(primaryButton, followButton, noFollowButton, draw2AC);
+    }
+
     public static List<Button> getPoliticsAssignSpeakerButtons(Game game, Player politicsHolder) {
         List<Button> assignSpeakerButtons = new ArrayList<>();
         List<Player> players = new ArrayList<>(game.getRealPlayers());
@@ -1149,11 +1159,14 @@ public class PlayStrategyCardService {
         return List.of(followButton, getTech, noFollowButton);
     }
 
-    private static List<Button> getImperialButtons(int sc) {
+    private static List<Button> getImperialButtons(int sc, Game game) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         Button drawSo = Buttons.gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective);
         Button scoreImperial = Buttons.gray("score_imperial", "Score Imperial", PlanetEmojis.Mecatol);
+        if ("evenfall_sc".equalsIgnoreCase(game.getScSetID())) {
+            scoreImperial = Buttons.gray("drawRelic_sc", "Draw Relic", ExploreEmojis.Relic);
+        }
         Button scoreAnObjective = Buttons.gray("scoreAnObjective", "Score A Public", CardEmojis.Public1);
         return List.of(followButton, noFollowButton, drawSo, scoreImperial, scoreAnObjective);
     }

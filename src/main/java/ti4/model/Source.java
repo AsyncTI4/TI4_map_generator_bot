@@ -37,6 +37,7 @@ public class Source {
         blue_reverie,
         twilight_kart,
         twilight_ds,
+        pally,
 
         // lil homebrew
         lazax,

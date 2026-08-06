@@ -1015,7 +1015,7 @@ public class ButtonHelperCommanders {
             String planetId = planetReal.getName();
             String planetName = Helper.getPlanetName(planetId);
 
-            for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+            for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true, true)) {
                 Tile tile2 = game.getTileByPosition(pos2);
                 if (CommandCounterHelper.hasCC(event, player.getColor(), tile2)
                         && !game.isDominusOrb()
