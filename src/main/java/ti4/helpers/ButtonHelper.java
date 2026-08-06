@@ -7781,8 +7781,9 @@ public class ButtonHelper {
             if (opponent == player) {
                 continue;
             }
-            if (opponent.getHomeSystemTile() != null) {
-                for (UnitHolder uH : opponent.getHomeSystemTile().getPlanetUnitHolders()) {
+            Tile tile = opponent.getHomeSystemTile();
+            if (tile != null) {
+                for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                     if (player.getPlanets().contains(uH.getName())) {
                         return true;
                     }
