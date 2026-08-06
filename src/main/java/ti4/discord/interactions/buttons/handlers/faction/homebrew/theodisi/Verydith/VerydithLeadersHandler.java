@@ -17,11 +17,35 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.FactionEmojis;
 
 @UtilityClass
 public class VerydithLeadersHandler {
     private static final String CHOOSE_PLAYER = "chooseVerydithPlayer_";
     private static final String SELECT_SYSTEM = "selectVerydithHeroSystem_";
+    // Agent
+    private static final String AGENT_STEP1 = "selectFirstTargetVerydithAgent";
+    private static final String AGENT_STEP2 = "selectSecondTargetVerydithAgent_";
+
+    // Agent
+    public static Button getVerydithAgentCardsInfoButton(Player player) {
+        return Buttons.gray(player.factionButtonChecker() + AGENT_STEP1, "Use Seris Kael", FactionEmojis.verydith);
+    }
+
+    @ButtonHandler(AGENT_STEP1)
+    public static void selectFirstTargetVerydithAgent(ButtonInteractionEvent event, Game game, Player player) {
+        if (game == null || player == null || !player.hasUnexhaustedLeader("verydithagent")) {
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        for (Player target : game.getRealPlayers()) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + AGENT_STEP2 + target.getColor(),
+                    target.getFactionNameOrColor(),
+                    target.getFactionEmojiOrColor()));
+        }
+    }
 
     // Commander
     public static void checkVerydithCommander(Game activeMap) {
@@ -36,7 +60,8 @@ public class VerydithLeadersHandler {
                                     if (!tile.hasPlayerCC(otherPlayer)
                                             && planet.getTokenList().contains(tokenToAddOrRemove)) {
                                         planet.removeToken(tokenToAddOrRemove);
-                                    } else if (tile.hasPlayerCC(otherPlayer)) {
+                                    } else if (tile.hasPlayerCC(otherPlayer)
+                                            && !planet.getTokenList().contains(tokenToAddOrRemove)) {
                                         planet.addToken(tokenToAddOrRemove);
                                     }
                                 }

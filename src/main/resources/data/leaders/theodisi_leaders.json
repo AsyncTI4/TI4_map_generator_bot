@@ -41,6 +41,7 @@
     "title": "Warden of Accord",
     "abilityWindow": "When a player returns a promissory note to its owner, you may exhaust this card:",
     "abilityText": "Those players each gain 1 command token and perform a transaction.",
+    "notes": "Bot can't reliably tell when a promissory is returned to its owner with total accuracy, there is a button in cards info. You select the payers that had the trigger happen to be the effect of the agent.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
