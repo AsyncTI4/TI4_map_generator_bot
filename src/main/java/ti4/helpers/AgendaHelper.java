@@ -2812,6 +2812,18 @@ public final class AgendaHelper {
                 }
                 MessageHelper.sendMessageToChannel(channel, message);
             }
+            if ("evenfall_sc".equalsIgnoreCase(game.getScSetID())) {
+                for (Player player : game.getRealPlayers()) {
+                    if (player.getPlanets().contains("mr")
+                            || player.getPlanets().contains("mrte")) {
+                        game.setSpeaker(player);
+                        MessageHelper.sendMessageToChannel(
+                                channel,
+                                "## " + player.getRepresentationUnfogged()
+                                        + " has Mecatol Rex and has been set as the speaker.");
+                    }
+                }
+            }
         }
         if (!action) {
             for (Player player : game.getRealPlayers()) {

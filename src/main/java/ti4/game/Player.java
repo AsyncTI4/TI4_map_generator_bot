@@ -2597,8 +2597,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             addAbility("policy_the_people_connect");
             addAbility("policy_the_environment_preserve");
             addAbility("policy_the_economy_empower");
-            removeOwnedUnitByID("olradin_mech");
-            addOwnedUnitByID("olradin_mech_positive");
             MessageHelper.sendMessageToChannel(
                     getCorrectChannel(),
                     getRepresentationUnfogged()
