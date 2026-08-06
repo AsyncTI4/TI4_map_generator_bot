@@ -66,6 +66,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
@@ -3279,6 +3280,11 @@ public class ButtonHelper {
                 buttons.add(Buttons.gray("placeCCBack_" + tile.getPosition(), "Don't Spend"));
                 buttons.add(Buttons.red("lose1CC", "Spend 1 Command Token"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons);
+            }
+        }
+        for (Player verydith : game.getRealPlayers()) {
+            if (game.playerHasLeaderUnlockedOrAlliance(verydith, "verydithcommander")) {
+                VerydithLeadersHandler.checkVerydithCommander(game);
             }
         }
     }
