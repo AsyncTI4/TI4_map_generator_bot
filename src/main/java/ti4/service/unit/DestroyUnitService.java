@@ -180,7 +180,13 @@ public class DestroyUnitService {
         if (combat) {
             AeternaTechHandler.offerThanatocyteLattice(event, game, units);
         }
-        AeternaAbilityHandler.offerCycleOfReclamationCapture(event, game, units, combat);
+        for (RemovedUnit u : units) {
+            if (u.unitKey().unitType() == UnitType.Fighter) {
+                continue;
+            }
+            AeternaAbilityHandler.offerCycleOfReclamationCapture(event, game, units, combat);
+            break;
+        }
         AeternaUnitsHandler.addCryptControlTokenForDestroyedFighters(game, units);
         AeternaUnitsHandler.offerGraveyardEffectsForDestroyedUnits(event, game, units);
         AeternaPromissoryHandler.rollForStasisFighters(event, game, units);
