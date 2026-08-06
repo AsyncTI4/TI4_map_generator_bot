@@ -465,6 +465,15 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case Constants.MOD_VERYDITH_FLAGSHIP -> {
+                List<Player> eligiblePlayers = game.getRealPlayersExcludingThis(player);
+                for (Player otherPlayer : eligiblePlayers) {
+                    String ccID = Mapper.getCCID(otherPlayer.getColor());
+                    if (tile.hasCC(ccID) && ButtonHelper.doesPlayerHaveFSHere("verydith_flagship", player, tile)) {
+                        meetsCondition = true;
+                    }
+                }
+            }
             case "nebula_cosmic_defender" -> {
                 Player activePlayer = game.getActivePlayer();
                 if (game.isCosmicPhenomenaeMode()

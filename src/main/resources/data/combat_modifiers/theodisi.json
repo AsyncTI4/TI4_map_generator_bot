@@ -88,5 +88,20 @@
                 "alias": "ponthouscommander"
             }
         ]
+    },
+    {
+        "alias": "verydith_flagship_plus_1_die",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "opponent_cc_in_system",
+        "scope": "_ship_no_ff",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "verydith_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
     }
 ]

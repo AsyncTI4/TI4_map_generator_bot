@@ -53,6 +53,7 @@ public final class CommandCounterHelper {
         tile.addCC(ccID);
         Game game = player.getGame();
         for (Player verydithPlayer : game.getRealPlayers()) {
+            VerydithLeadersHandler.checkVerydithCommander(game);
             if (verydithPlayer == player || !verydithPlayer.hasUnlockedBreakthrough("verydithbt")) {
                 continue;
             }
@@ -65,7 +66,6 @@ public final class CommandCounterHelper {
 
             VerydithBreakthroughHandler.offerUnyieldingAccord(event, verydithPlayer, tile);
         }
-        VerydithLeadersHandler.checkVerydithCommander(game);
         if (player.hasLeader("ardentiacommander")) {
             CommanderUnlockCheckService.checkPlayer(player, "ardentia");
         }

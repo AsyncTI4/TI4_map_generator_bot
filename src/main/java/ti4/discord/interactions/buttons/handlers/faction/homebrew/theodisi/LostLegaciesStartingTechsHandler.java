@@ -113,13 +113,13 @@ public class LostLegaciesStartingTechsHandler {
                 player,
                 techs,
                 player.getRepresentationUnfogged()
-                        + " choose your first starting technology. You must choose **2 technologies in different colors with 1 total prerequisite**. Choose one zero-prerequisite technology and one one-prerequisite technology.",
+                        + " choose your first non-faction starting technology. You must choose **2 technologies in different colors with 1 total prerequisite**. Choose one zero-prerequisite technology and one one-prerequisite technology.",
                 false);
         sendTechPrompt(
                 player,
                 techs,
                 player.getRepresentationUnfogged()
-                        + " choose your second starting technology. It must have a **different color** from your first choice, and the two choices must have **1 total prerequisite**.",
+                        + " choose your second non-faction starting technology. It must have a **different color** from your first choice, and the two choices must have **1 total prerequisite**.",
                 false);
     }
 

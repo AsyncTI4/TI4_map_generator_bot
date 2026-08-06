@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
+import ti4.game.Leader;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -18,6 +19,7 @@ import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.ExhaustLeaderService;
 
 @UtilityClass
 public class VerydithLeadersHandler {
@@ -26,6 +28,7 @@ public class VerydithLeadersHandler {
     // Agent
     private static final String AGENT_STEP1 = "selectFirstTargetVerydithAgent";
     private static final String AGENT_STEP2 = "selectSecondTargetVerydithAgent_";
+    private static final String AGENT_STEP3 = "resolveVerydithAgent_";
 
     // Agent
     public static Button getVerydithAgentCardsInfoButton(Player player) {
@@ -41,10 +44,85 @@ public class VerydithLeadersHandler {
         List<Button> buttons = new ArrayList<>();
         for (Player target : game.getRealPlayers()) {
             buttons.add(Buttons.green(
-                    player.factionButtonChecker() + AGENT_STEP2 + target.getColor(),
+                    player.factionButtonChecker() + AGENT_STEP2 + target.getFaction(),
                     target.getFactionNameOrColor(),
                     target.getFactionEmojiOrColor()));
         }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), "Please choose the person returning the promissory note.", buttons);
+
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
+    @ButtonHandler(AGENT_STEP2)
+    public static void selectSecondTargetVerydithAgent(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (game == null || player == null || !player.hasUnexhaustedLeader("verydithagent")) {
+            return;
+        }
+
+        String target1 = buttonID.substring(AGENT_STEP2.length());
+        Player sender = game.getPlayerFromColorOrFaction(target1);
+        if (sender == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find player.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        for (Player target : game.getRealPlayers()) {
+            if (target == sender) {
+                continue;
+            }
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + AGENT_STEP3 + target.getFaction() + "|" + sender.getFaction(),
+                    target.getFactionNameOrColor(),
+                    target.getFactionEmojiOrColor()));
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), "Please choose the person receiving the promissory note.", buttons);
+
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(AGENT_STEP3)
+    public static void resolveVerydithAgent(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (game == null || player == null || !player.hasUnexhaustedLeader("verydithagent")) {
+            return;
+        }
+
+        String[] payload = buttonID.replace(AGENT_STEP3, "").split("\\|", 2);
+        if (payload.length != 2) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        String target2 = payload[0];
+        String target1 = payload[1];
+        Player receiver = game.getPlayerFromColorOrFaction(target2);
+        Player sender = game.getPlayerFromColorOrFaction(target1);
+        if (target1 == null || target2 == null) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        Leader agent = player.getLeaderByID("verydithagent").orElse(null);
+        ExhaustLeaderService.exhaustLeader(game, player, agent);
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                receiver.getCorrectChannel(),
+                receiver.getRepresentation() + ", you may gain 1 CC and perform a transaction with "
+                        + sender.getRepresentationNoPing() + " due to _Seris Kael_, the Verydith Agent",
+                ButtonHelper.getGainCCButtons(receiver));
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                sender.getCorrectChannel(),
+                sender.getRepresentation() + ", you may gain 1 CC and perform a transaction with "
+                        + receiver.getRepresentationNoPing() + " due to _Seris Kael_, the Verydith Agent",
+                ButtonHelper.getGainCCButtons(sender));
+
+        ButtonHelper.deleteMessage(event);
     }
 
     // Commander
@@ -57,10 +135,11 @@ public class VerydithLeadersHandler {
                         if (unitHolder instanceof Planet planet) {
                             if (player.getPlanets().contains(planet.getName())) {
                                 for (Player otherPlayer : activeMap.getRealPlayersExcludingThis(player)) {
-                                    if (!tile.hasPlayerCC(otherPlayer)
+                                    String ccID = Mapper.getCCID(otherPlayer.getColor());
+                                    if (!tile.hasCC(ccID)
                                             && planet.getTokenList().contains(tokenToAddOrRemove)) {
                                         planet.removeToken(tokenToAddOrRemove);
-                                    } else if (tile.hasPlayerCC(otherPlayer)
+                                    } else if (tile.hasCC(ccID)
                                             && !planet.getTokenList().contains(tokenToAddOrRemove)) {
                                         planet.addToken(tokenToAddOrRemove);
                                     }

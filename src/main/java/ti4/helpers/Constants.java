@@ -1481,6 +1481,7 @@ public final class Constants {
     public static final String MOD_ADJACENT_MECH = "adjacent_mech";
     public static final String MOD_OPPONENT_NON_FIGHTER_SHIP = "opponent_non_fighter_ship";
     public static final String MOD_OPPONENT_SHIP = "opponent_ship";
+    public static final String MOD_VERYDITH_FLAGSHIP = "opponent_cc_in_system";
 
     public static final String MIGRATION_NAME = "migration_name";
     public static final String RUN_MANUAL_DATA_MIGRATION = "run_manual_data_migration";
