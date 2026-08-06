@@ -7773,6 +7773,26 @@ public class ButtonHelper {
         return buttons;
     }
 
+    public static boolean doesPlayerControlRexOrOpponentHS(Player player, Game game) {
+        if (player.getPlanets().contains("mr") || player.getPlanets().contains("mrte")) {
+            return true;
+        }
+        for (Player opponent : game.getRealPlayersNDummies()) {
+            if (opponent == player) {
+                continue;
+            }
+            Tile tile = opponent.getHomeSystemTile();
+            if (tile != null) {
+                for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                    if (player.getPlanets().contains(uH.getName())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public static List<Button> getButtonsForConventions(Player player, Game game) {
         String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();

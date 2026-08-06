@@ -1603,7 +1603,9 @@ public class ButtonHelperHeroes {
         } else {
             unitModelID = "olradin_mech_negative";
         }
-        player.addOwnedUnitByID(unitModelID);
+        if (!player.getGame().isTwilightsFallMode()) {
+            player.addOwnedUnitByID(unitModelID);
+        }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         DiscordantStarsHelper.checkOlradinMech(game);
         ButtonHelper.deleteMessage(event);
