@@ -21,6 +21,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.unit.DestroyUnitService;
 
 @UtilityClass
 public class ThronesThroneHandler {
@@ -83,7 +84,7 @@ public class ThronesThroneHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                "Select the unit you wish to remove and add back to the board galvanized.",
+                "Select the unit you wish to destroy and add back to the board galvanized.",
                 buttons);
 
         ButtonHelper.deleteMessage(event);
@@ -119,13 +120,13 @@ public class ThronesThroneHandler {
 
         UnitKey unitKey = Mapper.getUnitKey(asyncId, player.getColorID());
 
-        holder.removeUnit(unitKey, 1);
+        DestroyUnitService.destroyUnit(event, tile, game, unitKey, 1, holder, false);
         holder.addUnit(unitKey, 1);
         holder.addGalvanizedUnit(unitKey, 1);
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                "Removed " + unitKey.humanReadableName() + " from " + tile.getRepresentation()
+                "Destroyed " + unitKey.humanReadableName() + " from " + tile.getRepresentation()
                         + " and placed it back, galvanized.");
 
         ButtonHelper.deleteMessage(event);
