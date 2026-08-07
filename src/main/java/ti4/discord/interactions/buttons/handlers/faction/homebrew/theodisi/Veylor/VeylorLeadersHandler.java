@@ -42,9 +42,7 @@ public class VeylorLeadersHandler {
         ActionCardHelper.drawActionCards(target, 1);
         AgendaHelper.drawAgenda(1, game, target);
 
-        MessageHelper.sendMessageToChannel(
-            target.getCorrectChannel(),
-            target.getRepresentation() + " drew 1 agenda.");
+        MessageHelper.sendMessageToChannel(target.getCorrectChannel(), target.getRepresentation() + " drew 1 agenda.");
     }
 
     // Commander

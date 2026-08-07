@@ -3,7 +3,6 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veyl
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -40,7 +39,7 @@ public class VeylorUnitHandler {
                             + Mapper.getActionCard(actionCard.getKey()).getName(),
                     CardEmojis.getACEmoji(game)));
         }
-        
+
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation() + ", please choose an action card to discard.",
@@ -48,12 +47,11 @@ public class VeylorUnitHandler {
     }
 
     @ButtonHandler(SELECT_AC)
-    public static void resolveEdictAcDiscard(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void resolveEdictAcDiscard(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (player == null || game == null) {
             return;
         }
-    
+
         int handIndex;
         try {
             handIndex = Integer.parseInt(buttonID.substring(SELECT_AC.length()));
@@ -61,12 +59,12 @@ public class VeylorUnitHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-    
+
         if (!player.getActionCards().containsValue(handIndex)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
-    
+
         ActionCardHelper.discardAC(event, game, player, handIndex);
 
         ButtonHelper.deleteMessage(event);

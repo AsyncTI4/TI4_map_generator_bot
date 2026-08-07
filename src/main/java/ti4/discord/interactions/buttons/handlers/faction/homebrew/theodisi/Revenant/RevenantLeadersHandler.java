@@ -356,7 +356,8 @@ public class RevenantLeadersHandler {
             return;
         }
 
-        PurgeHeroService.purgeHeroPreamble(event, player, game, "revenantthroneshero", "Lost Throne of Pride - Fallen King");
+        PurgeHeroService.purgeHeroPreamble(
+                event, player, game, "revenantthroneshero", "Lost Throne of Pride - Fallen King");
 
         String message = player.getRepresentation()
                 + ", choose a system containing 1 or more of your units in which to use PRODUCTION 4 due to Lost Throne of Pride, the Revenant Thrones hero.";

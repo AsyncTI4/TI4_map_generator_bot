@@ -2688,10 +2688,11 @@ public final class ButtonHelperModifyUnits {
                     + ", your opponent used _Assault Escort_, forcing you to destroy a non-fighter ship. Please assign it with buttons.";
             buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "assaultcannoncombat");
         } else if (cause.contains("silentEdict")) {
-             MessageHelper.sendMessageToChannel(
+            MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), player.getRepresentation(false, false) + " used _Silent Edict_.");
             buttons = getOpposingUnitsToHit(player, game, tile, false);
-            msg = player.getRepresentation() + ", please choose which non-carrier opposing unit to hit (carriers will appear, they are not eligible to be the target of Silent Edict).";
+            msg = player.getRepresentation()
+                    + ", please choose which non-carrier opposing unit to hit (carriers will appear, they are not eligible to be the target of Silent Edict).";
             VeylorUnitHandler.sendEdictDiscardButtons(game, player);
         } else {
             MessageHelper.sendMessageToChannel(
