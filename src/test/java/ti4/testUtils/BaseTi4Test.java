@@ -28,7 +28,7 @@ public class BaseTi4Test {
     private static final int GLOBAL_BEFORE_ALL_WAIT_THRESHOLD_SECONDS = 30;
     private static final CountDownLatch setupCountDownLatch = new CountDownLatch(1);
     private static final AtomicBoolean setupStarted = new AtomicBoolean(false);
-    private static final JDA mockJda = mock(JDA.class);
+    protected static final JDA mockJda = mock(JDA.class);
     private static final Guild mockGuild = mock(Guild.class);
 
     @BeforeAll
