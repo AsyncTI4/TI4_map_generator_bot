@@ -75,7 +75,7 @@
     "name": "Orrin Malvek",
     "title": "Deacon of Taxes & Prayer",
     "abilityWindow": "ACTION:",
-    "abilityText": "Exhaust this card. Draw 1 action card and look at the top card of the agenda deck. Place it on the top or bottom of the deck.",
+    "abilityText": "Choose 1 player and exhaust this card. That player draws 1 action card and looks at the top card of the agenda deck. They may place it on the top or bottom of the deck.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -370,7 +370,7 @@
     "title": "Fallen King",
     "abilityName": "Lost Throne of Pride - Revenant of Ruin",
     "abilityWindow": "At any time:",
-    "abilityText": "You may treat a system that contains 1 or more of your units as if it had PRODUCTION 4 until the end of this action and immediately use that PRODUCTION.",
+    "abilityText": "You may treat a system that contains 1 or more of your units as if it had PRODUCTION 4 until the end of this action and immediately use that PRODUCTION. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },
