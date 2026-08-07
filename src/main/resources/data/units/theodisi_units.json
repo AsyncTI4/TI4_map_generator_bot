@@ -387,6 +387,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
+    "notes": "This unit's extra dice are auto-calculated based on how many ground forces are in its space area, assuming the flagship is getting filled first.",
     "ability": "During your tactical actions, this unit rolls additional combat and unit ability dice equal to the number of ground forces it transported."
   },
   {
@@ -617,7 +618,7 @@
     "faction": "aeterna",
     "productionValue": 6,
     "isStructure": true,
-    "ability": "Once per action, if a unit in a system containing or adjacent to this unit is destroyed, gain 1 commodity or produce 1 unit of the same type in this system, if able. Up to 4 fighters in this unit's system do not count against capacity."
+    "ability": "Once per action, if a unit in a system containing or adjacent to this unit is destroyed, gain 1 commodity or you may produce 1 unit of the same type in this system, if able. Up to 4 fighters in this unit's system do not count against capacity."
   },
   {
     "id": "aeterna_spacedock2",
@@ -630,7 +631,7 @@
     "faction": "aeterna",
     "productionValue": 8,
     "isStructure": true,
-    "ability": "Once per action, if a unit in a system containing or adjacent to this unit is destroyed, gain 1 commodity and produce 1 unit of the same type in this system, if able. Up to 8 fighters in this unit's system do not count against capacity."
+    "ability": "Once per action, if a unit in a system containing or adjacent to this unit is destroyed, gain 1 commodity and you may produce 1 unit of the same type in this system, if able. Up to 8 fighters in this unit's system do not count against capacity."
   },
   {
     "id": "ponthous_flagship",

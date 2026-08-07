@@ -103,5 +103,85 @@
             }
         ],
         "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "xytheris_flagship_bonus",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "carried_ffinfmf_in_space_area",
+        "persistenceType": "CONDITIONAL",
+        "condition": "not_active_player",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "xytheris_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "xytheris_flagship_bonus_afb",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "carried_ffinfmf_in_space_area",
+        "persistenceType": "CONDITIONAL",
+        "condition": "not_active_player",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "xytheris_flagship"
+            }
+        ],
+        "forCombatAbility": "AFB"
+    },
+    {
+        "alias": "xytheris_flagship_bonus_bombard",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "carried_ffinfmf_in_space_area",
+        "persistenceType": "CONDITIONAL",
+        "condition": "not_active_player",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "xytheris_flagship"
+            }
+        ],
+        "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "xytheris_flagship_bonus_spacecannondefence",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "carried_ffinfmf_in_space_area",
+        "persistenceType": "CONDITIONAL",
+        "condition": "not_active_player",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "xytheris_flagship"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonDefence"
+    },
+    {
+        "alias": "xytheris_flagship_bonus_spacecannonoffence",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "carried_ffinfmf_in_space_area",
+        "persistenceType": "CONDITIONAL",
+        "condition": "not_active_player",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "xytheris_flagship"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonOffence"
     }
 ]

@@ -79,20 +79,21 @@ public class LostLegaciesStartingTechsHandler {
                 player,
                 techs,
                 player.getRepresentationUnfogged()
-                        + " choose your first starting technology. You must choose **2 technologies in the same color with no prerequisites**.",
+                        + " choose your first non-faction starting technology. You must choose **2 technologies in the same color with no prerequisites**.",
                 false);
         sendTechPrompt(
                 player,
                 techs,
                 player.getRepresentationUnfogged()
-                        + " choose your second starting technology. It must have the **same color** as your first choice and have no prerequisites.",
+                        + " choose your second non-faction starting technology. It must have the **same color** as your first choice and have no prerequisites.",
                 false);
     }
 
     public static void offerAeternaStartingTechs(Game game, Player player) {
         List<TechnologyModel> techs = eligibleTechnologies(game, player, 0);
-        String rule = "You may choose up to **2 technologies with no prerequisites owned by no other player**. "
-                + "All zero-prerequisite technologies are listed, so verify that no other player owns your choice.";
+        String rule =
+                "You may choose up to **2 non-faction technologies with no prerequisites owned by no other player**. "
+                        + "All zero-prerequisite technologies are listed, so verify that no other player owns your choice.";
         sendTechPrompt(
                 player,
                 techs,

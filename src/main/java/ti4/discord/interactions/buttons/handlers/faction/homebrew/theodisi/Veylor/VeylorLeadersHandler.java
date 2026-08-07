@@ -12,6 +12,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
@@ -31,6 +32,18 @@ public class VeylorLeadersHandler {
     private static final String GAIN_HERO_CC = "gainVeylorHeroCC_";
     private static final String CHOOSE_COMMANDER_SYSTEM = "veylorCommanderSelectSystem_";
     private static final String CHOOSE_COMMANDER_SHIP = "veylorCommanderSelectShip_";
+
+    // Agent
+    public static void startVeylorAgent(Game game, Player target) {
+        if (game == null || target == null) {
+            return;
+        }
+
+        ActionCardHelper.drawActionCards(target, 1);
+        AgendaHelper.drawAgenda(1, game, target);
+
+        MessageHelper.sendMessageToChannel(target.getCorrectChannel(), target.getRepresentation() + " drew 1 agenda.");
+    }
 
     // Commander
     public static Button offerVeylorCommanderUnlock(Player player) {
