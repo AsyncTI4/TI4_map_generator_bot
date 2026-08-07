@@ -457,13 +457,6 @@ public class RevenantLeadersHandler {
         return middleSeparator < 0 ? null : producedUnitKey.substring(middleSeparator + 1, lastSeparator);
     }
 
-    // Red Revenant Leader Set
-    public static void addRedLeaderCardsInfoButtons(List<Button> buttons, Player player) {
-        if (buttons != null && player != null && player.hasUnexhaustedLeader(REVXYTHERIS)) {
-            buttons.add(getRevXytherisCardsInfoButton(player));
-        }
-    }
-
     // Revenant of Xytheris
     public static void openRevXytherisAgentWindow(Game game, Player activePlayer) {
         if (game == null
