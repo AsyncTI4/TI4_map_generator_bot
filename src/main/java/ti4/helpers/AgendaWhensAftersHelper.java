@@ -358,6 +358,10 @@ public final class AgendaWhensAftersHelper {
         if (player.hasTechReady("dsedyng")) {
             names.add("Unity Algorithm");
         }
+
+        if (player.hasTechReady("thveylory")) {
+            names.add("Kleptocratic Politics");
+        }
         return names;
     }
 
@@ -416,6 +420,10 @@ public final class AgendaWhensAftersHelper {
 
         if (player.hasTechReady("dsedyng")) {
             buttons.add(Buttons.red("queueAfter_tech_dsedyng", "Unity Algorithm"));
+        }
+
+        if (player.hasTechReady("thveylory")) {
+            buttons.add(Buttons.red("queueAfter_tech_thveylory", "Kleptocratic Politics"));
         }
         CryypterHelper.addVotCRiderQueueButtons(player, buttons);
 
@@ -596,15 +604,27 @@ public final class AgendaWhensAftersHelper {
                             case "pn" -> PromissoryNoteHelper.resolvePNPlay(after, player, game, event);
                             case "planet" -> PlanetExhaustAbility.doAction(event, player, after, game, true);
                             case "tech" -> {
-                                player.exhaustTech("dsedyng");
-                                riderButtons = AgendaRiderHelper.getAgendaButtons(
-                                        "Edyn Unity Algorithm", game, player.factionButtonChecker());
-                                MessageHelper.sendMessageToChannelWithFactionReact(
-                                        player.getCorrectChannel(),
-                                        player.getRepresentation() + ", please choose your target.",
-                                        game,
-                                        player,
-                                        riderButtons);
+                                if ("dsedyng".equalsIgnoreCase(after)) {
+                                    player.exhaustTech("dsedyng");
+                                    riderButtons = AgendaRiderHelper.getAgendaButtons(
+                                            "Edyn Unity Algorithm", game, player.factionButtonChecker());
+                                    MessageHelper.sendMessageToChannelWithFactionReact(
+                                            player.getCorrectChannel(),
+                                            player.getRepresentation() + ", please choose your target.",
+                                            game,
+                                            player,
+                                            riderButtons);
+                                } else if ("thveylory".equalsIgnoreCase(after)) {
+                                    player.exhaustTech("thveylory");
+                                    riderButtons = AgendaRiderHelper.getAgendaButtons(
+                                            "Veylor Kleptocratic Politics", game, player.factionButtonChecker());
+                                    MessageHelper.sendMessageToChannelWithFactionReact(
+                                            player.getCorrectChannel(),
+                                            player.getRepresentation() + ", please choose your target for _Kleptocratic Politics_.",
+                                            game,
+                                            player,
+                                            riderButtons);
+                                }
                             }
                             case "leader" -> {
                                 if (after.toLowerCase().contains("keleres")) {
@@ -1070,6 +1090,10 @@ public final class AgendaWhensAftersHelper {
                 afterButtons.add(Buttons.gray(
                         factionChecker + "play_after_Edyn Unity Algorithm", "Use Unity Algorithm", FactionEmojis.edyn));
             }
+            if (p1.hasTechReady("thveylory")) {
+                afterButtons.add(Buttons.gray(
+                        factionChecker + "play_after_Veylor Kleptocratic Politics", "Use Kleptocratic Politics", FactionEmojis.veylor));
+            }
             if (game.getCurrentAgendaInfo().contains("Player")
                     && IsPlayerElectedService.isPlayerElected(game, p1, "committee")) {
                 afterButtons.add(Buttons.gray(
@@ -1138,6 +1162,9 @@ public final class AgendaWhensAftersHelper {
 
             if (riderName.contains("Unity Algorithm")) {
                 player.exhaustTech("dsedyng");
+            }
+            if (riderName.contains("Kleptocratic Politics")) {
+                player.exhaustTech("thveylory");
             }
             if ("conspirators".equalsIgnoreCase(riderName)) {
                 game.setStoredValue("conspiratorsFaction", player.getFaction());

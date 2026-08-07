@@ -919,6 +919,14 @@ public final class AgendaHelper {
                                         + "Each player who voted for that outcome drew 1 action card.");
                     }
 
+                    if (winningR != null && winningR.hasTech("thveylory") && specificVote.contains("Kleptocratic Politics")) {
+                        MessageHelper.sendMessageToChannelWithButtons(
+                                winningR.getCorrectChannel(),
+                                winningR.getRepresentation()
+                                        + ", please resolve _Kleptocratic Politics_ by using the buttons below. You do not spend a command token when doing this, if it removes one just use /player stats to add one back.",
+                                ButtonHelperHeroes.getSecondaryButtons(game));
+                    }
+
                     if (winningR != null
                             && (specificVote.contains("Rider")
                                     || (winningR.hasAbility("future_sight")
