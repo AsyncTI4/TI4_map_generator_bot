@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -177,11 +178,18 @@ public class TeHelperGeneral {
         }
 
         if (newMessage != null) {
-            // edit the message with the new partX buttons
-            event.getMessage()
-                    .editMessage(newMessage)
-                    .setComponents(ButtonHelper.turnButtonListIntoActionRowList(newButtons))
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            List<List<ActionRow>> partitions = MessageHelper.getPartitionedButtonLists(newButtons);
+            if (partitions.size() > 1) {
+                // too many buttons to fit one message's component limit, so send them split up instead
+                ButtonHelper.deleteMessage(event);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), newMessage, newButtons);
+            } else {
+                // edit the message with the new partX buttons
+                event.getMessage()
+                        .editMessage(newMessage)
+                        .setComponents(ButtonHelper.turnButtonListIntoActionRowList(newButtons))
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
+            }
         }
     }
 }
