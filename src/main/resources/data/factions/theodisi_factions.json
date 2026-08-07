@@ -233,7 +233,7 @@
         "alias": "kryxos",
         "factionName": "The Dominion of Kryxos",
         "homeSystem": "th6",
-        "startingFleet": "1 dn, 1 cv, 1 cr, 1 dd, 1 ff, 1 mf b, 1 inf ch, 1 sd b, 1 pds cu",
+        "startingFleet": "1 dn, 1 cv, 1 cr, 1 dd, 1 ff, 1 mf b, 1 inf chrysali, 1 sd b, 1 pds cu",
         "commodities": 2,
         "factionTech": [
             "thkryxosfs",
