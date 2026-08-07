@@ -474,8 +474,10 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("revenantverydithagent")) {
             buttons.add(RevenantLeadersHandler.getRevVerydithCardsInfoButton(game, player));
         }
-        RevenantLeadersHandler.addRedLeaderCardsInfoButtons(buttons, player);
-        if (RevenantLeadersHandler.canUseRevThronesHero(game, player)) {
+        if (player.hasUnexhaustedLeader("revenantxytherisagent")) {
+            buttons.add(RevenantLeadersHandler.getRevXytherisCardsInfoButton(player));
+        }
+        if (player.hasLeaderUnlocked("revenantthroneshero")) {
             buttons.add(RevenantLeadersHandler.getRevThronesHeroButton(player));
         }
         if (player.hasPlanet("cineron")
