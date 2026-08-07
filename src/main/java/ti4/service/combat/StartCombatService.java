@@ -2275,6 +2275,12 @@ public class StartCombatService {
                     p2.factionButtonChecker() + "gainAeternaCCOnLoss", "Gain 1 CC (On Loss)", FactionEmojis.aeterna));
         }
 
+        //Veylor Flagship
+        if ((p1.ownsUnit("veylor_flagship") && ButtonHelper.doesPlayerHaveFSHere("veylor_flagship", p1, tile)) || (p2.ownsUnit("veylor_flagship") && ButtonHelper.doesPlayerHaveFSHere("veylor_flagship", p2, tile))) {
+            buttons.add(Buttons.gray(
+                    "assCannonNDihmohn_silentEdict_" + tile.getPosition(), "Use Silent Edict (end of combat round)", FactionEmojis.veylor));
+        }
+
         if (game.isLiberationC4Mode()) {
             if ("c41".equalsIgnoreCase(tile.getTileID())) {
                 Player sol = game.getPlayerFromColorOrFaction("sol");
