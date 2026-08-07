@@ -40,6 +40,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -429,6 +430,11 @@ public final class ButtonHelperTacticalAction {
             for (Player nonActivePlayer : game.getRealPlayers()) {
                 if (player == nonActivePlayer) {
                     continue;
+                }
+                if (nonActivePlayer.ownsUnit("xytheris_mech")
+                        && ButtonHelper.doesPlayerOwnAPlanetInThisSystem(tile, nonActivePlayer, game)
+                        && nonActivePlayer.getTg() > 0) {
+                    XytherisUnitHandler.offerHexanButtons(game, nonActivePlayer, tile);
                 }
                 if (nonActivePlayer.hasTech("vw") && FoWHelper.playerHasUnitsInSystem(nonActivePlayer, tile)) {
 

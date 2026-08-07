@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -710,6 +711,7 @@ public class CombatModHelper {
                             "sigma_argent_flagship_2", player, game.getTileByPosition(adjPos));
                 }
             }
+            case "not_active_player" -> meetsCondition = game.getActivePlayer() != player;
             default -> meetsCondition = true;
         }
         return meetsCondition;
@@ -856,6 +858,28 @@ public class CombatModHelper {
                         scalingCount = 0;
                     } else {
                         scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player);
+                    }
+                }
+                case "carried_ffinfmf_in_space_area" -> { // Doesn't actually track carried units, assumes flagship cap
+                    // is filled first
+                    UnitModel uM = Mapper.getUnit("xytheris_flagship");
+                    int numberOfCarryableUnitsInSystem =
+                            (activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player)
+                                    + activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player));
+                    if (!"space".equalsIgnoreCase(unitHolder.getName())
+                            || !player.ownsUnit("xytheris_flagship")
+                            || game.getActivePlayer() != player) {
+                        scalingCount = 0;
+                    } else if (numberOfCarryableUnitsInSystem >= uM.getCapacityValue()) {
+                        scalingCount = uM.getCapacityValue()
+                                + (XytherisLeadersHandler.getMyrixAgentBonus(
+                                        game,
+                                        player,
+                                        activeSystem,
+                                        unitHolder,
+                                        Units.getUnitKey(uM.getUnitType(), player.getColor())));
+                    } else {
+                        scalingCount = numberOfCarryableUnitsInSystem;
                     }
                 }
                 case "carriers_in_system" ->

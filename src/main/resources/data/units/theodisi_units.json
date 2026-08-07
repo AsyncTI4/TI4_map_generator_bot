@@ -387,6 +387,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
+    "notes": "This unit's extra dice are auto-calculated based on how many ground forces are in its space area, assuming the flagship is getting filled first.",
     "ability": "During your tactical actions, this unit rolls additional combat and unit ability dice equal to the number of ground forces it transported."
   },
   {

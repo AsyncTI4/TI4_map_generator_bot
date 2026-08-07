@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesAbilityHandler;
 import ti4.draft.DraftCategory;
 import ti4.game.Player;
@@ -111,6 +112,9 @@ public class FrankenAbilityService {
                         player.getCorrectChannel(),
                         player.getRepresentation() + ", please place up to 14 Tomb tokens for **Ancient Empire**.",
                         buttons);
+            }
+            if ("call_of_the_haunted".equalsIgnoreCase(abilityID)) {
+                RevenantAbilityHandler.offerCallOfTheHauntedButtons(player.getGame(), player);
             }
             if ("primordial_secrets".equalsIgnoreCase(abilityID)) {
                 ArcanumAbilityHandler.offerPrimordialSecretsButtons(player.getGame(), player);
