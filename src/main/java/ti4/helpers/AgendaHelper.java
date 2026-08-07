@@ -919,7 +919,9 @@ public final class AgendaHelper {
                                         + "Each player who voted for that outcome drew 1 action card.");
                     }
 
-                    if (winningR != null && winningR.hasTech("thveylory") && specificVote.contains("Kleptocratic Politics")) {
+                    if (winningR != null
+                            && winningR.hasTech("thveylory")
+                            && specificVote.contains("Kleptocratic Politics")) {
                         MessageHelper.sendMessageToChannelWithButtons(
                                 winningR.getCorrectChannel(),
                                 winningR.getRepresentation()

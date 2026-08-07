@@ -1,7 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor;
 
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -19,7 +18,7 @@ import ti4.service.emoji.CardEmojis;
 public class VeylorPromissoryHandler {
     private static final String DRAW_1AC = "drawNoneAcPlusOneMore";
     private static final String DRAW_2AC = "draw1AcPlusOneMore";
-    
+
     public static void sendDiscardButtonsForPn(GenericInteractionCreateEvent event, Game game, Player player) {
         if (game == null || player == null) {
             return;
@@ -27,13 +26,15 @@ public class VeylorPromissoryHandler {
 
         ActionCardHelper.getDiscardActionCardButtons(player, false);
 
-        List<Button> buttons = List.of(Buttons.green(player.factionButtonChecker() + DRAW_1AC, "Draw 1 AC", CardEmojis.ActionCard), Buttons.green(player.factionButtonChecker() + DRAW_2AC, "Draw 2 AC", CardEmojis.ActionCard));
+        List<Button> buttons = List.of(
+                Buttons.green(player.factionButtonChecker() + DRAW_1AC, "Draw 1 AC", CardEmojis.ActionCard),
+                Buttons.green(player.factionButtonChecker() + DRAW_2AC, "Draw 2 AC", CardEmojis.ActionCard));
 
         MessageHelper.sendMessageToChannelWithButtons(
-            player.getCorrectChannel(),
-            player.getRepresentation()
-                + ", please tell the bot how many action cards to draw (number discarded + 1, and don't fib it, the bot is watching you 👀.",
-            buttons);
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + ", please tell the bot how many action cards to draw (number discarded + 1, and don't fib it, the bot is watching you 👀.",
+                buttons);
     }
 
     @ButtonHandler(DRAW_1AC)

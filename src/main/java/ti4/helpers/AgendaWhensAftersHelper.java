@@ -620,7 +620,8 @@ public final class AgendaWhensAftersHelper {
                                             "Veylor Kleptocratic Politics", game, player.factionButtonChecker());
                                     MessageHelper.sendMessageToChannelWithFactionReact(
                                             player.getCorrectChannel(),
-                                            player.getRepresentation() + ", please choose your target for _Kleptocratic Politics_.",
+                                            player.getRepresentation()
+                                                    + ", please choose your target for _Kleptocratic Politics_.",
                                             game,
                                             player,
                                             riderButtons);
@@ -1092,7 +1093,9 @@ public final class AgendaWhensAftersHelper {
             }
             if (p1.hasTechReady("thveylory")) {
                 afterButtons.add(Buttons.gray(
-                        factionChecker + "play_after_Veylor Kleptocratic Politics", "Use Kleptocratic Politics", FactionEmojis.veylor));
+                        factionChecker + "play_after_Veylor Kleptocratic Politics",
+                        "Use Kleptocratic Politics",
+                        FactionEmojis.veylor));
             }
             if (game.getCurrentAgendaInfo().contains("Player")
                     && IsPlayerElectedService.isPlayerElected(game, p1, "committee")) {
