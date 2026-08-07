@@ -124,9 +124,9 @@ public class ThronesUnitHandler {
         AddUnitService.addUnits(event, tile, game, player.getColor(), AURELION);
 
         MessageHelper.sendMessageToChannel(
-            player.getCorrectChannel(),
-            player.getRepresentation()
-                + " placed a " + UnitEmojis.flagship + " in " + tile.getRepresentation() + ".");
+                player.getCorrectChannel(),
+                player.getRepresentation() + " placed a " + UnitEmojis.flagship + " in " + tile.getRepresentation()
+                        + ".");
 
         ButtonHelper.deleteMessage(event);
     }
