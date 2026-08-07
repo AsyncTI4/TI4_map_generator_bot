@@ -45,6 +45,7 @@ public class KryxosAbilityHandler {
         if (buttons.isEmpty()) {
             return;
         }
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
