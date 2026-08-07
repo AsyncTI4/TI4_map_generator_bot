@@ -125,7 +125,8 @@
         "type": "extrarolls",
         "value": "+1",
         "valueScalingType": "carried_ffinfmf_in_space_area",
-        "persistenceType": "ALWAYS",
+        "persistenceType": "CONDITIONAL",
+        "condition": "not_active_player",
         "scope": "fs",
         "related": [
             {
@@ -140,7 +141,8 @@
         "type": "extrarolls",
         "value": "+1",
         "valueScalingType": "carried_ffinfmf_in_space_area",
-        "persistenceType": "ALWAYS",
+        "persistenceType": "CONDITIONAL",
+        "condition": "not_active_player",
         "scope": "fs",
         "related": [
             {
@@ -155,7 +157,8 @@
         "type": "extrarolls",
         "value": "+1",
         "valueScalingType": "carried_ffinfmf_in_space_area",
-        "persistenceType": "ALWAYS",
+        "persistenceType": "CONDITIONAL",
+        "condition": "not_active_player",
         "scope": "fs",
         "related": [
             {
@@ -170,7 +173,8 @@
         "type": "extrarolls",
         "value": "+1",
         "valueScalingType": "carried_ffinfmf_in_space_area",
-        "persistenceType": "ALWAYS",
+        "persistenceType": "CONDITIONAL",
+        "condition": "not_active_player",
         "scope": "fs",
         "related": [
             {
