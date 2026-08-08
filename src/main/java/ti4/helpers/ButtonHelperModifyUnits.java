@@ -1574,6 +1574,11 @@ public final class ButtonHelperModifyUnits {
     }
 
     public static List<Button> getOpposingUnitsToHit(Player player, Game game, Tile tile, boolean exoHit) {
+        return getOpposingUnitsToHit(player, game, tile, exoHit, false);
+    }
+
+    public static List<Button> getOpposingUnitsToHit(
+            Player player, Game game, Tile tile, boolean exoHit, boolean excludeCarriers) {
         String exo = exoHit ? "exo" : "";
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
@@ -1587,6 +1592,9 @@ public final class ButtonHelperModifyUnits {
                 }
                 UnitModel unitModel = p2.getUnitFromUnitKey(unitKey);
                 if (!unitModel.getIsShip() && !game.isTwilightsFallMode()) {
+                    continue;
+                }
+                if (excludeCarriers && unitKey.unitType() == UnitType.Carrier) {
                     continue;
                 }
 
@@ -2690,9 +2698,8 @@ public final class ButtonHelperModifyUnits {
         } else if (cause.contains("silentEdict")) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), player.getRepresentation(false, false) + " used _Silent Edict_.");
-            buttons = getOpposingUnitsToHit(player, game, tile, false);
-            msg = player.getRepresentation()
-                    + ", please choose which non-carrier opposing unit to hit (carriers will appear, they are not eligible to be the target of Silent Edict).";
+            buttons = getOpposingUnitsToHit(player, game, tile, false, true);
+            msg = player.getRepresentation() + ", please choose which non-carrier opposing unit to hit.";
             VeylorUnitHandler.sendEdictDiscardButtons(game, player);
         } else {
             MessageHelper.sendMessageToChannel(

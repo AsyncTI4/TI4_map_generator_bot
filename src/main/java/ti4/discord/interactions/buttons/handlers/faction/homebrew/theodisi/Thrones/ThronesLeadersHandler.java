@@ -112,7 +112,7 @@ public class ThronesLeadersHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCorrectChannel(),
                 target.getRepresentationUnfogged()
-                        + ", please choose which destroyed ship Malrik the Defiler, the Thrones agent, should place.",
+                        + ", please choose which destroyed unit Malrik the Defiler, the Thrones agent, should place.",
                 buttons);
         MessageHelper.sendEphemeralMessageToEventChannel(
                 event, "Sent ship-choice buttons to " + target.getRepresentationUnfoggedNoPing() + ".");
@@ -231,7 +231,7 @@ public class ThronesLeadersHandler {
     }
 
     private static boolean isEligibleShipModel(UnitModel unitModel) {
-        return unitModel != null && unitModel.getIsShip();
+        return unitModel != null; // USed to be ship only now its unit, easier to change this than remove a ton of stuff
     }
 
     private static List<Tile> getEligibleDestinationTiles(Game game, Player target) {

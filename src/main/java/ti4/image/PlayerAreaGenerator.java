@@ -1449,11 +1449,7 @@ public class PlayerAreaGenerator {
                     continue;
                 }
 
-                Leader commander = otherPlayer.getLeaders().stream()
-                        .filter(leader -> Constants.COMMANDER.equals(leader.getType()))
-                        .filter(leader -> leader.getId().contains(otherPlayer.getFaction()))
-                        .findFirst()
-                        .orElse(null);
+                Leader commander = game.getRevenantLichCommander(lichPoolOwner, otherPlayer);
                 if (commander == null) {
                     continue;
                 }

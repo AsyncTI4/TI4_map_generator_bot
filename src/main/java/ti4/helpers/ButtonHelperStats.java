@@ -146,7 +146,9 @@ public final class ButtonHelperStats {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), axis, ButtonHelperAbilities.getBuyableAxisOrders(player, game));
         }
-        if (player.hasAbility("expeditionary_cache") && KairnAbilityHandler.getAvailableExpeditionTokens(game) > 0) {
+        if (realGain > 0
+                && player.hasAbility("expeditionary_cache")
+                && KairnAbilityHandler.getAvailableExpeditionTokens(game) > 0) {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()

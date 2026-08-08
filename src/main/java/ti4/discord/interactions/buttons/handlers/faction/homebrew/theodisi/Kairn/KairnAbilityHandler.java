@@ -233,8 +233,12 @@ public class KairnAbilityHandler {
             }
         }
         String prefix = player.factionButtonChecker() + PLACE_EXPEDITION_TOKEN;
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Done"));
+        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Done Placing Tokens"));
         List<Button> displayedButtons = NewStuffHelper.buttonPagination(planets, extraButtons, prefix, 25, 0, false);
+        if (planets.size() <= 24) {
+            displayedButtons = new ArrayList<>(displayedButtons);
+            displayedButtons.addAll(extraButtons);
+        }
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
@@ -272,10 +276,18 @@ public class KairnAbilityHandler {
                 + getExpeditionTokensToPlace(player, game) + " more token"
                 + (getExpeditionTokensToPlace(player, game) == 1 ? "." : "s.");
         String prefix = player.factionButtonChecker() + PLACE_EXPEDITION_TOKEN;
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Done"));
+        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Done Placing Tokens"));
 
-        if (NewStuffHelper.checkAndHandlePaginationChange(
-                event, event.getMessageChannel(), planets, extraButtons, message, prefix, buttonID)) {
+        int pageIndex = buttonID.lastIndexOf("page");
+        if (pageIndex >= 0 && buttonID.substring(pageIndex + 4).matches("\\d+")) {
+            int page = Integer.parseInt(buttonID.substring(pageIndex + 4));
+            List<Button> displayedButtons =
+                    NewStuffHelper.buttonPagination(planets, extraButtons, prefix, 25, page, false);
+            if (planets.size() <= 24) {
+                displayedButtons = new ArrayList<>(displayedButtons);
+                displayedButtons.addAll(extraButtons);
+            }
+            MessageHelper.editMessageWithButtons(event, message, displayedButtons);
             return;
         }
 

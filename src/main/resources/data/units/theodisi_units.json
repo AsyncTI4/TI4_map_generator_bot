@@ -547,7 +547,7 @@
     "sustainDamage": true,
     "isGroundForce": true,
     "ability": "When 1 or more dice are rolled, you may destroy this unit to increase the value of 1 die by 3.",
-    "notes": "When rolled is hard for the bot to do, so this is something that is applied beforehand. Use the button to destroy a mech in the combat menu BEFORE you roll. A +3 to 1 die that has the best value dice roll will be applied."
+    "notes": "After rolling dice, the bot offers a button to destroy a Ghola. If a die can become a hit with +3, the highest eligible die produces 1 additional hit."
   },
   {
     "id": "aurelion",

@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.contest.replay.core.CombatRollPayload;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -13,15 +15,17 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
+import ti4.helpers.RiftUnitsHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
-import ti4.model.CombatModifierModel;
-import ti4.model.NamedCombatModifierModel;
+import ti4.model.UnitModel;
+import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.commodities.CommodityConversionService;
 import ti4.service.emoji.FactionEmojis;
@@ -40,7 +44,12 @@ public class ThronesUnitHandler {
     private static final String THRONES_MECH = "thrones_mech";
     private static final String USE_GHOLA = "useGhola_";
     private static final String DESTROY_GHOLA = "destroyGhola_";
-    private static final String GHOLA_ROLL_BONUS = "thronesGholaRollBonus_";
+    private static final String DECLINE_GHOLA = "declineGhola_";
+    private static final String PENDING_GHOLA_ROLL = "pendingGholaRoll_";
+    private static final String USE_GHOLA_RIFT = "useGholaRift_";
+    private static final String DESTROY_GHOLA_RIFT = "destroyGholaRift_";
+    private static final String DECLINE_GHOLA_RIFT = "declineGholaRift_";
+    private static final String PENDING_GHOLA_RIFT = "pendingGholaRift_";
 
     public static Button getAurelionCommodityConversionButton(Player player) {
         return Buttons.gray(
@@ -122,6 +131,12 @@ public class ThronesUnitHandler {
         }
 
         AddUnitService.addUnits(event, tile, game, player.getColor(), AURELION);
+
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " placed a " + UnitEmojis.flagship + " in " + tile.getRepresentation()
+                        + ".");
+
         ButtonHelper.deleteMessage(event);
     }
 
@@ -149,24 +164,77 @@ public class ThronesUnitHandler {
                 .toList();
     }
 
-    public static void addGholaButton(List<Button> buttons, Game game, Player player, Tile tile, String groundOrSpace) {
-        if (buttons == null
+    public static void offerGholaAfterRoll(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player player,
+            Player opponent,
+            Tile tile,
+            UnitHolder combatHolder,
+            CombatRollType rollType,
+            CombatRollPayload payload) {
+        if (event == null
                 || game == null
                 || player == null
+                || opponent == null
                 || tile == null
+                || combatHolder == null
+                || rollType == null
+                || payload == null
                 || !player.ownsUnit(THRONES_MECH)
-                || !game.getStoredValue(GHOLA_ROLL_BONUS + player.getFaction()).isEmpty()) {
+                || !hasGholaOnBoard(game, player)) {
             return;
         }
+        boolean producesHit = payload.unitRolls().stream()
+                .flatMap(unitRoll ->
+                        unitRoll.dice().stream().filter(die -> dieRemainsAfterRerolls(payload, unitRoll, die)))
+                .anyMatch(die -> !die.success() && die.result() + 3 >= die.threshold());
+        String context = tile.getPosition() + "|" + opponent.getFaction() + "|"
+                + (rollType == CombatRollType.combatround && Constants.SPACE.equals(combatHolder.getName())) + "|"
+                + producesHit;
+        String pendingId = createPendingId(game, PENDING_GHOLA_ROLL, context);
+        game.setStoredValue(PENDING_GHOLA_ROLL + pendingId, player.getFaction() + "|" + context);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing()
+                        + ", you may destroy a Ghola (Thrones mech) to increase 1 die from this roll by +3.",
+                List.of(
+                        Buttons.red(
+                                player.factionButtonChecker() + USE_GHOLA + pendingId,
+                                "Use Ghola",
+                                FactionEmojis.thrones),
+                        Buttons.gray(player.factionButtonChecker() + DECLINE_GHOLA + pendingId, "Decline")));
+    }
 
-        if (!hasGholaOnBoard(game, player)) {
-            return;
+    private static boolean dieRemainsAfterRerolls(
+            CombatRollPayload payload, CombatRollPayload.UnitRoll unitRoll, CombatRollPayload.DieRoll die) {
+        CombatRollPayload.RollSegmentType segment = unitRoll.segmentType();
+        if (segment == CombatRollPayload.RollSegmentType.JOL_NAR_COMMANDER_REROLL_MISSES
+                || segment == CombatRollPayload.RollSegmentType.JOL_NAR_COMMANDER_REROLL_HITS
+                || segment == CombatRollPayload.RollSegmentType.IRON_COMMANDER_REROLL_MISSES
+                || segment == CombatRollPayload.RollSegmentType.KALTRIM_COMMANDER_REROLL_ONES
+                || segment == CombatRollPayload.RollSegmentType.MUNITIONS_RESERVES_REROLL) {
+            return true;
         }
 
-        buttons.add(Buttons.red(
-                player.factionButtonChecker() + USE_GHOLA + tile.getPosition() + "|" + groundOrSpace,
-                "Use Ghola",
-                FactionEmojis.thrones));
+        List<CombatRollPayload.RollSegmentType> rerolls = payload.unitRolls().stream()
+                .filter(other -> java.util.Objects.equals(unitRoll.asyncId(), other.asyncId()))
+                .map(CombatRollPayload.UnitRoll::segmentType)
+                .filter(other -> other != CombatRollPayload.RollSegmentType.PRIMARY
+                        && other != CombatRollPayload.RollSegmentType.SUPERCHARGE_SELECTED_UNIT
+                        && other != CombatRollPayload.RollSegmentType.SUPERCHARGE_REST
+                        && other != CombatRollPayload.RollSegmentType.GRAVLEASH_SELECTED_UNIT
+                        && other != CombatRollPayload.RollSegmentType.GRAVLEASH_REST)
+                .toList();
+        boolean rerollsAllDice = rerolls.contains(CombatRollPayload.RollSegmentType.MUNITIONS_RESERVES_REROLL);
+        boolean rerollsThisMiss = !die.success()
+                && (rerolls.contains(CombatRollPayload.RollSegmentType.JOL_NAR_COMMANDER_REROLL_MISSES)
+                        || rerolls.contains(CombatRollPayload.RollSegmentType.IRON_COMMANDER_REROLL_MISSES));
+        boolean rerollsThisHit =
+                die.success() && rerolls.contains(CombatRollPayload.RollSegmentType.JOL_NAR_COMMANDER_REROLL_HITS);
+        boolean rerollsThisOne =
+                die.result() == 1 && rerolls.contains(CombatRollPayload.RollSegmentType.KALTRIM_COMMANDER_REROLL_ONES);
+        return !rerollsAllDice && !rerollsThisMiss && !rerollsThisHit && !rerollsThisOne;
     }
 
     @ButtonHandler(USE_GHOLA)
@@ -175,16 +243,16 @@ public class ThronesUnitHandler {
         if (game == null || player == null) {
             return;
         }
-        String[] payload = buttonID.substring(USE_GHOLA.length()).split("\\|", 2);
-        Tile combatTile = payload.length == 2 ? game.getTileByPosition(payload[0]) : null;
+        String pendingId = buttonID.substring(USE_GHOLA.length());
+        String[] payload = game.getStoredValue(PENDING_GHOLA_ROLL + pendingId).split("\\|", 5);
+        Tile combatTile = payload.length == 5 ? game.getTileByPosition(payload[1]) : null;
         if (game == null
                 || player == null
                 || !player.ownsUnit(THRONES_MECH)
                 || combatTile == null
-                || (!Constants.SPACE.equalsIgnoreCase(payload.length == 2 ? payload[1] : "")
-                        && !"ground".equalsIgnoreCase(payload.length == 2 ? payload[1] : ""))
                 || !hasGholaOnBoard(game, player)
-                || !game.getStoredValue(GHOLA_ROLL_BONUS + player.getFaction()).isEmpty()) {
+                || payload.length != 5
+                || !player.getFaction().equals(payload[0])) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -193,23 +261,25 @@ public class ThronesUnitHandler {
         for (Tile mechTile : game.getTileMap().values()) {
             for (UnitHolder mechHolder : mechTile.getUnitHolders().values()) {
                 for (UnitKey unitKey : mechHolder.getUnitKeysForPlayer(player)) {
-                    if (unitKey.unitType() != UnitType.Mech) {
+                    if (!isGhola(player, unitKey)) {
                         continue;
                     }
                     for (UnitState state : mechHolder.getNonZeroUnitStates(unitKey)) {
+                        int holderIndex =
+                                new ArrayList<>(mechTile.getUnitHolders().values()).indexOf(mechHolder);
                         int count = mechHolder.getUnitCountForState(unitKey, state);
                         String stateText =
                                 switch (state) {
-                                    case dmg -> "damaged ";
-                                    case glv -> "galvanized ";
-                                    case dmg_glv -> "damaged galvanized ";
+                                    case dmg -> "Damaged ";
+                                    case glv -> "Galvanized ";
+                                    case dmg_glv -> "Damaged Galvanized ";
                                     default -> "";
                                 };
                         buttons.add(Buttons.red(
-                                player.factionButtonChecker() + DESTROY_GHOLA + combatTile.getPosition() + "|"
-                                        + payload[1] + "|" + mechTile.getPosition() + "|"
-                                        + mechHolder.getName() + "|" + unitKey.asyncID() + "|" + state,
-                                "Destroy 1 " + stateText + "Ghola on "
+                                player.factionButtonChecker() + DESTROY_GHOLA + pendingId + "|"
+                                        + mechTile.getPosition() + "|"
+                                        + holderIndex + "|" + unitKey.asyncID() + "|" + state,
+                                "Destroy 1 " + stateText + "Ghola On "
                                         + Helper.getUnitHolderRepresentation(
                                                 mechTile, mechHolder.getName(), game, player)
                                         + " (" + count + ")",
@@ -226,7 +296,7 @@ public class ThronesUnitHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing()
-                        + ", choose a Ghola to destroy. Their next roll in this combat gains +3 to its best die.",
+                        + ", please choose a Ghola (Thrones mech) to destroy. The highest eligible die from the previous roll gains +3.",
                 buttons);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
@@ -237,88 +307,272 @@ public class ThronesUnitHandler {
         if (game == null || player == null) {
             return;
         }
-        String[] payload = buttonID.substring(DESTROY_GHOLA.length()).split("\\|", 6);
-        Tile combatTile = payload.length == 6 ? game.getTileByPosition(payload[0]) : null;
-        Tile mechTile = payload.length == 6 ? game.getTileByPosition(payload[2]) : null;
-        UnitHolder mechHolder =
-                mechTile == null ? null : mechTile.getUnitHolders().get(payload[3]);
+        String[] payload = buttonID.substring(DESTROY_GHOLA.length()).split("\\|", 5);
+        String pendingId = payload.length == 5 ? payload[0] : "";
+        String[] pending = game.getStoredValue(PENDING_GHOLA_ROLL + pendingId).split("\\|", 5);
+        Tile combatTile = pending.length == 5 ? game.getTileByPosition(pending[1]) : null;
+        Player opponent = pending.length == 5 ? game.getPlayerFromColorOrFaction(pending[2]) : null;
+        Tile mechTile = payload.length == 5 ? game.getTileByPosition(payload[1]) : null;
+        UnitHolder mechHolder = payload.length == 5 ? getHolderByIndex(mechTile, payload[2]) : null;
         UnitKey mechKey = mechHolder == null
                 ? null
                 : mechHolder.getUnitKeysForPlayer(player).stream()
-                        .filter(key -> key.unitType() == UnitType.Mech)
-                        .filter(key -> key.asyncID().equals(payload[4]))
+                        .filter(key -> isGhola(player, key))
+                        .filter(key -> key.asyncID().equals(payload[3]))
                         .findFirst()
                         .orElse(null);
-        UnitState state = payload.length == 6 ? Units.findUnitState(payload[5]) : null;
+        UnitState state = payload.length == 5 ? Units.findUnitState(payload[4]) : null;
         if (game == null
                 || player == null
+                || pending.length != 5
+                || !player.getFaction().equals(pending[0])
                 || !player.ownsUnit(THRONES_MECH)
                 || combatTile == null
-                || (!Constants.SPACE.equalsIgnoreCase(payload.length == 6 ? payload[1] : "")
-                        && !"ground".equalsIgnoreCase(payload.length == 6 ? payload[1] : ""))
+                || opponent == null
                 || mechHolder == null
                 || mechKey == null
                 || state == null
-                || mechHolder.getUnitCountForState(mechKey, state) < 1
-                || !game.getStoredValue(GHOLA_ROLL_BONUS + player.getFaction()).isEmpty()) {
+                || mechHolder.getUnitCountForState(mechKey, state) < 1) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
         DestroyUnitService.destroyUnit(
                 event, mechTile, game, new ParsedUnit(mechKey, 1, mechHolder.getName()), true, state);
-        game.setStoredValue(GHOLA_ROLL_BONUS + player.getFaction(), combatTile.getPosition() + "|" + payload[1]);
+        game.removeStoredValue(PENDING_GHOLA_ROLL + pendingId);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing()
-                        + " destroyed a Ghola. +3 will apply to the best die of their next roll in this combat.");
+                        + " destroyed a Ghola (Thrones mech), increasing 1 die from their previous roll by +3."
+                        + (Boolean.parseBoolean(pending[4]) ? " This produced 1 additional hit." : ""));
+        if (Boolean.parseBoolean(pending[4]) && Boolean.parseBoolean(pending[3]) && opponent != player) {
+            CombatRollService.sendSpaceAssignHitsButtons(event, game, opponent, combatTile, 1);
+        } else if (Boolean.parseBoolean(pending[4])) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Resolve the 1 additional hit from _Ghola_ using the appropriate hit-assignment buttons.");
+        }
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void addGholaNextRollModifier(
-            List<NamedCombatModifierModel> modifiers,
+    @ButtonHandler(DECLINE_GHOLA)
+    public static void declineGholaForRollBonus(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (game == null || player == null) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        String pendingId = buttonID.substring(DECLINE_GHOLA.length());
+        String[] pending = game.getStoredValue(PENDING_GHOLA_ROLL + pendingId).split("\\|", 5);
+        if (pending.length == 5 && player.getFaction().equals(pending[0])) {
+            game.removeStoredValue(PENDING_GHOLA_ROLL + pendingId);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static boolean offerGholaAfterRiftRoll(
+            GenericInteractionCreateEvent event,
             Game game,
             Player player,
             Tile tile,
-            UnitHolder holder,
-            CombatRollType rollType) {
-        if (modifiers == null || game == null || player == null || tile == null || holder == null || rollType == null) {
-            return;
+            UnitKey unitKey,
+            boolean damaged,
+            Player cabal,
+            Die die) {
+        if (event == null
+                || game == null
+                || player == null
+                || tile == null
+                || unitKey == null
+                || die == null
+                || die.isSuccess()
+                || die.getResult() + 3 < die.getThreshold()
+                || !player.ownsUnit(THRONES_MECH)
+                || !hasGholaOnBoard(game, player)) {
+            return false;
         }
-        String key = GHOLA_ROLL_BONUS + player.getFaction();
-        String[] context = game.getStoredValue(key).split("\\|", 2);
-        if (context.length != 2
-                || !tile.getPosition().equals(context[0])
-                || (Constants.SPACE.equalsIgnoreCase(context[1]) != Constants.SPACE.equals(holder.getName()))) {
-            return;
-        }
-
-        CombatModifierModel modifier = new CombatModifierModel();
-        modifier.setAlias("thrones_ghola");
-        modifier.setType(Constants.COMBAT_MODIFIERS);
-        modifier.setValue(3);
-        modifier.setMaxDice(1);
-        modifier.setPersistenceType("ALWAYS");
-        modifier.setScope("");
-        modifier.setRelated(List.of());
-        modifier.setForCombatAbility(rollType);
-        modifiers.add(new NamedCombatModifierModel(modifier, "_Ghola_"));
-        game.removeStoredValue(key);
+        String context = tile.getPosition() + "|" + unitKey.asyncID() + "|" + damaged + "|"
+                + (cabal == null ? "-" : cabal.getFaction());
+        String pendingId = createPendingId(game, PENDING_GHOLA_RIFT, context);
+        game.setStoredValue(PENDING_GHOLA_RIFT + pendingId, player.getFaction() + "|" + context);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing()
+                        + ", you may destroy a Ghola (Thrones mech) to add +3 to this gravity-rift roll and save the unit.",
+                List.of(
+                        Buttons.red(
+                                player.factionButtonChecker() + USE_GHOLA_RIFT + pendingId,
+                                "Use Ghola",
+                                FactionEmojis.thrones),
+                        Buttons.gray(player.factionButtonChecker() + DECLINE_GHOLA_RIFT + pendingId, "Decline")));
+        return true;
     }
 
-    public static void clearGholaRollBonus(Game game) {
-        if (game == null) {
+    @ButtonHandler(USE_GHOLA_RIFT)
+    public static void offerGholaRiftDestructionButtons(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (game == null || player == null) {
+            ButtonHelper.deleteMessage(event);
             return;
         }
+        String pendingId = buttonID.substring(USE_GHOLA_RIFT.length());
+        String[] payload = game.getStoredValue(PENDING_GHOLA_RIFT + pendingId).split("\\|", 5);
+        if (payload.length != 5
+                || !player.getFaction().equals(payload[0])
+                || !player.ownsUnit(THRONES_MECH)
+                || !hasGholaOnBoard(game, player)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        for (Tile mechTile : game.getTileMap().values()) {
+            for (UnitHolder mechHolder : mechTile.getUnitHolders().values()) {
+                for (UnitKey mechKey : mechHolder.getUnitKeysForPlayer(player)) {
+                    if (!isGhola(player, mechKey)) continue;
+                    for (UnitState state : mechHolder.getNonZeroUnitStates(mechKey)) {
+                        int holderIndex =
+                                new ArrayList<>(mechTile.getUnitHolders().values()).indexOf(mechHolder);
+                        buttons.add(Buttons.red(
+                                player.factionButtonChecker() + DESTROY_GHOLA_RIFT + pendingId + "|"
+                                        + mechTile.getPosition() + "|" + holderIndex + "|"
+                                        + mechKey.asyncID() + "|" + state,
+                                "Destroy Ghola On "
+                                        + Helper.getUnitHolderRepresentation(
+                                                mechTile, mechHolder.getName(), game, player),
+                                mechKey.unitEmoji()));
+                    }
+                }
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + ", please choose a Ghola (Thrones mech) to destroy.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(DESTROY_GHOLA_RIFT)
+    public static void destroyGholaForRiftBonus(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (game == null || player == null) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        String[] payload = buttonID.substring(DESTROY_GHOLA_RIFT.length()).split("\\|", 5);
+        String pendingId = payload.length == 5 ? payload[0] : "";
+        String[] pending = game.getStoredValue(PENDING_GHOLA_RIFT + pendingId).split("\\|", 5);
+        Tile mechTile = payload.length == 5 ? game.getTileByPosition(payload[1]) : null;
+        UnitHolder mechHolder = payload.length == 5 ? getHolderByIndex(mechTile, payload[2]) : null;
+        UnitKey mechKey = mechHolder == null
+                ? null
+                : mechHolder.getUnitKeysForPlayer(player).stream()
+                        .filter(key -> isGhola(player, key) && key.asyncID().equals(payload[3]))
+                        .findFirst()
+                        .orElse(null);
+        UnitState state = payload.length == 5 ? Units.findUnitState(payload[4]) : null;
+        if (pending.length != 5
+                || !player.getFaction().equals(pending[0])
+                || mechHolder == null
+                || mechKey == null
+                || state == null
+                || mechHolder.getUnitCountForState(mechKey, state) < 1) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        DestroyUnitService.destroyUnit(
+                event, mechTile, game, new ParsedUnit(mechKey, 1, mechHolder.getName()), true, state);
+        game.removeStoredValue(PENDING_GHOLA_RIFT + pendingId);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing()
+                        + " destroyed a Ghola (Thrones mech) and added +3 to the gravity-rift roll; the unit survived.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(DECLINE_GHOLA_RIFT)
+    public static void declineGholaForRiftBonus(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (game == null || player == null) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        String pendingId = buttonID.substring(DECLINE_GHOLA_RIFT.length());
+        String[] payload = game.getStoredValue(PENDING_GHOLA_RIFT + pendingId).split("\\|", 5);
+        Tile tile = payload.length == 5 ? game.getTileByPosition(payload[1]) : null;
+        UnitKey unitKey = payload.length == 5 ? ti4.image.Mapper.getUnitKey(payload[2], player.getColorID()) : null;
+        Player cabal =
+                payload.length == 5 && !"-".equals(payload[4]) ? game.getPlayerFromColorOrFaction(payload[4]) : null;
+        if (payload.length != 5 || !player.getFaction().equals(payload[0]) || tile == null || unitKey == null) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        String result = RiftUnitsHelper.resolveFailedRiftUnit(
+                event, game, player, tile, unitKey, Boolean.parseBoolean(payload[3]), cabal);
+        game.removeStoredValue(PENDING_GHOLA_RIFT + pendingId);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), unitKey.unitEmoji() + result);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void clearPendingGholaWindows(Game game) {
+        if (game == null) return;
         game.getStoredValueMap().keySet().stream()
-                .filter(key -> key.startsWith(GHOLA_ROLL_BONUS))
+                .filter(key -> key.startsWith(PENDING_GHOLA_ROLL))
                 .toList()
                 .forEach(game::removeStoredValue);
+        for (String key : game.getStoredValueMap().keySet().stream()
+                .filter(key -> key.startsWith(PENDING_GHOLA_RIFT))
+                .toList()) {
+            String[] payload = game.getStoredValue(key).split("\\|", 5);
+            Player player = payload.length == 5 ? game.getPlayerFromColorOrFaction(payload[0]) : null;
+            Tile tile = payload.length == 5 ? game.getTileByPosition(payload[1]) : null;
+            UnitKey unitKey = player == null || payload.length != 5
+                    ? null
+                    : ti4.image.Mapper.getUnitKey(payload[2], player.getColorID());
+            Player cabal = payload.length == 5 && !"-".equals(payload[4])
+                    ? game.getPlayerFromColorOrFaction(payload[4])
+                    : null;
+            if (player != null
+                    && tile != null
+                    && unitKey != null
+                    && tile.getSpaceUnitHolder().getUnitCount(unitKey) > 0) {
+                String result = RiftUnitsHelper.resolveFailedRiftUnit(
+                        null, game, player, tile, unitKey, Boolean.parseBoolean(payload[3]), cabal);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        unitKey.unitEmoji() + result + " The unresolved Ghola decision was closed.");
+            }
+            game.removeStoredValue(key);
+        }
     }
 
     private static boolean hasGholaOnBoard(Game game, Player player) {
         return game.getTileMap().values().stream()
                 .flatMap(tile -> tile.getUnitHolders().values().stream())
-                .anyMatch(holder -> holder.getUnitCount(UnitType.Mech, player) > 0);
+                .flatMap(holder -> holder.getUnitKeysForPlayer(player).stream()
+                        .filter(unitKey -> holder.getUnitCount(unitKey) > 0))
+                .anyMatch(unitKey -> isGhola(player, unitKey));
+    }
+
+    private static UnitHolder getHolderByIndex(Tile tile, String indexText) {
+        if (tile == null || indexText == null || !indexText.matches("\\d+")) {
+            return null;
+        }
+        int index = Integer.parseInt(indexText);
+        List<UnitHolder> holders = new ArrayList<>(tile.getUnitHolders().values());
+        return index < holders.size() ? holders.get(index) : null;
+    }
+
+    private static String createPendingId(Game game, String prefix, String context) {
+        String pendingId;
+        do {
+            pendingId = Integer.toUnsignedString((context + System.nanoTime()).hashCode(), 36);
+        } while (!game.getStoredValue(prefix + pendingId).isEmpty());
+        return pendingId;
+    }
+
+    private static boolean isGhola(Player player, UnitKey unitKey) {
+        UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+        return unitKey.unitType() == UnitType.Mech && unitModel != null && THRONES_MECH.equals(unitModel.getId());
     }
 }

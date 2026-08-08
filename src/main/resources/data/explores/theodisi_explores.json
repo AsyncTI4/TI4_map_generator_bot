@@ -1,0 +1,198 @@
+[
+    {
+        "id": "economicboon",
+        "name": "Economic Boon",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. When you would exhaust a planet you control you may exhaust this card instead.",
+        "source": "theodisi"
+    },
+    {
+        "id": "freedomfighters",
+        "name": "Freedom Fighters",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Place 2 destroyers and 2 infantry from your reinforcements in this system.",
+        "source": "theodisi"
+    },
+    {
+        "id": "polymorphism",
+        "name": "Polymorphism",
+        "type": "Industrial",
+        "resolution": "Attach",
+        "text": "ATTACH: When you exhaust this planet, you may replace 1 non-fighter ship you control with 1 ship from your reinforcements with a cost up to 1 more than that returned ship.",
+        "attachmentId": "polymorphism",
+        "source": "theodisi"
+    },
+    {
+        "id": "spatialdisplacement",
+        "name": "Spatial Displacement",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Gain 1 commodity or spend 1 commodity or trade good to move 1 of your ships from this system into an adjacent system that contains no other player's ships.",
+        "source": "theodisi"
+    },
+    {
+        "id": "supermassiveindustrial",
+        "name": "Supermassive Industrial Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "This is always treated as an Industrial Relic Fragment while it is in your play area.\n\nWhen this card is purged you may gain 1 purged Industrial Relic Fragment.",
+        "source": "theodisi"
+    },
+    {
+        "id": "supermassivehazardous",
+        "name": "Supermassive Hazardous Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "This is always treated a Hazardous Relic Fragment while it is in your play area.\n\nWhen this card is purged you may gain 1 purged Hazardous Relic Fragment.",
+        "source": "theodisi"
+    },
+    {
+        "id": "naturesboon",
+        "name": "Nature's Boon",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area. This card may be exchnaged as part of a transaction. When you exhaust a planet you may exhaust this card to combine the values of that planet's resources and influence. Treat the combined value as if it were both resources and influence of that planet.",
+        "source": "theodisi"
+    },
+    {
+        "id": "loststation",
+        "name": "Lost Station",
+        "type": "Hazardous",
+        "resolution": "Token",
+        "text": "Place the Lost Station token in this system. Gain the Lost Station station card and ready it. Then, purge this card.",
+        "attachmentId": "loststation",
+        "source": "theodisi"
+    },
+    {
+        "id": "battleworld",
+        "name": "Battleworld",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "ATTACH: At the end of your turn if this planet has no neutral units on it, place 1 infantry from your reinforcements, 1 neutral mech, and 2 neutral infantry on this planet. Those neutral units enter coexistence. When a player wins a combat against neutral units on this planet, they main gain 1 command token.",
+        "attachmentId": "battleworld",
+        "source": "theodisi"
+    },
+    {
+        "id": "immediateassembly",
+        "name": "Immediate Assembly",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet, or if oyu remove 1 infantry from this planet, this planet gains PRODUCTION 3 as if it were a unit until the end of this turn or place 1 mech on this planet.",
+        "source": "theodisi"
+    },
+    {
+        "id": "supermassivecultural",
+        "name": "Supermassive Cultural Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "This is always treated a Cultural Relic Fragment while it is in your play area.\n\nWhen this card is purged you may gain 1 purged Cultural Relic Fragment.",
+        "source": "theodisi"
+    },
+    {
+        "id": "objectivedeliberations",
+        "name": "Objective Deliberations",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Gain 2 trade goods, or spend 2 trade goods to draw 1 secret objective.",
+        "source": "theodisi"
+    },
+    {
+        "id": "explorationenclave",
+        "name": "Exploration Enclave",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "You may spend up to 2 influence to ready that many non-home planets.",
+        "source": "theodisi"
+    },
+    {
+        "id": "diversifiedresearchfacility",
+        "name": "Diversified Research Facility",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "ATTACH: This planet may be treated as if it had a technology specialty of any color; if this planet already has a technology specialty, this planet's resource and influence values are each increased by 1 instead.",
+        "attachmentId": "diversifiedresearchfacility",
+        "source": "theodisi"
+    },
+    {
+        "id": "diplomaticboon",
+        "name": "Diplomatic Boon",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Exhaust this card and choose 1 non-home planet you control other than Mecatol Rex in a system that contains 1 of your ships. Place 1 infantry or fighter in that system up to the influence value of that planet.",
+        "source": "theodisi"
+    },
+    {
+        "id": "supermassiveunknown",
+        "name": "Supermassive Unknown Fragment",
+        "type": "Frontier",
+        "resolution": "Fragment",
+        "text": "This is always treated an Unknown Relic Fragment while it is in your play area.\n\nWhen this card is purged you may gain 1 other purged relic fragment of any type.",
+        "source": "theodisi"
+    },
+    {
+        "id": "synergisticresearch",
+        "name": "Synergistic Research",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Gain your breakthrough or research 1 technology with no prerequisites in a color that matches 1 of your synergy colors. If your breakthrough has no synergy colors gain 2 command tokens instead.",
+        "source": "theodisi"
+    },
+    {
+        "id": "disruptiveforces",
+        "name": "Disruptive Forces",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "If the fracture is not in play, put it in play. Place 1 ingress token in this system or gain 1 command token and draw 1 action card.",
+        "source": "theodisi"
+    },
+    {
+        "id": "cosmicboon",
+        "name": "Cosmic Boon",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. At the end of your turn you may exhaust this card to explore 2 planets you control.",
+        "source": "theodisi"
+    },
+    {
+        "id": "celestialpath",
+        "name": "Celestial Path",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Remove 1 command token form this system, if able, and gain 1 command token. Then, place 1 frontier token in your home system.",
+        "source": "theodisi"
+    },
+    {
+        "id": "mutagenhazardous",
+        "name": "Mutagen",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and choose Agent, Commander, Faction Technology, or Faction Ability. Draft 1 random unused non-unit non-setup component of that type.",
+        "source": "theodisi"
+    },
+    {
+        "id": "mutagenindustrial",
+        "name": "Mutagen",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and choose Agent, Commander, Faction Technology, or Faction Ability. Draft 1 random unused non-unit non-setup component of that type.",
+        "source": "theodisi"
+    },
+    {
+        "id": "mutagencultural",
+        "name": "Mutagen",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and choose Agent, Commander, Faction Technology, or Faction Ability. Draft 1 random unused non-unit non-setup component of that type.",
+        "source": "theodisi"
+    },
+    {
+        "id": "mutagenfrontier",
+        "name": "Mutagen",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and choose Agent, Commander, Faction Technology, or Faction Ability. Draft 1 random unused non-unit non-setup component of that type.",
+        "source": "theodisi"
+    }
+]

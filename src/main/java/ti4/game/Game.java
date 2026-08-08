@@ -4159,9 +4159,18 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
             if ("thpnrevenant".equals(pnID)) {
-                if (!"revenantcommander".equals(leaderID)) {
-                    continue;
+                Player pnOwner = getPNOwner(pnID);
+                Leader commander = getRevenantPantheonCommander(pnOwner);
+                if (pnOwner != null
+                        && !pnOwner.getFaction().equalsIgnoreCase(player.getFaction())
+                        && commander != null
+                        && commander.getId().equalsIgnoreCase(leaderID)
+                        && !commander.isLocked()) {
+                    return true;
                 }
+                continue;
+            }
+            if ("dspnceld".equals(pnID)) { // Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null
                         && !pnOwner.getFaction().equalsIgnoreCase(player.getFaction())
@@ -4170,8 +4179,13 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 }
                 continue;
             }
-            if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
+            if (pnID.contains("_an")) {
                 Player pnOwner = getPNOwner(pnID);
+                if (pnOwner != null
+                        && "revenant".equalsIgnoreCase(pnOwner.getFaction())
+                        && !"revenantcommander".equalsIgnoreCase(leaderID)) {
+                    continue;
+                }
                 if (pnOwner != null
                         && !pnOwner.getFaction().equalsIgnoreCase(player.getFaction())
                         && pnOwner.hasLeaderUnlocked(leaderID)) {
@@ -4191,15 +4205,16 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
 
-        // Grant access to the native commander of each player whose command token is in the revenant lich debt pool.
+        // Grant access to the selected commander whose faction token is in the Revenant lich debt pool.
         Player lichPoolOwner = getRevenantCommanderOwner(player);
         if (!"revenantcommander".equalsIgnoreCase(leaderID) && lichPoolOwner != null) {
             for (Player otherPlayer : getRealPlayersNDummies()) {
                 if (otherPlayer.equals(lichPoolOwner)) continue;
 
+                Leader commander = getRevenantLichCommander(lichPoolOwner, otherPlayer);
                 if (lichPoolOwner.getDebtTokenCount(otherPlayer.getColor(), "lich") > 0
-                        && leaderID.contains(otherPlayer.getFaction())
-                        && otherPlayer.hasLeaderUnlocked(leaderID)) {
+                        && commander != null
+                        && commander.getId().equalsIgnoreCase(leaderID)) {
                     return true;
                 }
             }
@@ -4215,11 +4230,48 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (player.hasLeaderUnlocked("revenantcommander")) {
             return player;
         }
-        if (!player.getPromissoryNotesInPlayArea().contains("thpnrevenant")) {
+        for (String pnID : player.getPromissoryNotesInPlayArea()) {
+            if (!pnID.contains("_an")) {
+                continue;
+            }
+            Player pnOwner = getPNOwner(pnID);
+            if (pnOwner != null
+                    && "revenant".equalsIgnoreCase(pnOwner.getFaction())
+                    && pnOwner.hasLeaderUnlocked("revenantcommander")) {
+                return pnOwner;
+            }
+        }
+        return null;
+    }
+
+    public Leader getRevenantPantheonCommander(Player revenantPlayer) {
+        if (revenantPlayer == null || !"revenant".equalsIgnoreCase(revenantPlayer.getFaction())) {
             return null;
         }
-        Player pnOwner = getPNOwner("thpnrevenant");
-        return pnOwner != null && pnOwner.hasLeaderUnlocked("revenantcommander") ? pnOwner : null;
+        return revenantPlayer.getLeaders().stream()
+                .filter(leader -> Constants.COMMANDER.equals(leader.getType()))
+                .filter(leader -> Constants.CALL_OF_THE_HAUNTED_LEADERS.contains(leader.getId()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Leader getRevenantLichCommander(Player lichPoolOwner, Player target) {
+        if (lichPoolOwner == null || target == null) {
+            return null;
+        }
+        String[] selection = getStoredValue("revenantLichCommander_" + lichPoolOwner.getFaction())
+                .split("\\|", 2);
+        if (selection.length == 2 && target.getFaction().equalsIgnoreCase(selection[0])) {
+            Leader selectedCommander = target.getLeaderByID(selection[1]).orElse(null);
+            if (selectedCommander != null && Constants.COMMANDER.equals(selectedCommander.getType())) {
+                return selectedCommander;
+            }
+        }
+        return target.getLeaders().stream()
+                .filter(leader -> Constants.COMMANDER.equals(leader.getType()))
+                .filter(leader -> leader.getId().contains(target.getFaction()))
+                .findFirst()
+                .orElse(null);
     }
 
     public List<Leader> playerUnlockedLeadersOrAlliance(Player player) {
@@ -4229,16 +4281,26 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
             if ("thpnrevenant".equals(pnID)) {
                 Player pnOwner = getPNOwner(pnID);
+                Leader commander = getRevenantPantheonCommander(pnOwner);
+                if (pnOwner != null && !pnOwner.equals(player) && commander != null && !commander.isLocked()) {
+                    leaders.add(commander);
+                }
+                continue;
+            }
+            if ("dspnceld".equals(pnID)) { // Celdauri Trade Alliance
+                Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null && !pnOwner.equals(player)) {
-                    Leader commander =
-                            pnOwner.getLeaderByID("revenantcommander").orElse(null);
-                    if (commander != null && pnOwner.hasLeaderUnlocked("revenantcommander")) {
-                        leaders.add(commander);
+                    for (Leader playerLeader : pnOwner.getLeaders()) {
+                        if (leaderIsFake(playerLeader.getId())
+                                || !playerLeader.getId().contains("commander")) {
+                            continue;
+                        }
+                        leaders.add(playerLeader);
                     }
                 }
                 continue;
             }
-            if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
+            if (pnID.contains("_an")) {
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null && !pnOwner.equals(player)) {
                     for (Leader playerLeader : pnOwner.getLeaders()) {
@@ -4246,6 +4308,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                             continue;
                         }
                         if (!playerLeader.getId().contains("commander")) {
+                            continue;
+                        }
+                        if ("revenant".equalsIgnoreCase(pnOwner.getFaction())
+                                && !"revenantcommander".equalsIgnoreCase(playerLeader.getId())) {
                             continue;
                         }
                         leaders.add(playerLeader);
@@ -4278,7 +4344,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
 
-        // Add the native commanders of players whose command tokens are in this debt pool.
+        // Add the selected commander whose faction token is in this debt pool.
         Player lichPoolOwner = getRevenantCommanderOwner(player);
         if (lichPoolOwner != null) {
             for (Player otherPlayer : getRealPlayers()) {
@@ -4287,13 +4353,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                     continue;
                 }
 
-                Leader commander = otherPlayer.getLeaders().stream()
-                        .filter(leader -> Constants.COMMANDER.equals(leader.getType()))
-                        .filter(leader -> leader.getId().contains(otherPlayer.getFaction()))
-                        .findFirst()
-                        .orElse(null);
-                if (commander != null && !commander.isLocked()) {
-                    leaders.add(commander);
+                Leader commander = getRevenantLichCommander(lichPoolOwner, otherPlayer);
+                if (commander != null) {
+                    leaders.add(getUnlockedLeaderCopy(commander));
                 }
             }
         }
@@ -4302,6 +4364,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 .filter(leader -> leader != null && !leader.isLocked())
                 .collect(Collectors.toList());
         return leaders;
+    }
+
+    public Leader getUnlockedLeaderCopy(Leader leader) {
+        return new Leader(
+                leader.getId(), leader.getType(), leader.getTgCount(), leader.isExhausted(), false, leader.isActive());
     }
 
     public void incrementMapImageGenerationCount() {
