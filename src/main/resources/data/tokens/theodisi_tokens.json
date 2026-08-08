@@ -83,5 +83,16 @@
         "tokenPlanetName": "skarnath",
         "isPlanet": true,
         "source": "theodisi"
+    },
+    {
+        "id": "loststation",
+        "imagePath": "token_theodisi_loststation.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "loststation"
+        ],
+        "tokenPlanetName": "loststation",
+        "isPlanet": true,
+        "source": "theodisi"
     }
 ]

@@ -35,28 +35,28 @@
         "source": "theodisi"
     },
     {
-        "alias": "economic_boon",
+        "alias": "economicboon",
         "name": "Economic Boon",
         "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. When you would exhaust a planet you control you may exhaust this card instead.",
         "isFakeRelic": true,
         "source": "theodisi"
     },
     {
-        "alias": "natures_boon",
+        "alias": "naturesboon",
         "name": "Nature's Boon",
         "text": "Place this card face up in your play area. This card may be exchnaged as part of a transaction. When you exhaust a planet you may exhaust this card to combine the values of that planet's resources and influence. Treat the combined value as if it were both resources and influence of that planet.",
         "isFakeRelic": true,
         "source": "theodisi"
     },
     {
-        "alias": "diplomatic_boon",
+        "alias": "diplomaticboon",
         "name": "Diplomatic Boon",
         "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Exhaust this card and choose 1 non-home planet you control other than Mecatol Rex in a system that contains 1 of your ships. Place 1 infantry or fighter in that system up to the influence value of that planet.",
         "isFakeRelic": true,
         "source": "theodisi"
     },
     {
-        "alias": "cosmic_boon",
+        "alias": "cosmicboon",
         "name": "Cosmic Boon",
         "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. At the end of your turn you may exhaust this card to explore 2 planets you control.",
         "isFakeRelic": true,
@@ -87,28 +87,28 @@
         "source": "theodisi"
     },
     {
-        "alias": "mutagen_hazardous",
+        "alias": "mutagenhazardous",
         "name": "Mutagen",
         "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and choose Agent, Commander, Faction Technology, or Faction Ability. Draft 1 random unused non-unit non-setup component of that type.",
         "isFakeRelic": true,
         "source": "theodisi"
     },
     {
-        "alias": "mutagen_industrial",
+        "alias": "mutagenindustrial",
         "name": "Mutagen",
         "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and choose Agent, Commander, Faction Technology, or Faction Ability. Draft 1 random unused non-unit non-setup component of that type.",
         "isFakeRelic": true,
         "source": "theodisi"
     },
     {
-        "alias": "mutagen_cultural",
+        "alias": "mutagencultural",
         "name": "Mutagen",
         "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and choose Agent, Commander, Faction Technology, or Faction Ability. Draft 1 random unused non-unit non-setup component of that type.",
         "isFakeRelic": true,
         "source": "theodisi"
     },
     {
-        "alias": "mutagen_frontier",
+        "alias": "mutagenfrontier",
         "name": "Mutagen",
         "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and choose Agent, Commander, Faction Technology, or Faction Ability. Draft 1 random unused non-unit non-setup component of that type.",
         "isFakeRelic": true,
