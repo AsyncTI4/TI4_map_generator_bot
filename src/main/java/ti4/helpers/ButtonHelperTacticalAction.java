@@ -255,7 +255,7 @@ public final class ButtonHelperTacticalAction {
         KairnTechHandler.clearSurveyorsLensFragmentWindows(game);
         KryxosBreakthroughHandler.clearPrototypeInnovators(game);
         MyrrLeadersHandler.clearMyrrAgent(game);
-        ThronesUnitHandler.clearGholaRollBonus(game);
+        ThronesUnitHandler.clearPendingGholaWindows(game);
         RevenantLeadersHandler.clearRedLeaderTacticalState(game);
         ThronesTechHandler.clearRiftTouchedBastion(game);
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
@@ -563,7 +563,7 @@ public final class ButtonHelperTacticalAction {
         KairnUnitHandler.clearExcavatorMechExplore(game);
         KryxosBreakthroughHandler.clearPrototypeInnovators(game);
         MyrrLeadersHandler.clearMyrrAgent(game);
-        ThronesUnitHandler.clearGholaRollBonus(game);
+        ThronesUnitHandler.clearPendingGholaWindows(game);
         MyrrTechHandler.clearSegmentedStructuring(game);
         ArdentiaUnitHandler.clearIronClawDeployUsed(game);
         DreamButtonHandler.clearDreamAgentAnomaly(game);

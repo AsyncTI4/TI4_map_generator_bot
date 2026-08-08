@@ -87,10 +87,8 @@ public class LostLegciesExploreHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation()
-                        + ", please choose the ship you wish to move using _Spatial Displacement_.",
+                player.getRepresentation() + ", please choose the ship you wish to move using _Spatial Displacement_.",
                 buttons);
-
     }
 
     @ButtonHandler(MOVE_SHIP)
@@ -168,7 +166,8 @@ public class LostLegciesExploreHandler {
         UnitKey unitKey = Mapper.getUnitKey(asyncId, player.getColorID());
         Tile destTile = game.getTileByPosition(destPos);
         if (origTile == null || destTile == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find original or destination tile.");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "Could not find original or destination tile.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -184,8 +183,7 @@ public class LostLegciesExploreHandler {
             return;
         }
 
-        MoveUnitService.moveUnits(
-                event, origTile, game, player.getColor(), "1 " + asyncId, destTile, Constants.SPACE);
+        MoveUnitService.moveUnits(event, origTile, game, player.getColor(), "1 " + asyncId, destTile, Constants.SPACE);
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),

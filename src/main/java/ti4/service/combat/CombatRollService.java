@@ -527,7 +527,6 @@ public class CombatRollService {
         List<NamedCombatModifierModel> tempOpponentMods = CombatTempModHelper.buildCurrentRoundTempNamedModifiers(
                 opponent, tileModel, combatOnHolder, true, rollType);
         tempMods.addAll(tempOpponentMods);
-        ThronesUnitHandler.addGholaNextRollModifier(tempMods, game, player, tile, combatOnHolder, rollType);
         RevenantLeadersHandler.addRevXytherisAgentModifier(tempMods, game, player, rollType);
         if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasAbility("control_network"))) {
             tempMods.addAll(NetrunnersAbilitiesHandler.getPendingControlNetworkSpaceCannonModifier(
@@ -640,6 +639,7 @@ public class CombatRollService {
             message = AshenBreakthroughHandler.appendBombardmentManualReminder(player, rollType, message);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        ThronesUnitHandler.offerGholaAfterRoll(event, game, player, opponent, tile, combatOnHolder, rollType, payload);
         if (rollType == CombatRollType.combatround
                 && Constants.SPACE.equalsIgnoreCase(unitHolderName)
                 && opponent != player) {

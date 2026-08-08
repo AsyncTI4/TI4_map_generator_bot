@@ -288,6 +288,19 @@ public class StartPhaseService {
             }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round " + round);
+        for (Player player : game.getRealPlayers()) {
+            if (!player.hasAbility("allure_of_darkness")) {
+                continue;
+            }
+            List<Button> buttons = RevenantLeadersHandler.offerLichTokenChoices(player, game);
+            if (!buttons.isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentation()
+                                + ", due to **Allure of Darkness**, please choose the player on whom to place the _Lich_ token.",
+                        buttons);
+            }
+        }
         if (game.isShowBanners()) {
             BannerGenerator.drawPhaseBanner("strategy", round, game.getActionsChannel());
         }
@@ -1281,12 +1294,6 @@ public class StartPhaseService {
                             p2.getRepresentationUnfogged() + ", you have the opportunity to use _Imperial Arbiter_.",
                             buttons);
                     hold.append((hold.isEmpty()) ? "" : " or ").append("_Imperial Arbiter_");
-                }
-                if (p2.hasAbility("allure_of_darkness")) {
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            p2.getCardsInfoThread(),
-                            p2.getRepresentation() + " please choose the player to place the _Lich_ token on:",
-                            RevenantLeadersHandler.offerLichTokenChoices(p2, game));
                 }
             }
         }

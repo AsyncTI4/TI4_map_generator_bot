@@ -560,6 +560,10 @@ public class Mapper {
         AttachmentModel model = attachments.get(id);
         if (model != null) return model;
         id = id.replace("attachment_", "").replace(".png", "");
+        if ("diversifiedresearchfacilitystat".equals(id)
+                && attachments.containsKey("diversifiedresearchfacility_stat")) {
+            return attachments.get("diversifiedresearchfacility_stat");
+        }
         if (attachments.get(id) == null) {
             id = "lloyd_" + id;
         }
