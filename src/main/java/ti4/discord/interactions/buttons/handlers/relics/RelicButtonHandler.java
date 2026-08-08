@@ -94,9 +94,22 @@ class RelicButtonHandler {
     }
 
     @ButtonHandler("drawRelic")
-    static void drawRelic(ButtonInteractionEvent event, Player player, Game game) {
+    static void drawRelic(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         RelicHelper.drawRelicAndNotify(player, event, game);
-        ButtonHelper.deleteMessage(event);
+        if (!buttonID.contains("_sc")) {
+            ButtonHelper.deleteMessage(event);
+        }
+    }
+
+    @ButtonHandler("resolveEvenFall3Primary")
+    static void resolveEvenFall3Primary(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        if (player.getPlanets().contains("mr") || player.getPlanets().contains("mrte")) {
+            RelicHelper.drawWithAdvantage(player, game, 2);
+            ActionCardHelper.drawActionCards(player, 3);
+        } else {
+            RelicHelper.drawRelicAndNotify(player, event, game);
+            ActionCardHelper.drawActionCards(player, 1);
+        }
     }
 
     @ButtonHandler("dominusOrb")

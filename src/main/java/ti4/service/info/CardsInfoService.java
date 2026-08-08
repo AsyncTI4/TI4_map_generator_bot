@@ -28,6 +28,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
@@ -473,13 +474,18 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("revenantverydithagent")) {
             buttons.add(RevenantLeadersHandler.getRevVerydithCardsInfoButton(game, player));
         }
-        RevenantLeadersHandler.addRedLeaderCardsInfoButtons(buttons, player);
-        if (RevenantLeadersHandler.canUseRevThronesHero(game, player)) {
+        if (player.hasUnexhaustedLeader("revenantxytherisagent")) {
+            buttons.add(RevenantLeadersHandler.getRevXytherisCardsInfoButton(player));
+        }
+        if (player.hasLeaderUnlocked("revenantthroneshero")) {
             buttons.add(RevenantLeadersHandler.getRevThronesHeroButton(player));
         }
         if (player.hasPlanet("cineron")
                 && !player.getExhaustedPlanetsAbilities().contains("cineron")) {
             buttons.add(ThronesThroneHandler.getCineronButton(player));
+        }
+        if (player.hasUnexhaustedLeader("verydithagent")) {
+            buttons.add(VerydithLeadersHandler.getVerydithAgentCardsInfoButton(player));
         }
         buttons.add(Buttons.gray("offerPlayerPref", "Player Settings"));
         buttons.add(Buttons.gray("searchMyGames", "List My Games"));

@@ -16,6 +16,7 @@ import ti4.service.emoji.FactionEmojis;
 public class VerydithTechHandler {
     private static final String USE_BN = "useBilateralNexus";
 
+    // Bilateral Nexus
     public static void getBilateralNexusButton(GenericInteractionCreateEvent event, Player player, Game game) {
         if (player == null || game == null || !player.hasTechReady("thverydithg")) {
             return;

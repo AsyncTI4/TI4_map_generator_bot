@@ -920,6 +920,16 @@ public final class AgendaHelper {
                     }
 
                     if (winningR != null
+                            && winningR.hasTech("thveylory")
+                            && specificVote.contains("Kleptocratic Politics")) {
+                        MessageHelper.sendMessageToChannelWithButtons(
+                                winningR.getCorrectChannel(),
+                                winningR.getRepresentation()
+                                        + ", please resolve _Kleptocratic Politics_ by using the buttons below. You do not spend a command token when doing this, if it removes one just use /player stats to add one back.",
+                                ButtonHelperHeroes.getSecondaryButtons(game));
+                    }
+
+                    if (winningR != null
                             && (specificVote.contains("Rider")
                                     || (winningR.hasAbility("future_sight")
                                             && game.getStoredValue("executiveOrder")
@@ -2811,6 +2821,18 @@ public final class AgendaHelper {
                             + game.getStoredValue(key).replace("_", ", ") + ".";
                 }
                 MessageHelper.sendMessageToChannel(channel, message);
+            }
+            if ("evenfall_sc".equalsIgnoreCase(game.getScSetID())) {
+                for (Player player : game.getRealPlayers()) {
+                    if (player.getPlanets().contains("mr")
+                            || player.getPlanets().contains("mrte")) {
+                        game.setSpeaker(player);
+                        MessageHelper.sendMessageToChannel(
+                                channel,
+                                "## " + player.getRepresentationUnfogged()
+                                        + " has Mecatol Rex and has been set as the speaker.");
+                    }
+                }
             }
         }
         if (!action) {

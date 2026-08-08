@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixAbilityHandler;
 import ti4.game.Game;
@@ -401,6 +402,9 @@ public class AddPlanetService {
                         + " has gained control of a planet which allows them to draw a relic!\nUse the button __after__ you have resolved __all__ ground combats.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, draw);
             }
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "verydithcommander")) {
+            VerydithLeadersHandler.checkVerydithCommander(game);
         }
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")

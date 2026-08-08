@@ -42,6 +42,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
+import ti4.service.leader.PurgeHeroService;
 import ti4.service.tech.ListTechService;
 import ti4.service.tech.PlayerTechService;
 import ti4.service.unit.AddUnitService;
@@ -92,7 +93,6 @@ public class RevenantLeadersHandler {
     private static final String PLACE_REVMYRR_UNIT = "placeRevenantMyrrUnit_";
     private static final String REVMYRR_USED = "revenantMyrrCommanderUsed_";
     // Revenant of Ruin
-    private static final String REVTHRONES = "revenantthroneshero";
     private static final String USE_REVTHRONES = "useRevenantThronesHero";
     private static final String SELECT_REVTHRONES_SYSTEM = "selectRevenantThronesSystem_";
     private static final String REVTHRONES_PRODUCTION = "revenantThronesProduction_";
@@ -356,16 +356,17 @@ public class RevenantLeadersHandler {
             return;
         }
 
+        PurgeHeroService.purgeHeroPreamble(
+                event, player, game, "revenantthroneshero", "Lost Throne of Pride - Fallen King");
+
         String message = player.getRepresentation()
                 + ", choose a system containing 1 or more of your units in which to use PRODUCTION 4 due to Lost Throne of Pride, the Revenant Thrones hero.";
         String prefix = player.factionButtonChecker() + SELECT_REVTHRONES_SYSTEM;
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
-        List<Button> paginatedButtons = NewStuffHelper.buttonPagination(buttons, extraButtons, prefix, 25, 0, false);
+        List<Button> paginatedButtons = NewStuffHelper.buttonPagination(buttons, prefix, 0);
         if (buttons.size() <= 24) {
             paginatedButtons = new ArrayList<>(buttons);
-            paginatedButtons.addAll(extraButtons);
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, paginatedButtons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, paginatedButtons);
     }
 
     @ButtonHandler(SELECT_REVTHRONES_SYSTEM)
@@ -380,9 +381,8 @@ public class RevenantLeadersHandler {
         String message = player.getRepresentation()
                 + ", choose a system containing 1 or more of your units in which to use PRODUCTION 4 due to Lost Throne of Pride, the Revenant Thrones hero.";
         String prefix = player.factionButtonChecker() + SELECT_REVTHRONES_SYSTEM;
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
         if (NewStuffHelper.checkAndHandlePaginationChange(
-                event, event.getMessageChannel(), buttons, extraButtons, message, prefix, buttonID)) {
+                event, event.getMessageChannel(), buttons, message, prefix, buttonID)) {
             return;
         }
 
@@ -406,7 +406,7 @@ public class RevenantLeadersHandler {
     }
 
     public static int getRevThronesProduction(Game game, Player player, Tile tile) {
-        if (game == null || player == null || tile == null || !player.hasLeaderUnlocked(REVTHRONES)) {
+        if (game == null || player == null || tile == null) {
             return 0;
         }
         return tile.getPosition().equals(game.getStoredValue(REVTHRONES_PRODUCTION + player.getFaction())) ? 4 : 0;
@@ -426,7 +426,6 @@ public class RevenantLeadersHandler {
         return game != null
                 && player != null
                 && player.isActivePlayer()
-                && player.hasLeaderUnlocked(REVTHRONES)
                 && game.getStoredValue(REVTHRONES_PRODUCTION + player.getFaction())
                         .isEmpty();
     }
@@ -456,13 +455,6 @@ public class RevenantLeadersHandler {
         }
         int middleSeparator = producedUnitKey.lastIndexOf('_', lastSeparator - 1);
         return middleSeparator < 0 ? null : producedUnitKey.substring(middleSeparator + 1, lastSeparator);
-    }
-
-    // Red Revenant Leader Set
-    public static void addRedLeaderCardsInfoButtons(List<Button> buttons, Player player) {
-        if (buttons != null && player != null && player.hasUnexhaustedLeader(REVXYTHERIS)) {
-            buttons.add(getRevXytherisCardsInfoButton(player));
-        }
     }
 
     // Revenant of Xytheris
