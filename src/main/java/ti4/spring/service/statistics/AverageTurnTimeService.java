@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
@@ -29,7 +28,6 @@ public class AverageTurnTimeService {
 
     private final PlayerEntityRepository playerEntityRepository;
 
-    @Transactional(readOnly = true)
     public void getAverageTurnTimes(SlashCommandInteractionEvent event) {
         boolean ignoreEndedGames =
                 event.getOption(Constants.IGNORE_ENDED_GAMES, Boolean.FALSE, OptionMapping::getAsBoolean);
@@ -51,6 +49,10 @@ public class AverageTurnTimeService {
 
             int times = 3;
 
+            // Fetched once up front: looking this up per user would issue a query per player in the report.
+            Map<String, List<Integer>> fastestDaysByUserId =
+                    UserGameInfoService.get().getThreeFastestDaysToComplete6PlayerGamesByUserId();
+
             for (int i = 1; i < times; i++) {
 
                 result = "";
@@ -65,8 +67,7 @@ public class AverageTurnTimeService {
 
                 for (var stats : sortedResults) {
                     String userId = stats.userId;
-                    List<Integer> threeFastestDays =
-                            UserGameInfoService.get().getUsersThreeFastestDaysToComplete6PlayerGames(userId);
+                    List<Integer> threeFastestDays = fastestDaysByUserId.getOrDefault(userId, List.of());
                     List<Integer> threeFastestDaysCopy = new ArrayList<>(threeFastestDays);
                     if (i == 1) {
                         if (threeFastestDaysCopy.size() > 3) {
@@ -152,7 +153,6 @@ public class AverageTurnTimeService {
         return sb.toString();
     }
 
-    @Transactional(readOnly = true)
     public String getAverageTurnTimesString(List<String> userIds) {
         List<UserAverageTurnTimeAccumulator> averageTurnTimes = getAverageTurnTimes(userIds);
         return toResultString(averageTurnTimes);
@@ -166,7 +166,6 @@ public class AverageTurnTimeService {
         return getAverageTurnTimes(players, minimumTurns, maximumResults);
     }
 
-    @Transactional(readOnly = true)
     public Map<String, Long> getUserIdsToAverageTurnTimes(List<String> userIds) {
         List<UserAverageTurnTimeAccumulator> averageTurnTimes = getAverageTurnTimes(userIds);
 
