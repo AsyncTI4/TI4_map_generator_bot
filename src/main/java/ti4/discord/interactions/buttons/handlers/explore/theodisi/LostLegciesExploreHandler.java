@@ -12,8 +12,10 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
+import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.MiscEmojis;
@@ -36,13 +38,13 @@ public class LostLegciesExploreHandler {
         buttons.add(Buttons.green(player.factionButtonChecker() + "gainComms_1", "Gain 1 Commodity", MiscEmojis.comm));
         buttons.add(Buttons.green(
                 player.factionButtonChecker() + USE_SPATIAL + tile.getPosition(),
-                "Spatailly Displace 1 Ship",
+                "Use Spatial Displacement",
                 UnitEmojis.destroyer));
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation()
-                        + ", you may gain 1 commodity or spend 1 commodity or trade good to move 1 ship to an adjacent system that contains no other player's ships.",
+                        + ", you may gain 1 commodity or spend 1 commodity or trade good to move 1 ship to an adjacent system that contains no other player's ships using _Spatial Displacement_.",
                 buttons);
     }
 
@@ -69,13 +71,13 @@ public class LostLegciesExploreHandler {
                 }
 
                 buttons.add(Buttons.green(
-                        player.factionButtonChecker() + MOVE_SHIP + unitKey.asyncID(),
+                        player.factionButtonChecker() + MOVE_SHIP + unitKey.asyncID() + "|" + activeTile.getPosition(),
                         "Move 1 " + unitModel.getName(),
                         unitKey.unitEmoji()));
             }
         }
 
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteMessage(event);
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -86,10 +88,9 @@ public class LostLegciesExploreHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", you may move 1 ship to an adjacent system that contains no other player's ships.",
+                        + ", please choose the ship you wish to move using _Spatial Displacement_.",
                 buttons);
 
-        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler(MOVE_SHIP)
@@ -101,64 +102,97 @@ public class LostLegciesExploreHandler {
 
         String[] payload = buttonID.substring(MOVE_SHIP.length()).split("\\|", 2);
         if (payload.length != 2) {
+            return;
+        }
+
+        String asyncId = payload[0];
+        String tilePos = payload[1];
+        Tile tile = game.getTileByPosition(tilePos);
+        if (asyncId == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that ship.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (tile == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that system.");
             ButtonHelper.deleteMessage(event);
             return;
         }
 
-        Tile tile = game.getTileByPosition(payload[0]);
-        UnitModel uM = player.getUnitFromAsyncID(payload[1]);
-        if (tile == null || uM == null) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        List<Button> systems = new ArrayList<>();
-        for (String adjacentSystem : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)) {
-            if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
-                Tile adjacentTile = game.getTileByPosition(adjacentSystem);
-                systems.add(Buttons.green(
-                        player.factionButtonChecker() + DISPLACE + tile.getPosition() + "|" + uM.getAsyncId() + "|"
-                                + adjacentTile.getPosition(),
-                        tile.getRepresentationForButtons(game, player)));
+        List<Button> destinations = new ArrayList<>();
+        for (String adjacent : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)) {
+            Tile adjacentTile = game.getTileByPosition(adjacent);
+            if (adjacentTile == null || FoWHelper.otherPlayersHaveShipsInSystem(player, adjacentTile, game)) {
+                continue;
             }
+
+            destinations.add(Buttons.green(
+                    player.factionButtonChecker() + DISPLACE + tile.getPosition() + "|" + asyncId + "|"
+                            + adjacentTile.getPosition(),
+                    adjacentTile.getRepresentationForButtons(game, player)));
         }
+        if (destinations.isEmpty()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There are no eligible adjacent systems.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + ", please choose the system to which you wish to move the ship.",
+                destinations);
+
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler(DISPLACE)
-    public static void spatialDisplacementFinal(
+    public static void resolveSpatialDisplacement(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (game == null || player == null) {
-            ButtonHelper.deleteMessage(event);
             return;
         }
 
-        String[] payload = buttonID.substring(DISPLACE.length()).split("\\|", 3);
-        if (payload.length != 3) {
+        String payload = buttonID.replace(DISPLACE, "");
+        String[] parts = payload.split("\\|", 3);
+        if (parts.length != 3) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve that movement selection.");
             ButtonHelper.deleteMessage(event);
             return;
         }
+        String origPos = parts[0];
+        String asyncId = parts[1];
+        String destPos = parts[2];
 
-        Tile startingTile = game.getTileByPosition(payload[0]);
-        UnitModel uM = player.getUnitFromAsyncID(payload[1]);
-        Tile destinationTile = game.getTileByPosition(payload[2]);
-        if (startingTile == null || uM == null || destinationTile == null) {
+        Tile origTile = game.getTileByPosition(origPos);
+        UnitModel unit = player.getUnitFromAsyncID(asyncId);
+        UnitKey unitKey = Mapper.getUnitKey(asyncId, player.getColorID());
+        Tile destTile = game.getTileByPosition(destPos);
+        if (origTile == null || destTile == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find original or destination tile.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (unit == null || unitKey == null || origTile.getSpaceUnitHolder().getUnitCount(unitKey) < 1) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that ship.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (!FoWHelper.getAdjacentTiles(game, origPos, player, false).contains(destPos)
+                || FoWHelper.otherPlayersHaveShipsInSystem(player, destTile, game)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "That system is no longer eligible.");
             ButtonHelper.deleteMessage(event);
             return;
         }
 
         MoveUnitService.moveUnits(
-                event,
-                startingTile,
-                game,
-                player.getColor(),
-                "1 " + uM.getAsyncId(),
-                destinationTile,
-                "1 " + uM.getAsyncId());
+                event, origTile, game, player.getColor(), "1 " + asyncId, destTile, Constants.SPACE);
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " moved 1 " + uM.getNameRepresentation() + " from "
-                        + startingTile.getRepresentation() + " to " + destinationTile.getRepresentation()
+                player.getRepresentation() + " moved 1 " + unit.getNameRepresentation() + " from "
+                        + origTile.getRepresentation() + " to " + destTile.getRepresentation()
                         + " via _Spatial Displacement_.");
+
+        ButtonHelper.deleteMessage(event);
     }
 }

@@ -1,0 +1,19 @@
+{
+    "id": "loststation",
+    "name": "Lost Station",
+    "aliases": [
+        "loststation"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetType": "SPACESTATION",
+    "planetLayout": {
+        "unitHolderName": "loststation",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 72,
+            "y": 58
+        }
+    },
+    "source": "pok"
+}

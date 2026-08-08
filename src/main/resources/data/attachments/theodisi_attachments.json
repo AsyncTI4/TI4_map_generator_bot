@@ -80,12 +80,13 @@
         "id": "diversifiedresearchfacility",
         "name": "Diversified Research Facility",
         "imagePath": "attachment_diversifiedresearchfacility.png",
+        "techSpeciality": ["biotic", "propulsion", "cybernetic", "warfare"],
         "source": "theodisi"
     },
     {
-        "id": "diversifiedresearchfacility_stat",
-        "name": "Diversified Research Facility R1|I1",
-        "imagePath": "attachment_diversifiedresearchfacility_stat.png",
+        "id": "diversifiedresearchfacilitystat",
+        "name": "Diversified Research Facility",
+        "imagePath": "attachment_diversifiedresearchfacilitystat.png",
         "influenceModifier": 1,
         "resourcesModifier": 1,
         "source": "theodisi"

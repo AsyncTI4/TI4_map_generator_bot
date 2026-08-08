@@ -624,7 +624,10 @@ public class ExploreService {
                                         .orElse(new ArrayList<>())
                                         .isEmpty()
                                 || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planetID)) {
-                            if ((Constants.WARFARE.equals(attachment)
+                            if ("diversifiedresearchfacility".equals(attachment)) {
+                                attachment = "diversifiedresearchfacilitystat";
+                                attachmentFilename = Mapper.getAttachmentImagePath(attachment);
+                            } else if ((Constants.WARFARE.equals(attachment)
                                     || Constants.PROPULSION.equals(attachment)
                                     || Constants.CYBERNETIC.equals(attachment)
                                     || Constants.BIOTIC.equals(attachment)
@@ -1285,7 +1288,7 @@ public class ExploreService {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), "2 dd, 2 inf " + planetName);
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        "Automatically placed 2 destroyers in the space area, and 2 infantry on the explored planet in this system.");
+                        "Automatically placed 2 destroyers in the space area, and 2 infantry on the explored planet.");
             }
             case "spatialdisplacement" ->
                 LostLegciesExploreHandler.resolveSpatialDisplacement(event, game, player, tile);

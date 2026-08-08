@@ -112,7 +112,7 @@
         "type": "Cultural",
         "resolution": "Attach",
         "text": "ATTACH: This planet may be treated as if it had a technology specialty of any color; if this planet already has a technology specialty, this planet's resource and influence values are each increased by 1 instead.",
-        "attachmentId": "diversified_research_facility",
+        "attachmentId": "diversifiedresearchfacility",
         "source": "theodisi"
     },
     {
