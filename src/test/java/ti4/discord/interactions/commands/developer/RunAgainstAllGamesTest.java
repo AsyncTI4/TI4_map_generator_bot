@@ -2,34 +2,38 @@ package ti4.discord.interactions.commands.developer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
-import ti4.game.Player;
+import ti4.game.GameStats;
+import ti4.json.JsonMapperManager;
 import ti4.testUtils.BaseTi4Test;
 
 class RunAgainstAllGamesTest extends BaseTi4Test {
 
     @Test
-    void revertBlackSpectrumPlotsStripsOnlyTheBlackSpectrumDuplicates() {
+    void migrateActionCardTargetsMovesLegacySabotageTargetsOntoTheCanceledPlay() throws JsonProcessingException {
         Game game = new Game();
-        Player player = new Player("user-id", "user/name", game);
-        player.setColor("red");
-        game.setPlayers(new LinkedHashMap<>(Map.of("user-id", player)));
+        game.setGameStats(legacyStats());
 
-        player.setPlotCard("seethe");
-        player.setPlotCard("bsp_seethe");
-        player.setPlotCard("assail");
-        player.setPlotCard("bsp_assail");
-
-        boolean changed = RunAgainstAllGames.revertBlackSpectrumPlots(game);
+        boolean changed = RunAgainstAllGames.migrateActionCardTargets(game);
 
         assertThat(changed).isTrue();
-        assertThat(player.getPlotCardsRaw()).containsKey("seethe").containsKey("assail");
-        assertThat(player.getPlotCardsRaw()).doesNotContainKey("bsp_seethe").doesNotContainKey("bsp_assail");
+        assertThat(game.getGameStats().getActionCardPlays())
+                .extracting(GameStats.ActionCardPlay::isCanceled)
+                .containsExactly(true, false);
 
         // Running again makes no further changes
-        assertThat(RunAgainstAllGames.revertBlackSpectrumPlots(game)).isFalse();
+        assertThat(RunAgainstAllGames.migrateActionCardTargets(game)).isFalse();
+    }
+
+    // A save from before cancels were flagged: the Sabotage play carries the name of the card it
+    // canceled. Deliberately free of Overrule targets so the migration stays off the database.
+    private static GameStats legacyStats() throws JsonProcessingException {
+        return JsonMapperManager.basic().readValue("""
+                        {"actionCardPlays":[
+                            {"actionCard":"Flank Speed","playerId":"player1"},
+                            {"actionCard":"Sabotage","playerId":"player2","target":"Flank Speed"}
+                        ]}""", GameStats.class);
     }
 }

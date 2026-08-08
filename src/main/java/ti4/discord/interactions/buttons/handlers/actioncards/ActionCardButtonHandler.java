@@ -4,7 +4,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.game.GameStats;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaRiderHelper;
@@ -128,7 +127,7 @@ class ActionCardButtonHandler {
             AgendaRiderHelper.reverseRider("reverse_" + acName, game, player);
         }
         if (sendReact) {
-            game.getGameStats().recordAcPlayWithTarget(GameStats.SABOTAGE, player, acName);
+            game.getGameStats().markLatestPlayCanceled(acName);
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(
                         game.getActionsChannel(),
