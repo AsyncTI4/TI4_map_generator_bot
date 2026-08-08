@@ -1,20 +1,17 @@
 package ti4.discord.interactions.commands.developer;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
-import ti4.game.Player;
+import ti4.game.GameStats;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.game.persistence.GameManager;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.GenericCardModel;
-import ti4.model.Source.ComponentSource;
+import ti4.spring.service.statistics.overrule.OverruleStatsService;
 
 class RunAgainstAllGames extends Subcommand {
 
@@ -29,10 +26,9 @@ class RunAgainstAllGames extends Subcommand {
         Set<String> changedGames = new HashSet<>();
         ConsumeGameUtility.consumeAllGames(
                 game -> {
-                    boolean changed = revertBlackSpectrumPlots(game);
-                    if (changed) {
+                    if (migrateActionCardTargets(game)) {
                         changedGames.add(game.getName());
-                        GameManager.save(game, "Removed stray Black Spectrum plot card duplicates.");
+                        GameManager.save(game, "Migrated action card Sabotage/Overrule targets to canceled flags.");
                     }
                 },
                 ExecutionLockType.WRITE);
@@ -42,24 +38,19 @@ class RunAgainstAllGames extends Subcommand {
                 + " games: " + String.join(", ", changedGames));
     }
 
-    // Player.setupFactionSpecificOptions() hands every Firmament/Obsidian player every plot card
-    // ever loaded (Mapper.getPlots()), with no source filtering. Black Spectrum added 5 plot cards
-    // reusing the same names as the base 5 (Enervate/Siphon/Seethe/Assail/Extract), so every such
-    // player ended up with 10 cards: a normal one and a buffed Black Spectrum one for each name.
-    // Strip the stray Black Spectrum copies from every player's plot card pool.
-    static boolean revertBlackSpectrumPlots(Game game) {
-        boolean changed = false;
-        for (Player player : game.getPlayers().values()) {
-            for (String plotId : new ArrayList<>(player.getPlotCardsRaw().keySet())) {
-                GenericCardModel model = Mapper.getPlot(plotId);
-                if (model != null
-                        && model.getSource() == ComponentSource.black_spectrum
-                        && model.getHomebrewReplacesID().isPresent()) {
-                    player.getPlotCardsRaw().remove(plotId);
-                    changed = true;
-                }
-            }
+    // Cancels used to be recorded as a "Sabotage" action card play targeting the canceled card, and
+    // Overrule plays carried the strategy card that was chosen. Move both onto their new homes: the
+    // canceled flag of the play itself, and the overrule_choice table.
+    /**
+     * @deprecated one-off. Remove this along with the migration it calls once it has run against all
+     *     games.
+     */
+    @Deprecated
+    static boolean migrateActionCardTargets(Game game) {
+        GameStats.OverruleTargetMigration migration = game.getGameStats().migrateTargetsToCanceledFlags();
+        if (!migration.strategyCardChoices().isEmpty()) {
+            OverruleStatsService.get().addMigratedCounts(game.getName(), migration.strategyCardChoices());
         }
-        return changed;
+        return migration.changed();
     }
 }

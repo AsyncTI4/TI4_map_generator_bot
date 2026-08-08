@@ -3,11 +3,9 @@ package ti4.service.statistics;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +27,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.DeckModel;
+import ti4.spring.service.statistics.overrule.OverruleStatsService;
 
 @UtilityClass
 public class ActionCardStatsService {
@@ -50,8 +49,8 @@ public class ActionCardStatsService {
 
         Map<String, Integer> cancelCounts = new HashMap<>();
         Map<String, Integer> actionCardsPlayedCounts = new HashMap<>();
-        Map<String, Integer> overruleCounts = new HashMap<>();
         Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts = new HashMap<>();
+        Set<String> includedGameNames = new HashSet<>();
 
         // A discarded card that isn't in the selected deck means the game is mislabeled (e.g. it
         // changed decks mid-game), which would pollute the stats with off-deck cards.
@@ -63,59 +62,39 @@ public class ActionCardStatsService {
                         .and(game -> deckCardIds.containsAll(
                                 game.getDiscardActionCards().keySet())),
                 game -> accumulateActionCardStats(
-                        game, cancelCounts, actionCardsPlayedCounts, overruleCounts, playToWinCorrelationCounts),
+                        game, cancelCounts, actionCardsPlayedCounts, playToWinCorrelationCounts, includedGameNames),
                 ExecutionLockType.READ);
 
         MessageHelper.sendMessageToThread(
                 event.getChannel(),
                 "Action Card Play Statistics",
                 buildMessage(
-                        acDeck, cancelCounts, actionCardsPlayedCounts, overruleCounts, playToWinCorrelationCounts));
+                        acDeck, cancelCounts, actionCardsPlayedCounts, playToWinCorrelationCounts, includedGameNames));
     }
 
     private static void accumulateActionCardStats(
             Game game,
             Map<String, Integer> cancelCounts,
             Map<String, Integer> actionCardsPlayedCounts,
-            Map<String, Integer> overruleCounts,
-            Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
-        game.getGameStats()
-                .getCountPerTarget(GameStats.SABOTAGE)
-                .forEach((acName, count) -> cancelCounts.merge(acName, count, Integer::sum));
-
-        game.getGameStats()
-                .getCountPerTarget(GameStats.OVERRULE)
-                .forEach((scName, count) -> overruleCounts.merge(scName, count, Integer::sum));
+            Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
+            Set<String> includedGameNames) {
+        includedGameNames.add(game.getName());
 
         game.getDiscardActionCards()
                 .forEach((acID, ignored) -> incrementActionCardPlayCount(actionCardsPlayedCounts, acID));
 
         List<ActionCardPlay> actionCardPlays = game.getGameStats().getActionCardPlays();
+        for (ActionCardPlay actionCardPlay : actionCardPlays) {
+            if (actionCardPlay.isCanceled()) {
+                cancelCounts.merge(actionCardPlay.getActionCard(), 1, Integer::sum);
+            }
+        }
+
         Player winner = game.getWinner().orElse(null);
         if (actionCardPlays.isEmpty() || winner == null) {
             return;
         }
-        Set<ActionCardPlay> sabotagedPlays = findSabotagedPlays(actionCardPlays);
-        accumulateActionCardPlayToWinCorrelation(game, winner, sabotagedPlays, playToWinCorrelationCounts);
-    }
-
-    // A Sabotage is recorded after the play it cancels, with the canceled card's name as its
-    // target, so each Sabotage matches the nearest earlier not-yet-matched play of that card.
-    private static Set<ActionCardPlay> findSabotagedPlays(List<ActionCardPlay> actionCardPlays) {
-        Set<ActionCardPlay> sabotagedPlays = Collections.newSetFromMap(new IdentityHashMap<>());
-        for (int i = 0; i < actionCardPlays.size(); i++) {
-            ActionCardPlay sabotage = actionCardPlays.get(i);
-            if (!GameStats.SABOTAGE.equals(sabotage.getActionCard()) || sabotage.getTarget() == null) {
-                continue;
-            }
-            for (int j = i - 1; j >= 0; j--) {
-                ActionCardPlay candidate = actionCardPlays.get(j);
-                if (sabotage.getTarget().equals(candidate.getActionCard()) && sabotagedPlays.add(candidate)) {
-                    break;
-                }
-            }
-        }
-        return sabotagedPlays;
+        accumulateActionCardPlayToWinCorrelation(game, winner, playToWinCorrelationCounts);
     }
 
     private static void incrementActionCardPlayCount(
@@ -164,8 +143,8 @@ public class ActionCardStatsService {
             DeckModel acDeck,
             Map<String, Integer> cancelCounts,
             Map<String, Integer> actionCardsPlayedCounts,
-            Map<String, Integer> overruleCounts,
-            Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
+            Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
+            Set<String> includedGameNames) {
         Map<String, Integer> copiesPerName = getCopiesPerName(acDeck);
         Map<String, Integer> playedExpectedDraws = computeExpectedDraws(actionCardsPlayedCounts, copiesPerName);
         Map<String, Integer> playsIncludingCanceled = playToWinCorrelationCounts.entrySet().stream()
@@ -189,7 +168,7 @@ public class ActionCardStatsService {
         if (copiesPerName.containsKey(GameStats.OVERRULE)) {
             message.append("\n**Overrule targets**\n");
             appendTrackingStartNote(message);
-            appendOverruleStats(message, overruleCounts);
+            appendOverruleStats(message, OverruleStatsService.get().getCountPerStrategyCard(includedGameNames));
         }
         return message.toString();
     }
@@ -295,10 +274,7 @@ public class ActionCardStatsService {
     }
 
     private static void accumulateActionCardPlayToWinCorrelation(
-            Game game,
-            Player winner,
-            Set<ActionCardPlay> sabotagedPlays,
-            Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
+            Game game, Player winner, Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
         String winningPlayerId = StringUtils.defaultIfBlank(winner.getStatsTrackedUserID(), winner.getUserID());
         for (ActionCardPlay actionCardPlay : game.getGameStats().getActionCardPlays()) {
             if (StringUtils.isBlank(actionCardPlay.getPlayerId())) {
@@ -308,7 +284,7 @@ public class ActionCardStatsService {
             PlayToWinCorrelationCount count = playToWinCorrelationCounts.computeIfAbsent(
                     actionCardPlay.getActionCard(), _ -> new PlayToWinCorrelationCount());
             count.incrementPlaysIncludingCanceled();
-            if (sabotagedPlays.contains(actionCardPlay)) {
+            if (actionCardPlay.isCanceled()) {
                 continue;
             }
             count.incrementTotal();

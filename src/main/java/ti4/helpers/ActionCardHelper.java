@@ -26,7 +26,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvax
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.game.GameStats;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -2281,10 +2280,7 @@ public class ActionCardHelper {
     }
 
     static void recordTrackedActionCardPlay(Game game, Player player, String actionCardName) {
-        // Sabo and Overrule are tracked at separate points to track their targets
-        if (!GameStats.SABOTAGE.equals(actionCardName) && !GameStats.OVERRULE.equals(actionCardName)) {
-            game.getGameStats().recordAcPlay(actionCardName, player);
-        }
+        game.getGameStats().recordAcPlay(actionCardName, player);
     }
 
     private static String getGarboziaACIdentByAlias(Game game, Player player, String key) {
