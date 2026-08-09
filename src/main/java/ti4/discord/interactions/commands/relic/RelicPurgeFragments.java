@@ -1,6 +1,7 @@
 package ti4.discord.interactions.commands.relic;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -55,8 +56,10 @@ class RelicPurgeFragments extends GameStateSubcommand {
             }
         }
 
+        fragmentsToPurge.sort(Comparator.comparing(fragmentID -> !fragmentID.startsWith("supermassive")));
+
         while (fragmentsToPurge.size() > count) {
-            fragmentsToPurge.removeFirst();
+            fragmentsToPurge.removeLast();
         }
 
         if (fragmentsToPurge.size() < count) {
@@ -78,14 +81,18 @@ class RelicPurgeFragments extends GameStateSubcommand {
             activePlayer.removeFragment(fragid);
             game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
             switch (fragid) {
-                case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" ->
-                    message.append("a ").append(ExploreEmojis.CFrag).append("cultural");
-                case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->
-                    message.append("a ").append(ExploreEmojis.HFrag).append("hazardous");
-                case "irf1", "irf2", "irf3", "irf4", "irf5" ->
-                    message.append("an ").append(ExploreEmojis.IFrag).append("industrial");
-                case "urf1", "urf2", "urf3" ->
-                    message.append("an ").append(ExploreEmojis.UFrag).append("unknown");
+                case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9", "supermassivecultural" ->
+                    message.append(" a " + (fragid.contains("supermassive") ? "supermassive " : "")
+                            + ExploreEmojis.CFrag + "cultural");
+                case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7", "supermassivehazardous" ->
+                    message.append(" a " + (fragid.contains("supermassive") ? "supermassive " : "")
+                            + ExploreEmojis.HFrag + "hazardous");
+                case "irf1", "irf2", "irf3", "irf4", "irf5", "supermassiveindustrial" ->
+                    message.append(" an " + (fragid.contains("supermassive") ? "supermassive " : "")
+                            + ExploreEmojis.IFrag + "industrial");
+                case "urf1", "urf2", "urf3", "supermassiveunknown" ->
+                    message.append(" an " + (fragid.contains("supermassive") ? "supermassive " : "")
+                            + ExploreEmojis.UFrag + "unknown");
                 default -> message.append(' ').append(fragid);
             }
             message.append(" relic fragment.");
@@ -94,11 +101,21 @@ class RelicPurgeFragments extends GameStateSubcommand {
                 activePlayer.removeFragment(fragid);
                 game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
                 switch (fragid) {
-                    case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" ->
-                        message.append(ExploreEmojis.CFrag);
-                    case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> message.append(ExploreEmojis.HFrag);
-                    case "irf1", "irf2", "irf3", "irf4", "irf5" -> message.append(ExploreEmojis.IFrag);
-                    case "urf1", "urf2", "urf3" -> message.append(ExploreEmojis.UFrag);
+                    case "crf1",
+                            "crf2",
+                            "crf3",
+                            "crf4",
+                            "crf5",
+                            "crf6",
+                            "crf7",
+                            "crf8",
+                            "crf9",
+                            "supermassivecultural" -> message.append(ExploreEmojis.CFrag);
+                    case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7", "supermassivehazardous" ->
+                        message.append(ExploreEmojis.HFrag);
+                    case "irf1", "irf2", "irf3", "irf4", "irf5", "supermassiveindustrial" ->
+                        message.append(ExploreEmojis.IFrag);
+                    case "urf1", "urf2", "urf3", "supermassiveunknown" -> message.append(ExploreEmojis.UFrag);
                     default -> message.append(' ').append(fragid);
                 }
             }

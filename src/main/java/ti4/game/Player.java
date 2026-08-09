@@ -2510,7 +2510,19 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public Set<String> getTradableRelics() {
-        return SetUtils.intersection(getActualRelics(), Set.of("thesilverflame", "silverflame"));
+        return SetUtils.intersection(
+                getActualRelics(),
+                Set.of(
+                        "thesilverflame",
+                        "silverflame",
+                        "economicboon",
+                        "naturesboon",
+                        "diplomaticboon",
+                        "cosmicboon",
+                        "mutagenhazardous",
+                        "mutagenindustrial",
+                        "mutagencultural",
+                        "mutagenunknown"));
     }
 
     public Set<String> getActualRelics() {

@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -18,6 +19,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
@@ -100,6 +102,10 @@ class SpendingButtonHandler {
                         + Helper.getPlanetRepresentation(planetName, game) + " due to the _Arcane Citadel_.";
                 AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planetName);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            }
+            if (uH.getTokenList().contains("attachment_polymorphism.png")
+                    && FoWHelper.playerHasShipsInSystem(player, game.getTileFromPlanet(planetName))) {
+                LostLegciesExploreHandler.offerPolymorphism(event, game, player, planetName);
             }
             if (uH.getTokenList().contains("attachment_facilitylogisticshub.png")) {
                 String msg = player.getRepresentation() + " gained 1 commodity due to exhausting "
