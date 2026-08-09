@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -59,7 +57,7 @@ public class GameStats {
      */
     @Deprecated
     public OverruleTargetMigration migrateTargetsToCanceledFlags() {
-        Map<String, Integer> strategyCardChoices = new HashMap<>();
+        List<OverruleTargetMigration.OverruleEntry> overrulePlays = new ArrayList<>();
         boolean changed = false;
         for (int i = 0; i < actionCardPlays.size(); i++) {
             ActionCardPlay play = actionCardPlays.get(i);
@@ -68,7 +66,7 @@ public class GameStats {
                 continue;
             }
             if (OVERRULE.equals(play.getActionCard())) {
-                strategyCardChoices.merge(target, 1, Integer::sum);
+                overrulePlays.add(new OverruleTargetMigration.OverruleEntry(play.getPlayerId(), target));
             } else if (SABOTAGE.equals(play.getActionCard()) && !markLatestPlayCanceledBefore(target, i)) {
                 // The canceled play was never recorded (e.g. an Overrule canceled before its
                 // strategy card was chosen); stand in for it so the cancel still gets counted.
@@ -80,7 +78,7 @@ public class GameStats {
             play.setTarget(null);
             changed = true;
         }
-        return new OverruleTargetMigration(strategyCardChoices, changed);
+        return new OverruleTargetMigration(overrulePlays, changed);
     }
 
     private static String getTrackedPlayerId(Player player) {
@@ -94,7 +92,9 @@ public class GameStats {
      * @deprecated remove along with {@link #migrateTargetsToCanceledFlags()}.
      */
     @Deprecated
-    public record OverruleTargetMigration(Map<String, Integer> strategyCardChoices, boolean changed) {}
+    public record OverruleTargetMigration(List<OverruleEntry> overrulePlays, boolean changed) {
+        public record OverruleEntry(String playerId, String strategyCard) {}
+    }
 
     @EqualsAndHashCode
     @Getter

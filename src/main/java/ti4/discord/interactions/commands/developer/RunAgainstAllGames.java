@@ -48,8 +48,8 @@ class RunAgainstAllGames extends Subcommand {
     @Deprecated
     static boolean migrateActionCardTargets(Game game) {
         GameStats.OverruleTargetMigration migration = game.getGameStats().migrateTargetsToCanceledFlags();
-        if (!migration.strategyCardChoices().isEmpty()) {
-            OverruleStatsService.get().addMigratedCounts(game.getName(), migration.strategyCardChoices());
+        if (!migration.overrulePlays().isEmpty()) {
+            OverruleStatsService.get().addMigratedPlays(game.getName(), migration.overrulePlays());
         }
         return migration.changed();
     }

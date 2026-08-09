@@ -27,6 +27,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.DeckModel;
+import ti4.spring.service.statistics.overrule.OverrulePlayEntity;
 import ti4.spring.service.statistics.overrule.OverruleStatsService;
 
 @UtilityClass
@@ -50,7 +51,7 @@ public class ActionCardStatsService {
         Map<String, Integer> cancelCounts = new HashMap<>();
         Map<String, Integer> actionCardsPlayedCounts = new HashMap<>();
         Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts = new HashMap<>();
-        Set<String> includedGameNames = new HashSet<>();
+        Map<String, String> winnerIdByGame = new HashMap<>();
 
         // A discarded card that isn't in the selected deck means the game is mislabeled (e.g. it
         // changed decks mid-game), which would pollute the stats with off-deck cards.
@@ -62,14 +63,14 @@ public class ActionCardStatsService {
                         .and(game -> deckCardIds.containsAll(
                                 game.getDiscardActionCards().keySet())),
                 game -> accumulateActionCardStats(
-                        game, cancelCounts, actionCardsPlayedCounts, playToWinCorrelationCounts, includedGameNames),
+                        game, cancelCounts, actionCardsPlayedCounts, playToWinCorrelationCounts, winnerIdByGame),
                 ExecutionLockType.READ);
 
         MessageHelper.sendMessageToThread(
                 event.getChannel(),
                 "Action Card Play Statistics",
                 buildMessage(
-                        acDeck, cancelCounts, actionCardsPlayedCounts, playToWinCorrelationCounts, includedGameNames));
+                        acDeck, cancelCounts, actionCardsPlayedCounts, playToWinCorrelationCounts, winnerIdByGame));
     }
 
     private static void accumulateActionCardStats(
@@ -77,9 +78,7 @@ public class ActionCardStatsService {
             Map<String, Integer> cancelCounts,
             Map<String, Integer> actionCardsPlayedCounts,
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
-            Set<String> includedGameNames) {
-        includedGameNames.add(game.getName());
-
+            Map<String, String> winnerIdByGame) {
         game.getDiscardActionCards()
                 .forEach((acID, ignored) -> incrementActionCardPlayCount(actionCardsPlayedCounts, acID));
 
@@ -91,10 +90,17 @@ public class ActionCardStatsService {
         }
 
         Player winner = game.getWinner().orElse(null);
-        if (actionCardPlays.isEmpty() || winner == null) {
+        if (winner == null) {
+            // Standard-competitive filter already requires a winner, but guard so downstream code
+            // and any future callers can trust winnerIdByGame keys carry a non-null value.
             return;
         }
-        accumulateActionCardPlayToWinCorrelation(game, winner, playToWinCorrelationCounts);
+        String winnerId = StringUtils.defaultIfBlank(winner.getStatsTrackedUserID(), winner.getUserID());
+        winnerIdByGame.put(game.getName(), winnerId);
+        if (actionCardPlays.isEmpty()) {
+            return;
+        }
+        accumulateActionCardPlayToWinCorrelation(actionCardPlays, winnerId, playToWinCorrelationCounts);
     }
 
     private static void incrementActionCardPlayCount(
@@ -144,7 +150,7 @@ public class ActionCardStatsService {
             Map<String, Integer> cancelCounts,
             Map<String, Integer> actionCardsPlayedCounts,
             Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts,
-            Set<String> includedGameNames) {
+            Map<String, String> winnerIdByGame) {
         Map<String, Integer> copiesPerName = getCopiesPerName(acDeck);
         Map<String, Integer> playedExpectedDraws = computeExpectedDraws(actionCardsPlayedCounts, copiesPerName);
         Map<String, Integer> playsIncludingCanceled = playToWinCorrelationCounts.entrySet().stream()
@@ -166,9 +172,11 @@ public class ActionCardStatsService {
         message.append("_The Impact Score compares wins to expected draws._\n");
         appendPlayToWinCorrelationStats(message, playToWinCorrelationCounts, winCorrelationExpectedDraws);
         if (copiesPerName.containsKey(GameStats.OVERRULE)) {
-            message.append("\n**Overrule targets**\n");
+            message.append("\n**Overrule targets and win rate**\n");
             appendTrackingStartNote(message);
-            appendOverruleStats(message, OverruleStatsService.get().getCountPerStrategyCard(includedGameNames));
+            List<OverrulePlayEntity> overrulePlays =
+                    OverruleStatsService.get().findPlaysForGames(winnerIdByGame.keySet());
+            appendOverruleStats(message, overrulePlays, winnerIdByGame);
         }
         return message.toString();
     }
@@ -256,27 +264,57 @@ public class ActionCardStatsService {
                 + "%";
     }
 
-    private static void appendOverruleStats(StringBuilder message, Map<String, Integer> overruleCounts) {
-        if (overruleCounts.isEmpty()) {
+    private static void appendOverruleStats(
+            StringBuilder message, List<OverrulePlayEntity> plays, Map<String, String> winnerIdByGame) {
+        if (plays.isEmpty()) {
             message.append("No Overrule data matched the selected filters.\n");
             return;
         }
 
-        overruleCounts.entrySet().stream()
-                .sorted(Comparator.comparingInt((Map.Entry<String, Integer> entry) -> entry.getValue())
+        Map<String, WinsAndPlays> byStrategyCard = new HashMap<>();
+        for (OverrulePlayEntity play : plays) {
+            WinsAndPlays stats = byStrategyCard.computeIfAbsent(play.getStrategyCard(), _ -> new WinsAndPlays());
+            stats.plays++;
+            String winnerId = winnerIdByGame.get(play.getGameName());
+            if (winnerId != null && winnerId.equals(play.getPlayerId())) {
+                stats.wins++;
+            }
+        }
+
+        byStrategyCard.entrySet().stream()
+                .sorted(Comparator.comparingDouble((Map.Entry<String, WinsAndPlays> entry) ->
+                                entry.getValue().winRate())
                         .reversed()
+                        .thenComparing(entry -> entry.getValue().plays, Comparator.reverseOrder())
                         .thenComparing(Map.Entry::getKey))
-                .forEach(entry -> message.append("- ")
-                        .append(entry.getKey())
-                        .append(": ")
-                        .append(entry.getValue())
-                        .append('\n'));
+                .forEach(entry -> {
+                    WinsAndPlays stats = entry.getValue();
+                    message.append("- ")
+                            .append(entry.getKey())
+                            .append(": ")
+                            .append(stats.wins)
+                            .append(" wins, ")
+                            .append(stats.plays)
+                            .append(" plays (")
+                            .append(String.format("%.1f%%", stats.winRate() * 100))
+                            .append(")\n");
+                });
+    }
+
+    private static final class WinsAndPlays {
+        int wins;
+        int plays;
+
+        double winRate() {
+            return plays == 0 ? 0 : (double) wins / plays;
+        }
     }
 
     private static void accumulateActionCardPlayToWinCorrelation(
-            Game game, Player winner, Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
-        String winningPlayerId = StringUtils.defaultIfBlank(winner.getStatsTrackedUserID(), winner.getUserID());
-        for (ActionCardPlay actionCardPlay : game.getGameStats().getActionCardPlays()) {
+            List<ActionCardPlay> actionCardPlays,
+            String winnerId,
+            Map<String, PlayToWinCorrelationCount> playToWinCorrelationCounts) {
+        for (ActionCardPlay actionCardPlay : actionCardPlays) {
             if (StringUtils.isBlank(actionCardPlay.getPlayerId())) {
                 continue;
             }
@@ -288,7 +326,7 @@ public class ActionCardStatsService {
                 continue;
             }
             count.incrementTotal();
-            if (winningPlayerId.equals(actionCardPlay.getPlayerId())) {
+            if (winnerId.equals(actionCardPlay.getPlayerId())) {
                 count.incrementWins();
             }
         }

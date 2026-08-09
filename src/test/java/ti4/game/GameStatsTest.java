@@ -2,9 +2,9 @@ package ti4.game;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import ti4.game.GameStats.ActionCardPlay;
+import ti4.game.GameStats.OverruleTargetMigration.OverruleEntry;
 
 class GameStatsTest {
 
@@ -60,15 +60,17 @@ class GameStatsTest {
     }
 
     @Test
-    void shouldHarvestOverruleChoicesAndPlaceholderUnmatchedCancels() {
+    void shouldHarvestOverrulePlaysWithPlayerIdAndPlaceholderUnmatchedCancels() {
         GameStats stats = new GameStats();
         stats.getActionCardPlays().add(legacySabotage(GameStats.OVERRULE));
         stats.getActionCardPlays().add(legacyOverrule("Warfare"));
+        stats.getActionCardPlays().add(legacyOverrule("Politics"));
 
         GameStats.OverruleTargetMigration migration = stats.migrateTargetsToCanceledFlags();
 
-        assertThat(migration.strategyCardChoices()).containsExactlyEntriesOf(Map.of("Warfare", 1));
-        assertThat(stats.getActionCardPlays()).hasSize(3);
+        assertThat(migration.overrulePlays())
+                .containsExactly(new OverruleEntry("winnu", "Warfare"), new OverruleEntry("winnu", "Politics"));
+        assertThat(stats.getActionCardPlays()).hasSize(4);
         ActionCardPlay placeholder = stats.getActionCardPlays().getFirst();
         assertThat(placeholder.getActionCard()).isEqualTo(GameStats.OVERRULE);
         assertThat(placeholder.getPlayerId()).isNull();
@@ -88,7 +90,7 @@ class GameStatsTest {
         GameStats.OverruleTargetMigration secondRun = stats.migrateTargetsToCanceledFlags();
 
         assertThat(secondRun.changed()).isFalse();
-        assertThat(secondRun.strategyCardChoices()).isEmpty();
+        assertThat(secondRun.overrulePlays()).isEmpty();
         assertThat(stats.getActionCardPlays()).hasSize(2);
     }
 
