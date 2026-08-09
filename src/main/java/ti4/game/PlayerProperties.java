@@ -6,9 +6,14 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import ti4.service.transaction.TransactionItem;
 
 @Data
 public class PlayerProperties {
@@ -123,7 +128,11 @@ public class PlayerProperties {
     private Set<String> unitsOwned = new HashSet<>();
     private Set<Integer> followedSCs = new HashSet<>();
     private Set<Integer> SCs = new LinkedHashSet<>();
+
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private List<String> transactionItems = new ArrayList<>();
+
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
     private List<String> spentThingsThisWindow = new ArrayList<>();
@@ -145,5 +154,20 @@ public class PlayerProperties {
 
     public void loadCommodities(int commodities) {
         this.commodities = commodities;
+    }
+
+    public List<TransactionItem> getTransactionItems() {
+        return transactionItems.stream()
+                .map(TransactionItem::parse)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    public List<String> getSerializedTransactionItems() {
+        return transactionItems;
+    }
+
+    public void setTransactionItems(List<String> transactionItems) {
+        this.transactionItems = new ArrayList<>(transactionItems);
     }
 }

@@ -22,6 +22,7 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
+import ti4.service.transaction.TransactionItem;
 
 public final class TransactionGenerator {
 
@@ -138,7 +139,7 @@ public final class TransactionGenerator {
             DrawingUtil.drawEmoji(g2, hero, 210, 294, 200); // good doggies are smaller
         else DrawingUtil.drawEmoji(g2, hero, 60, 294, 500);
 
-        List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
+        List<TransactionItem> transactionItems = p1.getTransactionItemsWithPlayer(p2);
         for (Player player : List.of(p1, p2)) {
             boolean sendingNothing = true;
             HorizontalAlign hAlign = player == p2 ? HorizontalAlign.Left : HorizontalAlign.Right;
@@ -150,20 +151,13 @@ public final class TransactionGenerator {
             int emojiRow = 0;
             int emojiCount = 0;
             g2.setFont(Storage.getFont24());
-            for (String item : transactionItems) {
-                if (!item.contains("sending" + player.getFaction())) continue;
+            for (TransactionItem transactionItem : transactionItems) {
+                if (!transactionItem.isSentBy(player.getFaction())) continue;
                 sendingNothing = false;
 
-                String thingToTransact = item.split("_")[2];
-                String furtherDetail = item.replace(
-                        item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
-                int amountToTransact = 1;
-                if ("frags".equalsIgnoreCase(thingToTransact)
-                        || (("PNs".equalsIgnoreCase(thingToTransact) || "ACs".equalsIgnoreCase(thingToTransact))
-                                && furtherDetail.contains("generic"))) {
-                    amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
-                    furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
-                }
+                String thingToTransact = transactionItem.type();
+                String furtherDetail = transactionItem.detailWithoutQuantity();
+                int amountToTransact = transactionItem.quantity();
 
                 boolean skipYShift = false;
                 boolean isEmoji = List.of("TGs", "Comms", "ACs", "PNs", "Frags").contains(thingToTransact);
@@ -236,7 +230,7 @@ public final class TransactionGenerator {
                         y += drawStringMultiLine(g2, txt, x, y + 40, 250, hAlign);
                     }
                     default -> {
-                        String txt = "\"" + item + "\"";
+                        String txt = "\"" + transactionItem.serialize() + "\"";
                         y += drawStringMultiLine(g2, txt, x, y + 40, 250, hAlign);
                     }
                 }

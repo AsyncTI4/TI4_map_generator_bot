@@ -936,7 +936,7 @@ class GameSaveService {
             writer.write(System.lineSeparator());
             writer.write(Constants.BOMBARD_UNITS + " " + String.join(",", player.getBombardUnits()));
             writer.write(System.lineSeparator());
-            writer.write(Constants.TRANSACTION_ITEMS + " " + String.join(",", player.getTransactionItems()));
+            writer.write(Constants.TRANSACTION_ITEMS + " " + String.join(",", player.getSerializedTransactionItems()));
             writer.write(System.lineSeparator());
             writer.write(Constants.TEAMMATE_IDS + " " + String.join(",", player.getTeamMateIDs()));
             writer.write(System.lineSeparator());
