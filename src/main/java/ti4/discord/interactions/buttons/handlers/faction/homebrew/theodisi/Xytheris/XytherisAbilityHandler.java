@@ -23,7 +23,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.thundersedge.TeHelperUnits;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollType;
@@ -60,16 +59,17 @@ public class XytherisAbilityHandler {
                         && !TeHelperUnits.affectedByQuietus(game, player, remoteTile)
                         && !remoteTile.isScar(game))
                 .flatMap(remoteTile -> remoteTile.getUnitHolders().values().stream())
-                .flatMap(remoteHolder ->
-                        remoteHolder.getUnitAsyncIdsOnHolder(Mapper.getColorID(player.getColor())).entrySet().stream()
-                                .filter(entry -> entry.getValue() > 0)
-                                .<Pair<UnitModel, UnitHolder>>map(entry -> new ImmutablePair<>(
-                                        player.getPriorityUnitByAsyncID(entry.getKey(), null), remoteHolder)))
-                .filter(unit ->
-                        unit.getLeft() != null && unit.getLeft().getCombatDieCountForAbility(rollType, player) > 0)
-                .max(Comparator.comparingDouble(unit -> unit.getLeft().getCombatDieCountForAbility(rollType, player)
-                        * (10 - unit.getLeft().getCombatDieHitsOnForAbility(rollType, player))
-                        / 10.0d));
+                .flatMap(remoteHolder -> remoteHolder.getUnitKeys().stream()
+                        .filter(player::unitBelongsToPlayer)
+                        .filter(unitKey -> remoteHolder.getUnitCount(unitKey) > 0)
+                        .<Pair<UnitModel, UnitHolder>>map(unitKey -> new ImmutablePair<>(
+                                player.getPriorityUnitByAsyncID(unitKey.asyncID(), remoteHolder), remoteHolder)))
+                .filter(candidate -> candidate.getLeft() != null
+                        && candidate.getLeft().getCombatDieCountForAbility(rollType, player) > 0)
+                .max(Comparator.comparingDouble(
+                        candidate -> candidate.getLeft().getCombatDieCountForAbility(rollType, player)
+                                * (10 - candidate.getLeft().getCombatDieHitsOnForAbility(rollType, player))
+                                / 10.0d));
     }
 
     public static Button getStingOfTheHiveHitReplacementButton(

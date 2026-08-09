@@ -35,8 +35,11 @@ public class ThronesTechHandler {
     private static final String RTB_RIFT = "riftTouchedBastionRift_";
 
     // Specter Step
-    public static Button getSpecterStepButton(Player player) {
-        return Buttons.green(player.factionButtonChecker() + USE_SS, "Use Specter Step", FactionEmojis.thrones);
+    public static List<Button> getSpecterStepButtons(Player player) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green(player.factionButtonChecker() + USE_SS, "Use Specter Step", FactionEmojis.thrones));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        return buttons;
     }
 
     @ButtonHandler(USE_SS)
