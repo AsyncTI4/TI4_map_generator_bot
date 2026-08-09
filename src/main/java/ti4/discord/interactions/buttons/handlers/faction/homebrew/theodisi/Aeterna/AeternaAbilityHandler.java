@@ -27,6 +27,7 @@ import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
 @UtilityClass
 public class AeternaAbilityHandler {
+    private static final String CYCLE_AGENDA_CAPTURE = "cycleOfReclamationAgendaCapture_";
     private static final String FULL_MOON = "full_moonphase";
     private static final String WAXING_MOON = "waxing_moonphase";
     private static final String WANING_MOON = "waning_moonphase";
@@ -271,10 +272,20 @@ public class AeternaAbilityHandler {
         if (destroyedUnits.isEmpty()) return;
         for (Player aeterna : game.getRealPlayers()) {
             if (!aeterna.hasAbility("cycle_of_reclamation") || (combat && aeterna == game.getActivePlayer())) continue;
+            String agendaContext =
+                    game.getRound() + "|" + game.getStoredValue("agendaCount") + "|" + game.getCurrentAgendaInfo();
+            String agendaCaptureKey = CYCLE_AGENDA_CAPTURE + aeterna.getFaction();
+            if (game.getPhaseOfGame().startsWith("agenda")
+                    && agendaContext.equals(game.getStoredValue(agendaCaptureKey))) {
+                continue;
+            }
             boolean nearby =
                     destroyedUnits.stream().anyMatch(unit -> isInOrAdjacentToAeternaUnits(game, aeterna, unit));
             if (!nearby) continue;
 
+            if (game.getPhaseOfGame().startsWith("agenda")) {
+                game.setStoredValue(agendaCaptureKey, agendaContext);
+            }
             AddUnitService.addUnits(
                     event, aeterna.getNomboxTile(), game, game.getNeutral().getColor(), "1 destroyer");
             MessageHelper.sendMessageToChannel(

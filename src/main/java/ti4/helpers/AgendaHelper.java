@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.acd2.PublicOutrageAcd2ButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.acd2.SettlementsAcd2ButtonHandler;
+import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrAbilitiesHandler;
@@ -1626,6 +1627,10 @@ public final class AgendaHelper {
                         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planet);
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
+                    if (uH.getTokenList().contains("attachment_polymorphism.png")
+                            && FoWHelper.playerHasShipsInSystem(player, game.getTileFromPlanet(planet))) {
+                        LostLegciesExploreHandler.offerPolymorphism(event, game, player, planet);
+                    }
                 }
             }
             if (thing.contains("dsghotg") && !prevoting) {
@@ -1680,6 +1685,10 @@ public final class AgendaHelper {
                                         + " due to the _Arcane Citadel_.";
                                 AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planet);
                                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                            }
+                            if (uH.getTokenList().contains("attachment_polymorphism.png")
+                                    && FoWHelper.playerHasShipsInSystem(player, game.getTileFromPlanet(planet))) {
+                                LostLegciesExploreHandler.offerPolymorphism(event, game, player, planet);
                             }
                         }
                     }

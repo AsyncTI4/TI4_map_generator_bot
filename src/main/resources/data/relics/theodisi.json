@@ -38,6 +38,7 @@
         "alias": "economicboon",
         "name": "Economic Boon",
         "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. When you would exhaust a planet you control you may exhaust this card instead.",
+        "notes": "Button will be in cards info, use it to ready selected planet after exhausting the target planet.",
         "isFakeRelic": true,
         "source": "theodisi"
     },

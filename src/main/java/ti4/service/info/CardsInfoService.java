@@ -30,6 +30,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -486,6 +487,9 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("verydithagent")) {
             buttons.add(VerydithLeadersHandler.getVerydithAgentCardsInfoButton(player));
+        }
+        if (player.hasRelicReady("economicboon") && player.getExhaustedPlanets().size() > 0) {
+            buttons.add(LostLegaciesRelicHandler.getEconomicBoonCardsInfoButton(player));
         }
         buttons.add(Buttons.gray("offerPlayerPref", "Player Settings"));
         buttons.add(Buttons.gray("searchMyGames", "List My Games"));

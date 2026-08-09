@@ -171,10 +171,10 @@ public final class ButtonHelperTacticalAction {
                         KairnTechHandler.getSurveyorsLensButton(player));
             }
             if (player.hasTechReady("ththronesb")) {
-                MessageHelper.sendMessageToChannelWithButton(
+                MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentation() + ", you have _Specter Step_ and may resolve it now:",
-                        ThronesTechHandler.getSpecterStepButton(player));
+                        ThronesTechHandler.getSpecterStepButtons(player));
             }
             if (player.hasAbility("colony_outposts")
                     && player.getStrategicCC() > 0

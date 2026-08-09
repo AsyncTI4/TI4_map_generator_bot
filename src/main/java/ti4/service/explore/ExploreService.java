@@ -737,6 +737,15 @@ public class ExploreService {
                                         player.getRepresentation() + " has explored Mallice in " + game.getName()
                                                 + ", and discovered the _Gamma Wormhole_.");
                             }
+                            if ("loststation".equalsIgnoreCase(token)) {
+                                Helper.addTokenPlanetToTile(game, tile, "loststation");
+                                game.clearPlanetsCache();
+                                player.addPlanet("loststation");
+                                player.refreshPlanet("loststation");
+                                MessageHelper.sendMessageToChannel(
+                                        event.getMessageChannel(),
+                                        "Lost Station added to map, play area, and readied.");
+                            }
                             DSHelperBreakthroughs.doLanefirBtCheck(game, player);
                             OblivionUnitHandler.doOblivionMechCheck(game, player);
                         }
@@ -1292,6 +1301,39 @@ public class ExploreService {
             }
             case "spatialdisplacement" ->
                 LostLegciesExploreHandler.resolveSpatialDisplacement(event, game, player, tile);
+            case "immediateassembly" -> {
+                message = new StringBuilder(
+                        player.getRepresentation() + ", please resolve _Immediate Assembly_:\n-# You have ");
+                message.append(
+                        ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID));
+
+                List<Button> buttons = new ArrayList<>();
+                if (ExploreHelper.checkForMech(planetID, game, player)) {
+                    buttons.add(Buttons.green(
+                                    player.factionButtonChecker() + "resolveImmediateAssemblyMech_" + planetID
+                                            + "_production",
+                                    "Gain PRODUCTION 3 With A Mech On " + planetName)
+                            .withEmoji(UnitEmojis.mech.asEmoji()));
+                    buttons.add(Buttons.blue(
+                                    player.factionButtonChecker() + "resolveImmediateAssemblyMech_" + planetID
+                                            + "_mech",
+                                    "Place A Mech With A Mech On " + planetName)
+                            .withEmoji(UnitEmojis.mech.asEmoji()));
+                }
+                if (ExploreHelper.checkForInf(planetID, game, player)) {
+                    buttons.add(Buttons.green(
+                                    player.factionButtonChecker() + "resolveImmediateAssemblyInf_" + planetID
+                                            + "_production",
+                                    "Gain PRODUCTION 3 By Removing 1 Infantry On " + planetName)
+                            .withEmoji(UnitEmojis.infantry.asEmoji()));
+                    buttons.add(Buttons.blue(
+                                    player.factionButtonChecker() + "resolveImmediateAssemblyInf_" + planetID + "_mech",
+                                    "Place A Mech By Removing 1 Infantry On " + planetName)
+                            .withEmoji(UnitEmojis.infantry.asEmoji()));
+                }
+                buttons.add(decline);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
+            }
         }
         RiftSetModeService.resolveExplore(ogID, player, game);
         FOWPlusService.resolveExplore(event, ogID, tile, planetID, player, game);

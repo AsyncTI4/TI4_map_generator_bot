@@ -174,6 +174,7 @@ public class ArcanumAbilityHandler {
 
         player.removeFragment(fragmentId);
         game.purgeExplore(fragmentId);
+        game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
         game.setStoredValue(
                 RITUAL_FRAGS_PURGED + player.getFaction(),
                 selected.isEmpty() ? fragmentId : selected + "|" + fragmentId);
