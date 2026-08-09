@@ -3219,7 +3219,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             }
             return GMService.getGMChannel(game);
         }
-        return privateChannel != null ? privateChannel : game.getMainGameChannel();
+        return game.getMainGameChannel();
     }
 
     public String bannerName() {
