@@ -56,11 +56,12 @@ class ButtonHelperExplore {
                     case "urf" -> "frontier";
                     default -> "";
                 };
+        boolean prioritizeSupermassive = RelicHelper.hasPurgedRelicFragmentOfType(game, trait);
         List<String> fragmentsToPurge = new ArrayList<>();
         for (String fragId : player.getFragments()) {
             ExploreModel fragment = Mapper.getExplore(fragId);
             if (fragment != null && trait.equalsIgnoreCase(fragment.getType())) {
-                if (fragId.startsWith("supermassive")) {
+                if (prioritizeSupermassive && fragId.startsWith("supermassive")) {
                     fragmentsToPurge.addFirst(fragId);
                 } else {
                     fragmentsToPurge.add(fragId);

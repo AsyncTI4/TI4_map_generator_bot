@@ -14,7 +14,9 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.ExploreHelper;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
@@ -39,6 +41,150 @@ public class LostLegciesExploreHandler {
     private static final String USE_SPATIAL = "useSpatialDisplacement_";
     private static final String MOVE_SHIP = "moveSpatialDisplacementShip_";
     private static final String DISPLACE = "finalizeSpatialDisplacementShipMovement_";
+    // Battleworld
+    private static final String BATTLEWORLD_ATTACHMENT = "attachment_battleworld.png";
+    private static final String CLAIM_BATTLEWORLD_CC = "claimBattleworldCC_";
+    // Immediate Assembly
+    private static final String RESOLVE_IMMEDIATE_ASSEMBLY_MECH = "resolveImmediateAssemblyMech_";
+    private static final String RESOLVE_IMMEDIATE_ASSEMBLY_INF = "resolveImmediateAssemblyInf_";
+    public static final String IMMEDIATE_ASSEMBLY_PRODUCTION = "immediateAssemblyProduction_";
+
+    public static void resolveBattleworldEndOfTurn(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (game == null || player == null) {
+            return;
+        }
+
+        for (String planetName : player.getPlanets()) {
+            UnitHolder planet = game.getUnitHolderFromPlanet(planetName);
+            Tile tile = game.getTileFromPlanet(planetName);
+            if (planet == null || tile == null || !planet.getTokenList().contains(BATTLEWORLD_ATTACHMENT)) {
+                continue;
+            }
+            Player neutral = game.getNeutral();
+            if (FoWHelper.playerHasUnitsOnPlanet(neutral, planet)) {
+                continue;
+            }
+
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planetName);
+            AddUnitService.addUnits(
+                    event, tile, game, neutral.getColor(), "1 mech " + planetName + ", 2 infantry " + planetName);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " placed 1 infantry, 1 neutral mech, and 2 neutral infantry on "
+                            + Helper.getPlanetRepresentation(planetName, game) + " due to _Battleworld_.");
+        }
+    }
+
+    public static void offerBattleworldCombatReward(
+            Game game, Player playerOne, Player playerTwo, Tile tile, UnitHolder planet) {
+        if (game == null || playerOne == null || playerTwo == null || tile == null || planet == null) {
+            return;
+        }
+
+        if (!planet.getTokenList().contains(BATTLEWORLD_ATTACHMENT)) {
+            return;
+        }
+
+        Player neutral = game.getNeutral();
+        Player player = playerOne == neutral ? playerTwo : playerTwo == neutral ? playerOne : null;
+        if (player == null || !player.isRealPlayer() || !FoWHelper.playerHasUnitsOnPlanet(neutral, planet)) {
+            return;
+        }
+
+        MessageHelper.sendMessageToChannelWithButton(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + ", after you win this ground combat against the neutral units on "
+                        + Helper.getPlanetRepresentation(planet.getName(), game)
+                        + ", press this button to gain 1 command token due to _Battleworld_.",
+                Buttons.gray(
+                        player.factionButtonChecker() + CLAIM_BATTLEWORLD_CC + planet.getName(),
+                        "Claim Battleworld Command Token"));
+    }
+
+    @ButtonHandler(CLAIM_BATTLEWORLD_CC)
+    public static void claimBattleworldCommandToken(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (game == null || player == null) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", choose where to gain 1 command token from _Battleworld_.",
+                ButtonHelper.getGainCCButtons(player));
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(RESOLVE_IMMEDIATE_ASSEMBLY_MECH)
+    public static void resolveImmediateAssemblyMech(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] payload =
+                buttonID.substring(RESOLVE_IMMEDIATE_ASSEMBLY_MECH.length()).split("_(?=[^_]+$)");
+        String planetName = payload[0];
+        String result = payload.length > 1 ? payload[1] : "";
+        Tile tile = game == null ? null : game.getTileFromPlanet(planetName);
+        if (player == null
+                || tile == null
+                || !("production".equals(result) || "mech".equals(result))
+                || !ExploreHelper.checkForMech(planetName, game, player)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        if ("production".equals(result)) {
+            game.setStoredValue(IMMEDIATE_ASSEMBLY_PRODUCTION + player.getFaction(), planetName);
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    player.getRepresentationNoPing() + " is using a mech to resolve _Immediate Assembly_. "
+                            + Helper.getPlanetRepresentation(planetName, game)
+                            + " has **PRODUCTION 3** until the end of their turn.");
+        } else if ("mech".equals(result)) {
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "1 mech " + planetName);
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    player.getRepresentationNoPing() + " is using a mech to resolve _Immediate Assembly_. "
+                            + "Placed 1 mech on " + Helper.getPlanetRepresentation(planetName, game) + ".");
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(RESOLVE_IMMEDIATE_ASSEMBLY_INF)
+    public static void resolveImmediateAssemblyInf(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] payload =
+                buttonID.substring(RESOLVE_IMMEDIATE_ASSEMBLY_INF.length()).split("_(?=[^_]+$)");
+        String planetName = payload[0];
+        String result = payload.length > 1 ? payload[1] : "";
+        Tile tile = game == null ? null : game.getTileFromPlanet(planetName);
+        UnitHolder planet = game == null ? null : game.getUnitHolderFromPlanet(planetName);
+        if (player == null
+                || tile == null
+                || planet == null
+                || !("production".equals(result) || "mech".equals(result))
+                || !ExploreHelper.checkForInf(planetName, game, player)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1, null);
+        ButtonHelper.resolveInfantryRemoval(player, 1, tile);
+        if ("production".equals(result)) {
+            game.setStoredValue(IMMEDIATE_ASSEMBLY_PRODUCTION + player.getFaction(), planetName);
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    player.getRepresentationNoPing() + " removed 1 infantry to resolve _Immediate Assembly_. "
+                            + Helper.getPlanetRepresentation(planetName, game)
+                            + " has **PRODUCTION 3** until the end of their turn.");
+        } else if ("mech".equals(result)) {
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "1 mech " + planetName);
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    player.getRepresentationNoPing() + " removed 1 infantry to resolve _Immediate Assembly_. "
+                            + "Placed 1 mech on " + Helper.getPlanetRepresentation(planetName, game) + ".");
+        }
+        ButtonHelper.deleteMessage(event);
+    }
 
     // Polymorphism
     public static void offerPolymorphism(ButtonInteractionEvent event, Game game, Player player, String planetName) {

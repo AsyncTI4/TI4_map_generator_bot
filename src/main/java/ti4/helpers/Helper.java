@@ -43,6 +43,7 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
@@ -1470,6 +1471,24 @@ public final class Helper {
                 inf += additionalInfluence;
                 found = true;
             }
+            if (thing.startsWith("naturesboon_")) {
+                String planetName = thing.substring("naturesboon_".length());
+                Planet planet = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetName));
+                if (planet != null) {
+                    msg.append("> Used _Nature's Boon_ for ")
+                            .append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game))
+                            .append('\n');
+                    if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
+                        inf += planet.getResources();
+                    } else if ("both".equalsIgnoreCase(resOrInfOrBoth)) {
+                        res += planet.getInfluence();
+                        inf += planet.getResources();
+                    } else {
+                        res += planet.getInfluence();
+                    }
+                }
+                found = true;
+            }
             if (!found
                     && !thing.contains("tg_")
                     && !thing.contains("boon")
@@ -1591,7 +1610,7 @@ public final class Helper {
                             .append('\n');
                     res += 1;
                 }
-                if (thing.contains("boon")) {
+                if ("boon".equals(thing)) {
                     msg.append("> Used Boon Relic ").append(ExploreEmojis.Relic).append('\n');
                     res += 1;
                 }
@@ -2282,6 +2301,12 @@ public final class Helper {
             if (cosmicSuper) {
                 productionValueTotal++;
             }
+        }
+        if (player.getPlanets().contains(uH.getName())
+                && uH.getName()
+                        .equals(game.getStoredValue(
+                                LostLegciesExploreHandler.IMMEDIATE_ASSEMBLY_PRODUCTION + player.getFaction()))) {
+            productionValueTotal += 3;
         }
 
         return productionValueTotal;

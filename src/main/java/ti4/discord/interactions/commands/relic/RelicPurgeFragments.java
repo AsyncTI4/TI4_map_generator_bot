@@ -43,6 +43,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
         Player activePlayer = getPlayer();
         String color = event.getOption(Constants.TRAIT, null, OptionMapping::getAsString);
         int count = event.getOption(Constants.COUNT, 3, OptionMapping::getAsInt);
+        Game game = getGame();
 
         List<String> fragmentsToPurge = new ArrayList<>();
         List<String> unknowns = new ArrayList<>();
@@ -56,7 +57,9 @@ class RelicPurgeFragments extends GameStateSubcommand {
             }
         }
 
-        fragmentsToPurge.sort(Comparator.comparing(fragmentID -> !fragmentID.startsWith("supermassive")));
+        if (RelicHelper.hasPurgedRelicFragmentOfType(game, color)) {
+            fragmentsToPurge.sort(Comparator.comparing(fragmentID -> !fragmentID.startsWith("supermassive")));
+        }
 
         while (fragmentsToPurge.size() > count) {
             fragmentsToPurge.removeLast();
@@ -73,7 +76,6 @@ class RelicPurgeFragments extends GameStateSubcommand {
             }
         }
 
-        Game game = getGame();
         StringBuilder message =
                 new StringBuilder().append(activePlayer.getRepresentation()).append(" purged ");
         if (fragmentsToPurge.size() == 1) {

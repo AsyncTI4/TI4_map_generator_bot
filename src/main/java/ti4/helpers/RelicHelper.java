@@ -4,7 +4,9 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -21,6 +23,7 @@ import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
@@ -32,6 +35,35 @@ import ti4.service.tech.ListTechService;
 
 @UtilityClass
 public class RelicHelper {
+
+    /** Returns whether a relic fragment of the requested trait is currently purged and available to gain. */
+    public static boolean hasPurgedRelicFragmentOfType(Game game, String trait) {
+        if (game == null || trait == null) {
+            return false;
+        }
+
+        DeckModel explorationDeck = Mapper.getDeck(game.getExplorationDeckID());
+        if (explorationDeck == null) {
+            return false;
+        }
+
+        Set<String> unavailableFragments = new HashSet<>();
+        for (String exploreType :
+                List.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL, Constants.FRONTIER)) {
+            unavailableFragments.addAll(game.getExploreDeck(exploreType));
+            unavailableFragments.addAll(game.getExploreDiscard(exploreType));
+        }
+        for (Player player : game.getPlayers().values()) {
+            unavailableFragments.addAll(player.getFragments());
+        }
+
+        return explorationDeck.getNewDeck().stream()
+                .filter(fragmentID -> !unavailableFragments.contains(fragmentID))
+                .map(Mapper::getExplore)
+                .anyMatch(fragment -> fragment != null
+                        && Constants.FRAGMENT.equalsIgnoreCase(fragment.getResolution())
+                        && trait.equalsIgnoreCase(fragment.getType()));
+    }
 
     public static void drawWithAdvantage(Player player, Game game, int advantage) {
         List<Button> buttons = new ArrayList<>();

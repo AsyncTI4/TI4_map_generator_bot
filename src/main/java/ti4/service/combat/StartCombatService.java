@@ -25,6 +25,7 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
@@ -246,6 +247,7 @@ public class StartCombatService {
         GameEventDraft.stage(
                 game,
                 new GameSubEvent.Combat("ground", tile.getPosition(), unitHolder.getName(), player2.getFaction()));
+        LostLegciesExploreHandler.offerBattleworldCombatReward(game, player, player2, tile, unitHolder);
         if (!game.isFowMode()) {
             findOrCreateCombatThread(
                     game,
