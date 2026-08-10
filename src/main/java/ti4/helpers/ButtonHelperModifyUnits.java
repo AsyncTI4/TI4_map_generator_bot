@@ -1903,7 +1903,7 @@ public final class ButtonHelperModifyUnits {
         GameEventDraft.stageRetreat(
                 game, player, pos1, Constants.SPACE, pos2, Constants.SPACE, beforeRetreat, sourceSpace);
 
-        if (tile2 != null && tile2.getPosition().startsWith("frac")) {
+        if (tile2 != null && tile2.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
     }
@@ -2254,7 +2254,7 @@ public final class ButtonHelperModifyUnits {
         if ("warsun".equalsIgnoreCase(unitLong)) {
             CommanderUnlockCheckService.checkPlayer(player, "muaat");
         }
-        if (tile != null && tile.getPosition().startsWith("frac")) {
+        if (tile != null && tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
 
@@ -2584,7 +2584,7 @@ public final class ButtonHelperModifyUnits {
                 AgendaHelper.ministerOfIndustryCheck(player, game, tile, event);
             }
         }
-        if (tile != null && tile.getPosition().startsWith("frac")) {
+        if (tile != null && tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
 

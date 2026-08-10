@@ -390,7 +390,7 @@ public class TeHelperActionCards {
             player.setTg(player.getTg() - 2);
             String message = player.getRepresentation() + " paid some mercenaries 2 trade goods to post up at "
                     + Helper.getPlanetRepresentation(planet, game) + ".";
-            if (tile != null && tile.getPosition().contains("frac")) {
+            if (tile != null && tile.isFracture()) {
                 Planet uh = game.getUnitHolderFromPlanet(planet);
                 if (uh != null && !"mirage".equalsIgnoreCase(planet)) {
                     uh.addToken("token_relictoken.png");

@@ -1788,7 +1788,7 @@ public class TileGenerator {
                     if (unitHolder instanceof Planet planetHolder) {
                         scale = planetHolder.getRadius() / 65.0f;
                     }
-                    if (tile.getPosition().contains("frac")) {
+                    if (tile.isFracture()) {
                         tokenPath = tile.getTokenPath("token_worlddestroyed_frac.png");
                     }
                     scale *= 1.55f;

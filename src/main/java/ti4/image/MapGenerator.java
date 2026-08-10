@@ -164,7 +164,9 @@ public class MapGenerator implements AutoCloseable {
 
         // Height of map section
         int mapHeight = getMapHeight(game);
-        if (FractureService.isFractureInPlay(game) && !game.isNoFractureMode()) {
+        // Draw the row whenever it is on the board - noFractureMode stops the Fracture entering play, it does not
+        // hide a Fracture that is already there (which rendered as an overlap on an undersized canvas)
+        if (FractureService.isFractureRegionOnMap(game)) {
             fractureYbump = 400;
             mapHeight += fractureYbump;
         }
@@ -278,7 +280,7 @@ public class MapGenerator implements AutoCloseable {
             return;
         }
         Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
-        boolean showFracture = FractureService.isFractureInPlay(game) && !game.isNoFractureMode();
+        boolean showFracture = FractureService.isFractureRegionOnMap(game);
         // Show Grey Setup Tiles
         if (game.isShowMapSetup() || tilesToDisplay.isEmpty()) {
             int ringCount = game.getRingCount();

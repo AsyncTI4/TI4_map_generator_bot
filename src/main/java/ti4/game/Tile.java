@@ -134,7 +134,7 @@ public class Tile {
             if (tile.getTileModel().isHyperlane()) return false;
             if (!tile.getPlanetUnitHolders().isEmpty()) return false;
             if (tile.isSupernova()) return false;
-            if (tile.getPosition().contains("frac")) return false;
+            if (tile.isFracture()) return false;
             return !tile.getTileModel().hasWormhole();
         };
     }
@@ -627,8 +627,21 @@ public class Tile {
     }
 
     @JsonIgnore
+    public boolean isFracture() {
+        if (hasAnyToken(Constants.TOKEN_FRACTURE)) return true;
+        TileModel model = getTileModel();
+        if (model != null && model.isFracture()) return true;
+        // Legacy: Fracture space used to be identified purely by the fixed frac1-frac7 board slots
+        return position != null && position.startsWith("frac");
+    }
+
+    @JsonIgnore
     public boolean hasEgress() {
-        return getTileModel().hasEgress();
+        TileModel model = getTileModel();
+        if (model == null) return false;
+        if (model.hasEgress()) return true;
+        // Legacy: egress tiles used to be identified by an "egress..." alias
+        return model.getAliases().stream().anyMatch(alias -> alias.startsWith("egress"));
     }
 
     @JsonIgnore

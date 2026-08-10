@@ -14,5 +14,6 @@
     ],
     "tileBack": "fracture",
     "isGravityRift": true,
+    "isFracture": true,
     "source": "other"
 }

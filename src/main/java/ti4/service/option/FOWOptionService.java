@@ -63,6 +63,10 @@ public class FOWOptionService {
         // Other Options (max 5)
         HIDE_PLAYER_NAMES(
                 FOWOptionCategory.OTHER, "Hide real names", "Completely hide player Discord names on the map"),
+        DISABLE_FRACTURE(
+                FOWOptionCategory.OTHER,
+                "Disable Fracture",
+                "The Fracture can never enter play. Same setting as `/game weird_game_setup no_fracture`"),
 
         // Hidden from normal options
         FOW_PLUS(null, "FoW Plus Mode", "Hello darkness my old friend... WIP - ask Solax for details", false),
@@ -142,7 +146,7 @@ public class FOWOptionService {
                 continue;
             }
 
-            boolean currentValue = game.getFowOption(option);
+            boolean currentValue = readOption(game, option);
             sb.append(valueRepresentation(currentValue))
                     .append(" **")
                     .append(option.getTitle())
@@ -188,8 +192,25 @@ public class FOWOptionService {
 
         FOWOption fowOption = FOWOption.fromString(option);
         boolean newValue = Boolean.parseBoolean(value);
-        game.setFowOption(fowOption, newValue);
+        writeOption(game, fowOption, newValue);
         offerFOWOptionButtons(event, game, category);
+    }
+
+    /**
+     * DISABLE_FRACTURE is backed by the game-wide noFractureMode property instead of the fowOptions map, so this
+     * button and {@code /game weird_game_setup no_fracture} are the same setting and cannot diverge.
+     */
+    private static boolean readOption(Game game, FOWOption option) {
+        if (option == FOWOption.DISABLE_FRACTURE) return game.isNoFractureMode();
+        return game.getFowOption(option);
+    }
+
+    private static void writeOption(Game game, FOWOption option, boolean value) {
+        if (option == FOWOption.DISABLE_FRACTURE) {
+            game.setNoFractureMode(value);
+        } else {
+            game.setFowOption(option, value);
+        }
     }
 
     @ButtonHandler("fowOptionCategory_")

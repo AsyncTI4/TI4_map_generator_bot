@@ -31,10 +31,26 @@ import ti4.service.unit.AddUnitService;
 @UtilityClass
 public class FractureService {
 
+    /** Is there any Fracture space on the board, whether from a tile or from a fracture token? */
     public static boolean isFractureInPlay(Game game) {
-        return game.getTileFromPlanet("styx") != null
-                || Stream.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7")
-                        .allMatch(pos -> game.getTileByPosition(pos) != null);
+        return game.getTileMap().values().stream().anyMatch(Tile::isFracture);
+    }
+
+    /** Is the fixed frac1-frac7 row occupied? Only for map rendering - use {@link #isFractureInPlay} otherwise. */
+    public static boolean isFractureRegionOnMap(Game game) {
+        return Stream.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7")
+                .anyMatch(pos -> game.getTileByPosition(pos) != null);
+    }
+
+    public static boolean canFractureEnterPlay(Game game) {
+        return !game.isNoFractureMode() && !isFractureInPlay(game);
+    }
+
+    /** Player facing explanation of why {@link #canFractureEnterPlay} is false. */
+    public static String whyFractureCannotEnterPlay(Game game) {
+        if (isFractureInPlay(game)) return "The Fracture is already in play.";
+        if (game.isNoFractureMode()) return "The Fracture is disabled for this game, so it cannot enter play.";
+        return "";
     }
 
     @ButtonHandler("rollFracture")
@@ -42,22 +58,26 @@ public class FractureService {
         String bt = player.getBreakthroughID();
         if (buttonID.contains("_")) bt = buttonID.split("_")[1];
 
+        if (!canFractureEnterPlay(game)) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), whyFractureCannotEnterPlay(game));
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            return;
+        }
+
         int result = new Die(0).getResult();
         if ("cabalbt".equals(bt)) {
             String msg = player.getRepresentation(false, false)
                     + " has _Al'Raith Ix Ianovar_ so The Fracture enters automatically"
                     + "! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-            spawnFracture(event, game);
-            spawnIngressTokens(event, game, player, bt);
+            if (spawnFracture(event, game)) spawnIngressTokens(event, game, player, bt);
             AlRaithService.serveBeginCabalBreakthroughButtons(event, game, player);
         } else {
             if (result == 1 || result == 10) { // success
                 String msg = player.getRepresentation(false, false) + " rolled a " + DiceEmojis.getGreenDieEmoji(result)
                         + "! The Fracture is now in play! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-                spawnFracture(event, game);
-                spawnIngressTokens(event, game, player, bt);
+                if (spawnFracture(event, game)) spawnIngressTokens(event, game, player, bt);
             } else if (result == 6 && RandomHelper.isOneInX(10)) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
@@ -72,8 +92,26 @@ public class FractureService {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
-    public static void spawnFracture(GenericInteractionCreateEvent event, Game game) {
-        if (isFractureInPlay(game)) return;
+    /**
+     * Brings The Fracture into play, ingress tokens included, for an effect that does so automatically. Says why
+     * nothing happened when it is blocked, so a mandatory effect never silently does nothing.
+     *
+     * @return whether The Fracture entered play
+     */
+    public static boolean enterPlayOrExplain(
+            GenericInteractionCreateEvent event, Game game, @NotNull Player player, String breakthrough) {
+        if (!spawnFracture(event, game)) {
+            String why = whyFractureCannotEnterPlay(game);
+            if (!why.isEmpty()) MessageHelper.sendMessageToChannel(player.getCorrectChannel(), why);
+            return false;
+        }
+        spawnIngressTokens(event, game, player, breakthrough);
+        return true;
+    }
+
+    /** Places The Fracture if it is allowed to enter play. Returns true if the tiles were actually placed. */
+    public static boolean spawnFracture(GenericInteractionCreateEvent event, Game game) {
+        if (!canFractureEnterPlay(game)) return false;
         List<String> fracture = Arrays.asList(
                 "fracture1", "fracture2", "fracture3", "fracture4", "fracture5", "fracture6", "fracture7");
         List<String> positions = Arrays.asList("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7");
@@ -97,6 +135,7 @@ public class FractureService {
             // add units
             AddUnitService.addUnits(event, game.getTileByPosition(pos), game, neutralColorID, units.get(i));
         }
+        return true;
     }
 
     public static void spawnIngressTokens(
@@ -141,38 +180,49 @@ public class FractureService {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), automatic.toString());
 
         int countPer = numberOfIngressPerTechType;
+        boolean anyChoicesToMake = false;
         for (TechnologyType type : techTypesToAddIngress) {
             List<Tile> tilesWithSkip = getTilesWithSkipAndNoIngressAndNotAdding(game, type, automaticAdds);
-            if (tilesWithSkip.size() <= numberOfIngressPerTechType) continue;
+            if (tilesWithSkip.isEmpty()) continue;
+            // Nothing is auto-placed in fog, so the GM gets buttons for every type - even unambiguous ones
+            if (!game.isFowMode() && tilesWithSkip.size() <= numberOfIngressPerTechType) continue;
+            anyChoicesToMake = true;
 
+            // In fog the GM resolves ingress placement, so the buttons must not carry the player's ownership prefix
+            String prefix = game.isFowMode() ? "" : player.factionButtonChecker();
             List<Button> buttons = new ArrayList<>(tilesWithSkip.stream()
                     .map(tile -> {
-                        String id = player.factionButtonChecker() + "addIngressToken_" + tile.getPosition() + "_"
-                                + countPer;
+                        String id = prefix + "addIngressToken_" + tile.getPosition() + "_" + countPer;
                         String label = "Add Ingress To " + tile.getRepresentationForButtons(game, player);
                         return Buttons.red(id, label, type.emoji());
                     })
                     .toList());
 
             String msg = game.isFowMode()
-                    ? GMService.gmPing(game)
+                    ? GMService.gmPing(game) + ", please choose a system with a " + type.emoji()
+                            + " to place an Ingress token for "
+                            + player.getRepresentationUnfoggedNoPing() + "."
                     : player.getRepresentation() + ", please choose a system with a " + type.emoji()
                             + " to place an Ingress token.";
             buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
             MessageHelper.sendMessageToChannelWithButtons(
                     game.isFowMode() ? GMService.getGMChannel(game) : player.getCorrectChannel(), msg, buttons);
-            if (game.isFowMode()) {
-                MessageHelper.sendMessageToChannel(
-                        player.getPrivateChannel(),
-                        player.getRepresentationUnfogged()
-                                + ", buttons to resolve Ingress tokens for The Fracture have been sent to the GM.");
-            } else {
+            if (!game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(),
                         "## Please do not place more ingress tokens than legal."
                                 + " If brought in by breakthrough, that means up to 3 planets per technology type of the breakthrough (6 total)."
                                 + " Otherwise, 1 planet per technology type (4 total).");
             }
+        }
+
+        if (game.isFowMode() && anyChoicesToMake) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", The Fracture is entering play. In fog games Ingress tokens are placed by the GM"
+                            + " — please wait for " + GMService.gmPing(game)
+                            + " to resolve it, and do not place any yourself.");
         }
 
         ThundersEdgeRulesService.alertTabletalkWithFractureRules(game);
@@ -183,12 +233,19 @@ public class FractureService {
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
 
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(), "Placed an ingress token in " + tile.getRepresentationForButtons() + ".");
+        if (tile == null) {
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            return;
+        }
         tile.addToken(Constants.TOKEN_INGRESS, "space");
 
+        String confirmation = "Placed an ingress token in " + tile.getRepresentationForButtons() + ".";
         if (game.isFowMode()) {
+            // The GM resolves ingress placement in fog, and they may not be a seated player
+            MessageHelper.sendMessageToChannel(GMService.getGMChannel(game), confirmation);
             FoWHelper.pingSystem(game, tile.getPosition(), "A new ingress tears into The Fracture.", false);
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), confirmation);
         }
 
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);

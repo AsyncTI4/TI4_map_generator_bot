@@ -4942,7 +4942,7 @@ public class ButtonHelper {
         for (Tile tile : game.getTileMap().values()) {
             if (tile.isEdgeOfBoard(game)
                     && tile.getPosition().length() > 2
-                    && !tile.getPosition().contains("frac")
+                    && !tile.isFracture()
                     && (game.isDiscordantStarsMode() || FoWHelper.playerHasShipsInSystem(player, tile))) {
                 if (game.isAgeOfExplorationMode() && tile.isHomeSystem(game)) {
                     continue;

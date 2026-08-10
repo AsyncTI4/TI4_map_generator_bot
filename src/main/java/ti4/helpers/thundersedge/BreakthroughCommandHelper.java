@@ -250,15 +250,16 @@ public final class BreakthroughCommandHelper {
             if ("cabalbt".equalsIgnoreCase(bt.getID())) {
                 if (btIDs.size() == 1) {
                     // If there are other BTs to potentially roll, don't automatically spawn
-                    if (!FractureService.isFractureInPlay(game)) {
+                    if (FractureService.enterPlayOrExplain(null, game, player, bt.getID())) {
                         String msg = player.getRepresentation(false, false)
                                 + " has gained _Al'Raith Ix Ianovar_, and so The Fracture enters play automatically!"
                                 + " Ingress tokens will be placed in their position on the map, if there were no choices to be made.";
-                        FractureService.spawnFracture(null, game);
-                        FractureService.spawnIngressTokens(null, game, player, bt.getID());
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
-                    AlRaithService.serveBeginCabalBreakthroughButtons(null, game, player);
+                    // Moving ingress tokens needs The Fracture on the board, however it got there
+                    if (FractureService.isFractureInPlay(game)) {
+                        AlRaithService.serveBeginCabalBreakthroughButtons(null, game, player);
+                    }
                 }
             }
             if ("firmamentbt".equalsIgnoreCase(bt.getID())) {
@@ -284,8 +285,7 @@ public final class BreakthroughCommandHelper {
             if ("oblivionbt".equalsIgnoreCase(bt.getID())) {
                 OblivionBreakthroughHandler.startCallOfTheVoid(game, player);
             }
-            if (!FractureService.isFractureInPlay(game) && !game.isNoFractureMode())
-                serveRollFractureButtons(player, btID);
+            if (FractureService.canFractureEnterPlay(game)) serveRollFractureButtons(player, btID);
             if ("muaatbt".equals(bt.getAlias())) StellarGenesisService.serveAvernusButtons(game, player);
             if ("keleresbt".equals(bt.getAlias())) player.gainCustodiaVigilia();
         });

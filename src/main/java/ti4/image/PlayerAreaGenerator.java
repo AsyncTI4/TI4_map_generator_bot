@@ -2330,7 +2330,7 @@ public class PlayerAreaGenerator {
                 int distance1, distance2;
                 if (homePos.equals(tile1.getPosition())) {
                     distance1 = 0;
-                } else if (tile1.getPosition().contains("frac")) {
+                } else if (tile1.isFracture()) {
                     distance1 = "styx".equals(planet1) ? 9000 : 8000;
                 } else if (Arrays.asList("tl", "tr", "bl", "br").contains(tile1.getPosition())) {
                     distance1 = 7000;
@@ -2340,7 +2340,7 @@ public class PlayerAreaGenerator {
                 }
                 if (homePos.equals(tile2.getPosition())) {
                     distance2 = 0;
-                } else if (tile2.getPosition().contains("frac")) {
+                } else if (tile2.isFracture()) {
                     distance2 = "styx".equals(planet2) ? 9000 : 8000;
                 } else if (Arrays.asList("tl", "tr", "bl", "br").contains(tile2.getPosition())) {
                     distance2 = 7000;

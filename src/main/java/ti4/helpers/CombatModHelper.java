@@ -421,8 +421,7 @@ public class CombatModHelper {
                 meetsCondition = (!ButtonHelperAgents.getAdjacentTilesWithStructuresInThem(player, game, tile)
                                 .isEmpty()
                         || ButtonHelperAgents.doesTileHaveAStructureInIt(player, tile));
-            case "fracture_combat" ->
-                meetsCondition = tile != null && tile.getPosition().contains("frac");
+            case "fracture_combat" -> meetsCondition = tile != null && tile.isFracture();
             case Constants.MOD_UNITS_TWO_MATCHING_NOT_FF -> {
                 if (unitsByQuantity.size() == 1) {
                     Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).getFirst();

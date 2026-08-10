@@ -1614,9 +1614,7 @@ public class ButtonHelperHeroes {
     public static List<Button> getGhostHeroTilesStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.getPosition().contains("t")
-                    || tile.getPosition().contains("b")
-                    || tile.getPosition().contains("frac")) {
+            if (tile.getPosition().contains("t") || tile.getPosition().contains("b") || tile.isFracture()) {
                 continue;
             }
             if (FoWHelper.doesTileHaveWHs(game, tile.getPosition()) || FoWHelper.playerHasUnitsInSystem(player, tile)) {
