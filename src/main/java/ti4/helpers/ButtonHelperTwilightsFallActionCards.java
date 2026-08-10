@@ -351,7 +351,7 @@ public final class ButtonHelperTwilightsFallActionCards {
                 + Mapper.getRelic(relic).getName() + "_, owned by " + p2.getRepresentation() + ", to be _Unravel_'d.";
         if (p2 == player) {
             FractureService.enterPlayOrExplain(event, game, player, null);
-            // Moving an ingress token needs The Fracture on the board, however it got there
+            // Only offer the move if The Fracture is actually on the board
             if (FractureService.isFractureInPlay(game)) {
                 TeHelperTechs.initializePlanesplitterStep1(game, player);
             }

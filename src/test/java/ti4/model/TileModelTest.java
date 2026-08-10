@@ -18,8 +18,7 @@ class TileModelTest extends BaseTi4Test {
 
     @Test
     void everyFractureBackedTileIsFlaggedAsFracture() {
-        // isFracture is the runtime marker; the fracture card back is the data these tiles were authored with.
-        // Keep the two in lockstep so a new fracture tile cannot silently miss the flag.
+        // Keep the flag and the card back in lockstep so a new fracture tile cannot miss the flag
         for (TileModel model : TileHelper.getAllTileModels()) {
             if (model.getTileBack() == TileModel.TileBack.FRACTURE) {
                 assertTrue(model.isFracture(), model.getAlias() + ": has the fracture back but not isFracture");

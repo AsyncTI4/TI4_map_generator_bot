@@ -631,7 +631,7 @@ public class Tile {
         if (hasAnyToken(Constants.TOKEN_FRACTURE)) return true;
         TileModel model = getTileModel();
         if (model != null && model.isFracture()) return true;
-        // Legacy: Fracture space used to be identified purely by the fixed frac1-frac7 board slots
+        // Legacy: the frac1-frac7 slots alone used to mean fracture space
         return position != null && position.startsWith("frac");
     }
 

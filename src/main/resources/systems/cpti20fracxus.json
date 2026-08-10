@@ -15,5 +15,6 @@
     "tileBack": "fracture",
     "isGravityRift": true,
     "isFracture": true,
+    "hasEgress": true,
     "source": "other"
 }

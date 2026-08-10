@@ -36,7 +36,7 @@ public class FractureService {
         return game.getTileMap().values().stream().anyMatch(Tile::isFracture);
     }
 
-    /** Is the fixed frac1-frac7 row occupied? Only for map rendering - use {@link #isFractureInPlay} otherwise. */
+    /** Positional check, for map rendering only - use {@link #isFractureInPlay} for rules. */
     public static boolean isFractureRegionOnMap(Game game) {
         return Stream.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7")
                 .anyMatch(pos -> game.getTileByPosition(pos) != null);
@@ -46,7 +46,6 @@ public class FractureService {
         return !game.isNoFractureMode() && !isFractureInPlay(game);
     }
 
-    /** Player facing explanation of why {@link #canFractureEnterPlay} is false. */
     public static String whyFractureCannotEnterPlay(Game game) {
         if (isFractureInPlay(game)) return "The Fracture is already in play.";
         if (game.isNoFractureMode()) return "The Fracture is disabled for this game, so it cannot enter play.";
@@ -92,12 +91,7 @@ public class FractureService {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
-    /**
-     * Brings The Fracture into play, ingress tokens included, for an effect that does so automatically. Says why
-     * nothing happened when it is blocked, so a mandatory effect never silently does nothing.
-     *
-     * @return whether The Fracture entered play
-     */
+    /** Brings The Fracture into play for an automatic effect, or says why it could not. */
     public static boolean enterPlayOrExplain(
             GenericInteractionCreateEvent event, Game game, @NotNull Player player, String breakthrough) {
         if (!spawnFracture(event, game)) {
@@ -184,11 +178,11 @@ public class FractureService {
         for (TechnologyType type : techTypesToAddIngress) {
             List<Tile> tilesWithSkip = getTilesWithSkipAndNoIngressAndNotAdding(game, type, automaticAdds);
             if (tilesWithSkip.isEmpty()) continue;
-            // Nothing is auto-placed in fog, so the GM gets buttons for every type - even unambiguous ones
+            // Nothing auto-places in fog, so the GM gets buttons for every type
             if (!game.isFowMode() && tilesWithSkip.size() <= numberOfIngressPerTechType) continue;
             anyChoicesToMake = true;
 
-            // In fog the GM resolves ingress placement, so the buttons must not carry the player's ownership prefix
+            // The GM presses these in fog, so they must not carry the player's FFCC_ ownership prefix
             String prefix = game.isFowMode() ? "" : player.factionButtonChecker();
             List<Button> buttons = new ArrayList<>(tilesWithSkip.stream()
                     .map(tile -> {
@@ -241,7 +235,7 @@ public class FractureService {
 
         String confirmation = "Placed an ingress token in " + tile.getRepresentationForButtons() + ".";
         if (game.isFowMode()) {
-            // The GM resolves ingress placement in fog, and they may not be a seated player
+            // In fog the presser is the GM, who need not be a seated player
             MessageHelper.sendMessageToChannel(GMService.getGMChannel(game), confirmation);
             FoWHelper.pingSystem(game, tile.getPosition(), "A new ingress tears into The Fracture.", false);
         } else {

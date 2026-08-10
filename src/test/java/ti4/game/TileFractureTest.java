@@ -1,10 +1,14 @@
 package ti4.game;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class TileFractureTest extends BaseTi4Test {
@@ -24,10 +28,19 @@ class TileFractureTest extends BaseTi4Test {
 
     @Test
     void unknownTileIdsDoNotBlowUp() {
-        // getTileModel() is null for tile IDs that are no longer in the registry - see Tile.isValid()
+        // getTileModel() is null for tile IDs no longer in the registry - see Tile.isValid()
         Tile unknown = new Tile("no_such_tile_id", "305");
         assertFalse(unknown.isFracture());
         assertFalse(unknown.hasEgress());
+    }
+
+    /** /add_token needs the art file to exist, so assert the whole resolution chain. */
+    @Test
+    void theFractureTokenIsPlaceableViaAddToken() {
+        assertTrue(Mapper.isValidToken("fracture"), "`fracture` is not a registered token id");
+        String tokenFileName = Mapper.getTokenID(AliasHandler.resolveToken("fracture"));
+        assertEquals(Constants.TOKEN_FRACTURE, tokenFileName);
+        assertNotNull(Mapper.getTokenPath(tokenFileName), "token_fracture_async.png is missing from resources/tokens");
     }
 
     @Test

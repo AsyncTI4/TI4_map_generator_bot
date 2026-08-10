@@ -256,7 +256,7 @@ public final class BreakthroughCommandHelper {
                                 + " Ingress tokens will be placed in their position on the map, if there were no choices to be made.";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
-                    // Moving ingress tokens needs The Fracture on the board, however it got there
+                    // Only offer the move if The Fracture is actually on the board
                     if (FractureService.isFractureInPlay(game)) {
                         AlRaithService.serveBeginCabalBreakthroughButtons(null, game, player);
                     }

@@ -164,8 +164,7 @@ public class MapGenerator implements AutoCloseable {
 
         // Height of map section
         int mapHeight = getMapHeight(game);
-        // Draw the row whenever it is on the board - noFractureMode stops the Fracture entering play, it does not
-        // hide a Fracture that is already there (which rendered as an overlap on an undersized canvas)
+        // noFractureMode stops the Fracture entering play; it must not hide one that is already on the board
         if (FractureService.isFractureRegionOnMap(game)) {
             fractureYbump = 400;
             mapHeight += fractureYbump;

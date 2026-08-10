@@ -196,10 +196,7 @@ public class FOWOptionService {
         offerFOWOptionButtons(event, game, category);
     }
 
-    /**
-     * DISABLE_FRACTURE is backed by the game-wide noFractureMode property instead of the fowOptions map, so this
-     * button and {@code /game weird_game_setup no_fracture} are the same setting and cannot diverge.
-     */
+    /** DISABLE_FRACTURE reads/writes noFractureMode, so this and {@code weird_game_setup no_fracture} cannot diverge. */
     private static boolean readOption(Game game, FOWOption option) {
         if (option == FOWOption.DISABLE_FRACTURE) return game.isNoFractureMode();
         return game.getFowOption(option);
