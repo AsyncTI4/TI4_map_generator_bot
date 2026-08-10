@@ -38,14 +38,14 @@ public class KryxosLeadersHandler {
 
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    target.getCardsInfoThread(),
+                    game.getActionsChannel(),
                     target.getRepresentationUnfogged()
                             + " has no non-faction technology available to return for Dravok Veyl.");
             return;
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
-                target.getCardsInfoThread(),
+                game.getActionsChannel(),
                 target.getRepresentationUnfogged()
                         + ", please choose the non-faction technology to return for Dravok Veyl, the Kryxos agent.",
                 buttons);
@@ -111,7 +111,7 @@ public class KryxosLeadersHandler {
         }
 
         ButtonHelper.deleteMessage(event);
-        PlayerTechService.getTech(game, player, event, "getTech_" + techId + "__noPay");
+        PlayerTechService.getTech(game, player, event, "getTech_" + techId);
     }
 
     // Hero
