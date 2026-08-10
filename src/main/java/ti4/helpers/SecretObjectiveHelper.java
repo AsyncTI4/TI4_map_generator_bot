@@ -155,26 +155,27 @@ public class SecretObjectiveHelper {
                 } else {
                     String factionChecker = player.factionButtonChecker();
                     List<Button> purgeFragButtons = new ArrayList<>();
-                    if (player.getCrf() > 0) {
+                    if (ButtonHelperExplore.getNormalFragmentCount(player, Constants.CULTURAL) > 0) {
                         Button transact =
                                 Buttons.blue(factionChecker + "purge_Frags_CRF_1", "Purge 1 Cultural Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    if (player.getIrf() > 0) {
+                    if (ButtonHelperExplore.getNormalFragmentCount(player, Constants.INDUSTRIAL) > 0) {
                         Button transact =
                                 Buttons.green(factionChecker + "purge_Frags_IRF_1", "Purge 1 Industrial Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    if (player.getHrf() > 0) {
+                    if (ButtonHelperExplore.getNormalFragmentCount(player, Constants.HAZARDOUS) > 0) {
                         Button transact =
                                 Buttons.red(factionChecker + "purge_Frags_HRF_1", "Purge 1 Hazardous Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    if (player.getUrf() > 0) {
+                    if (ButtonHelperExplore.getNormalFragmentCount(player, Constants.FRONTIER) > 0) {
                         Button transact =
                                 Buttons.gray(factionChecker + "purge_Frags_URF_1", "Purge 1 Frontier Fragment");
                         purgeFragButtons.add(transact);
                     }
+                    purgeFragButtons.addAll(ButtonHelperExplore.getSupermassiveFragmentPurgeButtons(player, factionChecker));
                     Button transact2 = Buttons.green(factionChecker + "deleteButtons", "Done Purging");
                     purgeFragButtons.add(transact2);
 

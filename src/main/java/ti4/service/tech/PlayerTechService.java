@@ -35,6 +35,7 @@ import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.ButtonHelperExplore;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
@@ -1040,30 +1041,34 @@ public class PlayerTechService {
             buttons.addAll(dwsCommanders);
         }
         if (!techM.isUnitUpgrade() && player.hasAbility("iconoclasm")) {
-
-            for (int x = 1; x < player.getCrf() + 1; x++) {
+            int culturalFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.CULTURAL);
+            int industrialFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.INDUSTRIAL);
+            int hazardousFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.HAZARDOUS);
+            int frontierFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.FRONTIER);
+            for (int x = 1; x < culturalFragments + 1; x++) {
                 Button transact = Buttons.blue(
                         "purge_Frags_CRF_" + x, "Purge Cultural Fragments (" + x + ")", ExploreEmojis.CFrag);
                 buttons.add(transact);
             }
 
-            for (int x = 1; (x < player.getIrf() + 1 && x < 4); x++) {
+            for (int x = 1; (x < industrialFragments + 1 && x < 4); x++) {
                 Button transact = Buttons.green(
                         "purge_Frags_IRF_" + x, "Purge Industrial Fragments (" + x + ")", ExploreEmojis.IFrag);
                 buttons.add(transact);
             }
 
-            for (int x = 1; (x < player.getHrf() + 1 && x < 4); x++) {
+            for (int x = 1; (x < hazardousFragments + 1 && x < 4); x++) {
                 Button transact = Buttons.red(
                         "purge_Frags_HRF_" + x, "Purge Hazardous Fragments (" + x + ")", ExploreEmojis.HFrag);
                 buttons.add(transact);
             }
 
-            for (int x = 1; x < player.getUrf() + 1; x++) {
+            for (int x = 1; x < frontierFragments + 1; x++) {
                 Button transact = Buttons.gray(
                         "purge_Frags_URF_" + x, "Purge Frontier Fragments (" + x + ")", ExploreEmojis.UFrag);
                 buttons.add(transact);
             }
+            buttons.addAll(ButtonHelperExplore.getSupermassiveFragmentPurgeButtons(player, ""));
         }
         if (player.hasTechReady("is")) {
             Button inheritanceSystemsButton = Buttons.gray("exhaustTech_is", "Exhaust Inheritance Systems");
