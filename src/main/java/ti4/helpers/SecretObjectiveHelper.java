@@ -175,7 +175,8 @@ public class SecretObjectiveHelper {
                                 Buttons.gray(factionChecker + "purge_Frags_URF_1", "Purge 1 Frontier Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    purgeFragButtons.addAll(ButtonHelperExplore.getSupermassiveFragmentPurgeButtons(player, factionChecker));
+                    purgeFragButtons.addAll(
+                            ButtonHelperExplore.getSupermassiveFragmentPurgeButtons(player, factionChecker));
                     Button transact2 = Buttons.green(factionChecker + "deleteButtons", "Done Purging");
                     purgeFragButtons.add(transact2);
 

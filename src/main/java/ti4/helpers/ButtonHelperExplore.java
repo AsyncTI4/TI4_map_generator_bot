@@ -70,8 +70,10 @@ public class ButtonHelperExplore {
     }
 
     @ButtonHandler(GAIN_SUPERMASSIVE_FRAGMENT)
-    public static void gainSupermassiveFragment(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String[] payload = buttonID.substring(GAIN_SUPERMASSIVE_FRAGMENT.length()).split("\\|", 2);
+    public static void gainSupermassiveFragment(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String[] payload =
+                buttonID.substring(GAIN_SUPERMASSIVE_FRAGMENT.length()).split("\\|", 2);
         if (game == null || player == null || payload.length != 2) {
             return;
         }
@@ -99,8 +101,8 @@ public class ButtonHelperExplore {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation() + " gained _" + Mapper.getExplore(fragmentToGain).getName()
-                        + "_ from the purged fragments.");
+                player.getRepresentation() + " gained _"
+                        + Mapper.getExplore(fragmentToGain).getName() + "_ from the purged fragments.");
     }
 
     public static List<Button> getSupermassiveFragmentPurgeButtons(Player player, String factionChecker) {
@@ -109,18 +111,22 @@ public class ButtonHelperExplore {
                 .map(Mapper::getExplore)
                 .filter(fragment -> fragment != null)
                 .map(fragment -> switch (fragment.getType().toLowerCase()) {
-                    case "cultural" -> Buttons.blue(
-                            factionChecker + "purgeSupermassiveFrag_" + fragment.getAlias(),
-                            "Purge " + fragment.getName());
-                    case "industrial" -> Buttons.green(
-                            factionChecker + "purgeSupermassiveFrag_" + fragment.getAlias(),
-                            "Purge " + fragment.getName());
-                    case "hazardous" -> Buttons.red(
-                            factionChecker + "purgeSupermassiveFrag_" + fragment.getAlias(),
-                            "Purge " + fragment.getName());
-                    default -> Buttons.gray(
-                            factionChecker + "purgeSupermassiveFrag_" + fragment.getAlias(),
-                            "Purge " + fragment.getName());
+                    case "cultural" ->
+                        Buttons.blue(
+                                factionChecker + "purgeSupermassiveFrag_" + fragment.getAlias(),
+                                "Purge " + fragment.getName());
+                    case "industrial" ->
+                        Buttons.green(
+                                factionChecker + "purgeSupermassiveFrag_" + fragment.getAlias(),
+                                "Purge " + fragment.getName());
+                    case "hazardous" ->
+                        Buttons.red(
+                                factionChecker + "purgeSupermassiveFrag_" + fragment.getAlias(),
+                                "Purge " + fragment.getName());
+                    default ->
+                        Buttons.gray(
+                                factionChecker + "purgeSupermassiveFrag_" + fragment.getAlias(),
+                                "Purge " + fragment.getName());
                 })
                 .toList();
     }
@@ -176,22 +182,26 @@ public class ButtonHelperExplore {
                 .map(Mapper::getExplore)
                 .filter(fragment -> fragment != null)
                 .map(fragment -> switch (fragment.getType().toLowerCase()) {
-                    case "cultural" -> Buttons.blue(
-                            player.factionButtonChecker() + GAIN_SUPERMASSIVE_FRAGMENT + supermassiveFragment + "|"
-                                    + fragment.getAlias(),
-                            "Gain " + fragment.getName());
-                    case "industrial" -> Buttons.green(
-                            player.factionButtonChecker() + GAIN_SUPERMASSIVE_FRAGMENT + supermassiveFragment + "|"
-                                    + fragment.getAlias(),
-                            "Gain " + fragment.getName());
-                    case "hazardous" -> Buttons.red(
-                            player.factionButtonChecker() + GAIN_SUPERMASSIVE_FRAGMENT + supermassiveFragment + "|"
-                                    + fragment.getAlias(),
-                            "Gain " + fragment.getName());
-                    default -> Buttons.gray(
-                            player.factionButtonChecker() + GAIN_SUPERMASSIVE_FRAGMENT + supermassiveFragment + "|"
-                                    + fragment.getAlias(),
-                            "Gain " + fragment.getName());
+                    case "cultural" ->
+                        Buttons.blue(
+                                player.factionButtonChecker() + GAIN_SUPERMASSIVE_FRAGMENT + supermassiveFragment + "|"
+                                        + fragment.getAlias(),
+                                "Gain " + fragment.getName());
+                    case "industrial" ->
+                        Buttons.green(
+                                player.factionButtonChecker() + GAIN_SUPERMASSIVE_FRAGMENT + supermassiveFragment + "|"
+                                        + fragment.getAlias(),
+                                "Gain " + fragment.getName());
+                    case "hazardous" ->
+                        Buttons.red(
+                                player.factionButtonChecker() + GAIN_SUPERMASSIVE_FRAGMENT + supermassiveFragment + "|"
+                                        + fragment.getAlias(),
+                                "Gain " + fragment.getName());
+                    default ->
+                        Buttons.gray(
+                                player.factionButtonChecker() + GAIN_SUPERMASSIVE_FRAGMENT + supermassiveFragment + "|"
+                                        + fragment.getAlias(),
+                                "Gain " + fragment.getName());
                 })
                 .toList();
     }
@@ -203,7 +213,8 @@ public class ButtonHelperExplore {
         }
 
         Set<String> unavailableFragments = new HashSet<>();
-        for (String exploreType : List.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL, Constants.FRONTIER)) {
+        for (String exploreType :
+                List.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL, Constants.FRONTIER)) {
             unavailableFragments.addAll(game.getExploreDeck(exploreType));
             unavailableFragments.addAll(game.getExploreDiscard(exploreType));
         }
@@ -213,7 +224,8 @@ public class ButtonHelperExplore {
 
         return explorationDeck.getNewDeck().stream()
                 .distinct()
-                .filter(fragmentId -> !fragmentId.equals(excludedFragment) && !unavailableFragments.contains(fragmentId))
+                .filter(fragmentId ->
+                        !fragmentId.equals(excludedFragment) && !unavailableFragments.contains(fragmentId))
                 .filter(fragmentId -> {
                     ExploreModel fragment = Mapper.getExplore(fragmentId);
                     return fragment != null

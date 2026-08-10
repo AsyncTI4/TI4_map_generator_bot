@@ -776,7 +776,8 @@ public class ComponentActionHelper {
                                 Buttons.gray(factionChecker + "purge_Frags_URF_1", "Purge 1 Frontier Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    purgeFragButtons.addAll(ButtonHelperExplore.getSupermassiveFragmentPurgeButtons(p1, factionChecker));
+                    purgeFragButtons.addAll(
+                            ButtonHelperExplore.getSupermassiveFragmentPurgeButtons(p1, factionChecker));
                     Button transact3 = Buttons.red(factionChecker + "deleteButtons", "Done Purging");
                     purgeFragButtons.add(transact3);
                     MessageHelper.sendMessageToChannelWithButtons(
@@ -807,7 +808,8 @@ public class ComponentActionHelper {
                                 Buttons.gray(factionChecker + "purge_Frags_URF_1", "Purge 1 Frontier Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    purgeFragButtons.addAll(ButtonHelperExplore.getSupermassiveFragmentPurgeButtons(p1, factionChecker));
+                    purgeFragButtons.addAll(
+                            ButtonHelperExplore.getSupermassiveFragmentPurgeButtons(p1, factionChecker));
                     Button transact2 = Buttons.green(factionChecker + "gain_CC", "Gain 1 Command Token");
                     purgeFragButtons.add(transact2);
                     Button transact3 =
@@ -866,14 +868,10 @@ public class ComponentActionHelper {
                 int industrialFragments = ButtonHelperExplore.getNormalFragmentCount(p1, Constants.INDUSTRIAL);
                 int hazardousFragments = ButtonHelperExplore.getNormalFragmentCount(p1, Constants.HAZARDOUS);
                 int frontierFragments = ButtonHelperExplore.getNormalFragmentCount(p1, Constants.FRONTIER);
-                int supermassiveCultural =
-                        ButtonHelperExplore.getSupermassiveFragmentCount(p1, Constants.CULTURAL);
-                int supermassiveIndustrial =
-                        ButtonHelperExplore.getSupermassiveFragmentCount(p1, Constants.INDUSTRIAL);
-                int supermassiveHazardous =
-                        ButtonHelperExplore.getSupermassiveFragmentCount(p1, Constants.HAZARDOUS);
-                int supermassiveFrontier =
-                        ButtonHelperExplore.getSupermassiveFragmentCount(p1, Constants.FRONTIER);
+                int supermassiveCultural = ButtonHelperExplore.getSupermassiveFragmentCount(p1, Constants.CULTURAL);
+                int supermassiveIndustrial = ButtonHelperExplore.getSupermassiveFragmentCount(p1, Constants.INDUSTRIAL);
+                int supermassiveHazardous = ButtonHelperExplore.getSupermassiveFragmentCount(p1, Constants.HAZARDOUS);
+                int supermassiveFrontier = ButtonHelperExplore.getSupermassiveFragmentCount(p1, Constants.FRONTIER);
                 int numToBeat = 2 - frontierFragments - supermassiveFrontier;
                 if (game.isAgeOfExplorationMode()) {
                     numToBeat -= 1;

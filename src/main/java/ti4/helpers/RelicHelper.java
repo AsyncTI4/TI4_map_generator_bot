@@ -286,10 +286,21 @@ public class RelicHelper {
 
     public void sendFrags(
             GenericInteractionCreateEvent event, Player sender, Player receiver, String trait, int count, Game game) {
+        sendFrags(event, sender, receiver, trait, count, game, true);
+    }
+
+    public void sendFrags(
+            GenericInteractionCreateEvent event,
+            Player sender,
+            Player receiver,
+            String trait,
+            int count,
+            Game game,
+            boolean includeSupermassive) {
         List<String> fragments = new ArrayList<>();
         for (String cardID : sender.getFragments()) {
             ExploreModel card = Mapper.getExplore(cardID);
-            if (card.getType().equalsIgnoreCase(trait)) {
+            if (card.getType().equalsIgnoreCase(trait) && (includeSupermassive || !cardID.startsWith("supermassive"))) {
                 fragments.add(cardID);
             }
         }

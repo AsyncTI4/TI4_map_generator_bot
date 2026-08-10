@@ -634,14 +634,12 @@ public class PromissoryNoteHelper {
                 int industrialFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.INDUSTRIAL);
                 int hazardousFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.HAZARDOUS);
                 int frontierFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.FRONTIER);
-                int supermassiveCultural =
-                        ButtonHelperExplore.getSupermassiveFragmentCount(player, Constants.CULTURAL);
+                int supermassiveCultural = ButtonHelperExplore.getSupermassiveFragmentCount(player, Constants.CULTURAL);
                 int supermassiveIndustrial =
                         ButtonHelperExplore.getSupermassiveFragmentCount(player, Constants.INDUSTRIAL);
                 int supermassiveHazardous =
                         ButtonHelperExplore.getSupermassiveFragmentCount(player, Constants.HAZARDOUS);
-                int supermassiveFrontier =
-                        ButtonHelperExplore.getSupermassiveFragmentCount(player, Constants.FRONTIER);
+                int supermassiveFrontier = ButtonHelperExplore.getSupermassiveFragmentCount(player, Constants.FRONTIER);
                 int numToBeat = 2 - frontierFragments - supermassiveFrontier;
 
                 numToBeat -= 1;
@@ -681,7 +679,8 @@ public class PromissoryNoteHelper {
                         purgeFragButtons.add(transact);
                     }
                 }
-                purgeFragButtons.addAll(ButtonHelperExplore.getSupermassiveFragmentPurgeButtons(player, factionChecker));
+                purgeFragButtons.addAll(
+                        ButtonHelperExplore.getSupermassiveFragmentPurgeButtons(player, factionChecker));
                 Button transact2 = Buttons.red(factionChecker + "drawRelicFromFrag", "Finish Purging and Draw Relic");
                 if (player.hasAbility("a_new_edifice")) {
                     transact2 = Buttons.red(factionChecker + "drawRelicFromFrag", "Finish Purging and Explore");
