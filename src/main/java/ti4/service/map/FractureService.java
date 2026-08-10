@@ -91,12 +91,14 @@ public class FractureService {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
-    /** Brings The Fracture into play for an automatic effect, or says why it could not. */
+    /** Brings The Fracture into play for an automatic effect, saying so only if it is switched off for the game. */
     public static boolean enterPlayOrExplain(
             GenericInteractionCreateEvent event, Game game, @NotNull Player player, String breakthrough) {
         if (!spawnFracture(event, game)) {
-            String why = whyFractureCannotEnterPlay(game);
-            if (!why.isEmpty()) MessageHelper.sendMessageToChannel(player.getCorrectChannel(), why);
+            // Already in play is the normal case for a later effect, so stay quiet unless it is actually disabled
+            if (!isFractureInPlay(game)) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), whyFractureCannotEnterPlay(game));
+            }
             return false;
         }
         spawnIngressTokens(event, game, player, breakthrough);
