@@ -243,6 +243,7 @@ public final class Constants {
 
     public static final String TOKEN_INGRESS = "token_ingress.png";
     public static final String TOKEN_EGRESS = "token_egress.png";
+    public static final String TOKEN_FRACTURE = "token_fracture_async.png";
     public static final String TOKEN_BREACH_ACTIVE = "token_breachActive.png";
     public static final String TOKEN_BREACH_INACTIVE = "token_breachInactive.png";
     public static final String TOKEN_SEVERED = "token_severed.png";

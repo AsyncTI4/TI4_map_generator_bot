@@ -224,7 +224,7 @@ public class TacticalActionService {
                 "natau");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
 
-        if (tile.getPosition().startsWith("frac")) {
+        if (tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
         if (!game.isL1Hero() && !ctx.playersWithPds2.isEmpty()) {

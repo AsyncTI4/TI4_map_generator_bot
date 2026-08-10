@@ -75,7 +75,7 @@ class ExploreButtonHandler {
                     player.getCorrectChannel(), pF + " Spent a " + commOrTg + " for a mech on " + planetName + ".");
         }
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
-        if (tile != null && tile.getPosition().startsWith("frac")) {
+        if (tile != null && tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
     }

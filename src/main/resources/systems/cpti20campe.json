@@ -13,5 +13,6 @@
     ],
     "shipPositionsType": "TYPE05",
     "tileBack": "fracture",
+    "isFracture": true,
     "source": "other"
 }

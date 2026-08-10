@@ -533,9 +533,7 @@ public final class FoWHelper {
         }
 
         Set<Feature> adjToFeatures = EnumSet.noneOf(Feature.class);
-        for (String alias : tile.getTileModel().getAliases()) {
-            if (alias.startsWith("egress")) adjToFeatures.add(Feature.ingress);
-        }
+        if (tile.hasEgress()) adjToFeatures.add(Feature.ingress);
 
         if (game.isCosmicPhenomenaeMode()) {
             if (tile.isScar(game)) {
@@ -566,8 +564,7 @@ public final class FoWHelper {
         }
 
         for (Tile t : allTiles) {
-            if (adjToFeatures.contains(Feature.egress)
-                    && t.getTileModel().getAliases().stream().anyMatch(x -> x.startsWith("egress"))) {
+            if (adjToFeatures.contains(Feature.egress) && t.hasEgress()) {
                 adjacentPositions.add(t.getPosition());
                 continue;
             }

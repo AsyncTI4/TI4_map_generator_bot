@@ -192,7 +192,7 @@ public class CommanderUnlockCheckService {
             }
             case "obsidian" -> {
                 for (Tile t : game.getTileMap().values()) {
-                    if (t.getPosition().startsWith("frac") && t.containsPlayersUnits(player)) {
+                    if (t.isFracture() && t.containsPlayersUnits(player)) {
                         shouldBeUnlocked = true;
                         break;
                     }

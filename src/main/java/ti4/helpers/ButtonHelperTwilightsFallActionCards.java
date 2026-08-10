@@ -350,11 +350,11 @@ public final class ButtonHelperTwilightsFallActionCards {
         String msg = player.getRepresentation() + " has chosen for _"
                 + Mapper.getRelic(relic).getName() + "_, owned by " + p2.getRepresentation() + ", to be _Unravel_'d.";
         if (p2 == player) {
-            if (!FractureService.isFractureInPlay(game)) {
-                FractureService.spawnFracture(event, game);
-                FractureService.spawnIngressTokens(event, game, player, null);
+            FractureService.enterPlayOrExplain(event, game, player, null);
+            // Only offer the move if The Fracture is actually on the board
+            if (FractureService.isFractureInPlay(game)) {
+                TeHelperTechs.initializePlanesplitterStep1(game, player);
             }
-            TeHelperTechs.initializePlanesplitterStep1(game, player);
         } else {
             Integer poIndex =
                     game.addCustomPO("Unravel " + Mapper.getRelic(relic).getName(), 1);
@@ -937,7 +937,7 @@ public final class ButtonHelperTwilightsFallActionCards {
                 if (tile.getPlanetUnitHolders().isEmpty()
                         && FoWHelper.playerHasActualShipsInSystem(player, tile)
                         && !tile.getTileModel().hasWormhole()
-                        && !tile.getPosition().contains("frac")
+                        && !tile.isFracture()
                         && tile.getSpaceStations().isEmpty()) {
                     buttons.add(
                             Buttons.gray("starFlareTKStep2_" + tile.getPosition(), tile.getRepresentationForButtons()));

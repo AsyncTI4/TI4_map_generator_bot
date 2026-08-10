@@ -2637,10 +2637,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
 
         if ("planesplitter-firm".equalsIgnoreCase(techID) || "tf-planesplitter".equalsIgnoreCase(techID)) {
-            if (!FractureService.isFractureInPlay(game)) {
-                FractureService.spawnFracture(null, game);
-                FractureService.spawnIngressTokens(null, game, this, null);
-            }
+            FractureService.enterPlayOrExplain(null, game, this, null);
         }
 
         if ("thveylorg".equalsIgnoreCase(techID)) {

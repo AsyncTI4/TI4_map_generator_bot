@@ -382,7 +382,7 @@ public final class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         }
 
-        if (unitsWereMoved && game.isCallOfTheVoidMode() && tile.getPosition().contains("frac")) {
+        if (unitsWereMoved && game.isCallOfTheVoidMode() && tile.isFracture()) {
             String msg = player.getRepresentation()
                     + " you should gain 1 command token due to moving in The Fracture while the _Call of the Void_ galactic event is in play.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);

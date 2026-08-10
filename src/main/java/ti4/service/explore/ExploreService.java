@@ -966,7 +966,7 @@ public class ExploreService {
                                         + UnitEmojis.infantry
                                         + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetID)
                                         + ", however this placement is __optional__.");
-                        if (tile.getPosition().startsWith("frac")) {
+                        if (tile.isFracture()) {
                             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
                         }
                     } else {
