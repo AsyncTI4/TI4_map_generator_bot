@@ -13,6 +13,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
@@ -31,6 +32,8 @@ import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.map.FractureService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.MoveUnitService;
 import ti4.service.unit.RemoveUnitService;
@@ -57,6 +60,40 @@ public class LostLegciesExploreHandler {
     private static final String SPENDTG_SO = "spendTgForSecretObjDelib";
     // Exploration Enclave
     private static final String SPENDINF_EE = "spendInfToReadyPlanetsEE";
+    // Disruptive Forces
+    private static final String GAINN_CC_DRAW_AC = "disruptiveForcesGainCCAndAc";
+
+    // Disruptive Forces
+    public static List<Button> getDisruptiveForcesButtons(
+            GenericInteractionCreateEvent event, Game game, Player player, Tile tile) {
+        if (game == null || player == null || tile == null) {
+            return List.of();
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        if (FractureService.isFractureInPlay(game)) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "addIngressToken_" + tile.getPosition() + "_1",
+                    "Add Ingress To " + tile.getRepresentationForButtons(game, player)));
+        }
+        buttons.add(Buttons.green(player.factionButtonChecker() + GAINN_CC_DRAW_AC, "Gain 1 CC And Draw 1 AC"));
+
+        return buttons;
+    }
+
+    @ButtonHandler(GAINN_CC_DRAW_AC)
+    public static void resolveDisruptiveForces(ButtonInteractionEvent event, Game game, Player player) {
+        if (game == null || player == null) {
+            return;
+        }
+
+        ActionCardHelper.drawActionCards(player, 1);
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), "", ButtonHelper.getGainCCButtons(player));
+
+        ButtonHelper.deleteMessage(event);
+    }
 
     // Exploration Enclave
     public static List<Button> getExplorationEnclaveButtons(
@@ -170,6 +207,7 @@ public class LostLegciesExploreHandler {
 
         player.setTg(oldTg - 2);
         game.drawSecretObjective(player.getUserID());
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),

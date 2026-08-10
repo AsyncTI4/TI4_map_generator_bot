@@ -22,6 +22,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arden
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -373,7 +374,8 @@ public class ComponentActionHelper {
                             "absol_jr",
                             "circletofthevoid",
                             "endurance_steroids",
-                            "the_incursion_gate");
+                            "the_incursion_gate",
+                            "diplomaticboon");
                     if (exhaustRelics.contains(relic.toLowerCase())) {
                         if (!p1.getExhaustedRelics().contains(relic)) {
                             if (!"circletofthevoid".equalsIgnoreCase(relic)
@@ -1208,6 +1210,22 @@ public class ComponentActionHelper {
                     event.getMessageChannel(),
                     "Ha! As if I'd automate something like this. Please resolve manually. Here's some exhaust buttons though.",
                     buttons);
+        } else if ("diplomaticboon".equalsIgnoreCase(relicID)) {
+            List<Button> buttons = LostLegaciesRelicHandler.getDiplomaticBoonPlanets(event, game, player);
+            if (buttons.isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getRepresentationNoPing()
+                                + " has no eligible non-home planets, other than Mecatol Rex, for _Diplomatic Boon_.");
+                return;
+            }
+            player.addExhaustedRelic(relicID);
+            purgeOrExhaust = "exhausted";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing()
+                            + ", please choose a non-home planet, other than Mecatol Rex, for _Diplomatic Boon_.",
+                    buttons);
         } else { // PURGE THE RELIC
             player.removeRelic(relicID);
             player.removeExhaustedRelic(relicID);
@@ -1295,7 +1313,12 @@ public class ComponentActionHelper {
             }
             case "passturn" ->
                 MessageHelper.sendMessageToChannelWithButton(event.getChannel(), null, Buttons.REDISTRIBUTE_CCs);
-            case "titanprototype", "absol_jr", "circletofthevoid", "endurance_steroids", "the_incursion_gate" -> {
+            case "titanprototype",
+                    "absol_jr",
+                    "circletofthevoid",
+                    "endurance_steroids",
+                    "the_incursion_gate",
+                    "diplomaticboon" -> {
                 // handled above
             }
             case "bookoflatvinia" -> BookOfLatviniaService.purgeBookOfLatvinia(event, game, player);

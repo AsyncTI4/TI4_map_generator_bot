@@ -4750,6 +4750,9 @@ public class ButtonHelper {
         if (player.hasRelicReady("full_moonphase")) {
             endButtons.add(AeternaAbilityHandler.getFullMoonButton(player));
         }
+        if (player.hasRelicReady("cosmicboon")) {
+            endButtons.add(LostLegaciesRelicHandler.getCosmicBoonButton(player));
+        }
 
         // Legendary Planets
         List<String> implementedLegendaryPlanets = List.of(
