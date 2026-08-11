@@ -49,6 +49,7 @@ import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.relic.BookOfLatviniaService;
+import ti4.service.relic.MutagenService;
 import ti4.service.relic.SilverFlameService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -126,6 +127,13 @@ public class ComponentActionHelper {
         }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 1) {
             compButtons.add(Buttons.red(factionChecker + prefix + "doStarCharts_", "Purge 2 Star Charts"));
+        }
+        if (MutagenService.getMutagenCount(p1) > 1) {
+            compButtons.add(Buttons.red(factionChecker + prefix + "doMutagens_", "Purge 2 Mutagens"));
+        }
+        if (p1.hasRelic("volatile_mutagenics")) {
+            compButtons.add(
+                    Buttons.red(factionChecker + prefix + "doVolatileMutagenics_", "Purge Volatile Mutagenics"));
         }
 
         if (game.isTotalWarMode() && ButtonHelperActionCards.getAllCommsInHS(p1, game) > 9) {
@@ -350,6 +358,8 @@ public class ComponentActionHelper {
 
             if (Constants.ENIGMATIC_DEVICE.equalsIgnoreCase(relic)
                     || (!relic.contains("starchart")
+                            && !MutagenService.isMutagen(relic)
+                            && !"volatile_mutagenics".equals(relic)
                             && (relicData.getText().contains("Action:")
                                     || relicData.getText().contains("ACTION:")))) {
                 Button rButton;
@@ -972,6 +982,8 @@ public class ComponentActionHelper {
                 ButtonHelper.purge2StarCharters(p1, game);
                 DiscordantStarsHelper.drawBlueBackTiles(event, game, p1, 1);
             }
+            case "doMutagens" -> MutagenService.resolveMutagenPurge(event, game, p1, false);
+            case "doVolatileMutagenics" -> MutagenService.resolveMutagenPurge(event, game, p1, true);
             case "stellarAtomicsAction" -> {
                 game.unscorePublicObjective(
                         p1.getUserID(), game.getRevealedPublicObjectives().get("Stellar Atomics"));
@@ -1155,6 +1167,14 @@ public class ComponentActionHelper {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Invalid relic or player does not have specified relic: `" + relicID + "`");
+            return;
+        }
+        if (MutagenService.isMutagen(relicID)) {
+            MutagenService.resolveMutagenPurge(event, game, player, false);
+            return;
+        }
+        if ("volatile_mutagenics".equals(relicID)) {
+            MutagenService.resolveMutagenPurge(event, game, player, true);
             return;
         }
         game.setStoredValue(

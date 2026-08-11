@@ -168,7 +168,7 @@
         "name": "Mutagen",
         "type": "Hazardous",
         "resolution": "Instant",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and choose Agent, Commander, Faction Technology, or Faction Ability. Draft 1 random unused non-unit non-setup component of that type.",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
         "source": "theodisi"
     },
     {
@@ -176,7 +176,7 @@
         "name": "Mutagen",
         "type": "Industrial",
         "resolution": "Instant",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and choose Agent, Commander, Faction Technology, or Faction Ability. Draft 1 random unused non-unit non-setup component of that type.",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
         "source": "theodisi"
     },
     {
@@ -184,7 +184,7 @@
         "name": "Mutagen",
         "type": "Cultural",
         "resolution": "Instant",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and choose Agent, Commander, Faction Technology, or Faction Ability. Draft 1 random unused non-unit non-setup component of that type.",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
         "source": "theodisi"
     },
     {
@@ -192,7 +192,7 @@
         "name": "Mutagen",
         "type": "Frontier",
         "resolution": "Instant",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and choose Agent, Commander, Faction Technology, or Faction Ability. Draft 1 random unused non-unit non-setup component of that type.",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
         "source": "theodisi"
     }
 ]

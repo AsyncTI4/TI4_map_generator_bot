@@ -118,7 +118,7 @@
     {
         "alias": "volatile_mutagenics",
         "name": "Volatile Mutagenics",
-        "text": "ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 2 to gain, readied and unlocked, and return the rest.",
+        "text": "ACTION: Purge this card to reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 2 to gain, readied and unlocked, and return the rest.",
         "source": "theodisi"
     },
     {
