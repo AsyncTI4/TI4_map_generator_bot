@@ -64,6 +64,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
@@ -4749,6 +4750,9 @@ public class ButtonHelper {
         if (player.hasRelicReady("full_moonphase")) {
             endButtons.add(AeternaAbilityHandler.getFullMoonButton(player));
         }
+        if (player.hasRelicReady("cosmicboon")) {
+            endButtons.add(LostLegaciesRelicHandler.getCosmicBoonButton(player));
+        }
 
         // Legendary Planets
         List<String> implementedLegendaryPlanets = List.of(
@@ -8833,6 +8837,7 @@ public class ButtonHelper {
         if (game.isFowMode()) {
             FoWHelper.pingAllPlayersWithFullStats(game, null, player, "Purged 2 Star Charts.");
         }
+        OblivionUnitHandler.doOblivionMechCheck(game, player);
     }
 
     public static void offerSpeakerButtons(Game game) {

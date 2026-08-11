@@ -9,10 +9,14 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ActionCardHelper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.FoWHelper;
@@ -25,8 +29,11 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.button.ReactionService;
+import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.map.FractureService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.MoveUnitService;
 import ti4.service.unit.RemoveUnitService;
@@ -48,7 +55,169 @@ public class LostLegciesExploreHandler {
     private static final String RESOLVE_IMMEDIATE_ASSEMBLY_MECH = "resolveImmediateAssemblyMech_";
     private static final String RESOLVE_IMMEDIATE_ASSEMBLY_INF = "resolveImmediateAssemblyInf_";
     public static final String IMMEDIATE_ASSEMBLY_PRODUCTION = "immediateAssemblyProduction_";
+    // Objective Deliberations
+    private static final String GAINTG_OD = "gainTgObjDeliberation";
+    private static final String SPENDTG_SO = "spendTgForSecretObjDelib";
+    // Exploration Enclave
+    private static final String SPENDINF_EE = "spendInfToReadyPlanetsEE";
+    // Disruptive Forces
+    private static final String GAINN_CC_DRAW_AC = "disruptiveForcesGainCCAndAc";
 
+    // Disruptive Forces
+    public static List<Button> getDisruptiveForcesButtons(
+            GenericInteractionCreateEvent event, Game game, Player player, Tile tile) {
+        if (game == null || player == null || tile == null) {
+            return List.of();
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        if (FractureService.isFractureInPlay(game)) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "addIngressToken_" + tile.getPosition() + "_1",
+                    "Add Ingress To " + tile.getRepresentationForButtons(game, player)));
+        }
+        buttons.add(Buttons.green(player.factionButtonChecker() + GAINN_CC_DRAW_AC, "Gain 1 CC And Draw 1 AC"));
+
+        return buttons;
+    }
+
+    @ButtonHandler(GAINN_CC_DRAW_AC)
+    public static void resolveDisruptiveForces(ButtonInteractionEvent event, Game game, Player player) {
+        if (game == null || player == null) {
+            return;
+        }
+
+        ActionCardHelper.drawActionCards(player, 1);
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), "", ButtonHelper.getGainCCButtons(player));
+
+        ButtonHelper.deleteMessage(event);
+    }
+
+    // Exploration Enclave
+    public static List<Button> getExplorationEnclaveButtons(
+            GenericInteractionCreateEvent event, Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green(player.factionButtonChecker() + SPENDINF_EE, "Spend Influence to Ready Planets"));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "decline_explore", "Decline Exploration"));
+
+        return buttons;
+    }
+
+    @ButtonHandler(SPENDINF_EE)
+    public static void resolveExplorationEncalveSpend(ButtonInteractionEvent event, Game game, Player player) {
+        if (game == null || player == null) {
+            return;
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        buttons.addAll(ButtonHelper.getExhaustButtonsWithTG(game, player, "inf"));
+        buttons.add(Buttons.red(
+                player.factionButtonChecker() + "doneSpendingExplorationEnclave", "Done Spending Influence"));
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing()
+                        + ", you may spend up to 2 influence to ready that many non-home planets.",
+                buttons);
+
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("doneSpendingExplorationEnclave")
+    public static void resolveExplorationEnclave(ButtonInteractionEvent event, Game game, Player player) {
+        if (game == null || player == null) {
+            return;
+        }
+
+        int influenceSpent = 0;
+        for (String spentThing : player.getSpentThingsThisWindow()) {
+            Planet planet = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(spentThing));
+            if (planet != null) {
+                influenceSpent += planet.getInfluence();
+            }
+        }
+        influenceSpent += player.getSpentTgsThisWindow();
+        player.resetSpentThings();
+
+        List<Button> buttons = new ArrayList<>();
+
+        for (String planetName : player.getExhaustedPlanets()) {
+            Tile tile = game.getTileFromPlanet(planetName);
+            if (tile == null || tile.isHomeSystem(game)) {
+                continue;
+            }
+
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "refresh_" + planetName,
+                    Helper.getPlanetRepresentation(planetName, game)));
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentation() + ", you may ready " + Math.min(influenceSpent, 2) + " non-home planet"
+                        + (influenceSpent > 1 ? "s." : "."),
+                buttons);
+
+        ButtonHelper.deleteMessage(event);
+    }
+
+    // Objective Deliberations
+    public static List<Button> offerObjectiveDeliberationButtons(
+            GenericInteractionCreateEvent event, Game game, Player player) {
+        if (game == null || player == null) {
+            return List.of();
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green(player.factionButtonChecker() + GAINTG_OD, "Gain 2 Trade Goods", MiscEmojis.tg));
+        buttons.add(Buttons.red(
+                player.factionButtonChecker() + SPENDTG_SO,
+                "Spend 2 Trade Goods For 1 Secret Objective",
+                CardEmojis.SecretObjective));
+
+        return buttons;
+    }
+
+    @ButtonHandler(GAINTG_OD)
+    public static void resolveObjectiveDeliberationTgGain(ButtonInteractionEvent event, Game game, Player player) {
+        if (game == null || player == null) {
+            return;
+        }
+
+        ButtonHelperStats.gainTGs(event, game, player, 2, false);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(SPENDTG_SO)
+    public static void resolveSpendTgForSoObjectiveDeliberation(
+            ButtonInteractionEvent event, Game game, Player player) {
+        if (game == null || player == null) {
+            return;
+        }
+
+        if (player.getTg() < 2) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "You do not have enough trade goods to spend.");
+            return;
+        }
+
+        int oldTg = player.getTg();
+
+        player.setTg(oldTg - 2);
+        game.drawSecretObjective(player.getUserID());
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
+
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing()
+                        + " spent 2 trade goods to draw a secret objective.\n-# You now have " + player.getTg() + " "
+                        + (player.getTg() > 1 ? "trade goods." : "trade good."));
+        ButtonHelper.deleteMessage(event);
+    }
+
+    // Battleworld
     public static void resolveBattleworldEndOfTurn(GenericInteractionCreateEvent event, Game game, Player player) {
         if (game == null || player == null) {
             return;
@@ -149,6 +318,7 @@ public class LostLegciesExploreHandler {
         ButtonHelper.deleteMessage(event);
     }
 
+    // Immediate Assembly
     @ButtonHandler(RESOLVE_IMMEDIATE_ASSEMBLY_INF)
     public static void resolveImmediateAssemblyInf(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {

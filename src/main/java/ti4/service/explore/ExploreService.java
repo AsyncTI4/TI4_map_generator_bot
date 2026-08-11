@@ -4,6 +4,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -54,6 +55,7 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -61,6 +63,8 @@ import ti4.model.AttachmentModel;
 import ti4.model.ExploreModel;
 import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
+import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -71,8 +75,10 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.map.FractureService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.PlanetService;
+import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -786,8 +792,8 @@ public class ExploreService {
                 ? "`error?`"
                 : Mapper.getPlanet(planetID).getName();
         Button decline = Buttons.red("decline_explore", "Decline Exploration");
-        String fragMessage = player.getFactionEmojiOrColor() + " gained a "
-                + (exploreModel.getAlias().contains("supermassive") ? "supermassive" : "") + " %s fragment.";
+        String fragMessage = player.getFactionEmojiOrColor() + " gained "
+                + (exploreModel.getAlias().contains("supermassive") ? "a supermassive " : "a ") + "%s fragment.";
         if (RandomHelper.isOneInX(100)) {
             fragMessage = "%s\n" + ExploreEmojis.LinkGet;
         }
@@ -1279,7 +1285,7 @@ public class ExploreService {
                     "mutagenindustrial",
                     "mutagenhazardous",
                     "mutagencultural",
-                    "mutagenunknown" -> {
+                    "mutagenfrontier" -> {
                 game.purgeExplore(ogID);
                 player.addRelic(cardID);
                 message =
@@ -1333,6 +1339,81 @@ public class ExploreService {
                 }
                 buttons.add(decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
+            }
+            case "objectivedeliberations" -> {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(),
+                        player.getRepresentation()
+                                + ", please resolve _Objective Deliberations_.\n-# You have " + player.getTg() + " "
+                                + (player.getTg() > 1 ? "trade goods." : "trade good."),
+                        LostLegciesExploreHandler.offerObjectiveDeliberationButtons(event, game, player));
+            }
+            case "explorationenclave" -> {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(),
+                        player.getRepresentation()
+                                + ", please resolve _Exploration Enclave_.\n-# You have " + player.getTg() + " "
+                                + (player.getTg() > 1 ? "trade goods." : "trade good."),
+                        LostLegciesExploreHandler.getExplorationEnclaveButtons(event, game, player));
+            }
+            case "synergisticresearch" -> {
+                var breakthrough = player.getBreakthroughModel();
+                if (!player.hasUnlockedBreakthrough(player.getBreakthroughID())) {
+                    BreakthroughCommandHelper.unlockAllBreakthroughs(game, player);
+                } else if (breakthrough != null && breakthrough.hasSynergy()) {
+                    Set<String> seenTechs = new HashSet<>();
+
+                    List<TechnologyModel> techs = new ArrayList<>(breakthrough.getSynergy().stream()
+                            .filter(TechnologyType.mainFour::contains)
+                            .flatMap(type ->
+                                    ListTechService.getAllTechOfAType(game, type.toString(), player, false, false)
+                                            .stream())
+                            .filter(tech -> tech.getRequirements().orElse("").isEmpty())
+                            .filter(tech -> seenTechs.add(tech.getAlias()))
+                            .toList());
+
+                    List<Button> buttons = ListTechService.getTechButtons(techs, player, "free");
+
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            event.getMessageChannel(),
+                            player.getRepresentation() + ", please choose a technology.",
+                            buttons);
+                } else {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            event.getMessageChannel(),
+                            player.getRepresentation()
+                                    + ", you may gain 2 command tokens, since your breakthrough has no tech synergies.",
+                            ButtonHelper.getGainCCButtons(player));
+                }
+            }
+            case "disruptiveforces" -> {
+                if (!FractureService.isFractureInPlay(game)) {
+                    FractureService.spawnFracture(event, game);
+                    FractureService.spawnIngressTokens(event, game, player, null);
+                }
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(),
+                        player.getRepresentation() + ", please resolve _Disruptive Forces_.",
+                        LostLegciesExploreHandler.getDisruptiveForcesButtons(event, game, player, tile));
+            }
+            case "celestialpath" -> {
+                if (tile.hasPlayerCC(player)) {
+                    String ccID = Mapper.getCCID(player.getColor());
+                    tile.removeCC(ccID);
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            event.getMessageChannel(),
+                            player.getRepresentation()
+                                    + " had their command token removed from the system due to _Celestial Path_. You main now gain a command token.",
+                            ButtonHelper.getGainCCButtons(player));
+                } else {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No token to remove in system.");
+                }
+                Tile homeSystem = player.getHomeSystemTile();
+                homeSystem.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getRepresentation()
+                                + " placed a frontier token in their home system due to _Celestial Path_.");
             }
         }
         RiftSetModeService.resolveExplore(ogID, player, game);
