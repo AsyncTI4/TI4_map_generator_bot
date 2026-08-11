@@ -90,35 +90,41 @@
     {
         "alias": "mutagenhazardous",
         "name": "Mutagen",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and choose Agent, Commander, Faction Technology, or Faction Ability. Draft 1 random unused non-unit non-setup component of that type.",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
         "isFakeRelic": true,
         "source": "theodisi"
     },
     {
         "alias": "mutagenindustrial",
         "name": "Mutagen",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and choose Agent, Commander, Faction Technology, or Faction Ability. Draft 1 random unused non-unit non-setup component of that type.",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
         "isFakeRelic": true,
         "source": "theodisi"
     },
     {
         "alias": "mutagencultural",
         "name": "Mutagen",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and choose Agent, Commander, Faction Technology, or Faction Ability. Draft 1 random unused non-unit non-setup component of that type.",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
         "isFakeRelic": true,
         "source": "theodisi"
     },
     {
         "alias": "mutagenfrontier",
         "name": "Mutagen",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and choose Agent, Commander, Faction Technology, or Faction Ability. Draft 1 random unused non-unit non-setup component of that type.",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
         "isFakeRelic": true,
         "source": "theodisi"
     },
     {
         "alias": "volatile_mutagenics",
         "name": "Volatile Mutagenics",
-        "text": "ACTION: Draw 1 random non-unit, non-setup faction ability, faction technology, agent, and commander. Choose 2 to draft. Then, purge the unchosen components and this card.",
+        "text": "ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 2 to gain, readied and unlocked, and return the rest.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "alluringthrone",
+        "name": "Alluring Throne",
+        "text": "When you draw this card, place the Illustrion planet token into a non-home system that is adjacent to a planet you control; gain control of and ready it. After you move 1 of your flagships out of or through Illustrion's system and into a non-home system, you may move the Illustrion token with it.",
         "source": "theodisi"
     }
 ]
