@@ -107,6 +107,19 @@ public final class ButtonHelperTwilightsFallActionCards {
             DestroyUnitService.destroyUnit(
                     event, oG, game, key, 1, oG.getUnitHolders().get(uHName), false);
             List<Button> buttons = new ArrayList<>();
+            List<String> colors = new ArrayList<>();
+            for (String tilePos : FoWHelper.getAdjacentTiles(game, tileP, player, false, true)) {
+                Tile tile2 = game.getTileByPosition(tilePos);
+                for (UnitHolder uH : tile2.getUnitHolders().values()) {
+                    for (Player p2 : game.getRealAndEliminatedAndDummyPlayers()) {
+                        if (uH.getUnitCount(UnitType.Infantry, p2.getColor()) > 0
+                                && !p2.getColor().equalsIgnoreCase(color)
+                                && !colors.contains(p2.getColor())) {
+                            colors.add(p2.getColor());
+                        }
+                    }
+                }
+            }
             for (String tilePos : FoWHelper.getAdjacentTiles(game, tileP, player, false, true)) {
                 Tile tile2 = game.getTileByPosition(tilePos);
                 for (UnitHolder uH : tile2.getUnitHolders().values()) {
@@ -120,7 +133,8 @@ public final class ButtonHelperTwilightsFallActionCards {
                             label = "(" + StringUtils.capitalize(p2.getColor()) + ") "
                                     + Helper.getPlanetRepresentation(uH.getName(), game);
                         }
-                        if (uH.getUnitCount(UnitType.Infantry, p2.getColor()) > 0) {
+                        if (uH.getUnitCount(UnitType.Infantry, p2.getColor()) > 0
+                                && (colors.contains(p2.getColor()) || colors.isEmpty())) {
                             buttons.add(Buttons.gray(
                                     player.factionButtonChecker() + "locustOn_" + tilePos + "_" + uH.getName() + "_"
                                             + p2.getColor(),
@@ -350,11 +364,11 @@ public final class ButtonHelperTwilightsFallActionCards {
         String msg = player.getRepresentation() + " has chosen for _"
                 + Mapper.getRelic(relic).getName() + "_, owned by " + p2.getRepresentation() + ", to be _Unravel_'d.";
         if (p2 == player) {
-            if (!FractureService.isFractureInPlay(game)) {
-                FractureService.spawnFracture(event, game);
-                FractureService.spawnIngressTokens(event, game, player, null);
+            FractureService.enterPlayOrExplain(event, game, player, null);
+            // Only offer the move if The Fracture is actually on the board
+            if (FractureService.isFractureInPlay(game)) {
+                TeHelperTechs.initializePlanesplitterStep1(game, player);
             }
-            TeHelperTechs.initializePlanesplitterStep1(game, player);
         } else {
             Integer poIndex =
                     game.addCustomPO("Unravel " + Mapper.getRelic(relic).getName(), 1);
@@ -937,7 +951,7 @@ public final class ButtonHelperTwilightsFallActionCards {
                 if (tile.getPlanetUnitHolders().isEmpty()
                         && FoWHelper.playerHasActualShipsInSystem(player, tile)
                         && !tile.getTileModel().hasWormhole()
-                        && !tile.getPosition().contains("frac")
+                        && !tile.isFracture()
                         && tile.getSpaceStations().isEmpty()) {
                     buttons.add(
                             Buttons.gray("starFlareTKStep2_" + tile.getPosition(), tile.getRepresentationForButtons()));

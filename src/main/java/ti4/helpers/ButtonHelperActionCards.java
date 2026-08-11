@@ -1163,7 +1163,7 @@ public final class ButtonHelperActionCards {
         Player p2 = game.getPlayerFromLeader("empyreancommander");
         CommanderUnlockCheckService.checkPlayer(p2, "empyrean");
         CommanderUnlockCheckService.checkPlayer(player, "ghost", "ghoti");
-        if (tile.getPosition().startsWith("frac")) {
+        if (tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
     }

@@ -416,15 +416,15 @@ public class TacticalActionOutputService {
         if (player.hasTech("bedreamneg") && DreamButtonHandler.tileContainsNexusToken(game, tile, true)) {
             bonusMoveValue++;
         }
-        if (game.isCallOfTheVoidMode() && activeSystem.getPosition().contains("frac")) {
+        if (game.isCallOfTheVoidMode() && activeSystem.isFracture()) {
             bonusMoveValue++;
         }
 
-        if (player.hasUnlockedBreakthrough("cabalbt") && tile.getPosition().contains("frac")) {
+        if (player.hasUnlockedBreakthrough("cabalbt") && tile.isFracture()) {
             bonusMoveValue++;
         }
 
-        if (player.hasTech("tf-planesplitter") && tile.getPosition().contains("frac")) {
+        if (player.hasTech("tf-planesplitter") && tile.isFracture()) {
             bonusMoveValue++;
         }
 

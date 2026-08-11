@@ -46,17 +46,20 @@ public class TkCatalyzeResolver implements EdictResolver {
     private static void rollCatalyze(ButtonInteractionEvent event, Game game, Player player) {
         int result = new Die(0).getResult();
         if (result == 1 || result == 10) { // success
-            if (FractureService.isFractureInPlay(game)) {
+            Tile styx = game.getTileFromPlanet("styx");
+            if (styx != null) {
                 // Destroy Styx
-                Tile styx = game.getTileFromPlanet("styx");
                 DestroyUnitService.destroyAllUnitsInSystem(event, styx, game, false);
                 AddUnitService.addUnits(event, styx, game, game.getNeutralColor(), "2 dn, 1 dd, 3 inf s");
-            } else {
+            } else if (FractureService.canFractureEnterPlay(game)) {
                 String msg = player.getRepresentation(false, false) + " rolled a " + DiceEmojis.getGreenDieEmoji(result)
                         + "! The Fracture is now in play! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 FractureService.spawnFracture(event, game);
                 FractureService.spawnIngressTokens(event, game, player, null);
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(), FractureService.whyFractureCannotEnterPlay(game));
             }
         } else if (result == 6 && RandomHelper.isOneInX(10)) {
             MessageHelper.sendMessageToChannel(

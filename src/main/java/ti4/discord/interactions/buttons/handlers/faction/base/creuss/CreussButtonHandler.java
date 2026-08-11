@@ -53,7 +53,7 @@ class CreussButtonHandler {
             if (tile.getPosition().contains("t")
                     || tile.getPosition().contains("b")
                     || tile == tile1
-                    || tile.getPosition().contains("frac")) {
+                    || tile.isFracture()) {
                 continue;
             }
             if (FoWHelper.doesTileHaveWHs(game, tile.getPosition()) || FoWHelper.playerHasUnitsInSystem(player, tile)) {

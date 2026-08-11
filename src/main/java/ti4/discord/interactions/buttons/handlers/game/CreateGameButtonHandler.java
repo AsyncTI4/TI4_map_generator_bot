@@ -499,7 +499,7 @@ public class CreateGameButtonHandler {
             int droppedGames = 0;
             droppedGames -= StringUtils.countMatches(trackRecord, "replaced");
             droppedGames -= StringUtils.countMatches(trackRecord, "dropped");
-            limitIncrease -= droppedGames;
+            limitIncrease += droppedGames;
             if (ongoingAmount > completedGames + 2 + limitIncrease && ongoingAmount != 0) {
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(),
@@ -507,7 +507,7 @@ public class CreateGameButtonHandler {
                                 + " is at their game limit (# of ongoing games must be equal or less than # of completed games + 3 - dropped games) and so cannot join more games at the moment."
                                 + " Their number of ongoing games is " + ongoingAmount
                                 + ", their number of completed games is " + completedGames
-                                + " and their number of dropped games is " + droppedGames + ".\n\n"
+                                + " and their number of dropped games is " + Math.abs(droppedGames) + ".\n\n"
                                 + "If you're playing a private game with friends, you can ping a bothelper for a 1-game exemption from the limit.");
                 return false;
             }

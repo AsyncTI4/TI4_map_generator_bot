@@ -539,7 +539,7 @@ public final class ButtonHelperAgents {
                 ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             }
         }
-        if (tileDestination != null && tileDestination.getPosition().startsWith("frac")) {
+        if (tileDestination != null && tileDestination.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), message + ".");
@@ -2452,7 +2452,7 @@ public final class ButtonHelperAgents {
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         CommanderUnlockCheckService.checkPlayer(player, "titans", "saar", "rohdhna", "cheiran", "celdauri");
-        if (tile != null && tile.getPosition().startsWith("frac")) {
+        if (tile != null && tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
         AgendaHelper.ministerOfIndustryCheck(player, game, game.getTileFromPlanet(planet), event);
