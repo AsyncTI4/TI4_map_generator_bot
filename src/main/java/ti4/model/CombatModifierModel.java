@@ -11,6 +11,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Units.UnitType;
 import ti4.service.combat.CombatRollType;
 
 @Data
@@ -114,6 +115,9 @@ public class CombatModifierModel implements ModelInterface {
             }
             if ("_groundforce_".equals(scope)) {
                 isInScope = unit.getIsGroundForce();
+            }
+            if ("_flagship_or_mech_".equals(scope)) {
+                isInScope = unit.getUnitType() == UnitType.Flagship || unit.getUnitType() == UnitType.Mech;
             }
             if ("classifiedWeapons".equals(scope)) {
                 String storedValue = game.getStoredValue("classifiedWeapons");
