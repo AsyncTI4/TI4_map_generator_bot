@@ -1105,6 +1105,42 @@ public class ExploreService {
                     IronBreakthroughHandler.sendIronBtMessage(player, game);
                 }
             }
+            case "folderspace", "folderspace2" -> {
+                player.setFleetCC(player.getFleetCC() + 1);
+                message = new StringBuilder(player.getRepresentation()
+                        + ", please resolve _Folded Space_. You have been automatically granted 1 fleet command token. Your current command tokens are now "
+                        + player.getCCRepresentation() + ".");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
+                List<Button> buttons = new ArrayList<>();
+                for (Tile tile2 : game.getTileMap().values()) {
+                    if (FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, game) || tile == tile2) {
+                        continue;
+                    }
+                    buttons.add(Buttons.green(
+                            "argentHeroStep3_" + tile2.getPosition() + "_" + tile.getPosition(),
+                            tile2.getRepresentationForButtons(game, player)));
+                }
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(), "Select a tile to move to with folded space.", buttons);
+            }
+            case "scorcheddepot" -> {
+                message = new StringBuilder(
+                        player.getRepresentation() + ", please resolve _Scorched Depot_:\n-# You have ");
+                message.append(
+                        ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, player, planetID));
+                List<Button> buttons = new ArrayList<>();
+                if (ExploreHelper.checkForMech(planetID, game, player)) {
+                    buttons.add(Buttons.green("resolveScorchedDepot_Mech_" + planetID, "Resolve With A Mech There")
+                            .withEmoji(UnitEmojis.mech.asEmoji()));
+                }
+                if (ExploreHelper.checkForInf(planetID, game, player)) {
+                    buttons.add(Buttons.green(
+                                    "resolveScorchedDepot_Inf_" + planetID, "Resolve By Removing 1 Infantry There")
+                            .withEmoji(UnitEmojis.infantry.asEmoji()));
+                }
+                buttons.add(decline);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message.toString(), buttons);
+            }
             case "frln1", "frln2", "frln3" -> {
                 message = new StringBuilder(player.getRepresentation() + ", please resolve _Freelancers_:\n-# "
                         + ButtonHelper.getListOfStuffAvailableToSpend(player, game, false));
@@ -1298,6 +1334,18 @@ public class ExploreService {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "Automatically placed 2 destroyers in the space area, and 2 infantry on the explored planet.");
+            }
+            case "distinguishedadmiral" -> {
+                List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "You can use these buttons to redistribute or gain a command token, along with spending 2 influence potentially..",
+                        buttons);
+                Button deleteButton =
+                        Buttons.red("FFCC_" + player.getFaction() + "_deleteButtons", "Delete These Buttons");
+                String message2 = player.getRepresentation(false, true) + " cc buttons";
+                MessageHelper.sendMessageToChannelWithButtons(
+                        event.getMessageChannel(), message2, List.of(Buttons.REDISTRIBUTE_CCs, deleteButton));
             }
             case "spatialdisplacement" ->
                 LostLegciesExploreHandler.resolveSpatialDisplacement(event, game, player, tile);

@@ -42,6 +42,13 @@ public class FractureService {
                 .anyMatch(pos -> game.getTileByPosition(pos) != null);
     }
 
+    public static boolean isFractureExpandedRegionOnMap(Game game) {
+        return Stream.of(
+                        "frac8", "frac9", "frac10", "frac11", "frac12", "frac13", "frac14", "frac15", "frac16",
+                        "frac17", "frac18", "frac19", "frac20", "frac21", "frac22", "frac23", "frac24", "frac25")
+                .anyMatch(pos -> game.getTileByPosition(pos) != null);
+    }
+
     public static boolean canFractureEnterPlay(Game game) {
         return !game.isNoFractureMode() && !isFractureInPlay(game);
     }
