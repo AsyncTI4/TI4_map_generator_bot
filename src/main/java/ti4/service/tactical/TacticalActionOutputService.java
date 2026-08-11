@@ -314,9 +314,10 @@ public class TacticalActionOutputService {
             }
             if (riftDistance < distance) {
                 if (ignoresAnomalies) {
-                    output.append(ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
-                            ? " (ignores gravity-rift effects due to _Power Word: Plane Shift_)"
-                            : " (this flagship ignores gravity-rift effects due to _Alluring Throne_)");
+                    output.append(
+                            ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
+                                    ? " (ignores gravity-rift effects due to _Power Word: Plane Shift_)"
+                                    : " (this flagship ignores gravity-rift effects due to _Alluring Throne_)");
                 } else {
                     // Don't automatically count rifts, allowing the player to verify the chosen path.
                     output.append(" (gravity rifts along a path could add +")
