@@ -1285,7 +1285,7 @@ public class ExploreService {
                     "mutagenindustrial",
                     "mutagenhazardous",
                     "mutagencultural",
-                    "mutagenunknown" -> {
+                    "mutagenfrontier" -> {
                 game.purgeExplore(ogID);
                 player.addRelic(cardID);
                 message =

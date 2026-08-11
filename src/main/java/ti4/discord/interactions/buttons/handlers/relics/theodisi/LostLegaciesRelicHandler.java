@@ -16,6 +16,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.logging.BotLogger;
@@ -45,10 +46,11 @@ public class LostLegaciesRelicHandler {
 
     @ButtonHandler(USE_CBOON)
     public static void resolveCosmicBoon(ButtonInteractionEvent event, Game game, Player player) {
-        if (game == null || player == null) {
+        if (game == null || player == null || !player.hasRelicReady("cosmicboon")) {
             return;
         }
 
+        player.addExhaustedRelic("cosmicboon");
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", you may use these buttons to explore 2 planets you control.",
@@ -67,7 +69,11 @@ public class LostLegaciesRelicHandler {
         for (String planetName : player.getPlanets()) {
             Planet planet = game.getUnitHolderFromPlanet(planetName);
             Tile tile = game.getTileFromPlanet(planetName);
-            if (planet != null && !planet.isHomePlanet() && (tile != null && !tile.isMecatol())) {
+            if (planet != null
+                    && !planet.isHomePlanet()
+                    && tile != null
+                    && !tile.isMecatol()
+                    && FoWHelper.playerHasShipsInSystem(player, tile)) {
                 planets.add(Buttons.green(
                         player.factionButtonChecker() + CHOOSE_DBOON_PLANET + planetName,
                         planet.getRepresentation(game)));
