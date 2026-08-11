@@ -45,12 +45,8 @@ public class MutagenService {
 
     public static void resolveMutagenPurge(
             ButtonInteractionEvent event, Game game, Player player, boolean volatileMutagenics) {
-        if (!game.getStoredValue(REMAINING_KEY + player.getFaction()).isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    player.getRepresentationNoPing() + ", please finish choosing your current _Mutagen_ components first.");
-            return;
-        }
+        game.removeStoredValue(OPTIONS_KEY + player.getFaction());
+        game.removeStoredValue(REMAINING_KEY + player.getFaction());
         if (!volatileMutagenics && getMutagenCount(player) < 2) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -66,7 +62,8 @@ public class MutagenService {
         if (options.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    player.getRepresentationNoPing() + ", no unused _Mutagen_ components are currently available to gain.");
+                    player.getRepresentationNoPing()
+                            + ", no unused _Mutagen_ components are currently available to gain.");
             return;
         }
 
