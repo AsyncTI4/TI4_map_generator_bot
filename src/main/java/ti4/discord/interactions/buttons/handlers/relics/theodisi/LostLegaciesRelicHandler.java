@@ -24,6 +24,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
@@ -150,10 +151,12 @@ public class LostLegaciesRelicHandler {
             if (payload.length != 2 || game.getTileByPosition(payload[0]) == null) {
                 continue;
             }
+            var unitKey = Units.getUnitKey(payload[1], killer.getColor());
+            if (unitKey == null) {
+                continue;
+            }
             buttons.add(Buttons.green(
-                    killer.factionButtonChecker() + PLACE_NEUTRAL + choice,
-                    "Place 1 "
-                            + Mapper.getUnitKey(payload[1], killer.getColor()).humanReadableName()));
+                    killer.factionButtonChecker() + PLACE_NEUTRAL + choice, "Place 1 " + unitKey.humanReadableName()));
         }
         if (buttons.isEmpty()) {
             return;
