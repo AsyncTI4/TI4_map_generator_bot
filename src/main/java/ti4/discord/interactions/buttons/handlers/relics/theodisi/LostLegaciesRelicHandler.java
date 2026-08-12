@@ -24,6 +24,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -58,6 +59,8 @@ public class LostLegaciesRelicHandler {
     private static final String HORN_SYSTEM = "hornOfTheAbyssSystem_";
     private static final String HORN_COST = "hornOfTheAbyssCost_";
     private static final String HORN_SHIPS = "hornOfTheAbyssShips_";
+    private static final String HORN_REPLACEMENT_BATCH = "hornOfTheAbyssReplacementBatch";
+    private static final String HORN_REPLACEMENT_CHOICES = "hornOfTheAbyssReplacementChoices_";
     private static final int HORN_COST_LIMIT = 8;
 
     // Horn of the Abyss
@@ -80,21 +83,88 @@ public class LostLegaciesRelicHandler {
 
         for (Map.Entry<Player, List<RemovedUnit>> entry : destroyedByKiller.entrySet()) {
             Player killer = entry.getKey();
-            List<Button> buttons = entry.getValue().stream()
-                    .map(destroyedUnit -> Buttons.green(
-                            killer.factionButtonChecker() + PLACE_NEUTRAL
-                                    + destroyedUnit.tile().getPosition() + "|"
-                                    + destroyedUnit.unitKey().unitName(),
-                            "Place 1 " + destroyedUnit.unitKey().humanReadableName()))
-                    .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(
-                    event.getMessageChannel(),
-                    killer.getRepresentationNoPing()
-                            + ", choose 1 destroyed neutral unit to replace with _Horn of the Abyss_.\n"
-                            + "-# Selecting a unit removes every other choice from this batch.",
-                    buttons);
+            Map<String, RemovedUnit> replacementChoices = getNeutralReplacementChoices(killer, entry.getValue());
+            if (replacementChoices.isEmpty()) {
+                continue;
+            }
+            if (!game.getStoredValue(HORN_REPLACEMENT_BATCH).isEmpty()) {
+                String key = HORN_REPLACEMENT_CHOICES + killer.getFaction();
+                List<String> choices =
+                        new ArrayList<>(List.of(game.getStoredValue(key).split(",")));
+                choices.removeIf(String::isEmpty);
+                replacementChoices.keySet().forEach(choice -> {
+                    if (!choices.contains(choice)) {
+                        choices.add(choice);
+                    }
+                });
+                game.setStoredValue(key, String.join(",", choices));
+                continue;
+            }
+            sendNeutralReplacementPrompt(event, game, killer, replacementChoices.keySet());
         }
+    }
+
+    public static void beginNeutralReplacementBatch(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            game.removeStoredValue(HORN_REPLACEMENT_CHOICES + player.getFaction());
+        }
+        game.setStoredValue(HORN_REPLACEMENT_BATCH, "yes");
+    }
+
+    public static void finishNeutralReplacementBatch(GenericInteractionCreateEvent event, Game game) {
+        game.removeStoredValue(HORN_REPLACEMENT_BATCH);
+        for (Player player : game.getRealPlayers()) {
+            String key = HORN_REPLACEMENT_CHOICES + player.getFaction();
+            List<String> choices =
+                    new ArrayList<>(List.of(game.getStoredValue(key).split(",")));
+            choices.removeIf(String::isEmpty);
+            game.removeStoredValue(key);
+            sendNeutralReplacementPrompt(event, game, player, choices);
+        }
+    }
+
+    private static Map<String, RemovedUnit> getNeutralReplacementChoices(
+            Player killer, List<RemovedUnit> destroyedUnits) {
+        Map<String, RemovedUnit> replacementChoices = new LinkedHashMap<>();
+        boolean canPlaceWarSun = killer.hasTech("ws")
+                || killer.hasTech("absol_ws")
+                || killer.getUnitModels().stream()
+                        .anyMatch(unit -> unit.getUnitType() == UnitType.Warsun
+                                && unit.getFaction().isPresent());
+        for (RemovedUnit destroyedUnit : destroyedUnits) {
+            if (destroyedUnit.unitKey().unitType() == UnitType.Warsun && !canPlaceWarSun) {
+                continue;
+            }
+            String payload = destroyedUnit.tile().getPosition() + "|"
+                    + destroyedUnit.unitKey().unitName();
+            replacementChoices.putIfAbsent(payload, destroyedUnit);
+        }
+        return replacementChoices;
+    }
+
+    private static void sendNeutralReplacementPrompt(
+            GenericInteractionCreateEvent event, Game game, Player killer, Iterable<String> choices) {
+        List<Button> buttons = new ArrayList<>();
+        for (String choice : choices) {
+            String[] payload = choice.split("\\|", 2);
+            if (payload.length != 2 || game.getTileByPosition(payload[0]) == null) {
+                continue;
+            }
+            buttons.add(Buttons.green(
+                    killer.factionButtonChecker() + PLACE_NEUTRAL + choice,
+                    "Place 1 "
+                            + Mapper.getUnitKey(payload[1], killer.getColor()).humanReadableName()));
+        }
+        if (buttons.isEmpty()) {
+            return;
+        }
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                killer.getRepresentationNoPing()
+                        + ", choose 1 destroyed neutral unit to replace with _Horn of the Abyss_.\n"
+                        + "-# Selecting a unit removes every other choice from this batch.",
+                buttons);
     }
 
     @ButtonHandler(PLACE_NEUTRAL)
