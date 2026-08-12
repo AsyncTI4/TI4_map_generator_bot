@@ -1263,11 +1263,11 @@ public class ComponentActionHelper {
             }
             player.addExhaustedRelic(relicID);
             purgeOrExhaust = "exhausted";
+            String message = player.getRepresentationNoPing()
+                    + ", please choose a non-home planet for _Ancient Radar_ to explore once as each planet trait.";
+            String buttonPrefix = player.factionButtonChecker() + "exploreAncientRadar_";
             MessageHelper.sendMessageToChannelWithButtons(
-                    event.getMessageChannel(),
-                    player.getRepresentationNoPing()
-                            + ", please choose a non-home planet for _Ancient Radar_ to explore once as each planet trait.",
-                    buttons);
+                    event.getMessageChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
 
         } else if ("horn_of_the_abyss".equalsIgnoreCase(relicID)) {
             List<Button> buttons = LostLegaciesRelicHandler.getHornOfTheAbyssSystemButtons(game, player);

@@ -73,12 +73,14 @@ public class LostLegaciesRelicHandler {
                     .equals(destroyedUnit.unitKey().colorID())) {
                 continue;
             }
-            for (Player killer : CaptureUnitService.listProbableKiller(game, destroyedUnit)) {
-                if (killer.hasRelic("horn_of_the_abyss")) {
-                    destroyedByKiller
-                            .computeIfAbsent(killer, ignored -> new ArrayList<>())
-                            .add(destroyedUnit);
-                }
+            List<Player> possibleKillers = CaptureUnitService.listProbableKiller(game, destroyedUnit).stream()
+                    .filter(killer -> destroyedUnit.uh().getUnitKeys().stream().anyMatch(killer::unitBelongsToPlayer))
+                    .distinct()
+                    .toList();
+            if (possibleKillers.size() == 1 && possibleKillers.getFirst().hasRelic("horn_of_the_abyss")) {
+                destroyedByKiller
+                        .computeIfAbsent(possibleKillers.getFirst(), ignored -> new ArrayList<>())
+                        .add(destroyedUnit);
             }
         }
 
@@ -327,10 +329,12 @@ public class LostLegaciesRelicHandler {
     }
 
     public static void clearHornOfTheAbyssState(Game game) {
+        game.removeStoredValue(HORN_REPLACEMENT_BATCH);
         for (Player player : game.getRealPlayers()) {
             game.removeStoredValue(HORN_SYSTEM + player.getFaction());
             game.removeStoredValue(HORN_COST + player.getFaction());
             game.removeStoredValue(HORN_SHIPS + player.getFaction());
+            game.removeStoredValue(HORN_REPLACEMENT_CHOICES + player.getFaction());
         }
     }
 
@@ -352,7 +356,11 @@ public class LostLegaciesRelicHandler {
         for (String planetName : player.getPlanets()) {
             Planet planet = game.getUnitHolderFromPlanet(planetName);
             Tile tile = game.getTileFromPlanet(planetName);
-            if (planet != null && !planet.isHomePlanet() && !tile.isMecatol(game) && !planet.isLegendary()) {
+            if (planet != null
+                    && tile != null
+                    && !planet.isHomePlanet()
+                    && !tile.isMecatol(game)
+                    && !planet.isLegendary()) {
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + RADAR_EXPLORE + planetName, planet.getRepresentation(game)));
             }
@@ -367,13 +375,28 @@ public class LostLegaciesRelicHandler {
         if (game == null || player == null) {
             return;
         }
+        if (!player.hasRelic("ancient_radar") || !player.getExhaustedRelics().contains("ancient_radar")) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String message = player.getRepresentationNoPing()
+                + ", please choose a non-home planet for _Ancient Radar_ to explore once as each planet trait.";
+        String buttonPrefix = player.factionButtonChecker() + RADAR_EXPLORE;
+        if (NewStuffHelper.checkAndHandlePaginationChange(
+                event,
+                event.getMessageChannel(),
+                getAncientRadarPlanets(event, game, player),
+                message,
+                buttonPrefix,
+                buttonID)) {
+            return;
+        }
 
         String planetName = buttonID.substring(RADAR_EXPLORE.length());
         Tile tile = game.getTileFromPlanet(planetName);
         Planet planet = game.getUnitHolderFromPlanet(planetName);
-        if (!player.hasRelic("ancient_radar")
-                || !player.getExhaustedRelics().contains("ancient_radar")
-                || !player.getPlanets().contains(planetName)
+        if (!player.getPlanets().contains(planetName)
                 || tile == null
                 || planet == null
                 || planet.isHomePlanet()
