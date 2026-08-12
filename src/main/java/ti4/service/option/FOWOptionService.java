@@ -20,6 +20,7 @@ import ti4.service.fow.GMService;
 public class FOWOptionService {
 
     private static final Pattern FOW_OPTION_ = Pattern.compile("fowOption_");
+    private static final int BUTTONS_PER_ROW = 5;
 
     public enum FOWOptionCategory {
         GAME,
@@ -37,7 +38,7 @@ public class FOWOptionService {
     }
 
     public enum FOWOption {
-        // Comm Options (max 5)
+        // Comm Options
         MANAGED_COMMS(FOWOptionCategory.GAME, "Managed comms", "Use managed player-to-player communication threads"),
         ALLOW_AGENDA_COMMS(
                 FOWOptionCategory.GAME,
@@ -48,7 +49,7 @@ public class FOWOptionService {
         HIDE_TOTAL_VOTES(FOWOptionCategory.GAME, "Hide total votes", "Hide total votes amount in agenda"),
         HIDE_VOTE_ORDER(FOWOptionCategory.GAME, "Hide voting order", "Hide player colors from vote order"),
 
-        // Visibility Options (max 5)
+        // Visibility Options
         BRIGHT_NOVAS(FOWOptionCategory.VISIBILITY, "Bright Novas", "Locations of Supernovas are always visible"),
         HIDE_EXPLORES(
                 FOWOptionCategory.VISIBILITY, "Hide Explore Decks", "Disables looking at explore and relic decks"),
@@ -59,8 +60,12 @@ public class FOWOptionService {
                 FOWOptionCategory.VISIBILITY,
                 "Stats from HS",
                 "Only way to see players stats is to see their Home System"),
+        HIDE_AC_DISCARD(
+                FOWOptionCategory.VISIBILITY,
+                "Hide AC Discard",
+                "Action card discard pile shows only cards that were played"),
 
-        // Other Options (max 5)
+        // Other Options
         HIDE_PLAYER_NAMES(
                 FOWOptionCategory.OTHER, "Hide real names", "Completely hide player Discord names on the map"),
         DISABLE_FRACTURE(
@@ -167,7 +172,10 @@ public class FOWOptionService {
                                     "Enable " + option.getTitle()));
         }
 
-        rows.add(ActionRow.of(optionButtons));
+        // An ActionRow holds at most 5 buttons, and the message at most 5 rows - one of which is the category row.
+        for (int i = 0; i < optionButtons.size(); i += BUTTONS_PER_ROW) {
+            rows.add(ActionRow.of(optionButtons.subList(i, Math.min(i + BUTTONS_PER_ROW, optionButtons.size()))));
+        }
         rows.add(ActionRow.of(categoryButtons));
 
         if (event == null) {

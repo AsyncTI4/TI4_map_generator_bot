@@ -50,6 +50,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.spring.context.SpringContext;
@@ -78,6 +79,29 @@ public class ActionCardHelper {
         ralnelbt,
         garbozia,
         purged
+    }
+
+    /**
+     * Whether action cards that were discarded rather than played must be hidden from {@code viewer}.
+     * Only ever true in Fog of War games with the option turned on, and never for a GM.
+     * The option is checked before the viewer, because {@link Player#isGM()} is a guild role lookup.
+     */
+    public static boolean hidesUnplayedDiscards(Game game, Player viewer) {
+        if (!game.isFowMode() || !game.getFowOption(FOWOption.HIDE_AC_DISCARD)) return false;
+        return viewer == null || !viewer.isGM();
+    }
+
+    /** Whether {@code viewer} is allowed to see, and interact with, a given card in the discard pile. */
+    public static boolean isDiscardVisible(Game game, Player viewer, String acId) {
+        return isDiscardVisible(game, hidesUnplayedDiscards(game, viewer), acId);
+    }
+
+    /**
+     * @param hideUnplayed the result of {@link #hidesUnplayedDiscards}, hoisted out of the loop by callers that
+     *                     check a whole pile so the GM role lookup only happens once.
+     */
+    public static boolean isDiscardVisible(Game game, boolean hideUnplayed, String acId) {
+        return !hideUnplayed || game.getPlayedActionCards().contains(acId);
     }
 
     public static void sendActionCardInfo(Game game, Player player) {
@@ -743,14 +767,15 @@ public class ActionCardHelper {
             if (player.hasPlanet("garbozia")
                     && game.getDiscardACStatus().getOrDefault(acID, null) == ACStatus.garbozia) {
                 game.getDiscardACStatus().put(acID, ACStatus.purged);
+                game.getPlayedActionCards().add(acID);
                 if (!game.isFowMode()) {
                     fromGarbozia = true;
                 }
             } else if (player.hasAbility("cybernetic_madness")) {
-                game.purgedActionCard(player.getUserID(), acIndex);
+                game.purgedActionCard(player.getUserID(), acIndex, true);
                 OblivionUnitHandler.doOblivionMechCheck(game, player);
             } else {
-                game.discardActionCard(player.getUserID(), acIndex);
+                game.discardActionCard(player.getUserID(), acIndex, true);
             }
         }
         recordTrackedActionCardPlay(game, player, actionCardTitle);
@@ -2417,8 +2442,9 @@ public class ActionCardHelper {
     public static void pickACardFromDiscardStep1(
             Game game, Player player, String buttonPrefix, String message, MessageChannel channel) {
         List<Button> buttons = new ArrayList<>();
+        boolean hideUnplayed = hidesUnplayedDiscards(game, player);
         for (String acStringID : game.getDiscardActionCards().keySet()) {
-            if (!isDiscardActionCardPickable(game, acStringID)) {
+            if (!isDiscardActionCardPickable(game, hideUnplayed, acStringID)) {
                 continue;
             }
             buttons.add(Buttons.green(
@@ -2441,7 +2467,7 @@ public class ActionCardHelper {
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         ButtonHelper.deleteMessage(event);
         String acID = buttonID.replace("pickFromDiscard_", "");
-        if (!isDiscardActionCardPickable(game, acID)) {
+        if (!isDiscardActionCardPickable(game, hidesUnplayedDiscards(game, player), acID)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
@@ -2474,7 +2500,7 @@ public class ActionCardHelper {
             GenericInteractionCreateEvent event, Game game, Player player, int acIndex) {
         String acId = getDiscardedAcID(game, acIndex);
 
-        if (acId == null) {
+        if (acId == null || !isDiscardVisible(game, player, acId)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry");
             return;
         }
@@ -2500,9 +2526,9 @@ public class ActionCardHelper {
                 .orElse(null);
     }
 
-    private static boolean isDiscardActionCardPickable(Game game, String acId) {
+    private static boolean isDiscardActionCardPickable(Game game, boolean hideUnplayed, String acId) {
         ACStatus status = game.getDiscardACStatus().get(acId);
-        return status == null;
+        return status == null && isDiscardVisible(game, hideUnplayed, acId);
     }
 
     @ButtonHandler("riseOfAMessiah")

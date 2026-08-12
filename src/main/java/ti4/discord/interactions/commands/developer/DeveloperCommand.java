@@ -30,7 +30,8 @@ public class DeveloperCommand implements ParentCommand {
                     new DeleteUserMessages(),
                     new PostMatchmakingButtons(),
                     new ModifyMatchmakingQueue(),
-                    new RunSql())
+                    new RunSql(),
+                    new TestHideAcDiscard())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

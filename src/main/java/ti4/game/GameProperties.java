@@ -3,8 +3,10 @@ package ti4.game;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import ti4.helpers.ActionCardHelper.ACStatus;
@@ -203,6 +205,7 @@ public class GameProperties {
 
     private Map<String, Integer> discardActionCards = new LinkedHashMap<>();
     private Map<String, ACStatus> discardACStatus = new HashMap<>();
+    private Set<String> playedActionCards = new LinkedHashSet<>();
     private GameStats gameStats = new GameStats();
 
     // Stored Values

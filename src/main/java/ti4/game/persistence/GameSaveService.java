@@ -179,6 +179,9 @@ class GameSaveService {
                 .collect(Collectors.toMap(Entry::getKey, e -> e.getValue().toString())));
         writeCardsStrings(discardStatus, writer, Constants.AC_STATUS);
 
+        writer.write(Constants.AC_PLAYED + " " + String.join(",", game.getPlayedActionCards()));
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.EXPLORE + " " + String.join(",", game.getAllExplores()));
         writer.write(System.lineSeparator());
 
