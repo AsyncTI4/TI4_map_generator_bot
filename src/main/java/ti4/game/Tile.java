@@ -645,6 +645,15 @@ public class Tile {
     }
 
     @JsonIgnore
+    public boolean hasIngress() {
+        TileModel model = getTileModel();
+        if (model == null) return false;
+        if (model.hasIngress()) return true;
+        // Legacy: ingress tiles used to be identified by an "ingress..." alias
+        return false;
+    }
+
+    @JsonIgnore
     public List<WormholeModel.Wormhole> getWormholes(Game game) {
         Set<WormholeModel.Wormhole> whs = EnumSet.noneOf(WormholeModel.Wormhole.class);
         List<WormholeModel.Wormhole> whs2 = new ArrayList<>(whs);

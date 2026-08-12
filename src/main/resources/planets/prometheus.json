@@ -1,0 +1,115 @@
+{
+    "planetLayout": {
+        "unitHolderName": "prometheus",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 185
+        }
+    },
+    "id": "prometheus",
+    "tileId": "ef3",
+    "name": "Prometheus",
+    "aliases": [
+        "prometheus"
+    ],
+    "positionInTile": {
+        "x": 135.0,
+        "y": 185.0
+    },
+    "resources": 4,
+    "influence": 0,
+    "factionHomeworld": null,
+    "planetType": "LIGHTNING",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": null,
+    "legendaryAbilityText": null,
+    "unitPositions": {
+        "unitHolderName": "prometheus",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 96.0,
+                    "y": 170.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 65.0,
+                    "y": 205.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 102.0,
+                    "y": 197.0
+                },
+                {
+                    "x": 117.0,
+                    "y": 197.0
+                },
+                {
+                    "x": 135.0,
+                    "y": 197.0
+                },
+                {
+                    "x": 113.0,
+                    "y": 210.0
+                },
+                {
+                    "x": 130.0,
+                    "y": 210.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 103.0,
+                    "y": 127.0
+                },
+                {
+                    "x": 121.0,
+                    "y": 127.0
+                },
+                {
+                    "x": 98.0,
+                    "y": 140.0
+                },
+                {
+                    "x": 115.0,
+                    "y": 140.0
+                },
+                {
+                    "x": 135.0,
+                    "y": 140.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 116.0,
+                    "y": 168.0
+                },
+                {
+                    "x": 85.0,
+                    "y": 168.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 36.0,
+                    "y": 174.0
+                },
+                {
+                    "x": 158.0,
+                    "y": 130.0
+                },
+                {
+                    "x": 165.0,
+                    "y": 160.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "source": "expanded_fracture"
+}
