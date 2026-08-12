@@ -60,6 +60,22 @@ public class FOWOptionService {
                 FOWOptionCategory.VISIBILITY,
                 "Stats from HS",
                 "Only way to see players stats is to see their Home System"),
+        HIDE_STATS_VIA_FACTION_PN(
+                FOWOptionCategory.VISIBILITY,
+                "Hide Stats via Faction PN",
+                "A faction-specific promissory note in your play area no longer reveals that player's stats"),
+        HIDE_STATS_VIA_ALLIANCE(
+                FOWOptionCategory.VISIBILITY,
+                "Hide Stats via Alliance",
+                "An Alliance card in your play area no longer reveals that player's stats"),
+        HIDE_STATS_VIA_SFTT(
+                FOWOptionCategory.VISIBILITY,
+                "Hide Stats via SftT",
+                "A Support for the Throne card in your play area no longer reveals that player's stats"),
+        HIDE_STATS_VIA_MAHACT_CC(
+                FOWOptionCategory.VISIBILITY,
+                "Hide Stats via Mahact CC",
+                "A Mahact command counter in your fleet no longer reveals that player's stats"),
         HIDE_AC_DISCARD(
                 FOWOptionCategory.VISIBILITY,
                 "Hide AC Discard",

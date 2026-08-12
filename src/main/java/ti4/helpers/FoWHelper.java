@@ -35,6 +35,7 @@ import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
+import ti4.model.PromissoryNoteModel;
 import ti4.model.WormholeModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.fow.FOWPlusService;
@@ -292,9 +293,10 @@ public final class FoWHelper {
         if (viewingPlayer.getAllianceMembers().contains(player.getFaction())) {
             return true;
         }
-        if ((hasPlayersPromInPlayArea(player, viewingPlayer) || hasMahactCCInFleet(player, viewingPlayer))
-                && !FOWPlusService.isActive(game)
-                && !game.getFowOption(FOWOption.STATS_FROM_HS_ONLY)) {
+        if (!FOWPlusService.isActive(game)
+                && !game.getFowOption(FOWOption.STATS_FROM_HS_ONLY)
+                && (hasPlayersPromInPlayArea(game, player, viewingPlayer)
+                        || hasMahactCCInFleet(game, player, viewingPlayer))) {
             return true;
         }
         initializeFog(game, viewingPlayer, false);
@@ -400,22 +402,31 @@ public final class FoWHelper {
         return tile != null && !tile.hasFog(viewingPlayer);
     }
 
-    private static boolean hasPlayersPromInPlayArea(@NotNull Player player, @NotNull Player viewingPlayer) {
-        boolean hasPromInPA = false;
-        Game game = player.getGame();
-        List<String> promissoriesInPlayArea = viewingPlayer.getPromissoryNotesInPlayArea();
-        for (String prom_ : promissoriesInPlayArea) {
-            if (game.getPNOwner(prom_) == player) {
-                hasPromInPA = true;
-                break;
+    private static boolean hasPlayersPromInPlayArea(
+            @NotNull Game game, @NotNull Player player, @NotNull Player viewingPlayer) {
+        for (String prom_ : viewingPlayer.getPromissoryNotesInPlayArea()) {
+            if (game.getPNOwner(prom_) != player) {
+                continue;
+            }
+            if (!game.getFowOption(revealGateFor(Mapper.getPromissoryNote(prom_)))) {
+                return true;
             }
         }
-        return hasPromInPA;
+        return false;
     }
 
-    private static boolean hasMahactCCInFleet(@NotNull Player player, @NotNull Player viewingPlayer) {
-        List<String> mahactCCs = viewingPlayer.getMahactCC();
-        return mahactCCs.contains(player.getColor());
+    private static FOWOption revealGateFor(PromissoryNoteModel pn) {
+        if (pn.getAlias().endsWith("_an")) return FOWOption.HIDE_STATS_VIA_ALLIANCE;
+        if (pn.getAlias().endsWith("_sftt")) return FOWOption.HIDE_STATS_VIA_SFTT;
+        return FOWOption.HIDE_STATS_VIA_FACTION_PN;
+    }
+
+    private static boolean hasMahactCCInFleet(
+            @NotNull Game game, @NotNull Player player, @NotNull Player viewingPlayer) {
+        if (game.getFowOption(FOWOption.HIDE_STATS_VIA_MAHACT_CC)) {
+            return false;
+        }
+        return viewingPlayer.getMahactCC().contains(player.getColor());
     }
 
     /**
