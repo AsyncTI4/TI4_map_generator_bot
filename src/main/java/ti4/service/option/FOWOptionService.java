@@ -72,6 +72,10 @@ public class FOWOptionService {
                 FOWOptionCategory.OTHER,
                 "Disable Fracture",
                 "The Fracture can never enter play. Same setting as `/game weird_game_setup no_fracture`"),
+        OPTIONAL_PILLAGABLE_TG(
+                FOWOptionCategory.OTHER,
+                "Optional Pillage-able TG",
+                "Prompt before auto-granting TG that could trigger Pillage (Stellar Genesis/Magmus, Rear Admiral Farran), even in Fog of War"),
 
         // Hidden from normal options
         FOW_PLUS(null, "FoW Plus Mode", "Hello darkness my old friend... WIP - ask Solax for details", false),
