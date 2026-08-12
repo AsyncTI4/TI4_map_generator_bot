@@ -143,6 +143,33 @@ class FoWHelperTest extends BaseTi4Test {
     }
 
     @Test
+    void canSeeStatsOfPlayer_playAreaBlackSpectrumAllianceHomebrew_withAllianceToggleOn_doesNotReveal() {
+        // bsp_arborec_alliance is a faction-specific homebrew replacement for the generic
+        // <color>_an Alliance card (homebrewReplacesID: "<color>_an"), so it must be classified as
+        // Alliance, not Faction PN, even though its own alias doesn't end in "_an".
+        game.setFowMode(true);
+        game.setFowOption(FOWOption.HIDE_STATS_VIA_ALLIANCE, true);
+        player.setFaction("arborec");
+        Player viewer = addViewer();
+        player.addOwnedPromissoryNoteByID("bsp_arborec_alliance");
+        viewer.addPromissoryNoteToPlayArea("bsp_arborec_alliance");
+
+        assertThat(FoWHelper.canSeeStatsOfPlayer(game, player, viewer)).isFalse();
+    }
+
+    @Test
+    void canSeeStatsOfPlayer_playAreaBlackSpectrumAllianceHomebrew_withUnrelatedFactionPnToggleOn_stillReveals() {
+        game.setFowMode(true);
+        game.setFowOption(FOWOption.HIDE_STATS_VIA_FACTION_PN, true);
+        player.setFaction("arborec");
+        Player viewer = addViewer();
+        player.addOwnedPromissoryNoteByID("bsp_arborec_alliance");
+        viewer.addPromissoryNoteToPlayArea("bsp_arborec_alliance");
+
+        assertThat(FoWHelper.canSeeStatsOfPlayer(game, player, viewer)).isTrue();
+    }
+
+    @Test
     void canSeeStatsOfPlayer_playAreaSftt_defaultOptions_revealsStats() {
         game.setFowMode(true);
         Player viewer = addViewer();

@@ -416,8 +416,11 @@ public final class FoWHelper {
     }
 
     private static FOWOption revealGateFor(PromissoryNoteModel pn) {
-        if (pn.getAlias().endsWith("_an")) return FOWOption.HIDE_STATS_VIA_ALLIANCE;
-        if (pn.getAlias().endsWith("_sftt")) return FOWOption.HIDE_STATS_VIA_SFTT;
+        // Faction-specific homebrew replacements (e.g. Black Spectrum's per-faction Alliance/SftT
+        // cards) keep the alias of the card they replace here, so classify by that when present.
+        String classificationAlias = pn.getHomebrewReplacesID().orElse(pn.getAlias());
+        if (classificationAlias.endsWith("_an")) return FOWOption.HIDE_STATS_VIA_ALLIANCE;
+        if (classificationAlias.endsWith("_sftt")) return FOWOption.HIDE_STATS_VIA_SFTT;
         return FOWOption.HIDE_STATS_VIA_FACTION_PN;
     }
 
