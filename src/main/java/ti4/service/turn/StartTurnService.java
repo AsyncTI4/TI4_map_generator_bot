@@ -26,6 +26,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
@@ -63,6 +64,7 @@ import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.WhisperService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.relic.QuantumEntanglerService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.strategycard.StrategyCardMessageService;
 import ti4.settings.users.UserSettingsManager;
@@ -84,6 +86,8 @@ public class StartTurnService {
 
         game.removeStoredValue("fortuneSeekers");
         ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
+        LostLegaciesRelicHandler.clearHornOfTheAbyssState(game);
+        QuantumEntanglerService.clearPendingQuantumEntanglers(game);
         RevenantLeadersHandler.clearRedLeaderTacticalState(game);
         AeternaAbilityHandler.clearMoonReturnStoredValues(game);
         ArcanumAbilityHandler.clearRitualOfAscensionStoredValues(game);
