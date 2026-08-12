@@ -1,7 +1,10 @@
 package ti4.discord.interactions.buttons.handlers.relics.theodisi;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
@@ -16,14 +19,20 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ComponentActionHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.explore.ExploreService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.CaptureUnitService;
+import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
 @UtilityClass
 public class LostLegaciesRelicHandler {
@@ -38,6 +47,274 @@ public class LostLegaciesRelicHandler {
     private static final String PLACE_FF_DBOON = "placeFighterWithDiplomaticBoon_";
     // Cosmic Boon
     private static final String USE_CBOON = "useCosmicBoon";
+    // Ancient Radar
+    private static final String RADAR_EXPLORE = "exploreAncientRadar_";
+    // Horn of the Abyss
+    private static final String PLACE_NEUTRAL = "hornOfTheAbyssPlace_";
+    private static final String CHOOSE_HORN_SYSTEM = "chooseHornOfTheAbyssSystem_";
+    private static final String PLACE_HORN_SHIP = "placeHornOfTheAbyssShip_";
+    private static final String DONE_HORN_SHIPS = "donePlacingHornOfTheAbyssShips";
+    private static final String HORN_SYSTEM = "hornOfTheAbyssSystem_";
+    private static final String HORN_COST = "hornOfTheAbyssCost_";
+    private static final String HORN_SHIPS = "hornOfTheAbyssShips_";
+    private static final int HORN_COST_LIMIT = 8;
+
+    // Horn of the Abyss
+    public static void offerNeutralReplacement(
+            GenericInteractionCreateEvent event, Game game, List<RemovedUnit> destroyedUnits) {
+        Map<Player, List<RemovedUnit>> destroyedByKiller = new LinkedHashMap<>();
+        for (RemovedUnit destroyedUnit : destroyedUnits) {
+            if (!game.getNeutralColor().equals(destroyedUnit.unitKey().colorID())) {
+                continue;
+            }
+            for (Player killer : CaptureUnitService.listProbableKiller(game, destroyedUnit)) {
+                if (killer.hasRelic("horn_of_the_abyss")) {
+                    destroyedByKiller
+                            .computeIfAbsent(killer, ignored -> new ArrayList<>())
+                            .add(destroyedUnit);
+                }
+            }
+        }
+
+        for (Map.Entry<Player, List<RemovedUnit>> entry : destroyedByKiller.entrySet()) {
+            Player killer = entry.getKey();
+            List<Button> buttons = entry.getValue().stream()
+                    .map(destroyedUnit -> Buttons.green(
+                            killer.factionButtonChecker() + PLACE_NEUTRAL
+                                    + destroyedUnit.tile().getPosition() + "|"
+                                    + destroyedUnit.unitKey().unitName(),
+                            "Place 1 " + destroyedUnit.unitKey().humanReadableName()))
+                    .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(),
+                    killer.getRepresentationNoPing()
+                            + ", choose 1 destroyed neutral unit to replace with _Horn of the Abyss_.\n"
+                            + "-# Selecting a unit removes every other choice from this batch.",
+                    buttons);
+        }
+    }
+
+    @ButtonHandler(PLACE_NEUTRAL)
+    public static void placeNeutralReplacement(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!player.hasRelic("horn_of_the_abyss")) {
+            return;
+        }
+
+        String[] payload = buttonID.substring(PLACE_NEUTRAL.length()).split("\\|", 2);
+        if (payload.length != 2) {
+            return;
+        }
+
+        Tile tile = game.getTileByPosition(payload[0]);
+        if (tile == null) {
+            return;
+        }
+
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + payload[1]);
+
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing()
+                        + " used _Horn of the Abyss_ and placed 1 "
+                        + payload[1]
+                        + " in "
+                        + tile.getRepresentationForButtons(game, player)
+                        + ".");
+
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static List<Button> getHornOfTheAbyssSystemButtons(Game game, Player player) {
+        return game.getTileMap().values().stream()
+                .filter(tile -> !tile.getTileModel().isHyperlane())
+                .filter(tile -> !hasOtherPlayersShips(tile, game, player))
+                .sorted(Comparator.comparing(Tile::getPosition))
+                .map(tile -> Buttons.green(
+                        player.factionButtonChecker() + CHOOSE_HORN_SYSTEM + tile.getPosition(),
+                        tile.getRepresentationForButtons(game, player)))
+                .toList();
+    }
+
+    @ButtonHandler(CHOOSE_HORN_SYSTEM)
+    public static void chooseHornOfTheAbyssSystem(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!player.hasRelic("horn_of_the_abyss")
+                || !player.getExhaustedRelics().contains("horn_of_the_abyss")) {
+            return;
+        }
+
+        List<Button> systemButtons = getHornOfTheAbyssSystemButtons(game, player);
+        String message = player.getRepresentationNoPing()
+                + ", please choose the system in which to place neutral ships with _Horn of the Abyss_.\n"
+                + "-# You may place neutral ships with a combined cost of 4 or less.";
+        String buttonPrefix = player.factionButtonChecker() + CHOOSE_HORN_SYSTEM;
+        if (NewStuffHelper.checkAndHandlePaginationChange(
+                event, event.getMessageChannel(), systemButtons, message, buttonPrefix, buttonID)) {
+            return;
+        }
+
+        String position = buttonID.substring(CHOOSE_HORN_SYSTEM.length());
+        Tile tile = game.getTileByPosition(position);
+        if (tile == null || tile.getTileModel().isHyperlane() || hasOtherPlayersShips(tile, game, player)) {
+            return;
+        }
+
+        game.setStoredValue(HORN_SYSTEM + player.getFaction(), position);
+        game.setStoredValue(HORN_COST + player.getFaction(), "0");
+        game.removeStoredValue(HORN_SHIPS + player.getFaction());
+        sendHornOfTheAbyssShipButtons(event, game, player);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(PLACE_HORN_SHIP)
+    public static void placeHornOfTheAbyssShip(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String position = game.getStoredValue(HORN_SYSTEM + player.getFaction());
+        Tile tile = position.isEmpty() ? null : game.getTileByPosition(position);
+        UnitModel ship = game.getNeutral().getUnitFromAsyncID(buttonID.substring(PLACE_HORN_SHIP.length()));
+        if (!player.getExhaustedRelics().contains("horn_of_the_abyss")
+                || tile == null
+                || ship == null
+                || !ship.getIsShip()
+                || hasOtherPlayersShips(tile, game, player)) {
+            return;
+        }
+
+        int totalCost = getHornCost(game, player);
+        int shipCost = getHornShipCost(ship);
+        if (shipCost <= 0 || totalCost + shipCost > HORN_COST_LIMIT) {
+            return;
+        }
+
+        AddUnitService.addUnits(event, tile, game, game.getNeutralColor(), "1 " + ship.getAsyncId());
+        game.setStoredValue(HORN_COST + player.getFaction(), Integer.toString(totalCost + shipCost));
+        String shipList = game.getStoredValue(HORN_SHIPS + player.getFaction());
+        game.setStoredValue(
+                HORN_SHIPS + player.getFaction(),
+                shipList.isEmpty() ? ship.getName() : shipList + ", " + ship.getName());
+        sendHornOfTheAbyssShipButtons(event, game, player);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(DONE_HORN_SHIPS)
+    public static void finishHornOfTheAbyssShips(ButtonInteractionEvent event, Game game, Player player) {
+        String position = game.getStoredValue(HORN_SYSTEM + player.getFaction());
+        String shipList = game.getStoredValue(HORN_SHIPS + player.getFaction());
+        int totalCost = getHornCost(game, player);
+        Tile tile = position.isEmpty() ? null : game.getTileByPosition(position);
+        game.removeStoredValue(HORN_SYSTEM + player.getFaction());
+        game.removeStoredValue(HORN_COST + player.getFaction());
+        game.removeStoredValue(HORN_SHIPS + player.getFaction());
+
+        if (!shipList.isEmpty() && tile != null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing() + " exhausted _Horn of the Abyss_ and placed " + shipList + " in "
+                            + tile.getRepresentationForButtons(game, player) + " (combined cost "
+                            + formatHornCost(totalCost) + ").");
+        }
+        ButtonHelper.deleteMessage(event);
+        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
+    }
+
+    private static void sendHornOfTheAbyssShipButtons(ButtonInteractionEvent event, Game game, Player player) {
+        int totalCost = getHornCost(game, player);
+        List<Button> shipButtons = game.getNeutral().getUnitModels().stream()
+                .filter(UnitModel::getIsShip)
+                .filter(ship -> getHornShipCost(ship) > 0 && totalCost + getHornShipCost(ship) <= HORN_COST_LIMIT)
+                .sorted(Comparator.comparing(UnitModel::getCost).thenComparing(UnitModel::getName))
+                .map(ship -> Buttons.green(
+                        player.factionButtonChecker() + PLACE_HORN_SHIP + ship.getAsyncId(),
+                        "Place 1 " + ship.getName() + " (Cost " + formatHornCost(getHornShipCost(ship)) + ")",
+                        ship.getUnitEmoji()))
+                .toList();
+        shipButtons = new ArrayList<>(shipButtons);
+        shipButtons.add(Buttons.red(player.factionButtonChecker() + DONE_HORN_SHIPS, "Done Placing Ships"));
+
+        String message =
+                player.getRepresentationNoPing() + ", please choose neutral ships to place with _Horn of the Abyss_.\n"
+                        + "-# Combined cost: " + formatHornCost(totalCost) + "/4.";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, shipButtons);
+    }
+
+    private static int getHornShipCost(UnitModel ship) {
+        return Math.round(ship.getCost() * 2);
+    }
+
+    private static int getHornCost(Game game, Player player) {
+        try {
+            return Integer.parseInt(game.getStoredValue(HORN_COST + player.getFaction()));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    public static void clearHornOfTheAbyssState(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            game.removeStoredValue(HORN_SYSTEM + player.getFaction());
+            game.removeStoredValue(HORN_COST + player.getFaction());
+            game.removeStoredValue(HORN_SHIPS + player.getFaction());
+        }
+    }
+
+    private static String formatHornCost(int halfCost) {
+        return halfCost % 2 == 0 ? Integer.toString(halfCost / 2) : halfCost / 2 + ".5";
+    }
+
+    private static boolean hasOtherPlayersShips(Tile tile, Game game, Player player) {
+        return tile.getSpaceUnitHolder().getUnitKeys().stream().anyMatch(unitKey -> {
+            Player owner = game.getPlayerFromColorOrFaction(unitKey.colorID());
+            UnitModel model = owner == null ? null : owner.getUnitFromUnitKey(unitKey);
+            return owner != null && !owner.isNeutral() && owner != player && model != null && model.getIsShip();
+        });
+    }
+
+    // Ancient Radar
+    public static List<Button> getAncientRadarPlanets(ButtonInteractionEvent event, Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planetName : player.getPlanets()) {
+            Planet planet = game.getUnitHolderFromPlanet(planetName);
+            Tile tile = game.getTileFromPlanet(planetName);
+            if (planet != null && !planet.isHomePlanet() && !tile.isMecatol(game) && !planet.isLegendary()) {
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + RADAR_EXPLORE + planetName, planet.getRepresentation(game)));
+            }
+        }
+
+        return buttons;
+    }
+
+    @ButtonHandler(RADAR_EXPLORE)
+    public static void resolveAncientRadarExplore(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (game == null || player == null) {
+            return;
+        }
+
+        String planetName = buttonID.substring(RADAR_EXPLORE.length());
+        Tile tile = game.getTileFromPlanet(planetName);
+        Planet planet = game.getUnitHolderFromPlanet(planetName);
+        if (!player.hasRelic("ancient_radar")
+                || !player.getExhaustedRelics().contains("ancient_radar")
+                || !player.getPlanets().contains(planetName)
+                || tile == null
+                || planet == null
+                || planet.isHomePlanet()
+                || tile.isMecatol(game)
+                || planet.isLegendary()) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        for (String trait : List.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL)) {
+            ExploreService.explorePlanet(event, tile, planetName, trait, player, true, game, 1, false);
+        }
+
+        ButtonHelper.deleteMessage(event);
+        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
+    }
 
     // Cosmic Boon
     public static Button getCosmicBoonButton(Player player) {

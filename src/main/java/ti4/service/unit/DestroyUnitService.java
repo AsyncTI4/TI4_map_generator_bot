@@ -29,6 +29,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylo
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -180,17 +181,14 @@ public class DestroyUnitService {
         if (combat) {
             AeternaTechHandler.offerThanatocyteLattice(event, game, units);
         }
-        for (RemovedUnit u : units) {
-            if (u.unitKey().unitType() == UnitType.Fighter) {
-                continue;
-            }
-            AeternaAbilityHandler.offerCycleOfReclamationCapture(event, game, units, combat);
-            break;
-        }
+        AeternaAbilityHandler.offerCycleOfReclamationCapture(event, game, units, combat);
         AeternaUnitsHandler.addCryptControlTokenForDestroyedFighters(game, units);
         AeternaUnitsHandler.offerGraveyardEffectsForDestroyedUnits(event, game, units);
         AeternaPromissoryHandler.rollForStasisFighters(event, game, units);
         CrystellumAbilityHandler.offerFragmentationForBatchIfRelevant(event, game, units, combat);
+        if (combat) {
+            LostLegaciesRelicHandler.offerNeutralReplacement(event, game, units);
+        }
 
         // Handle other destroyed units individually
         for (RemovedUnit u : units) handleDestroyedUnit(event, game, units, u, combat);
