@@ -535,6 +535,7 @@ public final class FoWHelper {
         Set<Feature> adjToFeatures = EnumSet.noneOf(Feature.class);
         if (tile.hasEgress()) adjToFeatures.add(Feature.ingress);
 
+        if (tile.hasIngress()) adjToFeatures.add(Feature.egress);
         if (game.isCosmicPhenomenaeMode()) {
             if (tile.isScar(game)) {
                 adjToFeatures.add(Feature.scar);

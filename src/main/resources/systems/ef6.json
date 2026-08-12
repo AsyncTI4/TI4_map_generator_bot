@@ -1,0 +1,15 @@
+{
+    "id": "ef6",
+    "name": "Entropic Scar (Fracture)",
+    "aliases": [
+        "ef6"
+    ],
+    "imagePath": "ef6.png",
+    "shipPositionsType": "TYPE08",
+    "planets": [],
+    "wormholes": [],
+    "tileBack": "red",
+    "isScar": true,
+    "isFracture": true,
+    "source": "expanded_fracture"
+}
