@@ -24,6 +24,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
+import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
@@ -64,7 +65,8 @@ public class LostLegaciesRelicHandler {
             GenericInteractionCreateEvent event, Game game, List<RemovedUnit> destroyedUnits) {
         Map<Player, List<RemovedUnit>> destroyedByKiller = new LinkedHashMap<>();
         for (RemovedUnit destroyedUnit : destroyedUnits) {
-            if (!game.getNeutralColor().equals(destroyedUnit.unitKey().colorID())) {
+            if (!Mapper.getColorID(game.getNeutralColor())
+                    .equals(destroyedUnit.unitKey().colorID())) {
                 continue;
             }
             for (Player killer : CaptureUnitService.listProbableKiller(game, destroyedUnit)) {

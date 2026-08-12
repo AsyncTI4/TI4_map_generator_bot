@@ -163,7 +163,10 @@ public class CombatModHelper {
                             unitsByQuantity,
                             game)) {
                 RelicModel relicModel = Mapper.getRelic(relic);
-                modifiers.add(new NamedCombatModifierModel(relevantMod.get(), relicModel.getSimpleRepresentation()));
+                String relicName = "specialized_augmentations".equals(relic)
+                        ? relicModel.getSimpleRepresentation(false)
+                        : relicModel.getSimpleRepresentation();
+                modifiers.add(new NamedCombatModifierModel(relevantMod.get(), relicName));
             }
         }
 
