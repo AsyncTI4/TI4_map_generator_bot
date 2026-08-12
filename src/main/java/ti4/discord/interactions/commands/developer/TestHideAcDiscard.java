@@ -52,7 +52,7 @@ class TestHideAcDiscard extends GameStateSubcommand {
             List.of(PLAYED_ID, FORCED_ID, GARBOZIA_ID, SKIMMER_ID, PURGED_PLAYED_ID, PURGED_FORCED_ID);
 
     TestHideAcDiscard() {
-        super("test_hide_ac_discard", "TEMPORARY: post buttons to live-test HIDE_AC_DISCARD", true, false);
+        super("test_hide_ac_discard", "TEMPORARY: post buttons to live-test HIDE_AC_DISCARD", true, true);
     }
 
     @Override
