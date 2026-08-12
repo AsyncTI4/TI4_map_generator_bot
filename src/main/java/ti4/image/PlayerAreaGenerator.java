@@ -349,23 +349,19 @@ public class PlayerAreaGenerator {
         DrawingUtil.superDrawStringCenteredDefault(g2, comms, (int) card.getCenterX(), y + 75);
 
         // Fragments
-        int urf = player.getUrf();
-        int irf = player.getIrf();
         String urfImage = "pa_fragment_urf.png";
         String irfImage = "pa_fragment_irf.png";
         int xDelta = 0;
-        xDelta = drawFrags(y, x - xOffset, 0, urf, urfImage, xDelta);
+        xDelta = drawFrags(y, x - xOffset, 0, player, Constants.FRONTIER, urfImage, xDelta);
         xDelta += 25;
-        xDelta = drawFrags(y, x - xOffset, 0, irf, irfImage, xDelta);
+        xDelta = drawFrags(y, x - xOffset, 0, player, Constants.INDUSTRIAL, irfImage, xDelta);
 
         int xDelta2 = 0;
-        int hrf = player.getHrf();
-        int crf = player.getCrf();
         String hrfImage = "pa_fragment_hrf.png";
         String crfImage = "pa_fragment_crf.png";
-        xDelta2 = drawFrags(y + 73, x - xOffset, 0, hrf, hrfImage, xDelta2);
+        xDelta2 = drawFrags(y + 73, x - xOffset, 0, player, Constants.HAZARDOUS, hrfImage, xDelta2);
         xDelta2 += 25;
-        xDelta2 = drawFrags(y + 73, x - xOffset, 0, crf, crfImage, xDelta2);
+        xDelta2 = drawFrags(y + 73, x - xOffset, 0, player, Constants.CULTURAL, crfImage, xDelta2);
 
         xDelta = x + 600;
         // xDelta = x + 550 + Math.max(xDelta, xDelta2); DISABLE AUTO-SCALE BASED ON
@@ -1144,12 +1140,24 @@ public class PlayerAreaGenerator {
         return null;
     }
 
-    private int drawFrags(int y, int x, int yDelta, int urf, String urfImage, int xDelta) {
-        for (int i = 0; i < urf; i++) {
-            drawPAImage(x + 475 + xDelta, y + yDelta - 25, urfImage);
-            xDelta += 15;
+    private int drawFrags(int y, int x, int yDelta, Player player, String trait, String fragmentImage, int xDelta) {
+        List<String> fragments = player.getFragments().stream()
+                .filter(fragmentId -> {
+                    ExploreModel fragment = Mapper.getExplore(fragmentId);
+                    return fragment != null && trait.equalsIgnoreCase(fragment.getType());
+                })
+                .toList();
+        for (int i = 0; i < fragments.size(); i++) {
+            if (fragments.get(i).startsWith("supermassive")) {
+                drawPAImageScaled(x + 457 + xDelta + i * 15, y + yDelta - 43, fragmentImage, 108, 110);
+            }
         }
-        return xDelta;
+        for (int i = 0; i < fragments.size(); i++) {
+            if (!fragments.get(i).startsWith("supermassive")) {
+                drawPAImage(x + 475 + xDelta + i * 15, y + yDelta - 25, fragmentImage);
+            }
+        }
+        return xDelta + fragments.size() * 15;
     }
 
     private int relicInfo(Player player, int x, int y) {

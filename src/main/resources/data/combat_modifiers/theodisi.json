@@ -183,5 +183,100 @@
             }
         ],
         "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "specialized_augmentations_extra_roll_combat",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "specialized_augmentations_plus2_combat",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "specialized_augmentations_extra_roll_afb",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "AFB"
+    },
+    {
+        "alias": "specialized_augmentations_plus2_afb",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "AFB"
+    },
+    {
+        "alias": "specialized_augmentations_extra_roll_bombardment",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "specialized_augmentations_plus2_bombardment",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "specialized_augmentations_extra_roll_space_cannon_offence",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "specialized_augmentations_plus2_space_cannon_offence",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "specialized_augmentations_extra_roll_space_cannon_defence",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "SpaceCannonDefence"
+    },
+    {
+        "alias": "specialized_augmentations_plus2_space_cannon_defence",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "SpaceCannonDefence"
     }
 ]

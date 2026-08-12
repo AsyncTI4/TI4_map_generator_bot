@@ -45,7 +45,6 @@ import net.dv8tion.jda.api.exceptions.MissingAccessException;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
@@ -2510,19 +2509,21 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public Set<String> getTradableRelics() {
-        return SetUtils.intersection(
-                getActualRelics(),
-                Set.of(
-                        "thesilverflame",
-                        "silverflame",
-                        "economicboon",
-                        "naturesboon",
-                        "diplomaticboon",
-                        "cosmicboon",
-                        "mutagenhazardous",
-                        "mutagenindustrial",
-                        "mutagencultural",
-                        "mutagenunknown"));
+        Set<String> tradableRelics = Set.of(
+                "thesilverflame",
+                "silverflame",
+                "economicboon",
+                "naturesboon",
+                "diplomaticboon",
+                "cosmicboon",
+                "mutagenhazardous",
+                "mutagenindustrial",
+                "mutagencultural",
+                "mutagenfrontier");
+        return getRelics().stream()
+                .filter(Mapper::isValidRelic)
+                .filter(tradableRelics::contains)
+                .collect(Collectors.toSet());
     }
 
     public Set<String> getActualRelics() {

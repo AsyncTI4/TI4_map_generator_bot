@@ -15,10 +15,12 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.MoveUnitService;
 import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
@@ -28,6 +30,9 @@ public class ThronesTechHandler {
     private static final String USE_SS = "useSpecterStep";
     private static final String SELECT_SS_SHIP = "selectShipForSS_";
     private static final String MOVE_SS_SHIP = "moveSpecterStepShip_";
+    private static final String MOVE_SS_TRANSPORT = "moveSpecterStepTransport_";
+    private static final String DONE_SS_TRANSPORT = "doneSpecterStepTransport_";
+    private static final String SS_TRANSPORT_PAGE = "specterStepTransportPage_";
     // Rift-Touched Bastion
     private static final String RTB = "ththronesr";
     private static final String USE_RTB = "useRiftTouchedBastion";
@@ -185,11 +190,138 @@ public class ThronesTechHandler {
         AddUnitService.addUnits(event, destination, game, player.getColor(), "1 " + asyncId, removedShips);
         player.exhaustTech(SS);
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(
+        List<Button> transportButtons = getSpecterStepTransportButtons(player, source, destination);
+        List<Button> extraButtons = List.of(getSpecterStepTransportDoneButton(player, source, destination));
+        String transportPagePrefix = player.factionButtonChecker() + SS_TRANSPORT_PAGE + source.getPosition() + "|"
+                + destination.getPosition() + "_";
+        List<Button> displayedTransportButtons = new ArrayList<>(transportButtons);
+        displayedTransportButtons.addAll(extraButtons);
+        if (displayedTransportButtons.size() > 25) {
+            displayedTransportButtons =
+                    NewStuffHelper.buttonPagination(transportButtons, extraButtons, transportPagePrefix, 25, 0, false);
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + " moved 1 " + ship.getName() + " from "
                         + source.getRepresentationForButtons(game, player) + " to "
+                        + destination.getRepresentationForButtons(game, player) + " with _Specter Step_. "
+                        + "You may now move any fighters or ground forces it transports.",
+                displayedTransportButtons);
+    }
+
+    @ButtonHandler(SS_TRANSPORT_PAGE)
+    public static void changeSpecterStepTransportPage(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String payload = buttonID.substring(SS_TRANSPORT_PAGE.length());
+        int pageMarker = payload.lastIndexOf("_page");
+        if (game == null || player == null || pageMarker < 0) {
+            return;
+        }
+
+        String[] positions = payload.substring(0, pageMarker).split("\\|", 2);
+        if (positions.length != 2) {
+            return;
+        }
+        Tile source = game.getTileByPosition(positions[0]);
+        Tile destination = game.getTileByPosition(positions[1]);
+        if (source == null || destination == null || !source.getPosition().equals(game.getActiveSystem())) {
+            return;
+        }
+
+        List<Button> transportButtons = getSpecterStepTransportButtons(player, source, destination);
+        List<Button> extraButtons = List.of(getSpecterStepTransportDoneButton(player, source, destination));
+        String prefix = player.factionButtonChecker() + SS_TRANSPORT_PAGE + source.getPosition() + "|"
+                + destination.getPosition() + "_";
+        NewStuffHelper.checkAndHandlePaginationChange(
+                event,
+                event.getMessageChannel(),
+                transportButtons,
+                extraButtons,
+                event.getMessage().getContentRaw(),
+                prefix,
+                buttonID);
+    }
+
+    @ButtonHandler(MOVE_SS_TRANSPORT)
+    public static void moveSpecterStepTransport(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] parts = buttonID.substring(MOVE_SS_TRANSPORT.length()).split("\\|", 4);
+        if (game == null || player == null || parts.length != 4) {
+            return;
+        }
+
+        String asyncId = parts[0];
+        String holderName = parts[1];
+        Tile source = game.getTileByPosition(parts[2]);
+        Tile destination = game.getTileByPosition(parts[3]);
+        if (source == null
+                || destination == null
+                || !source.getPosition().equals(game.getActiveSystem())
+                || source.getUnitHolders().get(holderName) == null) {
+            return;
+        }
+
+        UnitKey unitKey = source.getUnitHolders().get(holderName).getUnitsByStateForPlayer(player).keySet().stream()
+                .filter(key -> asyncId.equals(key.asyncID()))
+                .findFirst()
+                .orElse(null);
+        UnitModel unit = unitKey == null ? null : player.getUnitFromUnitKey(unitKey);
+        if (unit == null || !(unitKey.unitType() == UnitType.Fighter || unit.getIsGroundForce())) {
+            return;
+        }
+
+        MoveUnitService.moveUnits(
+                event,
+                source,
+                game,
+                player.getColor(),
+                "1 " + asyncId + " " + holderName,
+                destination,
+                Constants.SPACE);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentation() + " moved 1 " + unit.getName() + " to "
                         + destination.getRepresentationForButtons(game, player) + " with _Specter Step_.");
+    }
+
+    @ButtonHandler(DONE_SS_TRANSPORT)
+    public static void finishSpecterStepTransport(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] positions = buttonID.substring(DONE_SS_TRANSPORT.length()).split("\\|", 2);
+        if (game == null
+                || player == null
+                || positions.length != 2
+                || !positions[0].equals(game.getActiveSystem())
+                || game.getTileByPosition(positions[0]) == null
+                || game.getTileByPosition(positions[1]) == null) {
+            return;
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static List<Button> getSpecterStepTransportButtons(Player player, Tile source, Tile destination) {
+        List<Button> buttons = new ArrayList<>();
+        for (var holder : source.getUnitHolders().values()) {
+            for (UnitKey unitKey : holder.getUnitsByStateForPlayer(player).keySet()) {
+                UnitModel unit = player.getUnitFromUnitKey(unitKey);
+                if (unit == null || !(unitKey.unitType() == UnitType.Fighter || unit.getIsGroundForce())) {
+                    continue;
+                }
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + MOVE_SS_TRANSPORT + unitKey.asyncID() + "|" + holder.getName()
+                                + "|" + source.getPosition() + "|" + destination.getPosition(),
+                        "Move 1 " + unit.getName() + " from " + holder.getName(),
+                        unitKey.unitEmoji()));
+            }
+        }
+        return buttons;
+    }
+
+    private static Button getSpecterStepTransportDoneButton(Player player, Tile source, Tile destination) {
+        return Buttons.red(
+                player.factionButtonChecker() + DONE_SS_TRANSPORT + source.getPosition() + "|"
+                        + destination.getPosition(),
+                "Done Moving");
     }
 
     // Rift-Touched Bastion

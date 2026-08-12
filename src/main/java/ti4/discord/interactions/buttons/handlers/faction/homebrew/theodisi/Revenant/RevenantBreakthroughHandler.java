@@ -94,6 +94,13 @@ public class RevenantBreakthroughHandler {
                 && leader != null
                 && player.hasUnlockedBreakthrough(REVENANT_RISING)
                 && player.hasReadyBreakthrough(REVENANT_RISING)
+                && isRevenantRisingAttachedAgent(game, player, leader);
+    }
+
+    public static boolean isRevenantRisingAttachedAgent(Game game, Player player, Leader leader) {
+        return game != null
+                && player != null
+                && leader != null
                 && getAttachedAgents(game, player).contains(leader.getId());
     }
 

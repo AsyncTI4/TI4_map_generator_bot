@@ -31,6 +31,8 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.planet.AddPlanetService;
+import ti4.service.relic.AlluringThroneService;
 import ti4.service.tech.ListTechService;
 
 @UtilityClass
@@ -253,6 +255,11 @@ public class RelicHelper {
                     }
                 }
             }
+            case "alluringthrone" -> {
+                AlluringThroneService.serveIllustrionButtons(game, player);
+                AddPlanetService.addPlanet(player, "illustrion", game);
+                player.refreshPlanet("illustrion");
+            }
         }
         CommanderUnlockCheckService.checkPlayer(player, "argent");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), helpMessage.toString());
@@ -286,10 +293,21 @@ public class RelicHelper {
 
     public void sendFrags(
             GenericInteractionCreateEvent event, Player sender, Player receiver, String trait, int count, Game game) {
+        sendFrags(event, sender, receiver, trait, count, game, true);
+    }
+
+    public void sendFrags(
+            GenericInteractionCreateEvent event,
+            Player sender,
+            Player receiver,
+            String trait,
+            int count,
+            Game game,
+            boolean includeSupermassive) {
         List<String> fragments = new ArrayList<>();
         for (String cardID : sender.getFragments()) {
             ExploreModel card = Mapper.getExplore(cardID);
-            if (card.getType().equalsIgnoreCase(trait)) {
+            if (card.getType().equalsIgnoreCase(trait) && (includeSupermassive || !cardID.startsWith("supermassive"))) {
                 fragments.add(cardID);
             }
         }

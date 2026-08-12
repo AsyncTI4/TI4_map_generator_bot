@@ -37,6 +37,8 @@ public class XytherisAbilityHandler {
     private static final String STING_ROLL = "stingOfTheHiveRoll_";
     private static final String STING_ROLL_COUNTER = "stingOfTheHiveRollCounter_";
     private static final String REPLACE_HIT = "stingHiveReplaceHit_";
+    private static final String MOVE_MINE = "stingHiveMoveMine_";
+    private static final String MOVE_MINE_FROM = "stingHiveMoveMineFrom_";
     private static final String RESOLVE_MINES = "resolveStingHiveMines_";
     private static final String PRODUCE_HITS = "stingHiveProduceHits_";
     private static final String GAIN_COMMODITY = "stingHiveGainCommodity_";
@@ -72,7 +74,7 @@ public class XytherisAbilityHandler {
                                 / 10.0d));
     }
 
-    public static Button getStingOfTheHiveHitReplacementButton(
+    public static List<Button> getStingOfTheHiveHitReplacementButtons(
             Game game, Player player, Tile tile, CombatRollType rollType, Player target, int hits) {
         if (game == null
                 || player == null
@@ -81,28 +83,26 @@ public class XytherisAbilityHandler {
                 || hits < 1
                 || rollType == CombatRollType.combatround
                 || !player.hasAbility(STING_OF_THE_HIVE)
-                || getAvailableStingOfTheHiveMines(game) < 1
                 || !tile.getPosition().equals(game.getActiveSystem())) {
-            return null;
+            return List.of();
         }
         String roll = game.getStoredValue(STING_ROLL + player.getFaction());
         if (!roll.startsWith("available|")) {
-            return null;
+            return List.of();
         }
-        return Buttons.gray(
-                player.factionButtonChecker()
-                        + REPLACE_HIT
-                        + tile.getPosition()
-                        + "|"
-                        + rollType.name()
-                        + "|"
-                        + target.getFaction()
-                        + "|"
-                        + hits
-                        + "|"
-                        + roll.substring("available|".length()),
-                "Place Mine",
-                FactionEmojis.xytheris);
+        String payload = tile.getPosition() + "|" + rollType.name() + "|" + target.getFaction() + "|" + hits + "|"
+                + roll.substring("available|".length());
+        List<Button> buttons = new ArrayList<>();
+        if (getAvailableStingOfTheHiveMines(game) > 0) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + REPLACE_HIT + payload, "Place Mine", FactionEmojis.xytheris));
+        }
+        if (game.getTileMap().values().stream()
+                .anyMatch(source -> source != tile && getStingOfTheHiveMineCount(game, source) > 0)) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + MOVE_MINE + payload, "Move Mine", FactionEmojis.xytheris));
+        }
+        return buttons;
     }
 
     public static void beginStingOfTheHiveRoll(Game game, Player player, Tile tile, CombatRollType rollType, int hits) {
@@ -155,7 +155,104 @@ public class XytherisAbilityHandler {
             return;
         }
 
+        boolean activeSystemHadNoMines = getStingOfTheHiveMineCount(game, tile) == 0;
         addMine(game, tile);
+        resolveStingOfTheHiveHitReplacement(
+                event, game, player, values, tile, rollType, target, hits, "placed", activeSystemHadNoMines);
+    }
+
+    @ButtonHandler(MOVE_MINE)
+    public static void chooseStingOfTheHiveMineToMove(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] values = buttonID.substring(MOVE_MINE.length()).split("\\|", 5);
+        Tile destination = values.length == 5 ? game.getTileByPosition(values[0]) : null;
+        if (destination == null
+                || !destination.getPosition().equals(game.getActiveSystem())
+                || !player.hasAbility(STING_OF_THE_HIVE)
+                || !game.getStoredValue(STING_ROLL + player.getFaction()).equals("available|" + values[4])) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        List<Button> buttons = game.getTileMap().values().stream()
+                .filter(source -> source != destination && getStingOfTheHiveMineCount(game, source) > 0)
+                .sorted(Comparator.comparing(Tile::getPosition))
+                .map(source -> Buttons.gray(
+                        player.factionButtonChecker() + MOVE_MINE_FROM + source.getPosition() + "|"
+                                + String.join("|", values),
+                        "Move Mine From " + source.getRepresentationForButtons(game, player),
+                        FactionEmojis.xytheris))
+                .toList();
+        if (buttons.isEmpty()) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentation() + ", please choose the system from which to move a mine token.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(MOVE_MINE_FROM)
+    public static void moveStingOfTheHiveMine(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] values = buttonID.substring(MOVE_MINE_FROM.length()).split("\\|", 6);
+        Tile source = values.length == 6 ? game.getTileByPosition(values[0]) : null;
+        Tile destination = values.length == 6 ? game.getTileByPosition(values[1]) : null;
+        CombatRollType rollType;
+        try {
+            rollType = values.length == 6 ? CombatRollType.valueOf(values[2]) : null;
+        } catch (IllegalArgumentException e) {
+            rollType = null;
+        }
+        Player target = values.length == 6 ? game.getPlayerFromColorOrFaction(values[3]) : null;
+        int hits;
+        try {
+            hits = values.length == 6 ? Integer.parseInt(values[4]) : 0;
+        } catch (NumberFormatException e) {
+            hits = 0;
+        }
+        if (source == null
+                || destination == null
+                || source == destination
+                || target == null
+                || rollType == null
+                || hits < 1
+                || !destination.getPosition().equals(game.getActiveSystem())
+                || !player.hasAbility(STING_OF_THE_HIVE)
+                || !game.getStoredValue(STING_ROLL + player.getFaction()).equals("available|" + values[5])
+                || getStingOfTheHiveMineCount(game, source) < 1) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        boolean activeSystemHadNoMines = getStingOfTheHiveMineCount(game, destination) == 0;
+        removeMines(game, source, 1);
+        addMine(game, destination);
+        resolveStingOfTheHiveHitReplacement(
+                event,
+                game,
+                player,
+                new String[] {values[1], values[2], values[3], values[4], values[5]},
+                destination,
+                rollType,
+                target,
+                hits,
+                "moved",
+                activeSystemHadNoMines);
+    }
+
+    private static void resolveStingOfTheHiveHitReplacement(
+            ButtonInteractionEvent event,
+            Game game,
+            Player player,
+            String[] values,
+            Tile tile,
+            CombatRollType rollType,
+            Player target,
+            int hits,
+            String action,
+            boolean offerMineRemoval) {
         int mineCount = getStingOfTheHiveMineCount(game, tile);
         game.setStoredValue(STING_ROLL + player.getFaction(), "used|" + values[4]);
         int remainingHits = hits - 1;
@@ -163,11 +260,15 @@ public class XytherisAbilityHandler {
         if (remainingHits == 0) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    player.getRepresentation() + " used **Sting of the Hive** to place a mine in "
+                    player.getRepresentation() + " used **Sting of the Hive** to " + action + " a mine "
+                            + ("placed".equals(action) ? "in " : "to ")
                             + tile.getRepresentation()
                             + " instead of the produced hit. No hits remain to assign.\n-# This system now contains "
                             + mineCount + " mine token" + (mineCount == 1 ? "." : "s.")
                             + " Multiple mine tokens use a single map marker with their count displayed on it.");
+            if (offerMineRemoval) {
+                offerStingOfTheHiveAfterMovement(event, game, tile);
+            }
             return;
         }
 
@@ -239,8 +340,8 @@ public class XytherisAbilityHandler {
         }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation()
-                        + " used **Sting of the Hive** to place a mine in "
+                player.getRepresentation() + " used **Sting of the Hive** to " + action + " a mine "
+                        + ("placed".equals(action) ? "in " : "to ")
                         + tile.getRepresentation()
                         + " instead of 1 produced hit.\n-# This system now contains "
                         + mineCount
@@ -248,6 +349,9 @@ public class XytherisAbilityHandler {
                         + (mineCount == 1 ? "." : "s.")
                         + " Multiple mine tokens use a single map marker with their count displayed on it.");
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, assignmentButtons);
+        if (offerMineRemoval) {
+            offerStingOfTheHiveAfterMovement(event, game, tile);
+        }
     }
 
     /** Offers the mine-token effect immediately after movement in the active system. */
