@@ -34,5 +34,6 @@
         "hecate"
     ],
     "source": "expanded_fracture",
+    "isFracture": true,
     "tileBack": "red"
 }
