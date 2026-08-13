@@ -38,6 +38,7 @@ public final class TokenPlanetService {
         lethara,
         gyraxis,
         loststation,
+        illustrion,
     }
 
     public static String adsf() {

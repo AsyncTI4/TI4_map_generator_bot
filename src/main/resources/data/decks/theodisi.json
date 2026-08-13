@@ -6,7 +6,7 @@
         "description": "PoK explore cards plus Lost Legacies explores.",
         "cardIDs": [
             "aw1", "aw2", "aw3", "aw4", "biotic", "cm1", "cm2", "cm3", "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9", "cybernetic", "dmz", "ds", "dv1", "dv2", "dw", "ed1", "ed2", "ent", "exp1", "exp2", "exp3", "fb1", "fb2", "fb3", "fb4", "frln1", "frln2", "frln3", "gw", "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7", "ion", "irf1", "irf2", "irf3", "irf4", "irf5", "kel1", "kel2", "lc1", "lc2", "lf1", "lf2", "lf3", "lf4", "ls", "majent", "minent", "mirage", "mo1", "mo2", "mo3", "ms1", "ms2", "mw", "propulsion", "pw", "rw", "toe", "urf1", "urf2", "urf3", "vfs1", "vfs2", "vfs3", "warfare", "gamma",
-            "economicboon", "freedomfighters", "polymorphism", "spatialdisplacement", "supermassiveindustrial", "supermassivehazardous", "naturesboon", "loststation", "battleworld", "immediateassembly", "supermassivecultural", "objectivedeliberations", "explorationenclave", "diversifiedresearchfacility", "diplomaticboon", "supermassiveunknown", "synergisticresearch", "disruptiveforces", "cosmicboon", "celestialpath"
+            "economicboon", "freedomfighters", "polymorphism", "spatialdisplacement", "supermassiveindustrial", "supermassivehazardous", "naturesboon", "loststation", "battleworld", "immediateassembly", "supermassivecultural", "objectivedeliberations", "explorationenclave", "diversifiedresearchfacility", "diplomaticboon", "supermassiveunknown", "synergisticresearch", "disruptiveforces", "cosmicboon", "celestialpath", "mutagencultural", "mutagenhazardous", "mutagenindustrial", "mutagenfrontier"
         ],
         "source": "theodisi"
     },
@@ -18,7 +18,7 @@
         "cardIDs": [
             "aw1", "aw2", "aw3", "aw4", "biotic", "cm1", "cm2", "cm3", "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9", "cybernetic", "dmz", "ds", "dv1", "dv2", "dw", "ed1", "ed2", "ent", "exp1", "exp2", "exp3", "fb1", "fb2", "fb3", "fb4", "frln1", "frln2", "frln3", "gamma", "gw", "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7", "ion", "irf1", "irf2", "irf3", "irf4", "irf5", "kel1", "kel2", "lc1", "lc2", "lf1", "lf2", "lf3", "lf4", "ls", "majent", "minent", "mirage", "mo1", "mo2", "mo3", "ms1", "ms2", "mw", "propulsion", "pw", "rw", "toe", "urf1", "urf2", "urf3", "vfs1", "vfs2", "vfs3", "warfare",
             "starchartcultural", "starcharthazardous", "starchartindustrial", "starchartfrontier", "forgottentradestation", "distinguishedadmiral", "councilpreserve", "scorcheddepot", "arcanecitadel", "hiddenlaboratory", "seedyspaceport", "ancientshipyard", "orbitalfoundries", "folderspace", "suspiciouswreckage", "darkvisions",
-            "economicboon", "freedomfighters", "polymorphism", "spatialdisplacement", "supermassiveindustrial", "supermassivehazardous", "naturesboon", "loststation", "battleworld", "immediateassembly", "supermassivecultural", "objectivedeliberations", "explorationenclave", "diversifiedresearchfacility", "diplomaticboon", "supermassiveunknown", "synergisticresearch", "disruptiveforces", "cosmicboon", "celestialpath"
+            "economicboon", "freedomfighters", "polymorphism", "spatialdisplacement", "supermassiveindustrial", "supermassivehazardous", "naturesboon", "loststation", "battleworld", "immediateassembly", "supermassivecultural", "objectivedeliberations", "explorationenclave", "diversifiedresearchfacility", "diplomaticboon", "supermassiveunknown", "synergisticresearch", "disruptiveforces", "cosmicboon", "celestialpath", "mutagencultural", "mutagenhazardous", "mutagenindustrial", "mutagenfrontier"
         ],
         "source": "theodisi"
     },
@@ -30,7 +30,75 @@
         "cardIDs": [
             "aw1", "aw2", "aw3", "aw4", "biotic", "cm1", "cm2", "cm3", "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9", "cybernetic", "dmz", "ds", "dv1", "dv2", "dw", "ed1", "ed2", "ent", "exp1", "exp2", "exp3", "fb1", "fb2", "fb3", "fb4", "frln1", "frln2", "frln3", "gamma", "gw", "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7", "ion", "irf1", "irf2", "irf3", "irf4", "irf5", "kel1", "kel2", "lc1", "lc2", "lf1", "lf2", "lf3", "lf4", "ls", "majent", "minent", "mirage", "mo1", "mo2", "mo3", "ms1", "ms2", "mw", "propulsion", "pw", "rw", "toe", "urf1", "urf2", "urf3", "vfs1", "vfs2", "vfs3", "warfare",
             "starchartcultural", "starcharthazardous", "starchartindustrial", "starchartfrontier", "forgottentradestation", "distinguishedadmiral", "councilpreserve", "scorcheddepot", "arcanecitadel", "hiddenlaboratory", "seedyspaceport", "ancientshipyard", "orbitalfoundries", "folderspace", "suspiciouswreckage", "darkvisions", "nomadictraders", "grandbazaar", "greatwork", "culturalartifact", "forgottenlegion", "extractionrun", "localinstability", "hazardousartifact", "overgrowninfrastructure", "materialcache", "fallenempire", "industrialartifact", "retiredadventurers", "recoveredmemorycore", "decodedbriefings", "unknownartifact",
-            "economicboon", "freedomfighters", "polymorphism", "spatialdisplacement", "supermassiveindustrial", "supermassivehazardous", "naturesboon", "loststation", "battleworld", "immediateassembly", "supermassivecultural", "objectivedeliberations", "explorationenclave", "diversifiedresearchfacility", "diplomaticboon", "supermassiveunknown", "synergisticresearch", "disruptiveforces", "cosmicboon", "celestialpath"
+            "economicboon", "freedomfighters", "polymorphism", "spatialdisplacement", "supermassiveindustrial", "supermassivehazardous", "naturesboon", "loststation", "battleworld", "immediateassembly", "supermassivecultural", "objectivedeliberations", "explorationenclave", "diversifiedresearchfacility", "diplomaticboon", "supermassiveunknown", "synergisticresearch", "disruptiveforces", "cosmicboon", "celestialpath", "mutagencultural", "mutagenhazardous", "mutagenindustrial", "mutagenfrontier"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "alias": "relics_pok_te_ll",
+        "name": "PoK + TE + LL Relics",
+        "type": "relic",
+        "description": "Prophecy of Kings, Thunder's Edge, and Lost Legacies relics.",
+        "cardIDs": [
+            "codex", "dominusorb", "dynamiscore", "emelpar", "emphidia", "mawofworlds", "nanoforge", "obsidian", "prophetstears", "shard", "stellarconverter", "thalnos", "titanprototype",
+            "bookoflatvinia", "circletofthevoid", "heartofixth", "lightrailordnance", "metalivoidarmaments", "metalivoidshielding", "neuraloop", "quantumcore", "thesilverflame", "thetriad",
+            "ancient_radar", "horn_of_the_abyss", "specialized_augmentations", "quantum_entangler", "volatile_mutagenics", "alluringthrone"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "alias": "relics_pok_te_us_ll",
+        "name": "PoK + TE + US + LL Relics",
+        "type": "relic",
+        "description": "Prophecy of Kings, Thunder's Edge, Uncharted Space, and Lost Legacies relics.",
+        "cardIDs": [
+            "codex", "dominusorb", "dynamiscore", "emelpar", "emphidia", "mawofworlds", "nanoforge", "obsidian", "prophetstears", "shard", "stellarconverter", "thalnos", "titanprototype",
+            "bookoflatvinia", "circletofthevoid", "heartofixth", "lightrailordnance", "metalivoidarmaments", "metalivoidshielding", "neuraloop", "quantumcore", "thesilverflame", "thetriad",
+            "boon_of_the_cerulean_god", "decrypted_cartoglyph", "e6-g0_network", "eye_of_vogul", "starfall_array", "throne_of_the_false_emperor", "twilight_mirror",
+            "ancient_radar", "horn_of_the_abyss", "specialized_augmentations", "quantum_entangler", "volatile_mutagenics", "alluringthrone"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "alias": "relics_pok_te_us_br_ll",
+        "name": "PoK + TE + US + BR + LL Relics",
+        "type": "relic",
+        "description": "Prophecy of Kings, Thunder's Edge, Uncharted Space, Blue Reverie, and Lost Legacies relics.",
+        "cardIDs": [
+            "codex", "dominusorb", "dynamiscore", "emelpar", "emphidia", "mawofworlds", "nanoforge", "obsidian", "prophetstears", "shard", "stellarconverter", "thalnos", "titanprototype",
+            "bookoflatvinia", "circletofthevoid", "heartofixth", "lightrailordnance", "metalivoidarmaments", "metalivoidshielding", "neuraloop", "quantumcore", "thesilverflame", "thetriad",
+            "boon_of_the_cerulean_god", "decrypted_cartoglyph", "e6-g0_network", "eye_of_vogul", "starfall_array", "throne_of_the_false_emperor", "twilight_mirror",
+            "aendstorch", "matjeksdragoncage", "gedustation", "kadlinsstaff", "theantipode", "taraniscrest",
+            "ancient_radar", "horn_of_the_abyss", "specialized_augmentations", "quantum_entangler", "volatile_mutagenics", "alluringthrone"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "alias": "relics_absol_pok_te_us_ll",
+        "name": "Absol + PoK + TE + US + LL Relics",
+        "type": "relic",
+        "description": "Absol variants replace weaker Prophecy of Kings relics, adds Thunder's Edge, Uncharted Space, and Lost Legacies relics.",
+        "cardIDs": [
+            "codex", "absol_dominusorb", "dynamiscore", "emelpar", "emphidia", "absol_mawofworlds", "nanoforge", "obsidian", "prophetstears", "absol_stellarconverter", "thalnos", "titanprototype",
+            "absol_luxarchtreatise", "absol_plenaryorbital", "absol_quantumcore", "absol_shardofthethrone1", "absol_syncretone", "absol_tyrantslament",
+            "boon_of_the_cerulean_god", "decrypted_cartoglyph", "e6-g0_network", "eye_of_vogul", "starfall_array", "throne_of_the_false_emperor", "twilight_mirror",
+            "neuraloop", "circletofthevoid", "bookoflatvinia", "thetriad", "lightrailordnance", "metalivoidshielding", "metalivoidarmaments",
+            "ancient_radar", "horn_of_the_abyss", "specialized_augmentations", "quantum_entangler", "volatile_mutagenics", "alluringthrone"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "alias": "relics_absol_pok_te_us_br_ll",
+        "name": "Absol + PoK + TE + US + BR + LL Relics",
+        "type": "relic",
+        "description": "Absol variants replace weaker Prophecy of Kings relics, adds Thunder's Edge, Uncharted Space, Blue Reverie, and Lost Legacies relics.",
+        "cardIDs": [
+            "codex", "absol_dominusorb", "dynamiscore", "emelpar", "emphidia", "absol_mawofworlds", "nanoforge", "obsidian", "prophetstears", "absol_stellarconverter", "thalnos", "titanprototype",
+            "absol_luxarchtreatise", "absol_plenaryorbital", "absol_quantumcore", "absol_shardofthethrone1", "absol_syncretone", "absol_tyrantslament",
+            "boon_of_the_cerulean_god", "decrypted_cartoglyph", "e6-g0_network", "eye_of_vogul", "starfall_array", "throne_of_the_false_emperor", "twilight_mirror",
+            "neuraloop", "circletofthevoid", "bookoflatvinia", "thetriad", "lightrailordnance", "metalivoidshielding", "metalivoidarmaments",
+            "aendstorch", "matjeksdragoncage", "gedustation", "kadlinsstaff", "theantipode", "taraniscrest",
+            "ancient_radar", "horn_of_the_abyss", "specialized_augmentations", "quantum_entangler", "volatile_mutagenics", "alluringthrone"
         ],
         "source": "theodisi"
     }

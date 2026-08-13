@@ -31,6 +31,8 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.planet.AddPlanetService;
+import ti4.service.relic.AlluringThroneService;
 import ti4.service.tech.ListTechService;
 
 @UtilityClass
@@ -252,6 +254,11 @@ public class RelicHelper {
                         }
                     }
                 }
+            }
+            case "alluringthrone" -> {
+                AlluringThroneService.serveIllustrionButtons(game, player);
+                AddPlanetService.addPlanet(player, "illustrion", game);
+                player.refreshPlanet("illustrion");
             }
         }
         CommanderUnlockCheckService.checkPlayer(player, "argent");

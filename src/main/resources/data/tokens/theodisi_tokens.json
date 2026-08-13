@@ -94,5 +94,14 @@
         "tokenPlanetName": "loststation",
         "isPlanet": true,
         "source": "theodisi"
+    },
+    {
+        "id": "illustrion",
+        "imagePath": "token_theodisi_illustrion.png",
+        "spaceOrPlanet": "space",
+        "aliasList": ["illustrion", "alluringthrone"],
+        "tokenPlanetName": "illustrion",
+        "isPlanet": true,
+        "source": "theodisi"
     }
 ]

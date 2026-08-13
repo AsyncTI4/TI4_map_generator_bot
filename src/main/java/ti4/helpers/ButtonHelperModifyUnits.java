@@ -28,6 +28,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.kalora.KaloraAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -335,6 +336,7 @@ public final class ButtonHelperModifyUnits {
         boolean usedDuraniumAlready = !player.hasTech("da");
         int sardakkMechHits = 0;
         if (hits < 1 && (usedDuraniumAlready || duraniumMsg.isEmpty())) return 0;
+        LostLegaciesRelicHandler.beginNeutralReplacementBatch(game);
 
         if (numSustains > 0) {
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
@@ -520,6 +522,7 @@ public final class ButtonHelperModifyUnits {
             }
         }
         IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "groundcombat");
+        LostLegaciesRelicHandler.finishNeutralReplacementBatch(event, game);
         event.getMessage();
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         return sardakkMechHits;
@@ -578,6 +581,9 @@ public final class ButtonHelperModifyUnits {
             boolean justSummarizing,
             boolean spaceCannonOffence) {
         UnitHolder unitHolder = tile.getUnitHolders().get("space");
+        if (!justSummarizing) {
+            LostLegaciesRelicHandler.beginNeutralReplacementBatch(game);
+        }
         int ashenAshfallSustains = 0;
         boolean sustainedShip = false;
         StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " assigned " + (hits == 1 ? "the hit" : "hits")
@@ -998,6 +1004,9 @@ public final class ButtonHelperModifyUnits {
                     break;
                 }
             }
+        }
+        if (!justSummarizing) {
+            LostLegaciesRelicHandler.finishNeutralReplacementBatch(event, game);
         }
         if (!justSummarizing && event instanceof ButtonInteractionEvent bevent) {
             IronLeadersHandler.checkCommanderUnlockAfterCombat(game, tile, unitHolder, "spacecombat");

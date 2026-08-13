@@ -49,6 +49,8 @@ import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.relic.BookOfLatviniaService;
+import ti4.service.relic.MutagenService;
+import ti4.service.relic.QuantumEntanglerService;
 import ti4.service.relic.SilverFlameService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -126,6 +128,13 @@ public class ComponentActionHelper {
         }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 1) {
             compButtons.add(Buttons.red(factionChecker + prefix + "doStarCharts_", "Purge 2 Star Charts"));
+        }
+        if (MutagenService.getMutagenCount(p1) > 1) {
+            compButtons.add(Buttons.red(factionChecker + prefix + "doMutagens_", "Purge 2 Mutagens"));
+        }
+        if (p1.hasRelic("volatile_mutagenics")) {
+            compButtons.add(
+                    Buttons.red(factionChecker + prefix + "doVolatileMutagenics_", "Purge Volatile Mutagenics"));
         }
 
         if (game.isTotalWarMode() && ButtonHelperActionCards.getAllCommsInHS(p1, game) > 9) {
@@ -347,9 +356,15 @@ public class ComponentActionHelper {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that relic.");
                 continue;
             }
+            if ("quantum_entangler".equalsIgnoreCase(relic)
+                    && (game.getAllRelics().size() < 3 || game.getRealPlayers().size() < 2)) {
+                continue;
+            }
 
             if (Constants.ENIGMATIC_DEVICE.equalsIgnoreCase(relic)
                     || (!relic.contains("starchart")
+                            && !MutagenService.isMutagen(relic)
+                            && !"volatile_mutagenics".equals(relic)
                             && (relicData.getText().contains("Action:")
                                     || relicData.getText().contains("ACTION:")))) {
                 Button rButton;
@@ -375,7 +390,9 @@ public class ComponentActionHelper {
                             "circletofthevoid",
                             "endurance_steroids",
                             "the_incursion_gate",
-                            "diplomaticboon");
+                            "diplomaticboon",
+                            "ancient_radar",
+                            "horn_of_the_abyss");
                     if (exhaustRelics.contains(relic.toLowerCase())) {
                         if (!p1.getExhaustedRelics().contains(relic)) {
                             if (!"circletofthevoid".equalsIgnoreCase(relic)
@@ -972,6 +989,8 @@ public class ComponentActionHelper {
                 ButtonHelper.purge2StarCharters(p1, game);
                 DiscordantStarsHelper.drawBlueBackTiles(event, game, p1, 1);
             }
+            case "doMutagens" -> MutagenService.resolveMutagenPurge(event, game, p1, false);
+            case "doVolatileMutagenics" -> MutagenService.resolveMutagenPurge(event, game, p1, true);
             case "stellarAtomicsAction" -> {
                 game.unscorePublicObjective(
                         p1.getUserID(), game.getRevealedPublicObjectives().get("Stellar Atomics"));
@@ -1157,6 +1176,14 @@ public class ComponentActionHelper {
                     "Invalid relic or player does not have specified relic: `" + relicID + "`");
             return;
         }
+        if (MutagenService.isMutagen(relicID)) {
+            MutagenService.resolveMutagenPurge(event, game, player, false);
+            return;
+        }
+        if ("volatile_mutagenics".equals(relicID)) {
+            MutagenService.resolveMutagenPurge(event, game, player, true);
+            return;
+        }
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Used the "
@@ -1226,6 +1253,39 @@ public class ComponentActionHelper {
                     player.getRepresentationNoPing()
                             + ", please choose a non-home planet, other than Mecatol Rex, for _Diplomatic Boon_.",
                     buttons);
+        } else if ("ancient_radar".equalsIgnoreCase(relicID)) {
+            List<Button> buttons = LostLegaciesRelicHandler.getAncientRadarPlanets(event, game, player);
+            if (buttons.isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getRepresentationNoPing() + " has no eligible planets for _Ancient Radar_.");
+                return;
+            }
+            player.addExhaustedRelic(relicID);
+            purgeOrExhaust = "exhausted";
+            String message = player.getRepresentationNoPing()
+                    + ", please choose a non-home planet for _Ancient Radar_ to explore once as each planet trait.";
+            String buttonPrefix = player.factionButtonChecker() + "exploreAncientRadar_";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
+
+        } else if ("horn_of_the_abyss".equalsIgnoreCase(relicID)) {
+            List<Button> buttons = LostLegaciesRelicHandler.getHornOfTheAbyssSystemButtons(game, player);
+            if (buttons.isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getRepresentationNoPing() + " has no eligible system for _Horn of the Abyss_.");
+                return;
+            }
+            player.addExhaustedRelic(relicID);
+            purgeOrExhaust = "exhausted";
+            String message = player.getRepresentationNoPing()
+                    + ", please choose the system in which to place neutral ships with _Horn of the Abyss_.\n"
+                    + "-# You may place neutral ships with a combined cost of 4 or less.";
+            String buttonPrefix = player.factionButtonChecker() + "chooseHornOfTheAbyssSystem_";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
+
         } else { // PURGE THE RELIC
             player.removeRelic(relicID);
             player.removeExhaustedRelic(relicID);
@@ -1318,11 +1378,14 @@ public class ComponentActionHelper {
                     "circletofthevoid",
                     "endurance_steroids",
                     "the_incursion_gate",
-                    "diplomaticboon" -> {
+                    "diplomaticboon",
+                    "ancient_radar",
+                    "horn_of_the_abyss" -> {
                 // handled above
             }
             case "bookoflatvinia" -> BookOfLatviniaService.purgeBookOfLatvinia(event, game, player);
             case "thesilverflame" -> SilverFlameService.rollSilverFlame(game, player);
+            case "quantum_entangler" -> QuantumEntanglerService.offerQuantumEntanglerTargets(event, game, player);
             default ->
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(), "This relic is not tied to any automation. Please resolve manually.");

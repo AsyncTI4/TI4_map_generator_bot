@@ -204,7 +204,7 @@
         "name": "Cycle of Reclamation",
         "faction": "aeterna",
         "window": "During setup:",
-       "windowEffect": "Place the moon phase cards in your play area.\n\nWhen 1 or more units are destroyed in a system containing or adjacent to a system containing your units except during a combat on your tactical actions, capture 1 neutral destroyer.",
+       "windowEffect": "Place the moon phase cards in your play area.\n\nOnce per action, except during your tactical actions and whenever you use a unit ability: if a unit is destroyed in a system containing or adjacent to a system containing 1 of your ships, you may capture 1 neutral destroyer.",
         "source": "theodisi"
     },
     {
