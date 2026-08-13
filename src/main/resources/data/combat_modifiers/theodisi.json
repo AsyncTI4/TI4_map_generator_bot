@@ -1,5 +1,20 @@
 [
     {
+        "alias": "demoralizing_environment",
+        "type": "mods",
+        "value": "-2",
+        "persistenceType": "TEMP_ONE_ROUND",
+        "scope": "_ship_no_ff",
+        "applyToOpponent": true,
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "action_cards",
+                "alias": "demoralizing_environment"
+            }
+        ]
+    },
+    {
         "alias": "survivalists_extra_die_when_damaged",
         "type": "extrarolls",
         "value": "+1",

@@ -11,8 +11,12 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.CombatInitiativeLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PoliticalMarriageLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RetrofittingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExplosivesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TacticalRetreatLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
@@ -89,6 +93,7 @@ public final class ButtonHelperTacticalAction {
 
     public static void endOfTacticalActionThings(Player player, Game game, ButtonInteractionEvent event) {
         logTacticalAction(game, player);
+        RetrofittingLLButtonHandler.returnRetrofittedTechs(game);
         XytherisAbilityHandler.clearStingOfTheHiveRollState(game);
         OblivionAbilityHandler.offerReflectionExplore(event, game);
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
@@ -551,6 +556,10 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("allianceModeSimultaneousAction");
         game.removeStoredValue("absolLux");
         game.removeStoredValue("borrowedAuthorityColor");
+        for (Player player : game.getRealPlayers()) {
+            game.removeStoredValue(CombatInitiativeLLButtonHandler.STATE + player.getFaction());
+            game.removeStoredValue(TransitRiderLLButtonHandler.STATE + player.getFaction());
+        }
         game.removeStoredValue("ardentiaSubjugate");
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
@@ -703,10 +712,21 @@ public final class ButtonHelperTacticalAction {
     public static void selectActiveSystem(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("ringTile_", "");
         Tile tile = game.getTileByPosition(pos);
+        if (PoliticalMarriageLLButtonHandler.blocksActivation(game, player, tile)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "_Political Marriage_ prevents you from activating this system this turn.");
+            return;
+        }
         if (!game.getStoredValue("borrowedAuthorityColor").isEmpty()
                 && !ButtonHelper.canActivateTile(game, player, tile)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "That system cannot be activated with _Borrowed Authority_.");
+            return;
+        }
+        if (TransitRiderLLButtonHandler.isActive(game, player) && !ButtonHelper.canActivateTile(game, player, tile)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "That system cannot be activated with _Transit Rider_.");
             return;
         }
         if (!game.getStoredValue("ardentiaSubjugate").isEmpty() && tile.isHomeSystem(game)) {

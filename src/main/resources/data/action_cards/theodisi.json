@@ -269,6 +269,7 @@
         "phase": "Action",
         "window": "When you exhaust a planet you control",
         "text": "Treat it as if it had the resource value of 1 other planet you control.",
+        "notes": "This must be played after exhausting a planet.",
         "source": "theodisi"
     },
     {
@@ -277,6 +278,7 @@
         "phase": "Action",
         "window": "When you produce 1 or more units",
         "text": "You may place any number of those units in an adjacent system that contains 1 or more of your ships and no other players' ships.",
+        "notes": "For best results, play after producing, before paying.",
         "source": "theodisi"
     },
     {
@@ -285,6 +287,7 @@
         "phase": "Action",
         "window": "When you produce 1 or more units",
         "text": "Return 1 non-fighter ship you control in that system to your reinforcements. Reduce the combined cost of the produced units by the cost of the returned ship +2.",
+        "notes": "For best results, play before paying, after producing.",
         "source": "theodisi"
     },
     {

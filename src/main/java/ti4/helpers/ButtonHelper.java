@@ -54,6 +54,7 @@ import org.apache.commons.lang3.function.Consumers;
 import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
@@ -5345,6 +5346,10 @@ public class ButtonHelper {
         if (game.isNaaluAgent() && tile.isHomeSystem(game)) return false;
         if (!FOWPlusService.canActivatePosition(tile.getPosition(), player, game, visiblePositions)) return false;
         if ("silver_flame".equalsIgnoreCase(tile.getTileID())) return false;
+        if (TransitRiderLLButtonHandler.isActive(game, player)
+                && !getOtherPlayersWithUnitsInTheSystem(player, game, tile).isEmpty()) {
+            return false;
+        }
         String borrowedAuthorityColor = game.getStoredValue("borrowedAuthorityColor");
         if (!borrowedAuthorityColor.isEmpty()
                 && (tile.isHomeSystem(game)

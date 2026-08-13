@@ -10,6 +10,10 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.EmergencyAppropriationsLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRequisitionLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
@@ -418,6 +422,10 @@ class DeleteButtonsButtonHandler {
             RevenantTechHandler.clearLazarusProduction(game, player);
         }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
+            EmergencyAppropriationsLLButtonHandler.clear(game, player);
+            PriorityRequisitionLLButtonHandler.clear(game, player);
+            SharedResourcesLLButtonHandler.clear(game, player);
+            WildlifePreservationLLButtonHandler.clear(game, player);
             if (player.hasTech("asn")
                     && game.getStoredValue("ASN" + player.getFaction()).isEmpty()
                     && (buttonID.contains("tacticalAction")

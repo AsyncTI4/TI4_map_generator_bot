@@ -9,6 +9,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShieldingLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionTargetingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -327,6 +328,15 @@ class CombatButtonHandler {
                     Buttons.red(
                             player.factionButtonChecker() + "getDamageButtons_" + tile.getPosition() + "_spacecombat",
                             "Assign Hits"));
+            return;
+        }
+        if (PrecisionTargetingLLButtonHandler.requiresManualAssignment(game, player, tile)) {
+            String targets = PrecisionTargetingLLButtonHandler.getTargetDescription(game, player, tile);
+            MessageHelper.sendMessageToChannelWithButton(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing() + ", auto-assignment was redirected because _Precision Targeting_"
+                            + " requires a hit to be assigned to one of these ships if able: **" + targets + "**.",
+                    Buttons.red("getDamageButtons_" + tile.getPosition() + "_spacecombat", "Assign Hits"));
             return;
         }
         MessageHelper.sendMessageToChannel(
