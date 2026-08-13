@@ -11,7 +11,31 @@ import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
 
 class MatchmakingCompatibilityServiceTest {
 
-    private static final Set<Integer> ALL_BUCKETS = Set.of(0, 1, 2, 3, 4, 5);
+    private static final Set<Integer> ALL_HOURS =
+            Set.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23);
+
+    // Typical evening-hours profiles per region, expressed in UTC (12 contiguous hot hours each,
+    // the minimum the "similar active hours" restriction is willing to enable).
+    // EU (Central, UTC+1): 13:00–01:00 local -> 12–23 UTC
+    private static final Set<Integer> EU_HOURS = Set.of(12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23);
+    // USA (Eastern, UTC-5): 17:00–05:00 local -> 22,23,0..9 UTC
+    private static final Set<Integer> USA_HOURS = Set.of(22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+    // APAC (Japan, UTC+9): 17:00–05:00 local -> 8..19 UTC
+    private static final Set<Integer> APAC_HOURS = Set.of(8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19);
+    // SEA (Singapore/Bangkok, UTC+7/+8): 17:00–05:00 local -> 10..21 UTC
+    private static final Set<Integer> SEA_HOURS = Set.of(10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21);
+
+    // Full-day (16 awake / 8 asleep) profiles per region, expressed in UTC.
+    // Awake 06:00–22:00 local time -> 16 hot hours; the 8 asleep hours span local 22:00–06:00.
+    // EU (Central, UTC+1) awake -> UTC 05..20
+    private static final Set<Integer> EU_16H_HOURS = Set.of(5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
+    // USA (Eastern, UTC-5) awake -> UTC 11..23,0,1,2
+    private static final Set<Integer> USA_16H_HOURS =
+            Set.of(11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2);
+    // APAC (Japan, UTC+9) awake -> UTC 21,22,23,0..12
+    private static final Set<Integer> APAC_16H_HOURS = Set.of(21, 22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+    // SEA (Singapore, UTC+8) awake -> UTC 22,23,0..13
+    private static final Set<Integer> SEA_16H_HOURS = Set.of(22, 23, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
 
     @Test
     void compatiblePlayersHaveNoReason() {
@@ -76,14 +100,16 @@ class MatchmakingCompatibilityServiceTest {
     }
 
     @Test
-    void similarActiveHoursRequiresSharedBuckets() {
+    void similarActiveHoursRequiresTwelveSharedHours() {
         PlayerMatchmakingData picky = player("a")
                 .restrictions(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION)
-                .activeHourBuckets(0, 1, 2)
+                .activeHours(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
                 .build();
-        PlayerMatchmakingData fewShared = player("b").activeHourBuckets(0, 4, 5).build();
+        PlayerMatchmakingData fewShared = player("b")
+                .activeHours(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 21, 22, 23)
+                .build();
         PlayerMatchmakingData manyShared =
-                player("c").activeHourBuckets(0, 1, 2, 5).build();
+                player("c").activeHours(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11).build();
 
         assertThat(MatchmakingCompatibilityService.areIncompatible(picky, fewShared))
                 .isTrue();
@@ -92,18 +118,202 @@ class MatchmakingCompatibilityServiceTest {
     }
 
     @Test
-    void playerWithTooFewActiveHourBucketsCanNeverMatch() {
-        // Fewer than the three shared buckets a match requires means the shared count can never be reached.
-        assertThat(MatchmakingCompatibilityService.hasEnoughActiveHourDataToMatch(
-                        player("a").activeHourBuckets(0, 1).build()))
+    void playerWithTooFewActiveHoursCanNeverMatch() {
+        // Fewer than 12 hot hours means the 12-shared-hour requirement can never be satisfied.
+        assertThat(MatchmakingCompatibilityService.hasEnoughActiveHourDataToMatch(player("a")
+                        .activeHours(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+                        .build()))
                 .isFalse();
     }
 
     @Test
-    void playerWithEnoughActiveHourBucketsCanMatch() {
-        assertThat(MatchmakingCompatibilityService.hasEnoughActiveHourDataToMatch(
-                        player("a").activeHourBuckets(0, 1, 2).build()))
+    void playerWithEnoughActiveHoursCanMatch() {
+        assertThat(MatchmakingCompatibilityService.hasEnoughActiveHourDataToMatch(player("a")
+                        .activeHours(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+                        .build()))
                 .isTrue();
+    }
+
+    @Test
+    void euAndUsaPlayersAreNotMatched() {
+        PlayerMatchmakingData eu = regional("eu", EU_HOURS);
+        PlayerMatchmakingData usa = regional("usa", USA_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(eu, usa)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(usa, eu)).isTrue();
+    }
+
+    @Test
+    void euAndApacPlayersAreNotMatched() {
+        PlayerMatchmakingData eu = regional("eu", EU_HOURS);
+        PlayerMatchmakingData apac = regional("apac", APAC_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(eu, apac)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(apac, eu)).isTrue();
+    }
+
+    @Test
+    void euAndSeaPlayersAreNotMatched() {
+        PlayerMatchmakingData eu = regional("eu", EU_HOURS);
+        PlayerMatchmakingData sea = regional("sea", SEA_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(eu, sea)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(sea, eu)).isTrue();
+    }
+
+    @Test
+    void usaAndApacPlayersAreNotMatched() {
+        PlayerMatchmakingData usa = regional("usa", USA_HOURS);
+        PlayerMatchmakingData apac = regional("apac", APAC_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(usa, apac)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(apac, usa)).isTrue();
+    }
+
+    @Test
+    void usaAndSeaPlayersAreNotMatched() {
+        PlayerMatchmakingData usa = regional("usa", USA_HOURS);
+        PlayerMatchmakingData sea = regional("sea", SEA_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(usa, sea)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(sea, usa)).isTrue();
+    }
+
+    @Test
+    void apacAndSeaPlayersAreNotMatched() {
+        PlayerMatchmakingData apac = regional("apac", APAC_HOURS);
+        PlayerMatchmakingData sea = regional("sea", SEA_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(apac, sea)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(sea, apac)).isTrue();
+    }
+
+    @Test
+    void twoEuPlayersMatch() {
+        PlayerMatchmakingData a = regional("eu1", EU_HOURS);
+        PlayerMatchmakingData b = regional("eu2", EU_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isFalse();
+    }
+
+    @Test
+    void twoUsaPlayersMatch() {
+        PlayerMatchmakingData a = regional("usa1", USA_HOURS);
+        PlayerMatchmakingData b = regional("usa2", USA_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isFalse();
+    }
+
+    @Test
+    void twoApacPlayersMatch() {
+        PlayerMatchmakingData a = regional("apac1", APAC_HOURS);
+        PlayerMatchmakingData b = regional("apac2", APAC_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isFalse();
+    }
+
+    @Test
+    void twoSeaPlayersMatch() {
+        PlayerMatchmakingData a = regional("sea1", SEA_HOURS);
+        PlayerMatchmakingData b = regional("sea2", SEA_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isFalse();
+    }
+
+    @Test
+    void euAndUsaAwakeSixteenHoursAreNotMatched() {
+        PlayerMatchmakingData eu = regional("eu", EU_16H_HOURS);
+        PlayerMatchmakingData usa = regional("usa", USA_16H_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(eu, usa)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(usa, eu)).isTrue();
+    }
+
+    @Test
+    void euAndApacAwakeSixteenHoursAreNotMatched() {
+        PlayerMatchmakingData eu = regional("eu", EU_16H_HOURS);
+        PlayerMatchmakingData apac = regional("apac", APAC_16H_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(eu, apac)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(apac, eu)).isTrue();
+    }
+
+    @Test
+    void euAndSeaAwakeSixteenHoursAreNotMatched() {
+        PlayerMatchmakingData eu = regional("eu", EU_16H_HOURS);
+        PlayerMatchmakingData sea = regional("sea", SEA_16H_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(eu, sea)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(sea, eu)).isTrue();
+    }
+
+    @Test
+    void usaAndApacAwakeSixteenHoursAreNotMatched() {
+        PlayerMatchmakingData usa = regional("usa", USA_16H_HOURS);
+        PlayerMatchmakingData apac = regional("apac", APAC_16H_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(usa, apac)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(apac, usa)).isTrue();
+    }
+
+    @Test
+    void usaAndSeaAwakeSixteenHoursAreNotMatched() {
+        PlayerMatchmakingData usa = regional("usa", USA_16H_HOURS);
+        PlayerMatchmakingData sea = regional("sea", SEA_16H_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(usa, sea)).isTrue();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(sea, usa)).isTrue();
+    }
+
+    @Test
+    void apacAndSeaAwakeSixteenHoursAreMatched() {
+        // APAC and SEA are only one timezone apart. With full 16h awake windows their overlap
+        // grows from ~10h to ~15h, which clears the 12-shared-hour bar. This is the intended
+        // outcome for geographically close regions.
+        PlayerMatchmakingData apac = regional("apac", APAC_16H_HOURS);
+        PlayerMatchmakingData sea = regional("sea", SEA_16H_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(apac, sea)).isFalse();
+        assertThat(MatchmakingCompatibilityService.areIncompatible(sea, apac)).isFalse();
+    }
+
+    @Test
+    void twoEuAwakeSixteenHoursPlayersMatch() {
+        PlayerMatchmakingData a = regional("eu1", EU_16H_HOURS);
+        PlayerMatchmakingData b = regional("eu2", EU_16H_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isFalse();
+    }
+
+    @Test
+    void twoUsaAwakeSixteenHoursPlayersMatch() {
+        PlayerMatchmakingData a = regional("usa1", USA_16H_HOURS);
+        PlayerMatchmakingData b = regional("usa2", USA_16H_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isFalse();
+    }
+
+    @Test
+    void twoApacAwakeSixteenHoursPlayersMatch() {
+        PlayerMatchmakingData a = regional("apac1", APAC_16H_HOURS);
+        PlayerMatchmakingData b = regional("apac2", APAC_16H_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isFalse();
+    }
+
+    @Test
+    void twoSeaAwakeSixteenHoursPlayersMatch() {
+        PlayerMatchmakingData a = regional("sea1", SEA_16H_HOURS);
+        PlayerMatchmakingData b = regional("sea2", SEA_16H_HOURS);
+
+        assertThat(MatchmakingCompatibilityService.areIncompatible(a, b)).isFalse();
+    }
+
+    private static PlayerMatchmakingData regional(String userId, Set<Integer> hours) {
+        return player(userId)
+                .restrictions(MatchmakingOptions.SIMILAR_ACTIVE_HOURS_OPTION)
+                .activeHours(hours.toArray(new Integer[0]))
+                .build();
     }
 
     @Test
@@ -171,7 +381,7 @@ class MatchmakingCompatibilityServiceTest {
         private List<String> restrictions = List.of();
         private List<String> avoidList = List.of();
         private Rating rating = new Rating(25, CONFIDENT_SIGMA);
-        private Set<Integer> activeHourBuckets = ALL_BUCKETS;
+        private Set<Integer> activeHours = ALL_HOURS;
         private int completedGames = 5;
         private Set<String> roleNames = Set.of();
         private Duration queueWait = Duration.ZERO;
@@ -197,8 +407,8 @@ class MatchmakingCompatibilityServiceTest {
             return this;
         }
 
-        private Builder activeHourBuckets(Integer... values) {
-            activeHourBuckets = Set.of(values);
+        private Builder activeHours(Integer... values) {
+            activeHours = Set.of(values);
             return this;
         }
 
@@ -233,7 +443,7 @@ class MatchmakingCompatibilityServiceTest {
                     restrictions,
                     avoidList,
                     rating,
-                    activeHourBuckets,
+                    activeHours,
                     completedGames,
                     roleNames,
                     queueWait,
