@@ -123,12 +123,13 @@ public class ExtensionRefitLLButtonHandler {
         Planet sourcePlanet = state.length == 2 ? game.getPlanetsInfo().get(state[0]) : null;
         Planet destinationPlanet = game.getPlanetsInfo().get(destinationPlanetName);
         String attachment = state.length == 2 ? state[1] : "";
+        List<String> controlledPlanets = player.getPlanetsAllianceMode();
 
         if (sourcePlanet == null
                 || destinationPlanet == null
                 || attachment.isBlank()
-                || !player.getPlanetsAllianceMode().contains(sourcePlanet.getName())
-                || !player.getPlanetsAllianceMode().contains(destinationPlanetName)
+                || !controlledPlanets.contains(sourcePlanet.getName())
+                || !controlledPlanets.contains(destinationPlanetName)
                 || !sourcePlanet.getAttachments().contains(attachment)
                 || sourcePlanet.getName().equals(destinationPlanetName)
                 || destinationPlanet.isHomePlanet(game)
