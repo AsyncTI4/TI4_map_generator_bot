@@ -23,9 +23,19 @@ public class FOWOptionService {
     private static final int BUTTONS_PER_ROW = 5;
 
     public enum FOWOptionCategory {
-        GAME,
-        VISIBILITY,
-        OTHER;
+        GAME("Game"),
+        VISIBILITY("Visibility"),
+        OTHER("Other"),
+        // Name must stay underscore-free: changeFOWOptions splits button IDs on "_" with the
+        // category as the first token, so an underscore here would break that parse.
+        PLAYERSTATS("Precise Player Stats");
+
+        @Getter
+        private final String title;
+
+        FOWOptionCategory(String title) {
+            this.title = title;
+        }
 
         static FOWOptionCategory fromString(String string) {
             for (FOWOptionCategory category : values()) {
@@ -56,30 +66,32 @@ public class FOWOptionService {
         HIDE_MAP(FOWOptionCategory.VISIBILITY, "Hide Unexplored Map", "Hides unexplored (blue 0b) map tiles."),
         HIDE_PLAYER_INFOS(
                 FOWOptionCategory.VISIBILITY, "Hide Player Infos", "Hides anchored player info areas from the map."),
-        STATS_FROM_HS_ONLY(
-                FOWOptionCategory.VISIBILITY,
-                "Stats from HS",
-                "Only way to see players stats is to see their Home System"),
-        HIDE_STATS_VIA_FACTION_PN(
-                FOWOptionCategory.VISIBILITY,
-                "Hide Stats via Faction PN",
-                "A faction-specific promissory note in your play area no longer reveals that player's stats"),
-        HIDE_STATS_VIA_ALLIANCE(
-                FOWOptionCategory.VISIBILITY,
-                "Hide Stats via Alliance",
-                "An Alliance card in your play area no longer reveals that player's stats"),
-        HIDE_STATS_VIA_SFTT(
-                FOWOptionCategory.VISIBILITY,
-                "Hide Stats via SftT",
-                "A Support for the Throne card in your play area no longer reveals that player's stats"),
-        HIDE_STATS_VIA_MAHACT_CC(
-                FOWOptionCategory.VISIBILITY,
-                "Hide Stats via Mahact CC",
-                "A Mahact command counter in your fleet no longer reveals that player's stats"),
         HIDE_AC_DISCARD(
                 FOWOptionCategory.VISIBILITY,
                 "Hide AC Discard",
                 "Action card discard pile shows only cards that were played"),
+
+        // Precise Player Stats Options
+        STATS_FROM_HS_ONLY(
+                FOWOptionCategory.PLAYERSTATS,
+                "Stats from HS",
+                "Only way to see players stats is to see their Home System"),
+        HIDE_STATS_VIA_FACTION_PN(
+                FOWOptionCategory.PLAYERSTATS,
+                "Hide Stats via Faction PN",
+                "A faction-specific promissory note in your play area no longer reveals that player's stats"),
+        HIDE_STATS_VIA_ALLIANCE(
+                FOWOptionCategory.PLAYERSTATS,
+                "Hide Stats via Alliance",
+                "An Alliance card in your play area no longer reveals that player's stats"),
+        HIDE_STATS_VIA_SFTT(
+                FOWOptionCategory.PLAYERSTATS,
+                "Hide Stats via SftT",
+                "A Support for the Throne card in your play area no longer reveals that player's stats"),
+        HIDE_STATS_VIA_MAHACT_CC(
+                FOWOptionCategory.PLAYERSTATS,
+                "Hide Stats via Mahact CC",
+                "A Mahact command counter in your fleet no longer reveals that player's stats"),
 
         // Other Options
         HIDE_PLAYER_NAMES(
@@ -149,7 +161,7 @@ public class FOWOptionService {
 
     private static void offerFOWOptionButtons(
             ButtonInteractionEvent event, Game game, FOWOptionCategory selectedCategory) {
-        StringBuilder sb = new StringBuilder("### Change FoW " + selectedCategory + " Options\n\n");
+        StringBuilder sb = new StringBuilder("### Change FoW " + selectedCategory.getTitle() + " Options\n\n");
         if (FOWPlusService.isActive(game)) {
             sb.append("_FoW+ mode is active. Some options are forced and cannot be changed._\n\n");
         }
@@ -158,9 +170,9 @@ public class FOWOptionService {
         List<Button> categoryButtons = new ArrayList<>();
         for (FOWOptionCategory category : FOWOptionCategory.values()) {
             if (category == selectedCategory) {
-                categoryButtons.add(Buttons.gray("fowOptionCategory_" + category, category.name() + " Options"));
+                categoryButtons.add(Buttons.gray("fowOptionCategory_" + category, category.getTitle() + " Options"));
             } else {
-                categoryButtons.add(Buttons.blue("fowOptionCategory_" + category, category.name() + " Options"));
+                categoryButtons.add(Buttons.blue("fowOptionCategory_" + category, category.getTitle() + " Options"));
             }
         }
         categoryButtons.add(Buttons.gray("deleteButtons", "Done"));
