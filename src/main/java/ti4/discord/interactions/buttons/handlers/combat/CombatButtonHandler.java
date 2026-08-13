@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShieldingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -244,7 +245,12 @@ class CombatButtonHandler {
     @ButtonHandler("cancelGroundHits_")
     public static void cancelGroundHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
+        int originalHits = Integer.parseInt(buttonID.split("_")[2]);
+        int h = originalHits - 1;
+
+        if (originalHits > 0) {
+            MirrorShieldingLLButtonHandler.recordCancelledHits(game, player, tile, 1);
+        }
         String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
@@ -266,7 +272,12 @@ class CombatButtonHandler {
     @ButtonHandler("cancelSpaceHits_")
     public static void cancelSpaceHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
+        int originalHits = Integer.parseInt(buttonID.split("_")[2]);
+        int h = originalHits - 1;
+
+        if (originalHits > 0) {
+            MirrorShieldingLLButtonHandler.recordCancelledHits(game, player, tile, 1);
+        }
         String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();

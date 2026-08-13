@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.CombatInitiativeLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
@@ -123,6 +125,22 @@ public class TacticalActionService {
     }
 
     public boolean spendAndPlaceTokenIfNecessary(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
+        String combatInitiativeKey = CombatInitiativeLLButtonHandler.STATE + player.getFaction();
+        if (!game.getStoredValue(combatInitiativeKey).isEmpty()) {
+            if (!CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
+                CommandCounterHelper.addCC(event, player, tile);
+            }
+            game.removeStoredValue(combatInitiativeKey);
+            return true;
+        }
+        String transitRiderKey = TransitRiderLLButtonHandler.STATE + player.getFaction();
+        if (!game.getStoredValue(transitRiderKey).isEmpty()) {
+            if (!CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
+                CommandCounterHelper.addCC(event, player, tile);
+            }
+            game.removeStoredValue(transitRiderKey);
+            return true;
+        }
         String borrowedAuthorityColor = game.getStoredValue("borrowedAuthorityColor");
         if (!borrowedAuthorityColor.isEmpty()) {
             String ccId = Mapper.getCCID(borrowedAuthorityColor);

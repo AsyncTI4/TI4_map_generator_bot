@@ -349,6 +349,7 @@ public final class ButtonHelperActionCards {
         checkForPlayingSummit(game, player);
         checkForPlayingBountyContracts(game, player);
         checkForPlayingSpliceCards(game, player);
+        checkForPreassigningRelitigate(game, player);
         if (player.getPlayableActionCards().contains("puppetsonastring")) {
             String msg =
                     "You have _Puppets On A String_ in your hand. If you're not about to pass, you can ignore this message."
@@ -359,6 +360,20 @@ public final class ButtonHelperActionCards {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
+    }
+
+    private static void checkForPreassigningRelitigate(Game game, Player player) {
+        if (!player.getPlayableActionCards().contains("relitigate")
+                || !game.getStoredValue("Relitigate").isEmpty()) return;
+
+        List<Button> buttons = List.of(
+                Buttons.green("resolvePreassignment_Relitigate", "Pre-Play Relitigate"),
+                Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationNoPing()
+                        + ", you may pre-play _Relitigate_. It will trigger at the start of the next normal Agenda Phase.",
+                buttons);
     }
 
     @ButtonHandler("resolveCounterStroke")

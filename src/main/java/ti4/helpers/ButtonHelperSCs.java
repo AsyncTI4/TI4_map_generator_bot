@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.AdministrativeExemptionLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.commandcounter.CommandCounterButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
@@ -1605,6 +1606,10 @@ public final class ButtonHelperSCs {
         String scName = "a strategy card";
         if (scNum != -1) scName = "**" + Helper.getSCName(scNum, game) + "**";
         String msgStart = " following to perform the secondary ability of " + scName + ".";
+
+        if (AdministrativeExemptionLLButtonHandler.useExemption(game, player)) {
+            return msgStart + " No command token was spent due to _Administrative Exemption_.";
+        }
 
         if (player.isElected("tk-endorse")) {
             return msgStart + " You are elected for _Endorse_, so you do not spend a token.";

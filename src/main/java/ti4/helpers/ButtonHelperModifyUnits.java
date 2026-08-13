@@ -20,6 +20,7 @@ import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionTargetingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
@@ -812,6 +813,11 @@ public final class ButtonHelperModifyUnits {
             } else {
                 assignHitOrder.add("mech");
             }
+        }
+        List<String> precisionTargetTypes = PrecisionTargetingLLButtonHandler.getTargetUnitTypes(game, player, tile);
+        if (!precisionTargetTypes.isEmpty()) {
+            assignHitOrder.removeAll(precisionTargetTypes);
+            assignHitOrder.addAll(0, precisionTargetTypes);
         }
         for (String thingToHit : assignHitOrder) {
             if (hits <= 0) continue;

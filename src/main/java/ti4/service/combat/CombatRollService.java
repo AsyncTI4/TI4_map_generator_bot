@@ -29,6 +29,8 @@ import ti4.contest.replay.core.CombatRollPayload.DieRollSource;
 import ti4.contest.replay.core.CombatRollPayload.RollSegmentType;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnosisLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExplosivesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
@@ -284,6 +286,8 @@ public class CombatRollService {
                 }
             }
         }
+        playerUnitsByQuantity = MassHypnosisLLButtonHandler.splitHypnotizedShipForRoll(
+                game, player, tile, combatOnHolder, rollType, playerUnitsByQuantity);
         String bombardPlanet = "";
         if (rollType == CombatRollType.bombardment
                 && !game.getStoredValue("bombardmentTarget" + player.getFaction())
@@ -571,8 +575,28 @@ public class CombatRollService {
         CombatRollPayload.RollHeader rollHeader =
                 buildRollHeader(game, player, opponent, tile, combatOnHolder, rollType, combatSummary);
         CombatRollPayload payload = rollResult.payload().withHeader(rollHeader);
+        RiggedExplosivesLLButtonHandler.destroyFailedRiggedExplosives(event, game, player, tile, rollType, payload);
         FOWCombatThreadMirroring.mirrorCombatMessage(event, player, game, message);
         int h = rollResult.totalHits();
+        int massHypnosisHits =
+                MassHypnosisLLButtonHandler.getRedirectedHits(game, player, tile, combatOnHolder, rollType, payload);
+
+        if (massHypnosisHits > 0) {
+            h = Math.max(0, h - massHypnosisHits);
+            message = message.replaceFirst(
+                    "\\n\\*\\*Total hits \\d+\\*\\*[^\\n]*\\n", CombatMessageHelper.displayHitResults(h));
+            if (payload.total() != null) {
+                CombatRollPayload.RollTotal total = payload.total();
+                payload = new CombatRollPayload(
+                        payload.header(),
+                        payload.notes(),
+                        payload.modifiers(),
+                        payload.unitRolls(),
+                        new CombatRollPayload.RollTotal(total.diceRolled(), h, total.misses(), total.maximumHits()));
+            }
+            message += "\n_Mass Hypnosis_ redirected " + massHypnosisHits + " hit" + (massHypnosisHits == 1 ? "" : "s")
+                    + " to its owner's ships.";
+        }
         int renegadeCount = opponent.hasUnit("ponthous_destroyer2")
                 ? tile.getSpaceUnitHolder().getUnitCount(UnitType.Destroyer, opponent)
                 : 0;
@@ -639,6 +663,9 @@ public class CombatRollService {
             message = AshenBreakthroughHandler.appendBombardmentManualReminder(player, rollType, message);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        if (massHypnosisHits > 0 && !game.isFowMode()) {
+            CombatRollService.sendSpaceAssignHitsButtons(event, game, player, tile, massHypnosisHits);
+        }
         ThronesUnitHandler.offerGholaAfterRoll(event, game, player, opponent, tile, combatOnHolder, rollType, payload);
         if (rollType == CombatRollType.combatround
                 && Constants.SPACE.equalsIgnoreCase(unitHolderName)
@@ -2965,6 +2992,11 @@ public class CombatRollService {
         output.forEach((k, v) -> flatOutput.merge(k.getLeft(), v, Integer::sum));
         checkBadUnits(player, event, unitsByAsyncId, flatOutput);
 
+        for (UnitModel riggedExplosivesCannon :
+                RiggedExplosivesLLButtonHandler.getRiggedExplosivesCannons(game, player, tile)) {
+            unitsOnTile.put(new ImmutablePair<>(riggedExplosivesCannon, spaceHolder), 1);
+        }
+
         return output;
     }
 
@@ -2998,6 +3030,13 @@ public class CombatRollService {
         Map<Pair<UnitModel, UnitHolder>, Integer> merged = new LinkedHashMap<>();
         for (Map.Entry<String, List<Pair<UnitModel, UnitHolder>>> modelEntry : modelKeys.entrySet()) {
             List<Pair<UnitModel, UnitHolder>> keys = modelEntry.getValue();
+            if (keys.stream().anyMatch(key -> MassHypnosisLLButtonHandler.isHypnotizedRollModel(key.getLeft()))) {
+                divergingModels.add(modelEntry.getKey());
+                for (Pair<UnitModel, UnitHolder> key : keys) {
+                    merged.put(key, countByIdentity.get(key));
+                }
+                continue;
+            }
             if (keys.size() == 1) {
                 Pair<UnitModel, UnitHolder> k = keys.get(0);
                 merged.put(k, countByIdentity.get(k));

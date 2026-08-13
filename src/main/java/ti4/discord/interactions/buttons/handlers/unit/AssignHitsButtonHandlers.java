@@ -5,6 +5,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShieldingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.*;
@@ -229,6 +230,10 @@ class AssignHitsButtonHandlers {
                         msg += "\n> These SUSTAIN DAMAGE uses cancel 2 hits due to " + sustainSource + ".";
                     }
                     String assignHitsType = getAssignHitsType(game, player);
+                    if ("spacecombat".equals(assignHitsType) || "groundcombat".equals(assignHitsType)) {
+                        MirrorShieldingLLButtonHandler.recordCancelledHits(
+                                game, player, tile, cancelsTwoHits ? amt * 2 : amt);
+                    }
                     if (assignHitsType.contains("combat")) {
                         AshenUnitHandler.offerAshfallEngineOnSustain(event, game, player, tile, holder, type);
                     }

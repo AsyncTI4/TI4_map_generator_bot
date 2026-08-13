@@ -29,6 +29,8 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.acd2.PublicOutrageAcd2ButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.acd2.SettlementsAcd2ButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.ExplorationRiderLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
@@ -1150,11 +1152,19 @@ public final class AgendaHelper {
                                     identity + " due to having a winning _Relic Rider_, you have gained a Relic.");
                             RelicHelper.drawRelicAndNotify(winningR, event, game);
                         }
-                        if (specificVote.contains("Exploration Rider")) {
+                        if (specificVote.contains("Exploration Rider (LL)")) {
+                            String message = identity
+                                    + ", you have a winning _Exploration Rider_. Choose one controlled planet of each trait to explore.";
+                            MessageHelper.sendMessageToChannel(channel, message);
+                            ExplorationRiderLLButtonHandler.offerReward(game, winningR);
+                        } else if (specificVote.contains("Exploration Rider")) {
                             String message = identity
                                     + ", you have a winning _Exploration Rider_. Choose a non-cultural planet to explore.";
                             MessageHelper.sendMessageToChannel(channel, message);
                             ButtonHelperActionCards.sendExplorationRiderButtons(winningR, game, 3, Set.of());
+                        }
+                        if (specificVote.contains("Transit Rider")) {
+                            TransitRiderLLButtonHandler.offerReward(game, winningR);
                         }
                         if (specificVote.contains("Radiance")) {
                             List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(
