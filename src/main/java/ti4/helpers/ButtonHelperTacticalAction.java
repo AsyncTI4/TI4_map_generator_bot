@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExplosivesLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TacticalRetreatLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
@@ -553,6 +555,8 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
         game.removeStoredValue("gyraxisActive");
+        RiggedExplosivesLLButtonHandler.clearRiggedExplosives(game);
+        TacticalRetreatLLButtonHandler.clearTacticalRetreat(game);
         XytherisLeadersHandler.clearMyrixAgentEffects(game);
         XytherisLeadersHandler.clearHeroUnitAbilityRoll(game);
         XytherisAbilityHandler.clearStingOfTheHiveRollState(game);
