@@ -33,8 +33,11 @@ public class RiggedExplosivesLLButtonHandler {
 
     @ButtonHandler(RESOLVE_RIGGED_EXPLOSIVES)
     public static void resolveRiggedExplosives(ButtonInteractionEvent event, Game game, Player player) {
+        for (int selection = 1; selection <= 5; selection++) {
+            game.removeStoredValue(getStateKey(player, selection));
+        }
         Tile tile = game.getTileByPosition(game.getActiveSystem());
-        if (tile == null || getSelectionCount(game, player) > 0) {
+        if (tile == null) {
             return;
         }
 
@@ -59,6 +62,7 @@ public class RiggedExplosivesLLButtonHandler {
         }
 
         Tile tile = game.getTileByPosition(values[0]);
+        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
         UnitHolder holder = tile == null ? null : tile.getUnitHolders().get(values[1]);
         UnitKey unitKey = holder == null
                 ? null
@@ -69,6 +73,7 @@ public class RiggedExplosivesLLButtonHandler {
         UnitModel unit = unitKey == null ? null : player.getPriorityUnitByAsyncID(unitKey.asyncID(), holder);
 
         if (tile == null
+                || tile != activeSystem
                 || holder == null
                 || unitKey == null
                 || unit == null

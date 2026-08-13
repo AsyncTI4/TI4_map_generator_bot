@@ -178,15 +178,7 @@ public class ForwardAssemblyLLButtonHandler {
         Map<String, Integer> movedUnits = state.length == 3 ? decodeMovedUnits(state[2]) : new HashMap<>();
         List<Button> buttons = getMoveButtons(game, player, source, movedUnits);
         MessageHelper.editMessageWithButtons(
-                event,
-                getMoveMessage(player, destination),
-                NewStuffHelper.buttonPagination(
-                        buttons,
-                        List.of(Buttons.red(player.factionButtonChecker() + DONE, "Done Moving")),
-                        player.factionButtonChecker() + MOVE,
-                        25,
-                        0,
-                        false));
+                event, getMoveMessage(player, destination), getMovePageButtons(player, buttons));
     }
 
     private static List<Button> getSourceButtons(Game game, Player player) {
@@ -241,6 +233,17 @@ public class ForwardAssemblyLLButtonHandler {
                     Buttons.green(player.factionButtonChecker() + MOVE + producedEntry, label, unitKey.unitEmoji()));
         }
         return buttons;
+    }
+
+    private static List<Button> getMovePageButtons(Player player, List<Button> buttons) {
+        Button done = Buttons.red(player.factionButtonChecker() + DONE, "Done Moving");
+        List<Button> page = NewStuffHelper.buttonPagination(
+                buttons, List.of(done), player.factionButtonChecker() + MOVE, 25, 0, false);
+        if (!page.contains(done)) {
+            page = new ArrayList<>(page);
+            page.add(done);
+        }
+        return page;
     }
 
     private static List<String> getProducedUnitEntries(Player player, String sourcePosition) {

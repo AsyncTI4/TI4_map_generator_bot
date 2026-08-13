@@ -11,6 +11,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
@@ -26,14 +27,8 @@ public class PrecisionTargetingLLButtonHandler {
     @ButtonHandler(RESOLVE)
     public static void resolvePrecisionTargeting(ButtonInteractionEvent event, Game game, Player player) {
         StartCombatService.CurrentCombat combat = StartCombatService.getCurrentCombat(game);
-        Tile tile = combat == null ? null : game.getTileByPosition(combat.tilePosition());
-        Player target = combat == null
-                ? null
-                : combat.factions().stream()
-                        .map(game::getPlayerFromColorOrFaction)
-                        .filter(other -> other != null && other != player)
-                        .findFirst()
-                        .orElse(null);
+        Tile tile = getCombatTile(game, combat);
+        Player target = getOpponent(game, player, tile);
         if (tile == null || target == null) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "No current space combat was found for _Precision Targeting_.");
@@ -60,8 +55,13 @@ public class PrecisionTargetingLLButtonHandler {
     public static void selectPrecisionTarget(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] payload = buttonID.substring(SELECT.length()).split("\\|", 2);
         Player target = payload.length == 2 ? game.getPlayerFromColorOrFaction(payload[0]) : null;
+        if (target == null
+                && payload.length == 2
+                && game.getNeutral().getFaction().equals(payload[0])) {
+            target = game.getNeutral();
+        }
         StartCombatService.CurrentCombat combat = StartCombatService.getCurrentCombat(game);
-        Tile tile = combat == null ? null : game.getTileByPosition(combat.tilePosition());
+        Tile tile = getCombatTile(game, combat);
         UnitKey key = tile == null || target == null
                 ? null
                 : tile.getSpaceUnitHolder().getUnitKeysForPlayer(target).stream()
@@ -119,8 +119,35 @@ public class PrecisionTargetingLLButtonHandler {
                 .orElse("");
     }
 
+    public static List<String> getTargetUnitTypes(Game game, Player defender, Tile tile) {
+        String[] state = game.getStoredValue(STATE + defender.getFaction()).split("\\|", 3);
+        StartCombatService.CurrentCombat combat = StartCombatService.getCurrentCombat(game);
+        if (state.length != 3
+                || tile == null
+                || combat == null
+                || !tile.getPosition().equals(state[0])) {
+            return List.of();
+        }
+        try {
+            if (combat.round() != Integer.parseInt(state[1])) return List.of();
+        } catch (NumberFormatException e) {
+            return List.of();
+        }
+        return List.of(state[2].split(",")).stream()
+                .map(asyncId -> tile.getSpaceUnitHolder().getUnitKeysForPlayer(defender).stream()
+                        .filter(key -> key.asyncID().equals(asyncId))
+                        .findFirst()
+                        .map(key -> key.unitName())
+                        .orElse(null))
+                .filter(java.util.Objects::nonNull)
+                .distinct()
+                .toList();
+    }
+
     public static void clearPrecisionTargeting(Game game) {
         for (Player player : game.getRealPlayers()) game.removeStoredValue(STATE + player.getFaction());
+        if (game.getNeutral() != null)
+            game.removeStoredValue(STATE + game.getNeutral().getFaction());
     }
 
     private static List<Button> getTargetButtons(Game game, Player player, Player target, Tile tile) {
@@ -136,5 +163,22 @@ public class PrecisionTargetingLLButtonHandler {
         }
         buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done"));
         return buttons;
+    }
+
+    private static Tile getCombatTile(Game game, StartCombatService.CurrentCombat combat) {
+        return combat == null || combat.tilePosition() == null
+                ? game.getTileByPosition(game.getActiveSystem())
+                : game.getTileByPosition(combat.tilePosition());
+    }
+
+    private static Player getOpponent(Game game, Player player, Tile tile) {
+        if (tile == null) return null;
+        List<Player> opponents = new ArrayList<>(game.getRealPlayers());
+        if (game.getNeutral() != null) opponents.add(game.getNeutral());
+        return opponents.stream()
+                .filter(other -> other != player)
+                .filter(other -> FoWHelper.playerHasActualShipsInSystem(other, tile))
+                .findFirst()
+                .orElse(null);
     }
 }

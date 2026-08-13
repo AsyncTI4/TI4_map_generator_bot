@@ -17,6 +17,7 @@ import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.TileModel;
 import ti4.service.emoji.ExploreEmojis;
 
 @UtilityClass
@@ -138,8 +139,12 @@ public class AncientMapsLLButtonHandler {
                 + " with _Ancient Maps_.";
         String buttonPrefix = player.factionButtonChecker() + PLACE_ANCIENT_MAPS + tileId + "_";
 
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), message, NewStuffHelper.buttonPagination(placementButtons, buttonPrefix, 0));
+        TileModel tileModel = TileHelper.getTileById(tileId);
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                event.getMessageChannel(),
+                message,
+                tileModel == null ? List.of() : List.of(tileModel.getRepresentationEmbed(false)),
+                NewStuffHelper.buttonPagination(placementButtons, buttonPrefix, 0));
         ButtonHelper.deleteMessage(event);
     }
 

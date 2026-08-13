@@ -12,11 +12,11 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
@@ -62,16 +62,12 @@ public class DeconstructedMilitiaLLButtonHandler {
         }
         int cost = Math.round(unit.getCost());
         RemoveUnitService.removeUnit(event, tile, game, player, tile.getSpaceUnitHolder(), unitKey.unitType(), 1);
-        List<Button> fighterButtons = Helper.getPlaceUnitButtons(
-                event, player, game, tile, "deconstructedMilitia", "placeOneNDone_skipbuild");
-        MessageHelper.sendMessageToChannelWithButtons(
+        int fighters = cost * 2;
+        AddUnitService.addUnits(event, tile, game, player.getColor(), fighters + " fighter");
+        MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " removed 1 " + unit.getName()
-                        + ". Place fighters in the active system with combined cost " + cost
-                        + " for _Deconstructed Militia_ (enforce the limit manually).",
-                fighterButtons.stream()
-                        .filter(button -> button.getLabel().contains("Fighter"))
-                        .toList());
+                player.getRepresentationNoPing() + " removed 1 " + unit.getName() + " and placed " + fighters
+                        + " fighters in the active system for _Deconstructed Militia_.");
         ButtonHelper.deleteMessage(event);
     }
 

@@ -278,6 +278,6 @@ public class ExtensionRefitLLButtonHandler {
 
     private static String getAttachmentName(String attachment) {
         AttachmentModel attachmentModel = Mapper.getAttachmentInfo(attachment);
-        return attachmentModel == null ? attachment : "_" + attachmentModel.getName() + "_";
+        return attachmentModel == null ? attachment : attachmentModel.getName();
     }
 }

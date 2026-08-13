@@ -19,7 +19,7 @@ public class EmergencyAppropriationsLLButtonHandler {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing()
-                        + " played _Emergency Appropriations_. Their planets' influence counts as resources for this payment.");
+                        + " played _Emergency Appropriations_. Their planets use their higher resource or influence value for this payment.");
         ButtonHelper.deleteMessage(event);
     }
 

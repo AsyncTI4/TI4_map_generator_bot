@@ -73,10 +73,14 @@ public class SenateGridlockLLButtonHandler {
         for (Player target : game.getRealPlayers()) {
             Vote targetVote = getVote(game, target);
             if (target != player && targetVote != null && !playerVote.outcome.equals(targetVote.outcome)) {
+                String targetName = game.isFowMode()
+                        ? target.getFactionNameOrColor()
+                        : target.getFactionModel().getShortName();
                 buttons.add(Buttons.gray(
                         player.factionButtonChecker() + SELECT + target.getFaction(),
                         "Copy " + targetVote.votes + " vote" + (targetVote.votes == 1 ? "" : "s") + " from "
-                                + target.getRepresentationNoPing()));
+                                + targetName,
+                        target.fogSafeEmoji()));
             }
         }
         return buttons;

@@ -13,6 +13,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.message.MessageHelper;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.StartCombatService;
@@ -36,12 +37,13 @@ public class MirrorShieldingLLButtonHandler {
             return;
         }
 
-        Player opponent = game.getRealPlayers().stream()
-                .filter(other -> other != player && context.factions().contains(other.getFaction()))
+        Tile tile = game.getTileByPosition(context.tilePosition());
+        List<Player> opponents = new ArrayList<>(game.getRealPlayers());
+        if (game.getNeutral() != null) opponents.add(game.getNeutral());
+        Player opponent = opponents.stream()
+                .filter(other -> other != player && FoWHelper.playerHasActualShipsInSystem(other, tile))
                 .findFirst()
                 .orElse(null);
-        Tile tile = game.getTileByPosition(context.tilePosition());
-
         if (opponent == null || tile == null) {
             ButtonHelper.deleteMessage(event);
             return;

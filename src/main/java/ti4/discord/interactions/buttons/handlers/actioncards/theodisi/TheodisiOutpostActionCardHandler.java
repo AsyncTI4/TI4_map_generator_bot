@@ -12,8 +12,10 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
+import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 
@@ -67,10 +69,14 @@ public class TheodisiOutpostActionCardHandler {
         String planetName = payload.substring(separator + 1);
         Planet planet = game.getPlanetsInfo().get(planetName);
         String attachment = getOutpostAttachment(outpost);
-        if (planet == null || attachment == null || !player.getPlanets().contains(planetName)) {
+        if (planet == null
+                || attachment == null
+                || game.getDiscardACStatus().get(outpost) == ACStatus.purged
+                || !player.getPlanets().contains(planetName)) {
             return;
         }
         planet.addToken(attachment);
+        game.getDiscardACStatus().put(outpost, ACStatus.purged);
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
@@ -153,9 +159,10 @@ public class TheodisiOutpostActionCardHandler {
 
                 for (Player otherPlayer : game.getRealPlayers()) {
                     if (otherPlayer != player) {
-                        buttons.add(Buttons.green(
+                        buttons.add(FoWHelper.fogSafeTargetButton(
                                 player.factionButtonChecker() + "resolveMarketOutpost_" + otherPlayer.getFaction(),
-                                "Choose " + otherPlayer.getRepresentationNoPing()));
+                                "green",
+                                otherPlayer));
                     }
                 }
             }

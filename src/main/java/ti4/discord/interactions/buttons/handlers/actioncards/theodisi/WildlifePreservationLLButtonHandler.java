@@ -19,7 +19,7 @@ public class WildlifePreservationLLButtonHandler {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing()
-                        + " played _Wildlife Preservation_. Their planets' resources count as influence for this payment.");
+                        + " played _Wildlife Preservation_. Their planets use their higher resource or influence value for this payment.");
         ButtonHelper.deleteMessage(event);
     }
 

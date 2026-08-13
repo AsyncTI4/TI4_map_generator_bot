@@ -1047,15 +1047,23 @@ public final class Helper {
             boolean countResourcesAsInfluence = WildlifePreservationLLButtonHandler.isActive(game, player);
             planets = planets.stream()
                     .sorted((p1, p2) -> Integer.compare(
-                            countResourcesAsInfluence ? getPlanetResources(p2, game) : getPlanetInfluence(p2, game),
-                            countResourcesAsInfluence ? getPlanetResources(p1, game) : getPlanetInfluence(p1, game)))
+                            countResourcesAsInfluence
+                                    ? Math.max(getPlanetResources(p2, game), getPlanetInfluence(p2, game))
+                                    : getPlanetInfluence(p2, game),
+                            countResourcesAsInfluence
+                                    ? Math.max(getPlanetResources(p1, game), getPlanetInfluence(p1, game))
+                                    : getPlanetInfluence(p1, game)))
                     .collect(Collectors.toList());
         } else {
             boolean countInfluenceAsResources = EmergencyAppropriationsLLButtonHandler.isActive(game, player);
             planets = planets.stream()
                     .sorted((p1, p2) -> Integer.compare(
-                            countInfluenceAsResources ? getPlanetInfluence(p2, game) : getPlanetResources(p2, game),
-                            countInfluenceAsResources ? getPlanetInfluence(p1, game) : getPlanetResources(p1, game)))
+                            countInfluenceAsResources
+                                    ? Math.max(getPlanetResources(p2, game), getPlanetInfluence(p2, game))
+                                    : getPlanetResources(p2, game),
+                            countInfluenceAsResources
+                                    ? Math.max(getPlanetResources(p1, game), getPlanetInfluence(p1, game))
+                                    : getPlanetResources(p1, game)))
                     .collect(Collectors.toList());
         }
         for (String planet : planets) {
@@ -1562,9 +1570,8 @@ public final class Helper {
                         } else {
                             if (countInfluenceAsResources) {
                                 msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
-                                        .append(
-                                                " (counting influence as resources due to _Emergency Appropriations_)\n");
-                                res += planet.getInfluence();
+                                        .append(" (using its higher value due to _Emergency Appropriations_)\n");
+                                resourceValue = planet.getMaxResInf();
                             } else if (Math.min(gledgeMech, planet.getInfluence()) > 0) {
                                 msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
                                         .append('\n');
@@ -1591,8 +1598,8 @@ public final class Helper {
                         } else {
                             if (countResourcesAsInfluence) {
                                 msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
-                                        .append(" (counting resources as influence due to _Wildlife Preservation_)\n");
-                                inf += planet.getResources();
+                                        .append(" (using its higher value due to _Wildlife Preservation_)\n");
+                                inf += planet.getMaxResInf();
                             } else {
                                 msg.append(getPlanetRepresentationPlusEmojiPlusInfluence(thing, game))
                                         .append('\n');

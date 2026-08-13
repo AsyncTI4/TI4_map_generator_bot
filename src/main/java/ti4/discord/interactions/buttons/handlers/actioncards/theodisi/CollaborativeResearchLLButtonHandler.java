@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -133,13 +134,15 @@ public class CollaborativeResearchLLButtonHandler {
     }
 
     private static void sendPaymentButtons(Game game, Player owner, Player target, ButtonInteractionEvent event) {
+        MessageChannel actionsChannel =
+                game.getMainGameChannel() == null ? event.getMessageChannel() : game.getMainGameChannel();
         List<Button> ownerButtons = new ArrayList<>();
         if (owner.getTg() >= 2) {
             ownerButtons.add(Buttons.green(owner.factionButtonChecker() + OWNER_SPEND, "Spend 2 Trade Goods"));
         }
         ownerButtons.add(Buttons.red(owner.factionButtonChecker() + OWNER_DECLINE, "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
-                owner.getCardsInfoThread(),
+                actionsChannel,
                 owner.getRepresentationNoPing()
                         + ", choose whether to spend 2 trade goods for _Collaborative Research_.",
                 ownerButtons);
@@ -151,7 +154,7 @@ public class CollaborativeResearchLLButtonHandler {
         }
         targetButtons.add(Buttons.red(target.factionButtonChecker() + TARGET_DECLINE + owner.getFaction(), "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
-                target.getCardsInfoThread(),
+                actionsChannel,
                 target.getRepresentationNoPing() + ", " + owner.getRepresentationNoPing()
                         + " selected you for _Collaborative Research_. Choose whether to spend 2 trade goods.",
                 targetButtons);
@@ -205,7 +208,7 @@ public class CollaborativeResearchLLButtonHandler {
         String message = owner.getRepresentationNoPing()
                 + ", choose a technology to research for _Collaborative Research_. The selected player will gain it after you do.";
         MessageHelper.sendMessageToChannelWithButtons(
-                owner.getCardsInfoThread(),
+                game.getMainGameChannel() == null ? event.getMessageChannel() : game.getMainGameChannel(),
                 message,
                 NewStuffHelper.buttonPagination(buttons, owner.factionButtonChecker() + RESEARCH, 0));
     }

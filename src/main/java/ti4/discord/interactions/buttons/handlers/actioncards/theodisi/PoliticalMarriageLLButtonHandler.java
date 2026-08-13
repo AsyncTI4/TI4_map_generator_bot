@@ -5,7 +5,6 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -25,9 +24,8 @@ public class PoliticalMarriageLLButtonHandler {
         List<Button> buttons = new ArrayList<>();
         for (Player target : game.getRealPlayers()) {
             if (target != player) {
-                buttons.add(Buttons.gray(
-                        player.factionButtonChecker() + SELECT + target.getFaction(),
-                        "Choose " + target.getRepresentationNoPing()));
+                buttons.add(FoWHelper.fogSafeTargetButton(
+                        player.factionButtonChecker() + SELECT + target.getFaction(), "gray", target));
             }
         }
         MessageHelper.editMessageWithButtons(

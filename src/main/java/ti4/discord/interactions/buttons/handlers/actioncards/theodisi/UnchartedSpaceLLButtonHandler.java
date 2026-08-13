@@ -12,6 +12,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
+import ti4.model.TileModel;
 
 @UtilityClass
 public class UnchartedSpaceLLButtonHandler {
@@ -41,12 +42,11 @@ public class UnchartedSpaceLLButtonHandler {
             return;
         }
 
-        MessageHelper.sendMessageToChannelWithButtons(
+        TileModel tileModel = TileHelper.getTileById(tileId);
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing()
-                        + ", please choose an edge position for "
-                        + TileHelper.getTileById(tileId).getName()
-                        + ".",
+                player.getRepresentationNoPing() + ", please choose an edge position for " + tileModel.getName() + ".",
+                List.of(tileModel.getRepresentationEmbed(false)),
                 buttons);
         ButtonHelper.deleteMessage(event);
     }

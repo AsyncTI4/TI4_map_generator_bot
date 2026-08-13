@@ -361,13 +361,13 @@ public class LostLegciesExploreHandler {
         if (game == null || player == null || planetName == null) {
             return;
         }
-        Tile tile = game.getTileFromPlanet(planetName);
-        if (tile == null
-                || tile.getSpaceUnitHolder().getUnitsByStateForPlayer(player).keySet().stream()
-                        .noneMatch(unitKey -> {
-                            UnitModel unit = player.getUnitFromUnitKey(unitKey);
-                            return unit != null && unit.getIsShip() && unitKey.unitType() != UnitType.Fighter;
-                        })) {
+        boolean hasEligibleShip = game.getTileMap().values().stream()
+                .flatMap(tile -> tile.getSpaceUnitHolder().getUnitsByStateForPlayer(player).keySet().stream())
+                .anyMatch(unitKey -> {
+                    UnitModel unit = player.getUnitFromUnitKey(unitKey);
+                    return unit != null && unit.getIsShip() && unitKey.unitType() != UnitType.Fighter;
+                });
+        if (!hasEligibleShip) {
             return;
         }
 
@@ -377,20 +377,16 @@ public class LostLegciesExploreHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation()
-                        + ", you may use _Polymorphism_ to replace 1 non-fighter ship in this system with a ship that costs 1 more.",
+                        + ", you may use _Polymorphism_ to replace 1 non-fighter ship you control with a ship that costs 1 more.",
                 buttons);
     }
 
     @ButtonHandler(USE_POLY)
     public static void selectPolymorphismShip(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String planetName = buttonID.substring(USE_POLY.length());
-        Tile tile = game == null ? null : game.getTileFromPlanet(planetName);
         UnitHolder planet = game == null ? null : ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
-        UnitHolder space = tile == null ? null : tile.getSpaceUnitHolder();
         if (player == null
-                || tile == null
                 || planet == null
-                || space == null
                 || !player.getPlanets().contains(planetName)
                 || !planet.getTokenList().contains("attachment_polymorphism.png")) {
             ButtonHelper.deleteMessage(event);
@@ -398,18 +394,20 @@ public class LostLegciesExploreHandler {
         }
 
         List<Button> buttons = new ArrayList<>();
-        for (UnitKey unitKey : space.getUnitsByStateForPlayer(player).keySet()) {
-            UnitModel unit = player.getUnitFromUnitKey(unitKey);
-            if (unit == null || !unit.getIsShip() || unitKey.unitType() == UnitType.Fighter) {
-                continue;
-            }
-            for (UnitState state : space.getNonZeroUnitStates(unitKey)) {
-                String stateText = state == UnitState.none ? "" : state.humanDescr() + " ";
-                buttons.add(Buttons.red(
-                        player.factionButtonChecker() + SELECT_POLY_SHIP + planetName + "|" + unitKey.asyncID() + "|"
-                                + state,
-                        "Remove 1 " + stateText + unit.getName(),
-                        unitKey.unitEmoji()));
+        for (Tile unitTile : game.getTileMap().values()) {
+            UnitHolder space = unitTile.getSpaceUnitHolder();
+            for (UnitKey unitKey : space.getUnitsByStateForPlayer(player).keySet()) {
+                UnitModel unit = player.getUnitFromUnitKey(unitKey);
+                if (unit == null || !unit.getIsShip() || unitKey.unitType() == UnitType.Fighter) continue;
+                for (UnitState state : space.getNonZeroUnitStates(unitKey)) {
+                    String stateText = state == UnitState.none ? "" : state.humanDescr() + " ";
+                    buttons.add(Buttons.red(
+                            player.factionButtonChecker() + SELECT_POLY_SHIP + planetName + "|" + unitTile.getPosition()
+                                    + "|" + unitKey.asyncID() + "|" + state,
+                            "Remove 1 " + stateText + unit.getName() + " in "
+                                    + unitTile.getRepresentationForButtons(game, player),
+                            unitKey.unitEmoji()));
+                }
             }
         }
 
@@ -428,15 +426,15 @@ public class LostLegciesExploreHandler {
 
     @ButtonHandler(SELECT_POLY_SHIP)
     public static void removePolymorphismShip(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] payload = buttonID.substring(SELECT_POLY_SHIP.length()).split("\\|", 3);
-        String planetName = payload.length == 3 ? payload[0] : null;
-        Tile tile = planetName == null || game == null ? null : game.getTileFromPlanet(planetName);
+        String[] payload = buttonID.substring(SELECT_POLY_SHIP.length()).split("\\|", 4);
+        String planetName = payload.length == 4 ? payload[0] : null;
+        Tile tile = payload.length == 4 ? game.getTileByPosition(payload[1]) : null;
         UnitHolder planet =
                 planetName == null || game == null ? null : ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
         UnitHolder space = tile == null ? null : tile.getSpaceUnitHolder();
         UnitKey unitKey =
-                payload.length == 3 && player != null ? Mapper.getUnitKey(payload[1], player.getColor()) : null;
-        UnitState state = payload.length == 3 ? Units.findUnitState(payload[2]) : null;
+                payload.length == 4 && player != null ? Mapper.getUnitKey(payload[2], player.getColor()) : null;
+        UnitState state = payload.length == 4 ? Units.findUnitState(payload[3]) : null;
         UnitModel removedShip = unitKey == null || player == null ? null : player.getUnitFromUnitKey(unitKey);
         if (player == null
                 || tile == null
@@ -461,8 +459,8 @@ public class LostLegciesExploreHandler {
                 .filter(unit -> Float.compare(unit.getCost(), replacementCost) == 0)
                 .sorted(java.util.Comparator.comparing(UnitModel::getName))
                 .map(unit -> Buttons.green(
-                        player.factionButtonChecker() + PLACE_POLY_SHIP + planetName + "|" + unit.getAsyncId() + "|"
-                                + replacementCost,
+                        player.factionButtonChecker() + PLACE_POLY_SHIP + planetName + "|" + tile.getPosition() + "|"
+                                + unit.getAsyncId() + "|" + replacementCost,
                         "Place 1 " + unit.getName(),
                         unit.getUnitEmoji()))
                 .toList();
@@ -484,15 +482,15 @@ public class LostLegciesExploreHandler {
 
     @ButtonHandler(PLACE_POLY_SHIP)
     public static void placePolymorphismShip(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] payload = buttonID.substring(PLACE_POLY_SHIP.length()).split("\\|", 3);
-        String planetName = payload.length == 3 ? payload[0] : null;
-        Tile tile = planetName == null || game == null ? null : game.getTileFromPlanet(planetName);
+        String[] payload = buttonID.substring(PLACE_POLY_SHIP.length()).split("\\|", 4);
+        String planetName = payload.length == 4 ? payload[0] : null;
+        Tile tile = payload.length == 4 ? game.getTileByPosition(payload[1]) : null;
         UnitHolder planet =
                 planetName == null || game == null ? null : ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
-        UnitModel unit = payload.length == 3 && player != null ? player.getUnitFromAsyncID(payload[1]) : null;
+        UnitModel unit = payload.length == 4 && player != null ? player.getUnitFromAsyncID(payload[2]) : null;
         float replacementCost;
         try {
-            replacementCost = payload.length == 3 ? Float.parseFloat(payload[2]) : -1;
+            replacementCost = payload.length == 4 ? Float.parseFloat(payload[3]) : -1;
         } catch (NumberFormatException e) {
             ButtonHelper.deleteMessage(event);
             return;

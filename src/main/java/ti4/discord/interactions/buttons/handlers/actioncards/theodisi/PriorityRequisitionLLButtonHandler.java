@@ -125,7 +125,9 @@ public class PriorityRequisitionLLButtonHandler {
 
         int discount = (int) unit.getCost() + 2;
         RemoveUnitService.removeUnit(event, source, game, player, space, unitKey.unitType(), 1);
-        game.setStoredValue(STATE + player.getFaction(), Integer.toString(discount));
+        game.setStoredValue(
+                STATE + player.getFaction(),
+                game.getStoredValue("producedUnitCostFor" + player.getFaction()) + "|" + discount);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " returned 1 " + unit.getName()
@@ -135,8 +137,12 @@ public class PriorityRequisitionLLButtonHandler {
     }
 
     public static int getDiscount(Game game, Player player) {
+        String[] state = game.getStoredValue(STATE + player.getFaction()).split("\\|", 2);
+        if (state.length != 2 || !state[0].equals(game.getStoredValue("producedUnitCostFor" + player.getFaction()))) {
+            return 0;
+        }
         try {
-            return Math.max(0, Integer.parseInt(game.getStoredValue(STATE + player.getFaction())));
+            return Math.max(0, Integer.parseInt(state[1]));
         } catch (NumberFormatException e) {
             return 0;
         }

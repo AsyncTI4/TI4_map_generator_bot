@@ -24,8 +24,9 @@ public class RaisedMoraleLLButtonHandler {
     @ButtonHandler(RESOLVE_RAISED_MORALE)
     public static void resolveRaisedMorale(ButtonInteractionEvent event, Game game, Player player) {
         StartCombatService.CurrentCombat combat = StartCombatService.getCurrentCombat(game);
-        Tile tile =
-                combat == null || combat.tilePosition() == null ? null : game.getTileByPosition(combat.tilePosition());
+        Tile tile = combat == null || combat.tilePosition() == null
+                ? game.getTileByPosition(game.getActiveSystem())
+                : game.getTileByPosition(combat.tilePosition());
         if (tile == null) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),

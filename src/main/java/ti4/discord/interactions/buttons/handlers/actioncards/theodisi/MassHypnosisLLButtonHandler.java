@@ -18,6 +18,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
@@ -39,10 +40,16 @@ public class MassHypnosisLLButtonHandler {
         List<Button> buttons = new ArrayList<>();
         for (Player target : game.getRealPlayers()) {
             if (target != player) {
-                buttons.add(Buttons.green(
+                buttons.add(FoWHelper.fogSafeTargetButton(
                         player.factionButtonChecker() + SELECT_MASS_HYPNOSIS_TARGET + target.getFaction(),
-                        "Choose " + target.getRepresentationNoPing()));
+                        "green",
+                        target));
             }
+        }
+        Player neutral = game.getNeutral();
+        if (neutral != null && neutral != player) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + SELECT_MASS_HYPNOSIS_TARGET + neutral.getFaction(), "Neutral"));
         }
         ti4.message.MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
@@ -56,10 +63,16 @@ public class MassHypnosisLLButtonHandler {
     public static void selectMassHypnosisTarget(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = game.getPlayerFromColorOrFaction(buttonID.substring(SELECT_MASS_HYPNOSIS_TARGET.length()));
+        if (target == null
+                && game.getNeutral() != null
+                && game.getNeutral().getFaction().equals(buttonID.substring(SELECT_MASS_HYPNOSIS_TARGET.length()))) {
+            target = game.getNeutral();
+        }
         if (target == null || target == player) return;
         StartCombatService.CurrentCombat combat = StartCombatService.getCurrentCombat(game);
-        Tile combatTile =
-                combat == null || combat.tilePosition() == null ? null : game.getTileByPosition(combat.tilePosition());
+        Tile combatTile = combat == null || combat.tilePosition() == null
+                ? game.getTileByPosition(game.getActiveSystem())
+                : game.getTileByPosition(combat.tilePosition());
         if (combatTile == null) return;
 
         List<Button> buttons = getShipButtons(player, target, combatTile);
@@ -85,16 +98,16 @@ public class MassHypnosisLLButtonHandler {
     @ButtonHandler(SELECT_MASS_HYPNOSIS_SHIP)
     public static void selectMassHypnosisShip(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] values = buttonID.substring(SELECT_MASS_HYPNOSIS_SHIP.length()).split("\\|", 4);
-        Player target = values.length >= 1
-                ? game.getRealPlayers().stream()
-                        .filter(other -> other.getFaction().equals(values[0]))
-                        .findFirst()
-                        .orElse(null)
-                : null;
+        Player target = values.length >= 1 ? game.getPlayerFromColorOrFaction(values[0]) : null;
+        if (target == null
+                && values.length >= 1
+                && game.getNeutral().getFaction().equals(values[0])) {
+            target = game.getNeutral();
+        }
         if (target != null) {
             StartCombatService.CurrentCombat combat = StartCombatService.getCurrentCombat(game);
             Tile combatTile = combat == null || combat.tilePosition() == null
-                    ? null
+                    ? game.getTileByPosition(game.getActiveSystem())
                     : game.getTileByPosition(combat.tilePosition());
             List<Button> buttons = combatTile == null ? List.of() : getShipButtons(player, target, combatTile);
             String message = player.getRepresentationNoPing()
