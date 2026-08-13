@@ -164,7 +164,7 @@ public class OblivionTechHandler {
                 && player != null
                 && player.hasTechReady(MM)
                 && !isCensured(game, player)
-                && hasEligibleComponentAction(game);
+                && hasEligibleComponentAction(game, player);
     }
 
     public static void offerACPlayFromDiscardButtons(GenericInteractionCreateEvent event, Player player, Game game) {
@@ -172,7 +172,7 @@ public class OblivionTechHandler {
                 || player == null
                 || !player.hasTech(MM)
                 || isCensured(game, player)
-                || !hasEligibleComponentAction(game)) {
+                || !hasEligibleComponentAction(game, player)) {
             return;
         }
 
@@ -217,7 +217,7 @@ public class OblivionTechHandler {
         }
 
         String acId = ActionCardHelper.getDiscardedAcID(game, acIndex);
-        if (!isEligibleComponentAction(game, acId) || !game.pickActionCard(player.getUserID(), acIndex)) {
+        if (!isEligibleComponentAction(game, player, acId) || !game.pickActionCard(player.getUserID(), acIndex)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "That action card is no longer available.");
             ButtonHelper.deleteMessage(event);
             return;
@@ -250,7 +250,7 @@ public class OblivionTechHandler {
     private static List<Button> getDiscardComponentActionButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         game.getDiscardActionCards().entrySet().stream()
-                .filter(entry -> isEligibleComponentAction(game, entry.getKey()))
+                .filter(entry -> isEligibleComponentAction(game, player, entry.getKey()))
                 .sorted(Comparator.comparing(
                         entry -> Mapper.getActionCard(entry.getKey()).getName()))
                 .forEach(entry -> {
@@ -263,18 +263,21 @@ public class OblivionTechHandler {
         return buttons;
     }
 
-    private static boolean isEligibleComponentAction(Game game, String acId) {
-        if (game == null || acId == null || game.getDiscardACStatus().get(acId) != null) {
+    private static boolean isEligibleComponentAction(Game game, Player player, String acId) {
+        if (game == null
+                || acId == null
+                || game.getDiscardACStatus().get(acId) != null
+                || !ActionCardHelper.isDiscardVisible(game, player, acId)) {
             return false;
         }
         ActionCardModel actionCard = Mapper.getActionCard(acId);
         return actionCard != null && "action".equalsIgnoreCase(actionCard.getWindow());
     }
 
-    private static boolean hasEligibleComponentAction(Game game) {
+    private static boolean hasEligibleComponentAction(Game game, Player player) {
         return game != null
                 && game.getDiscardActionCards().keySet().stream()
-                        .anyMatch(acId -> isEligibleComponentAction(game, acId));
+                        .anyMatch(acId -> isEligibleComponentAction(game, player, acId));
     }
 
     private static boolean isCensured(Game game, Player player) {
