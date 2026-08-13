@@ -28,12 +28,10 @@ public class GameStats {
         actionCardPlays.add(new ActionCardPlay(acName, getTrackedPlayerId(player)));
     }
 
+    // Cancels are attributed to the newest play of that card which is not already canceled, so a
+    // player who has a copy canceled and then plays another copy only has the first one flagged.
     public boolean markLatestPlayCanceled(String acName) {
-        return markLatestPlayCanceledBefore(acName, actionCardPlays.size());
-    }
-
-    private boolean markLatestPlayCanceledBefore(String acName, int beforeIndex) {
-        for (int i = beforeIndex - 1; i >= 0; i--) {
+        for (int i = actionCardPlays.size() - 1; i >= 0; i--) {
             ActionCardPlay play = actionCardPlays.get(i);
             if (acName.equals(play.getActionCard()) && !play.isCanceled()) {
                 play.setCanceled(true);
@@ -49,51 +47,11 @@ public class GameStats {
                 .count();
     }
 
-    /**
-     * @deprecated one-off migration for saves where cancels were recorded as Sabotage plays
-     *     targeting the canceled card, and Overrule plays carried the chosen strategy card. Remove
-     *     this, {@link ActionCardPlay#getTarget()} and {@link OverruleTargetMigration} once it has
-     *     run against all games.
-     */
-    @Deprecated
-    public OverruleTargetMigration migrateTargetsToCanceledFlags() {
-        List<OverruleTargetMigration.OverruleEntry> overrulePlays = new ArrayList<>();
-        boolean changed = false;
-        for (int i = 0; i < actionCardPlays.size(); i++) {
-            ActionCardPlay play = actionCardPlays.get(i);
-            String target = play.getTarget();
-            if (target == null) {
-                continue;
-            }
-            if (OVERRULE.equals(play.getActionCard())) {
-                overrulePlays.add(new OverruleTargetMigration.OverruleEntry(play.getPlayerId(), target));
-            } else if (SABOTAGE.equals(play.getActionCard()) && !markLatestPlayCanceledBefore(target, i)) {
-                // The canceled play was never recorded (e.g. an Overrule canceled before its
-                // strategy card was chosen); stand in for it so the cancel still gets counted.
-                ActionCardPlay placeholder = new ActionCardPlay(target, null);
-                placeholder.setCanceled(true);
-                actionCardPlays.add(i, placeholder);
-                i++;
-            }
-            play.setTarget(null);
-            changed = true;
-        }
-        return new OverruleTargetMigration(overrulePlays, changed);
-    }
-
     private static String getTrackedPlayerId(Player player) {
         if (player == null) {
             return null;
         }
         return StringUtils.defaultIfBlank(player.getStatsTrackedUserID(), player.getUserID());
-    }
-
-    /**
-     * @deprecated remove along with {@link #migrateTargetsToCanceledFlags()}.
-     */
-    @Deprecated
-    public record OverruleTargetMigration(List<OverruleEntry> overrulePlays, boolean changed) {
-        public record OverruleEntry(String playerId, String strategyCard) {}
     }
 
     @EqualsAndHashCode
@@ -103,13 +61,6 @@ public class GameStats {
     public static class ActionCardPlay {
         private String actionCard;
         private String playerId;
-
-        /**
-         * @deprecated only still read by {@link GameStats#migrateTargetsToCanceledFlags()} so that
-         *     legacy saves can be converted. Remove once that migration has run against all games.
-         */
-        @Deprecated
-        private String target;
 
         @JsonInclude(JsonInclude.Include.NON_DEFAULT)
         private boolean canceled;
@@ -124,10 +75,6 @@ public class GameStats {
 
         void setCanceled(boolean canceled) {
             this.canceled = canceled;
-        }
-
-        void setTarget(String target) {
-            this.target = target;
         }
     }
 }
