@@ -1,5 +1,6 @@
 package ti4.spring.service.statistics.matchmaking.queue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameLaunchPostService;
 import ti4.service.game.CreateGameService;
+import ti4.settings.users.UserSettings;
 
 @UtilityClass
 class MatchmakingNotifier {
@@ -31,18 +33,41 @@ class MatchmakingNotifier {
         String expiryMessage = "The matchmaking service wasn't able to find you a game in the time frame you selected. "
                 + "Queue again when ready and consider being open to additional game types or longer wait times.";
         for (QueuedParty party : expired) {
-            String maxQueueTime = party.leaderSettings().getMatchmakingMaxQueueTime();
-            int maxHours = MatchmakingOptions.getHours(maxQueueTime);
-            for (MatchmakingQueueMember member : party.members()) {
-                BotLogger.info("Matchmaking queue: dropping user " + member.getUserId() + " (party "
-                        + party.party().getId() + ", tigl=" + party.party().isTigl()
-                        + ") after reaching max queue time of " + maxHours + "h.");
-            }
+            BotLogger.info(describeExpiredParty(party));
             if (party.members().size() != 1) continue;
             User user = JdaService.jda.getUserById(party.members().getFirst().getUserId());
             if (user == null) continue;
             MessageHelper.sendMessageToUser(expiryMessage, user);
         }
+    }
+
+    private static String describeExpiredParty(QueuedParty party) {
+        UserSettings settings = party.leaderSettings();
+        int maxHours = MatchmakingOptions.getHours(settings.getMatchmakingMaxQueueTime());
+        List<String> memberIds =
+                party.members().stream().map(MatchmakingQueueMember::getUserId).toList();
+        List<String> extras = new ArrayList<>();
+        if (party.party().isTigl()) {
+            extras.add("tiglRanks=" + settings.getMatchmakingTiglRanks());
+        }
+        List<String> avoidList = settings.getMatchmakingAvoidList();
+        if (avoidList != null && !avoidList.isEmpty()) {
+            extras.add("avoidList=" + avoidList);
+        }
+        String extrasText = extras.isEmpty() ? "" : ", " + String.join(", ", extras);
+        return String.format(
+                "Matchmaking queue: dropping party %d (tigl=%s, members=%s) after reaching max queue time of %dh."
+                        + " Settings: expansions=%s, playerCounts=%s, victoryPoints=%s, paces=%s, restrictions=%s%s",
+                party.party().getId(),
+                party.party().isTigl(),
+                memberIds,
+                maxHours,
+                settings.getMatchmakingExpansions(),
+                settings.getMatchmakingPlayerCounts(),
+                settings.getMatchmakingVictoryPointGoals(),
+                settings.getMatchmakingPaces(),
+                settings.getMatchmakingRestrictions(),
+                extrasText);
     }
 
     static void postMatchedGames(List<MatchedGame> gamesToCreate) {
