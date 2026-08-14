@@ -22,7 +22,7 @@ class ReengineerAcd2ButtonHandler {
     @ButtonHandler("resolveReengineer")
     public static void resolveReengineer(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        String lastDiscard = lastDiscard(game);
+        String lastDiscard = lastDiscard(game, player);
         if (lastDiscard != null) {
             String name = Mapper.getActionCard(lastDiscard).getName();
             buttons.add(Buttons.green(
@@ -43,14 +43,13 @@ class ReengineerAcd2ButtonHandler {
     @ButtonHandler("reengineerTakeDiscard")
     public static void resolveReengineerTakeDiscard(Player player, Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
-        String lastDiscard = lastDiscard(game);
+        String lastDiscard = lastDiscard(game, player);
         if (lastDiscard == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(), "There is no action card in the discard pile for _Reengineer_.");
         } else {
             String name = Mapper.getActionCard(lastDiscard).getName();
-            player.setActionCard(lastDiscard);
-            game.getDiscardActionCards().remove(lastDiscard);
+            game.pickActionCard(player.getUserID(), game.getDiscardActionCards().get(lastDiscard));
             ActionCardHelper.sendActionCardInfo(game, player);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -80,14 +79,16 @@ class ReengineerAcd2ButtonHandler {
                 buttons);
     }
 
-    private static String lastDiscard(Game game) {
+    private static String lastDiscard(Game game, Player player) {
         Map<String, Integer> discard = game.getDiscardActionCards();
         if (discard == null || discard.isEmpty()) {
             return null;
         }
+        boolean hideUnplayed = ActionCardHelper.hidesUnplayedDiscards(game, player);
         String last = null;
         for (String acID : discard.keySet()) {
-            if (game.getDiscardACStatus().get(acID) == null) {
+            if (game.getDiscardACStatus().get(acID) == null
+                    && ActionCardHelper.isDiscardVisible(game, hideUnplayed, acID)) {
                 last = acID;
             }
         }

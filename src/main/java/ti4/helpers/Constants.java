@@ -788,6 +788,7 @@ public final class Constants {
     public static final String EXPLORATION_DECKS = "exploration_decks";
     public static final String AC_DISCARDED = "action_cards_discarded";
     public static final String AC_STATUS = "action_cards_status";
+    public static final String AC_PLAYED = "action_cards_played";
     public static final String AC_PURGED = "action_cards_purged";
     public static final String SO = "secret_objectives";
     public static final String PRODUCED_UNITS = "produced_units";

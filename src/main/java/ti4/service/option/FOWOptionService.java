@@ -20,11 +20,22 @@ import ti4.service.fow.GMService;
 public class FOWOptionService {
 
     private static final Pattern FOW_OPTION_ = Pattern.compile("fowOption_");
+    private static final int BUTTONS_PER_ROW = 5;
 
     public enum FOWOptionCategory {
-        GAME,
-        VISIBILITY,
-        OTHER;
+        GAME("Game"),
+        VISIBILITY("Visibility"),
+        OTHER("Other"),
+        // Name must stay underscore-free: changeFOWOptions splits button IDs on "_" with the
+        // category as the first token, so an underscore here would break that parse.
+        PLAYERSTATS("Precise Player Stats");
+
+        @Getter
+        private final String title;
+
+        FOWOptionCategory(String title) {
+            this.title = title;
+        }
 
         static FOWOptionCategory fromString(String string) {
             for (FOWOptionCategory category : values()) {
@@ -37,7 +48,7 @@ public class FOWOptionService {
     }
 
     public enum FOWOption {
-        // Comm Options (max 5)
+        // Comm Options
         MANAGED_COMMS(FOWOptionCategory.GAME, "Managed comms", "Use managed player-to-player communication threads"),
         ALLOW_AGENDA_COMMS(
                 FOWOptionCategory.GAME,
@@ -48,25 +59,51 @@ public class FOWOptionService {
         HIDE_TOTAL_VOTES(FOWOptionCategory.GAME, "Hide total votes", "Hide total votes amount in agenda"),
         HIDE_VOTE_ORDER(FOWOptionCategory.GAME, "Hide voting order", "Hide player colors from vote order"),
 
-        // Visibility Options (max 5)
+        // Visibility Options
         BRIGHT_NOVAS(FOWOptionCategory.VISIBILITY, "Bright Novas", "Locations of Supernovas are always visible"),
         HIDE_EXPLORES(
                 FOWOptionCategory.VISIBILITY, "Hide Explore Decks", "Disables looking at explore and relic decks"),
         HIDE_MAP(FOWOptionCategory.VISIBILITY, "Hide Unexplored Map", "Hides unexplored (blue 0b) map tiles."),
         HIDE_PLAYER_INFOS(
                 FOWOptionCategory.VISIBILITY, "Hide Player Infos", "Hides anchored player info areas from the map."),
-        STATS_FROM_HS_ONLY(
+        HIDE_AC_DISCARD(
                 FOWOptionCategory.VISIBILITY,
+                "Hide AC Discard",
+                "Action card discard pile shows only cards that were played"),
+
+        // Precise Player Stats Options
+        STATS_FROM_HS_ONLY(
+                FOWOptionCategory.PLAYERSTATS,
                 "Stats from HS",
                 "Only way to see players stats is to see their Home System"),
+        HIDE_STATS_VIA_FACTION_PN(
+                FOWOptionCategory.PLAYERSTATS,
+                "Hide Stats via Faction PN",
+                "A faction-specific promissory note in your play area no longer reveals that player's stats"),
+        HIDE_STATS_VIA_ALLIANCE(
+                FOWOptionCategory.PLAYERSTATS,
+                "Hide Stats via Alliance",
+                "An Alliance card in your play area no longer reveals that player's stats"),
+        HIDE_STATS_VIA_SFTT(
+                FOWOptionCategory.PLAYERSTATS,
+                "Hide Stats via SftT",
+                "A Support for the Throne card in your play area no longer reveals that player's stats"),
+        HIDE_STATS_VIA_MAHACT_CC(
+                FOWOptionCategory.PLAYERSTATS,
+                "Hide Stats via Mahact CC",
+                "A Mahact command counter in your fleet no longer reveals that player's stats"),
 
-        // Other Options (max 5)
+        // Other Options
         HIDE_PLAYER_NAMES(
                 FOWOptionCategory.OTHER, "Hide real names", "Completely hide player Discord names on the map"),
         DISABLE_FRACTURE(
                 FOWOptionCategory.OTHER,
                 "Disable Fracture",
                 "The Fracture can never enter play. Same setting as `/game weird_game_setup no_fracture`"),
+        OPTIONAL_PILLAGABLE_TG(
+                FOWOptionCategory.OTHER,
+                "Optional Pillage-able TG",
+                "Prompt before auto-granting TG that could trigger Pillage (Stellar Genesis/Magmus, Rear Admiral Farran), even in Fog of War"),
 
         // Hidden from normal options
         FOW_PLUS(null, "FoW Plus Mode", "Hello darkness my old friend... WIP - ask Solax for details", false),
@@ -124,7 +161,7 @@ public class FOWOptionService {
 
     private static void offerFOWOptionButtons(
             ButtonInteractionEvent event, Game game, FOWOptionCategory selectedCategory) {
-        StringBuilder sb = new StringBuilder("### Change FoW " + selectedCategory + " Options\n\n");
+        StringBuilder sb = new StringBuilder("### Change FoW " + selectedCategory.getTitle() + " Options\n\n");
         if (FOWPlusService.isActive(game)) {
             sb.append("_FoW+ mode is active. Some options are forced and cannot be changed._\n\n");
         }
@@ -133,9 +170,9 @@ public class FOWOptionService {
         List<Button> categoryButtons = new ArrayList<>();
         for (FOWOptionCategory category : FOWOptionCategory.values()) {
             if (category == selectedCategory) {
-                categoryButtons.add(Buttons.gray("fowOptionCategory_" + category, category.name() + " Options"));
+                categoryButtons.add(Buttons.gray("fowOptionCategory_" + category, category.getTitle() + " Options"));
             } else {
-                categoryButtons.add(Buttons.blue("fowOptionCategory_" + category, category.name() + " Options"));
+                categoryButtons.add(Buttons.blue("fowOptionCategory_" + category, category.getTitle() + " Options"));
             }
         }
         categoryButtons.add(Buttons.gray("deleteButtons", "Done"));
@@ -167,7 +204,10 @@ public class FOWOptionService {
                                     "Enable " + option.getTitle()));
         }
 
-        rows.add(ActionRow.of(optionButtons));
+        // An ActionRow holds at most 5 buttons, and the message at most 5 rows - one of which is the category row.
+        for (int i = 0; i < optionButtons.size(); i += BUTTONS_PER_ROW) {
+            rows.add(ActionRow.of(optionButtons.subList(i, Math.min(i + BUTTONS_PER_ROW, optionButtons.size()))));
+        }
         rows.add(ActionRow.of(categoryButtons));
 
         if (event == null) {

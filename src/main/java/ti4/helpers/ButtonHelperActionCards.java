@@ -2850,10 +2850,12 @@ public final class ButtonHelperActionCards {
     public static void resolveReverse(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String acName = buttonID.replace("resolveReverse_", "");
         List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());
+        boolean hideUnplayed = ActionCardHelper.hidesUnplayedDiscards(game, player);
         for (String acStringID : acStrings) {
             ActionCardModel actionCard = Mapper.getActionCard(acStringID);
             String actionCardTitle = actionCard.getName();
-            if (acName.equalsIgnoreCase(actionCardTitle)) {
+            if (acName.equalsIgnoreCase(actionCardTitle)
+                    && ActionCardHelper.isDiscardVisible(game, hideUnplayed, acStringID)) {
                 boolean picked = game.pickActionCard(
                         player.getUserID(), game.getDiscardActionCards().get(acStringID));
                 if (!picked) {

@@ -339,6 +339,7 @@ class GameLoadService {
                 case Constants.MANDATES -> game.setMandates(getCardList(info));
                 case Constants.AC_DISCARDED -> game.setDiscardActionCards(getParsedCards(info));
                 case Constants.AC_STATUS -> game.setDiscardActionCardStatus(getParsedCardStatus(info));
+                case Constants.AC_PLAYED -> game.setPlayedActionCards(new LinkedHashSet<>(getCardList(info)));
                 case Constants.AC_PURGED ->
                     game.setPurgedActionCards(
                             getParsedCards(info).keySet().stream().toList()); // @Deprecated
