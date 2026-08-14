@@ -117,6 +117,7 @@
         "phase": "Agenda",
         "window": "At the start of the agenda phase",
         "text": "Select 1 agenda in the discard pile. Players immediately vote on that agenda as if it had just been revealed.",
+        "notes": "Pre-set this card.",
         "source": "theodisi"
     },
     {

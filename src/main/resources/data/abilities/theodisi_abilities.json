@@ -142,7 +142,7 @@
         "id": "hive_echo",
         "name": "Hive Echo",
         "faction": "xytheris",
-        "permanentEffect": "During SPACE CANNON OFFENSE, a unit with SPACE CANNON up to 2 systems away may use it against units in the active system. During BOMBARDMENT and ANTI-FIGHTER BARRAGE steps, if the active system contains 1 of your ships, a unit with that unit ability up to 2 systems away may use it against units in the active system.",
+        "permanentEffect": "Whenever you would use a unit ability in a system that contains your ships other than during SPACE CANNON DEFENSE, you may use the unit ability of 1 unit with that unit ability up to 2 systems away as if it were in the active system.",
         "source": "theodisi"
     },
     {
