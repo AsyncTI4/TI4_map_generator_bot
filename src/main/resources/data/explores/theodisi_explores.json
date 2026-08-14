@@ -120,7 +120,7 @@
         "name": "Diplomatic Boon",
         "type": "Cultural",
         "resolution": "Instant",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Exhaust this card and choose 1 non-home planet you control other than Mecatol Rex in a system that contains 1 of your ships. Place 1 infantry or fighter in that system up to the influence value of that planet.",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Exhaust this card and choose 1 non-home planet you control other than Mecatol Rex in a system that contains 1 or more of your ships. Place any combination of infantry or fighters in that system up to the influence value of that planet.",
         "source": "theodisi"
     },
     {
