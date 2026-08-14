@@ -30,6 +30,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
+import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
@@ -453,8 +454,16 @@ final class FowSetupFactionService {
         String userId = event.getModalId().replace("fowSetupPositionResolve_", "");
         Player player = game.getPlayer(userId);
         if (player == null) return;
-        startColorPick(
-                event, game, player, event.getValue("position").getAsString().trim());
+        String position = event.getValue("position").getAsString().trim();
+        // Validate up front - PlayerSetupService.setupPlayer already assigns faction/color and clears the
+        // player's planets/techs/leaders before it checks position validity, so an invalid position here would
+        // leave the player half-configured instead of just failing cleanly.
+        if (!PositionMapper.isTilePositionValid(position)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "Tile position `" + position + "` is not valid. Nothing was changed.");
+            return;
+        }
+        startColorPick(event, game, player, position);
     }
 
     private static List<String> availableHomeSystemPositions(Game game) {
