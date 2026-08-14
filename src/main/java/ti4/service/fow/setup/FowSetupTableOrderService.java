@@ -37,8 +37,8 @@ final class FowSetupTableOrderService {
             sb.append('\n');
         }
         sb.append("\n**a. Manual** - pick players one at a time in seat order.\n");
-        sb.append("**b. Dice** - configure dice count/sides; players roll the button posted to the main ")
-                .append("channel; then resolve.\n");
+        sb.append("**b. Dice** - configure dice count/sides; a roll button gets posted to each player's ")
+                .append("own private channel so nobody sees anyone else's roll; then resolve.\n");
 
         buttons.add(Buttons.blue("fowSetupOrderManualStart", "Start Manual Order"));
         buttons.add(Buttons.blue("fowSetupDiceConfig~MDL", "Configure Dice"));
@@ -149,10 +149,15 @@ final class FowSetupTableOrderService {
         state.getDiceRolls().clear();
         FowSetupWizardService.saveState(game, state);
 
-        MessageHelper.sendMessageToChannelWithButton(
-                game.getMainGameChannel(),
-                "Roll for table order! Everyone click below to roll " + count + "d" + sides + ".",
-                Buttons.green("fowSetupDiceRoll", "Roll for Table Order"));
+        // One roll button per player's own channel - nobody sees anyone else's roll. If a player's private
+        // channel isn't linked, getCorrectChannel() falls back to the GM room instead of failing silently.
+        for (Player player : game.getRealPlayers()) {
+            MessageHelper.sendMessageToChannelWithButton(
+                    player.getCorrectChannel(),
+                    "Roll for table order! Click below to roll " + count + "d" + sides
+                            + ". Only you will see your result.",
+                    Buttons.green("fowSetupDiceRoll", "Roll for Table Order"));
+        }
         FowSetupWizardService.openOrRefresh(game);
     }
 
@@ -160,17 +165,18 @@ final class FowSetupTableOrderService {
     static void rollDice(ButtonInteractionEvent event, Game game) {
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         if (state.getDiceCount() == null || state.getDiceSides() == null) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Dice haven't been configured yet.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Dice haven't been configured yet.");
             return;
         }
         Player player = game.getPlayer(event.getUser().getId());
         if (player == null || !player.isRealPlayer()) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Only real players in this game can roll.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Only real players in this game can roll.");
             return;
         }
         if (state.getDiceRolls().containsKey(player.getUserID())) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "You already rolled a " + state.getDiceRolls().get(player.getUserID()) + ".");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "You already rolled a " + state.getDiceRolls().get(player.getUserID()) + ".");
             return;
         }
 
@@ -181,9 +187,7 @@ final class FowSetupTableOrderService {
         state.getDiceRolls().put(player.getUserID(), total);
         FowSetupWizardService.saveState(game, state);
 
-        MessageHelper.sendEphemeralMessageToEventChannel(event, "You rolled a **" + total + "**.");
-        MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(), player.getUserName() + " rolled **" + total + "**.");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You rolled a **" + total + "**.");
     }
 
     @ButtonHandler("fowSetupOrderResolveAsc")

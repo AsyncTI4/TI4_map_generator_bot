@@ -493,7 +493,7 @@ public class FrankenDrazDraft extends FrankenDraft {
                 || hand.getCategoryCount(DraftCategory.BREAKTHROUGH) > 0;
     }
 
-    private static List<FactionModel> getDraftableFactionsForGame(Game game) {
+    public static List<FactionModel> getDraftableFactionsForGame(Game game) {
         Map<String, FactionModel> factions = new LinkedHashMap<>();
         for (FactionModel faction : getAllFrankenLegalFactions(game)) {
             factions.put(faction.getAlias(), faction);

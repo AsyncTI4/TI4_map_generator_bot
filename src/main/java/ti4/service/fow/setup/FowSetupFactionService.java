@@ -55,7 +55,7 @@ final class FowSetupFactionService {
                 .append("you want), then assign home positions.\n\n");
         for (Player player : game.getPlayers().values()) {
             String effective = effectiveFaction(state, player);
-            String pos = player.getHomeSystemPosition();
+            String pos = effectivePosition(player);
             List<String> dealt = state.getDealtFactionChoices().get(player.getUserID());
             sb.append("> ")
                     .append(player.getUserName())
@@ -284,15 +284,28 @@ final class FowSetupFactionService {
     }
 
     /** Treats blank and the literal string "null" (a text-save-format quirk on unset fields) as unset. */
-    private static boolean isSetFaction(String faction) {
-        return StringUtils.isNotBlank(faction) && !"null".equals(faction);
+    private static boolean isSetValue(String value) {
+        return StringUtils.isNotBlank(value) && !"null".equals(value);
     }
 
     private static String effectiveFaction(FowSetupWizardState state, Player player) {
         String pending = state.getPendingFactionByUserId().get(player.getUserID());
-        if (isSetFaction(pending)) return pending;
+        if (isSetValue(pending)) return pending;
         String faction = player.getFaction();
-        return isSetFaction(faction) ? faction : null;
+        return isSetValue(faction) ? faction : null;
+    }
+
+    /**
+     * player.getHomeSystemPosition() is only set for Ghost/Crimson's extra tile (or Franken temp spots) -
+     * for a normal PlayerSetupService.setupPlayer() call the real assigned position lives in
+     * getPlayerStatsAnchorPosition() instead (mirrors the precedence Player.getHomeSystemTile() itself
+     * uses). Both fields return the literal string "null" when unset rather than real null.
+     */
+    private static String effectivePosition(Player player) {
+        String override = player.getHomeSystemPosition();
+        if (isSetValue(override)) return override;
+        String anchor = player.getPlayerStatsAnchorPosition();
+        return isSetValue(anchor) ? anchor : null;
     }
 
     // --- Manual faction assignment: pick player, then a real dropdown of eligible factions ---
@@ -375,7 +388,7 @@ final class FowSetupFactionService {
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         List<Button> playerButtons = new ArrayList<>();
         for (Player player : game.getPlayers().values()) {
-            if (StringUtils.isBlank(effectiveFaction(state, player)) || player.getHomeSystemPosition() != null) {
+            if (StringUtils.isBlank(effectiveFaction(state, player)) || effectivePosition(player) != null) {
                 continue;
             }
             playerButtons.add(
@@ -393,9 +406,35 @@ final class FowSetupFactionService {
     }
 
     @ButtonHandler("fowSetupPositionPlayer_")
-    static void openPositionModal(ButtonInteractionEvent event, Game game, String buttonID) {
+    static void pickPositionForPlayer(ButtonInteractionEvent event, Game game, String buttonID) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
         String userId = buttonID.replace("fowSetupPositionPlayer_", "").replace("~MDL", "");
+        Player player = game.getPlayer(userId);
+        if (player == null) return;
+
+        List<Button> positionButtons = new ArrayList<>();
+        for (String position : availableHomeSystemPositions(game)) {
+            positionButtons.add(Buttons.gray("fowSetupPositionPick_" + userId + "_" + position, position));
+        }
+        positionButtons.add(Buttons.blue("fowSetupPositionTypeCustom_" + userId + "~MDL", "Type a Custom Position"));
+        positionButtons.add(Buttons.CANCEL);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), "Which position for " + player.getUserName() + "?", positionButtons);
+    }
+
+    @ButtonHandler("fowSetupPositionPick_")
+    static void resolvePositionPick(ButtonInteractionEvent event, Game game, String buttonID) {
+        if (!FowSetupWizardService.requireGM(event, game)) return;
+        String[] parts = buttonID.replace("fowSetupPositionPick_", "").split("_", 2);
+        Player player = game.getPlayer(parts[0]);
+        if (player == null) return;
+        startColorPick(event, game, player, parts[1]);
+    }
+
+    @ButtonHandler("fowSetupPositionTypeCustom_")
+    static void openPositionModal(ButtonInteractionEvent event, Game game, String buttonID) {
+        if (!FowSetupWizardService.requireGM(event, game)) return;
+        String userId = buttonID.replace("fowSetupPositionTypeCustom_", "").replace("~MDL", "");
         Player player = game.getPlayer(userId);
         if (player == null) return;
 
@@ -414,7 +453,29 @@ final class FowSetupFactionService {
         String userId = event.getModalId().replace("fowSetupPositionResolve_", "");
         Player player = game.getPlayer(userId);
         if (player == null) return;
+        startColorPick(
+                event, game, player, event.getValue("position").getAsString().trim());
+    }
 
+    private static List<String> availableHomeSystemPositions(Game game) {
+        List<String> takenPositions = new ArrayList<>();
+        for (Player player : game.getPlayers().values()) {
+            String pos = effectivePosition(player);
+            if (pos != null) {
+                takenPositions.add(pos);
+            }
+        }
+        List<String> availablePositions = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.isHomeSystem() && !takenPositions.contains(tile.getPosition())) {
+                availablePositions.add(tile.getPosition());
+            }
+        }
+        return availablePositions;
+    }
+
+    private static void startColorPick(GenericInteractionCreateEvent event, Game game, Player player, String position) {
+        String userId = player.getUserID();
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         String faction = effectiveFaction(state, player);
         if (StringUtils.isBlank(faction)) {
@@ -422,7 +483,6 @@ final class FowSetupFactionService {
                     event.getMessageChannel(), player.getUserName() + " has no faction yet.");
             return;
         }
-        String position = event.getValue("position").getAsString().trim();
         state.getPendingPositionByUserId().put(userId, position);
         FowSetupWizardService.saveState(game, state);
 
@@ -432,16 +492,19 @@ final class FowSetupFactionService {
             finishPositionAssignment(event, game, player, faction, position, null);
             return;
         }
-        StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("fowSetupColorSelect_" + userId);
-        for (ColorModel color : unusedColors) {
-            menuBuilder.addOptions(SelectOption.of(StringUtils.capitalize(color.getName()), color.getName())
-                    .withEmoji(ColorEmojis.getColorEmoji(color.getName()).asEmoji()));
+        // Discord select menus cap out at 25 options - this codebase's color palette is well over that.
+        for (List<ColorModel> page : ListUtils.partition(unusedColors, 25)) {
+            StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("fowSetupColorSelect_" + userId);
+            for (ColorModel color : page) {
+                menuBuilder.addOptions(SelectOption.of(StringUtils.capitalize(color.getName()), color.getName())
+                        .withEmoji(ColorEmojis.getColorEmoji(color.getName()).asEmoji()));
+            }
+            menuBuilder.setRequiredRange(1, 1);
+            event.getMessageChannel()
+                    .sendMessage("Pick a color for " + player.getUserName() + ":")
+                    .addComponents(ActionRow.of(menuBuilder.build()))
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
-        menuBuilder.setRequiredRange(1, 1);
-        event.getMessageChannel()
-                .sendMessage("Pick a color for " + player.getUserName() + ":")
-                .addComponents(ActionRow.of(menuBuilder.build()))
-                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @SelectionHandler("fowSetupColorSelect_")
@@ -489,7 +552,7 @@ final class FowSetupFactionService {
 
         List<Player> needsPosition = new ArrayList<>();
         for (Player player : game.getPlayers().values()) {
-            if (StringUtils.isNotBlank(effectiveFaction(state, player)) && player.getHomeSystemPosition() == null) {
+            if (StringUtils.isNotBlank(effectiveFaction(state, player)) && effectivePosition(player) == null) {
                 needsPosition.add(player);
             }
         }
@@ -498,18 +561,7 @@ final class FowSetupFactionService {
             return;
         }
 
-        List<String> takenPositions = new ArrayList<>();
-        for (Player player : game.getPlayers().values()) {
-            if (player.getHomeSystemPosition() != null) {
-                takenPositions.add(player.getHomeSystemPosition());
-            }
-        }
-        List<String> availablePositions = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (tile.isHomeSystem() && !takenPositions.contains(tile.getPosition())) {
-                availablePositions.add(tile.getPosition());
-            }
-        }
+        List<String> availablePositions = new ArrayList<>(availableHomeSystemPositions(game));
         Collections.shuffle(availablePositions);
 
         if (availablePositions.size() < needsPosition.size()) {
