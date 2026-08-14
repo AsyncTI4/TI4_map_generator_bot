@@ -5,6 +5,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. When you would exhaust a planet you control you may exhaust this card instead.",
+        "flavorText": "*\"If you'll just sign here the deal will be done. I'm sure you're familiar with the terms and conditions but just in case...\"*",
         "source": "theodisi"
     },
     {
@@ -13,6 +14,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "Place 2 destroyers and 2 infantry from your reinforcements in this system.",
+        "flavorText": "*\"The Veterans were happy to take up arms when they realized who the target was.\"*",
         "source": "theodisi"
     },
     {
@@ -21,6 +23,7 @@
         "type": "Industrial",
         "resolution": "Attach",
         "text": "ATTACH: When you exhaust this planet, you may replace 1 non-fighter ship you control with 1 ship from your reinforcements with a cost up to 1 more than that returned ship.",
+        "flavorText": "*\"I Likely wouldn't have believed it if I hadn't seen it with my own eyes but one second I'm tailing a destroyer and the next I'm getting left in the dust by a crusier class.\"*",
         "attachmentId": "polymorphism",
         "source": "theodisi"
     },
@@ -30,6 +33,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "Gain 1 commodity or spend 1 commodity or trade good to move 1 of your ships from this system into an adjacent system that contains no other player's ships.",
+        "flavorText": "*\"The fleets moved with speed and grace and most importantly without any need to stop and refuel.\"*",
         "source": "theodisi"
     },
     {
@@ -54,6 +58,7 @@
         "type": "Hazardous",
         "resolution": "Instant",
         "text": "Place this card face up in your play area. This card may be exchnaged as part of a transaction. When you exhaust a planet you may exhaust this card to combine the values of that planet's resources and influence. Treat the combined value as if it were both resources and influence of that planet.",
+        "flavorText": "*With no profit motive, the Myrr was able to take its time removing the resources of the planet without disturbing its natural beauty and ecosystems.*",
         "source": "theodisi"
     },
     {
@@ -63,6 +68,7 @@
         "resolution": "Token",
         "text": "Place the Lost Station token in this system. Gain the Lost Station station card and ready it. Then, purge this card.",
         "attachmentId": "loststation",
+        "flavorText": "*Before the Ponthous outfit lay a barren Throne station. No king, no choas.*",
         "source": "theodisi"
     },
     {
@@ -72,6 +78,7 @@
         "resolution": "Attach",
         "text": "ATTACH: At the end of your turn if this planet has no neutral units on it, place 1 infantry from your reinforcements, 1 neutral mech, and 2 neutral infantry on this planet. Those neutral units enter coexistence. When a player wins a combat against neutral units on this planet, they main gain 1 command token.",
         "attachmentId": "battleworld",
+        "flavorText": "*The crowd roared as the Arcanum grandmaster was struck down by the Xytheris soldier.*",
         "source": "theodisi"
     },
     {
@@ -80,6 +87,7 @@
         "type": "Hazardous",
         "resolution": "Instant",
         "text": "If you have at least 1 mech on this planet, or if oyu remove 1 infantry from this planet, this planet gains PRODUCTION 3 as if it were a unit until the end of this turn or place 1 mech on this planet.",
+        "flavorText": "*\"The master's dictate could potnetially be interpretted in such a way as to allow me to lend you a hand.\" - Orun*",
         "source": "theodisi"
     },
     {
@@ -96,6 +104,7 @@
         "type": "Cultural",
         "resolution": "Instant",
         "text": "Gain 2 trade goods, or spend 2 trade goods to draw 1 secret objective.",
+        "flavorText": "*Synod politicians attend rigorous athletics courses to ensure they're capable of standing in place for days on end for a Galactic Senate filibuster.*",
         "source": "theodisi"
     },
     {
@@ -104,6 +113,7 @@
         "type": "Cultural",
         "resolution": "Instant",
         "text": "You may spend up to 2 influence to ready that many non-home planets.",
+        "flavorText": "*The Kairn navigated the newfound planet's surface like it had seen it a thousand times.*",
         "source": "theodisi"
     },
     {
@@ -120,7 +130,8 @@
         "name": "Diplomatic Boon",
         "type": "Cultural",
         "resolution": "Instant",
-        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Exhaust this card and choose 1 non-home planet you control other than Mecatol Rex in a system that contains 1 or more of your ships. Place any combination of infantry or fighters in that system up to the influence value of that planet.",
+        "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Exhaust this card and choose 1 non-home planet you control other than Mecatol Rex in a system that contains 1 of your ships. Place 1 infantry or fighter in that system up to the influence value of that planet.",
+        "flavorText": "*\"Not to worry, we'll be providing a Verydith security detail to ensure safety of all politicians involved.\"*",
         "source": "theodisi"
     },
     {
@@ -137,6 +148,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Gain your breakthrough or research 1 technology with no prerequisites in a color that matches 1 of your synergy colors. If your breakthrough has no synergy colors gain 2 command tokens instead.",
+        "flavorText": "*\"Let's play to our strengths, no need to fix what isn't broken.\"*",
         "source": "theodisi"
     },
     {
@@ -145,6 +157,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "If the fracture is not in play, put it in play. Place 1 ingress token in this system or gain 1 command token and draw 1 action card.",
+        "flavorText": "*From the newly opened wormhole emerged the Throne of Wrath. An omen of doom for all who saw it.*",
         "source": "theodisi"
     },
     {
@@ -153,6 +166,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. At the end of your turn you may exhaust this card to explore 2 planets you control.",
+        "flavorText": "*What Nothi found in the core of the Veydra would go on to reshape the future of the Nihlus system.*",
         "source": "theodisi"
     },
     {
@@ -161,6 +175,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Remove 1 command token form this system, if able, and gain 1 command token. Then, place 1 frontier token in your home system.",
+        "flavorText": "*The dark energy scanners which were ringing violently not moments prior had suddenly went silent and began repinging back Nihlus system.*",
         "source": "theodisi"
     },
     {
@@ -169,6 +184,7 @@
         "type": "Hazardous",
         "resolution": "Instant",
         "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
+        "flavorText": "*Test 31: Introducing foreign DNA into Kryxos Broodlings seems to have a profound effect on the expressed traits and physical characteristics. Further analysis into the viability of potential enhancements requested by the High Evolutionary.*",
         "source": "theodisi"
     },
     {
@@ -177,6 +193,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
+        "flavorText": "*Test 4081: Tests with bipdel species yield the most consistent results. Enhanced intelligence and adopting the strengths of their genetic contributors.*",
         "source": "theodisi"
     },
     {
@@ -185,6 +202,7 @@
         "type": "Cultural",
         "resolution": "Instant",
         "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
+        "flavorText": "*Test 17413: Integration with Xytheris DNA alters Broodling brain chemistry making them more subservient to \"Matriarch\" figures, defending their chosen mothers with their life.*",
         "source": "theodisi"
     },
     {
@@ -193,6 +211,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Place this card face up in your play area. This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Mutagen cards and reveal 1 random, unused, non-unit Faction Technology, Agent, and Commander. Choose 1 to gain, readied and unlocked, and return the rest.",
+        "flavorText": "*Test 203411: The chaotic forces of the Throne of Pride's genetic material have been deemed entirely unfit for integration with Kryxos broods. Chaotic and unpredictable results make finding any meaningful results a futile effort.*",
         "source": "theodisi"
     }
 ]
