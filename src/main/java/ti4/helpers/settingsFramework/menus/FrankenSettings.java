@@ -381,6 +381,9 @@ public class FrankenSettings extends SettingsMenu {
         Map<String, String> options = new LinkedHashMap<>();
         options.put(STANDARD_DRAFT, STANDARD_DRAFT);
         for (FrankenDraftMode mode : FrankenDraftMode.values()) {
+            // Inaugural Splice is only meant to be triggered automatically as a follow-up to the Twilight's
+            // Fall milty/nucleus draft (see ButtonHelperTwilightsFall.startInauguralSplice), not picked directly.
+            if (mode == FrankenDraftMode.INAUGURALSPLICE) continue;
             options.put(mode.toString(), mode.toString());
         }
         return options;

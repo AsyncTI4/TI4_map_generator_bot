@@ -93,16 +93,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
 
         Boolean tfMode = event.getOption(Constants.TWILIGHTS_FALL_MODE, null, OptionMapping::getAsBoolean);
         if (tfMode != null) {
-            game.setTwilightsFallMode(tfMode);
-            if (game.isTwilightsFallMode()) {
-                String msg = "Use the buttons to enable or disable various homebrew options:";
-                List<ContainerChildComponent> sections = TEOptionService.getTFHomebrewInfo(game);
-                MessageV2Builder builder = new MessageV2Builder(game.getMainGameChannel());
-                builder.append(msg);
-                builder.append(Container.of(sections));
-                builder.append(Buttons.DONE_DELETE_BUTTONS);
-                builder.send();
-            }
+            applyTwilightsFallMode(game, tfMode);
         }
 
         if (!setGameMode(event, game)) {
@@ -184,19 +175,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
 
         Boolean thunderMode = event.getOption(Constants.THUNDERS_EDGE_MODE, null, OptionMapping::getAsBoolean);
         if (thunderMode != null) {
-            game.setThundersEdge(thunderMode);
-            if (thunderMode && !game.getActionCards().contains("brilliance")) {
-                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), "The Thunder's Edge action card deck has been set.");
-            }
-            if (thunderMode && !game.getAllRelics().contains("thesilverflame")) {
-                game.addRelicToGame("quantumcore");
-                game.addRelicToGame("thesilverflame");
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        "_The Silver Flame_ and _The Quantumcore_ relics have been added back to the relic deck.");
-            }
+            applyThundersEdgeMode(event, game, thunderMode);
         }
 
         Boolean riftsetMode = event.getOption(FOWOption.RIFTSET_MODE.toString(), null, OptionMapping::getAsBoolean);
@@ -207,6 +186,37 @@ public class WeirdGameSetup extends GameStateSubcommand {
         Boolean fowPlus = event.getOption(FOWOption.FOW_PLUS.toString(), null, OptionMapping::getAsBoolean);
         if (fowPlus != null && game.isFowMode()) {
             FOWPlusService.setActive(game, fowPlus);
+        }
+    }
+
+    /** Extracted so non-slash-command callers (e.g. the FoW setup wizard) can toggle Twilight's Fall mode. */
+    public static void applyTwilightsFallMode(Game game, boolean enable) {
+        game.setTwilightsFallMode(enable);
+        if (game.isTwilightsFallMode()) {
+            String msg = "Use the buttons to enable or disable various homebrew options:";
+            List<ContainerChildComponent> sections = TEOptionService.getTFHomebrewInfo(game);
+            MessageV2Builder builder = new MessageV2Builder(game.getMainGameChannel());
+            builder.append(msg);
+            builder.append(Container.of(sections));
+            builder.append(Buttons.DONE_DELETE_BUTTONS);
+            builder.send();
+        }
+    }
+
+    /** Extracted so non-slash-command callers (e.g. the FoW setup wizard) can toggle Thunder's Edge mode. */
+    public static void applyThundersEdgeMode(GenericInteractionCreateEvent event, Game game, boolean enable) {
+        game.setThundersEdge(enable);
+        if (enable && !game.getActionCards().contains("brilliance")) {
+            game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "The Thunder's Edge action card deck has been set.");
+        }
+        if (enable && !game.getAllRelics().contains("thesilverflame")) {
+            game.addRelicToGame("quantumcore");
+            game.addRelicToGame("thesilverflame");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "_The Silver Flame_ and _The Quantumcore_ relics have been added back to the relic deck.");
         }
     }
 

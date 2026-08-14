@@ -10,6 +10,7 @@ public class PoweredOverdraftFrankenDraft extends FrankenDraft {
 
     @Override
     public int getItemLimitForCategory(DraftCategory category) {
+        if (isFowExcludedCategory(category)) return 0;
         return switch (category) {
             case ABILITY -> 4;
             case TECH, BLUETILE -> 3;
