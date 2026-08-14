@@ -28,10 +28,16 @@ class MatchmakingNotifier {
 
     static void notifyExpired(List<QueuedParty> expired) {
         if (expired.isEmpty()) return;
-        BotLogger.info("Expiring " + expired.size() + " matchmaking parties.");
         String expiryMessage = "The matchmaking service wasn't able to find you a game in the time frame you selected. "
                 + "Queue again when ready and consider being open to additional game types or longer wait times.";
         for (QueuedParty party : expired) {
+            String maxQueueTime = party.leaderSettings().getMatchmakingMaxQueueTime();
+            int maxHours = MatchmakingOptions.getHours(maxQueueTime);
+            for (MatchmakingQueueMember member : party.members()) {
+                BotLogger.info("Matchmaking queue: dropping user " + member.getUserId() + " (party "
+                        + party.party().getId() + ", tigl=" + party.party().isTigl()
+                        + ") after reaching max queue time of " + maxHours + "h.");
+            }
             if (party.members().size() != 1) continue;
             User user = JdaService.jda.getUserById(party.members().getFirst().getUserId());
             if (user == null) continue;
