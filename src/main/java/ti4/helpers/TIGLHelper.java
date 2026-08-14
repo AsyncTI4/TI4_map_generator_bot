@@ -247,10 +247,6 @@ public final class TIGLHelper {
                 .toList();
     }
 
-    /**
-     * Filters standard-ladder rank display names to those at or below the user's current TIGL rank,
-     * so a searcher cannot pull in players ranked above them.
-     */
     public static List<String> filterStandardTiglRankOptionsAtOrBelow(User user, List<String> options) {
         int maxIndex = getUsersHighestTIGLRank(user, false).getIndex();
         return options.stream()
