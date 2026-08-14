@@ -848,27 +848,18 @@ public final class ButtonHelperTwilightsFall {
                     Mapper.getTech(cardID).getRepresentationEmbed());
             triggerYellowUnits(game, player);
         } else {
-            if (game.getStoredValue("savedSpliceCards").contains(cardID + "_")) {
-                game.setStoredValue(
-                        "savedSpliceCards",
-                        game.getStoredValue("savedSpliceCards").replace(cardID + "_", ""));
-            } else {
-                if (game.getStoredValue("savedSpliceCards").contains("_" + cardID + "_")) {
-                    game.setStoredValue(
-                            "savedSpliceCards",
-                            game.getStoredValue("savedSpliceCards").replace("_" + cardID + "_", "_"));
+            String savedSpliceCards = "";
+            for (String card : game.getStoredValue("savedSpliceCards").split("_")) {
+                if (card.isEmpty() || card.equalsIgnoreCase(cardID)) {
+                    continue;
+                }
+                if (savedSpliceCards.isEmpty()) {
+                    savedSpliceCards = card;
                 } else {
-                    if (game.getStoredValue("savedSpliceCards").contains("_" + cardID)) {
-                        game.setStoredValue(
-                                "savedSpliceCards",
-                                game.getStoredValue("savedSpliceCards").replace("_" + cardID, ""));
-                    } else {
-                        game.setStoredValue(
-                                "savedSpliceCards",
-                                game.getStoredValue("savedSpliceCards").replace(cardID, ""));
-                    }
+                    savedSpliceCards = savedSpliceCards + "_" + card;
                 }
             }
+            game.setStoredValue("savedSpliceCards", savedSpliceCards);
             if (remove) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),

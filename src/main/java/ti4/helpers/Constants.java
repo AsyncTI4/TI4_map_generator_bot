@@ -1351,6 +1351,7 @@ public final class Constants {
     public static final String RAPID_MOBILIZATION_MODE = "rapid_mobilization_mode";
     public static final String MONUMENTS_TO_THE_AGES_MODE = "monuments_to_the_ages_mode";
     public static final String COSMIC_PHENOMENAE_MODE = "cosmic_phenomenae_mode";
+    public static final String COSMIC_CONVERGENCE_MODE = "cosmic_convergence_mode";
     public static final String WEIRD_WORMHOLES_MODE = "weird_wormholes_mode";
     public static final String NO_FRACTURE = "no_fracture";
     public static final String CALL_OF_THE_VOID_MODE = "call_of_the_void_mode";

@@ -23,8 +23,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veryd
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -56,6 +58,7 @@ import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.SpeakerService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
@@ -454,6 +457,64 @@ public class PlayStrategyCardService {
                 conclusionButtons.add(Buttons.red(
                         player.factionButtonChecker() + "fleetLogWhenAllReactedTo_" + scToPlay,
                         "Use Fleet Logistics When All Have Reacted"));
+            }
+        }
+
+        if (scToPlay == 2 && "evenfall_sc".equalsIgnoreCase(game.getScSetID())) {
+            for (String planet : player.getPlanets()) {
+                Tile tile = game.getTileFromPlanet(planet);
+                Planet uH = game.getUnitHolderFromPlanet(planet);
+                if (tile != null && uH != null && uH.isLegendary()) {
+                    List<Button> buttons = new ArrayList<>();
+                    for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                        buttons.add(Buttons.gray(
+                                player.getFactionCheckerPrefix() + "signalJammingStep4_" + p2.getFaction() + "_"
+                                        + tile.getPosition(),
+                                p2.getFactionNameOrColor()));
+                    }
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation() + " choose whose command counter should go in "
+                                    + tile.getRepresentationForButtons(),
+                            buttons);
+                }
+            }
+        }
+
+        if (scToPlay == 4
+                && "evenfall_sc".equalsIgnoreCase(game.getScSetID())
+                && ButtonHelper.doesPlayerControlRexOrOpponentHS(player, game)) {
+            String warfareDone2 = player.getRepresentationUnfogged()
+                    + ", a mech and 3 infantry have been added to every home system planet you own and rex.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), warfareDone2);
+            for (Tile tile : game.getTileMap().values()) {
+                boolean control = false;
+                if (tile.isHomeSystem(game)) {
+                    for (UnitHolder planet : tile.getPlanetUnitHolders()) {
+                        if (player.getPlanets().contains(planet.getName())) {
+                            AddUnitService.addUnits(
+                                    event,
+                                    tile,
+                                    game,
+                                    player.getColor(),
+                                    "3 inf " + planet.getName() + ", mech " + planet.getName());
+                        }
+                    }
+                }
+                if (tile.isMecatol(game)) {
+                    for (UnitHolder planet : tile.getPlanetUnitHolders()) {
+                        if (player.getPlanets().contains(planet.getName())
+                                && !"avernus".equalsIgnoreCase(planet.getName())) {
+                            AddUnitService.addUnits(
+                                    event,
+                                    tile,
+                                    game,
+                                    player.getColor(),
+                                    "3 inf " + planet.getName() + ", mech " + planet.getName());
+                        }
+                    }
+                }
+                if (control) {}
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(

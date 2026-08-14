@@ -316,11 +316,11 @@ public class CreateGameService {
         String expMsg = """
                 ## Which expansion are you using for this game? (Required)
                 -# This will adjust available components accordingly. To elaborate on the options:
-                > **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, action cards, or The Fracture. This mode has the new relics, finalized Codex cards (except Xxcha hero), new tiles, and new Strategy Cards. It is the default if you do not press any of these buttons.
+                > **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, action cards, or The Fracture. This mode has the new relics, finalized Codex cards (except Xxcha hero), new tiles, and new Strategy Cards.
                 > **Old PoK** - Use only components from Prophecy of Kings expansion + Codicies 1-4.5
-                > **Thunder's Edge + New PoK** - Use components from both expansions, including all mechanics from Thunder's Edge.\
+                > **Thunder's Edge + New PoK** - Use components from both expansions, including all mechanics from Thunder's Edge. It is the default if you do not press any of these buttons.\
 
-                -# Please realize that these are broad overviews and that some small components may not fit perfectly into these categories.""";
+                -# Please realize that these are broad overviews and that some small components may not fit perfectly into these categories. """;
         MessageHelper.sendMessageToChannelWithButtons(actionsChannel, expMsg, buttons);
     }
 

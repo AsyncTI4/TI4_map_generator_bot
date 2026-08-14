@@ -943,6 +943,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("Monuments to the Ages", isMonumentToTheAgesMode());
         gameModes.put("Weird Wormholes", isWeirdWormholesMode());
         gameModes.put("Cosmic Phenomenae", isCosmicPhenomenaeMode());
+        gameModes.put("Cosmic Convergence", isCosmicConvergenceMode());
         gameModes.put("Wild wild Galaxy", isWildWildGalaxyMode());
         gameModes.put("Feast or Famine", isFeastOrFamineMode());
         gameModes.put("Zealous Orthodoxy", isZealousOrthodoxyMode());

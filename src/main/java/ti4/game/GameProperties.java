@@ -47,7 +47,7 @@ public class GameProperties {
     private @ExportableField boolean replacementMade;
 
     // Deck IDs
-    private @ExportableField String acDeckID = "action_cards_pok";
+    private @ExportableField String acDeckID = "action_cards_te";
     private @ExportableField String soDeckID = "secret_objectives_pok";
     private @ExportableField String stage1PublicDeckID = "public_stage_1_objectives_pok";
     private @ExportableField String stage2PublicDeckID = "public_stage_2_objectives_pok";
@@ -122,7 +122,7 @@ public class GameProperties {
 
     // Game modes / homebrew flags
     private @ExportableField boolean baseGameMode; // TODO: Make this obsolete
-    private @ExportableField boolean thundersEdge;
+    private @ExportableField boolean thundersEdge = true;
     private @ExportableField boolean twilightsFallMode;
     private @ExportableField boolean prophecyOfKings = true;
     private @ExportableField boolean ageOfExplorationMode;
@@ -137,6 +137,7 @@ public class GameProperties {
     private @ExportableField boolean culturalExchangeProgramMode;
     private @ExportableField boolean conventionsOfWarAbandonedMode;
     private @ExportableField boolean rapidMobilizationMode;
+    private @ExportableField boolean cosmicConvergenceMode;
     private @ExportableField boolean weirdWormholesMode;
     private @ExportableField boolean noFractureMode;
     private @ExportableField boolean callOfTheVoidMode;

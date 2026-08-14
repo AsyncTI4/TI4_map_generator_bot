@@ -871,7 +871,7 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             Planet planetReal = game.getPlanetsInfo().get(planet);
-            if (!planet.contains("mr") && planetReal.isHomePlanet(game) && !planetReal.isSpaceStation()) {
+            if (!planet.contains("mr") && !planetReal.isHomePlanet(game) && !planetReal.isSpaceStation()) {
                 buttons.add(
                         Buttons.green("freeSystemsHeroPlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
             }

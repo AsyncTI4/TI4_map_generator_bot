@@ -571,6 +571,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.WEIRD_WORMHOLES_MODE + " " + game.isWeirdWormholesMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.COSMIC_CONVERGENCE_MODE + " " + game.isCosmicConvergenceMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.NO_FRACTURE + " " + game.isNoFractureMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.CALL_OF_THE_VOID_MODE + " " + game.isCallOfTheVoidMode());

@@ -195,6 +195,18 @@ public class AddPlanetService {
                     if (player_.hasAbility("planetary_reconfiguration")) {
                         TaAbilityHandler.returnPlanetaryReconfigurationDesigns(player_, game, unitHolder);
                     }
+                    if (player_.hasTech("pa")
+                            && !player_.getExhaustedPlanets().contains(planet)
+                            && ButtonHelper.checkForTechSkips(game, planet)
+                            && !ButtonHelperAbilities.canBePillaged(player_, game, player.getTg() + 1)) {
+                        player_.exhaustPlanet(planet);
+                        MessageHelper.sendMessageToChannel(
+                                player_.getCorrectChannel(),
+                                player_.getRepresentation() + " Your " + Helper.getPlanetRepresentation(planet, game)
+                                        + " was auto exhausted due to your **Psychoarchaeology** technology to gain 1tg.");
+                        player_.gainTG(1, true);
+                        ButtonHelperAgents.resolveArtunoCheck(player_, 1);
+                    }
                     player_.removePlanet(planet);
                     CommanderUnlockCheckService.checkPlayer(player_, "uydai");
                     List<String> relics = new ArrayList<>(player_.getRelics());

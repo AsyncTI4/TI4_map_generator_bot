@@ -845,7 +845,7 @@ public class CombatModHelper {
                 }
                 case "adjacent_anomaly" -> {
                     for (String pos :
-                            FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+                            FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true, true)) {
                         Tile tile = game.getTileByPosition(pos);
                         if (tile.isAnomaly(game, player)) {
                             scalingCount += 1;
