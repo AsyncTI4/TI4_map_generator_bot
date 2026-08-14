@@ -1127,6 +1127,9 @@ public final class ButtonHelperTacticalAction {
         if (player.hasAbility("miniaturization")) {
             movableFromPlanets.addAll(List.of(UnitType.Spacedock, UnitType.Pds));
         }
+        if (player.hasUnlockedBreakthrough("xytherisbt") && player.hasUpgradedUnit("pds2")) {
+            movableFromPlanets.add(UnitType.Pds);
+        }
 
         boolean remove = "remove".equalsIgnoreCase(moveOrRemove);
 
