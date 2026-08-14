@@ -492,6 +492,9 @@ public class TacticalActionService {
                 || player.hasUnit("tf-morphwing");
         boolean hierarch = player.hasUnit("tk-hierarch") && space.getUnitCount(UnitType.Cruiser, player) > 0;
         if (naaluFS || belkoFF || hierarch) committable.add(UnitType.Fighter);
+        if (player.hasUnlockedBreakthrough("xytherisbt") && player.hasUpgradedUnit("pds2")) {
+            committable.add(UnitType.Pds);
+        }
         return committable;
     }
 
