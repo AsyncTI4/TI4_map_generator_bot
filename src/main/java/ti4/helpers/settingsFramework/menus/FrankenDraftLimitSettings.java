@@ -3,7 +3,6 @@ package ti4.helpers.settingsFramework.menus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +29,28 @@ import tools.jackson.databind.JsonNode;
 class FrankenDraftLimitSettings extends SettingsMenu {
     private static final String MENU_ID = "draftLimits";
     private static final int MAX_LIMIT = 20;
-    private static final List<DraftCategory> CATEGORIES = Arrays.asList(DraftCategory.values());
+    // STARTINGTECH must precede TECH because settings actions are matched by their ID suffix.
+    private static final List<DraftCategory> CATEGORIES = List.of(
+            DraftCategory.FACTION,
+            DraftCategory.ABILITY,
+            DraftCategory.STARTINGTECH,
+            DraftCategory.TECH,
+            DraftCategory.BREAKTHROUGH,
+            DraftCategory.AGENT,
+            DraftCategory.COMMANDER,
+            DraftCategory.HERO,
+            DraftCategory.MECH,
+            DraftCategory.FLAGSHIP,
+            DraftCategory.COMMODITIES,
+            DraftCategory.PN,
+            DraftCategory.HOMESYSTEM,
+            DraftCategory.STARTINGFLEET,
+            DraftCategory.BLUETILE,
+            DraftCategory.REDTILE,
+            DraftCategory.DRAFTORDER,
+            DraftCategory.MAHACTKING,
+            DraftCategory.UNIT,
+            DraftCategory.PLOT);
 
     @JsonIgnore
     private final Game game;

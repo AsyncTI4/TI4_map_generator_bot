@@ -48,8 +48,8 @@ public class XytherisAbilityHandler {
         Game game = player.getGame();
         if (game == null
                 || !player.hasAbility("hive_echo")
-                || (rollType != CombatRollType.SpaceCannonOffence
-                        && !FoWHelper.playerHasActualShipsInSystem(player, tile))) {
+                || rollType == CombatRollType.SpaceCannonDefence
+                || !FoWHelper.playerHasActualShipsInSystem(player, tile)) {
             return Optional.empty();
         }
 
