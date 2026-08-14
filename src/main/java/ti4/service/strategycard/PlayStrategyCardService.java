@@ -488,7 +488,6 @@ public class PlayStrategyCardService {
                     + ", a mech and 3 infantry have been added to every home system planet you own and rex.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), warfareDone2);
             for (Tile tile : game.getTileMap().values()) {
-                boolean control = false;
                 if (tile.isHomeSystem(game)) {
                     for (UnitHolder planet : tile.getPlanetUnitHolders()) {
                         if (player.getPlanets().contains(planet.getName())) {
@@ -514,7 +513,6 @@ public class PlayStrategyCardService {
                         }
                     }
                 }
-                if (control) {}
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(
