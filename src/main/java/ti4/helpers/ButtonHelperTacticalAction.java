@@ -80,6 +80,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventDraft;
@@ -237,14 +238,31 @@ public final class ButtonHelperTacticalAction {
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), warfareDone, redistro);
                 if ("evenfall_sc".equalsIgnoreCase(game.getScSetID())
                         && ButtonHelper.doesPlayerControlRexOrOpponentHS(player, game)) {
-                    // String warfareDone2 = player.getRepresentationUnfogged()
-                    //         + ", your **Warfare** action is finished, you may place a dreadnaught, a cruiser and 2
-                    // fighters in the active system. This has been automatically done.";
-                    // Tile tile = game.getTileByPosition(game.getActiveSystem());
-                    // MessageHelper.sendMessageToChannel(player.getCorrectChannel(), warfareDone2);
-                    // if(tile != null){
-                    //     AddUnitService.addUnits(event, tile, game, player.getColor(), "dn, cr, 2 ff");
-                    // }
+                    String warfareDone2 = player.getRepresentationUnfogged()
+                            + ", your **Warfare** action is finished, so a dreadnaught, a cruiser and 2 fighters has been automatically added to mecatol rex or an enemy HS if you control them. This has been automatically done.";
+                    for (Tile tile : game.getTileMap().values()) {
+                        boolean control = false;
+                        if (tile.isHomeSystem(game)
+                                && player.getHomeSystemTile() != tile
+                                && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                            for (UnitHolder planet : tile.getPlanetUnitHolders()) {
+                                if (player.getPlanets().contains(planet.getName())) {
+                                    control = true;
+                                }
+                            }
+                        }
+                        if (tile.isMecatol(game) && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                            for (UnitHolder planet : tile.getPlanetUnitHolders()) {
+                                if (player.getPlanets().contains(planet.getName())) {
+                                    control = true;
+                                }
+                            }
+                        }
+                        if (control) {
+                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), warfareDone2);
+                            AddUnitService.addUnits(event, tile, game, player.getColor(), "dn, cr, 2 ff");
+                        }
+                    }
                 }
             }
             if (player.hasAbility("dream_nexus")) {

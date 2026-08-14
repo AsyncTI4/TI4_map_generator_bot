@@ -2,12 +2,15 @@ package ti4.service.map;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -19,9 +22,12 @@ import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
+import ti4.image.TileHelper;
+import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.TileModel;
 import ti4.service.breakthrough.AlRaithService;
 import ti4.service.emoji.DiceEmojis;
 import ti4.service.fow.GMService;
@@ -50,6 +56,9 @@ public class FractureService {
     }
 
     public static boolean canFractureEnterPlay(Game game) {
+        if (game.isCosmicConvergenceMode()) {
+            return true;
+        }
         return !game.isNoFractureMode() && !isFractureInPlay(game);
     }
 
@@ -80,10 +89,96 @@ public class FractureService {
             AlRaithService.serveBeginCabalBreakthroughButtons(event, game, player);
         } else {
             if (result == 1 || result == 10) { // success
-                String msg = player.getRepresentation(false, false) + " rolled a " + DiceEmojis.getGreenDieEmoji(result)
-                        + "! The Fracture is now in play! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-                if (spawnFracture(event, game)) spawnIngressTokens(event, game, player, bt);
+                if (game.isCosmicConvergenceMode()) {
+                    int countPer = 1;
+                    boolean goneThrough = false;
+                    List<TechnologyType> techTypesToAddIngress = new ArrayList<>();
+                    techTypesToAddIngress.addAll(TechnologyType.mainFour);
+                    for (TechnologyType type : techTypesToAddIngress) {
+                        List<Tile> tilesWithSkip =
+                                getTilesWithSkipAndNoIngressAndNotAdding(game, type, new ArrayList<>());
+                        if (tilesWithSkip.isEmpty()) continue;
+
+                        // The GM presses these in fog, so they must not carry the player's FFCC_ ownership prefix
+                        String prefix = game.isFowMode() ? "" : player.factionButtonChecker();
+                        List<Button> buttons = new ArrayList<>(tilesWithSkip.stream()
+                                .map(tile -> {
+                                    String id = prefix + "addIngressToken_" + tile.getPosition() + "_" + countPer;
+                                    String label = "Add Ingress To " + tile.getRepresentationForButtons(game, player);
+                                    return Buttons.red(id, label, type.emoji());
+                                })
+                                .toList());
+
+                        String msg = game.isFowMode()
+                                ? GMService.gmPing(game) + ", please choose a system with a " + type.emoji()
+                                        + " to place an Ingress token for "
+                                        + player.getRepresentationUnfoggedNoPing() + "."
+                                : player.getRepresentation() + ", please choose a system with a " + type.emoji()
+                                        + " to place an Ingress token.";
+                        buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+                        MessageHelper.sendMessageToChannelWithButtons(
+                                game.isFowMode() ? GMService.getGMChannel(game) : player.getCorrectChannel(),
+                                msg,
+                                buttons);
+                        if (!game.isFowMode() && !goneThrough) {
+                            goneThrough = true;
+                            MessageHelper.sendMessageToChannel(
+                                    game.getMainGameChannel(), "## Please only place one ingress token.");
+                        }
+                    }
+                    String newTileID = "";
+                    List<String> redTilesToPullFrom = new ArrayList<>(
+                            List.of("ef1", "ef2", "ef3", "ef4", "ef5", "ef6", "ef7", "ef8", "ef9", "ef10"));
+                    List<Button> buttons = new ArrayList<>();
+                    redTilesToPullFrom.removeAll(game.getTileMap().values().stream()
+                            .map(Tile::getTileID)
+                            .toList());
+                    List<String> tileToPullFromUnshuffled = new ArrayList<>(redTilesToPullFrom);
+                    Collections.shuffle(redTilesToPullFrom);
+                    List<MessageEmbed> tileEmbeds = new ArrayList<>();
+                    List<String> ids = new ArrayList<>();
+
+                    String tileID = redTilesToPullFrom.getFirst();
+                    ids.add(tileID);
+                    TileModel tile = TileHelper.getTileById(tileID);
+                    tileEmbeds.add(tile.getRepresentationEmbed(false));
+
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(),
+                            player.getRepresentation() + " drew 1 fracture tile from this list:\n> "
+                                    + tileToPullFromUnshuffled);
+
+                    event.getMessageChannel()
+                            .sendMessageEmbeds(tileEmbeds)
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
+
+                    newTileID = ids.getFirst();
+                    List<String> directlyAdjacentTiles = new ArrayList<>(
+                            List.of("frac9", "frac10", "frac14", "frac15", "frac19", "frac20", "frac22", "frac23"));
+                    if ("ef2".equalsIgnoreCase(newTileID)) {
+                        directlyAdjacentTiles = new ArrayList<>(List.of("tl", "tr", "bl", "br"));
+                    }
+                    for (String pos : directlyAdjacentTiles) {
+                        Tile tile2 = game.getTileByPosition(pos);
+                        if (tile2 == null) {
+                            buttons.add(Buttons.green(
+                                    player.factionButtonChecker() + "cosmicConStep3_" + newTileID + "_" + pos, pos));
+                        }
+                    }
+
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + ", please choose the location for the new tile (it probably doesnt matter too much).",
+                            buttons);
+
+                } else {
+                    String msg =
+                            player.getRepresentation(false, false) + " rolled a " + DiceEmojis.getGreenDieEmoji(result)
+                                    + "! The Fracture is now in play! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                    if (spawnFracture(event, game)) spawnIngressTokens(event, game, player, bt);
+                }
             } else if (result == 6 && RandomHelper.isOneInX(10)) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
@@ -184,6 +279,7 @@ public class FractureService {
 
         int countPer = numberOfIngressPerTechType;
         boolean anyChoicesToMake = false;
+        boolean goneThrough = false;
         for (TechnologyType type : techTypesToAddIngress) {
             List<Tile> tilesWithSkip = getTilesWithSkipAndNoIngressAndNotAdding(game, type, automaticAdds);
             if (tilesWithSkip.isEmpty()) continue;
@@ -210,7 +306,8 @@ public class FractureService {
             buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
             MessageHelper.sendMessageToChannelWithButtons(
                     game.isFowMode() ? GMService.getGMChannel(game) : player.getCorrectChannel(), msg, buttons);
-            if (!game.isFowMode()) {
+            if (!game.isFowMode() && !goneThrough) {
+                goneThrough = true;
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(),
                         "## Please do not place more ingress tokens than legal."

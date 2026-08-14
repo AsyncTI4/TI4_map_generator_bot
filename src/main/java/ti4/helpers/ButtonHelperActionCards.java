@@ -1779,13 +1779,13 @@ public final class ButtonHelperActionCards {
         FoWHelper.notifyActorAndAffectedElsePublic(
                 game,
                 player,
-                player.getRepresentationUnfogged() + ", you've _Signal Jam_'d the system: "
+                player.getRepresentationUnfogged() + ", you placed a player's command token in the system: "
                         + tile.getRepresentationForButtons(game, player) + ".",
                 p2,
-                p2.getRepresentationUnfogged() + ", you've been _Signal Jam_'d in system: "
+                p2.getRepresentationUnfogged() + ", your command token has been placed in system: "
                         + tile.getRepresentationForButtons(game, p2) + ".",
-                player.getRepresentationUnfogged() + " has _Signal Jam_'d " + p2.getRepresentationUnfogged()
-                        + " in tile " + tile.getRepresentationForButtons(game, p2) + ".");
+                player.getRepresentationUnfogged() + " has placed " + p2.getRepresentationUnfogged()
+                        + " command token in tile " + tile.getRepresentationForButtons(game, p2) + ".");
     }
 
     @ButtonHandler("reactorMeltdownStep2_")
