@@ -68,8 +68,14 @@ final class FowSetupDecksService {
         sb.append("> Strategy Card Set: ")
                 .append(scSet != null ? scSet.getName() : "_unset_")
                 .append('\n');
-        sb.append("\nClick a deck type below to pick from its available options, or use the import button for a ")
-                .append("Deck-editor config. See the info thread for the per-card removal commands.\n");
+        sb.append("\nClick a deck type below to pick from its available options.\n\n")
+                .append("**Remove individual cards:** `/custom remove_ac_from_game`, `remove_agenda_from_game`, ")
+                .append("`remove_relic_from_game`, `remove_so_from_game`, `remove_po_from_game`, ")
+                .append("`remove_sc_from_game`, or `/explore remove` (Technology/Event decks aren't supported - ")
+                .append("see the info thread for details).\n")
+                .append("**Import a Deck-editor config:** the button below takes a URL. Discord buttons/modals ")
+                .append("can't accept file uploads, so if you have a `.json` file instead, run ")
+                .append("`/special2 import_deck_config` yourself with its `file` attachment option.\n");
 
         for (DeckSlot slot : DECK_SLOTS) {
             buttons.add(Buttons.gray("fowSetupDeckPick_" + slot.constantKey(), "Set " + slot.label() + " Deck"));

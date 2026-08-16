@@ -150,14 +150,32 @@ final class FowSetupTableOrderService {
         FowSetupWizardService.saveState(game, state);
 
         // One roll button per player's own channel - nobody sees anyone else's roll. If a player's private
-        // channel isn't linked, getCorrectChannel() falls back to the GM room instead of failing silently.
+        // channel isn't linked, getCorrectChannel() silently falls back to the GM room instead of failing -
+        // report that explicitly rather than leaving the GM to wonder why nobody got a button.
+        List<String> missingPrivateChannel = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
+            if (player.getPrivateChannel() == null) {
+                missingPrivateChannel.add(player.getUserName());
+            }
             MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),
                     "Roll for table order! Click below to roll " + count + "d" + sides
                             + ". Only you will see your result.",
                     Buttons.green("fowSetupDiceRoll", "Roll for Table Order"));
         }
+
+        StringBuilder confirmation = new StringBuilder(
+                "Roll buttons sent to " + game.getRealPlayers().size() + " player(s).");
+        if (!missingPrivateChannel.isEmpty()) {
+            confirmation
+                    .append("\n**")
+                    .append(missingPrivateChannel.size())
+                    .append(" player(s) have no linked private channel, so their button went to this GM room ")
+                    .append("instead of a channel only they can see:** ")
+                    .append(String.join(", ", missingPrivateChannel))
+                    .append(". Run `/fow check_channels` to fix this, then re-open Configure Dice to resend.");
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), confirmation.toString());
         FowSetupWizardService.openOrRefresh(game);
     }
 

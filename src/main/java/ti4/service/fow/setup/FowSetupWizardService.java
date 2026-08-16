@@ -16,7 +16,6 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
@@ -68,10 +67,32 @@ public final class FowSetupWizardService {
     public static void openOrRefresh(Game game) {
         FowSetupWizardState state = loadState(game);
         TextChannel gmChannel = GMService.getGMChannel(game);
+        postIntroOnce(game, gmChannel, state);
         if (state.getPanelMessageId() != null) {
             gmChannel.deleteMessageById(state.getPanelMessageId()).queue(Consumers.nop(), BotLogger::catchRestError);
         }
         renderStep(game, gmChannel, state);
+    }
+
+    /** Posted once ever per game, the first time the wizard opens - a step list plus prep advice. */
+    private static void postIntroOnce(Game game, TextChannel gmChannel, FowSetupWizardState state) {
+        if (state.isIntroShown()) return;
+        StringBuilder intro = new StringBuilder("## Welcome to the FoW Game Setup Wizard\n")
+                .append("This walks you through setting up a Fog of War game step by step, entirely in this GM ")
+                .append("room. Before you start, it helps to have a plan - roughly what **map** you want, how ")
+                .append("many **players** and who they are, what **factions**/homebrew you're using, and your ")
+                .append("**scoring** target, etc. You can revisit any step with **Previous Step**/**Next Step**, ")
+                .append("so nothing here is final until you hit Start Game.\n\n### Steps\n");
+        for (FowSetupStep step : FowSetupStep.values()) {
+            if (step == FowSetupStep.DONE) continue;
+            intro.append(step.ordinal() + 1)
+                    .append(". ")
+                    .append(stepTitle(step))
+                    .append('\n');
+        }
+        MessageHelper.sendMessageToChannel(gmChannel, intro.toString());
+        state.setIntroShown(true);
+        saveState(game, state);
     }
 
     public static boolean requireGM(GenericInteractionCreateEvent event, Game game) {
@@ -81,6 +102,15 @@ public final class FowSetupWizardService {
             return false;
         }
         return true;
+    }
+
+    /** Posted in the GM room right after a FoW game is created (both `/fow create_fow_game_button` and the
+     * `/bothelper` variant funnel through {@code CreateFoWGameService.executeCreateFoWGame}), so a GM never
+     * has to know the `/fow setup` slash command exists to find the wizard. */
+    @ButtonHandler("fowSetupOpenWizard")
+    public static void openWizardButton(ButtonInteractionEvent event, Game game) {
+        if (!requireGM(event, game)) return;
+        openOrRefresh(game);
     }
 
     @ButtonHandler("fowSetupRefresh")
@@ -115,7 +145,7 @@ public final class FowSetupWizardService {
             case TABLE_ORDER -> FowSetupTableOrderService.render(game, state, sb, buttons);
             case FOG_TYPE -> renderFogType(game, state, sb, buttons);
             case DECKS -> FowSetupDecksService.render(game, state, sb, buttons);
-            case NEUTRAL_PLAYER -> renderNeutralPlayer(game, state, sb, buttons);
+            case NEUTRAL_PLAYER -> FowSetupNeutralPlayerService.render(game, state, sb, buttons);
             case DEAL_SO -> renderDealSO(game, state, sb, buttons);
             case DONE -> renderDone(game, state, sb, buttons);
         }
@@ -165,7 +195,32 @@ public final class FowSetupWizardService {
             navButtons.add(Buttons.blue("fowSetupGoto_" + steps[idx + 1], "Next Step ➡"));
         }
         navButtons.add(Buttons.gray("fowSetupRefresh", "Refresh"));
+        if (stepInfo(state.getStep()) != null) {
+            navButtons.add(Buttons.gray("fowSetupShowInfo", "ℹ Show Info Thread"));
+        }
         return navButtons;
+    }
+
+    /**
+     * Info threads only auto-post the first time a GM reaches a step ({@code infoThreadsPosted} never
+     * clears), so a GM who passed a step before its info text was written or changed would otherwise
+     * never see it. The "Show Info Thread" nav button (always available) force-reposts on demand -
+     * {@code getThreadInChannel} finds the existing thread by name rather than duplicating it.
+     */
+    @ButtonHandler("fowSetupShowInfo")
+    public static void showInfoThread(ButtonInteractionEvent event, Game game) {
+        if (!requireGM(event, game)) return;
+        FowSetupWizardState state = loadState(game);
+        String info = stepInfo(state.getStep());
+        if (info == null) return;
+        ThreadGetter.getThreadInChannel(
+                GMService.getGMChannel(game),
+                game.getName() + "-setup-" + state.getStep().name().toLowerCase(),
+                true,
+                false,
+                thread -> MessageHelper.sendMessageToChannel(thread, info));
+        state.getInfoThreadsPosted().add(state.getStep());
+        saveState(game, state);
     }
 
     private static void postStepInfoThreadOnce(Game game, FowSetupWizardState state) {
@@ -460,39 +515,19 @@ public final class FowSetupWizardService {
     // ---------------------------------------------------------------------------------------
 
     // ---------------------------------------------------------------------------------------
-    // Step 6: Neutral player
-    // ---------------------------------------------------------------------------------------
-
-    private static void renderNeutralPlayer(
-            Game game, FowSetupWizardState state, StringBuilder sb, List<Button> buttons) {
-        sb.append("Give the neutral player a color, then add their units (see info thread below).\n");
-        buttons.add(Buttons.green("fowSetupNeutralPlayer", "Setup Neutral Player"));
-    }
-
-    @ButtonHandler("fowSetupNeutralPlayer")
-    public static void setupNeutralPlayer(ButtonInteractionEvent event, Game game) {
-        if (!requireGM(event, game)) return;
-        String color = SetupNeutralPlayer.pickNeutralColor(game);
-        game.setupNeutralPlayer(color);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), "Neutral player has been set as **" + color + "**.");
-        openOrRefresh(game);
-    }
-
-    // ---------------------------------------------------------------------------------------
     // Step 7: Deal secret objectives & start
     // ---------------------------------------------------------------------------------------
 
     private static void renderDealSO(Game game, FowSetupWizardState state, StringBuilder sb, List<Button> buttons) {
         sb.append("Last step: deal secret objectives, then start the game.\n");
-        buttons.add(Buttons.green("fowSetupDealSO", "Deal 3 Secret Objectives to All"));
+        buttons.add(Buttons.green("fowSetupDealSO", "Deal 2 Secret Objectives to All"));
         buttons.add(Buttons.green("fowSetupStartGame", "Start Game"));
     }
 
     @ButtonHandler("fowSetupDealSO")
     public static void dealSO(ButtonInteractionEvent event, Game game) {
         if (!requireGM(event, game)) return;
-        DrawSecretService.dealSOToAll(event, 3, game);
+        DrawSecretService.dealSOToAll(event, 2, game);
     }
 
     @ButtonHandler("fowSetupStartGame")

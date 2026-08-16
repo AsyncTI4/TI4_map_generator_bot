@@ -3,6 +3,7 @@ package ti4.service.fow.setup;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +18,7 @@ public class FowSetupWizardState {
     private FowSetupStep step = FowSetupStep.GAME_TYPE;
     private Long panelMessageId;
     private Set<FowSetupStep> infoThreadsPosted = EnumSet.noneOf(FowSetupStep.class);
+    private boolean introShown = false;
 
     private String gameType;
     private String scenarioNote;
@@ -39,4 +41,12 @@ public class FowSetupWizardState {
     private Long diceRollMessageId;
     /** userID -> roll total. Insertion order doubles as click order for tiebreaks. */
     private Map<String, Integer> diceRolls = new LinkedHashMap<>();
+
+    /**
+     * Step "Game Options": which toggles the wizard's own submenu currently shows as ON, keyed by
+     * {@code HomebrewService.Homebrew.name()} (or "TIGL"). Only options with no single unambiguous
+     * backing boolean need this (e.g. the two Absol toggles share one {@code Game.absolMode} flag) -
+     * most options just read/write the real game flag directly instead of duplicating it here.
+     */
+    private Set<String> enabledGameOptions = new LinkedHashSet<>();
 }

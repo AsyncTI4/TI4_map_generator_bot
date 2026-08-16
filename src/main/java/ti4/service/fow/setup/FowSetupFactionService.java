@@ -337,7 +337,7 @@ final class FowSetupFactionService {
         if (player == null) return;
 
         List<FactionModel> factions = FrankenDraft.getDraftableFactionsForGame(game).stream()
-                .sorted(Comparator.comparing(FactionModel::getFactionName))
+                .sorted(Comparator.comparing(FactionModel::getFactionName, String.CASE_INSENSITIVE_ORDER))
                 .toList();
         for (List<FactionModel> page : ListUtils.partition(factions, 25)) {
             StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("fowSetupFactionSelect_" + userId);
@@ -347,11 +347,21 @@ final class FowSetupFactionService {
                                 FactionEmojis.getFactionIcon(faction.getAlias()).asEmoji()));
             }
             menuBuilder.setRequiredRange(1, 1);
+            String range = pageRangeLabel(
+                    page.stream().map(FactionModel::getFactionName).toList());
             event.getMessageChannel()
-                    .sendMessage("Pick a faction for " + player.getUserName() + ":")
+                    .sendMessage("Pick a faction for " + player.getUserName() + range + ":")
                     .addComponents(ActionRow.of(menuBuilder.build()))
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         }
+    }
+
+    /** " (A - M)" style suffix describing the alphabetical range of names on one select-menu page. */
+    static String pageRangeLabel(List<String> namesInPageOrder) {
+        if (namesInPageOrder.isEmpty()) return "";
+        String first = namesInPageOrder.getFirst();
+        String last = namesInPageOrder.getLast();
+        return first.equals(last) ? " (" + first + ")" : " (" + first + " - " + last + ")";
     }
 
     @SelectionHandler("fowSetupFactionSelect_")
@@ -495,7 +505,9 @@ final class FowSetupFactionService {
         state.getPendingPositionByUserId().put(userId, position);
         FowSetupWizardService.saveState(game, state);
 
-        List<ColorModel> unusedColors = GameColorsService.getUnusedColors(game);
+        List<ColorModel> unusedColors = GameColorsService.getUnusedColors(game).stream()
+                .sorted(Comparator.comparing(ColorModel::getName, String.CASE_INSENSITIVE_ORDER))
+                .toList();
         if (unusedColors.isEmpty()) {
             // No free colors somehow - fall back to auto-pick rather than block setup entirely.
             finishPositionAssignment(event, game, player, faction, position, null);
@@ -509,8 +521,11 @@ final class FowSetupFactionService {
                         .withEmoji(ColorEmojis.getColorEmoji(color.getName()).asEmoji()));
             }
             menuBuilder.setRequiredRange(1, 1);
+            String range = pageRangeLabel(page.stream()
+                    .map(color -> StringUtils.capitalize(color.getName()))
+                    .toList());
             event.getMessageChannel()
-                    .sendMessage("Pick a color for " + player.getUserName() + ":")
+                    .sendMessage("Pick a color for " + player.getUserName() + range + ":")
                     .addComponents(ActionRow.of(menuBuilder.build()))
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         }

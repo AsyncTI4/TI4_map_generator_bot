@@ -106,9 +106,17 @@ public class HomebrewService {
     @ButtonHandler("setupHomebrew_")
     public static void setUpHomebrew(Game game, ButtonInteractionEvent event, String buttonID) {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-        game.setHomebrew(true);
-
         Homebrew type = Homebrew.valueOf(buttonID.split("_")[1]);
+        applyHomebrew(game, event, type);
+    }
+
+    /**
+     * Core per-homebrew apply logic, split out so callers that manage their own message/button
+     * lifecycle (e.g. the FoW setup wizard's toggle buttons) can reuse it without triggering this
+     * button's own delete-the-clicked-button side effect.
+     */
+    public static void applyHomebrew(Game game, ButtonInteractionEvent event, Homebrew type) {
+        game.setHomebrew(true);
         switch (type) {
             case HB444 -> {
                 game.setMaxSOCountPerPlayer(4);

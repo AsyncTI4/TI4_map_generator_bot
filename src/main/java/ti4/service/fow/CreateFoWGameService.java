@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -212,6 +213,10 @@ public class CreateFoWGameService {
         sb = new StringBuilder(roleGM.getAsMention() + " - gm room\n");
         sb.append(getInfoTextFromFile("FoWGMIntro.txt"));
         MessageHelper.sendMessageToChannel(gmChannel, sb.toString());
+        MessageHelper.sendMessageToChannelWithButton(
+                gmChannel,
+                "Walk through map, factions, table order, fog type, decks, and more step by step:",
+                Buttons.blue("fowSetupOpenWizard", "Open /fow setup Wizard"));
         HomebrewService.offerGameHomebrewButtons(gmChannel);
         GMService.logActivity(
                 newGame,
