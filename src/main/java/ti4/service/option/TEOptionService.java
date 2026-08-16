@@ -56,9 +56,18 @@ public class TEOptionService {
             The second option is closer to Rules As Written, the first is closer to a classic franken draft.""";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("startTFDraft_bag", "Use Bag Draft of Everything"));
-        buttons.add(Buttons.gray("startDraftSystem_andcatPresetMilty", "Start Milty Draft + Later Inaugural Splice"));
-        buttons.add(
-                Buttons.gray("startDraftSystem_andcatPresetNucleus", "Start Nucleus Draft + Later Inaugural Splice"));
+        // Milty/Nucleus draft slices, tiles and speaker order - in FoW the GM hand-builds the map and sets
+        // seat/speaker order via `/fow setup` instead, and tile/draft-order categories are already forced to
+        // 0 for FoW (FrankenDraft.isFowExcludedCategory), so those two drafts have nothing left to draft.
+        if (!game.isFowMode()) {
+            buttons.add(
+                    Buttons.gray("startDraftSystem_andcatPresetMilty", "Start Milty Draft + Later Inaugural Splice"));
+            buttons.add(Buttons.gray(
+                    "startDraftSystem_andcatPresetNucleus", "Start Nucleus Draft + Later Inaugural Splice"));
+        } else {
+            msg += "\n\n-# Fog of War: only the bag draft is offered - Milty/Nucleus draft slices, tiles and "
+                    + "speaker order, which the FoW setup wizard handles itself.";
+        }
         buttons.add(Buttons.red("editTFHomebrew", "Enable TF Homebrew options"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
     }

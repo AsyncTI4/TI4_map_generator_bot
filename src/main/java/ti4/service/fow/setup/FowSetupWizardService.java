@@ -142,9 +142,14 @@ public final class FowSetupWizardService {
     // ---------------------------------------------------------------------------------------
 
     private static void renderStep(Game game, TextChannel gmChannel, FowSetupWizardState state) {
-        StringBuilder sb =
-                new StringBuilder("# FoW Game Setup - Step " + (state.getStep().ordinal() + 1) + "/"
-                        + FowSetupStep.values().length + ": " + stepTitle(state.getStep()) + "\n\n");
+        // DONE is a landing page rather than a step, so it's excluded from the count here and from the
+        // intro's step list - otherwise the header would read "Step 10/10" for a step that does nothing.
+        int totalSteps = FowSetupStep.values().length - 1;
+        StringBuilder sb = new StringBuilder(
+                state.getStep() == FowSetupStep.DONE
+                        ? "# FoW Game Setup - " + stepTitle(FowSetupStep.DONE) + "\n\n"
+                        : "# FoW Game Setup - Step " + (state.getStep().ordinal() + 1) + "/" + totalSteps + ": "
+                                + stepTitle(state.getStep()) + "\n\n");
         List<Button> buttons = new ArrayList<>();
         switch (state.getStep()) {
             case GAME_TYPE -> renderGameType(game, state, sb, buttons);
@@ -398,8 +403,10 @@ public final class FowSetupWizardService {
     // ---------------------------------------------------------------------------------------
 
     private static void renderGameType(Game game, FowSetupWizardState state, StringBuilder sb, List<Button> buttons) {
-        sb.append("These mirror the normal (non-fog) game setup buttons - clicking them always replies in this ")
-                .append("GM room, not the public channel, since they just reply wherever they were clicked.\n\n")
+        sb.append("These mirror the normal (non-fog) game setup buttons - clicking one replies here in the GM ")
+                .append("room, not the public channel. Note the Twilight's Fall and Franken buttons then hand ")
+                .append("off to their own draft systems, which route their later messages their own way - see ")
+                .append("the info thread.\n\n")
                 .append("Currently: Thunder's Edge = ")
                 .append(game.isThundersEdge())
                 .append(", Twilight's Fall = ")
@@ -597,10 +604,6 @@ public final class FowSetupWizardService {
         if (!requireGM(event, game)) return;
         FOWOptionService.offerFOWOptionButtons(game);
     }
-
-    // ---------------------------------------------------------------------------------------
-    // DECKS step
-    // ---------------------------------------------------------------------------------------
 
     // ---------------------------------------------------------------------------------------
     // DEAL_SO step: deal secret objectives & start

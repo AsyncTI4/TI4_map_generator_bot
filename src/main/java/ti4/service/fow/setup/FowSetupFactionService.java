@@ -52,10 +52,22 @@ final class FowSetupFactionService {
 
     private static final String BANNED_FACTIONS_KEY = "bannedFactions";
 
+    /**
+     * Human players only, in a state where they still need faction/position setup. Excludes dummies -
+     * the neutral (Dicecord) player is a dummy with faction "neutral" and no position, so without this
+     * it qualifies as "has a faction but needs a position" and shows up in the assign/randomize flows.
+     * Reachable whenever a GM sets up the neutral player and then steps back to Factions.
+     */
+    private static List<Player> setupCandidates(Game game) {
+        return game.getPlayers().values().stream()
+                .filter(player -> !player.isDummy())
+                .toList();
+    }
+
     static void render(Game game, FowSetupWizardState state, StringBuilder sb, List<Button> buttons) {
         sb.append("Assign each player a faction manually, or deal a mini faction draft (ban factions first if ")
                 .append("you want), then assign home positions.\n\n");
-        for (Player player : game.getPlayers().values()) {
+        for (Player player : setupCandidates(game)) {
             String effective = effectiveFaction(state, player);
             String pos = effectivePosition(player);
             List<String> dealt = state.getDealtFactionChoices().get(player.getUserID());
@@ -63,7 +75,10 @@ final class FowSetupFactionService {
                     .append(player.getUserName())
                     .append(": ")
                     .append(StringUtils.isBlank(effective) ? "_no faction yet_" : effective)
-                    .append(pos == null ? "" : " @ " + pos)
+                    .append(
+                            pos == null
+                                    ? ""
+                                    : " @ " + pos + (isPlacedOnMap(game, player) ? "" : " _(temp, not on map)_"))
                     .append(
                             dealt == null || StringUtils.isNotBlank(effective)
                                     ? ""
@@ -265,14 +280,14 @@ final class FowSetupFactionService {
 
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         List<Player> targets = new ArrayList<>();
-        for (Player player : game.getPlayers().values()) {
+        for (Player player : setupCandidates(game)) {
             if (StringUtils.isBlank(effectiveFaction(state, player))) {
                 targets.add(player);
             }
         }
         if (targets.isEmpty()) {
             StringBuilder sb = new StringBuilder("Every player already has a faction:\n");
-            for (Player player : game.getPlayers().values()) {
+            for (Player player : setupCandidates(game)) {
                 sb.append("> ")
                         .append(player.getUserName())
                         .append(": ")
@@ -404,6 +419,18 @@ final class FowSetupFactionService {
         return isSetValue(anchor) ? anchor : null;
     }
 
+    /**
+     * A recorded position only counts as a real placement if a tile actually exists there on the GM's map.
+     * Franken and Twilight's Fall setup park every player at a temporary off-map anchor (ring-5 "50x", see
+     * {@code FrankenDraftBagService.setUpFrankenFactions}) and franken factions have a blank home system, so
+     * {@code PlayerSetupService.setupPlayer} records the anchor without ever placing a tile. Treating that
+     * as "already placed" is what made "Assign Position" report everyone as done in a Twilight's Fall game.
+     */
+    private static boolean isPlacedOnMap(Game game, Player player) {
+        String position = effectivePosition(player);
+        return position != null && game.getTileByPosition(position) != null;
+    }
+
     // --- Manual faction assignment: pick player, then a real dropdown of eligible factions ---
 
     @ButtonHandler("fowSetupFactionManual")
@@ -411,8 +438,10 @@ final class FowSetupFactionService {
         if (!FowSetupWizardService.requireGM(event, game)) return;
         List<Button> playerButtons = new ArrayList<>();
         // Players don't count as "real" until they have both a faction and a color, so before any faction is
-        // assigned everyone is still in getNotRealPlayers() - same list `/game info` shows as "Other Players".
-        for (Player player : game.getNotRealPlayers()) {
+        // assigned everyone is still "not real" - same list `/game info` shows as "Other Players". Dummies
+        // (the neutral player) are never real either, hence setupCandidates rather than getNotRealPlayers.
+        for (Player player : setupCandidates(game)) {
+            if (player.isRealPlayer()) continue;
             playerButtons.add(Buttons.gray("fowSetupFactionPlayer_" + player.getUserID(), player.getUserName()));
         }
         if (playerButtons.isEmpty()) {
@@ -493,8 +522,8 @@ final class FowSetupFactionService {
         if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         List<Button> playerButtons = new ArrayList<>();
-        for (Player player : game.getPlayers().values()) {
-            if (StringUtils.isBlank(effectiveFaction(state, player)) || effectivePosition(player) != null) {
+        for (Player player : setupCandidates(game)) {
+            if (StringUtils.isBlank(effectiveFaction(state, player)) || isPlacedOnMap(game, player)) {
                 continue;
             }
             playerButtons.add(Buttons.gray("fowSetupPositionPlayer_" + player.getUserID(), player.getUserName()));
@@ -673,8 +702,8 @@ final class FowSetupFactionService {
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
 
         List<Player> needsPosition = new ArrayList<>();
-        for (Player player : game.getPlayers().values()) {
-            if (StringUtils.isNotBlank(effectiveFaction(state, player)) && effectivePosition(player) == null) {
+        for (Player player : setupCandidates(game)) {
+            if (StringUtils.isNotBlank(effectiveFaction(state, player)) && !isPlacedOnMap(game, player)) {
                 needsPosition.add(player);
             }
         }

@@ -21,6 +21,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.fow.GMService;
 import ti4.service.game.SetOrderService;
 
 /** TABLE_ORDER step of the FoW setup wizard: seat order (manual or dice) and the speaker pick. */
@@ -244,6 +245,30 @@ final class FowSetupTableOrderService {
         FowSetupWizardService.saveState(game, state);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You rolled a **" + total + "**.");
+
+        // The GM's panel only shows rolls when it's redrawn, and rolls land in each player's own private
+        // channel where the GM can't see them - so tell the GM room once the last player is in, with the
+        // full results, rather than leaving the GM to poll Refresh.
+        List<Player> waitingOn = game.getRealPlayers().stream()
+                .filter(p -> !state.getDiceRolls().containsKey(p.getUserID()))
+                .toList();
+        if (waitingOn.isEmpty()) {
+            StringBuilder sb = new StringBuilder(
+                    "All " + state.getDiceRolls().size() + " player(s) have rolled for table order:\n");
+            state.getDiceRolls().entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue())
+                    .forEach(entry -> {
+                        Player rolled = game.getPlayer(entry.getKey());
+                        sb.append("> ")
+                                .append(rolled == null ? entry.getKey() : rolled.getUserName())
+                                .append(": ")
+                                .append(entry.getValue())
+                                .append('\n');
+                    });
+            sb.append("Use a Resolve button on the Table Order step to turn these into a seat order.");
+            GMService.sendMessageToGMChannel(game, sb.toString(), true);
+        }
+        FowSetupWizardService.openOrRefresh(game);
     }
 
     @ButtonHandler("fowSetupOrderResolveAsc")
