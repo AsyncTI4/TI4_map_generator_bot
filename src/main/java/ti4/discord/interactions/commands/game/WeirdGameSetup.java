@@ -21,6 +21,7 @@ import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.option.TEOptionService;
@@ -195,7 +196,11 @@ public class WeirdGameSetup extends GameStateSubcommand {
         if (game.isTwilightsFallMode()) {
             String msg = "Use the buttons to enable or disable various homebrew options:";
             List<ContainerChildComponent> sections = TEOptionService.getTFHomebrewInfo(game);
-            MessageV2Builder builder = new MessageV2Builder(game.getMainGameChannel());
+            // This used to always post to the public main channel, leaking TF homebrew setup chatter in
+            // FoW games (this command has no FoW-specific gating, so it's reachable on any game). Same fix
+            // as TEOptionService's homebrewChannel: GM room in FoW games, unchanged elsewhere.
+            var channel = game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel();
+            MessageV2Builder builder = new MessageV2Builder(channel);
             builder.append(msg);
             builder.append(Container.of(sections));
             builder.append(Buttons.DONE_DELETE_BUTTONS);

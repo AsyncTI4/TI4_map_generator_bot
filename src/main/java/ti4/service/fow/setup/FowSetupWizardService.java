@@ -16,6 +16,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.commands.game.WeirdGameSetup;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
@@ -57,6 +58,14 @@ public final class FowSetupWizardService {
             BotLogger.error("Failed to parse FoW setup wizard state for game " + game.getName(), e);
             return new FowSetupWizardState();
         }
+    }
+
+    /** The wizard's own state has no use once the game it set up is over - called from
+     * {@code EndGameService.gameEndStuff} so it doesn't linger in the save file forever. Other
+     * stored-value keys this wizard writes to (e.g. "bannedFactions") are shared with non-wizard
+     * features and aren't this method's to clear. */
+    public static void clearStateOnGameEnd(Game game) {
+        game.removeStoredValue(STORE_KEY);
     }
 
     public static void saveState(Game game, FowSetupWizardState state) {
@@ -213,12 +222,7 @@ public final class FowSetupWizardService {
         FowSetupWizardState state = loadState(game);
         String info = stepInfo(state.getStep());
         if (info == null) return;
-        ThreadGetter.getThreadInChannel(
-                GMService.getGMChannel(game),
-                game.getName() + "-setup-" + state.getStep().name().toLowerCase(),
-                true,
-                false,
-                thread -> MessageHelper.sendMessageToChannel(thread, info));
+        postInfoToThread(game, state.getStep(), info);
         state.getInfoThreadsPosted().add(state.getStep());
         saveState(game, state);
     }
@@ -226,18 +230,42 @@ public final class FowSetupWizardService {
     private static void postStepInfoThreadOnce(Game game, FowSetupWizardState state) {
         String info = stepInfo(state.getStep());
         if (info == null || state.getInfoThreadsPosted().contains(state.getStep())) return;
-        ThreadGetter.getThreadInChannel(
-                GMService.getGMChannel(game),
-                game.getName() + "-setup-" + state.getStep().name().toLowerCase(),
-                true,
-                false,
-                thread -> MessageHelper.sendMessageToChannel(thread, info));
+        postInfoToThread(game, state.getStep(), info);
         state.getInfoThreadsPosted().add(state.getStep());
         saveState(game, state);
     }
 
+    private static void postInfoToThread(Game game, FowSetupStep step, String info) {
+        String pinged = GMService.gmPing(game);
+        String message = (pinged.isEmpty() ? "" : pinged + "\n") + info;
+        ThreadGetter.getThreadInChannel(
+                GMService.getGMChannel(game),
+                game.getName() + "-setup-" + step.name().toLowerCase(),
+                true,
+                false,
+                thread -> MessageHelper.sendMessageToChannel(thread, message));
+    }
+
     private static String stepInfo(FowSetupStep step) {
         return switch (step) {
+            case GAME_TYPE -> """
+                ### Picking an expansion / game mode
+                **New PoK / Old PoK** - which card art/errata revision to use, same choice as the non-fog \
+                setup flow. **Thunder's Edge + New PoK** does that plus the full Thunder's Edge homebrew \
+                setup (adds the TE action-card deck, restores the Silver Flame/Quantumcore relics) - more \
+                complete than the identically-named button in non-fog `/game setup`, which only flips the \
+                flag. **Start Base Game Only Setup** switches to base-game content only (no PoK) - unlike \
+                the non-fog flow this only flips the flag, it does **not** continue into a Milty draft \
+                settings menu, since this wizard doesn't run Milty at all.
+                **Supported Homebrew** is the older flat button list - prefer the categorized toggles on the \
+                Game Options step instead, this one's kept for parity with the non-fog flow.
+                **Galactic Events** opens the same Thunder's Edge event-toggle menu as the non-fog flow.
+                **Start Twilight's Fall Game** and **Start Franken Setup** hand off to those systems' own \
+                existing draft/setup flows, which are not FoW-wizard-integrated - anything they post follows \
+                their own channel-routing rules, not this wizard's GM-room-only guarantee.
+                **Set Scenario Note** is a free-text field for your own reference only (house rules, scenario \
+                name, etc.) - it isn't wired into any game logic.
+                """;
             case GAME_OPTIONS -> """
                 ### Notes on these options
                 - **Absol Relics/Agendas** and **Absol Techs/Mechs** both flip the same underlying "Absol \
@@ -246,10 +274,28 @@ public final class FowSetupWizardService {
                 the moment you click it. Players added later still need it removed manually.
                 - **Remove All Homebrews** turns the flags back off but does **not** undo deck/VP/objective \
                 changes already made - check those manually afterward.
-                - **TIGL Game** only sets the record-keeping flag; it doesn't change any decks or rules.
+                - **Fractured TIGL** is the only TIGL variant that can combine with FoW mode - standard TIGL \
+                is unconditionally blocked in FoW games, so this button uses the full Fractured TIGL setup \
+                (tags the game, posts the TIGL rules text, snapshots player ranks) rather than a plain flag.
+                - **Alliance Mode** just flips the flag (and turns off TIGL, since they're mutually \
+                exclusive) - it does not pair anyone up. Once you have factions/colors assigned, go to the \
+                Factions step and use "Pair Alliance Members" to actually team players together (this bumps \
+                VP to 14 if still default, shares eligible commanders, and removes each paired player's \
+                Alliance promissory note - same as `/player add_alliance_member`).
                 - The scoring presets (4/4/4, 4/5/6) and the custom scoring modal both just set VP, max \
                 secret objectives per player, and peekable Stage 1/2 objective counts - use whichever is \
                 more convenient, or run the modal after a preset to fine-tune one value.
+                """;
+            case FOG_TYPE -> """
+                ### Choosing a preset vs. fine-tuning
+                The three preset buttons (Normal/Fog Lite/Fog+) set a curated bundle of individual FoW \
+                options in one click - "Fine-tune Options" opens `/fow fow_options`, the full per-option \
+                menu, so you can start from a preset and then flip specific options afterward instead of \
+                configuring everything from scratch.
+                Once you've picked something, use `/fow show_game_as` (targeting one of the real players) \
+                to sanity-check what that player would actually see on the map/board - it's the fastest way \
+                to catch a fog setting that's more (or less) restrictive than you intended before players \
+                start looking at things themselves.
                 """;
             case MAP_LOAD -> """
                 ### Map-editing commands you'll likely need once the base map is in
@@ -278,6 +324,13 @@ public final class FowSetupWizardService {
                 **CSV roster upload** - not built yet. The idea: GM uploads a comma-separated list of \
                 possible factions per player (`player1a, player1b, player1c; player2a, ...`) generated by \
                 a companion website, and the wizard deals accordingly. Documented here for later.
+                **Pair Alliance Members** (only shown if Alliance Mode is on, from the Game Options step) - \
+                pick two players who already have a faction and color to team them up. This is the same \
+                logic as `/player add_alliance_member`: it bumps VP to 14 if still default, shares eligible \
+                commanders between the pair, and removes each player's Alliance promissory note. Note: \
+                re-pairing an already-paired player may not cleanly replace their old partner in the \
+                underlying data (a pre-existing quirk in that command, not specific to this wizard) - if \
+                you need to change a pairing, ask a dev rather than assuming a simple re-pair fixes it.
                 """;
             case TABLE_ORDER -> """
                 ### Before using the dice-roll button
@@ -320,12 +373,28 @@ public final class FowSetupWizardService {
                 targeting that color, e.g. `/tokens add_token` or the unit-add commands with the neutral \
                 color selected.
                 """;
+            case DEAL_SO -> """
+                ### Last checks before starting
+                "Deal 2 Secret Objectives to All" runs the same logic as `/cardsso deal_so_to_all` for every \
+                real player at once - re-clicking it won't re-deal players who already have secrets.
+                "Start Game" runs `StartPhaseService`'s normal phase-start logic (same as `/game start_phase`), \
+                moving the game into the strategy phase - players can act immediately after this. This is \
+                your last chance to jump back (Previous Step) and fix anything before that happens.
+                """;
+            case DONE -> """
+                ### What "Done" means here
+                This step is just a landing page - it doesn't do anything itself. Use **Previous Step** to \
+                revisit any earlier step at any time, even after starting the game (the wizard doesn't lock \
+                once you reach here). **Close Wizard** deletes this panel and resets which step the wizard \
+                *opens to* next time (back to Game Type) - it does not undo or clear any answers you've \
+                already given (factions, map, dice rolls, toggles, etc.), those all stay exactly as set.
+                """;
             default -> null;
         };
     }
 
     // ---------------------------------------------------------------------------------------
-    // Step 0: Game type & scenario
+    // GAME_TYPE step: game type & scenario
     // ---------------------------------------------------------------------------------------
 
     private static void renderGameType(Game game, FowSetupWizardState state, StringBuilder sb, List<Button> buttons) {
@@ -346,7 +415,7 @@ public final class FowSetupWizardService {
         buttons.add(Buttons.red("fowSetupBaseGameOnly", "Start Base Game Only Setup"));
         buttons.add(Buttons.green("chooseExp_newPoK", "New PoK"));
         buttons.add(Buttons.gray("chooseExp_oldPoK", "Old PoK"));
-        buttons.add(Buttons.blue("chooseExp_te", "Thunder's Edge + New PoK"));
+        buttons.add(Buttons.blue("fowSetupChooseExpTE", "Thunder's Edge + New PoK"));
 
         sb.append("**Alternate game modes**\n");
         buttons.add(Buttons.green("getHomebrewButtons", "Supported Homebrew"));
@@ -355,6 +424,24 @@ public final class FowSetupWizardService {
         buttons.add(Buttons.green("frankenSetup", "Start Franken Setup"));
 
         buttons.add(Buttons.gray("fowSetupScenario~MDL", "Set Scenario Note"));
+    }
+
+    /**
+     * "New PoK"/"Old PoK" reuse the shared {@code chooseExp_} handler (also used by non-fog `/game
+     * setup`), which just flips {@code thundersEdge}/{@code useOldPok}. The TE option gets its own
+     * wizard-specific button instead of reusing {@code chooseExp_te}, so it can also call
+     * {@code WeirdGameSetup.applyThundersEdgeMode} - the fuller path that adds the Thunder's Edge
+     * action-card deck and restores the Silver Flame/Quantumcore relics, which the shared handler
+     * doesn't do. That method already replies via {@code event.getMessageChannel()} (GM-room-safe).
+     */
+    @ButtonHandler("fowSetupChooseExpTE")
+    public static void chooseExpThundersEdge(ButtonInteractionEvent event, Game game) {
+        if (!requireGM(event, game)) return;
+        game.removeStoredValue("useOldPok");
+        WeirdGameSetup.applyThundersEdgeMode(event, game, true);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), "Set game to use Thunder's Edge + New PoK components.");
+        openOrRefresh(game);
     }
 
     @ButtonHandler("fowSetupBaseGameOnly")
@@ -395,6 +482,7 @@ public final class FowSetupWizardService {
 
     @ModalHandler("fowSetupScenarioResolve")
     public static void resolveScenarioModal(ModalInteractionEvent event, Game game) {
+        if (!requireGM(event, game)) return;
         FowSetupWizardState state = loadState(game);
         state.setScenarioNote(event.getValue("scenarioNote").getAsString());
         saveState(game, state);
@@ -402,7 +490,7 @@ public final class FowSetupWizardService {
     }
 
     // ---------------------------------------------------------------------------------------
-    // Step 1: Load the map
+    // MAP_LOAD step: load the map
     // ---------------------------------------------------------------------------------------
 
     private static void renderMapLoad(Game game, FowSetupWizardState state, StringBuilder sb, List<Button> buttons) {
@@ -455,7 +543,7 @@ public final class FowSetupWizardService {
     }
 
     // ---------------------------------------------------------------------------------------
-    // Step 4: Fog of War type
+    // FOG_TYPE step: fog of war type
     // ---------------------------------------------------------------------------------------
 
     private static void renderFogType(Game game, FowSetupWizardState state, StringBuilder sb, List<Button> buttons) {
@@ -511,11 +599,11 @@ public final class FowSetupWizardService {
     }
 
     // ---------------------------------------------------------------------------------------
-    // Step 5: Decks
+    // DECKS step
     // ---------------------------------------------------------------------------------------
 
     // ---------------------------------------------------------------------------------------
-    // Step 7: Deal secret objectives & start
+    // DEAL_SO step: deal secret objectives & start
     // ---------------------------------------------------------------------------------------
 
     private static void renderDealSO(Game game, FowSetupWizardState state, StringBuilder sb, List<Button> buttons) {
@@ -542,7 +630,7 @@ public final class FowSetupWizardService {
 
     private static void renderDone(Game game, FowSetupWizardState state, StringBuilder sb, List<Button> buttons) {
         sb.append("Setup wizard complete. Use **Previous Step** if you need to revisit anything, or ")
-                .append("**Close Wizard** to remove this panel.\n");
+                .append("**Close Wizard** to remove this panel and archive its info threads.\n");
         buttons.add(Buttons.red("fowSetupCloseWizard", "Close Wizard"));
     }
 
@@ -550,11 +638,32 @@ public final class FowSetupWizardService {
     public static void closeWizard(ButtonInteractionEvent event, Game game) {
         if (!requireGM(event, game)) return;
         FowSetupWizardState state = loadState(game);
+        archiveInfoThreads(game, state);
         state.setPanelMessageId(null);
         // Closing means "fully done" - the next /fow setup starts a fresh review from step 1. This only
         // resets which step is displayed; every other saved answer (factions, map, dice rolls, etc.) stays.
         state.setStep(FowSetupStep.GAME_TYPE);
         saveState(game, state);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    /**
+     * Nothing else ever cleans up the per-step info threads this wizard creates - at game end they get
+     * swept up for free (deleting a Discord channel cascade-deletes its threads), but setup usually
+     * finishes long before the game does, so without this they'd sit in the GM room's thread list for
+     * the entire rest of the game. Archive (not delete) so the content is still there if anyone needs to
+     * check back, matching the same archive-don't-delete pattern EndGameService already uses for threads
+     * in channels it keeps.
+     */
+    private static void archiveInfoThreads(Game game, FowSetupWizardState state) {
+        TextChannel gmChannel = GMService.getGMChannel(game);
+        for (FowSetupStep step : state.getInfoThreadsPosted()) {
+            ThreadGetter.getThreadInChannel(
+                    gmChannel,
+                    game.getName() + "-setup-" + step.name().toLowerCase(),
+                    false,
+                    false,
+                    thread -> thread.getManager().setArchived(true).queue(Consumers.nop(), BotLogger::catchRestError));
+        }
     }
 }

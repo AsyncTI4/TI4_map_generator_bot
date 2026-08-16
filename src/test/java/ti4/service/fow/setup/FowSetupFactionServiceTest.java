@@ -2,12 +2,16 @@ package ti4.service.fow.setup;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
 /**
@@ -20,15 +24,21 @@ class FowSetupFactionServiceTest extends BaseTi4Test {
 
     @Test
     void invalidCustomPositionIsRejectedBeforeAnyStateIsMutated() {
-        Game game = new Game();
+        // Spied so getPlayersWithGMRole() (normally derived from live Discord role membership) can be
+        // stubbed directly, rather than mocking the full Guild/Member/Role chain it would otherwise need.
+        Game game = spy(new Game());
         game.setName("fow-position-validation-test");
-        game.addPlayer("test-user-id", "test-user");
+        Player player = game.addPlayer("test-user-id", "test-user");
+        when(game.getPlayersWithGMRole()).thenReturn(List.of(player));
 
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         state.getPendingFactionByUserId().put("test-user-id", "winnu");
         FowSetupWizardService.saveState(game, state);
 
+        User user = mock(User.class);
+        when(user.getId()).thenReturn("test-user-id");
         ModalInteractionEvent event = mock(ModalInteractionEvent.class);
+        when(event.getUser()).thenReturn(user);
         when(event.getModalId()).thenReturn("fowSetupPositionResolve_test-user-id");
         ModalMapping positionValue = mock(ModalMapping.class);
         when(positionValue.getAsString()).thenReturn("not-a-real-position");

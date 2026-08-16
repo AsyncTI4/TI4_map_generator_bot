@@ -11,7 +11,11 @@ import ti4.service.fow.setup.FowSetupWizardService;
 class SetupWizard extends GameStateSubcommand {
 
     SetupWizard() {
-        super("setup", "Open (or refresh) the FoW GM setup wizard", false, true);
+        // saveGame must be true: openOrRefresh mutates wizard state (panel message id, intro-shown flag,
+        // etc.) via Game.setStoredValue on every call, not just the first. saveGame=false would both skip
+        // persisting that (CommandGameState.postExecute only calls GameManager.save when saveGame=true)
+        // and run this under a READ lock instead of WRITE, racing other mutations on the same game.
+        super("setup", "Open (or refresh) the FoW GM setup wizard", true, true);
     }
 
     @Override

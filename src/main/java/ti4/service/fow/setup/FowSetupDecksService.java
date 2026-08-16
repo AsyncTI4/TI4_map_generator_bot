@@ -31,7 +31,7 @@ import ti4.model.StrategyCardSetModel;
 import ti4.service.game.DeckConfigImportService;
 import ti4.service.game.SetDeckService;
 
-/** Step 5 of the FoW setup wizard: pick decks (and the Strategy Card set), or import a Deck-editor config. */
+/** DECKS step of the FoW setup wizard: pick decks (and the Strategy Card set), or import a Deck-editor config. */
 final class FowSetupDecksService {
 
     private FowSetupDecksService() {}
@@ -81,7 +81,7 @@ final class FowSetupDecksService {
             buttons.add(Buttons.gray("fowSetupDeckPick_" + slot.constantKey(), "Set " + slot.label() + " Deck"));
         }
         buttons.add(Buttons.gray("fowSetupDeckPickSC", "Set Strategy Card Set"));
-        buttons.add(Buttons.blue("fowSetupDeckConfigImport~MDL", "Import Deck-editor Config (URL)"));
+        buttons.add(Buttons.blue("fowSetupDeckConfigImportExplain", "Import Deck-editor Config (URL)"));
     }
 
     private static String currentDeckId(Game game, String deckType) {
@@ -201,7 +201,21 @@ final class FowSetupDecksService {
 
     // --- Import a deck-set config from the companion Deck-editor tool ---
 
-    @ButtonHandler("fowSetupDeckConfigImport~MDL")
+    /** Discord modals can only carry field labels/placeholders, not body text, so a button that opens
+     * a modal directly can never show a paragraph at click time - post it as a plain message with a
+     * "Continue" button first instead (same two-step pattern as {@code fowSetupBaseGameOnly}). */
+    @ButtonHandler("fowSetupDeckConfigImportExplain")
+    static void explainDeckConfigImport(ButtonInteractionEvent event, Game game) {
+        if (!FowSetupWizardService.requireGM(event, game)) return;
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                "Import a Deck-editor config: the button below takes a URL. Discord buttons/modals can't "
+                        + "accept file uploads, so if you have a `.json` file instead, run "
+                        + "`/special2 import_deck_config` yourself with its `file` attachment option.",
+                List.of(Buttons.blue("fowSetupDeckConfigImportModal~MDL", "Continue"), Buttons.CANCEL));
+    }
+
+    @ButtonHandler("fowSetupDeckConfigImportModal~MDL")
     static void openDeckConfigImportModal(ButtonInteractionEvent event) {
         TextInput url = TextInput.create("url", TextInputStyle.SHORT)
                 .setRequired(true)

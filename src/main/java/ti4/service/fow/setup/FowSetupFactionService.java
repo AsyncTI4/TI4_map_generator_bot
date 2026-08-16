@@ -21,6 +21,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.commands.player.AddAllianceMember;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.discord.interactions.routing.SelectionHandler;
@@ -44,7 +45,7 @@ import ti4.service.fow.GMService;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.game.GameColorsService;
 
-/** Step 2 of the FoW setup wizard: faction assignment and home-position assignment. */
+/** FACTIONS step of the FoW setup wizard: faction assignment and home-position assignment. */
 final class FowSetupFactionService {
 
     private FowSetupFactionService() {}
@@ -75,6 +76,85 @@ final class FowSetupFactionService {
         buttons.add(Buttons.green("fowSetupPositionsManual", "Assign Position (one player)"));
         buttons.add(Buttons.green("fowSetupPositionsRandomize", "Randomize All Positions"));
         buttons.add(Buttons.gray("fowSetupShowBoards", "Show All Player Boards"));
+
+        // Alliance Mode is set on the Game Options step - pairing needs faction+color, so it only
+        // makes sense here once players are real. Hidden entirely for non-Alliance games.
+        if (game.isAllianceMode()) {
+            sb.append("\n### Alliance pairs\n");
+            List<Player> realPlayers = game.getRealPlayers();
+            boolean anyPairs = false;
+            for (int i = 0; i < realPlayers.size(); i++) {
+                for (int j = i + 1; j < realPlayers.size(); j++) {
+                    Player a = realPlayers.get(i);
+                    Player b = realPlayers.get(j);
+                    if (a.isPlayerMemberOfAlliance(b)) {
+                        sb.append("> ")
+                                .append(a.getUserName())
+                                .append(" <-> ")
+                                .append(b.getUserName())
+                                .append('\n');
+                        anyPairs = true;
+                    }
+                }
+            }
+            if (!anyPairs) {
+                sb.append("> _no pairs yet_\n");
+            }
+            buttons.add(Buttons.blue("fowSetupAlliancePick1", "Pair Alliance Members"));
+        }
+    }
+
+    // --- Alliance Mode pairing: pick player 1, then player 2, then apply ---
+
+    @ButtonHandler("fowSetupAlliancePick1")
+    static void pickAlliancePlayer1(ButtonInteractionEvent event, Game game) {
+        if (!FowSetupWizardService.requireGM(event, game)) return;
+        List<Button> playerButtons = new ArrayList<>();
+        for (Player player : game.getRealPlayers()) {
+            playerButtons.add(Buttons.gray("fowSetupAlliancePick2_" + player.getUserID(), player.getUserName()));
+        }
+        if (playerButtons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "No players have a faction and color assigned yet.");
+            return;
+        }
+        playerButtons.add(Buttons.CANCEL);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), "Pick the first player of the pair:", playerButtons);
+    }
+
+    @ButtonHandler("fowSetupAlliancePick2_")
+    static void pickAlliancePlayer2(ButtonInteractionEvent event, Game game, String buttonID) {
+        if (!FowSetupWizardService.requireGM(event, game)) return;
+        String player1Id = buttonID.replace("fowSetupAlliancePick2_", "");
+        Player player1 = game.getPlayer(player1Id);
+        if (player1 == null) return;
+
+        List<Button> playerButtons = new ArrayList<>();
+        for (Player player : game.getRealPlayers()) {
+            if (player.getUserID().equals(player1Id)) continue;
+            playerButtons.add(Buttons.gray(
+                    "fowSetupAllianceConfirm_" + player1Id + "_" + player.getUserID(), player.getUserName()));
+        }
+        if (playerButtons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No other players to pair with.");
+            return;
+        }
+        playerButtons.add(Buttons.CANCEL);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), "Pair " + player1.getUserName() + " with:", playerButtons);
+    }
+
+    @ButtonHandler("fowSetupAllianceConfirm_")
+    static void confirmAlliancePair(ButtonInteractionEvent event, Game game, String buttonID) {
+        if (!FowSetupWizardService.requireGM(event, game)) return;
+        // Discord user IDs are purely numeric snowflakes, so a single "_" unambiguously separates the two.
+        String[] parts = buttonID.replace("fowSetupAllianceConfirm_", "").split("_", 2);
+        Player player1 = game.getPlayer(parts[0]);
+        Player player2 = game.getPlayer(parts[1]);
+        if (player1 == null || player2 == null) return;
+        AddAllianceMember.makeAlliancePartners(player1, player2, event, game);
+        FowSetupWizardService.openOrRefresh(game);
     }
 
     // --- Ban factions from the Franken-eligible pool (shared by manual entry and the mini draft) ---
@@ -82,6 +162,28 @@ final class FowSetupFactionService {
     @ButtonHandler("fowSetupBanFactionsMenu")
     static void banFactionsMenu(ButtonInteractionEvent event, Game game) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
+        postBanFactionsMenu(event, game, false, null);
+    }
+
+    @ButtonHandler("fowSetupBanFactionToggle_")
+    static void toggleBanFaction(ButtonInteractionEvent event, Game game, String buttonID) {
+        if (!FowSetupWizardService.requireGM(event, game)) return;
+        String alias = buttonID.replace("fowSetupBanFactionToggle_", "");
+        List<String> banned = new ArrayList<>(bannedFactionAliases(game));
+        boolean nowBanned = !banned.remove(alias);
+        if (nowBanned) {
+            banned.add(alias);
+        }
+        game.setStoredValue(BANNED_FACTIONS_KEY, String.join("finSep", banned));
+        String leadNote = Mapper.getFaction(alias).getFactionName() + (nowBanned ? " banned." : " unbanned.");
+        postBanFactionsMenu(event, game, true, leadNote);
+    }
+
+    /** {@code editInPlace} updates the message the clicked toggle button lives on instead of reposting
+     * a fresh ban list on every single ban/unban click - {@code leadNote} folds the confirmation into
+     * that same message rather than sending a separate one. */
+    private static void postBanFactionsMenu(
+            ButtonInteractionEvent event, Game game, boolean editInPlace, String leadNote) {
         List<String> banned = bannedFactionAliases(game);
         List<Button> factionButtons = new ArrayList<>();
         for (FactionModel faction : FrankenDraft.getAllFrankenLegalFactions(game)) {
@@ -96,24 +198,17 @@ final class FowSetupFactionService {
                                     "Ban " + faction.getFactionName()));
         }
         factionButtons.add(Buttons.CANCEL);
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), "Click a faction to ban/unban it from the Franken pool:", factionButtons);
-    }
-
-    @ButtonHandler("fowSetupBanFactionToggle_")
-    static void toggleBanFaction(ButtonInteractionEvent event, Game game, String buttonID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
-        String alias = buttonID.replace("fowSetupBanFactionToggle_", "");
-        List<String> banned = new ArrayList<>(bannedFactionAliases(game));
-        boolean nowBanned = !banned.remove(alias);
-        if (nowBanned) {
-            banned.add(alias);
+        String message =
+                (leadNote == null ? "" : leadNote + "\n\n") + "Click a faction to ban/unban it from the Franken pool:";
+        // A single message caps out at Modal.MAX_COMPONENTS (5) rows of 5 buttons = 25. The full Franken-
+        // legal faction pool (base+PoK, plus DS/BR/Absol/homebrew when enabled) routinely exceeds that, so
+        // editing in place would silently fail to update once it does - fall back to a fresh multi-message
+        // send (sendMessageToChannelWithButtons auto-paginates) rather than eating the edit.
+        if (editInPlace && factionButtons.size() <= 25) {
+            MessageHelper.editMessageWithButtons(event, message, factionButtons);
+        } else {
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, factionButtons);
         }
-        game.setStoredValue(BANNED_FACTIONS_KEY, String.join("finSep", banned));
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                Mapper.getFaction(alias).getFactionName() + (nowBanned ? " banned." : " unbanned."));
-        banFactionsMenu(event, game);
     }
 
     private static List<String> bannedFactionAliases(Game game) {
@@ -402,8 +497,7 @@ final class FowSetupFactionService {
             if (StringUtils.isBlank(effectiveFaction(state, player)) || effectivePosition(player) != null) {
                 continue;
             }
-            playerButtons.add(
-                    Buttons.gray("fowSetupPositionPlayer_" + player.getUserID() + "~MDL", player.getUserName()));
+            playerButtons.add(Buttons.gray("fowSetupPositionPlayer_" + player.getUserID(), player.getUserName()));
         }
         if (playerButtons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -419,7 +513,7 @@ final class FowSetupFactionService {
     @ButtonHandler("fowSetupPositionPlayer_")
     static void pickPositionForPlayer(ButtonInteractionEvent event, Game game, String buttonID) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
-        String userId = buttonID.replace("fowSetupPositionPlayer_", "").replace("~MDL", "");
+        String userId = buttonID.replace("fowSetupPositionPlayer_", "");
         Player player = game.getPlayer(userId);
         if (player == null) return;
 
@@ -453,7 +547,10 @@ final class FowSetupFactionService {
                 .setPlaceholder("e.g. 305")
                 .setRequired(true)
                 .build();
-        Modal modal = Modal.create("fowSetupPositionResolve_" + userId, "Home Position for " + player.getUserName())
+        // Discord caps modal titles at Modal.MAX_TITLE_LENGTH (45) - usernames/nicknames can run up to 32
+        // chars, so "Home Position for " (19 chars) plus a long one can overflow and throw synchronously.
+        String title = StringUtils.left("Home Position for " + player.getUserName(), 45);
+        Modal modal = Modal.create("fowSetupPositionResolve_" + userId, title)
                 .addComponents(Label.of("Tile Position", position))
                 .build();
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
@@ -461,6 +558,7 @@ final class FowSetupFactionService {
 
     @ModalHandler("fowSetupPositionResolve_")
     static void resolvePositionModal(ModalInteractionEvent event, Game game) {
+        if (!FowSetupWizardService.requireGM(event, game)) return;
         String userId = event.getModalId().replace("fowSetupPositionResolve_", "");
         Player player = game.getPlayer(userId);
         if (player == null) return;

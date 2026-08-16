@@ -23,7 +23,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.SetOrderService;
 
-/** Step 3 of the FoW setup wizard: table / seat order, either picked manually or resolved from dice rolls. */
+/** TABLE_ORDER step of the FoW setup wizard: seat order (manual or dice) and the speaker pick. */
 final class FowSetupTableOrderService {
 
     private FowSetupTableOrderService() {}
@@ -39,9 +39,11 @@ final class FowSetupTableOrderService {
         sb.append("\n**a. Manual** - pick players one at a time in seat order.\n");
         sb.append("**b. Dice** - configure dice count/sides; a roll button gets posted to each player's ")
                 .append("own private channel so nobody sees anyone else's roll; then resolve.\n");
+        sb.append("**c. Speaker** - independent of seat order, pick who holds the speaker token.\n");
 
         buttons.add(Buttons.blue("fowSetupOrderManualStart", "Start Manual Order"));
         buttons.add(Buttons.blue("fowSetupDiceConfig~MDL", "Configure Dice"));
+        buttons.add(Buttons.gray("fowSetupPickSpeaker", "Set Speaker"));
 
         if (!state.getDiceRolls().isEmpty()) {
             sb.append("\n### Rolls so far\n");
@@ -67,7 +69,7 @@ final class FowSetupTableOrderService {
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         state.getManualOrderPicks().clear();
         FowSetupWizardService.saveState(game, state);
-        postRemainingPickButtons(event, game, state);
+        postRemainingPickButtons(event, game, state, false);
     }
 
     @ButtonHandler("fowSetupOrderResolveManual")
@@ -75,7 +77,10 @@ final class FowSetupTableOrderService {
         startManualOrder(event, game);
     }
 
-    private static void postRemainingPickButtons(ButtonInteractionEvent event, Game game, FowSetupWizardState state) {
+    /** {@code editInPlace} updates the "Pick seat #N" message in place instead of posting a fresh one
+     * for every single seat pick. */
+    private static void postRemainingPickButtons(
+            ButtonInteractionEvent event, Game game, FowSetupWizardState state, boolean editInPlace) {
         List<Button> playerButtons = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
             if (state.getManualOrderPicks().contains(player.getUserID())) continue;
@@ -86,7 +91,11 @@ final class FowSetupTableOrderService {
             return;
         }
         String msg = "Pick seat #" + (state.getManualOrderPicks().size() + 1) + ":";
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, playerButtons);
+        if (editInPlace) {
+            MessageHelper.editMessageWithButtons(event, msg, playerButtons);
+        } else {
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, playerButtons);
+        }
     }
 
     @ButtonHandler("fowSetupOrderPick_")
@@ -105,8 +114,36 @@ final class FowSetupTableOrderService {
             FowSetupWizardService.saveState(game, state);
             FowSetupWizardService.openOrRefresh(game);
         } else {
-            postRemainingPickButtons(event, game, state);
+            postRemainingPickButtons(event, game, state, true);
         }
+    }
+
+    // --- Speaker (independent of seat order) ---
+
+    @ButtonHandler("fowSetupPickSpeaker")
+    static void pickSpeaker(ButtonInteractionEvent event, Game game) {
+        if (!FowSetupWizardService.requireGM(event, game)) return;
+        List<Button> playerButtons = new ArrayList<>();
+        for (Player player : game.getRealPlayers()) {
+            playerButtons.add(Buttons.gray("fowSetupSpeakerPick_" + player.getUserID(), player.getUserName()));
+        }
+        if (playerButtons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "No players have a faction and color assigned yet.");
+            return;
+        }
+        playerButtons.add(Buttons.CANCEL);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Who is speaker?", playerButtons);
+    }
+
+    @ButtonHandler("fowSetupSpeakerPick_")
+    static void resolveSpeakerPick(ButtonInteractionEvent event, Game game, String buttonID) {
+        if (!FowSetupWizardService.requireGM(event, game)) return;
+        Player player = game.getPlayer(buttonID.replace("fowSetupSpeakerPick_", ""));
+        if (player == null) return;
+        game.setSpeaker(player);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getUserName() + " is now speaker.");
+        FowSetupWizardService.openOrRefresh(game);
     }
 
     // --- Dice-based order ---
@@ -129,6 +166,7 @@ final class FowSetupTableOrderService {
 
     @ModalHandler("fowSetupDiceConfigResolve")
     static void resolveDiceConfigModal(ModalInteractionEvent event, Game game) {
+        if (!FowSetupWizardService.requireGM(event, game)) return;
         int count;
         int sides;
         try {
