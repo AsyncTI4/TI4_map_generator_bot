@@ -109,6 +109,7 @@ public final class FowSetupWizardService {
         List<Button> buttons = new ArrayList<>();
         switch (state.getStep()) {
             case GAME_TYPE -> renderGameType(game, state, sb, buttons);
+            case GAME_OPTIONS -> FowSetupGameOptionsService.render(game, state, sb, buttons);
             case MAP_LOAD -> renderMapLoad(game, state, sb, buttons);
             case FACTIONS -> FowSetupFactionService.render(game, state, sb, buttons);
             case TABLE_ORDER -> FowSetupTableOrderService.render(game, state, sb, buttons);
@@ -141,6 +142,7 @@ public final class FowSetupWizardService {
     private static String stepTitle(FowSetupStep step) {
         return switch (step) {
             case GAME_TYPE -> "Game Type & Scenario";
+            case GAME_OPTIONS -> "Game Options";
             case MAP_LOAD -> "Load the Map";
             case FACTIONS -> "Assign Factions & Positions";
             case TABLE_ORDER -> "Table / Seat Order";
@@ -181,6 +183,19 @@ public final class FowSetupWizardService {
 
     private static String stepInfo(FowSetupStep step) {
         return switch (step) {
+            case GAME_OPTIONS -> """
+                ### Notes on these options
+                - **Absol Relics/Agendas** and **Absol Techs/Mechs** both flip the same underlying "Absol \
+                Mode" flag but change different decks - click both if you want the full Absol set.
+                - **No Supports** only removes Support for the Throne from players already in the game at \
+                the moment you click it. Players added later still need it removed manually.
+                - **Remove All Homebrews** turns the flags back off but does **not** undo deck/VP/objective \
+                changes already made - check those manually afterward.
+                - **TIGL Game** only sets the record-keeping flag; it doesn't change any decks or rules.
+                - The scoring presets (4/4/4, 4/5/6) and the custom scoring modal both just set VP, max \
+                secret objectives per player, and peekable Stage 1/2 objective counts - use whichever is \
+                more convenient, or run the modal after a preset to fine-tune one value.
+                """;
             case MAP_LOAD -> """
                 ### Map-editing commands you'll likely need once the base map is in
                 - `/map add_tile` / `/map add_tile_list` - place additional tiles or a whole batch at once

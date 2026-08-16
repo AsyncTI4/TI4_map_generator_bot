@@ -44,9 +44,9 @@ public class HomebrewService {
         HBOMEGAPHASE("Omega Phase", "Enable Omega Phase homebrew mode", null),
         HBVOTC("Voices of the Council", "Voices of the Council mode", null);
 
-        final String name;
-        final String description;
-        final TI4Emoji emoji;
+        public final String name;
+        public final String description;
+        public final TI4Emoji emoji;
 
         Homebrew(String name, String description, TI4Emoji emoji) {
             this.name = name;
