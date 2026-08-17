@@ -1,5 +1,20 @@
 [
     {
+        "alias": "demoralizing_environment",
+        "type": "mods",
+        "value": "-2",
+        "persistenceType": "TEMP_ONE_ROUND",
+        "scope": "_ship_no_ff",
+        "applyToOpponent": true,
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "action_cards",
+                "alias": "demoralizing_environment"
+            }
+        ]
+    },
+    {
         "alias": "survivalists_extra_die_when_damaged",
         "type": "extrarolls",
         "value": "+1",
@@ -108,9 +123,9 @@
         "alias": "xytheris_flagship_bonus",
         "type": "extrarolls",
         "value": "+1",
-        "valueScalingType": "carried_ffinfmf_in_space_area",
+        "valueScalingType": "carried_gf_in_space_area",
         "persistenceType": "CONDITIONAL",
-        "condition": "not_active_player",
+        "condition": "active_player",
         "scope": "fs",
         "related": [
             {
@@ -124,9 +139,9 @@
         "alias": "xytheris_flagship_bonus_afb",
         "type": "extrarolls",
         "value": "+1",
-        "valueScalingType": "carried_ffinfmf_in_space_area",
+        "valueScalingType": "carried_gf_in_space_area",
         "persistenceType": "CONDITIONAL",
-        "condition": "not_active_player",
+        "condition": "active_player",
         "scope": "fs",
         "related": [
             {
@@ -140,9 +155,9 @@
         "alias": "xytheris_flagship_bonus_bombard",
         "type": "extrarolls",
         "value": "+1",
-        "valueScalingType": "carried_ffinfmf_in_space_area",
+        "valueScalingType": "carried_gf_in_space_area",
         "persistenceType": "CONDITIONAL",
-        "condition": "not_active_player",
+        "condition": "active_player",
         "scope": "fs",
         "related": [
             {
@@ -156,9 +171,9 @@
         "alias": "xytheris_flagship_bonus_spacecannondefence",
         "type": "extrarolls",
         "value": "+1",
-        "valueScalingType": "carried_ffinfmf_in_space_area",
+        "valueScalingType": "carried_gf_in_space_area",
         "persistenceType": "CONDITIONAL",
-        "condition": "not_active_player",
+        "condition": "active_player",
         "scope": "fs",
         "related": [
             {
@@ -172,9 +187,9 @@
         "alias": "xytheris_flagship_bonus_spacecannonoffence",
         "type": "extrarolls",
         "value": "+1",
-        "valueScalingType": "carried_ffinfmf_in_space_area",
+        "valueScalingType": "carried_gf_in_space_area",
         "persistenceType": "CONDITIONAL",
-        "condition": "not_active_player",
+        "condition": "active_player",
         "scope": "fs",
         "related": [
             {

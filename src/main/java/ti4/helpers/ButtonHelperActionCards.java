@@ -349,6 +349,7 @@ public final class ButtonHelperActionCards {
         checkForPlayingSummit(game, player);
         checkForPlayingBountyContracts(game, player);
         checkForPlayingSpliceCards(game, player);
+        checkForPreassigningRelitigate(game, player);
         if (player.getPlayableActionCards().contains("puppetsonastring")) {
             String msg =
                     "You have _Puppets On A String_ in your hand. If you're not about to pass, you can ignore this message."
@@ -359,6 +360,20 @@ public final class ButtonHelperActionCards {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
+    }
+
+    private static void checkForPreassigningRelitigate(Game game, Player player) {
+        if (!player.getPlayableActionCards().contains("relitigate")
+                || !game.getStoredValue("Relitigate").isEmpty()) return;
+
+        List<Button> buttons = List.of(
+                Buttons.green("resolvePreassignment_Relitigate", "Pre-Play Relitigate"),
+                Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationNoPing()
+                        + ", you may pre-play _Relitigate_. It will trigger at the start of the next normal Agenda Phase.",
+                buttons);
     }
 
     @ButtonHandler("resolveCounterStroke")
@@ -1764,13 +1779,13 @@ public final class ButtonHelperActionCards {
         FoWHelper.notifyActorAndAffectedElsePublic(
                 game,
                 player,
-                player.getRepresentationUnfogged() + ", you've _Signal Jam_'d the system: "
+                player.getRepresentationUnfogged() + ", you placed a player's command token in the system: "
                         + tile.getRepresentationForButtons(game, player) + ".",
                 p2,
-                p2.getRepresentationUnfogged() + ", you've been _Signal Jam_'d in system: "
+                p2.getRepresentationUnfogged() + ", your command token has been placed in system: "
                         + tile.getRepresentationForButtons(game, p2) + ".",
-                player.getRepresentationUnfogged() + " has _Signal Jam_'d " + p2.getRepresentationUnfogged()
-                        + " in tile " + tile.getRepresentationForButtons(game, p2) + ".");
+                player.getRepresentationUnfogged() + " has placed " + p2.getRepresentationUnfogged()
+                        + " command token in tile " + tile.getRepresentationForButtons(game, p2) + ".");
     }
 
     @ButtonHandler("reactorMeltdownStep2_")
@@ -2835,10 +2850,12 @@ public final class ButtonHelperActionCards {
     public static void resolveReverse(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String acName = buttonID.replace("resolveReverse_", "");
         List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());
+        boolean hideUnplayed = ActionCardHelper.hidesUnplayedDiscards(game, player);
         for (String acStringID : acStrings) {
             ActionCardModel actionCard = Mapper.getActionCard(acStringID);
             String actionCardTitle = actionCard.getName();
-            if (acName.equalsIgnoreCase(actionCardTitle)) {
+            if (acName.equalsIgnoreCase(actionCardTitle)
+                    && ActionCardHelper.isDiscardVisible(game, hideUnplayed, acStringID)) {
                 boolean picked = game.pickActionCard(
                         player.getUserID(), game.getDiscardActionCards().get(acStringID));
                 if (!picked) {

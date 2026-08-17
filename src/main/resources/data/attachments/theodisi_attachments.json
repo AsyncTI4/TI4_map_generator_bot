@@ -24,6 +24,30 @@
         "source": "theodisi"
     },
     {
+        "id": "initiativeoutpost",
+        "name": "Initiative Outpost",
+        "imagePath": "attachment_initiativeoutpost.png",
+        "source": "theodisi"
+    },
+    {
+        "id": "explorationoutpost",
+        "name": "Exploration Outpost",
+        "imagePath": "attachment_explorationoutpost.png",
+        "source": "theodisi"
+    },
+    {
+        "id": "assemblyoutpost",
+        "name": "Assembly Outpost",
+        "imagePath": "attachment_assemblyoutpost.png",
+        "source": "theodisi"
+    },
+    {
+        "id": "marketoutpost",
+        "name": "Market Outpost",
+        "imagePath": "attachment_marketoutpost.png",
+        "source": "theodisi"
+    },
+    {
         "id": "ponthousboth",
         "name": "Ponthous +/-",
         "imagePath": "attachment_ponthousboth.png",

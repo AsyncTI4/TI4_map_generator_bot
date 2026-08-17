@@ -46,8 +46,8 @@ public class LostLegaciesRelicHandler {
     private static final String CHOOSE_NBOON_PLANET = "chooseNaturesBoonPlanet_";
     // Diplomatic Boon
     private static final String CHOOSE_DBOON_PLANET = "chooseDiplomaticBoonPlanet_";
-    private static final String PLACE_INF_DBOON = "placeInfantryWithDiplomaticBoon_";
-    private static final String PLACE_FF_DBOON = "placeFighterWithDiplomaticBoon_";
+    private static final String PLACE_UNIT_DBOON = "placeUnitWithDiplomaticBoon_";
+    private static final String FINISH_DBOON = "finishDiplomaticBoonPlacement";
     // Cosmic Boon
     private static final String USE_CBOON = "useCosmicBoon";
     // Ancient Radar
@@ -473,81 +473,113 @@ public class LostLegaciesRelicHandler {
             return;
         }
 
-        List<Button> fighterOrInf = new ArrayList<>();
-        fighterOrInf.add(Buttons.green(
-                player.factionButtonChecker() + PLACE_INF_DBOON + planetName,
-                "Place " + planet.getInfluence() + " Infantry",
-                UnitEmojis.infantry));
-        fighterOrInf.add(Buttons.green(
-                player.factionButtonChecker() + PLACE_FF_DBOON + planetName,
-                "Place " + planet.getInfluence() + " Fighters",
-                UnitEmojis.fighter));
-
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + ", please select wether you would like to place fighters or infantry using _Diplomatic Boon_ on "
+                        + ", place up to " + planet.getInfluence()
+                        + " total infantry and fighters using _Diplomatic Boon_ on "
                         + planet.getRepresentation(game) + ".",
-                fighterOrInf);
+                getDiplomaticBoonPlacementButtons(game, player, planetName, planet.getInfluence()));
 
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler(PLACE_INF_DBOON)
-    public static void placeInfantryUsingDiplomaticBoon(
+    @ButtonHandler(PLACE_UNIT_DBOON)
+    public static void placeUnitUsingDiplomaticBoon(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (game == null || player == null) {
             return;
         }
 
-        String planetName = buttonID.replace(PLACE_INF_DBOON, "");
-        Planet planet = game.getUnitHolderFromPlanet(planetName);
-        if (planet == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find planet");
-            ButtonHelper.deleteMessage(event);
+        String[] payload = buttonID.replace(PLACE_UNIT_DBOON, "").split("~", 4);
+        if (payload.length != 4) {
             return;
         }
 
-        AddUnitService.addUnits(
-                event,
-                game.getTileFromPlanet(planetName),
-                game,
-                player.getColor(),
-                planet.getInfluence() + " infantry " + planetName);
-
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getRepresentation() + " placed " + planet.getInfluence() + " infantry on "
-                        + planet.getRepresentation(game) + " using _Diplomatic Boon_");
-
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(PLACE_FF_DBOON)
-    public static void placeFightersUsingDiplomaticBoon(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (game == null || player == null) {
+        String planetName = payload[0];
+        int remaining;
+        try {
+            remaining = Integer.parseInt(payload[1]);
+        } catch (NumberFormatException e) {
+            return;
+        }
+        if (remaining < 1) {
             return;
         }
 
-        String planetName = buttonID.replace(PLACE_FF_DBOON, "");
+        String unit = payload[2];
+        String destination = payload[3];
         Planet planet = game.getUnitHolderFromPlanet(planetName);
         Tile tile = game.getTileFromPlanet(planetName);
-        if (planet == null || tile == null) {
+        if (planet == null || tile == null || (!"infantry".equals(unit) && !"fighter".equals(unit))) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find planet or tile.");
             ButtonHelper.deleteMessage(event);
             return;
         }
 
-        AddUnitService.addUnits(event, tile, game, player.getColor(), planet.getInfluence() + " fighter");
+        if ("infantry".equals(unit)) {
+            Planet destinationPlanet = game.getUnitHolderFromPlanet(destination);
+            Tile destinationTile = game.getTileFromPlanet(destination);
+            if (destinationPlanet == null
+                    || destinationTile == null
+                    || !player.getPlanets().contains(destination)
+                    || !tile.getPosition().equals(destinationTile.getPosition())) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(), "Could not find an eligible destination planet.");
+                ButtonHelper.deleteMessage(event);
+                return;
+            }
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + destination);
+        } else {
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "1 fighter");
+        }
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentation() + " placed " + planet.getInfluence() + " fighter "
-                        + (planet.getInfluence() > 1 ? "s" : "") + " in " + tile.getRepresentation()
-                        + " using _Diplomatic Boon_");
+                player.getRepresentation() + " placed 1 " + unit + " using _Diplomatic Boon_.");
 
+        if (remaining > 1) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(),
+                    player.getRepresentation() + " may place " + (remaining - 1)
+                            + " more total infantry and fighters using _Diplomatic Boon_.",
+                    getDiplomaticBoonPlacementButtons(game, player, planetName, remaining - 1));
+        }
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(FINISH_DBOON)
+    public static void finishDiplomaticBoonPlacement(ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static List<Button> getDiplomaticBoonPlacementButtons(
+            Game game, Player player, String planetName, int remaining) {
+        Tile tile = game.getTileFromPlanet(planetName);
+        if (tile == null) {
+            return List.of(Buttons.red(player.factionButtonChecker() + FINISH_DBOON, "Done Placing"));
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green(
+                player.factionButtonChecker() + PLACE_UNIT_DBOON + planetName + "~" + remaining + "~fighter~space",
+                "Place 1 Fighter (" + remaining + " remaining)",
+                UnitEmojis.fighter));
+        for (String controlledPlanet : player.getPlanets()) {
+            Planet destination = game.getUnitHolderFromPlanet(controlledPlanet);
+            Tile destinationTile = game.getTileFromPlanet(controlledPlanet);
+            if (destination != null
+                    && destinationTile != null
+                    && tile.getPosition().equals(destinationTile.getPosition())) {
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + PLACE_UNIT_DBOON + planetName + "~" + remaining + "~infantry~"
+                                + controlledPlanet,
+                        "Place 1 Infantry on " + destination.getRepresentation(game) + " (" + remaining + " remaining)",
+                        UnitEmojis.infantry));
+            }
+        }
+        buttons.add(Buttons.red(player.factionButtonChecker() + FINISH_DBOON, "Done Placing"));
+        return buttons;
     }
 
     // Economic Boon

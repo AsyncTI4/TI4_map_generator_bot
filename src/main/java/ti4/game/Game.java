@@ -42,6 +42,10 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.AncientMapsLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.ExtensionRefitLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShieldingLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousPromissoryHandler;
@@ -943,6 +947,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("Monuments to the Ages", isMonumentToTheAgesMode());
         gameModes.put("Weird Wormholes", isWeirdWormholesMode());
         gameModes.put("Cosmic Phenomenae", isCosmicPhenomenaeMode());
+        gameModes.put("Cosmic Convergence", isCosmicConvergenceMode());
         gameModes.put("Wild wild Galaxy", isWildWildGalaxyMode());
         gameModes.put("Feast or Famine", isFeastOrFamineMode());
         gameModes.put("Zealous Orthodoxy", isZealousOrthodoxyMode());
@@ -1435,6 +1440,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
 
+        ExtensionRefitLLButtonHandler.clearExtensionRefit(this);
+        AncientMapsLLButtonHandler.clearAncientMaps(this);
+        MirrorShieldingLLButtonHandler.clearMirrorShielding(this);
+        RaisedMoraleLLButtonHandler.clearRaisedMorale(this);
         PonthousPromissoryHandler.clearThunderbirdPrototype(this);
         PonthousTechHandler.clearThunderbirdProtocol(this);
         KryxosBreakthroughHandler.clearPrototypeInnovators(this);
@@ -2655,8 +2664,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 .map(ac -> Mapper.getActionCard(ac).getName())
                 .collect(Collectors.joining("\n"));
         Collections.shuffle(getActionCards());
-        acsToShuffle.forEach(ac -> getDiscardActionCards().remove(ac)); // clear out the shuffled back cards
-        acsToShuffle.forEach(ac -> getDiscardACStatus().remove(ac)); // just in case
+        acsToShuffle.forEach(this::removeFromDiscard); // clear out the shuffled back cards
         String msg = "# " + getPing()
                 + ", the action card deck has run out of cards, and so the discard pile has been shuffled to form a new action card deck.";
         if (!isFowMode()) {
@@ -2961,7 +2969,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (!getActionCards().isEmpty()) {
             String id = getActionCards().getFirst();
             getActionCards().remove(id);
-            setDiscardActionCard(id, null);
+            setDiscardActionCard(id, null, false);
             return id;
         }
 
@@ -3055,7 +3063,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return false;
     }
 
-    private void setDiscardActionCard(String id, ACStatus status) {
+    private void setDiscardActionCard(String id, ACStatus status, boolean played) {
         Collection<Integer> values = getDiscardActionCards().values();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
@@ -3063,13 +3071,30 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         getDiscardActionCards().put(id, identifier);
         if (status != null) getDiscardACStatus().put(id, status);
+        if (played) {
+            getPlayedActionCards().add(id);
+        } else {
+            getPlayedActionCards().remove(id);
+        }
     }
 
-    private void setPurgedActionCard(String id) {
-        setDiscardActionCard(id, ACStatus.purged);
+    private void setPurgedActionCard(String id, boolean played) {
+        setDiscardActionCard(id, ACStatus.purged, played);
+    }
+
+    /** Removes a card from the discard pile and every piece of bookkeeping that hangs off it. */
+    private void removeFromDiscard(String acID) {
+        getDiscardActionCards().remove(acID);
+        getDiscardACStatus().remove(acID);
+        getPlayedActionCards().remove(acID);
     }
 
     public boolean discardActionCard(String userID, Integer acIDNumber) {
+        return discardActionCard(userID, acIDNumber, false);
+    }
+
+    /** @param played whether the card is leaving the hand because it was played, rather than discarded. */
+    public boolean discardActionCard(String userID, Integer acIDNumber, boolean played) {
         Player player = getPlayer(userID);
         if (player == null) {
             return false;
@@ -3085,13 +3110,18 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (!acID.isEmpty()) {
             player.removeActionCard(acIDNumber);
             ACStatus status = shouldPutCardOnRalnel(player) ? ACStatus.ralnelbt : null;
-            setDiscardActionCard(acID, status);
+            setDiscardActionCard(acID, status, played);
             return true;
         }
         return false;
     }
 
     public boolean purgedActionCard(String userID, Integer acIDNumber) {
+        return purgedActionCard(userID, acIDNumber, false);
+    }
+
+    /** @param played whether the card is leaving the hand because it was played, rather than purged from hand. */
+    public boolean purgedActionCard(String userID, Integer acIDNumber, boolean played) {
         Player player = getPlayer(userID);
         if (player == null) {
             return false;
@@ -3114,7 +3144,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!acID.isEmpty()) {
             player.removeActionCard(acIDNumber);
-            setPurgedActionCard(acID);
+            setPurgedActionCard(acID, played);
             return true;
         }
         return false;
@@ -3144,8 +3174,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
         if (!acID.isEmpty()) {
-            getDiscardActionCards().remove(acID);
-            getDiscardACStatus().remove(acID);
+            removeFromDiscard(acID);
             player.setActionCard(acID);
             return true;
         }
@@ -3166,8 +3195,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
         if (!acID.isEmpty()) {
-            getDiscardActionCards().remove(acID);
-            getDiscardACStatus().remove(acID);
+            removeFromDiscard(acID);
             player.setActionCard(acID);
             return true;
         }
@@ -3183,8 +3211,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
         if (!acID.isEmpty()) {
-            getDiscardActionCards().remove(acID);
-            getDiscardACStatus().remove(acID);
+            removeFromDiscard(acID);
             getActionCards().add(acID);
             Collections.shuffle(getActionCards());
             return true;
@@ -3490,6 +3517,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         setActionCards(deck.getNewShuffledDeck());
         getDiscardActionCards().clear();
         getDiscardACStatus().clear();
+        getPlayedActionCards().clear();
         for (Player player : players.values()) {
             player.getActionCards().clear();
         }
@@ -3695,7 +3723,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void setPurgedActionCards(List<String> purgedActionCardList) {
-        purgedActionCardList.forEach(ac -> setDiscardActionCard(ac, ACStatus.purged));
+        purgedActionCardList.forEach(ac -> setDiscardActionCard(ac, ACStatus.purged, false));
     }
 
     public String getPing() {

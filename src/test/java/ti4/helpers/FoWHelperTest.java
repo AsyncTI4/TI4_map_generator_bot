@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 
 /**
@@ -98,5 +99,105 @@ class FoWHelperTest extends BaseTi4Test {
         assertThat(button.getLabel()).isEqualTo(player.getColorIfCanSeeStats(viewer));
         // Per-viewer button drops the icon entirely so it can't leak color to someone who can't see it.
         assertThat(button.getEmoji()).isNull();
+    }
+
+    // ---- canSeeStatsOfPlayer: per-PN-type stat-reveal toggles --------------------------------
+
+    private Player addViewer() {
+        Player viewer = game.addPlayer("viewer-id", "viewer");
+        viewer.setFaction("hacan");
+        viewer.setColor("blue");
+        return viewer;
+    }
+
+    @Test
+    void canSeeStatsOfPlayer_playAreaFactionPN_defaultOptions_revealsStats() {
+        game.setFowMode(true);
+        Player viewer = addViewer();
+        player.addOwnedPromissoryNoteByID("convoys"); // hacan faction PN, playArea: true
+        viewer.addPromissoryNoteToPlayArea("convoys");
+
+        assertThat(FoWHelper.canSeeStatsOfPlayer(game, player, viewer)).isTrue();
+    }
+
+    @Test
+    void canSeeStatsOfPlayer_playAreaFactionPN_withFactionPnToggleOn_doesNotReveal() {
+        game.setFowMode(true);
+        game.setFowOption(FOWOption.HIDE_STATS_VIA_FACTION_PN, true);
+        Player viewer = addViewer();
+        player.addOwnedPromissoryNoteByID("convoys");
+        viewer.addPromissoryNoteToPlayArea("convoys");
+
+        assertThat(FoWHelper.canSeeStatsOfPlayer(game, player, viewer)).isFalse();
+    }
+
+    @Test
+    void canSeeStatsOfPlayer_playAreaFactionPN_withUnrelatedAllianceToggleOn_stillReveals() {
+        game.setFowMode(true);
+        game.setFowOption(FOWOption.HIDE_STATS_VIA_ALLIANCE, true);
+        Player viewer = addViewer();
+        player.addOwnedPromissoryNoteByID("convoys");
+        viewer.addPromissoryNoteToPlayArea("convoys");
+
+        assertThat(FoWHelper.canSeeStatsOfPlayer(game, player, viewer)).isTrue();
+    }
+
+    @Test
+    void canSeeStatsOfPlayer_playAreaBlackSpectrumAllianceHomebrew_withAllianceToggleOn_doesNotReveal() {
+        // bsp_arborec_alliance is a faction-specific homebrew replacement for the generic
+        // <color>_an Alliance card (homebrewReplacesID: "<color>_an"), so it must be classified as
+        // Alliance, not Faction PN, even though its own alias doesn't end in "_an".
+        game.setFowMode(true);
+        game.setFowOption(FOWOption.HIDE_STATS_VIA_ALLIANCE, true);
+        player.setFaction("arborec");
+        Player viewer = addViewer();
+        player.addOwnedPromissoryNoteByID("bsp_arborec_alliance");
+        viewer.addPromissoryNoteToPlayArea("bsp_arborec_alliance");
+
+        assertThat(FoWHelper.canSeeStatsOfPlayer(game, player, viewer)).isFalse();
+    }
+
+    @Test
+    void canSeeStatsOfPlayer_playAreaBlackSpectrumAllianceHomebrew_withUnrelatedFactionPnToggleOn_stillReveals() {
+        game.setFowMode(true);
+        game.setFowOption(FOWOption.HIDE_STATS_VIA_FACTION_PN, true);
+        player.setFaction("arborec");
+        Player viewer = addViewer();
+        player.addOwnedPromissoryNoteByID("bsp_arborec_alliance");
+        viewer.addPromissoryNoteToPlayArea("bsp_arborec_alliance");
+
+        assertThat(FoWHelper.canSeeStatsOfPlayer(game, player, viewer)).isTrue();
+    }
+
+    @Test
+    void canSeeStatsOfPlayer_playAreaSftt_defaultOptions_revealsStats() {
+        game.setFowMode(true);
+        Player viewer = addViewer();
+        player.addOwnedPromissoryNoteByID("red_sftt"); // player's own color-templated SftT card
+        viewer.addPromissoryNoteToPlayArea("red_sftt");
+
+        assertThat(FoWHelper.canSeeStatsOfPlayer(game, player, viewer)).isTrue();
+    }
+
+    @Test
+    void canSeeStatsOfPlayer_playAreaSftt_withSfttToggleOn_doesNotReveal() {
+        game.setFowMode(true);
+        game.setFowOption(FOWOption.HIDE_STATS_VIA_SFTT, true);
+        Player viewer = addViewer();
+        player.addOwnedPromissoryNoteByID("red_sftt");
+        viewer.addPromissoryNoteToPlayArea("red_sftt");
+
+        assertThat(FoWHelper.canSeeStatsOfPlayer(game, player, viewer)).isFalse();
+    }
+
+    @Test
+    void canSeeStatsOfPlayer_masterToggleOn_overridesPermissivePerTypeToggles() {
+        game.setFowMode(true);
+        game.setFowOption(FOWOption.STATS_FROM_HS_ONLY, true);
+        Player viewer = addViewer();
+        player.addOwnedPromissoryNoteByID("convoys");
+        viewer.addPromissoryNoteToPlayArea("convoys");
+
+        assertThat(FoWHelper.canSeeStatsOfPlayer(game, player, viewer)).isFalse();
     }
 }

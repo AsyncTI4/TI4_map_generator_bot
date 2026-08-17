@@ -47,6 +47,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.info.TechInfoService;
 import ti4.service.info.UnitInfoService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.map.FractureService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.PlanetService;
 import ti4.service.player.PlayerColorService;
@@ -587,6 +588,12 @@ public class PlayerSetupService {
                         player.getCorrectChannel(),
                         "You cannot do _Rapid Mobilization_ __yet__, but once the map is setup, you can use this button to do so.",
                         buttons);
+            }
+        }
+        if (isSpeaker && !FractureService.isFractureInPlay(game)) {
+            if (game.isRapidMobilizationMode() || game.isCosmicConvergenceMode()) {
+                FractureService.spawnFracture(event, game);
+                FractureService.spawnIngressTokens(event, game, player, "nah");
             }
         }
     }

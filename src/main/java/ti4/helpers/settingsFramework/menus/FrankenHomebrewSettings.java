@@ -39,7 +39,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
         discoStars.setExtraInfo("Adds Discordant Stars faions only.");
         blueReverie.setExtraInfo("Adds Blue Reverie factions only.");
         unchartedSpace.setExtraInfo("Adds Uncharted Space content.");
-        lostLegacies.setExtraInfo("Adds Lost Legacies factions.");
+        lostLegacies.setExtraInfo("Adds Lost Legacies factions only.");
 
         if (json != null && json.has("homebrewSettings")) json = json.get("homebrewSettings");
         if (json != null

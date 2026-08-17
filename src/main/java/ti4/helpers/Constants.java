@@ -788,6 +788,7 @@ public final class Constants {
     public static final String EXPLORATION_DECKS = "exploration_decks";
     public static final String AC_DISCARDED = "action_cards_discarded";
     public static final String AC_STATUS = "action_cards_status";
+    public static final String AC_PLAYED = "action_cards_played";
     public static final String AC_PURGED = "action_cards_purged";
     public static final String SO = "secret_objectives";
     public static final String PRODUCED_UNITS = "produced_units";
@@ -1351,6 +1352,7 @@ public final class Constants {
     public static final String RAPID_MOBILIZATION_MODE = "rapid_mobilization_mode";
     public static final String MONUMENTS_TO_THE_AGES_MODE = "monuments_to_the_ages_mode";
     public static final String COSMIC_PHENOMENAE_MODE = "cosmic_phenomenae_mode";
+    public static final String COSMIC_CONVERGENCE_MODE = "cosmic_convergence_mode";
     public static final String WEIRD_WORMHOLES_MODE = "weird_wormholes_mode";
     public static final String NO_FRACTURE = "no_fracture";
     public static final String CALL_OF_THE_VOID_MODE = "call_of_the_void_mode";

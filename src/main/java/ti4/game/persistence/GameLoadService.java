@@ -339,6 +339,7 @@ class GameLoadService {
                 case Constants.MANDATES -> game.setMandates(getCardList(info));
                 case Constants.AC_DISCARDED -> game.setDiscardActionCards(getParsedCards(info));
                 case Constants.AC_STATUS -> game.setDiscardActionCardStatus(getParsedCardStatus(info));
+                case Constants.AC_PLAYED -> game.setPlayedActionCards(new LinkedHashSet<>(getCardList(info)));
                 case Constants.AC_PURGED ->
                     game.setPurgedActionCards(
                             getParsedCards(info).keySet().stream().toList()); // @Deprecated
@@ -622,6 +623,8 @@ class GameLoadService {
                 case Constants.WILD_WILD_GALAXY_MODE -> game.setWildWildGalaxyMode(parseBooleanOrDefault(info, false));
                 case Constants.FEAST_OR_FAMINE_MODE -> game.setFeastOrFamineMode(parseBooleanOrDefault(info, false));
                 case Constants.WEIRD_WORMHOLES_MODE -> game.setWeirdWormholesMode(parseBooleanOrDefault(info, false));
+                case Constants.COSMIC_CONVERGENCE_MODE ->
+                    game.setCosmicConvergenceMode(parseBooleanOrDefault(info, false));
                 case Constants.NO_FRACTURE -> game.setNoFractureMode(parseBooleanOrDefault(info, false));
                 case Constants.CALL_OF_THE_VOID_MODE -> game.setCallOfTheVoidMode(parseBooleanOrDefault(info, false));
                 case Constants.COSMIC_PHENOMENAE_MODE ->

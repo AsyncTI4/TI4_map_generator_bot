@@ -54,6 +54,7 @@ import org.apache.commons.lang3.function.Consumers;
 import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
@@ -5146,6 +5147,40 @@ public class ButtonHelper {
                 buttons);
     }
 
+    @ButtonHandler("cosmicConStep3_")
+    public static void cosmicConStep3(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        deleteMessage(event);
+        String newTileID = buttonID.split("_")[1];
+        String pos = buttonID.split("_")[2];
+        Tile tile = new Tile(newTileID, pos);
+        game.setTile(tile);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " added the system " + tile.getRepresentationForButtons(game, player)
+                        + ".");
+        if (tile.getPlanetUnitHolders().isEmpty()) {
+            AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
+        }
+        if (game.isDangerousWildsMode()) {
+            Player neutral = game.getNeutral();
+            boolean added = false;
+            for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                if (getTypeOfPlanet(game, uH.getName()).contains("hazardous")) {
+                    int neutralUnitsToAdd = Helper.getPlanetResources(uH.getName(), game);
+                    if (neutralUnitsToAdd > 0) {
+                        added = true;
+                        AddUnitService.addUnits(
+                                event, tile, game, neutral.getColor(), neutralUnitsToAdd + " infantry " + uH.getName());
+                    }
+                }
+            }
+            if (added) {
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(), "Added neutral infantry to hazardous planets.");
+            }
+        }
+    }
+
     @ButtonHandler("starChartsStep3_")
     public static void starChartStep3(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         deleteMessage(event);
@@ -5345,6 +5380,10 @@ public class ButtonHelper {
         if (game.isNaaluAgent() && tile.isHomeSystem(game)) return false;
         if (!FOWPlusService.canActivatePosition(tile.getPosition(), player, game, visiblePositions)) return false;
         if ("silver_flame".equalsIgnoreCase(tile.getTileID())) return false;
+        if (TransitRiderLLButtonHandler.isActive(game, player)
+                && !getOtherPlayersWithUnitsInTheSystem(player, game, tile).isEmpty()) {
+            return false;
+        }
         String borrowedAuthorityColor = game.getStoredValue("borrowedAuthorityColor");
         if (!borrowedAuthorityColor.isEmpty()
                 && (tile.isHomeSystem(game)

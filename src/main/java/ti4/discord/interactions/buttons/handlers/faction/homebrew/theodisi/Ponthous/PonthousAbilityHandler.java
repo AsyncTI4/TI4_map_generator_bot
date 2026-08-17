@@ -64,9 +64,9 @@ public class PonthousAbilityHandler {
         String resOrInf = buttonID.replace(USE_PONTHOUS, "");
 
         if ("res".equals(resOrInf)) {
-            setPonthousAttachment(game, PONTHOUS_INF);
-        } else if ("inf".equals(resOrInf)) {
             setPonthousAttachment(game, PONTHOUS_RES);
+        } else if ("inf".equals(resOrInf)) {
+            setPonthousAttachment(game, PONTHOUS_INF);
         } else {
             return;
         }

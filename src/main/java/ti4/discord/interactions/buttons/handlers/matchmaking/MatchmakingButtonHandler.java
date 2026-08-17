@@ -33,6 +33,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedPlayer;
+import ti4.helpers.TIGLHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameLaunchPostService;
@@ -327,12 +328,13 @@ class MatchmakingButtonHandler {
                 filterPaceRestrictionsByIfPlayerHasCompletedRequiredGame(userId),
                 userSettings.getMatchmakingPaces(),
                 DEFAULT_PACE_OPTIONS);
+        List<String> rankOptions = TIGLHelper.filterStandardTiglRankOptionsAtOrBelow(
+                event.getUser(), MatchmakingOptions.TIGL_RANK_OPTIONS);
+        if (rankOptions.isEmpty()) {
+            rankOptions = List.of(MatchmakingOptions.UNRANKED_OPTION);
+        }
         CheckboxGroup ranks = buildCheckboxGroup(
-                TIGL_RANKS_ID,
-                MatchmakingOptions.TIGL_RANK_OPTIONS,
-                userSettings.getMatchmakingTiglRanks(),
-                DEFAULT_TIGL_RANK_OPTIONS,
-                true);
+                TIGL_RANKS_ID, rankOptions, userSettings.getMatchmakingTiglRanks(), DEFAULT_TIGL_RANK_OPTIONS, true);
         Modal.Builder modal = Modal.create(SEARCH_FOR_PLAYERS_TIGL_MODAL_ID, "Search for Players")
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
                 .addComponents(Label.of("Pace", paces))
@@ -512,6 +514,8 @@ class MatchmakingButtonHandler {
     }
 
     private static PlayerSearchCriteria buildTiglSearchCriteria(ModalInteractionEvent event) {
+        List<String> requestedRanks = getSelectedValues(event, TIGL_RANKS_ID);
+        List<String> allowedRanks = TIGLHelper.filterStandardTiglRankOptionsAtOrBelow(event.getUser(), requestedRanks);
         return new PlayerSearchCriteria(
                 List.of("6"),
                 getSelectedValues(event, VICTORY_POINTS_ID),
@@ -519,7 +523,7 @@ class MatchmakingButtonHandler {
                 getSelectedValues(event, PACE_RESTRICTIONS_ID),
                 searchRestrictions(event),
                 true,
-                getSelectedValues(event, TIGL_RANKS_ID));
+                allowedRanks);
     }
 
     private static List<String> searchRestrictions(ModalInteractionEvent event) {

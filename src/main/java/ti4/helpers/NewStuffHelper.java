@@ -161,8 +161,10 @@ public final class NewStuffHelper {
         // Right now, only a 'null' status allows the card to be picked up. Add more to this list if it changes in the
         // future
         List<ACStatus> allowedStatus = new ArrayList<>(Collections.singleton(null));
+        boolean hideUnplayed = ActionCardHelper.hidesUnplayedDiscards(game, player);
         game.getDiscardActionCards().keySet().stream()
                 .filter(integer -> allowedStatus.contains(status.getOrDefault(integer, null)))
+                .filter(integer -> ActionCardHelper.isDiscardVisible(game, hideUnplayed, integer))
                 .map(integer -> Map.entry(integer, Mapper.getActionCard(integer).getName()))
                 .map(e -> Buttons.green(pre + e.getKey(), e.getValue(), CardEmojis.getACEmoji(game)))
                 .forEach(allButtons::add);

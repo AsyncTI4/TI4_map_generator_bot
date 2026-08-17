@@ -25,6 +25,9 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnosisLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionTargetingLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
@@ -333,6 +336,9 @@ public class StartCombatService {
         if (!game.isFowMode()) {
             channel = game.getMainGameChannel();
         }
+        MassHypnosisLLButtonHandler.clearMassHypnosis(game);
+        PrecisionTargetingLLButtonHandler.clearPrecisionTargeting(game);
+        RaisedMoraleLLButtonHandler.clearRaisedMorale(game);
         PonthousUnitHandler.clearOldGlorySustain(game);
         PonthousPromissoryHandler.clearThunderbirdPrototype(game);
         PonthousTechHandler.clearThunderbirdProtocol(game);
