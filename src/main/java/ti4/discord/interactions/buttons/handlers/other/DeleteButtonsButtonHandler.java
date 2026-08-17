@@ -19,6 +19,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arden
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -201,6 +202,9 @@ class DeleteButtonsButtonHandler {
                 editedMessage = Helper.buildSpentThingsMessage(player, game, "res");
             }
             ButtonHelper.sendMessageToRightStratThread(player, game, editedMessage, buttonID);
+            if ("skarnathBuild".equalsIgnoreCase(buttonID)) {
+                ThronesThroneHandler.clearSkarnathDiscount(game, player);
+            }
             if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
                 event.getChannel().getHistory().retrievePast(2).queue(messageHistory -> {
                     Message previousMessage = messageHistory.get(1);
