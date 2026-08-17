@@ -19,6 +19,7 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.Source.ComponentSource;
+import ti4.service.leader.RefreshLeaderService;
 
 @UtilityClass
 public class RevenantBreakthroughHandler {
@@ -155,9 +156,11 @@ public class RevenantBreakthroughHandler {
         }
 
         Leader purgedLeader = player.getLeader(agentId).orElse(null);
+        Leader exhaustedLeader = player.getLeader(exhaustedAgentId).orElse(null);
         List<String> attachedAgents = getAttachedAgents(game, player);
         if (!player.hasUnlockedBreakthrough(REVENANT_RISING)
                 || purgedLeader == null
+                || exhaustedLeader == null
                 || !attachedAgents.contains(agentId)) {
             ButtonHelper.deleteMessage(event);
             return;
@@ -173,6 +176,7 @@ public class RevenantBreakthroughHandler {
         String result = player.getRepresentation() + " chose to purge _" + purgedName
                 + "_ instead of exhausting _Revenant Rising_.";
         BreakthroughCommandHelper.readyBreakthrough(player, REVENANT_RISING);
+        RefreshLeaderService.refreshLeader(player, exhaustedLeader, game);
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), result);
         ButtonHelper.deleteMessage(event);
     }
