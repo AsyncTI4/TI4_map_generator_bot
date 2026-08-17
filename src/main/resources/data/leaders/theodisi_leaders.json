@@ -120,7 +120,7 @@
     "name": "Thessa Scale",
     "title": "Ash-Plate",
     "abilityWindow": "When you place a structure from your reinforcements on a planet you control:",
-    "abilityText": "Draw 2 action cards.",
+    "abilityText": "Draw 2 action cards, then discard 1.",
     "unlockCondition": "Have 4 or more non-fighter ships of the same type in the same system.",
     "source": "theodisi"
   },
