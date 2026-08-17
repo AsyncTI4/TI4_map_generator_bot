@@ -1,19 +1,17 @@
 package ti4.service.fow.setup;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.selections.SelectOption;
-import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
-import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
@@ -123,22 +121,20 @@ final class FowSetupDecksService {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No decks of that type are defined.");
             return;
         }
-        for (List<DeckModel> page : ListUtils.partition(options, 25)) {
-            StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("fowSetupDeckSelect_" + slotKey);
-            for (DeckModel deck : page) {
-                SelectOption option = SelectOption.of(StringUtils.left(deck.getName(), 100), deck.getAlias());
-                if (StringUtils.isNotBlank(deck.getDescription())) {
-                    option = option.withDescription(
-                            StringUtils.left(deck.getDescription().replace('\n', ' '), 100));
-                }
-                menuBuilder.addOptions(option);
+        List<SelectOption> selectOptions = new ArrayList<>();
+        for (DeckModel deck : options) {
+            SelectOption option = SelectOption.of(StringUtils.left(deck.getName(), 100), deck.getAlias());
+            if (StringUtils.isNotBlank(deck.getDescription())) {
+                option = option.withDescription(
+                        StringUtils.left(deck.getDescription().replace('\n', ' '), 100));
             }
-            menuBuilder.setRequiredRange(1, 1);
-            event.getMessageChannel()
-                    .sendMessage("Pick a " + slot.label() + " deck:")
-                    .addComponents(ActionRow.of(menuBuilder.build()))
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            selectOptions.add(option);
         }
+        MessageHelper.sendPagedSelectMenus(
+                event.getMessageChannel(),
+                "fowSetupDeckSelect_" + slotKey,
+                selectOptions,
+                "Pick a " + slot.label() + " deck:");
     }
 
     @SelectionHandler("fowSetupDeckSelect_")
@@ -167,22 +163,17 @@ final class FowSetupDecksService {
         List<StrategyCardSetModel> options = Mapper.getStrategyCardSets().values().stream()
                 .sorted(Comparator.comparing(StrategyCardSetModel::getName))
                 .toList();
-        for (List<StrategyCardSetModel> page : ListUtils.partition(options, 25)) {
-            StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("fowSetupDeckSelectSC");
-            for (StrategyCardSetModel scSet : page) {
-                SelectOption option = SelectOption.of(StringUtils.left(scSet.getName(), 100), scSet.getAlias());
-                if (scSet.getDescription().filter(StringUtils::isNotBlank).isPresent()) {
-                    option = option.withDescription(
-                            StringUtils.left(scSet.getDescription().get().replace('\n', ' '), 100));
-                }
-                menuBuilder.addOptions(option);
+        List<SelectOption> selectOptions = new ArrayList<>();
+        for (StrategyCardSetModel scSet : options) {
+            SelectOption option = SelectOption.of(StringUtils.left(scSet.getName(), 100), scSet.getAlias());
+            if (scSet.getDescription().filter(StringUtils::isNotBlank).isPresent()) {
+                option = option.withDescription(
+                        StringUtils.left(scSet.getDescription().get().replace('\n', ' '), 100));
             }
-            menuBuilder.setRequiredRange(1, 1);
-            event.getMessageChannel()
-                    .sendMessage("Pick a Strategy Card Set:")
-                    .addComponents(ActionRow.of(menuBuilder.build()))
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            selectOptions.add(option);
         }
+        MessageHelper.sendPagedSelectMenus(
+                event.getMessageChannel(), "fowSetupDeckSelectSC", selectOptions, "Pick a Strategy Card Set:");
     }
 
     @SelectionHandler("fowSetupDeckSelectSC")

@@ -18,6 +18,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.draft.TwilightsFallFrankenDraft;
 import ti4.game.Game;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -65,8 +66,13 @@ public class TEOptionService {
             buttons.add(Buttons.gray(
                     "startDraftSystem_andcatPresetNucleus", "Start Nucleus Draft + Later Inaugural Splice"));
         } else {
-            msg += "\n\n-# Fog of War: only the bag draft is offered - Milty/Nucleus draft slices, tiles and "
-                    + "speaker order, which the FoW setup wizard handles itself.";
+            // The splice is normally phase 2 after a milty/nucleus draft. In FoW the wizard already does what
+            // those drafts would (map, factions, positions, seat/speaker order), so the splice on its own is
+            // the RAW-style option here - players still draft their abilities/units/genomes.
+            buttons.add(Buttons.gray("startTFDraft_splice", "Inaugural Splice Only (abilities/units/genomes)"));
+            msg += "\n\n-# Fog of War: Milty/Nucleus aren't offered - they draft slices, tiles and speaker "
+                    + "order, which the `/fow setup` wizard handles itself. Use **Inaugural Splice Only** for the "
+                    + "RAW-style flow once the wizard has assigned factions and positions.";
         }
         buttons.add(Buttons.red("editTFHomebrew", "Enable TF Homebrew options"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
@@ -75,6 +81,18 @@ public class TEOptionService {
     @ButtonHandler("startTFDraft")
     public static void startTFDraft(ButtonInteractionEvent event, Game game) {
         game.setupTwilightsFallMode(event);
+        if (event.getButton().getCustomId().endsWith("_splice")) {
+            // force=false so any player the GM already set up through the wizard keeps their faction, colour
+            // and (crucially) their assigned home position - setUpFrankenFactions with force=true re-parks
+            // everyone at the temporary off-map 50x anchors, which would undo the wizard's placements.
+            FrankenDraftBagService.setUpFrankenFactions(game, event, false);
+            FrankenDraftBagService.clearPlayerHands(game);
+            // Same entry point the automatic post-milty splice uses; it deliberately skips seat-order
+            // assignment in FoW, since the wizard owns that.
+            ButtonHelperTwilightsFall.startInauguralSplice(game);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         FrankenDraftBagService.setUpFrankenFactions(game, event, true);
         FrankenDraftBagService.clearPlayerHands(game);
         game.setBagDraft(new TwilightsFallFrankenDraft(game));

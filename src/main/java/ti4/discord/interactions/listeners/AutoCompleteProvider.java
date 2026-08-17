@@ -684,9 +684,15 @@ class AutoCompleteProvider {
             case Constants.DRAFT_MODE -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<FrankenDraftMode> modes = new ArrayList<>(Arrays.asList(FrankenDraftMode.values()));
-                // Inaugural Splice is only meant to be triggered automatically as a follow-up to the Twilight's
-                // Fall milty/nucleus draft (see ButtonHelperTwilightsFall.startInauguralSplice), not picked directly.
-                modes.remove(FrankenDraftMode.INAUGURALSPLICE);
+                // Outside FoW, Inaugural Splice is only ever triggered automatically after the Twilight's Fall
+                // milty/nucleus draft (ButtonHelperTwilightsFall.startInauguralSplice) - picking it as an
+                // opening draft would deal a bag with no factions/tiles/home systems. FoW doesn't offer
+                // milty/nucleus at all, so there the splice is a legitimate standalone choice.
+                boolean fowGame = GameManager.isValid(gameName)
+                        && GameManager.getManagedGame(gameName).getGame().isFowMode();
+                if (!fowGame) {
+                    modes.remove(FrankenDraftMode.INAUGURALSPLICE);
+                }
                 List<Command.Choice> options = modes.stream()
                         .filter(mode -> mode.search(enteredValue))
                         .limit(25)

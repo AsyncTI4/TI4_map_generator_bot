@@ -111,7 +111,7 @@ final class FowSetupGameOptionsService {
             buttons.add(Buttons.green("fowSetupScoringPreset_" + Homebrew.HB456, "Apply 4/5/6"));
             buttons.add(Buttons.blue("fowSetupCustomScoring~MDL", "Set Custom Scoring"));
             buttons.add(Buttons.DONE_DELETE_BUTTONS);
-            postOrEdit(event, sb.toString(), buttons, editInPlace);
+            MessageHelper.postOrEditWithButtons(event, sb.toString(), buttons, editInPlace);
             return;
         }
 
@@ -161,16 +161,7 @@ final class FowSetupGameOptionsService {
         }
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
 
-        postOrEdit(event, sb.toString(), buttons, editInPlace);
-    }
-
-    private static void postOrEdit(
-            ButtonInteractionEvent event, String message, List<Button> buttons, boolean editInPlace) {
-        if (editInPlace) {
-            MessageHelper.editMessageWithButtons(event, message, buttons);
-        } else {
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-        }
+        MessageHelper.postOrEditWithButtons(event, sb.toString(), buttons, editInPlace);
     }
 
     private static boolean isOptionOn(Game game, FowSetupWizardState state, Homebrew hb) {

@@ -2,15 +2,11 @@ package ti4.service.fow.setup;
 
 import java.util.Comparator;
 import java.util.List;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.selections.SelectOption;
-import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -19,7 +15,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
-import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
 import ti4.service.emoji.ColorEmojis;
@@ -63,22 +58,20 @@ final class FowSetupNeutralPlayerService {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No colors are available to pick.");
             return;
         }
-        // Discord select menus cap out at 25 options - this codebase's color palette is well over that.
-        for (List<ColorModel> page : ListUtils.partition(options, 25)) {
-            StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("fowSetupNeutralColorSelect");
-            for (ColorModel color : page) {
-                menuBuilder.addOptions(SelectOption.of(StringUtils.capitalize(color.getName()), color.getName())
-                        .withEmoji(ColorEmojis.getColorEmoji(color.getName()).asEmoji()));
-            }
-            menuBuilder.setRequiredRange(1, 1);
-            String range = FowSetupFactionService.pageRangeLabel(page.stream()
-                    .map(color -> StringUtils.capitalize(color.getName()))
-                    .toList());
-            event.getMessageChannel()
-                    .sendMessage("Pick a color for the neutral player" + range + ":")
-                    .addComponents(ActionRow.of(menuBuilder.build()))
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
-        }
+        // The colour palette is well over Discord's per-menu option cap, so this spans several menus.
+        MessageHelper.sendPagedSelectMenus(
+                event.getMessageChannel(),
+                "fowSetupNeutralColorSelect",
+                colorSelectOptions(options),
+                "Pick a color for the neutral player:");
+    }
+
+    /** Shared with the per-player colour picker on the Factions step - same palette, same option shape. */
+    static List<SelectOption> colorSelectOptions(List<ColorModel> colors) {
+        return colors.stream()
+                .map(color -> SelectOption.of(StringUtils.capitalize(color.getName()), color.getName())
+                        .withEmoji(ColorEmojis.getColorEmoji(color.getName()).asEmoji()))
+                .toList();
     }
 
     @SelectionHandler("fowSetupNeutralColorSelect")

@@ -92,11 +92,7 @@ final class FowSetupTableOrderService {
             return;
         }
         String msg = "Pick seat #" + (state.getManualOrderPicks().size() + 1) + ":";
-        if (editInPlace) {
-            MessageHelper.editMessageWithButtons(event, msg, playerButtons);
-        } else {
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, playerButtons);
-        }
+        MessageHelper.postOrEditWithButtons(event, msg, playerButtons, editInPlace);
     }
 
     @ButtonHandler("fowSetupOrderPick_")

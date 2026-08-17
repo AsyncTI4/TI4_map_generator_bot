@@ -20,8 +20,8 @@ import ti4.discord.interactions.commands.game.WeirdGameSetup;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
-import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.helpers.async.JimboHandlers;
 import ti4.json.JsonMapperManager;
@@ -83,30 +83,39 @@ public final class FowSetupWizardService {
         renderStep(game, gmChannel, state);
     }
 
+    /**
+     * Numbered list of the wizard's steps. DONE is a landing page rather than a step, so it's excluded
+     * here and from the panel's "Step x/y" count. Shared with the blurb posted next to the wizard button
+     * at game creation ({@code CreateFoWGameService}) so the two can't drift apart.
+     */
+    public static String stepOverview() {
+        StringBuilder sb = new StringBuilder();
+        for (FowSetupStep step : FowSetupStep.values()) {
+            if (step == FowSetupStep.DONE) continue;
+            sb.append(step.ordinal() + 1).append(". ").append(stepTitle(step)).append('\n');
+        }
+        return sb.toString();
+    }
+
     /** Posted once ever per game, the first time the wizard opens - a step list plus prep advice. */
     private static void postIntroOnce(Game game, TextChannel gmChannel, FowSetupWizardState state) {
         if (state.isIntroShown()) return;
-        StringBuilder intro = new StringBuilder("## Welcome to the FoW Game Setup Wizard\n")
-                .append("This walks you through setting up a Fog of War game step by step, entirely in this GM ")
-                .append("room. Before you start, it helps to have a plan - roughly what **map** you want, how ")
-                .append("many **players** and who they are, what **factions**/homebrew you're using, and your ")
-                .append("**scoring** target, etc. You can revisit any step with **Previous Step**/**Next Step**, ")
-                .append("so nothing here is final until you hit Start Game.\n\n### Steps\n");
-        for (FowSetupStep step : FowSetupStep.values()) {
-            if (step == FowSetupStep.DONE) continue;
-            intro.append(step.ordinal() + 1)
-                    .append(". ")
-                    .append(stepTitle(step))
-                    .append('\n');
-        }
-        MessageHelper.sendMessageToChannel(gmChannel, intro.toString());
+        String intro = "## Welcome to the FoW Game Setup Wizard\n"
+                + "This walks you through setting up a Fog of War game step by step, entirely in this GM "
+                + "room. Before you start, it helps to have a plan - roughly what **map** you want, how "
+                + "many **players** and who they are, what **factions**/homebrew you're using, and your "
+                + "**scoring** target, etc. You can revisit any step with **Previous Step**/**Next Step**, "
+                + "so nothing here is final until you hit Start Game.\n\n### Steps\n"
+                + stepOverview();
+        MessageHelper.sendMessageToChannel(gmChannel, intro);
         state.setIntroShown(true);
         saveState(game, state);
     }
 
     public static boolean requireGM(GenericInteractionCreateEvent event, Game game) {
-        Player player = game.getPlayer(event.getUser().getId());
-        if (player == null || !game.getPlayersWithGMRole().contains(player)) {
+        // FoWHelper.isGameMaster is the codebase's existing GM predicate - same getPlayersWithGMRole check,
+        // so don't re-derive it here.
+        if (!FoWHelper.isGameMaster(event.getUser().getId(), game)) {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "Only a GM can use this wizard.");
             return false;
         }
@@ -303,6 +312,15 @@ public final class FowSetupWizardService {
                 start looking at things themselves.
                 """;
             case MAP_LOAD -> """
+                ### Load the map before you place anyone
+                Both import paths wipe the board and rebuild it: the map-string import calls \
+                `clearTileMap`, and the JSON import calls `removeAllTiles` (and also clears adjacency \
+                overrides, border anomalies, custom hyperlanes and lore). Anything already on the map goes, \
+                **including the home-system tiles that placed your players**. Their recorded position \
+                survives on the player, so re-importing a map mid-setup leaves them pointing at a tile that \
+                no longer exists - the Factions step detects this and lists them as needing a position \
+                again, but it's far less work to just load the map first.
+
                 ### Map-editing commands you'll likely need once the base map is in
                 - `/map add_tile` / `/map add_tile_list` - place additional tiles or a whole batch at once
                 - `/tokens add_token` - add tokens (frontier, anomaly, border tokens, etc.) to a tile
@@ -329,6 +347,16 @@ public final class FowSetupWizardService {
                 **CSV roster upload** - not built yet. The idea: GM uploads a comma-separated list of \
                 possible factions per player (`player1a, player1b, player1c; player2a, ...`) generated by \
                 a companion website, and the wizard deals accordingly. Documented here for later.
+
+                ### Assign positions LAST if you're running a draft
+                In a non-fog game `/franken build_map` places everyone automatically from a map template and \
+                the tiles they drafted. Fog games have no template and don't draft tiles, so **you placing \
+                players here is the only thing that ever puts them on the map** - and starting (or \
+                restarting) a Franken / Twilight's Fall draft parks every player back at a temporary off-map \
+                anchor, silently discarding positions you'd already assigned. So: build the map, run the \
+                draft, let it finish, *then* assign positions. Players sitting on a temp anchor are shown \
+                above as `@ 50x (temp, not on map)`, and stay eligible for "Assign Position" until they're \
+                really placed.
                 **Pair Alliance Members** (only shown if Alliance Mode is on, from the Game Options step) - \
                 pick two players who already have a faction and color to team them up. This is the same \
                 logic as `/player add_alliance_member`: it bumps VP to 14 if still default, shares eligible \
@@ -503,6 +531,9 @@ public final class FowSetupWizardService {
     private static void renderMapLoad(Game game, FowSetupWizardState state, StringBuilder sb, List<Button> buttons) {
         sb.append("Choose how to load the map. See the info thread below for follow-up commands and ")
                 .append("troubleshooting once tiles are in.\n\n")
+                .append("⚠ Both import options **replace the entire map**, so load the map before placing ")
+                .append("players - anyone already placed loses the home-system tile that put them there and ")
+                .append("will need their position assigned again.\n\n")
                 .append("a. **Import JSON** - click below to import from a URL, e.g. exported from ")
                 .append("https://stabar-ti.github.io/hex-Custom-async-ti-hyperlink/\n")
                 .append("b. **Import Map String** - click below to paste a map string.\n")

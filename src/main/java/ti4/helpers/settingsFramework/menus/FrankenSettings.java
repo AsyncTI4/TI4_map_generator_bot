@@ -71,7 +71,7 @@ public class FrankenSettings extends SettingsMenu {
         this.game = game;
 
         draftMode = new ChoiceSetting<>("DraftMode", "Draft Mode", STANDARD_DRAFT);
-        draftMode.setAllValues(draftModeOptions());
+        draftMode.setAllValues(draftModeOptions(game));
         draftMode.setShow(FrankenSettings::draftModeLabel);
 
         force = new BooleanSetting("Force", "Force overwrite existing player setups", false);
@@ -377,13 +377,16 @@ public class FrankenSettings extends SettingsMenu {
                         || componentId.startsWith(prefix + "."));
     }
 
-    private static Map<String, String> draftModeOptions() {
+    private static Map<String, String> draftModeOptions(Game game) {
         Map<String, String> options = new LinkedHashMap<>();
         options.put(STANDARD_DRAFT, STANDARD_DRAFT);
         for (FrankenDraftMode mode : FrankenDraftMode.values()) {
-            // Inaugural Splice is only meant to be triggered automatically as a follow-up to the Twilight's
-            // Fall milty/nucleus draft (see ButtonHelperTwilightsFall.startInauguralSplice), not picked directly.
-            if (mode == FrankenDraftMode.INAUGURALSPLICE) continue;
+            // Outside FoW, Inaugural Splice is only ever triggered automatically as a follow-up to the
+            // Twilight's Fall milty/nucleus draft (ButtonHelperTwilightsFall.startInauguralSplice) - picking
+            // it as an opening draft would deal a bag with no factions/tiles/home systems. In FoW the milty
+            // and nucleus drafts aren't offered at all (the `/fow setup` wizard covers what they'd draft), so
+            // the splice on its own is a legitimate standalone choice there.
+            if (mode == FrankenDraftMode.INAUGURALSPLICE && !game.isFowMode()) continue;
             options.put(mode.toString(), mode.toString());
         }
         return options;

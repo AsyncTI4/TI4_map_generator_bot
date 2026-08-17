@@ -5,11 +5,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import java.util.Map;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.selections.SelectOption;
-import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -17,7 +16,6 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
-import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
@@ -29,6 +27,7 @@ import ti4.draft.FrankenDraft;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -39,7 +38,6 @@ import ti4.model.FactionModel;
 import ti4.service.ShowGameService;
 import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
-import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
@@ -67,6 +65,19 @@ final class FowSetupFactionService {
     static void render(Game game, FowSetupWizardState state, StringBuilder sb, List<Button> buttons) {
         sb.append("Assign each player a faction manually, or deal a mini faction draft (ban factions first if ")
                 .append("you want), then assign home positions.\n\n");
+        // Starting a Franken/Twilight's Fall draft re-parks every player at a temporary off-map anchor, so
+        // any position assigned before the draft finishes is thrown away. Non-fog games get placed
+        // automatically by `/franken build_map` from a map template; FoW has no template and drafts no
+        // tiles, so the GM placing players here is the only thing that ever puts them on the map.
+        if (mapIsEmpty(game)) {
+            sb.append("⚠ No map yet - pick factions and run drafts freely, but positions need the map built ")
+                    .append("first (**Load the Map** step). Faction picks are held here and applied to the ")
+                    .append("player (along with their colour) when you place them.\n\n");
+        }
+        if (game.getActiveBagDraft() != null) {
+            sb.append("⚠ A draft is currently running. Assign positions **after** it finishes - starting or ")
+                    .append("restarting a draft resets every player to a temporary off-map position.\n\n");
+        }
         for (Player player : setupCandidates(game)) {
             String effective = effectiveFaction(state, player);
             String pos = effectivePosition(player);
@@ -215,15 +226,9 @@ final class FowSetupFactionService {
         factionButtons.add(Buttons.CANCEL);
         String message =
                 (leadNote == null ? "" : leadNote + "\n\n") + "Click a faction to ban/unban it from the Franken pool:";
-        // A single message caps out at Modal.MAX_COMPONENTS (5) rows of 5 buttons = 25. The full Franken-
-        // legal faction pool (base+PoK, plus DS/BR/Absol/homebrew when enabled) routinely exceeds that, so
-        // editing in place would silently fail to update once it does - fall back to a fresh multi-message
-        // send (sendMessageToChannelWithButtons auto-paginates) rather than eating the edit.
-        if (editInPlace && factionButtons.size() <= 25) {
-            MessageHelper.editMessageWithButtons(event, message, factionButtons);
-        } else {
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, factionButtons);
-        }
+        // The full Franken-legal faction pool routinely exceeds what one message can hold, which an in-place
+        // edit can't paginate - postOrEditWithButtons falls back to a fresh multi-message send in that case.
+        MessageHelper.postOrEditWithButtons(event, message, factionButtons, editInPlace);
     }
 
     private static List<String> bannedFactionAliases(Game game) {
@@ -428,7 +433,22 @@ final class FowSetupFactionService {
      */
     private static boolean isPlacedOnMap(Game game, Player player) {
         String position = effectivePosition(player);
-        return position != null && game.getTileByPosition(position) != null;
+        if (position == null) return false;
+        Tile tile = game.getTileByPosition(position);
+        if (tile == null) return false;
+        // Requiring a home-system tile (a 0g slot, or a green-backed faction HS) rather than just any tile
+        // also catches stale anchors: loading a map string or JSON wipes the whole tile map
+        // (AddTileListService.clearTileMap / MapJsonIOService.removeAllTiles), so a player placed before the
+        // load keeps their recorded position while the tile that made it real is gone or replaced.
+        if (tile.isHomeSystem()) return true;
+        // isHomeSystem() classifies by tile back and returns early, so it says "no" for the handful of
+        // factions whose home system is a blue-backed tile - Ignis Aurora's Raven, the Admins of Asyncia and
+        // the PBD2000 factions all sit on 62/s14. Accept the tile if it is literally this player's own home
+        // system, which is the question actually being asked here.
+        FactionModel faction = player.getFactionSetupInfo();
+        if (faction == null) return false;
+        String homeSystemTileId = AliasHandler.resolveTile(faction.getHomeSystem());
+        return StringUtils.isNotBlank(homeSystemTileId) && homeSystemTileId.equalsIgnoreCase(tile.getTileID());
     }
 
     // --- Manual faction assignment: pick player, then a real dropdown of eligible factions ---
@@ -463,29 +483,16 @@ final class FowSetupFactionService {
         List<FactionModel> factions = FrankenDraft.getDraftableFactionsForGame(game).stream()
                 .sorted(Comparator.comparing(FactionModel::getFactionName, String.CASE_INSENSITIVE_ORDER))
                 .toList();
-        for (List<FactionModel> page : ListUtils.partition(factions, 25)) {
-            StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("fowSetupFactionSelect_" + userId);
-            for (FactionModel faction : page) {
-                menuBuilder.addOptions(SelectOption.of(faction.getFactionName(), faction.getAlias())
+        List<SelectOption> options = factions.stream()
+                .map(faction -> SelectOption.of(faction.getFactionName(), faction.getAlias())
                         .withEmoji(
-                                FactionEmojis.getFactionIcon(faction.getAlias()).asEmoji()));
-            }
-            menuBuilder.setRequiredRange(1, 1);
-            String range = pageRangeLabel(
-                    page.stream().map(FactionModel::getFactionName).toList());
-            event.getMessageChannel()
-                    .sendMessage("Pick a faction for " + player.getUserName() + range + ":")
-                    .addComponents(ActionRow.of(menuBuilder.build()))
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
-        }
-    }
-
-    /** " (A - M)" style suffix describing the alphabetical range of names on one select-menu page. */
-    static String pageRangeLabel(List<String> namesInPageOrder) {
-        if (namesInPageOrder.isEmpty()) return "";
-        String first = namesInPageOrder.getFirst();
-        String last = namesInPageOrder.getLast();
-        return first.equals(last) ? " (" + first + ")" : " (" + first + " - " + last + ")";
+                                FactionEmojis.getFactionIcon(faction.getAlias()).asEmoji()))
+                .toList();
+        MessageHelper.sendPagedSelectMenus(
+                event.getMessageChannel(),
+                "fowSetupFactionSelect_" + userId,
+                options,
+                "Pick a faction for " + player.getUserName() + ":");
     }
 
     @SelectionHandler("fowSetupFactionSelect_")
@@ -520,6 +527,10 @@ final class FowSetupFactionService {
     @ButtonHandler("fowSetupPositionsManual")
     static void pickPlayerForPosition(ButtonInteractionEvent event, Game game) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
+        if (mapIsEmpty(game)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), NO_MAP_MESSAGE);
+            return;
+        }
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         List<Button> playerButtons = new ArrayList<>();
         for (Player player : setupCandidates(game)) {
@@ -603,6 +614,21 @@ final class FowSetupFactionService {
         startColorPick(event, game, player, position);
     }
 
+    /**
+     * Positions can only meaningfully be assigned once the map exists. The custom-position modal only checks
+     * that a coordinate is legal on the grid, not that a tile is there, so without this a GM could drop a
+     * home system into empty space on an unbuilt map - and {@code availableHomeSystemPositions} would have
+     * had no suggestions to offer anyway. The wizard's step order already puts Load the Map first; this stops
+     * the out-of-order case rather than relying on the GM following it.
+     */
+    private static boolean mapIsEmpty(Game game) {
+        return game.getTileMap().isEmpty();
+    }
+
+    private static final String NO_MAP_MESSAGE =
+            "The map is empty - build or import it on the **Load the Map** step first. Home positions have to "
+                    + "point at tiles that already exist, otherwise you'd strand a home system in empty space.";
+
     private static List<String> availableHomeSystemPositions(Game game) {
         List<String> takenPositions = new ArrayList<>();
         for (Player player : game.getPlayers().values()) {
@@ -622,6 +648,12 @@ final class FowSetupFactionService {
 
     private static void startColorPick(GenericInteractionCreateEvent event, Game game, Player player, String position) {
         String userId = player.getUserID();
+        // Common funnel for both the position-button and the typed-custom-position paths, so the empty-map
+        // guard here covers the modal route that bypasses pickPlayerForPosition's own check.
+        if (mapIsEmpty(game)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), NO_MAP_MESSAGE);
+            return;
+        }
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         String faction = effectiveFaction(state, player);
         if (StringUtils.isBlank(faction)) {
@@ -640,22 +672,12 @@ final class FowSetupFactionService {
             finishPositionAssignment(event, game, player, faction, position, null);
             return;
         }
-        // Discord select menus cap out at 25 options - this codebase's color palette is well over that.
-        for (List<ColorModel> page : ListUtils.partition(unusedColors, 25)) {
-            StringSelectMenu.Builder menuBuilder = StringSelectMenu.create("fowSetupColorSelect_" + userId);
-            for (ColorModel color : page) {
-                menuBuilder.addOptions(SelectOption.of(StringUtils.capitalize(color.getName()), color.getName())
-                        .withEmoji(ColorEmojis.getColorEmoji(color.getName()).asEmoji()));
-            }
-            menuBuilder.setRequiredRange(1, 1);
-            String range = pageRangeLabel(page.stream()
-                    .map(color -> StringUtils.capitalize(color.getName()))
-                    .toList());
-            event.getMessageChannel()
-                    .sendMessage("Pick a color for " + player.getUserName() + range + ":")
-                    .addComponents(ActionRow.of(menuBuilder.build()))
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
-        }
+        // The colour palette is well over Discord's per-menu option cap, so this spans several menus.
+        MessageHelper.sendPagedSelectMenus(
+                event.getMessageChannel(),
+                "fowSetupColorSelect_" + userId,
+                FowSetupNeutralPlayerService.colorSelectOptions(unusedColors),
+                "Pick a color for " + player.getUserName() + ":");
     }
 
     @SelectionHandler("fowSetupColorSelect_")
@@ -694,11 +716,120 @@ final class FowSetupFactionService {
         state.getPendingPositionByUserId().remove(userId);
         FowSetupWizardService.saveState(game, state);
         FowSetupWizardService.openOrRefresh(game);
+
+        // Gate factions get a second tile. setupPlayer either drops it on an arbitrary corner (ghost,
+        // crimson) or - because its check uses the non-existent alias "miltymod_ghost" - not at all
+        // (miltymodghost, pi_ghost). Neither is right for FoW, where the GM built the map, so let them
+        // choose where it goes.
+        String realHomeTile = gateFactionHomeTile(player);
+        if (realHomeTile != null) {
+            promptGateHomeSystem(event, game, player, realHomeTile);
+        }
+    }
+
+    // --- Gate factions (Ghosts of Creuss variants, Crimson): a second, GM-placed home-system tile ---
+
+    /**
+     * Gate tile (the faction's declared {@code homeSystem}) mapped to the actual home-system tile that goes
+     * with it. Mirrors the hardcoding already in {@code PlayerSetupService} - the faction data has no field
+     * for a second home system, so there's nothing to derive this from. Keyed on the gate tile rather than
+     * the faction alias so it covers every Creuss variant (ghost, miltymodghost, pi_ghost) at once.
+     */
+    private static final Map<String, String> GATE_TILE_TO_HOME_TILE = Map.of("17", "51", "94", "118");
+
+    /** The real home-system tile id for a gate faction, or null if this faction isn't one. */
+    private static String gateFactionHomeTile(Player player) {
+        FactionModel faction = player.getFactionSetupInfo();
+        if (faction == null) return null;
+        String gateTile = AliasHandler.resolveTile(faction.getHomeSystem());
+        return gateTile == null ? null : GATE_TILE_TO_HOME_TILE.get(gateTile);
+    }
+
+    private static void promptGateHomeSystem(
+            GenericInteractionCreateEvent event, Game game, Player player, String realHomeTile) {
+        List<Button> positionButtons = new ArrayList<>();
+        for (String position : availableHomeSystemPositions(game)) {
+            positionButtons.add(Buttons.gray("fowSetupGateHomePick_" + player.getUserID() + "_" + position, position));
+        }
+        positionButtons.add(
+                Buttons.blue("fowSetupGateHomeCustom_" + player.getUserID() + "~MDL", "Type a Custom Position"));
+        positionButtons.add(Buttons.CANCEL);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getUserName() + " plays a gate faction, so their actual home system is a separate tile. "
+                        + "Where should it go? (Currently at `" + effectivePosition(player)
+                        + "` - the bot's automatic guess, which you can override here.)",
+                positionButtons);
+    }
+
+    @ButtonHandler("fowSetupGateHomePick_")
+    static void resolveGateHomePick(ButtonInteractionEvent event, Game game, String buttonID) {
+        if (!FowSetupWizardService.requireGM(event, game)) return;
+        String[] parts = buttonID.replace("fowSetupGateHomePick_", "").split("_", 2);
+        placeGateHomeSystem(event, game, game.getPlayer(parts[0]), parts[1]);
+    }
+
+    @ButtonHandler("fowSetupGateHomeCustom_")
+    static void openGateHomeModal(ButtonInteractionEvent event, Game game, String buttonID) {
+        if (!FowSetupWizardService.requireGM(event, game)) return;
+        String userId = buttonID.replace("fowSetupGateHomeCustom_", "").replace("~MDL", "");
+        Player player = game.getPlayer(userId);
+        if (player == null) return;
+        TextInput position = TextInput.create("position", TextInputStyle.SHORT)
+                .setPlaceholder("e.g. tr")
+                .setRequired(true)
+                .build();
+        Modal modal = Modal.create(
+                        "fowSetupGateHomeResolve_" + userId,
+                        StringUtils.left("Home System for " + player.getUserName(), 45))
+                .addComponents(Label.of("Tile Position", position))
+                .build();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ModalHandler("fowSetupGateHomeResolve_")
+    static void resolveGateHomeModal(ModalInteractionEvent event, Game game) {
+        if (!FowSetupWizardService.requireGM(event, game)) return;
+        String userId = event.getModalId().replace("fowSetupGateHomeResolve_", "");
+        placeGateHomeSystem(
+                event,
+                game,
+                game.getPlayer(userId),
+                event.getValue("position").getAsString().trim());
+    }
+
+    private static void placeGateHomeSystem(
+            GenericInteractionCreateEvent event, Game game, Player player, String position) {
+        if (player == null) return;
+        String realHomeTile = gateFactionHomeTile(player);
+        if (realHomeTile == null) return;
+        if (!PositionMapper.isTilePositionValid(position)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "Tile position `" + position + "` is not valid. Nothing was changed.");
+            return;
+        }
+        // Clear whatever setupPlayer guessed, so overriding doesn't leave a duplicate home system behind.
+        String previous = player.getHomeSystemPosition();
+        if (isSetValue(previous) && !previous.equals(position)) {
+            Tile stale = game.getTileByPosition(previous);
+            if (stale != null && realHomeTile.equalsIgnoreCase(stale.getTileID())) {
+                game.removeTile(previous);
+            }
+        }
+        game.setTile(new Tile(realHomeTile, position));
+        player.setHomeSystemPosition(position);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), player.getUserName() + "'s home system placed at `" + position + "`.");
+        FowSetupWizardService.openOrRefresh(game);
     }
 
     @ButtonHandler("fowSetupPositionsRandomize")
     static void randomizePositions(ButtonInteractionEvent event, Game game) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
+        if (mapIsEmpty(game)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), NO_MAP_MESSAGE);
+            return;
+        }
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
 
         List<Player> needsPosition = new ArrayList<>();

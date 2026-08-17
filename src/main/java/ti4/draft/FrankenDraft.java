@@ -113,7 +113,10 @@ public class FrankenDraft extends BagDraft {
      * Ghosts of Creuss' dual-home-system setup doesn't play well with Fog of War, so they're auto-banned
      * from the Franken faction pool whenever the game is in FoW mode.
      */
-    private static final List<String> FOW_BANNED_FACTIONS = List.of("ghost", "miltymod_ghost");
+    // Aliases must match the faction data exactly - "miltymodghost" has no underscore (miltymod.json).
+    // PlayerSetupService's dual-home-system special case checks "miltymod_ghost" and so never fires for it,
+    // which is the pre-existing upstream reason this variant is worth keeping out of FoW games too.
+    private static final List<String> FOW_BANNED_FACTIONS = List.of("ghost", "miltymodghost");
 
     public static boolean isFowBannedFaction(@Nullable Game game, String factionAlias) {
         return game != null && game.isFowMode() && FOW_BANNED_FACTIONS.contains(factionAlias.toLowerCase());

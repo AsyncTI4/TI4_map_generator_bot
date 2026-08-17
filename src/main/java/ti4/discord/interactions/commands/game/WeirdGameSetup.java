@@ -94,7 +94,20 @@ public class WeirdGameSetup extends GameStateSubcommand {
 
         Boolean tfMode = event.getOption(Constants.TWILIGHTS_FALL_MODE, null, OptionMapping::getAsBoolean);
         if (tfMode != null) {
-            applyTwilightsFallMode(game, tfMode);
+            game.setTwilightsFallMode(tfMode);
+            if (game.isTwilightsFallMode()) {
+                String msg = "Use the buttons to enable or disable various homebrew options:";
+                List<ContainerChildComponent> sections = TEOptionService.getTFHomebrewInfo(game);
+                // This used to always post to the public main channel, leaking TF homebrew setup chatter in
+                // FoW games (this command has no FoW-specific gating, so it's reachable on any game). Same
+                // fix as TEOptionService's homebrewChannel: GM room in FoW games, unchanged elsewhere.
+                var channel = game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel();
+                MessageV2Builder builder = new MessageV2Builder(channel);
+                builder.append(msg);
+                builder.append(Container.of(sections));
+                builder.append(Buttons.DONE_DELETE_BUTTONS);
+                builder.send();
+            }
         }
 
         if (!setGameMode(event, game)) {
@@ -187,24 +200,6 @@ public class WeirdGameSetup extends GameStateSubcommand {
         Boolean fowPlus = event.getOption(FOWOption.FOW_PLUS.toString(), null, OptionMapping::getAsBoolean);
         if (fowPlus != null && game.isFowMode()) {
             FOWPlusService.setActive(game, fowPlus);
-        }
-    }
-
-    /** Extracted so non-slash-command callers (e.g. the FoW setup wizard) can toggle Twilight's Fall mode. */
-    public static void applyTwilightsFallMode(Game game, boolean enable) {
-        game.setTwilightsFallMode(enable);
-        if (game.isTwilightsFallMode()) {
-            String msg = "Use the buttons to enable or disable various homebrew options:";
-            List<ContainerChildComponent> sections = TEOptionService.getTFHomebrewInfo(game);
-            // This used to always post to the public main channel, leaking TF homebrew setup chatter in
-            // FoW games (this command has no FoW-specific gating, so it's reachable on any game). Same fix
-            // as TEOptionService's homebrewChannel: GM room in FoW games, unchanged elsewhere.
-            var channel = game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel();
-            MessageV2Builder builder = new MessageV2Builder(channel);
-            builder.append(msg);
-            builder.append(Container.of(sections));
-            builder.append(Buttons.DONE_DELETE_BUTTONS);
-            builder.send();
         }
     }
 
