@@ -509,7 +509,6 @@ public class FrankenDrazDraft extends FrankenDraft {
         for (String bannedFaction : bannedFactions) {
             factions.remove(bannedFaction);
         }
-        factions.keySet().removeIf(alias -> FrankenDraft.isFowBannedFaction(game, alias));
         return new ArrayList<>(factions.values());
     }
 }

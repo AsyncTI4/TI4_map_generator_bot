@@ -212,8 +212,17 @@ public final class TIGLHelper {
     }
 
     private static void setTIGLRankSnapshotAtSetup(Game game, boolean isFractured) {
-        List<User> users =
-                game.getPlayers().values().stream().map(Player::getUser).toList();
+        // Dummies (the neutral "Dicecord" player) are bot accounts, not league participants - including them
+        // would permanently report the game as having non-hub members and disable rank handling.
+        List<Player> rankedPlayers = game.getPlayers().values().stream()
+                .filter(player -> !player.isDummy())
+                .toList();
+        if (rankedPlayers.isEmpty()) {
+            // getLowestCommonRankBetweenPlayers starts at the *top* rank and walks down, so an empty list would
+            // record Hero/Archon as the game's minimum rank and draw that badge on the map.
+            return;
+        }
+        List<User> users = rankedPlayers.stream().map(Player::getUser).toList();
         if (!allUsersAreMembersOfHubServer(users)) {
             String message =
                     "Warning - there are players here who are not members of the AsyncTI4 HUB server. Automatic TIGL rank handling will not work.";
@@ -222,7 +231,7 @@ public final class TIGLHelper {
         }
         TIGLRank lowestRank = getLowestCommonRankBetweenPlayers(users, isFractured);
         game.setMinimumTIGLRankAtGameStart(lowestRank);
-        for (Player player : game.getPlayers().values()) {
+        for (Player player : rankedPlayers) {
             player.setPlayerTIGLRankAtGameStart(getUsersHighestTIGLRank(player.getUser(), isFractured));
         }
     }
@@ -297,6 +306,11 @@ public final class TIGLHelper {
 
     private static boolean allUsersAreMembersOfHubServer(List<User> users) {
         for (User user : users) {
+            // Player.getUser() returns null when JDA can't resolve the id (uncached user, left the server).
+            // Such a player can't be confirmed as a hub member - and dereferencing it here used to NPE.
+            if (user == null) {
+                return false;
+            }
             Member hubMember = JdaService.guildPrimary.getMemberById(user.getId());
             if (hubMember == null) {
                 return false;

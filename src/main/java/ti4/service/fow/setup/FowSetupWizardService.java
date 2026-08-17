@@ -338,7 +338,11 @@ public final class FowSetupWizardService {
                 ### Faction assignment options
                 **Manual** - use the buttons on the panel above.
                 **Ban Factions** - toggles factions in/out of the shared Franken-eligible pool (same pool \
-                used by Manual, Deal Factions, and `/franken`). Ghosts of Creuss is auto-banned in FoW games.
+                used by Manual, Deal Factions, and `/franken`). Nothing is banned by default - if you want a \
+                faction out of a game, ban it here.
+                **Gate factions** (Ghosts of Creuss variants, Crimson) work in fog: they have two home-system \
+                tiles, so after you place their gate the wizard asks where their actual home system goes, \
+                rather than dropping it on an arbitrary map corner.
                 **Deal Factions (Mini Draft)** - set how many factions to offer each unassigned player, and \
                 whether the same faction can appear on more than one player's list. Each player privately \
                 picks one from their own dealt list in their own channel (no bag-passing - this is a \
@@ -671,6 +675,9 @@ public final class FowSetupWizardService {
     @ButtonHandler("fowSetupCloseWizard")
     public static void closeWizard(ButtonInteractionEvent event, Game game) {
         if (!requireGM(event, game)) return;
+        // Do this before loading the state below - it saves a state of its own, so reading first would
+        // hand us a copy whose (now stale) ban-page ids we'd write straight back.
+        FowSetupFactionService.clearBanMenuMessages(GMService.getGMChannel(game), game);
         FowSetupWizardState state = loadState(game);
         archiveInfoThreads(game, state);
         state.setPanelMessageId(null);

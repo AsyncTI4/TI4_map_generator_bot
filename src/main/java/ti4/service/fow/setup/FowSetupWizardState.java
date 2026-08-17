@@ -32,6 +32,13 @@ public class FowSetupWizardState {
     // FACTIONS step: position typed for a player, awaiting a color pick before setupPlayer is called
     private Map<String, String> pendingPositionByUserId = new LinkedHashMap<>();
 
+    /**
+     * FACTIONS step: message ids of the ban-factions list. The faction pool doesn't fit one message, so the
+     * list spans several - they're tracked here so the whole set can be cleared together, instead of a plain
+     * Cancel removing only the page it happened to sit on.
+     */
+    private List<Long> banMenuMessageIds = new ArrayList<>();
+
     // TABLE_ORDER step: manual seat-order picks, in chosen order
     private List<String> manualOrderPicks = new ArrayList<>();
 

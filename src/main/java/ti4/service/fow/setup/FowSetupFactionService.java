@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.selections.SelectOption;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -188,7 +190,7 @@ final class FowSetupFactionService {
     @ButtonHandler("fowSetupBanFactionsMenu")
     static void banFactionsMenu(ButtonInteractionEvent event, Game game) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
-        postBanFactionsMenu(event, game, false, null);
+        postBanFactionsMenu(event, game, null);
     }
 
     @ButtonHandler("fowSetupBanFactionToggle_")
@@ -202,14 +204,35 @@ final class FowSetupFactionService {
         }
         game.setStoredValue(BANNED_FACTIONS_KEY, String.join("finSep", banned));
         String leadNote = Mapper.getFaction(alias).getFactionName() + (nowBanned ? " banned." : " unbanned.");
-        postBanFactionsMenu(event, game, true, leadNote);
+        postBanFactionsMenu(event, game, leadNote);
     }
 
-    /** {@code editInPlace} updates the message the clicked toggle button lives on instead of reposting
-     * a fresh ban list on every single ban/unban click - {@code leadNote} folds the confirmation into
-     * that same message rather than sending a separate one. */
-    private static void postBanFactionsMenu(
-            ButtonInteractionEvent event, Game game, boolean editInPlace, String leadNote) {
+    @ButtonHandler("fowSetupBanFactionsDone")
+    static void closeBanFactionsMenu(ButtonInteractionEvent event, Game game) {
+        if (!FowSetupWizardService.requireGM(event, game)) return;
+        clearBanMenuMessages(event.getMessageChannel(), game);
+    }
+
+    /**
+     * Deletes every page of the ban list. The Franken-legal pool doesn't fit one message, so a toggle has to
+     * redraw all the pages (editing one would leave the others showing stale labels) and Done has to remove all
+     * of them - the generic Cancel button only ever deleted the page it happened to sit on, leaving the rest
+     * behind. The page ids are tracked on the wizard state because they outlive the interaction that made them,
+     * which also lets closing the wizard sweep up a list the GM walked away from.
+     */
+    static void clearBanMenuMessages(MessageChannel channel, Game game) {
+        if (channel == null) return;
+        FowSetupWizardState state = FowSetupWizardService.loadState(game);
+        for (Long messageId : state.getBanMenuMessageIds()) {
+            channel.deleteMessageById(messageId).queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+        state.getBanMenuMessageIds().clear();
+        FowSetupWizardService.saveState(game, state);
+    }
+
+    /** {@code leadNote} folds the ban/unban confirmation into the redrawn list instead of sending it separately. */
+    private static void postBanFactionsMenu(ButtonInteractionEvent event, Game game, String leadNote) {
+        clearBanMenuMessages(event.getMessageChannel(), game);
         List<String> banned = bannedFactionAliases(game);
         List<Button> factionButtons = new ArrayList<>();
         for (FactionModel faction : FrankenDraft.getAllFrankenLegalFactions(game)) {
@@ -223,12 +246,18 @@ final class FowSetupFactionService {
                                     "fowSetupBanFactionToggle_" + faction.getAlias(),
                                     "Ban " + faction.getFactionName()));
         }
-        factionButtons.add(Buttons.CANCEL);
+        factionButtons.add(Buttons.gray("fowSetupBanFactionsDone", "Done Banning"));
         String message =
                 (leadNote == null ? "" : leadNote + "\n\n") + "Click a faction to ban/unban it from the Franken pool:";
-        // The full Franken-legal faction pool routinely exceeds what one message can hold, which an in-place
-        // edit can't paginate - postOrEditWithButtons falls back to a fresh multi-message send in that case.
-        MessageHelper.postOrEditWithButtons(event, message, factionButtons, editInPlace);
+        MessageHelper.splitAndSentWithAction(
+                message, event.getMessageChannel(), factionButtons, msg -> trackBanMenuMessage(game, msg));
+    }
+
+    /** Runs on JDA's callback thread once per posted page, so the read-modify-write has to be atomic. */
+    private static synchronized void trackBanMenuMessage(Game game, Message message) {
+        FowSetupWizardState state = FowSetupWizardService.loadState(game);
+        state.getBanMenuMessageIds().add(message.getIdLong());
+        FowSetupWizardService.saveState(game, state);
     }
 
     private static List<String> bannedFactionAliases(Game game) {
