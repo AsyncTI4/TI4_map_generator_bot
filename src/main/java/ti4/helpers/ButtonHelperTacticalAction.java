@@ -17,8 +17,10 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.Retrofitti
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExplosivesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TacticalRetreatLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
@@ -266,7 +268,7 @@ public final class ButtonHelperTacticalAction {
                 }
             }
             if (player.hasAbility("dream_nexus")) {
-                DreamButtonHandler.offerLiturgyButtons(event, game, player);
+                DreamUnitsHandler.offerLiturgyButtons(event, game, player);
             }
             CrystellumLeadersHandler.clearFacetBypass(game, player);
             resetStoredValuesForTacticalAction(game);
@@ -598,7 +600,7 @@ public final class ButtonHelperTacticalAction {
         ThronesUnitHandler.clearPendingGholaWindows(game);
         MyrrTechHandler.clearSegmentedStructuring(game);
         ArdentiaUnitHandler.clearIronClawDeployUsed(game);
-        DreamButtonHandler.clearDreamAgentAnomaly(game);
+        DreamLeadersHandler.clearDreamAgentAnomaly(game);
         RevenantLeadersHandler.clearRedLeaderTacticalWindow(game);
         RevenantTechHandler.clearLazarusProduction(game);
         ThronesTechHandler.clearRiftTouchedBastion(game);
@@ -644,11 +646,6 @@ public final class ButtonHelperTacticalAction {
             }
             List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, ringButtons);
-        }
-        // Offer the Dreaming Throne promissory 'Visions' buttons
-        if (!"dream".equalsIgnoreCase(player.getFaction())
-                && player.getPromissoryNotes().containsKey("bepndream")) {
-            DreamButtonHandler.offerVisionsPromissoryAtTacticalStart(game, player);
         }
     }
 
@@ -752,6 +749,7 @@ public final class ButtonHelperTacticalAction {
             return;
         }
         game.setActiveSystem(pos);
+        DreamPromissoryHandler.returnVisionsOnSystemActivation(event, game, player, tile);
         AlluringThroneService.offerIllustrionLegendaryAbility(game, tile, player);
         ArcanumTechHandler.offerSigilOfTransmutation(event, game, player, tile);
         XytherisLeadersHandler.offerMyrixAgentButtons(game, player, tile);
@@ -1080,9 +1078,9 @@ public final class ButtonHelperTacticalAction {
             }
         }
         if (!game.isL1Hero()
-                && !DreamButtonHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
+                && !DreamLeadersHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
             if (player.hasUnexhaustedLeader("dreamagent")) {
-                DreamButtonHandler.offerDreamAgentButtons(game, player, player);
+                DreamLeadersHandler.offerDreamAgentButtons(game, player, player);
             }
         }
         List<Planet> planetUnitHolders = tile.getPlanetUnitHolders();

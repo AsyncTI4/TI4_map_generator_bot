@@ -48,9 +48,9 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRe
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
@@ -1347,7 +1347,7 @@ public final class Helper {
         }
         // Dreaming Throne Commander
         if (votes > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "dreamcommander")) {
-            int count = DreamButtonHandler.getDreamCommanderVoteCount(game, player);
+            int count = DreamLeadersHandler.getDreamCommanderVoteCount(game, player);
             if (count > 0) {
                 votes += count;
                 if (!justVoteTotal) {
