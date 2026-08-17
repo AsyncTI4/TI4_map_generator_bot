@@ -191,7 +191,7 @@ public class DreamLeadersHandler {
         int uses = getDreamHeroNexusUses(game, player);
         List<Button> buttons = new ArrayList<>();
         if (uses < 3) {
-            if (DreamUnitsHandler.getNexusTokenTiles(game).size() < 3
+            if (DreamUnitsHandler.getNexusTokenCount(game) < 3
                     && !getDreamHeroNexusDestinations(game).isEmpty()) {
                 buttons.add(Buttons.green("dream_hero_offer_add_nexus", "Place Nexus Token", FactionEmojis.dream));
             }
@@ -242,7 +242,10 @@ public class DreamLeadersHandler {
             MessageHelper.sendMessageToEventChannel(event, "That is not a valid system for a nexus token.");
             return;
         }
-        DreamUnitsHandler.addNexusTokenToTile(tile);
+        if (!DreamUnitsHandler.addNexusTokenToTile(game, tile)) {
+            MessageHelper.sendMessageToEventChannel(event, "That is not a valid system for a nexus token.");
+            return;
+        }
         incrementDreamHeroNexusUses(game, player);
         MessageHelper.sendMessageToEventChannel(
                 event,

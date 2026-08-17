@@ -18,6 +18,7 @@ import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -61,7 +62,7 @@ public class DreamUnitsHandler {
         Tile activeTile = getActiveLiturgyTile(game, player);
         if (activeTile == null) return;
 
-        if (getNexusTokenTiles(game).size() >= 3) {
+        if (getNexusTokenCount(game) >= 3) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", cannot add a nexus token because all 3 are already on the map.");
@@ -196,13 +197,16 @@ public class DreamUnitsHandler {
         Tile activeTile = getActiveLiturgyTile(game, player);
         if (tile == null
                 || activeTile == null
-                || getNexusTokenTiles(game).size() >= 3
+                || getNexusTokenCount(game) >= 3
                 || DreamAbilitiesHandler.hasNexusToken(tile)
                 || !getLiturgyDestinations(game, player, activeTile).contains(tile)) {
             MessageHelper.sendMessageToEventChannel(event, "That is not a valid nexus token placement.");
             return;
         }
-        addNexusTokenToTile(tile);
+        if (!addNexusTokenToTile(game, tile)) {
+            MessageHelper.sendMessageToEventChannel(event, "That is not a valid nexus token placement.");
+            return;
+        }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToEventChannel(
                 event,
@@ -289,26 +293,49 @@ public class DreamUnitsHandler {
                 .toList();
     }
 
-    public static void addNexusTokenToTile(Tile tile) {
+    public static int getNexusTokenCount(Game game) {
+        String tokenId = Mapper.getTokenID(NEXUS_TOKEN_ALIAS);
+        return (int) game.getTileMap().values().stream()
+                .flatMap(tile -> tile.getSpaceUnitHolder().getTokenList().stream())
+                .filter(token -> isNexusToken(token, tokenId))
+                .count();
+    }
+
+    public static boolean addNexusTokenToTile(Game game, Tile tile) {
+        if (game == null
+                || tile == null
+                || DreamAbilitiesHandler.hasNexusToken(tile)
+                || getNexusTokenCount(game) >= 3) {
+            return false;
+        }
         tile.addToken(Mapper.getTokenID(NEXUS_TOKEN_ALIAS), "space");
+        return true;
     }
 
     public static boolean moveNexusTokenBetweenTiles(Player player, Tile fromTile, Tile toTile) {
         String nexusToken = getPhysicalNexusToken(fromTile);
         if (nexusToken == null || !fromTile.removeToken(nexusToken, "space")) return false;
 
-        addNexusTokenToTile(toTile);
+        if (!addNexusTokenToTile(player.getGame(), toTile)) {
+            fromTile.addToken(nexusToken, "space");
+            return false;
+        }
+        CommanderUnlockCheckService.checkPlayer(player, "dream");
         return true;
     }
 
     private static String getPhysicalNexusToken(Tile tile) {
         String tokenId = Mapper.getTokenID(NEXUS_TOKEN_ALIAS);
         return tile.getSpaceUnitHolder().getTokenList().stream()
-                .filter(token -> (tokenId != null && tokenId.equalsIgnoreCase(token))
-                        || NEXUS_TOKEN_ALIAS.equalsIgnoreCase(token)
-                        || NEXUS_TOKEN_ALIAS.equalsIgnoreCase(Mapper.getTokenKey(token)))
+                .filter(token -> isNexusToken(token, tokenId))
                 .findFirst()
                 .orElse(null);
+    }
+
+    private static boolean isNexusToken(String token, String tokenId) {
+        return (tokenId != null && tokenId.equalsIgnoreCase(token))
+                || NEXUS_TOKEN_ALIAS.equalsIgnoreCase(token)
+                || NEXUS_TOKEN_ALIAS.equalsIgnoreCase(Mapper.getTokenKey(token));
     }
 
     // The Recurring, the Dreaming Throne mech
