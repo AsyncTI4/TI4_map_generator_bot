@@ -423,7 +423,7 @@ public class TacticalActionOutputService {
         if (player.hasAbility("slipstream") && (tileHasWormhole || (movingFromHome && !game.isTwilightsFallMode()))) {
             bonusMoveValue++;
         }
-        if (DreamFactionTechHandler.getsNonEuclideanMoveBonus(game, player, tile)) {
+        if (player.hasTech("bedreamneg") && DreamFactionTechHandler.getsNonEuclideanMoveBonus(game, player, tile)) {
             bonusMoveValue++;
         }
         if (game.isCallOfTheVoidMode() && activeSystem.isFracture()) {

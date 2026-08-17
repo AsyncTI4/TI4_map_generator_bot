@@ -22,7 +22,6 @@ import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
 public class DreamAbilitiesHandler {
-    private static final String DREAM_FACTION = "dream";
     private static final String DREAM_FLAGSHIP_UNIT = "dream_flagship";
     private static final String NEXUS_TOKEN_ALIAS = "beansnexus";
 
@@ -52,6 +51,10 @@ public class DreamAbilitiesHandler {
 
     @ButtonHandler("dream_remove_nexus_")
     public static void removeNexusToken(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (game.getRealPlayers().stream().noneMatch(dreamPlayer -> dreamPlayer.hasAbility("the_waking"))) {
+            MessageHelper.sendMessageToEventChannel(event, "The Waking is not in play.");
+            return;
+        }
         String position = buttonID.replace("dream_remove_nexus_", "");
         Tile tile = game.getTileByPosition(position);
         if (tile == null) {
@@ -82,6 +85,7 @@ public class DreamAbilitiesHandler {
     }
 
     public static void offerTheWakingButtons(Game game) {
+        if (game.getRealPlayers().stream().noneMatch(player -> player.hasAbility("the_waking"))) return;
         for (Player player : game.getRealPlayers()) {
             List<Tile> eligibleTiles = getTheWakingEligibleTiles(game, player);
             if (eligibleTiles.isEmpty()) continue;
@@ -102,7 +106,7 @@ public class DreamAbilitiesHandler {
     }
 
     private static List<Tile> getTheWakingEligibleTiles(Game game, Player player) {
-        if (player == null || DREAM_FACTION.equalsIgnoreCase(player.getFaction())) return List.of();
+        if (player == null || player.hasAbility("the_waking")) return List.of();
         String key = "theWakingRemovedFor" + player.getFaction() + "Round" + game.getRound();
         if (!game.getStoredValue(key).isBlank()) return List.of();
 
@@ -128,6 +132,10 @@ public class DreamAbilitiesHandler {
     @ButtonHandler("incomprehensible_form_")
     public static void presentIncomprehensibleChoices(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!player.hasAbility("incomprehensible_form")) {
+            MessageHelper.sendMessageToEventChannel(event, "Only a player with Incomprehensible Form may use this.");
+            return;
+        }
         String pos = buttonID.replace("incomprehensible_form_", "");
         Tile tile = game.getTileByPosition(pos);
         if (tile == null) {
@@ -236,7 +244,7 @@ public class DreamAbilitiesHandler {
 
     private static Player getDreamFlagshipPlayerInTile(Game game, Tile tile) {
         return game.getRealPlayers().stream()
-                .filter(player -> DREAM_FACTION.equalsIgnoreCase(player.getFaction()))
+                .filter(player -> player.hasUnit(DREAM_FLAGSHIP_UNIT))
                 .filter(player -> ButtonHelper.doesPlayerHaveFSHere(DREAM_FLAGSHIP_UNIT, player, tile))
                 .findFirst()
                 .orElse(null);

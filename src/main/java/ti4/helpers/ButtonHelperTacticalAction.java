@@ -1078,10 +1078,9 @@ public final class ButtonHelperTacticalAction {
             }
         }
         if (!game.isL1Hero()
+                && player.hasUnexhaustedLeader("dreamagent")
                 && !DreamLeadersHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
-            if (player.hasUnexhaustedLeader("dreamagent")) {
-                DreamLeadersHandler.offerDreamAgentButtons(game, player, player);
-            }
+            DreamLeadersHandler.offerDreamAgentButtons(game, player, player);
         }
         List<Planet> planetUnitHolders = tile.getPlanetUnitHolders();
         if (!planetUnitHolders.isEmpty()

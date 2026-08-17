@@ -23,6 +23,9 @@ public class DreamLeadersHandler {
 
     private static final String AGENT_IGNORED_ANOMALY_TILE_KEY = "dreamAgentIgnoredAnomalyTile";
     private static final String AGENT_IGNORED_ANOMALY_PLAYER_KEY = "dreamAgentIgnoredAnomalyPlayer";
+    private static final String AGENT_PENDING_PLAYER_KEY = "dreamAgentPendingPlayer";
+    private static final String AGENT_PENDING_OWNER_KEY = "dreamAgentPendingOwner";
+    private static final String AGENT_DECLINE = "dream_agent_decline";
     private static final String HERO_NEXUS_USES_KEY = "dreamHeroNexusUses";
     private static final int HERO_BUTTON_LIMIT = 25;
 
@@ -75,6 +78,7 @@ public class DreamLeadersHandler {
     }
 
     public static void offerDreamAgentButtons(Game game, Player activePlayer, Player dreamPlayer) {
+        if (dreamPlayer == null || !dreamPlayer.hasUnexhaustedLeader("dreamagent")) return;
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray(
                 dreamPlayer.factionButtonChecker()
@@ -123,6 +127,8 @@ public class DreamLeadersHandler {
         dreamAgentOwner
                 .getLeader("dreamagent")
                 .ifPresent(agent -> ExhaustLeaderService.exhaustLeader(game, dreamAgentOwner, agent));
+        game.setStoredValue(AGENT_PENDING_PLAYER_KEY, activePlayer.getFaction());
+        game.setStoredValue(AGENT_PENDING_OWNER_KEY, dreamAgentOwner.getFaction());
         ButtonHelper.deleteMessage(event);
 
         List<Button> buttons = new ArrayList<>();
@@ -131,11 +137,11 @@ public class DreamLeadersHandler {
                     "dream_agent_choose_" + activePlayer.getFaction() + "_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, activePlayer)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.red(AGENT_DECLINE, "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
                 activePlayer.getCorrectChannel(),
                 activePlayer.getRepresentation()
-                        + " choose the anomaly whose movement effects you will ignore during this tactical action.",
+                        + ", choose the anomaly whose movement effects you will ignore during this tactical action.",
                 buttons);
     }
 
@@ -144,7 +150,15 @@ public class DreamLeadersHandler {
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String data = buttonID.replace("dream_agent_choose_", "");
         String[] parts = data.split("_", 2);
-        if (parts.length != 2 || !player.getFaction().equalsIgnoreCase(parts[0])) {
+        Player dreamAgentOwner = game.getPlayerFromColorOrFaction(game.getStoredValue(AGENT_PENDING_OWNER_KEY));
+        if (parts.length != 2
+                || !player.getFaction().equalsIgnoreCase(parts[0])
+                || !player.getFaction().equalsIgnoreCase(game.getStoredValue(AGENT_PENDING_PLAYER_KEY))
+                || dreamAgentOwner == null
+                || dreamAgentOwner
+                        .getLeader("dreamagent")
+                        .map(leader -> !leader.isExhausted())
+                        .orElse(true)) {
             MessageHelper.sendMessageToEventChannel(event, "Only the chosen active player may choose that anomaly.");
             return;
         }
@@ -155,11 +169,19 @@ public class DreamLeadersHandler {
         }
         game.setStoredValue(AGENT_IGNORED_ANOMALY_TILE_KEY, tile.getPosition());
         game.setStoredValue(AGENT_IGNORED_ANOMALY_PLAYER_KEY, player.getFaction());
+        game.removeStoredValue(AGENT_PENDING_PLAYER_KEY);
+        game.removeStoredValue(AGENT_PENDING_OWNER_KEY);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToEventChannel(
                 event,
                 player.getRepresentation() + ", will ignore the movement effects of "
                         + tile.getRepresentationForButtons(game, player) + " during this tactical action.");
+    }
+
+    @ButtonHandler(AGENT_DECLINE)
+    public static void declineDreamAgentChoice(ButtonInteractionEvent event, Game game) {
+        clearDreamAgentAnomaly(game);
+        ButtonHelper.deleteMessage(event);
     }
 
     public static boolean playerIgnoresDreamAgentAnomaly(Game game, Player player, Tile tile) {
@@ -171,6 +193,8 @@ public class DreamLeadersHandler {
     public static void clearDreamAgentAnomaly(Game game) {
         game.removeStoredValue(AGENT_IGNORED_ANOMALY_TILE_KEY);
         game.removeStoredValue(AGENT_IGNORED_ANOMALY_PLAYER_KEY);
+        game.removeStoredValue(AGENT_PENDING_PLAYER_KEY);
+        game.removeStoredValue(AGENT_PENDING_OWNER_KEY);
     }
 
     public static List<Tile> getDreamAgentAnomalyTiles(Game game) {
@@ -209,6 +233,7 @@ public class DreamLeadersHandler {
 
     @ButtonHandler("dream_hero_offer_add_nexus")
     public static void offerDreamHeroAddNexus(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!isDreamHeroActive(game, player)) return;
         boolean pageButton = isHeroPageButton(buttonID);
         int page = getHeroPage(buttonID);
         List<Button> buttons = new ArrayList<>();
@@ -232,6 +257,7 @@ public class DreamLeadersHandler {
 
     @ButtonHandler("dream_hero_add_nexus_")
     public static void dreamHeroAddNexus(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!isDreamHeroActive(game, player)) return;
         if (getDreamHeroNexusUses(game, player) >= 3) {
             MessageHelper.sendMessageToEventChannel(event, "You have already placed or moved 3 nexus tokens.");
             return;
@@ -256,6 +282,7 @@ public class DreamLeadersHandler {
 
     @ButtonHandler("dream_hero_offer_move_nexus")
     public static void offerDreamHeroMoveNexus(ButtonInteractionEvent event, Game game, Player player) {
+        if (!isDreamHeroActive(game, player)) return;
         ButtonHelper.deleteMessage(event);
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : DreamUnitsHandler.getNexusTokenTiles(game)) {
@@ -271,6 +298,7 @@ public class DreamLeadersHandler {
     @ButtonHandler("dream_hero_move_nexus_from_")
     public static void offerDreamHeroMoveNexusDestination(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!isDreamHeroActive(game, player)) return;
         String fromPosition = buttonID.replace("dream_hero_move_nexus_from_", "");
         if (isHeroPageButton(buttonID)) {
             fromPosition = fromPosition.substring(0, fromPosition.lastIndexOf("_page"));
@@ -303,6 +331,7 @@ public class DreamLeadersHandler {
 
     @ButtonHandler("dream_hero_move_nexus_")
     public static void dreamHeroMoveNexus(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!isDreamHeroActive(game, player)) return;
         if (getDreamHeroNexusUses(game, player) >= 3) {
             MessageHelper.sendMessageToEventChannel(event, "You have already placed or moved 3 nexus tokens.");
             return;
@@ -336,6 +365,7 @@ public class DreamLeadersHandler {
 
     @ButtonHandler("dream_hero_back_to_nexus")
     public static void dreamHeroBackToNexus(ButtonInteractionEvent event, Game game, Player player) {
+        if (!isDreamHeroActive(game, player)) return;
         ButtonHelper.deleteMessage(event);
         sendDreamHeroNexusMenu(game, player);
     }
@@ -343,6 +373,7 @@ public class DreamLeadersHandler {
     @ButtonHandler("dream_hero_offer_units")
     public static void offerDreamHeroUnitSystems(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!isDreamHeroActive(game, player)) return;
         boolean pageButton = isHeroPageButton(buttonID);
         int page = getHeroPage(buttonID);
         List<Button> buttons = new ArrayList<>();
@@ -368,6 +399,7 @@ public class DreamLeadersHandler {
     @ButtonHandler("dream_hero_units_tile_")
     public static void offerDreamHeroDestroyerCounts(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!isDreamHeroActive(game, player)) return;
         String position = buttonID.replace("dream_hero_units_tile_", "");
         Tile tile = game.getTileByPosition(position);
         if (tile == null || !getDreamHeroUnitDestinations(game, player).contains(tile)) {
@@ -390,6 +422,7 @@ public class DreamLeadersHandler {
 
     @ButtonHandler("dream_hero_place_units_")
     public static void dreamHeroPlaceUnits(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!isDreamHeroActive(game, player)) return;
         String[] parts = buttonID.replace("dream_hero_place_units_", "").split("_");
         if (parts.length != 2) {
             MessageHelper.sendMessageToEventChannel(event, "Could not parse that unit placement.");
@@ -419,6 +452,7 @@ public class DreamLeadersHandler {
 
     @ButtonHandler("dream_hero_skip_units")
     public static void dreamHeroSkipUnits(ButtonInteractionEvent event, Game game, Player player) {
+        if (!isDreamHeroActive(game, player)) return;
         ButtonHelper.deleteMessage(event);
         game.removeStoredValue(HERO_NEXUS_USES_KEY + player.getFaction());
         MessageHelper.sendMessageToEventChannel(
@@ -487,6 +521,13 @@ public class DreamLeadersHandler {
         String value = game.getStoredValue(HERO_NEXUS_USES_KEY + player.getFaction());
         if (value.isBlank()) return 0;
         return Integer.parseInt(value);
+    }
+
+    private static boolean isDreamHeroActive(Game game, Player player) {
+        return game != null
+                && player != null
+                && !game.getStoredValue(HERO_NEXUS_USES_KEY + player.getFaction())
+                        .isBlank();
     }
 
     private static void incrementDreamHeroNexusUses(Game game, Player player) {

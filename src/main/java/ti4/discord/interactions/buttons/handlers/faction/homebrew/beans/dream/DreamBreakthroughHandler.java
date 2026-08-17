@@ -12,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.NewStuffHelper;
 import ti4.message.MessageHelper;
 import ti4.service.RemoveCommandCounterService;
@@ -19,13 +20,18 @@ import ti4.service.emoji.FactionEmojis;
 
 @UtilityClass
 public class DreamBreakthroughHandler {
+    private static final String DREAM_SPACE_CONVERGENCE = "dreambt";
+
     public static boolean hasDreamBtNexusMove(Game game, Player player) {
-        return DreamUnitsHandler.getNexusTokenTiles(game).stream()
-                .anyMatch(
-                        tile -> !getDreamBtNexusDestinations(game, player, tile).isEmpty());
+        return player != null
+                && player.hasUnlockedBreakthrough(DREAM_SPACE_CONVERGENCE)
+                && DreamUnitsHandler.getNexusTokenTiles(game).stream()
+                        .anyMatch(tile ->
+                                !getDreamBtNexusDestinations(game, player, tile).isEmpty());
     }
 
     public static void postDreamBtMoveNexusButtons(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (player == null || !player.hasUnlockedBreakthrough(DREAM_SPACE_CONVERGENCE)) return;
         List<Tile> sourceTiles = DreamUnitsHandler.getNexusTokenTiles(game);
         if (sourceTiles.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -56,6 +62,7 @@ public class DreamBreakthroughHandler {
     @ButtonHandler("dream_bt_move_nexus_from_")
     public static void offerDreamBtMoveNexusDestinations(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!player.hasUnlockedBreakthrough(DREAM_SPACE_CONVERGENCE)) return;
         String fromPosition = buttonID.replace("dream_bt_move_nexus_from_", "");
         Tile fromTile = game.getTileByPosition(fromPosition);
         if (fromTile == null || !DreamAbilitiesHandler.hasNexusToken(fromTile)) {
@@ -93,6 +100,7 @@ public class DreamBreakthroughHandler {
     @ButtonHandler("dream_bt_move_nexus_destination_")
     public static void changeDreamBtMoveNexusDestinationPage(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!player.hasUnlockedBreakthrough(DREAM_SPACE_CONVERGENCE)) return;
         String sourceAndPage = buttonID.replace("dream_bt_move_nexus_destination_", "");
         int pageSeparator = sourceAndPage.lastIndexOf("_page");
         if (pageSeparator < 1) return;
@@ -119,6 +127,7 @@ public class DreamBreakthroughHandler {
     @ButtonHandler("dream_bt_move_nexus_")
     public static void resolveDreamBtMoveNexus(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!player.hasUnlockedBreakthrough(DREAM_SPACE_CONVERGENCE)) return;
         String[] parts = buttonID.replace("dream_bt_move_nexus_", "").split("_to_", 2);
         if (parts.length != 2) {
             MessageHelper.sendMessageToEventChannel(event, "Could not parse that nexus move.");
@@ -156,9 +165,13 @@ public class DreamBreakthroughHandler {
     @ButtonHandler("dream_bt_remove_cc_")
     public static void resolveDreamBtRemoveCommandToken(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!player.hasUnlockedBreakthrough(DREAM_SPACE_CONVERGENCE)) return;
         Tile tile = game.getTileByPosition(buttonID.replace("dream_bt_remove_cc_", ""));
-        if (tile == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Could not find that system.");
+        if (tile == null
+                || !tile.getPosition().equals(game.getActiveSystem())
+                || !CommandCounterHelper.hasCC(player, tile)
+                || !DreamAbilitiesHandler.hasNexusTokenOrDreamFlagship(game, tile)) {
+            MessageHelper.sendMessageToEventChannel(event, "That is not a valid Dream-Space Convergence use.");
             return;
         }
         RemoveCommandCounterService.fromTile(player.getColor(), tile, game);

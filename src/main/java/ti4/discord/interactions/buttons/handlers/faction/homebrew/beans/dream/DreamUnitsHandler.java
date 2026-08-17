@@ -382,6 +382,7 @@ public class DreamUnitsHandler {
     @ButtonHandler("dream_recurring_mech_paid_")
     public static void offerRecurringMechPlacementButtons(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!player.hasUnit("dream_mech")) return;
         String[] parts = buttonID.replace("dream_recurring_mech_paid_", "").split("_from_", 2);
         if (parts.length != 2) {
             MessageHelper.sendMessageToEventChannel(event, "Could not parse that _Recurring_ payment confirmation.");
@@ -405,6 +406,7 @@ public class DreamUnitsHandler {
 
     @ButtonHandler("dream_recurring_mech_")
     public static void placeRecurringMech(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!player.hasUnit("dream_mech")) return;
         String[] parts = buttonID.replace("dream_recurring_mech_", "").split("_to_", 2);
         if (parts.length != 2) {
             MessageHelper.sendMessageToEventChannel(event, "Could not parse that _Recurring_ placement.");
