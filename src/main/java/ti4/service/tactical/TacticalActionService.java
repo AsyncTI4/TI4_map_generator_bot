@@ -226,7 +226,7 @@ public class TacticalActionService {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
 
         // Post-core triggers
-        CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost");
+        CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost", "dream");
         CommanderUnlockCheckService.checkPlayer(
                 player,
                 "nivyn",

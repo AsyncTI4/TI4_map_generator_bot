@@ -15,6 +15,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedReso
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesThroneHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaust;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -212,6 +213,7 @@ class SpendingButtonHandler {
     @ButtonHandler("resetProducedThings")
     public static void resetProducedThings(ButtonInteractionEvent event, Player player, Game game) {
         Helper.resetProducedUnits(player, game, event);
+        ThronesThroneHandler.clearSkarnathDiscount(game, player);
         PriorityRequisitionLLButtonHandler.clear(game, player);
         event.getMessage()
                 .editMessage(Helper.buildProducedUnitsMessage(player, game))

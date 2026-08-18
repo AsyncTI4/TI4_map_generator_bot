@@ -26,6 +26,7 @@ import ti4.service.unit.DestroyUnitService;
 @UtilityClass
 public class ThronesThroneHandler {
     private static final String USE_SKARNATH = "useSkarnathAbility_";
+    private static final String SKARNATH_TARGET_SYSTEM = "skarnathTargetSystem_";
     private static final String SELECT_CINERON_SYSTEM = "selectCineronSystem_";
     private static final String SELECT_CINERON_UNIT = "selectCineronUnit_";
 
@@ -168,7 +169,7 @@ public class ThronesThroneHandler {
             return;
         }
 
-        game.setStoredValue("skarnathTargetSystem_" + player.getFaction(), tilePos);
+        game.setStoredValue(SKARNATH_TARGET_SYSTEM + player.getFaction(), tilePos);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
@@ -180,6 +181,12 @@ public class ThronesThroneHandler {
 
     public static int getSkarnathDiscount(Game game, Player player, Map<String, Integer> producedUnits) {
         if (producedUnits == null || producedUnits.isEmpty()) return 0;
+
+        String targetSystem = game.getStoredValue(SKARNATH_TARGET_SYSTEM + player.getFaction());
+        if (targetSystem.isEmpty()
+                || producedUnits.keySet().stream().anyMatch(unit -> !targetSystem.equals(unit.split("_")[1]))) {
+            return 0;
+        }
 
         Set<String> producedAliases = producedUnits.keySet().stream()
                 .map(k -> k.split("_")[0])
@@ -202,5 +209,9 @@ public class ThronesThroneHandler {
             }
         }
         return discount;
+    }
+
+    public static void clearSkarnathDiscount(Game game, Player player) {
+        game.removeStoredValue(SKARNATH_TARGET_SYSTEM + player.getFaction());
     }
 }

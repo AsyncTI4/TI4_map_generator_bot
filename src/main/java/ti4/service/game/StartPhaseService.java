@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrAbilitiesHandler;
@@ -941,7 +941,7 @@ public class StartPhaseService {
         }
         MyrrAbilitiesHandler.offerFactoryLeaseProduction(game);
         if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("the_waking"))) {
-            DreamButtonHandler.offerTheWakingButtons(game);
+            DreamAbilitiesHandler.offerTheWakingButtons(game);
         }
 
         Button yssarilPolicy = null;

@@ -256,7 +256,8 @@ public class AddUnitService {
             VeylorUnitHandler.checkVeylorMech(game);
         }
 
-        CommanderUnlockCheckService.checkPlayer(player, "myrr", "natau", "oblivion", "revenantponthous", "thrones");
+        CommanderUnlockCheckService.checkPlayer(
+                player, "dream", "myrr", "natau", "oblivion", "revenantponthous", "thrones");
     }
 
     private static void checkFleetCapacity(Tile tile, String color, Game game) {

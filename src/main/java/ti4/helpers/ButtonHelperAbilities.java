@@ -2007,7 +2007,10 @@ public final class ButtonHelperAbilities {
                     && !techToGain.contains(tech)
                     && !"iihq".equalsIgnoreCase(tech)
                     && !"thveylorg".equalsIgnoreCase(tech)
-                    && !"tharcanumpmy".equalsIgnoreCase(tech)) {
+                    && !"tharcanumpmy".equalsIgnoreCase(tech)
+                    && !"tharcanumpmg".equalsIgnoreCase(tech)
+                    && !"tharcanumpmr".equalsIgnoreCase(tech)
+                    && !"tharcanumpmb".equalsIgnoreCase(tech)) {
                 if (!game.playerHasLeaderUnlockedOrAlliance(victim, "bastioncommander")
                         || !Mapper.getTech(tech).isFactionTech()) {
                     if (game.isTwilightsFallMode()

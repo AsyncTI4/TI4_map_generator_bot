@@ -42,6 +42,7 @@ import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
@@ -398,6 +399,7 @@ public class PlayerAreaGenerator {
         xDeltaBottom = crimsonRebellionTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = galvanizeTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = theodisiTokenSupplies(player, xDeltaBottom, yPlayAreaSecondRow);
+        xDeltaBottom = dreamNexusTokenSupply(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = sleeperTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = creussWormholeTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = valefarZTokens(player, xDeltaBottom, yPlayAreaSecondRow);
@@ -788,7 +790,12 @@ public class PlayerAreaGenerator {
                     .flatMap(t -> t.getUnitHolders().values().stream())
                     .mapToInt(UnitHolder::getTotalGalvanizedCount)
                     .sum();
-            if (totGalvanized > maxGalvanizeTokens) {
+            boolean hasNonBastionGalvanizeSource = game.getRealPlayers().stream()
+                    .anyMatch(p -> p.hasTech("thardentiar")
+                            || p.hasTech("thponthousr")
+                            || p.ownsPromissoryNote("thpnponthous")
+                            || p.hasUnlockedBreakthrough("kryxosbt"));
+            if (!game.isFrankenGame() && !hasNonBastionGalvanizeSource && totGalvanized > maxGalvanizeTokens) {
                 String msg = player.getRepresentation()
                         + ", there are too many Galvanized units on the board. Please review and resolve manually.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -825,6 +832,18 @@ public class PlayerAreaGenerator {
                     yDelta);
         }
         return xDeltaFromRightSide;
+    }
+
+    private int dreamNexusTokenSupply(Player player, int xDeltaFromRightSide, int yDelta) {
+        if (!player.hasAbility("dream_nexus")) {
+            return xDeltaFromRightSide;
+        }
+        return displayTheodisiTokenSupply(
+                Mapper.getTokenID("beansnexus"),
+                3,
+                Math.max(0, 3 - DreamUnitsHandler.getNexusTokenCount(game)),
+                xDeltaFromRightSide,
+                yDelta);
     }
 
     private int displayTheodisiTokenSupply(

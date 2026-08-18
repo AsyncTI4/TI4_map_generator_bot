@@ -1179,6 +1179,11 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("syndicate".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveSyndicate", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("lost_treatise".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveLostTreatise", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);

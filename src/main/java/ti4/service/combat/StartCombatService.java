@@ -29,10 +29,11 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnos
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionTargetingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
@@ -1036,8 +1037,8 @@ public class StartCombatService {
                     && player.hasUnlockedBreakthrough("dreambt")
                     && tile.getPosition().equals(game.getActiveSystem())
                     && CommandCounterHelper.hasCC(player, tile)
-                    && DreamButtonHandler.tileContainsNexusToken(game, tile, true)) {
-                DreamButtonHandler.offerDreamBtRemoveCommandTokenButton(game, player, tile, msg);
+                    && DreamAbilitiesHandler.hasNexusTokenOrDreamFlagship(game, tile)) {
+                DreamBreakthroughHandler.offerDreamBtRemoveCommandTokenButton(game, player, tile, msg);
             }
             if (player.hasUnlockedBreakthrough("zephyrionbt")
                     && "space".equalsIgnoreCase(type)
@@ -2643,10 +2644,10 @@ public class StartCombatService {
         if (!isSpaceCombat
                 || tile == null
                 || (!p1.hasAbility("incomprehensible_form") && !p2.hasAbility("incomprehensible_form"))
-                || !DreamButtonHandler.tileContainsNexusToken(game, tile, true)) {
+                || !DreamAbilitiesHandler.hasNexusTokenOrDreamFlagship(game, tile)) {
             return;
         }
-        buttons.addAll(DreamButtonHandler.getIncomprehensibleFormButtons(game, p1, p2, tile));
+        buttons.addAll(DreamAbilitiesHandler.getIncomprehensibleFormButtons(game, p1, p2, tile));
     }
 
     private static String getSpaceCombatIntroMessage() {

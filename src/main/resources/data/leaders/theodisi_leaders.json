@@ -86,7 +86,7 @@
     "name": "Cyrala Vey",
     "title": "Bishop of Law & Scripture",
     "abilityWindow": "After an agenda is resolved:",
-    "abilityText": "If the outcome you voted for is not resolved, produce 1 ship with a cost less than the number of votes you cast in a system that contains your ships.",
+    "abilityText": "If an outcome you voted for is not resolved, produce 1 unit in a system that contains 1 of your ships with a cost up to the number of votes you cast.",
     "unlockCondition": "At the start of the agenda phase, exhaust all but 3 planets you control.",
     "source": "theodisi"
   },
@@ -120,7 +120,7 @@
     "name": "Thessa Scale",
     "title": "Ash-Plate",
     "abilityWindow": "When you place a structure from your reinforcements on a planet you control:",
-    "abilityText": "Draw 2 action cards.",
+    "abilityText": "Draw 2 action cards, then discard 1.",
     "unlockCondition": "Have 4 or more non-fighter ships of the same type in the same system.",
     "source": "theodisi"
   },
@@ -324,7 +324,7 @@
     "name": "Ashara of the Silent Choir",
     "title": "Duke of the Necromancer",
     "abilityWindow": "At any time:",
-    "abilityText": "This commander has the ability text of the commander with the lich token on it.",
+    "abilityText": "While the Lich Token is on an unlocked commander you may use the effect of that commander.",
     "unlockCondition": "2 other players have unlocked commanders",
     "source": "theodisi"
   },
