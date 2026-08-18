@@ -1,8 +1,10 @@
 package ti4.discord.interactions.commands.game;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -16,6 +18,7 @@ import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
+import ti4.model.TechnologyModel;
 import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
 import ti4.service.emoji.FactionEmojis;
@@ -43,6 +46,9 @@ public class StartScenario extends GameStateSubcommand {
         }
         if (scenario.contains("liberation")) {
             startLiberationCodex4(game, event);
+        }
+        if (scenario.contains("erwin's gambit")) {
+            startErwinsGambit(game, event);
         }
         MessageHelper.replyToMessage(event, "Successfully started the scenario.");
     }
@@ -193,5 +199,109 @@ public class StartScenario extends GameStateSubcommand {
             DrawSecretService.dealSOToAll(event, 2, game);
         }
         CommanderUnlockCheckService.checkPlayer(nekro, "nekro");
+    }
+
+    public static String drawRandomFactionTech(Game game){
+        List<TechnologyModel> techs = new ArrayList<>();
+        techs.addAll(Mapper.getTechs().values());
+        Collections.shuffle(techs);
+        for(TechnologyModel model : techs){
+            if(!model.getSource().isOfficial()){
+                continue;
+            }
+            if(!model.getFaction().isPresent()){
+                continue;
+            }
+            boolean playerHasIt = false;
+            for(Player p : game.getRealAndEliminatedPlayers()){
+                if(p.getTechs().contains(model.getAlias()) || p.getNotResearchedFactionTechs().contains(model.getAlias())){
+                    playerHasIt = true;
+                    break;
+                }
+            }
+            if(playerHasIt){
+                continue;
+            }
+            return model.getAlias();
+        }
+        return null;
+    }
+
+
+    private static void startErwinsGambit(Game game, GenericInteractionCreateEvent event) {
+        game.setErwinsGambitMode(true);
+        var factions = List.of("mentak", "hacan", "sol", "saar", "letnev", "jolnar");
+        if (game.getRealPlayers().isEmpty()) {
+            AddTileListService.addTileListToMap(
+                    game,
+                    "{114} 20 41 42 23 109 22 40 47 59 60 79 24 25 77 32 26 45 0 68 33 0 61 36 0 19 50 0 110 27 0 21 46 0 117 28",
+                    event);
+        }
+        List<Player> players = new ArrayList<>();
+        for (Player player : game.getPlayers().values()) {
+            if (!player.isRealPlayer()) {
+                players.add(player);
+            }
+        }
+        for (String faction : factions) {
+            if (players.isEmpty()) {
+                MessageHelper.sendMessageToEventChannel(
+                        event, "You don't have six players, but I'll try my best anyway.");
+                break;
+            }
+            if (game.getPlayerFromColorOrFaction(faction) == null) {
+                int face = ThreadLocalRandom.current().nextInt(0, players.size());
+                Tile tile = game.getTileFromPositionOrAlias(faction);
+                boolean speaker = "mentak".equalsIgnoreCase(faction);
+                if (tile != null) {
+                    PlayerSetupState setupState = new PlayerSetupState(faction, tile.getPosition(), speaker);
+                    PlayerSetupService.setupPlayer(setupState, players.get(face), game, event);
+                    players.remove(face);
+                }
+            }
+        }
+
+        
+        List<String> allRelics = game.getAllRelics();
+
+        Player mentak = game.getPlayerFromColorOrFaction("mentak");
+        ArrayList<String> relics = new ArrayList<>(List.of("quantumcore","circletofthevoid","dynamiscore","prophetstears","titanprototype"));
+        Collections.shuffle(relics);
+        if (mentak != null) {
+            for(int x = 0; x < 2; x++){
+                String relicID = relics.removeFirst();
+                allRelics.remove(relicID);
+                mentak.addRelic(relicID);
+                RelicModel relicModel = Mapper.getRelic(relicID);
+                String message = mentak.getFactionEmoji() + " Drew Relic: " + relicModel.getName();
+                MessageHelper.sendMessageToChannelWithEmbed(
+                        mentak.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
+                String tech = drawRandomFactionTech(game);
+                mentak.addTech(tech);
+                TechnologyModel tM = Mapper.getTech(tech);
+                String message2 = mentak.getFactionEmoji() + " Drew Technology: " + tM.getName();
+                MessageHelper.sendMessageToChannelWithEmbed(
+                        mentak.getCorrectChannel(), message2, tM.getRepresentationEmbed(false, true));
+            }
+            mentak.setTg(2);
+            mentak.addAbility("safe_harbor");
+        }
+        game.setStoredValue("unclaimedHSRelics", "hacan_sol_saar_letnev_jolnar");
+
+        Player hacan = game.getPlayerFromColorOrFaction("hacan");
+        hacan.addAbility("contraband_auction");
+        Player saar = game.getPlayerFromColorOrFaction("saar");
+        saar.addAbility("outlaw_brotherhood");
+        Player letnev = game.getPlayerFromColorOrFaction("letnev");
+        letnev.addAbility("iron_price");
+        Player jolnar = game.getPlayerFromColorOrFaction("jolnar");
+        jolnar.addAbility("hylar_fencing_operation");
+        Player sol = game.getPlayerFromColorOrFaction("sol");
+        sol.addAbility("asset_recovery");
+        
+        
+        if (game.getRealPlayers().size() == 6) {
+            DrawSecretService.dealSOToAll(event, 2, game);
+        }
     }
 }

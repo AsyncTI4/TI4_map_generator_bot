@@ -15,15 +15,17 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.NotNull;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.jetbrains.annotations.NotNull;
 import ti4.cron.CronManager;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.commands.CommandHelper;
@@ -457,7 +459,7 @@ class AutoCompleteProvider {
             }
             case Constants.SCENARIO -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                var tokens = List.of("ordinian (codex 1)", "liberation (codex 4)");
+                var tokens = List.of("ordinian (codex 1)", "liberation (codex 4)","erwin's gambit (homebrew)");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }

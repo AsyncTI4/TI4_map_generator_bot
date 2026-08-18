@@ -1,23 +1,6 @@
 package ti4.game.persistence;
 
-import static ti4.game.persistence.GamePersistenceKeys.ENDGAMEINFO;
-import static ti4.game.persistence.GamePersistenceKeys.ENDMAPINFO;
-import static ti4.game.persistence.GamePersistenceKeys.ENDPLAYER;
-import static ti4.game.persistence.GamePersistenceKeys.ENDPLAYERINFO;
-import static ti4.game.persistence.GamePersistenceKeys.ENDTILE;
-import static ti4.game.persistence.GamePersistenceKeys.ENDTOKENS;
-import static ti4.game.persistence.GamePersistenceKeys.ENDUNITHOLDER;
-import static ti4.game.persistence.GamePersistenceKeys.ENDUNITS;
-import static ti4.game.persistence.GamePersistenceKeys.GAMEINFO;
-import static ti4.game.persistence.GamePersistenceKeys.MAPINFO;
-import static ti4.game.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
-import static ti4.game.persistence.GamePersistenceKeys.PLANET_TOKENS;
-import static ti4.game.persistence.GamePersistenceKeys.PLAYER;
-import static ti4.game.persistence.GamePersistenceKeys.PLAYERINFO;
-import static ti4.game.persistence.GamePersistenceKeys.TILE;
-import static ti4.game.persistence.GamePersistenceKeys.TOKENS;
-import static ti4.game.persistence.GamePersistenceKeys.UNITHOLDER;
-import static ti4.game.persistence.GamePersistenceKeys.UNITS;
+import static ti4.game.persistence.GamePersistenceKeys.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -35,6 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.game.Expeditions;
@@ -605,6 +589,8 @@ class GameSaveService {
         writer.write(Constants.ORDINIAN_C1_MODE + " " + game.isOrdinianC1Mode());
         writer.write(System.lineSeparator());
         writer.write(Constants.LIBERATION_C4_MODE + " " + game.isLiberationC4Mode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.ERWINS_GAMBIT_MODE + " " + game.isErwinsGambitMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_FULL_COMPONENT_TEXT + " " + game.isShowFullComponentTextEmbeds());
         writer.write(System.lineSeparator());

@@ -955,6 +955,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
 
         gameModes.put("Liberation", isLiberationC4Mode());
+        gameModes.put("Erwin's Gambit", isErwinsGambitMode());
         gameModes.put("Ordinian", isOrdinianC1Mode());
         gameModes.put("Alliance", isAllianceMode());
 

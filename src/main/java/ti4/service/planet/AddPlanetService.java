@@ -5,11 +5,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
@@ -197,6 +199,7 @@ public class AddPlanetService {
                     }
                     if (player_.hasTech("pa")
                             && !player_.getExhaustedPlanets().contains(planet)
+                            && "action".equalsIgnoreCase(game.getPhaseOfGame())
                             && ButtonHelper.checkForTechSkips(game, planet)
                             && !ButtonHelperAbilities.canBePillaged(player_, game, player.getTg() + 1)) {
                         player_.exhaustPlanet(planet);
