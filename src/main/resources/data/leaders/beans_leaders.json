@@ -18,7 +18,7 @@
     "title": "The Awakened One",
     "abilityWindow": "When you cast votes on an agenda:",
     "abilityText": "Cast an additional number of votes equal to the number of planets in systems that contain 1 or more of your nexus tokens.",
-    "unlockCondition": "Have all 3 of your nexus tokens on the game board.",
+    "unlockCondition": "Have ships in 2 different, non-nebula systems that contain an anomaly.",
     "source": "beans"
   },
   {

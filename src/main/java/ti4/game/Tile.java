@@ -569,15 +569,21 @@ public class Tile {
 
     @JsonIgnore
     public boolean isNebula() {
-        if (hasAnyToken("token_ds_wound.png", "attachment_superweapon_availyn.png", "token_nebula_async.png"))
-            return true;
+        if (hasAnyToken(
+                "token_ds_wound.png",
+                "attachment_superweapon_availyn.png",
+                "token_nebula_async.png",
+                "token_beans_nexus.png")) return true;
         return getTileModel().isNebula();
     }
 
     @JsonIgnore
     public boolean isNebula(Game game) {
-        if (hasAnyToken("token_ds_wound.png", "attachment_superweapon_availyn.png", "token_nebula_async.png"))
-            return true;
+        if (hasAnyToken(
+                "token_ds_wound.png",
+                "attachment_superweapon_availyn.png",
+                "token_nebula_async.png",
+                "token_beans_nexus.png")) return true;
         if (game != null) {
             for (Player p : game.getPlayers().values()) {
                 if ((p.hasUnlockedBreakthrough("veldyrbt") || p.hasTech("tf-harnessedaurora"))

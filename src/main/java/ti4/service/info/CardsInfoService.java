@@ -8,11 +8,11 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
@@ -144,8 +144,8 @@ public class CardsInfoService {
             buttons.add(TaLeadersHandler.getLenCardsInfoButton());
         }
         if (player.hasUnexhaustedLeader("dreamagent")
-                && !DreamButtonHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
-            buttons.add(DreamButtonHandler.getDreamAgentCardsInfoButton(player));
+                && !DreamLeadersHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
+            buttons.add(DreamLeadersHandler.getDreamAgentCardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("crystellumagent")) {
             buttons.add(CrystellumLeadersHandler.getCrystellumAgentButton(player));
