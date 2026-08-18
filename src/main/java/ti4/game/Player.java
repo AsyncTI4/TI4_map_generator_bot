@@ -1491,9 +1491,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 }
 
                 for (String trait : planet.getPlanetTypes()) {
-                    if (Constants.CULTURAL.equals(trait)
-                            || Constants.HAZARDOUS.equals(trait)
-                            || Constants.INDUSTRIAL.equals(trait)) {
+                    if (!planet.isHomePlanet(game)
+                            && (Constants.CULTURAL.equals(trait)
+                                    || Constants.HAZARDOUS.equals(trait)
+                                    || Constants.INDUSTRIAL.equals(trait))) {
                         controlledTraits.add(trait);
                     }
                 }

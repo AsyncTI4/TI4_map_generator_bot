@@ -18,7 +18,6 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.AdministrativeExemptionLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaBreakthroughHandler;
@@ -512,9 +511,6 @@ public class PlayStrategyCardService {
                     }
                 }
             }
-        }
-        if (player.hasAbility("mandate_of_presence") && !isOverrule) {
-            VerydithAbilitiesHandler.getMandateButtons(event, player, game);
         }
         if (player.hasRelicReady("lunar_eclipse_moonphase")
                 && AeternaAbilityHandler.canReturnCapturedNeutralUnits(game, player, 2)) {

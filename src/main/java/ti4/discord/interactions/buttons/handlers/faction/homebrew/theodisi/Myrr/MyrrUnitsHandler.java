@@ -57,7 +57,7 @@ public class MyrrUnitsHandler {
         return "-# You have " + replicatorCount + " Replicator"
                 + (replicatorCount == 1 ? "" : "s")
                 + " in this system with a total PRODUCTION of " + replicatorProduction + ". "
-                + "These units may only produce dreadnoughts or unit types they transported.\n";
+                + "These units may only produce dreadnoughts or units that can be transported and are currently in this system's space area.\n";
     }
 
     public static void offerIronboundGuardianDeploy(ButtonInteractionEvent event, Game game, Player player, Tile tile) {

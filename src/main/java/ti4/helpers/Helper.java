@@ -2480,8 +2480,10 @@ public final class Helper {
         if (ArcanumTechHandler.hasSigilOfTransmutation(game, player, tile)) {
             productionValueTotal += 3;
         }
-        boolean hasExactlyOneShipInSystem =
-                tile.getSpaceUnitHolder().countPlayersUnitsWithModelCondition(player, unit -> unit.getIsShip()) == 1;
+        boolean hasExactlyOneShipInSystem = tile.getSpaceUnitHolder()
+                        .countPlayersUnitsWithModelCondition(
+                                player, unit -> unit.getIsShip() && unit.getUnitType() != UnitType.Fighter)
+                == 1;
         if (hasExactlyOneShipInSystem && player.hasAbility("rallying_cry")) {
             productionValueTotal += 2;
         }
