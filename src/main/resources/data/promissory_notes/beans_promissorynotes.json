@@ -4,9 +4,9 @@
         "name": "Visions",
         "faction": "dream",
         "color": "",
-        "playArea": false,
+        "playArea": true,
         "source": "beans",
-        "text": "At the start of a tactical action: You may return this card to the Dreaming Throne player to remove 1 nexus token from a system containing a planet you control."
+        "text": "When you gain this card, place it face up in your play area. While this card is in your play area, your ship's movement is not affected by nebulas. If you activate a system that contains 1 or more of the Dreaming Throne player's units, return this card to the Dreaming Throne player."
     },
     {
         "alias": "bepncryst",

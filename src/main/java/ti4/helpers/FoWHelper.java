@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -482,10 +481,6 @@ public final class FoWHelper {
         Set<String> otherAdjacencies = getNonWormholeAdjacencies(game, position);
         adjacentPositions.addAll(otherAdjacencies);
 
-        // Nexus Token Adjacency for Dreaming Throne
-        if (player != null && player.hasAbility("dream_nexus")) {
-            adjacentPositions.addAll(DreamButtonHandler.getDreamNexusAdjacencies(game, player, position));
-        }
         if (player != null
                 && (game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")
                         || player.hasTech("tf-starbasewebway"))
