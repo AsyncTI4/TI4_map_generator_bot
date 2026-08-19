@@ -14,12 +14,15 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.game.helper.GameHelper;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.map.FractureService;
+import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
+import ti4.spring.service.statistics.matchmaking.SkillTier;
 
 @UtilityClass
 public class GameStatisticsFilterer {
@@ -37,6 +40,7 @@ public class GameStatisticsFilterer {
     private static final String HAS_SCENARIO_FILTER = "has_scenario";
     private static final String FRACTURE_IN_PLAY_FILTER = "fracture_in_play";
     private static final String STARTED_AFTER_FILTER = "started_after";
+    private static final String SKILL_TIER_FILTER = "skill_tier";
 
     private static final int MINIMUM_ROUND = 3;
     private static final DateTimeFormatter STARTED_AFTER_FILTER_FORMATTER =
@@ -67,7 +71,17 @@ public class GameStatisticsFilterer {
         filters.add(new OptionData(OptionType.BOOLEAN, FRACTURE_IN_PLAY_FILTER, "Is The Fracture in play?"));
         filters.add(new OptionData(
                 OptionType.STRING, STARTED_AFTER_FILTER, "Filter games by if they started after a date (YYYY-MM-DD)"));
+        filters.add(skillTierFilterOption());
         return filters;
+    }
+
+    private static OptionData skillTierFilterOption() {
+        OptionData skillTierOption = new OptionData(
+                OptionType.STRING, SKILL_TIER_FILTER, "Skill of the game, by average player matchmaking rating");
+        for (SkillTier skillTier : SkillTier.values()) {
+            skillTierOption.addChoice(skillTier.getDisplayName() + " (" + skillTier.getLabel() + ")", skillTier.name());
+        }
+        return skillTierOption;
     }
 
     public static Predicate<Game> getGamesFilterForWonGame(SlashCommandInteractionEvent event) {
@@ -108,6 +122,8 @@ public class GameStatisticsFilterer {
         Boolean fractureInPlayFilter = event.getOption(FRACTURE_IN_PLAY_FILTER, null, OptionMapping::getAsBoolean);
         String startedAfterFilter = event.getOption(STARTED_AFTER_FILTER, null, OptionMapping::getAsString);
         LocalDate startedAfterDate = parseStartedAfterDate(startedAfterFilter, event);
+        SkillTier skillTierFilter =
+                SkillTier.fromOptionValue(event.getOption(SKILL_TIER_FILTER, null, OptionMapping::getAsString));
 
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(playerCountFilter, game);
         return playerCountPredicate
@@ -124,8 +140,28 @@ public class GameStatisticsFilterer {
                 .and(game -> filterOnScenario(scenarioFilter, game))
                 .and(game -> filterOnFractureInPlay(fractureInPlayFilter, game))
                 .and(game -> filterOnStartedAfter(startedAfterDate, game))
+                .and(skillTierPredicate(skillTierFilter))
                 .and(GameStatisticsFilterer::filterAbortedGames)
                 .and(GameStatisticsFilterer::filterEarlyRounds);
+    }
+
+    /**
+     * Classifies a game by the average matchmaking rating of its players. Resolves the rating service once rather than
+     * per game, and stays inert unless the filter is actually in use, so unrelated stats commands never pay for the
+     * rating calculation.
+     */
+    private static Predicate<Game> skillTierPredicate(SkillTier skillTierFilter) {
+        if (skillTierFilter == null) {
+            return game -> true;
+        }
+        MatchmakingRatingEventService ratingService = MatchmakingRatingEventService.get();
+        return game -> {
+            List<String> userIds = game.getRealAndEliminatedPlayers().stream()
+                    .map(Player::getUserID)
+                    .toList();
+            Long averageDisplayRating = ratingService.getAverageDisplayRating(userIds);
+            return averageDisplayRating != null && skillTierFilter.contains(averageDisplayRating);
+        };
     }
 
     private static LocalDate parseStartedAfterDate(String startedAfterDate, SlashCommandInteractionEvent event) {

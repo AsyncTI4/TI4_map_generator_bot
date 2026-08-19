@@ -8,7 +8,9 @@ import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,6 +73,28 @@ public class MatchmakingRatingEventService {
 
     public Map<String, BigDecimal> getConservativePlayerRatings(Set<String> userIds) {
         return filterRatingsByUserIds(getCachedConservativePlayerRatings(), userIds);
+    }
+
+    /**
+     * Average conservative display rating across the given users, using the player-base average for anyone without a
+     * rating yet. Returns null when no users are supplied.
+     */
+    public Long getAverageDisplayRating(Collection<String> userIds) {
+        if (userIds.isEmpty()) {
+            return null;
+        }
+        Map<String, BigDecimal> ratings = getConservativePlayerRatings(new HashSet<>(userIds));
+        BigDecimal defaultRating = getAverageConservativeRating();
+        BigDecimal average = userIds.stream()
+                .map(userId -> ratings.getOrDefault(userId, defaultRating))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .divide(BigDecimal.valueOf(userIds.size()), java.math.MathContext.DECIMAL64);
+        return toDisplayRating(average);
+    }
+
+    public SkillTier getSkillTier(Collection<String> userIds) {
+        Long averageDisplayRating = getAverageDisplayRating(userIds);
+        return averageDisplayRating == null ? null : SkillTier.fromDisplayRating(averageDisplayRating);
     }
 
     public BigDecimal getAverageConservativeRating() {
