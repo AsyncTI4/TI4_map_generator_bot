@@ -163,7 +163,10 @@ public class CombatModHelper {
                             unitsByQuantity,
                             game)) {
                 RelicModel relicModel = Mapper.getRelic(relic);
-                modifiers.add(new NamedCombatModifierModel(relevantMod.get(), relicModel.getSimpleRepresentation()));
+                String relicName = "specialized_augmentations".equals(relic)
+                        ? relicModel.getSimpleRepresentation(false)
+                        : relicModel.getSimpleRepresentation();
+                modifiers.add(new NamedCombatModifierModel(relevantMod.get(), relicName));
             }
         }
 
@@ -421,8 +424,7 @@ public class CombatModHelper {
                 meetsCondition = (!ButtonHelperAgents.getAdjacentTilesWithStructuresInThem(player, game, tile)
                                 .isEmpty()
                         || ButtonHelperAgents.doesTileHaveAStructureInIt(player, tile));
-            case "fracture_combat" ->
-                meetsCondition = tile != null && tile.getPosition().contains("frac");
+            case "fracture_combat" -> meetsCondition = tile != null && tile.isFracture();
             case Constants.MOD_UNITS_TWO_MATCHING_NOT_FF -> {
                 if (unitsByQuantity.size() == 1) {
                     Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).getFirst();
@@ -711,7 +713,7 @@ public class CombatModHelper {
                             "sigma_argent_flagship_2", player, game.getTileByPosition(adjPos));
                 }
             }
-            case "not_active_player" -> meetsCondition = game.getActivePlayer() != player;
+            case "active_player" -> meetsCondition = game.getActivePlayer() == player;
             default -> meetsCondition = true;
         }
         return meetsCondition;
@@ -846,7 +848,7 @@ public class CombatModHelper {
                 }
                 case "adjacent_anomaly" -> {
                     for (String pos :
-                            FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+                            FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true, true)) {
                         Tile tile = game.getTileByPosition(pos);
                         if (tile.isAnomaly(game, player)) {
                             scalingCount += 1;
@@ -860,12 +862,12 @@ public class CombatModHelper {
                         scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player);
                     }
                 }
-                case "carried_ffinfmf_in_space_area" -> { // Doesn't actually track carried units, assumes flagship cap
+                case "carried_gf_in_space_area" -> { // Doesn't actually track carried units, assumes flagship cap
                     // is filled first
                     UnitModel uM = Mapper.getUnit("xytheris_flagship");
-                    int numberOfCarryableUnitsInSystem =
-                            (activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player)
-                                    + activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player));
+                    int numberOfCarryableUnitsInSystem = (activeSystem
+                            .getSpaceUnitHolder()
+                            .countPlayersUnitsWithModelCondition(player, UnitModel::getIsGroundForce));
                     if (!"space".equalsIgnoreCase(unitHolder.getName())
                             || !player.ownsUnit("xytheris_flagship")
                             || game.getActivePlayer() != player) {

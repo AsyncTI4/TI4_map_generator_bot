@@ -103,6 +103,10 @@ class GalacticEventButtonHandler {
             game.setWeirdWormholesMode(enable);
             message += "Weird Wormholes Mode. Nothing more needs to be done.";
         }
+        if ("CosmicConvergence".equalsIgnoreCase(mode)) {
+            game.setCosmicConvergenceMode(enable);
+            message += "Cosmic Convergence Mode. Nothing more needs to be done.";
+        }
         if ("CallOfTheVoid".equalsIgnoreCase(mode)) {
             game.setCallOfTheVoidMode(enable);
             message += "Call of the Void. Nothing more needs to be done.";

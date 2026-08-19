@@ -24,7 +24,7 @@
             "For each legendary planet you control, choose one unique player to place a command token from reinforcements in that system."
         ],
         "secondaryTexts": [
-            "Spend 1 token from your strategy pool to participate in the genome splice."
+            "Spend 1 token from your strategy pool to ready up to 2 exhausted planets you control."
         ],
         "colourHexCode": "#f69421",
         "botSCAutomationID": "pok2diplomacy",

@@ -202,5 +202,19 @@
         "itemId": "allure_of_darkness",
         "undraftable": true,
         "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "call_of_the_haunted",
+        "additionalComponents": [
+            "PN:thpnrevenant"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "PN",
+        "itemId": "thpnrevenant",
+        "undraftable": true,
+        "source": "theodisi"
     }
 ]

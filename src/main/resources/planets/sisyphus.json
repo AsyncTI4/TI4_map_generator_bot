@@ -1,0 +1,23 @@
+{
+    "id": "sisyphus",
+    "tileId": "ef4",
+    "name": "Sisyphus",
+    "shortName": "Sisyphus",
+    "aliases": [
+        "sisyphus"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": [
+        "SPACESTATION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "sisyphus",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 200.0,
+            "y": 210.0
+        }
+    },
+    "source": "expanded_fracture"
+}

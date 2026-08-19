@@ -29,6 +29,8 @@ import ti4.contest.replay.core.CombatRollPayload.DieRollSource;
 import ti4.contest.replay.core.CombatRollPayload.RollSegmentType;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnosisLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExplosivesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
@@ -284,6 +286,8 @@ public class CombatRollService {
                 }
             }
         }
+        playerUnitsByQuantity = MassHypnosisLLButtonHandler.splitHypnotizedShipForRoll(
+                game, player, tile, combatOnHolder, rollType, playerUnitsByQuantity);
         String bombardPlanet = "";
         if (rollType == CombatRollType.bombardment
                 && !game.getStoredValue("bombardmentTarget" + player.getFaction())
@@ -571,14 +575,14 @@ public class CombatRollService {
         CombatRollPayload.RollHeader rollHeader =
                 buildRollHeader(game, player, opponent, tile, combatOnHolder, rollType, combatSummary);
         CombatRollPayload payload = rollResult.payload().withHeader(rollHeader);
+        RiggedExplosivesLLButtonHandler.destroyFailedRiggedExplosives(event, game, player, tile, rollType, payload);
         FOWCombatThreadMirroring.mirrorCombatMessage(event, player, game, message);
         int h = rollResult.totalHits();
-        int renegadeCount = opponent.hasUnit("ponthous_destroyer2")
-                ? tile.getSpaceUnitHolder().getUnitCount(UnitType.Destroyer, opponent)
-                : 0;
-        if (rollType == CombatRollType.AFB && h > 0 && opponent != player && renegadeCount > 0) {
-            int canceledHits = Math.min(h, renegadeCount);
-            h -= canceledHits;
+        int massHypnosisHits =
+                MassHypnosisLLButtonHandler.getRedirectedHits(game, player, tile, combatOnHolder, rollType, payload);
+
+        if (massHypnosisHits > 0) {
+            h = Math.max(0, h - massHypnosisHits);
             message = message.replaceFirst(
                     "\\n\\*\\*Total hits \\d+\\*\\*[^\\n]*\\n", CombatMessageHelper.displayHitResults(h));
             if (payload.total() != null) {
@@ -590,8 +594,8 @@ public class CombatRollService {
                         payload.unitRolls(),
                         new CombatRollPayload.RollTotal(total.diceRolled(), h, total.misses(), total.maximumHits()));
             }
-            message += "\n_Renegade II_ canceled " + canceledHits + " ANTI-FIGHTER BARRAGE hit"
-                    + (canceledHits == 1 ? "" : "s") + " automatically.";
+            message += "\n_Mass Hypnosis_ redirected " + massHypnosisHits + " hit" + (massHypnosisHits == 1 ? "" : "s")
+                    + " to its owner's ships.";
         }
         XytherisAbilityHandler.beginStingOfTheHiveRoll(game, player, tile, rollType, h);
         int round;
@@ -639,6 +643,9 @@ public class CombatRollService {
             message = AshenBreakthroughHandler.appendBombardmentManualReminder(player, rollType, message);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        if (massHypnosisHits > 0 && !game.isFowMode()) {
+            CombatRollService.sendSpaceAssignHitsButtons(event, game, player, tile, massHypnosisHits);
+        }
         ThronesUnitHandler.offerGholaAfterRoll(event, game, player, opponent, tile, combatOnHolder, rollType, payload);
         if (rollType == CombatRollType.combatround
                 && Constants.SPACE.equalsIgnoreCase(unitHolderName)
@@ -864,12 +871,12 @@ public class CombatRollService {
                             opponent.factionButtonChecker() + "cancelAFBHits_" + tile.getPosition() + "_" + h,
                             "Cancel a Hit"));
                 }
-                Button stingOfTheHiveButton = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButton(
+                List<Button> stingOfTheHiveButtons = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
                         game, player, tile, rollType, opponent, h);
-                if (stingOfTheHiveButton != null) {
-                    buttons.add(stingOfTheHiveButton);
+                if (!stingOfTheHiveButtons.isEmpty()) {
+                    buttons.addAll(stingOfTheHiveButtons);
                     msg2 += "\n-# Wait for " + player.getRepresentationNoPing()
-                            + " to decide whether to place a mine before assigning hits.";
+                            + " to decide whether to cancel hits and place mine tokens before assigning hits.";
                 }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
             }
@@ -950,32 +957,32 @@ public class CombatRollService {
                     "Manually Assign Hit" + (h == 1 ? "" : "s")));
             buttons.add(Buttons.gray(
                     factionChecker + "cancelPdsOffenseHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
-            Button stingOfTheHiveButton = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButton(
+            List<Button> stingOfTheHiveButtons = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
                     game, player, tile, rollType, opponent, h);
-            if (stingOfTheHiveButton != null) {
-                buttons.add(stingOfTheHiveButton);
+            if (!stingOfTheHiveButtons.isEmpty()) {
+                buttons.addAll(stingOfTheHiveButtons);
             }
             String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign "
                     + (h == 1 ? "the hit" : "hits") + "."
                     + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true, true);
-            if (stingOfTheHiveButton != null) {
+            if (!stingOfTheHiveButtons.isEmpty()) {
                 msg2 += "\n-# Wait for " + player.getRepresentationNoPing()
-                        + " to decide whether to place a mine before assigning hits.";
+                        + " to decide whether to cancel hits and place mine tokens before assigning hits.";
             }
             MessageHelper.sendMessageToChannelWithButtons(channel, msg2, buttons);
         }
 
         if (rollType == CombatRollType.SpaceCannonDefence && h > 0 && opponent != player) {
-            Button stingOfTheHiveButton = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButton(
+            List<Button> stingOfTheHiveButtons = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
                     game, player, tile, rollType, opponent, h);
-            if (stingOfTheHiveButton != null) {
-                MessageHelper.sendMessageToChannelWithButton(
+            if (!stingOfTheHiveButtons.isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation()
-                                + ", you may use **Sting of the Hive** to place a mine instead of 1 SPACE CANNON DEFENCE hit.\n-# "
+                                + ", you may use **Sting of the Hive** to cancel any number of these SPACE CANNON DEFENCE hits and place that many mine tokens.\n-# "
                                 + opponent.getRepresentationNoPing()
                                 + " should wait to assign hits until you have decided:",
-                        stingOfTheHiveButton);
+                        stingOfTheHiveButtons);
             }
         }
 
@@ -1014,17 +1021,17 @@ public class CombatRollService {
                                 && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(bombardPlanet))) {
                             if (p2.isRealPlayer()) {
                                 List<Button> targetButtons = new ArrayList<>(buttons);
-                                Button stingOfTheHiveButton =
-                                        XytherisAbilityHandler.getStingOfTheHiveHitReplacementButton(
+                                List<Button> stingOfTheHiveButtons =
+                                        XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
                                                 game, player, tile, rollType, p2, h);
-                                if (stingOfTheHiveButton != null) {
-                                    targetButtons.add(stingOfTheHiveButton);
+                                if (!stingOfTheHiveButtons.isEmpty()) {
+                                    targetButtons.addAll(stingOfTheHiveButtons);
                                 }
                                 String assignmentMessage = p2.getRepresentation()
                                         + ", please assign the BOMBARDMENT hit" + (h == 1 ? "" : "s") + ".";
-                                if (stingOfTheHiveButton != null) {
+                                if (!stingOfTheHiveButtons.isEmpty()) {
                                     assignmentMessage += "\n-# Wait for " + player.getRepresentationNoPing()
-                                            + " to decide whether to place a mine before assigning hits.";
+                                            + " to decide whether to cancel hits and place mine tokens before assigning hits.";
                                 }
                                 MessageHelper.sendMessageToChannelWithButtons(
                                         game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
@@ -1037,18 +1044,18 @@ public class CombatRollService {
                                                 + game.getUnitHolderFromPlanet(bombardPlanet)
                                                         .getName() + "_" + h,
                                         "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
-                                Button stingOfTheHiveButton =
-                                        XytherisAbilityHandler.getStingOfTheHiveHitReplacementButton(
+                                List<Button> stingOfTheHiveButtons =
+                                        XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
                                                 game, player, tile, rollType, p2, h);
-                                if (stingOfTheHiveButton != null) {
-                                    buttons2.add(stingOfTheHiveButton);
+                                if (!stingOfTheHiveButtons.isEmpty()) {
+                                    buttons2.addAll(stingOfTheHiveButtons);
                                 }
                                 String assignmentMessage =
                                         player.getRepresentation() + ", please assign the BOMBARDMENT hit"
                                                 + (h == 1 ? "" : "s") + " for the dummy player.";
-                                if (stingOfTheHiveButton != null) {
+                                if (!stingOfTheHiveButtons.isEmpty()) {
                                     assignmentMessage += "\n-# Wait for " + player.getRepresentationNoPing()
-                                            + " to decide whether to place a mine before assigning hits.";
+                                            + " to decide whether to cancel hits and place mine tokens before assigning hits.";
                                 }
                                 MessageHelper.sendMessageToChannelWithButtons(
                                         game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
@@ -2965,6 +2972,11 @@ public class CombatRollService {
         output.forEach((k, v) -> flatOutput.merge(k.getLeft(), v, Integer::sum));
         checkBadUnits(player, event, unitsByAsyncId, flatOutput);
 
+        for (UnitModel riggedExplosivesCannon :
+                RiggedExplosivesLLButtonHandler.getRiggedExplosivesCannons(game, player, tile)) {
+            unitsOnTile.put(new ImmutablePair<>(riggedExplosivesCannon, spaceHolder), 1);
+        }
+
         return output;
     }
 
@@ -2998,6 +3010,13 @@ public class CombatRollService {
         Map<Pair<UnitModel, UnitHolder>, Integer> merged = new LinkedHashMap<>();
         for (Map.Entry<String, List<Pair<UnitModel, UnitHolder>>> modelEntry : modelKeys.entrySet()) {
             List<Pair<UnitModel, UnitHolder>> keys = modelEntry.getValue();
+            if (keys.stream().anyMatch(key -> MassHypnosisLLButtonHandler.isHypnotizedRollModel(key.getLeft()))) {
+                divergingModels.add(modelEntry.getKey());
+                for (Pair<UnitModel, UnitHolder> key : keys) {
+                    merged.put(key, countByIdentity.get(key));
+                }
+                continue;
+            }
             if (keys.size() == 1) {
                 Pair<UnitModel, UnitHolder> k = keys.get(0);
                 merged.put(k, countByIdentity.get(k));

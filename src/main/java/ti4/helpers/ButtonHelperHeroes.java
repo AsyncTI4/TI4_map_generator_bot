@@ -871,7 +871,7 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             Planet planetReal = game.getPlanetsInfo().get(planet);
-            if (!planet.contains("mr") && planetReal.isHomePlanet(game) && !planetReal.isSpaceStation()) {
+            if (!planet.contains("mr") && !planetReal.isHomePlanet(game) && !planetReal.isSpaceStation()) {
                 buttons.add(
                         Buttons.green("freeSystemsHeroPlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
             }
@@ -1614,9 +1614,7 @@ public class ButtonHelperHeroes {
     public static List<Button> getGhostHeroTilesStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.getPosition().contains("t")
-                    || tile.getPosition().contains("b")
-                    || tile.getPosition().contains("frac")) {
+            if (tile.getPosition().contains("t") || tile.getPosition().contains("b") || tile.isFracture()) {
                 continue;
             }
             if (FoWHelper.doesTileHaveWHs(game, tile.getPosition()) || FoWHelper.playerHasUnitsInSystem(player, tile)) {

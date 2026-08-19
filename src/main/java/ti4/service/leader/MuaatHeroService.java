@@ -44,6 +44,7 @@ public class MuaatHeroService {
         if (frontier) {
             novaTile.getSpaceUnitHolder().addToken(frontierFilename);
         }
+        novaTile.getSpaceUnitHolder().removeToken(Constants.TOKEN_INGRESS);
 
         String message2 = tile.getRepresentation() + " has been _Nova Seed_'d by " + muaat.getRepresentation() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, novaTile, 1, message2);

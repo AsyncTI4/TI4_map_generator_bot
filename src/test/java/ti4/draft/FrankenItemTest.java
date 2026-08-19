@@ -7,9 +7,31 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import ti4.game.Game;
 import ti4.testUtils.BaseTi4Test;
 
 class FrankenItemTest extends BaseTi4Test {
+    @Test
+    void frankenDrazUsesConfiguredFactionLimit() {
+        Game game = new Game();
+        FrankenDrazDraft draft = new FrankenDrazDraft(game);
+        game.setBagDraft(draft);
+
+        Assertions.assertEquals(6, draft.getItemLimitForCategory(DraftCategory.FACTION));
+
+        game.setStoredValue("frankenLimit" + DraftCategory.FACTION, "4");
+        Assertions.assertEquals(4, draft.getItemLimitForCategory(DraftCategory.FACTION));
+        Assertions.assertEquals(4, FrankenDraft.getItemLimitForCategory(DraftCategory.FACTION, game));
+        Assertions.assertEquals(10, draft.getBagSize());
+        Assertions.assertEquals(10, game.getFrankenBagSize());
+
+        game.setStoredValue("frankenLimit" + DraftCategory.FACTION, "8");
+        Assertions.assertEquals(8, draft.getItemLimitForCategory(DraftCategory.FACTION));
+        Assertions.assertEquals(8, FrankenDraft.getItemLimitForCategory(DraftCategory.FACTION, game));
+        Assertions.assertEquals(14, draft.getBagSize());
+        Assertions.assertEquals(14, game.getFrankenBagSize());
+    }
+
     @Test
     void testAllCardsGenerateSuccessfully() {
         assertDoesNotThrow(DraftItem::generateAllDraftableCards);

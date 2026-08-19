@@ -76,6 +76,10 @@ public final class FOWPlusService {
             Pair.of(FOWOption.HIDE_TOTAL_VOTES, true),
             Pair.of(FOWOption.HIDE_VOTE_ORDER, true),
             Pair.of(FOWOption.STATS_FROM_HS_ONLY, true),
+            Pair.of(FOWOption.HIDE_STATS_VIA_FACTION_PN, true),
+            Pair.of(FOWOption.HIDE_STATS_VIA_ALLIANCE, true),
+            Pair.of(FOWOption.HIDE_STATS_VIA_SFTT, true),
+            Pair.of(FOWOption.HIDE_STATS_VIA_MAHACT_CC, true),
             Pair.of(FOWOption.HIDE_EXPLORES, true),
             Pair.of(FOWOption.HIDE_MAP, true),
             Pair.of(FOWOption.HIDE_PLAYER_INFOS, true));

@@ -45,7 +45,9 @@ public class WeirdGameSetup extends GameStateSubcommand {
                 Constants.UNCHARTED_SPACE_STUFF,
                 "True to add the Uncharted Space Stuff to the draft pool."));
         addOptions(new OptionData(
-                OptionType.BOOLEAN, Constants.NO_FRACTURE, "True to turn off fracture rolling in TE games."));
+                OptionType.BOOLEAN,
+                Constants.NO_FRACTURE,
+                "True to stop The Fracture ever entering play in TE games."));
         addOptions(new OptionData(
                 OptionType.INTEGER, Constants.CC_LIMIT, "Command token limit each player should have, default 16."));
         addOptions(new OptionData(

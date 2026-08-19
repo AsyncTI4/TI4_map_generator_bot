@@ -48,7 +48,7 @@
         "alias": "crystellum",
         "factionName": "The Crystellum",
         "homeSystem": "be2",
-        "startingFleet": "1 cv, 1 dn, 1 cv, 2 ff, 2 inf p, 2 inf s, sd p",
+        "startingFleet": "1 cv, 1 dn, 1 cv, 4 ff, 2 inf p, 2 inf s, sd p",
         "commodities": 2,
         "factionTech": [
             "becrystrd",
@@ -70,8 +70,8 @@
             "spire"
         ],
         "abilities": [
-            "refraction",
-            "fragmentation"
+            "fragmentation",
+            "pieces_of_a_whole"
         ],
         "leaders": [
             "crystellumagent",
@@ -100,7 +100,7 @@
         "alias": "ashen",
         "factionName": "The Ashen Legion",
         "homeSystem": "be3",
-        "startingFleet": "2 dn, 1 cv, 1 ff, 4 inf p, sd p",
+        "startingFleet": "1 dn, 1 cv, 6 inf p, sd p",
         "commodities": 2,
         "factionTech": [
             "beasheninf",
@@ -114,7 +114,8 @@
         ],
         "abilities": [
             "phoenix_rising",
-            "beauty_in_destruction"
+            "burning_legion",
+            "forged_in_fire"
         ],
         "leaders": [
             "ashenagent",
@@ -143,7 +144,7 @@
         "alias": "iron",
         "factionName": "The Iron Tide",
         "homeSystem": "be4",
-        "startingFleet": "1 cv, 1 dd, 1 dn, 2 ff, 2 inf k, 1 mf k, sd k",
+        "startingFleet": "1 cv, 1 dd, 1 dn, 2 ff, 2 inf k, 2 mf k, sd k",
         "commodities": 2,
         "factionTech": [
             "beironmf",
@@ -246,9 +247,9 @@
             "kha"
         ],
         "abilities": [
-            "system_breach",
-            "control_network",
-            "ransomware"
+            "neural_instruments",
+            "proxy_network",
+            "reverse_engineering"
         ],
         "leaders": [
             "netrunnersagent",
@@ -277,7 +278,7 @@
         "alias": "natau",
         "factionName": "The Natau Priesthood",
         "homeSystem": "be7",
-        "startingFleet": "1 cv, 1 cr, 1 dd, 2 ff, 1 inf decay, 1 inf demise, 2 inf disorder, sd disorder",
+        "startingFleet": "1 cv, 2 cr, 3 ff, 1 inf decay, 1 inf demise, 1 inf disorder, sd disorder",
         "commodities": 3,
         "factionTech": [
             "benataudo",
@@ -298,7 +299,7 @@
         "abilities": [
             "doctrine",
             "paradigm",
-            "natau_decree"
+            "dark_power"
         ],
         "leaders": [
             "natauagent",

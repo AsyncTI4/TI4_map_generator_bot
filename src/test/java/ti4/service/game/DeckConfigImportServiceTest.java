@@ -1,12 +1,8 @@
 package ti4.service.game;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.junit.jupiter.api.BeforeEach;
@@ -93,7 +89,7 @@ class DeckConfigImportServiceTest extends BaseTi4Test {
         assertFalse(
                 game.getAllRelics().contains("codex"), "valid exclusion must still apply despite an unsupported one");
         assertEquals(
-                "action_cards_pok",
+                "action_cards_te",
                 game.getAcDeckID(),
                 "the unknown ac_deck alias must be skipped, leaving the default untouched");
     }

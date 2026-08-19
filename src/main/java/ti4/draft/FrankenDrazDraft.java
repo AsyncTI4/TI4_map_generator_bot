@@ -63,12 +63,17 @@ public class FrankenDrazDraft extends FrankenDraft {
     @Override
     public int getItemLimitForCategory(DraftCategory category) {
         return switch (category) {
-            case FACTION -> DEFAULT_FACTION_LIMIT;
+            case FACTION -> getFactionDraftLimit();
             case BLUETILE -> 3;
             case REDTILE -> 2;
             case DRAFTORDER -> 1;
             default -> 0;
         };
+    }
+
+    private int getFactionDraftLimit() {
+        String configuredLimit = getOwner().getStoredValue("frankenLimit" + DraftCategory.FACTION);
+        return configuredLimit.isEmpty() ? DEFAULT_FACTION_LIMIT : Integer.parseInt(configuredLimit);
     }
 
     @Override

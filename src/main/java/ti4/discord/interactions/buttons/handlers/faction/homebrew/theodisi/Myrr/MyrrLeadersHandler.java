@@ -224,10 +224,11 @@ public class MyrrLeadersHandler {
 
         int cards = count * 2;
         ActionCardHelper.drawActionCards(player, cards);
+        ActionCardHelper.sendACDiscardButtons(player);
         MessageHelper.sendMessageToChannel(
                 event == null ? player.getCorrectChannel() : event.getMessageChannel(),
                 player.getRepresentation() + " drew " + cards + " action card" + (cards == 1 ? "" : "s")
-                        + " using Thessa Scale, the Myrr commander.");
+                        + " using Thessa Scale, the Myrr commander. Buttons to discard 1 have been sent to your #cards-info thread.");
     }
 
     public static void startMyrrHero(GenericInteractionCreateEvent event, Game game, Player player) {

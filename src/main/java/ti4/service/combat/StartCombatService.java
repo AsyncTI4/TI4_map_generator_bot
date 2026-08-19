@@ -25,10 +25,15 @@ import ti4.ResourceHelper;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnosisLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionTargetingLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
@@ -246,6 +251,7 @@ public class StartCombatService {
         GameEventDraft.stage(
                 game,
                 new GameSubEvent.Combat("ground", tile.getPosition(), unitHolder.getName(), player2.getFaction()));
+        LostLegciesExploreHandler.offerBattleworldCombatReward(game, player, player2, tile, unitHolder);
         if (!game.isFowMode()) {
             findOrCreateCombatThread(
                     game,
@@ -331,6 +337,9 @@ public class StartCombatService {
         if (!game.isFowMode()) {
             channel = game.getMainGameChannel();
         }
+        MassHypnosisLLButtonHandler.clearMassHypnosis(game);
+        PrecisionTargetingLLButtonHandler.clearPrecisionTargeting(game);
+        RaisedMoraleLLButtonHandler.clearRaisedMorale(game);
         PonthousUnitHandler.clearOldGlorySustain(game);
         PonthousPromissoryHandler.clearThunderbirdPrototype(game);
         PonthousTechHandler.clearThunderbirdProtocol(game);
@@ -1028,8 +1037,8 @@ public class StartCombatService {
                     && player.hasUnlockedBreakthrough("dreambt")
                     && tile.getPosition().equals(game.getActiveSystem())
                     && CommandCounterHelper.hasCC(player, tile)
-                    && DreamButtonHandler.tileContainsNexusToken(game, tile, true)) {
-                DreamButtonHandler.offerDreamBtRemoveCommandTokenButton(game, player, tile, msg);
+                    && DreamAbilitiesHandler.hasNexusTokenOrDreamFlagship(game, tile)) {
+                DreamBreakthroughHandler.offerDreamBtRemoveCommandTokenButton(game, player, tile, msg);
             }
             if (player.hasUnlockedBreakthrough("zephyrionbt")
                     && "space".equalsIgnoreCase(type)
@@ -2635,10 +2644,10 @@ public class StartCombatService {
         if (!isSpaceCombat
                 || tile == null
                 || (!p1.hasAbility("incomprehensible_form") && !p2.hasAbility("incomprehensible_form"))
-                || !DreamButtonHandler.tileContainsNexusToken(game, tile, true)) {
+                || !DreamAbilitiesHandler.hasNexusTokenOrDreamFlagship(game, tile)) {
             return;
         }
-        buttons.addAll(DreamButtonHandler.getIncomprehensibleFormButtons(game, p1, p2, tile));
+        buttons.addAll(DreamAbilitiesHandler.getIncomprehensibleFormButtons(game, p1, p2, tile));
     }
 
     private static String getSpaceCombatIntroMessage() {

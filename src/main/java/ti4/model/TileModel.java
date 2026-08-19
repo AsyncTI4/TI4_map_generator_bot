@@ -60,7 +60,9 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private @JsonProperty("isNebula") boolean nebula;
     private @JsonProperty("isGravityRift") boolean gravityRift;
     private @JsonProperty("isScar") boolean isScar;
+    private @JsonProperty("isFracture") boolean fracture;
     private @JsonProperty("hasEgress") boolean hasEgress;
+    private @JsonProperty("hasIngress") boolean hasIngress;
     private String imageURL;
     private ComponentSource source;
     private TileBack tileBack = TileBack.BLACK;
@@ -188,8 +190,18 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
+    public boolean isFracture() {
+        return fracture;
+    }
+
+    @JsonIgnore
     public boolean hasEgress() {
         return hasEgress;
+    }
+
+    @JsonIgnore
+    public boolean hasIngress() {
+        return hasIngress;
     }
 
     @JsonIgnore

@@ -30,7 +30,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "When this unit would be destroyed, you may spend 1 influence to place it on another planet in a system that contains 1 of your nexus tokens or your flagship."
+    "ability": "When this unit would be destroyed, you may spend 1 influence to place it on another planet in a system that contains 1 of your nexus tokens."
   },
   {
     "id": "dream_destroyer",
@@ -71,7 +71,7 @@
     "afbDieCount": 3,
     "sustainDamage": false,
     "isShip": true,
-    "ability": "At the end of a tactical action in this unit's system, you may place or move 1 nexus token into any system that contains your units."
+    "ability": "At the end of a tactical action in this unit's system, you may place or move 1 nexus token into a non-home system that contains 1 or more of your ships and no other player's ships."
   },
   {
     "id": "crystellum_flagship",

@@ -18,9 +18,11 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityHandler;
@@ -97,10 +99,17 @@ public class StartPhaseService {
                 LoreService.showPhaseLore(game, "agenda"); // before setPhaseOfGame: END lore reads the old phase
                 game.setPhaseOfGame("agenda");
                 GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "agenda"));
-                Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
-                List<Button> buttons = List.of(flipAgenda);
-                MessageHelper.sendMessageToChannelWithButtons(
-                        event.getMessageChannel(), "Please flip agenda now", buttons);
+                RelitigateLLButtonHandler.clearAgendaPhaseState(game);
+                if (RelitigateLLButtonHandler.offerPreassignedRelitigate(event, game, event.getMessageChannel())) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(),
+                            "Agenda reveal is waiting for a preset _Relitigate_ to resolve.");
+                } else {
+                    Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
+                    List<Button> buttons = List.of(flipAgenda);
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            event.getMessageChannel(), "Please flip the agenda.", buttons);
+                }
             }
             case "publicObj" ->
                 ListPlayerInfoService.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
@@ -930,8 +939,9 @@ public class StartPhaseService {
         for (Player player : game.getRealPlayers()) {
             sendStatusReminders(game, player);
         }
+        MyrrAbilitiesHandler.offerFactoryLeaseProduction(game);
         if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("the_waking"))) {
-            DreamButtonHandler.offerTheWakingButtons(game);
+            DreamAbilitiesHandler.offerTheWakingButtons(game);
         }
 
         Button yssarilPolicy = null;

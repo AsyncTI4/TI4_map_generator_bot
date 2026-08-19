@@ -4,7 +4,9 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -21,6 +23,7 @@ import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
@@ -28,10 +31,41 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.planet.AddPlanetService;
+import ti4.service.relic.AlluringThroneService;
 import ti4.service.tech.ListTechService;
 
 @UtilityClass
 public class RelicHelper {
+
+    /** Returns whether a relic fragment of the requested trait is currently purged and available to gain. */
+    public static boolean hasPurgedRelicFragmentOfType(Game game, String trait) {
+        if (game == null || trait == null) {
+            return false;
+        }
+
+        DeckModel explorationDeck = Mapper.getDeck(game.getExplorationDeckID());
+        if (explorationDeck == null) {
+            return false;
+        }
+
+        Set<String> unavailableFragments = new HashSet<>();
+        for (String exploreType :
+                List.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL, Constants.FRONTIER)) {
+            unavailableFragments.addAll(game.getExploreDeck(exploreType));
+            unavailableFragments.addAll(game.getExploreDiscard(exploreType));
+        }
+        for (Player player : game.getPlayers().values()) {
+            unavailableFragments.addAll(player.getFragments());
+        }
+
+        return explorationDeck.getNewDeck().stream()
+                .filter(fragmentID -> !unavailableFragments.contains(fragmentID))
+                .map(Mapper::getExplore)
+                .anyMatch(fragment -> fragment != null
+                        && Constants.FRAGMENT.equalsIgnoreCase(fragment.getResolution())
+                        && trait.equalsIgnoreCase(fragment.getType()));
+    }
 
     public static void drawWithAdvantage(Player player, Game game, int advantage) {
         List<Button> buttons = new ArrayList<>();
@@ -221,6 +255,11 @@ public class RelicHelper {
                     }
                 }
             }
+            case "alluringthrone" -> {
+                AlluringThroneService.serveIllustrionButtons(game, player);
+                AddPlanetService.addPlanet(player, "illustrion", game);
+                player.refreshPlanet("illustrion");
+            }
         }
         CommanderUnlockCheckService.checkPlayer(player, "argent");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), helpMessage.toString());
@@ -254,10 +293,21 @@ public class RelicHelper {
 
     public void sendFrags(
             GenericInteractionCreateEvent event, Player sender, Player receiver, String trait, int count, Game game) {
+        sendFrags(event, sender, receiver, trait, count, game, true);
+    }
+
+    public void sendFrags(
+            GenericInteractionCreateEvent event,
+            Player sender,
+            Player receiver,
+            String trait,
+            int count,
+            Game game,
+            boolean includeSupermassive) {
         List<String> fragments = new ArrayList<>();
         for (String cardID : sender.getFragments()) {
             ExploreModel card = Mapper.getExplore(cardID);
-            if (card.getType().equalsIgnoreCase(trait)) {
+            if (card.getType().equalsIgnoreCase(trait) && (includeSupermassive || !cardID.startsWith("supermassive"))) {
                 fragments.add(cardID);
             }
         }
