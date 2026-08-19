@@ -233,8 +233,7 @@ public class MatchmakingRatingEventService {
             long count = entry.getValue();
             String separator = bracket < 0 ? " to " : "-";
             String label = count == 1 ? unitLabel.substring(0, unitLabel.length() - 1) : unitLabel;
-            stringBuilder.append(
-                    String.format("- `%d%s%d`: %d %s\n", bracket, separator, bracket + 99, count, label));
+            stringBuilder.append(String.format("- `%d%s%d`: %d %s\n", bracket, separator, bracket + 99, count, label));
         }
     }
 
