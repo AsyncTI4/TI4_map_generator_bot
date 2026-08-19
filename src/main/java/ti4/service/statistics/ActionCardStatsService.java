@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
@@ -22,7 +21,6 @@ import ti4.game.GameStats;
 import ti4.game.GameStats.ActionCardPlay;
 import ti4.game.Player;
 import ti4.game.persistence.ConsumeGameUtility;
-import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
@@ -40,13 +38,7 @@ public class ActionCardStatsService {
     }
 
     private static void showActionCardStats(SlashCommandInteractionEvent event) {
-        String acDeckId = event.getOption(Constants.AC_DECK, DEFAULT_AC_DECK_ID, OptionMapping::getAsString);
-        DeckModel acDeck = Mapper.getDeck(acDeckId);
-        if (acDeck == null || acDeck.getType() != DeckModel.DeckType.ACTION_CARD) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "'" + acDeckId + "' is not an action card deck, please retry.");
-            return;
-        }
+        DeckModel acDeck = Mapper.getDeck(DEFAULT_AC_DECK_ID);
 
         Map<String, Integer> cancelCounts = new HashMap<>();
         Map<String, Integer> actionCardsPlayedCounts = new HashMap<>();
@@ -59,7 +51,7 @@ public class ActionCardStatsService {
 
         ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getStandardCompetitiveGamesFilter()
-                        .and(game -> acDeckId.equals(game.getAcDeckID()))
+                        .and(game -> DEFAULT_AC_DECK_ID.equals(game.getAcDeckID()))
                         .and(game -> deckCardIds.containsAll(
                                 game.getDiscardActionCards().keySet())),
                 game -> accumulateActionCardStats(
@@ -91,8 +83,6 @@ public class ActionCardStatsService {
 
         Player winner = game.getWinner().orElse(null);
         if (winner == null) {
-            // Standard-competitive filter already requires a winner, but guard so downstream code
-            // and any future callers can trust winnerIdByGame keys carry a non-null value.
             return;
         }
         String winnerId = StringUtils.defaultIfBlank(winner.getStatsTrackedUserID(), winner.getUserID());
