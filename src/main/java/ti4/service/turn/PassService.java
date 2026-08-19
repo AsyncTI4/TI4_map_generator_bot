@@ -41,6 +41,7 @@ public class PassService {
             ButtonHelperCommanders.olradinCommanderStep1(player, game);
         }
         ButtonHelperActionCards.checkForPlayingBountyContracts(game, player);
+        ButtonHelperActionCards.checkForPlayingStrategicFocus(game, player);
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Passed.");
