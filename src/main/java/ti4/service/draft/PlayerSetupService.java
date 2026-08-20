@@ -498,6 +498,12 @@ public class PlayerSetupService {
                             + " you may peek at the next objective in your `#cards-info` thread (by your promissory note). "
                             + "This holds true for anyone with _Read the Fates_. Don't do this until after secret objectives are dealt and discarded.");
         }
+        if (player.hasAbility("phoenix_rising")) {
+            AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), "12 infantry");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " added 12 captured infantry to their faction sheet.");
+        }
         if (player.hasAbility("mechanized_military")) {
             String unitID = AliasHandler.resolveUnit("mech");
             player.setUnitCap(unitID, 6);
