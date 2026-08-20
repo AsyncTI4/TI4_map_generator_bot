@@ -161,10 +161,6 @@ public class AshenUnitHandler {
         if (!(unit.uh() instanceof Planet planetHolder)) {
             return;
         }
-        if (!"bombardment".equalsIgnoreCase(game.getStoredValue(defender.getFaction() + "latestAssignHits"))) {
-            return;
-        }
-
         String attackerFaction = game.getStoredValue(getAshenFlagshipBombardmentKey(planetHolder.getName()));
         if (attackerFaction.isBlank()) {
             return;

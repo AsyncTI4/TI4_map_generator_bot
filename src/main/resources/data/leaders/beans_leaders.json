@@ -98,6 +98,7 @@
     "abilityName": "Ashfall Effigy - Hell From Above",
     "abilityWindow": "ACTION:",
     "abilityText": "Choose 1 system. Roll all your units BOMBARDMENT that you own against each planet in that system. Then, purge this card.",
+    "notes": "This will not automate the flagship's \"commit one captured infantry per infantry destroyed\" ability. Use `/capture remove_units` and `/add_units` to manually resolve The Pyre's ability.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans"
   },

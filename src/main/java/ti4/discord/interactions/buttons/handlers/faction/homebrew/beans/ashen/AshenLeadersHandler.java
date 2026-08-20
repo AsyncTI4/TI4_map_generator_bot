@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.tuple.Pair;
@@ -27,7 +26,6 @@ import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.NewStuffHelper;
-import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
@@ -140,17 +138,16 @@ public class AshenLeadersHandler {
         }
 
         int displayedHits = player.hasTech("x89c4") ? hits / 2 : hits;
-        String message = displayedHits > 0
-                ? player.getRepresentationUnfogged() + ", **Karos**: for each of these "
-                        + StringHelper.pluralize(displayedHits, "hit")
-                        + ", you may either gain 1 commodity or convert 1 of your commodities to a trade good."
-                        + "\n-# You have (" + player.getCommoditiesRepresentation() + ") commodities."
-                : player.getRepresentationUnfogged()
-                        + ", **Karos**: if you produced 1 or more BOMBARDMENT hits before modifiers, you may either gain 1 commodity or convert 1 of your commodities to a trade good for each such hit."
-                        + "\n-# You have (" + player.getCommoditiesRepresentation() + ") commodities.";
-        List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, false);
-        MessageChannel primaryChannel = event.getMessageChannel();
-        MessageHelper.sendMessageToChannelWithButtons(primaryChannel, message, buttons);
+        List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true).stream()
+                .filter(button -> !"deleteButtons".equals(button.getCustomId()))
+                .toList();
+        for (int hit = 0; hit < displayedHits; hit++) {
+            String message = player.getRepresentationUnfogged()
+                    + ", **Karos**: for this BOMBARDMENT hit, you may either gain 1 commodity or convert 1 of "
+                    + "your commodities to a trade good."
+                    + "\n-# You have (" + player.getCommoditiesRepresentation() + ") commodities.";
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        }
     }
 
     @ButtonHandler(AGENT_SELECT_TARGET)
