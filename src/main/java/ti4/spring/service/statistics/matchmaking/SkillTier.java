@@ -26,8 +26,12 @@ public enum SkillTier {
     /** A parsed filter value: a tier, optionally inverted by the {@value #EXCLUSION_PREFIX} prefix. */
     public record Selection(SkillTier skillTier, boolean excluded) {
 
+        public boolean matches(SkillTier other) {
+            return (skillTier == other) != excluded;
+        }
+
         public boolean matches(long displayRating) {
-            return skillTier.contains(displayRating) != excluded;
+            return matches(fromDisplayRating(displayRating));
         }
 
         public String getLabel() {

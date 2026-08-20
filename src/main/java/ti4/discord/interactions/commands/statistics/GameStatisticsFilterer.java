@@ -160,9 +160,9 @@ public class GameStatisticsFilterer {
             List<String> userIds = game.getRealAndEliminatedPlayers().stream()
                     .map(Player::getUserID)
                     .toList();
-            Long averageDisplayRating = ratingService.getAverageDisplayRating(userIds);
-            // An unclassifiable game is dropped by both forms: excluding a tier should not sweep it in.
-            return averageDisplayRating != null && skillTierFilter.matches(averageDisplayRating);
+            // Null when fewer than half the players are rated.
+            SkillTier gameSkillTier = ratingService.getSkillTier(userIds);
+            return gameSkillTier != null && skillTierFilter.matches(gameSkillTier);
         };
     }
 

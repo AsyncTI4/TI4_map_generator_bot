@@ -80,18 +80,32 @@ public class MatchmakingRatingEventService {
         if (userIds.isEmpty()) {
             return null;
         }
+        return averageDisplayRating(userIds, getConservativePlayerRatings(new HashSet<>(userIds)));
+    }
+
+    public SkillTier getSkillTier(Collection<String> userIds) {
+        if (userIds.isEmpty()) {
+            return null;
+        }
         Map<String, BigDecimal> ratings = getConservativePlayerRatings(new HashSet<>(userIds));
+        long ratedCount = userIds.stream().filter(ratings::containsKey).count();
+        if (!hasRatedQuorum(userIds.size(), ratedCount)) {
+            return null;
+        }
+        return SkillTier.fromDisplayRating(averageDisplayRating(userIds, ratings));
+    }
+
+    private static boolean hasRatedQuorum(int playerCount, long ratedCount) {
+        return ratedCount * 2 >= playerCount;
+    }
+
+    private long averageDisplayRating(Collection<String> userIds, Map<String, BigDecimal> ratings) {
         BigDecimal defaultRating = getAverageConservativeRating();
         BigDecimal average = userIds.stream()
                 .map(userId -> ratings.getOrDefault(userId, defaultRating))
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .divide(BigDecimal.valueOf(userIds.size()), MathContext.DECIMAL64);
         return toDisplayRating(average);
-    }
-
-    public SkillTier getSkillTier(Collection<String> userIds) {
-        Long averageDisplayRating = getAverageDisplayRating(userIds);
-        return averageDisplayRating == null ? null : SkillTier.fromDisplayRating(averageDisplayRating);
     }
 
     public BigDecimal getAverageConservativeRating() {
