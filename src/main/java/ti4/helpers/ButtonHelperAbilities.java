@@ -43,6 +43,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.tactical.TacticalActionService;
@@ -1773,6 +1774,29 @@ public final class ButtonHelperAbilities {
                 player.setHasUsedEnvironmentPlunderAbility(true);
             }
         }
+    }
+
+    /** How a "you may gain 1 trade good" trigger that could hand a Mentak neighbor a Pillage opportunity should be resolved. */
+    public enum PillageGainMode {
+        /** No Pillage risk worth prompting about (or the table hasn't opted in to FoW prompting) - grant automatically. */
+        AUTO,
+        /**
+         * FoW game with {@link FOWOption#OPTIONAL_PILLAGABLE_TG} enabled - always offer a private opt-in,
+         * regardless of actual Pillage range, so the prompt's mere appearance never leaks that a pillager is nearby.
+         */
+        FOW_OPT_IN,
+        /** Non-FoW game and actually in Pillage range (public info there) - offer an opt-in naming Pillage explicitly. */
+        RANGE_OPT_IN
+    }
+
+    public static PillageGainMode resolveOptionalTgGainMode(Player player, Game game) {
+        if (game.isFowMode() && game.getFowOption(FOWOption.OPTIONAL_PILLAGABLE_TG)) {
+            return PillageGainMode.FOW_OPT_IN;
+        }
+        if (!game.isFowMode() && canBePillaged(player, game, player.getTg() + 1)) {
+            return PillageGainMode.RANGE_OPT_IN;
+        }
+        return PillageGainMode.AUTO;
     }
 
     public static boolean canBePillaged(Player player, Game game, int tg) {

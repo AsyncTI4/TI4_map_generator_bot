@@ -110,6 +110,44 @@ class GameTest extends BaseTi4Test {
                 .containsEntry("centralize_trade", List.of("hasThe2", "hasThe1", "naaluPnPlayer"));
     }
 
+    @Test
+    void shouldOnlyRecordActionCardsThatWerePlayed() {
+        var game = createSinglePlayerGame();
+        var player = game.getPlayer("player1");
+        player.setActionCard("sabo1");
+        player.setActionCard("mb1");
+
+        game.discardActionCard("player1", player.getActionCards().get("sabo1"), true);
+        game.discardActionCard("player1", player.getActionCards().get("mb1"));
+
+        assertThat(game.getDiscardActionCards()).containsOnlyKeys("sabo1", "mb1");
+        assertThat(game.getPlayedActionCards()).containsExactly("sabo1");
+    }
+
+    @Test
+    void shouldForgetAPlayedActionCardOnceItLeavesTheDiscard() {
+        var game = createSinglePlayerGame();
+        var player = game.getPlayer("player1");
+        player.setActionCard("sabo1");
+        game.discardActionCard("player1", player.getActionCards().get("sabo1"), true);
+
+        assertThat(game.pickActionCard("player1", game.getDiscardActionCards().get("sabo1")))
+                .isTrue();
+
+        assertThat(game.getPlayedActionCards()).isEmpty();
+
+        // Discarding it again without playing it must not resurrect the old record.
+        game.discardActionCard("player1", player.getActionCards().get("sabo1"));
+        assertThat(game.getPlayedActionCards()).isEmpty();
+    }
+
+    private Game createSinglePlayerGame() {
+        var game = new Game();
+        var player = createPlayer("player1", Set.of(), game);
+        game.setPlayers(new LinkedHashMap<>(Map.of("player1", player)));
+        return game;
+    }
+
     private Game createThreePlayerGame() {
         var game = new Game();
         game.setName("threePlayerGame");

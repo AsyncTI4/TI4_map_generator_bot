@@ -172,6 +172,10 @@ public final class BreakthroughCommandHelper {
                 .toList();
         if (!lockedBtIDs.isEmpty()) {
             unlockBreakthroughs(game, player, lockedBtIDs);
+        } else {
+            if (game.isCosmicConvergenceMode()) {
+                serveRollFractureButtons(player, "eh");
+            }
         }
     }
 

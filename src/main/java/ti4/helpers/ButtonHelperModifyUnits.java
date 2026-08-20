@@ -566,6 +566,23 @@ public final class ButtonHelperModifyUnits {
         return autoAssignSpaceCombatHits(player, game, tile, hits, event, justSummarizing, false);
     }
 
+    private static boolean opponentCanDirectHit(Game game, Player player, Tile tile, boolean spaceCannonOffence) {
+        List<Player> opponents = spaceCannonOffence
+                ? ButtonHelper.getPlayersWithPds2Cover(player, game, tile.getPosition())
+                : game.getRealPlayersNDummies().stream()
+                        .filter(p2 -> FoWHelper.playerHasActualShipsInSystem(p2, tile))
+                        .toList();
+
+        boolean foundOpponent = false;
+        for (Player p2 : opponents) {
+            if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) continue;
+
+            if (ActionCardHelper.canPlayActionCards(p2)) return true;
+            foundOpponent = true;
+        }
+        return !foundOpponent;
+    }
+
     private static void handleLetnevCommanderCheck(
             Player player, Game game, GenericInteractionCreateEvent event, int min) {
         for (int x = 0; x < min; x++) {
@@ -597,19 +614,7 @@ public final class ButtonHelperModifyUnits {
         int numSustains = getNumberOfSustainableUnits(player, game, unitHolder, true, spaceCannonOffence)
                 + oldGloryFighterSustains;
         boolean noMechPowers = ButtonHelper.isLawInPlay(game, "articles_war");
-        boolean opponentCanDirectHit = true;
-        if (!spaceCannonOffence) {
-            Player opponent = null;
-            for (Player p2 : game.getRealPlayers()) {
-                if (FoWHelper.playerHasActualShipsInSystem(p2, tile) && p2 != player) {
-                    opponent = p2;
-                    break;
-                }
-            }
-            if (opponent != null) {
-                opponentCanDirectHit = !opponent.getActionCards().isEmpty();
-            }
-        }
+        boolean opponentCanDirectHit = opponentCanDirectHit(game, player, tile, spaceCannonOffence);
 
         Map<UnitKey, Integer> repairableUnitsByUnitKey = new TreeMap<>(new ShipRepairComparator());
         if (player.hasTech("da") && !spaceCannonOffence) {

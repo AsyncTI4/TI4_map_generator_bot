@@ -16,7 +16,6 @@ import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.model.LeaderModel;
-import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.fow.GMService;
@@ -45,16 +44,11 @@ public class SabotageService {
             return true;
         }
 
-        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
-                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
-            return false;
-        }
+        if (!ActionCardHelper.canPlayActionCards(player)) return false;
 
         if (isAffectedByTransparasteel(player, game)) return false;
 
         if (playerHasSabotage(player)) return true;
-
-        if (player.getAcCount() == 0) return false;
 
         return !allSabotagesAreDiscarded(game, player);
     }

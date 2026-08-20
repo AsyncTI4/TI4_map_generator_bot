@@ -17,8 +17,10 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.Retrofitti
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExplosivesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TacticalRetreatLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
@@ -80,6 +82,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
+import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventDraft;
@@ -237,18 +240,35 @@ public final class ButtonHelperTacticalAction {
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), warfareDone, redistro);
                 if ("evenfall_sc".equalsIgnoreCase(game.getScSetID())
                         && ButtonHelper.doesPlayerControlRexOrOpponentHS(player, game)) {
-                    // String warfareDone2 = player.getRepresentationUnfogged()
-                    //         + ", your **Warfare** action is finished, you may place a dreadnaught, a cruiser and 2
-                    // fighters in the active system. This has been automatically done.";
-                    // Tile tile = game.getTileByPosition(game.getActiveSystem());
-                    // MessageHelper.sendMessageToChannel(player.getCorrectChannel(), warfareDone2);
-                    // if(tile != null){
-                    //     AddUnitService.addUnits(event, tile, game, player.getColor(), "dn, cr, 2 ff");
-                    // }
+                    String warfareDone2 = player.getRepresentationUnfogged()
+                            + ", your **Warfare** action is finished, so a dreadnaught, a cruiser and 2 fighters has been automatically added to mecatol rex or an enemy HS if you control them. This has been automatically done.";
+                    for (Tile tile : game.getTileMap().values()) {
+                        boolean control = false;
+                        if (tile.isHomeSystem(game)
+                                && player.getHomeSystemTile() != tile
+                                && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                            for (UnitHolder planet : tile.getPlanetUnitHolders()) {
+                                if (player.getPlanets().contains(planet.getName())) {
+                                    control = true;
+                                }
+                            }
+                        }
+                        if (tile.isMecatol(game) && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                            for (UnitHolder planet : tile.getPlanetUnitHolders()) {
+                                if (player.getPlanets().contains(planet.getName())) {
+                                    control = true;
+                                }
+                            }
+                        }
+                        if (control) {
+                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), warfareDone2);
+                            AddUnitService.addUnits(event, tile, game, player.getColor(), "dn, cr, 2 ff");
+                        }
+                    }
                 }
             }
             if (player.hasAbility("dream_nexus")) {
-                DreamButtonHandler.offerLiturgyButtons(event, game, player);
+                DreamUnitsHandler.offerLiturgyButtons(event, game, player);
             }
             CrystellumLeadersHandler.clearFacetBypass(game, player);
             resetStoredValuesForTacticalAction(game);
@@ -580,7 +600,7 @@ public final class ButtonHelperTacticalAction {
         ThronesUnitHandler.clearPendingGholaWindows(game);
         MyrrTechHandler.clearSegmentedStructuring(game);
         ArdentiaUnitHandler.clearIronClawDeployUsed(game);
-        DreamButtonHandler.clearDreamAgentAnomaly(game);
+        DreamLeadersHandler.clearDreamAgentAnomaly(game);
         RevenantLeadersHandler.clearRedLeaderTacticalWindow(game);
         RevenantTechHandler.clearLazarusProduction(game);
         ThronesTechHandler.clearRiftTouchedBastion(game);
@@ -626,11 +646,6 @@ public final class ButtonHelperTacticalAction {
             }
             List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, ringButtons);
-        }
-        // Offer the Dreaming Throne promissory 'Visions' buttons
-        if (!"dream".equalsIgnoreCase(player.getFaction())
-                && player.getPromissoryNotes().containsKey("bepndream")) {
-            DreamButtonHandler.offerVisionsPromissoryAtTacticalStart(game, player);
         }
     }
 
@@ -734,6 +749,7 @@ public final class ButtonHelperTacticalAction {
             return;
         }
         game.setActiveSystem(pos);
+        DreamPromissoryHandler.returnVisionsOnSystemActivation(event, game, player, tile);
         AlluringThroneService.offerIllustrionLegendaryAbility(game, tile, player);
         ArcanumTechHandler.offerSigilOfTransmutation(event, game, player, tile);
         XytherisLeadersHandler.offerMyrixAgentButtons(game, player, tile);
@@ -799,7 +815,7 @@ public final class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
 
-        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, pos);
+        List<Player> playersWithPds2 = ButtonHelper.getPlayersWithPds2Cover(player, game, pos);
         if (!game.isFowMode() && !playersWithPds2.isEmpty() && !game.isL1Hero()) {
             List<String> mentions = new ArrayList<>();
             for (Player playerWithPds : playersWithPds2) {
@@ -1062,10 +1078,9 @@ public final class ButtonHelperTacticalAction {
             }
         }
         if (!game.isL1Hero()
-                && !DreamButtonHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
-            if (player.hasUnexhaustedLeader("dreamagent")) {
-                DreamButtonHandler.offerDreamAgentButtons(game, player, player);
-            }
+                && player.hasUnexhaustedLeader("dreamagent")
+                && !DreamLeadersHandler.getDreamAgentAnomalyTiles(game).isEmpty()) {
+            DreamLeadersHandler.offerDreamAgentButtons(game, player, player);
         }
         List<Planet> planetUnitHolders = tile.getPlanetUnitHolders();
         if (!planetUnitHolders.isEmpty()

@@ -29,10 +29,11 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnos
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionTargetingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
@@ -826,7 +827,7 @@ public class StartCombatService {
     public static void sendSpaceCannonButtonsToThread(
             MessageChannel threadChannel, Game game, Player activePlayer, Tile tile) {
         StringBuilder pdsMessage = new StringBuilder();
-        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition());
+        List<Player> playersWithPds2 = ButtonHelper.getPlayersWithPds2Cover(activePlayer, game, tile.getPosition());
         if (tile.isScar(game)) {
             MessageHelper.sendMessageToChannel(
                     threadChannel, "## Reminder that you cannot use any unit abilities in an Entropic Scar.");
@@ -1036,8 +1037,8 @@ public class StartCombatService {
                     && player.hasUnlockedBreakthrough("dreambt")
                     && tile.getPosition().equals(game.getActiveSystem())
                     && CommandCounterHelper.hasCC(player, tile)
-                    && DreamButtonHandler.tileContainsNexusToken(game, tile, true)) {
-                DreamButtonHandler.offerDreamBtRemoveCommandTokenButton(game, player, tile, msg);
+                    && DreamAbilitiesHandler.hasNexusTokenOrDreamFlagship(game, tile)) {
+                DreamBreakthroughHandler.offerDreamBtRemoveCommandTokenButton(game, player, tile, msg);
             }
             if (player.hasUnlockedBreakthrough("zephyrionbt")
                     && "space".equalsIgnoreCase(type)
@@ -1334,7 +1335,7 @@ public class StartCombatService {
         spaceCannonButtons.add(Buttons.red("declinePDS_" + tile.getTileID(), "Decline SPACE CANNON"));
 
         // Add Graviton Laser System button if applicable
-        for (Player playerWithPds : ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition())) {
+        for (Player playerWithPds : ButtonHelper.getPlayersWithPds2Cover(activePlayer, game, tile.getPosition())) {
             if (playerWithPds.hasTechReady("gls")) { // Graviton Laser Systems
                 spaceCannonButtons.add(
                         Buttons.gray("exhaustTech_gls", "Exhaust Graviton Laser System", TechEmojis.CyberneticTech));
@@ -1342,7 +1343,7 @@ public class StartCombatService {
             }
         }
         if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("control_network"))) {
-            for (Player rollingPlayer : ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition())) {
+            for (Player rollingPlayer : ButtonHelper.getPlayersWithPds2Cover(activePlayer, game, tile.getPosition())) {
                 if (game.getRealPlayers().stream().anyMatch(player -> player.hasUnit("netrunners_flagship"))
                         && NetrunnersUnitsHandler.empBlocksSpaceCannonAgainstOpponent(
                                 game, rollingPlayer, tile, CombatRollType.SpaceCannonOffence)) {
@@ -1499,7 +1500,8 @@ public class StartCombatService {
         if (game.isFowMode() || "ground".equalsIgnoreCase(spaceOrGround)) {
             return 0;
         }
-        if (!ButtonHelper.tileHasPDS2Cover(player1, game, tile.getPosition()).isEmpty()) {
+        if (!ButtonHelper.getPlayersWithPds2Cover(player1, game, tile.getPosition())
+                .isEmpty()) {
             return 1;
         }
         return 0;
@@ -2643,10 +2645,10 @@ public class StartCombatService {
         if (!isSpaceCombat
                 || tile == null
                 || (!p1.hasAbility("incomprehensible_form") && !p2.hasAbility("incomprehensible_form"))
-                || !DreamButtonHandler.tileContainsNexusToken(game, tile, true)) {
+                || !DreamAbilitiesHandler.hasNexusTokenOrDreamFlagship(game, tile)) {
             return;
         }
-        buttons.addAll(DreamButtonHandler.getIncomprehensibleFormButtons(game, p1, p2, tile));
+        buttons.addAll(DreamAbilitiesHandler.getIncomprehensibleFormButtons(game, p1, p2, tile));
     }
 
     private static String getSpaceCombatIntroMessage() {

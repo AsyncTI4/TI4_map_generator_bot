@@ -1779,13 +1779,13 @@ public final class ButtonHelperActionCards {
         FoWHelper.notifyActorAndAffectedElsePublic(
                 game,
                 player,
-                player.getRepresentationUnfogged() + ", you've _Signal Jam_'d the system: "
+                player.getRepresentationUnfogged() + ", you placed a player's command token in the system: "
                         + tile.getRepresentationForButtons(game, player) + ".",
                 p2,
-                p2.getRepresentationUnfogged() + ", you've been _Signal Jam_'d in system: "
+                p2.getRepresentationUnfogged() + ", your command token has been placed in system: "
                         + tile.getRepresentationForButtons(game, p2) + ".",
-                player.getRepresentationUnfogged() + " has _Signal Jam_'d " + p2.getRepresentationUnfogged()
-                        + " in tile " + tile.getRepresentationForButtons(game, p2) + ".");
+                player.getRepresentationUnfogged() + " has placed " + p2.getRepresentationUnfogged()
+                        + " command token in tile " + tile.getRepresentationForButtons(game, p2) + ".");
     }
 
     @ButtonHandler("reactorMeltdownStep2_")
@@ -2065,6 +2065,27 @@ public final class ButtonHelperActionCards {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
+    }
+
+    public static void checkForPlayingStrategicFocus(Game game, Player player) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
+            return;
+        }
+        if (!player.getPlayableActionCards().contains("strategic_focus")) {
+            return;
+        }
+        Integer handIndex = player.getActionCards().get("strategic_focus");
+        String msg = player.getRepresentation()
+                + ", you have _Strategic Focus_ in your hand and just passed — this is the window to play it."
+                + " Use the button below to play it now, or ignore this message if you don't want to.";
+        List<Button> buttons = new ArrayList<>();
+        if (handIndex != null) {
+            buttons.add(Buttons.green(
+                    Constants.AC_PLAY_FROM_HAND + handIndex, "Play Strategic Focus", CardEmojis.getACEmoji(game)));
+        }
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
     public static void checkForPlayingBountyContracts(Game game, Player player) {
@@ -2850,10 +2871,12 @@ public final class ButtonHelperActionCards {
     public static void resolveReverse(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String acName = buttonID.replace("resolveReverse_", "");
         List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());
+        boolean hideUnplayed = ActionCardHelper.hidesUnplayedDiscards(game, player);
         for (String acStringID : acStrings) {
             ActionCardModel actionCard = Mapper.getActionCard(acStringID);
             String actionCardTitle = actionCard.getName();
-            if (acName.equalsIgnoreCase(actionCardTitle)) {
+            if (acName.equalsIgnoreCase(actionCardTitle)
+                    && ActionCardHelper.isDiscardVisible(game, hideUnplayed, acStringID)) {
                 boolean picked = game.pickActionCard(
                         player.getUserID(), game.getDiscardActionCards().get(acStringID));
                 if (!picked) {

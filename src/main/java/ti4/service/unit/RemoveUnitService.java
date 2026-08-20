@@ -198,7 +198,10 @@ public class RemoveUnitService {
         }
 
         if (toRemoveCount > 0 && event != null) {
-            MessageHelper.replyToMessage(event, "Did not find enough units to remove, " + toRemoveCount + " missing.");
+            MessageHelper.replyToMessage(
+                    event,
+                    "Did not find enough " + parsedUnit.unitKey().getColor() + " units to remove, " + toRemoveCount
+                            + " missing.");
         }
 
         allUnitsRemoved.stream()

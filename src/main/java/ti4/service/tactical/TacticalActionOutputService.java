@@ -13,7 +13,9 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamFactionTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
@@ -333,9 +335,8 @@ public class TacticalActionOutputService {
                     game.setStoredValue("possiblyUsedRift", "yes");
                 }
             }
-            if (player.hasTech("bedreamneg")) {
-                output.append(
-                        " starting system containing a nexus token gives +1 to move value with Non-Euclidean Geometries.");
+            if (player.hasTech("bedreamneg") && DreamFactionTechHandler.getsNonEuclideanMoveBonus(game, player, tile)) {
+                output.append(" (+1 move from a nexus token source with _Non-Euclidean Geometries_)");
             }
             if (player.hasTech("becrystrd")) {
                 output.append(" (has _Resonance Drive_ for +1 to each ship at capacity. This is not automated.");
@@ -385,7 +386,8 @@ public class TacticalActionOutputService {
         int baseMoveValue = model.getMoveValue();
         if (baseMoveValue == 0) return 0;
         if (tile.isNebula(game)
-                && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
+                && !DreamAbilitiesHandler.ignoresNebula(player, game, tile)
+                && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                 && !player.hasAbility("voidborn")
                 && !player.hasTech("absol_amd")
                 && !player.getRelics().contains("circletofthevoid")
@@ -421,7 +423,7 @@ public class TacticalActionOutputService {
         if (player.hasAbility("slipstream") && (tileHasWormhole || (movingFromHome && !game.isTwilightsFallMode()))) {
             bonusMoveValue++;
         }
-        if (player.hasTech("bedreamneg") && DreamButtonHandler.tileContainsNexusToken(game, tile, true)) {
+        if (player.hasTech("bedreamneg") && DreamFactionTechHandler.getsNonEuclideanMoveBonus(game, player, tile)) {
             bonusMoveValue++;
         }
         if (game.isCallOfTheVoidMode() && activeSystem.isFracture()) {

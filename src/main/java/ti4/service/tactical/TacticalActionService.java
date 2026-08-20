@@ -226,7 +226,7 @@ public class TacticalActionService {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
 
         // Post-core triggers
-        CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost");
+        CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost", "dream");
         CommanderUnlockCheckService.checkPlayer(
                 player,
                 "nivyn",
@@ -258,7 +258,7 @@ public class TacticalActionService {
 
     private FinishMovementContext executeCoreFinishMovement(
             ButtonInteractionEvent event, Game game, Player player, Tile tile) {
-        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
+        List<Player> playersWithPds2 = ButtonHelper.getPlayersWithPds2Cover(player, game, tile.getPosition());
 
         if (player.hasLeader("ironhero")) {
             IronLeadersHandler.updateIronHeroEligibility(game, player, tile);
