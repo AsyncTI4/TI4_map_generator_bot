@@ -49,4 +49,28 @@ class SkillTierTest {
         assertThat(SkillTier.fromOptionValue("")).isNull();
         assertThat(SkillTier.fromOptionValue("elite")).isNull();
     }
+
+    @Test
+    void parsesSelectionsWithAndWithoutExclusionPrefix() {
+        assertThat(SkillTier.parseSelection("LOWER")).isEqualTo(new SkillTier.Selection(SkillTier.LOWER, false));
+        assertThat(SkillTier.parseSelection("-LOWER")).isEqualTo(new SkillTier.Selection(SkillTier.LOWER, true));
+        assertThat(SkillTier.parseSelection(" -higher ")).isEqualTo(new SkillTier.Selection(SkillTier.HIGHER, true));
+
+        assertThat(SkillTier.parseSelection(null)).isNull();
+        assertThat(SkillTier.parseSelection("-")).isNull();
+        assertThat(SkillTier.parseSelection("-elite")).isNull();
+    }
+
+    @Test
+    void exclusionSelectionMatchesExactlyTheComplement() {
+        for (SkillTier skillTier : SkillTier.values()) {
+            var included = new SkillTier.Selection(skillTier, false);
+            var excluded = new SkillTier.Selection(skillTier, true);
+            for (long displayRating = -1000; displayRating <= 4000; displayRating += 10) {
+                assertThat(excluded.matches(displayRating))
+                        .as("%s at %d should be the inverse of the plain tier", excluded, displayRating)
+                        .isNotEqualTo(included.matches(displayRating));
+            }
+        }
+    }
 }

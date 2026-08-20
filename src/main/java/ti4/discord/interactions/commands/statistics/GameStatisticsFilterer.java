@@ -81,6 +81,12 @@ public class GameStatisticsFilterer {
         for (SkillTier skillTier : SkillTier.values()) {
             skillTierOption.addChoice(skillTier.getDisplayName() + " (" + skillTier.getLabel() + ")", skillTier.name());
         }
+        // Inverted forms need their own choices: a choice-constrained option cannot accept a typed "-LOWER".
+        for (SkillTier skillTier : SkillTier.values()) {
+            skillTierOption.addChoice(
+                    "Not " + skillTier.getDisplayName() + " (excludes " + skillTier.getLabel() + ")",
+                    SkillTier.EXCLUSION_PREFIX + skillTier.name());
+        }
         return skillTierOption;
     }
 
@@ -122,8 +128,8 @@ public class GameStatisticsFilterer {
         Boolean fractureInPlayFilter = event.getOption(FRACTURE_IN_PLAY_FILTER, null, OptionMapping::getAsBoolean);
         String startedAfterFilter = event.getOption(STARTED_AFTER_FILTER, null, OptionMapping::getAsString);
         LocalDate startedAfterDate = parseStartedAfterDate(startedAfterFilter, event);
-        SkillTier skillTierFilter =
-                SkillTier.fromOptionValue(event.getOption(SKILL_TIER_FILTER, null, OptionMapping::getAsString));
+        SkillTier.Selection skillTierFilter =
+                SkillTier.parseSelection(event.getOption(SKILL_TIER_FILTER, null, OptionMapping::getAsString));
 
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(playerCountFilter, game);
         return playerCountPredicate
@@ -145,7 +151,7 @@ public class GameStatisticsFilterer {
                 .and(GameStatisticsFilterer::filterEarlyRounds);
     }
 
-    private static Predicate<Game> skillTierPredicate(SkillTier skillTierFilter) {
+    private static Predicate<Game> skillTierPredicate(SkillTier.Selection skillTierFilter) {
         if (skillTierFilter == null) {
             return game -> true;
         }
@@ -155,7 +161,8 @@ public class GameStatisticsFilterer {
                     .map(Player::getUserID)
                     .toList();
             Long averageDisplayRating = ratingService.getAverageDisplayRating(userIds);
-            return averageDisplayRating != null && skillTierFilter.contains(averageDisplayRating);
+            // An unclassifiable game is dropped by both forms: excluding a tier should not sweep it in.
+            return averageDisplayRating != null && skillTierFilter.matches(averageDisplayRating);
         };
     }
 
