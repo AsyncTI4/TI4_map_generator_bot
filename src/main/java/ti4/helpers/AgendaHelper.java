@@ -1877,7 +1877,7 @@ public final class AgendaHelper {
     }
 
     @ButtonHandler("refreshAgenda")
-    public static void refreshAgenda(Game game) {
+    public static void refreshAgenda(Game game, ButtonInteractionEvent event) {
         String agendaDetails = game.getCurrentAgendaInfo();
         String agendaID = "CL";
         if (StringUtils.countMatches(agendaDetails, "_") > 2) {
@@ -1918,6 +1918,7 @@ public final class AgendaHelper {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), AgendaSummaryHelper.getSummaryOfVotes(game, true));
         }
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("proceedToFinalizingVote")

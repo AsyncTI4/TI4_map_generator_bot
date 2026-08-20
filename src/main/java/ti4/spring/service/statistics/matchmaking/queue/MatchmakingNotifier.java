@@ -97,16 +97,15 @@ class MatchmakingNotifier {
                     .queue(
                             forumPost -> {
                                 ThreadChannel thread = forumPost.getThreadChannel();
-                                if (getPlayersNeeded(game) > 0) {
-                                    PlayerSearchCriteria criteria = toSearchCriteria(game);
-                                    Consumer<Message> postLaunch = message -> MatchmakingQueueSearchService.get()
-                                            .register(thread.getId(), message.getId(), criteria);
-                                    CreateGameLaunchPostService.postLaunchButtons(
-                                            thread, members, gameFunName, postLaunch);
-                                } else {
-                                    CreateGameLaunchPostService.postLaunchButtons(thread, members, gameFunName);
-                                }
-                                postLfgPing(thread, game);
+                                Consumer<Message> onLaunchPosted = message -> {
+                                    if (getPlayersNeeded(game) > 0) {
+                                        MatchmakingQueueSearchService.get()
+                                                .register(thread.getId(), message.getId(), toSearchCriteria(game));
+                                    }
+                                    postLfgPing(thread, game);
+                                };
+                                CreateGameLaunchPostService.postLaunchButtons(
+                                        thread, members, gameFunName, onLaunchPosted);
                             },
                             BotLogger::catchRestError);
         }

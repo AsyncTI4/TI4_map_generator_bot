@@ -2282,6 +2282,12 @@ public class ActionCardHelper {
         return acID.contains("sabo") || acID.contains("shatter");
     }
 
+    public static boolean canPlayActionCards(Player player) {
+        if (player.isNpc() || player.isDummy()) return false;
+
+        return !player.getPlayableActionCards().isEmpty();
+    }
+
     private static boolean isActionCardCancelable(ActionCardModel actionCard) {
         return !actionCard.getText().contains("cannot be canceled");
     }

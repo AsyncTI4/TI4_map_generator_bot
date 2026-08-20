@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
@@ -37,6 +38,7 @@ import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.componentsV2.MessageV2Builder;
 import ti4.service.ShowGameService;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.emoji.CardEmojis;
@@ -149,6 +151,17 @@ public final class GMService {
                 true,
                 false,
                 threadChannel -> MessageHelper.sendMessageToChannel(threadChannel, message));
+    }
+
+    /** Posts a components-V2 component to the FoW activity-log thread (inside the GM channel). No-op outside FoW. */
+    public static void postToActivityThread(Game game, MessageTopLevelComponent component) {
+        if (!game.isFowMode()) return;
+        ThreadGetter.getThreadInChannel(
+                getGMChannel(game), game.getName() + ACTIVITY_LOG_THREAD, true, false, threadChannel -> {
+                    MessageV2Builder builder = new MessageV2Builder(threadChannel);
+                    builder.append(component);
+                    builder.send();
+                });
     }
 
     /**

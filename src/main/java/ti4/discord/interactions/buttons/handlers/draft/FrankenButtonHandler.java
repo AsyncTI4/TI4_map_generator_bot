@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.components.container.Container;
 import net.dv8tion.jda.api.components.container.ContainerChildComponent;
 import net.dv8tion.jda.api.components.section.Section;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
@@ -154,9 +155,15 @@ public class FrankenButtonHandler {
         player.setStoredValue(key, "y");
 
         Container c = player.getRepresentationContainer();
-        MessageV2Builder tabletalk = new MessageV2Builder(game.getTableTalkChannel(), true);
-        tabletalk.append(c);
-        tabletalk.send();
+        if (game.isFowMode()) {
+            // FoW games have no table talk channel,
+            // and collected for the GMs in the activity-log thread.
+            sendFactionSummary(player.getCorrectChannel(), c, true);
+            GMService.postToActivityThread(game, c);
+        } else {
+            TextChannel tabletalk = game.getTableTalkChannel();
+            sendFactionSummary(tabletalk == null ? game.getMainGameChannel() : tabletalk, c, true);
+        }
 
         FrankenDraftBagService.updateFinishedBuildingMessage(game);
         ButtonHelper.deleteMessage(event);
@@ -172,6 +179,13 @@ public class FrankenButtonHandler {
         }
         builder.append(game.getPing() + " Every player has chosen their components! Press this button to continue.");
         builder.append(Buttons.DEAL_2_SO);
+        builder.send();
+    }
+
+    private static void sendFactionSummary(MessageChannel channel, Container container, boolean pin) {
+        if (channel == null) return;
+        MessageV2Builder builder = new MessageV2Builder(channel, pin);
+        builder.append(container);
         builder.send();
     }
 
