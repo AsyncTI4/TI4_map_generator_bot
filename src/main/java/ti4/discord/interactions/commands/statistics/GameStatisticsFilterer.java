@@ -145,11 +145,6 @@ public class GameStatisticsFilterer {
                 .and(GameStatisticsFilterer::filterEarlyRounds);
     }
 
-    /**
-     * Classifies a game by the average matchmaking rating of its players. Resolves the rating service once rather than
-     * per game, and stays inert unless the filter is actually in use, so unrelated stats commands never pay for the
-     * rating calculation.
-     */
     private static Predicate<Game> skillTierPredicate(SkillTier skillTierFilter) {
         if (skillTierFilter == null) {
             return game -> true;

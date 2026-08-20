@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import de.gesundkrank.jskills.Rating;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.Instant;
@@ -75,10 +76,6 @@ public class MatchmakingRatingEventService {
         return filterRatingsByUserIds(getCachedConservativePlayerRatings(), userIds);
     }
 
-    /**
-     * Average conservative display rating across the given users, using the player-base average for anyone without a
-     * rating yet. Returns null when no users are supplied.
-     */
     public Long getAverageDisplayRating(Collection<String> userIds) {
         if (userIds.isEmpty()) {
             return null;
@@ -88,7 +85,7 @@ public class MatchmakingRatingEventService {
         BigDecimal average = userIds.stream()
                 .map(userId -> ratings.getOrDefault(userId, defaultRating))
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .divide(BigDecimal.valueOf(userIds.size()), java.math.MathContext.DECIMAL64);
+                .divide(BigDecimal.valueOf(userIds.size()), MathContext.DECIMAL64);
         return toDisplayRating(average);
     }
 
