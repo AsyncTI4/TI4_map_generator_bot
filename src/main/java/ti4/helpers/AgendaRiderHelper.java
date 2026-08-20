@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -107,6 +108,10 @@ public class AgendaRiderHelper {
                 : StringUtils.capitalize(voteMessage);
 
         String identifier = game.isFowMode() ? player.getColor() : player.getFaction();
+
+        if ("Transit Rider".equalsIgnoreCase(rider)) {
+            TransitRiderLLButtonHandler.registerPrediction(game, player);
+        }
 
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
         String existingData = outcomes.getOrDefault(choice, "empty");

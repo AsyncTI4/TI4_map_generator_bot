@@ -38,7 +38,9 @@ public class KryxosUnitHandler {
         if (player == null
                 || game == null
                 || techID == null
-                || !player.getTechs().contains(techID)) {
+                || !player.getTechs().contains(techID)
+                || "thkryxosfs".equalsIgnoreCase(techID)
+                || "thkryxosmf".equalsIgnoreCase(techID)) {
             return;
         }
 

@@ -293,7 +293,7 @@ public class XytherisLeadersHandler {
     }
 
     // Shared Xytheris Ability roll counter
-    private static int getUnitAbilityCount(UnitModel unit) {
+    public static int getUnitAbilityCount(UnitModel unit) {
         return (unit.getSpaceCannonDieCount() > 0 ? 1 : 0)
                 + (unit.getBombardDieCount() > 0 ? 1 : 0)
                 + (unit.getSustainDamage() ? 1 : 0)

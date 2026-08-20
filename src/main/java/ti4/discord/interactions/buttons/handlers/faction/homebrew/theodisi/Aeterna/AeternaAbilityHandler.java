@@ -27,6 +27,7 @@ import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
 @UtilityClass
 public class AeternaAbilityHandler {
+    private static final String CYCLE_ACTION_CAPTURE = "cycleOfReclamationActionCapture_";
     private static final String FULL_MOON = "full_moonphase";
     private static final String WAXING_MOON = "waxing_moonphase";
     private static final String WANING_MOON = "waning_moonphase";
@@ -270,16 +271,32 @@ public class AeternaAbilityHandler {
             GenericInteractionCreateEvent event, Game game, List<RemovedUnit> destroyedUnits, boolean combat) {
         if (destroyedUnits.isEmpty()) return;
         for (Player aeterna : game.getRealPlayers()) {
-            if (!aeterna.hasAbility("cycle_of_reclamation") || (combat && aeterna == game.getActivePlayer())) continue;
+            boolean duringAeternasTacticalAction = aeterna == game.getActivePlayer()
+                    && !game.getCurrentActiveSystem().isEmpty();
+            if (!aeterna.hasAbility("cycle_of_reclamation") || duringAeternasTacticalAction) continue;
+            String actionCaptureKey = CYCLE_ACTION_CAPTURE + aeterna.getFaction();
+            if (!game.getPhaseOfGame().startsWith("agenda")
+                    && !game.getStoredValue(actionCaptureKey).isEmpty()) {
+                continue;
+            }
             boolean nearby =
                     destroyedUnits.stream().anyMatch(unit -> isInOrAdjacentToAeternaUnits(game, aeterna, unit));
             if (!nearby) continue;
 
+            if (!game.getPhaseOfGame().startsWith("agenda")) {
+                game.setStoredValue(actionCaptureKey, "used");
+            }
             AddUnitService.addUnits(
                     event, aeterna.getNomboxTile(), game, game.getNeutral().getColor(), "1 destroyer");
             MessageHelper.sendMessageToChannel(
                     aeterna.getCorrectChannel(),
                     aeterna.getRepresentation() + " captured 1 neutral destroyer with **Cycle of Reclamation**.");
+        }
+    }
+
+    public static void clearCycleOfReclamationActionCaptures(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            game.removeStoredValue(CYCLE_ACTION_CAPTURE + player.getFaction());
         }
     }
 
@@ -391,9 +408,16 @@ public class AeternaAbilityHandler {
 
     private static boolean isInOrAdjacentToAeternaUnits(Game game, Player player, RemovedUnit destroyedUnit) {
         Tile tile = destroyedUnit.tile();
-        if (tile.containsPlayersUnits(player) || player.unitBelongsToPlayer(destroyedUnit.unitKey())) return true;
+        UnitModel destroyedUnitModel = player.getUnitFromUnitKey(destroyedUnit.unitKey());
+        if (tile.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip)
+                || (player.unitBelongsToPlayer(destroyedUnit.unitKey())
+                        && destroyedUnitModel != null
+                        && destroyedUnitModel.getIsShip())) {
+            return true;
+        }
         return FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true).stream()
                 .map(game::getTileByPosition)
-                .anyMatch(adjacent -> adjacent != null && adjacent.containsPlayersUnits(player));
+                .anyMatch(adjacent -> adjacent != null
+                        && adjacent.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip));
     }
 }

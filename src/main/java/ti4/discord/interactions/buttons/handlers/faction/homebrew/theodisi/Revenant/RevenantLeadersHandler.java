@@ -42,6 +42,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
+import ti4.service.leader.PurgeHeroService;
 import ti4.service.tech.ListTechService;
 import ti4.service.tech.PlayerTechService;
 import ti4.service.unit.AddUnitService;
@@ -92,7 +93,6 @@ public class RevenantLeadersHandler {
     private static final String PLACE_REVMYRR_UNIT = "placeRevenantMyrrUnit_";
     private static final String REVMYRR_USED = "revenantMyrrCommanderUsed_";
     // Revenant of Ruin
-    private static final String REVTHRONES = "revenantthroneshero";
     private static final String USE_REVTHRONES = "useRevenantThronesHero";
     private static final String SELECT_REVTHRONES_SYSTEM = "selectRevenantThronesSystem_";
     private static final String REVTHRONES_PRODUCTION = "revenantThronesProduction_";
@@ -356,16 +356,17 @@ public class RevenantLeadersHandler {
             return;
         }
 
+        PurgeHeroService.purgeHeroPreamble(
+                event, player, game, "revenantthroneshero", "Lost Throne of Pride - Fallen King");
+
         String message = player.getRepresentation()
                 + ", choose a system containing 1 or more of your units in which to use PRODUCTION 4 due to Lost Throne of Pride, the Revenant Thrones hero.";
         String prefix = player.factionButtonChecker() + SELECT_REVTHRONES_SYSTEM;
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
-        List<Button> paginatedButtons = NewStuffHelper.buttonPagination(buttons, extraButtons, prefix, 25, 0, false);
+        List<Button> paginatedButtons = NewStuffHelper.buttonPagination(buttons, prefix, 0);
         if (buttons.size() <= 24) {
             paginatedButtons = new ArrayList<>(buttons);
-            paginatedButtons.addAll(extraButtons);
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, paginatedButtons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, paginatedButtons);
     }
 
     @ButtonHandler(SELECT_REVTHRONES_SYSTEM)
@@ -380,9 +381,8 @@ public class RevenantLeadersHandler {
         String message = player.getRepresentation()
                 + ", choose a system containing 1 or more of your units in which to use PRODUCTION 4 due to Lost Throne of Pride, the Revenant Thrones hero.";
         String prefix = player.factionButtonChecker() + SELECT_REVTHRONES_SYSTEM;
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
         if (NewStuffHelper.checkAndHandlePaginationChange(
-                event, event.getMessageChannel(), buttons, extraButtons, message, prefix, buttonID)) {
+                event, event.getMessageChannel(), buttons, message, prefix, buttonID)) {
             return;
         }
 
@@ -406,7 +406,7 @@ public class RevenantLeadersHandler {
     }
 
     public static int getRevThronesProduction(Game game, Player player, Tile tile) {
-        if (game == null || player == null || tile == null || !player.hasLeaderUnlocked(REVTHRONES)) {
+        if (game == null || player == null || tile == null) {
             return 0;
         }
         return tile.getPosition().equals(game.getStoredValue(REVTHRONES_PRODUCTION + player.getFaction())) ? 4 : 0;
@@ -426,7 +426,6 @@ public class RevenantLeadersHandler {
         return game != null
                 && player != null
                 && player.isActivePlayer()
-                && player.hasLeaderUnlocked(REVTHRONES)
                 && game.getStoredValue(REVTHRONES_PRODUCTION + player.getFaction())
                         .isEmpty();
     }
@@ -456,13 +455,6 @@ public class RevenantLeadersHandler {
         }
         int middleSeparator = producedUnitKey.lastIndexOf('_', lastSeparator - 1);
         return middleSeparator < 0 ? null : producedUnitKey.substring(middleSeparator + 1, lastSeparator);
-    }
-
-    // Red Revenant Leader Set
-    public static void addRedLeaderCardsInfoButtons(List<Button> buttons, Player player) {
-        if (buttons != null && player != null && player.hasUnexhaustedLeader(REVXYTHERIS)) {
-            buttons.add(getRevXytherisCardsInfoButton(player));
-        }
     }
 
     // Revenant of Xytheris
@@ -1703,15 +1695,14 @@ public class RevenantLeadersHandler {
     }
 
     // Lich token debt pool handling
+    private static final String SELECT_LICH_TARGET = "selectLichTarget_";
+    private static final String SELECT_LICH_COMMANDER = "selectLichCommander_";
+
     public static List<Button> offerLichTokenChoices(Player player, Game game) {
         List<Button> targets = new ArrayList<>();
         for (Player target : game.getRealPlayersExcludingThis(player)) {
-            if (player.getDebtTokenCount(target.getColor(), "lich") >= 1) {
-                continue;
-            }
-
             targets.add(Buttons.green(
-                    player.factionButtonChecker() + "selectLichTarget_" + target.getColor(),
+                    player.factionButtonChecker() + SELECT_LICH_TARGET + target.getColor(),
                     target.getFaction(),
                     FactionEmojis.getFactionIcon(target.getFaction())));
         }
@@ -1719,14 +1710,14 @@ public class RevenantLeadersHandler {
         return targets;
     }
 
-    @ButtonHandler("selectLichTarget_")
+    @ButtonHandler(SELECT_LICH_TARGET)
     public static void resolveAllureOfDarkness(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (game == null || player == null || !player.hasAbility("allure_of_darkness")) {
             return;
         }
 
-        String targetColor = buttonID.replace("selectLichTarget_", "");
+        String targetColor = buttonID.replace(SELECT_LICH_TARGET, "");
         Player target = game.getPlayerFromColorOrFaction(targetColor);
         if (target == null) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Could not find player.");
@@ -1734,19 +1725,66 @@ public class RevenantLeadersHandler {
             return;
         }
 
+        List<Leader> commanders = target.getLeaders().stream()
+                .filter(leader -> Constants.COMMANDER.equals(leader.getType()))
+                .toList();
+        if (commanders.isEmpty()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "That player has no commander.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (commanders.size() == 1) {
+            placeLichToken(event, game, player, target, commanders.get(0));
+            return;
+        }
+
+        List<Button> buttons = commanders.stream()
+                .map(commander -> Buttons.green(
+                        player.factionButtonChecker() + SELECT_LICH_COMMANDER + target.getColor() + "|"
+                                + commander.getId(),
+                        commander.getName(),
+                        FactionEmojis.revenant))
+                .toList();
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + ", choose which of " + target.getRepresentationNoPing()
+                        + "'s commanders receives the lich token.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(SELECT_LICH_COMMANDER)
+    public static void resolveLichCommanderChoice(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (game == null || player == null || !player.hasAbility("allure_of_darkness")) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        String[] payload = buttonID.replace(SELECT_LICH_COMMANDER, "").split("\\|", 2);
+        Player target = payload.length == 2 ? game.getPlayerFromColorOrFaction(payload[0]) : null;
+        Leader commander = target == null || payload.length != 2
+                ? null
+                : target.getLeaderByID(payload[1]).orElse(null);
+        if (target == null || commander == null || !Constants.COMMANDER.equals(commander.getType())) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        placeLichToken(event, game, player, target, commander);
+    }
+
+    private static void placeLichToken(
+            ButtonInteractionEvent event, Game game, Player player, Player target, Leader commander) {
         for (Player targets : game.getRealPlayers()) {
             player.clearAllDebtTokens(targets.getColor(), "lich");
         }
-
         game.setDebtPoolIcon("lich", FactionEmojis.revenant.emojiString());
-
-        player.addDebtTokens(targetColor, 1, "lich");
-
+        game.setStoredValue(
+                "revenantLichCommander_" + player.getFaction(), target.getFaction() + "|" + commander.getId());
+        player.addDebtTokens(target.getColor(), 1, "lich");
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " placed the lich token on " + target.getRepresentation()
-                        + "'s commander.");
-
+                player.getRepresentation() + " placed the lich token on " + target.getRepresentationNoPing() + "'s "
+                        + commander.getName() + " commander.");
         ButtonHelper.deleteMessage(event);
     }
 }

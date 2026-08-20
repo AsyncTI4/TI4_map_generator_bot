@@ -243,6 +243,7 @@ public final class Constants {
 
     public static final String TOKEN_INGRESS = "token_ingress.png";
     public static final String TOKEN_EGRESS = "token_egress.png";
+    public static final String TOKEN_FRACTURE = "token_fracture_async.png";
     public static final String TOKEN_BREACH_ACTIVE = "token_breachActive.png";
     public static final String TOKEN_BREACH_INACTIVE = "token_breachInactive.png";
     public static final String TOKEN_SEVERED = "token_severed.png";
@@ -458,6 +459,8 @@ public final class Constants {
     private static final String SKARNATH = "skarnath";
     private static final String LETHARA = "lethara";
     private static final String GYRAXIS = "gyraxis";
+    private static final String LOST_STATION = "loststation";
+    private static final String ILLUSTRION = "illustrion";
     public static final List<String> TOKEN_PLANETS = List.of(
             MIRAGE,
             OASIS,
@@ -468,6 +471,8 @@ public final class Constants {
             SKARNATH,
             LETHARA,
             GYRAXIS,
+            LOST_STATION,
+            ILLUSTRION,
             AVERNUS,
             THUNDERSEDGE,
             BROKENPLANET1,
@@ -783,6 +788,7 @@ public final class Constants {
     public static final String EXPLORATION_DECKS = "exploration_decks";
     public static final String AC_DISCARDED = "action_cards_discarded";
     public static final String AC_STATUS = "action_cards_status";
+    public static final String AC_PLAYED = "action_cards_played";
     public static final String AC_PURGED = "action_cards_purged";
     public static final String SO = "secret_objectives";
     public static final String PRODUCED_UNITS = "produced_units";
@@ -1346,6 +1352,7 @@ public final class Constants {
     public static final String RAPID_MOBILIZATION_MODE = "rapid_mobilization_mode";
     public static final String MONUMENTS_TO_THE_AGES_MODE = "monuments_to_the_ages_mode";
     public static final String COSMIC_PHENOMENAE_MODE = "cosmic_phenomenae_mode";
+    public static final String COSMIC_CONVERGENCE_MODE = "cosmic_convergence_mode";
     public static final String WEIRD_WORMHOLES_MODE = "weird_wormholes_mode";
     public static final String NO_FRACTURE = "no_fracture";
     public static final String CALL_OF_THE_VOID_MODE = "call_of_the_void_mode";
@@ -1481,6 +1488,7 @@ public final class Constants {
     public static final String MOD_ADJACENT_MECH = "adjacent_mech";
     public static final String MOD_OPPONENT_NON_FIGHTER_SHIP = "opponent_non_fighter_ship";
     public static final String MOD_OPPONENT_SHIP = "opponent_ship";
+    public static final String MOD_VERYDITH_FLAGSHIP = "opponent_cc_in_system";
 
     public static final String MIGRATION_NAME = "migration_name";
     public static final String RUN_MANUAL_DATA_MIGRATION = "run_manual_data_migration";
@@ -1532,6 +1540,7 @@ public final class Constants {
     public static final String OLRADIN_MECH_RES_PNG = "attachment_olradin_mech_res.png";
     public static final String OLRADIN_MECH_INF_PNG = "attachment_olradin_mech_inf.png";
     public static final String VOX_SENTINELS_PNG = "attachment_vox_sentinels.png";
+    public static final String VERYDITH_ATTACHMENT_PNG = "attachment_verydithposresinf.png";
     public static final String EXAMPLES_ONLY = "examples_only";
     public static final String HOW_TO_MOVE_UNITS = "how_to_move_units";
     public static final String IS_ASTEROID_FIELD = "is_asteroid_field";

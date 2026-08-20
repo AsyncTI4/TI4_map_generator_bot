@@ -37,10 +37,14 @@ public class ExhaustLeaderService {
         }
 
         if (Constants.AGENT.equals(leader.getType())) {
-            if (player.hasUnit("revenant_mech")) {
+            boolean isRevenantRisingAttachedAgent =
+                    RevenantBreakthroughHandler.isRevenantRisingAttachedAgent(game, player, leader);
+            if (!isRevenantRisingAttachedAgent && player.hasUnit("revenant_mech")) {
                 RevenantUnitsHandler.doRevenantMechCheck(game, player);
             }
-            RevenantTechHandler.getProduceShipsInSystemsWithShipsButtons(game, player);
+            if (!isRevenantRisingAttachedAgent) {
+                RevenantTechHandler.getProduceShipsInSystemsWithShipsButtons(game, player);
+            }
         }
 
         if (tgCount != null) {

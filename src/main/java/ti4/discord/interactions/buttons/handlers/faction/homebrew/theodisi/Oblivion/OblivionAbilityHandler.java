@@ -213,6 +213,8 @@ public class OblivionAbilityHandler {
         }
 
         removeReflection(game, tile);
+        OblivionLeadersHandler.offerCommanderProduction(game, player);
+        OblivionUnitHandler.doOblivionMechCheck(game, player);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " purged a reflection token in "

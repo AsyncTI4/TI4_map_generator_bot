@@ -54,6 +54,7 @@ import org.apache.commons.lang3.function.Consumers;
 import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
@@ -64,8 +65,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
@@ -74,6 +77,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunar
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.selections.selectmenus.SelectFaction;
@@ -740,6 +744,9 @@ public class ButtonHelper {
         if ((whatIsItFor.contains("res") || whatIsItFor.contains("both"))
                 && player.hasUnlockedBreakthrough("tyrisbt")) {
             TyrisBreakthroughHandler.getPlaceButton(player, game).ifPresent(buttons::add);
+        }
+        if (!whatIsItFor.contains("tgsonly") && player.hasRelicReady("naturesboon")) {
+            buttons.add(LostLegaciesRelicHandler.getNaturesBoonSpendButton(player, whatIsItFor));
         }
         buttons.add(Buttons.gray("resetSpend_" + whatIsItFor, "Reset Spent Planets and Trade Goods"));
         return buttons;
@@ -3281,6 +3288,11 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons);
             }
         }
+        for (Player verydith : game.getRealPlayers()) {
+            if (game.playerHasLeaderUnlockedOrAlliance(verydith, "verydithcommander")) {
+                VerydithLeadersHandler.checkVerydithCommander(game);
+            }
+        }
     }
 
     public static void resolveMahactMechAbilityUse(
@@ -4739,6 +4751,9 @@ public class ButtonHelper {
         if (player.hasRelicReady("full_moonphase")) {
             endButtons.add(AeternaAbilityHandler.getFullMoonButton(player));
         }
+        if (player.hasRelicReady("cosmicboon")) {
+            endButtons.add(LostLegaciesRelicHandler.getCosmicBoonButton(player));
+        }
 
         // Legendary Planets
         List<String> implementedLegendaryPlanets = List.of(
@@ -4932,7 +4947,7 @@ public class ButtonHelper {
         for (Tile tile : game.getTileMap().values()) {
             if (tile.isEdgeOfBoard(game)
                     && tile.getPosition().length() > 2
-                    && !tile.getPosition().contains("frac")
+                    && !tile.isFracture()
                     && (game.isDiscordantStarsMode() || FoWHelper.playerHasShipsInSystem(player, tile))) {
                 if (game.isAgeOfExplorationMode() && tile.isHomeSystem(game)) {
                     continue;
@@ -5130,6 +5145,40 @@ public class ButtonHelper {
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", please choose another tile that the new tile will be adjacent to.",
                 buttons);
+    }
+
+    @ButtonHandler("cosmicConStep3_")
+    public static void cosmicConStep3(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        deleteMessage(event);
+        String newTileID = buttonID.split("_")[1];
+        String pos = buttonID.split("_")[2];
+        Tile tile = new Tile(newTileID, pos);
+        game.setTile(tile);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " added the system " + tile.getRepresentationForButtons(game, player)
+                        + ".");
+        if (tile.getPlanetUnitHolders().isEmpty()) {
+            AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
+        }
+        if (game.isDangerousWildsMode()) {
+            Player neutral = game.getNeutral();
+            boolean added = false;
+            for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                if (getTypeOfPlanet(game, uH.getName()).contains("hazardous")) {
+                    int neutralUnitsToAdd = Helper.getPlanetResources(uH.getName(), game);
+                    if (neutralUnitsToAdd > 0) {
+                        added = true;
+                        AddUnitService.addUnits(
+                                event, tile, game, neutral.getColor(), neutralUnitsToAdd + " infantry " + uH.getName());
+                    }
+                }
+            }
+            if (added) {
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(), "Added neutral infantry to hazardous planets.");
+            }
+        }
     }
 
     @ButtonHandler("starChartsStep3_")
@@ -5331,6 +5380,10 @@ public class ButtonHelper {
         if (game.isNaaluAgent() && tile.isHomeSystem(game)) return false;
         if (!FOWPlusService.canActivatePosition(tile.getPosition(), player, game, visiblePositions)) return false;
         if ("silver_flame".equalsIgnoreCase(tile.getTileID())) return false;
+        if (TransitRiderLLButtonHandler.isActive(game, player)
+                && !getOtherPlayersWithUnitsInTheSystem(player, game, tile).isEmpty()) {
+            return false;
+        }
         String borrowedAuthorityColor = game.getStoredValue("borrowedAuthorityColor");
         if (!borrowedAuthorityColor.isEmpty()
                 && (tile.isHomeSystem(game)
@@ -6987,6 +7040,38 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(event.getChannel(), msg);
     }
 
+    @ButtonHandler("resolveFireTeam")
+    public static void resolveFireTeam(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+
+        String key = "warFundingRolls" + player.getFaction();
+        String summary = game.getStoredValue(key);
+        String msg = player.getRepresentation() + " your units rerolled their misses and got the following:\n";
+        for (String part : summary.split(";")) {
+            if (!part.contains("_")) {
+                continue;
+            }
+            int numDice = Integer.parseInt(part.split("_")[0]);
+            int hitOn = Integer.parseInt(part.split("_")[1]);
+            String unit = part.split("_")[2];
+            List<Die> resultRolls = DiceHelper.rollDice(hitOn, numDice);
+            int hitRolls = DiceHelper.countSuccesses(resultRolls);
+            String unitRoll = CombatMessageHelper.displayUnitRoll(
+                    player.getUnitByBaseType(unit),
+                    hitOn,
+                    0,
+                    numDice / player.getUnitByBaseType(unit).getCombatDieCount(),
+                    player.getUnitByBaseType(unit).getCombatDieCount(),
+                    numDice % player.getUnitByBaseType(unit).getCombatDieCount(),
+                    resultRolls,
+                    hitRolls,
+                    "space");
+            msg += unitRoll;
+        }
+        msg += "\nHave your opponent assign hits with the assign hits button present underneath the combat picture.";
+        MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("rollThalnos_")
     public static void resolveRollForThalnos(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
@@ -7845,6 +7930,26 @@ public class ButtonHelper {
         return buttons;
     }
 
+    public static boolean doesPlayerControlRexOrOpponentHS(Player player, Game game) {
+        if (player.getPlanets().contains("mr") || player.getPlanets().contains("mrte")) {
+            return true;
+        }
+        for (Player opponent : game.getRealPlayersNDummies()) {
+            if (opponent == player) {
+                continue;
+            }
+            Tile tile = opponent.getHomeSystemTile();
+            if (tile != null) {
+                for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                    if (player.getPlanets().contains(uH.getName())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public static List<Button> getButtonsForConventions(Player player, Game game) {
         String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
@@ -7899,8 +8004,8 @@ public class ButtonHelper {
                 fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
     }
 
-    public static List<Player> tileHasPDS2Cover(Player player, Game game, String tilePos) {
-        Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tilePos, player, false, true);
+    public static List<Player> getPlayersWithPds2Cover(Player targetPlayer, Game game, String tilePos) {
+        Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tilePos, targetPlayer, false, true);
         for (Player p2 : game.getRealPlayers()) {
             adjTiles.addAll(FoWHelper.getAdjacentTiles(game, tilePos, p2, false, true));
         }
@@ -7910,21 +8015,21 @@ public class ButtonHelper {
                 && game.getTileByPosition(tilePos).isScar(game)) {
             return playersWithPds2;
         }
-        if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos), game)
-                && player.hasAbility("starfall_gunnery")
-                && checkNumberNonFighterShipsWithoutSpaceCannon(player, game.getTileByPosition(tilePos)) > 0) {
-            playersWithPds2.add(player);
+        if (FoWHelper.otherPlayersHaveShipsInSystem(targetPlayer, game.getTileByPosition(tilePos), game)
+                && targetPlayer.hasAbility("starfall_gunnery")
+                && checkNumberNonFighterShipsWithoutSpaceCannon(targetPlayer, game.getTileByPosition(tilePos)) > 0) {
+            playersWithPds2.add(targetPlayer);
         }
 
-        if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos), game)
-                && player.hasTech("tf-kinematicstarfall")
-                && checkNumberNonFighterShipsWithoutSpaceCannon(player, game.getTileByPosition(tilePos)) > 0) {
-            playersWithPds2.add(player);
+        if (FoWHelper.otherPlayersHaveShipsInSystem(targetPlayer, game.getTileByPosition(tilePos), game)
+                && targetPlayer.hasTech("tf-kinematicstarfall")
+                && checkNumberNonFighterShipsWithoutSpaceCannon(targetPlayer, game.getTileByPosition(tilePos)) > 0) {
+            playersWithPds2.add(targetPlayer);
         }
         Tile activeTile = game.getTileByPosition(tilePos);
-        if (FoWHelper.otherPlayersHaveShipsInSystem(player, activeTile, game)
-                && ArcanumTechHandler.hasSigilOfTransmutation(game, player, activeTile)) {
-            playersWithPds2.add(player);
+        if (FoWHelper.otherPlayersHaveShipsInSystem(targetPlayer, activeTile, game)
+                && ArcanumTechHandler.hasSigilOfTransmutation(game, targetPlayer, activeTile)) {
+            playersWithPds2.add(targetPlayer);
         }
         for (Player twilightPlayer : game.getRealPlayers()) {
             if (playersWithPds2.contains(twilightPlayer)
@@ -7932,8 +8037,9 @@ public class ButtonHelper {
                 continue;
             }
 
-            if (twilightPlayer == player || player.getAllianceMembers().contains(twilightPlayer.getFaction())) {
-                if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos), game)) {
+            if (twilightPlayer == targetPlayer
+                    || targetPlayer.getAllianceMembers().contains(twilightPlayer.getFaction())) {
+                if (FoWHelper.otherPlayersHaveShipsInSystem(targetPlayer, game.getTileByPosition(tilePos), game)) {
                     playersWithPds2.add(twilightPlayer);
                 }
             } else {
@@ -7944,8 +8050,8 @@ public class ButtonHelper {
             Tile adjTile = game.getTileByPosition(adjTilePos);
             if (adjTile == null) {
                 BotLogger.warning(
-                        new LogOrigin(player),
-                        "`ButtonHelper.tileHasPDS2Cover` Game: " + game.getName() + " Tile: " + tilePos
+                        new LogOrigin(targetPlayer),
+                        "`ButtonHelper.getPlayersWithPds2Cover` Game: " + game.getName() + " Tile: " + tilePos
                                 + " has a null adjacent tile: `" + adjTilePos + "` within: `" + adjTiles + "`");
                 continue;
             }
@@ -7961,9 +8067,10 @@ public class ButtonHelper {
                         if (p2.controlsMecatol(false)
                                 && p2.hasPlanet("custodiavigilia")
                                 && !playersWithPds2.contains(p2)) {
-                            if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
+                            if (p2 == targetPlayer
+                                    || targetPlayer.getAllianceMembers().contains(p2.getFaction())) {
                                 if (FoWHelper.otherPlayersHaveShipsInSystem(
-                                        player, game.getTileByPosition(tilePos), game)) {
+                                        targetPlayer, game.getTileByPosition(tilePos), game)) {
                                     playersWithPds2.add(p2);
                                 }
                             } else {
@@ -8009,10 +8116,10 @@ public class ButtonHelper {
                             && (model.getDeepSpaceCannon(owningPlayer)
                                     || tilePos.equalsIgnoreCase(adjTilePos)
                                     || game.playerHasLeaderUnlockedOrAlliance(owningPlayer, "mirvedacommander"))) {
-                        if (owningPlayer == player
-                                || player.getAllianceMembers().contains(owningPlayer.getFaction())) {
+                        if (owningPlayer == targetPlayer
+                                || targetPlayer.getAllianceMembers().contains(owningPlayer.getFaction())) {
                             if (FoWHelper.otherPlayersHaveShipsInSystem(
-                                    player, game.getTileByPosition(tilePos), game)) {
+                                    targetPlayer, game.getTileByPosition(tilePos), game)) {
                                 playersWithPds2.add(owningPlayer);
                             }
                         } else {
@@ -8029,8 +8136,9 @@ public class ButtonHelper {
                             .isEmpty()) {
                 continue;
             }
-            if (hiveEchoPlayer == player || player.getAllianceMembers().contains(hiveEchoPlayer.getFaction())) {
-                if (FoWHelper.otherPlayersHaveShipsInSystem(player, activeTile, game)) {
+            if (hiveEchoPlayer == targetPlayer
+                    || targetPlayer.getAllianceMembers().contains(hiveEchoPlayer.getFaction())) {
+                if (FoWHelper.otherPlayersHaveShipsInSystem(targetPlayer, activeTile, game)) {
                     playersWithPds2.add(hiveEchoPlayer);
                 }
             } else {
@@ -8038,9 +8146,9 @@ public class ButtonHelper {
             }
         }
         if (game.getRealPlayers().stream()
-                .anyMatch(player_ -> game.playerHasLeaderUnlockedOrAlliance(player_, "netrunnerscommander"))) {
-            playersWithPds2.addAll(
-                    NetrunnersLeadersHandler.getCommanderSpaceCannonPlayers(player, game, tilePos, playersWithPds2));
+                .anyMatch(player -> game.playerHasLeaderUnlockedOrAlliance(player, "netrunnerscommander"))) {
+            playersWithPds2.addAll(NetrunnersLeadersHandler.getCommanderSpaceCannonPlayers(
+                    targetPlayer, game, tilePos, playersWithPds2));
         }
         return playersWithPds2;
     }
@@ -8052,7 +8160,7 @@ public class ButtonHelper {
             if (adjTile == null) {
                 BotLogger.warning(
                         new LogOrigin(player),
-                        "`ButtonHelper.tileHasPDS2Cover` Game: " + game.getName() + " Tile: " + tilePos
+                        "`ButtonHelper.sendEBSWarning` Game: " + game.getName() + " Tile: " + tilePos
                                 + " has a null adjacent tile: `" + adjTilePos + "` within: `" + adjTiles + "`");
                 continue;
             }
@@ -8875,6 +8983,7 @@ public class ButtonHelper {
         if (game.isFowMode()) {
             FoWHelper.pingAllPlayersWithFullStats(game, null, player, "Purged 2 Star Charts.");
         }
+        OblivionUnitHandler.doOblivionMechCheck(game, player);
     }
 
     public static void offerSpeakerButtons(Game game) {

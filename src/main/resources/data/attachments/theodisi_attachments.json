@@ -24,6 +24,30 @@
         "source": "theodisi"
     },
     {
+        "id": "initiativeoutpost",
+        "name": "Initiative Outpost",
+        "imagePath": "attachment_initiativeoutpost.png",
+        "source": "theodisi"
+    },
+    {
+        "id": "explorationoutpost",
+        "name": "Exploration Outpost",
+        "imagePath": "attachment_explorationoutpost.png",
+        "source": "theodisi"
+    },
+    {
+        "id": "assemblyoutpost",
+        "name": "Assembly Outpost",
+        "imagePath": "attachment_assemblyoutpost.png",
+        "source": "theodisi"
+    },
+    {
+        "id": "marketoutpost",
+        "name": "Market Outpost",
+        "imagePath": "attachment_marketoutpost.png",
+        "source": "theodisi"
+    },
+    {
         "id": "ponthousboth",
         "name": "Ponthous +/-",
         "imagePath": "attachment_ponthousboth.png",
@@ -53,6 +77,42 @@
         "name": "Vox Sentinels",
         "imagePath": "attachment_vox_sentinels.png",
         "isFakeAttachment": true,
+        "source": "theodisi"
+    },
+    {
+        "id": "verydithposresinf",
+        "name": "Verydith Commander",
+        "imagePath": "attachment_verydithposresinf.png",
+        "resourcesModifier": 1,
+        "influenceModifier": 1,
+        "isFakeAttachment": true,
+        "source": "theodisi"
+    },
+    {
+        "id": "polymorphism",
+        "name": "Polymorphism",
+        "imagePath": "attachment_polymorphism.png",
+        "source": "theodisi"
+    },
+    {
+        "id": "battleworld",
+        "name": "Battleworld",
+        "imagePath": "attachment_battleworld.png",
+        "source": "theodisi"
+    },
+    {
+        "id": "diversifiedresearchfacility",
+        "name": "Diversified Research Facility",
+        "imagePath": "attachment_diversifiedresearchfacility.png",
+        "techSpeciality": ["biotic", "propulsion", "cybernetic", "warfare"],
+        "source": "theodisi"
+    },
+    {
+        "id": "diversifiedresearchfacilitystat",
+        "name": "Diversified Research Facility",
+        "imagePath": "attachment_diversifiedresearchfacilitystat.png",
+        "influenceModifier": 1,
+        "resourcesModifier": 1,
         "source": "theodisi"
     }
 ]

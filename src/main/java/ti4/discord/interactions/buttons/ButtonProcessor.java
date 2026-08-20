@@ -287,11 +287,11 @@ public class ButtonProcessor {
                 }
                 case "gain1tgFromLetnevCommander" -> {
                     trackButtonHandler("gain1tgFromLetnevCommander");
-                    gain1tgFromLetnevCommander(event, player, game, mainGameChannel);
+                    gain1tgFromLetnevCommander(event, player, game);
                 }
                 case "gain1tgFromMuaatCommander" -> {
                     trackButtonHandler("gain1tgFromMuaatCommander");
-                    gain1tgFromMuaatCommander(event, player, game, mainGameChannel);
+                    gain1tgFromMuaatCommander(event, player, game);
                 }
                 case "gain1tgFromCommander" -> {
                     trackButtonHandler("gain1tgFromCommander");
@@ -379,23 +379,21 @@ public class ButtonProcessor {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static void gain1tgFromMuaatCommander(
-            ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
+    private static void gain1tgFromMuaatCommander(ButtonInteractionEvent event, Player player, Game game) {
         String message = player.getRepresentation() + " gained 1 trade good " + player.gainTG(1)
                 + " from Magmus, the Muaat commander.";
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
-        MessageHelper.sendMessageToChannel(mainGameChannel, message);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
     }
 
-    private static void gain1tgFromLetnevCommander(
-            ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
+    private static void gain1tgFromLetnevCommander(ButtonInteractionEvent event, Player player, Game game) {
         String message = player.getRepresentation() + " gained 1 trade good " + player.gainTG(1)
                 + " from Rear Admiral Farran, the Letnev commander.";
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
-        MessageHelper.sendMessageToChannel(mainGameChannel, message);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
     }
 

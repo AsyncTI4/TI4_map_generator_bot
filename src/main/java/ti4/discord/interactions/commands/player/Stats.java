@@ -192,6 +192,7 @@ class Stats extends GameStateSubcommand {
 
         OptionMapping optionC = event.getOption(Constants.COMMODITIES);
         if (optionC != null) {
+            int oldCommodities = player.getCommodities();
             PlayerStatsService.setValue(event, game, player, optionC, player::setCommodities, player::getCommodities);
             if (player.hasAbility("military_industrial_complex")
                     && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
@@ -200,7 +201,8 @@ class Stats extends GameStateSubcommand {
                         player.getRepresentationUnfogged() + ", you have the opportunity to buy _Axis Orders_.",
                         ButtonHelperAbilities.getBuyableAxisOrders(player, game));
             }
-            if (player.hasAbility("expeditionary_cache")
+            if (player.getCommodities() > oldCommodities
+                    && player.hasAbility("expeditionary_cache")
                     && KairnAbilityHandler.getAvailableExpeditionTokens(game) > 0) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),

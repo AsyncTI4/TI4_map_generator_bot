@@ -7,13 +7,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamFactionTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
+import ti4.service.relic.AlluringThroneService;
 
 @UtilityClass
 public class CheckDistanceHelper {
@@ -91,18 +94,22 @@ public class CheckDistanceHelper {
                     if (tile == null
                             || (tile.isNebula(game)
                                     && player != null
-                                    && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
+                                    && !DreamAbilitiesHandler.ignoresNebula(player, game, tile)
+                                    && !DreamFactionTechHandler.treatsNebulasAsAdjacent(game, player, tile)
+                                    && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
+                                    && !AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile2)
                                     && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     && !player.hasAbility("voidborn")
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !ButtonHelper.isLawInPlay(game, "shared_research"))
                             || (tile.isSupernova()
                                     && player != null
-                                    && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
+                                    && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
+                                    && !AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile2)
                                     && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !player.hasAbility("gashlai_physiology")
@@ -119,11 +126,12 @@ public class CheckDistanceHelper {
                                     && FoWHelper.otherPlayersHaveMovementBlockersInSystem(player, tile, game))
                             || (tile.isAsteroidField()
                                     && player != null
-                                    && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
+                                    && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                                     && !player.hasTech("amd")
                                     && !player.hasTech("wavelength")
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
+                                    && !AlluringThroneService.illustrionFlagshipIgnoresAnomalies(game, player, tile2)
                                     && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                                     && !player.hasTech("absol_amd")
                                     && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2))) {
@@ -133,7 +141,7 @@ public class CheckDistanceHelper {
                 if (!forMap) {
                     if (tile != null
                             && tile.isGravityRift(game, player)
-                            && !DreamButtonHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
+                            && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
                             && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)) {
                         num = -1;
                         if (game.isCosmicPhenomenaeMode()) {
@@ -146,6 +154,7 @@ public class CheckDistanceHelper {
                 }
 
                 addAdjacentPositionsIfNotThereYet(game, existingPosition, distances, player, distance + num);
+                addNebulaAdjacenciesIfNotThereYet(game, existingPosition, distances, player, distance + num);
             }
         }
 
@@ -159,6 +168,17 @@ public class CheckDistanceHelper {
     private static void addAdjacentPositionsIfNotThereYet(
             Game game, String position, Map<String, Integer> distances, Player player, int distance) {
         for (String tilePosition : adjacentPositions(game, position, player)) {
+            if (distances.get(tilePosition) != null && distances.get(tilePosition) > distance) {
+                distances.remove(tilePosition);
+            }
+            distances.putIfAbsent(tilePosition, distance);
+        }
+    }
+
+    private static void addNebulaAdjacenciesIfNotThereYet(
+            Game game, String position, Map<String, Integer> distances, Player player, int distance) {
+        Tile tile = game.getTileByPosition(position);
+        for (String tilePosition : DreamFactionTechHandler.getNebulaAdjacencies(game, player, tile)) {
             if (distances.get(tilePosition) != null && distances.get(tilePosition) > distance) {
                 distances.remove(tilePosition);
             }

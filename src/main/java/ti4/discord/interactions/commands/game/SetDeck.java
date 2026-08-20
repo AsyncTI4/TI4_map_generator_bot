@@ -49,6 +49,11 @@ class SetDeck extends GameStateSubcommand {
             if (Optional.ofNullable(value).isPresent()) {
                 if (Constants.STRATEGY_CARD_SET.equals(deckType)) {
                     game.setStrategyCardSet(value);
+                    if ("evenfall_sc".equalsIgnoreCase(value)) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getChannel(), "The Overrule action card has been removed.");
+                        game.removeACFromGame("overrule");
+                    }
                 } else {
                     DeckModel deckModel = Mapper.getDecks().get(value);
                     if (SetDeckService.setDeck(event, game, deckType, deckModel)) {

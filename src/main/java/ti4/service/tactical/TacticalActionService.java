@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.CombatInitiativeLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
@@ -123,6 +125,22 @@ public class TacticalActionService {
     }
 
     public boolean spendAndPlaceTokenIfNecessary(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
+        String combatInitiativeKey = CombatInitiativeLLButtonHandler.STATE + player.getFaction();
+        if (!game.getStoredValue(combatInitiativeKey).isEmpty()) {
+            if (!CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
+                CommandCounterHelper.addCC(event, player, tile);
+            }
+            game.removeStoredValue(combatInitiativeKey);
+            return true;
+        }
+        String transitRiderKey = TransitRiderLLButtonHandler.STATE + player.getFaction();
+        if (!game.getStoredValue(transitRiderKey).isEmpty()) {
+            if (!CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
+                CommandCounterHelper.addCC(event, player, tile);
+            }
+            game.removeStoredValue(transitRiderKey);
+            return true;
+        }
         String borrowedAuthorityColor = game.getStoredValue("borrowedAuthorityColor");
         if (!borrowedAuthorityColor.isEmpty()) {
             String ccId = Mapper.getCCID(borrowedAuthorityColor);
@@ -208,7 +226,7 @@ public class TacticalActionService {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
 
         // Post-core triggers
-        CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost");
+        CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost", "dream");
         CommanderUnlockCheckService.checkPlayer(
                 player,
                 "nivyn",
@@ -224,7 +242,7 @@ public class TacticalActionService {
                 "natau");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
 
-        if (tile.getPosition().startsWith("frac")) {
+        if (tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
         if (!game.isL1Hero() && !ctx.playersWithPds2.isEmpty()) {
@@ -240,7 +258,7 @@ public class TacticalActionService {
 
     private FinishMovementContext executeCoreFinishMovement(
             ButtonInteractionEvent event, Game game, Player player, Tile tile) {
-        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
+        List<Player> playersWithPds2 = ButtonHelper.getPlayersWithPds2Cover(player, game, tile.getPosition());
 
         if (player.hasLeader("ironhero")) {
             IronLeadersHandler.updateIronHeroEligibility(game, player, tile);
@@ -281,7 +299,9 @@ public class TacticalActionService {
     private List<Button> buildFinishMovementButtons(
             ButtonInteractionEvent event, Game game, Player player, FinishMovementContext ctx) {
         List<Button> systemButtons;
-        if (!ctx.unitsWereMoved && !ctx.hasGfsInRange) {
+        if (!ctx.unitsWereMoved
+                && !ctx.hasGfsInRange
+                && !ButtonHelper.getTilesOfUnitsWithBombard(player, game).contains(ctx.tile)) {
             systemButtons = getBuildButtons(event, game, player, ctx.tile);
         } else {
             systemButtons = getLandingTroopsButtons(game, player, ctx.tile);
@@ -472,6 +492,9 @@ public class TacticalActionService {
                 || player.hasUnit("tf-morphwing");
         boolean hierarch = player.hasUnit("tk-hierarch") && space.getUnitCount(UnitType.Cruiser, player) > 0;
         if (naaluFS || belkoFF || hierarch) committable.add(UnitType.Fighter);
+        if (player.hasUnlockedBreakthrough("xytherisbt") && player.hasUpgradedUnit("pds2")) {
+            committable.add(UnitType.Pds);
+        }
         return committable;
     }
 

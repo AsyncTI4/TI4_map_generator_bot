@@ -38,6 +38,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.map.FractureService;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
@@ -449,6 +450,14 @@ public final class TeHelperTechs {
     public static void initializePlanesplitterStep1(Game game, Player player) {
         // When you perform a strategic action, you may move an ingress token into a system that contains or is adjacent
         // to your units.\nThis technology cannot be researched.
+        // Step 1 adds a token and step 2 removes one, so with no Fracture this conjures an ingress from nothing
+        if (!FractureService.isFractureInPlay(game)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", The Fracture is not in play, so there are no ingress tokens to move.");
+            return;
+        }
         handlePlanesplitterStep1(game, player, null, "planesplitterStep1_page0");
     }
 

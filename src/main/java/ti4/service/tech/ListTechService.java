@@ -300,7 +300,11 @@ public class ListTechService {
             }
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
-            requirements = G.matcher(requirements).replaceFirst("");
+            if (synergies.contains(TechnologyType.valueOf("BIOTIC"))) {
+                requirements = requirements.replaceFirst("X", "");
+            } else {
+                requirements = G.matcher(requirements).replaceFirst("");
+            }
             if (ButtonHelperCommanders.getVeldyrCommanderTechs(player, game, true)
                     .contains(tech.getAlias())) {
                 requirements = "";

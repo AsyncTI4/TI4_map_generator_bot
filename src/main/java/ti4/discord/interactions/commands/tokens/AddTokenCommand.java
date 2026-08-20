@@ -80,7 +80,8 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                     event,
                     tile,
                     tokenFileName,
-                    Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName),
+                    Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName)
+                            || "token_theodisi_kairnexpedition.png".equals(tokenFileName),
                     game);
         }
     }

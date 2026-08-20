@@ -24,38 +24,40 @@ class GameTest extends BaseTi4Test {
     }
 
     @Test
-    void shouldTrackAcPlaysWithPlayersAndOptionalTargets() {
+    void shouldTrackAcPlaysWithPlayersAndCancels() {
         var game = new Game();
         game.setStoredValue("unrelated", "value");
         var player = createPlayer("player1", Set.of(), game);
 
-        game.getGameStats().recordAcPlayWithTarget(GameStats.OVERRULE, player, "leadership");
-        game.getGameStats().recordAcPlayWithTarget(GameStats.OVERRULE, player, "leadership");
-        game.getGameStats().recordAcPlayWithTarget(GameStats.OVERRULE, player, "politics");
+        game.getGameStats().recordAcPlay(GameStats.OVERRULE, player);
+        game.getGameStats().recordAcPlay(GameStats.OVERRULE, player);
         game.getGameStats().recordAcPlay(GameStats.SABOTAGE, player);
+        game.getGameStats().markLatestPlayCanceled(GameStats.OVERRULE);
 
-        assertThat(game.getGameStats().getCountPerTarget(GameStats.OVERRULE))
-                .containsExactlyInAnyOrderEntriesOf(Map.of("leadership", 2, "politics", 1));
-        assertThat(game.getGameStats().getTotalPlays(GameStats.OVERRULE)).isEqualTo(3);
-        assertThat(game.getGameStats().getCountPerTarget(GameStats.SABOTAGE)).isEmpty();
+        assertThat(game.getGameStats().getTotalPlays(GameStats.OVERRULE)).isEqualTo(2);
         assertThat(game.getGameStats().getTotalPlays(GameStats.SABOTAGE)).isEqualTo(1);
         assertThat(game.getGameStats().getActionCardPlays())
                 .extracting(GameStats.ActionCardPlay::getPlayerId)
                 .containsOnly("player1");
+        assertThat(game.getGameStats().getActionCardPlays())
+                .extracting(GameStats.ActionCardPlay::isCanceled)
+                .containsExactly(false, true, false);
         assertThat(game.getStoredValueMap()).containsOnlyKeys("unrelated");
     }
 
     @Test
-    void shouldOnlySerializeNonEmptyTargetsForActionCardPlays() {
+    void shouldOnlySerializeCanceledActionCardPlays() {
         var game = new Game();
         var player = createPlayer("player1", Set.of(), game);
 
-        game.getGameStats().recordAcPlayWithTarget(GameStats.OVERRULE, player, "leadership");
+        game.getGameStats().recordAcPlay(GameStats.OVERRULE, player);
         game.getGameStats().recordAcPlay(GameStats.SABOTAGE, player);
+        game.getGameStats().markLatestPlayCanceled(GameStats.SABOTAGE);
 
         var json = JsonMapperManager.basic().valueToTree(game.getGameStats()).get("actionCardPlays");
-        assertThat(json.get(0).get("target").asText()).isEqualTo("leadership");
-        assertThat(json.get(1).has("target")).isFalse();
+        assertThat(json.get(0).has("canceled")).isFalse();
+        assertThat(json.get(0).has("target")).isFalse();
+        assertThat(json.get(1).get("canceled").asBoolean()).isTrue();
     }
 
     @Test
@@ -106,6 +108,44 @@ class GameTest extends BaseTi4Test {
         assertThat(game.getPublicObjectives2Peekable()).containsExactly("centralize_trade", "galvanize");
         assertThat(game.getPublicObjectives2Peeked())
                 .containsEntry("centralize_trade", List.of("hasThe2", "hasThe1", "naaluPnPlayer"));
+    }
+
+    @Test
+    void shouldOnlyRecordActionCardsThatWerePlayed() {
+        var game = createSinglePlayerGame();
+        var player = game.getPlayer("player1");
+        player.setActionCard("sabo1");
+        player.setActionCard("mb1");
+
+        game.discardActionCard("player1", player.getActionCards().get("sabo1"), true);
+        game.discardActionCard("player1", player.getActionCards().get("mb1"));
+
+        assertThat(game.getDiscardActionCards()).containsOnlyKeys("sabo1", "mb1");
+        assertThat(game.getPlayedActionCards()).containsExactly("sabo1");
+    }
+
+    @Test
+    void shouldForgetAPlayedActionCardOnceItLeavesTheDiscard() {
+        var game = createSinglePlayerGame();
+        var player = game.getPlayer("player1");
+        player.setActionCard("sabo1");
+        game.discardActionCard("player1", player.getActionCards().get("sabo1"), true);
+
+        assertThat(game.pickActionCard("player1", game.getDiscardActionCards().get("sabo1")))
+                .isTrue();
+
+        assertThat(game.getPlayedActionCards()).isEmpty();
+
+        // Discarding it again without playing it must not resurrect the old record.
+        game.discardActionCard("player1", player.getActionCards().get("sabo1"));
+        assertThat(game.getPlayedActionCards()).isEmpty();
+    }
+
+    private Game createSinglePlayerGame() {
+        var game = new Game();
+        var player = createPlayer("player1", Set.of(), game);
+        game.setPlayers(new LinkedHashMap<>(Map.of("player1", player)));
+        return game;
     }
 
     private Game createThreePlayerGame() {

@@ -1,0 +1,26 @@
+{
+    "id": "illustrion",
+    "name": "Illustrion",
+    "aliases": [
+        "illustrion",
+        "alluringthrone"
+    ],
+    "resources": 2,
+    "influence": 2,
+    "planetTypes": [
+        "CULTURAL"
+    ],
+    "legendaryAbilityName": "Alluring Throne",
+    "legendaryAbilityText": "Your flagship may ignore the effects of each anomaly. When a player activates a system that contains Illustrion and no other legendary planets you may exhaust this card and spend 1 token from your strategy pool; immediately end that player's turn.",
+    "planetLayout": {
+        "unitHolderName": "illustrion",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 92,
+            "y": 66
+        },
+        "planetRadius": 60,
+        "extraIcons": 1
+    },
+    "source": "theodisi"
+}

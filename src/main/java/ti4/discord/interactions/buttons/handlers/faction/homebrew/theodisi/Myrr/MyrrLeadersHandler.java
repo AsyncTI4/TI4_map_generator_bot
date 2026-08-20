@@ -45,6 +45,7 @@ public class MyrrLeadersHandler {
     private static final String AGENT_DESTROY = "myrrAgentDestroy_";
     private static final String AGENT_PRODUCTION = "myrrAgentProduction_";
     private static final String AGENT_POSITION = "myrrAgentPosition_";
+    private static final String COMMANDER_USES = "myrrCommanderUses_";
 
     private static final String HERO_REMOVE = "myrrHeroRemove_";
     private static final String HERO_DONE_REMOVING = "myrrHeroDoneRemoving";
@@ -222,12 +223,34 @@ public class MyrrLeadersHandler {
             return;
         }
 
-        int cards = count * 2;
+        int usesThisRound = getCommanderUsesThisRound(game, player);
+        int resolvedStructures = Math.min(count, Math.max(0, 2 - usesThisRound));
+        if (resolvedStructures < 1) {
+            return;
+        }
+        game.setStoredValue(getCommanderUsesKey(game, player), Integer.toString(usesThisRound + resolvedStructures));
+
+        int cards = resolvedStructures * 2;
         ActionCardHelper.drawActionCards(player, cards);
+        for (int i = 0; i < resolvedStructures; i++) {
+            ActionCardHelper.sendACDiscardButtons(player);
+        }
         MessageHelper.sendMessageToChannel(
                 event == null ? player.getCorrectChannel() : event.getMessageChannel(),
                 player.getRepresentation() + " drew " + cards + " action card" + (cards == 1 ? "" : "s")
-                        + " using Thessa Scale, the Myrr commander.");
+                        + " using Thessa Scale, the Myrr commander. Buttons to discard 1 have been sent to your #cards-info thread.");
+    }
+
+    private static int getCommanderUsesThisRound(Game game, Player player) {
+        try {
+            return Integer.parseInt(game.getStoredValue(getCommanderUsesKey(game, player)));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    private static String getCommanderUsesKey(Game game, Player player) {
+        return COMMANDER_USES + player.getFaction() + "_" + game.getRound();
     }
 
     public static void startMyrrHero(GenericInteractionCreateEvent event, Game game, Player player) {

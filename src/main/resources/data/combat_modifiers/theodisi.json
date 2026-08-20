@@ -1,5 +1,20 @@
 [
     {
+        "alias": "demoralizing_environment",
+        "type": "mods",
+        "value": "-2",
+        "persistenceType": "TEMP_ONE_ROUND",
+        "scope": "_ship_no_ff",
+        "applyToOpponent": true,
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "action_cards",
+                "alias": "demoralizing_environment"
+            }
+        ]
+    },
+    {
         "alias": "survivalists_extra_die_when_damaged",
         "type": "extrarolls",
         "value": "+1",
@@ -88,5 +103,195 @@
                 "alias": "ponthouscommander"
             }
         ]
+    },
+    {
+        "alias": "verydith_flagship_plus_1_die",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "opponent_cc_in_system",
+        "scope": "_ship_no_ff",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "verydith_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "xytheris_flagship_bonus",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "carried_gf_in_space_area",
+        "persistenceType": "CONDITIONAL",
+        "condition": "active_player",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "xytheris_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "xytheris_flagship_bonus_afb",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "carried_gf_in_space_area",
+        "persistenceType": "CONDITIONAL",
+        "condition": "active_player",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "xytheris_flagship"
+            }
+        ],
+        "forCombatAbility": "AFB"
+    },
+    {
+        "alias": "xytheris_flagship_bonus_bombard",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "carried_gf_in_space_area",
+        "persistenceType": "CONDITIONAL",
+        "condition": "active_player",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "xytheris_flagship"
+            }
+        ],
+        "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "xytheris_flagship_bonus_spacecannondefence",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "carried_gf_in_space_area",
+        "persistenceType": "CONDITIONAL",
+        "condition": "active_player",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "xytheris_flagship"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonDefence"
+    },
+    {
+        "alias": "xytheris_flagship_bonus_spacecannonoffence",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "carried_gf_in_space_area",
+        "persistenceType": "CONDITIONAL",
+        "condition": "active_player",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "xytheris_flagship"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "specialized_augmentations_extra_roll_combat",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "specialized_augmentations_plus2_combat",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "specialized_augmentations_extra_roll_afb",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "AFB"
+    },
+    {
+        "alias": "specialized_augmentations_plus2_afb",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "AFB"
+    },
+    {
+        "alias": "specialized_augmentations_extra_roll_bombardment",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "specialized_augmentations_plus2_bombardment",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "specialized_augmentations_extra_roll_space_cannon_offence",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "specialized_augmentations_plus2_space_cannon_offence",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "specialized_augmentations_extra_roll_space_cannon_defence",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "SpaceCannonDefence"
+    },
+    {
+        "alias": "specialized_augmentations_plus2_space_cannon_defence",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "ALWAYS",
+        "scope": "_flagship_or_mech_",
+        "related": [{"type": "relic", "alias": "specialized_augmentations"}],
+        "forCombatAbility": "SpaceCannonDefence"
     }
 ]

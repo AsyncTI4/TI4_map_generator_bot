@@ -494,18 +494,31 @@ public class CreateGameButtonHandler {
                     limitIncrease = 1;
                 }
             }
-            if (ongoingAmount > completedGames + 2 + limitIncrease) {
+            var userSettings = UserSettingsManager.get(member.getId());
+            String trackRecord = userSettings.getTrackRecord();
+            int droppedGames = 0;
+            droppedGames -= StringUtils.countMatches(trackRecord, "replaced");
+            droppedGames -= StringUtils.countMatches(trackRecord, "dropped");
+            limitIncrease += droppedGames;
+            if (ongoingAmount > completedGames + 2 + limitIncrease && ongoingAmount != 0) {
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(),
                         member.getUser().getAsMention()
-                                + " is at their game limit (# of ongoing games must be equal or less than # of completed games + 3) and so cannot join more games at the moment."
+                                + " is at their game limit (# of ongoing games must be equal or less than # of completed games + 3 - dropped games) and so cannot join more games at the moment."
                                 + " Their number of ongoing games is " + ongoingAmount
-                                + " and their number of completed games is " + completedGames + ".\n\n"
+                                + ", their number of completed games is " + completedGames
+                                + " and their number of dropped games is " + Math.abs(droppedGames) + ".\n\n"
                                 + "If you're playing a private game with friends, you can ping a bothelper for a 1-game exemption from the limit.");
                 return false;
             }
+            if (ongoingAmount == completedGames + 2 + limitIncrease && ongoingAmount != 0) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        member.getUser().getAsMention()
+                                + " this is a notice that you are now at your game limit. Your game limit is equal to your number of completed games + 3. If you are playing a private game with friends, you can ping a bothelper for a 1-game exemption from the limit. If you get replaced or drop any games, your limit decreases by 1.");
+            }
             // Used for specific people we are limiting the amount of games of
-            var userSettings = UserSettingsManager.get(member.getId());
+
             if (userSettings.getGameLimit() > 0 && ongoingAmount >= userSettings.getGameLimit()) {
 
                 MessageHelper.sendMessageToChannel(

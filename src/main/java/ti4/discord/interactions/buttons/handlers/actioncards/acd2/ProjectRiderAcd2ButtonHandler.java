@@ -26,7 +26,7 @@ class ProjectRiderAcd2ButtonHandler {
         game.setStoredValue(getProjectRiderSelectionKey(player), "");
         ButtonHelper.deleteMessage(event);
 
-        if (getProjectRiderSelectableCards(game).isEmpty()) {
+        if (getProjectRiderSelectableCards(game, player).isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
@@ -63,7 +63,7 @@ class ProjectRiderAcd2ButtonHandler {
             sendProjectRiderSelectionButtons(player, game, selectedCards);
             return;
         }
-        if (!isProjectRiderCardSelectable(game, acId)) {
+        if (!isProjectRiderCardSelectable(game, player, acId)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
@@ -107,7 +107,7 @@ class ProjectRiderAcd2ButtonHandler {
         for (String acId : selectedCards) {
             Integer acIndex = game.getDiscardActionCards().get(acId);
             if (acIndex == null
-                    || !isProjectRiderCardSelectable(game, acId)
+                    || !isProjectRiderCardSelectable(game, player, acId)
                     || !game.pickActionCard(player.getUserID(), acIndex)) {
                 unavailableCards.add(Mapper.getActionCard(acId).getName());
                 continue;
@@ -139,7 +139,7 @@ class ProjectRiderAcd2ButtonHandler {
 
     private static void sendProjectRiderSelectionButtons(Player player, Game game, List<String> selectedCards) {
         boolean canPickMore = selectedCards.size() < PROJECT_RIDER_MAX_SELECTIONS
-                && !getProjectRiderSelectableCards(game).isEmpty();
+                && !getProjectRiderSelectableCards(game, player).isEmpty();
 
         List<Button> buttons = new ArrayList<>();
         if (canPickMore) {
@@ -190,15 +190,16 @@ class ProjectRiderAcd2ButtonHandler {
         return PROJECT_RIDER_SELECTED_CARDS_PREFIX + player.getUserID();
     }
 
-    private static List<String> getProjectRiderSelectableCards(Game game) {
+    private static List<String> getProjectRiderSelectableCards(Game game, Player player) {
         return game.getDiscardActionCards().keySet().stream()
-                .filter(acId -> isProjectRiderCardSelectable(game, acId))
+                .filter(acId -> isProjectRiderCardSelectable(game, player, acId))
                 .toList();
     }
 
-    private static boolean isProjectRiderCardSelectable(Game game, String acId) {
+    private static boolean isProjectRiderCardSelectable(Game game, Player player, String acId) {
         return game.getDiscardActionCards().containsKey(acId)
-                && game.getDiscardACStatus().get(acId) == null;
+                && game.getDiscardACStatus().get(acId) == null
+                && ActionCardHelper.isDiscardVisible(game, player, acId);
     }
 
     private static String formatProjectRiderCardIds(List<String> actionCards) {

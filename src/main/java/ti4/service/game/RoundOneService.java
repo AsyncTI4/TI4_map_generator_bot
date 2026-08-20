@@ -57,27 +57,20 @@ public class RoundOneService {
                 MessageHelper.sendMessageWithFiles(game.getActionsChannel(), files, message.toString(), true, false);
             }
         }
-        if ((game.getStoredValue("useOldPok").isEmpty())
-                && !game.isTwilightsFallMode()
-                && !game.isBaseGameMode()
-                && !game.isHomebrewSCMode()) {
-            game.setStrategyCardSet("te");
-        }
 
-        if ((!game.getStoredValue("useOldPok").isEmpty()) && !game.isTwilightsFallMode()) {
+        if ((!game.getStoredValue("useOldPok").isEmpty())) {
             game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok"));
             game.resetRelics();
+            game.setThundersEdge(false);
             game.setStrategyCardSet("pok");
-        } else if (!game.isThundersEdge() && !game.isTwilightsFallMode()) {
+            game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"));
+        } else if (!game.isThundersEdge() && !game.isTwilightsFallMode() && !game.isBaseGameMode()) {
             game.removeRelicFromGame("quantumcore");
             game.removeRelicFromGame("thesilverflame");
+            game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"));
         }
-        if (game.isThundersEdge() && !game.isTwilightsFallMode()) {
-            game.setupNeutralPlayer();
-            game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
-            game.validateAndSetActionCardDeck(event, Mapper.getDeck(getTeActionCardDeckAlias(game)));
-            game.setStrategyCardSet("te");
-        }
+        game.setupNeutralPlayer();
+
         if (game.isTwilightsFallMode()) {
             ButtonHelperTwilightsFall.fixMahactColors(game, event);
             game.setupNeutralPlayer();

@@ -43,9 +43,14 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.EmergencyAppropriationsLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRequisitionLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
@@ -1039,12 +1044,26 @@ public final class Helper {
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         // Helper.getPlanetInfluence(planet, game);
         if ("inf".equalsIgnoreCase(whatIsItFor)) {
+            boolean countResourcesAsInfluence = WildlifePreservationLLButtonHandler.isActive(game, player);
             planets = planets.stream()
-                    .sorted((p1, p2) -> Integer.compare(getPlanetInfluence(p2, game), getPlanetInfluence(p1, game)))
+                    .sorted((p1, p2) -> Integer.compare(
+                            countResourcesAsInfluence
+                                    ? Math.max(getPlanetResources(p2, game), getPlanetInfluence(p2, game))
+                                    : getPlanetInfluence(p2, game),
+                            countResourcesAsInfluence
+                                    ? Math.max(getPlanetResources(p1, game), getPlanetInfluence(p1, game))
+                                    : getPlanetInfluence(p1, game)))
                     .collect(Collectors.toList());
         } else {
+            boolean countInfluenceAsResources = EmergencyAppropriationsLLButtonHandler.isActive(game, player);
             planets = planets.stream()
-                    .sorted((p1, p2) -> Integer.compare(getPlanetResources(p2, game), getPlanetResources(p1, game)))
+                    .sorted((p1, p2) -> Integer.compare(
+                            countInfluenceAsResources
+                                    ? Math.max(getPlanetResources(p2, game), getPlanetInfluence(p2, game))
+                                    : getPlanetResources(p2, game),
+                            countInfluenceAsResources
+                                    ? Math.max(getPlanetResources(p1, game), getPlanetInfluence(p1, game))
+                                    : getPlanetResources(p1, game)))
                     .collect(Collectors.toList());
         }
         for (String planet : planets) {
@@ -1328,7 +1347,7 @@ public final class Helper {
         }
         // Dreaming Throne Commander
         if (votes > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "dreamcommander")) {
-            int count = DreamButtonHandler.getDreamCommanderVoteCount(game, player);
+            int count = DreamLeadersHandler.getDreamCommanderVoteCount(game, player);
             if (count > 0) {
                 votes += count;
                 if (!justVoteTotal) {
@@ -1424,6 +1443,8 @@ public final class Helper {
             }
         }
         game.setStoredValue("resetSpend", "no");
+        PriorityRequisitionLLButtonHandler.clear(game, player);
+        SharedResourcesLLButtonHandler.clear(game, player);
     }
 
     public static String buildSpentThingsMessage(Player player, Game game, String resOrInfOrBoth) {
@@ -1434,6 +1455,10 @@ public final class Helper {
         if (resOrInfOrBoth.contains("tech")) {
             resOrInfOrBoth = resOrInfOrBoth.replace("tech", "");
         }
+        boolean countInfluenceAsResources =
+                "res".equalsIgnoreCase(resOrInfOrBoth) && EmergencyAppropriationsLLButtonHandler.isActive(game, player);
+        boolean countResourcesAsInfluence =
+                "inf".equalsIgnoreCase(resOrInfOrBoth) && WildlifePreservationLLButtonHandler.isActive(game, player);
         int tg = player.getSpentTgsThisWindow();
         boolean xxchaHero = player.hasLeaderUnlocked("xxchahero");
         boolean xxchaBt = player.hasUnlockedBreakthrough("xxchabt");
@@ -1470,6 +1495,24 @@ public final class Helper {
                 inf += additionalInfluence;
                 found = true;
             }
+            if (thing.startsWith("naturesboon_")) {
+                String planetName = thing.substring("naturesboon_".length());
+                Planet planet = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetName));
+                if (planet != null) {
+                    msg.append("> Used _Nature's Boon_ for ")
+                            .append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game))
+                            .append('\n');
+                    if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
+                        inf += planet.getResources();
+                    } else if ("both".equalsIgnoreCase(resOrInfOrBoth)) {
+                        res += planet.getInfluence();
+                        inf += planet.getResources();
+                    } else {
+                        res += planet.getInfluence();
+                    }
+                }
+                found = true;
+            }
             if (!found
                     && !thing.contains("tg_")
                     && !thing.contains("boon")
@@ -1502,6 +1545,8 @@ public final class Helper {
                     } else {
                         planetsSpent.add(thing);
                     }
+                    Planet resourceDonor = SharedResourcesLLButtonHandler.getResourceDonor(game, player, thing);
+                    int resourceValue = resourceDonor == null ? planet.getResources() : resourceDonor.getResources();
                     Tile t = game.getTileFromPlanet(planet.getName());
                     if (t != null && !t.isHomeSystem(game)) {
                         if (planet.getResources() > bestRes) {
@@ -1523,14 +1568,23 @@ public final class Helper {
                                     .append('\n');
                             res += planet.getMaxResInf();
                         } else {
-                            if (Math.min(gledgeMech, planet.getInfluence()) > 0) {
+                            if (countInfluenceAsResources) {
+                                msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                        .append(" (using its higher value due to _Emergency Appropriations_)\n");
+                                resourceValue = planet.getMaxResInf();
+                            } else if (Math.min(gledgeMech, planet.getInfluence()) > 0) {
                                 msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
                                         .append('\n');
                             } else {
-                                msg.append(getPlanetRepresentationPlusEmojiPlusResources(thing, game))
-                                        .append('\n');
+                                msg.append(getPlanetRepresentationPlusEmojiPlusResources(thing, game));
+                                if (resourceDonor != null) {
+                                    msg.append(" (counting as ")
+                                            .append(resourceValue)
+                                            .append(" resources due to _Shared Resources_)");
+                                }
+                                msg.append('\n');
                             }
-                            res += planet.getResources();
+                            res += resourceValue;
                         }
                     } else if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
                         if (xxchaHero) {
@@ -1542,9 +1596,15 @@ public final class Helper {
                                     .append('\n');
                             inf += planet.getMaxResInf();
                         } else {
-                            msg.append(getPlanetRepresentationPlusEmojiPlusInfluence(thing, game))
-                                    .append('\n');
-                            inf += planet.getInfluence();
+                            if (countResourcesAsInfluence) {
+                                msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
+                                        .append(" (using its higher value due to _Wildlife Preservation_)\n");
+                                inf += planet.getMaxResInf();
+                            } else {
+                                msg.append(getPlanetRepresentationPlusEmojiPlusInfluence(thing, game))
+                                        .append('\n');
+                                inf += planet.getInfluence();
+                            }
                         }
                     } else if ("freelancers".equalsIgnoreCase(resOrInfOrBoth)) {
                         msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game))
@@ -1567,7 +1627,7 @@ public final class Helper {
                             res += planet.getMaxResInf();
                         } else {
                             inf += planet.getInfluence();
-                            res += planet.getResources();
+                            res += resourceValue;
                         }
                     }
                 }
@@ -1591,7 +1651,7 @@ public final class Helper {
                             .append('\n');
                     res += 1;
                 }
-                if (thing.contains("boon")) {
+                if ("boon".equals(thing)) {
                     msg.append("> Used Boon Relic ").append(ExploreEmojis.Relic).append('\n');
                     res += 1;
                 }
@@ -1661,6 +1721,14 @@ public final class Helper {
                     msg.append("> ").append(thing).append('\n');
                 }
             }
+        }
+        int priorityRequisitionDiscount = PriorityRequisitionLLButtonHandler.getDiscount(game, player);
+        if (priorityRequisitionDiscount > 0
+                && ("res".equalsIgnoreCase(resOrInfOrBoth) || "both".equalsIgnoreCase(resOrInfOrBoth))) {
+            res += priorityRequisitionDiscount;
+            msg.append("> Used _Priority Requisition_ for a ")
+                    .append(priorityRequisitionDiscount)
+                    .append(" resource discount.\n");
         }
         res += tg + keleresAgent;
         inf += tg + keleresAgent;
@@ -2283,6 +2351,12 @@ public final class Helper {
                 productionValueTotal++;
             }
         }
+        if (player.getPlanets().contains(uH.getName())
+                && uH.getName()
+                        .equals(game.getStoredValue(
+                                LostLegciesExploreHandler.IMMEDIATE_ASSEMBLY_PRODUCTION + player.getFaction()))) {
+            productionValueTotal += 3;
+        }
 
         return productionValueTotal;
     }
@@ -2406,13 +2480,24 @@ public final class Helper {
         if (ArcanumTechHandler.hasSigilOfTransmutation(game, player, tile)) {
             productionValueTotal += 3;
         }
-        boolean hasExactlyOneShipInSystem =
-                tile.getSpaceUnitHolder().countPlayersUnitsWithModelCondition(player, unit -> unit.getIsShip()) == 1;
+        boolean hasExactlyOneShipInSystem = tile.getSpaceUnitHolder()
+                        .countPlayersUnitsWithModelCondition(
+                                player, unit -> unit.getIsShip() && unit.getUnitType() != UnitType.Fighter)
+                == 1;
         if (hasExactlyOneShipInSystem && player.hasAbility("rallying_cry")) {
             productionValueTotal += 2;
         }
         productionValueTotal += MyrrLeadersHandler.getMyrrAgentProduction(game, player, tile);
         productionValueTotal += RevenantLeadersHandler.getRevThronesProduction(game, player, tile);
+        if (player.hasTech("thverydithy")) {
+            int numberOfCCInSystem = 0;
+            for (Player playerCC : game.getRealPlayers()) {
+                if (tile.hasPlayerCC(playerCC)) {
+                    numberOfCCInSystem++;
+                }
+            }
+            productionValueTotal += numberOfCCInSystem;
+        }
         return productionValueTotal;
     }
 
@@ -2848,7 +2933,7 @@ public final class Helper {
                             "Produce Mech on " + getPlanetRepresentation(pp, game),
                             UnitEmojis.mech);
                 }
-                if (resourcelimit > 1 && !greenMechd) {
+                if (resourcelimit > 1 && !greenMechd && !game.isBaseGameMode()) {
                     unitButtons.add(mfButton);
                 }
                 if (resourcelimit > 1 && !ironMechSpaceAdded && IronAbilitiesHandler.hasExoAtmospheric(player)) {

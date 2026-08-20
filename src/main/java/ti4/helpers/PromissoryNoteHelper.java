@@ -16,6 +16,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorPromissoryHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -629,39 +630,57 @@ public class PromissoryNoteHelper {
                 String factionChecker = "";
                 String message = "Please choose the fragments you wish to purge. ";
                 List<Button> purgeFragButtons = new ArrayList<>();
-                int numToBeat = 2 - player.getUrf();
+                int culturalFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.CULTURAL);
+                int industrialFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.INDUSTRIAL);
+                int hazardousFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.HAZARDOUS);
+                int frontierFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.FRONTIER);
+                int supermassiveCultural = ButtonHelperExplore.getSupermassiveFragmentCount(player, Constants.CULTURAL);
+                int supermassiveIndustrial =
+                        ButtonHelperExplore.getSupermassiveFragmentCount(player, Constants.INDUSTRIAL);
+                int supermassiveHazardous =
+                        ButtonHelperExplore.getSupermassiveFragmentCount(player, Constants.HAZARDOUS);
+                int supermassiveFrontier = ButtonHelperExplore.getSupermassiveFragmentCount(player, Constants.FRONTIER);
+                int numToBeat = 2 - frontierFragments - supermassiveFrontier;
 
                 numToBeat -= 1;
 
-                if (player.getCrf() > numToBeat) {
-                    for (int x = numToBeat + 1; (x < player.getCrf() + 1 && x < 4); x++) {
+                if (culturalFragments + supermassiveCultural > numToBeat) {
+                    for (int x = Math.max(1, numToBeat - supermassiveCultural + 1);
+                            (x < culturalFragments + 1 && x < 4);
+                            x++) {
                         Button transact =
                                 Buttons.blue(factionChecker + "purge_Frags_CRF_" + x, "Cultural Fragments (" + x + ")");
                         purgeFragButtons.add(transact);
                     }
                 }
-                if (player.getIrf() > numToBeat) {
-                    for (int x = numToBeat + 1; (x < player.getIrf() + 1 && x < 4); x++) {
+                if (industrialFragments + supermassiveIndustrial > numToBeat) {
+                    for (int x = Math.max(1, numToBeat - supermassiveIndustrial + 1);
+                            (x < industrialFragments + 1 && x < 4);
+                            x++) {
                         Button transact = Buttons.green(
                                 factionChecker + "purge_Frags_IRF_" + x, "Industrial Fragments (" + x + ")");
                         purgeFragButtons.add(transact);
                     }
                 }
-                if (player.getHrf() > numToBeat) {
-                    for (int x = numToBeat + 1; (x < player.getHrf() + 1 && x < 4); x++) {
+                if (hazardousFragments + supermassiveHazardous > numToBeat) {
+                    for (int x = Math.max(1, numToBeat - supermassiveHazardous + 1);
+                            (x < hazardousFragments + 1 && x < 4);
+                            x++) {
                         Button transact =
                                 Buttons.red(factionChecker + "purge_Frags_HRF_" + x, "Hazardous Fragments (" + x + ")");
                         purgeFragButtons.add(transact);
                     }
                 }
 
-                if (player.getUrf() > 0) {
-                    for (int x = 1; x < player.getUrf() + 1; x++) {
+                if (frontierFragments > 0) {
+                    for (int x = 1; x < frontierFragments + 1; x++) {
                         Button transact =
                                 Buttons.gray(factionChecker + "purge_Frags_URF_" + x, "Frontier Fragments (" + x + ")");
                         purgeFragButtons.add(transact);
                     }
                 }
+                purgeFragButtons.addAll(
+                        ButtonHelperExplore.getSupermassiveFragmentPurgeButtons(player, factionChecker));
                 Button transact2 = Buttons.red(factionChecker + "drawRelicFromFrag", "Finish Purging and Draw Relic");
                 if (player.hasAbility("a_new_edifice")) {
                     transact2 = Buttons.red(factionChecker + "drawRelicFromFrag", "Finish Purging and Explore");
@@ -709,6 +728,13 @@ public class PromissoryNoteHelper {
         }
         if ("thpnthrones".equalsIgnoreCase(id)) {
             ThronesPromissoryHandler.getUnplacedThronePlanetButtonsForPN(event, game, player);
+        }
+        if ("thpnveylor".equalsIgnoreCase(id)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", buttons to discard an action card have been sent to your #cards-info thread.");
+            VeylorPromissoryHandler.sendDiscardButtonsForPn(event, game, player);
         }
         // These PNs' text contains "action:" but describe a trigger on another player's action
         List<String> actionTextPNsNotOwnAction = List.of("acq", "bapnconc");

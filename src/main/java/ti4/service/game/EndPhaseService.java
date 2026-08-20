@@ -18,9 +18,6 @@ public class EndPhaseService {
             AeternaLeadersHandler.clearAeternaCommanderActionState(game, player);
             AeternaUnitsHandler.clearCryptActionState(game, player);
             AeternaUnitsHandler.clearGraveyardActionState(game, player);
-            if (player.hasAbility("mandate_of_presence")) {
-                game.removeStoredValue("mandateUsedThisActionPhase_" + player.getFaction());
-            }
         }
         StatusHelper.announceStatusPhase(game);
         if (!game.isOmegaPhaseMode()) {

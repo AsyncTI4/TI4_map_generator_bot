@@ -12,6 +12,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
@@ -31,6 +32,18 @@ public class VeylorLeadersHandler {
     private static final String GAIN_HERO_CC = "gainVeylorHeroCC_";
     private static final String CHOOSE_COMMANDER_SYSTEM = "veylorCommanderSelectSystem_";
     private static final String CHOOSE_COMMANDER_SHIP = "veylorCommanderSelectShip_";
+
+    // Agent
+    public static void startVeylorAgent(Game game, Player target) {
+        if (game == null || target == null) {
+            return;
+        }
+
+        ActionCardHelper.drawActionCards(target, 1);
+        AgendaHelper.drawAgenda(1, game, target);
+
+        MessageHelper.sendMessageToChannel(target.getCorrectChannel(), target.getRepresentation() + " drew 1 agenda.");
+    }
 
     // Commander
     public static Button offerVeylorCommanderUnlock(Player player) {
@@ -189,11 +202,11 @@ public class VeylorLeadersHandler {
                 continue;
             }
 
-            int votesCast = getVotesCastForLosingOutcome(player, winner, game);
+            int votesCast = getVotesCast(player, game);
             if (votesCast < 1) {
                 continue;
             }
-            if (player.getUnitModels().stream().noneMatch(unit -> unit.getIsShip() && unit.getCost() < votesCast)) {
+            if (player.getUnitModels().stream().noneMatch(unit -> unit.getCost() <= votesCast)) {
                 continue;
             }
 
@@ -213,7 +226,7 @@ public class VeylorLeadersHandler {
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
                     player.getRepresentation()
-                            + ", since the outcome you voted for was not resolved, you may produce 1 ship in a system that contains your ships with cost less than your cast votes due to Cyrala Vey, the Veylor commander.",
+                            + ", since an outcome you voted for was not resolved, you may produce 1 unit in a system that contains your ships with cost up to the number of votes you cast due to Cyrala Vey, the Veylor commander.",
                     displayedButtons);
         }
     }
@@ -236,7 +249,7 @@ public class VeylorLeadersHandler {
                 int votesCast = Integer.parseInt(pageParts[1]);
                 List<Button> systemsWithShips = getVeylorCommanderSystemButtons(player, game, votesCast);
                 String message = player.getRepresentation()
-                        + ", since the outcome you voted for was not resolved, you may produce 1 ship in a system that contains your ships with cost less than your cast votes due to Cyrala Vey, the Veylor commander.";
+                        + ", since an outcome you voted for was not resolved, you may produce 1 unit in a system that contains your ships with cost up to the number of votes you cast due to Cyrala Vey, the Veylor commander.";
                 if (NewStuffHelper.checkAndHandlePaginationChange(
                         event,
                         event.getMessageChannel(),
@@ -278,13 +291,13 @@ public class VeylorLeadersHandler {
         List<Button> buttons = getVeylorCommanderShipButtons(player, tile, votesCast);
 
         if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No eligible ship can be produced.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No eligible unit can be produced.");
             ButtonHelper.deleteMessage(event);
             return;
         }
 
-        String message = "Please choose the ship to produce in " + tile.getRepresentation()
-                + " with cost less than your " + votesCast + " votes cast.";
+        String message = "Please choose the unit to produce in " + tile.getRepresentation() + " with cost up to your "
+                + votesCast + " votes cast.";
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 message,
@@ -320,8 +333,8 @@ public class VeylorLeadersHandler {
                     return;
                 }
                 List<Button> buttons = getVeylorCommanderShipButtons(player, pageTile, votesCast);
-                String message = "Please choose the ship to produce in " + pageTile.getRepresentation()
-                        + " with cost less than your " + votesCast + " votes cast:";
+                String message = "Please choose the unit to produce in " + pageTile.getRepresentation()
+                        + " with cost up to your " + votesCast + " votes cast:";
                 NewStuffHelper.checkAndHandlePaginationChange(
                         event,
                         event.getMessageChannel(),
@@ -356,8 +369,8 @@ public class VeylorLeadersHandler {
         }
 
         List<Button> buttons = getVeylorCommanderShipButtons(player, tile, votesCast);
-        String message = "Please choose the ship to produce in " + tile.getRepresentation()
-                + " with cost less than your " + votesCast + " votes cast:";
+        String message = "Please choose the unit to produce in " + tile.getRepresentation() + " with cost up to your "
+                + votesCast + " votes cast:";
         if (buttons.stream().noneMatch(button -> buttonID.equals(button.getCustomId()))) {
             ButtonHelper.deleteMessage(event);
             return;
@@ -367,12 +380,9 @@ public class VeylorLeadersHandler {
                 "placeOneNDone_dontskip_" + parts[0] + "_" + tile.getPosition(), event, game, player);
     }
 
-    private static int getVotesCastForLosingOutcome(Player player, String winner, Game game) {
+    private static int getVotesCast(Player player, Game game) {
         int votesCast = 0;
         for (var outcome : game.getCurrentAgendaVotes().entrySet()) {
-            if (outcome.getKey().equalsIgnoreCase(winner)) {
-                continue;
-            }
             for (String vote : outcome.getValue().split(";")) {
                 String[] parts = vote.split("_", 2);
                 if (parts.length == 2 && parts[0].equalsIgnoreCase(player.getFaction())) {
@@ -401,8 +411,7 @@ public class VeylorLeadersHandler {
 
     private static List<Button> getVeylorCommanderShipButtons(Player player, Tile tile, int votesCast) {
         return player.getUnitModels().stream()
-                .filter(UnitModel::getIsShip)
-                .filter(unit -> unit.getCost() < votesCast)
+                .filter(unit -> unit.getCost() <= votesCast)
                 .sorted(Comparator.comparing(UnitModel::getName))
                 .map(unit -> Buttons.green(
                         player.factionButtonChecker() + CHOOSE_COMMANDER_SHIP + unit.getAsyncId() + "|"

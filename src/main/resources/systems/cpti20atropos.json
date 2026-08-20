@@ -15,5 +15,6 @@
     "shipPositionsType": "TYPE05",
     "tileBack": "fracture",
     "isAsteroidField": true,
+    "isFracture": true,
     "source": "other"
 }

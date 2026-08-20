@@ -22,6 +22,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arden
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -48,6 +49,8 @@ import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.relic.BookOfLatviniaService;
+import ti4.service.relic.MutagenService;
+import ti4.service.relic.QuantumEntanglerService;
 import ti4.service.relic.SilverFlameService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -125,6 +128,13 @@ public class ComponentActionHelper {
         }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 1) {
             compButtons.add(Buttons.red(factionChecker + prefix + "doStarCharts_", "Purge 2 Star Charts"));
+        }
+        if (MutagenService.getMutagenCount(p1) > 1) {
+            compButtons.add(Buttons.red(factionChecker + prefix + "doMutagens_", "Purge 2 Mutagens"));
+        }
+        if (p1.hasRelic("volatile_mutagenics")) {
+            compButtons.add(
+                    Buttons.red(factionChecker + prefix + "doVolatileMutagenics_", "Purge Volatile Mutagenics"));
         }
 
         if (game.isTotalWarMode() && ButtonHelperActionCards.getAllCommsInHS(p1, game) > 9) {
@@ -346,9 +356,15 @@ public class ComponentActionHelper {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that relic.");
                 continue;
             }
+            if ("quantum_entangler".equalsIgnoreCase(relic)
+                    && (game.getAllRelics().size() < 3 || game.getRealPlayers().size() < 2)) {
+                continue;
+            }
 
             if (Constants.ENIGMATIC_DEVICE.equalsIgnoreCase(relic)
                     || (!relic.contains("starchart")
+                            && !MutagenService.isMutagen(relic)
+                            && !"volatile_mutagenics".equals(relic)
                             && (relicData.getText().contains("Action:")
                                     || relicData.getText().contains("ACTION:")))) {
                 Button rButton;
@@ -373,7 +389,10 @@ public class ComponentActionHelper {
                             "absol_jr",
                             "circletofthevoid",
                             "endurance_steroids",
-                            "the_incursion_gate");
+                            "the_incursion_gate",
+                            "diplomaticboon",
+                            "ancient_radar",
+                            "horn_of_the_abyss");
                     if (exhaustRelics.contains(relic.toLowerCase())) {
                         if (!p1.getExhaustedRelics().contains(relic)) {
                             if (!"circletofthevoid".equalsIgnoreCase(relic)
@@ -610,7 +629,8 @@ public class ComponentActionHelper {
                             "redcreussagent",
                             "kryxosagent",
                             "ardentiaagent",
-                            "aeternaagent");
+                            "aeternaagent",
+                            "veyloragent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
                         String message = p1.getRepresentationUnfogged() + ", please choose the user of the agent.";
@@ -755,26 +775,28 @@ public class ComponentActionHelper {
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message3, buttons);
                     String message2 = "Please choose the fragment you wish to purge. ";
                     List<Button> purgeFragButtons = new ArrayList<>();
-                    if (p1.getCrf() > 0) {
+                    if (ButtonHelperExplore.getNormalFragmentCount(p1, Constants.CULTURAL) > 0) {
                         Button transact =
                                 Buttons.blue(factionChecker + "purge_Frags_CRF_1", "Purge 1 Cultural Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    if (p1.getIrf() > 0) {
+                    if (ButtonHelperExplore.getNormalFragmentCount(p1, Constants.INDUSTRIAL) > 0) {
                         Button transact =
                                 Buttons.green(factionChecker + "purge_Frags_IRF_1", "Purge 1 Industrial Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    if (p1.getHrf() > 0) {
+                    if (ButtonHelperExplore.getNormalFragmentCount(p1, Constants.HAZARDOUS) > 0) {
                         Button transact =
                                 Buttons.red(factionChecker + "purge_Frags_HRF_1", "Purge 1 Hazardous Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    if (p1.getUrf() > 0) {
+                    if (ButtonHelperExplore.getNormalFragmentCount(p1, Constants.FRONTIER) > 0) {
                         Button transact =
                                 Buttons.gray(factionChecker + "purge_Frags_URF_1", "Purge 1 Frontier Fragment");
                         purgeFragButtons.add(transact);
                     }
+                    purgeFragButtons.addAll(
+                            ButtonHelperExplore.getSupermassiveFragmentPurgeButtons(p1, factionChecker));
                     Button transact3 = Buttons.red(factionChecker + "deleteButtons", "Done Purging");
                     purgeFragButtons.add(transact3);
                     MessageHelper.sendMessageToChannelWithButtons(
@@ -785,26 +807,28 @@ public class ComponentActionHelper {
                 } else if ("fabrication".equalsIgnoreCase(buttonID)) {
                     String message = "Please choose the fragment you wish to purge. ";
                     List<Button> purgeFragButtons = new ArrayList<>();
-                    if (p1.getCrf() > 0) {
+                    if (ButtonHelperExplore.getNormalFragmentCount(p1, Constants.CULTURAL) > 0) {
                         Button transact =
                                 Buttons.blue(factionChecker + "purge_Frags_CRF_1", "Purge 1 Cultural Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    if (p1.getIrf() > 0) {
+                    if (ButtonHelperExplore.getNormalFragmentCount(p1, Constants.INDUSTRIAL) > 0) {
                         Button transact =
                                 Buttons.green(factionChecker + "purge_Frags_IRF_1", "Purge 1 Industrial Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    if (p1.getHrf() > 0) {
+                    if (ButtonHelperExplore.getNormalFragmentCount(p1, Constants.HAZARDOUS) > 0) {
                         Button transact =
                                 Buttons.red(factionChecker + "purge_Frags_HRF_1", "Purge 1 Hazardous Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    if (p1.getUrf() > 0) {
+                    if (ButtonHelperExplore.getNormalFragmentCount(p1, Constants.FRONTIER) > 0) {
                         Button transact =
                                 Buttons.gray(factionChecker + "purge_Frags_URF_1", "Purge 1 Frontier Fragment");
                         purgeFragButtons.add(transact);
                     }
+                    purgeFragButtons.addAll(
+                            ButtonHelperExplore.getSupermassiveFragmentPurgeButtons(p1, factionChecker));
                     Button transact2 = Buttons.green(factionChecker + "gain_CC", "Gain 1 Command Token");
                     purgeFragButtons.add(transact2);
                     Button transact3 =
@@ -859,7 +883,15 @@ public class ComponentActionHelper {
             case "getRelic" -> {
                 String message = "Please choose the fragments you wish to purge. ";
                 List<Button> purgeFragButtons = new ArrayList<>();
-                int numToBeat = 2 - p1.getUrf();
+                int culturalFragments = ButtonHelperExplore.getNormalFragmentCount(p1, Constants.CULTURAL);
+                int industrialFragments = ButtonHelperExplore.getNormalFragmentCount(p1, Constants.INDUSTRIAL);
+                int hazardousFragments = ButtonHelperExplore.getNormalFragmentCount(p1, Constants.HAZARDOUS);
+                int frontierFragments = ButtonHelperExplore.getNormalFragmentCount(p1, Constants.FRONTIER);
+                int supermassiveCultural = ButtonHelperExplore.getSupermassiveFragmentCount(p1, Constants.CULTURAL);
+                int supermassiveIndustrial = ButtonHelperExplore.getSupermassiveFragmentCount(p1, Constants.INDUSTRIAL);
+                int supermassiveHazardous = ButtonHelperExplore.getSupermassiveFragmentCount(p1, Constants.HAZARDOUS);
+                int supermassiveFrontier = ButtonHelperExplore.getSupermassiveFragmentCount(p1, Constants.FRONTIER);
+                int numToBeat = 2 - frontierFragments - supermassiveFrontier;
                 if (game.isAgeOfExplorationMode()) {
                     numToBeat -= 1;
                 }
@@ -871,35 +903,42 @@ public class ComponentActionHelper {
                         purgeFragButtons.add(transact);
                     }
                 }
-                if (p1.getCrf() > numToBeat) {
-                    for (int x = numToBeat + 1; (x < p1.getCrf() + 1 && x < 4); x++) {
+                if (culturalFragments + supermassiveCultural > numToBeat) {
+                    for (int x = Math.max(1, numToBeat - supermassiveCultural + 1);
+                            (x < culturalFragments + 1 && x < 4);
+                            x++) {
                         Button transact =
                                 Buttons.blue(factionChecker + "purge_Frags_CRF_" + x, "Cultural Fragments (" + x + ")");
                         purgeFragButtons.add(transact);
                     }
                 }
-                if (p1.getIrf() > numToBeat) {
-                    for (int x = numToBeat + 1; (x < p1.getIrf() + 1 && x < 4); x++) {
+                if (industrialFragments + supermassiveIndustrial > numToBeat) {
+                    for (int x = Math.max(1, numToBeat - supermassiveIndustrial + 1);
+                            (x < industrialFragments + 1 && x < 4);
+                            x++) {
                         Button transact = Buttons.green(
                                 factionChecker + "purge_Frags_IRF_" + x, "Industrial Fragments (" + x + ")");
                         purgeFragButtons.add(transact);
                     }
                 }
-                if (p1.getHrf() > numToBeat) {
-                    for (int x = numToBeat + 1; (x < p1.getHrf() + 1 && x < 4); x++) {
+                if (hazardousFragments + supermassiveHazardous > numToBeat) {
+                    for (int x = Math.max(1, numToBeat - supermassiveHazardous + 1);
+                            (x < hazardousFragments + 1 && x < 4);
+                            x++) {
                         Button transact =
                                 Buttons.red(factionChecker + "purge_Frags_HRF_" + x, "Hazardous Fragments (" + x + ")");
                         purgeFragButtons.add(transact);
                     }
                 }
 
-                if (p1.getUrf() > 0) {
-                    for (int x = 1; x < p1.getUrf() + 1; x++) {
+                if (frontierFragments > 0) {
+                    for (int x = 1; x < frontierFragments + 1; x++) {
                         Button transact =
                                 Buttons.gray(factionChecker + "purge_Frags_URF_" + x, "Frontier Fragments (" + x + ")");
                         purgeFragButtons.add(transact);
                     }
                 }
+                purgeFragButtons.addAll(ButtonHelperExplore.getSupermassiveFragmentPurgeButtons(p1, factionChecker));
                 Button transact2 = Buttons.red(factionChecker + "drawRelicFromFrag", "Finish Purging and Draw Relic");
                 if (p1.hasAbility("a_new_edifice")) {
                     transact2 = Buttons.red(factionChecker + "drawRelicFromFrag", "Finish Purging and Explore");
@@ -950,6 +989,8 @@ public class ComponentActionHelper {
                 ButtonHelper.purge2StarCharters(p1, game);
                 DiscordantStarsHelper.drawBlueBackTiles(event, game, p1, 1);
             }
+            case "doMutagens" -> MutagenService.resolveMutagenPurge(event, game, p1, false);
+            case "doVolatileMutagenics" -> MutagenService.resolveMutagenPurge(event, game, p1, true);
             case "stellarAtomicsAction" -> {
                 game.unscorePublicObjective(
                         p1.getUserID(), game.getRevealedPublicObjectives().get("Stellar Atomics"));
@@ -1135,6 +1176,14 @@ public class ComponentActionHelper {
                     "Invalid relic or player does not have specified relic: `" + relicID + "`");
             return;
         }
+        if (MutagenService.isMutagen(relicID)) {
+            MutagenService.resolveMutagenPurge(event, game, player, false);
+            return;
+        }
+        if ("volatile_mutagenics".equals(relicID)) {
+            MutagenService.resolveMutagenPurge(event, game, player, true);
+            return;
+        }
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Used the "
@@ -1188,6 +1237,55 @@ public class ComponentActionHelper {
                     event.getMessageChannel(),
                     "Ha! As if I'd automate something like this. Please resolve manually. Here's some exhaust buttons though.",
                     buttons);
+        } else if ("diplomaticboon".equalsIgnoreCase(relicID)) {
+            List<Button> buttons = LostLegaciesRelicHandler.getDiplomaticBoonPlanets(event, game, player);
+            if (buttons.isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getRepresentationNoPing()
+                                + " has no eligible non-home planets, other than Mecatol Rex, for _Diplomatic Boon_.");
+                return;
+            }
+            player.addExhaustedRelic(relicID);
+            purgeOrExhaust = "exhausted";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing()
+                            + ", please choose a non-home planet, other than Mecatol Rex, for _Diplomatic Boon_.",
+                    buttons);
+        } else if ("ancient_radar".equalsIgnoreCase(relicID)) {
+            List<Button> buttons = LostLegaciesRelicHandler.getAncientRadarPlanets(event, game, player);
+            if (buttons.isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getRepresentationNoPing() + " has no eligible planets for _Ancient Radar_.");
+                return;
+            }
+            player.addExhaustedRelic(relicID);
+            purgeOrExhaust = "exhausted";
+            String message = player.getRepresentationNoPing()
+                    + ", please choose a non-home planet for _Ancient Radar_ to explore once as each planet trait.";
+            String buttonPrefix = player.factionButtonChecker() + "exploreAncientRadar_";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
+
+        } else if ("horn_of_the_abyss".equalsIgnoreCase(relicID)) {
+            List<Button> buttons = LostLegaciesRelicHandler.getHornOfTheAbyssSystemButtons(game, player);
+            if (buttons.isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getRepresentationNoPing() + " has no eligible system for _Horn of the Abyss_.");
+                return;
+            }
+            player.addExhaustedRelic(relicID);
+            purgeOrExhaust = "exhausted";
+            String message = player.getRepresentationNoPing()
+                    + ", please choose the system in which to place neutral ships with _Horn of the Abyss_.\n"
+                    + "-# You may place neutral ships with a combined cost of 4 or less.";
+            String buttonPrefix = player.factionButtonChecker() + "chooseHornOfTheAbyssSystem_";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
+
         } else { // PURGE THE RELIC
             player.removeRelic(relicID);
             player.removeExhaustedRelic(relicID);
@@ -1275,11 +1373,19 @@ public class ComponentActionHelper {
             }
             case "passturn" ->
                 MessageHelper.sendMessageToChannelWithButton(event.getChannel(), null, Buttons.REDISTRIBUTE_CCs);
-            case "titanprototype", "absol_jr", "circletofthevoid", "endurance_steroids", "the_incursion_gate" -> {
+            case "titanprototype",
+                    "absol_jr",
+                    "circletofthevoid",
+                    "endurance_steroids",
+                    "the_incursion_gate",
+                    "diplomaticboon",
+                    "ancient_radar",
+                    "horn_of_the_abyss" -> {
                 // handled above
             }
             case "bookoflatvinia" -> BookOfLatviniaService.purgeBookOfLatvinia(event, game, player);
             case "thesilverflame" -> SilverFlameService.rollSilverFlame(game, player);
+            case "quantum_entangler" -> QuantumEntanglerService.offerQuantumEntanglerTargets(event, game, player);
             default ->
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(), "This relic is not tied to any automation. Please resolve manually.");

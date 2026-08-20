@@ -60,6 +60,8 @@ public class FrankenSettings extends SettingsMenu {
     private final ListSetting<FrankenBanList> banLists;
     private final FrankenHomebrewSettings homebrewSettings;
 
+    private final FrankenDeckSettings deckSettings;
+
     @JsonIgnore
     private final FrankenDraftLimitSettings draftLimitSettings;
 
@@ -116,6 +118,7 @@ public class FrankenSettings extends SettingsMenu {
         }
 
         homebrewSettings = new FrankenHomebrewSettings(game, json, this);
+        deckSettings = new FrankenDeckSettings(game, json, this);
         draftLimitSettings = new FrankenDraftLimitSettings(game, json, this);
 
         if (json != null && json.has("messageId")) {
@@ -139,7 +142,7 @@ public class FrankenSettings extends SettingsMenu {
 
     @Override
     protected List<SettingsMenu> categories() {
-        return List.of(homebrewSettings, draftLimitSettings);
+        return List.of(homebrewSettings, deckSettings, draftLimitSettings);
     }
 
     @Override
@@ -169,9 +172,13 @@ public class FrankenSettings extends SettingsMenu {
             syncFrankendrazDsBrState(lastSettingTouched);
         }
         String summary = super.menuSummaryString(lastSettingTouched) + frankenNotes();
+        persistSettings();
+        return summary;
+    }
+
+    void persistSettings() {
         game.setFrankenSettings(this);
         game.setFrankenSettingsJson(json());
-        return summary;
     }
 
     @Override
@@ -179,6 +186,7 @@ public class FrankenSettings extends SettingsMenu {
         String err = super.resetSettings();
         if (err != null) return err;
         homebrewSettings.resetSettings();
+        deckSettings.resetSettings();
         draftLimitSettings.resetSettings();
         if (isFrankendrazMode()) {
             banAllDsFactions.setVal(true);
@@ -190,11 +198,12 @@ public class FrankenSettings extends SettingsMenu {
     }
 
     private String startDraft(GenericInteractionCreateEvent event) {
-        applyHomebrewSettings();
         String validationError = FrankenDraftStartService.validateStartFrankenDraft(game, force.isVal());
         if (validationError != null) {
             return validationError;
         }
+        applyHomebrewSettings();
+        deckSettings.applyDecks(game, event);
         applyBanSettings();
         return FrankenDraftStartService.startFrankenDraft(event, game, force.isVal(), selectedDraftMode());
     }
