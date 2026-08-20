@@ -81,12 +81,11 @@ public class GameStatisticsFilterer {
         for (SkillTier skillTier : SkillTier.values()) {
             skillTierOption.addChoice(skillTier.getDisplayName() + " (" + skillTier.getLabel() + ")", skillTier.name());
         }
-        // Inverted forms need their own choices: a choice-constrained option cannot accept a typed "-LOWER".
-        for (SkillTier skillTier : SkillTier.values()) {
-            skillTierOption.addChoice(
-                    "Not " + skillTier.getDisplayName() + " (excludes " + skillTier.getLabel() + ")",
-                    SkillTier.EXCLUSION_PREFIX + skillTier.name());
-        }
+        // Dropping the weakest games is the exclusion worth offering; a choice-constrained option cannot accept a
+        // typed "-LOWER", so it needs its own entry. SkillTier.parseSelection still inverts any tier if needed.
+        skillTierOption.addChoice(
+                "Exclude " + SkillTier.LOWER.getDisplayName() + " (" + SkillTier.LOWER.getLabel() + ")",
+                SkillTier.EXCLUSION_PREFIX + SkillTier.LOWER.name());
         return skillTierOption;
     }
 
