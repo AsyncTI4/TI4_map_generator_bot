@@ -195,6 +195,12 @@ public class RevealPublicObjectiveService {
 
     private String handleStage1Revealed(
             Game game, GenericInteractionCreateEvent event, Map.Entry<String, Integer> objective) {
+        if (objective == null) {
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(), "No unrevealed stage 1 public objectives remain.");
+            return null;
+        }
+
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         var channel = game.getActionsChannel();
         MessageHelper.sendMessageToChannel(
