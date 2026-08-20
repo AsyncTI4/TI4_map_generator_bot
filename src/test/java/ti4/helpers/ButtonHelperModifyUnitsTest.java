@@ -387,6 +387,35 @@ class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         assertEquals(2, tile.getUnitHolders().get(Constants.SPACE).getDamagedUnitCount(dreadnoughtUnitKey));
     }
 
+    @Test
+    void testAutoAssignSpaceCombatHits_Summarizing_NeutralOpponent_SustainsFlagshipInsteadOfLosingFighters() {
+        Player player = createPlayer(game, "red");
+        player.addOwnedUnitByID("fighter");
+        player.addOwnedUnitByID("flagship");
+
+        Player neutral = game.setupNeutralPlayer("blue");
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Destroyer, neutral.getColor()), 1);
+
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
+        tile.addUnit(Constants.SPACE, fighterUnitKey, 3);
+
+        UnitKey flagshipUnitKey = Units.getUnitKey(UnitType.Flagship, "red");
+        tile.addUnit(Constants.SPACE, flagshipUnitKey, 1);
+
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 1, null, true, false);
+
+        assertTrue(actualMessage.contains("Would sustain 1 <flagship>"));
+        assertFalse(actualMessage.contains("Would destroy"));
+    }
+
+    private static Player createPlayer(Game game, String color) {
+        Player player = new Player("101", "testUser", game);
+        player.setFactionEmoji("a");
+        player.setColor(color);
+        return player;
+    }
+
     private static Player createPlayerWithDuraniumArmor(Game game, String color) {
         Player player = new Player("101", "testUser", game);
         player.setFactionEmoji("a");

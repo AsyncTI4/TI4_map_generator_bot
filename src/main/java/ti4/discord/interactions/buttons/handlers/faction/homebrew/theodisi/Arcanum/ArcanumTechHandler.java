@@ -197,7 +197,7 @@ public class ArcanumTechHandler {
         }
 
         boolean spaceCannonPromptAlreadyAvailable = FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
-                && !ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition())
+                && !ButtonHelper.getPlayersWithPds2Cover(player, game, tile.getPosition())
                         .isEmpty();
         player.exhaustTech(SIGIL_OF_TRANSMUTATION);
         game.setStoredValue(SIGIL_OF_TRANSMUTATION_TILE + player.getFaction(), tile.getPosition());
