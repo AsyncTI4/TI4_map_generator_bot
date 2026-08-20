@@ -13,7 +13,6 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumPromissoryHandler;
@@ -162,10 +161,6 @@ public class DestroyUnitService {
             GenericInteractionCreateEvent event, Game game, List<RemovedUnit> units, boolean combat) {
         // batch up infantry for INF2-ish effects
         for (Player player : game.getRealPlayersNNeutral()) {
-            if (AshenUnitHandler.resolveAshenInfDestroy(game, player, units, event)) {
-                continue;
-            }
-
             int numInfantry = 0;
             for (RemovedUnit u : units) {
                 if (player.unitBelongsToPlayer(u.unitKey()) && u.unitKey().unitType() == UnitType.Infantry) {
@@ -205,9 +200,6 @@ public class DestroyUnitService {
         Player player = game.getPlayerFromColorOrFaction(unit.unitKey().colorID());
 
         if (combat && player != null) {
-            if (player.hasAbility("beauty_in_destruction")) {
-                AshenAbilityHandler.offerBeautyInDestruction(game, player, unit, event);
-            }
             if (player.hasUnit("ashen_dreadnought") || player.hasUnit("ashen_dreadnought2")) {
                 AshenUnitHandler.offerAshfallEngineOnDestroy(event, game, player, unit);
             }

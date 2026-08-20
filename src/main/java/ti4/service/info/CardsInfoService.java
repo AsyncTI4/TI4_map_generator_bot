@@ -372,6 +372,9 @@ public class CardsInfoService {
             if (player.hasAbility("mark_of_pharadn")) {
                 f = FactionEmojis.pharadn;
             }
+            if (player.hasAbility("forged_in_fire")) {
+                f = FactionEmojis.ashen;
+            }
             if (player.hasAbility("shroud_of_lith")) {
                 f = FactionEmojis.kollecc;
             }

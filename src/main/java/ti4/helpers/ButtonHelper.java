@@ -299,6 +299,16 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message3, buttons);
             }
         }
+        if (player.hasAbility("phoenix_rising")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    (totalAmount <= 10
+                                    ? UnitEmojis.infantry.toString().repeat(totalAmount)
+                                    : UnitEmojis.infantry + "×" + totalAmount)
+                            + " died and were captured.");
+            AddUnitService.addUnits(
+                    null, player.getNomboxTile(), player.getGame(), player.getColor(), totalAmount + " infantry");
+        }
     }
 
     public static void resolveInfantryDestroy(Player player, int totalAmount, Tile tile) {
@@ -309,6 +319,7 @@ public class ButtonHelper {
                         && !player.hasUnit("tk-twilightlegionnaire"))) return;
         if (player.getUnitsOwned().contains("pharadn_infantry")
                 || player.getUnitsOwned().contains("pharadn_infantry2")
+                || player.hasAbility("phoenix_rising")
                 || player.hasUnit("tf-yinclone")) return;
 
         if (player.hasTech("cl2")) {
@@ -731,6 +742,9 @@ public class ButtonHelper {
         }
         if (player.getNombox().hasUnits() && player.hasAbility("mark_of_pharadn")) {
             buttons.add(Buttons.gray("getReleaseButtons", "Release captured units", FactionEmojis.pharadn));
+        }
+        if (player.getNombox().hasUnits() && (player.hasAbility("forged_in_fire"))) {
+            buttons.add(Buttons.gray("getReleaseButtons", "Release captured units", FactionEmojis.ashen));
         }
         if (player.hasUnexhaustedLeader("khraskagent")
                 && (whatIsItFor.contains("inf") || whatIsItFor.contains("both"))) {
