@@ -32,7 +32,7 @@
             "WARFARE",
             "PROPULSION"
         ],
-        "text": "When you would roll dice as part of your infantry's printed text ability, on a 5 or lower, you may exhaust this card to treat the result of that die as a 10. \n\nWhen you roll for a unit's BOMBARDMENT ability: \n\nYou may damage that unit to reroll any number of those dice.",
+        "text": "ACTION: You may exhaust this card to roll 1 of your non-flagship units BOMBARDMENT against a planet in an adjacent system. When you do, you may choose to cancel all of those hits to place infantry into coexistence on that planet up to the number of hits produced.",
         "source": "beans"
     },
     {

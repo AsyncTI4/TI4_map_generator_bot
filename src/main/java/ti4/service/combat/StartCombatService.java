@@ -30,6 +30,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionT
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
@@ -2426,6 +2427,14 @@ public class StartCombatService {
                                 p.factionButtonChecker() + "ralnelPull_" + tile.getPosition() + "_" + unitH.getName(),
                                 "Use Ralnel Mech Ability on " + nameOfHolder,
                                 FactionEmojis.Ralnel));
+                    }
+
+                    // Phoenix Rising
+                    if (isGroundCombat
+                            && p.hasTech("beasheninf")
+                            && (p.getNombox().getUnitCount(UnitType.Infantry, p) > 0)
+                            && p.getPlanets().contains(unitH.getName())) {
+                        buttons.add(AshenAbilityHandler.getCinderbornButton(p, unitH.getName()));
                     }
 
                     // atokera

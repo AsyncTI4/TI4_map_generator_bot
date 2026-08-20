@@ -39,27 +39,19 @@
         "source": "beans"
     },
     {
-        "id": "burning_legion",
+        "id": "phoenix_rising",
         "name": "Burning Legion",
         "faction": "ashen",
         "window": "During setup:",
-        "windowEffect": "Place 12 infantry from the supply on your faction sheet. These units are captured.",
-        "source": "beans"
-    },
-    {
-        "id": "phoenix_rising",
-        "name": "Phoenix Rising",
-        "faction": "ashen",
-        "window": "At the start of a round of ground combat on a planet you control:",
-        "windowEffect": "You may place 1 captured infantry from your faction sheet on that planet.",
+        "windowEffect": "Place 12 infantry from the supply on your faction sheet. These units are captured. When your infantry are removed or destroyed, capture them.",
         "source": "beans"
     },
     {
         "id": "forged_in_fire",
         "name": "Forged in Fire",
         "faction": "ashen",
-        "window": "When your infantry are destroyed or removed:",
-        "windowEffect": "Capture them.",
+        "window": "When a game effect would have you place or produce infantry:",
+        "windowEffect": "You must return 1 captured infantry for each infantry placed or produced, instead of spending resources.",
         "source": "beans"
     },
     {

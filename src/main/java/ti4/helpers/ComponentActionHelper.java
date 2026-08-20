@@ -14,6 +14,7 @@ import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
@@ -158,6 +159,7 @@ public class ComponentActionHelper {
                                             .anyMatch(otherPlayer -> otherPlayer != p1
                                                     && !ButtonHelper.getTilesWithYourCC(otherPlayer, game, event)
                                                             .isEmpty());
+                                case "ashenbt" -> AshenBreakthroughHandler.hasEligibleTarget(game, p1);
                                 case "saarbt" ->
                                     game.getTileMap().values().stream()
                                             .filter(Tile::isAsteroidField)

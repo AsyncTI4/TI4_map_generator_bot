@@ -65,7 +65,7 @@
         "faction": "ashen",
         "baseUpgrade": "inf2",
         "source": "beans",
-        "text": "When this unit would be destroyed, roll 1 die. On a 6 or higher, you may produce 1 hit. If you do, place this unit on this card. At the start of your next turn, place each unit that is on this card on planets you control in your home system."
+        "text": "DEPLOY: At the start of a round of ground combat on a planet you control, you may place 1 captured infantry from your faction sheet on that planet."
     },
     {
         "alias": "beashendn",
