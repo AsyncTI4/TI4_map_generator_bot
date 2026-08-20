@@ -4,11 +4,14 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import de.gesundkrank.jskills.Rating;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,6 +74,38 @@ public class MatchmakingRatingEventService {
 
     public Map<String, BigDecimal> getConservativePlayerRatings(Set<String> userIds) {
         return filterRatingsByUserIds(getCachedConservativePlayerRatings(), userIds);
+    }
+
+    public Long getAverageDisplayRating(Collection<String> userIds) {
+        if (userIds.isEmpty()) {
+            return null;
+        }
+        return averageDisplayRating(userIds, getConservativePlayerRatings(new HashSet<>(userIds)));
+    }
+
+    public SkillTier getSkillTier(Collection<String> userIds) {
+        if (userIds.isEmpty()) {
+            return null;
+        }
+        Map<String, BigDecimal> ratings = getConservativePlayerRatings(new HashSet<>(userIds));
+        long ratedCount = userIds.stream().filter(ratings::containsKey).count();
+        if (!hasRatedQuorum(userIds.size(), ratedCount)) {
+            return null;
+        }
+        return SkillTier.fromDisplayRating(averageDisplayRating(userIds, ratings));
+    }
+
+    private static boolean hasRatedQuorum(int playerCount, long ratedCount) {
+        return ratedCount * 2 >= playerCount;
+    }
+
+    private long averageDisplayRating(Collection<String> userIds, Map<String, BigDecimal> ratings) {
+        BigDecimal defaultRating = getAverageConservativeRating();
+        BigDecimal average = userIds.stream()
+                .map(userId -> ratings.getOrDefault(userId, defaultRating))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .divide(BigDecimal.valueOf(userIds.size()), MathContext.DECIMAL64);
+        return toDisplayRating(average);
     }
 
     public BigDecimal getAverageConservativeRating() {
