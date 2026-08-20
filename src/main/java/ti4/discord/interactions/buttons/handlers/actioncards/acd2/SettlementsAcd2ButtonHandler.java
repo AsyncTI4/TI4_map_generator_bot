@@ -20,6 +20,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -91,9 +93,11 @@ public class SettlementsAcd2ButtonHandler {
         }
         String planet = payload.substring(separator + 1);
         Tile tile = game.getTileFromPlanet(planet);
+        Planet uH = game.getUnitHolderFromPlanet(planet);
         ButtonHelper.deleteMessage(event);
-        if (tile == null) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Settlements_.");
+        // Non-home is a builder filter, so it has to be re-checked for blind-typed targets.
+        if (tile == null || uH == null || uH.isHomePlanet(game)) {
+            PlanetTargetService.fizzle(player);
             return;
         }
 
@@ -116,6 +120,25 @@ public class SettlementsAcd2ButtonHandler {
     private static void sendPlacementButtons(Player player, Game game, int remaining) {
         String outcome = game.getStoredValue(winnerKey(player));
         Set<String> planets = new LinkedHashSet<>();
+        if (game.isFowMode()) {
+            // This list unions the holdings of every voter for the outcome, so it discloses several players'
+            // planets at once. In fog, offer the planets this player knows about; "was controlled by a voter"
+            // is checked when the placement resolves.
+            List<Button> fogButtons = PlanetTargetService.targetButtons(
+                    game,
+                    player,
+                    PlanetTargetSpec.of(player.factionButtonChecker() + "settlementsPlaceOn_" + remaining)
+                            .where(p -> !p.isHomePlanet(game)),
+                    new ArrayList<>());
+            fogButtons.add(Buttons.red("deleteButtons", "Done"));
+            String fogRemaining = remaining == 1 ? "your last infantry" : "an infantry (" + remaining + " remaining)";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + ", choose where to place " + fogRemaining
+                            + " into coexistence for _Settlements_.",
+                    fogButtons);
+            return;
+        }
         for (Player voter : votersFor(game, outcome)) {
             for (String planet : voter.getPlanets()) {
                 Planet uH = game.getUnitHolderFromPlanet(planet);

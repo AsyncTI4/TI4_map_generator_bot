@@ -42,6 +42,8 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.planet.AddPlanetService;
@@ -572,35 +574,39 @@ public final class ButtonHelperAbilities {
         return scButtons;
     }
 
+    /**
+     * A trap is attached "to a planet in that system that contains 1 or more of your infantry units", after a
+     * tactical action there. That target set is entirely the acting player's own information - their units,
+     * in the system they just activated - so there is nothing to hide and nothing to look up about anyone
+     * else. Listing another player's holdings here was both a fog leak and the wrong rule.
+     */
     @ButtonHandler("setTrapStep1")
     public static void setTrapStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        for (Player p2 : game.getRealPlayers()) {
-            buttons.add(FoWHelper.fogSafeTargetButton("setTrapStep2_" + p2.getFaction(), "gray", p2));
+        Tile active = game.getTileByPosition(game.getActiveSystem());
+        if (active != null) {
+            for (UnitHolder uh : active.getUnitHolders().values()) {
+                if (!(uh instanceof Planet)) continue;
+                if (uh.getUnitCount(UnitType.Infantry, player.getColor()) <= 0) continue;
+                buttons.add(Buttons.gray(
+                        "setTrapStep3_" + uh.getName(), Helper.getPlanetRepresentation(uh.getName(), game)));
+            }
         }
+        String msg = buttons.isEmpty()
+                ? ", you have no infantry on a planet in the active system, so there is nowhere to set a trap."
+                : ", please choose the planet you wish to put a trap on.";
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + ", please choose whose planet you wish to put a trap on.",
-                buttons);
-    }
-
-    @ButtonHandler("setTrapStep2_")
-    public static void setTrapStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        List<Button> buttons = new ArrayList<>();
-        for (String planet : p2.getPlanets()) {
-            buttons.add(Buttons.gray("setTrapStep3_" + planet, Helper.getPlanetRepresentation(planet, game)));
-        }
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + ", please choose the planet you wish to put a trap on.",
-                buttons);
+                player.getCardsInfoThread(), player.getRepresentationUnfogged() + msg, buttons);
     }
 
     @ButtonHandler("setTrapStep3_")
     public static void setTrapStep3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
+        // A blind-typed planet need not be on this map at all.
+        if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) == null) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
         List<Button> availableTraps = new ArrayList<>();
         for (String availableTrap : getUnusedTraps(game, player)) {
             availableTraps.add(Buttons.green("setTrapStep4_" + planet + "_" + availableTrap, availableTrap));
@@ -1036,6 +1042,12 @@ public final class ButtonHelperAbilities {
         String message = player.getFactionEmoji() + " added a Tomb token to "
                 + Helper.getPlanetRepresentation(planet, game) + ".";
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        // A blind-typed planet need not be on this map. (The "already has a tomb" rule below is already
+        // enforced here, so it survives the blind path.)
+        if (unitHolder == null) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
         if (unitHolder.getTokenList().contains("token_tomb.png")) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
@@ -1073,6 +1085,18 @@ public final class ButtonHelperAbilities {
     public static void startAncientEmpire(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String message = player.getRepresentation() + ", please choose a planet to add a Tomb token to.";
         List<Button> buttons = new ArrayList<>();
+        if (game.isFowMode()) {
+            // Listing every planet on the map tells a fog player what exists on systems they have never
+            // seen. Offer the ones they know about; Blind Target still reaches the rest.
+            buttons = PlanetTargetService.targetButtons(
+                    game,
+                    player,
+                    PlanetTargetSpec.of("addTombToken")
+                            .where(p -> !p.getTokenList().contains("token_tomb.png")),
+                    buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+            return;
+        }
         for (String planet : game.getPlanets()) {
             UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             if (unitHolder != null) {
@@ -1139,6 +1163,15 @@ public final class ButtonHelperAbilities {
     public static void putSleeperOn(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         buttonID = buttonID.replace("putSleeperOnPlanet_", "");
         String planet = buttonID;
+        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        // This is the *place* flow, and it can now be reached with a blind-typed planet. addOrRemoveSleeper
+        // is a toggle, so calling it on a planet that already holds a sleeper would quietly remove someone
+        // else's instead of placing one. Removal has its own dedicated flow.
+        if (uH == null || uH.getTokenList().contains(Constants.TOKEN_SLEEPER_PNG)) {
+            PlanetTargetService.fizzle(event, player);
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
         String message =
                 player.getFactionEmojiOrColor() + " put a Sleeper on " + Helper.getPlanetRepresentation(planet, game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);

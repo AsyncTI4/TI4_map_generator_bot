@@ -32,6 +32,8 @@ import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.UnitModel;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
@@ -285,13 +287,22 @@ public final class DSHelperBreakthroughs {
                     p2.getRepresentation() + ", your _Historian Conclave_ offer to " + p1.getFactionNameOrColor()
                             + " has been accepted. You may be able to coexist on the explored planet if you have not already done so with someone else.");
             List<Button> buttons2 = new ArrayList<>();
-            for (String planet : p1.getPlanets()) {
-                if (game.getUnitHolderFromPlanet(planet) != null
-                        && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)
-                        && FoWHelper.playerHasUnitsOnPlanet(p1, game.getUnitHolderFromPlanet(planet))) {
-                    buttons2.add(Buttons.gray(
-                            p2.factionButtonChecker() + "exchangeProgramPart3_" + planet,
-                            Helper.getPlanetRepresentation(planet, game)));
+            if (game.isFowMode()) {
+                buttons2 = PlanetTargetService.targetButtons(
+                        game,
+                        p2,
+                        PlanetTargetSpec.of(p2.factionButtonChecker() + "exchangeProgramPart3")
+                                .where(p -> !p.isHomePlanet(game)),
+                        buttons2);
+            } else {
+                for (String planet : p1.getPlanets()) {
+                    if (game.getUnitHolderFromPlanet(planet) != null
+                            && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)
+                            && FoWHelper.playerHasUnitsOnPlanet(p1, game.getUnitHolderFromPlanet(planet))) {
+                        buttons2.add(Buttons.gray(
+                                p2.factionButtonChecker() + "exchangeProgramPart3_" + planet,
+                                Helper.getPlanetRepresentation(planet, game)));
+                    }
                 }
             }
             buttons2.add(Buttons.red("deleteButtons", "Decline"));
@@ -586,12 +597,20 @@ public final class DSHelperBreakthroughs {
             List<Button> buttons = new ArrayList<>();
             Player target = p1;
             Player player = p2;
-            for (String planet : target.getPlanetsAllianceMode()) {
-                if (game.getUnitHolderFromPlanet(planet) != null
-                        && game.getUnitHolderFromPlanet(planet).hasGroundForces(target)) {
-                    buttons.add(Buttons.gray(
-                            player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
-                            Helper.getPlanetRepresentation(planet, game)));
+            if (game.isFowMode()) {
+                buttons = PlanetTargetService.targetButtons(
+                        game,
+                        player,
+                        PlanetTargetSpec.of(player.factionButtonChecker() + "exchangeProgramPart3"),
+                        buttons);
+            } else {
+                for (String planet : target.getPlanetsAllianceMode()) {
+                    if (game.getUnitHolderFromPlanet(planet) != null
+                            && game.getUnitHolderFromPlanet(planet).hasGroundForces(target)) {
+                        buttons.add(Buttons.gray(
+                                player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
+                                Helper.getPlanetRepresentation(planet, game)));
+                    }
                 }
             }
             buttons.add(Buttons.red("deleteButtons", "Cancel"));

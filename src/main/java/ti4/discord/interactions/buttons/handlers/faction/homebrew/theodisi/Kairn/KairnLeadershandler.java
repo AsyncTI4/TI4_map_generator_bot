@@ -475,6 +475,12 @@ public class KairnLeadershandler {
     }
 
     private static Set<String> getKairnAgentEligibleTraits(Game game, Player target) {
+        // No planet is ever named here, but the *set of decks offered* is derived from the target's
+        // holdings - being shown only "cultural" says they hold cultural planets and no others. In fog,
+        // offer all three so the menu discloses nothing; an ineligible pick is caught downstream.
+        if (game.isFowMode()) {
+            return new HashSet<>(Set.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL));
+        }
         Set<String> traits = new HashSet<>();
         for (String planetName : target.getPlanets()) {
             Planet planet = game.getPlanetsInfo().get(planetName);

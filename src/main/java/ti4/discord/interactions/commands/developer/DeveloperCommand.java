@@ -30,6 +30,8 @@ public class DeveloperCommand implements ParentCommand {
                     new DeleteUserMessages(),
                     new PostMatchmakingButtons(),
                     new ModifyMatchmakingQueue(),
+                    // TEMPORARY - remove this entry and the class once fog planet targeting is verified.
+                    new TestFogPlanetTargets(),
                     new RunSql())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

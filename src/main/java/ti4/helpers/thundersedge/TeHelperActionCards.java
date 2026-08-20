@@ -38,6 +38,8 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.BlindSelectionService;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.planet.FlipTileService;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
@@ -211,12 +213,17 @@ public class TeHelperActionCards {
 
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
-        for (String planet : p2.getPlanets()) {
-            if (game.getUnitHolderFromPlanet(planet) != null
-                    && game.getUnitHolderFromPlanet(planet).hasGroundForces(p2)) {
-                buttons.add(Buttons.gray(
-                        player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
-                        Helper.getPlanetRepresentation(planet, game)));
+        if (game.isFowMode()) {
+            buttons = PlanetTargetService.targetButtons(
+                    game, player, PlanetTargetSpec.of(player.factionButtonChecker() + "exchangeProgramPart3"), buttons);
+        } else {
+            for (String planet : p2.getPlanets()) {
+                if (game.getUnitHolderFromPlanet(planet) != null
+                        && game.getUnitHolderFromPlanet(planet).hasGroundForces(p2)) {
+                    buttons.add(Buttons.gray(
+                            player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
+                            Helper.getPlanetRepresentation(planet, game)));
+                }
             }
         }
         buttons.add(Buttons.red(player.factionButtonChecker() + "loseAFleetCultural", "Lose A Fleet Token"));
@@ -245,6 +252,26 @@ public class TeHelperActionCards {
     private static void exchangeProgramPart3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
 
         String planet = buttonID.split("_")[1];
+        // Shared sink: five different builders funnel here (Cultural Exchange, Galactic Movement, the two
+        // Bentor coexistence grants, Xin/Deepwrought), and an off-map planet used to reach AddUnitService as
+        // a null tile.
+        Planet unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        if (game.getTileFromPlanet(planet) == null || unitHolder == null) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
+        // Coexisting means sharing a planet with somebody. Every non-fog builder above already filters on
+        // that, so this changes nothing there; in fog it is hidden state, so it cannot narrow the candidate
+        // list and has to be checked here instead - otherwise a blind guess could plant an infantry on an
+        // empty planet and simply take it.
+        boolean somebodyToCoexistWith = game.getRealPlayers().stream()
+                .anyMatch(other -> other != player
+                        && other.getColor() != null
+                        && unitHolder.getUnitCount(UnitType.Infantry, other.getColor()) > 0);
+        if (!somebodyToCoexistWith) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
         game.setStoredValue("coexistFlag", "yes");
         AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "inf " + planet);
         game.removeStoredValue("coexistFlag");
@@ -481,6 +508,12 @@ public class TeHelperActionCards {
         String regex = "resolvePirateContract_" + RegexHelper.posRegex();
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
+            // posRegex accepts any bot-legal position, not only positions on this map, so a blind-typed
+            // target can reach here with no tile. RegexService swallows the NPE, so guard explicitly.
+            if (tile == null) {
+                PlanetTargetService.fizzle(event, player);
+                return;
+            }
             resolvePiratesGeneric(event, game, player, tile, "dd");
 
             String message = player.getRepresentation() + " paid a pirate to post up at "
@@ -495,6 +528,12 @@ public class TeHelperActionCards {
         String regex = "resolveNokarBt_" + RegexHelper.posRegex();
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
+            // posRegex accepts any bot-legal position, not only positions on this map, so a blind-typed
+            // target can reach here with no tile. RegexService swallows the NPE, so guard explicitly.
+            if (tile == null) {
+                PlanetTargetService.fizzle(event, player);
+                return;
+            }
             resolvePiratesGeneric(event, game, player, tile, "2 dd, cr");
 
             String message = player.getRepresentation() + " hired 2 neutral destroyers and a cruiser to post up at "
@@ -509,6 +548,12 @@ public class TeHelperActionCards {
         String regex = "resolvePirateFleet_" + RegexHelper.posRegex();
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
+            // posRegex accepts any bot-legal position, not only positions on this map, so a blind-typed
+            // target can reach here with no tile. RegexService swallows the NPE, so guard explicitly.
+            if (tile == null) {
+                PlanetTargetService.fizzle(event, player);
+                return;
+            }
             resolvePiratesGeneric(event, game, player, tile, "cv, ca, dd, 2 ff");
 
             String message = player.getRepresentation() + " paid a fleet of pirates to post up at "

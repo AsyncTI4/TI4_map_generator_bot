@@ -21,6 +21,7 @@ import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.fow.BlindSelectionService;
+import ti4.service.fow.PlanetTargetService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
@@ -47,6 +48,10 @@ class MahactHeroButtonHandler {
         String pos2 = buttonID.split("_")[2];
         Tile tile1 = game.getTileByPosition(pos1);
         Tile tile2 = game.getTileByPosition(pos2);
+        if (tile1 == null || tile2 == null) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
         List<Player> players2 = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, game, tile1);
         if (!players2.isEmpty()) {
             player = players2.getFirst();
@@ -121,6 +126,10 @@ class MahactHeroButtonHandler {
     @ButtonHandler("benedictionStep1_")
     public static void benedictionStep1(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos1 = buttonID.split("_")[1];
+        if (game.getTileByPosition(pos1) == null) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + " please choose the system you wish to send the ships in "

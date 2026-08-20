@@ -15,10 +15,13 @@ import ti4.game.UnitHolder;
 import ti4.helpers.AgendaRiderHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.planet.FlipTileService;
 import ti4.service.unit.AddUnitService;
 
@@ -26,7 +29,23 @@ import ti4.service.unit.AddUnitService;
 class YinHeroButtonHandler {
 
     @ButtonHandler("yinHeroStart")
-    public static void yinHeroStart(ButtonInteractionEvent event, Game game) {
+    public static void yinHeroStart(ButtonInteractionEvent event, Game game, Player player) {
+        if (game.isFowMode()) {
+            // Both branches below disclose holdings: picking a player then listing their planets, and the
+            // "unowned" branch walking the whole map (which also reveals, by omission, which planets ARE
+            // owned). In fog we offer exactly the planets this player knows exist, whoever holds them.
+            List<Button> fogButtons = PlanetTargetService.targetButtons(
+                    game,
+                    player,
+                    PlanetTargetSpec.of(player.factionButtonChecker() + "yinHeroPlanet")
+                            .where(p -> !p.isSpaceStation(game)
+                                    && game.getTileFromPlanet(p.getName()) != null
+                                    && !game.getTileFromPlanet(p.getName()).isHomeSystem(game)),
+                    new ArrayList<>());
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getChannel(), "Please choose which planet to invade.", fogButtons);
+            return;
+        }
         List<Button> buttons = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "yinHeroTarget", null);
         if (game.getTileByPosition("tl") != null
                 && "82a".equalsIgnoreCase(game.getTileByPosition("tl").getTileID())) {
@@ -37,6 +56,7 @@ class YinHeroButtonHandler {
                 event.getChannel(), "Please choose the player that owns the planet you wish to land on.", buttons);
     }
 
+    // Non-fog only - see yinHeroStart, which skips this step entirely in fog.
     @ButtonHandler("yinHeroTarget_")
     public static void yinHeroTarget(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String faction = buttonID.replace("yinHeroTarget_", "");
@@ -95,8 +115,33 @@ class YinHeroButtonHandler {
             planet = "hexmallice";
             FlipTileService.flipTileIfNeeded(event, game.getTileFromPlanet("hexlockedmallice"), game);
         }
+        Tile targetTile = game.getTileFromPlanet(planet);
+        Planet targetPlanet = game.getUnitHolderFromPlanet(planet);
+        boolean mallice = planet.toLowerCase().contains("mallice");
+        // Existence is checked in both modes - it only replaces a crash.
+        if (targetTile == null || targetPlanet == null) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
+        // The rules checks apply in fog only. A blind-typed planet never passed the fog spec's filters, so
+        // they have to be re-applied here - but outside fog the legacy builder is authoritative, and it
+        // deliberately offers a *controlled* space station (only its "unowned planets" branch excludes them).
+        // Applying the fog rules unconditionally would silently remove that non-fog capability.
+        // Mallice is exempt either way: it is reached by its own dedicated button.
+        if (game.isFowMode()
+                && !mallice
+                && (targetTile.isHomeSystem(game)
+                        || targetPlanet.isSpaceStation(game)
+                        || Helper.getPlanetRepresentation(planet, game)
+                                .toLowerCase()
+                                .contains("dmz"))) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
+        // The actor's own channel, not wherever the button happened to be pressed - this names a planet and
+        // the player invading it, which in fog is not for whoever else can read that channel.
         MessageHelper.sendMessageToChannel(
-                event.getChannel(),
+                player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " is invading " + Helper.getPlanetRepresentation(planet, game)
                         + ".");
         List<Button> buttons = new ArrayList<>();
@@ -107,7 +152,7 @@ class YinHeroButtonHandler {
                     UnitEmojis.infantry));
         }
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getChannel(), "Please choose how many infantry you wish to land on the planet.", buttons);
+                player.getCorrectChannel(), "Please choose how many infantry you wish to land on the planet.", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -116,12 +161,31 @@ class YinHeroButtonHandler {
         String planetNInf = buttonID.replace("yinHeroInfantry_", "");
         String planet = planetNInf.split("_")[0];
         String amount = planetNInf.split("_")[1];
-        Tile tile = game.getTile(AliasHandler.resolveTile(planet));
+        Tile tile = game.getTileFromPlanet(planet);
+        if (tile == null) {
+            tile = game.getTile(AliasHandler.resolveTile(planet));
+        }
+        if (tile == null || tile.getUnitHolders().get(planet) == null) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
+        Player defender = game.getPlayerThatControlsPlanet(planet, true);
         AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " inf " + planet);
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                player.getFactionEmojiOrColor() + " Chose to land " + amount + " infantry on "
-                        + Helper.getPlanetRepresentation(planet, game));
+        String landed = player.getFactionEmojiOrColor() + " Chose to land " + amount + " infantry on "
+                + Helper.getPlanetRepresentation(planet, game);
+        if (defender != null && defender != player) {
+            // The defender is entitled to know their planet was landed on; nobody else is.
+            FoWHelper.notifyActorAndAffectedElsePublic(
+                    game,
+                    player,
+                    landed,
+                    defender,
+                    defender.getRepresentationUnfogged() + ", infantry landed on your planet "
+                            + Helper.getPlanetRepresentation(planet, game) + ".",
+                    landed);
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), landed);
+        }
         UnitHolder unitHolder = tile.getUnitHolders().get(planet);
         boolean groundCombatStarted = StartCombatService.groundCombatCheck(game, unitHolder, tile, event);
         if (groundCombatStarted) {

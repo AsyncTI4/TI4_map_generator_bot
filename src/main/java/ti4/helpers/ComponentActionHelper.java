@@ -26,6 +26,7 @@ import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRel
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
@@ -45,6 +46,9 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.BlindSelectionService;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
@@ -395,9 +399,10 @@ public class ComponentActionHelper {
                             "horn_of_the_abyss");
                     if (exhaustRelics.contains(relic.toLowerCase())) {
                         if (!p1.getExhaustedRelics().contains(relic)) {
+                            // Availability probe only - must not use the filtered builder, which appends a
+                            // Blind Target button (never empty in fog) and used to clobber shared state.
                             if (!"circletofthevoid".equalsIgnoreCase(relic)
-                                    || !ButtonHelperActionCards.getCircletButtons(game, p1)
-                                            .isEmpty()) {
+                                    || ButtonHelperActionCards.hasCircletTargets(game, p1)) {
                                 rButton = Buttons.blue(
                                         factionChecker + prefix + "relic_" + relic, "Exhaust " + relicData.getName());
                             } else {
@@ -998,13 +1003,15 @@ public class ComponentActionHelper {
                         event.getMessageChannel(),
                         p1.getFactionEmoji() + " removed their token from the _Stellar Atomics_ card.");
                 List<Button> buttons = new ArrayList<>();
-                for (Player p2 : game.getRealPlayersNDummies()) {
-                    if (p2 == p1) {
-                        continue;
-                    }
-                    if (game.isFowMode()) {
-                        buttons.add(Buttons.gray("atomicsStep2_" + p2.getFaction(), p2.getColor()));
-                    } else {
+                if (game.isFowMode()) {
+                    // The player step was already fog-aware, but step 2 then listed that player's whole
+                    // holding list. Skip it and offer the planets this player knows about instead.
+                    buttons = PlanetTargetService.targetButtons(game, p1, atomicsSpec(game), buttons);
+                } else {
+                    for (Player p2 : game.getRealPlayersNDummies()) {
+                        if (p2 == p1) {
+                            continue;
+                        }
                         Button button = Buttons.gray(
                                 "atomicsStep2_" + p2.getFaction(),
                                 p2.getFactionModel().getShortName());
@@ -1105,15 +1112,28 @@ public class ComponentActionHelper {
         ButtonHelper.deleteMessage(event);
     }
 
+    /** Shared by the fog list and by resolution, so a blind-typed target obeys the same rules. */
+    public static PlanetTargetSpec atomicsSpec(Game game) {
+        return PlanetTargetSpec.of("atomicsStep3_" + BlindSelectionService.TBD_FACTION)
+                .excludingSelf()
+                .where(p -> !p.isSpaceStation(game)
+                        && game.getTileFromPlanet(p.getName()) != null
+                        && !game.getTileFromPlanet(p.getName()).isHomeSystem(game));
+    }
+
+    // Non-fog only - the fog path goes straight from the component action to Step 3.
     @ButtonHandler("atomicsStep2_")
     public static void resolveAtomicsStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (p2 == null) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
         List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getPlanets()) {
             Tile tile = game.getTileFromPlanet(planet);
-            if (tile != null
-                    && !tile.isHomeSystem(game)
-                    && !game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
+            Planet uH = game.getUnitHolderFromPlanet(planet);
+            if (tile != null && uH != null && !tile.isHomeSystem(game) && !uH.isSpaceStation()) {
                 buttons.add(Buttons.gray(
                         "atomicsStep3_" + p2.getFaction() + "_" + planet,
                         Helper.getPlanetRepresentation(planet, game)));
@@ -1128,8 +1148,14 @@ public class ComponentActionHelper {
 
     @ButtonHandler("atomicsStep3_")
     public static void resolveAtomicsStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        String planet = buttonID.split("_")[2];
+        // Spec passed so "not a home system, not a space station" is enforced for blind-typed targets too.
+        var target = PlanetTargetService.resolve(game, player, buttonID, atomicsSpec(game), null);
+        if (target == null) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
+        Player p2 = target.owner();
+        String planet = target.planetId();
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         ButtonHelper.deleteMessage(event);
 

@@ -22,6 +22,8 @@ import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.GenericCardModel;
 import ti4.model.TechnologyModel;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.regex.RegexService;
 import ti4.service.tech.ListTechService;
@@ -92,21 +94,33 @@ public class PlotCardsService {
             if (puppet == null) return;
 
             List<Button> buttons = new ArrayList<>();
-            for (String planet : puppet.getPlanets()) {
-                Tile tile = game.getTileFromPlanet(planet);
-                if (tile == null) continue;
-                if (tile.isHomeSystem(game)) continue;
-
-                Planet p = tile.getUnitHolderFromPlanet(planet);
-                if (p == null) continue;
-
-                String id = player.factionButtonChecker() + "resolveSeethe_" + planet;
-                String label = Helper.getPlanetRepresentation(planet, game) + " [" + p.getUnitCount() + " units]";
-                buttons.add(Buttons.red(id, label));
-            }
-
             String message = player.getRepresentation() + ", please choose a non-home planet controlled by "
                     + puppet.getRepresentation(false, false) + " to eradicate.";
+            if (game.isFowMode()) {
+                // This list disclosed the victim's entire non-home holdings AND the garrison size on each.
+                // The unit count is dropped outright rather than made optional - it is the leak.
+                buttons = PlanetTargetService.targetButtons(
+                        game,
+                        player,
+                        PlanetTargetSpec.of(player.factionButtonChecker() + "resolveSeethe")
+                                .where(pl -> game.getTileFromPlanet(pl.getName()) != null
+                                        && !game.getTileFromPlanet(pl.getName()).isHomeSystem(game)),
+                        buttons);
+                message = player.getRepresentation() + ", please choose a non-home planet to eradicate.";
+            } else {
+                for (String planet : puppet.getPlanets()) {
+                    Tile tile = game.getTileFromPlanet(planet);
+                    if (tile == null) continue;
+                    if (tile.isHomeSystem(game)) continue;
+
+                    Planet p = tile.getUnitHolderFromPlanet(planet);
+                    if (p == null) continue;
+
+                    String id = player.factionButtonChecker() + "resolveSeethe_" + planet;
+                    String label = Helper.getPlanetRepresentation(planet, game) + " [" + p.getUnitCount() + " units]";
+                    buttons.add(Buttons.red(id, label));
+                }
+            }
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         });
@@ -145,6 +159,12 @@ public class PlotCardsService {
 
             Planet planet = t.getUnitHolderFromPlanet(matcher.group("planet"));
             if (planet == null) return;
+            // Non-home is a builder filter, so a blind-typed target has to be re-checked here or Seethe
+            // would eradicate units on any planet at all.
+            if (t.isHomeSystem(game)) {
+                PlanetTargetService.fizzle(player);
+                return;
+            }
 
             boolean disaster = planet.getUnitCount() >= 15;
             if (disaster) {

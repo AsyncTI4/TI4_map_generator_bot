@@ -146,6 +146,7 @@ import ti4.service.fow.BlindSelectionService;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
+import ti4.service.fow.PlanetTargetService;
 import ti4.service.game.GameColorsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftTile;
@@ -4633,6 +4634,10 @@ public class ButtonHelper {
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
+        if (tile == null) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
         AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
