@@ -284,6 +284,7 @@ public class CommanderUnlockCheckService {
             }
 
             // BEANS
+            case "ashen" -> shouldBeUnlocked = true;
             case "dream" -> {
                 int eligibleSystems = 0;
                 for (Tile tile : game.getTileMap().values()) {

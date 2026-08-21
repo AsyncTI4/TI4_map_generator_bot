@@ -102,6 +102,7 @@ import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
@@ -639,9 +640,6 @@ public class CombatRollService {
         if (message.endsWith(";\n")) {
             message = message.substring(0, message.length() - 2);
         }
-        if (player.hasBreakthrough("ashenbt")) {
-            message = AshenBreakthroughHandler.appendBombardmentManualReminder(player, rollType, message);
-        }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         if (massHypnosisHits > 0 && !game.isFowMode()) {
             CombatRollService.sendSpaceAssignHitsButtons(event, game, player, tile, massHypnosisHits);
@@ -1005,9 +1003,14 @@ public class CombatRollService {
 
         if (rollType == CombatRollType.bombardment) {
             AshenLeadersHandler.offerCommanderBombardmentButtons(event, game, player, h);
+            if (h >= 3) {
+                CommanderUnlockCheckService.checkPlayer(player, "ashen");
+            }
+            if (AshenBreakthroughHandler.offerHitReplacement(event, game, player, tile, bombardPlanet, h)) {
+                return h;
+            }
             if (h > 0) {
-                if (!AshenLeadersHandler.offerHeroBombardmentAssignButtons(event, game, player, h, bombardPlanet)
-                        && !game.isFowMode()) {
+                if (!game.isFowMode()) {
                     List<Button> buttons = new ArrayList<>();
 
                     buttons.add(Buttons.red(
