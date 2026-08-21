@@ -1948,11 +1948,16 @@ public final class ButtonHelperFactionSpecific {
         // Whose planet it is, is hidden state, so it cannot narrow the fog list - it is checked here. The
         // non-fog builder already restricts to saar.getPlanetsAllianceMode(), so this changes nothing there.
         boolean saarOrAlly = saar != null && saar.getPlanetsAllianceMode().contains(newPlanet);
+        // Match whichever builder produced this button: the fog spec filters on isSpaceStation(game), the
+        // non-fog loop on isSpaceStation(). They differ - the game-arg overload also counts a Gledge Core
+        // planet in Twilight DS - so using one unconditionally would fizzle a destination the other offered.
+        boolean spaceStation = destination != null
+                && (game.isFowMode() ? destination.isSpaceStation(game) : destination.isSpaceStation());
         if (saar == null
                 || oriPlanet == null
                 || destination == null
                 || !saarOrAlly
-                || destination.isSpaceStation(game)
+                || spaceStation
                 || "triad".equalsIgnoreCase(newPlanet)
                 || newPlanet.equalsIgnoreCase(origPlanet)) {
             PlanetTargetService.fizzle(event, player);

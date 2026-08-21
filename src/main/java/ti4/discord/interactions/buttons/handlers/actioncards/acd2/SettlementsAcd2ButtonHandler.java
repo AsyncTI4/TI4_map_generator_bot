@@ -95,8 +95,15 @@ public class SettlementsAcd2ButtonHandler {
         Tile tile = game.getTileFromPlanet(planet);
         Planet uH = game.getUnitHolderFromPlanet(planet);
         ButtonHelper.deleteMessage(event);
-        // Non-home is a builder filter, so it has to be re-checked for blind-typed targets.
-        if (tile == null || uH == null || uH.isHomePlanet(game)) {
+        // Non-home and "controlled by a voter for the winning outcome" are both builder filters, so both
+        // have to be re-checked here - a blind-typed target never passed through the fog list, and the fog
+        // list itself can't apply the second one without disclosing who voted for what.
+        Player controller = game.getPlayerThatControlsPlanet(planet, true);
+        if (tile == null
+                || uH == null
+                || uH.isHomePlanet(game)
+                || controller == null
+                || !votersFor(game, game.getStoredValue(winnerKey(player))).contains(controller)) {
             PlanetTargetService.fizzle(player);
             return;
         }
