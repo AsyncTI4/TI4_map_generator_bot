@@ -54,8 +54,8 @@ public class StartScenario extends GameStateSubcommand {
         if (scenario.contains("liberation")) {
             startLiberationCodex4(game, event);
         }
-        if (scenario.contains("erwin's gambit")) {
-            startErwinsGambit(game, event);
+        if (scenario.contains("erwan's gambit")) {
+            startErwansGambit(game, event);
         }
         MessageHelper.replyToMessage(event, "Successfully started the scenario.");
     }
@@ -362,8 +362,8 @@ public class StartScenario extends GameStateSubcommand {
         return null;
     }
 
-    private static void startErwinsGambit(Game game, GenericInteractionCreateEvent event) {
-        game.setErwinsGambitMode(true);
+    private static void startErwansGambit(Game game, GenericInteractionCreateEvent event) {
+        game.setErwansGambitMode(true);
         var factions = List.of("mentak", "hacan", "sol", "saar", "letnev", "jolnar");
         if (game.getRealPlayers().isEmpty()) {
             AddTileListService.addTileListToMap(
@@ -435,6 +435,9 @@ public class StartScenario extends GameStateSubcommand {
 
         if (game.getRealPlayers().size() == 6) {
             DrawSecretService.dealSOToAll(event, 2, game);
+            game.drawSecretObjective(mentak.getUserID());
+            game.drawSecretObjective(mentak.getUserID());
+            game.drawSecretObjective(mentak.getUserID());
         }
     }
 }

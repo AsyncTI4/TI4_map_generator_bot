@@ -57,6 +57,7 @@ public class Source {
         black_spectrum,
         addiction,
         expanded_fracture,
+        erwans_gambit,
 
         // async homebrew
         draft,

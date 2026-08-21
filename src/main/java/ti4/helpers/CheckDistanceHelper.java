@@ -119,7 +119,7 @@ public class CheckDistanceHelper {
                                     && !player.hasTech("lwd")
                                     && !player.hasTech("absol_lwd")
                                     && tile2 != null
-                                    && (!game.isErwinsGambitMode()
+                                    && (!game.isErwansGambitMode()
                                             || !"saar".equalsIgnoreCase(player.getFaction())
                                             || !FoWHelper.playerHasShipsInSystem(
                                                     game.getPlayerFromColorOrFaction("mentak"), tile2))

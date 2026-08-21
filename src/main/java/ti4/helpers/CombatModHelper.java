@@ -579,7 +579,7 @@ public class CombatModHelper {
                         }
                     }
                 }
-                if (game.isErwinsGambitMode() && !"letnev".equalsIgnoreCase(player.getFaction())) {
+                if (game.isErwansGambitMode() && !"letnev".equalsIgnoreCase(player.getFaction())) {
                     meetsCondition = false;
                 }
             }

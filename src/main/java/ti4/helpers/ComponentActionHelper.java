@@ -455,7 +455,7 @@ public class ComponentActionHelper {
             }
         }
 
-        if (game.isErwinsGambitMode() && getTilePlayerCanTurnInBounty(game, p1) != null) {
+        if (game.isErwansGambitMode() && getTilePlayerCanTurnInBounty(game, p1) != null) {
             compButtons.add(
                     Buttons.green(factionChecker + prefix + "turnInBounty", "Turn In Bounty", UnitEmojis.Galvanized));
         }

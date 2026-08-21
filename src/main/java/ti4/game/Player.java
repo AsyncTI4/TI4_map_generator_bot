@@ -1226,6 +1226,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 ? LunariumAbilityHandler.getFactionSheetCCs(game, this)
                 : game.getMaxSOCountPerPlayer();
         int bonus = 0;
+        if (game.isErwansGambitMode() && "mentak".equalsIgnoreCase(getFaction())) bonus = game.getRound() + 1;
         if (hasRelic("obsidian")) bonus++;
         if (hasRelic("absol_obsidian")) bonus++;
         if (hasAbility("information_brokers")) bonus++;

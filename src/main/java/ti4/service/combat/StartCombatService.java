@@ -987,7 +987,7 @@ public class StartCombatService {
                                 + ", a reminder that if you keep alive at least 3 non-fighter ships in the active system until the end of combat, you could score _Demonstrate Your Power_.",
                         buttons2);
             }
-            if (game.isErwinsGambitMode()
+            if (game.isErwansGambitMode()
                     && "space".equalsIgnoreCase(type)
                     && "mentak".equalsIgnoreCase(player.getFaction())
                     && capitalShips >= 3) {

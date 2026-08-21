@@ -589,7 +589,7 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.LIBERATION_C4_MODE + " " + game.isLiberationC4Mode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.ERWINS_GAMBIT_MODE + " " + game.isErwinsGambitMode());
+        writer.write(Constants.ERWANS_GAMBIT_MODE + " " + game.isErwansGambitMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_FULL_COMPONENT_TEXT + " " + game.isShowFullComponentTextEmbeds());
         writer.write(System.lineSeparator());
