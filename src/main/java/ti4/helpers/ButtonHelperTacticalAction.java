@@ -850,7 +850,7 @@ public final class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
 
-        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, pos);
+        List<Player> playersWithPds2 = ButtonHelper.getPlayersWithPds2Cover(player, game, pos);
         if (!game.isFowMode() && !playersWithPds2.isEmpty() && !game.isL1Hero()) {
             List<String> mentions = new ArrayList<>();
             for (Player playerWithPds : playersWithPds2) {

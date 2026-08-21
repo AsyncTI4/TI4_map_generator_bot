@@ -2067,6 +2067,27 @@ public final class ButtonHelperActionCards {
         }
     }
 
+    public static void checkForPlayingStrategicFocus(Game game, Player player) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
+            return;
+        }
+        if (!player.getPlayableActionCards().contains("strategic_focus")) {
+            return;
+        }
+        Integer handIndex = player.getActionCards().get("strategic_focus");
+        String msg = player.getRepresentation()
+                + ", you have _Strategic Focus_ in your hand and just passed — this is the window to play it."
+                + " Use the button below to play it now, or ignore this message if you don't want to.";
+        List<Button> buttons = new ArrayList<>();
+        if (handIndex != null) {
+            buttons.add(Buttons.green(
+                    Constants.AC_PLAY_FROM_HAND + handIndex, "Play Strategic Focus", CardEmojis.getACEmoji(game)));
+        }
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
     public static void checkForPlayingBountyContracts(Game game, Player player) {
         if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
                 || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
@@ -2444,9 +2465,8 @@ public final class ButtonHelperActionCards {
                     if (x == 1) nice &= (d1.getResult() == 9);
                 }
                 msg.append(nice ? " (nice)" : "")
-                        .append(".\n Total hits were ")
-                        .append(hits)
-                        .append(".");
+                        .append(".")
+                        .append(CombatMessageHelper.displayHitResults(hits).stripTrailing());
             }
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
             if (hits > 0 && p2.hasAbility("data_recovery")) {
@@ -2501,7 +2521,8 @@ public final class ButtonHelperActionCards {
                     hits++;
                 }
             }
-            msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
+            msg = new StringBuilder(msg.substring(0, msg.length() - 2)
+                    + CombatMessageHelper.displayHitResults(hits).stripTrailing());
             UnitKey key = Units.getUnitKey(UnitType.Fighter, p2.getColor());
             var unitParsed = new ParsedUnit(key, hits, Constants.SPACE);
             RemoveUnitService.removeUnit(event, tile, game, unitParsed);

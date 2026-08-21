@@ -275,8 +275,8 @@ public class PlayHeroService {
             case "vyserixhero" -> VyserixLeaderHandler.offerHeroAttachmentButtons(event, game, player);
             case "onyxxahero" -> OnyxxaLeaderHandler.postHeroMoveShipButtons(game, player);
             case "xanhero" -> XanHeroHandler.postInitialButtons(game, player);
-            case "dreamhero" -> DreamLeadersHandler.postDreamHeroButtons(game, player);
             case "ashenhero" -> AshenLeadersHandler.postHeroButtons(event, game, player);
+            case "dreamhero" -> DreamLeadersHandler.postDreamHeroButtons(game, player);
             case "netrunnershero" -> NetrunnersLeadersHandler.startRevolution(game, player);
             case "tahero" -> TaLeadersHandler.postHeroButtons(game, player, event);
             case "tyrishero" ->

@@ -120,11 +120,11 @@
     "combatHitsOn": 5,
     "combatDieCount": 2,
     "bombardHitsOn": 5,
-    "bombardDieCount": 2,
+    "bombardDieCount": 3,
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "For each infantry destroyed by this unit's BOMBARDMENT ability, commit 1 infantry from your reinforcements to that planet."
+    "ability": "For each infantry destroyed by this unit's BOMBARDMENT ability, commit 1 captured infantry from your faction sheet to that planet."
   },
   {
     "id": "ashen_mech",
@@ -150,7 +150,7 @@
     "source": "beans",
     "faction": "ashen",
     "moveValue": 1,
-    "capacityValue": 1,
+    "capacityValue": 2,
     "capacityUsed": 1,
     "cost": 4,
     "combatHitsOn": 5,
@@ -171,7 +171,7 @@
     "source": "beans",
     "faction": "ashen",
     "moveValue": 2,
-    "capacityValue": 1,
+    "capacityValue": 2,
     "capacityUsed": 1,
     "cost": 4,
     "combatHitsOn": 4,
@@ -193,10 +193,10 @@
     "faction": "ashen",
     "capacityUsed": 1,
     "cost": 0.5,
-    "combatHitsOn": 8,
+    "combatHitsOn": 7,
     "combatDieCount": 1,
     "isGroundForce": true,
-    "ability": "When this unit would be destroyed, roll 1 die. On a 9 or higher, you may produce 1 hit. If you do, place that unit on this card. At the start of your next turn, place each unit on this card on planets you control in your home system."
+    "ability": ""
   },
   {
     "id": "ashen_infantry2",
@@ -209,10 +209,10 @@
     "faction": "ashen",
     "capacityUsed": 1,
     "cost": 0.5,
-    "combatHitsOn": 7,
+    "combatHitsOn": 6,
     "combatDieCount": 1,
     "isGroundForce": true,
-    "ability": "When this unit would be destroyed, roll 1 die. On a 6 or higher, you may produce 1 hit. If you do, place that unit on this card. At the start of your next turn, place each unit on this card on planets you control in your home system."
+    "ability": "DEPLOY: At the start of a round of ground combat on a planet you control, you may place 1 captured infantry on that planet."
   },
   {
     "id": "iron_flagship",

@@ -348,9 +348,9 @@ public class ArcanumBreakthroughHandler {
 
     private static boolean isEligible(String mode, UnitModel unit) {
         return switch (mode) {
-            case MOVE -> unit.getMoveValue() > 0;
-            case COMBAT -> unit.getCombatDieCount() != 0;
-            case CAPACITY -> unit.getIsShip();
+            case MOVE -> unit.getIsShip() && unit.getMoveValue() > 0;
+            case COMBAT -> unit.getIsShip() && unit.getCombatDieCount() > 0;
+            case CAPACITY -> unit.getIsShip() && unit.getCapacityValue() > 0;
             default -> false;
         };
     }

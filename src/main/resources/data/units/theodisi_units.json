@@ -684,6 +684,7 @@
     "afbHitsOn": 9,
     "afbDieCount": 2,
     "isShip": true,
+    "sustainDamage": true,
     "ability": "This unit can only transport infantry."
   },
   {
@@ -704,6 +705,7 @@
     "afbHitsOn": 6,
     "afbDieCount": 3,
     "isShip": true,
+    "sustainDamage": true,
     "ability": "This unit can only transport ground forces."
   }
 ]
