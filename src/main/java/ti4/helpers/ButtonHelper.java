@@ -2669,6 +2669,10 @@ public class ButtonHelper {
     }
 
     public static int checkNumberNonFighterShips(Player player, Tile tile) {
+        return checkNumberNonFighterShips(player, tile, true);
+    }
+
+    public static int checkNumberNonFighterShips(Player player, Tile tile, boolean includeMechs) {
         int count = 0;
         UnitHolder space = tile.getUnitHolders().get("space");
         for (UnitKey unit : space.getUnitKeys()) {
@@ -2680,10 +2684,10 @@ public class ButtonHelper {
             UnitModel removedUnit = unitModels.getFirst();
             if (removedUnit.getIsShip() && !removedUnit.getAsyncId().contains("ff")) {
                 count += space.getUnitCount(unit);
-            } else if ("mech".equalsIgnoreCase(removedUnit.getBaseType())
+            } else if (includeMechs
+                    && "mech".equalsIgnoreCase(removedUnit.getBaseType())
                     && player.hasUnit("naaz_mech_space")
-                    && !player.hasUnit("naaz_voltron")
-                    && "action".equalsIgnoreCase(player.getGame().getPhaseOfGame())) {
+                    && !player.hasUnit("naaz_voltron")) {
                 count += space.getUnitCount(unit);
             }
         }
