@@ -21,7 +21,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -42,8 +43,10 @@ import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.DeepgloomService;
+import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.ExhaustLeaderService;
@@ -452,6 +455,11 @@ public class ComponentActionHelper {
             }
         }
 
+        if (game.isErwansGambitMode() && getTilePlayerCanTurnInBounty(game, p1) != null) {
+            compButtons.add(
+                    Buttons.green(factionChecker + prefix + "turnInBounty", "Turn In Bounty", UnitEmojis.Galvanized));
+        }
+
         // Abilities
         if (p1.hasAbility("star_forge")
                 && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar"))
@@ -470,9 +478,11 @@ public class ComponentActionHelper {
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("orbital_drop") && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar"))) {
-            Button abilityButton =
-                    Buttons.green(factionChecker + prefix + "ability_orbitalDrop", "Orbital Drop", FactionEmojis.Sol);
-            compButtons.add(abilityButton);
+            compButtons.add(
+                    Buttons.green(factionChecker + prefix + "ability_orbitalDrop", "Orbital Drop", FactionEmojis.Sol));
+        }
+        if (p1.hasAbility("contraband_auction") && !p1.getExhaustedAbilities().contains("contraband_auction")) {
+            compButtons.add(Buttons.green(factionChecker + prefix + "ability_Contraband", "Contraband Auction"));
         }
         if (game.playerHasLeaderUnlockedOrAlliance(p1, "tyriscommander")) {
             TyrisLeaderHandler.addCommanderActionButton(p1, factionChecker, prefix, compButtons);
@@ -691,6 +701,12 @@ public class ComponentActionHelper {
                     List<Button> buttons = ButtonHelperAbilities.getSuperWeaponButtonsPart1(p1, game);
                     String message =
                             p1.getRepresentation() + ", please choose the planet you wish to put a Superweapon on.";
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                } else if ("Contraband".equalsIgnoreCase(buttonID)) {
+                    String message = "Please choose whether you want to put up a relic or faction tech for action.";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("beginAuction_relic", "Relic", ExploreEmojis.Relic));
+                    buttons.add(Buttons.blue("beginAuction_tech", "Faction Tech"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("orbitalDrop".equalsIgnoreCase(buttonID)) {
                     String successMessage = p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Sol
@@ -1099,10 +1115,65 @@ public class ComponentActionHelper {
                 game.scorePublicObjective(p1.getUserID(), poIndex);
                 Helper.checkEndGame(game, p1);
             }
+            case "turnInBounty" -> {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        p1.getFactionEmoji() + " has decided to turn in a bounty for 1 VP or 6 Trade goods.");
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.blue("redeemBounty_6tg", "Gain 6 Tg", MiscEmojis.tg));
+                buttons.add(Buttons.green("redeemBounty_vp", "Gain Victory Point"));
+                MessageHelper.sendMessageToChannel(
+                        p1.getCorrectChannel(), p1.getRepresentation() + " choose your reward.", buttons);
+                Tile tile = getTilePlayerCanTurnInBounty(game, p1);
+                tile.getSpaceUnitHolder().removeAllGalvanize();
+            }
         }
 
         if (!firstPart.contains("ability") && !firstPart.contains("getRelic") && !firstPart.contains("pn")) {
             serveNextComponentActionButtons(event, game, p1);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static Tile getTilePlayerCanTurnInBounty(Game game, Player player) {
+        Tile tile = null;
+        for (Tile tile2 : game.getTileMap().values()) {
+            if (tile2.getSpaceUnitHolder().getGalvanizedUnitCount(player.getColorID()) > 0) {
+                if (tile2.isMecatol(game)
+                        || player.getHomeSystemTile() == tile2
+                        || ("sol".equalsIgnoreCase(player.getFaction())
+                                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                                        .contains(tile2))) {
+                    return tile;
+                }
+            }
+        }
+
+        return tile;
+    }
+
+    @ButtonHandler("redeemBounty_")
+    public static void redeemBounty(Player p1, Game game, ButtonInteractionEvent event, String buttonID) {
+        String reward = buttonID.split("_")[1];
+        switch (reward) {
+            case "vp" -> {
+                String customPOName = "Bounty VPs (" + p1.getFaction() + ")";
+                int vp = 1;
+                if (game.getCustomPublicVP().containsKey(customPOName)) {
+                    vp = game.getCustomPublicVP().get(customPOName) + 1;
+                    game.removeCustomPO(customPOName);
+                }
+                Integer poIndex = game.addCustomPO(customPOName, vp);
+                game.scorePublicObjective(p1.getUserID(), poIndex);
+                Helper.checkEndGame(game, p1);
+                MessageHelper.sendMessageToChannel(
+                        p1.getCorrectChannel(), p1.getRepresentationNoPing() + " gained a VP.");
+            }
+            default -> {
+                p1.gainTG(6, true);
+                MessageHelper.sendMessageToChannel(
+                        p1.getCorrectChannel(), p1.getRepresentationNoPing() + " gained 6 tg.");
+            }
         }
         ButtonHelper.deleteMessage(event);
     }

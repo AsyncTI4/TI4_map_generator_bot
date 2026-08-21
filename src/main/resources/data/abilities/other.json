@@ -116,5 +116,47 @@
         "faction": "keleres",
         "permanentEffect": "During setup, choose an unplayed faction from among the Mentak, the Xxcha and The Argent Flight; take that faction's home system, command tokens and control markers. Additionally, take the Keleres Hero that corresponds to that faction",
         "source": "codex3"
+    },
+    {
+        "id": "safe_harbor",
+        "name": "Safe Harbor",
+        "faction": "mentak",
+        "permanentEffect": "Pay 2 Trade Goods to a non-Mentak player to activate a non-home system that contains that player’s ships and/or ground forces. Effect: Combat is not initiated during this tactical action; instead, Mentak units enter Coexistence with that player's units. At the end of the Status Phase, any ground forces in Coexistence return to the space area",
+        "source": "erwans_gambit"
+    },
+    {
+        "id": "iron_price",
+        "name": "Iron Price",
+        "faction": "letnev",
+        "permanentEffect": "The Mentak player cannot use their Safe Harbor ability to activate Letnev systems. Additionally, any Letnev ship carrying a bounty rolls +1 die in combat.",
+        "source": "erwans_gambit"
+    },
+    {
+        "id": "hylar_fencing_operation",
+        "name": "Hylar Fencing Operation",
+        "faction": "jolnar",
+        "permanentEffect": "When Mentak uses Safe Harbor in a Jol-Nar system, the Jol-Nar player may pay 2 Trade Goods to Mentak to research 1 technology owned by the Mentak player.",
+        "source": "erwans_gambit"
+    },
+    {
+        "id": "outlaw_brotherhood",
+        "name": "Outlaw Brotherhood",
+        "faction": "saar",
+        "permanentEffect": "When Mentak uses Safe Harbor in a Saar system, they do not pay the 2 Trade Goods cost. The Saar player may pass through systems containing Mentak units.",
+        "source": "erwans_gambit"
+    },
+    {
+        "id": "contraband_auction",
+        "name": "Contraband Auction",
+        "faction": "hacan",
+        "permanentEffect": "Draw 1 relic from the relic deck OR 1 faction technology from the reference deck. All players place a blind bid using Resources. The highest bidder gains the card. Then, gain 2 Trade Goods and exhaust this card.",
+        "source": "erwans_gambit"
+    },
+    {
+        "id": "asset_recovery",
+        "name": "Asset Recovery",
+        "faction": "sol",
+        "permanentEffect": "When the Sol player gains a bounty, they may resolve it at any system containing one of their Space Docks.",
+        "source": "erwans_gambit"
     }
 ]
