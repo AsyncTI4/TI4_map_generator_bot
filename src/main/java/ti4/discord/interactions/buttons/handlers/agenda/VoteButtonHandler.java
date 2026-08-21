@@ -3,10 +3,13 @@ package ti4.discord.interactions.buttons.handlers.agenda;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -18,6 +21,8 @@ import ti4.helpers.AgendaRiderHelper;
 import ti4.helpers.AgendaSummaryHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
+import ti4.helpers.RegexHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.PlanetEmojis;
@@ -110,27 +115,22 @@ class VoteButtonHandler {
         }
     }
 
-    // Non-fog only: the fog path never offers the player-picking step that leads here.
+    // Non-fog only. firstStepOfVoting is this button's one and only generator, and it only builds a
+    // planetOutcomes_ button from its non-fog branch - in fog it calls fogPlanetOutcomeButtons directly and
+    // skips this step entirely. Unlike tiedPlanets_ below, nothing else in the codebase builds this id, and
+    // fog mode is fixed at game creation (no live toggle exists), so there is no real path that reaches this
+    // method with fog on.
     @ButtonHandler("planetOutcomes_")
-    static void planetOutcomes(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+    static void planetOutcomes(ButtonInteractionEvent event, String buttonID, Game game) {
         String factionOrColor = buttonID.substring(buttonID.indexOf('_') + 1);
         Player planetOwner = game.getPlayerFromColorOrFaction(factionOrColor);
-        String voteMessage = "Choosing to vote for one of " + factionOrColor
-                + "'s planets. Please use the buttons to choose the planet you wish to vote for.";
-        List<Button> outcomeActionRow;
-        if (game.isFowMode()) {
-            if (player == null) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve that player.");
-                return;
-            }
-            voteMessage = "Please choose the planet you wish to vote for.";
-            outcomeActionRow = fogPlanetOutcomeButtons(game, player, "outcome");
-        } else if (planetOwner == null) {
+        if (planetOwner == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve that player.");
             return;
-        } else {
-            outcomeActionRow = getPlanetOutcomeButtons(planetOwner, game, "outcome", null);
         }
+        String voteMessage = "Choosing to vote for one of " + factionOrColor
+                + "'s planets. Please use the buttons to choose the planet you wish to vote for.";
+        List<Button> outcomeActionRow = getPlanetOutcomeButtons(planetOwner, game, "outcome", null);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, outcomeActionRow);
         ButtonHelper.deleteMessage(event);
     }
@@ -168,7 +168,8 @@ class VoteButtonHandler {
     }
 
     /**
-     * The fog-safe candidate list for an Elect Planet outcome.
+     * The fog-safe candidate list for an Elect Planet outcome, paginated to Discord's 25-buttons-per-message
+     * cap.
      *
      * <p>Two sources: planets the voter could know exist, and planets already named in this agenda's votes.
      * The second set matters for correctness rather than secrecy - the vote summary shows later voters which
@@ -176,8 +177,17 @@ class VoteButtonHandler {
      *
      * <p>Safe to relabel: an outcome is keyed by the raw planet id, and the summary renders it through
      * {@code getAgendaOutcomeName}, so nothing downstream depends on this button's text.
+     *
+     * <p>Known planets are not naturally bounded - stat-visibility alone can add a whole ally's holdings on
+     * top of everything scouted, so a big pod with a couple of alliances routinely exceeds 25. Below that, this
+     * returns the same flat list it always did; {@link #votePlanetPage} is the page-2-and-beyond entry point.
      */
     static List<Button> fogPlanetOutcomeButtons(Game game, Player player, String prefix) {
+        List<Button> all = rawFogPlanetOutcomeButtons(game, player, prefix);
+        return NewStuffHelper.buttonPagination(all, null, votePagePrefix(prefix), 25, 0, false);
+    }
+
+    private static List<Button> rawFogPlanetOutcomeButtons(Game game, Player player, String prefix) {
         // A button pressed after the agenda window closed has no agenda info to read. AgendaHelper.autoResolve
         // guards the same expression the same way. Empty is an unambiguous signal to the callers below,
         // because a live fog list always carries at least the Blind Target button.
@@ -197,6 +207,58 @@ class VoteButtonHandler {
                 })
                 .withAlwaysInclude(new HashSet<>(game.getCurrentAgendaVotes().keySet()));
         return PlanetTargetService.targetButtons(game, player, spec, new ArrayList<>());
+    }
+
+    private static final String VOTE_PLANET_PAGE_PREFIX = "votePlanetPage_";
+
+    /**
+     * Prefix used to build this outcome's page-nav button ids: {@code votePlanetPage_<realPrefix>|page<N>}. A
+     * dedicated prefix - never {@code prefix} itself - so a nav press cannot be misrouted by
+     * {@code @ButtonHandler}'s longest-prefix match into {@code outcome_}'s real vote-casting handler. Neither
+     * real prefix ("outcome", "resolveAgendaVote_outcomeTie*") contains "|page", so the split below is exact.
+     */
+    private static String votePagePrefix(String realPrefix) {
+        return VOTE_PLANET_PAGE_PREFIX + realPrefix + "|";
+    }
+
+    /** A page-nav id's decoded parts: which outcome prefix it was built for, and which page it names. */
+    record ParsedPageID(String realPrefix, int page) {}
+
+    /** Decodes a {@code votePlanetPage_<realPrefix>|page<N>} id, or null if it doesn't match that shape. */
+    static ParsedPageID parseVotePageID(String pageButtonID) {
+        String remainder = pageButtonID.substring(VOTE_PLANET_PAGE_PREFIX.length());
+        Matcher pageMatch = Pattern.compile(RegexHelper.pageRegex()).matcher(remainder);
+        if (!pageMatch.find()) return null;
+        String realPrefix = StringUtils.substringBeforeLast(remainder, "|page");
+        return new ParsedPageID(realPrefix, Integer.parseInt(pageMatch.group("page")));
+    }
+
+    /** The requested page of {@link #fogPlanetOutcomeButtons}'s full list. */
+    static List<Button> votePlanetPageButtons(Game game, Player player, ParsedPageID parsed) {
+        List<Button> all = rawFogPlanetOutcomeButtons(game, player, parsed.realPrefix());
+        return NewStuffHelper.buttonPagination(
+                all, null, votePagePrefix(parsed.realPrefix()), 25, parsed.page(), false);
+    }
+
+    /** Page 2 and beyond of {@link #fogPlanetOutcomeButtons}. Read-only: paging casts no vote. */
+    @ButtonHandler(value = VOTE_PLANET_PAGE_PREFIX, save = false)
+    static void votePlanetPage(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve that player.");
+            return;
+        }
+        ParsedPageID parsed = parseVotePageID(buttonID);
+        if (parsed == null) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        List<Button> pageButtons = votePlanetPageButtons(game, player, parsed);
+        String voteMessage = parsed.realPrefix().contains("outcomeTie")
+                ? "As Speaker, please decide a winner."
+                : "Please choose the planet you wish to vote for.";
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getChannel(), voteMessage + " (page " + (parsed.page() + 1) + ")", pageButtons);
     }
 
     private static List<Button> getPlanetOutcomeButtons(Player planetOwner, Game game, String prefix, String rider) {

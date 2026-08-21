@@ -27,8 +27,9 @@ public class VyserixLeaderHandler {
         String message = player.getRepresentation()
                 + ", choose a non-home planet without a technology specialty to attach _Titles Are Silly_ to.";
         if (game.isFowMode()) {
-            // Unlike most of these flows this leaks map inventory rather than ownership: which planets exist
-            // and which carry a tech specialty, including on systems the player has never seen.
+            // The card's own text ("1 non-home planet on the game board") is unrestricted by knowledge - but
+            // that reach is already there via Blind Target, which accepts any real planet name and isn't
+            // gated on fog knowledge at resolution either.
             buttons = PlanetTargetService.targetButtons(
                     game,
                     player,
