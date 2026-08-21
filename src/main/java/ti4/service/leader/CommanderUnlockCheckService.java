@@ -299,7 +299,13 @@ public class CommanderUnlockCheckService {
             }
             case "ta" -> shouldBeUnlocked = (TaAbilityHandler.getControlledPlanetCountWithAnyDesign(player, game) >= 4);
             case "netrunners" ->
-                shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false) >= 4);
+                shouldBeUnlocked = player.getTechs().stream()
+                                .filter(tech -> game.getRealPlayersExcludingThis(player).stream()
+                                                .filter(otherPlayer -> otherPlayer.hasTech(tech))
+                                                .count()
+                                        >= 2)
+                                .count()
+                        >= 2;
             case "crystellum" ->
                 shouldBeUnlocked =
                         (CrystellumLeadersHandler.getCrystellumCommanderCapacitySystemCount(game, player) >= 3);

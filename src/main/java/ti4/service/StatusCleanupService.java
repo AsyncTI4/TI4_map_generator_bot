@@ -10,6 +10,9 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -92,6 +95,11 @@ public class StatusCleanupService {
 
         for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
 
+            NetrunnersAbilitiesHandler.clearReverseEngineering(game, player);
+            NetrunnersAbilitiesHandler.clearProxyNetwork(game, player);
+            NetrunnersAbilitiesHandler.clearBlackout(game, player);
+            NetrunnersFactionTechsHandler.clearDataMining(game, player);
+            NetrunnersUnitsHandler.clearTrojan(game, player);
             player.setPassed(false);
             Set<Integer> SCs = player.getSCs();
             for (int sc : SCs) {

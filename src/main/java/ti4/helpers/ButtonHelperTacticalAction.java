@@ -23,7 +23,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.Dr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
@@ -69,7 +68,6 @@ import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.EidolonMaximumService;
 import ti4.service.breakthrough.VoidTetherService;
-import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -523,13 +521,6 @@ public final class ButtonHelperTacticalAction {
                 List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
                 spaceCannonButtons.add(
                         Buttons.red("declinePDS_" + tile.getTileID() + "_" + player.getFaction(), "Decline PDS"));
-                if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasAbility("control_network"))
-                        && (game.getRealPlayers().stream().noneMatch(player_ -> player_.hasUnit("netrunners_flagship"))
-                                || !NetrunnersUnitsHandler.empBlocksSpaceCannonAgainstOpponent(
-                                        game, playerWithPds, tile, CombatRollType.SpaceCannonOffence))) {
-                    spaceCannonButtons.addAll(NetrunnersAbilitiesHandler.getControlNetworkSpaceCannonButtons(
-                            game, playerWithPds, tile, CombatRollType.SpaceCannonOffence, "space"));
-                }
                 MessageHelper.sendMessageToChannelWithButtons(
                         playerWithPds.getCorrectChannel(),
                         title + playerWithPds.getRepresentationUnfogged() + ", you have SPACE CANNON coverage in "
@@ -749,6 +740,7 @@ public final class ButtonHelperTacticalAction {
             return;
         }
         game.setActiveSystem(pos);
+        NetrunnersAbilitiesHandler.offerBlackout(game, player, tile);
         DreamPromissoryHandler.returnVisionsOnSystemActivation(event, game, player, tile);
         AlluringThroneService.offerIllustrionLegendaryAbility(game, tile, player);
         ArcanumTechHandler.offerSigilOfTransmutation(event, game, player, tile);

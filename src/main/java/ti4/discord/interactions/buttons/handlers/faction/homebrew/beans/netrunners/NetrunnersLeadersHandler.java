@@ -1,622 +1,316 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.game.Leader;
-import ti4.game.Planet;
 import ti4.game.Player;
-import ti4.game.Tile;
-import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperModifyUnits;
-import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
-import ti4.helpers.Units;
-import ti4.helpers.Units.UnitKey;
-import ti4.helpers.Units.UnitType;
-import ti4.helpers.thundersedge.TeHelperUnits;
+import ti4.image.Mapper;
 import ti4.message.MessageHelper;
-import ti4.model.UnitModel;
-import ti4.service.combat.StartCombatService;
+import ti4.model.PlanetModel;
+import ti4.model.TechSpecialtyModel.TechSpecialty;
+import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
-import ti4.service.unit.AddUnitService;
-import ti4.service.unit.CheckUnitContainmentService;
-import ti4.service.unit.DestroyUnitService;
+import ti4.service.tech.ListTechService;
 
 @UtilityClass
 public class NetrunnersLeadersHandler {
-
-    private static final String AGENT_ID = "netrunnersagent";
-    private static final String AGENT_CHOOSE_TARGET = "netrunnersAgentChooseTarget";
-    private static final String AGENT_TARGET = "netrunnersAgentTarget_";
-    private static final String OVERCLOCK_TILE_PREFIX = "netrunnersAgentTile_";
-    private static final String OVERCLOCK_UNIT_PREFIX = "netrunnersAgentUnit_";
-    private static final String OVERCLOCK_DONE_PREFIX = "netrunnersAgentDone_";
-    private static final String OVERCLOCK_REMAINING_PREFIX = "netrunnersAgentRemaining_";
-    private static final String COMMANDER_ID = "netrunnerscommander";
-    private static final String COMMANDER_FAKE_UNIT_ID = "netrunnerscommanderpds";
-    private static final String HERO_CHOOSE_STRUCTURE_PREFIX = "netrunnersHeroChooseStructure_";
-    private static final String HERO_DESTROY_STRUCTURE_PREFIX = "netrunnersHeroDestroyStructure_";
-
-    public static Button getOverclockCardsInfoButton(Player player) {
-        return Buttons.gray(
-                player.factionButtonChecker() + AGENT_CHOOSE_TARGET, "Use Overclock", FactionEmojis.netrunners);
+    public static boolean shouldChooseCommanderTechnologySecondary(Game game, Player player) {
+        return game != null
+                && player != null
+                && player.hasLeaderUnlocked("netrunnerscommander")
+                && game.getStoredValue("netrunnersCommanderTechnologySecondary" + player.getFaction())
+                        .isEmpty();
     }
 
-    @ButtonHandler(AGENT_CHOOSE_TARGET)
-    public static void chooseOverclockTarget(ButtonInteractionEvent event, Player player, Game game) {
-        if (!player.hasUnexhaustedLeader(AGENT_ID)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Overclock is no longer available.");
-            ButtonHelper.deleteMessage(event);
+    public static boolean commanderSkipsTechnologySecondaryToken(Game game, Player player) {
+        return game != null
+                && player != null
+                && player.hasLeaderUnlocked("netrunnerscommander")
+                && "skip".equals(game.getStoredValue("netrunnersCommanderTechnologySecondary" + player.getFaction()));
+    }
+
+    public static void offerCommanderTechnologySecondary(Game game, Player player) {
+        if (!shouldChooseCommanderTechnologySecondary(game, player)) {
             return;
         }
-
-        List<Button> buttons = new ArrayList<>();
-        for (Player target : game.getRealPlayers()) {
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + AGENT_TARGET + target.getFaction(), target.getColorDisplayName()));
-        }
-
-        MessageChannel channel =
-                player.getCardsInfoThread() == null ? player.getCorrectChannel() : player.getCardsInfoThread();
         MessageHelper.sendMessageToChannelWithButtons(
-                channel, player.getRepresentation() + ", please choose a player to use _Overclock_ on:", buttons);
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged()
+                        + ", Tek Mir-un, the Netrunners commander, lets you choose whether to spend a strategy token for this Technology secondary.",
+                List.of(
+                        Buttons.green(
+                                player.factionButtonChecker() + "netrunnersCommanderTechnologySecondary_skip",
+                                "Research Without Spending a Token",
+                                FactionEmojis.netrunners),
+                        Buttons.gray(
+                                player.factionButtonChecker() + "netrunnersCommanderTechnologySecondary_spend",
+                                "Spend a Token Normally",
+                                FactionEmojis.netrunners)));
     }
 
-    public static void startOverclockSession(Game game, Player netrunner, Player affectedPlayer) {
-        game.setStoredValue(OVERCLOCK_REMAINING_PREFIX + affectedPlayer.getFaction(), "2");
+    @ButtonHandler("netrunnersCommanderTechnologySecondary_")
+    public static void resolveCommanderTechnologySecondary(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        if (!player.hasLeaderUnlocked("netrunnerscommander")) return;
+        String choice = buttonID.replace("netrunnersCommanderTechnologySecondary_", "");
+        if (!"skip".equals(choice) && !"spend".equals(choice)) return;
+        game.setStoredValue("netrunnersCommanderTechnologySecondary" + player.getFaction(), choice);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        if ("spend".equals(choice)) offerCommanderFreeTechnology(game, player);
+        ListTechService.acquireATech(event, game, player, true, false, TechnologyType.mainFive, true);
     }
 
-    public static int getOverclockRemaining(Game game, Player affectedPlayer) {
-        String stored = game.getStoredValue(OVERCLOCK_REMAINING_PREFIX + affectedPlayer.getFaction());
-        return stored.isEmpty() ? 0 : Integer.parseInt(stored);
-    }
-
-    private static void setOverclockRemaining(Game game, Player affectedPlayer, int remaining) {
-        if (remaining <= 0) {
-            clearOverclockSession(game, affectedPlayer);
-            return;
-        }
-        game.setStoredValue(OVERCLOCK_REMAINING_PREFIX + affectedPlayer.getFaction(), Integer.toString(remaining));
-    }
-
-    private static void clearOverclockSession(Game game, Player affectedPlayer) {
-        game.removeStoredValue(OVERCLOCK_REMAINING_PREFIX + affectedPlayer.getFaction());
-    }
-
-    private static List<Tile> getOverclockStructureTiles(Game game, Player affectedPlayer) {
-        if (game == null || affectedPlayer == null) {
-            return List.of();
-        }
-
-        return game.getTileMap().values().stream()
-                .filter(Objects::nonNull)
-                .filter(tile -> tile.containsPlayersUnitsWithModelCondition(affectedPlayer, UnitModel::getIsStructure))
-                .toList();
-    }
-
-    private static List<Button> getOverclockStructureTileButtons(Game game, Player affectedPlayer) {
-        List<Button> buttons = getOverclockStructureTiles(game, affectedPlayer).stream()
-                .limit(24)
-                .map(tile -> Buttons.green(
-                        affectedPlayer.factionButtonChecker()
-                                + OVERCLOCK_TILE_PREFIX
-                                + affectedPlayer.getFaction()
-                                + "_"
-                                + tile.getPosition(),
-                        tile.getRepresentationForButtons(game, affectedPlayer)))
-                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
-        buttons.add(Buttons.red(
-                affectedPlayer.factionButtonChecker() + OVERCLOCK_DONE_PREFIX + affectedPlayer.getFaction(),
-                "Done With Overclock"));
-        return buttons;
-    }
-
-    @ButtonHandler(AGENT_TARGET)
-    public static void resolveOverclockTarget(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!player.hasUnexhaustedLeader(AGENT_ID)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "_Overclock_ is no longer available.");
-            return;
-        }
-
-        String faction = getOverclockPayload(buttonID, AGENT_TARGET);
-        Player affectedPlayer = game.getPlayerFromColorOrFaction(faction);
-        if (affectedPlayer == null) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Could not find that player.");
-            return;
-        }
-
-        startOverclockSession(game, player, affectedPlayer);
-
-        Leader agent = player.getLeader(AGENT_ID).orElse(null);
-        if (agent != null) {
-            ExhaustLeaderService.exhaustLeader(game, player, agent);
-        }
-
-        List<Button> buttons = getOverclockStructureTileButtons(game, affectedPlayer);
-        if (buttons.isEmpty()) {
-            clearOverclockSession(game, affectedPlayer);
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Player has no eligibl tiles with structures.");
-            return;
-        }
-
-        MessageHelper.sendMessageToChannel(
-                game.getActionsChannel(),
-                player.getRepresentation() + " exhausted **Overclock** to allow "
-                        + affectedPlayer.getRepresentation()
-                        + " to produce up to 2 units with tiles containing their structures.");
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                game.getActionsChannel(),
-                affectedPlayer.getRepresentationUnfogged()
-                        + ", choose a tile containing one of your structures for _Overclock_. "
-                        + "You have " + getOverclockRemaining(game, affectedPlayer) + " use(s) remaining.",
-                buttons);
-
-        ButtonHelper.deleteMessage(event);
-    }
-
-    private static String getOverclockPayload(String buttonID, String prefix) {
-        int prefixIndex = buttonID.indexOf(prefix);
-        if (prefixIndex < 0) {
-            return "";
-        }
-        return buttonID.substring(prefixIndex + prefix.length());
-    }
-
-    @ButtonHandler(OVERCLOCK_TILE_PREFIX)
-    public static void resolveOverclockTile(
-            Game game, Player affectedPlayer, ButtonInteractionEvent event, String buttonID) {
-        String payload = getOverclockPayload(buttonID, OVERCLOCK_TILE_PREFIX);
-        String[] parts = payload.split("_", 2);
-        if (parts.length < 2) {
-            return;
-        }
-
-        Player target = game.getPlayerFromColorOrFaction(parts[0]);
-        Tile tile = game.getTileByPosition(parts[1]);
-
-        if (target == null || tile == null) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "That Overclock option is no longer valid.");
-            return;
-        }
-
-        if (!affectedPlayer.equals(target)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "That Overclock option is not for you.");
-            return;
-        }
-
-        if (getOverclockRemaining(game, affectedPlayer) < 1) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "**Overclock** is no longer available.");
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        if (!getOverclockStructureTiles(game, affectedPlayer).contains(tile)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "That tile no longer contains one of your structures.");
-            return;
-        }
-
-        List<Button> buttons = getOverclockUnitButtons(event, game, affectedPlayer, tile);
-        if (buttons.isEmpty()) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "No valid Overclock production options were found for that tile.");
-            return;
-        }
-
-        String message = affectedPlayer.getRepresentationUnfogged()
-                + ", use these buttons to produce in "
-                + tile.getRepresentationForButtons(game, affectedPlayer)
-                + " for **Overclock**. "
-                + getOverclockRemaining(game, affectedPlayer)
-                + " Overclock use(s) remaining.";
-
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
-    }
-
-    @ButtonHandler(OVERCLOCK_UNIT_PREFIX)
-    public static void resolveOverclockUnit(
-            Game game, Player affectedPlayer, ButtonInteractionEvent event, String buttonID) {
-        String payload = getOverclockPayload(buttonID, OVERCLOCK_UNIT_PREFIX);
-        String[] parts = payload.split("\\|", 2);
-        if (parts.length < 2) {
-            return;
-        }
-
-        Player target = game.getPlayerFromColorOrFaction(parts[0]);
-        String placeButtonId = parts[1];
-        if (target == null || !affectedPlayer.equals(target) || getOverclockRemaining(game, affectedPlayer) < 1) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "**Overclock** is no longer available.");
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        ButtonHelperModifyUnits.placeUnitAndDeleteButton(placeButtonId, event, game, affectedPlayer);
-        sendOverclockPaymentPrompt(game, affectedPlayer, event);
-        int remaining = getOverclockRemaining(game, affectedPlayer) - 1;
-        setOverclockRemaining(game, affectedPlayer, remaining);
-        if (remaining < 1) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    affectedPlayer.getRepresentationUnfogged() + " has finished resolving **Overclock**.");
-            return;
-        }
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getChannel(),
-                affectedPlayer.getRepresentationUnfogged()
-                        + ", choose another tile containing one of your structures for _Overclock_. "
-                        + "You have " + remaining + " use(s) remaining.",
-                getOverclockStructureTileButtons(game, affectedPlayer));
-    }
-
-    @ButtonHandler(OVERCLOCK_DONE_PREFIX)
-    public static void resolveOverclockDone(
-            Game game, Player affectedPlayer, ButtonInteractionEvent event, String buttonID) {
-        String faction = getOverclockPayload(buttonID, OVERCLOCK_DONE_PREFIX);
-        Player target = game.getPlayerFromColorOrFaction(faction);
-        if (target != null && affectedPlayer.equals(target)) {
-            clearOverclockSession(game, affectedPlayer);
-        }
-        ButtonHelper.deleteMessage(event);
-    }
-
-    private static List<Button> getOverclockUnitButtons(
-            ButtonInteractionEvent event, Game game, Player affectedPlayer, Tile tile) {
-        Map<String, Integer> producedUnitsSnapshot = new LinkedHashMap<>(affectedPlayer.getCurrentProducedUnits());
-        List<Button> generatedButtons = Helper.getPlaceUnitButtons(
-                event, affectedPlayer, game, tile, "netrunnersagent", "placeOneNDone_skipbuild");
-        restoreProducedUnits(affectedPlayer, producedUnitsSnapshot);
-
-        List<Button> wrappedButtons = generatedButtons.stream()
-                .filter(button -> button.getCustomId() != null)
-                .filter(button -> button.getCustomId().contains("placeOneNDone_"))
-                .map(button -> wrapOverclockUnitButton(affectedPlayer, button))
-                .limit(24)
-                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
-        wrappedButtons.add(Buttons.red(
-                affectedPlayer.factionButtonChecker() + OVERCLOCK_DONE_PREFIX + affectedPlayer.getFaction(),
-                "Done With Overclock"));
-        return wrappedButtons;
-    }
-
-    private static void sendOverclockPaymentPrompt(Game game, Player affectedPlayer, ButtonInteractionEvent event) {
-        List<Button> buttons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, affectedPlayer, "res"));
-        buttons.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getChannel(),
-                affectedPlayer.getRepresentationUnfogged() + ", Pay for the additional unit.",
-                buttons);
-    }
-
-    private static void restoreProducedUnits(Player affectedPlayer, Map<String, Integer> producedUnitsSnapshot) {
-        affectedPlayer.resetProducedUnits();
-        producedUnitsSnapshot.forEach(affectedPlayer::setProducedUnit);
-    }
-
-    private static Button wrapOverclockUnitButton(Player affectedPlayer, Button button) {
-        String innerId = button.getCustomId();
-        String checker = affectedPlayer.factionButtonChecker();
-        if (innerId.startsWith(checker)) {
-            innerId = innerId.substring(checker.length());
-        }
-        String wrappedId = checker + OVERCLOCK_UNIT_PREFIX + affectedPlayer.getFaction() + "|" + innerId;
-        String emoji = button.getEmoji() == null ? null : button.getEmoji().toString();
-
-        return switch (button.getStyle()) {
-            case PRIMARY -> Buttons.blue(wrappedId, button.getLabel(), emoji);
-            case SECONDARY -> Buttons.gray(wrappedId, button.getLabel(), emoji);
-            case DANGER -> Buttons.red(wrappedId, button.getLabel(), emoji);
-            default -> Buttons.green(wrappedId, button.getLabel(), emoji);
-        };
-    }
-
-    public static void startRevolution(Game game, Player netrunner) {
-        List<Player> targets = getRevolutionTargets(game, netrunner);
-        if (targets.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    netrunner.getCorrectChannel(),
-                    netrunner.getRepresentation()
-                            + " used **Digital Uprising**, but no players with control tokens in the **"
-                            + NetrunnersAbilitiesHandler.SYSTEM_BREACH_POOL
-                            + "** pool have structures on non-home planets to destroy.");
-            return;
-        }
-
-        String targetPings =
-                String.join(" ", targets.stream().map(Player::getRepresentation).toList());
-        List<Button> buttons = targets.stream()
-                .map(target -> Buttons.red(
-                        target.factionButtonChecker() + HERO_CHOOSE_STRUCTURE_PREFIX + netrunner.getFaction(),
-                        "Destroy a structure",
+    private static void offerCommanderFreeTechnology(Game game, Player player) {
+        List<Button> buttons = player.getPlanets().stream()
+                .filter(player::hasPlanetReady)
+                .filter(planet -> {
+                    PlanetModel model = Mapper.getPlanet(planet);
+                    return model != null
+                            && model.getTechSpecialties() != null
+                            && model.getTechSpecialties().stream()
+                                    .anyMatch(NetrunnersLeadersHandler::isColoredSpecialty);
+                })
+                .map(planet -> Buttons.green(
+                        player.factionButtonChecker() + "netrunnersCommanderPlanet_" + planet,
+                        "Exhaust " + planet,
                         FactionEmojis.netrunners))
                 .toList();
-        MessageHelper.sendMessageToChannelWithButtons(
-                netrunner.getCorrectChannel(),
-                netrunner.getRepresentation() + " used **Digital Uprising**. "
-                        + targetPings
-                        + ", use your button to choose and destroy 1 structure you own on a non-home planet.",
-                buttons);
+        if (!buttons.isEmpty()) {
+            buttons = new java.util.ArrayList<>(buttons);
+            buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", because you spent a strategy token, you may exhaust a technology-specialty planet to research a technology of that color for free via Tek Mir-un, the Netrunners commander.",
+                    buttons);
+        }
     }
 
-    @ButtonHandler(HERO_CHOOSE_STRUCTURE_PREFIX)
-    public static void offerRevolutionStructureButtons(
-            Game game, Player target, ButtonInteractionEvent event, String buttonID) {
-        Player netrunner = game.getPlayerFromColorOrFaction(buttonID.replace(HERO_CHOOSE_STRUCTURE_PREFIX, ""));
-        if (!isRevolutionTarget(game, netrunner, target)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "You do not have an eligible structure to destroy for **Digital Uprising**.");
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
-            return;
-        }
-
-        List<Button> buttons = getRevolutionStructureButtons(game, netrunner, target);
-        MessageChannel channel =
-                target.getCardsInfoThread() == null ? target.getCorrectChannel() : target.getCardsInfoThread();
+    @ButtonHandler("netrunnersCommanderPlanet_")
+    public static void resolveCommanderPlanet(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.replace("netrunnersCommanderPlanet_", "");
+        PlanetModel model = Mapper.getPlanet(planet);
+        if (!player.hasLeaderUnlocked("netrunnerscommander")
+                || !player.hasPlanetReady(planet)
+                || model == null
+                || model.getTechSpecialties() == null) return;
+        List<TechnologyModel> techs = model.getTechSpecialties().stream()
+                .filter(NetrunnersLeadersHandler::isColoredSpecialty)
+                .flatMap(specialty ->
+                        ListTechService.getAllTechOfAType(game, specialty.toString(), player, false, true).stream())
+                .distinct()
+                .toList();
+        if (techs.isEmpty()) return;
+        player.exhaustPlanet(planet);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         MessageHelper.sendMessageToChannelWithButtons(
-                channel,
-                target.getRepresentationUnfogged()
-                        + ", choose 1 structure you own on a non-home planet to destroy for **Digital Uprising**.",
-                buttons);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged()
+                        + ", choose the free technology to research via Tek Mir-un, the Netrunners commander:",
+                ListTechService.getTechButtons(techs, player, "free"));
     }
 
-    @ButtonHandler(HERO_DESTROY_STRUCTURE_PREFIX)
-    public static void resolveRevolutionStructure(
-            Game game, Player target, ButtonInteractionEvent event, String buttonID) {
-        String[] parts = buttonID.replace(HERO_DESTROY_STRUCTURE_PREFIX, "").split("_", 4);
-        if (parts.length < 4) {
+    private static boolean isColoredSpecialty(TechSpecialty specialty) {
+        return specialty == TechSpecialty.BIOTIC
+                || specialty == TechSpecialty.CYBERNETIC
+                || specialty == TechSpecialty.PROPULSION
+                || specialty == TechSpecialty.WARFARE;
+    }
+
+    public static void offerAgentDiscount(Game game, Player researcher, String techId) {
+        if (game == null || researcher == null || Mapper.getTech(techId) == null) return;
+        for (Player netrunner : game.getRealPlayers()) {
+            if (!netrunner.hasUnexhaustedLeader("netrunnersagent")) continue;
+            int discount = (int) game.getRealPlayersExcludingThis(netrunner).stream()
+                    .filter(player -> player.hasTech(techId))
+                    .count();
+            if (discount < 1) continue;
+            MessageHelper.sendMessageToChannelWithButton(
+                    netrunner.getCorrectChannel(),
+                    netrunner.getRepresentationUnfogged() + ", " + researcher.getRepresentation(false, true)
+                            + " is paying to research " + Mapper.getTech(techId).getNameRepresentation()
+                            + ". You may exhaust Zor No-ahn, the Netrunners agent, to reduce that cost by "
+                            + discount + ".",
+                    Buttons.gray(
+                            netrunner.factionButtonChecker() + "netrunnersAgentDiscount_" + researcher.getFaction()
+                                    + "|" + techId,
+                            "Use Netrunners Agent",
+                            FactionEmojis.netrunners));
+        }
+    }
+
+    public static Button getAgentCardsInfoButton(Player player) {
+        return Buttons.gray(
+                player.factionButtonChecker() + "netrunnersAgentInfo", "Netrunners Agent", FactionEmojis.netrunners);
+    }
+
+    @ButtonHandler("netrunnersAgentInfo")
+    public static void showAgentInfo(ButtonInteractionEvent event, Player player) {
+        if (!player.hasUnexhaustedLeader("netrunnersagent")) {
             return;
         }
+        MessageHelper.sendEphemeralMessageToEventChannel(
+                event,
+                "Zor No-ahn, the Netrunners agent, is offered automatically when a player pays to research a technology. The discount is based on the number of other players that have that technology.");
+    }
 
-        Player netrunner = game.getPlayerFromColorOrFaction(parts[0]);
-        Tile tile = game.getTileByPosition(parts[1]);
-        UnitType unitType = getUnitType(parts[2]);
-        String unitHolderName = parts[3];
-        RevolutionStructure structure = getRevolutionStructure(target, tile, unitHolderName, unitType);
-        if (!isRevolutionTarget(game, netrunner, target) || structure == null) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "That structure is no longer eligible for **Digital Uprising**.");
-            ButtonHelper.deleteMessage(event);
+    @ButtonHandler("netrunnersAgentDiscount_")
+    public static void resolveAgentDiscount(
+            Game game, Player netrunner, ButtonInteractionEvent event, String buttonID) {
+        String[] parts = buttonID.replace("netrunnersAgentDiscount_", "").split("\\|", 2);
+        if (parts.length != 2) return;
+        Player researcher = game.getPlayerFromColorOrFaction(parts[0]);
+        String techId = parts[1];
+        if (researcher == null || Mapper.getTech(techId) == null || !netrunner.hasUnexhaustedLeader("netrunnersagent"))
             return;
-        }
-
-        DestroyUnitService.destroyUnit(event, tile, game, structure.unitKey(), 1, structure.unitHolder(), false);
-        AddUnitService.addUnits(event, tile, game, netrunner.getColor(), "2 inf " + unitHolderName);
-        StartCombatService.groundCombatCheck(game, structure.unitHolder(), tile, event);
-        ButtonHelper.deleteMessage(event);
-
+        int discount = (int) game.getRealPlayersExcludingThis(netrunner).stream()
+                .filter(player -> player.hasTech(techId))
+                .count();
+        if (discount < 1) return;
+        ExhaustLeaderService.exhaustLeader(
+                game, netrunner, netrunner.getLeader("netrunnersagent").orElseThrow());
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         MessageHelper.sendMessageToChannel(
-                game.getActionsChannel(),
-                target.getRepresentation() + " destroyed 1 " + getStructureName(target, structure)
-                        + " on " + Helper.getPlanetRepresentation(unitHolderName, game)
-                        + " for " + netrunner.getRepresentation(false, true)
-                        + "'s **Digital Uprising**. Added 2 "
-                        + netrunner.getFactionEmojiOrColor()
-                        + " infantry to that planet. Resolve ground combat if able.");
-        if (!game.isFowMode()) {
-            ButtonHelper.updateMap(
-                    game, event, "Digital Uprising on " + Helper.getPlanetRepresentation(unitHolderName, game));
-        }
+                researcher.getCorrectChannel(),
+                netrunner.getRepresentation() + " exhausted Zor No-ahn, the Netrunners agent, reducing "
+                        + researcher.getRepresentation(false, true) + "'s technology cost by " + discount
+                        + ". Apply that reduction while resolving the already-open technology payment.");
     }
 
-    public static void checkCommanderUnlock(Game game, UnitKey unitKey) {
-        if (game == null || unitKey == null || unitKey.unitType() != UnitType.Pds) {
+    public static void offerHeroTechSelection(Game game, Player player) {
+        if (game == null || player == null) {
             return;
         }
-
-        Player player = game.getPlayerByColorID(unitKey.colorID()).orElse(null);
-        if (player != null && player.hasLeader(COMMANDER_ID)) {
-            CommanderUnlockCheckService.checkPlayer(player, "netrunners");
-        }
-    }
-
-    public static List<Player> getCommanderSpaceCannonPlayers(
-            Player activePlayer, Game game, String tilePos, List<Player> playersWithPds) {
-        Tile tile = game.getTileByPosition(tilePos);
-        if (tile == null || tile.isScar(game)) {
-            return List.of();
-        }
-        return game.getRealPlayers().stream()
-                .filter(netrunner -> !playersWithPds.contains(netrunner))
-                .filter(netrunner -> game.playerHasLeaderUnlockedOrAlliance(netrunner, COMMANDER_ID))
-                .filter(netrunner -> canUseSpaceCannonAgainstActivePlayer(activePlayer, game, tile, netrunner))
-                .filter(netrunner ->
-                        !getCommanderSpaceCannonUnits(game, netrunner, tile).isEmpty())
+        List<Button> buttons = player.getTechs().stream()
+                .filter(tech -> Mapper.getTech(tech) != null)
+                .filter(tech ->
+                        game.getRealPlayersExcludingThis(player).stream().anyMatch(other -> other.hasTech(tech)))
+                .map(tech -> Buttons.green(
+                        player.factionButtonChecker() + "netrunnersHeroTech_" + tech,
+                        Mapper.getTech(tech).getName(),
+                        FactionEmojis.netrunners))
                 .toList();
-    }
-
-    public static Map<UnitModel, Integer> getCommanderSpaceCannonUnits(Game game, Player netrunner, Tile targetTile) {
-        if (targetTile == null || targetTile.isScar(game)) {
-            return Map.of();
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " has no technology eligible for _Power Surge - Network Overload_. The hero was already purged.");
+            return;
         }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", please choose the shared technology to return with _Power Surge - Network Overload_.",
+                buttons);
+    }
 
-        Map<UnitModel, Integer> units = new LinkedHashMap<>();
-        for (Player owner : game.getRealPlayersExcludingThis(netrunner)) {
-            if (netrunner.getDebtTokenCount(owner.getColor(), NetrunnersAbilitiesHandler.SYSTEM_BREACH_POOL) < 1) {
-                continue;
-            }
-            BorrowedPds pds = getBestBorrowedPds(game, netrunner, owner, targetTile);
-            if (pds != null) {
-                units.put(getCommanderPdsModel(netrunner, owner, pds), 1);
-            }
+    @ButtonHandler("netrunnersHeroTech_")
+    public static void resolveHeroTech(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String techId = buttonID.replace("netrunnersHeroTech_", "");
+        if (Mapper.getTech(techId) == null
+                || !player.hasTech(techId)
+                || game.getRealPlayersExcludingThis(player).stream().noneMatch(other -> other.hasTech(techId))) return;
+        for (Player owner : game.getRealPlayers()) {
+            if (owner.hasTech(techId)) owner.removeTech(techId);
         }
-        return units;
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentation() + " returned "
+                        + Mapper.getTech(techId).getNameRepresentation()
+                        + " for every owner via _Power Surge - Network Overload_.");
+        offerHeroTokenSourceSelection(game, player);
     }
 
-    private static boolean canUseSpaceCannonAgainstActivePlayer(
-            Player activePlayer, Game game, Tile tile, Player rollingPlayer) {
-        if (rollingPlayer == activePlayer || activePlayer.getAllianceMembers().contains(rollingPlayer.getFaction())) {
-            return FoWHelper.otherPlayersHaveShipsInSystem(activePlayer, tile, game);
+    private static void offerHeroTokenSourceSelection(Game game, Player player) {
+        if (game == null || player == null) {
+            return;
         }
-        return true;
-    }
-
-    private static BorrowedPds getBestBorrowedPds(Game game, Player netrunner, Player owner, Tile targetTile) {
-        return CheckUnitContainmentService.getTilesContainingPlayersUnits(game, owner, UnitType.Pds).stream()
-                .filter(pdsTile -> isCommanderPdsTileUsable(game, netrunner, targetTile, pdsTile))
-                .flatMap(pdsTile -> pdsTile.getUnitHolders().values().stream()
-                        .flatMap(unitHolder -> getBorrowedPds(owner, pdsTile, unitHolder).stream()))
-                .filter(pds -> isCommanderPdsInRange(game, netrunner, owner, targetTile, pds))
-                .max(Comparator.comparingInt(pds -> getPdsScore(owner, pds.model())))
-                .orElse(null);
-    }
-
-    private static boolean isCommanderPdsTileUsable(Game game, Player netrunner, Tile targetTile, Tile pdsTile) {
-        return pdsTile != null
-                && !pdsTile.isScar(game)
-                && (targetTile.getPosition().equals(pdsTile.getPosition())
-                        || !TeHelperUnits.affectedByQuietus(game, netrunner, pdsTile));
-    }
-
-    private static List<BorrowedPds> getBorrowedPds(Player owner, Tile tile, UnitHolder unitHolder) {
-        return unitHolder.getUnitKeysForPlayer(owner).stream()
-                .filter(unitKey -> unitKey.unitType() == UnitType.Pds)
-                .map(owner::getUnitFromUnitKey)
-                .filter(Objects::nonNull)
-                .filter(model -> model.getSpaceCannonDieCount(owner) > 0)
-                .map(model -> new BorrowedPds(tile, model))
+        List<Button> buttons = game.getRealPlayersExcludingThis(player).stream()
+                .filter(other ->
+                        player.getDebtTokenCount(other.getColor(), NetrunnersAbilitiesHandler.CONTROL_TOKEN_POOL) > 0)
+                .filter(other -> other.getTechs().stream()
+                        .map(Mapper::getTech)
+                        .anyMatch(tech ->
+                                tech != null && tech.getFaction().isEmpty() && !player.hasTech(tech.getAlias())))
+                .map(other -> Buttons.green(
+                        player.factionButtonChecker() + "netrunnersHeroSource_" + other.getFaction(),
+                        "Return " + other.getColorDisplayName() + " Token",
+                        FactionEmojis.netrunners))
                 .toList();
+        if (buttons.isEmpty()) {
+            finishHero(game, player, null);
+            return;
+        }
+        buttons = new java.util.ArrayList<>(buttons);
+        buttons.add(Buttons.red(player.factionButtonChecker() + "netrunnersHeroDone", "Done Returning Tokens"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", you may return a control token to gain 1 command token and a non-faction technology that player has.",
+                buttons);
     }
 
-    private static boolean isCommanderPdsInRange(
-            Game game, Player netrunner, Player owner, Tile targetTile, BorrowedPds pds) {
-        return targetTile.getPosition().equals(pds.tile().getPosition())
-                || (FoWHelper.getAdjacentTiles(game, targetTile.getPosition(), netrunner, false, true)
-                                .contains(pds.tile().getPosition())
-                        && (pds.model().getDeepSpaceCannon(owner)
-                                || game.playerHasLeaderUnlockedOrAlliance(netrunner, "mirvedacommander")));
+    @ButtonHandler("netrunnersHeroDone")
+    public static void finishHero(Game game, Player player, ButtonInteractionEvent event) {
+        if (game == null || player == null) {
+            return;
+        }
+        if (event != null) ButtonHelper.deleteMessage(event);
     }
 
-    private static int getPdsScore(Player owner, UnitModel model) {
-        return model.getSpaceCannonDieCount(owner) * (11 - model.getSpaceCannonHitsOn(owner));
-    }
-
-    private static List<Player> getRevolutionTargets(Game game, Player netrunner) {
-        return game.getRealPlayersExcludingThis(netrunner).stream()
-                .filter(target -> isRevolutionTarget(game, netrunner, target))
+    @ButtonHandler("netrunnersHeroSource_")
+    public static void chooseHeroTechnology(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        Player source = game.getPlayerFromColorOrFaction(buttonID.replace("netrunnersHeroSource_", ""));
+        if (source == null
+                || player.getDebtTokenCount(source.getColor(), NetrunnersAbilitiesHandler.CONTROL_TOKEN_POOL) < 1)
+            return;
+        List<Button> buttons = source.getTechs().stream()
+                .map(Mapper::getTech)
+                .filter(tech -> tech != null && tech.getFaction().isEmpty() && !player.hasTech(tech.getAlias()))
+                .map(tech -> Buttons.green(
+                        player.factionButtonChecker() + "netrunnersHeroGain_" + source.getFaction() + "_"
+                                + tech.getAlias(),
+                        tech.getName(),
+                        FactionEmojis.netrunners))
                 .toList();
+        if (buttons.isEmpty()) return;
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged() + ", choose the technology to gain:",
+                buttons);
     }
 
-    private static boolean isRevolutionTarget(Game game, Player netrunner, Player target) {
-        return target != null
-                && netrunner.getDebtTokenCount(target.getColor(), NetrunnersAbilitiesHandler.SYSTEM_BREACH_POOL) > 0
-                && !getRevolutionStructures(game, target).isEmpty();
+    @ButtonHandler("netrunnersHeroGain_")
+    public static void resolveHeroTechnology(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String[] parts = buttonID.replace("netrunnersHeroGain_", "").split("_", 2);
+        if (parts.length != 2) return;
+        Player source = game.getPlayerFromColorOrFaction(parts[0]);
+        String techId = parts[1];
+        if (source == null
+                || !source.hasTech(techId)
+                || Mapper.getTech(techId) == null
+                || Mapper.getTech(techId).getFaction().isPresent()
+                || player.hasTech(techId)
+                || player.getDebtTokenCount(source.getColor(), NetrunnersAbilitiesHandler.CONTROL_TOKEN_POOL) < 1)
+            return;
+        player.clearDebt(source, 1, NetrunnersAbilitiesHandler.CONTROL_TOKEN_POOL);
+        player.setTacticalCC(player.getTacticalCC() + 1);
+        player.addTech(techId);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentation() + " returned "
+                        + source.getRepresentation(false, true) + "'s control token, gained 1 command token and "
+                        + Mapper.getTech(techId).getNameRepresentation() + " via _Power Surge - Network Overload_.");
+        offerHeroTokenSourceSelection(game, player);
     }
-
-    private static List<Button> getRevolutionStructureButtons(Game game, Player netrunner, Player target) {
-        return getRevolutionStructures(game, target).stream()
-                .map(structure -> Buttons.red(
-                        target.factionButtonChecker() + HERO_DESTROY_STRUCTURE_PREFIX
-                                + netrunner.getFaction() + "_"
-                                + structure.tile().getPosition() + "_"
-                                + structure.unitKey().unitTypeVal() + "_"
-                                + structure.unitHolder().getName(),
-                        getStructureName(target, structure) + " on "
-                                + Helper.getPlanetRepresentation(
-                                        structure.unitHolder().getName(), game),
-                        structure.unitKey().unitEmoji()))
-                .toList();
-    }
-
-    private static List<RevolutionStructure> getRevolutionStructures(Game game, Player target) {
-        if (game == null || target == null) {
-            return List.of();
-        }
-        return ButtonHelper.getTilesOfPlayersSpecificUnits(game, target, UnitType.Pds, UnitType.Spacedock).stream()
-                .flatMap(tile -> tile.getPlanetUnitHolders().stream()
-                        .filter(planet -> !planet.isHomePlanet(game))
-                        .flatMap(planet -> getRevolutionStructures(target, tile, planet).stream()))
-                .toList();
-    }
-
-    private static List<RevolutionStructure> getRevolutionStructures(Player target, Tile tile, UnitHolder unitHolder) {
-        if (target == null || unitHolder == null) {
-            return List.of();
-        }
-        return unitHolder.getUnitKeysForPlayer(target).stream()
-                .filter(unitKey -> isStructure(target, unitKey))
-                .map(unitKey -> new RevolutionStructure(tile, unitHolder, unitKey))
-                .toList();
-    }
-
-    private static UnitType getUnitType(String unitType) {
-        if (unitType == null) {
-            return null;
-        }
-        UnitType type = Units.findUnitType(unitType);
-        if (type != null) {
-            return type;
-        }
-        try {
-            return UnitType.valueOf(unitType);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
-
-    private static RevolutionStructure getRevolutionStructure(
-            Player target, Tile tile, String unitHolderName, UnitType unitType) {
-        if (target == null || tile == null || unitType == null) {
-            return null;
-        }
-        UnitHolder unitHolder = tile.getUnitHolders().get(unitHolderName);
-        if (!(unitHolder instanceof Planet)) {
-            return null;
-        }
-        return getRevolutionStructures(target, tile, unitHolder).stream()
-                .filter(structure -> structure.unitKey().unitType() == unitType)
-                .findFirst()
-                .orElse(null);
-    }
-
-    private static boolean isStructure(Player target, UnitKey unitKey) {
-        UnitModel model = target.getUnitFromUnitKey(unitKey);
-        return model == null
-                ? unitKey.unitType() == UnitType.Pds || unitKey.unitType() == UnitType.Spacedock
-                : model.getIsStructure();
-    }
-
-    private static String getStructureName(Player target, RevolutionStructure structure) {
-        UnitModel model = target.getUnitFromUnitKey(structure.unitKey());
-        return model == null ? structure.unitKey().humanReadableName() : model.getName();
-    }
-
-    private static UnitModel getCommanderPdsModel(Player netrunner, Player owner, BorrowedPds pds) {
-        UnitModel model = new UnitModel() {
-            @Override
-            public UnitType getUnitType() {
-                return UnitType.Pds;
-            }
-        };
-        model.setSpaceCannonHitsOn(pds.model().getSpaceCannonHitsOn(owner));
-        model.setSpaceCannonDieCount(pds.model().getSpaceCannonDieCount(owner));
-        model.setName(
-                "Seize: " + owner.getColorDisplayName() + " " + pds.model().getName());
-        model.setAsyncId(COMMANDER_FAKE_UNIT_ID + owner.getFaction());
-        model.setId(COMMANDER_FAKE_UNIT_ID + owner.getFaction());
-        model.setBaseType("pds");
-        model.setFaction(netrunner.getFaction());
-        model.setDeepSpaceCannon(pds.model().getDeepSpaceCannon(owner));
-        return model;
-    }
-
-    private record BorrowedPds(Tile tile, UnitModel model) {}
-
-    private record RevolutionStructure(Tile tile, UnitHolder unitHolder, UnitKey unitKey) {}
 }

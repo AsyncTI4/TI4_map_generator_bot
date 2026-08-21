@@ -113,7 +113,7 @@
         "name": "Reverse Engineering",
         "faction": "netrunners",
         "window": "Once per round, at the end of your turn:",
-        "windowEffect": "You may spend a token from your strategy pool to to gain a copied technology.",
+        "windowEffect": "You may spend a token from your strategy pool to gain your currently copied technology.",
         "source": "beans"
     },
     {

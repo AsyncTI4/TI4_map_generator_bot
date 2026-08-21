@@ -14,7 +14,6 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.EmergencyA
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRequisitionLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
@@ -447,9 +446,6 @@ class DeleteButtonsButtonHandler {
             game.removeStoredValue(MyrrBreakthroughHandler.PRODUCTION_USED_KEY + player.getFaction());
             player.resetSpentThings();
             game.removeStoredValue("producedUnitCostFor" + player.getFaction());
-            if (player.hasAbility("control_network")) {
-                NetrunnersAbilitiesHandler.cleanupControlNetworkProduction(game, player);
-            }
             if (player.hasAbility("amalgamation")) {
                 game.removeStoredValue("amalgAmount");
             }

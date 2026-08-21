@@ -35,8 +35,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaTechHandler;
@@ -850,15 +848,6 @@ public class StartCombatService {
             }
         }
         List<Button> spaceCannonButtons = getSpaceCannonButtons(game, activePlayer, tile);
-        if (game.getRealPlayers().stream().anyMatch(player -> player.hasUnit("netrunners_flagship"))) {
-            for (Player player : game.getRealPlayers()) {
-                String empMessage = NetrunnersUnitsHandler.getEmpSpaceCannonBlockMessage(
-                        player, tile, CombatRollType.SpaceCannonOffence);
-                if (!empMessage.isEmpty()) {
-                    pdsMessage.append(empMessage).append('\n');
-                }
-            }
-        }
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, pdsMessage.toString(), spaceCannonButtons);
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
@@ -1322,14 +1311,6 @@ public class StartCombatService {
 
     public static List<Button> getSpaceCannonButtons(Game game, Player activePlayer, Tile tile) {
         List<Button> spaceCannonButtons = new ArrayList<>();
-        if (game.getRealPlayers().stream().anyMatch(player -> player.hasUnit("netrunners_flagship"))
-                && NetrunnersUnitsHandler.empBlocksSpaceCannonAgainst(
-                        activePlayer, tile, CombatRollType.SpaceCannonOffence)) {
-            if (!game.isFowMode()) {
-                spaceCannonButtons.add(Buttons.red("declinePDS_" + tile.getTileID(), "Decline SPACE CANNON"));
-            }
-            return spaceCannonButtons;
-        }
         spaceCannonButtons.add(Buttons.gray(
                 "combatRoll_" + tile.getPosition() + "_space_spacecannonoffence", "Roll SPACE CANNON Offence"));
         if (game.isFowMode()) return spaceCannonButtons;
@@ -1341,17 +1322,6 @@ public class StartCombatService {
                 spaceCannonButtons.add(
                         Buttons.gray("exhaustTech_gls", "Exhaust Graviton Laser System", TechEmojis.CyberneticTech));
                 break;
-            }
-        }
-        if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("control_network"))) {
-            for (Player rollingPlayer : ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition())) {
-                if (game.getRealPlayers().stream().anyMatch(player -> player.hasUnit("netrunners_flagship"))
-                        && NetrunnersUnitsHandler.empBlocksSpaceCannonAgainstOpponent(
-                                game, rollingPlayer, tile, CombatRollType.SpaceCannonOffence)) {
-                    continue;
-                }
-                spaceCannonButtons.addAll(NetrunnersAbilitiesHandler.getControlNetworkSpaceCannonButtons(
-                        game, rollingPlayer, tile, CombatRollType.SpaceCannonOffence, "space"));
             }
         }
         return spaceCannonButtons;
@@ -2580,18 +2550,9 @@ public class StartCombatService {
                     if (CombatRollService.checkIfUnitsOfType(
                             nonActive, game, null, tile, unitH.getName(), CombatRollType.SpaceCannonDefence)) {
                         Player target = nonActive == p1 ? p2 : p1;
-                        if (game.getRealPlayers().stream().anyMatch(player -> player.hasUnit("netrunners_flagship"))
-                                && NetrunnersUnitsHandler.empBlocksSpaceCannonAgainst(
-                                        target, tile, CombatRollType.SpaceCannonDefence)) {
-                            continue;
-                        }
                         buttons.add(Buttons.gray(
                                 "combatRoll_" + tile.getPosition() + "_" + unitH.getName() + "_spacecannondefence",
                                 "Roll SPACE CANNON Defence for " + nameOfHolder));
-                        if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("control_network"))) {
-                            buttons.addAll(NetrunnersAbilitiesHandler.getControlNetworkSpaceCannonButtons(
-                                    game, nonActive, tile, CombatRollType.SpaceCannonDefence, unitH.getName()));
-                        }
                     }
                 }
             }

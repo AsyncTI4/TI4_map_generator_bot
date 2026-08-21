@@ -1,6 +1,5 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -8,431 +7,326 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.game.Planet;
 import ti4.game.Player;
-import ti4.game.Tile;
-import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
-import ti4.helpers.StringHelper;
-import ti4.helpers.Units.UnitKey;
-import ti4.helpers.Units.UnitType;
-import ti4.helpers.thundersedge.TeHelperUnits;
+import ti4.image.Mapper;
 import ti4.message.MessageHelper;
-import ti4.model.CombatModifierModel;
-import ti4.model.NamedCombatModifierModel;
-import ti4.model.UnitModel;
-import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.transaction.SendDebtService;
+import ti4.service.turn.EndTurnService;
 
 @UtilityClass
 public class NetrunnersAbilitiesHandler {
+    public static final String NEURAL_INSTRUMENTS_ABILITY = "neural_instruments";
+    public static final String PROXY_NETWORK_ABILITY = "proxy_network";
+    public static final String CONTROL_TOKEN_POOL = "hackerman";
+    private static final String SHARED_NETWORK_ACCESS = "bepnnetrunners";
+    private static final String PROXY_TECH = "netrunnersProxyTech";
+    private static final String REVERSE_ENGINEERING_USED = "netrunnersReverseEngineeringUsed";
 
-    public static final String SYSTEM_BREACH_ABILITY = "system_breach";
-    public static final String CONTROL_NETWORK_ABILITY = "control_network";
-    public static final String RANSOMWARE_ABILITY = "ransomware";
-    public static final String SYSTEM_BREACH_POOL = "hackerman";
-    private static final String CONTROL_NETWORK_PRODUCTION_TILE = "controlNetworkProductionTile";
-    private static final String CONTROL_NETWORK_PRODUCTION_LIMIT = "controlNetworkProductionLimit";
-    private static final String CONTROL_NETWORK_PRODUCTION_TARGET = "controlNetworkProductionTarget";
-    private static final String CONTROL_NETWORK_SPACE_CANNON_TILE = "controlNetworkSpaceCannonTile";
-    private static final String CONTROL_NETWORK_SPACE_CANNON_HOLDER = "controlNetworkSpaceCannonHolder";
-    private static final String CONTROL_NETWORK_SPACE_CANNON_ROLL = "controlNetworkSpaceCannonRoll";
-
-    public static void resolveSystemBreach(Game game, UnitKey unitKey, int count) {
-        if (game == null || unitKey == null || count < 1) {
-            return;
+    public static void offerNeuralInstruments(Game game, Player techGainer) {
+        if (game == null || techGainer == null) return;
+        List<Player> netrunners = game.getRealPlayersExcludingThis(techGainer).stream()
+                .filter(player -> player.hasAbility(NEURAL_INSTRUMENTS_ABILITY))
+                .toList();
+        if (netrunners.isEmpty()) return;
+        if (game.getDebtPoolIcon(CONTROL_TOKEN_POOL) == null) {
+            game.setDebtPoolIcon(CONTROL_TOKEN_POOL, FactionEmojis.netrunners.toString());
         }
-
-        Player placingPlayer = game.getPlayerFromColorOrFaction(unitKey.getColor());
-        UnitModel unitModel = placingPlayer == null ? null : placingPlayer.getUnitFromUnitKey(unitKey);
-        if (placingPlayer == null || unitModel == null || !unitModel.getIsStructure()) {
-            return;
-        }
-
-        if (game.getDebtPoolIcon(SYSTEM_BREACH_POOL) == null) {
-            game.setDebtPoolIcon(SYSTEM_BREACH_POOL, FactionEmojis.netrunners.toString());
-        }
-
-        for (Player netrunner : game.getRealPlayers()) {
-            if (netrunner != placingPlayer && netrunner.hasAbility(SYSTEM_BREACH_ABILITY)) {
-                SendDebtService.sendDebt(placingPlayer, netrunner, count, SYSTEM_BREACH_POOL);
-
-                MessageHelper.sendMessageToChannel(
+        for (Player netrunner : netrunners) {
+            if (netrunner.getDebtTokenCount(techGainer.getColor(), CONTROL_TOKEN_POOL) > 0) continue;
+            if (netrunner.hasUnlockedBreakthrough("netrunnersbt")
+                    && !techGainer.getBreakthroughIDs().isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButton(
                         netrunner.getCorrectChannel(),
-                        netrunner.getRepresentation() + " used **System Breach** to place " + count + " of "
-                                + placingPlayer.getRepresentation(false, true)
-                                + "'s control token" + (count == 1 ? "" : "s") + " in their **" + SYSTEM_BREACH_POOL
-                                + "** pool."
-                                + " This is technically optional, done automatically for convenience.");
-            }
-        }
-    }
-
-    private static CombatModifierModel getControlNetworkSpaceCannonModifier(CombatRollType rollType) {
-        CombatModifierModel modifier = new CombatModifierModel();
-        modifier.setAlias("netrunners_control_network");
-        modifier.setType("mods");
-        modifier.setValue(-1);
-        modifier.setPersistenceType(Constants.MOD_TEMP_ONE_ROUND.toString());
-        modifier.setScope("");
-        modifier.setRelated(List.of());
-        modifier.setForCombatAbility(rollType);
-        return modifier;
-    }
-
-    public static List<Button> getControlNetworkSpaceCannonButtons(
-            Game game, Player rollingPlayer, Tile tile, CombatRollType rollType, String unitHolderName) {
-        List<Button> buttons = new ArrayList<>();
-        for (Player netrunner : game.getRealPlayers()) {
-            if (netrunner == rollingPlayer
-                    || !netrunner.hasAbility(CONTROL_NETWORK_ABILITY)
-                    || netrunner.getDebtTokenCount(rollingPlayer.getColor(), SYSTEM_BREACH_POOL) < 1) {
+                        netrunner.getRepresentationUnfogged() + ", you may use **Data Breach** instead of placing "
+                                + techGainer.getRepresentation(false, true) + "'s token.",
+                        Buttons.gray(
+                                netrunner.factionButtonChecker() + "netrunnersDataBreachMove_"
+                                        + techGainer.getFaction(),
+                                "Use Data Breach",
+                                FactionEmojis.netrunners));
                 continue;
             }
-            buttons.add(Buttons.gray(
-                    netrunner.factionButtonChecker()
-                            + "controlNetworkSpaceCannon_" + rollingPlayer.getColor() + "_"
-                            + tile.getPosition() + "_" + rollType + "_" + unitHolderName,
-                    "Use Control Network",
-                    FactionEmojis.netrunners));
+            SendDebtService.sendDebt(techGainer, netrunner, 1, CONTROL_TOKEN_POOL);
+            MessageHelper.sendMessageToChannel(
+                    netrunner.getCorrectChannel(),
+                    netrunner.getRepresentationUnfogged() + ", you automatically placed 1 of "
+                            + techGainer.getRepresentation(false, true)
+                            + "'s command tokens on their faction sheet via **Neural Instruments**."
+                            + "\n-# This optional effect was resolved automatically for convenience.");
         }
-        return buttons;
     }
 
-    @ButtonHandler("controlNetworkSpaceCannon_")
-    public static void resolveControlNetworkSpaceCannon(
-            Game game, Player netrunner, ButtonInteractionEvent event, String buttonID) {
-        String[] parts = buttonID.replace("controlNetworkSpaceCannon_", "").split("_", 4);
-        if (parts.length < 4) {
+    public static void offerBlackout(Game game, Player activator, ti4.game.Tile tile) {
+        if (game == null || activator == null || tile == null) {
             return;
         }
-
-        Player rollingPlayer = game.getPlayerFromColorOrFaction(parts[0]);
-        Tile tile = game.getTileByPosition(parts[1]);
-        CombatRollType rollType = CombatRollType.valueOf(parts[2]);
-        String unitHolderName = parts[3];
-        if (rollingPlayer == null
-                || tile == null
-                || !netrunner.hasAbility(CONTROL_NETWORK_ABILITY)
-                || netrunner.getDebtTokenCount(rollingPlayer.getColor(), SYSTEM_BREACH_POOL) < 1) {
-            return;
+        for (Player netrunner : game.getRealPlayersExcludingThis(activator)) {
+            if (!netrunner.hasTech("benetrunnersbo") || !FoWHelper.playerHasUnitsInSystem(netrunner, tile)) continue;
+            List<Button> buttons = activator.getTechs().stream()
+                    .map(Mapper::getTech)
+                    .filter(java.util.Objects::nonNull)
+                    .filter(tech -> activator.hasTech(tech.getAlias()))
+                    .filter(tech -> !tech.isUnitUpgrade())
+                    .map(tech -> Buttons.gray(
+                            netrunner.factionButtonChecker() + "netrunnersBlackout_" + activator.getFaction() + "_"
+                                    + tech.getAlias(),
+                            tech.getName(),
+                            FactionEmojis.netrunners))
+                    .toList();
+            if (!buttons.isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        netrunner.getCorrectChannel(),
+                        netrunner.getRepresentationUnfogged()
+                                + ", please choose a technology to suppress with **Blackout**.",
+                        buttons);
+            }
         }
+    }
 
-        setControlNetworkSpaceCannonValues(game, rollingPlayer, tile, rollType, unitHolderName);
-        netrunner.clearDebt(rollingPlayer, 1, SYSTEM_BREACH_POOL);
-
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                netrunner.getRepresentation() + " used **Control Network** to remove 1 of "
-                        + rollingPlayer.getRepresentation(false, true)
-                        + "'s control tokens from their **" + SYSTEM_BREACH_POOL
-                        + "** pool and apply -1 to their next SPACE CANNON roll.");
+    @ButtonHandler("netrunnersBlackout_")
+    public static void resolveBlackout(Game game, Player netrunner, ButtonInteractionEvent event, String buttonID) {
+        String[] parts = buttonID.replace("netrunnersBlackout_", "").split("_", 2);
+        if (parts.length != 2) return;
+        Player target = game.getPlayerFromColorOrFaction(parts[0]);
+        if (target == null
+                || !netrunner.hasTech("benetrunnersbo")
+                || !target.hasTech(parts[1])
+                || Mapper.getTech(parts[1]) == null
+                || Mapper.getTech(parts[1]).isUnitUpgrade()) return;
+        game.setStoredValue("netrunnersBlackout" + target.getFaction() + "_" + netrunner.getFaction(), parts[1]);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
-    public static List<NamedCombatModifierModel> getPendingControlNetworkSpaceCannonModifier(
-            Game game, Player rollingPlayer, Tile tile, UnitHolder unitHolder, CombatRollType rollType) {
-        if (tile == null
-                || unitHolder == null
-                || rollType == null
-                || !tile.getTileID()
-                        .equals(game.getStoredValue(CONTROL_NETWORK_SPACE_CANNON_TILE + rollingPlayer.getFaction()))
-                || !unitHolder
-                        .getName()
-                        .equals(game.getStoredValue(CONTROL_NETWORK_SPACE_CANNON_HOLDER + rollingPlayer.getFaction()))
-                || !rollType.toString()
-                        .equals(game.getStoredValue(CONTROL_NETWORK_SPACE_CANNON_ROLL + rollingPlayer.getFaction()))) {
-            return List.of();
-        }
-
-        cleanupControlNetworkSpaceCannon(game, rollingPlayer);
-        return List.of(new NamedCombatModifierModel(
-                getControlNetworkSpaceCannonModifier(rollType),
-                FactionEmojis.netrunners + " Control Network: -1 to SPACE CANNON rolls"));
+    @ButtonHandler("netrunnersDataBreachMove_")
+    public static void moveDataBreachToken(Game game, Player netrunner, ButtonInteractionEvent event, String buttonID) {
+        Player target = game.getPlayerFromColorOrFaction(buttonID.replace("netrunnersDataBreachMove_", ""));
+        if (target == null
+                || !netrunner.hasUnlockedBreakthrough("netrunnersbt")
+                || !netrunner.hasAbility(NEURAL_INSTRUMENTS_ABILITY)
+                || target.getBreakthroughIDs().isEmpty()) return;
+        game.setStoredValue(
+                "netrunnersDataBreach" + netrunner.getFaction(),
+                target.getFaction() + "~" + target.getBreakthroughIDs().getFirst());
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                netrunner.getRepresentation() + " moved their **Data Breach** token onto "
+                        + target.getRepresentation(false, true) + "'s breakthrough.");
     }
 
-    public static void offerRansomwareButtons(Game game) {
-        for (Player netrunner : game.getRealPlayers()) {
-            if (!netrunner.hasAbility(RANSOMWARE_ABILITY)) {
-                continue;
-            }
-            for (Player payer : game.getRealPlayersExcludingThis(netrunner)) {
-                int tokenCount = netrunner.getDebtTokenCount(payer.getColor(), SYSTEM_BREACH_POOL);
-                if (payer.getTg() < 1 || tokenCount < 1 || payer.getCardsInfoThread() == null) {
-                    continue;
-                }
-
-                String message = payer.getRepresentationUnfogged()
-                        + ", you may pay 1 trade good to remove 1 of your control tokens from their **"
-                        + SYSTEM_BREACH_POOL
-                        + "** pool via **Ransomware**.";
-                List<Button> buttons = List.of(
-                        Buttons.green(
-                                payer.factionButtonChecker() + "ransomwarePay_" + netrunner.getFaction(),
-                                "Pay 1 Trade Good",
-                                FactionEmojis.netrunners),
-                        Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(payer.getCardsInfoThread(), message, buttons);
-            }
-        }
+    public static void offerProxyNetwork(Game game, Player netrunner) {
+        if (game == null || netrunner == null || !netrunner.hasAbility(PROXY_NETWORK_ABILITY)) return;
+        boolean hasEligiblePlayer = game.getRealPlayersExcludingThis(netrunner).stream()
+                .anyMatch(player -> netrunner.getDebtTokenCount(player.getColor(), CONTROL_TOKEN_POOL) > 0
+                        && player.getTechs().stream()
+                                .map(Mapper::getTech)
+                                .anyMatch(tech ->
+                                        tech != null && tech.getFaction().isEmpty()));
+        if (!hasEligiblePlayer) return;
+        MessageHelper.sendMessageToChannelWithButton(
+                netrunner.getCorrectChannel(),
+                netrunner.getRepresentationUnfogged()
+                        + ", you may remove a control token from your faction sheet to copy a non-faction technology until the end of your turn.",
+                Buttons.gray(
+                        netrunner.factionButtonChecker() + "proxyNetworkStart",
+                        "Use Proxy Network",
+                        FactionEmojis.netrunners));
     }
 
-    @ButtonHandler("ransomwarePay_")
-    public static void resolveRansomware(Game game, Player payer, ButtonInteractionEvent event, String buttonID) {
-        Player netrunner = game.getPlayerFromColorOrFaction(buttonID.replace("ransomwarePay_", ""));
-        if (netrunner == null
-                || !netrunner.hasAbility(RANSOMWARE_ABILITY)
-                || payer.getTg() < 1
-                || netrunner.getDebtTokenCount(payer.getColor(), SYSTEM_BREACH_POOL) < 1) {
-            return;
-        }
-
-        payer.gainTG(-1);
-        netrunner.gainTG(1, true);
-        netrunner.clearDebt(payer, 1, SYSTEM_BREACH_POOL);
-
-        String message = payer.getFactionEmojiOrColor() + " paid 1 trade good to "
-                + netrunner.getFactionEmojiOrColor()
-                + " to remove 1 of their control tokens from the **" + SYSTEM_BREACH_POOL
-                + "** pool via **Ransomware**.";
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
-    }
-
-    public static Button getControlNetworkCardsInfoButton(Player player) {
-        return Buttons.gray(
-                player.factionButtonChecker() + "controlNetworkBlockadedDock",
-                "Produce at blockaded spacedock (if applicable)",
-                FactionEmojis.netrunners);
-    }
-
-    @ButtonHandler("controlNetworkBlockadedDock")
-    public static void offerControlNetworkBlockadedDockButtons(
-            Game game, Player netrunner, ButtonInteractionEvent event) {
-        List<Button> buttons = getControlNetworkBlockadedDockButtons(game, netrunner);
-        if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    netrunner.getRepresentation()
-                            + " has no players with eligible blockaded space docks for **Control Network**.");
-            return;
-        }
-
+    @ButtonHandler("proxyNetworkStart")
+    public static void startProxyNetwork(Game game, Player netrunner, ButtonInteractionEvent event) {
+        if (game == null || netrunner == null || !netrunner.hasAbility(PROXY_NETWORK_ABILITY)) return;
+        List<Button> buttons = game.getRealPlayersExcludingThis(netrunner).stream()
+                .filter(player -> netrunner.getDebtTokenCount(player.getColor(), CONTROL_TOKEN_POOL) > 0)
+                .filter(player -> player.getTechs().stream()
+                        .map(Mapper::getTech)
+                        .anyMatch(tech -> tech != null && tech.getFaction().isEmpty()))
+                .map(player -> Buttons.green(
+                        netrunner.factionButtonChecker() + "proxyNetworkPlayer_" + player.getFaction(),
+                        "Copy a Technology from " + player.getColorDisplayName(),
+                        FactionEmojis.netrunners))
+                .toList();
+        if (buttons.isEmpty()) return;
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                netrunner.getRepresentation()
-                        + ", please choose the player whose blockaded space dock you wish to use. Note that this can only be done during the production window of a tactical action.",
+                netrunner.getRepresentationUnfogged()
+                        + ", please choose the player whose control token you will remove to copy one of their non-faction technologies.",
                 buttons);
     }
 
-    @ButtonHandler("controlNetworkProduce_")
-    public static void resolveControlNetworkProduction(
+    @ButtonHandler("proxyNetworkPlayer_")
+    public static void chooseProxyNetworkTech(
             Game game, Player netrunner, ButtonInteractionEvent event, String buttonID) {
-        String[] parts = buttonID.replace("controlNetworkProduce_", "").split("_");
-        if (parts.length < 2) {
-            return;
-        }
-
-        Player target = game.getPlayerFromColorOrFaction(parts[0]);
-        Tile tile = game.getTileByPosition(parts[1]);
-        if (!canUseControlNetworkProduction(game, netrunner, target, tile)) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    netrunner.getRepresentation() + " cannot use **Control Network** with that space dock.");
-            return;
-        }
-
-        int productionValue = getControlNetworkProductionValue(game, target, tile);
-        netrunner.clearDebt(target, 1, SYSTEM_BREACH_POOL);
-        setControlNetworkProductionValues(game, netrunner, target, tile, productionValue);
-
-        List<Button> buttons = getControlNetworkProductionButtons(event, netrunner, game, tile);
-        String productionMessage = netrunner.getRepresentationUnfogged()
-                + ", use these buttons to produce ships and fighters. Ground forces cannot be produced with **Control Network**.\n"
-                + "You have " + productionValue + " PRODUCTION value in this system.\n"
-                + ButtonHelper.getListOfStuffAvailableToSpend(netrunner, game, true);
-
-        String actionMessage = netrunner.getRepresentationUnfogged() + " used **Control Network** to remove 1 of "
-                + target.getRepresentation(true, true)
-                + "'s control tokens from their **" + SYSTEM_BREACH_POOL
-                + "** pool and use the PRODUCTION ability of "
-                + target.getRepresentation(true, true)
-                + "'s blockaded space dock in "
-                + tile.getRepresentationForButtons(game, netrunner)
-                + ".";
-
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), actionMessage);
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), productionMessage);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Produce Units", buttons);
-    }
-
-    public static String getControlNetworkProductionMessage(
-            Game game, Player player, Tile tile, int cost, int unitCount) {
-        String keySuffix = player.getFaction();
-        if (tile == null
-                || !tile.getPosition().equals(game.getStoredValue(CONTROL_NETWORK_PRODUCTION_TILE + keySuffix))) {
-            return "";
-        }
-
-        String storedProductionLimit = game.getStoredValue(CONTROL_NETWORK_PRODUCTION_LIMIT + keySuffix);
-        if (storedProductionLimit.isEmpty()) {
-            return "";
-        }
-
-        int productionLimit = Integer.parseInt(storedProductionLimit);
-        String message = "Producing a total of " + StringHelper.pluralize(unitCount, "unit")
-                + " (**Control Network** PRODUCTION limit is " + productionLimit + ")"
-                + " for a total cost of " + StringHelper.pluralize(cost, "resource") + ".";
-        if (productionLimit < unitCount) {
-            message += "\n### Warning! Exceeding **Control Network** PRODUCTION limit of " + productionLimit + "!";
-        }
-        return message;
-    }
-
-    public static void cleanupControlNetworkProduction(Game game, Player player) {
-        String keySuffix = player.getFaction();
-        game.removeStoredValue(CONTROL_NETWORK_PRODUCTION_TILE + keySuffix);
-        game.removeStoredValue(CONTROL_NETWORK_PRODUCTION_LIMIT + keySuffix);
-        game.removeStoredValue(CONTROL_NETWORK_PRODUCTION_TARGET + keySuffix);
-    }
-
-    private static List<Button> getControlNetworkBlockadedDockButtons(Game game, Player netrunner) {
-        List<Button> buttons = new ArrayList<>();
-        for (Player target : game.getRealPlayersExcludingThis(netrunner)) {
-            if (netrunner.getDebtTokenCount(target.getColor(), SYSTEM_BREACH_POOL) < 1) {
-                continue;
-            }
-            for (Tile tile : game.getTileMap().values()) {
-                if (canUseControlNetworkProduction(game, netrunner, target, tile)) {
-                    buttons.add(Buttons.green(
-                            netrunner.factionButtonChecker() + "controlNetworkProduce_" + target.getColor() + "_"
-                                    + tile.getPosition(),
-                            target.getColorDisplayName() + ": " + tile.getRepresentationForButtons(game, netrunner),
-                            FactionEmojis.netrunners));
-                }
-            }
-        }
-        return buttons;
-    }
-
-    private static List<Button> getControlNetworkProductionButtons(
-            ButtonInteractionEvent event, Player netrunner, Game game, Tile tile) {
-        return Helper.getPlaceUnitButtons(event, netrunner, game, tile, "controlNetwork", "place").stream()
-                .filter(button -> !isGroundForceProductionButton(button))
+        Player source = game.getPlayerFromColorOrFaction(buttonID.replace("proxyNetworkPlayer_", ""));
+        if (source == null
+                || !netrunner.hasAbility(PROXY_NETWORK_ABILITY)
+                || netrunner.getDebtTokenCount(source.getColor(), CONTROL_TOKEN_POOL) < 1) return;
+        List<Button> buttons = source.getTechs().stream()
+                .map(Mapper::getTech)
+                .filter(tech -> tech != null && tech.getFaction().isEmpty() && !netrunner.hasTech(tech.getAlias()))
+                .map(tech -> Buttons.green(
+                        netrunner.factionButtonChecker() + "proxyNetworkTech_" + source.getFaction() + "_"
+                                + tech.getAlias(),
+                        tech.getName(),
+                        FactionEmojis.netrunners))
                 .toList();
+        if (buttons.isEmpty()) return;
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                netrunner.getRepresentationUnfogged() + ", please choose the technology to copy.",
+                buttons);
     }
 
-    private static boolean isGroundForceProductionButton(Button button) {
-        return NetrunnersUnitsHandler.isGroundForceProductionButton(button);
+    @ButtonHandler("proxyNetworkTech_")
+    public static void resolveProxyNetwork(Game game, Player netrunner, ButtonInteractionEvent event, String buttonID) {
+        String[] parts = buttonID.replace("proxyNetworkTech_", "").split("_", 2);
+        if (parts.length != 2) return;
+        Player source = game.getPlayerFromColorOrFaction(parts[0]);
+        String techId = parts[1];
+        if (source == null
+                || !netrunner.hasAbility(PROXY_NETWORK_ABILITY)
+                || !source.hasTech(techId)
+                || Mapper.getTech(techId) == null
+                || Mapper.getTech(techId).getFaction().isPresent()
+                || netrunner.hasTech(techId)
+                || netrunner.getDebtTokenCount(source.getColor(), CONTROL_TOKEN_POOL) < 1) return;
+        netrunner.clearDebt(source, 1, CONTROL_TOKEN_POOL);
+        netrunner.addTech(techId);
+        game.setStoredValue(PROXY_TECH + netrunner.getFaction(), techId);
+        offerSharedNetworkAccess(game, netrunner, techId);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                netrunner.getRepresentation() + " copied "
+                        + Mapper.getTech(techId).getNameRepresentation()
+                        + " via **Proxy Network** until the end of their turn.");
     }
 
-    private static boolean canUseControlNetworkProduction(Game game, Player netrunner, Player target, Tile tile) {
-        return target != null
-                && target != netrunner
-                && tile != null
-                && netrunner.getDebtTokenCount(target.getColor(), SYSTEM_BREACH_POOL) > 0
-                && FoWHelper.playerHasActualShipsInSystem(netrunner, tile)
-                && tileHasSpaceDockControlledByPlayer(target, tile)
-                && getControlNetworkProductionValue(game, target, tile) > 0;
-    }
-
-    private static boolean tileHasSpaceDockControlledByPlayer(Player player, Tile tile) {
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static int getControlNetworkProductionValue(Game game, Player target, Tile tile) {
-        if (tile.isScar(game) && !target.hasUnlockedBreakthrough("nivynbt")) {
-            return 0;
-        }
-        if (TeHelperUnits.affectedByQuietus(game, target, tile)) {
-            return 0;
-        }
-
-        int highestProductionValue = 0;
-        boolean cosmicSuper = isAdjacentToCosmicSupernova(game, target, tile);
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            for (UnitKey unit : unitHolder.getUnits().keySet()) {
-                if (!target.unitBelongsToPlayer(unit)) {
-                    continue;
-                }
-
-                UnitModel unitModel = target.getPriorityUnitByAsyncID(unit.asyncID(), unitHolder);
-                if (unitModel == null || !"sd".equals(unitModel.getAsyncId())) {
-                    continue;
-                }
-
-                int productionValue = unitModel.getProductionValue();
-                if ((productionValue == 2
-                                || productionValue == 4
-                                || target.ownsUnit("mykomentori_spacedock2")
-                                || target.ownsUnit("miltymod_spacedock2"))
-                        && unitHolder instanceof Planet planet) {
-                    if (target.hasUnit("celdauri_spacedock") || target.hasUnit("celdauri_spacedock2")) {
-                        productionValue += Math.max(planet.getResources(), planet.getInfluence());
-                    } else {
-                        productionValue += planet.getResources();
-                    }
-                    if (target.hasUnit("axis_mech")
-                            && !ButtonHelper.isLawInPlay(game, "articles_war")
-                            && unitHolder.getUnitCount(UnitType.Mech, target) > 0) {
-                        productionValue = Math.max(5, productionValue);
-                    }
-                }
-                if (productionValue > 0 && target.hasRelic("boon_of_the_cerulean_god")) {
-                    productionValue++;
-                }
-                if (productionValue > 0 && cosmicSuper) {
-                    productionValue++;
-                }
-                highestProductionValue = Math.max(highestProductionValue, productionValue);
-            }
-        }
-        return highestProductionValue;
-    }
-
-    private static boolean isAdjacentToCosmicSupernova(Game game, Player player, Tile tile) {
-        if (!game.isCosmicPhenomenaeMode()) {
+    public static boolean offerReverseEngineering(Game game, Player player) {
+        if (game == null || player == null) {
             return false;
         }
-        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
-            Tile adjacentTile = game.getTileByPosition(pos);
-            if (adjacentTile != null && adjacentTile.isSupernova()) {
-                return true;
-            }
+        String techId = game.getStoredValue(PROXY_TECH + player.getFaction());
+        if (!player.hasAbility("reverse_engineering")
+                || techId.isEmpty()
+                || !player.hasTech(techId)
+                || player.getStrategicCC() < 1
+                || Integer.toString(game.getRound())
+                        .equals(game.getStoredValue(REVERSE_ENGINEERING_USED + player.getFaction()))) return false;
+        var tech = Mapper.getTech(techId);
+        if (tech == null) return false;
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", you may spend 1 strategy token to permanently gain "
+                        + tech.getNameRepresentation() + " with **Reverse Engineering**.",
+                List.of(
+                        Buttons.green(
+                                player.factionButtonChecker() + "netrunnersReverseEngineeringGain",
+                                "Use Reverse Engineering",
+                                FactionEmojis.netrunners),
+                        Buttons.red(player.factionButtonChecker() + "netrunnersReverseEngineeringDecline", "Decline")));
+        return true;
+    }
+
+    public static void clearReverseEngineering(Game game, Player player) {
+        if (game != null && player != null) {
+            game.removeStoredValue(REVERSE_ENGINEERING_USED + player.getFaction());
         }
-        return false;
     }
 
-    private static void setControlNetworkProductionValues(
-            Game game, Player netrunner, Player target, Tile tile, int productionValue) {
-        String keySuffix = netrunner.getFaction();
-        game.setStoredValue(CONTROL_NETWORK_PRODUCTION_TILE + keySuffix, tile.getPosition());
-        game.setStoredValue(CONTROL_NETWORK_PRODUCTION_LIMIT + keySuffix, Integer.toString(productionValue));
-        game.setStoredValue(CONTROL_NETWORK_PRODUCTION_TARGET + keySuffix, target.getFaction());
+    public static void clearBlackout(Game game, Player player) {
+        if (game == null || player == null) {
+            return;
+        }
+        for (Player netrunner : game.getRealPlayers()) {
+            game.removeStoredValue("netrunnersBlackout" + player.getFaction() + "_" + netrunner.getFaction());
+        }
     }
 
-    private static void setControlNetworkSpaceCannonValues(
-            Game game, Player rollingPlayer, Tile tile, CombatRollType rollType, String unitHolderName) {
-        String keySuffix = rollingPlayer.getFaction();
-        game.setStoredValue(CONTROL_NETWORK_SPACE_CANNON_TILE + keySuffix, tile.getTileID());
-        game.setStoredValue(CONTROL_NETWORK_SPACE_CANNON_HOLDER + keySuffix, unitHolderName);
-        game.setStoredValue(CONTROL_NETWORK_SPACE_CANNON_ROLL + keySuffix, rollType.toString());
+    public static void clearProxyNetwork(Game game, Player player) {
+        if (game == null || player == null) {
+            return;
+        }
+        String techId = game.getStoredValue(PROXY_TECH + player.getFaction());
+        if (!techId.isEmpty()) {
+            player.removeTech(techId);
+            game.removeStoredValue(PROXY_TECH + player.getFaction());
+        }
     }
 
-    private static void cleanupControlNetworkSpaceCannon(Game game, Player rollingPlayer) {
-        String keySuffix = rollingPlayer.getFaction();
-        game.removeStoredValue(CONTROL_NETWORK_SPACE_CANNON_TILE + keySuffix);
-        game.removeStoredValue(CONTROL_NETWORK_SPACE_CANNON_HOLDER + keySuffix);
-        game.removeStoredValue(CONTROL_NETWORK_SPACE_CANNON_ROLL + keySuffix);
+    @ButtonHandler("netrunnersReverseEngineeringGain")
+    public static void resolveReverseEngineering(Game game, Player player, ButtonInteractionEvent event) {
+        if (game == null || player == null) {
+            return;
+        }
+        String techId = game.getStoredValue(PROXY_TECH + player.getFaction());
+        if (!player.hasAbility("reverse_engineering")
+                || techId.isEmpty()
+                || !player.hasTech(techId)
+                || player.getStrategicCC() < 1) return;
+        player.setStrategicCC(player.getStrategicCC() - 1);
+        game.setStoredValue(REVERSE_ENGINEERING_USED + player.getFaction(), Integer.toString(game.getRound()));
+        game.removeStoredValue(PROXY_TECH + player.getFaction());
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " spent 1 strategy token and permanently gained "
+                        + Mapper.getTech(techId).getNameRepresentation() + " with **Reverse Engineering**.");
+        EndTurnService.endTurnAndUpdateMap(event, game, player);
+    }
+
+    @ButtonHandler("netrunnersReverseEngineeringDecline")
+    public static void declineReverseEngineering(Game game, Player player, ButtonInteractionEvent event) {
+        if (game == null || player == null || !player.hasAbility("reverse_engineering")) {
+            return;
+        }
+        game.setStoredValue(REVERSE_ENGINEERING_USED + player.getFaction(), Integer.toString(game.getRound()));
+        ButtonHelper.deleteMessage(event);
+        EndTurnService.endTurnAndUpdateMap(event, game, player);
+    }
+
+    private static void offerSharedNetworkAccess(Game game, Player netrunner, String techId) {
+        if (game == null || netrunner == null || !netrunner.hasAbility(PROXY_NETWORK_ABILITY)) {
+            return;
+        }
+        for (Player holder : game.getRealPlayersExcludingThis(netrunner)) {
+            if (!holder.getPromissoryNotes().containsKey(SHARED_NETWORK_ACCESS) || holder.hasTech(techId)) continue;
+            MessageHelper.sendMessageToChannelWithButtons(
+                    holder.getCorrectChannel(),
+                    holder.getRepresentationUnfogged() + ", " + netrunner.getRepresentation(false, true)
+                            + " copied " + Mapper.getTech(techId).getNameRepresentation()
+                            + ". You may play _Shared Network Access_ to gain that technology.",
+                    List.of(Buttons.green(
+                            holder.factionButtonChecker() + "sharedNetworkAccess_" + netrunner.getFaction() + "_"
+                                    + techId,
+                            "Play Shared Network Access",
+                            FactionEmojis.netrunners)));
+        }
+    }
+
+    @ButtonHandler("sharedNetworkAccess_")
+    public static void resolveSharedNetworkAccess(
+            Game game, Player holder, ButtonInteractionEvent event, String buttonID) {
+        String[] parts = buttonID.replace("sharedNetworkAccess_", "").split("_", 2);
+        if (parts.length != 2) return;
+        Player netrunner = game.getPlayerFromColorOrFaction(parts[0]);
+        String techId = parts[1];
+        if (netrunner == null
+                || !holder.getPromissoryNotes().containsKey(SHARED_NETWORK_ACCESS)
+                || !netrunner.hasTech(techId)
+                || Mapper.getTech(techId) == null
+                || holder.hasTech(techId)) return;
+        holder.addPromissoryNoteToPlayArea(SHARED_NETWORK_ACCESS);
+        holder.addTech(techId);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                holder.getRepresentation() + " played _Shared Network Access_ and gained "
+                        + Mapper.getTech(techId).getNameRepresentation() + ".");
     }
 }

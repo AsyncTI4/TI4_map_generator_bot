@@ -17,6 +17,9 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.*;
@@ -82,6 +85,8 @@ public class PlayerTechService {
 
     public static void addTech(GenericInteractionCreateEvent event, Game game, Player player, String techID) {
         player.addTech(techID);
+        NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
+        NetrunnersUnitsHandler.offerLegionDeploy(game, player);
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
         String message = player.getRepresentation() + " added technology: "
                 + Mapper.getTech(techID).getRepresentation(false) + ".";
@@ -262,6 +267,7 @@ public class PlayerTechService {
         }
 
         player.exhaustTech(tech);
+        NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
         if (!GameEventDraft.stage(game, new GameSubEvent.TechExhausted(player.getFaction(), tech))) {
             GameEventService.commit(game, GameEventType.CARD_PLAY_TECH_EXHAUST, player, Map.of("cardId", tech));
         }
@@ -770,6 +776,8 @@ public class PlayerTechService {
             CommanderUnlockCheckService.checkPlayer(player, "zealots");
         }
         player.addTech(techID);
+        NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
+        NetrunnersUnitsHandler.offerLegionDeploy(game, player);
         if (!isResearch) {
             ArcanumUnitHandler.getRuneboundButtons(player, game, techID);
         }
@@ -941,6 +949,7 @@ public class PlayerTechService {
             }
         }
         if (paymentRequired) {
+            NetrunnersLeadersHandler.offerAgentDiscount(game, player, techID);
             payForTech(game, player, event, techID, paymentType);
         } else {
             if (player.hasLeader("zealotshero")

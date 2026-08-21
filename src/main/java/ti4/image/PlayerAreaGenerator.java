@@ -43,6 +43,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
@@ -2757,6 +2758,9 @@ public class PlayerAreaGenerator {
             if (!unl) textColor = Color.red;
             graphics.setColor(textColor);
             drawRectWithOverlay(graphics, x, y - 2, 44, 152, model);
+            if (NetrunnersBreakthroughHandler.hasDataBreachToken(game, player, bt)) {
+                drawFactionIconImage(graphics, "netrunners", x + 20, y + 2, 20, 20);
+            }
 
             if (player.getBreakthroughTGs(bt) > 0) {
                 BufferedImage tg = ImageHelper.readEmojiImageScaled(MiscEmojis.tg, 40);

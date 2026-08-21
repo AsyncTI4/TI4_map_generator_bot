@@ -16,7 +16,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.BorrowedTi
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PoliticalMarriageLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaPromissoryHandler;
@@ -180,9 +180,7 @@ public class StartTurnService {
         game.setPhaseOfGame("action");
         AeternaPromissoryHandler.offerStasisFighterPlacement(event, game, player);
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
-        if (NetrunnersPromissoryHandler.shouldOfferSharedNetworkAccessButtons(player, game)) {
-            NetrunnersPromissoryHandler.offerSharedNetworkAccessButtons(player, game);
-        }
+        NetrunnersAbilitiesHandler.offerProxyNetwork(game, player);
         SabotageService.startOfTurnSaboWindowReminders(game, player);
         boolean isFowPrivateGame = game.isFowMode();
 

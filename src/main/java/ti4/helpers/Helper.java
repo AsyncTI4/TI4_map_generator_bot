@@ -51,9 +51,6 @@ import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExp
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrAbilitiesHandler;
@@ -1865,38 +1862,6 @@ public final class Helper {
                 && !player.getCurrentProducedUnits().isEmpty()
                 && player.getCurrentProducedUnits().keySet().stream()
                         .allMatch(unit -> remoteWorkforcePosition.equals(unit.split("_")[1]));
-        String siphonDiscountMessage = "";
-        if (player.ownsUnit("netrunners_spacedock") || player.ownsUnit("netrunners_spacedock2")) {
-            siphonDiscountMessage = NetrunnersFactionTechsHandler.getSiphonDiscountMessage(game, player);
-        }
-        if (player.hasAbility("control_network")) {
-            String controlNetworkMessage =
-                    NetrunnersAbilitiesHandler.getControlNetworkProductionMessage(game, player, tile, cost, unitCount);
-            if (!controlNetworkMessage.isEmpty()) {
-                msg.append(controlNetworkMessage);
-                if (player.hasUnlockedBreakthrough("arcanumbtback")) {
-                    msg.append("\n-1 from Power Word: Wish");
-                }
-                if (remoteWorkforceBuild) {
-                    msg.append("\n-1 from Remote Workforce");
-                }
-                if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
-                    msg.append("\n-1 from Echo of the Anvil");
-                }
-                if (player.hasPlanet("skarnath")
-                        && player.getExhaustedPlanetsAbilities().contains("skarnath")) {
-                    int neighborDiscount =
-                            ThronesThroneHandler.getSkarnathDiscount(game, player, player.getCurrentProducedUnits());
-                    if (neighborDiscount > 0) {
-                        msg.append("\n-")
-                                .append(neighborDiscount)
-                                .append(" from matching neighboring player")
-                                .append(neighborDiscount > 1 ? "s" : "");
-                    }
-                }
-                return msg.toString();
-            }
-        }
         if (unitCount <= 1) {
             msg.append("For a cost of ")
                     .append(cost)
@@ -2000,7 +1965,6 @@ public final class Helper {
                         .append(neighborDiscount > 1 ? "s" : "");
             }
         }
-        msg.append(siphonDiscountMessage);
         return msg.toString();
     }
 
@@ -2544,9 +2508,6 @@ public final class Helper {
         }
         totalUnits += numInf + numFF;
         if (wantCost) {
-            if (player.ownsUnit("netrunners_spacedock") || player.ownsUnit("netrunners_spacedock2")) {
-                cost = NetrunnersFactionTechsHandler.applySiphonDiscount(game, player, cost);
-            }
             if (player.hasUnlockedBreakthrough("arcanumbtback")) {
                 cost = Math.max(0, cost - 1);
             }
@@ -2981,12 +2942,6 @@ public final class Helper {
         }
         if (!"sling".equalsIgnoreCase(warfareNOtherstuff)) {
             unitButtons.addAll(IronBreakthroughHandler.getPlaceUnitButtonsForIronBt(player, tile, game, placePrefix));
-        }
-        if (game.getRealPlayers().stream().anyMatch(player_ -> player_.hasUnit("netrunners_flagship"))
-                && NetrunnersUnitsHandler.empBlocksGroundForceProduction(game, player, tile)) {
-            unitButtons = new ArrayList<>(unitButtons.stream()
-                    .filter(button -> !NetrunnersUnitsHandler.isGroundForceProductionButton(button))
-                    .toList());
         }
         if ("place".equalsIgnoreCase(placePrefix)) {
             Button DoneProducingUnits = Buttons.red(
