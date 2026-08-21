@@ -119,7 +119,10 @@ public class CheckDistanceHelper {
                                     && !player.hasTech("lwd")
                                     && !player.hasTech("absol_lwd")
                                     && tile2 != null
-                                    && (!game.isErwinsGambitMode() || !"saar".equalsIgnoreCase(player.getFaction()) || !FoWHelper.playerHasShipsInSystem(game.getPlayerFromColorOrFaction("mentak"), tile2))
+                                    && (!game.isErwinsGambitMode()
+                                            || !"saar".equalsIgnoreCase(player.getFaction())
+                                            || !FoWHelper.playerHasShipsInSystem(
+                                                    game.getPlayerFromColorOrFaction("mentak"), tile2))
                                     && !ButtonHelper.doesPlayerHaveFSHere("yssaril_flagship", player, tile2)
                                     && (!player.hasUnit("mentak_cruiser3")
                                             || tile2.getSpaceUnitHolder().getUnitCount(UnitType.Cruiser, player) < 1))

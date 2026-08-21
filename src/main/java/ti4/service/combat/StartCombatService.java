@@ -131,6 +131,10 @@ public class StartCombatService {
     }
 
     public static void combatCheck(Game game, GenericInteractionCreateEvent event, Tile tile) {
+        if (event instanceof ButtonInteractionEvent
+                && !game.getStoredValue("safeHarborUsed").isEmpty()) {
+            return;
+        }
         spaceCombatCheck(game, tile, event);
         tile.getUnitHolders().values().stream()
                 .filter(unitHolder -> !Constants.SPACE.equals(unitHolder.getName()))
@@ -896,6 +900,8 @@ public class StartCombatService {
         combatPlayers.add(p2);
         List<Button> buttons = new ArrayList<>();
 
+        Player mentakOpponent = null;
+        boolean mentakFound = false;
         for (Player player : combatPlayers) {
             Player otherPlayer = p1;
             if (otherPlayer == player) {
@@ -979,6 +985,15 @@ public class StartCombatService {
                         msg
                                 + ", a reminder that if you keep alive at least 3 non-fighter ships in the active system until the end of combat, you could score _Demonstrate Your Power_.",
                         buttons2);
+            }
+            if (game.isErwinsGambitMode()
+                    && "space".equalsIgnoreCase(type)
+                    && "mentak".equalsIgnoreCase(player.getFaction())
+                    && capitalShips >= 3) {
+                mentakFound = true;
+            }
+            if (!"mentak".equalsIgnoreCase(player.getFaction())) {
+                mentakOpponent = player;
             }
 
             if ((player.hasAbility("primacy")
@@ -1249,6 +1264,13 @@ public class StartCombatService {
                                 + "the Kortali commander.",
                         buttons);
             }
+        }
+        if (mentakFound) {
+            Button steal = Buttons.gray(
+                    mentakOpponent.factionButtonChecker() + "toggleGalvanize_" + tile.getPosition(), "Claim a bounty");
+            String message = mentakOpponent.getRepresentation()
+                    + ", a reminder that if you win this combat you can claim a bounty with this button. (bounty is represented via a galvanize token)";
+            MessageHelper.sendMessageToChannelWithButton(mentakOpponent.getCardsInfoThread(), message, steal);
         }
     }
 

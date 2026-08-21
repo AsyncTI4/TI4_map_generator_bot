@@ -4,17 +4,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.discord.interactions.commands.player.AddAllianceMember;
+import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
+import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
@@ -104,6 +111,133 @@ public class StartScenario extends GameStateSubcommand {
         game.addCustomPO("Coatl HS", 1);
         center.addToken("token_custc1.png", "space");
         CommanderUnlockCheckService.checkPlayer(nekro, "nekro");
+    }
+
+    @ButtonHandler("beginAuction_")
+    public static void beginAuction(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String type = buttonID.split("_")[1];
+        if ("relic".equalsIgnoreCase(type)) {
+            RelicModel relic = Mapper.getRelic(game.getAllRelics().getFirst());
+            game.setStoredValue("auctionObject", "relic_" + game.getAllRelics().getFirst());
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    game.getMainGameChannel(),
+                    "Hacan has begun an action on this relic:",
+                    relic.getRepresentationEmbed());
+        } else {
+            String tech = drawRandomFactionTech(game);
+            game.setStoredValue("auctionObject", "tech_" + tech);
+            TechnologyModel relic = Mapper.getTech(drawRandomFactionTech(game));
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    game.getMainGameChannel(),
+                    "Hacan has begun an action on this technology:",
+                    relic.getRepresentationEmbed());
+        }
+
+        for (Player p : game.getRealPlayers()) {
+            List<Button> buttons = new ArrayList<>();
+            for (int x = 0; x < Helper.getPlayerResourcesAvailable(player, game) + 1; x++) {
+                buttons.add(Buttons.green("bidResource_" + x, "" + x));
+            }
+            MessageHelper.sendMessageToChannel(
+                    p.getCardsInfoThread(),
+                    p.getRepresentation()
+                            + " please select the amount of resources you want to bid on the auctioned item.",
+                    buttons);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("bidResource_")
+    public static void bidResource(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        ButtonHelper.deleteMessage(event);
+        String amount = buttonID.split("_")[1];
+        MessageHelper.sendMessageToChannel(
+                player.getCardsInfoThread(), "You bid " + amount + " resources for the item.");
+        game.setStoredValue(player.getFaction() + "bidAmount", amount);
+
+        int amountRemaining = 0;
+        for (Player p : game.getRealPlayers()) {
+            if (game.getStoredValue(p.getFaction() + "bidAmount").isEmpty()) {
+                amountRemaining++;
+            }
+        }
+        if (amountRemaining == 0) {
+            List<Player> highPlayers = new ArrayList<>();
+            int highest = 0;
+            for (Player p : game.getRealPlayers()) {
+                Integer amountB = Integer.parseInt(game.getStoredValue(p.getFaction() + "bidAmount"));
+                if (amountB == highest) {
+                    highPlayers.add(p);
+                }
+                if (amountB > highest) {
+                    highest = amountB;
+                    highPlayers = new ArrayList<>();
+                    highPlayers.add(p);
+                }
+                game.removeStoredValue(p.getFaction() + "bidAmount");
+            }
+            if (highPlayers.size() == 1) {
+                Player winner = highPlayers.getFirst();
+                MessageHelper.sendMessageToChannel(
+                        winner.getCorrectChannel(),
+                        winner.getRepresentation() + " you won the auction! Use buttons to spend resources. ",
+                        ButtonHelper.getExhaustButtonsWithTG(game, player, "res"));
+                String object = game.getStoredValue("auctionObject");
+                String type = object.split("_")[0];
+                String id = object.replace(type + "_", "");
+                if ("tech".equalsIgnoreCase(type)) {
+                    winner.addTech(id);
+                } else {
+                    RelicHelper.drawRelicAndNotify(winner, event, game);
+                }
+                game.removeStoredValue("auctionObject");
+                Player hacan = game.getPlayerFromColorOrFaction("hacan");
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        winner.getRepresentation() + " won the auction with a bid of " + highest + " resources");
+                hacan.gainTG(2, true);
+                ComponentActionHelper.serveNextComponentActionButtons(event, game, hacan);
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        "Multiple people tied in the auction with a bid of " + highest
+                                + " resources. Buttons have been sent to Mentak to break the tie.");
+                List<Button> buttons = new ArrayList<>();
+                Player mentak = game.getPlayerFromColorOrFaction("mentak");
+                for (Player tied : highPlayers) {
+                    buttons.add(Buttons.green("winAuction_" + tied.getFaction(), tied.getFactionNameOrColor()));
+                }
+                MessageHelper.sendMessageToChannel(
+                        mentak.getCorrectChannel(),
+                        mentak.getRepresentation() + " please select the player you wish to win the auction.",
+                        buttons);
+            }
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(), "There are " + amountRemaining + " players remaining who need to bid.");
+        }
+    }
+
+    @ButtonHandler("winAuction_")
+    public static void winAuction(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player winner = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        MessageHelper.sendMessageToChannel(
+                winner.getCorrectChannel(),
+                winner.getRepresentation() + " you won the auction! Use buttons to spend resources. ",
+                ButtonHelper.getExhaustButtonsWithTG(game, player, "res"));
+        String object = game.getStoredValue("auctionObject");
+        String type = object.split("_")[0];
+        String id = object.replace(type + "_", "");
+        if ("tech".equalsIgnoreCase(type)) {
+            winner.addTech(id);
+        } else {
+            RelicHelper.drawRelicAndNotify(winner, event, game);
+        }
+        game.removeStoredValue("auctionObject");
+        Player hacan = game.getPlayerFromColorOrFaction("hacan");
+        hacan.gainTG(2, true);
+        ComponentActionHelper.serveNextComponentActionButtons(event, game, hacan);
+        ButtonHelper.deleteMessage(event);
     }
 
     private static void startLiberationCodex4(Game game, GenericInteractionCreateEvent event) {
@@ -201,32 +335,32 @@ public class StartScenario extends GameStateSubcommand {
         CommanderUnlockCheckService.checkPlayer(nekro, "nekro");
     }
 
-    public static String drawRandomFactionTech(Game game){
+    public static String drawRandomFactionTech(Game game) {
         List<TechnologyModel> techs = new ArrayList<>();
         techs.addAll(Mapper.getTechs().values());
         Collections.shuffle(techs);
-        for(TechnologyModel model : techs){
-            if(!model.getSource().isOfficial()){
+        for (TechnologyModel model : techs) {
+            if (!model.getSource().isOfficial()) {
                 continue;
             }
-            if(!model.getFaction().isPresent()){
+            if (!model.getFaction().isPresent()) {
                 continue;
             }
             boolean playerHasIt = false;
-            for(Player p : game.getRealAndEliminatedPlayers()){
-                if(p.getTechs().contains(model.getAlias()) || p.getNotResearchedFactionTechs().contains(model.getAlias())){
+            for (Player p : game.getRealAndEliminatedPlayers()) {
+                if (p.getTechs().contains(model.getAlias())
+                        || p.getNotResearchedFactionTechs().contains(model.getAlias())) {
                     playerHasIt = true;
                     break;
                 }
             }
-            if(playerHasIt){
+            if (playerHasIt) {
                 continue;
             }
             return model.getAlias();
         }
         return null;
     }
-
 
     private static void startErwinsGambit(Game game, GenericInteractionCreateEvent event) {
         game.setErwinsGambitMode(true);
@@ -261,14 +395,14 @@ public class StartScenario extends GameStateSubcommand {
             }
         }
 
-        
         List<String> allRelics = game.getAllRelics();
 
         Player mentak = game.getPlayerFromColorOrFaction("mentak");
-        ArrayList<String> relics = new ArrayList<>(List.of("quantumcore","circletofthevoid","dynamiscore","prophetstears","titanprototype"));
+        ArrayList<String> relics = new ArrayList<>(
+                List.of("quantumcore", "circletofthevoid", "dynamiscore", "prophetstears", "titanprototype"));
         Collections.shuffle(relics);
         if (mentak != null) {
-            for(int x = 0; x < 2; x++){
+            for (int x = 0; x < 2; x++) {
                 String relicID = relics.removeFirst();
                 allRelics.remove(relicID);
                 mentak.addRelic(relicID);
@@ -298,8 +432,7 @@ public class StartScenario extends GameStateSubcommand {
         jolnar.addAbility("hylar_fencing_operation");
         Player sol = game.getPlayerFromColorOrFaction("sol");
         sol.addAbility("asset_recovery");
-        
-        
+
         if (game.getRealPlayers().size() == 6) {
             DrawSecretService.dealSOToAll(event, 2, game);
         }
