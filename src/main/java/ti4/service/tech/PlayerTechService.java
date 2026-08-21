@@ -81,7 +81,11 @@ import ti4.spring.service.gameevent.GameSubEvent;
 public class PlayerTechService {
 
     public static void addTech(GenericInteractionCreateEvent event, Game game, Player player, String techID) {
+        boolean gainedTech = !player.hasTech(techID);
         player.addTech(techID);
+        if (gainedTech) {
+            ArcanumUnitHandler.getRuneboundButtons(player, game, techID);
+        }
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
         String message = player.getRepresentation() + " added technology: "
                 + Mapper.getTech(techID).getRepresentation(false) + ".";
