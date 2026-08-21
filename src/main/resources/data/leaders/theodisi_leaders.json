@@ -210,8 +210,8 @@
     "type": "agent",
     "name": "Veyla the Keeper",
     "title": "Custodian of Tomes",
-    "abilityWindow": "When a player gains a non-faction technology:",
-    "abilityText": "You may exhaust this card to allow that player to return that technology to its deck and gain 1 non-unit-upgrade technology with a number of prerequisites up to 1 greater than the number on the returned technology.",
+      "abilityWindow": "When a player gains a non-faction technology:",
+      "abilityText": "You may exhaust this card to allow that player to return that technology to its deck and gain 1 non-unit-upgrade technology with a number of prerequisites up to 1 greater than the number on the returned technology.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
