@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -182,6 +184,22 @@ public class AgendaRiderHelper {
         return planetOutcomeButtons;
     }
 
+    /**
+     * {@link #getPlanetOutcomeButtons}, paginated past Discord's 25-button cap in fog. Not routed through
+     * {@link PlanetTargetService#targetButtons} - this flow's ids are shaped
+     * {@code prefix + "rider_planet;" + planet + "_" + rider}, not the {@code prefix + "_" + planetId} shape
+     * that service hardcodes, so it gets its own small local wrapper instead, the same way the agenda vote
+     * list's pagination worked before it was generalized into that service.
+     */
+    static List<Button> paginatedPlanetOutcomeButtons(
+            Player planetSource, Player viewer, Game game, String prefix, String rider, String navPrefix, int page) {
+        List<Button> all = getPlanetOutcomeButtons(planetSource, viewer, game, prefix, rider);
+        if (!game.isFowMode()) {
+            return all;
+        }
+        return NewStuffHelper.buttonPagination(all, null, navPrefix, 25, page, false);
+    }
+
     public static List<Button> getAgendaButtons(String riderName, Game game, String prefix) {
         String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
         String lower = agendaDetails.toLowerCase();
@@ -216,15 +234,30 @@ public class AgendaRiderHelper {
     @ButtonHandler("planetRider_")
     public static void planetRider(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         buttonID = buttonID.replace("planetRider_", "");
+        // A page-nav press re-enters this same handler (see paginatedPlanetOutcomeButtons's navPrefix) with
+        // a trailing "pageN". Stripping it first, before the color/rider split below, means a fresh press
+        // and a page-N press reduce to the identical "color_rider" string either way.
+        int page = 0;
+        Matcher pageMatch = Pattern.compile(RegexHelper.pageRegex()).matcher(buttonID);
+        if (pageMatch.find()) {
+            page = Integer.parseInt(pageMatch.group("page"));
+            buttonID = buttonID.substring(0, pageMatch.start());
+        }
         String factionOrColor = buttonID.substring(0, buttonID.indexOf('_'));
         Player planetOwner = game.getPlayerFromColorOrFaction(factionOrColor);
         String voteMessage = "Chose to Rider for one of " + factionOrColor + "'s planets. Please choose which one.";
 
         String rider = buttonID.replace(factionOrColor + "_", "");
-        List<Button> outcomeActionRow =
-                getPlanetOutcomeButtons(planetOwner, player, game, player.factionButtonChecker(), rider);
+        // Reuses the presser's own gate, matching the real target buttons built one line below - only the
+        // player who opened this list can page through it.
+        String navPrefix = player.factionButtonChecker() + "planetRider_" + factionOrColor + "_" + rider;
+        List<Button> outcomeActionRow = paginatedPlanetOutcomeButtons(
+                planetOwner, player, game, player.factionButtonChecker(), rider, navPrefix, page);
         if (game.isFowMode()) {
             voteMessage = "Chose to Rider for a planet. Please choose which one.";
+        }
+        if (page > 0) {
+            voteMessage += " (page " + (page + 1) + ")";
         }
 
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, outcomeActionRow);

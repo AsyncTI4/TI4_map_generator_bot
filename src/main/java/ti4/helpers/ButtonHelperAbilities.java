@@ -1170,7 +1170,11 @@ public final class ButtonHelperAbilities {
         // This is the *place* flow, and it can now be reached with a blind-typed planet. addOrRemoveSleeper
         // is a toggle, so calling it on a planet that already holds a sleeper would quietly remove someone
         // else's instead of placing one. Removal has its own dedicated flow.
-        if (uH == null || uH.getTokenList().contains(Constants.TOKEN_SLEEPER_PNG)) {
+        // addSleeperViaBt's own rule: no space stations. Blind Target skips the list, so it has to be
+        // re-checked here too.
+        if (uH == null
+                || uH.getTokenList().contains(Constants.TOKEN_SLEEPER_PNG)
+                || (uH instanceof Planet p && p.isSpaceStation())) {
             PlanetTargetService.fizzle(event, player);
             event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             return;

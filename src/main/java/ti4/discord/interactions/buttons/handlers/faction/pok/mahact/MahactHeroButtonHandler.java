@@ -31,7 +31,7 @@ class MahactHeroButtonHandler {
 
     @ButtonHandler("mahactBenedictionFrom_")
     public static void mahactBenedictionFrom(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        mahactBenediction(buttonID, event, game, player);
+        if (!mahactBenediction(buttonID, event, game, player)) return;
         String pos1 = buttonID.split("_")[1];
         String pos2 = buttonID.split("_")[2];
         MessageHelper.sendMessageToChannel(
@@ -43,18 +43,27 @@ class MahactHeroButtonHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static void mahactBenediction(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+    /** @return false when the target failed to resolve (fizzled) and the caller must not announce success. */
+    private static boolean mahactBenediction(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String pos1 = buttonID.split("_")[1];
         String pos2 = buttonID.split("_")[2];
         Tile tile1 = game.getTileByPosition(pos1);
         Tile tile2 = game.getTileByPosition(pos2);
         if (tile1 == null || tile2 == null) {
             PlanetTargetService.fizzle(event, player);
-            return;
+            return false;
         }
         List<Player> players2 = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, game, tile1);
         if (!players2.isEmpty()) {
             player = players2.getFirst();
+        }
+        // getBenediction2ndTileOptions' own rule: pos2 must be adjacent to pos1 and hold another player's
+        // ships. Blind Target skips the list, so it has to be re-checked here too - otherwise a typed
+        // position could teleport the fleet anywhere and force a combat trigger there.
+        if (!FoWHelper.getAdjacentTilesAndNotThisTile(game, pos1, player, false).contains(pos2)
+                || !FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, game)) {
+            PlanetTargetService.fizzle(event, player);
+            return false;
         }
 
         game.setStoredValue("mahactHeroTarget", player.getFaction());
@@ -121,6 +130,7 @@ class MahactHeroButtonHandler {
             StartCombatService.startSpaceCombat(game, player, player2, tile2, event, "-benediction");
         }
         game.setActiveSystem(pos2);
+        return true;
     }
 
     @ButtonHandler("benedictionStep1_")

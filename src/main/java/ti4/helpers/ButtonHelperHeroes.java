@@ -382,7 +382,7 @@ public class ButtonHelperHeroes {
         var spec = PlanetTargetSpec.of("khraskHeroStep4Exhaust_" + BlindSelectionService.TBD_FACTION);
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) return;
         var target = PlanetTargetService.resolve(
-                game, player, buttonID, t -> t.owner().getReadiedPlanets().contains(t.planetId()));
+                game, player, buttonID, spec, t -> t.owner().getReadiedPlanets().contains(t.planetId()));
         if (target == null) {
             PlanetTargetService.fizzle(event, player);
             return;
@@ -663,8 +663,9 @@ public class ButtonHelperHeroes {
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         var spec = PlanetTargetSpec.of("khraskHeroStep4Ready_" + BlindSelectionService.TBD_FACTION);
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) return;
-        var target = PlanetTargetService.resolve(
-                game, player, buttonID, t -> t.owner().getExhaustedPlanets().contains(t.planetId()));
+        var target = PlanetTargetService.resolve(game, player, buttonID, spec, t -> t.owner()
+                .getExhaustedPlanets()
+                .contains(t.planetId()));
         if (target == null) {
             PlanetTargetService.fizzle(event, player);
             return;

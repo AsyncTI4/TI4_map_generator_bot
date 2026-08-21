@@ -264,9 +264,10 @@ public class TeHelperActionCards {
         String planet = buttonID.split("_")[1];
         // Shared sink: five different builders funnel here (Cultural Exchange, Galactic Movement, the two
         // Bentor coexistence grants, Xin/Deepwrought), and an off-map planet used to reach AddUnitService as
-        // a null tile.
+        // a null tile. isHomePlanet mirrors coexistSpec's own where() above - that spec is only used for
+        // pagination, so a Blind Target press never passed through it and has to be re-checked here too.
         Planet unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        if (game.getTileFromPlanet(planet) == null || unitHolder == null) {
+        if (game.getTileFromPlanet(planet) == null || unitHolder == null || unitHolder.isHomePlanet(game)) {
             PlanetTargetService.fizzle(event, player);
             return;
         }
@@ -513,6 +514,17 @@ public class TeHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
+    /**
+     * Re-derives {@link #beginPirates}' {@code emptyTile} rule for one resolved tile. A Blind Target press
+     * skips the builder's list and its predicate entirely, so this has to be re-checked at resolution.
+     */
+    public static boolean legalPirateTarget(Game game, Tile tile, String prefix) {
+        return tile != null
+                && Tile.tileHasNoPlayerShips(game).test(tile)
+                && !tile.getTileModel().isHyperlane()
+                && (!tile.isHomeSystem(game) || prefix.contains("NokarBt"));
+    }
+
     @ButtonHandler("resolvePirateContract_")
     private static void resolvePirateContract(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String regex = "resolvePirateContract_" + RegexHelper.posRegex();
@@ -520,7 +532,7 @@ public class TeHelperActionCards {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             // posRegex accepts any bot-legal position, not only positions on this map, so a blind-typed
             // target can reach here with no tile. RegexService swallows the NPE, so guard explicitly.
-            if (tile == null) {
+            if (!legalPirateTarget(game, tile, "resolvePirateContract")) {
                 PlanetTargetService.fizzle(event, player);
                 return;
             }
@@ -540,7 +552,7 @@ public class TeHelperActionCards {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             // posRegex accepts any bot-legal position, not only positions on this map, so a blind-typed
             // target can reach here with no tile. RegexService swallows the NPE, so guard explicitly.
-            if (tile == null) {
+            if (!legalPirateTarget(game, tile, "resolveNokarBt")) {
                 PlanetTargetService.fizzle(event, player);
                 return;
             }
@@ -560,7 +572,7 @@ public class TeHelperActionCards {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             // posRegex accepts any bot-legal position, not only positions on this map, so a blind-typed
             // target can reach here with no tile. RegexService swallows the NPE, so guard explicitly.
-            if (tile == null) {
+            if (!legalPirateTarget(game, tile, "resolvePirateFleet")) {
                 PlanetTargetService.fizzle(event, player);
                 return;
             }

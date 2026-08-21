@@ -4648,7 +4648,11 @@ public class ButtonHelper {
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
-        if (tile == null) {
+        // getEchoAvailableSystems' own rule: no planets, not a hyperlane. Blind Target skips the list, so it
+        // has to be re-checked here too.
+        if (tile == null
+                || !tile.getPlanetUnitHolders().isEmpty()
+                || tile.getTilePath().toLowerCase().contains("hyperlane")) {
             PlanetTargetService.fizzle(event, player);
             return;
         }

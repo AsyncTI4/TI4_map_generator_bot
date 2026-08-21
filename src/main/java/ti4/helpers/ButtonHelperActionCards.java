@@ -1177,9 +1177,17 @@ public final class ButtonHelperActionCards {
     @ButtonHandler("ghostShipStep2_")
     public static void resolveGhostShipStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        if (tile == null) {
+        if (tile == null || !FoWHelper.doesTileHaveWHs(game, tile.getPosition())) {
             PlanetTargetService.fizzle(event, player);
             return;
+        }
+        // getGhostShipButtons' own rule: no other player may have ships here. Blind Target skips the list,
+        // so it has to be re-checked here too.
+        for (Player p2 : game.getRealPlayersNNeutral()) {
+            if (p2 != player && FoWHelper.playerHasActualShipsInSystem(p2, tile)) {
+                PlanetTargetService.fizzle(event, player);
+                return;
+            }
         }
         // flipTileIfNeeded can itself hand back null for a tile it cannot resolve.
         tile = FlipTileService.flipTileIfNeeded(event, tile, game);
@@ -1205,7 +1213,15 @@ public final class ButtonHelperActionCards {
     @ButtonHandler("probeStep2_")
     public static void resolveProbeStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        if (tile == null) {
+        // getFrontierTokenButtonsRaw's one rule common to both Frontier Rider and Circlet of the Void: the
+        // system actually has a frontier token. Blind Target skips the list, so it has to be re-checked here
+        // too - the button id alone can't say which of the two callers built it, so this only enforces the
+        // rule they share, not Circlet's extra no-other-ships requirement.
+        if (tile == null
+                || !tile.getUnitHolders()
+                        .get(Constants.SPACE)
+                        .getTokenList()
+                        .contains(Mapper.getTokenID(Constants.FRONTIER))) {
             PlanetTargetService.fizzle(event, player);
             return;
         }

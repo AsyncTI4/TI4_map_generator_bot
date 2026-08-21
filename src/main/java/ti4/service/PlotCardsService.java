@@ -156,13 +156,22 @@ public class PlotCardsService {
                 .where(pl -> game.getTileFromPlanet(pl.getName()) != null
                         && !game.getTileFromPlanet(pl.getName()).isHomeSystem(game));
         if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, seetheSpec)) return;
-        String regex = "resolveSeethe_" + RegexHelper.unitHolderRegex(game, "planet");
+        // planetNameRegex, not unitHolderRegex: the latter only matches planets on THIS map, so a
+        // Blind-Target press naming a real-but-off-map planet would never match and the interaction would
+        // silently fail instead of fizzling - the null checks below exist precisely to catch that case.
+        String regex = "resolveSeethe_" + RegexHelper.planetNameRegex(game, "planet");
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile t = game.getTileFromPlanet(matcher.group("planet"));
-            if (t == null) return;
+            if (t == null) {
+                PlanetTargetService.fizzle(player);
+                return;
+            }
 
             Planet planet = t.getUnitHolderFromPlanet(matcher.group("planet"));
-            if (planet == null) return;
+            if (planet == null) {
+                PlanetTargetService.fizzle(player);
+                return;
+            }
             // Non-home is a builder filter, so a blind-typed target has to be re-checked here or Seethe
             // would eradicate units on any planet at all.
             if (t.isHomeSystem(game)) {
