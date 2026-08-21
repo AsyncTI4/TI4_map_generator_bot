@@ -387,6 +387,86 @@ class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         assertEquals(2, tile.getUnitHolders().get(Constants.SPACE).getDamagedUnitCount(dreadnoughtUnitKey));
     }
 
+    @Test
+    void testAutoAssignSpaceCombatHits_Summarizing_NeutralOpponent_SustainsFlagshipInsteadOfLosingFighters() {
+        Player player = createPlayer(game, "red");
+        player.addOwnedUnitByID("fighter");
+        player.addOwnedUnitByID("flagship");
+
+        Player neutral = game.setupNeutralPlayer("blue");
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Destroyer, neutral.getColor()), 1);
+
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
+        tile.addUnit(Constants.SPACE, fighterUnitKey, 3);
+
+        UnitKey flagshipUnitKey = Units.getUnitKey(UnitType.Flagship, "red");
+        tile.addUnit(Constants.SPACE, flagshipUnitKey, 1);
+
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 1, null, true, false);
+
+        assertTrue(actualMessage.contains("Would sustain 1 <flagship>"));
+        assertFalse(actualMessage.contains("Would destroy"));
+    }
+
+    @Test
+    void testAutoAssignSpaceCombatHits_Summarizing_SpaceCannonOffence_AdjacentShooterWithNoActionCards() {
+        Game scoGame = new Game();
+        Player player = createSpaceCannonTarget(scoGame);
+        createAdjacentPds2Shooter(scoGame);
+
+        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(
+                player, scoGame, scoGame.getTileByPosition("101"), 1, null, true, true);
+
+        assertTrue(actualMessage.contains("Would sustain 1 <flagship>"));
+        assertFalse(actualMessage.contains("Would destroy"));
+    }
+
+    @Test
+    void testAutoAssignSpaceCombatHits_Summarizing_SpaceCannonOffence_AdjacentShooterHoldingActionCards() {
+        Game scoGame = new Game();
+        Player player = createSpaceCannonTarget(scoGame);
+        Player shooter = createAdjacentPds2Shooter(scoGame);
+        shooter.setActionCard("sabo1");
+
+        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(
+                player, scoGame, scoGame.getTileByPosition("101"), 1, null, true, true);
+
+        assertFalse(actualMessage.contains("Would sustain"));
+        assertTrue(actualMessage.contains("Would destroy 1 <fighter>"));
+    }
+
+    private static Player createSpaceCannonTarget(Game game) {
+        Player player = createPlayer(game, "red");
+        player.addOwnedUnitByID("fighter");
+        player.addOwnedUnitByID("flagship");
+
+        Tile combatTile = new Tile("19", "101");
+        game.setTile(combatTile);
+        combatTile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Fighter, "red"), 3);
+        combatTile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Flagship, "red"), 1);
+        return player;
+    }
+
+    private static Player createAdjacentPds2Shooter(Game game) {
+        Player shooter = game.addPlayer("202", "shooterUser");
+        shooter.setFaction("sol");
+        shooter.setColor("blue");
+        shooter.addOwnedUnitByID("pds2");
+
+        Tile pdsTile = new Tile("20", "102");
+        game.setTile(pdsTile);
+        pdsTile.addUnit("vefutii", Units.getUnitKey(UnitType.Pds, "blue"), 1);
+        return shooter;
+    }
+
+    private static Player createPlayer(Game game, String color) {
+        Player player = new Player("101", "testUser", game);
+        player.setFactionEmoji("a");
+        player.setColor(color);
+        return player;
+    }
+
     private static Player createPlayerWithDuraniumArmor(Game game, String color) {
         Player player = new Player("101", "testUser", game);
         player.setFactionEmoji("a");

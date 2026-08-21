@@ -30,6 +30,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionT
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
@@ -827,7 +828,7 @@ public class StartCombatService {
     public static void sendSpaceCannonButtonsToThread(
             MessageChannel threadChannel, Game game, Player activePlayer, Tile tile) {
         StringBuilder pdsMessage = new StringBuilder();
-        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition());
+        List<Player> playersWithPds2 = ButtonHelper.getPlayersWithPds2Cover(activePlayer, game, tile.getPosition());
         if (tile.isScar(game)) {
             MessageHelper.sendMessageToChannel(
                     threadChannel, "## Reminder that you cannot use any unit abilities in an Entropic Scar.");
@@ -1335,7 +1336,7 @@ public class StartCombatService {
         spaceCannonButtons.add(Buttons.red("declinePDS_" + tile.getTileID(), "Decline SPACE CANNON"));
 
         // Add Graviton Laser System button if applicable
-        for (Player playerWithPds : ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition())) {
+        for (Player playerWithPds : ButtonHelper.getPlayersWithPds2Cover(activePlayer, game, tile.getPosition())) {
             if (playerWithPds.hasTechReady("gls")) { // Graviton Laser Systems
                 spaceCannonButtons.add(
                         Buttons.gray("exhaustTech_gls", "Exhaust Graviton Laser System", TechEmojis.CyberneticTech));
@@ -1343,7 +1344,7 @@ public class StartCombatService {
             }
         }
         if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("control_network"))) {
-            for (Player rollingPlayer : ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition())) {
+            for (Player rollingPlayer : ButtonHelper.getPlayersWithPds2Cover(activePlayer, game, tile.getPosition())) {
                 if (game.getRealPlayers().stream().anyMatch(player -> player.hasUnit("netrunners_flagship"))
                         && NetrunnersUnitsHandler.empBlocksSpaceCannonAgainstOpponent(
                                 game, rollingPlayer, tile, CombatRollType.SpaceCannonOffence)) {
@@ -1500,7 +1501,8 @@ public class StartCombatService {
         if (game.isFowMode() || "ground".equalsIgnoreCase(spaceOrGround)) {
             return 0;
         }
-        if (!ButtonHelper.tileHasPDS2Cover(player1, game, tile.getPosition()).isEmpty()) {
+        if (!ButtonHelper.getPlayersWithPds2Cover(player1, game, tile.getPosition())
+                .isEmpty()) {
             return 1;
         }
         return 0;
@@ -2425,6 +2427,14 @@ public class StartCombatService {
                                 p.factionButtonChecker() + "ralnelPull_" + tile.getPosition() + "_" + unitH.getName(),
                                 "Use Ralnel Mech Ability on " + nameOfHolder,
                                 FactionEmojis.Ralnel));
+                    }
+
+                    // Phoenix Rising
+                    if (isGroundCombat
+                            && p.hasTech("beasheninf")
+                            && (p.getNombox().getUnitCount(UnitType.Infantry, p) > 0)
+                            && p.getPlanets().contains(unitH.getName())) {
+                        buttons.add(AshenAbilityHandler.getCinderbornButton(p, unitH.getName()));
                     }
 
                     // atokera

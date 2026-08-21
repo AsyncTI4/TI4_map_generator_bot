@@ -142,7 +142,8 @@ public class ArcanumTechHandler {
     private static void offerPlanetExplorationButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
         Button done = Buttons.red(
-                player.factionButtonChecker() + "finishComponentAction", "Done Resolving Seal of Revelation");
+                player.factionButtonChecker() + "finishComponentAction_sealOfRevelation",
+                "Done Resolving Seal of Revelation");
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButton(
                     event.getMessageChannel(),
@@ -197,7 +198,7 @@ public class ArcanumTechHandler {
         }
 
         boolean spaceCannonPromptAlreadyAvailable = FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
-                && !ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition())
+                && !ButtonHelper.getPlayersWithPds2Cover(player, game, tile.getPosition())
                         .isEmpty();
         player.exhaustTech(SIGIL_OF_TRANSMUTATION);
         game.setStoredValue(SIGIL_OF_TRANSMUTATION_TILE + player.getFaction(), tile.getPosition());

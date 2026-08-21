@@ -2141,6 +2141,27 @@ public final class ButtonHelperActionCards {
         }
     }
 
+    public static void checkForPlayingStrategicFocus(Game game, Player player) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
+            return;
+        }
+        if (!player.getPlayableActionCards().contains("strategic_focus")) {
+            return;
+        }
+        Integer handIndex = player.getActionCards().get("strategic_focus");
+        String msg = player.getRepresentation()
+                + ", you have _Strategic Focus_ in your hand and just passed — this is the window to play it."
+                + " Use the button below to play it now, or ignore this message if you don't want to.";
+        List<Button> buttons = new ArrayList<>();
+        if (handIndex != null) {
+            buttons.add(Buttons.green(
+                    Constants.AC_PLAY_FROM_HAND + handIndex, "Play Strategic Focus", CardEmojis.getACEmoji(game)));
+        }
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
     public static void checkForPlayingBountyContracts(Game game, Player player) {
         if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
                 || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
