@@ -302,6 +302,86 @@ class PlanetTargetServiceTest extends BaseTi4Test {
         }
     }
 
+    // ---- pagination past Discord's 25-buttons-per-message cap -----------------------------------
+
+    @Test
+    void targetButtons_paginatesPastTwentyFive() {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game game = harness.load();
+            game.setFowMode(true);
+            Player actor = game.getRealPlayers().getFirst();
+
+            List<String> onMapPlanets = game.getTileMap().values().stream()
+                    .flatMap(t -> t.getUnitHolders().values().stream())
+                    .filter(uh -> uh instanceof ti4.game.Planet p && !p.isSpaceStation(game))
+                    .map(uh -> uh.getName())
+                    .distinct()
+                    .limit(26)
+                    .toList();
+            assertThat(onMapPlanets)
+                    .as("default test map should have at least 26 non-space-station planets")
+                    .hasSizeGreaterThanOrEqualTo(26);
+
+            var spec = PlanetTargetSpec.of(PREFIX).withAlwaysInclude(Set.copyOf(onMapPlanets));
+            List<Button> page1 = build(game, actor, spec);
+
+            assertThat(page1).hasSizeLessThanOrEqualTo(25);
+            assertThat(page1)
+                    .as("a page-25+ list must offer a Next Page button")
+                    .anyMatch(b -> b.getCustomId() != null && b.getCustomId().startsWith(PREFIX + "page"));
+        }
+    }
+
+    @Test
+    void targetButtons_belowTheCapIsUnpaginated() {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game game = harness.load();
+            game.setFowMode(true);
+            Player actor = game.getRealPlayers().getFirst();
+            String own = actor.getPlanets().getFirst();
+
+            // selfOnly bounds the candidate set to the actor's own planets - always small.
+            List<Button> buttons =
+                    build(game, actor, PlanetTargetSpec.of(PREFIX).selfOnly());
+
+            assertThat(offers(buttons, own)).isTrue();
+            assertThat(buttons)
+                    .noneMatch(b -> b.getCustomId() != null && b.getCustomId().contains("page"));
+        }
+    }
+
+    /**
+     * A resolve handler receives {@code buttonID} only after {@code ListenerContext.checkFinsFactionChecker}
+     * has already stripped a leading {@code FFCC_<faction>_} gate from it - real target press or page-nav
+     * press alike. A spec built from {@code player.factionButtonChecker() + "somePrefix"} (Yin hero, Vyserix,
+     * the shared coexistence sink, ...) therefore has a {@code pageNavPrefix} the resolve handler will never
+     * see intact. Pins the fix: {@code pageNumberFor} must match against the same stripped form, or a nav
+     * press from an FFCC_-gated spec is never recognized as one and silently falls through to fizzle.
+     */
+    @Test
+    void pageNumberFor_matchesAnFfccGatedPrefixAfterTheFrameworkStripsIt() {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game game = harness.load();
+            Player actor = game.getRealPlayers().getFirst();
+            var spec = PlanetTargetSpec.of(actor.factionButtonChecker() + "someCardStep3");
+
+            // The id as it exists on Discord - what NewStuffHelper.buttonPagination actually builds.
+            String asBuiltForDiscord = spec.buttonPrefix() + "page1";
+            // The id as a resolve handler actually receives it, gate already stripped by the framework.
+            String asSeenByHandler = asBuiltForDiscord.replace("FFCC_" + actor.getFaction() + "_", "");
+
+            assertThat(asBuiltForDiscord)
+                    .as("sanity: the two forms actually differ")
+                    .isNotEqualTo(asSeenByHandler);
+            assertThat(PlanetTargetService.pageNumberFor(asSeenByHandler, actor, spec))
+                    .as("must recognize the post-strip form, since that's the only form a handler ever sees")
+                    .isEqualTo(1);
+            assertThat(PlanetTargetService.pageNumberFor("someCardStep3_realplanetid", actor, spec))
+                    .as("an ordinary target press must not be misread as a page press")
+                    .isNull();
+        }
+    }
+
     // ---- the shared fizzle pool ---------------------------------------------------------------
 
     @Test

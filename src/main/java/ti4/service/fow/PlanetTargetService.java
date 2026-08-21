@@ -9,6 +9,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -22,6 +24,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
+import ti4.helpers.RegexHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
@@ -88,6 +92,12 @@ public class PlanetTargetService {
      * @param requireOwned    the card needs a controller, so drop uncontrolled planets — but only where the
      *                        acting player can legitimately see that they are uncontrolled. See
      *                        {@link #targetButtons} for why that qualifier matters.
+     * @param pageNavPrefix   prefix for this spec's page-2-and-beyond nav buttons; defaults to
+     *                        {@code buttonPrefix}. Override with {@link #withPageNavPrefix} only when
+     *                        {@code buttonPrefix} is <b>not</b> owned exclusively by a spec-aware resolve
+     *                        handler - e.g. agenda vote casting, where {@code outcome_} is also matched by
+     *                        {@code AgendaHelper.outcome}, a generic handler for every agenda type that would
+     *                        misinterpret a nav press routed to it via the same prefix.
      */
     public record PlanetTargetSpec(
             String buttonPrefix,
@@ -95,20 +105,23 @@ public class PlanetTargetService {
             Visibility visibility,
             Predicate<Planet> publicLegality,
             Set<String> alwaysInclude,
-            boolean requireController) {
+            boolean requireController,
+            String pageNavPrefix) {
 
         public PlanetTargetSpec {
             if (ownership == null) ownership = Ownership.ANY;
             if (visibility == null) visibility = Visibility.KNOWN;
+            if (pageNavPrefix == null) pageNavPrefix = buttonPrefix;
         }
 
         /** Defaults: anyone's planets, everything the actor knows about, no controller requirement. */
         public static PlanetTargetSpec of(String buttonPrefix) {
-            return new PlanetTargetSpec(buttonPrefix, Ownership.ANY, Visibility.KNOWN, null, null, false);
+            return new PlanetTargetSpec(buttonPrefix, Ownership.ANY, Visibility.KNOWN, null, null, false, null);
         }
 
         public PlanetTargetSpec ownership(Ownership o) {
-            return new PlanetTargetSpec(buttonPrefix, o, visibility, publicLegality, alwaysInclude, requireController);
+            return new PlanetTargetSpec(
+                    buttonPrefix, o, visibility, publicLegality, alwaysInclude, requireController, pageNavPrefix);
         }
 
         public PlanetTargetSpec excludingSelf() {
@@ -120,7 +133,8 @@ public class PlanetTargetService {
         }
 
         public PlanetTargetSpec visibility(Visibility v) {
-            return new PlanetTargetSpec(buttonPrefix, ownership, v, publicLegality, alwaysInclude, requireController);
+            return new PlanetTargetSpec(
+                    buttonPrefix, ownership, v, publicLegality, alwaysInclude, requireController, pageNavPrefix);
         }
 
         public PlanetTargetSpec visibleNowOnly() {
@@ -130,17 +144,24 @@ public class PlanetTargetService {
         /** Public map facts only — planet trait, home system, space station. Never hidden state. */
         public PlanetTargetSpec where(Predicate<Planet> legality) {
             return new PlanetTargetSpec(
-                    buttonPrefix, ownership, visibility, legality, alwaysInclude, requireController);
+                    buttonPrefix, ownership, visibility, legality, alwaysInclude, requireController, pageNavPrefix);
         }
 
         public PlanetTargetSpec withAlwaysInclude(Set<String> planets) {
             return new PlanetTargetSpec(
-                    buttonPrefix, ownership, visibility, publicLegality, planets, requireController);
+                    buttonPrefix, ownership, visibility, publicLegality, planets, requireController, pageNavPrefix);
         }
 
         /** For cards that cannot resolve against an uncontrolled planet (Uprising, Plague, Reparations…). */
         public PlanetTargetSpec requiringController() {
-            return new PlanetTargetSpec(buttonPrefix, ownership, visibility, publicLegality, alwaysInclude, true);
+            return new PlanetTargetSpec(
+                    buttonPrefix, ownership, visibility, publicLegality, alwaysInclude, true, pageNavPrefix);
+        }
+
+        /** See {@code pageNavPrefix} above - only for a spec whose buttonPrefix isn't exclusively its own. */
+        public PlanetTargetSpec withPageNavPrefix(String navPrefix) {
+            return new PlanetTargetSpec(
+                    buttonPrefix, ownership, visibility, publicLegality, alwaysInclude, requireController, navPrefix);
         }
 
         /** True when this planet is filtered out for the acting player by the ownership axis. */
@@ -202,13 +223,22 @@ public class PlanetTargetService {
 
     /**
      * Buttons for every holder containing {@code spec.unit()}, as {@code <prefix>_<position>_<space|planetId>}.
-     * Appends the unit-holder Blind Target button. Outside fog the caller's list is returned untouched.
+     * Appends the unit-holder Blind Target button, and paginates past Discord's 25-button cap the same way
+     * {@link #targetButtons} does - see {@link #handlePlanetPage} / {@link #handleUnitHolderPage} for why a
+     * resolve handler must check pagination before resolving. Outside fog the caller's list is returned
+     * untouched.
      */
     public static List<Button> unitHolderTargetButtons(
             Game game, Player actor, UnitHolderTargetSpec spec, List<Button> nonFogButtons) {
         if (!game.isFowMode()) {
             return nonFogButtons;
         }
+        List<Button> all = rawUnitHolderTargetButtons(game, actor, spec, nonFogButtons);
+        return NewStuffHelper.buttonPagination(all, null, spec.buttonPrefix(), 25, 0, false);
+    }
+
+    private static List<Button> rawUnitHolderTargetButtons(
+            Game game, Player actor, UnitHolderTargetSpec spec, List<Button> nonFogButtons) {
         Set<String> positions = spec.visibility() == Visibility.VISIBLE_NOW
                 ? FoWHelper.getTilePositionsToShow(game, actor)
                 : FoWHelper.getKnownTilePositions(game, actor);
@@ -230,6 +260,33 @@ public class PlanetTargetService {
         buttons.sort((a, b) -> a.getLabel().compareToIgnoreCase(b.getLabel()));
         BlindSelectionService.appendBlindUnitHolderTargetButton(buttons, spec.buttonPrefix());
         return buttons;
+    }
+
+    /** {@link #handlePlanetPage}'s counterpart for {@link #unitHolderTargetButtons}. */
+    public static boolean handleUnitHolderPage(
+            ButtonInteractionEvent event, Game game, Player actor, String buttonID, UnitHolderTargetSpec spec) {
+        // See handlePlanetPage's javadoc: buttonPrefix as built can carry an FFCC_<faction>_ gate that never
+        // reaches a handler, so matching must use the same stripped form the framework already applied.
+        String ffccGate = "FFCC_" + actor.getFaction() + "_";
+        String effectivePrefix = spec.buttonPrefix().startsWith(ffccGate)
+                ? spec.buttonPrefix().substring(ffccGate.length())
+                : spec.buttonPrefix();
+        if (!buttonID.startsWith(effectivePrefix)) return false;
+        Matcher pageMatch =
+                Pattern.compile(RegexHelper.pageRegex()).matcher(buttonID.substring(effectivePrefix.length()));
+        if (!pageMatch.find()) return false;
+        int page = Integer.parseInt(pageMatch.group("page"));
+        List<Button> pageButtons = NewStuffHelper.buttonPagination(
+                rawUnitHolderTargetButtons(game, actor, spec, new ArrayList<>()),
+                null,
+                spec.buttonPrefix(),
+                25,
+                page,
+                false);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getChannel(), "Choose your target. (page " + (page + 1) + ")", pageButtons);
+        return true;
     }
 
     /**
@@ -404,14 +461,25 @@ public class PlanetTargetService {
 
     /**
      * Outside fog, returns {@code nonFogButtons} untouched — existing behaviour is preserved exactly.
-     * In fog, replaces it with planets the player could know about, plus a Blind Target button.
+     * In fog, replaces it with planets the player could know about, plus a Blind Target button, paginated to
+     * Discord's 25-buttons-per-message cap. Page 2 and beyond is reached through nav buttons whose id is
+     * {@code spec.pageNavPrefix() + "page" + N} - which defaults to {@code buttonPrefix}, so a nav press
+     * routes (via {@code @ButtonHandler}'s longest-prefix match) to that same component's own resolve handler
+     * with no extra wiring. That handler must call {@link #handlePlanetPage} before {@link #resolve}, or a
+     * nav press falls through to resolve() and fizzles instead of turning the page - safe (resolve()'s own
+     * parsing rejects it), but wrong. See {@link PlanetTargetSpec#withPageNavPrefix} for the one case where
+     * the default collides with something else and needs overriding.
      */
     public static List<Button> targetButtons(
             Game game, Player actor, PlanetTargetSpec spec, List<Button> nonFogButtons) {
         if (!game.isFowMode()) {
             return nonFogButtons;
         }
+        List<Button> all = rawTargetButtons(game, actor, spec);
+        return NewStuffHelper.buttonPagination(all, null, spec.pageNavPrefix(), 25, 0, false);
+    }
 
+    private static List<Button> rawTargetButtons(Game game, Player actor, PlanetTargetSpec spec) {
         Set<String> candidates = candidatePlanetIds(game, actor, spec.visibility(), spec.alwaysInclude());
         Set<String> visibleNow = FoWHelper.getTilePositionsToShow(game, actor);
         UnaryOperator<String> label = fogSafeLabeller(game, actor);
@@ -439,6 +507,54 @@ public class PlanetTargetService {
 
         BlindSelectionService.appendBlindTargetButton(buttons, spec.buttonPrefix(), true);
         return buttons;
+    }
+
+    /**
+     * Call at the top of a resolve handler, before {@link #resolve}, passing the same {@code spec} used to
+     * build the list: if {@code buttonID} is a page-nav press for this spec, redisplays the requested page
+     * and returns true so the caller can return immediately. Returns false for every other id, including a
+     * real target press, so the caller falls through to normal resolution.
+     */
+    public static boolean handlePlanetPage(
+            ButtonInteractionEvent event, Game game, Player actor, String buttonID, PlanetTargetSpec spec) {
+        Integer page = pageNumberFor(buttonID, actor, spec);
+        if (page == null) return false;
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getChannel(),
+                "Choose your target. (page " + (page + 1) + ")",
+                targetButtonsPage(game, actor, spec, page));
+        return true;
+    }
+
+    /**
+     * {@code buttonID}'s page number under {@code spec}'s nav prefix, or null if it isn't a page-nav id.
+     *
+     * <p>{@code spec.pageNavPrefix()} is the prefix as <i>built</i> - which, for a spec whose buttonPrefix
+     * embeds {@code player.factionButtonChecker()}, includes an {@code FFCC_<faction>_} gate. That segment
+     * never reaches a resolve handler: {@code ListenerContext.checkFinsFactionChecker} strips it off every
+     * button id, real target or nav press alike, before any handler is invoked. Match against the same
+     * stripped form, or a nav id from an FFCC_-gated spec would never be recognized as one.
+     */
+    static Integer pageNumberFor(String buttonID, Player actor, PlanetTargetSpec spec) {
+        String ffccGate = "FFCC_" + actor.getFaction() + "_";
+        String effectivePrefix = spec.pageNavPrefix().startsWith(ffccGate)
+                ? spec.pageNavPrefix().substring(ffccGate.length())
+                : spec.pageNavPrefix();
+        if (!buttonID.startsWith(effectivePrefix)) return null;
+        Matcher pageMatch =
+                Pattern.compile(RegexHelper.pageRegex()).matcher(buttonID.substring(effectivePrefix.length()));
+        return pageMatch.find() ? Integer.parseInt(pageMatch.group("page")) : null;
+    }
+
+    /**
+     * Page {@code page} (0-indexed) of {@code spec}'s candidate list, exactly as {@link #targetButtons} would
+     * slice it. Pure, unlike {@link #handlePlanetPage} - split out so a page beyond the first is testable
+     * without mocking a {@link ButtonInteractionEvent}.
+     */
+    public static List<Button> targetButtonsPage(Game game, Player actor, PlanetTargetSpec spec, int page) {
+        return NewStuffHelper.buttonPagination(
+                rawTargetButtons(game, actor, spec), null, spec.pageNavPrefix(), 25, page, false);
     }
 
     /**

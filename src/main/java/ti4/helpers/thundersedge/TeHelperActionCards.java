@@ -250,6 +250,16 @@ public class TeHelperActionCards {
 
     @ButtonHandler("exchangeProgramPart3")
     private static void exchangeProgramPart3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        // Shared sink: five different builders funnel here (Cultural Exchange, Galactic Movement, the two
+        // Bentor coexistence grants, Xin/Deepwrought), all under the identical prefix
+        // "<factionButtonChecker>exchangeProgramPart3", so a page-nav press cannot say which one built it.
+        // Three of the five narrow their list to non-home planets and two don't; resolution below never
+        // re-checks that either way, so it is disclosure-only. Rebuilding with the narrower spec is the safe
+        // default - the two unfiltered builders would only under-offer on a page 2 they are, in practice,
+        // very unlikely to ever reach.
+        var coexistSpec = PlanetTargetSpec.of(player.factionButtonChecker() + "exchangeProgramPart3")
+                .where(p -> !p.isHomePlanet(game));
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, coexistSpec)) return;
 
         String planet = buttonID.split("_")[1];
         // Shared sink: five different builders funnel here (Cultural Exchange, Galactic Movement, the two

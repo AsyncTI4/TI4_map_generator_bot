@@ -5,6 +5,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -79,15 +81,19 @@ public class SettlementsAcd2ButtonHandler {
     public static void resolveSettlementsPlaceOn(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String payload = buttonID.replace("settlementsPlaceOn_", "");
-        int separator = payload.indexOf('_');
-        if (separator < 0) {
+        // remaining leads both shapes this payload can take - "<remaining>_<planet>" for a real target and
+        // "<remaining>page<N>" for a nav press - so it has to be read before telling which one this is.
+        Matcher leadingDigits = Pattern.compile("^(\\d+)").matcher(payload);
+        if (!leadingDigits.find()) {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        int remaining;
-        try {
-            remaining = Integer.parseInt(payload.substring(0, separator));
-        } catch (NumberFormatException e) {
+        int remaining = Integer.parseInt(leadingDigits.group(1));
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, placeOnSpec(game, player, remaining)))
+            return;
+
+        int separator = payload.indexOf('_');
+        if (separator < 0) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -124,6 +130,12 @@ public class SettlementsAcd2ButtonHandler {
         }
     }
 
+    /** {@code remaining} is embedded in the button prefix itself, so each count needs its own spec instance. */
+    private static PlanetTargetSpec placeOnSpec(Game game, Player player, int remaining) {
+        return PlanetTargetSpec.of(player.factionButtonChecker() + "settlementsPlaceOn_" + remaining)
+                .where(p -> !p.isHomePlanet(game));
+    }
+
     private static void sendPlacementButtons(Player player, Game game, int remaining) {
         String outcome = game.getStoredValue(winnerKey(player));
         Set<String> planets = new LinkedHashSet<>();
@@ -132,11 +144,7 @@ public class SettlementsAcd2ButtonHandler {
             // planets at once. In fog, offer the planets this player knows about; "was controlled by a voter"
             // is checked when the placement resolves.
             List<Button> fogButtons = PlanetTargetService.targetButtons(
-                    game,
-                    player,
-                    PlanetTargetSpec.of(player.factionButtonChecker() + "settlementsPlaceOn_" + remaining)
-                            .where(p -> !p.isHomePlanet(game)),
-                    new ArrayList<>());
+                    game, player, placeOnSpec(game, player, remaining), new ArrayList<>());
             fogButtons.add(Buttons.red("deleteButtons", "Done"));
             String fogRemaining = remaining == 1 ? "your last infantry" : "an infantry (" + remaining + " remaining)";
             MessageHelper.sendMessageToChannelWithButtons(

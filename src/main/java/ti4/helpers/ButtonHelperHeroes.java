@@ -96,6 +96,8 @@ public class ButtonHelperHeroes {
     @ButtonHandler("shrineView_")
     public static void resolveShrineView(
             Player player, Player p2, Game game, ButtonInteractionEvent event, String buttonID) {
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, PlanetTargetSpec.of("shrineView")))
+            return;
         String planet = buttonID.replace("shrineView_", "");
         ButtonHelper.deleteMessage(event);
         if (planet.equalsIgnoreCase(game.getStoredValue("kaltrimcrownplanet"))) {
@@ -377,6 +379,8 @@ public class ButtonHelperHeroes {
     @ButtonHandler("khraskHeroStep4Exhaust_")
     public static void resolveKhraskHeroStep4Exhaust(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        var spec = PlanetTargetSpec.of("khraskHeroStep4Exhaust_" + BlindSelectionService.TBD_FACTION);
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) return;
         var target = PlanetTargetService.resolve(
                 game, player, buttonID, t -> t.owner().getReadiedPlanets().contains(t.planetId()));
         if (target == null) {
@@ -657,6 +661,8 @@ public class ButtonHelperHeroes {
     @ButtonHandler("khraskHeroStep4Ready_")
     public static void resolveKhraskHeroStep4Ready(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        var spec = PlanetTargetSpec.of("khraskHeroStep4Ready_" + BlindSelectionService.TBD_FACTION);
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) return;
         var target = PlanetTargetService.resolve(
                 game, player, buttonID, t -> t.owner().getExhaustedPlanets().contains(t.planetId()));
         if (target == null) {

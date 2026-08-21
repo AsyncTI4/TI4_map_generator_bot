@@ -1891,6 +1891,7 @@ public final class ButtonHelperActionCards {
     @ButtonHandler("reactorMeltdownStep3_")
     public static void resolveReactorMeltdownStep3(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        if (PlanetTargetService.handleUnitHolderPage(event, game, player, buttonID, meltdownSpec(game))) return;
         var target = PlanetTargetService.resolveUnitHolder(game, player, buttonID, meltdownSpec(game));
         if (target == null) {
             PlanetTargetService.fizzle(event, player);
@@ -2439,6 +2440,7 @@ public final class ButtonHelperActionCards {
 
     @ButtonHandler("unstableStep3_")
     public static void resolveUnstableStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, unstableSpec(game))) return;
         // The spec is passed so its hazardous filter runs here too: a blind-typed target never passed
         // through the list at all.
         var target = PlanetTargetService.resolve(game, player, buttonID, unstableSpec(game), null);
@@ -2507,6 +2509,7 @@ public final class ButtonHelperActionCards {
 
     @ButtonHandler("uprisingStep3_")
     public static void resolveUprisingStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, uprisingSpec())) return;
         // Readied and not-a-home-system were previously enforced only by which buttons got built, so nothing
         // checked them once a target could be typed blind. Both are hidden state, so they fizzle here rather
         // than being filtered out of the list.
@@ -2547,6 +2550,7 @@ public final class ButtonHelperActionCards {
 
     @ButtonHandler("plagueStep3_")
     public static void resolvePlagueStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, plagueSpec())) return;
         var target = PlanetTargetService.resolve(game, player, buttonID, plagueSpec(), null);
         if (target == null) {
             PlanetTargetService.fizzle(event, player);
@@ -2705,6 +2709,7 @@ public final class ButtonHelperActionCards {
 
     @ButtonHandler("crippleStep3_")
     public static void resolveCrippleStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, crippleSpec())) return;
         var target = PlanetTargetService.resolve(game, player, buttonID, crippleSpec(), null);
         if (target == null) {
             PlanetTargetService.fizzle(event, player);
@@ -2772,6 +2777,7 @@ public final class ButtonHelperActionCards {
     @ButtonHandler("reparationsStep3_")
     public static void resolveReparationsStep3(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, reparationsSpec())) return;
         var target = PlanetTargetService.resolve(game, player, buttonID, reparationsSpec(), t -> t.owner()
                 .getReadiedPlanets()
                 .contains(t.planetId()));

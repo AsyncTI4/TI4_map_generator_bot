@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
@@ -1694,6 +1696,14 @@ public final class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
+    /** {@code origPlanet} is embedded in the prefix itself, so each origin needs its own spec instance. */
+    private static PlanetTargetSpec raghsCallSpec(Game game, String origPlanet) {
+        return PlanetTargetSpec.of("raghsCallStepTwo_" + origPlanet)
+                .where(p -> !"triad".equalsIgnoreCase(p.getName())
+                        && !p.isSpaceStation(game)
+                        && !p.getName().equalsIgnoreCase(origPlanet));
+    }
+
     @ButtonHandler("raghsCallStepOne_")
     public static void resolveRaghsCallStepOne(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
@@ -1711,14 +1721,7 @@ public final class ButtonHelperFactionSpecific {
         if (game.isFowMode()) {
             // The note was traded consensually, but playing it is unilateral - listing every planet its
             // owner holds is not part of the bargain. Offer the planets this player already knows about.
-            buttons = PlanetTargetService.targetButtons(
-                    game,
-                    player,
-                    PlanetTargetSpec.of("raghsCallStepTwo_" + origPlanet)
-                            .where(p -> !"triad".equalsIgnoreCase(p.getName())
-                                    && !p.isSpaceStation(game)
-                                    && !p.getName().equalsIgnoreCase(origPlanet)),
-                    buttons);
+            buttons = PlanetTargetService.targetButtons(game, player, raghsCallSpec(game, origPlanet), buttons);
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
                     player.getRepresentationUnfogged()
@@ -1936,6 +1939,16 @@ public final class ButtonHelperFactionSpecific {
     @ButtonHandler("raghsCallStepTwo_")
     public static void resolveRaghsCallStepTwo(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        // origPlanet leads both shapes this id can take - "<origPlanet>_<newPlanet>" for a real target and
+        // "<origPlanet>page<N>" for a nav press - so it has to be read before telling which one this is.
+        String afterPrefix = buttonID.replace("raghsCallStepTwo_", "");
+        Matcher pageMatch = Pattern.compile(RegexHelper.pageRegex()).matcher(afterPrefix);
+        String origPlanetForSpec = pageMatch.find()
+                ? afterPrefix.substring(0, pageMatch.start())
+                : afterPrefix.split("_")[0];
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, raghsCallSpec(game, origPlanetForSpec)))
+            return;
+
         String origPlanet = buttonID.split("_")[1];
         String newPlanet = buttonID.split("_")[2];
         Player saar = game.getPNOwner("ragh");

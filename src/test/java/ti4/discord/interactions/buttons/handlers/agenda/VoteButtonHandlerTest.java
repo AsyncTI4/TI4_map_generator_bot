@@ -11,6 +11,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.game.persistence.TestGameHarness;
+import ti4.service.fow.PlanetTargetService;
 import ti4.testUtils.BaseTi4Test;
 
 /**
@@ -57,9 +58,9 @@ class VoteButtonHandlerTest extends BaseTi4Test {
                     .as("a page-25+ list must offer a Next Page button")
                     .isNotNull();
 
-            var parsed = VoteButtonHandler.parseVotePageID(nextPage.getCustomId());
-            assertThat(parsed).isNotNull();
-            List<Button> page2 = VoteButtonHandler.votePlanetPageButtons(game, actor, parsed);
+            var spec = VoteButtonHandler.electPlanetSpec(game, "outcome");
+            assertThat(spec).isNotNull();
+            List<Button> page2 = PlanetTargetService.targetButtonsPage(game, actor, spec, 1);
             assertThat(page2).isNotEmpty();
             // Blind Target sorts last in the underlying list, so with 26+ real candidates it lands on page 2 -
             // exactly the case that used to go missing.

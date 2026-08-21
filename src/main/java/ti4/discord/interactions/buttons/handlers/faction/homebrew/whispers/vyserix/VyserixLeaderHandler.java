@@ -59,6 +59,11 @@ public class VyserixLeaderHandler {
 
     @ButtonHandler("vyserixHeroAttach_")
     public static void resolveHeroAttach(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        var spec = PlanetTargetSpec.of(player.factionButtonChecker() + "vyserixHeroAttach")
+                .where(p -> !p.isHomePlanet()
+                        && !p.isFake()
+                        && p.getTechSpecialities().isEmpty());
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) return;
         String planet = buttonID.replace("vyserixHeroAttach_", "");
         Tile tile = game.getTileFromPlanet(planet);
         Planet unitHolder = game.getPlanetsInfo().get(planet);

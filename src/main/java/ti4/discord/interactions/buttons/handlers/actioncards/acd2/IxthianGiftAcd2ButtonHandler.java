@@ -104,6 +104,7 @@ class IxthianGiftAcd2ButtonHandler {
     @ButtonHandler("ixthianGiftPlanet_")
     public static void resolveIxthianGiftPlanet(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, giftSpec(game, player))) return;
         String[] parts = buttonID.replace("ixthianGiftPlanet_", "").split("_", 2);
         ButtonHelper.deleteMessage(event);
         if (parts.length < 2) {

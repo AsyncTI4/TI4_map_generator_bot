@@ -1148,6 +1148,7 @@ public class ComponentActionHelper {
 
     @ButtonHandler("atomicsStep3_")
     public static void resolveAtomicsStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, atomicsSpec(game))) return;
         // Spec passed so "not a home system, not a space station" is enforced for blind-typed targets too.
         var target = PlanetTargetService.resolve(game, player, buttonID, atomicsSpec(game), null);
         if (target == null) {

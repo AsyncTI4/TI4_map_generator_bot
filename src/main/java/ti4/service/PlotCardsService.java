@@ -152,6 +152,10 @@ public class PlotCardsService {
 
     @ButtonHandler("resolveSeethe_")
     private static void resolveSeethe(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        var seetheSpec = PlanetTargetSpec.of(player.factionButtonChecker() + "resolveSeethe")
+                .where(pl -> game.getTileFromPlanet(pl.getName()) != null
+                        && !game.getTileFromPlanet(pl.getName()).isHomeSystem(game));
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, seetheSpec)) return;
         String regex = "resolveSeethe_" + RegexHelper.unitHolderRegex(game, "planet");
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile t = game.getTileFromPlanet(matcher.group("planet"));

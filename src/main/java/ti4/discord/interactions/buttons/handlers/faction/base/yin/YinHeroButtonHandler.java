@@ -107,6 +107,11 @@ class YinHeroButtonHandler {
 
     @ButtonHandler("yinHeroPlanet_")
     public static void yinHeroPlanet(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+        var spec = PlanetTargetSpec.of(player.factionButtonChecker() + "yinHeroPlanet")
+                .where(p -> !p.isSpaceStation(game)
+                        && game.getTileFromPlanet(p.getName()) != null
+                        && !game.getTileFromPlanet(p.getName()).isHomeSystem(game));
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) return;
         String planet = buttonID.replace("yinHeroPlanet_", "");
         if ("lockedmallice".equalsIgnoreCase(planet)) {
             planet = "mallice";
