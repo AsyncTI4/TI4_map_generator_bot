@@ -2465,9 +2465,8 @@ public final class ButtonHelperActionCards {
                     if (x == 1) nice &= (d1.getResult() == 9);
                 }
                 msg.append(nice ? " (nice)" : "")
-                        .append(".\n Total hits were ")
-                        .append(hits)
-                        .append(".");
+                        .append(".")
+                        .append(CombatMessageHelper.displayHitResults(hits).stripTrailing());
             }
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
             if (hits > 0 && p2.hasAbility("data_recovery")) {
@@ -2522,7 +2521,8 @@ public final class ButtonHelperActionCards {
                     hits++;
                 }
             }
-            msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
+            msg = new StringBuilder(msg.substring(0, msg.length() - 2)
+                    + CombatMessageHelper.displayHitResults(hits).stripTrailing());
             UnitKey key = Units.getUnitKey(UnitType.Fighter, p2.getColor());
             var unitParsed = new ParsedUnit(key, hits, Constants.SPACE);
             RemoveUnitService.removeUnit(event, tile, game, unitParsed);

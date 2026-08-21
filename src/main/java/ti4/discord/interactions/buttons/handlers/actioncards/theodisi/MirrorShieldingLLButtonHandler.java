@@ -12,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.CombatMessageHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.message.MessageHelper;
@@ -53,9 +54,9 @@ public class MirrorShieldingLLButtonHandler {
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " used _Mirror Shielding_ to produce "
-                        + canceledHits + " hit" + (canceledHits == 1 ? "" : "s") + " against "
-                        + opponent.getRepresentationNoPing() + ".");
+                player.getRepresentationNoPing() + " used _Mirror Shielding_ against "
+                        + opponent.getRepresentationNoPing() + "."
+                        + CombatMessageHelper.displayHitResults(canceledHits).stripTrailing());
 
         if (Constants.SPACE.equals(context.unitHolderName())) {
             CombatRollService.sendSpaceAssignHitsButtons(event, game, opponent, tile, canceledHits);
