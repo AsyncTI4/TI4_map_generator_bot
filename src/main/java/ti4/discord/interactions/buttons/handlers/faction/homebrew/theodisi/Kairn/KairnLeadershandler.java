@@ -24,6 +24,7 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.fow.PlanetTargetService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.turn.StartTurnService;
 
@@ -427,7 +428,21 @@ public class KairnLeadershandler {
 
         String exploreId = values[1];
         ExploreModel explore = Mapper.getExplore(exploreId);
-        if (explore == null || !game.getAllExploreDiscard().remove(exploreId)) {
+        if (explore == null) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        // Fog offers all three discard piles so the menu discloses nothing about the target's holdings, so
+        // the trait rule has to be enforced here instead - before any state is mutated. Outside fog the
+        // builder already restricted the list, so this is a no-op there.
+        if (game.isFowMode()
+                && explore.getType() != null
+                && !getKairnAgentActualTraits(game, target)
+                        .contains(explore.getType().toLowerCase())) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
+        if (!game.getAllExploreDiscard().remove(exploreId)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -475,6 +490,18 @@ public class KairnLeadershandler {
     }
 
     private static Set<String> getKairnAgentEligibleTraits(Game game, Player target) {
+        // No planet is ever named here, but the *set of decks offered* is derived from the target's
+        // holdings - being shown only "cultural" says they hold cultural planets and no others. In fog,
+        // offer all three so the menu discloses nothing; the real rule is enforced at resolution in
+        // selectKairnAgentExplore, where an ineligible pick comes to nothing.
+        if (game.isFowMode()) {
+            return new HashSet<>(Set.of(Constants.CULTURAL, Constants.HAZARDOUS, Constants.INDUSTRIAL));
+        }
+        return getKairnAgentActualTraits(game, target);
+    }
+
+    /** The traits the target genuinely holds - the real eligibility rule, and hidden state in fog. */
+    private static Set<String> getKairnAgentActualTraits(Game game, Player target) {
         Set<String> traits = new HashSet<>();
         for (String planetName : target.getPlanets()) {
             Planet planet = game.getPlanetsInfo().get(planetName);

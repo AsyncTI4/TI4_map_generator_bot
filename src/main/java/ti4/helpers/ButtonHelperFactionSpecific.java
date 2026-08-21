@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
@@ -70,6 +72,8 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.game.StartPhaseService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -121,13 +125,24 @@ public final class ButtonHelperFactionSpecific {
         if (!activePlayerFaction.equalsIgnoreCase(player.getFaction())) {
             Player p2 = game.getPlayerFromColorOrFaction(activePlayerFaction);
             List<Button> buttons2 = new ArrayList<>();
-            for (String planet : p2.getPlanets()) {
-                if (game.getUnitHolderFromPlanet(planet) != null
-                        && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)
-                        && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(planet))) {
-                    buttons2.add(Buttons.gray(
-                            player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
-                            Helper.getPlanetRepresentation(planet, game)));
+            if (game.isFowMode()) {
+                // "Has units on it" is hidden state and cannot narrow the fog list; non-home is a public map
+                // fact and still can. A planet with nobody to coexist with comes to nothing at resolution.
+                buttons2 = PlanetTargetService.targetButtons(
+                        game,
+                        player,
+                        PlanetTargetSpec.of(player.factionButtonChecker() + "exchangeProgramPart3")
+                                .where(p -> !p.isHomePlanet(game)),
+                        buttons2);
+            } else {
+                for (String planet : p2.getPlanets()) {
+                    if (game.getUnitHolderFromPlanet(planet) != null
+                            && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)
+                            && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(planet))) {
+                        buttons2.add(Buttons.gray(
+                                player.factionButtonChecker() + "exchangeProgramPart3_" + planet,
+                                Helper.getPlanetRepresentation(planet, game)));
+                    }
                 }
             }
             String msg = player.getRepresentation() + " please choose the planet of theirs that you will coexist on.";
@@ -1681,14 +1696,39 @@ public final class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
+    /** {@code origPlanet} is embedded in the prefix itself, so each origin needs its own spec instance. */
+    private static PlanetTargetSpec raghsCallSpec(Game game, String origPlanet) {
+        return PlanetTargetSpec.of("raghsCallStepTwo_" + origPlanet)
+                .where(p -> !"triad".equalsIgnoreCase(p.getName())
+                        && !p.isSpaceStation(game)
+                        && !p.getName().equalsIgnoreCase(origPlanet));
+    }
+
     @ButtonHandler("raghsCallStepOne_")
     public static void resolveRaghsCallStepOne(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String origPlanet = buttonID.split("_")[1];
-        PromissoryNoteHelper.resolvePNPlay("ragh", player, game, event);
         List<Button> buttons = new ArrayList<>();
+        // Resolve the note's owner BEFORE playing it. resolvePNPlay dereferences that owner, so with the
+        // note not in play this threw an NPE instead of coming to nothing.
         Player saar = game.getPNOwner("ragh");
         saar = saar == null ? game.getPNOwner("sigma_raghs_call") : saar;
+        if (saar == null) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
+        PromissoryNoteHelper.resolvePNPlay("ragh", player, game, event);
+        if (game.isFowMode()) {
+            // The note was traded consensually, but playing it is unilateral - listing every planet its
+            // owner holds is not part of the bargain. Offer the planets this player already knows about.
+            buttons = PlanetTargetService.targetButtons(game, player, raghsCallSpec(game, origPlanet), buttons);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", please choose which planet to relocate the Saar ground forces to.",
+                    buttons);
+            return;
+        }
         for (String planet : saar.getPlanetsAllianceMode()) {
             if ("triad".equalsIgnoreCase(planet)
                     || game.getUnitHolderFromPlanet(planet) == null
@@ -1899,11 +1939,43 @@ public final class ButtonHelperFactionSpecific {
     @ButtonHandler("raghsCallStepTwo_")
     public static void resolveRaghsCallStepTwo(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        // origPlanet leads both shapes this id can take - "<origPlanet>_<newPlanet>" for a real target and
+        // "<origPlanet>page<N>" for a nav press - so it has to be read before telling which one this is.
+        String afterPrefix = buttonID.replace("raghsCallStepTwo_", "");
+        Matcher pageMatch = Pattern.compile(RegexHelper.pageRegex()).matcher(afterPrefix);
+        String origPlanetForSpec = pageMatch.find()
+                ? afterPrefix.substring(0, pageMatch.start())
+                : afterPrefix.split("_")[0];
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, raghsCallSpec(game, origPlanetForSpec)))
+            return;
+
         String origPlanet = buttonID.split("_")[1];
         String newPlanet = buttonID.split("_")[2];
         Player saar = game.getPNOwner("ragh");
         saar = saar == null ? game.getPNOwner("sigma_raghs_call") : saar;
         UnitHolder oriPlanet = ButtonHelper.getUnitHolderFromPlanetName(origPlanet, game);
+        // newPlanet is now blind-typed-reachable, so it need not be on the map, and it must still satisfy
+        // the builder's rules. Bail before removing anything from the origin planet - the units would
+        // otherwise be destroyed on the way to a destination that does not exist.
+        Planet destination = ButtonHelper.getUnitHolderFromPlanetName(newPlanet, game);
+        // Whose planet it is, is hidden state, so it cannot narrow the fog list - it is checked here. The
+        // non-fog builder already restricts to saar.getPlanetsAllianceMode(), so this changes nothing there.
+        boolean saarOrAlly = saar != null && saar.getPlanetsAllianceMode().contains(newPlanet);
+        // Match whichever builder produced this button: the fog spec filters on isSpaceStation(game), the
+        // non-fog loop on isSpaceStation(). They differ - the game-arg overload also counts a Gledge Core
+        // planet in Twilight DS - so using one unconditionally would fizzle a destination the other offered.
+        boolean spaceStation = destination != null
+                && (game.isFowMode() ? destination.isSpaceStation(game) : destination.isSpaceStation());
+        if (saar == null
+                || oriPlanet == null
+                || destination == null
+                || !saarOrAlly
+                || spaceStation
+                || "triad".equalsIgnoreCase(newPlanet)
+                || newPlanet.equalsIgnoreCase(origPlanet)) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
         Map<UnitKey, Integer> units = new HashMap<>(oriPlanet.getUnits());
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
             UnitKey unitKey = unitEntry.getKey();

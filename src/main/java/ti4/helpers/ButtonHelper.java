@@ -146,6 +146,7 @@ import ti4.service.fow.BlindSelectionService;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
+import ti4.service.fow.PlanetTargetService;
 import ti4.service.game.GameColorsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftTile;
@@ -4647,6 +4648,14 @@ public class ButtonHelper {
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
+        // getEchoAvailableSystems' own rule: no planets, not a hyperlane. Blind Target skips the list, so it
+        // has to be re-checked here too.
+        if (tile == null
+                || !tile.getPlanetUnitHolders().isEmpty()
+                || tile.getTilePath().toLowerCase().contains("hyperlane")) {
+            PlanetTargetService.fizzle(event, player);
+            return;
+        }
         AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),

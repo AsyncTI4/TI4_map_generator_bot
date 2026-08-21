@@ -16,14 +16,38 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
+import ti4.service.fow.BlindSelectionService;
+import ti4.service.fow.PlanetTargetService;
+import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 class IxthianGiftAcd2ButtonHandler {
 
+    /** Shared by the fog list and by resolution, so a blind-typed target obeys the same rules. */
+    static PlanetTargetSpec giftSpec(Game game, Player player) {
+        return PlanetTargetSpec.of(
+                        player.factionButtonChecker() + "ixthianGiftPlanet_" + BlindSelectionService.TBD_FACTION)
+                .excludingSelf()
+                .where(p -> game.getTileFromPlanet(p.getName()) != null
+                        && !game.getTileFromPlanet(p.getName()).isHomeSystem(game));
+    }
+
     @ButtonHandler("resolveIxthianGift")
     public static void resolveIxthianGift(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
+        if (game.isFowMode()) {
+            // The player step was fog-safe; the planet step then listed that player's whole holding list.
+            // Skip straight to planets this player knows about. "Non-home" is public map info, so it can
+            // still filter the list.
+            buttons = PlanetTargetService.targetButtons(game, player, giftSpec(game, player), buttons);
+            ButtonHelper.deleteMessage(event);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + ", choose the planet for _Ixthian Gift_.",
+                    buttons);
+            return;
+        }
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
                 continue;
@@ -80,17 +104,22 @@ class IxthianGiftAcd2ButtonHandler {
     @ButtonHandler("ixthianGiftPlanet_")
     public static void resolveIxthianGiftPlanet(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, giftSpec(game, player))) return;
         String[] parts = buttonID.replace("ixthianGiftPlanet_", "").split("_", 2);
         ButtonHelper.deleteMessage(event);
         if (parts.length < 2) {
             return;
         }
-        Player target = game.getPlayerFromColorOrFaction(parts[0]);
         String planet = parts[1];
+        Player target = BlindSelectionService.ownerOf(game, parts[0], planet);
         Tile tile = game.getTileFromPlanet(planet);
         Planet unitHolder = game.getUnitHolderFromPlanet(planet);
-        if (target == null || tile == null || unitHolder == null) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Ixthian Gift_.");
+        // Non-home is a builder filter, so it has to be re-checked for blind-typed targets.
+        boolean legal = tile != null && unitHolder != null && !tile.isHomeSystem(game) && target != player;
+        if (target == null || !legal) {
+            // "Could not resolve" told the actor their guess was wrong. Use the shared pool so an illegal
+            // target is indistinguishable from a legal one that achieved nothing.
+            PlanetTargetService.fizzle(player);
             return;
         }
 

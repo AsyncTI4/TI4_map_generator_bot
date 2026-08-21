@@ -378,6 +378,54 @@ public final class FoWHelper {
         return tilePositionsToShow;
     }
 
+    /**
+     * Whether this tile has ever been revealed to the player, per their persisted fog memory.
+     * <p>
+     * Deliberately keys on position only. It does <b>not</b> compare the remembered tileID against the tile
+     * currently at that position, because tiles get rewritten in place (FlipTileService turns 82a into 82b and
+     * similar), which would turn a legitimately remembered system into a false negative. This matches the
+     * existing precedent in {@link Tile#hasFog(Player)} for Light Fog mode.
+     */
+    public static boolean hasEverSeenTile(@NotNull Player player, String position) {
+        return position != null && player.getFogTiles().containsKey(position);
+    }
+
+    /**
+     * Positions the player can see right now, unioned with every position they have ever seen. Outside fog
+     * everything is known, so this returns the whole map.
+     */
+    public static Set<String> getKnownTilePositions(Game game, @NotNull Player player) {
+        if (!game.isFowMode()) {
+            return new HashSet<>(game.getTileMap().keySet());
+        }
+        Set<String> known = new HashSet<>(getTilePositionsToShow(game, player));
+        known.addAll(player.getFogTiles().keySet());
+        return known;
+    }
+
+    /** Whether the player could know that the system at this position exists. */
+    public static boolean knowsTile(Game game, @NotNull Player player, String position) {
+        if (!game.isFowMode()) return true;
+        return hasEverSeenTile(player, position)
+                || getTilePositionsToShow(game, player).contains(position);
+    }
+
+    /**
+     * Whether the player could know that this planet exists: either they can see (or have seen) the system it
+     * sits in, or they can see the stats of whoever controls it, which discloses that player's planets.
+     * <p>
+     * Callers building a whole list should prefer the batched path in {@code PlanetTargetService}, which
+     * computes the visible-position set once instead of once per planet.
+     */
+    public static boolean knowsPlanetExists(Game game, @NotNull Player player, String planetId) {
+        if (!game.isFowMode()) return true;
+        Tile tile = game.getTileFromPlanet(planetId);
+        if (tile == null) return false;
+        if (knowsTile(game, player, tile.getPosition())) return true;
+        Player owner = game.getPlayerThatControlsPlanet(planetId, true);
+        return owner != null && canSeeStatsOfPlayer(game, owner, player);
+    }
+
     public static void updateFog(Game game, Player player) {
         if (player != null) initializeFog(game, player, true);
     }

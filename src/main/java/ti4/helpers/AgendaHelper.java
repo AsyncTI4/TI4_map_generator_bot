@@ -549,7 +549,7 @@ public final class AgendaHelper {
                             String tiedWinner = winnerInfo.nextToken();
                             Button button = Buttons.blue(
                                     speaker.factionButtonChecker() + "resolveAgendaVote_outcomeTie* " + tiedWinner,
-                                    tiedWinner);
+                                    getAgendaOutcomeName(game, tiedWinner, true));
                             tiedWinners.add(button);
                         }
                     } else {
@@ -569,8 +569,11 @@ public final class AgendaHelper {
         } else {
             resolveTime = true;
             winner = buttonID.substring(buttonID.lastIndexOf('*') + 2);
+            // getAgendaOutcomeName renders the readable name; the raw id was both ugly and, for a planet
+            // outcome in fog, published before resolution.
             MessageHelper.sendMessageToChannel(
-                    game.getActionsChannel(), "## The speaker has broken the tie for \"" + winner + "\".");
+                    game.getActionsChannel(),
+                    "## The speaker has broken the tie for \"" + getAgendaOutcomeName(game, winner, true) + "\".");
         }
         if (resolveTime) {
             resolveTime(game, winner);
@@ -1134,16 +1137,19 @@ public final class AgendaHelper {
                         }
                         if (specificVote.contains("Frontier Rider")) {
                             ButtonHelperStats.replenishComms(event, game, winningR, true);
-                            List<Button> buttons = ButtonHelperActionCards.getFrontierTokenButtons(game, winningR);
                             String message = identity
                                     + ", due to having a winning _Frontier Rider_, your commodities have been replenished"
                                     + " and you may explore a frontier token on the game board.";
-                            if (buttons.isEmpty()) {
+                            // Emptiness must be judged on the raw list: the display list always carries a
+                            // Blind Target button in fog.
+                            if (!ButtonHelperActionCards.hasFrontierTokenTargets(game, winningR)) {
                                 MessageHelper.sendMessageToChannel(
                                         channel, message + " There are no frontier tokens available to explore.");
                             } else {
                                 MessageHelper.sendMessageToChannelWithButtons(
-                                        channel, message + " Choose the system you wish to explore.", buttons);
+                                        channel,
+                                        message + " Choose the system you wish to explore.",
+                                        ButtonHelperActionCards.getFrontierTokenButtons(game, winningR));
                             }
                         }
                         if (specificVote.contains("Relic Rider")) {
@@ -2062,7 +2068,12 @@ public final class AgendaHelper {
         return winner.toString();
     }
 
-    static String getAgendaOutcomeName(Game game, String outcome, boolean capitalize) {
+    /**
+     * Renders an outcome key for display. For a planet outcome this is the static planet name from the model,
+     * with no live resources/influence and no [DMZ] marker - which is why it is the safe way to name an
+     * elected planet in a channel that not every reader can see the planet in.
+     */
+    public static String getAgendaOutcomeName(Game game, String outcome, boolean capitalize) {
         String agendaDetails = game.getCurrentAgendaInfo();
         if (StringUtils.countMatches(agendaDetails, "_") > 1) {
             agendaDetails = agendaDetails.split("_")[1];
