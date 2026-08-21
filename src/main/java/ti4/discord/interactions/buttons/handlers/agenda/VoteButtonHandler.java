@@ -55,6 +55,13 @@ class VoteButtonHandler {
             pfaction2 = player.getFaction();
         }
         if (pfaction2 != null) {
+            // A stale Vote button - pressed after the agenda window closed, e.g. from an old message - has no
+            // agenda info to read. Same guard AgendaHelper.autoResolve uses for the same reason.
+            if (game.getCurrentAgendaInfo().split("_").length < 2) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "This agenda resolution window has closed.");
+                ButtonHelper.deleteMessage(event);
+                return;
+            }
             String voteMessage = player.getRepresentation()
                     + " is up to vote. Please use the buttons to choose the outcome you wish to vote for.";
             String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];

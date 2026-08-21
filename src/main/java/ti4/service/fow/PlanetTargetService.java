@@ -313,14 +313,6 @@ public class PlanetTargetService {
             "The operation is recorded as concluded. No further details are available.");
 
     /**
-     * Button text for a candidate planet.
-     *
-     * <p>{@code Helper.getPlanetRepresentation} appends <i>live</i> resources/influence and a {@code [DMZ]}
-     * marker. For a system the player can see right now that is fine - they can read it off the map. For one
-     * they merely remember, it would report attachment and token changes made since they last looked, so
-     * those fall back to the planet's static name.
-     */
-    /**
      * Labels planets the way {@link #targetButtons} does, with the viewer's visibility computed once.
      *
      * <p>{@code Helper.getPlanetRepresentation} appends <i>live</i> resources/influence and a {@code [DMZ]}

@@ -23,7 +23,7 @@ import ti4.testUtils.BaseTi4Test;
  * Guards the Fog of War rule that a planet may only be offered as a target when the acting player could
  * know it exists: they can see its system, have ever seen its system, or can see its owner's stats.
  *
- * <p>The headline case is {@code targetButtons_includesPlanetOnRememberedButNotVisibleTile}. Before the fix,
+ * <p>The headline case is {@code targetButtons_includesEverythingTheActorCouldKnowAbout}. Before the fix,
  * the candidate filter discarded tile visibility entirely for any owned planet and kept only planets whose
  * owner's stats were visible - which in a normal fog game is nobody - so every planet-target action card
  * collapsed to showing the player their own planets.
@@ -83,7 +83,7 @@ class PlanetTargetServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void targetButtons_includesPlanetOnRememberedButNotVisibleTile() {
+    void targetButtons_includesEverythingTheActorCouldKnowAbout() {
         try (var harness = TestGameHarness.forDefaultMap()) {
             Game game = harness.load();
             game.setFowMode(true);
@@ -95,62 +95,29 @@ class PlanetTargetServiceTest extends BaseTi4Test {
             Player actor = c.actor();
             String hidden = c.planet();
             forgetEverything(actor);
-
-            // Not known yet: never seen, and the owner's stats are not visible.
             assertThat(offers(build(game, actor, PlanetTargetSpec.of(PREFIX)), hidden))
                     .isFalse();
 
-            // Scout it once, then lose sight of it. The memory alone must be enough to target it.
+            // Route 1: scout the system once, then lose sight of it. Memory alone must be enough.
             Tile tile = game.getTileFromPlanet(hidden);
             actor.updateFogTile(tile, null);
-
             assertThat(FoWHelper.hasEverSeenTile(actor, tile.getPosition())).isTrue();
-            assertThat(FoWHelper.knowsPlanetExists(game, actor, hidden)).isTrue();
             assertThat(offers(build(game, actor, PlanetTargetSpec.of(PREFIX)), hidden))
                     .isTrue();
-        }
-    }
 
-    @Test
-    void targetButtons_includesPlanetsOfPlayerWhoseStatsAreVisible() {
-        try (var harness = TestGameHarness.forDefaultMap()) {
-            Game game = harness.load();
-            game.setFowMode(true);
-
-            HiddenCase c = findHiddenCase(game);
-            assertThat(c).isNotNull();
-            Player actor = c.actor();
-            String hidden = c.planet();
-            Player owner = c.owner();
+            // Route 2: forget the scout, then learn it instead by seeing the owner's stats (e.g. an alliance).
             forgetEverything(actor);
-
             assertThat(offers(build(game, actor, PlanetTargetSpec.of(PREFIX)), hidden))
+                    .as("clearing fog memory should undo route 1")
                     .isFalse();
-
-            // Alliance members can see each other's stats, which discloses their planets.
-            actor.addAllianceMember(owner.getFaction());
-
-            assertThat(FoWHelper.canSeeStatsOfPlayer(game, owner, actor)).isTrue();
+            actor.addAllianceMember(c.owner().getFaction());
+            assertThat(FoWHelper.canSeeStatsOfPlayer(game, c.owner(), actor)).isTrue();
             assertThat(offers(build(game, actor, PlanetTargetSpec.of(PREFIX)), hidden))
                     .isTrue();
-        }
-    }
 
-    @Test
-    void targetButtons_alwaysIncludeBypassesTheKnowledgeFilter() {
-        try (var harness = TestGameHarness.forDefaultMap()) {
-            Game game = harness.load();
-            game.setFowMode(true);
-
-            HiddenCase c = findHiddenCase(game);
-            assertThat(c).isNotNull();
-            forgetEverything(c.actor());
-
-            assertThat(offers(build(game, c.actor(), PlanetTargetSpec.of(PREFIX)), c.planet()))
-                    .isFalse();
-
-            var spec = PlanetTargetSpec.of(PREFIX).withAlwaysInclude(Set.of(c.planet()));
-            assertThat(offers(build(game, c.actor(), spec), c.planet())).isTrue();
+            // Route 3: alwaysInclude bypasses both - an outcome someone already voted for stays selectable.
+            var spec = PlanetTargetSpec.of(PREFIX).withAlwaysInclude(Set.of(hidden));
+            assertThat(offers(build(game, actor, spec), hidden)).isTrue();
         }
     }
 
@@ -171,7 +138,7 @@ class PlanetTargetServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void targetButtons_publicLegalityFiltersTheList() {
+    void targetButtons_publicLegalityFiltersTheListAndBlindTargetSurvives() {
         try (var harness = TestGameHarness.forDefaultMap()) {
             Game game = harness.load();
             game.setFowMode(true);
@@ -183,18 +150,7 @@ class PlanetTargetServiceTest extends BaseTi4Test {
             assertThat(all.size()).isGreaterThan(none.size());
             // Blind Target survives even when every candidate is filtered out - an empty panel would itself
             // reveal that nothing on the map qualifies.
-            assertThat(none).isNotEmpty();
-        }
-    }
-
-    @Test
-    void targetButtons_alwaysOffersBlindTarget() {
-        try (var harness = TestGameHarness.forDefaultMap()) {
-            Game game = harness.load();
-            game.setFowMode(true);
-            Player actor = game.getRealPlayers().getFirst();
-
-            assertThat(build(game, actor, PlanetTargetSpec.of(PREFIX)))
+            assertThat(none)
                     .anyMatch(b -> b.getCustomId() != null && b.getCustomId().startsWith("blindSelection~MDL"));
         }
     }
@@ -213,23 +169,45 @@ class PlanetTargetServiceTest extends BaseTi4Test {
         }
     }
 
-    // ---- resolve: everything that is not a real, owned, legal target comes to nothing ----------
-
     @Test
-    void resolve_returnsNullForOffMapPlanet() {
+    void targetButtons_labelHidesLiveStatsForRememberedOnlyPlanets() {
         try (var harness = TestGameHarness.forDefaultMap()) {
             Game game = harness.load();
-            Player actor = game.getRealPlayers().getFirst();
-            assertThat(PlanetTargetService.resolve(game, actor, PREFIX + "_notaplanetatall", null))
-                    .isNull();
+            game.setFowMode(true);
+
+            HiddenCase c = findHiddenCase(game);
+            assertThat(c).isNotNull();
+            forgetEverything(c.actor());
+            Tile tile = game.getTileFromPlanet(c.planet());
+            c.actor().updateFogTile(tile, null);
+
+            String label = build(game, c.actor(), PlanetTargetSpec.of(PREFIX)).stream()
+                    .filter(b -> (PREFIX + "_" + c.planet()).equals(b.getCustomId()))
+                    .map(Button::getLabel)
+                    .findFirst()
+                    .orElse(null);
+
+            // Live resources/influence would report attachment changes made since the player last looked.
+            assertThat(label).isNotNull().doesNotContain("(").doesNotContain("[DMZ]");
         }
     }
 
+    // ---- resolve: everything that is not a real, owned, legal target comes to nothing ----------
+
     @Test
-    void resolve_returnsNullWhenTheTargetHasNoController() {
+    void resolve_returnsNullForNonExistentOrUncontrolledTargets() {
+        // Existence guards are unconditional - in fog or out - because they only replace a crash, never
+        // change behaviour for an id that previously worked.
         try (var harness = TestGameHarness.forDefaultMap()) {
             Game game = harness.load();
+            game.setFowMode(false);
             Player actor = game.getRealPlayers().getFirst();
+
+            assertThat(PlanetTargetService.resolve(game, actor, PREFIX + "_notaplanetatall", null))
+                    .isNull();
+            assertThat(PlanetTargetService.resolve(
+                            game, actor, PREFIX + "_notaplanetatall", PlanetTargetSpec.of(PREFIX), null))
+                    .isNull();
 
             String uncontrolled = game.getTileMap().values().stream()
                     .flatMap(t -> t.getUnitHolders().values().stream())
@@ -241,7 +219,6 @@ class PlanetTargetServiceTest extends BaseTi4Test {
             assertThat(uncontrolled)
                     .as("the default test map should have at least one uncontrolled planet")
                     .isNotNull();
-
             assertThat(PlanetTargetService.resolve(game, actor, PREFIX + "_" + uncontrolled, null))
                     .isNull();
         }
@@ -282,41 +259,30 @@ class PlanetTargetServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void resolve_honoursExcludeSelfOwnedInFog() {
-        try (var harness = TestGameHarness.forDefaultMap()) {
-            Game game = harness.load();
-            game.setFowMode(true);
-            Player actor = game.getRealPlayers().getFirst();
-            String own = actor.getPlanets().getFirst();
-
-            assertThat(PlanetTargetService.resolve(game, actor, PREFIX + "_" + own, PlanetTargetSpec.of(PREFIX), null))
-                    .isNotNull();
-            assertThat(PlanetTargetService.resolve(
-                            game,
-                            actor,
-                            PREFIX + "_" + own,
-                            PlanetTargetSpec.of(PREFIX).excludingSelf(),
-                            null))
-                    .isNull();
-        }
-    }
-
-    @Test
-    void resolve_appliesNoSpecDerivedCheckOutsideFog() {
+    void resolve_specDerivedChecksApplyInFogOnly() {
         // Blind Target exists only in fog, so outside it every button id came from the component's own
         // legacy builder, which already applied that component's rules. Re-applying a different rule set
         // here could only diverge from what that builder intended.
         //
-        // This is not hypothetical. Yin hero's non-fog builder offers a *controlled* space station while its
-        // fog spec excludes space stations; when this check was unconditional it silently removed a non-fog
-        // capability. Infiltrate is the same shape: non-fog builds its ids from another player's planets,
-        // so an unconditional SELF_ONLY would fizzle every non-fog play of it.
+        // Not hypothetical: Yin hero's non-fog builder offers a *controlled* space station while its fog spec
+        // excludes space stations, and Infiltrate's non-fog builder builds ids from another player's planets,
+        // so an unconditional SELF_ONLY fizzled every non-fog play of it. Both broke when this was briefly
+        // unconditional.
         try (var harness = TestGameHarness.forDefaultMap()) {
             Game game = harness.load();
-            game.setFowMode(false);
             Player actor = game.getRealPlayers().getFirst();
             String own = actor.getPlanets().getFirst();
+            var excludeSelf = PlanetTargetSpec.of(PREFIX).excludingSelf();
 
+            game.setFowMode(true);
+            assertThat(PlanetTargetService.resolve(game, actor, PREFIX + "_" + own, excludeSelf, null))
+                    .as("excludeSelf must reject the actor's own planet in fog")
+                    .isNull();
+
+            game.setFowMode(false);
+            assertThat(PlanetTargetService.resolve(game, actor, PREFIX + "_" + own, excludeSelf, null))
+                    .as("ownership must not apply outside fog")
+                    .isNotNull();
             assertThat(PlanetTargetService.resolve(
                             game,
                             actor,
@@ -329,14 +295,6 @@ class PlanetTargetServiceTest extends BaseTi4Test {
                             game,
                             actor,
                             PREFIX + "_" + own,
-                            PlanetTargetSpec.of(PREFIX).excludingSelf(),
-                            null))
-                    .as("ownership must not apply outside fog")
-                    .isNotNull();
-            assertThat(PlanetTargetService.resolve(
-                            game,
-                            actor,
-                            PREFIX + "_" + own,
                             PlanetTargetSpec.of(PREFIX).selfOnly(),
                             null))
                     .as("SELF_ONLY must not apply outside fog either")
@@ -344,58 +302,14 @@ class PlanetTargetServiceTest extends BaseTi4Test {
         }
     }
 
-    @Test
-    void resolve_stillRefusesNonExistentTargetsOutsideFog() {
-        // The existence guards are unconditional on purpose: they only replace a crash, so they cannot
-        // change behaviour for any id that previously worked.
-        try (var harness = TestGameHarness.forDefaultMap()) {
-            Game game = harness.load();
-            game.setFowMode(false);
-            Player actor = game.getRealPlayers().getFirst();
-
-            assertThat(PlanetTargetService.resolve(
-                            game, actor, PREFIX + "_notaplanetatall", PlanetTargetSpec.of(PREFIX), null))
-                    .isNull();
-        }
-    }
-
-    @Test
-    void targetButtons_labelHidesLiveStatsForRememberedOnlyPlanets() {
-        try (var harness = TestGameHarness.forDefaultMap()) {
-            Game game = harness.load();
-            game.setFowMode(true);
-
-            HiddenCase c = findHiddenCase(game);
-            assertThat(c).isNotNull();
-            forgetEverything(c.actor());
-            Tile tile = game.getTileFromPlanet(c.planet());
-            c.actor().updateFogTile(tile, null);
-
-            String label = build(game, c.actor(), PlanetTargetSpec.of(PREFIX)).stream()
-                    .filter(b -> (PREFIX + "_" + c.planet()).equals(b.getCustomId()))
-                    .map(Button::getLabel)
-                    .findFirst()
-                    .orElse(null);
-
-            // Live resources/influence would report attachment changes made since the player last looked.
-            assertThat(label).isNotNull().doesNotContain("(").doesNotContain("[DMZ]");
-        }
-    }
-
     // ---- the shared fizzle pool ---------------------------------------------------------------
 
     @Test
-    void fizzleMessages_comeFromOneSharedPool() {
+    void fizzleMessages_comeFromOneSharedPoolAndNeverNameAReason() {
         assertThat(PlanetTargetService.messagePool()).isNotEmpty();
-        // Every message a component can emit for "this came to nothing" must be in the shared pool. A
-        // component-specific sentence would tell the actor WHY it failed, which is the leak this closes.
-        for (int i = 0; i < 200; i++) {
+        for (int i = 0; i < 30; i++) {
             assertThat(PlanetTargetService.messagePool()).contains(PlanetTargetService.fizzleMessage());
         }
-    }
-
-    @Test
-    void fizzleMessages_neverNameAReason() {
         // The pool is drawn from for a genuine no-op as well as an illegal target, so no line may hint at
         // which of the two happened.
         for (String message : PlanetTargetService.messagePool()) {

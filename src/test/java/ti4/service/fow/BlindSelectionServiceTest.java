@@ -23,29 +23,25 @@ class BlindSelectionServiceTest extends BaseTi4Test {
     private static final String PLANET = "P";
     private static final String UNIT_HOLDER = "U";
 
+    private static String anyOnMapPlanet(Game game) {
+        return game.getTileMap().values().stream()
+                .flatMap(t -> t.getUnitHolders().values().stream())
+                .map(uh -> uh.getName())
+                .filter(name -> game.getTileFromPlanet(name) != null)
+                .findFirst()
+                .orElse(null);
+    }
+
     @Test
-    void positionPrompt_acceptsARawPosition() {
+    void positionPrompt_acceptsAPositionOrAPlanetName() {
         try (var harness = TestGameHarness.forDefaultMap()) {
             Game game = harness.load();
             String anyPosition = game.getTileMap().keySet().iterator().next();
             assertThat(BlindSelectionService.parseBlindTarget(game, POSITION, anyPosition))
                     .isEqualTo(anyPosition);
-        }
-    }
 
-    @Test
-    void positionPrompt_acceptsAPlanetNameAndReturnsItsSystem() {
-        try (var harness = TestGameHarness.forDefaultMap()) {
-            Game game = harness.load();
-
-            String planet = game.getTileMap().values().stream()
-                    .flatMap(t -> t.getUnitHolders().values().stream())
-                    .map(uh -> uh.getName())
-                    .filter(name -> game.getTileFromPlanet(name) != null)
-                    .findFirst()
-                    .orElse(null);
+            String planet = anyOnMapPlanet(game);
             assertThat(planet).isNotNull();
-
             Tile expected = game.getTileFromPlanet(planet);
             assertThat(BlindSelectionService.parseBlindTarget(game, POSITION, planet))
                     .isEqualTo(expected.getPosition());
@@ -60,10 +56,11 @@ class BlindSelectionServiceTest extends BaseTi4Test {
             // Refusing this would answer "is that planet in this game?" - a yes/no oracle over the map.
             // It is accepted here and fizzles at resolution instead.
             String offMap = "mellon";
-            if (game.getTileFromPlanet(offMap) == null) {
-                assertThat(BlindSelectionService.parseBlindTarget(game, POSITION, offMap))
-                        .isNotNull();
-            }
+            assertThat(game.getTileFromPlanet(offMap))
+                    .as("test assumes %s is not on the default test map", offMap)
+                    .isNull();
+            assertThat(BlindSelectionService.parseBlindTarget(game, POSITION, offMap))
+                    .isNotNull();
         }
     }
 
@@ -81,30 +78,17 @@ class BlindSelectionServiceTest extends BaseTi4Test {
     // ---- unit-holder targets: a system can hold a dock in space AND one on each planet ----------
 
     @Test
-    void unitHolderPrompt_aPositionMeansTheHolderInSpace() {
+    void unitHolderPrompt_positionMeansSpaceAndPlanetMeansItsHolder() {
         try (var harness = TestGameHarness.forDefaultMap()) {
             Game game = harness.load();
             String anyPosition = game.getTileMap().keySet().iterator().next();
             assertThat(BlindSelectionService.parseBlindTarget(game, UNIT_HOLDER, anyPosition))
                     .isEqualTo(anyPosition + "_space");
-        }
-    }
 
-    @Test
-    void unitHolderPrompt_aPlanetNameMeansThatPlanetsHolder() {
-        try (var harness = TestGameHarness.forDefaultMap()) {
-            Game game = harness.load();
-
-            String planet = game.getTileMap().values().stream()
-                    .flatMap(t -> t.getUnitHolders().values().stream())
-                    .map(uh -> uh.getName())
-                    .filter(name -> game.getTileFromPlanet(name) != null)
-                    .findFirst()
-                    .orElse(null);
+            String planet = anyOnMapPlanet(game);
             assertThat(planet).isNotNull();
-
-            Tile tile = game.getTileFromPlanet(planet);
             // Both halves matter: the system it is in, and which holder inside that system.
+            Tile tile = game.getTileFromPlanet(planet);
             assertThat(BlindSelectionService.parseBlindTarget(game, UNIT_HOLDER, planet))
                     .isEqualTo(tile.getPosition() + "_" + planet);
         }

@@ -132,9 +132,7 @@ class YinHeroButtonHandler {
                 && !mallice
                 && (targetTile.isHomeSystem(game)
                         || targetPlanet.isSpaceStation(game)
-                        || Helper.getPlanetRepresentation(planet, game)
-                                .toLowerCase()
-                                .contains("dmz"))) {
+                        || targetPlanet.getTokenList().stream().anyMatch(token -> token.contains("dmz")))) {
             PlanetTargetService.fizzle(event, player);
             return;
         }
