@@ -50,7 +50,30 @@ public class ColorModel implements ModelInterface {
     }
 
     public String getHue() {
-        return (hue == null ? "null" : hue);
+        if (hue != null) return hue;
+        if (primaryColorRef != null) return Mapper.getColor(primaryColorRef).getHue();
+        return "null";
+    }
+
+    // Coarse RGB-dominance check, used as a fallback for gradient colors bucketed under a generic
+    // MULTI1/MULTI2/MULTI3 hue (rather than a specific named hue) so an overtly red+green two-tone
+    // color (e.g. watermelon, rainbow) can still be flagged as a red-green confusion risk.
+    private static boolean isRedDominant(Color c) {
+        return c != null && c.getRed() > 100 && c.getRed() > c.getGreen() * 1.3 && c.getRed() > c.getBlue() * 1.3;
+    }
+
+    private static boolean isGreenDominant(Color c) {
+        return c != null && c.getGreen() > 100 && c.getGreen() > c.getRed() * 1.3 && c.getGreen() > c.getBlue() * 1.3;
+    }
+
+    @JsonIgnore
+    public boolean hasRedComponent() {
+        return isRedDominant(getPrimaryColor()) || isRedDominant(getSecondaryColor());
+    }
+
+    @JsonIgnore
+    public boolean hasGreenComponent() {
+        return isGreenDominant(getPrimaryColor()) || isGreenDominant(getSecondaryColor());
     }
 
     @JsonIgnore

@@ -19,6 +19,10 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserSettings {
 
+    public static final String COLOR_VISION_STANDARD = "standard";
+    public static final String COLOR_VISION_RED_GREEN = "red_green";
+    public static final String COLOR_VISION_OTHER = "other";
+
     private String userId;
     private List<String> preferredColors;
     private int personalPingInterval;
@@ -39,6 +43,7 @@ public class UserSettings {
     private boolean prefersPassOnWhensAfters;
     private boolean prefersPrePassOnSC = true;
     private Boolean prefersWrongButtonEphemeral;
+    private String colorVisionPref = COLOR_VISION_STANDARD;
     private int autoNoSaboInterval;
     private String whisperPref = "No Preference";
     private String supportPref = "No Preference";

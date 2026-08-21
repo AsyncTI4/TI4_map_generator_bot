@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.service.objectives.DrawSecretService;
 
@@ -18,6 +19,7 @@ class DealSOToAll extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
+        ButtonHelper.resolveSetupColorChecker(getGame());
         DrawSecretService.dealSOToAll(event, count, getGame());
     }
 }
