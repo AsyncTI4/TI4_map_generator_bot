@@ -19,9 +19,13 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.Component;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.components.selections.SelectMenu;
+import net.dv8tion.jda.api.components.selections.SelectOption;
+import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -478,6 +482,66 @@ public class MessageHelper {
                 .setComponents(rows)
                 .setFiles(files)
                 .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    /** How many buttons fit on a single message: max action rows x max buttons per row. */
+    private static int maxButtonsInOneMessage() {
+        return Message.MAX_COMPONENT_COUNT * ActionRow.getMaxAllowed(Component.Type.BUTTON);
+    }
+
+    /**
+     * Posts a button list, or rewrites the message the clicked button lives on. Use this for any refreshable
+     * list of buttons: send fresh when opening it (the click came from a different message), edit in place on
+     * every subsequent refresh, so repeatedly toggling something doesn't leave a trail of stale copies.
+     *
+     * <p>Not to be confused with {@code NewStuffHelper.sendOrEditButtons}, which decides implicitly (it edits
+     * only when the new text is byte-identical to the old), replaces components without rewriting the text,
+     * and keeps only the first action row. This one takes an explicit flag and does rewrite the text.
+     *
+     * <p>Editing can't span messages, so a list too large for one message falls back to a fresh send (which
+     * paginates) rather than silently losing the overflow.
+     */
+    public static void postOrEditWithButtons(
+            ButtonInteractionEvent event, String message, List<Button> buttons, boolean editInPlace) {
+        if (editInPlace && buttons.size() <= maxButtonsInOneMessage()) {
+            editMessageWithButtons(event, message, buttons);
+        } else {
+            sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        }
+    }
+
+    /**
+     * Posts {@code options} as one or more string-select menus, splitting on Discord's per-menu option cap.
+     * Callers build the {@link SelectOption}s themselves - those already carry label, value, emoji and
+     * description, so no mapper callbacks are needed here.
+     *
+     * <p>Every page reuses {@code menuId}: Discord only requires component ids to be unique within a single
+     * message, and the handler registry prefix-matches, so all pages route to the same handler.
+     *
+     * <p>When the options span multiple pages each prompt gains an "(A - M)" style suffix so the pages can be
+     * told apart; a single page is left unsuffixed.
+     */
+    public static void sendPagedSelectMenus(
+            MessageChannel channel, String menuId, List<SelectOption> options, String prompt) {
+        if (channel == null || options.isEmpty()) return;
+        List<List<SelectOption>> pages = ListUtils.partition(options, SelectMenu.OPTIONS_MAX_AMOUNT);
+        for (List<SelectOption> page : pages) {
+            StringSelectMenu menu = StringSelectMenu.create(menuId)
+                    .addOptions(page)
+                    .setRequiredRange(1, 1)
+                    .build();
+            String pagePrompt = prompt + (pages.size() > 1 ? pageRangeLabel(page) : "");
+            channel.sendMessage(pagePrompt)
+                    .addComponents(ActionRow.of(menu))
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+    }
+
+    /** " (A - M)" style suffix describing the range of labels on one select-menu page. */
+    private static String pageRangeLabel(List<SelectOption> page) {
+        String first = page.getFirst().getLabel();
+        String last = page.getLast().getLabel();
+        return first.equals(last) ? " (" + first + ")" : " (" + first + " - " + last + ")";
     }
 
     private static void replyToMessage(

@@ -21,7 +21,8 @@ public class FOWCommand implements ParentCommand {
                     new ShowGameAsPlayer(),
                     new PrivateCommunicationsCheck(),
                     new GMCommand(),
-                    new CreateFoWGameButton())
+                    new CreateFoWGameButton(),
+                    new SetupWizard())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

@@ -21,6 +21,7 @@ import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.option.TEOptionService;
@@ -97,7 +98,11 @@ public class WeirdGameSetup extends GameStateSubcommand {
             if (game.isTwilightsFallMode()) {
                 String msg = "Use the buttons to enable or disable various homebrew options:";
                 List<ContainerChildComponent> sections = TEOptionService.getTFHomebrewInfo(game);
-                MessageV2Builder builder = new MessageV2Builder(game.getMainGameChannel());
+                // This used to always post to the public main channel, leaking TF homebrew setup chatter in
+                // FoW games (this command has no FoW-specific gating, so it's reachable on any game). Same
+                // fix as TEOptionService's homebrewChannel: GM room in FoW games, unchanged elsewhere.
+                var channel = game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel();
+                MessageV2Builder builder = new MessageV2Builder(channel);
                 builder.append(msg);
                 builder.append(Container.of(sections));
                 builder.append(Buttons.DONE_DELETE_BUTTONS);
@@ -184,19 +189,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
 
         Boolean thunderMode = event.getOption(Constants.THUNDERS_EDGE_MODE, null, OptionMapping::getAsBoolean);
         if (thunderMode != null) {
-            game.setThundersEdge(thunderMode);
-            if (thunderMode && !game.getActionCards().contains("brilliance")) {
-                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), "The Thunder's Edge action card deck has been set.");
-            }
-            if (thunderMode && !game.getAllRelics().contains("thesilverflame")) {
-                game.addRelicToGame("quantumcore");
-                game.addRelicToGame("thesilverflame");
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        "_The Silver Flame_ and _The Quantumcore_ relics have been added back to the relic deck.");
-            }
+            applyThundersEdgeMode(event, game, thunderMode);
         }
 
         Boolean riftsetMode = event.getOption(FOWOption.RIFTSET_MODE.toString(), null, OptionMapping::getAsBoolean);
@@ -207,6 +200,23 @@ public class WeirdGameSetup extends GameStateSubcommand {
         Boolean fowPlus = event.getOption(FOWOption.FOW_PLUS.toString(), null, OptionMapping::getAsBoolean);
         if (fowPlus != null && game.isFowMode()) {
             FOWPlusService.setActive(game, fowPlus);
+        }
+    }
+
+    /** Extracted so non-slash-command callers (e.g. the FoW setup wizard) can toggle Thunder's Edge mode. */
+    public static void applyThundersEdgeMode(GenericInteractionCreateEvent event, Game game, boolean enable) {
+        game.setThundersEdge(enable);
+        if (enable && !game.getActionCards().contains("brilliance")) {
+            game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "The Thunder's Edge action card deck has been set.");
+        }
+        if (enable && !game.getAllRelics().contains("thesilverflame")) {
+            game.addRelicToGame("quantumcore");
+            game.addRelicToGame("thesilverflame");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "_The Silver Flame_ and _The Quantumcore_ relics have been added back to the relic deck.");
         }
     }
 
