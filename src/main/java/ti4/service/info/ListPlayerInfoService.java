@@ -717,7 +717,7 @@ public class ListPlayerInfoService {
                 int x = 0;
                 for (Tile tile : game.getTileMap().values()) {
                     if (FoWHelper.playerHasShipsInSystem(player, tile)) {
-                        x = Math.max(x, ButtonHelper.checkNumberNonFighterShips(player, tile));
+                        x = Math.max(x, ButtonHelper.checkNumberNonFighterShips(player, tile, false));
                     }
                 }
                 return x;
