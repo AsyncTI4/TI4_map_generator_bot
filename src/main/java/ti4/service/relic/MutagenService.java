@@ -82,9 +82,11 @@ public class MutagenService {
         if (volatileMutagenics) {
             player.removeRelic("volatile_mutagenics");
             player.removeExhaustedRelic("volatile_mutagenics");
-            DSHelperBreakthroughs.doLanefirBtCheck(game, player);
-            OblivionUnitHandler.doOblivionMechCheck(game, player);
         }
+
+        // Purging either kind of Mutagen is a single "purge 1 or more components" event.
+        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        OblivionUnitHandler.doOblivionMechCheck(game, player);
 
         game.setStoredValue(OPTIONS_KEY + player.getFaction(), String.join(",", options));
         game.setStoredValue(REMAINING_KEY + player.getFaction(), volatileMutagenics ? "2" : "1");
