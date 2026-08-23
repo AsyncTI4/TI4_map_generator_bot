@@ -817,19 +817,33 @@ public final class ButtonHelperTacticalAction {
 
         List<Player> playersWithPds2 = ButtonHelper.getPlayersWithPds2Cover(player, game, pos);
         if (!game.isFowMode() && !playersWithPds2.isEmpty() && !game.isL1Hero()) {
+            Tile pdsTile = game.getTileByPosition(pos);
+            Map<String, PdsCoverage> pdsCoverage =
+                    pdsTile == null ? null : PdsCoverageHelper.calculatePdsCoverage(game, pdsTile);
             List<String> mentions = new ArrayList<>();
+            int totalDice = 0;
             for (Player playerWithPds : playersWithPds2) {
                 if (playerWithPds == player) {
                     continue;
                 }
-                mentions.add(playerWithPds.getRepresentationNoPing());
+                PdsCoverage coverage = pdsCoverage == null ? null : pdsCoverage.get(playerWithPds.getFaction());
+                if (coverage == null) {
+                    mentions.add(playerWithPds.getRepresentationNoPing());
+                    continue;
+                }
+                totalDice += coverage.getCount();
+                mentions.add(playerWithPds.getRepresentationNoPing() + " (" + coverage.getCount()
+                        + (coverage.getCount() == 1 ? " die)" : " dice)"));
             }
             if (!mentions.isEmpty()) {
                 message.append('\n')
                         .append(player.getRepresentationUnfogged())
                         .append(" the activated system is in range of SPACE CANNON units owned by ")
-                        .append(String.join(", ", mentions))
-                        .append(".");
+                        .append(String.join(", ", mentions));
+                if (mentions.size() > 1 && totalDice > 0) {
+                    message.append(", for a total of ").append(totalDice).append(totalDice == 1 ? " die" : " dice");
+                }
+                message.append(".");
             }
         }
 
