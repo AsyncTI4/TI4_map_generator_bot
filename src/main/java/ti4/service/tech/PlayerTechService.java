@@ -774,8 +774,9 @@ public class PlayerTechService {
             CommanderUnlockCheckService.checkPlayer(player, "zealots");
         }
         player.addTech(techID);
-        if (!isResearch) {
-            ArcanumUnitHandler.getRuneboundButtons(player, game, techID);
+        ArcanumUnitHandler.getRuneboundButtons(player, game, techID);
+        if (isResearch) {
+            ArcanumLeadersHandler.offerVeylaTheKeeperButtons(game, player, techID);
         }
         GameEventService.commit(
                 game, GameEventType.TECH_RESEARCHED, player, Map.of("techId", techID, "paymentType", paymentType));
