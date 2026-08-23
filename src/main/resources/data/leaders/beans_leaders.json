@@ -200,7 +200,7 @@
     "title": "The Technocrat",
     "abilityName": "Power Surge - Network Overload",
     "abilityWindow": "ACTION:",
-    "abilityText": "Choose 1 technology you own that is owned by at least 1 other player. All players that own that technology return that technology to their technology deck. Then, for each player's control token on your faction sheet, you may return it to gain 1 command token and 1 non-faction technology that player owns. Then, purge this card.",
+    "abilityText": "Choose 1 technology you own that is owned by at least 1 other player. All other players that own that technology return that technology to their technology deck. Then, for each player's control token on your faction sheet, you may return it to gain 1 command token and 1 non-faction technology that player owns. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans"
   },

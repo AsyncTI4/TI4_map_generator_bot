@@ -334,7 +334,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "DEPLOY: When you research or gain a technology, you may place a mech from your reinforcements on a planet you control."
+    "ability": "DEPLOY: When you gain a technology, you may place a mech from your reinforcements on a planet you control."
   },
   {
     "id": "natau_flagship",

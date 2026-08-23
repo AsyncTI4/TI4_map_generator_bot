@@ -2368,21 +2368,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public boolean hasTech(String techID) {
         if (techID == null) return false;
-        // Blackout deliberately leaves the underlying technology list intact. Removing and restoring a technology
-        // rebuilds derived state mid-turn, while callers that ask whether the player has the technology still see it
-        // as suppressed for the duration of Blackout.
-        boolean blackedOut = game != null
-                && game.getRealPlayers().stream()
-                        .filter(netrunner -> netrunner.getTechs().contains("benetrunnersbo"))
-                        .map(netrunner ->
-                                game.getStoredValue("netrunnersBlackout" + getFaction() + "_" + netrunner.getFaction()))
-                        .anyMatch(blackedOutTech -> techID.equals(blackedOutTech)
-                                || ("det".equals(techID) && "absol_det".equals(blackedOutTech))
-                                || ("amd".equals(techID) && "absol_amd".equals(blackedOutTech))
-                                || (("scc".equalsIgnoreCase(techID) || "ah".equalsIgnoreCase(techID))
-                                        && "tf-ahl".equals(blackedOutTech))
-                                || ("tf-" + techID).equals(blackedOutTech));
-        if (blackedOut) return false;
         if ("det".equals(techID) || "amd".equals(techID)) {
             if (getTechs().contains("absol_" + techID)) {
                 return true;

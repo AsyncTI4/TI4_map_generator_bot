@@ -10,6 +10,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.NewStuffHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
@@ -38,15 +39,19 @@ public class NetrunnersAbilitiesHandler {
             if (netrunner.getDebtTokenCount(techGainer.getColor(), CONTROL_TOKEN_POOL) > 0) continue;
             if (netrunner.hasUnlockedBreakthrough("netrunnersbt")
                     && !techGainer.getBreakthroughIDs().isEmpty()) {
-                MessageHelper.sendMessageToChannelWithButton(
+                MessageHelper.sendMessageToChannelWithButtons(
                         netrunner.getCorrectChannel(),
                         netrunner.getRepresentationUnfogged() + ", you may use **Data Breach** instead of placing "
                                 + techGainer.getRepresentation(false, true) + "'s token.",
-                        Buttons.gray(
-                                netrunner.factionButtonChecker() + "netrunnersDataBreachMove_"
-                                        + techGainer.getFaction(),
-                                "Use Data Breach",
-                                FactionEmojis.netrunners));
+                        List.of(
+                                Buttons.gray(
+                                        netrunner.factionButtonChecker() + "netrunnersDataBreachMove_"
+                                                + techGainer.getFaction(),
+                                        "Use Data Breach"),
+                                Buttons.red(
+                                        netrunner.factionButtonChecker() + "netrunnersDataBreachDecline_"
+                                                + techGainer.getFaction(),
+                                        "Decline")));
                 continue;
             }
             SendDebtService.sendDebt(techGainer, netrunner, 1, CONTROL_TOKEN_POOL);
@@ -73,14 +78,13 @@ public class NetrunnersAbilitiesHandler {
                     .map(tech -> Buttons.gray(
                             netrunner.factionButtonChecker() + "netrunnersBlackout_" + activator.getFaction() + "_"
                                     + tech.getAlias(),
-                            tech.getName(),
-                            FactionEmojis.netrunners))
+                            tech.getName()))
                     .toList();
             if (!buttons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         netrunner.getCorrectChannel(),
                         netrunner.getRepresentationUnfogged()
-                                + ", please choose a technology to suppress with **Blackout**.",
+                                + ", please choose a technology that cannot be used until the end of that player's turn due to **Blackout**.",
                         buttons);
             }
         }
@@ -96,44 +100,104 @@ public class NetrunnersAbilitiesHandler {
                 || !target.hasTech(parts[1])
                 || Mapper.getTech(parts[1]) == null
                 || Mapper.getTech(parts[1]).isUnitUpgrade()) return;
-        game.setStoredValue("netrunnersBlackout" + target.getFaction() + "_" + netrunner.getFaction(), parts[1]);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                netrunner.getRepresentation() + ", " + target.getRepresentation() + ", **"
+                        + Mapper.getTech(parts[1]).getName() + "** cannot be used until the end of "
+                        + target.getRepresentation(false, true) + "'s turn due to **Blackout**."
+                        + "\n-# This effect is player-enforced.");
     }
 
     @ButtonHandler("netrunnersDataBreachMove_")
     public static void moveDataBreachToken(Game game, Player netrunner, ButtonInteractionEvent event, String buttonID) {
-        Player target = game.getPlayerFromColorOrFaction(buttonID.replace("netrunnersDataBreachMove_", ""));
+        if (game == null || netrunner == null) return;
+        String payload = buttonID.replace("netrunnersDataBreachMove_", "");
+        String[] parts = payload.split("_", 2);
+        Player target = game.getPlayerFromColorOrFaction(parts[0]);
         if (target == null
                 || !netrunner.hasUnlockedBreakthrough("netrunnersbt")
-                || !netrunner.hasAbility(NEURAL_INSTRUMENTS_ABILITY)
-                || target.getBreakthroughIDs().isEmpty()) return;
+                || !netrunner.hasAbility(NEURAL_INSTRUMENTS_ABILITY)) return;
+        if (target.getBreakthroughIDs().isEmpty()) {
+            SendDebtService.sendDebt(target, netrunner, 1, CONTROL_TOKEN_POOL);
+            ButtonHelper.deleteMessage(event);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    netrunner.getRepresentationNoPing() + " placed 1 of "
+                            + target.getRepresentation(false, true)
+                            + "'s command tokens on their faction sheet via **Neural Instruments**.");
+            return;
+        }
+
+        String message =
+                netrunner.getRepresentationUnfogged() + ", choose the breakthrough for your **Data Breach** token.";
+        String buttonPrefix =
+                netrunner.factionButtonChecker() + "netrunnersDataBreachMove_" + target.getFaction() + "_";
+        List<Button> buttons = target.getBreakthroughIDs().stream()
+                .filter(bt -> Mapper.getBreakthrough(bt) != null)
+                .map(Mapper::getBreakthrough)
+                .map(breakthrough -> Buttons.green(
+                        buttonPrefix + breakthrough.getAlias(),
+                        NetrunnersBreakthroughHandler.getDataBreachBreakthroughLabel(breakthrough)))
+                .toList();
+        if (buttons.isEmpty()) {
+            SendDebtService.sendDebt(target, netrunner, 1, CONTROL_TOKEN_POOL);
+            ButtonHelper.deleteMessage(event);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    netrunner.getRepresentationNoPing() + " placed 1 of "
+                            + target.getRepresentation(false, true)
+                            + "'s command tokens on their faction sheet via **Neural Instruments**.");
+            return;
+        }
+        if (NewStuffHelper.checkAndHandlePaginationChange(
+                event, event.getMessageChannel(), buttons, message, buttonPrefix, buttonID)) return;
+        if (parts.length == 1) {
+            ButtonHelper.deleteMessage(event);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
+            return;
+        }
+        String breakthroughId = parts[1];
+        if (!target.hasBreakthrough(breakthroughId) || Mapper.getBreakthrough(breakthroughId) == null) return;
         game.setStoredValue(
-                "netrunnersDataBreach" + netrunner.getFaction(),
-                target.getFaction() + "~" + target.getBreakthroughIDs().getFirst());
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+                "netrunnersDataBreach" + netrunner.getFaction(), target.getFaction() + "~" + breakthroughId);
+        ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 netrunner.getRepresentation() + " moved their **Data Breach** token onto "
-                        + target.getRepresentation(false, true) + "'s breakthrough.");
+                        + Mapper.getBreakthrough(breakthroughId).getNameRepresentation() + ".");
     }
 
-    public static void offerProxyNetwork(Game game, Player netrunner) {
-        if (game == null || netrunner == null || !netrunner.hasAbility(PROXY_NETWORK_ABILITY)) return;
+    @ButtonHandler("netrunnersDataBreachDecline_")
+    public static void declineDataBreachToken(
+            Game game, Player netrunner, ButtonInteractionEvent event, String buttonID) {
+        if (game == null || netrunner == null) return;
+        Player target = game.getPlayerFromColorOrFaction(buttonID.replace("netrunnersDataBreachDecline_", ""));
+        if (target == null
+                || !netrunner.hasAbility(NEURAL_INSTRUMENTS_ABILITY)
+                || netrunner.getDebtTokenCount(target.getColor(), CONTROL_TOKEN_POOL) > 0) {
+            return;
+        }
+        SendDebtService.sendDebt(target, netrunner, 1, CONTROL_TOKEN_POOL);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                netrunner.getRepresentationNoPing() + " placed 1 of " + target.getRepresentation(false, true)
+                        + "'s command tokens on their faction sheet via **Neural Instruments**.");
+    }
+
+    public static Button getProxyNetworkButton(Game game, Player netrunner) {
+        if (game == null || netrunner == null || !netrunner.hasAbility(PROXY_NETWORK_ABILITY)) return null;
         boolean hasEligiblePlayer = game.getRealPlayersExcludingThis(netrunner).stream()
                 .anyMatch(player -> netrunner.getDebtTokenCount(player.getColor(), CONTROL_TOKEN_POOL) > 0
                         && player.getTechs().stream()
                                 .map(Mapper::getTech)
                                 .anyMatch(tech ->
                                         tech != null && tech.getFaction().isEmpty()));
-        if (!hasEligiblePlayer) return;
-        MessageHelper.sendMessageToChannelWithButton(
-                netrunner.getCorrectChannel(),
-                netrunner.getRepresentationUnfogged()
-                        + ", you may remove a control token from your faction sheet to copy a non-faction technology until the end of your turn.",
-                Buttons.gray(
-                        netrunner.factionButtonChecker() + "proxyNetworkStart",
-                        "Use Proxy Network",
-                        FactionEmojis.netrunners));
+        if (!hasEligiblePlayer) return null;
+        return Buttons.gray(
+                netrunner.factionButtonChecker() + "proxyNetworkStart", "Use Proxy Network", FactionEmojis.netrunners);
     }
 
     @ButtonHandler("proxyNetworkStart")
@@ -149,7 +213,10 @@ public class NetrunnersAbilitiesHandler {
                         "Copy a Technology from " + player.getColorDisplayName(),
                         FactionEmojis.netrunners))
                 .toList();
-        if (buttons.isEmpty()) return;
+        if (buttons.isEmpty()) {
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            return;
+        }
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
@@ -174,7 +241,13 @@ public class NetrunnersAbilitiesHandler {
                         tech.getName(),
                         FactionEmojis.netrunners))
                 .toList();
-        if (buttons.isEmpty()) return;
+        if (buttons.isEmpty()) {
+            ButtonHelper.deleteMessage(event);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    netrunner.getRepresentationUnfogged() + " has no eligible technology to copy from that player.");
+            return;
+        }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
@@ -199,7 +272,7 @@ public class NetrunnersAbilitiesHandler {
         netrunner.addTech(techId);
         game.setStoredValue(PROXY_TECH + netrunner.getFaction(), techId);
         offerSharedNetworkAccess(game, netrunner, techId);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 netrunner.getRepresentation() + " copied "
@@ -236,15 +309,6 @@ public class NetrunnersAbilitiesHandler {
     public static void clearReverseEngineering(Game game, Player player) {
         if (game != null && player != null) {
             game.removeStoredValue(REVERSE_ENGINEERING_USED + player.getFaction());
-        }
-    }
-
-    public static void clearBlackout(Game game, Player player) {
-        if (game == null || player == null) {
-            return;
-        }
-        for (Player netrunner : game.getRealPlayers()) {
-            game.removeStoredValue("netrunnersBlackout" + player.getFaction() + "_" + netrunner.getFaction());
         }
     }
 
@@ -304,8 +368,7 @@ public class NetrunnersAbilitiesHandler {
                     List.of(Buttons.green(
                             holder.factionButtonChecker() + "sharedNetworkAccess_" + netrunner.getFaction() + "_"
                                     + techId,
-                            "Play Shared Network Access",
-                            FactionEmojis.netrunners)));
+                            "Play Shared Network Access")));
         }
     }
 

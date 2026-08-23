@@ -180,7 +180,6 @@ public class StartTurnService {
         game.setPhaseOfGame("action");
         AeternaPromissoryHandler.offerStasisFighterPlacement(event, game, player);
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
-        NetrunnersAbilitiesHandler.offerProxyNetwork(game, player);
         SabotageService.startOfTurnSaboWindowReminders(game, player);
         boolean isFowPrivateGame = game.isFowMode();
 
@@ -495,6 +494,12 @@ public class StartTurnService {
         }
         if (!doneActionThisTurn && player.hasUnexhaustedLeader("kairnagent")) {
             startButtons.add(KairnLeadershandler.getKairnAgentButton(player));
+        }
+        if (!doneActionThisTurn && player.hasAbility("proxy_network")) {
+            Button proxyNetworkButton = NetrunnersAbilitiesHandler.getProxyNetworkButton(game, player);
+            if (proxyNetworkButton != null) {
+                startButtons.add(proxyNetworkButton);
+            }
         }
         if (player.hasAbility("sting_of_the_hive") && XytherisAbilityHandler.hasStingOfTheHiveMines(game)) {
             startButtons.add(XytherisAbilityHandler.getStingOfTheHiveMineLedgerButton(player));

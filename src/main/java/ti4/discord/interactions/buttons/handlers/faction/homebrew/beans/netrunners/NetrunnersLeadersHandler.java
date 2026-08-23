@@ -9,12 +9,19 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperCommanders;
+import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.ButtonHelperSCs;
+import ti4.helpers.Helper;
+import ti4.helpers.NewStuffHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
+import ti4.model.StrategyCardModel;
 import ti4.model.TechSpecialtyModel.TechSpecialty;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.service.button.ReactionService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.tech.ListTechService;
@@ -61,10 +68,33 @@ public class NetrunnersLeadersHandler {
         if (!player.hasLeaderUnlocked("netrunnerscommander")) return;
         String choice = buttonID.replace("netrunnersCommanderTechnologySecondary_", "");
         if (!"skip".equals(choice) && !"spend".equals(choice)) return;
-        game.setStoredValue("netrunnersCommanderTechnologySecondary" + player.getFaction(), choice);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-        if ("spend".equals(choice)) offerCommanderFreeTechnology(game, player);
+        if ("spend".equals(choice)) {
+            resolveCommanderTechnologySpend(game, player, event);
+            return;
+        }
+        game.setStoredValue("netrunnersCommanderTechnologySecondary" + player.getFaction(), "skip");
+        ButtonHelper.deleteMessage(event);
         ListTechService.acquireATech(event, game, player, true, false, TechnologyType.mainFive, true);
+    }
+
+    private static void resolveCommanderTechnologySpend(Game game, Player player, ButtonInteractionEvent event) {
+        StrategyCardModel technology =
+                game.getStrategyCardModelByName("technology").orElse(null);
+        boolean used = ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player);
+        if (!used
+                && technology != null
+                && technology.usesAutomationForSCID("pok7technology")
+                && !player.getFollowedSCs().contains(technology.getInitiative())) {
+            int scNum = technology.getInitiative();
+            player.addFollowedSC(scNum, event);
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
+            if (player.getStrategicCC() > 0) {
+                ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Technology**");
+            }
+            ReactionService.addReaction(event, game, player, ButtonHelperSCs.deductCC(game, player, scNum));
+        }
+        ButtonHelper.deleteMessage(event);
+        offerCommanderFreeTechnology(game, player);
     }
 
     private static void offerCommanderFreeTechnology(Game game, Player player) {
@@ -82,15 +112,20 @@ public class NetrunnersLeadersHandler {
                         "Exhaust " + planet,
                         FactionEmojis.netrunners))
                 .toList();
-        if (!buttons.isEmpty()) {
-            buttons = new java.util.ArrayList<>(buttons);
-            buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(),
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
-                            + ", because you spent a strategy token, you may exhaust a technology-specialty planet to research a technology of that color for free via Tek Mir-un, the Netrunners commander.",
-                    buttons);
+                            + ", you have no ready planet with a colored technology specialty for Tek Mir-un, the Netrunners commander.");
+            return;
         }
+        buttons = new java.util.ArrayList<>(buttons);
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged()
+                        + ", because you spent a strategy token, you may exhaust a technology-specialty planet to research a technology of that color for free via Tek Mir-un, the Netrunners commander.",
+                buttons);
     }
 
     @ButtonHandler("netrunnersCommanderPlanet_")
@@ -101,15 +136,22 @@ public class NetrunnersLeadersHandler {
                 || !player.hasPlanetReady(planet)
                 || model == null
                 || model.getTechSpecialties() == null) return;
-        List<TechnologyModel> techs = model.getTechSpecialties().stream()
+        player.exhaustPlanet(planet);
+        List<TechnologyModel> techs = new java.util.ArrayList<>(model.getTechSpecialties().stream()
                 .filter(NetrunnersLeadersHandler::isColoredSpecialty)
                 .flatMap(specialty ->
                         ListTechService.getAllTechOfAType(game, specialty.toString(), player, false, true).stream())
                 .distinct()
-                .toList();
-        if (techs.isEmpty()) return;
-        player.exhaustPlanet(planet);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+                .toList());
+        if (techs.isEmpty()) {
+            ButtonHelper.deleteMessage(event);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", no technology matching that specialty is currently researchable via Tek Mir-un, the Netrunners commander.");
+            return;
+        }
+        ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged()
@@ -124,26 +166,14 @@ public class NetrunnersLeadersHandler {
                 || specialty == TechSpecialty.WARFARE;
     }
 
-    public static void offerAgentDiscount(Game game, Player researcher, String techId) {
-        if (game == null || researcher == null || Mapper.getTech(techId) == null) return;
-        for (Player netrunner : game.getRealPlayers()) {
-            if (!netrunner.hasUnexhaustedLeader("netrunnersagent")) continue;
-            int discount = (int) game.getRealPlayersExcludingThis(netrunner).stream()
-                    .filter(player -> player.hasTech(techId))
-                    .count();
-            if (discount < 1) continue;
-            MessageHelper.sendMessageToChannelWithButton(
-                    netrunner.getCorrectChannel(),
-                    netrunner.getRepresentationUnfogged() + ", " + researcher.getRepresentation(false, true)
-                            + " is paying to research " + Mapper.getTech(techId).getNameRepresentation()
-                            + ". You may exhaust Zor No-ahn, the Netrunners agent, to reduce that cost by "
-                            + discount + ".",
-                    Buttons.gray(
-                            netrunner.factionButtonChecker() + "netrunnersAgentDiscount_" + researcher.getFaction()
-                                    + "|" + techId,
-                            "Use Netrunners Agent",
-                            FactionEmojis.netrunners));
-        }
+    public static Button getAgentDiscountButton(Game game, Player player, String techId, String payType) {
+        int discount = getAgentDiscount(game, player, techId);
+        if (discount < 1) return null;
+        return Buttons.gray(
+                player.factionButtonChecker() + "netrunnersAgentDiscount_" + player.getFaction() + "|" + techId + "|"
+                        + payType,
+                "Use Netrunners Agent (-" + discount + ")",
+                FactionEmojis.netrunners);
     }
 
     public static Button getAgentCardsInfoButton(Player player) {
@@ -152,36 +182,102 @@ public class NetrunnersLeadersHandler {
     }
 
     @ButtonHandler("netrunnersAgentInfo")
-    public static void showAgentInfo(ButtonInteractionEvent event, Player player) {
-        if (!player.hasUnexhaustedLeader("netrunnersagent")) {
+    public static void chooseAgentTarget(Game game, ButtonInteractionEvent event, Player player) {
+        if (game == null || !player.hasUnexhaustedLeader("netrunnersagent")) return;
+        List<Button> buttons = game.getRealPlayersExcludingThis(player).stream()
+                .map(target -> Buttons.gray(
+                        player.factionButtonChecker() + "netrunnersAgentTarget_" + target.getFaction(),
+                        "Use Netrunners Agent On " + target.getFactionModel().getShortName(),
+                        target.getFactionEmoji()))
+                .toList();
+        if (buttons.isEmpty()) return;
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged()
+                        + ", please choose the player receiving Zor No-ahn, the Netrunners agent's technology discount.",
+                buttons);
+    }
+
+    @ButtonHandler("netrunnersAgentTarget_")
+    public static void chooseAgentTechnology(Game game, ButtonInteractionEvent event, Player player, String buttonID) {
+        if (game == null || !player.hasUnexhaustedLeader("netrunnersagent")) return;
+        Player target = game.getPlayerFromColorOrFaction(buttonID.replace("netrunnersAgentTarget_", ""));
+        if (target == null || target == player) return;
+        List<Button> buttons = target.getTechs().stream()
+                .filter(techId -> Mapper.getTech(techId) != null)
+                .map(techId -> Buttons.green(
+                        player.factionButtonChecker() + "netrunnersAgentDiscount_" + target.getFaction() + "|" + techId,
+                        Mapper.getTech(techId).getName(),
+                        FactionEmojis.netrunners))
+                .toList();
+        ButtonHelper.deleteMessage(event);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationUnfogged() + " has no eligible technology for that player.");
             return;
         }
-        MessageHelper.sendEphemeralMessageToEventChannel(
-                event,
-                "Zor No-ahn, the Netrunners agent, is offered automatically when a player pays to research a technology. The discount is based on the number of other players that have that technology.");
+        String message = player.getRepresentationUnfogged()
+                + ", please choose the technology " + target.getRepresentation(false, true)
+                + " is researching with Zor No-ahn, the Netrunners agent.";
+        String buttonPrefix = player.factionButtonChecker() + "netrunnersAgentDiscount_" + target.getFaction() + "|";
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
     }
 
     @ButtonHandler("netrunnersAgentDiscount_")
     public static void resolveAgentDiscount(
             Game game, Player netrunner, ButtonInteractionEvent event, String buttonID) {
-        String[] parts = buttonID.replace("netrunnersAgentDiscount_", "").split("\\|", 2);
-        if (parts.length != 2) return;
+        if (game == null || netrunner == null) return;
+        String[] parts = buttonID.replace("netrunnersAgentDiscount_", "").split("\\|", 3);
+        if (parts.length < 2) return;
         Player researcher = game.getPlayerFromColorOrFaction(parts[0]);
         String techId = parts[1];
-        if (researcher == null || Mapper.getTech(techId) == null || !netrunner.hasUnexhaustedLeader("netrunnersagent"))
-            return;
-        int discount = (int) game.getRealPlayersExcludingThis(netrunner).stream()
-                .filter(player -> player.hasTech(techId))
-                .count();
-        if (discount < 1) return;
+        String payType = parts.length == 3 ? parts[2] : "res";
+        if (researcher == null) return;
+        List<Button> techButtons = researcher.getTechs().stream()
+                .filter(candidate -> Mapper.getTech(candidate) != null)
+                .map(candidate -> Buttons.green(
+                        netrunner.factionButtonChecker() + "netrunnersAgentDiscount_" + researcher.getFaction() + "|"
+                                + candidate,
+                        Mapper.getTech(candidate).getName(),
+                        FactionEmojis.netrunners))
+                .toList();
+        String message = netrunner.getRepresentationUnfogged()
+                + ", please choose the technology " + researcher.getRepresentation(false, true)
+                + " is researching with Zor No-ahn, the Netrunners agent.";
+        String buttonPrefix =
+                netrunner.factionButtonChecker() + "netrunnersAgentDiscount_" + researcher.getFaction() + "|";
+        if (NewStuffHelper.checkAndHandlePaginationChange(
+                event, event.getMessageChannel(), techButtons, message, buttonPrefix, buttonID)) return;
+        int discount = getAgentDiscount(game, netrunner, techId);
+        if (!researcher.hasTech(techId) || discount < 1) return;
         ExhaustLeaderService.exhaustLeader(
                 game, netrunner, netrunner.getLeader("netrunnersagent").orElseThrow());
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        researcher.addSpentThing("netrunnersAgentDiscount_" + discount);
+        if (researcher == netrunner) {
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
+            event.getMessage()
+                    .editMessage(Helper.buildSpentThingsMessage(researcher, game, payType))
+                    .queue();
+        } else {
+            ButtonHelper.deleteMessage(event);
+        }
         MessageHelper.sendMessageToChannel(
                 researcher.getCorrectChannel(),
                 netrunner.getRepresentation() + " exhausted Zor No-ahn, the Netrunners agent, reducing "
                         + researcher.getRepresentation(false, true) + "'s technology cost by " + discount
-                        + ". Apply that reduction while resolving the already-open technology payment.");
+                        + ". The discount has been added to their spend summary.");
+    }
+
+    private static int getAgentDiscount(Game game, Player netrunner, String techId) {
+        if (game == null
+                || netrunner == null
+                || Mapper.getTech(techId) == null
+                || !netrunner.hasUnexhaustedLeader("netrunnersagent")) return 0;
+        return (int) game.getRealPlayersExcludingThis(netrunner).stream()
+                .filter(player -> player.hasTech(techId))
+                .count();
     }
 
     public static void offerHeroTechSelection(Game game, Player player) {
@@ -204,28 +300,42 @@ public class NetrunnersLeadersHandler {
                             + " has no technology eligible for _Power Surge - Network Overload_. The hero was already purged.");
             return;
         }
+        String message = player.getRepresentationUnfogged()
+                + ", please choose the shared technology to return with _Power Surge - Network Overload_.";
+        String buttonPrefix = player.factionButtonChecker() + "netrunnersHeroTech_";
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + ", please choose the shared technology to return with _Power Surge - Network Overload_.",
-                buttons);
+                player.getCorrectChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
     }
 
     @ButtonHandler("netrunnersHeroTech_")
     public static void resolveHeroTech(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = player.getTechs().stream()
+                .filter(tech -> Mapper.getTech(tech) != null)
+                .filter(tech ->
+                        game.getRealPlayersExcludingThis(player).stream().anyMatch(other -> other.hasTech(tech)))
+                .map(tech -> Buttons.green(
+                        player.factionButtonChecker() + "netrunnersHeroTech_" + tech,
+                        Mapper.getTech(tech).getName(),
+                        FactionEmojis.netrunners))
+                .toList();
+        String message = player.getRepresentationUnfogged()
+                + ", please choose the shared technology to return with _Power Surge - Network Overload_.";
+        String buttonPrefix = player.factionButtonChecker() + "netrunnersHeroTech_";
+        if (NewStuffHelper.checkAndHandlePaginationChange(
+                event, event.getMessageChannel(), buttons, message, buttonPrefix, buttonID)) return;
         String techId = buttonID.replace("netrunnersHeroTech_", "");
         if (Mapper.getTech(techId) == null
                 || !player.hasTech(techId)
                 || game.getRealPlayersExcludingThis(player).stream().noneMatch(other -> other.hasTech(techId))) return;
-        for (Player owner : game.getRealPlayers()) {
+        for (Player owner : game.getRealPlayersExcludingThis(player)) {
             if (owner.hasTech(techId)) owner.removeTech(techId);
         }
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentation() + " returned "
                         + Mapper.getTech(techId).getNameRepresentation()
-                        + " for every owner via _Power Surge - Network Overload_.");
+                        + " for every other owner via _Power Surge - Network Overload_.");
         offerHeroTokenSourceSelection(game, player);
     }
 
@@ -281,7 +391,11 @@ public class NetrunnersLeadersHandler {
                         tech.getName(),
                         FactionEmojis.netrunners))
                 .toList();
-        if (buttons.isEmpty()) return;
+        if (buttons.isEmpty()) {
+            ButtonHelper.deleteMessage(event);
+            offerHeroTokenSourceSelection(game, player);
+            return;
+        }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
@@ -303,14 +417,18 @@ public class NetrunnersLeadersHandler {
                 || player.getDebtTokenCount(source.getColor(), NetrunnersAbilitiesHandler.CONTROL_TOKEN_POOL) < 1)
             return;
         player.clearDebt(source, 1, NetrunnersAbilitiesHandler.CONTROL_TOKEN_POOL);
-        player.setTacticalCC(player.getTacticalCC() + 1);
         player.addTech(techId);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentation() + " returned "
-                        + source.getRepresentation(false, true) + "'s control token, gained 1 command token and "
+                        + source.getRepresentation(false, true) + "'s control token and gained "
                         + Mapper.getTech(techId).getNameRepresentation() + " via _Power Surge - Network Overload_.");
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", choose where to gain 1 command token via _Power Surge - Network Overload_.",
+                ButtonHelper.getGainCCButtons(player));
         offerHeroTokenSourceSelection(game, player);
     }
 }

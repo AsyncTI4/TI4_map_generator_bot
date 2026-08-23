@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiBreakthroughHandler;
@@ -197,7 +196,6 @@ public class CombatModHelper {
 
         List<UnitModel> unitsInCombat = new ArrayList<>(unitsByQuantity.keySet());
         for (UnitModel unit : unitsInCombat) {
-            if (NetrunnersUnitsHandler.isTrojanAbilitySuppressed(game, tile, unit)) continue;
             Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
                     .filter(modifier -> modifier.isRelevantTo(Constants.UNIT, unit.getAlias()))
                     .findFirst();
@@ -225,9 +223,7 @@ public class CombatModHelper {
             if (unit.getUnitType() == UnitType.Flagship && player.hasUnlockedBreakthrough("nekrobt")) {
                 for (String fs : ValefarZService.getFlagshipAbilitys(game, player)) {
                     UnitModel fsUnit = Mapper.getUnit(fs);
-                    if (fsUnit == null
-                            || fsUnit == unit
-                            || NetrunnersUnitsHandler.isTrojanAbilitySuppressed(game, tile, fsUnit)) continue;
+                    if (fsUnit == null || fsUnit == unit) continue;
                     Optional<CombatModifierModel> relevantMod2 = combatModifiers.values().stream()
                             .filter(modifier -> modifier.isRelevantTo(Constants.UNIT, fsUnit.getAlias()))
                             .findFirst();

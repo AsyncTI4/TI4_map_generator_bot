@@ -16,7 +16,6 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaUnitsHandler;
@@ -98,7 +97,6 @@ public class EndTurnService {
         AeternaLeadersHandler.clearAeternaCommanderActionState(game);
         AeternaUnitsHandler.clearCryptActionState(game);
         AeternaUnitsHandler.clearGraveyardActionState(game);
-        NetrunnersUnitsHandler.clearTrojan(game, player);
         RevenantLeadersHandler.clearPurpleLeaderActionState(game);
         if (player.hasAbility("phantom_energy")) {
             TyrisAbilityHandler.cleanupPhantomEnergy(game, player);
@@ -131,7 +129,6 @@ public class EndTurnService {
                     player.getRepresentationNoPing()
                             + " lost temporary access to their **Proxy Network** copied technology.");
         }
-        NetrunnersAbilitiesHandler.clearBlackout(game, player);
         game.setActiveSystem("");
     }
 

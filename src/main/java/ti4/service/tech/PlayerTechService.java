@@ -949,7 +949,6 @@ public class PlayerTechService {
             }
         }
         if (paymentRequired) {
-            NetrunnersLeadersHandler.offerAgentDiscount(game, player, techID);
             payForTech(game, player, event, techID, paymentType);
         } else {
             if (player.hasLeader("zealotshero")
@@ -1045,6 +1044,10 @@ public class PlayerTechService {
         }
         if ("res".equals(payType)) {
             buttons.addAll(dwsCommanders);
+        }
+        Button netrunnersAgentDiscount = NetrunnersLeadersHandler.getAgentDiscountButton(game, player, tech, payType);
+        if (netrunnersAgentDiscount != null) {
+            buttons.add(netrunnersAgentDiscount);
         }
         if (!techM.isUnitUpgrade() && player.hasAbility("iconoclasm")) {
             int culturalFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.CULTURAL);
