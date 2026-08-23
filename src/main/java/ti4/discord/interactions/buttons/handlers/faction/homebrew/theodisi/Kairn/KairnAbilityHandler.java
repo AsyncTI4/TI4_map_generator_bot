@@ -336,7 +336,7 @@ public class KairnAbilityHandler {
         List<Button> planets = getSharedDiscoveriesPlanetButtons(game, player);
         if (planets.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "There are no expedition tokens on planets in the active system.");
+                    event.getMessageChannel(), "There are no expedition tokens on controlled planets.");
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -368,13 +368,9 @@ public class KairnAbilityHandler {
         }
 
         String planetName = buttonID.substring(REMOVE_EXPEDITION_TOKEN.length());
-        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
-        Planet planet = activeSystem == null ? null : activeSystem.getUnitHolderFromPlanet(planetName);
+        Planet planet = game.getUnitHolderFromPlanet(planetName);
         Player planetOwner = game.getPlayerThatControlsPlanet(planetName);
-        if (planet == null
-                || planetOwner == null
-                || !planetOwner.getUserID().equals(game.getActivePlayerID())
-                || !planet.getTokenList().contains(EXPEDITION_TOKEN)) {
+        if (planet == null || planetOwner == null || !planet.getTokenList().contains(EXPEDITION_TOKEN)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -400,21 +396,42 @@ public class KairnAbilityHandler {
 
     private static List<Button> getSharedDiscoveriesPlanetButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
-        if (activeSystem == null) {
-            return buttons;
-        }
-        for (Planet planet : activeSystem.getPlanetUnitHolders()) {
-            Player planetOwner = game.getPlayerThatControlsPlanet(planet.getName());
-            if (planet.getTokenList().contains(EXPEDITION_TOKEN)
-                    && planetOwner != null
-                    && planetOwner.getUserID().equals(game.getActivePlayerID())) {
-                buttons.add(Buttons.green(
-                        player.factionButtonChecker() + REMOVE_EXPEDITION_TOKEN + planet.getName(),
-                        "Remove From " + Helper.getPlanetRepresentation(planet.getName(), game)));
+        for (Tile tile : game.getTileMap().values()) {
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                if (planet.getTokenList().contains(EXPEDITION_TOKEN)
+                        && game.getPlayerThatControlsPlanet(planet.getName()) != null) {
+                    buttons.add(Buttons.green(
+                            player.factionButtonChecker() + REMOVE_EXPEDITION_TOKEN + planet.getName(),
+                            "Remove From " + Helper.getPlanetRepresentation(planet.getName(), game)));
+                }
             }
         }
         return buttons;
+    }
+
+    public static void remindSharedDiscoveries(Game game, Tile activeSystem, Player activePlayer) {
+        if (game == null || activeSystem == null || activePlayer == null) {
+            return;
+        }
+
+        boolean hasExpeditionToken = activeSystem.getPlanetUnitHolders().stream()
+                .anyMatch(planet -> planet.getTokenList().contains(EXPEDITION_TOKEN)
+                        && activePlayer.equals(game.getPlayerThatControlsPlanet(planet.getName())));
+        if (!hasExpeditionToken) {
+            return;
+        }
+
+        for (Player player : game.getRealPlayers()) {
+            if (player.hasAbility(SHARED_DISCOVERIES)) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "-# "
+                                + player.getRepresentationNoPing()
+                                + ", reminder: the active system contains an expedition token on a planet controlled by "
+                                + activePlayer.getRepresentationNoPing()
+                                + ". You may use **Shared Discoveries** at the end of this tactical action.");
+            }
+        }
     }
 
     public static int getAvailableExpeditionTokens(Game game) {

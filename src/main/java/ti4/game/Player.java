@@ -2652,8 +2652,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             refreshPlanet("fabricatestation");
         }
 
-        ArcanumLeadersHandler.offerVeylaTheKeeperButtons(game, this, techID);
-
         // Update Owned Units when Researching a Unit Upgrade
         TechnologyModel techModel = Mapper.getTech(techID);
         if (techID == null) return;

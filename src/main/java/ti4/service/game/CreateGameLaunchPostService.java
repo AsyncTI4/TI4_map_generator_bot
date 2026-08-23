@@ -48,7 +48,7 @@ public class CreateGameLaunchPostService {
         String parentName = channel.getParentChannel().getName();
         if (MAKING_NEW_GAMES_CHANNEL.equalsIgnoreCase(parentName)
                 || MAKING_TIGL_GAMES_CHANNEL.equalsIgnoreCase(parentName)) {
-            buttons.add(Buttons.gray("searchForPlayers~MDL", "Search for Players"));
+            buttons.add(Buttons.green("searchForPlayers~MDL", "Join Matchmaking"));
         }
         buttons.add(Buttons.blue("launchGame", "Launch Game"));
         buttons.add(Buttons.gray("addSillyName~MDL", "Add Fun Game Name"));
