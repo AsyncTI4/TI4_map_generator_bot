@@ -3346,6 +3346,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!soID.isEmpty()) {
             player.removeSecret(soIDNumber);
+            if (Mapper.getSecretObjective(soID).getSource() == ComponentSource.erwans_gambit) {
+                return true;
+            }
             getSecretObjectives().add(soID);
             Collections.shuffle(getSecretObjectives());
             return true;

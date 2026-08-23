@@ -990,7 +990,7 @@ public class StartCombatService {
             if (game.isErwansGambitMode()
                     && "space".equalsIgnoreCase(type)
                     && "mentak".equalsIgnoreCase(player.getFaction())
-                    && capitalShips >= 3) {
+                    && capitalShips >= 2) {
                 mentakFound = true;
             }
             if (!"mentak".equalsIgnoreCase(player.getFaction())) {

@@ -71,7 +71,7 @@ public final class ButtonHelperAbilities {
     @ButtonHandler("drawHeistObj_")
     public static void drawHeistObj(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Integer type = Integer.parseInt(buttonID.split("_")[1]);
-        game.drawSecretObjective(buttonID, type);
+        game.drawSecretObjective(player.getUserID(), type);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " has drawn a Heist Objective worth " + type + " VP.");
@@ -84,7 +84,8 @@ public final class ButtonHelperAbilities {
             buttons.add(Buttons.green(
                     "changePoToSo_" + so, Mapper.getSecretObjective(so).getName()));
         }
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Choose which objective you wish to reveal.");
+        MessageHelper.sendMessageToChannel(
+                player.getCardsInfoThread(), "Choose which objective you wish to reveal.", buttons);
     }
 
     @ButtonHandler("changePoToSo_")
@@ -107,7 +108,8 @@ public final class ButtonHelperAbilities {
             buttons.add(Buttons.green(
                     "removePoToSo_" + so, Mapper.getSecretObjective(so).getName()));
         }
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Choose which objective you wish to reveal.");
+        MessageHelper.sendMessageToChannel(
+                player.getCardsInfoThread(), "Choose which objective you wish to remove.", buttons);
     }
 
     @ButtonHandler("removePoToSo_")

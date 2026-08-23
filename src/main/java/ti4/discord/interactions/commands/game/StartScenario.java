@@ -25,6 +25,7 @@ import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
+import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
@@ -201,9 +202,9 @@ public class StartScenario extends GameStateSubcommand {
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(),
                         "Multiple people tied in the auction with a bid of " + highest
-                                + " resources. Buttons have been sent to Mentak to break the tie.");
+                                + " resources. Buttons have been sent to Hacan to break the tie.");
                 List<Button> buttons = new ArrayList<>();
-                Player mentak = game.getPlayerFromColorOrFaction("mentak");
+                Player mentak = game.getPlayerFromColorOrFaction("hacan");
                 for (Player tied : highPlayers) {
                     buttons.add(Buttons.green("winAuction_" + tied.getFaction(), tied.getFactionNameOrColor()));
                 }
@@ -340,7 +341,7 @@ public class StartScenario extends GameStateSubcommand {
         techs.addAll(Mapper.getTechs().values());
         Collections.shuffle(techs);
         for (TechnologyModel model : techs) {
-            if (!model.getSource().isOfficial()) {
+            if (!model.getSource().isOfficial() || model.getSource() == ComponentSource.twilights_fall) {
                 continue;
             }
             if (!model.getFaction().isPresent()) {
@@ -368,7 +369,7 @@ public class StartScenario extends GameStateSubcommand {
         if (game.getRealPlayers().isEmpty()) {
             AddTileListService.addTileListToMap(
                     game,
-                    "{114} 20 41 42 23 109 22 40 47 59 60 79 24 25 77 32 26 45 0 68 33 0 61 36 0 19 50 0 110 27 0 21 46 0 117 28",
+                    "{112} 114 20 41 42 23 109 22 40 47 59 60 79 24 25 77 32 26 45 2 68 33 1 61 36 12 19 50 10 110 27 16 21 46 11 117 28",
                     event);
         }
         List<Player> players = new ArrayList<>();
@@ -420,7 +421,7 @@ public class StartScenario extends GameStateSubcommand {
             mentak.setTg(2);
             mentak.addAbility("safe_harbor");
         }
-        game.setStoredValue("unclaimedHSRelics", "hacan_sol_saar_letnev_jolnar");
+        game.setStoredValue("unclaimedRelicLocations", "hacan_sol_saar_letnev_jolnar_mr");
 
         Player hacan = game.getPlayerFromColorOrFaction("hacan");
         hacan.addAbility("contraband_auction");
@@ -434,10 +435,10 @@ public class StartScenario extends GameStateSubcommand {
         sol.addAbility("asset_recovery");
 
         if (game.getRealPlayers().size() == 6) {
+            game.drawSecretObjective(mentak.getUserID());
+            game.drawSecretObjective(mentak.getUserID());
+            game.drawSecretObjective(mentak.getUserID());
             DrawSecretService.dealSOToAll(event, 2, game);
-            game.drawSecretObjective(mentak.getUserID());
-            game.drawSecretObjective(mentak.getUserID());
-            game.drawSecretObjective(mentak.getUserID());
         }
     }
 }

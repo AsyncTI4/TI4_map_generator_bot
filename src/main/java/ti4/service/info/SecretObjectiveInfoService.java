@@ -91,7 +91,7 @@ public class SecretObjectiveInfoService {
             buttons.add(Buttons.green("drawHeistObj_1", "Draw 1 VP Heist Objective"));
             buttons.add(Buttons.green("drawHeistObj_2", "Draw 2 VP Heist Objective"));
             buttons.add(Buttons.gray("revealHeistObj", "Reveal Heist Objective"));
-            buttons.add(Buttons.gray("removeHeistObj", "Remove Revealed Heist Objective"));
+            buttons.add(Buttons.red("removeHeistObj", "Remove Revealed Heist Objective"));
         }
 
         ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
