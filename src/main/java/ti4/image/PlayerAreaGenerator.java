@@ -43,6 +43,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
@@ -2749,7 +2750,12 @@ public class PlayerAreaGenerator {
             g2.setStroke(stroke2);
 
             drawFactionIconImage(graphics, faction, x - 1, y + 108, 42, 42);
-            String synergies = model.getBackgroundResource(unl && !exh);
+            BreakthroughModel copiedDataBreach = "netrunnersbt".equals(bt)
+                    ? NetrunnersBreakthroughHandler.getCopiedDataBreachBreakthrough(game, player)
+                    : null;
+            String synergies = copiedDataBreach == null
+                    ? model.getBackgroundResource(unl && !exh)
+                    : copiedDataBreach.getBackgroundResource(unl && !exh);
             drawPAImage(x, y, synergies);
             if (model.getShrinkName()) {
                 graphics.setFont(Storage.getFont16());
@@ -2762,6 +2768,12 @@ public class PlayerAreaGenerator {
             if (!unl) textColor = Color.red;
             graphics.setColor(textColor);
             drawRectWithOverlay(graphics, x, y - 2, 44, 152, model);
+            if (copiedDataBreach != null) {
+                String copiedFaction = NetrunnersBreakthroughHandler.getDataBreachTargetFaction(game, player);
+                if (copiedFaction != null) {
+                    drawFactionIconImage(graphics, copiedFaction, x + 20, y + 2, 20, 20);
+                }
+            }
 
             if (player.getBreakthroughTGs(bt) > 0) {
                 BufferedImage tg = ImageHelper.readEmojiImageScaled(MiscEmojis.tg, 40);

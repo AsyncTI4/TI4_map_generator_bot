@@ -58,7 +58,6 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRid
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaBreakthroughHandler;
@@ -8093,11 +8092,6 @@ public class ButtonHelper {
             } else {
                 playersWithPds2.add(hiveEchoPlayer);
             }
-        }
-        if (game.getRealPlayers().stream()
-                .anyMatch(player -> game.playerHasLeaderUnlockedOrAlliance(player, "netrunnerscommander"))) {
-            playersWithPds2.addAll(NetrunnersLeadersHandler.getCommanderSpaceCannonPlayers(
-                    targetPlayer, game, tilePos, playersWithPds2));
         }
         return playersWithPds2;
     }

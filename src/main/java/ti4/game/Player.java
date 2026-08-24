@@ -524,6 +524,20 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 synergies.addAll(getBreakthroughModel(bt).getSynergy());
             }
         }
+        if (isBreakthroughUnlocked("netrunnersbt")) {
+            String dataBreach = game.getStoredValue("netrunnersDataBreach" + getFaction());
+            String[] parts = dataBreach.split("~", 2);
+            if (parts.length == 2) {
+                Player target = game.getPlayerFromColorOrFaction(parts[0]);
+                BreakthroughModel copiedBreakthrough = Mapper.getBreakthrough(parts[1]);
+                if (target != null
+                        && target.hasBreakthrough(parts[1])
+                        && copiedBreakthrough != null
+                        && copiedBreakthrough.getSynergy() != null) {
+                    synergies.addAll(copiedBreakthrough.getSynergy());
+                }
+            }
+        }
         if (hasRelic("quantumcore")) {
             synergies.addAll(List.of(
                     TechnologyType.BIOTIC,
@@ -2359,6 +2373,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public boolean hasTech(String techID) {
+        if (techID == null) return false;
         if ("det".equals(techID) || "amd".equals(techID)) {
             if (getTechs().contains("absol_" + techID)) {
                 return true;

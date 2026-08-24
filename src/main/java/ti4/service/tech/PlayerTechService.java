@@ -17,6 +17,9 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
@@ -91,6 +94,8 @@ public class PlayerTechService {
         if (gainedTech) {
             ArcanumUnitHandler.getRuneboundButtons(player, game, techID);
         }
+        NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
+        NetrunnersUnitsHandler.offerLegionDeploy(game, player);
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
         String message = player.getRepresentation() + " added technology: "
                 + Mapper.getTech(techID).getRepresentation(false) + ".";
@@ -116,7 +121,8 @@ public class PlayerTechService {
         if ("tharcanumpmy".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             message += "\nAdded _Fabricate Station_ and its planet cards to your play area.";
         }
-        CommanderUnlockCheckService.checkPlayer(player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum");
+        CommanderUnlockCheckService.checkPlayer(
+                player, "mirveda", "jolnar", "nekro", "dihmohn", "kryxos", "arcanum", "netrunners");
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 
@@ -271,6 +277,7 @@ public class PlayerTechService {
         }
 
         player.exhaustTech(tech);
+        NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
         if (!GameEventDraft.stage(game, new GameSubEvent.TechExhausted(player.getFaction(), tech))) {
             GameEventService.commit(game, GameEventType.CARD_PLAY_TECH_EXHAUST, player, Map.of("cardId", tech));
         }
@@ -808,6 +815,8 @@ public class PlayerTechService {
             CommanderUnlockCheckService.checkPlayer(player, "zealots");
         }
         player.addTech(techID);
+        NetrunnersAbilitiesHandler.offerNeuralInstruments(game, player);
+        NetrunnersUnitsHandler.offerLegionDeploy(game, player);
         ArcanumUnitHandler.getRuneboundButtons(player, game, techID);
         if (isResearch) {
             ArcanumLeadersHandler.offerVeylaTheKeeperButtons(game, player, techID);
@@ -964,7 +973,8 @@ public class PlayerTechService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), buttonText, buttons);
         }
-        CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn", "kryxos", "arcanum");
+        CommanderUnlockCheckService.checkPlayer(
+                player, "jolnar", "nekro", "mirveda", "dihmohn", "kryxos", "arcanum", "netrunners");
 
         if (game.isTwilightsFallMode()
                 && game.getRound() == 1
@@ -1075,6 +1085,10 @@ public class PlayerTechService {
         }
         if ("res".equals(payType)) {
             buttons.addAll(dwsCommanders);
+        }
+        Button netrunnersAgentDiscount = NetrunnersLeadersHandler.getAgentDiscountButton(game, player, tech, payType);
+        if (netrunnersAgentDiscount != null) {
+            buttons.add(netrunnersAgentDiscount);
         }
         if (!techM.isUnitUpgrade() && player.hasAbility("iconoclasm")) {
             int culturalFragments = ButtonHelperExplore.getNormalFragmentCount(player, Constants.CULTURAL);
