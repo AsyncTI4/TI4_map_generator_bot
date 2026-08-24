@@ -23,6 +23,7 @@ import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecBut
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ardentia.ArdentiaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionLeaderHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
@@ -538,7 +539,7 @@ public final class ButtonHelperAgents {
                 ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             }
         }
-        if (tileDestination != null && tileDestination.getPosition().startsWith("frac")) {
+        if (tileDestination != null && tileDestination.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), message + ".");
@@ -1584,6 +1585,14 @@ public final class ButtonHelperAgents {
             }
             AeternaLeadersHandler.startAeternaAgent(game, target);
         }
+        if ("veyloragent".equalsIgnoreCase(agent)) {
+            Player target = game.getPlayerFromColorOrFaction(rest.substring(rest.indexOf('_') + 1));
+            if (target == null) {
+                MessageHelper.sendMessageToChannel(channel, "Could not find the selected Veylor Agent target.");
+                return;
+            }
+            VeylorLeadersHandler.startVeylorAgent(game, target);
+        }
 
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             String exhaustedMessage = buttonEvent.getMessage().getContentRaw();
@@ -2443,7 +2452,7 @@ public final class ButtonHelperAgents {
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         CommanderUnlockCheckService.checkPlayer(player, "titans", "saar", "rohdhna", "cheiran", "celdauri");
-        if (tile != null && tile.getPosition().startsWith("frac")) {
+        if (tile != null && tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
         AgendaHelper.ministerOfIndustryCheck(player, game, game.getTileFromPlanet(planet), event);

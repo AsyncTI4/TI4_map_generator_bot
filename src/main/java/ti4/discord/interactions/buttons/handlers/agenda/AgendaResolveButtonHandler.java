@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.AbolishmentAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.AbsolAbolishmentAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.AbsolArtifactAgendaResolver;
@@ -427,7 +428,10 @@ class AgendaResolveButtonHandler {
         boolean heroActive = VeylorLeadersHandler.isVeylorAgendaPhase(game)
                 && game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
         boolean veylorBtExtraAgenda = "yes".equals(game.getStoredValue("veylorBtExtraAgenda"));
-        int agendaLimit = 2 + (heroActive ? 1 : 0) + (veylorBtExtraAgenda ? 1 : 0);
+        int agendaLimit = 2
+                + (heroActive ? 1 : 0)
+                + (veylorBtExtraAgenda ? 1 : 0)
+                + (RelitigateLLButtonHandler.hasExtraAgenda(game) ? 1 : 0);
         if (aCount <= agendaLimit || game.isAbsolMode()) {
             buttons.add(Buttons.blue("flip_agenda", "Flip Agenda #" + aCount));
         }

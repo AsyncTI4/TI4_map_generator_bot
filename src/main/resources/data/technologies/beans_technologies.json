@@ -9,7 +9,7 @@
         "faction": "dream",
         "baseUpgrade": "dd2",
         "source": "beans",
-        "text": "At the end of a tactical action in this unit's system, you may place or move 1 nexus token into any system that contains your units."
+        "text": "At the end of a tactical action in this unit's system, you may place or move 1 nexus token into a non-home system that contains 1 or more of your ships and no other player's ships."
     },
     {
         "alias": "bedreamneg",
@@ -20,7 +20,7 @@
         "requirements": "BB",
         "faction": "dream",
         "source": "beans",
-        "text": "During your tactical actions, apply +1 to the move value of any ship that starts its movement in a system that contains 1 or more of oyur nexus tokens."
+        "text": "During your tactical actions, apply +1 to the move value of any ship that starts its movement in a system that contains 1 or more of your nexus tokens. You may treat nebulas as adjacent to each other for the purposes of movement."
     },
     {
         "alias": "becrystda",
@@ -65,7 +65,7 @@
         "faction": "ashen",
         "baseUpgrade": "inf2",
         "source": "beans",
-        "text": "When this unit would be destroyed, roll 1 die. On a 6 or higher, you may produce 1 hit. If you do, place this unit on this card. At the start of your next turn, place each unit that is on this card on planets you control in your home system."
+        "text": "DEPLOY: At the start of a round of ground combat on a planet you control, you may place 1 captured infantry from your faction sheet on that planet."
     },
     {
         "alias": "beashendn",
@@ -132,19 +132,18 @@
         "requirements": "Y",
         "faction": "netrunners",
         "source": "beans",
-        "text": "At the start of the status phase, gain 1 trade good for every 2 other player's control tokens on your faction sheet."
+        "text": "At the start of the status phase, gain 1 trade good for every control token on your faction sheet."
     },
     {
-        "alias": "benetrunnerssd",
-        "name": "Siphon II",
+        "alias": "benetrunnersbo",
+        "name": "Blackout",
         "types": [
-            "UNITUPGRADE"
+            "WARFARE"
         ],
-        "requirements": "YY",
+        "requirements": "RR",
         "faction": "netrunners",
-        "baseUpgrade": "sd2",
         "source": "beans",
-        "text": "This unit's PRODUCTION value is equal to 4 more than this planet's resource value. When using this unit's PRODUCTION ability, discount the combined cost of the units produced by 1 for every 2 other player's control tokens on your faction sheet. Up to 3 fighters in this system do not count against capacity."
+        "text": "When another player activates a system that contains your units, you may choose 1 non-unit upgrade technology owned by that player. That technology has no effect until the end of their turn."
     },
     {
         "alias": "benataudo",

@@ -191,6 +191,7 @@ public class TEOptionService {
             case "newpok" -> {
                 game.removeStoredValue("useOldPok");
                 game.setThundersEdge(false);
+                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"));
             }
             case "oldpok" -> {
                 game.setStoredValue("useOldPok", "true");
@@ -319,6 +320,13 @@ public class TEOptionService {
             galacticEventButtons.add(Buttons.red("enableDaneMode_WeirdWormholes_disable", "Disable Weird Wormholes"));
         } else {
             galacticEventButtons.add(Buttons.green("enableDaneMode_WeirdWormholes_enable", "Enable Weird Wormholes"));
+        }
+        if (game.isCosmicConvergenceMode()) {
+            galacticEventButtons.add(
+                    Buttons.red("enableDaneMode_CosmicConvergence_disable", "Disable Cosmic Convergence"));
+        } else {
+            galacticEventButtons.add(
+                    Buttons.green("enableDaneMode_CosmicConvergence_enable", "Enable Cosmic Convergence"));
         }
         if (game.isWildWildGalaxyMode()) {
             galacticEventButtons.add(Buttons.red("enableDaneMode_WildGalaxy_disable", "Disable Wild, Wild Galaxy"));

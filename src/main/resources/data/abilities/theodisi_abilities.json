@@ -26,8 +26,8 @@
         "id": "mandate_of_presence",
         "name": "Mandate of Presence",
         "faction": "verydith",
-        "window": "Once per action phase, when you perform a strategic action:",
-        "windowEffect": "Select 1 player and 1 system that contains 1 or more of your units, contains no legendary planets, and contains no other player's units. That player places 1 command token from their reinforcements in that system.",
+        "window": "When you pass:",
+        "windowEffect": "You may spend 1 command token from your strategy pool to perform the primary ability of the Diplomacy strategy card.",
         "source": "theodisi"
     },
     {
@@ -128,21 +128,21 @@
         "id": "forbidden_knowledge",
         "name": "Forbidden Knowledge",
         "faction": "arcanum",
-        "permanentEffect": "Primordial technologies have no ability text unless the player using their effect has 4 other technologies of that color.",
+        "permanentEffect": "The effects of Primordial technologies cannot be used by other players. Primordial technologies have no ability text unless the player using their effect has 4 other technologies of that color, ignoring synergies.",
         "source": "theodisi"
     },
     {
         "id": "sting_of_the_hive",
         "name": "Sting of the Hive",
         "faction": "xytheris",
-        "permanentEffect": "When you produce a hit with a unit ability, you may place 1 mine token in the active system instead.\n\nAfter movement, if the active system contains 1 or more mine tokens, remove any number of those tokens to gain 1 commodity for each token removed or produce hits on the active player's units up to the number of tokens removed.",
+        "permanentEffect": "When you produce 1 or more hits with a unit ability, you may cancel any number of those hits to place that many mine tokens in that system.\n\nAfter movement, if the active system contains 1 or more of your units, you may remove any number of mine tokens from that system to produce that many hits or gain that many commodities.",
         "source": "theodisi"
     },
     {
         "id": "hive_echo",
         "name": "Hive Echo",
         "faction": "xytheris",
-        "permanentEffect": "During SPACE CANNON OFFENSE, a unit with SPACE CANNON up to 2 systems away may use it against units in the active system. During BOMBARDMENT and ANTI-FIGHTER BARRAGE steps, if the active system contains 1 of your ships, a unit with that unit ability up to 2 systems away may use it against units in the active system.",
+        "permanentEffect": "When you would use SPACE CANNON, ANTI-FIGHTER BARRAGE, or BOMBARDMENT, except during SPACE CANNON DEFENSE, in a system containing your ships, a unit with that unit ability up to 2 systems away may use it as if it were in the active system.",
         "source": "theodisi"
     },
     {
@@ -204,7 +204,7 @@
         "name": "Cycle of Reclamation",
         "faction": "aeterna",
         "window": "During setup:",
-       "windowEffect": "Place the moon phase cards in your play area.\n\nWhen 1 or more units are destroyed in a system containing or adjacent to a system containing your units except during a combat on your tactical actions, capture 1 neutral destroyer.",
+       "windowEffect": "Place the moon phase cards in your play area.\n\nOnce per action, except during your tactical actions and whenever you use a unit ability: if a unit is destroyed in a system containing or adjacent to a system containing 1 of your ships, you may capture 1 neutral destroyer.",
         "source": "theodisi"
     },
     {
@@ -266,7 +266,7 @@
         "id": "rallying_cry",
         "name": "Rallying Cry",
         "faction": "ponthous",
-        "permanentEffect": "Systems that contain exactly 1 of your ships gain PRODUCTION 2 as if they were units.",
+        "permanentEffect": "Systems that contain exactly 1 of your non-fighter ships gain PRODUCTION 2 as if they were units.",
         "source": "theodisi"
     }
 ]

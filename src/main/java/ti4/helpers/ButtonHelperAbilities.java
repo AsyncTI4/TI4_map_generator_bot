@@ -43,6 +43,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.tactical.TacticalActionService;
@@ -65,6 +66,62 @@ public final class ButtonHelperAbilities {
                 player.getRepresentation() + " placed 1 of " + p2.getRepresentation()
                         + " control tokens on their sheet via their **Data Recovery** ability.");
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
+    @ButtonHandler("drawHeistObj_")
+    public static void drawHeistObj(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Integer type = Integer.parseInt(buttonID.split("_")[1]);
+        game.drawSecretObjective(player.getUserID(), type);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " has drawn a Heist Objective worth " + type + " VP.");
+    }
+
+    @ButtonHandler("revealHeistObj")
+    public static void revealHeistObj(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<>();
+        for (String so : player.getSecretsUnscored().keySet()) {
+            buttons.add(Buttons.green(
+                    "changePoToSo_" + so, Mapper.getSecretObjective(so).getName()));
+        }
+        MessageHelper.sendMessageToChannel(
+                player.getCardsInfoThread(), "Choose which objective you wish to reveal.", buttons);
+    }
+
+    @ButtonHandler("changePoToSo_")
+    public static void changePoToSo(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String so = buttonID.split("_")[1];
+        game.addToSoToPoList(so);
+        player.removeSecret(player.getSecrets().get(so));
+        Integer poIndex = game.addCustomPO(Mapper.getSecretObjectivesJustNames().get(so), 1);
+        MessageHelper.sendMessageToChannelWithEmbed(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " has revealed a Heist Objective.",
+                Mapper.getSecretObjective(so).getRepresentationEmbed());
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("removeHeistObj")
+    public static void removeHeistObj(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<>();
+        for (String so : game.getSoToPoList()) {
+            buttons.add(Buttons.green(
+                    "removePoToSo_" + so, Mapper.getSecretObjective(so).getName()));
+        }
+        MessageHelper.sendMessageToChannel(
+                player.getCardsInfoThread(), "Choose which objective you wish to remove.", buttons);
+    }
+
+    @ButtonHandler("removePoToSo_")
+    public static void removePoToSo(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String so = buttonID.split("_")[1];
+        game.getSoToPoList().remove(so);
+        game.removeCustomPO(Mapper.getSecretObjectivesJustNames().get(so));
+        MessageHelper.sendMessageToChannelWithEmbed(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " has removed a Heist Objective.",
+                Mapper.getSecretObjective(so).getRepresentationEmbed());
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("mirvedaFS_")
@@ -1775,6 +1832,29 @@ public final class ButtonHelperAbilities {
         }
     }
 
+    /** How a "you may gain 1 trade good" trigger that could hand a Mentak neighbor a Pillage opportunity should be resolved. */
+    public enum PillageGainMode {
+        /** No Pillage risk worth prompting about (or the table hasn't opted in to FoW prompting) - grant automatically. */
+        AUTO,
+        /**
+         * FoW game with {@link FOWOption#OPTIONAL_PILLAGABLE_TG} enabled - always offer a private opt-in,
+         * regardless of actual Pillage range, so the prompt's mere appearance never leaks that a pillager is nearby.
+         */
+        FOW_OPT_IN,
+        /** Non-FoW game and actually in Pillage range (public info there) - offer an opt-in naming Pillage explicitly. */
+        RANGE_OPT_IN
+    }
+
+    public static PillageGainMode resolveOptionalTgGainMode(Player player, Game game) {
+        if (game.isFowMode() && game.getFowOption(FOWOption.OPTIONAL_PILLAGABLE_TG)) {
+            return PillageGainMode.FOW_OPT_IN;
+        }
+        if (!game.isFowMode() && canBePillaged(player, game, player.getTg() + 1)) {
+            return PillageGainMode.RANGE_OPT_IN;
+        }
+        return PillageGainMode.AUTO;
+    }
+
     public static boolean canBePillaged(Player player, Game game, int tg) {
         if (player.getPromissoryNotesInPlayArea().contains("pop")) {
             return false;
@@ -1983,7 +2063,10 @@ public final class ButtonHelperAbilities {
                     && !techToGain.contains(tech)
                     && !"iihq".equalsIgnoreCase(tech)
                     && !"thveylorg".equalsIgnoreCase(tech)
-                    && !"tharcanumpmy".equalsIgnoreCase(tech)) {
+                    && !"tharcanumpmy".equalsIgnoreCase(tech)
+                    && !"tharcanumpmg".equalsIgnoreCase(tech)
+                    && !"tharcanumpmr".equalsIgnoreCase(tech)
+                    && !"tharcanumpmb".equalsIgnoreCase(tech)) {
                 if (!game.playerHasLeaderUnlockedOrAlliance(victim, "bastioncommander")
                         || !Mapper.getTech(tech).isFactionTech()) {
                     if (game.isTwilightsFallMode()

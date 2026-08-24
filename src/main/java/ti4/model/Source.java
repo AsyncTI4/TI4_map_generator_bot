@@ -37,6 +37,7 @@ public class Source {
         blue_reverie,
         twilight_kart,
         twilight_ds,
+        pally,
 
         // lil homebrew
         lazax,
@@ -55,6 +56,8 @@ public class Source {
         gamma,
         black_spectrum,
         addiction,
+        expanded_fracture,
+        erwans_gambit,
 
         // async homebrew
         draft,

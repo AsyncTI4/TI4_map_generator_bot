@@ -19,6 +19,9 @@ import ti4.message.MessageHelper;
 public class OblivionUnitHandler {
 
     public static void doOblivionMechCheck(Game game, Player player) {
+        if (game == null || player == null) {
+            return;
+        }
         OblivionLeadersHandler.offerCommanderProduction(game, player);
         if (!player.hasUnit("oblivion_mech")) {
             return;
@@ -97,12 +100,16 @@ public class OblivionUnitHandler {
 
         if (flagshipPositions.contains(position)) {
             game.getTileMap().values().stream()
-                    .filter(tile -> !tile.getPosition().startsWith("frac"))
+                    .filter(tile -> !tile.isFracture())
                     .filter(tile -> tile.getPlanetUnitHolders().isEmpty())
                     .map(Tile::getPosition)
                     .forEach(adjacentPositions::add);
-        } else if (!position.startsWith("frac")) {
-            adjacentPositions.addAll(flagshipPositions);
+        } else {
+            Tile currentTile = game.getTileByPosition(position);
+            boolean inFracture = currentTile != null ? currentTile.isFracture() : position.startsWith("frac");
+            if (!inFracture) {
+                adjacentPositions.addAll(flagshipPositions);
+            }
         }
     }
 }

@@ -1,0 +1,483 @@
+[
+    {
+        "alias": "unchart_space",
+        "name": "Uncharted Space",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Draw 1 random unused red tile and place it on the edge of the game board so that it is adjacent to 2 other tiles. If that system contains no other planets, place a frontier token in it.",
+        "flavorText": "*\"The cultist brought up the star chart and smiled. They were closer now to oblivion than they had ever been.\"*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "ancient_maps",
+        "name": "Ancient Maps",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Purge 2 relic fragments and draw 1 random unused blue tile. Place it on the edge of the game board so that it is adjacent to 2 other tiles.",
+        "flavorText": "*\"I've no idea where we bloody are,\" shouted the Kairn. \"This map's been in my family for nearly a millennium, but we are archaeologists, not cartographers.\"*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "dark_energy_spike",
+        "name": "Dark Energy Spike",
+        "phase": "Action",
+        "window": "When you explore a planet you control",
+        "text": "Explore the frontier deck in that system.",
+        "flavorText": "*The Oblivion systems had long since been fine-tuned to detect dark energy concentrations in barren systems. It was very rare to see them in occupied ones, though.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "overlooked_findings",
+        "name": "Overlooked Findings",
+        "phase": "Action",
+        "window": "When you explore a planet you control",
+        "text": "Place 1 card from the discard pile of that explore deck on top of its respective deck.",
+        "flavorText": "*\"If you wanted it so much, we wouldn't find this kind of stuff in your dumps. You see a Kairn take it though, and suddenly you're acting like we're taking your birthright.\" - Serrel Venn*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "mass_hypnosis",
+        "name": "Mass Hypnosis",
+        "phase": "Action",
+        "window": "At the start of a round of space combat",
+        "text": "Select 1 ship your opponent controls in that system. During this round of combat, hits produced by that unit are assigned to your opponent's units instead.",
+        "flavorText": "*The crew's shouts of joy were cut short as they realized their fallen dreadnought was no longer fighting against the Revenant, but for them.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "mirror_shielding",
+        "name": "Mirror Shielding",
+        "phase": "Action",
+        "window": "At the end of a round of combat",
+        "text": "Produce hits against your opponent's units equal to the number of hits you canceled during that round of combat.",
+        "flavorText": "*Seraxis chittered gleefully as the shots fired at the Evolution's chitin plating were redirected back at the enemy fleet.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "extension_refit",
+        "name": "Extension Refit",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Remove 1 attachment from a planet you control and reattach it to a non-home non-legendary planet you control.",
+        "flavorText": "*The Chaos Engines of Aurelion roared as they began restructuring the atmosphere and population of Ponthous.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "initiative_outpost",
+        "name": "Initiative Outpost",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Attach this card to a non-home planet you control. When that planet is exhausted during the action phase, you may draw 1 action card.",
+        "flavorText": "*The Grand Cardinal considers this installation an invstment in the continued recruitment of the devoted.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "exploration_outpost",
+        "name": "Exploration Outpost",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Attach this card to a non-home planet you control. When that planet is exhausted during the action phase, you may explore 1 other planet you control.",
+        "flavorText": "*Initial scans may have revealed very little under the surface, but Zairos knew better than to trust a scanner when it came to matters of import.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "assembly_outpost",
+        "name": "Assembly Outpost",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Attach this card to a non-home planet you control. When that planet is exhausted during the action phase, you may produce 1 unit in that planet's system.",
+        "flavorText": "*Malformed Myrr were a treasure among the galaxy, as a single Forgemaster could produce an armada fit for large-scale battle.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "market_outpost",
+        "name": "Market Outpost",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Attach this card to a non-home planet you control. When that planet is exhausted during the action phase, choose 1 other player. You both gain 1 trade good and may perform a transaction.",
+        "flavorText": "*The Galactic Market was one of the Verydith's crowning achievements among the war-torn galaxy.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "tactical_retreat",
+        "name": "Tactical Retreat",
+        "phase": "Action",
+        "window": "When a player moves ships into a system that contains 1 or more of your ships",
+        "text": "Move up to 2 of your non-fighter ships from the active system into an adjacent system that contains no other player's ships. Those ships may transport units.",
+        "flavorText": "*The queen prefers we remain alive, and I'm not one to qustion her orders.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "rigged_explosives",
+        "name": "Rigged Explosives",
+        "phase": "Action",
+        "window": "When a system that contains your ground forces is activated",
+        "text": "Up to 5 of your ground forces in the active system gain SPACE CANNON equal to their COMBAT value until the end of that action. Ground forces that use SPACE CANNON but do not produce at least 1 hit are destroyed.",
+        "flavorText": "*\"I wouldn't be so sure you've won just yet,\" cried Melloh, finger primed on the trigger.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "raised_morale",
+        "name": "Raised Morale",
+        "phase": "Action",
+        "window": "At the start of a round of combat or when you would use a unit ability",
+        "text": "Treat each of your damaged units in that combat as galvanized until the end of that combat.",
+        "flavorText": "*\"You think this is enough to stop us?\"*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "relitigate",
+        "name": "Relitigate",
+        "phase": "Agenda",
+        "window": "At the start of the agenda phase",
+        "text": "Select 1 agenda in the discard pile. Players immediately vote on that agenda as if it had just been revealed.",
+        "flavorText": "*\"Next on the docket, I'd like to revisit resolution 13579103, if you'll just turn to page....\"*",
+        "notes": "Pre-set this card.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "demoralizing_environment",
+        "name": "Demoralizing Environment",
+        "phase": "Action",
+        "window": "At the start of a round of combat",
+        "text": "Apply -2 to each of your opponent's non-fighter combat rolls during this combat round.",
+        "flavorText": "*The Throne had already destabilized the planet's environment. Any firther damage and it would become entirely uninhabitable.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "dedicated_study",
+        "name": "Dedicated Study",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Purge 1 non-faction non-unit technology with 2 or more prerequisites. Then, research 2 other technologies in the same color with a combined number of prerequisites equal to that technology.",
+        "flavorText": "*Arcanum scholars spend a lifetime just attempting to scratch the surface of understanding.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "borrowed_time",
+        "name": "Borrowed Time",
+        "phase": "Action",
+        "window": "At the end of your turn",
+        "text": "Spend up to 2 trade goods. Skip that many of your next turns.",
+        "flavorText": "*\"Sacrifice who you must, we need only buy ourselves a bit of time.\" - Viren Tolar*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "political_marriage",
+        "name": "Political Marriage",
+        "phase": "Action",
+        "window": "At the start of another player's turn",
+        "text": "That player cannot activate a system that contains your units during that turn.",
+        "flavorText": "*\"My dad always said, 'Anything for the sake of diplomacy,' but I doubt he saw me marrying a bug when he said that.\"*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "enlistment",
+        "name": "Enlistment",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Place 2 infantry from your reinforcements on a non-home planet adjacent to 1 or more of your units. Then, resolve combat on that planet.",
+        "flavorText": "*\"We take this fight to a new front.\"*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "combat_initiative",
+        "name": "Combat Initiative",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Perform a tactical action in a system using a token from your reinforcements. During that tactical action, you may only move 1 non-fighter ship.",
+        "flavorText": "*\"You might find our methods detectable, but if there were no market for what we sell, we simply wouldn't sell it.\" - Ellar Liser*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "precision_targeting",
+        "name": "Precision Targeting",
+        "phase": "Action",
+        "window":"At the start of a round of space combat",
+        "text": "Choose 2 non-fighter ships your opponent controls in the active system. At least 1 hit produced by your units during this combat round must be assigned to those ships, if able.",
+        "flavorText": "*Reflex enhancements helped this particular brood of Kryxos make shots that outclassed any computerized system in the stars.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "orbital_evacuation",
+        "name": "Orbital Evacuation",
+        "phase": "Action",
+        "window": "After another player commits ground forces to a planet you control",
+        "text": "Remove each of your ground forces from planets you control in the active system and place them on other planets you control.",
+        "flavorText": "*The Queensguard ushered the queen to her escape pod. The Hive may fall, but its spirit would endure.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "administrative_exemption",
+        "name": "Administrative Exemption",
+        "phase": "Action",
+        "window": "When you would resolve the secondary ability of a strategy card",
+        "text": "You do not have to spend a command token.",
+        "flavorText": "*\"As you can see, the contract states payment is to be administered by the Galactic Council AFTER services rendered, not before.\"*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "emergency_appropriations",
+        "name": "Emergency Appropriations",
+        "phase": "Action",
+        "window": "When you spend resources",
+        "text": "You can spend influence as if it were resources.",
+        "flavorText": "*The Veylor's lobbying attempts seemed to have worked a true miracle, as even the Verydith diplomat couldn't seem to deny their request for funding.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "wildlife_preservation",
+        "name": "Wildlife Preservation",
+        "phase": "Action",
+        "window": "When you spend influence",
+        "text": "You can spend resources as if it were influence.",
+        "flavorText": "*\"Bah, let the diplomats have their 'wildlife sanctuary.' This isn't the only habital planet in this system.\"*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "prototype_deployment",
+        "name": "Prototype Deployment",
+        "phase": "Action",
+        "window": "After you research a non-war sun unit upgrade technology",
+        "text": "Place 1 unit of that type from your reinforcements in a system that contains 1 or more of your space docks, or on a planet you control if that unit is a ground force or structure.",
+        "flavorText": "*\"The Master requested the finest fleets we can muster,\" chimed the Myrr. \"Your plans are acceptable, Kryxos.\"*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "retrofitting",
+        "name": "Retrofitting",
+        "phase": "Action",
+        "window": "When a system is activated",
+        "text": "Gain 1 unit upgrade technology. Return that technology to your technology deck at the end of that tactical action.",
+        "flavorText": "*\"The older cruiser models were unfit for combat, but with a few quick modifications we can make them ready enough.\" - Seraxis Thule*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "senate_gridlock",
+        "name": "Senate Gridlock",
+        "phase": "Agenda",
+        "window": "After all players have voted on an agenda, before resolving its outcome",
+        "text": "If you cast at least 1 vote for an outcome, you may cast additional votes for that outcome equal to the number of votes 1 other player cast on a different outcome.",
+        "flavorText": "*\"Hold!\" shouted Gilbrand. \"I have a few senators who would like to change their votes.\"*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "exploration_rider",
+        "name": "Exploration Rider",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "You cannot vote on this agenda. Predict aloud the outcome of this agenda. If your prediction is correct, explore 1 planet you conrol of each trait.",
+        "flavorText": "*\"I'm willing to work with you, but I'll need mineral rights to the area before I can convince our diplomats of anything.\"*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "archaeologist_coop",
+        "name": "Archaeologist Co-op",
+        "phase": "Action",
+        "window": "When you explore a planet you control",
+        "text": "You also explore each other planet you control in that system.",
+        "flavorText": "*There is no flavor text for this one. Blame Theodisi, I asked and he never told me what to put here. I guess I can say whatever I want, not like anyone really reads these anyways, right?*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "deconstructed_militia",
+        "name": "Deconstructed Militia",
+        "phase": "Action",
+        "window": "At the end of movement",
+        "text": "Remove 1 non-fighter ship with a cost of 4 or less from the active system. Place fighters in the active system with a combined cost equal to that unit's cost.",
+        "flavorText": "*The Myrr worked with surprising haste deconstructing the Dreadnought class for parts.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "collaborative_research",
+        "name": "Collaborative Research",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Select 1 player. Each of you may spend 2 trade goods. If you both do, you may research 1 non-faction technology that player does not own. If you do, that player gains that technology.",
+        "flavorText": "*The Arcanum rarely share secrets with outsiders unless sharing said secrets can help them uncover others.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "shared_resources",
+        "name": "Shared Resources",
+        "phase": "Action",
+        "window": "When you exhaust a planet you control",
+        "text": "Treat it as if it had the resource value of 1 other planet you control.",
+        "flavorText": "*The vassal bowed to the Throne of Wrath. \"Not to worry, our terraformers will have this place stripped of its resources immediately, sire.\"*",
+        "notes": "This must be played after exhausting a planet.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "forward_assembly",
+        "name": "Forward Assembly",
+        "phase": "Action",
+        "window": "When you produce 1 or more units",
+        "text": "You may place any number of those units in an adjacent system that contains 1 or more of your ships and no other players' ships.",
+        "flavorText": "*Myrr productions systems were so vast they could span not only whole systems but even clusters of stars.*",
+        "notes": "For best results, play after producing, before paying.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "priority_requisition",
+        "name": "Priority Requisition",
+        "phase": "Action",
+        "window": "When you produce 1 or more units",
+        "text": "Return 1 non-fighter ship you control in that system to your reinforcements. Reduce the combined cost of the produced units by the cost of the returned ship +2.",
+        "flavorText": "*The Myrr had never tried converting a full moon before, but the threat of Ruin warranted a deviation from the Master's mandate.*",
+        "notes": "For best results, play before paying, after producing.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "ecological_survey",
+        "name": "Ecological Survey",
+        "phase": "Action",
+        "window": "When you would explore a planet",
+        "text": "Look at the top card of each exploration deck. Choose 1 to resolve and discard the rest.",
+        "flavorText": "*The ancient Kairn radar had already sprung to life, norifying Zairos they had found a new home.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "transit_rider",
+        "name": "Transit Rider",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "You cannot vote on this agenda. Predict aloud the outcome of this agenda. If your prediction is correct, perform a tactical action in a system containing no other player's units without spending a command token. Unit abilities cannot be used during this tactical action.",
+        "flavorText": "*The Slavers were shrewd negotiators, not willing to assist in glactic crises until their travel routes were free of impediment.*",
+        "source": "theodisi"
+    },
+    {
+        "alias": "fsll",
+        "name": "Flank Speed",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "Apply +1 to the move value of each of your ships during this tactical action.",
+        "automationID": "flank_speed",
+        "flavorText": "Mendosa smirked. \"Don't ye fret now, girl. It sounds like ye've got somewhere ta be in a hurry, and it just se happens that I ken get ye there right quick.\"",
+        "source": "theodisi",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "After you activate a system",
+        "wildWildText": "Apply +2 to the move value of each of your ships during this tactical action."
+    },
+    {
+        "alias": "dhll",
+        "name": "Direct Hit",
+        "phase": "Action",
+        "window": "After another player's ship uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
+        "text": "Destroy that ship.",
+        "automationID": "direct_hit",
+        "flavorText": "There it was! An opening! Neekuaq gestured wildly, a rare display for one normally quite reserved. \"Fire the main battery!\"",
+        "source": "theodisi",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "After another player's ship or mech uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
+        "wildWildText": "Destroy that unit."
+    },
+    {
+        "alias": "mjetsll",
+        "name": "Maneuvering Jets",
+        "phase": "Action",
+        "window": "Before you assign hits produced by another player's SPACE CANNON roll",
+        "text": "Cancel 1 hit.",
+        "flavorText": "Something was wrong. T'esla sensed a flicker of movement on the planet's surface, followed by a faint glint of light. Reflexively, she veered her fighter to the side - an action that saved her life.",
+        "source": "theodisi",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "Before you assign hits produced by another player's SPACE CANNON roll",
+        "wildWildText": "Cancel ALL hits."
+    },
+    {
+        "alias": "mbll",
+        "name": "Morale Boost",
+        "phase": "Action",
+        "window": "At the start of a combat round",
+        "text": "Apply +1 to the result of each of your unit's combat rolls during this combat round.",
+        "flavorText": "Harrugh stood before his warriors, searching for the words that would express the pride that swelled within him.",
+        "source": "theodisi",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "At the start of a combat round",
+        "wildWildText": "Apply +2 to the result of each of your unit's combat rolls during this combat round."
+    },
+    {
+        "alias": "saboll",
+        "name": "Sabotage",
+        "phase": "Any",
+        "window": "When another player plays an action card other than 'Sabotage'",
+        "text": "Cancel that action card.",
+        "flavorText": "Q'uesh Sish tapped her claws impatiently. \"You were sssaying?\" But the confused Jol-Nar envoy stood silent. It was as if the words had escaped his thoughts entirely.",
+        "source": "theodisi",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "When another player plays an action card other than 'Sabotage'",
+        "wildWildText": "Cancel that action card, and then take that card into your hand."
+    },
+    {
+        "alias": "shll",
+        "name": "Shields Holding",
+        "phase": "Action",
+        "window": "Before you assign hits to your ships during a space combat",
+        "text": "Cancel up to 2 hits.",
+        "flavorText": "T'ro stared unflinching at the incoming barrage through the bridge's observation deck. The shield would hold.",
+        "source": "theodisi",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "Before you assign hits to your unit during a combat (space or ground)",
+        "wildWildText": "Cancel up to 2 hits."
+    },
+    {
+        "alias": "s_retreatll",
+        "name": "Skilled Retreat",
+        "phase": "Action",
+        "window": "At the start of a combat round",
+        "notes": "This may only be played during space combat",
+        "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
+        "automationID": "skilled_retreat",
+        "flavorText": "In an instant, the Sol fleet vanished from the Barony's scanners.",
+        "source": "theodisi",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "At the start of a combat round",
+        "wildWildText": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Do not place a command token from your reinforcements in that system."
+    },
+    {
+        "alias": "war_machinell",
+        "name": "War Machine",
+        "phase": "Action",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
+        "automationID": "war_machine",
+        "flavorText": "This would take weeks to replace if you had run it backwards, Varish called as she rotated the massive capacitor bank. \"Okay, fire it up.\"",
+        "source": "codex1",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "When 1 or more of your units use PRODUCTION",
+        "wildWildText": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 5."
+    },
+    {
+        "alias": "dpll",
+        "name": "Diplomatic Pressure",
+        "phase": "Agenda",
+        "window": "When an agenda is revealed",
+        "playTiming": "AGENDA_WHEN",
+        "text": "Choose another player. That player must give you 1 promissory note from their hand.",
+        "notes": "One player cannot play multiple of these targeting the same player during the same agenda.",
+        "automationID": "diplo_pressure",
+        "flavorText": "The Arborec emissary leaned close, and Brother Milor flinched at the faint whiff of decay. \"You do not understand,\" Dirzuga Ohao rasped. \"You must support this measure.\"",
+        "source": "theodisi",
+        "affectedByWildWildGalaxy": true,
+        "wildWildWindow": "When an agenda is revealed",
+        "wildWildText": "Choose another player. That player must give you 3 promissory notes from their hand."
+    },
+    {
+        "alias": "piratecontractll",
+        "name": "Pirate Contract",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Place 1 neutral destroyer in a non-home system that contains no non-neutral ships.",
+        "flavorText": "Suffi accepted the contract, swearing her solemn vow that she would see the viceroy's daughter kidnapped and held for ransom by the day's end.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "strategizell",
+        "name": "Strategize",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Perform the secondary ability of any readied or unchosen strategy card.",
+        "notes": "When resolving the chosen secondary ability, you must still spend the strategy token, except for Leadership. You must declare which strategy card you are choosing before the Sabo window, but need not declare how you will resolve the secondary ability.",
+        "flavorText": "Kyver stared Mathis in the eye, unblinking. For a time, neither made a move. The greens and browns of Kyver's eyes were impassive. They betrayed nothing of his intent. Nothing of his past or his future. They were but windows to the wild, unforgiving jungles of Retillion.",
+        "source": "theodisi"
+    }
+]

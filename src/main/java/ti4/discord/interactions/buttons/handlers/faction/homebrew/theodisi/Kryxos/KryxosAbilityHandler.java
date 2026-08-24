@@ -1,5 +1,6 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -37,14 +38,15 @@ public class KryxosAbilityHandler {
             return;
         }
 
-        List<Button> buttons = player.getReadiedPlanets().stream()
+        List<Button> buttons = new ArrayList<>(player.getReadiedPlanets().stream()
                 .map(planet -> Buttons.green(
                         player.factionButtonChecker() + EXHAUST_PLANET + technology.getAlias() + "|" + planet,
                         Helper.getPlanetRepresentation(planet, game)))
-                .toList();
+                .toList());
         if (buttons.isEmpty()) {
             return;
         }
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

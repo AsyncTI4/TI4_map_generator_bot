@@ -14,8 +14,8 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.edict.EdictPhaseHandler;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
@@ -30,6 +30,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Thrones.ThronesLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanHeroHandler;
@@ -274,9 +275,9 @@ public class PlayHeroService {
             case "vyserixhero" -> VyserixLeaderHandler.offerHeroAttachmentButtons(event, game, player);
             case "onyxxahero" -> OnyxxaLeaderHandler.postHeroMoveShipButtons(game, player);
             case "xanhero" -> XanHeroHandler.postInitialButtons(game, player);
-            case "dreamhero" -> DreamButtonHandler.postDreamHeroButtons(game, player);
             case "ashenhero" -> AshenLeadersHandler.postHeroButtons(event, game, player);
-            case "netrunnershero" -> NetrunnersLeadersHandler.startRevolution(game, player);
+            case "dreamhero" -> DreamLeadersHandler.postDreamHeroButtons(game, player);
+            case "netrunnershero" -> NetrunnersLeadersHandler.offerHeroTechSelection(game, player);
             case "tahero" -> TaLeadersHandler.postHeroButtons(game, player, event);
             case "tyrishero" ->
                 game.setStoredValue("tyrisHeroRound" + game.getRound() + "_" + player.getFaction(), "true");
@@ -299,6 +300,7 @@ public class PlayHeroService {
             case "kryxoshero" -> KryxosLeadersHandler.startKryxosHero(event, game, player);
             case "myrrhero" -> MyrrLeadersHandler.startMyrrHero(event, game, player);
             case "oblivionhero" -> OblivionLeadersHandler.startOblivionHero(event, game, player);
+            case "verydithhero" -> VerydithLeadersHandler.startVerydithHero(event, game, player);
             case "florzenhero" -> {
                 for (Tile tile : game.getTileMap().values()) {
                     for (UnitHolder uH : tile.getPlanetUnitHolders()) {

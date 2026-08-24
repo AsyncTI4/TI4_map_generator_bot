@@ -1,23 +1,6 @@
 package ti4.game.persistence;
 
-import static ti4.game.persistence.GamePersistenceKeys.ENDGAMEINFO;
-import static ti4.game.persistence.GamePersistenceKeys.ENDMAPINFO;
-import static ti4.game.persistence.GamePersistenceKeys.ENDPLAYER;
-import static ti4.game.persistence.GamePersistenceKeys.ENDPLAYERINFO;
-import static ti4.game.persistence.GamePersistenceKeys.ENDTILE;
-import static ti4.game.persistence.GamePersistenceKeys.ENDTOKENS;
-import static ti4.game.persistence.GamePersistenceKeys.ENDUNITHOLDER;
-import static ti4.game.persistence.GamePersistenceKeys.ENDUNITS;
-import static ti4.game.persistence.GamePersistenceKeys.GAMEINFO;
-import static ti4.game.persistence.GamePersistenceKeys.MAPINFO;
-import static ti4.game.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
-import static ti4.game.persistence.GamePersistenceKeys.PLANET_TOKENS;
-import static ti4.game.persistence.GamePersistenceKeys.PLAYER;
-import static ti4.game.persistence.GamePersistenceKeys.PLAYERINFO;
-import static ti4.game.persistence.GamePersistenceKeys.TILE;
-import static ti4.game.persistence.GamePersistenceKeys.TOKENS;
-import static ti4.game.persistence.GamePersistenceKeys.UNITHOLDER;
-import static ti4.game.persistence.GamePersistenceKeys.UNITS;
+import static ti4.game.persistence.GamePersistenceKeys.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -178,6 +161,9 @@ class GameSaveService {
         Map<String, String> discardStatus = new LinkedHashMap<>(game.getDiscardACStatus().entrySet().stream()
                 .collect(Collectors.toMap(Entry::getKey, e -> e.getValue().toString())));
         writeCardsStrings(discardStatus, writer, Constants.AC_STATUS);
+
+        writer.write(Constants.AC_PLAYED + " " + String.join(",", game.getPlayedActionCards()));
+        writer.write(System.lineSeparator());
 
         writer.write(Constants.EXPLORE + " " + String.join(",", game.getAllExplores()));
         writer.write(System.lineSeparator());
@@ -571,6 +557,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.WEIRD_WORMHOLES_MODE + " " + game.isWeirdWormholesMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.COSMIC_CONVERGENCE_MODE + " " + game.isCosmicConvergenceMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.NO_FRACTURE + " " + game.isNoFractureMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.CALL_OF_THE_VOID_MODE + " " + game.isCallOfTheVoidMode());
@@ -600,6 +588,8 @@ class GameSaveService {
         writer.write(Constants.ORDINIAN_C1_MODE + " " + game.isOrdinianC1Mode());
         writer.write(System.lineSeparator());
         writer.write(Constants.LIBERATION_C4_MODE + " " + game.isLiberationC4Mode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.ERWANS_GAMBIT_MODE + " " + game.isErwansGambitMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_FULL_COMPONENT_TEXT + " " + game.isShowFullComponentTextEmbeds());
         writer.write(System.lineSeparator());

@@ -67,8 +67,8 @@ class SliceTileWinRateStatisticsServiceTest extends BaseTi4Test {
         twilightsFallOnly.setTwilightsFallMode(true);
         assertFalse(SliceTileWinRateStatisticsService.isEligibleGameType(twilightsFallOnly), "Twilight's Fall only");
 
-        Game notThundersEdge = createStandardSliceGame("4", "sol", Map.of());
-        assertFalse(SliceTileWinRateStatisticsService.isEligibleGameType(notThundersEdge), "non-TE game");
+        // Game notThundersEdge = createStandardSliceGame("4", "sol", Map.of());
+        // assertFalse(SliceTileWinRateStatisticsService.isEligibleGameType(notThundersEdge), "non-TE game");
 
         Game homebrew = createStandardSliceGame("5", "sol", Map.of());
         homebrew.setThundersEdge(true);

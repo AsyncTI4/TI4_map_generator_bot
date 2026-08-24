@@ -45,11 +45,11 @@ import net.dv8tion.jda.api.exceptions.MissingAccessException;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TheodisiOutpostActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosUnitHandler;
@@ -524,6 +524,20 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 synergies.addAll(getBreakthroughModel(bt).getSynergy());
             }
         }
+        if (isBreakthroughUnlocked("netrunnersbt")) {
+            String dataBreach = game.getStoredValue("netrunnersDataBreach" + getFaction());
+            String[] parts = dataBreach.split("~", 2);
+            if (parts.length == 2) {
+                Player target = game.getPlayerFromColorOrFaction(parts[0]);
+                BreakthroughModel copiedBreakthrough = Mapper.getBreakthrough(parts[1]);
+                if (target != null
+                        && target.hasBreakthrough(parts[1])
+                        && copiedBreakthrough != null
+                        && copiedBreakthrough.getSynergy() != null) {
+                    synergies.addAll(copiedBreakthrough.getSynergy());
+                }
+            }
+        }
         if (hasRelic("quantumcore")) {
             synergies.addAll(List.of(
                     TechnologyType.BIOTIC,
@@ -634,8 +648,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 || getTechs().contains("absol_inf2")
                 || getTechs().contains("dsqhetinf")
                 || getTechs().contains("dszeliinf")
-                || getUnitsOwned().contains("ashen_infantry")
-                || getUnitsOwned().contains("ashen_infantry2")
                 || getUnitsOwned().contains("pharadn_infantry")
                 || getUnitsOwned().contains("pharadn_infantry2");
     }
@@ -1228,6 +1240,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 ? LunariumAbilityHandler.getFactionSheetCCs(game, this)
                 : game.getMaxSOCountPerPlayer();
         int bonus = 0;
+        if (game.isErwansGambitMode() && "mentak".equalsIgnoreCase(getFaction())) bonus = game.getRound() + 1;
         if (hasRelic("obsidian")) bonus++;
         if (hasRelic("absol_obsidian")) bonus++;
         if (hasAbility("information_brokers")) bonus++;
@@ -1491,9 +1504,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 }
 
                 for (String trait : planet.getPlanetTypes()) {
-                    if (Constants.CULTURAL.equals(trait)
-                            || Constants.HAZARDOUS.equals(trait)
-                            || Constants.INDUSTRIAL.equals(trait)) {
+                    if (!planet.isHomePlanet(game)
+                            && (Constants.CULTURAL.equals(trait)
+                                    || Constants.HAZARDOUS.equals(trait)
+                                    || Constants.INDUSTRIAL.equals(trait))) {
                         controlledTraits.add(trait);
                     }
                 }
@@ -2359,6 +2373,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public boolean hasTech(String techID) {
+        if (techID == null) return false;
         if ("det".equals(techID) || "amd".equals(techID)) {
             if (getTechs().contains("absol_" + techID)) {
                 return true;
@@ -2510,7 +2525,21 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public Set<String> getTradableRelics() {
-        return SetUtils.intersection(getActualRelics(), Set.of("thesilverflame", "silverflame"));
+        Set<String> tradableRelics = Set.of(
+                "thesilverflame",
+                "silverflame",
+                "economicboon",
+                "naturesboon",
+                "diplomaticboon",
+                "cosmicboon",
+                "mutagenhazardous",
+                "mutagenindustrial",
+                "mutagencultural",
+                "mutagenfrontier");
+        return getRelics().stream()
+                .filter(Mapper::isValidRelic)
+                .filter(tradableRelics::contains)
+                .collect(Collectors.toSet());
     }
 
     public Set<String> getActualRelics() {
@@ -2597,8 +2626,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             addAbility("policy_the_people_connect");
             addAbility("policy_the_environment_preserve");
             addAbility("policy_the_economy_empower");
-            removeOwnedUnitByID("olradin_mech");
-            addOwnedUnitByID("olradin_mech_positive");
             MessageHelper.sendMessageToChannel(
                     getCorrectChannel(),
                     getRepresentationUnfogged()
@@ -2627,10 +2654,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
 
         if ("planesplitter-firm".equalsIgnoreCase(techID) || "tf-planesplitter".equalsIgnoreCase(techID)) {
-            if (!FractureService.isFractureInPlay(game)) {
-                FractureService.spawnFracture(null, game);
-                FractureService.spawnIngressTokens(null, game, this, null);
-            }
+            FractureService.enterPlayOrExplain(null, game, this, null);
         }
 
         if ("thveylorg".equalsIgnoreCase(techID)) {
@@ -2642,8 +2666,6 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             addPlanet("fabricatestation");
             refreshPlanet("fabricatestation");
         }
-
-        ArcanumLeadersHandler.offerVeylaTheKeeperButtons(game, this, techID);
 
         // Update Owned Units when Researching a Unit Upgrade
         TechnologyModel techModel = Mapper.getTech(techID);
@@ -2812,6 +2834,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public void exhaustPlanet(String planet) {
         if (getPlanets().contains(planet) && !getExhaustedPlanets().contains(planet)) {
             getExhaustedPlanets().add(planet);
+            TheodisiOutpostActionCardHandler.offerOutpostEffects(game, this, planet);
         }
         Game game = this.game;
         if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null
@@ -3221,7 +3244,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             }
             return GMService.getGMChannel(game);
         }
-        return privateChannel != null ? privateChannel : game.getMainGameChannel();
+        return game.getMainGameChannel();
     }
 
     public String bannerName() {

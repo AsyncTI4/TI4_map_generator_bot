@@ -301,7 +301,7 @@ public class ArcanumLeadersHandler {
         return game.getTechnologyDeck().stream()
                 .map(Mapper::getTech)
                 .filter(Objects::nonNull)
-                .filter(tech -> !tech.isFactionTech() && !tech.isUnitUpgrade())
+                .filter(tech -> !tech.isUnitUpgrade())
                 .filter(tech -> !target.hasTech(tech.getAlias()))
                 .filter(tech -> tech.getRequirements().orElse("").length() <= maximumRequirements)
                 .map(tech -> Buttons.green(

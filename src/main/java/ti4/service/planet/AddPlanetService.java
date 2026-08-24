@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Ponthous.PonthousAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.vyserix.VyserixAbilityHandler;
 import ti4.game.Game;
@@ -193,6 +194,19 @@ public class AddPlanetService {
                     }
                     if (player_.hasAbility("planetary_reconfiguration")) {
                         TaAbilityHandler.returnPlanetaryReconfigurationDesigns(player_, game, unitHolder);
+                    }
+                    if (player_.hasTech("pa")
+                            && !player_.getExhaustedPlanets().contains(planet)
+                            && "action".equalsIgnoreCase(game.getPhaseOfGame())
+                            && ButtonHelper.checkForTechSkips(game, planet)
+                            && !ButtonHelperAbilities.canBePillaged(player_, game, player.getTg() + 1)) {
+                        player_.exhaustPlanet(planet);
+                        MessageHelper.sendMessageToChannel(
+                                player_.getCorrectChannel(),
+                                player_.getRepresentation() + " Your " + Helper.getPlanetRepresentation(planet, game)
+                                        + " was auto exhausted due to your **Psychoarchaeology** technology to gain 1tg.");
+                        player_.gainTG(1, true);
+                        ButtonHelperAgents.resolveArtunoCheck(player_, 1);
                     }
                     player_.removePlanet(planet);
                     CommanderUnlockCheckService.checkPlayer(player_, "uydai");
@@ -402,12 +416,15 @@ public class AddPlanetService {
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, draw);
             }
         }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "verydithcommander")) {
+            VerydithLeadersHandler.checkVerydithCommander(game);
+        }
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "onyxxacommander")
                 && alreadyOwned
                 && !setup
                 && tile != null
-                && tile.getPosition().startsWith("frac")) {
+                && tile.isFracture()) {
             OnyxxaLeaderHandler.onGainFracturePlanet(event, player, game, previousOwner);
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander") && !setup) {
@@ -450,7 +467,7 @@ public class AddPlanetService {
                         || game.getActivePlayerID() != null && !"".equalsIgnoreCase(game.getActivePlayerID()))
                 && player.hasUnlockedBreakthrough("zealotsbt")
                 && tile != null
-                && (tile.getPosition().contains("frac") || unitHolder.isLegendary())
+                && (tile.isFracture() || unitHolder.isLegendary())
                 && !doubleCheck
                 && !setup) {
             List<Button> buttons = new ArrayList<>();

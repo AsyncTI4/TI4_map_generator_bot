@@ -3,7 +3,6 @@ package ti4.service.leader;
 import java.util.List;
 import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesCommanderUnlockHandler;
@@ -19,6 +18,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
@@ -192,7 +192,7 @@ public class CommanderUnlockCheckService {
             }
             case "obsidian" -> {
                 for (Tile t : game.getTileMap().values()) {
-                    if (t.getPosition().startsWith("frac") && t.containsPlayersUnits(player)) {
+                    if (t.isFracture() && t.containsPlayersUnits(player)) {
                         shouldBeUnlocked = true;
                         break;
                     }
@@ -285,11 +285,23 @@ public class CommanderUnlockCheckService {
             }
 
             // BEANS
-            case "dream" ->
-                shouldBeUnlocked = (DreamButtonHandler.getNexusTokenTiles(game).size() >= 3);
+            case "ashen" -> shouldBeUnlocked = true;
+            case "dream" -> {
+                int eligibleSystems = 0;
+                for (Tile tile : game.getTileMap().values()) {
+                    if (!tile.isNebula(game)
+                            && tile.isAnomaly(game, player)
+                            && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+                        eligibleSystems++;
+                    }
+                }
+
+                shouldBeUnlocked = eligibleSystems >= 2;
+            }
             case "ta" -> shouldBeUnlocked = (TaAbilityHandler.getControlledPlanetCountWithAnyDesign(player, game) >= 4);
             case "netrunners" ->
-                shouldBeUnlocked = (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false) >= 4);
+                shouldBeUnlocked = TechnologyType.mainFour.stream()
+                        .anyMatch(type -> ButtonHelper.getNumberOfCertainTypeOfTech(player, type) >= 3);
             case "crystellum" ->
                 shouldBeUnlocked =
                         (CrystellumLeadersHandler.getCrystellumCommanderCapacitySystemCount(game, player) >= 3);

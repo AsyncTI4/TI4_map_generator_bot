@@ -437,21 +437,33 @@ public class ButtonHelperCommanders {
 
     public static void resolveLetnevCommanderCheck(Player player, Game game, GenericInteractionCreateEvent event) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "letnevcommander")) {
-            if (!ButtonHelperAbilities.canBePillaged(player, game, player.getTg() + 1) || game.isFowMode()) {
-                String mMessage = player.getRepresentationUnfogged()
-                        + " Since you have Rear Admiral Farran, the Letnev commander, unlocked,"
-                        + " 1 trade good has been added automatically " + player.gainTG(1) + ".";
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
-                ButtonHelperAbilities.pillageCheck(player, game);
-                ButtonHelperAgents.resolveArtunoCheck(player, 1);
-            } else {
-                String mMessage = player.getRepresentationUnfogged()
-                        + ", you have Rear Admiral Farran, the Letnev commander, unlocked,"
-                        + " so you __may__ gain 1 trade good, but since you are in **Pillage** range, this has not been done automatically.";
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1 Trade Good", MiscEmojis.tg));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
+            switch (ButtonHelperAbilities.resolveOptionalTgGainMode(player, game)) {
+                case FOW_OPT_IN -> {
+                    String mMessage = player.getRepresentationUnfogged()
+                            + ", you have Rear Admiral Farran, the Letnev commander, unlocked,"
+                            + " so you __may__ gain 1 trade good.";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1 Trade Good", MiscEmojis.tg));
+                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), mMessage, buttons);
+                }
+                case RANGE_OPT_IN -> {
+                    String mMessage = player.getRepresentationUnfogged()
+                            + ", you have Rear Admiral Farran, the Letnev commander, unlocked,"
+                            + " so you __may__ gain 1 trade good, but since you are in **Pillage** range, this has not been done automatically.";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1 Trade Good", MiscEmojis.tg));
+                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
+                }
+                case AUTO -> {
+                    String mMessage = player.getRepresentationUnfogged()
+                            + " Since you have Rear Admiral Farran, the Letnev commander, unlocked,"
+                            + " 1 trade good has been added automatically " + player.gainTG(1) + ".";
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
+                    ButtonHelperAbilities.pillageCheck(player, game);
+                    ButtonHelperAgents.resolveArtunoCheck(player, 1);
+                }
             }
         }
     }
@@ -668,22 +680,34 @@ public class ButtonHelperCommanders {
     public static void resolveMuaatCommanderCheck(
             Player player, Game game, GenericInteractionCreateEvent event, String reason) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander") || player.hasTech("tf-stellargenesis")) {
-            if (!ButtonHelperAbilities.canBePillaged(player, game, player.getTg() + 1) || game.isFowMode()) {
-                String message = player.getRepresentationUnfogged()
-                        + " you gained a trade good from Magmus, the Muaat Commander, " + player.gainTG(1)
-                        + ", when you " + reason + ".";
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                ButtonHelperAbilities.pillageCheck(player, game);
-                ButtonHelperAgents.resolveArtunoCheck(player, 1);
-            } else {
-                String mMessage =
-                        player.getRepresentationUnfogged() + ", you have Magmus, the Muaat Commander, unlocked,"
-                                + " so you __may__ gain 1 trade good when you " + reason
-                                + ", but since you are in **Pillage** range, this has not been done automatically.";
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1 Trade Good", MiscEmojis.tg));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
+            switch (ButtonHelperAbilities.resolveOptionalTgGainMode(player, game)) {
+                case FOW_OPT_IN -> {
+                    String mMessage =
+                            player.getRepresentationUnfogged() + ", you have Magmus, the Muaat Commander, unlocked,"
+                                    + " so you __may__ gain 1 trade good when you " + reason + ".";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1 Trade Good", MiscEmojis.tg));
+                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), mMessage, buttons);
+                }
+                case RANGE_OPT_IN -> {
+                    String mMessage =
+                            player.getRepresentationUnfogged() + ", you have Magmus, the Muaat Commander, unlocked,"
+                                    + " so you __may__ gain 1 trade good when you " + reason
+                                    + ", but since you are in **Pillage** range, this has not been done automatically.";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1 Trade Good", MiscEmojis.tg));
+                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mMessage, buttons);
+                }
+                case AUTO -> {
+                    String message = player.getRepresentationUnfogged()
+                            + " you gained a trade good from Magmus, the Muaat Commander, " + player.gainTG(1)
+                            + ", when you " + reason + ".";
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                    ButtonHelperAbilities.pillageCheck(player, game);
+                    ButtonHelperAgents.resolveArtunoCheck(player, 1);
+                }
             }
         }
         if (player.hasUnit("kolume_mech")) {
@@ -1015,7 +1039,7 @@ public class ButtonHelperCommanders {
             String planetId = planetReal.getName();
             String planetName = Helper.getPlanetName(planetId);
 
-            for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+            for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true, true)) {
                 Tile tile2 = game.getTileByPosition(pos2);
                 if (CommandCounterHelper.hasCC(event, player.getColor(), tile2)
                         && !game.isDominusOrb()

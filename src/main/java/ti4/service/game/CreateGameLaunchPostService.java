@@ -45,7 +45,11 @@ public class CreateGameLaunchPostService {
         buttons.add(Buttons.red("leaveGameList", "Leave Game"));
         buttons.add(Buttons.gray("editPlayers~MDL", "Add Players"));
         buttons.add(Buttons.gray("removePlayers~MDL", "Remove Players"));
-        buttons.add(Buttons.gray("searchForPlayers~MDL", "Search for Players"));
+        String parentName = channel.getParentChannel().getName();
+        if (MAKING_NEW_GAMES_CHANNEL.equalsIgnoreCase(parentName)
+                || MAKING_TIGL_GAMES_CHANNEL.equalsIgnoreCase(parentName)) {
+            buttons.add(Buttons.green("searchForPlayers~MDL", "Join Matchmaking"));
+        }
         buttons.add(Buttons.blue("launchGame", "Launch Game"));
         buttons.add(Buttons.gray("addSillyName~MDL", "Add Fun Game Name"));
 

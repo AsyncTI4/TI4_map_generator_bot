@@ -349,6 +349,7 @@ public final class ButtonHelperActionCards {
         checkForPlayingSummit(game, player);
         checkForPlayingBountyContracts(game, player);
         checkForPlayingSpliceCards(game, player);
+        checkForPreassigningRelitigate(game, player);
         if (player.getPlayableActionCards().contains("puppetsonastring")) {
             String msg =
                     "You have _Puppets On A String_ in your hand. If you're not about to pass, you can ignore this message."
@@ -359,6 +360,20 @@ public final class ButtonHelperActionCards {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
+    }
+
+    private static void checkForPreassigningRelitigate(Game game, Player player) {
+        if (!player.getPlayableActionCards().contains("relitigate")
+                || !game.getStoredValue("Relitigate").isEmpty()) return;
+
+        List<Button> buttons = List.of(
+                Buttons.green("resolvePreassignment_Relitigate", "Pre-Play Relitigate"),
+                Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationNoPing()
+                        + ", you may pre-play _Relitigate_. It will trigger at the start of the next normal Agenda Phase.",
+                buttons);
     }
 
     @ButtonHandler("resolveCounterStroke")
@@ -1163,7 +1178,7 @@ public final class ButtonHelperActionCards {
         Player p2 = game.getPlayerFromLeader("empyreancommander");
         CommanderUnlockCheckService.checkPlayer(p2, "empyrean");
         CommanderUnlockCheckService.checkPlayer(player, "ghost", "ghoti");
-        if (tile.getPosition().startsWith("frac")) {
+        if (tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
     }
@@ -1764,13 +1779,13 @@ public final class ButtonHelperActionCards {
         FoWHelper.notifyActorAndAffectedElsePublic(
                 game,
                 player,
-                player.getRepresentationUnfogged() + ", you've _Signal Jam_'d the system: "
+                player.getRepresentationUnfogged() + ", you placed a player's command token in the system: "
                         + tile.getRepresentationForButtons(game, player) + ".",
                 p2,
-                p2.getRepresentationUnfogged() + ", you've been _Signal Jam_'d in system: "
+                p2.getRepresentationUnfogged() + ", your command token has been placed in system: "
                         + tile.getRepresentationForButtons(game, p2) + ".",
-                player.getRepresentationUnfogged() + " has _Signal Jam_'d " + p2.getRepresentationUnfogged()
-                        + " in tile " + tile.getRepresentationForButtons(game, p2) + ".");
+                player.getRepresentationUnfogged() + " has placed " + p2.getRepresentationUnfogged()
+                        + " command token in tile " + tile.getRepresentationForButtons(game, p2) + ".");
     }
 
     @ButtonHandler("reactorMeltdownStep2_")
@@ -2050,6 +2065,27 @@ public final class ButtonHelperActionCards {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
+    }
+
+    public static void checkForPlayingStrategicFocus(Game game, Player player) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
+            return;
+        }
+        if (!player.getPlayableActionCards().contains("strategic_focus")) {
+            return;
+        }
+        Integer handIndex = player.getActionCards().get("strategic_focus");
+        String msg = player.getRepresentation()
+                + ", you have _Strategic Focus_ in your hand and just passed — this is the window to play it."
+                + " Use the button below to play it now, or ignore this message if you don't want to.";
+        List<Button> buttons = new ArrayList<>();
+        if (handIndex != null) {
+            buttons.add(Buttons.green(
+                    Constants.AC_PLAY_FROM_HAND + handIndex, "Play Strategic Focus", CardEmojis.getACEmoji(game)));
+        }
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
     public static void checkForPlayingBountyContracts(Game game, Player player) {
@@ -2429,9 +2465,8 @@ public final class ButtonHelperActionCards {
                     if (x == 1) nice &= (d1.getResult() == 9);
                 }
                 msg.append(nice ? " (nice)" : "")
-                        .append(".\n Total hits were ")
-                        .append(hits)
-                        .append(".");
+                        .append(".")
+                        .append(CombatMessageHelper.displayHitResults(hits).stripTrailing());
             }
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
             if (hits > 0 && p2.hasAbility("data_recovery")) {
@@ -2486,7 +2521,8 @@ public final class ButtonHelperActionCards {
                     hits++;
                 }
             }
-            msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
+            msg = new StringBuilder(msg.substring(0, msg.length() - 2)
+                    + CombatMessageHelper.displayHitResults(hits).stripTrailing());
             UnitKey key = Units.getUnitKey(UnitType.Fighter, p2.getColor());
             var unitParsed = new ParsedUnit(key, hits, Constants.SPACE);
             RemoveUnitService.removeUnit(event, tile, game, unitParsed);
@@ -2574,8 +2610,7 @@ public final class ButtonHelperActionCards {
                 player.getRepresentationUnfogged() + ", you exhausted " + planetRep + ".",
                 p2,
                 p2.getRepresentationUnfogged() + ", your planet " + planetRep + " was exhausted.",
-                player.getRepresentationUnfogged() + ", you exhausted " + planetRep + " belonging to "
-                        + p2.getRepresentationUnfogged() + ".");
+                player.getRepresentationUnfogged() + ", you exhausted " + planetRep + ".");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -2835,10 +2870,12 @@ public final class ButtonHelperActionCards {
     public static void resolveReverse(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String acName = buttonID.replace("resolveReverse_", "");
         List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());
+        boolean hideUnplayed = ActionCardHelper.hidesUnplayedDiscards(game, player);
         for (String acStringID : acStrings) {
             ActionCardModel actionCard = Mapper.getActionCard(acStringID);
             String actionCardTitle = actionCard.getName();
-            if (acName.equalsIgnoreCase(actionCardTitle)) {
+            if (acName.equalsIgnoreCase(actionCardTitle)
+                    && ActionCardHelper.isDiscardVisible(game, hideUnplayed, acStringID)) {
                 boolean picked = game.pickActionCard(
                         player.getUserID(), game.getDiscardActionCards().get(acStringID));
                 if (!picked) {

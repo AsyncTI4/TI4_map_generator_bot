@@ -4,9 +4,9 @@
         "name": "Visions",
         "faction": "dream",
         "color": "",
-        "playArea": false,
+        "playArea": true,
         "source": "beans",
-        "text": "At the start of a tactical action: You may return this card to the Dreaming Throne player to remove 1 nexus token from a system containing a planet you control."
+        "text": "When you gain this card, place it face up in your play area. While this card is in your play area, your ship's movement is not affected by nebulas. If you activate a system that contains 1 or more of the Dreaming Throne player's units, return this card to the Dreaming Throne player."
     },
     {
         "alias": "bepncryst",
@@ -24,7 +24,7 @@
         "color": "",
         "playArea": false,
         "source": "beans",
-        "text": "During a combat against a player that is not the Ashen Legion player: When 1 of your units would be destroyed during ground combat, it is not destroyed instead. Then, return this card to the Ashen Legion player."
+        "text": "During a combat against a player that is not the Ashen Legion player: When 1 of your units would be destroyed during ground combat, it is not destroyed instead. Then, return this card to the Ashen Legion player. The Ashen Legion player captures 1 infantry from the supply."
     },
     {
         "alias": "bepniron",
@@ -53,7 +53,7 @@
         "color": "",
         "playArea": false,
         "source": "beans",
-        "text": "At the start of the Net-Runners player's turn: You may place any combination of up to 2 fighters and 2 infantry from your reinforcements in any system that contains one of your structures. Then, return this card to the Net-Runners player."
+        "text": "When the Net-Runners player copies a technology using their Proxy Network ability: You may place this card face up in your play area to gain that technology. At the start of the status phase, return this card to the Net-Runners player."
     },
     {
         "alias": "bepnnatau",

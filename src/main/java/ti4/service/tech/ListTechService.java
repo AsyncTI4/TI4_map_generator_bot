@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -106,6 +106,10 @@ public class ListTechService {
             boolean dwsBt,
             List<TechnologyType> techTypes,
             boolean first) {
+        if (sc && first && NetrunnersLeadersHandler.shouldChooseCommanderTechnologySecondary(game, player)) {
+            NetrunnersLeadersHandler.offerCommanderTechnologySecondary(game, player);
+            return;
+        }
         game.setComponentAction(!sc);
         String finsFactionCheckerPrefix = player.factionButtonChecker();
         game.setComponentAction(!sc);
@@ -113,6 +117,7 @@ public class ListTechService {
         String techSuffix = dwsBt ? "_dwsbt" : "";
 
         if (sc || dwsBt) {
+            boolean commanderSkipsToken = NetrunnersLeadersHandler.commanderSkipsTechnologySecondaryToken(game, player);
             boolean used = dwsBt || ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player);
             StrategyCardModel scModel =
                     game.getStrategyCardModelByName("technology").orElse(null);
@@ -122,13 +127,23 @@ public class ListTechService {
                     && !player.getFollowedSCs().contains(scModel.getInitiative())) {
                 int scNum = scModel.getInitiative();
                 player.addFollowedSC(scNum, event);
-                ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
-                if (player.getStrategicCC() > 0) {
-                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Technology**");
+                if (!commanderSkipsToken) {
+                    ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
+                    if (player.getStrategicCC() > 0) {
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(
+                                player, game, event, "followed **Technology**");
+                    }
+                    String message = ButtonHelperSCs.deductCC(game, player, scNum);
+                    ReactionService.addReaction(event, game, player, message);
+                } else {
+                    ReactionService.addReaction(
+                            event,
+                            game,
+                            player,
+                            "used **Tek Mir-un** to follow **Technology** without spending a strategy token.");
                 }
-                String message = ButtonHelperSCs.deductCC(game, player, scNum);
-                ReactionService.addReaction(event, game, player, message);
             }
+            game.removeStoredValue("netrunnersCommanderTechnologySecondary" + player.getFaction());
 
             if (first) {
                 ButtonHelperCommanders.yinCommanderSummary(player, game);
@@ -300,7 +315,11 @@ public class ListTechService {
             }
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
-            requirements = G.matcher(requirements).replaceFirst("");
+            if (synergies.contains(TechnologyType.valueOf("BIOTIC"))) {
+                requirements = requirements.replaceFirst("X", "");
+            } else {
+                requirements = G.matcher(requirements).replaceFirst("");
+            }
             if (ButtonHelperCommanders.getVeldyrCommanderTechs(player, game, true)
                     .contains(tech.getAlias())) {
                 requirements = "";
@@ -325,10 +344,6 @@ public class ListTechService {
 
         if (player.hasRelicReady("prophetstears") || player.hasRelicReady("absol_prophetstears")) {
             wilds++;
-        }
-        if (player.hasUnlockedBreakthrough("netrunnersbt")) {
-            int dataBreachDiscount = NetrunnersBreakthroughHandler.getDataBreachDiscount(player, tech);
-            wilds += Math.clamp(dataBreachDiscount, 0, requirements.length());
         }
 
         // All sources of pre-requisites below can also apply via synergy.

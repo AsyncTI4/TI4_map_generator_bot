@@ -91,7 +91,7 @@
         "alias": "rescue",
         "name": "Rescue",
         "phase": "Action",
-        "window": "After a player moves ships into a system that contains your ships",
+        "window": "After another player moves ships into a system that contains your ships",
         "text": "You may move 1 of your ships into the active system from any system that does not contain one of your command tokens.",
         "notes": "If the target ship has a capacity value, it may transport fighters and ground forces.",
         "flavorText": "\"Hold on...\" Tuck pleaded. \"We are coming. Hold on, please...\"",

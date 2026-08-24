@@ -41,6 +41,7 @@
     "title": "Warden of Accord",
     "abilityWindow": "When a player returns a promissory note to its owner, you may exhaust this card:",
     "abilityText": "Those players each gain 1 command token and perform a transaction.",
+    "notes": "Bot can't reliably tell when a promissory is returned to its owner with total accuracy, there is a button in cards info. You select the payers that had the trigger happen to be the effect of the agent.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -74,7 +75,7 @@
     "name": "Orrin Malvek",
     "title": "Deacon of Taxes & Prayer",
     "abilityWindow": "ACTION:",
-    "abilityText": "Exhaust this card. Draw 1 action card and look at the top card of the agenda deck. Place it on the top or bottom of the deck.",
+    "abilityText": "Choose 1 player and exhaust this card. That player draws 1 action card and looks at the top card of the agenda deck. They may place it on the top or bottom of the deck.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -85,7 +86,7 @@
     "name": "Cyrala Vey",
     "title": "Bishop of Law & Scripture",
     "abilityWindow": "After an agenda is resolved:",
-    "abilityText": "If the outcome you voted for is not resolved, produce 1 ship with a cost less than the number of votes you cast in a system that contains your ships.",
+    "abilityText": "If an outcome you voted for is not resolved, produce 1 unit in a system that contains 1 of your ships with a cost up to the number of votes you cast.",
     "unlockCondition": "At the start of the agenda phase, exhaust all but 3 planets you control.",
     "source": "theodisi"
   },
@@ -118,8 +119,8 @@
     "type": "commander",
     "name": "Thessa Scale",
     "title": "Ash-Plate",
-    "abilityWindow": "When you place a structure from your reinforcements on a planet you control:",
-    "abilityText": "Draw 2 action cards.",
+    "abilityWindow": "Twice per round, when you place a structure from your reinforcements on a planet you control:",
+    "abilityText": "Draw 2 action cards, then discard 1.",
     "unlockCondition": "Have 4 or more non-fighter ships of the same type in the same system.",
     "source": "theodisi"
   },
@@ -209,8 +210,8 @@
     "type": "agent",
     "name": "Veyla the Keeper",
     "title": "Custodian of Tomes",
-    "abilityWindow": "When a player gains a non-faction technology:",
-    "abilityText": "You may exhaust this card to allow that player to return that technology to its deck and gain 1 non-unit-upgrade technology with a number of prerequisites up to 1 greater than the number on the returned technology.",
+      "abilityWindow": "When a player gains a non-faction technology:",
+      "abilityText": "You may exhaust this card to allow that player to return that technology to its deck and gain 1 non-unit-upgrade technology with a number of prerequisites up to 1 greater than the number on the returned technology.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -323,7 +324,7 @@
     "name": "Ashara of the Silent Choir",
     "title": "Duke of the Necromancer",
     "abilityWindow": "At any time:",
-    "abilityText": "This commander has the ability text of the commander with the lich token on it.",
+    "abilityText": "While the Lich Token is on an unlocked commander you may use the effect of that commander.",
     "unlockCondition": "2 other players have unlocked commanders",
     "source": "theodisi"
   },
@@ -369,7 +370,7 @@
     "title": "Fallen King",
     "abilityName": "Lost Throne of Pride - Revenant of Ruin",
     "abilityWindow": "At any time:",
-    "abilityText": "You may treat a system that contains 1 or more of your units as if it had PRODUCTION 4 until the end of this action and immediately use that PRODUCTION.",
+    "abilityText": "You may treat a system that contains 1 or more of your units as if it had PRODUCTION 4 until the end of this action and immediately use that PRODUCTION. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },

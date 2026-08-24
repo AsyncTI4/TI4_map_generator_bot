@@ -43,19 +43,22 @@ public class OnyxxaBreakthroughHandler {
         String diceStr = diceEmoji != null ? diceEmoji.toString() : DiceEmojis.getGrayDieEmoji(result);
 
         if (result == 1 || result == 10) {
-            if (!FractureService.isFractureInPlay(game)) {
+            if (FractureService.canFractureEnterPlay(game)) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation(false, false) + " rolled a " + diceStr
                                 + "! The Fracture is now in play!");
                 FractureService.spawnFracture(event, game);
                 FractureService.spawnIngressTokens(event, game, player, "onyxxabt");
-            } else {
+            } else if (FractureService.isFractureInPlay(game)) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation(false, false) + " rolled a " + diceStr
                                 + "! The Fracture is already in play — move an ingress token to a system that contains your units.");
                 offerMoveIngressFromButtons(game, player);
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(), FractureService.whyFractureCannotEnterPlay(game));
             }
         } else {
             MessageHelper.sendMessageToChannel(
@@ -129,7 +132,7 @@ public class OnyxxaBreakthroughHandler {
         int infantryCount = unitHolder.getUnitCount(UnitType.Infantry, player.getColorID());
         if (infantryCount < 1) return;
 
-        boolean inFracture = tile.getPosition().startsWith("frac");
+        boolean inFracture = tile.isFracture();
         boolean inNexus = "82b".equals(tile.getTileID()) || "82bh".equals(tile.getTileID());
         if (!inFracture && !inNexus) return;
 

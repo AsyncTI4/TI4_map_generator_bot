@@ -3358,10 +3358,10 @@ public final class ButtonHelperFactionSpecific {
         }
     }
 
-    public static List<Button> getUnitButtonsForVortex(Player player, Game game, GenericInteractionCreateEvent event) {
+    public static List<Button> getUnitButtonsForVortex(Player player, Game game) {
         List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Spacedock);
         if (tiles.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Couldn't find any Dimensional Tears.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Couldn't find any Dimensional Tears.");
             return Collections.emptyList();
         }
         Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tiles.getFirst().getPosition(), player, false);
@@ -3457,7 +3457,7 @@ public final class ButtonHelperFactionSpecific {
                     && isNotBlank(planetReal.getOriginalPlanetType())
                     && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
             boolean fracture = game.getTileFromPlanet(planet) != null
-                    && game.getTileFromPlanet(planet).getPosition().contains("frac");
+                    && game.getTileFromPlanet(planet).isFracture();
             if (oneOfThree || fracture || extraAllowedPlanets.contains(planet.toLowerCase())) {
                 buttons.add(Buttons.green("terraformPlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
             }

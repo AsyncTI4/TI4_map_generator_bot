@@ -86,7 +86,7 @@
     "faction": "myrr",
     "baseUpgrade": "dn2",
     "source": "theodisi",
-    "text": "This unit cannot be destroyed by \"Direct Hit\" action cards. This unit can produce only dreadnoughts or units of the same type as those it is transporting."
+    "text": "This unit cannot be destroyed by \"Direct Hit\" action cards. This unit can produce only dreadnoughts or units that can be transported that are in the space area of this system."
   },
   {
     "alias": "thkairny",
@@ -108,7 +108,7 @@
     "requirements": "GG",
     "faction": "kairn",
     "source": "theodisi",
-    "text": "Increase your commodity value by 1 for each planet trait you control."
+    "text": "Increase your commodity value by 1 for each non-home planet trait you control."
   },
   {
     "alias": "thkryxosfs",
@@ -130,7 +130,7 @@
     "requirements": "GBY",
     "faction": "kryxos",
     "source": "theodisi",
-    "text": "Cost 8, Combat 1(x3), Move 4, Capacity 12\nSUSTAIN DAMAGE, ANTI-FIGHTER BARRAGE 3(x3)\nWhen this unit uses SUSTAIN DAMAGE, cancel an additional hit."
+    "text": "Cost 8, Combat 2(x3), Move 4, Capacity 12\nSUSTAIN DAMAGE, ANTI-FIGHTER BARRAGE 3(x3)\nWhen this unit uses SUSTAIN DAMAGE, cancel an additional hit."
   },
   {
     "alias": "thkryxosmf",
@@ -243,7 +243,7 @@
     "faction": "xytheris",
     "baseUpgrade": "dd2",
     "source": "theodisi",
-    "text": ""
+    "text": "Cost 1, Combat 8, Move 2, Capacity 1, ANTI-FIGHTER BARRAGE 6(x3), SPACE CANNON 6"
   },
   {
     "alias": "thoblivionr",
@@ -298,7 +298,7 @@
     "requirements": "B",
     "faction": "thrones",
     "source": "theodisi",
-    "text": "At the end of a tactical action, you may exhaust this card to move 1 of your ships from the active system to an adjacent system that contains 1 or more of your units and no other player's ships."
+    "text": "At the end of a tactical action, you may exhaust this card to move 1 of your ships from the active system into a system that contains no other player's ships. The ship may transport units."
   },
   {
     "alias": "ththronesr",
@@ -309,7 +309,7 @@
     "requirements": "RR",
     "faction": "thrones",
     "source": "theodisi",
-    "text": "When a player activates a system that contains your units, exhaust this card and choose 1 system that contains your units. Treat the chosen system as if it had a gravity rift."
+    "text": "When you activate a system or a system containing your units is activated, you may exhaust this card to treat 1 system that contains the active player's units as a gravity rift until the end of this action."
   },
   {
     "alias": "thaeternar",
@@ -355,6 +355,6 @@
     "faction": "ponthous",
     "baseUpgrade": "dd2",
     "source": "theodisi",
-    "text": "This unit can only transport ground forces. When your opponent's units produce hits with ANTI-FIGHER BARRAGE in this unit's system cancel 1 of those hits."
+    "text": "This unit can only transport ground forces."
   }
 ]

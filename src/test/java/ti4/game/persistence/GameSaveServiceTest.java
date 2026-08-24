@@ -15,8 +15,9 @@ class GameSaveServiceTest extends BaseTi4Test {
             Game game = harness.load();
             var player = game.getRealPlayers().getFirst();
             game.setLatestOutcomeVotedFor("testOutcome");
-            game.getGameStats().recordAcPlayWithTarget(GameStats.SABOTAGE, player, "Divert Funding");
-            game.getGameStats().recordAcPlayWithTarget(GameStats.OVERRULE, player, "Leadership");
+            game.getGameStats().recordAcPlay("Divert Funding", player);
+            game.getGameStats().markLatestPlayCanceled("Divert Funding");
+            game.getGameStats().recordAcPlay(GameStats.OVERRULE, player);
 
             boolean saved = GameSaveService.save(game, "test");
             assertThat(saved).isTrue();
@@ -24,14 +25,12 @@ class GameSaveServiceTest extends BaseTi4Test {
             Game reloaded = harness.load();
             assertThat(reloaded).isNotNull();
             assertThat(reloaded.getLatestOutcomeVotedFor()).isEqualTo("testOutcome");
-            assertThat(reloaded.getGameStats().getCountPerTarget(GameStats.SABOTAGE))
-                    .containsEntry("Divert Funding", 1);
-            assertThat(reloaded.getGameStats().getTotalPlays(GameStats.SABOTAGE))
-                    .isEqualTo(1);
-            assertThat(reloaded.getGameStats().getCountPerTarget(GameStats.OVERRULE))
-                    .containsEntry("Leadership", 1);
+            assertThat(reloaded.getGameStats().getTotalPlays("Divert Funding")).isEqualTo(1);
             assertThat(reloaded.getGameStats().getTotalPlays(GameStats.OVERRULE))
                     .isEqualTo(1);
+            assertThat(reloaded.getGameStats().getActionCardPlays())
+                    .extracting(GameStats.ActionCardPlay::isCanceled)
+                    .containsExactly(true, false);
             assertThat(reloaded.getGameStats().getActionCardPlays())
                     .extracting(GameStats.ActionCardPlay::getPlayerId)
                     .containsOnly(player.getStatsTrackedUserID());

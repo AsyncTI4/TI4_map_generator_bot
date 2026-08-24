@@ -42,6 +42,8 @@ import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Xytheris.XytherisAbilityHandler;
@@ -349,23 +351,19 @@ public class PlayerAreaGenerator {
         DrawingUtil.superDrawStringCenteredDefault(g2, comms, (int) card.getCenterX(), y + 75);
 
         // Fragments
-        int urf = player.getUrf();
-        int irf = player.getIrf();
         String urfImage = "pa_fragment_urf.png";
         String irfImage = "pa_fragment_irf.png";
         int xDelta = 0;
-        xDelta = drawFrags(y, x - xOffset, 0, urf, urfImage, xDelta);
+        xDelta = drawFrags(y, x - xOffset, 0, player, Constants.FRONTIER, urfImage, xDelta);
         xDelta += 25;
-        xDelta = drawFrags(y, x - xOffset, 0, irf, irfImage, xDelta);
+        xDelta = drawFrags(y, x - xOffset, 0, player, Constants.INDUSTRIAL, irfImage, xDelta);
 
         int xDelta2 = 0;
-        int hrf = player.getHrf();
-        int crf = player.getCrf();
         String hrfImage = "pa_fragment_hrf.png";
         String crfImage = "pa_fragment_crf.png";
-        xDelta2 = drawFrags(y + 73, x - xOffset, 0, hrf, hrfImage, xDelta2);
+        xDelta2 = drawFrags(y + 73, x - xOffset, 0, player, Constants.HAZARDOUS, hrfImage, xDelta2);
         xDelta2 += 25;
-        xDelta2 = drawFrags(y + 73, x - xOffset, 0, crf, crfImage, xDelta2);
+        xDelta2 = drawFrags(y + 73, x - xOffset, 0, player, Constants.CULTURAL, crfImage, xDelta2);
 
         xDelta = x + 600;
         // xDelta = x + 550 + Math.max(xDelta, xDelta2); DISABLE AUTO-SCALE BASED ON
@@ -402,6 +400,7 @@ public class PlayerAreaGenerator {
         xDeltaBottom = crimsonRebellionTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = galvanizeTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = theodisiTokenSupplies(player, xDeltaBottom, yPlayAreaSecondRow);
+        xDeltaBottom = dreamNexusTokenSupply(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = sleeperTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = creussWormholeTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = valefarZTokens(player, xDeltaBottom, yPlayAreaSecondRow);
@@ -792,7 +791,12 @@ public class PlayerAreaGenerator {
                     .flatMap(t -> t.getUnitHolders().values().stream())
                     .mapToInt(UnitHolder::getTotalGalvanizedCount)
                     .sum();
-            if (totGalvanized > maxGalvanizeTokens) {
+            boolean hasNonBastionGalvanizeSource = game.getRealPlayers().stream()
+                    .anyMatch(p -> p.hasTech("thardentiar")
+                            || p.hasTech("thponthousr")
+                            || p.ownsPromissoryNote("thpnponthous")
+                            || p.hasUnlockedBreakthrough("kryxosbt"));
+            if (!game.isFrankenGame() && !hasNonBastionGalvanizeSource && totGalvanized > maxGalvanizeTokens) {
                 String msg = player.getRepresentation()
                         + ", there are too many Galvanized units on the board. Please review and resolve manually.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -829,6 +833,18 @@ public class PlayerAreaGenerator {
                     yDelta);
         }
         return xDeltaFromRightSide;
+    }
+
+    private int dreamNexusTokenSupply(Player player, int xDeltaFromRightSide, int yDelta) {
+        if (!player.hasAbility("dream_nexus")) {
+            return xDeltaFromRightSide;
+        }
+        return displayTheodisiTokenSupply(
+                Mapper.getTokenID("beansnexus"),
+                3,
+                Math.max(0, 3 - DreamUnitsHandler.getNexusTokenCount(game)),
+                xDeltaFromRightSide,
+                yDelta);
     }
 
     private int displayTheodisiTokenSupply(
@@ -1144,12 +1160,24 @@ public class PlayerAreaGenerator {
         return null;
     }
 
-    private int drawFrags(int y, int x, int yDelta, int urf, String urfImage, int xDelta) {
-        for (int i = 0; i < urf; i++) {
-            drawPAImage(x + 475 + xDelta, y + yDelta - 25, urfImage);
-            xDelta += 15;
+    private int drawFrags(int y, int x, int yDelta, Player player, String trait, String fragmentImage, int xDelta) {
+        List<String> fragments = player.getFragments().stream()
+                .filter(fragmentId -> {
+                    ExploreModel fragment = Mapper.getExplore(fragmentId);
+                    return fragment != null && trait.equalsIgnoreCase(fragment.getType());
+                })
+                .toList();
+        for (int i = 0; i < fragments.size(); i++) {
+            if (fragments.get(i).startsWith("supermassive")) {
+                drawPAImageScaled(x + 457 + xDelta + i * 15, y + yDelta - 43, fragmentImage, 108, 110);
+            }
         }
-        return xDelta;
+        for (int i = 0; i < fragments.size(); i++) {
+            if (!fragments.get(i).startsWith("supermassive")) {
+                drawPAImage(x + 475 + xDelta + i * 15, y + yDelta - 25, fragmentImage);
+            }
+        }
+        return xDelta + fragments.size() * 15;
     }
 
     private int relicInfo(Player player, int x, int y) {
@@ -1449,11 +1477,7 @@ public class PlayerAreaGenerator {
                     continue;
                 }
 
-                Leader commander = otherPlayer.getLeaders().stream()
-                        .filter(leader -> Constants.COMMANDER.equals(leader.getType()))
-                        .filter(leader -> leader.getId().contains(otherPlayer.getFaction()))
-                        .findFirst()
-                        .orElse(null);
+                Leader commander = game.getRevenantLichCommander(lichPoolOwner, otherPlayer);
                 if (commander == null) {
                     continue;
                 }
@@ -2334,7 +2358,7 @@ public class PlayerAreaGenerator {
                 int distance1, distance2;
                 if (homePos.equals(tile1.getPosition())) {
                     distance1 = 0;
-                } else if (tile1.getPosition().contains("frac")) {
+                } else if (tile1.isFracture()) {
                     distance1 = "styx".equals(planet1) ? 9000 : 8000;
                 } else if (Arrays.asList("tl", "tr", "bl", "br").contains(tile1.getPosition())) {
                     distance1 = 7000;
@@ -2344,7 +2368,7 @@ public class PlayerAreaGenerator {
                 }
                 if (homePos.equals(tile2.getPosition())) {
                     distance2 = 0;
-                } else if (tile2.getPosition().contains("frac")) {
+                } else if (tile2.isFracture()) {
                     distance2 = "styx".equals(planet2) ? 9000 : 8000;
                 } else if (Arrays.asList("tl", "tr", "bl", "br").contains(tile2.getPosition())) {
                     distance2 = 7000;
@@ -2726,7 +2750,12 @@ public class PlayerAreaGenerator {
             g2.setStroke(stroke2);
 
             drawFactionIconImage(graphics, faction, x - 1, y + 108, 42, 42);
-            String synergies = model.getBackgroundResource(unl && !exh);
+            BreakthroughModel copiedDataBreach = "netrunnersbt".equals(bt)
+                    ? NetrunnersBreakthroughHandler.getCopiedDataBreachBreakthrough(game, player)
+                    : null;
+            String synergies = copiedDataBreach == null
+                    ? model.getBackgroundResource(unl && !exh)
+                    : copiedDataBreach.getBackgroundResource(unl && !exh);
             drawPAImage(x, y, synergies);
             if (model.getShrinkName()) {
                 graphics.setFont(Storage.getFont16());
@@ -2739,6 +2768,12 @@ public class PlayerAreaGenerator {
             if (!unl) textColor = Color.red;
             graphics.setColor(textColor);
             drawRectWithOverlay(graphics, x, y - 2, 44, 152, model);
+            if (copiedDataBreach != null) {
+                String copiedFaction = NetrunnersBreakthroughHandler.getDataBreachTargetFaction(game, player);
+                if (copiedFaction != null) {
+                    drawFactionIconImage(graphics, copiedFaction, x + 20, y + 2, 20, 20);
+                }
+            }
 
             if (player.getBreakthroughTGs(bt) > 0) {
                 BufferedImage tg = ImageHelper.readEmojiImageScaled(MiscEmojis.tg, 40);

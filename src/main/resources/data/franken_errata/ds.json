@@ -499,19 +499,10 @@
         "source": "ds"
     },
     {
-        "itemCategory": "BREAKTHROUGH",
-        "itemId": "mirvedabt",
-        "undraftable": true,
-        "source": "ds"
-    },
-    {
         "itemCategory": "TECH",
         "itemId": "dsmirvpds",
         "additionalComponents": [
             "ABILITY:privileged_citizenry"
-        ],
-        "optionalSwaps": [
-            "BREAKTHROUGH:mirvedabt"
         ],
         "source": "ds"
     },

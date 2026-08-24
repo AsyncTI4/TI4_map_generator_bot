@@ -3,8 +3,10 @@ package ti4.game;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import ti4.helpers.ActionCardHelper.ACStatus;
@@ -47,7 +49,7 @@ public class GameProperties {
     private @ExportableField boolean replacementMade;
 
     // Deck IDs
-    private @ExportableField String acDeckID = "action_cards_pok";
+    private @ExportableField String acDeckID = "action_cards_te";
     private @ExportableField String soDeckID = "secret_objectives_pok";
     private @ExportableField String stage1PublicDeckID = "public_stage_1_objectives_pok";
     private @ExportableField String stage2PublicDeckID = "public_stage_2_objectives_pok";
@@ -122,7 +124,7 @@ public class GameProperties {
 
     // Game modes / homebrew flags
     private @ExportableField boolean baseGameMode; // TODO: Make this obsolete
-    private @ExportableField boolean thundersEdge;
+    private @ExportableField boolean thundersEdge = true;
     private @ExportableField boolean twilightsFallMode;
     private @ExportableField boolean prophecyOfKings = true;
     private @ExportableField boolean ageOfExplorationMode;
@@ -137,6 +139,7 @@ public class GameProperties {
     private @ExportableField boolean culturalExchangeProgramMode;
     private @ExportableField boolean conventionsOfWarAbandonedMode;
     private @ExportableField boolean rapidMobilizationMode;
+    private @ExportableField boolean cosmicConvergenceMode;
     private @ExportableField boolean weirdWormholesMode;
     private @ExportableField boolean noFractureMode;
     private @ExportableField boolean callOfTheVoidMode;
@@ -154,6 +157,7 @@ public class GameProperties {
     private @ExportableField boolean hiddenAgendaMode;
     private @ExportableField boolean ordinianC1Mode;
     private @ExportableField boolean liberationC4Mode;
+    private @ExportableField boolean erwansGambitMode;
     private @ExportableField boolean allianceMode;
     private @ExportableField boolean communityMode;
     private @ExportableField boolean competitiveTIGLGame;
@@ -203,6 +207,7 @@ public class GameProperties {
 
     private Map<String, Integer> discardActionCards = new LinkedHashMap<>();
     private Map<String, ACStatus> discardACStatus = new HashMap<>();
+    private Set<String> playedActionCards = new LinkedHashSet<>();
     private GameStats gameStats = new GameStats();
 
     // Stored Values

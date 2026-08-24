@@ -247,6 +247,16 @@ public final class TIGLHelper {
                 .toList();
     }
 
+    public static List<String> filterStandardTiglRankOptionsAtOrBelow(User user, List<String> options) {
+        int maxIndex = getUsersHighestTIGLRank(user, false).getIndex();
+        return options.stream()
+                .filter(opt -> {
+                    TIGLRank rank = TIGLRank.fromString(opt);
+                    return rank != null && rank.getIndex() >= 0 && rank.getIndex() <= maxIndex;
+                })
+                .toList();
+    }
+
     private static Map<Long, TIGLRank> getTIGLRoleIdToRankMap() {
         Map<Long, TIGLRank> roleIdToRank = new HashMap<>();
         for (TIGLRank rank : getAllTIGLRanks()) {

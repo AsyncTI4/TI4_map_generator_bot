@@ -34,6 +34,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -456,7 +457,7 @@ class AutoCompleteProvider {
             }
             case Constants.SCENARIO -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                var tokens = List.of("ordinian (codex 1)", "liberation (codex 4)");
+                var tokens = List.of("ordinian (codex 1)", "liberation (codex 4)", "erwan's gambit (homebrew)");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
@@ -1343,8 +1344,11 @@ class AutoCompleteProvider {
             case Constants.PICK_AC_FROM_DISCARD, Constants.SHUFFLE_AC_BACK_INTO_DECK -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Game game = GameManager.getManagedGame(gameName).getGame();
+                Player viewer = game.getPlayer(event.getUser().getId());
+                boolean hideUnplayed = ActionCardHelper.hidesUnplayedDiscards(game, viewer);
                 Map<String, Integer> discardActionCardIDs = game.getDiscardActionCards();
                 List<Command.Choice> options = discardActionCardIDs.entrySet().stream()
+                        .filter(entry -> ActionCardHelper.isDiscardVisible(game, hideUnplayed, entry.getKey()))
                         .map(entry -> Map.entry(Mapper.getActionCard(entry.getKey()), entry.getValue()))
                         .filter(entry -> entry.getKey().getName().toLowerCase().contains(enteredValue))
                         .limit(25)

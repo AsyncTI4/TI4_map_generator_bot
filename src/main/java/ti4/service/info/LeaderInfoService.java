@@ -122,11 +122,10 @@ public class LeaderInfoService {
                     continue;
                 }
 
-                otherPlayer.getLeaders().stream()
-                        .filter(leader -> Constants.COMMANDER.equals(leader.getType()))
-                        .filter(leader -> leader.getId().contains(otherPlayer.getFaction()))
-                        .findFirst()
-                        .ifPresent(leader -> lichEmbeds.add(leader.getLeaderEmbed(game)));
+                Leader commander = game.getRevenantLichCommander(lichPoolOwner, otherPlayer);
+                if (commander != null) {
+                    lichEmbeds.add(game.getUnlockedLeaderCopy(commander).getLeaderEmbed(game));
+                }
             }
         }
         if (!lichEmbeds.isEmpty()) {

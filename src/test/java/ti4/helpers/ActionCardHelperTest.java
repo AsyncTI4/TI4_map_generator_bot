@@ -24,15 +24,15 @@ class ActionCardHelperTest {
     }
 
     @Test
-    void shouldNotDuplicateSabotageAndOverruleTargetTracking() {
+    void shouldRecordSabotageAndOverrulePlaysLikeAnyOtherCard() {
         var game = new Game();
         var player = new Player("player1", "", game);
 
         ActionCardHelper.recordTrackedActionCardPlay(game, player, GameStats.SABOTAGE);
         ActionCardHelper.recordTrackedActionCardPlay(game, player, GameStats.OVERRULE);
 
-        assertThat(game.getGameStats().getTotalPlays(GameStats.SABOTAGE)).isZero();
-        assertThat(game.getGameStats().getTotalPlays(GameStats.OVERRULE)).isZero();
-        assertThat(game.getGameStats().getActionCardPlays()).isEmpty();
+        assertThat(game.getGameStats().getTotalPlays(GameStats.SABOTAGE)).isEqualTo(1);
+        assertThat(game.getGameStats().getTotalPlays(GameStats.OVERRULE)).isEqualTo(1);
+        assertThat(game.getGameStats().getActionCardPlays()).hasSize(2);
     }
 }

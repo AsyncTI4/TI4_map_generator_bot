@@ -18,9 +18,11 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DreamButtonHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kairn.KairnLeadershandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.arvaxi.ArvaxiAbilityHandler;
@@ -97,10 +99,17 @@ public class StartPhaseService {
                 LoreService.showPhaseLore(game, "agenda"); // before setPhaseOfGame: END lore reads the old phase
                 game.setPhaseOfGame("agenda");
                 GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "agenda"));
-                Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
-                List<Button> buttons = List.of(flipAgenda);
-                MessageHelper.sendMessageToChannelWithButtons(
-                        event.getMessageChannel(), "Please flip agenda now", buttons);
+                RelitigateLLButtonHandler.clearAgendaPhaseState(game);
+                if (RelitigateLLButtonHandler.offerPreassignedRelitigate(event, game, event.getMessageChannel())) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(),
+                            "Agenda reveal is waiting for a preset _Relitigate_ to resolve.");
+                } else {
+                    Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
+                    List<Button> buttons = List.of(flipAgenda);
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            event.getMessageChannel(), "Please flip the agenda.", buttons);
+                }
             }
             case "publicObj" ->
                 ListPlayerInfoService.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
@@ -288,6 +297,19 @@ public class StartPhaseService {
             }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round " + round);
+        for (Player player : game.getRealPlayers()) {
+            if (!player.hasAbility("allure_of_darkness")) {
+                continue;
+            }
+            List<Button> buttons = RevenantLeadersHandler.offerLichTokenChoices(player, game);
+            if (!buttons.isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentation()
+                                + ", due to **Allure of Darkness**, please choose the player on whom to place the _Lich_ token.",
+                        buttons);
+            }
+        }
         if (game.isShowBanners()) {
             BannerGenerator.drawPhaseBanner("strategy", round, game.getActionsChannel());
         }
@@ -917,8 +939,9 @@ public class StartPhaseService {
         for (Player player : game.getRealPlayers()) {
             sendStatusReminders(game, player);
         }
+        MyrrAbilitiesHandler.offerFactoryLeaseProduction(game);
         if (game.getRealPlayers().stream().anyMatch(player -> player.hasAbility("the_waking"))) {
-            DreamButtonHandler.offerTheWakingButtons(game);
+            DreamAbilitiesHandler.offerTheWakingButtons(game);
         }
 
         Button yssarilPolicy = null;
@@ -1281,12 +1304,6 @@ public class StartPhaseService {
                             p2.getRepresentationUnfogged() + ", you have the opportunity to use _Imperial Arbiter_.",
                             buttons);
                     hold.append((hold.isEmpty()) ? "" : " or ").append("_Imperial Arbiter_");
-                }
-                if (p2.hasAbility("allure_of_darkness")) {
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            p2.getCardsInfoThread(),
-                            p2.getRepresentation() + " please choose the player to place the _Lich_ token on:",
-                            RevenantLeadersHandler.offerLichTokenChoices(p2, game));
                 }
             }
         }
