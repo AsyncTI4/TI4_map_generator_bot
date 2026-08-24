@@ -15,7 +15,7 @@
         "color": "",
         "playArea": false,
         "source": "beans",
-        "text": "After 1 of your non-fighter ships in the active system is destroyed during combat against a player other than the Crystellum player: Place 1 fighter from your reinforcements in that system. Then, return this card to the Crystellum player."
+        "text": "After 1 of your non-fighter ships in the active system is destroyed during combat against a player other than the Crystellum player: Place a number of fighters equal to the cost of the destroyed ship in that unit's system. Then, return this card to the Crystellum player."
     },
     {
         "alias": "bepnashen",

@@ -23,37 +23,26 @@
         "text": "During your tactical actions, apply +1 to the move value of any ship that starts its movement in a system that contains 1 or more of your nexus tokens. You may treat nebulas as adjacent to each other for the purposes of movement."
     },
     {
-        "alias": "becrystda",
-        "name": "Defensive Architecture",
-        "types": [
-            "WARFARE"
-        ],
-        "requirements": "RR",
-        "faction": "crystellum",
-        "source": "beans",
-        "text": "After 1 or more hits are produced against your units during space combat, you may exhaust this card to cancel 1 of those hits. If you do, produce 1 hit and assign it to 1 of your opponent's ships."
-    },
-    {
         "alias": "becrystrd",
         "name": "Resonance Drive",
         "types": [
             "PROPULSION"
         ],
-        "requirements": "B",
+        "requirements": "BB",
         "faction": "crystellum",
         "source": "beans",
-        "text": "During movement, apply +1 to the move value of your ships that are transporting a number of units equal to their capacity value."
+        "text": "During movement, you may destroy 1 of your non-fighter ships on the board to give a number of ships equal to half the cost of the destroyed ship +1 move until the end of this tactical action."
     },
     {
-        "alias": "becrystmb",
-        "name": "Molecular Binding",
+        "alias": "becrysta",
+        "name": "Atomization",
         "types": [
             "CYBERNETIC"
         ],
-        "requirements": "Y",
+        "requirements": "YY",
         "faction": "crystellum",
         "source": "beans",
-        "text": "At the start of your turn, you may replace 1 of your fighters on the game board with 1 destroyer from your reinforcements, or 2 infantry on any planet you control with 1 mech from your reinforcements."
+        "text": "At the start of your turn, you may exhaust this card and remove 1 of your non-fighter ships from the board with a cost of no more than 4 to capture that many fighters from the supply."
     },
     {
         "alias": "beasheninf",
