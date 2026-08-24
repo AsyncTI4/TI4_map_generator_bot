@@ -31,6 +31,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMora
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Aeterna.AeternaLeadersHandler;
@@ -1465,6 +1466,14 @@ public class StartCombatService {
                 && ArcanumPrimordialTechHandler.hasFourTechsMatchingPrimordial(p2, "tharcanumpmr")) {
             buttons.addAll(
                     ArcanumPrimordialTechHandler.getDisintegrateCombatButtons(p2, p1, tile, tile.getSpaceUnitHolder()));
+        }
+
+        // Pieces of a Whole
+        if (p1.hasAbility("pieces_of_a_whole")) {
+            CrystellumAbilityHandler.addPiecesOfAWholeButton(buttons, p1, tile);
+        }
+        if (p2.hasAbility("pieces_of_a_whole")) {
+            CrystellumAbilityHandler.addPiecesOfAWholeButton(buttons, p2, tile);
         }
 
         return buttons;

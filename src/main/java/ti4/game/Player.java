@@ -2699,6 +2699,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             removeOwnedUnitByID("fighter2");
             addOwnedUnitByID("mirveda_fighter3");
         }
+        if ("ff2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("crystellumbt")) {
+            removeOwnedUnitByID("fighter2");
+            addOwnedUnitByID("crystellum_fighter3");
+        }
         if ("dn2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("kortalibt")) {
             addOwnedUnitByID("tribune3");
             removeOwnedUnitByID("dreadnought2");

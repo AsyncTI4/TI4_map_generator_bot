@@ -251,7 +251,12 @@ public final class BreakthroughCommandHelper {
                         player.getCorrectChannel(),
                         player.getRepresentation() + " Made your home system into a nebula.");
             }
-
+            if ("crystellumbt".equalsIgnoreCase(bt.getID())) {
+                if (player.hasTech("ff2")) {
+                    player.addOwnedUnitByID("crystellum_fighter3");
+                    player.removeOwnedUnitByID("fighter2");
+                }
+            }
             if ("cabalbt".equalsIgnoreCase(bt.getID())) {
                 if (btIDs.size() == 1) {
                     // If there are other BTs to potentially roll, don't automatically spawn
