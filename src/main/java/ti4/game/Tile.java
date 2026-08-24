@@ -426,12 +426,12 @@ public class Tile {
         return tilePath;
     }
 
-    public List<Planet> getSpaceStations() {
+    public List<Planet> getSpaceStations(Game game) {
         List<Planet> planets = new ArrayList<>();
         for (UnitHolder uH : unitHolders.values()) {
             if (uH instanceof Planet p
                     && uH.getTokenList().stream().noneMatch(token -> token.contains(Constants.WORLD_DESTROYED))) {
-                if (!p.isSpaceStation()) continue;
+                if (!p.isSpaceStation(game)) continue;
 
                 planets.add(p);
             }
