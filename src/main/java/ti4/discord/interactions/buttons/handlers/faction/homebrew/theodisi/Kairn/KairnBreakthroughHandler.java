@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kair
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -111,11 +112,12 @@ public class KairnBreakthroughHandler {
         String planetName = payload.length == 3 ? payload[2] : payload[1];
         Planet planet = game.getUnitHolderFromPlanet(planetName);
         Tile tile = game.getTileFromPlanet(planetName);
+        Set<String> planetTraits = planet == null ? Set.of() : planet.getPlanetTypes();
         if (planet == null
                 || tile == null
                 || !player.getPlanetsAllianceMode().contains(planetName)
-                || !planet.getPlanetTypes().contains(requiredTrait)
-                || (selectedTrait != null && !planet.getPlanetTypes().contains(selectedTrait))) {
+                || !planetTraits.contains(requiredTrait)
+                || (selectedTrait != null && !planetTraits.contains(selectedTrait))) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "Could not resolve _Relic Trading Hub_ because that planet is unavailable.");
