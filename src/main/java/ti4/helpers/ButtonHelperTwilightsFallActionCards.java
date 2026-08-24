@@ -952,7 +952,7 @@ public final class ButtonHelperTwilightsFallActionCards {
                         && FoWHelper.playerHasActualShipsInSystem(player, tile)
                         && !tile.getTileModel().hasWormhole()
                         && !tile.isFracture()
-                        && tile.getSpaceStations().isEmpty()) {
+                        && tile.getSpaceStations(game).isEmpty()) {
                     buttons.add(
                             Buttons.gray("starFlareTKStep2_" + tile.getPosition(), tile.getRepresentationForButtons()));
                 }
