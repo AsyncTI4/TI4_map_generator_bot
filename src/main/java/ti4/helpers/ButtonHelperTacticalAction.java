@@ -564,7 +564,7 @@ public final class ButtonHelperTacticalAction {
     @ButtonHandler("useSafeHarbor")
     public static void useSafeHarbor(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-
+        ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(), player.getRepresentationNoPing() + " is using their safe harbor ability");
 
