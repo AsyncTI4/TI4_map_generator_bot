@@ -18,8 +18,13 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauDoctrineHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.*;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPrimordialTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Arcanum.ArcanumUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Kryxos.KryxosPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.Oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
@@ -552,6 +557,35 @@ public class PlayerTechService {
                 }
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
+            case "dsolrar", "tf-dsolrar" -> {
+                ButtonHelper.deleteTheOneButton(event);
+                String message = player.getRepresentationUnfogged()
+                        + " is using false flag operations to exhaust a planet and ready a planet.";
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                message = player.getRepresentationUnfogged() + ", please choose the planet you wish to ready.";
+                List<Button> buttons = new ArrayList<>();
+                for (String planet : player.getExhaustedPlanets()) {
+                    if (game.getTileFromPlanet(planet) == player.getHomeSystemTile()
+                            || "mrte".equalsIgnoreCase(planet)) {
+                        continue;
+                    }
+                    buttons.add(Buttons.gray(
+                            "khraskHeroStep4Ready_" + player.getFaction() + "_" + planet,
+                            Helper.getPlanetRepresentation(planet, game)));
+                }
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+                buttons = new ArrayList<>();
+                for (String planet : player.getReadiedPlanets()) {
+                    buttons.add(Buttons.gray(
+                            "reparationsStep3_" + player.getFaction() + "_" + planet,
+                            Helper.getPlanetRepresentation(planet, game)));
+                }
+                ButtonHelper.deleteMessage(event);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged() + ", please choose the planet you wish to exhaust.",
+                        buttons);
+            }
             case "dskolug" -> {
                 deleteIfButtonEvent(event);
                 String message = player.getRepresentationUnfogged() + " stalled using _Applied Biothermics_.";
@@ -560,7 +594,7 @@ public class PlayerTechService {
             }
             case "vtx", "absol_vtx" -> { // Vortex
                 deleteIfButtonEvent(event);
-                List<Button> buttons = ButtonHelperFactionSpecific.getUnitButtonsForVortex(player, game, event);
+                List<Button> buttons = ButtonHelperFactionSpecific.getUnitButtonsForVortex(player, game);
                 String message = player.getRepresentationUnfogged() + ", please choose which unit you wish to capture.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);

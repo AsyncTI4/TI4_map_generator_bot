@@ -105,6 +105,11 @@ public class ComponentActionHelper {
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
                     continue;
                 }
+                if ("vtx".equals(tech)
+                        && ButtonHelperFactionSpecific.getUnitButtonsForVortex(p1, game)
+                                .isEmpty()) {
+                    continue;
+                }
                 if ("tf-fabrication".equalsIgnoreCase(tech)
                         || "tf-orbitaldrop".equalsIgnoreCase(tech)
                         || "tf-mantlecracking".equalsIgnoreCase(tech)

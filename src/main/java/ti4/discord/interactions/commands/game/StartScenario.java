@@ -378,6 +378,7 @@ public class StartScenario extends GameStateSubcommand {
                 players.add(player);
             }
         }
+        game.setNoFractureMode(true);
         for (String faction : factions) {
             if (players.isEmpty()) {
                 MessageHelper.sendMessageToEventChannel(

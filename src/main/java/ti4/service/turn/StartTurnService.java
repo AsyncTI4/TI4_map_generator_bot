@@ -792,6 +792,20 @@ public class StartTurnService {
                         "Exhaust Temporal Displacement",
                         TechEmojis.CyberneticTech));
             }
+            if (player.hasTech("dsolrar")
+                    && !player.getExhaustedTechs().contains("dsolrar")
+                    && !game.isTwilightsFallMode()) {
+                startButtons.add(Buttons.gray(
+                        factionChecker + "exhaustTech_dsolrar",
+                        "Exhaust False Flag Operations",
+                        FactionEmojis.olradin));
+            }
+            if (player.hasTech("tf-dsolrar") && !player.getExhaustedTechs().contains("tf-dsolrar")) {
+                startButtons.add(Buttons.gray(
+                        factionChecker + "exhaustTech_tf-dsolrar",
+                        "Exhaust False Flag Operations",
+                        FactionEmojis.olradin));
+            }
             if (player.hasUnexhaustedLeader("kolleccagent")) {
                 startButtons.add(Buttons.gray(
                         factionChecker + "exhaustAgent_kolleccagent", "Use Kollecc Agent", FactionEmojis.kollecc));

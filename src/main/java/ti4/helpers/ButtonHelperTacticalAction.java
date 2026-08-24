@@ -224,7 +224,8 @@ public final class ButtonHelperTacticalAction {
             }
             if (!game.isAbsolMode()
                     && player.getRelics().contains("emphidia")
-                    && !player.getExhaustedRelics().contains("emphidia")) {
+                    && !player.getExhaustedRelics().contains("emphidia")
+                    && !ButtonHelper.getButtonsToExploreAllPlanets(player, game).isEmpty()) {
                 String message = player.getRepresentation()
                         + ", you may use the button to explore a planet using _The Crown of Emphidia_.";
                 List<Button> systemButtons2 = new ArrayList<>();
